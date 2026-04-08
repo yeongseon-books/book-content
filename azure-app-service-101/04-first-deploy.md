@@ -108,7 +108,7 @@ pip install -r requirements.txt
 
 ```bash
 export FLASK_APP=src.app:app
-export FLASK_ENV=development
+export FLASK_DEBUG=1
 flask run --port 8000
 ```
 
@@ -242,7 +242,7 @@ az webapp config set \
 az webapp up \
     --resource-group $RG \
     --name $APP_NAME \
-    --runtime "PYTHON:3.11"
+    --runtime "PYTHON|3.11"
 ```
 
 이 명령은:
