@@ -483,7 +483,7 @@ AppTraces
 ## 참고 자료
 
 - [Enable diagnostics logging (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/troubleshoot-diagnostic-logs)
-- [Application Insights for Python (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/app/opencensus-python)
+- [Azure Monitor OpenTelemetry for Python (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=python)
 - [KQL Quick Reference](https://learn.microsoft.com/azure/data-explorer/kql-quick-reference)
 
 ---

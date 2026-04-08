@@ -256,7 +256,7 @@ az webapp identity assign \
     --name $APP_NAME
 ```
 
-### Step 4: Key Vault 접근 권한 부여
+### Step 4: Key Vault 접근 권한 부여 (RBAC)
 
 ```bash
 PRINCIPAL_ID=$(az webapp identity show \
@@ -265,10 +265,15 @@ PRINCIPAL_ID=$(az webapp identity show \
     --query principalId \
     --output tsv)
 
-az keyvault set-policy \
+KEYVAULT_ID=$(az keyvault show \
     --name $KEYVAULT_NAME \
-    --object-id $PRINCIPAL_ID \
-    --secret-permissions get list
+    --query id \
+    --output tsv)
+
+az role assignment create \
+    --role "Key Vault Secrets User" \
+    --assignee $PRINCIPAL_ID \
+    --scope $KEYVAULT_ID
 ```
 
 ### Step 5: Key Vault Reference 설정
