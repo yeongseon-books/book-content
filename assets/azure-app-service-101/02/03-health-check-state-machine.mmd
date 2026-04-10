@@ -1,0 +1,23 @@
+stateDiagram-v2
+    [*] --> Healthy
+    Healthy --> Unhealthy: Repeated probe failures
+    note right of Healthy
+      Included in routing pool
+      Receives normal traffic
+    end note
+
+    Unhealthy --> Recovering: Probe returns 200-299 again
+    Unhealthy --> Replaced: Remains unhealthy for long period
+    note right of Unhealthy
+      Removed from load balancer pool
+      New requests stop flowing here
+    end note
+
+    Recovering --> Healthy: Consecutive successful probes
+    Recovering --> Unhealthy: Probe fails again
+    note right of Recovering
+      Gradual trust restored
+      Eligible to receive traffic again
+    end note
+
+    Replaced --> [*]

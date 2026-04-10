@@ -1,0 +1,6 @@
+flowchart LR
+    A[로컬 개발\nFlask 앱 작성] --> B[Gunicorn 로컬 테스트\nsrc.app:app]
+    B --> C[az webapp up 실행\n코드 업로드]
+    C --> D[Oryx 빌드\nrequirements.txt 설치]
+    D --> E[App Service 기동\nStartup Command 실행]
+    E --> F[앱 라이브\nazurewebsites.net 응답]

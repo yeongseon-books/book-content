@@ -1,0 +1,29 @@
+flowchart TD
+    A[성능 문제 감지] --> B{주요 병목은 무엇인가?}
+    B -->|메모리 부족 / OOM| C[Scale Up 우선]
+    B -->|동시 요청 증가 / 처리량 부족| D[Scale Out 우선]
+    B -->|둘 다| E[먼저 Scale Up<br/>인스턴스당 여유 확보]
+
+    C --> F{앱이 stateless한가?}
+    D --> F
+    E --> F
+
+    F -->|아니오| G[세션 / 파일 / 캐시 구조 정리]
+    F -->|예| H{의존성이 버틸 수 있는가?}
+
+    H -->|아니오| I[DB / Redis / API 한계 먼저 점검]
+    H -->|예| J[Scale Out + Autoscale 적용]
+
+    C --> K[SKU 업그레이드]
+    E --> J
+    K --> H
+
+    style A fill:#e0f2fe,stroke:#0284c7,color:#111
+    style B fill:#fef3c7,stroke:#d97706,color:#111
+    style C fill:#dbeafe,stroke:#2563eb,color:#111
+    style D fill:#dcfce7,stroke:#16a34a,color:#111
+    style E fill:#fde68a,stroke:#ca8a04,color:#111
+    style G fill:#fee2e2,stroke:#dc2626,color:#111
+    style I fill:#fee2e2,stroke:#dc2626,color:#111
+    style J fill:#dcfce7,stroke:#16a34a,color:#111
+    style K fill:#dbeafe,stroke:#2563eb,color:#111

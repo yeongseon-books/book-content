@@ -1,0 +1,10 @@
+flowchart LR
+    A[Azure Portal 또는 Azure CLI] --> B[App Service Configuration]
+    B --> C[App Settings / Connection Strings]
+    C --> D[플랫폼이 환경 변수로 주입]
+    D --> E[웹 앱 프로세스 시작]
+    E --> F[Flask / Node.js / .NET 앱]
+    F --> G[os.environ / process.env / IConfiguration]
+
+    H[설정 변경] -.-> I[앱 재시작 가능]
+    B -.-> H

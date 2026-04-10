@@ -1,0 +1,6 @@
+flowchart LR
+    A[클라이언트 요청 진입] --> B[미들웨어가 Correlation ID 확인 또는 생성]
+    B --> C[요청 처리 중 모든 로그에 correlationId 태그 추가]
+    C --> D[응답 헤더 X-Correlation-ID 반환]
+    D --> E[사용자/운영자가 ID 확보]
+    E --> F[KQL에서 correlationId로 requests / traces / dependencies 조회]

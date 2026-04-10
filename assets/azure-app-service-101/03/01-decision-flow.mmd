@@ -1,0 +1,36 @@
+flowchart TD
+    A[첫 App Service 생성] --> B{앱이 Windows 전용 의존성을 갖는가?}
+    B -->|예| C[Windows 선택]
+    B -->|아니오| D[Linux 선택]
+
+    C --> E{이미지/OS 패키지를 직접 통제해야 하는가?}
+    D --> E
+
+    E -->|예| F[Container 배포]
+    E -->|아니오| G[Code 배포]
+
+    F --> H{학습/실험 환경인가?}
+    G --> H
+
+    H -->|예| I[Free 또는 Shared]
+    H -->|아니오| J{고객 트래픽 또는 운영 안정성이 중요한가?}
+
+    J -->|아니오| K[Basic]
+    J -->|예| L{배포 슬롯/자동 확장/운영 안전장치가 필요한가?}
+
+    L -->|예| M[Standard]
+    L -->|아니오| K
+
+    M --> N{고급 네트워킹, 큰 메모리, 더 강한 격리가 필요한가?}
+    N -->|예| O[Premium 검토]
+    N -->|아니오| P[Standard 유지]
+
+    style C fill:#e8f0fe,stroke:#4c6ef5,color:#111
+    style D fill:#e8f0fe,stroke:#4c6ef5,color:#111
+    style F fill:#fff3bf,stroke:#f59f00,color:#111
+    style G fill:#fff3bf,stroke:#f59f00,color:#111
+    style I fill:#f1f3f5,stroke:#868e96,color:#111
+    style K fill:#d3f9d8,stroke:#2b8a3e,color:#111
+    style M fill:#c5f6fa,stroke:#0b7285,color:#111
+    style O fill:#ffd8a8,stroke:#d9480f,color:#111
+    style P fill:#c5f6fa,stroke:#0b7285,color:#111

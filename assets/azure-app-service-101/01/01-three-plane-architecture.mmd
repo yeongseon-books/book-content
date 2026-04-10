@@ -1,0 +1,32 @@
+flowchart TB
+    subgraph MGMT[Management Plane]
+        Portal[Azure Portal]
+        CLI[Azure CLI]
+        ARM[ARM / Bicep]
+    end
+
+    subgraph RUNTIME[Runtime Plane]
+        FE[Frontend]
+        Worker[Worker Instances]
+        App[App Process]
+    end
+
+    subgraph SCM[SCM Plane]
+        Kudu[Kudu / SCM Site]
+        Zip[zipdeploy]
+        Logs[Logs / Diagnostics]
+    end
+
+    Portal -->|configure| FE
+    CLI -->|configure| Worker
+    ARM -->|declare desired state| Worker
+
+    FE --> Worker
+    Worker --> App
+
+    Kudu -->|deploy| Worker
+    Kudu --> Zip
+    Kudu --> Logs
+
+    MGMT -. settings changes may trigger restart .-> RUNTIME
+    SCM -. separate endpoint / tooling .-> RUNTIME

@@ -1,0 +1,22 @@
+flowchart TB
+    subgraph INSTANCE[Worker Instance]
+        subgraph EPHEMERAL[Ephemeral Storage]
+            Temp[temporary local storage]
+            Cache[temporary cache]
+            Upload[upload staging]
+        end
+
+        subgraph PERSISTENT[Persistent Storage]
+            WWW["/home/site/wwwroot"]
+            LOG["/home/LogFiles"]
+            DATA["/home/data"]
+        end
+    end
+
+    Restart[Instance restart / recycle]
+    Scale[Multi-instance scale out]
+
+    Restart -->|clears| EPHEMERAL
+    Restart -->|preserves| PERSISTENT
+    Scale -->|not shared| EPHEMERAL
+    Scale -->|shared across instances| PERSISTENT

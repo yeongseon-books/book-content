@@ -1,0 +1,18 @@
+flowchart TB
+    subgraph Before[스왑 전]
+        P1[Production Slot\n코드 v1]
+        P2[APP_ENV=production\nDATABASE_URL=prod-db\nLOG_LEVEL=INFO]
+        S1[Staging Slot\n코드 v2]
+        S2[APP_ENV=staging\nDATABASE_URL=staging-db\nLOG_LEVEL=INFO]
+    end
+
+    A[Slot Swap 실행] --> B{무엇이 이동할까?}
+    Before --> A
+    B --> C[코드와 스왑 대상 설정 이동]
+    B --> D[Slot Setting 체크된 값은 각 슬롯에 유지]
+
+    C --> E[Production Slot\n코드 v2]
+    D --> F[APP_ENV=production 유지\nDATABASE_URL=prod-db 유지]
+
+    C --> G[Staging Slot\n코드 v1]
+    D --> H[APP_ENV=staging 유지\nDATABASE_URL=staging-db 유지]

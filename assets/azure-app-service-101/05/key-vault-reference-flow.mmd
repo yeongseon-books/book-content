@@ -1,0 +1,8 @@
+flowchart LR
+    A[App Service] --> B[Managed Identity]
+    B --> C[Azure RBAC / Key Vault Secrets User]
+    C --> D[Azure Key Vault]
+    D --> E[Secret 값 조회]
+    E --> F[Key Vault Reference 해석]
+    F --> G[환경 변수로 앱에 전달]
+    G --> H[애플리케이션 코드]

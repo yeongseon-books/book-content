@@ -11,7 +11,7 @@ Azure App Service 입문자를 위한 실전 가이드 시리즈.
 | # | 제목 | 파일 | 예상 분량 |
 |---|---|---|---|
 | 1 | Azure App Service란? - 플랫폼 아키텍처 이해하기 | [01-what-is-app-service.md](./azure-app-service-101/01-what-is-app-service.md) | 8분 |
-| 2 | Request Lifecycle: 요청이 앱에 도달하기까지 | [02-request-lifecycle.md](./azure-app-service-101/02-request-lifecycle.md) | 7분 |
+| 2 | Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까 | [02-request-lifecycle.md](./azure-app-service-101/02-request-lifecycle.md) | 7분 |
 | 3 | Hosting Models: 어떤 플랜을 선택해야 할까? | [03-hosting-models.md](./azure-app-service-101/03-hosting-models.md) | 6분 |
 | 4 | 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask) | [04-first-deploy.md](./azure-app-service-101/04-first-deploy.md) | 10분 |
 | 5 | Configuration 마스터하기: App Settings & 환경변수 | [05-configuration.md](./azure-app-service-101/05-configuration.md) | 7분 |
