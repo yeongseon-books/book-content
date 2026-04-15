@@ -1,0 +1,20 @@
+flowchart TB
+    subgraph L[Local Development]
+        L1[.env file]
+        L2[Fast execution and dev convenience]
+        L3[Must .gitignore]
+    end
+
+    subgraph S[Staging]
+        S1[App Settings]
+        S2[Runtime validation similar to production]
+        S3[Feature flags and non-sensitive settings]
+    end
+
+    subgraph P[Production]
+        P1[Key Vault + App Settings]
+        P2[Centralized secret management]
+        P3[Managed Identity and RBAC]
+    end
+
+    L --> S --> P

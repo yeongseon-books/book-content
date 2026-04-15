@@ -1,0 +1,5 @@
+flowchart LR
+    A[Level 0\nNo logs\nGuessing during incidents] --> B[Level 1\nBasic stdout\nError messages visible]
+    B --> C[Level 2\nStructured JSON\nSearchable by field]
+    C --> D[Level 3\nCorrelation IDs\nPer-request tracing]
+    D --> E[Level 4\nApp Insights + KQL\nTrends, bottlenecks, alerts, RCA]

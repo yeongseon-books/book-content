@@ -1,0 +1,10 @@
+flowchart LR
+    A[Azure Portal or Azure CLI] --> B[App Service Configuration]
+    B --> C[App Settings / Connection Strings]
+    C --> D[Platform injects as environment variables]
+    D --> E[Web app process starts]
+    E --> F[Flask / Node.js / .NET app]
+    F --> G[os.environ / process.env / IConfiguration]
+
+    H[Configuration change] -.-> I[May restart app]
+    B -.-> H

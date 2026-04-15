@@ -1,0 +1,32 @@
+flowchart TB
+    subgraph T1[Feature Unlocks by Tier]
+        direction LR
+        F[Free / Shared\nPractice·Learning] --> B[Basic\nDedicated Resources]
+        B --> S[Standard\nProduction Features]
+        S --> P[Premium\nScale Performance]
+    end
+
+    FD1[Shared Compute\nCPU quota-based]
+    BD1[Dedicated Compute\nCustom Domains·TLS]
+    SD1[Deployment Slots\nAutoscale\nBackup]
+    PD1[Larger CPU/Memory\nAdvanced Networking\nGreater Scale Capacity]
+
+    F --> FD1
+    B --> BD1
+    S --> SD1
+    P --> PD1
+
+    U1[When to use?\n'Just learning']
+    U2[When to use?\n'Need dedicated instance']
+    U3[When to use?\n'Minimize incidents']
+    U4[When to use?\n'High performance/security']
+
+    F -.-> U1
+    B -.-> U2
+    S -.-> U3
+    P -.-> U4
+
+    style F fill:#f1f3f5,stroke:#868e96,color:#111
+    style B fill:#d3f9d8,stroke:#2b8a3e,color:#111
+    style S fill:#c5f6fa,stroke:#0b7285,color:#111
+    style P fill:#ffd8a8,stroke:#d9480f,color:#111

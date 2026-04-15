@@ -1,0 +1,8 @@
+flowchart LR
+    A[App Service] --> B[Managed Identity]
+    B --> C[Azure RBAC / Key Vault Secrets User]
+    C --> D[Azure Key Vault]
+    D --> E[Retrieve secret value]
+    E --> F[Resolve Key Vault Reference]
+    F --> G[Deliver to app as environment variable]
+    G --> H[Application code]

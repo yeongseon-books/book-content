@@ -1,0 +1,13 @@
+flowchart LR
+    Client[클라이언트/브라우저]
+    FE[App Service Frontend]
+    Worker[정상 Worker 인스턴스]
+    App[애플리케이션 프로세스]
+    Resp[HTTP 응답]
+
+    Client -->|HTTPS 요청| FE
+    FE -->|TLS 종료\n호스트 검증\n라우팅| Worker
+    Worker -->|요청 전달| App
+    App -->|비즈니스 로직| Worker
+    Worker --> FE
+    FE --> Resp

@@ -1,0 +1,32 @@
+flowchart TB
+    subgraph MGMT[관리 플레인]
+        Portal[Azure Portal]
+        CLI[Azure CLI]
+        ARM[ARM / Bicep]
+    end
+
+    subgraph RUNTIME[런타임 플레인]
+        FE[Frontend]
+        Worker[Worker Instances]
+        App[App Process]
+    end
+
+    subgraph SCM[SCM 플레인]
+        Kudu[Kudu / SCM Site]
+        Zip[zipdeploy]
+        Logs[Logs / Diagnostics]
+    end
+
+    Portal -->|설정| FE
+    CLI -->|설정| Worker
+    ARM -->|원하는 상태 선언| Worker
+
+    FE --> Worker
+    Worker --> App
+
+    Kudu -->|배포| Worker
+    Kudu --> Zip
+    Kudu --> Logs
+
+    MGMT -. 설정 변경 시 재시작 가능 .-> RUNTIME
+    SCM -. 별도 엔드포인트/도구 .-> RUNTIME

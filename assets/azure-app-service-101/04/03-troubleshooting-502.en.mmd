@@ -1,0 +1,8 @@
+flowchart TD
+    A[502 Bad Gateway occurred] --> B{Is Gunicorn bound to\nPORT?}
+    B -- No --> C[Check Startup Command\n--bind=0.0.0.0:$PORT]
+    B -- Yes --> D{Is module path\ncorrect?}
+    D -- No --> E[Fix to correct path\nlike src.app:app]
+    D -- Yes --> F{Are dependencies\ninstalled?}
+    F -- No --> G[Check requirements.txt at root\nSCM_DO_BUILD_DURING_DEPLOYMENT=true]
+    F -- Yes --> H[Check runtime errors via\nLog Stream / SSH]

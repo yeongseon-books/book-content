@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant D as DNS
+    participant L as Azure Load Balancer
+    participant F as App Service Frontend
+    participant W as Worker Instance
+    participant A as App Process
+
+    C->>D: 호스트 이름 확인
+    D-->>C: IP 주소 / CNAME 대상
+    C->>L: HTTPS 요청
+    L->>F: 인바운드 트래픽 전달
+    F->>F: TLS 종료 + SNI/호스트 검증
+    F->>F: 접근 제한 평가
+    F->>W: 정상 인스턴스로 라우팅
+    W->>A: 앱 포트로 리버스 프록시
+    A-->>W: 응답 생성
+    W-->>F: 업스트림 응답 반환
+    F-->>L: 플랫폼 헤더 추가/이그레스
+    L-->>C: HTTP 응답

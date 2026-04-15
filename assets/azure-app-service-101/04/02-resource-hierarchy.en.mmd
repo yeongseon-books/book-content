@@ -1,0 +1,6 @@
+flowchart TD
+    A[Subscription] --> B[Resource Group]
+    B --> C[App Service Plan\nLinux B1]
+    C --> D[Web App\nFlask app]
+    B --> D
+    C -.Provides compute resources.- D

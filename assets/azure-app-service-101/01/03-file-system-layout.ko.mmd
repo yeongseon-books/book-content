@@ -1,0 +1,22 @@
+flowchart TB
+    subgraph INSTANCE[Worker 인스턴스]
+        subgraph EPHEMERAL[임시 스토리지]
+            Temp[임시 로컬 스토리지]
+            Cache[임시 캐시]
+            Upload[업로드 스테이징]
+        end
+
+        subgraph PERSISTENT[영구 스토리지]
+            WWW["/home/site/wwwroot"]
+            LOG["/home/LogFiles"]
+            DATA["/home/data"]
+        end
+    end
+
+    Restart[인스턴스 재시작/재활용]
+    Scale[다중 인스턴스 스케일 아웃]
+
+    Restart -->|삭제됨| EPHEMERAL
+    Restart -->|유지됨| PERSISTENT
+    Scale -->|공유 안 됨| EPHEMERAL
+    Scale -->|인스턴스 간 공유| PERSISTENT

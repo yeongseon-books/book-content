@@ -1,0 +1,29 @@
+flowchart TD
+    A[Performance issue detected] --> B{What is the main bottleneck?}
+    B -->|Memory shortage / OOM| C[Scale Up first]
+    B -->|Concurrent request increase / throughput shortage| D[Scale Out first]
+    B -->|Both| E[Scale Up first<br/>Secure per-instance headroom]
+
+    C --> F{Is app stateless?}
+    D --> F
+    E --> F
+
+    F -->|No| G[Clean up session/file/cache structure]
+    F -->|Yes| H{Can dependencies handle it?}
+
+    H -->|No| I[Check DB/Redis/API limits first]
+    H -->|Yes| J[Apply Scale Out + Autoscale]
+
+    C --> K[SKU upgrade]
+    E --> J
+    K --> H
+
+    style A fill:#e0f2fe,stroke:#0284c7,color:#111
+    style B fill:#fef3c7,stroke:#d97706,color:#111
+    style C fill:#dbeafe,stroke:#2563eb,color:#111
+    style D fill:#dcfce7,stroke:#16a34a,color:#111
+    style E fill:#fde68a,stroke:#ca8a04,color:#111
+    style G fill:#fee2e2,stroke:#dc2626,color:#111
+    style I fill:#fee2e2,stroke:#dc2626,color:#111
+    style J fill:#dcfce7,stroke:#16a34a,color:#111
+    style K fill:#dbeafe,stroke:#2563eb,color:#111

@@ -1,0 +1,33 @@
+flowchart TD
+    U[Traffic increase] --> LB[App Service Frontend / LB]
+    LB --> W1[App Instance 1]
+    LB --> W2[App Instance 2]
+    LB --> W3[App Instance 3]
+    LB --> W4[App Instance 4]
+
+    W1 --> DB[(Database)]
+    W2 --> DB
+    W3 --> DB
+    W4 --> DB
+
+    W1 --> R[(Redis)]
+    W2 --> R
+    W3 --> R
+    W4 --> R
+
+    W1 --> API[External API]
+    W2 --> API
+    W3 --> API
+    W4 --> API
+
+    X[What grows with instances<br/>DB connections / Redis connections / API call volume] --> DB
+
+    style U fill:#dbeafe,stroke:#2563eb,color:#111
+    style LB fill:#fef3c7,stroke:#d97706,color:#111
+    style W1 fill:#dcfce7,stroke:#16a34a,color:#111
+    style W2 fill:#dcfce7,stroke:#16a34a,color:#111
+    style W3 fill:#dcfce7,stroke:#16a34a,color:#111
+    style W4 fill:#dcfce7,stroke:#16a34a,color:#111
+    style DB fill:#fee2e2,stroke:#dc2626,color:#111
+    style R fill:#f3e8ff,stroke:#9333ea,color:#111
+    style API fill:#ffe4e6,stroke:#e11d48,color:#111

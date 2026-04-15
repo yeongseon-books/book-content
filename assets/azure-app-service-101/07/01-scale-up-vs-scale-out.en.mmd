@@ -1,0 +1,26 @@
+flowchart LR
+    subgraph SU[Scale Up / Vertical Scaling]
+        A1[Current instance<br/>S1] --> A2[Larger instance<br/>P1v3]
+    end
+
+    subgraph SO[Scale Out / Horizontal Scaling]
+        LB[Load Balancer]
+        B1[Instance 1<br/>S1] --> LB
+        B2[Instance 2<br/>S1] --> LB
+        B3[Instance 3<br/>S1] --> LB
+        B4[Instance 4<br/>S1] --> LB
+    end
+
+    C[Key Question]
+    C --> C1[Memory or<br/>per-instance CPU shortage]
+    C --> C2[Concurrent requests, throughput,<br/>availability issues]
+    C1 --> A2
+    C2 --> LB
+
+    style A1 fill:#dbeafe,stroke:#2563eb,color:#111
+    style A2 fill:#93c5fd,stroke:#1d4ed8,color:#111,stroke-width:3px
+    style B1 fill:#dcfce7,stroke:#16a34a,color:#111
+    style B2 fill:#dcfce7,stroke:#16a34a,color:#111
+    style B3 fill:#dcfce7,stroke:#16a34a,color:#111
+    style B4 fill:#dcfce7,stroke:#16a34a,color:#111
+    style LB fill:#fef3c7,stroke:#d97706,color:#111

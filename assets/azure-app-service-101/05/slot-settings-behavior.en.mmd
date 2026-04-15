@@ -1,0 +1,18 @@
+flowchart TB
+    subgraph Before[Before Swap]
+        P1[Production Slot\nCode v1]
+        P2[APP_ENV=production\nDATABASE_URL=prod-db\nLOG_LEVEL=INFO]
+        S1[Staging Slot\nCode v2]
+        S2[APP_ENV=staging\nDATABASE_URL=staging-db\nLOG_LEVEL=INFO]
+    end
+
+    A[Execute Slot Swap] --> B{What moves?}
+    Before --> A
+    B --> C[Code and swappable settings move]
+    B --> D[Slot Setting checked values stay in each slot]
+
+    C --> E[Production Slot\nCode v2]
+    D --> F[APP_ENV=production stays\nDATABASE_URL=prod-db stays]
+
+    C --> G[Staging Slot\nCode v1]
+    D --> H[APP_ENV=staging stays\nDATABASE_URL=staging-db stays]
