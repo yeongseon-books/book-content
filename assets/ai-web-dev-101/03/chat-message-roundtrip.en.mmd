@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant User
+    participant UI as Next.js UI
+    participant Server as API Route
+    participant AI as OpenAI
+
+    User->>UI: Type message + send
+    UI->>Server: POST /api/chat
+    Server->>AI: streamText request
+    AI-->>Server: Streaming response
+    Server-->>UI: Real-time data relay
+    UI-->>User: Display on screen

@@ -1,0 +1,8 @@
+flowchart LR
+    질문["사용자 질문"] -->|임베딩 변환| 쿼리벡터["질문 벡터"]
+    쿼리벡터 -->|유사도 비교| DB["벡터 DB\n(문서 벡터 저장소)"]
+    DB -->|가장 유사한 문서| 결과["관련 문서 조각\n(Top-K)"]
+
+    style 질문 fill:#e3f2fd,stroke:#1976d2
+    style DB fill:#f3e5f5,stroke:#7b1fa2
+    style 결과 fill:#e8f5e9,stroke:#388e3c

@@ -1,0 +1,12 @@
+flowchart TD
+    subgraph Vercel
+        nextjs["Next.js 앱"] --> vercel_server["Vercel 서버\n자동 빌드+배포"]
+        vercel_server --> vercel_url["프로젝트.vercel.app"]
+    end
+    subgraph Azure
+        flask["Flask/FastAPI 앱"] --> azure_server["Azure App Service\nCLI로 배포"]
+        azure_server --> azure_url["앱이름.azurewebsites.net"]
+    end
+
+    style vercel_server fill:#e8f5e9,stroke:#388e3c
+    style azure_server fill:#e3f2fd,stroke:#1976d2

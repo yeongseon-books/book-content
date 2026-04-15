@@ -1,0 +1,9 @@
+flowchart LR
+    사용자["내 Python 코드"] -->|HTTP 요청| API["OpenAI API 서버"]
+    API -->|질문 전달| 모델["GPT 모델"]
+    모델 -->|답변 생성| API
+    API -->|JSON 응답| 사용자
+
+    style 사용자 fill:#e3f2fd,stroke:#1976d2
+    style API fill:#fff3e0,stroke:#f57c00
+    style 모델 fill:#e8f5e9,stroke:#388e3c

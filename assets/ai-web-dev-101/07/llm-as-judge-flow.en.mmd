@@ -1,0 +1,7 @@
+sequenceDiagram
+    participant System as Eval System
+    participant Judge as Judge AI (GPT-4o)
+
+    System->>Judge: Candidate answer + Rubric
+    Judge->>Judge: Score accuracy, tone, etc.
+    Judge-->>System: Score + Reason (JSON)

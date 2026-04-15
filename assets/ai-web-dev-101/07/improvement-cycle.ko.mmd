@@ -1,0 +1,10 @@
+flowchart LR
+    A["1. 평가\n테스트 질문으로\n점수 측정"] --> B["2. 문제 발견\n실패 패턴 분석"]
+    B --> C["3. 프롬프트 수정\n지시 추가/예시 삽입"]
+    C --> D["4. 재평가\n점수 비교"]
+    D -->|반복| A
+
+    style A fill:#e3f2fd,stroke:#1976d2
+    style B fill:#fce4ec,stroke:#c62828
+    style C fill:#fff3e0,stroke:#f57c00
+    style D fill:#e8f5e9,stroke:#388e3c

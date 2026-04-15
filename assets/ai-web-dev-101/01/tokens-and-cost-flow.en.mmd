@@ -1,0 +1,9 @@
+flowchart LR
+    Question["My Question\n(25 tokens)"] --> Sum["Sum"]
+    Answer["AI Answer\n(12 tokens)"] --> Sum
+    Sum --> Total["Total: 37 tokens"]
+    Total --> Cost["~$0.00003\n(Way cheaper than coffee)"]
+
+    style Question fill:#e3f2fd,stroke:#1976d2
+    style Answer fill:#e8f5e9,stroke:#388e3c
+    style Cost fill:#f3e5f5,stroke:#7b1fa2

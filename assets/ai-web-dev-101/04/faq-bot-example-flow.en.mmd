@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant User
+    participant App as FAQ Chatbot
+    participant DB as Vector DB
+    participant AI as GPT
+
+    User->>App: "How do I get a refund?"
+    App->>DB: Search by question embedding
+    DB-->>App: "Refunds within 7 days..." (similar doc)
+    App->>AI: Send question + context doc
+    AI-->>App: Generate friendly answer
+    App-->>User: "You can request a refund within 7 days..."

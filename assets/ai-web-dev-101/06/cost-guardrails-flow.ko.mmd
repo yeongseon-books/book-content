@@ -1,0 +1,9 @@
+flowchart LR
+    모델["모델 선택\n(비용 vs 품질)"] --> 제한["토큰 제한\n(max_tokens)"]
+    제한 --> 예산["월 예산 설정\n(OpenAI Dashboard)"]
+    예산 --> 알림["비용 알림\n(Azure Cost Mgmt)"]
+    알림 --> 모니터링["사용량 모니터링"]
+
+    style 모델 fill:#e3f2fd,stroke:#1976d2
+    style 예산 fill:#fff3e0,stroke:#f57c00
+    style 알림 fill:#fce4ec,stroke:#c62828

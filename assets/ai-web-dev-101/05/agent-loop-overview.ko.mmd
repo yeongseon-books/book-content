@@ -1,0 +1,12 @@
+flowchart TD
+    A["사용자 입력"] --> B{"생각\n도구가 필요한가?"}
+    B -->|"필요함"| C["행동\n도구 호출 요청"]
+    C --> D["관찰\n실행 결과 확인"]
+    D --> B
+    B -->|"충분함"| E["최종 답변 생성"]
+
+    style A fill:#e3f2fd,stroke:#1976d2
+    style B fill:#fff3e0,stroke:#f57c00
+    style C fill:#fce4ec,stroke:#c62828
+    style D fill:#e8f5e9,stroke:#388e3c
+    style E fill:#f3e5f5,stroke:#7b1fa2

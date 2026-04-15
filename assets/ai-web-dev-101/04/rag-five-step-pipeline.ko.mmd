@@ -1,0 +1,11 @@
+flowchart TD
+    A["1. 문서 로드\nPDF, 텍스트, 웹페이지"] --> B["2. 청킹\n적당한 크기로 분할"]
+    B --> C["3. 임베딩\n텍스트를 벡터로 변환"]
+    C --> D["4. 저장\n벡터 DB에 보관"]
+    D --> E["5. 검색 및 생성\n유사 문서 찾기 → AI 답변"]
+
+    style A fill:#e3f2fd,stroke:#1976d2
+    style B fill:#e3f2fd,stroke:#1976d2
+    style C fill:#fff3e0,stroke:#f57c00
+    style D fill:#f3e5f5,stroke:#7b1fa2
+    style E fill:#e8f5e9,stroke:#388e3c

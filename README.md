@@ -18,6 +18,20 @@ Azure App Service 입문자를 위한 실전 가이드 시리즈.
 | 6 | 로그와 모니터링 기초 | [06-logging-monitoring.md](./azure-app-service-101/06-logging-monitoring.md) | 8분 |
 | 7 | Scaling 101: 언제 Scale Up vs Scale Out? | [07-scaling-101.md](./azure-app-service-101/07-scaling-101.md) | 6분 |
 
+### AI 웹 개발 입문
+
+AI API부터 배포까지, 초급 개발자를 위한 AI 웹 개발 실전 가이드 시리즈.
+
+| # | 제목 | 파일 | 예상 분량 |
+|---|---|---|---|
+| 1 | AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기 | [01-hello-ai-api.md](./ai-web-dev-101/01-hello-ai-api.md) | 10분 |
+| 2 | 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술 | [02-prompt-engineering.md](./ai-web-dev-101/02-prompt-engineering.md) | 8분 |
+| 3 | AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현 | [03-ai-chatbot.md](./ai-web-dev-101/03-ai-chatbot.md) | 10분 |
+| 4 | RAG 입문 — 내 데이터로 답하는 AI 만들기 | [04-rag-intro.md](./ai-web-dev-101/04-rag-intro.md) | 10분 |
+| 5 | AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기 | [05-ai-agent.md](./ai-web-dev-101/05-ai-agent.md) | 10분 |
+| 6 | AI 웹 앱 배포하기 — Vercel과 Azure에 올리고 운영하기 | [06-deploy.md](./ai-web-dev-101/06-deploy.md) | 9분 |
+| 7 | AI 앱의 평가와 개선 — 품질을 측정하고 더 좋게 만드는 법 | [07-eval-improve.md](./ai-web-dev-101/07-eval-improve.md) | 10분 |
+
 ## 폴더 구조
 
 ```
@@ -25,12 +39,16 @@ tech-blog/
 ├── README.md
 ├── azure-app-service-101/
 │   ├── 01-what-is-app-service.md
-│   ├── 02-request-lifecycle.md
-│   ├── 03-hosting-models.md
-│   ├── 04-first-deploy.md
-│   ├── 05-configuration.md
-│   ├── 06-logging-monitoring.md
+│   ├── ...
 │   └── 07-scaling-101.md
+├── ai-web-dev-101/
+│   ├── 01-hello-ai-api.md
+│   ├── 02-prompt-engineering.md
+│   ├── 03-ai-chatbot.md
+│   ├── 04-rag-intro.md
+│   ├── 05-ai-agent.md
+│   ├── 06-deploy.md
+│   └── 07-eval-improve.md
 └── assets/
     └── azure-app-service-101/
         ├── 01/

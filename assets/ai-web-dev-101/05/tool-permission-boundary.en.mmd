@@ -1,0 +1,9 @@
+flowchart TD
+    AI["AI Agent"] --> Allowed["Allowed Tools\nWeather, Calculator"]
+    AI --> Restricted["Restricted Tools\nPayment, Delete"]
+    Restricted --> Approval["Human Approval Required"]
+    Allowed --> Execute["Execute Immediately"]
+
+    style Allowed fill:#e8f5e9,stroke:#388e3c
+    style Restricted fill:#ffcdd2,stroke:#c62828
+    style Approval fill:#fff3e0,stroke:#f57c00

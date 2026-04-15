@@ -1,0 +1,9 @@
+flowchart LR
+    User["My Python Code"] -->|HTTP Request| API["OpenAI API Server"]
+    API -->|Forward Question| Model["GPT Model"]
+    Model -->|Generate Answer| API
+    API -->|JSON Response| User
+
+    style User fill:#e3f2fd,stroke:#1976d2
+    style API fill:#fff3e0,stroke:#f57c00
+    style Model fill:#e8f5e9,stroke:#388e3c

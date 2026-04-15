@@ -1,0 +1,8 @@
+flowchart LR
+    Request["POST Request\n(messages)"] --> Model["Select Model\n(gpt-4o)"]
+    Model --> Stream["streamText\nGenerate text"]
+    Stream --> Response["toDataStreamResponse\nReturn streaming response"]
+
+    style Request fill:#e3f2fd,stroke:#1976d2
+    style Model fill:#e8f5e9,stroke:#388e3c
+    style Response fill:#f3e5f5,stroke:#7b1fa2

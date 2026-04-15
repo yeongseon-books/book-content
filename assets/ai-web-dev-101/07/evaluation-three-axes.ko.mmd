@@ -1,0 +1,9 @@
+flowchart TD
+    품질["AI 답변 품질"] --> 정확["정확성\n사실 관계가 맞는가?"]
+    품질 --> 관련["관련성\n맥락에 맞는 답변인가?"]
+    품질 --> 안전["안전성\n편향/유출 위험은 없는가?"]
+
+    style 품질 fill:#f3e5f5,stroke:#7b1fa2
+    style 정확 fill:#e3f2fd,stroke:#1976d2
+    style 관련 fill:#fff3e0,stroke:#f57c00
+    style 안전 fill:#fce4ec,stroke:#c62828

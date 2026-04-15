@@ -1,0 +1,9 @@
+flowchart LR
+    Model["Model Selection\n(Cost vs Quality)"] --> Limit["Token Limit\n(max_tokens)"]
+    Limit --> Budget["Monthly Budget\n(OpenAI Dashboard)"]
+    Budget --> Alert["Cost Alert\n(Azure Cost Mgmt)"]
+    Alert --> Monitor["Usage Monitoring"]
+
+    style Model fill:#e3f2fd,stroke:#1976d2
+    style Budget fill:#fff3e0,stroke:#f57c00
+    style Alert fill:#fce4ec,stroke:#c62828

@@ -1,0 +1,13 @@
+flowchart LR
+    User["User\nBrowser"] -->|Type message| UI["Next.js Page\n(useChat hook)"]
+    UI -->|POST /api/chat| API["API Route\n(Server)"]
+    API --> SDK["Vercel AI SDK"]
+    SDK -->|Request| OpenAI["OpenAI GPT"]
+    OpenAI -->|Streaming response| SDK
+    SDK --> UI
+    UI -->|Display letter by letter| User
+
+    style User fill:#e3f2fd,stroke:#1976d2
+    style UI fill:#fff3e0,stroke:#f57c00
+    style API fill:#fff3e0,stroke:#f57c00
+    style OpenAI fill:#e8f5e9,stroke:#388e3c

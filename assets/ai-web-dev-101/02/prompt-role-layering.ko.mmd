@@ -1,0 +1,13 @@
+flowchart TD
+    subgraph 프롬프트 구성
+        system["System Prompt\n페르소나와 규칙 설정\n(개발자가 작성)"]
+        user["User Prompt\n구체적인 작업 지시\n(사용자가 입력)"]
+    end
+    system --> AI["AI 모델"]
+    user --> AI
+    AI --> 응답["답변\n(톤 + 내용 결합)"]
+
+    style system fill:#fff3e0,stroke:#f57c00
+    style user fill:#e3f2fd,stroke:#1976d2
+    style AI fill:#e8f5e9,stroke:#388e3c
+    style 응답 fill:#f3e5f5,stroke:#7b1fa2

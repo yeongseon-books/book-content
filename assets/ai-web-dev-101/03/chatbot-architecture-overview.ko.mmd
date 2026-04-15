@@ -1,0 +1,13 @@
+flowchart LR
+    사용자["사용자\n브라우저"] -->|메시지 입력| UI["Next.js 페이지\n(useChat 훅)"]
+    UI -->|POST /api/chat| API["API Route\n(서버)"]
+    API --> SDK["Vercel AI SDK"]
+    SDK -->|요청| OpenAI["OpenAI GPT"]
+    OpenAI -->|스트리밍 응답| SDK
+    SDK --> UI
+    UI -->|한 글자씩 표시| 사용자
+
+    style 사용자 fill:#e3f2fd,stroke:#1976d2
+    style UI fill:#fff3e0,stroke:#f57c00
+    style API fill:#fff3e0,stroke:#f57c00
+    style OpenAI fill:#e8f5e9,stroke:#388e3c

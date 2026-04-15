@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant User
+    participant Server
+    participant AI as OpenAI
+
+    User->>Server: Send question
+    Server->>AI: Request answer
+    Note over AI: Start generating
+    AI-->>Server: "The" (first chunk)
+    Server-->>User: "The" (show immediately)
+    AI-->>Server: " weather" (second chunk)
+    Server-->>User: "The weather" (update)
+    AI-->>Server: " is nice" (last chunk)
+    Server-->>User: "The weather is nice" (complete)

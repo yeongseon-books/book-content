@@ -1,0 +1,11 @@
+flowchart TD
+    A["1. Load Documents\nPDF, text, web pages"] --> B["2. Chunking\nSplit into segments"]
+    B --> C["3. Embedding\nConvert text to vectors"]
+    C --> D["4. Store\nSave in Vector DB"]
+    D --> E["5. Query & Generate\nFind similar docs → AI answer"]
+
+    style A fill:#e3f2fd,stroke:#1976d2
+    style B fill:#e3f2fd,stroke:#1976d2
+    style C fill:#fff3e0,stroke:#f57c00
+    style D fill:#f3e5f5,stroke:#7b1fa2
+    style E fill:#e8f5e9,stroke:#388e3c

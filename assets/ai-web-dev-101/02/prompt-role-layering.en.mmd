@@ -1,0 +1,13 @@
+flowchart TD
+    subgraph Prompt Structure
+        system["System Prompt\nSet persona & rules\n(Developer writes)"]
+        user["User Prompt\nSpecific task instruction\n(User inputs)"]
+    end
+    system --> AI["AI Model"]
+    user --> AI
+    AI --> Response["Response\n(Tone + Content combined)"]
+
+    style system fill:#fff3e0,stroke:#f57c00
+    style user fill:#e3f2fd,stroke:#1976d2
+    style AI fill:#e8f5e9,stroke:#388e3c
+    style Response fill:#f3e5f5,stroke:#7b1fa2

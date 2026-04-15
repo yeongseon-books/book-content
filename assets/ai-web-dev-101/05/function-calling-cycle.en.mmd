@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant App as My App
+    participant AI as GPT Model
+    participant Tool as External Tool
+
+    App->>AI: Tool list + user question
+    AI->>AI: Decide which tool is needed
+    AI-->>App: "Run get_weather('Seoul')"
+    App->>Tool: Execute get_weather('Seoul')
+    Tool-->>App: 25°C, Clear
+    App->>AI: Send execution result
+    AI-->>App: "Seoul is 25°C and clear"

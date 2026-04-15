@@ -1,0 +1,9 @@
+flowchart TD
+    AI["AI 에이전트"] --> 허용["허용된 도구\n날씨 조회, 계산기"]
+    AI --> 제한["제한된 도구\n결제, 삭제 등"]
+    제한 --> 승인["사람의 승인 필요"]
+    허용 --> 실행["바로 실행"]
+
+    style 허용 fill:#e8f5e9,stroke:#388e3c
+    style 제한 fill:#ffcdd2,stroke:#c62828
+    style 승인 fill:#fff3e0,stroke:#f57c00
