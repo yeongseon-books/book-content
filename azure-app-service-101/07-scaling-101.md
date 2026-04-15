@@ -518,3 +518,5 @@ az monitor metrics alert create \
 - [Best practices for Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/app-service-best-practices)
 
 ---
+
+**Tags:** `Azure` `App Service` `Scaling` `Autoscale` `Performance` `DevOps`

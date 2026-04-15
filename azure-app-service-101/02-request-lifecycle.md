@@ -522,3 +522,5 @@ Azure App Service의 Request Lifecycle을 이해하면, 장애가 났을 때 질
 - [Troubleshoot diagnostic logs (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/troubleshoot-diagnostic-logs)
 
 ---
+
+**Tags:** `Azure` `App Service` `Cloud` `Networking` `DevOps`

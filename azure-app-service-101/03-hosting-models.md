@@ -510,3 +510,5 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 - [App Service pricing (Azure)](https://azure.microsoft.com/pricing/details/app-service/)
 
 ---
+
+**Tags:** `Azure` `App Service` `Cloud` `Pricing` `DevOps`

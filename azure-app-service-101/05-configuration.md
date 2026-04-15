@@ -474,3 +474,5 @@ logger.info("Configuration loaded", extra={
 - [The Twelve-Factor App - Config](https://12factor.net/config)
 
 ---
+
+**Tags:** `Azure` `App Service` `Configuration` `Security` `DevOps`

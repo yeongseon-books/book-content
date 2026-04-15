@@ -694,3 +694,5 @@ App Service에서 로그와 모니터링의 핵심은 도구 이름이 아니라
 - [Kusto Query Language quick reference (Microsoft Learn)](https://learn.microsoft.com/azure/data-explorer/kql-quick-reference)
 
 ---
+
+**Tags:** `Azure` `App Service` `Monitoring` `Logging` `Application Insights` `DevOps`
