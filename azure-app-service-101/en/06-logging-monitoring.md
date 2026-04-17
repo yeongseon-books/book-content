@@ -27,8 +27,7 @@ Flask App (logger.info) → stdout/stderr → App Service Runtime
 | `/home/LogFiles/Application/` | Max 100MB/7 days | Short-term log archive |
 | Application Insights | 90 days default | Long-term analysis, alerts, KQL |
 
-![IMAGE: Log flow diagram]
-`📸 Screenshot: Log flow diagram (draw.io)`
+![Log flow diagram](../../assets/azure-app-service-101/06/01-log-flow-architecture.en.png)
 
 ---
 

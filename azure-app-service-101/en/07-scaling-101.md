@@ -28,8 +28,7 @@ More instances
 | **Vertical** | Scale Up/Down | Change instance size |
 | **Horizontal** | Scale Out/In | Change instance count |
 
-![IMAGE: Scaling concept diagram]
-`📸 Screenshot: Scale Up vs Scale Out comparison diagram (draw.io)`
+![Scaling concept diagram](../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
 
 ---
 

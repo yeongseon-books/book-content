@@ -41,8 +41,7 @@ Each Plane has **independent APIs and failure modes**. For example:
 - Changing App Settings in the Management Plane → May restart the Runtime Plane
 - SCM (Kudu) site being inaccessible → App itself may still work fine
 
-![IMAGE: 3-Plane Architecture Diagram]
-`📸 Screenshot: 3-Plane structure diagram (draw.io or similar)`
+![3-Plane Architecture Diagram](../../assets/azure-app-service-101/01/01-three-plane-architecture.en.png)
 
 ---
 

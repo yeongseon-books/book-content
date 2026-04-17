@@ -22,8 +22,7 @@ The flow for deciding your App Service hosting strategy:
 3. Choose Plan Tier (Dev → Production)
 ```
 
-![IMAGE: Hosting Model decision flowchart]
-`📸 Screenshot: Decision flowchart (draw.io)`
+![Hosting Model decision flowchart](../../assets/azure-app-service-101/03/01-decision-flow.en.png)
 
 ---
 

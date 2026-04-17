@@ -18,7 +18,7 @@ AI 개발을 하다 보면 "프롬프트를 조금 고쳤더니 A 질문은 잘 
 
 1. **객관적인 기준 확보**: "답변이 좋아진 것 같아요"라는 주관적인 느낌 대신 "정확도가 70%에서 85%로 올랐습니다"라는 숫자로 말하기 위해서입니다.
 
-![평가가 필요한 3가지 이유](../assets/ai-web-dev-101/07/evaluation-three-axes.png)
+![평가가 필요한 3가지 이유](../assets/ai-web-dev-101/07/evaluation-three-axes.ko.png)
 
 2. **회귀 테스트(Regression Test)**: 프롬프트를 수정했을 때 기존에 잘 되던 기능이 망가지지 않았는지 확인하기 위해서입니다.
 3. **비용 효율성**: 무조건 비싼 모델(GPT-4o 등)을 쓰기보다, 평가를 통해 저렴한 모델로도 충분한 품질이 나오는지 판단하기 위해서입니다.
@@ -35,7 +35,7 @@ AI 답변의 품질을 판단할 때 보통 다음 세 가지를 중점적으로
 
 이 세 가지를 모두 완벽하게 맞추기는 어렵지만, 서비스의 목적에 따라 우선순위를 정해 관리해야 합니다.
 
-![AI 답변 품질 평가의 3가지 축](../assets/ai-web-dev-101/07/test-case-scoring-flow.png)
+![AI 답변 품질 평가의 3가지 축](../assets/ai-web-dev-101/07/test-case-scoring-flow.ko.png)
 
 ---
 
@@ -111,7 +111,7 @@ JSON 형태로 점수와 이유를 출력하세요.
 
 이렇게 하면 사람이 일일이 읽지 않아도 수백 개의 답변을 순식간에 평가하고 통계를 낼 수 있습니다.
 
-![LLM-as-Judge 평가 흐름](../assets/ai-web-dev-101/07/llm-as-judge-flow.png)
+![LLM-as-Judge 평가 흐름](../assets/ai-web-dev-101/07/llm-as-judge-flow.ko.png)
 
 ---
 
@@ -124,7 +124,7 @@ JSON 형태로 점수와 이유를 출력하세요.
 3. **프롬프트 수정**: 발견한 문제를 해결하기 위해 지시 사항을 추가하거나 예시(Few-shot)를 넣습니다.
 4. **재평가**: 수정한 프롬프트로 다시 점수를 매겨 실제로 좋아졌는지 확인합니다.
 
-![프롬프트 개선 반복 사이클](../assets/ai-web-dev-101/07/improvement-cycle.png)
+![프롬프트 개선 반복 사이클](../assets/ai-web-dev-101/07/improvement-cycle.ko.png)
 
 ---
 
@@ -145,7 +145,7 @@ JSON 형태로 점수와 이유를 출력하세요.
 ### 4단계: 개선 결과 비교
 수정 후 다시 테스트했을 때, 환각 답변이 사라지고 "죄송하지만 해당 정보는 찾을 수 없습니다"라는 안전한 답변이 나오기 시작했습니다. 성공적인 개선입니다.
 
-![회귀 테스트로 기존 기능 보호하기](../assets/ai-web-dev-101/07/regression-check-flow.png)
+![회귀 테스트로 기존 기능 보호하기](../assets/ai-web-dev-101/07/regression-check-flow.ko.png)
 
 ---
 

@@ -22,7 +22,7 @@
 - **포트(Port) 설정**: 대부분의 클라우드 서비스는 `PORT`라는 환경 변수를 통해 서버가 기다려야 할 포트 번호를 알려줍니다. 코드가 이를 유연하게 받아들이도록 작성되었는지 확인하세요.
 
 **[그림] 로컬 개발 환경에서 실제 배포까지의 흐름**
-![로컬 개발에서 실제 배포까지의 흐름](../assets/ai-web-dev-101/06/local-to-live-deployment.png)
+![로컬 개발에서 실제 배포까지의 흐름](../assets/ai-web-dev-101/06/local-to-live-deployment.ko.png)
 
 ---
 
@@ -43,7 +43,7 @@
 - **Azure App Service**: Python(Flask, FastAPI)으로 데이터베이스를 직접 다루거나 복잡한 로직을 백엔드에 두었을 때 선택하세요. 기업용 안정성과 확장이 필요할 때 가장 든든한 동료가 됩니다.
 - **기타 대안**: 더 자유로운 설정을 원한다면 AWS App Runner나 Google Cloud Run 같은 서비스도 있습니다. 하지만 초급 단계에서는 Vercel이나 Azure로 감을 잡는 것이 가장 빠릅니다.
 
-![Vercel과 Azure의 배포 구조 비교](../assets/ai-web-dev-101/06/vercel-azure-hosting-overview.png)
+![Vercel과 Azure의 배포 구조 비교](../assets/ai-web-dev-101/06/vercel-azure-hosting-overview.ko.png)
 
 ---
 
@@ -82,7 +82,7 @@ git push origin main
 
 배포가 끝나면 `[프로젝트명].vercel.app` 형태의 도메인이 생성됩니다. 이 주소로 접속해 친구들과 공유해 보세요.
 
-![Vercel 배포 파이프라인](../assets/ai-web-dev-101/06/production-request-path.png)
+![Vercel 배포 파이프라인](../assets/ai-web-dev-101/06/production-request-path.ko.png)
 
 ### 운영 팁: 환경 변수 업데이트하기
 OpenAI API 키를 교체했거나, 다른 설정을 바꿔야 할 때가 있습니다.
@@ -172,7 +172,7 @@ node_modules/
 ```
 
 **[그림] 안전한 API 키 관리 vs 위험한 하드코딩**
-![안전한 API 키 관리 vs 위험한 하드코딩](../assets/ai-web-dev-101/06/secret-key-boundary.png)
+![안전한 API 키 관리 vs 위험한 하드코딩](../assets/ai-web-dev-101/06/secret-key-boundary.ko.png)
 
 ---
 
@@ -192,7 +192,7 @@ Azure를 쓴다면 'Cost Management' 메뉴에서 예산 알람(Budget Alert)을
 - **HTTP 500 에러 추적**: 만약 "서버 내부 오류"가 뜬다면, Vercel의 'Runtime Logs'나 Azure의 'Log Stream'을 열어보세요. 코드 한 줄의 오타나 누락된 환경 변수 때문일 확률이 90%입니다.
 - **사용자 질문 분석**: 사용자가 어떤 질문을 하는지, AI가 적절한 정보를 제공하는지 정기적으로 확인해 보세요. 이는 다음 7편에서 다룰 '서비스 개선'을 위한 가장 소중한 데이터가 됩니다.
 
-![비용 관리 체크포인트](../assets/ai-web-dev-101/06/cost-guardrails-flow.png)
+![비용 관리 체크포인트](../assets/ai-web-dev-101/06/cost-guardrails-flow.ko.png)
 
 ---
 

@@ -39,7 +39,7 @@ App Service는 크게 다음 세 영역으로 나뉩니다.
 
 즉, 세 Plane은 서로 연결되어 있지만 **같은 것이 아니고**, 각자 **독립적인 API와 장애 모드**를 가집니다. “포털에서 설정은 정상인데 앱이 느리다”, “앱은 정상인데 배포 로그가 안 보인다” 같은 상황을 이해하려면 이 분리가 꼭 필요합니다.
 
-![App Service 3-Plane 아키텍처](../assets/azure-app-service-101/01/01-three-plane-architecture.png)
+![App Service 3-Plane 아키텍처](../assets/azure-app-service-101/01/01-three-plane-architecture.ko.png)
 
 이제부터 각 Plane을 하나씩 보겠습니다.
 
@@ -78,7 +78,7 @@ Management Plane을 다룰 때 기억할 문장은 이겁니다. **설정은 곧
 
 요청 흐름을 가장 단순하게 그리면 아래와 같습니다.
 
-![App Service 요청 흐름](../assets/azure-app-service-101/01/02-request-flow.png)
+![App Service 요청 흐름](../assets/azure-app-service-101/01/02-request-flow.ko.png)
 
 사용자 요청은 먼저 **Frontend**를 거칩니다. 여기서 TLS 종료, 호스트 검증, 라우팅 같은 작업이 처리됩니다. 그다음 **Worker** 인스턴스로 넘어가고, 마지막으로 애플리케이션 프로세스가 실제 비즈니스 로직을 실행해 응답을 반환합니다.
 
@@ -155,7 +155,7 @@ app.run(host="0.0.0.0", port=port)
 
 App Service에서 파일시스템은 아주 자주 오해되는 주제입니다. 특히 처음 배포한 뒤 SSH나 Kudu로 파일을 들여다보면 “아, 여기도 결국 서버 하나구나”라는 착각이 들기 쉽습니다. 하지만 운영 관점에서는 **임시 저장소와 영구 저장소를 명확히 구분해서 생각해야** 합니다.
 
-![App Service 파일시스템 구조](../assets/azure-app-service-101/01/03-file-system-layout.png)
+![App Service 파일시스템 구조](../assets/azure-app-service-101/01/03-file-system-layout.ko.png)
 
 먼저 임시 저장소(Ephemeral)는 빠른 로컬 I/O를 제공할 수 있지만, 인스턴스 재시작 시 **삭제될 수 있고**, 인스턴스 간 **공유되지도 않습니다**. 그래서 임시 캐시, 업로드 스테이징, 중간 처리 파일처럼 “사라져도 되는 데이터”에만 써야 합니다.
 

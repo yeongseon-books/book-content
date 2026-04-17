@@ -18,8 +18,7 @@ Client → DNS → Azure Load Balancer → App Service Frontend → Worker Insta
 
 Issues can occur at each stage, resulting in different error messages.
 
-![IMAGE: Request Lifecycle flow diagram]
-`📸 Screenshot: Request Lifecycle diagram (draw.io)`
+![Request Lifecycle flow diagram](../../assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
 
 ---
 
