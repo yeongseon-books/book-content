@@ -13,16 +13,7 @@ Environment는 경계입니다.
 Container App은 논리 서비스입니다.
 Revision은 이미지와 설정의 불변 스냅샷입니다.
 
-```mermaid
-flowchart TB
-    ENV[Environment]
-    ENV --> APP1[Container App: api]
-    ENV --> APP2[Container App: worker]
-    APP1 --> REV1[Revision 1]
-    APP1 --> REV2[Revision 2]
-    APP2 --> REV3[Revision 1]
-```
-
+![계층 먼저 보기](../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.ko.png)
 ---
 
 ## Environment

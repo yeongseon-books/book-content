@@ -31,14 +31,7 @@ Second, enabling Dapr is not merely adding metadata to your app.
 
 It changes the pod shape.
 
-```mermaid
-flowchart LR
-    APP[User container] --> LOCAL[localhost]
-    LOCAL --> DAPRD[daprd sidecar process]
-    DAPRD --> COMP[Environment-scoped Dapr component]
-    COMP --> EXT[External service]
-```
-
+![The shortest accurate sentence](../../assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.en.png)
 The app talks locally.
 The sidecar talks outward.
 That is the basic contract.
@@ -52,19 +45,7 @@ Pinned Dapr source shows this in the injector service code and the pod patch pat
 
 The injector receives the admission review, builds a sidecar config from pod annotations and environment state, and generates patch operations that add the Dapr sidecar container.
 
-```mermaid
-sequenceDiagram
-    participant API as Kubernetes API server
-    participant WH as dapr-sidecar-injector webhook
-    participant Pod as Incoming pod spec
-    participant Patch as JSON patch
-
-    API->>WH: AdmissionReview for pod
-    WH->>WH: build SidecarConfig
-    WH->>Patch: generate sidecar patch
-    Patch->>Pod: add daprd container, env, ports, probes
-```
-
+![Start with the pod mutation model](../../assets/azure-aca-deep-dive/05/05-02-start-with-the-pod-mutation-model.en.png)
 ACA does not expose raw Kubernetes admission mechanics to you.
 But the runtime shape is still best explained by the upstream injector model, because the sidecar that appears is the same class of process.
 
@@ -102,15 +83,7 @@ That one file tells you most of what you need to know.
 - It exposes explicit ports.
 - It receives readiness and liveness probes.
 
-```mermaid
-flowchart TB
-    CFG[SidecarConfig] --> CMD[/daprd]
-    CFG --> ARGS[CLI flags]
-    CFG --> PORTS[3500 / 50001 / internal / metrics]
-    CFG --> PROBES[readiness and liveness probes]
-    CFG --> ENV[namespace, pod name, trust data]
-```
-
+![The sidecar container is literally `daprd`](../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.en.png)
 This is the right resolution for understanding Dapr in ACA.
 The product toggles Dapr at the app surface.
 The runtime ends up launching a Go process with a nontrivial configuration surface.
@@ -144,15 +117,7 @@ Pinned upstream Dapr code makes the bootstrap path readable.
 It calls into `app.Run()`.
 That bootstrap path then constructs runtime options, logging, security, and finally the Dapr runtime object before calling `Run`.
 
-```mermaid
-flowchart LR
-    MAIN[cmd/daprd/main.go] --> APP[cmd/daprd/app/app.go]
-    APP --> OPTS[parse options and flags]
-    OPTS --> CFG[runtime.Config]
-    CFG --> RT[runtime.FromConfig]
-    RT --> RUN[rt.Run]
-```
-
+![Boot path: `main.go` to `app.Run()` to runtime creation](../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.en.png)
 For ACA readers, the important takeaway is not every bootstrap detail.
 It is that enabling Dapr does in fact launch a complete runtime program, with a normal process lifecycle and configuration pipeline.
 
@@ -168,14 +133,7 @@ The upstream runtime config defaults define the Dapr HTTP and gRPC API ports.
 
 Microsoft's ACA Dapr overview also documents that the sidecar exposes HTTP on 3500 and gRPC on 50001.
 
-```mermaid
-flowchart LR
-    APP[User container] -->|HTTP| H3500[localhost:3500]
-    APP -->|gRPC| G50001[localhost:50001]
-    H3500 --> DAPRD[daprd]
-    G50001 --> DAPRD
-```
-
+![The sidecar ports are concrete and important](../../assets/azure-aca-deep-dive/05/05-05-the-sidecar-ports-are-concrete-and-impor.en.png)
 Those ports are not theoretical.
 They are the local contract between your code and the sidecar.
 
@@ -202,14 +160,7 @@ The sidecar says:
 - I know where to route it
 - I know how to authenticate and serialize it
 
-```mermaid
-flowchart LR
-    CODE[Application code] --> API[Dapr localhost API]
-    API --> DAPRD[daprd]
-    DAPRD --> COMP[Configured component]
-    COMP --> TARGET[Remote backing service]
-```
-
+![Why localhost matters so much](../../assets/azure-aca-deep-dive/05/05-06-why-localhost-matters-so-much.en.png)
 That is why Dapr can make apps simpler while making the pod shape more complex.
 
 ---
@@ -222,13 +173,7 @@ This episode shows why that is operationally meaningful.
 The sidecar runtime loads component definitions according to the Dapr app ID and scopes.
 Microsoft's components documentation is clear that scopes map to Dapr app IDs, not Container App names.
 
-```mermaid
-flowchart LR
-    ENV[Environment component catalog] --> SCOPE[Component scopes]
-    SCOPE --> APPID[Dapr app ID]
-    APPID --> DAPRD[daprd sidecar loads component]
-```
-
+![Component loading is where ACA's environment boundary reappears](../../assets/azure-aca-deep-dive/05/05-07-component-loading-is-where-aca-s-environ.en.png)
 So the environment owns the component registry boundary.
 The sidecar makes the final runtime decision about which scoped components become live for that app.
 
@@ -246,12 +191,7 @@ That means Dapr behavior in ACA always spans at least two scopes.
 - app scope for enablement and sidecar attachment
 - environment scope for component availability and sharing
 
-```mermaid
-flowchart LR
-    APPCFG[App Dapr enablement] --> SIDECAR[daprd attached to pod]
-    ENVCFG[Environment components] --> SIDECAR
-```
-
+![Enabling Dapr in ACA is an app-level switch with environment-level dependencies](../../assets/azure-aca-deep-dive/05/05-08-enabling-dapr-in-aca-is-an-app-level-swi.en.png)
 If an app-level Dapr setting looks correct but runtime behavior still fails, the missing piece is often at environment scope rather than app scope.
 
 ---
@@ -289,14 +229,7 @@ Besides state, pub/sub, invocation, and bindings, the sidecar exposes operationa
 - health
 - metadata
 
-```mermaid
-flowchart LR
-    APP[Application] --> BUILD[State / pubsub / invocation APIs]
-    APP --> OPS[Health / metadata APIs]
-    BUILD --> DAPRD[daprd]
-    OPS --> DAPRD
-```
-
+![Dapr is not only the building-block APIs; it is also health and metadata APIs](../../assets/azure-aca-deep-dive/05/05-09-dapr-is-not-only-the-building-block-apis.en.png)
 So the sidecar is not just a convenience wrapper for remote calls.
 It is also an addressable operational endpoint in the pod.
 
@@ -309,12 +242,7 @@ There are really two local relationships to remember.
 1. Your app calls the sidecar over localhost.
 2. The sidecar also calls into your app for certain patterns, such as service invocation delivery or pub/sub handlers.
 
-```mermaid
-flowchart LR
-    APP[User container] -->|localhost:3500 / 50001| DAPRD[daprd]
-    DAPRD -->|app-port / app-protocol| APP
-```
-
+![App-to-sidecar and sidecar-to-app are separate channels](../../assets/azure-aca-deep-dive/05/05-10-app-to-sidecar-and-sidecar-to-app-are-se.en.png)
 That second arrow matters because app port and app protocol settings are not decorative.
 They tell the sidecar how to reach your code.
 
@@ -333,13 +261,7 @@ If a request fails, the sidecar may know something your user container does not.
 - connection timeout to backing service
 - sidecar startup failure
 
-```mermaid
-flowchart LR
-    APPLOG[App logs] --> TIMELINE[Incident timeline]
-    DAPRLOG[Dapr sidecar logs] --> TIMELINE
-    SCALELOG[Scale events] --> TIMELINE
-```
-
+![Why sidecar logs belong in your incident timeline](../../assets/azure-aca-deep-dive/05/05-11-why-sidecar-logs-belong-in-your-incident.en.png)
 Treat sidecar logs as first-class evidence, not as noisy adjunct data.
 
 ---
@@ -360,16 +282,7 @@ Even when ACA abstracts the management details away, the runtime complexity rema
 
 ## Putting the whole sidecar lifecycle in one diagram
 
-```mermaid
-flowchart LR
-    ENABLE[Enable Dapr on app] --> INJECT[Injector mutates pod]
-    INJECT --> POD[Pod with user container + daprd]
-    POD --> BOOT[daprd bootstrap and runtime config]
-    BOOT --> LOAD[Load scoped environment components]
-    LOAD --> LOCAL[Expose localhost HTTP/gRPC APIs]
-    LOCAL --> RUN[Serve app requests and component calls]
-```
-
+![Putting the whole sidecar lifecycle in one diagram](../../assets/azure-aca-deep-dive/05/05-12-putting-the-whole-sidecar-lifecycle-in-o.en.png)
 That is the compact lifecycle that turns a single ACA checkbox into a second runtime process in your pod.
 
 ---

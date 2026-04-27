@@ -10,17 +10,7 @@ They are related, but they are not the same. This post separates them by input s
 
 ## One diagram first
 
-```mermaid
-flowchart LR
-    M[CPU / Memory / Custom metrics] --> HPA[HPA]
-    HPA --> PODS[Pod replicas]
-    PODS --> PENDING[Unschedulable pods?]
-    PENDING --> CA[Cluster Autoscaler]
-    CA --> NODES[Node count]
-    E[Service Bus / Event Hub / Cron] --> KEDA[KEDA]
-    KEDA --> HPA
-```
-
+![One diagram first](../../assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
 That is the whole relationship.
 
 - HPA changes **pod count**.
@@ -55,14 +45,7 @@ If the input signal is bad, autoscaling decisions get noisy or misleading.
 
 ## The HPA loop
 
-```mermaid
-flowchart TB
-    A[collect current metrics] --> B[compare to target]
-    B --> C[calculate desired replicas]
-    C --> D[update Deployment replica count]
-    D --> E[create or remove pods]
-```
-
+![The HPA loop](../../assets/azure-aks-101/06/06-02-the-hpa-loop.en.png)
 Suppose a FastAPI API is running with two pods and the target CPU utilization is 60%. If the average keeps sitting around 90%, HPA will try to raise the replica count.
 
 But that is not the end of the story. If no nodes have room for the new pods, those pods go Pending. That is where Cluster Autoscaler enters.
@@ -86,23 +69,7 @@ That makes HPA and Cluster Autoscaler complementary, not competing.
 
 ## HPA and Cluster Autoscaler together
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Load as Traffic
-    participant H as HPA
-    participant D as Deployment
-    participant S as Scheduler
-    participant C as Cluster Autoscaler
-
-    Load->>H: CPU rises
-    H->>D: increase replicas
-    D->>S: create new pods
-    S-->>D: no room, pods Pending
-    S->>C: unschedulable pods exist
-    C->>S: add nodes, reschedule
-```
-
+![HPA and Cluster Autoscaler together](../../assets/azure-aks-101/06/06-03-hpa-and-cluster-autoscaler-together.en.png)
 This explains a very common operational moment: pod count increases, but response quality does not improve immediately because the new pods still need actual node capacity.
 
 ---
@@ -129,14 +96,7 @@ That is why the most accurate short description is: KEDA translates external eve
 
 ## KEDA sits on top of HPA
 
-```mermaid
-flowchart TB
-    SO[ScaledObject] --> OP[KEDA operator]
-    OP --> EXT[External metrics]
-    EXT --> HPA[HPA]
-    HPA --> DEP[Deployment replicas]
-```
-
+![KEDA sits on top of HPA](../../assets/azure-aks-101/06/06-04-keda-sits-on-top-of-hpa.en.png)
 This relationship is worth being exact about.
 
 - HPA is the pod autoscaling mechanism.

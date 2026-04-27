@@ -16,18 +16,7 @@
 
 먼저 새 인스턴스 하나가 처음부터 함수를 실행할 준비가 될 때까지 어떤 단계들을 거치는지 정리하겠습니다.
 
-```mermaid
-flowchart LR
-    A[VM/컨테이너 할당] --> B[베이스 이미지 부팅]
-    B --> C[.NET CLR 시작]
-    C --> D[Functions Host 어셈블리 로드]
-    D --> E[ScriptHost 빌드 + DI 컨테이너]
-    E --> F[사용자 코드 다운로드]
-    F --> G[워커 프로세스 시작<br/>Python/Node/Java]
-    G --> H[FunctionLoadRequest<br/>모든 함수 로드]
-    H --> I[첫 InvocationRequest]
-```
-
+![콜드 스타트가 왜 비싼가 — 부트스트랩 비용의 분해](../../assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)
 1번부터 5번까지(VM 할당 ~ DI 컨테이너 빌드)는 **사용자 코드와 무관**합니다. 누구의 함수든 똑같이 거치는 단계입니다. 6번부터(코드 다운로드)부터 사용자별로 달라집니다.
 
 Placeholder Mode의 아이디어는 정확히 이 분리를 이용합니다.
@@ -316,44 +305,7 @@ if (Interlocked.CompareExchange(ref _specialized, 1, 0) == 0)
 
 지금까지 본 것을 한 장의 sequence diagram으로 정리하겠습니다.
 
-```mermaid
-sequenceDiagram
-    participant PLAT as Functions Platform
-    participant POOL as Placeholder Pool
-    participant INST as Instance (호스트 프로세스)
-    participant SBM as StandbyManager
-    participant MWMID as HostWarmupMiddleware
-    participant MID as PlaceholderSpecialization<br/>Middleware
-    participant SHM as ScriptHostManager
-    participant USER as 첫 사용자 요청
-
-    PLAT->>POOL: 워밍된 placeholder 인스턴스 N개 유지
-    POOL->>INST: VM 부팅 + .NET + Functions Host 로드
-    INST->>SBM: InitializeAsync()
-    SBM->>SBM: WarmUp 함수 파일 생성
-    SBM->>SBM: 50ms specialization timer 시작
-    PLAT->>MWMID: warmup invocation 경로 진입
-    MWMID->>MWMID: PreJitPrepare(coldstart.jittrace)
-    Note over INST: placeholder ready<br/>(사용자 무관)
-
-    PLAT->>INST: 사용자 앱 환경변수·콘텐츠 주입
-    Note over INST: InStandbyMode=false<br/>IsContainerReady()=true
-
-    USER->>MID: HTTP 요청
-    MID->>SBM: SpecializeHostAsync()
-    SBM->>SBM: TimeZone/Config/AssemblyContext 리셋
-    SBM->>INST: workerManager.SpecializeAsync()
-    SBM->>SHM: RestartHostAsync("specialization")
-    SHM->>SHM: 사용자 함수 발견 + 바인딩 생성
-    SBM->>SHM: DelayUntilHostReadyAsync()
-    SHM-->>SBM: ready
-    SBM-->>MID: 완료
-    MID->>MID: _invoke = _next (이후 검사 스킵)
-    MID->>USER: 정상 처리
-
-    Note over MID,USER: 두 번째 요청부터는<br/>specialization 검사 없음
-```
-
+![전체 그림 — 한 인스턴스의 일생](../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.ko.png)
 ---
 
 ## 플랜별로 콜드 스타트가 다른 이유

@@ -23,50 +23,7 @@ data plane은 어디서 시작되며,
 이후 화들은 아래 박스 하나씩을 확대해서 보는 구조입니다.
 먼저 경계를 눈에 익혀 두면 뒤의 kubelet, CNI, scheduler, autoscaler 이야기가 한 줄로 이어집니다.
 
-```mermaid
-flowchart LR
-    U[User
-kubectl / az] --> API
-
-    subgraph CP[Microsoft-managed boundary]
-        direction TB
-        API[kube-apiserver]
-        ETCD[etcd]
-        CM[kube-controller-manager]
-        SCH[kube-scheduler]
-        API <--> ETCD
-        API --> CM
-        API --> SCH
-    end
-
-    API --> K1
-    API --> K2
-
-    subgraph DP[Customer-managed boundary]
-        direction TB
-        subgraph NP1[Node pool A]
-            direction TB
-            N1[Node 1
-kubelet + kube-proxy + containerd + CNI]
-            P11[Workload Pod]
-            P12[Workload Pod]
-            N1 --> P11
-            N1 --> P12
-        end
-        subgraph NP2[Node pool B]
-            direction TB
-            N2[Node 2
-kubelet + kube-proxy + containerd + CNI]
-            P21[Workload Pod]
-            P22[Workload Pod]
-            N2 --> P21
-            N2 --> P22
-        end
-        K1[kubelet]
-        K2[kubelet]
-    end
-```
-
+![전체 그림 — AKS 클러스터의 control vs data plane](../../assets/azure-aks-deep-dive/01/01-01-aks-control-vs-data-plane.ko.png)
 이 그림에서 `kube-apiserver`, `etcd`, `kube-controller-manager`, `kube-scheduler`는 이번 1화의 주인공이고,
 노드의 `kubelet + containerd`는 2화,
 `CNI`는 3화,
@@ -153,26 +110,7 @@ API server가 죽었는가,
 사용자 입장에서 AKS는 종종 `kubectl apply -f deployment.yaml` 한 줄로 보입니다.
 하지만 control plane 안에서는 다음 순서가 벌어집니다.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant User as User
-    participant API as kube-apiserver
-    participant ETCD as etcd
-    participant SCH as kube-scheduler
-    participant Kubelet as kubelet on node
-
-    User->>API: POST Deployment / Pod template
-    API->>ETCD: persist desired state
-    ETCD-->>API: write success
-    API-->>User: object accepted
-    SCH->>API: watch unscheduled Pod
-    SCH->>API: create Binding
-    API->>ETCD: persist Pod -> Node assignment
-    Kubelet->>API: watch assigned Pod
-    API-->>Kubelet: PodSpec
-```
-
+![요청 한 번이 지나가는 길](../../assets/azure-aks-deep-dive/01/01-02-diagram.ko.png)
 이 흐름에서 가장 중요한 점은 두 개입니다.
 첫째, API server는 실행기가 아니라 조정자입니다.
 둘째, 실제 컨테이너를 띄우는 마지막 단계는 control plane이 아니라 노드의 kubelet과 container runtime입니다.
@@ -244,14 +182,7 @@ ServiceAccount token 관련 루프,
 "현재 상태"와 "원하는 상태" 사이의 차이를 계속 계산하고,
 차이가 있으면 API server에 다시 씁니다.
 
-```mermaid
-flowchart LR
-    D[Desired state in API] --> C[kube-controller-manager loop]
-    A[Actual cluster state] --> C
-    C --> P[Patch / update through API server]
-    P --> D
-```
-
+![`kube-controller-manager` — 상태 차이를 메우는 루프 모음](../../assets/azure-aks-deep-dive/01/01-03-kube-controller-manager.ko.png)
 운영자가 이 루프를 이해해야 하는 이유는,
 Kubernetes의 많은 동작이 즉시 실행이 아니라 "언젠가 수렴"이기 때문입니다.
 리소스를 만들었다고 바로 끝나는 것이 아니라,

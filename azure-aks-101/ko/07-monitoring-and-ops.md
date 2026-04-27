@@ -10,19 +10,7 @@ AKS는 배포가 끝났다고 운영이 끝나지 않습니다. 오히려 그때
 
 ## 운영 시야를 한 장으로 보면
 
-```mermaid
-flowchart LR
-    CL[AKS Cluster] --> AMA[Azure Monitor agent]
-    CL --> KSM[kube-state-metrics]
-    AMA --> LA[Log Analytics]
-    AMA --> AMW[Azure Monitor Workspace]
-    KSM --> AMW
-    LA --> CI[Container Insights]
-    AMW --> DASH[Grafana / Metrics]
-    LA --> ALERT[Log alerts]
-    AMW --> PALERT[Prometheus alerts]
-```
-
+![운영 시야를 한 장으로 보면](../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
 이 그림에서 기억할 것은 두 축입니다.
 
 - **로그 축**: Log Analytics, Container Insights, KQL
@@ -143,14 +131,7 @@ Azure Monitor managed Prometheus의 기본 스크레이프 대상에도 kube-sta
 
 ## 알람은 어느 층에 걸어야 하나
 
-```mermaid
-flowchart TB
-    A[애플리케이션 층] --> A1[5xx 증가 / 지연 시간]
-    B[Kubernetes 객체 층] --> B1[replicas mismatch / restarts]
-    C[노드 층] --> C1[CPU / 메모리 / 디스크 압박]
-    D[플랫폼 층] --> D1[제어면 로그 / 모니터링 수집 이상]
-```
-
+![알람은 어느 층에 걸어야 하나](../../assets/azure-aks-101/07/07-02-where-alerts-should-live.ko.png)
 좋은 알람은 여러 층에 나뉘어 있습니다. CPU 80% 알람 하나만으로는 운영이 잘 되지 않습니다.
 
 ### 애플리케이션 층

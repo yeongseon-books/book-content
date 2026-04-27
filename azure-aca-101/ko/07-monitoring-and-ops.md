@@ -13,15 +13,7 @@ KQL과 Revision 비교와 Application Insights를 연결합니다.
 무슨 일이 있었는지는 Log Analytics에서 찾고.
 요청이 어디를 거쳤는지는 Application Insights에서 따라갑니다.
 
-```mermaid
-flowchart LR
-    App[App container] --> LA[Log Analytics]
-    Sidecar[Dapr sidecar] --> LA
-    ACA[ACA system events] --> LA
-    App --> AI[Application Insights]
-    Sidecar --> AI
-```
-
+![관측성 지도](../../assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
 ---
 
 ## 두 종류 로그

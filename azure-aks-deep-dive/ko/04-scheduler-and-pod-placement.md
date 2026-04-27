@@ -17,19 +17,7 @@ Binding을 기록합니다.
 
 ## 스케줄링의 세 단계
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Q as Scheduling queue
-    participant S as kube-scheduler
-    participant API as kube-apiserver
-
-    Q->>S: unscheduled Pod
-    S->>S: Filter plugins
-    S->>S: Score plugins
-    S->>API: Bind selected node
-```
-
+![스케줄링의 세 단계](../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.ko.png)
 ---
 
 ## Filter와 Score
@@ -39,16 +27,7 @@ Filter는 불가능한 노드를 지우고,
 Score는 가능한 노드 중 더 나은 후보를 고릅니다.
 기본 plugin 집합에는 `NodeResourcesFit`, `NodeAffinity`, `PodTopologySpread`, `InterPodAffinity` 같은 이름이 보입니다.
 
-```mermaid
-flowchart LR
-    P[Pending Pod] --> PF[PreFilter]
-    PF --> F[Filter]
-    F -->|feasible nodes| PS[PreScore]
-    PS --> SC[Score]
-    SC --> H[highest score]
-    H --> B[Bind]
-```
-
+![Filter와 Score](../../assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png)
 ---
 
 ## Binding이 뜻하는 것

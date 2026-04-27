@@ -17,16 +17,7 @@ and why App Service keeps pushing you toward stateless design.
 
 ## The routing path in three stages
 
-```mermaid
-flowchart LR
-    C[Client] --> FE[Front-End]
-    FE --> HOST[Host name validation]
-    HOST --> ARR[ARR routing]
-    ARR --> W1[Worker 1]
-    ARR --> W2[Worker 2]
-    ARR --> W3[Worker N]
-```
-
+![The routing path in three stages](../../assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
 At the public-documentation level, this is the safe mental model.
 
 1. The request enters the Front-End.
@@ -50,16 +41,7 @@ These decisions happen before your code runs:
 - which workers are eligible to receive traffic
 - whether an affinity cookie should keep the client on the same worker
 
-```mermaid
-flowchart TB
-    R[Incoming request] --> H[Resolve host and slot]
-    H --> A{ARR Affinity cookie?}
-    A -->|Yes| SAME[Prefer same worker]
-    A -->|No| PICK[Pick healthy worker]
-    SAME --> SEND[Forward request]
-    PICK --> SEND
-```
-
+![What the Front-End decides first](../../assets/azure-app-service-deep-dive/02/02-02-what-the-front-end-decides-first.en.png)
 This post avoids inventing undocumented selection algorithms.
 But the public facts are clear enough.
 **When ARR Affinity is enabled, follow-up requests from the same client can keep landing on the same worker.**
@@ -89,20 +71,7 @@ They are not the same thing.
 
 ## Request flow with ARR Affinity enabled
 
-```mermaid
-sequenceDiagram
-    participant U as Client
-    participant F as Front-End + ARR
-    participant W as Worker 2
-
-    U->>F: First request
-    F->>W: Forward request
-    W-->>F: Response
-    F-->>U: Response + ARRAffinity cookie
-    U->>F: Next request + same cookie
-    F->>W: Forward to same worker
-```
-
+![Request flow with ARR Affinity enabled](../../assets/azure-app-service-deep-dive/02/02-03-request-flow-with-arr-affinity-enabled.en.png)
 This is not inherently bad.
 It is often convenient for legacy apps.
 
@@ -116,16 +85,7 @@ The problem is that this convenience fights App Service's horizontal scaling mod
 
 ## Request flow with ARR Affinity disabled
 
-```mermaid
-flowchart LR
-    C1[Request 1] --> FE[Front-End + ARR]
-    FE --> W1[Worker 1]
-    C2[Request 2] --> FE
-    FE --> W2[Worker 2]
-    C3[Request 3] --> FE
-    FE --> W3[Worker 3]
-```
-
+![Request flow with ARR Affinity disabled](../../assets/azure-app-service-deep-dive/02/02-04-request-flow-with-arr-affinity-disabled.en.png)
 With affinity disabled,
 the platform stops assuming that the same client must keep returning to the same worker.
 That is why stateless apps fit App Service so well.
@@ -176,13 +136,7 @@ but a subset of users keep seeing latency or errors.”
 
 ARR Affinity is a strong suspect in that situation.
 
-```mermaid
-flowchart TB
-    U1[User A] -->|ARR cookie A| W1[Worker 1 healthy]
-    U2[User B] -->|ARR cookie B| W2[Worker 2 degraded]
-    U3[User C] -->|ARR cookie C| W1
-```
-
+![Why only some users fail sometimes](../../assets/azure-app-service-deep-dive/02/02-05-why-only-some-users-fail-sometimes.en.png)
 If Worker 2 is degraded because of memory pressure,
 slow dependencies,
 or restart churn,
@@ -217,13 +171,7 @@ Slots belong in this picture too.
 The Front-End resolves host and slot context first,
 then forwards into the worker set for that slot.
 
-```mermaid
-flowchart LR
-    C[Client] --> FE[Front-End]
-    FE --> PROD[Production slot workers]
-    FE --> STAGE[Staging slot workers]
-```
-
+![Slots are also part of request routing](../../assets/azure-app-service-deep-dive/02/02-06-slots-are-also-part-of-request-routing.en.png)
 That is why slot swap is not just a naming trick.
 It changes which worker set receives production traffic.
 Warm-up matters for the same reason.

@@ -19,30 +19,7 @@
 
 트리거가 “언제”와 “무엇을 가지고” 둘 다 결정한다는 점이 중요합니다. 이걸 그림으로 보면 다음과 같습니다.
 
-```mermaid
-flowchart LR
-    subgraph Sources [이벤트 소스 = 트리거의 원천]
-        H[HTTP 요청]
-        Q[Storage Queue]
-        B[Blob Storage]
-        T[Timer]
-        E[Event Hub]
-    end
-
-    subgraph Func [함수 실행]
-        direction TB
-        Trig[트리거<br/>Trigger]
-        Body[함수 본체]
-        Trig -- payload 전달 --> Body
-    end
-
-    H --> Trig
-    Q --> Trig
-    B --> Trig
-    T --> Trig
-    E --> Trig
-```
-
+![트리거 = 함수를 깨우는 “원인”](../../assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.ko.png)
 ---
 
 ## 트리거 카탈로그 — 자주 쓰는 것부터
@@ -59,20 +36,7 @@ flowchart LR
 
 새 함수를 설계할 때 던질 질문은 항상 같습니다. **“이 함수는 무엇 때문에 깨어나야 하는가?”** 그 답이 곧 트리거 선택입니다.
 
-```mermaid
-graph TD
-    Start[함수가 깨어날 이유는?] --> Q1{외부 클라이언트가<br/>직접 호출?}
-    Q1 -- 예 --> HTTP[HTTP Trigger]
-    Q1 -- 아니오 --> Q2{시간 기반?}
-    Q2 -- 예 --> Timer[Timer Trigger]
-    Q2 -- 아니오 --> Q3{메시지가 도착?}
-    Q3 -- 큐 --> SBQueue[Service Bus / Queue]
-    Q3 -- 스트림 --> EventHub[Event Hub]
-    Q3 -- 아니오 --> Q4{데이터/파일 변경?}
-    Q4 -- 파일 --> Blob[Blob Trigger]
-    Q4 -- DB --> Cosmos[Cosmos DB Change Feed]
-```
-
+![트리거 카탈로그 — 자주 쓰는 것부터](../../assets/azure-functions-101/02/02-02-trigger-catalog-the-ones-youll-actually.ko.png)
 ---
 
 ## 바인딩 = 함수 입출력의 “선언적 연결선”
@@ -126,16 +90,7 @@ DB 연결, 인증, 재시도 같은 운영 코드는 **Functions Host가 대신 
 
 세 종류의 관계를 한 그림으로 정리하면 이렇습니다.
 
-```mermaid
-flowchart LR
-    Event[외부 이벤트] -- 함수 깨움 + payload --> Trig[Trigger]
-    Trig --> Func[함수 본체]
-    DB[(외부 데이터<br/>Cosmos DB / Blob 등)] -- 실행 시점 조회 --> InBind[Input Binding]
-    InBind --> Func
-    Func --> OutBind[Output Binding]
-    OutBind --> Sink[(외부 싱크<br/>Queue / DB / Service Bus 등)]
-```
-
+![입력 바인딩과 출력 바인딩](../../assets/azure-functions-101/02/02-03-input-bindings-vs-output-bindings.ko.png)
 함수는 가운데에 있고, 외부 세계와는 트리거·입력·출력 세 갈래로 연결됩니다. **이 세 갈래를 선언적으로 표현한 것이 바인딩의 본질**입니다.
 
 ---

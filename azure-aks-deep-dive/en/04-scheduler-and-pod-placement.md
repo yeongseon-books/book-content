@@ -17,19 +17,7 @@ and records a Binding.
 
 ## The three steps
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Q as Scheduling queue
-    participant S as kube-scheduler
-    participant API as kube-apiserver
-
-    Q->>S: unscheduled Pod
-    S->>S: Filter plugins
-    S->>S: Score plugins
-    S->>API: Bind selected node
-```
-
+![The three steps](../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png)
 ---
 
 ## Filter and Score
@@ -39,16 +27,7 @@ Filter removes nodes where the Pod cannot run.
 Score ranks the nodes that remain.
 The default plugin set includes `NodeResourcesFit`, `NodeAffinity`, `PodTopologySpread`, and `InterPodAffinity`.
 
-```mermaid
-flowchart LR
-    P[Pending Pod] --> PF[PreFilter]
-    PF --> F[Filter]
-    F -->|feasible nodes| PS[PreScore]
-    PS --> SC[Score]
-    SC --> H[highest score]
-    H --> B[Bind]
-```
-
+![Filter and Score](../../assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png)
 ---
 
 ## What Binding means

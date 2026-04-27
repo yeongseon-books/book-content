@@ -13,16 +13,7 @@ Environment is the boundary.
 Container App is the logical service.
 Revision is the immutable snapshot of image and config.
 
-```mermaid
-flowchart TB
-    ENV[Environment]
-    ENV --> APP1[Container App: api]
-    ENV --> APP2[Container App: worker]
-    APP1 --> REV1[Revision 1]
-    APP1 --> REV2[Revision 2]
-    APP2 --> REV3[Revision 1]
-```
-
+![Start with the hierarchy](../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
 ---
 
 ## Environment

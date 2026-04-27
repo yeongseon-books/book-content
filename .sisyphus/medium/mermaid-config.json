@@ -1,0 +1,9 @@
+{
+  "theme": "default",
+  "themeVariables": {
+    "fontFamily": "ui-sans-serif, -apple-system, system-ui, sans-serif",
+    "fontSize": "14px"
+  },
+  "flowchart": { "curve": "basis", "htmlLabels": true },
+  "sequence": { "showSequenceNumbers": false }
+}

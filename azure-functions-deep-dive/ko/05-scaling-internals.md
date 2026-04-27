@@ -22,34 +22,7 @@
 
 코드를 보기 전에 한 장의 그림으로 정리하겠습니다.
 
-```mermaid
-flowchart TB
-    subgraph CTRL["Scale Controller<br/>(플랫폼 컴포넌트, 호스트 외부)"]
-        SC[인스턴스 수 결정<br/>= desired instances]
-    end
-
-    subgraph EXT["Trigger Extensions<br/>(WebJobs SDK 측)"]
-        SM[IScaleMonitor<br/>큐 길이 / 랙 측정]
-        TS[ITargetScaler<br/>target-based 공식]
-    end
-
-    subgraph HOST["Functions Host (인스턴스 N개)"]
-        HPM[HostPerformanceManager<br/>health ping 응답]
-        REPO[TableStorageScaleMetricsRepository<br/>메트릭 저장]
-        WCM[WorkerConcurrencyManager<br/>인스턴스 내 워커 수]
-        TM[ConcurrencyThrottleManager<br/>호스트/워커 부하 신호]
-    end
-
-    SC -->|"GET /admin/host/ping<br/>User-Agent: ScaleController"| HPM
-    SM -.->|"메트릭 보고"| REPO
-    TS -.->|"target 공식 결과"| SC
-    HPM -->|"200 / 429"| SC
-    SC -->|"스케일아웃 명령"| HOST
-
-    WCM -.->|"같은 인스턴스 내부에서<br/>워커 프로세스 추가"| HOST
-    TM -.->|"부하 신호"| HPM
-```
-
+![큰 그림 — 스케일링은 어디에서 결정되는가](../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
 눈여겨볼 점은 두 개의 다른 결정이 서로 다른 곳에서 일어난다는 것입니다.
 
 | 결정 | 결정자 | 신호 | 결과 |
@@ -168,20 +141,7 @@ health ping이 호스트의 "지금 더 받을 수 있냐"라면, **ScaleMonitor
 
 이 두 개념은 코드는 SDK에 있지만 호스트 입장에서 어떻게 흘러가는지는 명확합니다.
 
-```mermaid
-sequenceDiagram
-    participant TR as Trigger Extension<br/>(Storage Queue 등)
-    participant SM as IScaleMonitor /<br/>ITargetScaler
-    participant REPO as TableStorage<br/>ScaleMetricsRepository
-    participant SC as Scale Controller<br/>(외부)
-
-    TR->>SM: 주기적으로 메트릭 수집<br/>(큐 길이, 랙, ...)
-    SM->>REPO: WriteAsync(metrics)
-    SC->>REPO: ReadAsync(metrics)
-    SC->>SC: ScaleMonitor가 voted scaleStatus 산출<br/>OR TargetScaler가 desired count 산출
-    SC->>TR: 인스턴스 수 변경
-```
-
+![ScaleMonitor와 TargetScaler — 트리거가 직접 측정하는 신호](../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
 두 가지 모드가 있고, 각각 다른 시기에 도입됐습니다.
 
 ### Incremental scaling (`IScaleMonitor`)
@@ -252,29 +212,7 @@ OOP 워커(Python·Node·Java)에서 한 워커는 보통 단일 프로세스라
 
 호스트 코드는 어디서 돌든 똑같습니다. 위에 본 `HostPerformanceManager.cs`도, `TableStorageScaleMetricsRepository.cs`도, `WorkerConcurrencyManager.cs`도 모두 한 코드베이스입니다. 다른 건 **누가 이 코드 바깥에서 결정을 내리느냐**입니다.
 
-```mermaid
-flowchart LR
-    subgraph CON["Consumption"]
-        SC1[Scale Controller<br/>전통 모드]
-    end
-    subgraph FLEX["Flex Consumption"]
-        SC2[Scale Controller<br/>플랫폼 신형]
-    end
-    subgraph PREM["Premium"]
-        SC3[Scale Controller<br/>+ runtime scale 옵션]
-    end
-    subgraph DED["Dedicated (App Service)"]
-        SC4[App Service Auto-Scale<br/>또는 수동]
-    end
-
-    SC1 -->|메트릭 + ping| HOST
-    SC2 -->|메트릭 + ping<br/>+ per-function 그룹| HOST
-    SC3 -->|메트릭 + ping<br/>또는 in-runtime monitor| HOST
-    SC4 -->|CPU/메모리 룰<br/>이벤트 기반 X| HOST
-
-    HOST[Functions Host<br/>같은 코드]
-```
-
+![플랜별 차이 — 같은 코드, 다른 동작](../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
 플랜별로 한 줄씩 정리하면:
 
 ### Consumption

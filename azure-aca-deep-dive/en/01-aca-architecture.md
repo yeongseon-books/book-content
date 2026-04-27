@@ -26,47 +26,7 @@ This is the map for the whole series.
 Every later post expands one box from this picture.
 Get the shape first, then the platform behaviors stop looking like isolated features.
 
-```mermaid
-flowchart LR
-    CLIENT[External client\nBrowser / API consumer] --> LB[ACA-managed load balancer]
-    LB --> ENVOY[Envoy ingress\nTLS termination\nHTTP routing]
-
-    subgraph ACA[Microsoft-managed Kubernetes substrate]
-        direction LR
-
-        ENVOY --> REV1[Revision A\nweight 80]
-        ENVOY --> REV2[Revision B\nweight 20]
-
-        subgraph APP1[Container App revision A]
-            direction TB
-            SVC1[Service]
-            POD1[Pod]
-            POD1 --> APPCTR1[User container]
-            POD1 --> DAPR1[daprd sidecar]
-        end
-
-        subgraph APP2[Container App revision B]
-            direction TB
-            SVC2[Service]
-            POD2[Pod]
-            POD2 --> APPCTR2[User container]
-            POD2 --> DAPR2[daprd sidecar]
-        end
-
-        REV1 --> SVC1
-        REV2 --> SVC2
-
-        KEDA[KEDA controller\nmetrics adapter\nscale decisions]
-        KEDA --> APP1
-        KEDA --> APP2
-    end
-
-    APP1 --> LOGS[Log Analytics / App Insights]
-    APP2 --> LOGS
-    APP1 --> ACR[Azure Container Registry]
-    APP2 --> ACR
-```
-
+![The big picture — one Container Apps environment](../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
 The left edge is the user-facing path.
 The middle is the runtime surface you configure as Container Apps.
 The dotted boundary is the Kubernetes layer you do not directly control.
@@ -116,14 +76,7 @@ That is the frame for the rest of the series.
 
 The stack is easier to reason about when split into layers.
 
-```mermaid
-flowchart TB
-    U[User-facing ACA resource model\nContainer App / Revision / Environment] --> P[Platform behaviors\nIngress / Traffic split / Scale / Dapr integration]
-    P --> OSS[Managed OSS building blocks\nKEDA / Dapr / Envoy]
-    OSS --> K8S[Microsoft-managed Kubernetes substrate]
-    K8S --> INFRA[Azure compute / network / storage primitives]
-```
-
+![A simpler model: ACA is a product surface over several lower layers](../../assets/azure-aca-deep-dive/01/01-02-a-simpler-model-aca-is-a-product-surface.en.png)
 The top layer is what you declare.
 The middle layers are how the declaration becomes runtime behavior.
 The bottom layer is where the actual execution capacity lives.
@@ -156,20 +109,7 @@ That means the Environment is where several platform-wide concerns become real.
 
 This is why an environment choice is architectural, not cosmetic.
 
-```mermaid
-flowchart LR
-    subgraph ENV[One Container Apps environment]
-        direction TB
-        APPA[App A]
-        APPB[App B]
-        APPC[App C]
-    end
-
-    ENV --> VNET[Virtual network boundary]
-    ENV --> LOG[Shared Log Analytics destination]
-    ENV --> DAPRCFG[Shared Dapr component surface]
-```
-
+![What the Environment really is](../../assets/azure-aca-deep-dive/01/01-03-what-the-environment-really-is.en.png)
 If two apps must never share those boundaries, they do not belong in the same environment.
 If they should communicate through built-in Dapr service invocation and land in the same telemetry plane, the environment is exactly where you group them.
 
@@ -188,16 +128,7 @@ That revision is immutable.
 
 You can think of the runtime expansion like this:
 
-```mermaid
-flowchart LR
-    APP[Container App] --> REV[Revision]
-    REV --> SVC[Service endpoint inside environment]
-    SVC --> REP[Replica set of pods]
-    REP --> POD[Pod]
-    POD --> USER[User container]
-    POD --> DAPR[daprd sidecar if enabled]
-```
-
+![What a Container App becomes at runtime](../../assets/azure-aca-deep-dive/01/01-04-what-a-container-app-becomes-at-runtime.en.png)
 The user experience says, "I updated my app."
 The runtime reality is closer to, "the platform minted a new immutable revision template, attached traffic and scale policy to it, then ran replicas from that snapshot."
 
@@ -223,18 +154,7 @@ You can:
 
 This is why ACA can do canary and blue-green without making you design that wiring from scratch.
 
-```mermaid
-stateDiagram-v2
-    [*] --> Provisioning
-    Provisioning --> Active: readiness passed
-    Provisioning --> Failed: checks failed
-    Active --> ScaleToZero: no active replicas
-    ScaleToZero --> Active: traffic or event trigger
-    Active --> Inactive: deactivated by operator
-    Failed --> Inactive
-    Inactive --> [*]
-```
-
+![Revisions are the operational center of gravity](../../assets/azure-aca-deep-dive/01/01-05-revisions-are-the-operational-center-of.en.png)
 The important nuance is that traffic policy is app-facing, but scale happens per revision.
 That separation explains a lot of rollout behavior.
 
@@ -263,14 +183,7 @@ For HTTP, ACA exposes a built-in HTTP scaling feature based on request concurren
 That resembles the KEDA HTTP add-on idea, but it is not a promise that ACA literally runs the upstream `kedacore/http-add-on` project one-to-one.
 The product surface is ACA's own.
 
-```mermaid
-flowchart LR
-    RULE[ACA scale rule] --> PLATFORM[ACA control plane]
-    PLATFORM --> KEDAOBJ[Managed KEDA objects]
-    KEDAOBJ --> HPA[HPA behavior / metrics queries]
-    HPA --> REPLICAS[Revision replica count]
-```
-
+![Why KEDA matters even if you never see a ScaledObject](../../assets/azure-aca-deep-dive/01/01-06-why-keda-matters-even-if-you-never-see-a.en.png)
 Episode 4 opens that black box.
 
 ---
@@ -289,13 +202,7 @@ The most useful way to picture this is simple.
 - The sidecar exposes the Dapr HTTP API on port 3500 and the Dapr gRPC API on port 50001.
 - Components are configured at the environment level, then loaded according to Dapr scopes.
 
-```mermaid
-flowchart LR
-    APP[User container] -->|localhost:3500 or 50001| DAPRD[daprd sidecar]
-    DAPRD --> COMP[Environment-level Dapr component]
-    COMP --> EXT[External state / pubsub / secret store]
-```
-
+![Dapr in ACA is not a mock integration](../../assets/azure-aca-deep-dive/01/01-07-dapr-in-aca-is-not-a-mock-integration.en.png)
 That is a real sidecar process, not a control-plane simulation.
 
 Episode 5 traces the injector and the Go runtime process itself.
@@ -315,16 +222,7 @@ The critical detail for this series is how weights are applied.
 In Envoy terminology, a cluster is an upstream service target, not a Kubernetes cluster.
 Traffic splitting across ACA revisions maps naturally onto weighted upstream cluster selection.
 
-```mermaid
-flowchart LR
-    CLIENT[Client request] --> LB[ACA-managed load balancer]
-    LB --> ENVOY[Envoy ingress]
-    ENVOY -->|80%| C1[Upstream cluster for revision A]
-    ENVOY -->|20%| C2[Upstream cluster for revision B]
-    C1 --> S1[Service A] --> P1[Pod A]
-    C2 --> S2[Service B] --> P2[Pod B]
-```
-
+![Envoy is where ingress becomes runtime routing](../../assets/azure-aca-deep-dive/01/01-08-envoy-is-where-ingress-becomes-runtime-r.en.png)
 Episode 6 follows this path in full.
 
 ---
@@ -333,30 +231,7 @@ Episode 6 follows this path in full.
 
 This split helps when debugging.
 
-```mermaid
-flowchart LR
-    subgraph CP[Control plane]
-        CFG[Environment and app config]
-        REV[Revision creation]
-        SCALE[Scale reconciliation]
-        DAPRCTL[Dapr component registration]
-        TRAFFIC[Traffic weight updates]
-    end
-
-    subgraph DP[Data plane]
-        ENVOY[Envoy ingress]
-        SVC[Service hop]
-        POD[Pod replica]
-        SIDECAR[daprd sidecar]
-    end
-
-    CFG --> REV
-    REV --> POD
-    SCALE --> POD
-    DAPRCTL --> SIDECAR
-    TRAFFIC --> ENVOY
-```
-
+![Control plane versus data plane in ACA](../../assets/azure-aca-deep-dive/01/01-09-control-plane-versus-data-plane-in-aca.en.png)
 If a new revision exists but serves no traffic, that is usually a control-plane decision.
 If traffic reaches the revision but fails before the app responds, that is a data-plane path problem.
 If scale rules exist but replicas stay at zero, the boundary is KEDA metrics and activation logic.

@@ -10,23 +10,7 @@
 
 ## 세 객체를 한 장으로 보면
 
-```mermaid
-flowchart TB
-    DEP[Deployment]
-    RS[ReplicaSet]
-    POD1[Pod 1]
-    POD2[Pod 2]
-    SVC[Service]
-    CLIENT[Client]
-
-    DEP --> RS
-    RS --> POD1
-    RS --> POD2
-    CLIENT --> SVC
-    SVC --> POD1
-    SVC --> POD2
-```
-
+![세 객체를 한 장으로 보면](../../assets/azure-aks-101/04/04-01-one-picture-first.ko.png)
 이 그림이 거의 전부입니다.
 
 - **Pod**는 컨테이너를 실행하는 최소 단위
@@ -200,21 +184,7 @@ NodePort는 구조를 이해하는 데는 좋지만, 외부 공개의 최종 형
 
 새 버전 이미지를 배포한다고 해 보겠습니다. Deployment는 보통 기존 Pod를 한 번에 다 지우지 않고, 일부씩 새 버전으로 교체합니다.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant D as Deployment
-    participant R as ReplicaSet
-    participant S as Service
-    participant O as Old Pods
-    participant N as New Pods
-
-    D->>R: 새 템플릿 반영
-    R->>N: 새 Pod 생성
-    S->>N: Ready 된 Pod부터 연결
-    R->>O: 기존 Pod 축소
-```
-
+![롤링 업데이트를 떠올리면 Deployment의 역할이 더 잘 보인다](../../assets/azure-aks-101/04/04-02-deployment-becomes-clearer-when-you-imag.ko.png)
 이 과정에서 Service는 Ready 상태가 된 새 Pod로 자연스럽게 붙습니다. 그래서 readiness probe가 중요합니다. “살아 있다”와 “트래픽 받아도 된다”를 구분하지 않으면, Service가 너무 일찍 새 Pod로 붙어 버릴 수 있습니다.
 
 ---

@@ -10,15 +10,7 @@ This post creates a small AKS cluster, adds a user node pool, and deploys a mini
 
 ## Today's flow
 
-```mermaid
-flowchart LR
-    A[az group create] --> B[az aks create]
-    B --> C[az aks nodepool add]
-    C --> D[az aks get-credentials]
-    D --> E[kubectl apply -f]
-    E --> F[kubectl get pods / svc]
-```
-
+![Today's flow](../../assets/azure-aks-101/03/03-01-today-s-flow.en.png)
 The split matters. `az` creates and configures Azure resources. `kubectl` talks to the Kubernetes API once the cluster exists.
 
 ---
@@ -253,14 +245,7 @@ The `-o wide` output is especially useful because it shows where the pods actual
 
 ## 8. The request path
 
-```mermaid
-flowchart LR
-    C[Client] --> LB[Azure Load Balancer]
-    LB --> SVC[Service: LoadBalancer]
-    SVC --> P1[Pod 1]
-    SVC --> P2[Pod 2]
-```
-
+![8. The request path](../../assets/azure-aks-101/03/03-02-8-the-request-path.en.png)
 This is the pre-Ingress version of exposure. The Service is carrying both the stable service identity and the external publication path. In the next networking post, an Ingress layer will sit in front of ClusterIP services instead.
 
 ---

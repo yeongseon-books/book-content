@@ -18,36 +18,7 @@
 
 먼저 한 호출의 전체 경로를 한 화면에 그리고 시작하겠습니다.
 
-```mermaid
-sequenceDiagram
-    participant T as Trigger<br/>(Queue/HTTP/Timer/...)
-    participant SDK as WebJobs SDK
-    participant WFI as WorkerFunctionInvoker
-    participant DISP as IFunctionInvocationDispatcher<br/>(Rpc 구현체)
-    participant GWC as GrpcWorkerChannel
-    participant OC as 워커별 Outbound Channel
-    participant IC as 워커별 Inbound Channel
-    participant FRS as FunctionRpcService
-    participant W as Worker
-
-    T->>SDK: 트리거 발화 (메시지 도착, HTTP 도달, 타이머 만료)
-    SDK->>WFI: InvokeCore (binding 데이터)
-    WFI->>DISP: InvokeAsync(ScriptInvocationContext)
-    DISP->>GWC: SendInvocationRequest
-    GWC->>OC: OutboundGrpcEvent { InvocationRequest }
-    FRS->>OC: outbound.Reader 읽기
-    FRS-->>W: StreamingMessage(InvocationRequest)
-
-    W->>W: 사용자 함수 실행
-    W-->>FRS: StreamingMessage(InvocationResponse)
-    FRS->>IC: InboundGrpcEvent { InvocationResponse }
-    GWC->>IC: inbound.Reader 읽기
-    GWC->>DISP: TaskCompletionSource.SetResult
-    DISP->>WFI: 결과 반환
-    WFI->>SDK: 결과 반환
-    SDK->>T: 트리거 완료
-```
-
+![큰 그림 — 트리거에서 워커까지](../../assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.ko.png)
 이 그림이 4화의 전부입니다. 이제 각 단계를 코드로 봅니다.
 
 ---
@@ -215,17 +186,7 @@ gRPC stream
 
 다만 **logging이나 같은 함수에 대한 일부 메시지 순서**는 지켜져야 할 때가 있습니다. 그래서 [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs)가 존재합니다 — invocation 단위로 메시지 순서를 보장하면서도 invocation 사이의 병렬성은 유지합니다.
 
-```mermaid
-flowchart LR
-    GWC[GrpcWorkerChannel] --> Dispatch[OrderedInvocation<br/>MessageDispatcher]
-    Dispatch -->|invocation_id A| QA[Queue A<br/>순서 보장]
-    Dispatch -->|invocation_id B| QB[Queue B<br/>순서 보장]
-    Dispatch -->|invocation_id C| QC[Queue C<br/>순서 보장]
-    QA --> Handler[per-invocation 핸들러]
-    QB --> Handler
-    QC --> Handler
-```
-
+![동시 호출 — 한 워커가 여러 개를 동시에 처리한다](../../assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.ko.png)
 같은 `invocation_id`의 메시지들은 도착 순서대로 처리되지만, 서로 다른 `invocation_id`들은 병렬로 처리됩니다.
 
 ---

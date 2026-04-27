@@ -22,34 +22,7 @@ This installment has three goals:
 
 Before we touch any code, here's the whole thing in one diagram.
 
-```mermaid
-flowchart TB
-    subgraph CTRL["Scale Controller<br/>(platform component, outside the host)"]
-        SC[Instance count decision<br/>= desired instances]
-    end
-
-    subgraph EXT["Trigger Extensions<br/>(WebJobs SDK side)"]
-        SM[IScaleMonitor<br/>queue length / lag measurement]
-        TS[ITargetScaler<br/>target-based formula]
-    end
-
-    subgraph HOST["Functions Host (N instances)"]
-        HPM[HostPerformanceManager<br/>health ping response]
-        REPO[TableStorageScaleMetricsRepository<br/>metric storage]
-        WCM[WorkerConcurrencyManager<br/>worker count within an instance]
-        TM[ConcurrencyThrottleManager<br/>host/worker load signal]
-    end
-
-    SC -->|"GET /admin/host/ping<br/>User-Agent: ScaleController"| HPM
-    SM -.->|"report metrics"| REPO
-    TS -.->|"target formula result"| SC
-    HPM -->|"200 / 429"| SC
-    SC -->|"scale-out command"| HOST
-
-    WCM -.->|"add worker processes<br/>within the same instance"| HOST
-    TM -.->|"load signal"| HPM
-```
-
+![The big picture — where scaling decisions are made](../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
 The key insight is that two different decisions are made in two different places.
 
 | Decision | Decided by | Signal | Result |
@@ -168,20 +141,7 @@ If the health ping is the host's answer to "can you take more right now?", then 
 
 The code for these lives in the SDK, but the way they flow from the host's perspective is clear.
 
-```mermaid
-sequenceDiagram
-    participant TR as Trigger Extension<br/>(e.g. Storage Queue)
-    participant SM as IScaleMonitor /<br/>ITargetScaler
-    participant REPO as TableStorage<br/>ScaleMetricsRepository
-    participant SC as Scale Controller<br/>(external)
-
-    TR->>SM: collect metrics periodically<br/>(queue length, lag, ...)
-    SM->>REPO: WriteAsync(metrics)
-    SC->>REPO: ReadAsync(metrics)
-    SC->>SC: ScaleMonitor produces voted scaleStatus<br/>OR TargetScaler produces desired count
-    SC->>TR: change instance count
-```
-
+![ScaleMonitor and TargetScaler — the signals triggers measure directly](../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.en.png)
 There are two modes, introduced at different points in time.
 
 ### Incremental scaling (`IScaleMonitor`)
@@ -252,29 +212,7 @@ Putting these two side by side:
 
 The host code is identical wherever it runs. The `HostPerformanceManager.cs` we just looked at, the `TableStorageScaleMetricsRepository.cs`, the `WorkerConcurrencyManager.cs` — all one codebase. What differs is **who is making decisions outside this code**.
 
-```mermaid
-flowchart LR
-    subgraph CON["Consumption"]
-        SC1[Scale Controller<br/>classic mode]
-    end
-    subgraph FLEX["Flex Consumption"]
-        SC2[Scale Controller<br/>new platform-side]
-    end
-    subgraph PREM["Premium"]
-        SC3[Scale Controller<br/>+ runtime scale option]
-    end
-    subgraph DED["Dedicated (App Service)"]
-        SC4[App Service Auto-Scale<br/>or manual]
-    end
-
-    SC1 -->|metrics + ping| HOST
-    SC2 -->|metrics + ping<br/>+ per-function group| HOST
-    SC3 -->|metrics + ping<br/>or in-runtime monitor| HOST
-    SC4 -->|CPU/memory rules<br/>not event-driven| HOST
-
-    HOST[Functions Host<br/>same code]
-```
-
+![Plan-by-plan — same code, different behavior](../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.en.png)
 Plan by plan, in a sentence each:
 
 ### Consumption

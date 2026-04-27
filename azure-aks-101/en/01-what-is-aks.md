@@ -13,63 +13,7 @@ AKS is Azure's answer to that cost. This first post is about understanding AKS m
 This is the map for the whole series.
 Each later post zooms into one part of the picture.
 
-```mermaid
-flowchart LR
-    subgraph Clients[Clients]
-        U1[Browser]
-        U2[Mobile app]
-        U3[Internal service]
-    end
-
-    subgraph Entry[Ingress / Services]
-        ING[Ingress]
-        SVC[Service]
-    end
-
-    subgraph Workloads[Workloads]
-        subgraph NS1[Namespace: prod]
-            D1[Deployment: api]
-            P1[Pod]
-            P2[Pod]
-            D1 --> P1
-            D1 --> P2
-        end
-        subgraph NS2[Namespace: ops]
-            D2[Deployment: worker]
-            P3[Pod]
-            D2 --> P3
-        end
-    end
-
-    subgraph Nodes[Node Pool]
-        NP1[System node pool]
-        NP2[User node pool]
-    end
-
-    subgraph Control[Control plane<br/>managed by Azure]
-        API[API server]
-        SCHED[Scheduler]
-        ETCD[etcd]
-    end
-
-    ACR[Azure Container Registry]
-    LA[Log Analytics]
-    CI[Container Insights]
-
-    U1 --> ING
-    U2 --> ING
-    U3 --> SVC
-    ING --> SVC
-    SVC --> Workloads
-    Workloads --> NP1
-    Workloads --> NP2
-    Control --> NP1
-    Control --> NP2
-    ACR --> Workloads
-    Workloads --> LA
-    LA --> CI
-```
-
+![The big picture — one AKS cluster at a glance](../../assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.en.png)
 Part 2 zooms into the control plane and node pools, parts 3 and 4 cover Deployments, Pods, and Services, part 5 covers networking and Ingress, part 6 covers scaling, and part 7 covers monitoring and operations.
 
 ---
@@ -92,24 +36,7 @@ AKS does not hide Kubernetes from you. `kubectl`, YAML manifests, Services, Ingr
 
 “Managed” is only useful if it cashes out into concrete operational differences.
 
-```mermaid
-flowchart TB
-    subgraph Azure[Mostly Azure's job]
-        A1[Control plane provisioning]
-        A2[API server availability]
-        A3[Core maintenance]
-        A4[Azure service integration]
-    end
-
-    subgraph User[Still your job]
-        U1[Application images]
-        U2[Requests and limits]
-        U3[Rollout strategy]
-        U4[Network and security policy]
-        U5[Capacity and cost]
-    end
-```
-
+![What “managed” means in practice](../../assets/azure-aks-101/01/01-02-what-managed-means-in-practice.en.png)
 Managed Kubernetes does not mean “operations disappear.” It means the center of gravity shifts. You spend less time thinking about etcd topology and control plane bootstrap, and more time thinking about workload placement, scaling, traffic management, observability, and cost.
 
 That distinction matters for two reasons.

@@ -19,30 +19,7 @@ The rules are simple:
 
 The point worth holding onto: a trigger decides both *when* and *with what*. Visually:
 
-```mermaid
-flowchart LR
-    subgraph Sources [Event sources = where triggers come from]
-        H[HTTP request]
-        Q[Storage Queue]
-        B[Blob Storage]
-        T[Timer]
-        E[Event Hub]
-    end
-
-    subgraph Func [Function execution]
-        direction TB
-        Trig[Trigger]
-        Body[Function body]
-        Trig -- passes payload --> Body
-    end
-
-    H --> Trig
-    Q --> Trig
-    B --> Trig
-    T --> Trig
-    E --> Trig
-```
-
+![A trigger is the “cause” that wakes a function up](../../assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png)
 ---
 
 ## Trigger catalog — the ones you’ll actually use
@@ -59,20 +36,7 @@ The full list is in the official docs, but in practice 90%+ of real-world work f
 
 When you design a new function, the question is always the same: **“What should cause this function to wake up?”** The answer is your trigger.
 
-```mermaid
-graph TD
-    Start[Why should the function wake up?] --> Q1{Called directly by<br/>an external client?}
-    Q1 -- Yes --> HTTP[HTTP Trigger]
-    Q1 -- No --> Q2{Time-based?}
-    Q2 -- Yes --> Timer[Timer Trigger]
-    Q2 -- No --> Q3{A message arrives?}
-    Q3 -- Queue --> SBQueue[Service Bus / Queue]
-    Q3 -- Stream --> EventHub[Event Hub]
-    Q3 -- No --> Q4{Data/file changed?}
-    Q4 -- File --> Blob[Blob Trigger]
-    Q4 -- DB --> Cosmos[Cosmos DB Change Feed]
-```
-
+![Trigger catalog — the ones you’ll actually use](../../assets/azure-functions-101/02/02-02-trigger-catalog-the-ones-youll-actually.en.png)
 ---
 
 ## Bindings = a declarative wire for function I/O
@@ -126,16 +90,7 @@ For example, you might have a function that says: “When an HTTP request comes 
 
 The three pieces in one diagram:
 
-```mermaid
-flowchart LR
-    Event[External event] -- wakes function + payload --> Trig[Trigger]
-    Trig --> Func[Function body]
-    DB[(External data<br/>Cosmos DB / Blob / etc.)] -- read at execution time --> InBind[Input Binding]
-    InBind --> Func
-    Func --> OutBind[Output Binding]
-    OutBind --> Sink[(External sink<br/>Queue / DB / Service Bus / etc.)]
-```
-
+![Input bindings vs. output bindings](../../assets/azure-functions-101/02/02-03-input-bindings-vs-output-bindings.en.png)
 The function sits in the middle, and it talks to the outside world through three lanes: trigger, input, output. **Bindings are simply the declarative expression of those three lanes.**
 
 ---

@@ -12,21 +12,7 @@ Cluster Autoscaler는 별도 Deployment로 떠서 unschedulable Pod를 보고 no
 
 ## 두 루프를 한 그림으로 보기
 
-```mermaid
-flowchart LR
-    M[Metrics] --> HPA[HPA controller]
-    HPA --> R[desired replicas]
-    R --> API1[update Scale]
-    API1 --> Pods[more or fewer Pods]
-
-    Pods --> U[unschedulable Pods]
-    U --> CA[Cluster Autoscaler]
-    CA --> Sim[binpacking simulation]
-    Sim --> NG[node group scale-up]
-    NG --> Nodes[more nodes]
-    Nodes --> Pods
-```
-
+![두 루프를 한 그림으로 보기](../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.ko.png)
 ---
 
 ## HPA의 핵심
@@ -37,22 +23,7 @@ flowchart LR
 missing metrics,
 stabilization window를 더 고려합니다.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant H as HPA controller
-    participant Metrics as metrics APIs
-    participant API as kube-apiserver
-    participant Scale as target /scale
-
-    H->>Metrics: fetch current metrics
-    Metrics-->>H: currentMetric
-    H->>Scale: read current replicas
-    Scale-->>H: currentReplicas
-    H->>H: compute desiredReplicas
-    H->>API: update target scale
-```
-
+![HPA의 핵심](../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.ko.png)
 ---
 
 ## CA의 핵심
@@ -62,17 +33,7 @@ CA는 unschedulable Pod를 보고,
 새 노드가 생기면 scheduler가 이 Pod를 배치할 수 있을지 먼저 시뮬레이션한 뒤,
 가장 적절한 pool을 선택해 node 수를 늘립니다.
 
-```mermaid
-flowchart TB
-    A[Unschedulable Pods] --> B[group pods by equivalence]
-    B --> C[For each node pool]
-    C --> D[Build template node]
-    D --> E[Binpacking estimator]
-    E --> F[Expansion option]
-    F --> G[Pick best node group]
-    G --> H[Increase node count]
-```
-
+![CA의 핵심](../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.ko.png)
 ---
 
 ## 이번 화의 요점

@@ -13,63 +13,7 @@ AKS는 그 부담을 줄이기 위해 나온 Azure의 관리형 Kubernetes입니
 이 그림이 이번 시리즈 전체의 지도입니다.
 뒤의 화들은 아래 상자 하나씩을 확대해서 보는 구조입니다.
 
-```mermaid
-flowchart LR
-    subgraph Clients[클라이언트]
-        U1[브라우저]
-        U2[모바일 앱]
-        U3[사내 서비스]
-    end
-
-    subgraph Entry[Ingress / Services]
-        ING[Ingress]
-        SVC[Service]
-    end
-
-    subgraph Workloads[워크로드]
-        subgraph NS1[Namespace: prod]
-            D1[Deployment: api]
-            P1[Pod]
-            P2[Pod]
-            D1 --> P1
-            D1 --> P2
-        end
-        subgraph NS2[Namespace: ops]
-            D2[Deployment: worker]
-            P3[Pod]
-            D2 --> P3
-        end
-    end
-
-    subgraph Nodes[Node Pool]
-        NP1[System node pool]
-        NP2[User node pool]
-    end
-
-    subgraph Control[Control plane<br/>Azure가 관리]
-        API[API server]
-        SCHED[Scheduler]
-        ETCD[etcd]
-    end
-
-    ACR[Azure Container Registry]
-    LA[Log Analytics]
-    CI[Container Insights]
-
-    U1 --> ING
-    U2 --> ING
-    U3 --> SVC
-    ING --> SVC
-    SVC --> Workloads
-    Workloads --> NP1
-    Workloads --> NP2
-    Control --> NP1
-    Control --> NP2
-    ACR --> Workloads
-    Workloads --> LA
-    LA --> CI
-```
-
+![전체 그림 — AKS 클러스터 한 장면](../../assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.ko.png)
 이 시리즈는 2화에서 Control Plane과 Node Pool 경계를, 3화와 4화에서 Deployment·Pod·Service를, 5화에서 Ingress와 네트워킹을, 6화에서 스케일링을, 7화에서 모니터링과 운영을 각각 확대합니다.
 
 ---
@@ -92,24 +36,7 @@ AKS를 써도 Kubernetes가 사라지는 것은 아닙니다. `kubectl`, YAML, I
 
 관리형이라는 말은 마케팅 문구처럼 들리기 쉽지만, 실무에서는 꽤 구체적입니다.
 
-```mermaid
-flowchart TB
-    subgraph Azure[Azure가 주로 담당]
-        A1[Control plane 배포]
-        A2[API server 가용성]
-        A3[기본 유지보수]
-        A4[Azure 서비스 통합]
-    end
-
-    subgraph User[사용자가 여전히 담당]
-        U1[애플리케이션 이미지]
-        U2[리소스 요청과 제한]
-        U3[배포 전략]
-        U4[네트워크 정책과 보안 설정]
-        U5[노드 수와 비용 관리]
-    end
-```
-
+![AKS가 “관리형”이라는 말의 정확한 뜻](../../assets/azure-aks-101/01/01-02-what-managed-means-in-practice.ko.png)
 AKS를 도입한다고 해서 “운영을 안 해도 된다”는 뜻은 아닙니다. 운영의 초점이 바뀝니다. 직접 etcd와 API server를 만지던 운영에서, **워크로드 배치와 비용, 네트워크, 릴리스, 관측성**을 설계하는 운영으로 이동합니다.
 
 이 구분이 중요한 이유는 두 가지입니다.

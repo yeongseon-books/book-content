@@ -25,54 +25,7 @@ This is the map for the rest of the series.
 Each later episode zooms into one of these boxes.
 Get the layout into your head first and the lower-level details land much more cleanly.
 
-```mermaid
-flowchart LR
-    CLIENT[External client]
-    EDGE[Azure Front Door<br/>or Traffic Manager]
-
-    subgraph FE[App Service Front-End]
-        direction TB
-        LB[Load balancing]
-        ARR[ARR<br/>routing + affinity]
-    end
-
-    subgraph SLOT[Deployment slot pool]
-        direction TB
-        SLOTPROD[Production slot]
-        SLOTSTAGE[Staging slot]
-    end
-    style SLOT stroke-dasharray: 5 5
-
-    subgraph WORKERS[Worker pool]
-        direction TB
-        W1[Worker 1<br/>sandbox + app process]
-        W2[Worker 2<br/>sandbox + app process]
-        W3[Worker N<br/>sandbox + app process]
-    end
-
-    FS[File server<br/>mounted at /home]
-    KUDU[Kudu / SCM site]
-    OBS[Application Insights<br/>Log Analytics]
-
-    CLIENT --> EDGE --> LB --> ARR
-    ARR --> SLOTPROD
-    ARR --> SLOTSTAGE
-    SLOTPROD --> W1
-    SLOTPROD --> W2
-    SLOTPROD --> W3
-    SLOTSTAGE --> W1
-    SLOTSTAGE --> W2
-    SLOTSTAGE --> W3
-    FS --> W1
-    FS --> W2
-    FS --> W3
-    KUDU --> FS
-    W1 --> OBS
-    W2 --> OBS
-    W3 --> OBS
-    KUDU --> OBS
-```
-
+![The big picture — one request through App Service](../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
 The global entry and client edge are intro-series territory.
 The Front-End and ARR path are episode 2.
 Workers and the per-worker sandbox are episode 3.
@@ -116,17 +69,7 @@ The local-cache documentation makes the shared-content point especially explicit
 App content is stored in a durable shared content store,
 and that content is shared across multiple VM instances.
 
-```mermaid
-flowchart LR
-    FE1[Front-End] --> W1[Worker A]
-    FE1 --> W2[Worker B]
-    FE1 --> W3[Worker C]
-    FS[Shared content store<br/>/home mounted to workers]
-    FS --> W1
-    FS --> W2
-    FS --> W3
-```
-
+![Canonical public architecture — Front-End, Worker, shared storage](../../assets/azure-app-service-deep-dive/01/01-02-canonical-public-architecture-front-end.en.png)
 The critical property here is not raw speed.
 It is shared visibility.
 The storage is shared,
@@ -174,14 +117,7 @@ The more accurate picture is this:
 - Apps are placed on that capacity.
 - Scale-out increases the app's running instances across workers.
 
-```mermaid
-flowchart TB
-    PLAN[App Service Plan] --> POOL[Worker capacity pool]
-    POOL --> APP1[App instance 1]
-    POOL --> APP2[App instance 2]
-    POOL --> APP3[App instance 3]
-```
-
+![Workers are what “instance count” actually means](../../assets/azure-app-service-deep-dive/01/01-03-workers-are-what-instance-count-actually.en.png)
 Workers are where user code really runs.
 For Windows code apps, the key process is IIS-hosted `w3wp.exe`.
 For Linux apps, the key execution unit is a container.
@@ -224,14 +160,7 @@ It is the deployment engine.
 It is the public code path for ZipDeploy and publish APIs.
 And for Windows App Service deployment internals, it is the primary open-source window.
 
-```mermaid
-flowchart LR
-    CLIENT[git push / zip deploy / publish] --> KUDU[Kudu SCM site]
-    KUDU --> BUILD[Build / detect / deploy]
-    BUILD --> FS[/home/site/wwwroot]
-    FS --> WORKER[Worker reload]
-```
-
+![Kudu is the deployment buddy site](../../assets/azure-app-service-deep-dive/01/01-01-kudu-is-the-deployment-buddy-site.en.png)
 Kudu ultimately affects file placement and app reload behavior.
 That is why deployment incidents belong in Kudu logs,
 while runtime incidents belong in app logs plus platform signals.
@@ -250,13 +179,7 @@ Inside the worker.
 - The Functions host starts on top of that substrate.
 - That host then launches language workers and opens the gRPC channel.
 
-```mermaid
-flowchart LR
-    FE[App Service Front-End] --> ASW[App Service worker]
-    ASW --> FH[Functions host]
-    FH --> LW[Language worker]
-```
-
+![Where Functions fits in this picture](../../assets/azure-app-service-deep-dive/01/01-05-where-functions-fits-in-this-picture.en.png)
 The two series therefore complement each other.
 The Functions series zooms into a specific runtime living on App Service.
 This series zooms into the general-purpose web platform underneath it.

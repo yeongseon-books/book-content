@@ -14,14 +14,7 @@ Revision에서 공개 URL로 이어집니다.
 
 경로를 먼저 보면 배포가 훨씬 단순하게 느껴집니다.
 
-```mermaid
-flowchart LR
-    Code[FastAPI code] --> Image[Container image]
-    Image --> Registry[Container Registry]
-    Registry --> ACA[Container App revision]
-    ACA --> URL[Public FQDN]
-```
-
+![배포 경로 전체 보기](../../assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png)
 ---
 
 ## 준비 명령

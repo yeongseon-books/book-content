@@ -14,56 +14,7 @@ This is the map for the rest of the series.
 Each later part zooms into one box from this picture.
 Get the layout in your head first; the code paths land more cleanly after that.
 
-```mermaid
-flowchart LR
-    subgraph SRC[Event sources]
-        direction TB
-        HTTP[HTTP]
-        TIMER[Timer]
-        QUEUE[Queue]
-        BLOB[Blob]
-        SB[Service Bus]
-        EH[Event Hub]
-        COSMOSIN[Cosmos DB]
-    end
-
-    subgraph HOST[Functions Host (.NET)]
-        direction TB
-        WJSHS[WebJobsScriptHostService] --> SHM[ScriptHostManager] --> SH[ScriptHost]
-        SH --> IDX[Indexer]
-        SH --> WRK[Workers]
-        SH --> LSN[Listeners]
-        SH --> JH[JobHost]
-    end
-
-    subgraph WORKER[Worker process]
-        direction TB
-        LW[Language Worker<br/>Python / Node / Java / ...]
-    end
-
-    subgraph OUT[Output bindings / external systems]
-        direction TB
-        HTTPRES[HTTP response]
-        QUEUEOUT[Queue]
-        BLOBOUT[Blob]
-        COSMOSOUT[Cosmos DB]
-    end
-
-    HTTP --> LSN
-    TIMER --> LSN
-    QUEUE --> LSN
-    BLOB --> LSN
-    SB --> LSN
-    EH --> LSN
-    COSMOSIN --> LSN
-
-    WRK -->|gRPC (FunctionRpcService)| LW
-    JH --> HTTPRES
-    JH --> QUEUEOUT
-    JH --> BLOBOUT
-    JH --> COSMOSOUT
-```
-
+![The big picture — one Azure Functions host instance](../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
 Part 1 covers host bootstrap, Part 2 zooms into the worker process, Part 3 into the gRPC channel, Part 4 into dispatcher and invocation, Part 5 into scaling, and Part 6 into placeholder mode and cold start.
 
 ---
@@ -72,13 +23,7 @@ Part 1 covers host bootstrap, Part 2 zooms into the worker process, Part 3 into 
 
 It looks complicated, but host bootstrap really compresses down to these four stages:
 
-```mermaid
-flowchart LR
-    A[1. Program.cs<br/>Build web host] --> B[2. WebJobsScriptHostService<br/>Register as Hosted Service]
-    B --> C[3. ScriptHost<br/>Instantiate and InitializeAsync]
-    C --> D[4. JobHost.StartAsync<br/>Activate trigger listeners]
-```
-
+![The big picture — host bootstrap in 4 stages](../../assets/azure-functions-deep-dive/01/01-02-the-big-picture-host-bootstrap-in-4-stag.en.png)
 This post walks through each of these four boxes in order. After stage 4, **the function is ready to run the moment a trigger fires**.
 
 ---
@@ -104,29 +49,7 @@ One important design decision here. **`WebJobsScriptHostService` is not "the hos
 
 Inside `ScriptHost.InitializeAsync`, called by `WebJobsScriptHostService`, the host does the work required to become a running function app.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Service as WebJobsScriptHostService
-    participant Script as ScriptHost
-    participant Config as host.json loader
-    participant Indexer as Function indexer
-    participant Workers as Worker channel manager
-    participant Job as JobHost
-
-    Service->>Script: new ScriptHost(...) + StartAsync
-    Script->>Config: Load host.json + env vars + worker.config
-    Config-->>Script: Options tree complete
-    Script->>Indexer: Index function metadata
-    Indexer-->>Script: N functions discovered
-    Script->>Workers: Prepare language worker channels
-    Script-->>Service: InitializeAsync complete
-    Script->>Script: base.StartAsyncCore()
-    Script->>Job: JobHost.StartAsync()
-    Job-->>Script: Trigger listeners activated
-    Script-->>Service: Bootstrap complete
-```
-
+![Stage 2: `ScriptHost.InitializeAsync` — where bootstrap actually happens](../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.en.png)
 The ordering matters. In `ScriptHost.StartAsyncCore()`, `InitializeAsync()` runs first and finishes before `base.StartAsyncCore()` runs. Trigger listener activation through `JobHost.StartAsync()` is therefore **after** initialization, not part of it. This post focuses on config loading and function indexing, leaves worker channel prep to episode 2, and picks up the invocation path in episode 4.
 
 > Code location: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
@@ -150,18 +73,7 @@ Values from `host.json` map straight to options objects. For example, `functionT
 
 > Code location: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 
-```mermaid
-graph LR
-    HJF[host.json file] --> Source[HostJsonFileConfigurationSource]
-    Source --> Conf[IConfiguration tree]
-    Conf --> Setup1[ScriptJobHostOptionsSetup]
-    Conf --> Setup2[HttpOptionsSetup]
-    Conf --> Setup3[QueuesOptionsSetup]
-    Setup1 --> Opts1[ScriptJobHostOptions]
-    Setup2 --> Opts2[HttpOptions]
-    Setup3 --> Opts3[QueuesOptions]
-```
-
+![Stage 3: where and how `host.json` is read](../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.en.png)
 This diagram is the path `host.json` takes into runtime options. **One key in the file → one node in IConfiguration → a Setup class → one field on an options object**. The mapping stays that direct.
 
 Two things operators should know:
@@ -199,17 +111,7 @@ In other words, **indexing is the stage that builds the Functions host's "functi
 - Bootstrap takes too long → forced restart
 - Memory/CPU thresholds exceeded → instance reclaim signal
 
-```mermaid
-stateDiagram-v2
-    [*] --> Starting
-    Starting --> Running: Bootstrap success
-    Starting --> Faulted: Exception thrown
-    Faulted --> Starting: Retry
-    Running --> Stopping: Shutdown signal / health failure
-    Stopping --> Starting: Restart
-    Stopping --> [*]: Permanent shutdown
-```
-
+![The host health monitor](../../assets/azure-functions-deep-dive/01/01-05-the-host-health-monitor.en.png)
 This state machine is the root cause of the operational symptom "my function suddenly restarted." If you see frequent "Host started" log entries in App Insights, this state machine is probably cycling more often than you'd like.
 
 ---

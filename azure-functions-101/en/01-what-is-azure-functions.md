@@ -51,20 +51,7 @@ There's no code to start a server, open a port, or configure a router. **You onl
 
 The simplest picture of what happens between a request coming in and the response going out looks like this:
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Client as Client
-    participant Trigger as HTTP Trigger
-    participant Host as Functions Host
-    participant Func as hello function
-    Client->>Trigger: GET /api/hello?name=Sisyphus
-    Trigger->>Host: Trigger fired
-    Host->>Func: hello(request) called
-    Func-->>Host: HttpResponse("Hello, Sisyphus!")
-    Host-->>Client: 200 OK
-```
-
+![Start With the Smallest Example — Hello, Function](../../assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png)
 Everything that comes later in this series is essentially the process of refining this picture. What happens when the trigger isn't HTTP (Part 2), how the Host and the function body are separated (Part 3), and how instances are added when one isn't enough (Parts 5 and 6) are each their own next post.
 
 ---
@@ -84,22 +71,7 @@ The key difference is **what you're being billed by the unit of**. App Service c
 
 The lifecycle difference becomes clearer side by side.
 
-```mermaid
-graph LR
-    subgraph AppService [Always-on - App Service]
-        A1[Deploy] --> A2[Process always running]
-        A2 --> A3[Handle requests]
-        A3 --> A2
-    end
-
-    subgraph Functions [Event-driven - Functions]
-        F1[Deploy] --> F2[Idle]
-        F2 -- Event arrives --> F3[Wake instance]
-        F3 --> F4[Run function]
-        F4 --> F2
-    end
-```
-
+![How Is This Different From a Traditional Web App?](../../assets/azure-functions-101/01/01-02-how-is-this-different-from-a-traditional.en.png)
 The "idle → wake → run → idle again" cycle on the right is the essence of serverless. That "wake" segment is the source of what you'll soon hear called a **cold start**. Part 6 covers it in detail.
 
 ---
@@ -115,44 +87,7 @@ Four words run through this entire series. In Part 1, just learn the names; from
 
 Here are those four concepts on a single diagram:
 
-```mermaid
-flowchart LR
-    subgraph Sources [Event sources]
-        S1[HTTP client]
-        S2[Storage Queue]
-        S3[Blob Storage]
-        S4[Timer]
-        S5[Event Hub]
-    end
-
-    subgraph FunctionApp [Function App instance]
-        Host[Functions Host]
-        Worker[Language Worker<br/>Python / Node.js / Java]
-        subgraph Funcs [Functions]
-            F1[OrderHandler<br/>HTTP Trigger]
-            F2[InvoiceProcessor<br/>Queue Trigger]
-            F3[ThumbnailMaker<br/>Blob Trigger]
-        end
-        Host --> Worker
-        Worker --> F1
-        Worker --> F2
-        Worker --> F3
-    end
-
-    subgraph Outputs [Output binding targets]
-        O1[Cosmos DB]
-        O2[Service Bus]
-        O3[Blob Storage]
-    end
-
-    S1 --> F1
-    S2 --> F2
-    S3 --> F3
-    F1 --> O1
-    F2 --> O2
-    F3 --> O3
-```
-
+![The Four Core Concepts of Azure Functions](../../assets/azure-functions-101/01/01-03-the-four-core-concepts-of-azure-function.en.png)
 Two things matter in this picture: **(1) the Host is a per-instance runtime, while your code runs in a worker process for non-.NET languages, and (2) triggers and bindings are the interface between your functions and the outside world.** That combination is what makes Functions work as an event-driven platform.
 
 If you want to go deeper, the companion series **Azure Functions Deep Dive** walks through how the Host starts functions and how it works with multiple language runtimes.

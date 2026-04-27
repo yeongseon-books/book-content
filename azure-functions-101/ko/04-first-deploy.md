@@ -41,15 +41,7 @@ python --version     # 3.11+
 
 ## 전체 흐름 한 장
 
-```mermaid
-flowchart LR
-    A[1. 로컬 프로젝트 생성<br/>func init] --> B[2. 함수 추가<br/>func new]
-    B --> C[3. 로컬 실행<br/>func start]
-    C --> D[4. Azure 리소스 생성<br/>az 명령 3개]
-    D --> E[5. 배포<br/>func azure functionapp publish]
-    E --> F[6. 호출<br/>curl https://...]
-```
-
+![전체 흐름 한 장](../../assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.ko.png)
 ---
 
 ## 1. 프로젝트 만들기
@@ -139,14 +131,7 @@ Azure에 함수를 올리려면 세 개의 리소스가 필요합니다.
 | **Storage Account** | Functions Host의 상태, 락, 큐 메타데이터를 저장하는 필수 저장소 |
 | **Function App** | 함수를 담는 컴퓨트 리소스 |
 
-```mermaid
-flowchart TD
-    RG[Resource Group<br/>rg-hello]
-    RG --> SA[Storage Account<br/>sthello001]
-    RG --> FA[Function App<br/>func-hello-001]
-    FA -. 의존 .-> SA
-```
-
+![4. Azure 리소스 만들기](../../assets/azure-functions-101/04/04-02-4-create-azure-resources.ko.png)
 > Note: Storage Account는 Functions가 자기 동작을 유지하는 데 쓰는 인프라 저장소입니다. 트리거 락, 호출 메타데이터, Timer 스케줄 상태 같은 값이 여기에 들어갑니다. 비즈니스 데이터는 별도 저장소를 두는 편이 안전합니다.
 
 이제 리소스를 만듭니다. 이름은 전역 고유해야 하므로 적절히 바꿔서 쓰면 됩니다.
@@ -203,22 +188,7 @@ func azure functionapp publish $APP
 
 내부 흐름은 다음과 같습니다.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Dev as 로컬 (func CLI)
-    participant Kudu as Function App SCM (Kudu)
-    participant Storage as Storage Account
-    participant Host as Function App (Host)
-
-    Dev->>Dev: 프로젝트를 zip으로 패키징
-    Dev->>Kudu: zip 업로드
-    Kudu->>Storage: 패키지 저장
-    Storage-->>Host: WEBSITE_RUN_FROM_PACKAGE로 마운트
-    Host->>Host: 함수 메타데이터 인덱싱
-    Host-->>Dev: 배포 완료, 트리거 URL 출력
-```
-
+![5. 배포](../../assets/azure-functions-101/04/04-03-5-deploy.ko.png)
 마지막에 다음과 비슷한 출력이 나옵니다.
 
 ```

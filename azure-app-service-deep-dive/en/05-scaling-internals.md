@@ -22,15 +22,7 @@ This episode turns those facts into a usable worker-pool mental model.
 
 ## The control path in one diagram
 
-```mermaid
-flowchart LR
-    METRIC[Metrics] --> AUTO[Azure Monitor autoscale]
-    AUTO --> PLAN[App Service Plan desired instance count]
-    PLAN --> ALLOC[App Service control plane allocation]
-    ALLOC --> WORKERS[More worker instances]
-    WORKERS --> FE[Front-End routing updates]
-```
-
+![The control path in one diagram](../../assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png)
 Two things matter here.
 
 1. separate the decision engine from the execution substrate
@@ -43,12 +35,7 @@ followed by App Service making more worker capacity available to that plan.
 
 ## What scale up and scale out actually change
 
-```mermaid
-flowchart TB
-    A[Scale up] --> B[Change App Service Plan SKU]
-    C[Scale out] --> D[Change instance count]
-```
-
+![What scale up and scale out actually change](../../assets/azure-app-service-deep-dive/05/05-02-what-scale-up-and-scale-out-actually-cha.en.png)
 The Learn documentation states the difference plainly.
 
 - **Scale up**: move to a larger tier or SKU with more CPU, memory, or features
@@ -69,14 +56,7 @@ This is one of the most common App Service misunderstandings.
 Even if you enter autoscale from an app-centric portal experience,
 the real target resource is the **App Service Plan**.
 
-```mermaid
-flowchart LR
-    APP1[Web App A] --> PLAN[App Service Plan]
-    APP2[Web App B] --> PLAN
-    APP3[Web App C] --> PLAN
-    AUTO[Autoscale rules] --> PLAN
-```
-
+![Autoscale attaches to the plan, not the app](../../assets/azure-app-service-deep-dive/05/05-03-autoscale-attaches-to-the-plan-not-the-a.en.png)
 That structure has consequences.
 If several apps share the same plan,
 one app's burst can drive plan-level scaling,
@@ -95,15 +75,7 @@ The Azure Monitor autoscale documentation is explicit about the rule engine.
 - scale-out can trigger when any scale-out rule is met
 - scale-in requires all scale-in rules to be met
 
-```mermaid
-flowchart TB
-    START[Autoscale evaluation] --> OUT{Any scale-out rule met?}
-    OUT -->|Yes| PLUS[Increase count]
-    OUT -->|No| IN{All scale-in rules met?}
-    IN -->|Yes| MINUS[Decrease count]
-    IN -->|No| HOLD[Keep count]
-```
-
+![What Azure Monitor autoscale actually does](../../assets/azure-app-service-deep-dive/05/05-04-what-azure-monitor-autoscale-actually-do.en.png)
 That logic matters operationally.
 Scale-out behaves like OR.
 Scale-in behaves like AND.
@@ -122,21 +94,7 @@ They still support a sound mental model.
 3. the plan gains more worker capacity
 4. the Front-End starts sending traffic to the new healthy workers
 
-```mermaid
-sequenceDiagram
-    participant M as Azure Monitor autoscale
-    participant P as App Service Plan
-    participant C as App Service control plane
-    participant W as Worker pool
-    participant F as Front-End
-
-    M->>P: Desired instance count = N+1
-    P->>C: Apply scale change
-    C->>W: Allocate additional worker capacity
-    W-->>F: New healthy worker available
-    F->>W: Send traffic to expanded pool
-```
-
+![What “adding a worker” means in practice](../../assets/azure-app-service-deep-dive/05/05-05-what-adding-a-worker-means-in-practice.en.png)
 That is as far as you need to go without drifting into undocumented internals.
 
 ---
@@ -146,15 +104,7 @@ That is as far as you need to go without drifting into undocumented internals.
 Autoscale is reactive,
 not predictive.
 
-```mermaid
-flowchart LR
-    LOAD[Traffic rises] --> METRIC[Metrics accumulate]
-    METRIC --> RULE[Rule evaluated]
-    RULE --> SCALE[Scale action]
-    SCALE --> WARM[New worker starts and warms]
-    WARM --> RELIEF[More capacity available]
-```
-
+![Why autoscale should be read as a feedback loop](../../assets/azure-app-service-deep-dive/05/05-06-why-autoscale-should-be-read-as-a-feedba.en.png)
 That is why predictable spikes are safer with pre-scaling.
 Metrics need time to accumulate.
 Rules need time to evaluate.
@@ -173,13 +123,7 @@ Adding a worker does not mean that worker can instantly receive user traffic.
 From the Front-End's perspective,
 the worker must first become eligible.
 
-```mermaid
-flowchart TB
-    NEW[New worker allocated] --> START[App starts]
-    START --> HEALTH[Warm-up / health checks]
-    HEALTH --> READY[Eligible for traffic]
-```
-
+![Health and readiness are the real end of scale-out](../../assets/azure-app-service-deep-dive/05/05-07-health-and-readiness-are-the-real-end-of.en.png)
 So the real end of scale-out is not the new instance count on paper.
 It is the moment the new worker enters the healthy routing pool.
 

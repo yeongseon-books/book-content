@@ -173,25 +173,7 @@ The host sends one of these per function, or batches them in a single `FunctionL
 
 ### All on one screen
 
-```mermaid
-sequenceDiagram
-    participant H as Host (.NET)
-    participant W as Worker (Node/Python/Java/...)
-
-    Note over H,W: The worker process has just spawned and the gRPC channel is open
-    W->>H: StartStream { worker_id }
-    H->>W: WorkerInitRequest { host_version, capabilities, ... }
-    W->>H: WorkerInitResponse { capabilities, result, worker_metadata }
-    Note over H,W: Both sides now know each other's capabilities
-
-    H->>W: FunctionLoadRequest { function_id, metadata } (repeated or as a collection)
-    W->>H: FunctionLoadResponse { function_id, result }
-
-    Note over H,W: Functions loaded. Ready to receive invocations.
-    H->>W: InvocationRequest { invocation_id, function_id, input_data, ... }
-    W->>H: InvocationResponse { invocation_id, output_data, result }
-```
-
+![All on one screen](../../assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.en.png)
 This sequence is **the life of every worker**. The Node worker, the Python worker, the Java worker — all the same. The implementation details on the worker side differ per language, but **the protocol is uniform**.
 
 ---
@@ -248,16 +230,7 @@ This part is easier to reason about if you stay close to the code. The main invo
 
 That makes `FunctionRpcService` the pump between the real gRPC stream and the host-side per-worker queues.
 
-```mermaid
-flowchart LR
-    Worker[Worker process] <-->|StreamingMessage| Stream[gRPC EventStream]
-    Stream <-->|read / write| Rpc[FunctionRpcService]
-    Rpc --> Inbound[inbound Channel&lt;InboundGrpcEvent&gt;]
-    Outbound[outbound Channel&lt;OutboundGrpcEvent&gt;] --> Rpc
-    Inbound --> Gwc[GrpcWorkerChannel]
-    Gwc --> Outbound
-```
-
+![The channel layout — closer to per-worker `Channel<T>` pairs than a generic event bus](../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.en.png)
 `IScriptEventManager` still exists here, but mainly as keyed storage for those channels. `InboundGrpcEvent` and `OutboundGrpcEvent` are real wrapper types, and other components can observe them around the edges. But for function invocation traffic, the mental model that matches the source is **per-worker queues plus a gRPC pump**, not “everything goes through one generic in-process event bus.”
 
 ---

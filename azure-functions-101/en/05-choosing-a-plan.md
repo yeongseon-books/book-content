@@ -25,38 +25,7 @@ If your mental shortcut has been “Functions = autoscale,” this is where that
 
 ## Big picture
 
-```mermaid
-flowchart TB
-    subgraph Cons [Consumption]
-        C1[Pay-per-use]
-        C2[Windows-first legacy]
-        C3[Cold starts present]
-        C4[No VNet integration]
-        C5[App-level scale]
-    end
-    subgraph Flex [Flex Consumption]
-        F1[Pay-per-use]
-        F2[Linux only]
-        F3[Optional Always Ready]
-        F4[VNet integration]
-        F5[Per-function scaling]
-    end
-    subgraph Prem [Premium]
-        P1[Always-on baseline capacity]
-        P2[Windows or Linux]
-        P3[Cold starts can be avoided]
-        P4[VNet integration]
-        P5[Larger SKU choices]
-    end
-    subgraph Ded [Dedicated]
-        D1[Fixed infrastructure]
-        D2[Windows or Linux]
-        D3[Cold start usually not the issue]
-        D4[VNet integration]
-        D5[Manual metric-based scaling]
-    end
-```
-
+![Big picture](../../assets/azure-functions-101/05/05-01-big-picture.en.png)
 Now put the differences on one table.
 
 ---
@@ -179,27 +148,7 @@ Teams often choose Dedicated on instinct and then discover that queues do not au
 
 ## Decision tree
 
-```mermaid
-graph TD
-    Q1{Need to reach resources<br/>inside a VNet?}
-    Q1 -- No --> Q2{Is this a new<br/>serverless app?}
-    Q1 -- Yes --> Q3{Is Linux acceptable?}
-
-    Q2 -- Yes --> FLEX0[Flex Consumption<br/>Default candidate]
-    Q2 -- No --> Q4{Do you want the smallest<br/>demo path?}
-
-    Q3 -- Yes --> FLEX1[Flex Consumption<br/>VNet + pay-per-use]
-    Q3 -- No --> PREM1[Premium<br/>VNet + Windows]
-
-    Q4 -- Yes --> CONS[Consumption<br/>Simple demo or existing app]
-    Q4 -- No --> Q5{Are cold starts<br/>a hard problem?}
-
-    Q5 -- Yes --> PREM2[Premium<br/>Baseline warm capacity]
-    Q5 -- No --> FLEX2[Flex Consumption<br/>Current default choice]
-
-    DED[Dedicated<br/>Existing App Service Plan or manual scaling]
-```
-
+![Decision tree](../../assets/azure-functions-101/05/05-02-decision-tree.en.png)
 Dedicated sits outside the main path on purpose. It is not a bad plan. It is a plan for cases where you can **explicitly give up event-driven platform scaling**.
 
 ---

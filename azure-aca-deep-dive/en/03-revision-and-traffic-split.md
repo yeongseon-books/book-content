@@ -33,14 +33,7 @@ That one sentence is the operational heart of ACA.
 It means the running unit you shift traffic to is not a mutable deployment slot.
 It is a distinct snapshot produced from a specific revision-scope template.
 
-```mermaid
-flowchart LR
-    TEMPLATE[Revision-scope template] --> REV[New revision]
-    REV --> PROV[Provisioning checks]
-    PROV --> ACTIVE[Active revision]
-    ACTIVE --> TRAFFIC[Eligible for traffic]
-```
-
+![A revision is an immutable runtime snapshot](../../assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.en.png)
 This explains several product behaviors that otherwise look unrelated.
 
 - Changing the image creates a new revision.
@@ -61,14 +54,7 @@ Application-scope changes affect the app surface without minting a new revision.
 
 This is one of the most useful distinctions in the entire product.
 
-```mermaid
-flowchart TB
-    CHANGE[Container App change] --> RS[Revision-scope]
-    CHANGE --> AS[Application-scope]
-    RS --> NEWREV[Create new revision]
-    AS --> SAMEAPP[Update app surface only]
-```
-
+![Revision-scope versus application-scope changes](../../assets/azure-aca-deep-dive/03/03-02-revision-scope-versus-application-scope.en.png)
 Microsoft documents the `properties.template` area as revision-scope and the `properties.configuration` area as application-scope.
 
 Revision-scope examples include:
@@ -102,17 +88,7 @@ Once the new revision is ready, traffic moves to it and old revisions are deprov
 In multiple revision mode, several active revisions can coexist and receive traffic concurrently.
 That is the mode where canary and blue-green become natural.
 
-```mermaid
-flowchart LR
-    SINGLE[Single revision mode] --> S1[New revision becomes ready]
-    S1 --> S2[Traffic switches to new revision]
-    S2 --> S3[Old revision deprovisioned]
-
-    MULTI[Multiple revision mode] --> M1[Multiple active revisions]
-    M1 --> M2[Manual traffic weights]
-    M2 --> M3[Explicit activation / deactivation]
-```
-
+![Single revision mode and multiple revision mode are not just UI toggles](../../assets/azure-aca-deep-dive/03/03-03-single-revision-mode-and-multiple-revisi.en.png)
 The deep-dive lesson is this.
 The mode is not merely a release preference.
 It changes the set of revisions Envoy is allowed to treat as upstream candidates.
@@ -129,13 +105,7 @@ ACA offers two routing ideas that often get mixed together.
 Weights distribute requests probabilistically across active revisions.
 Labels pin a separate URL to one revision at a time.
 
-```mermaid
-flowchart LR
-    MAIN[Main app URL] -->|80%| REV1[Revision 1]
-    MAIN -->|20%| REV2[Revision 2]
-    LABEL[Label URL: staging] --> REV2
-```
-
+![Labels and weights solve different routing problems](../../assets/azure-aca-deep-dive/03/03-04-labels-and-weights-solve-different-routi.en.png)
 That distinction matters operationally.
 
 - Use weights when you want gradual exposure on the production app URL.
@@ -198,14 +168,7 @@ That matters because revision traffic splitting is naturally expressed as weight
 The upstream Envoy route schema defines weighted clusters in the route configuration API.
 That is the right conceptual anchor for ACA traffic splitting.
 
-```mermaid
-flowchart LR
-    ACA[ACA ingress traffic config] --> ROUTE[Envoy route config]
-    ROUTE --> WC[WeightedCluster entries]
-    WC --> C1[Upstream cluster for revision A]
-    WC --> C2[Upstream cluster for revision B]
-```
-
+![From revision weight to Envoy weight](../../assets/azure-aca-deep-dive/03/03-05-from-revision-weight-to-envoy-weight.en.png)
 ACA itself is closed-source, so you do not see the exact product adapter code.
 But the combination of Microsoft's traffic-splitting docs and Envoy's weighted-cluster model is enough to explain the mechanism accurately.
 
@@ -218,15 +181,7 @@ That something is the ingress routing layer.
 
 If the user app had to decide, the request would already be at one revision, which defeats the point.
 
-```mermaid
-flowchart LR
-    CLIENT[Client] --> ENVOY[Ingress Envoy]
-    ENVOY -->|weight 80| SVC1[Service for revision A]
-    ENVOY -->|weight 20| SVC2[Service for revision B]
-    SVC1 --> POD1[Pod A]
-    SVC2 --> POD2[Pod B]
-```
-
+![Why the weight belongs at the ingress layer and not inside the app](../../assets/azure-aca-deep-dive/03/03-06-why-the-weight-belongs-at-the-ingress-la.en.png)
 The weight has to exist before the service hop.
 That is why episode 6 will trace the full path as client to load balancer to Envoy to service to pod.
 
@@ -245,20 +200,7 @@ Ready means more than "a revision object exists."
 - Replicas scaled up to the expected count.
 - Startup and readiness probes passed.
 
-```mermaid
-sequenceDiagram
-    participant Deploy as Deploy update
-    participant ACA as ACA control plane
-    participant Rev as New revision
-    participant Envoy as Envoy ingress
-
-    Deploy->>ACA: update template
-    ACA->>Rev: create immutable revision
-    Rev->>Rev: provision replicas
-    Rev->>Rev: pass startup/readiness checks
-    ACA->>Envoy: update traffic target when ready
-```
-
+![Zero-downtime rollout depends on readiness, not just on revision creation](../../assets/azure-aca-deep-dive/03/03-07-zero-downtime-rollout-depends-on-readine.en.png)
 So when people say ACA provides zero-downtime deployment in single revision mode, the deeper statement is that the control plane waits for a readiness threshold before re-pointing ingress.
 
 ---
@@ -274,12 +216,7 @@ Common patterns map directly onto weight changes.
 - Canary: 95/5, then 80/20, then 50/50, then 0/100.
 - A/B test: hold two or more revisions live at fixed percentages.
 
-```mermaid
-flowchart LR
-    R1[Known good revision] -->|95| PROD[Production URL]
-    R2[Canary revision] -->|5| PROD
-```
-
+![Multiple revision mode turns rollout into routing math](../../assets/azure-aca-deep-dive/03/03-08-multiple-revision-mode-turns-rollout-int.en.png)
 The elegant part is that the revision remains immutable while the exposure changes around it.
 That separation is exactly what you want in a controlled rollout system.
 
@@ -295,12 +232,7 @@ It is also a shift in control.
 When you point at `latestRevision: true`, you are telling ACA to keep the app URL attached to the newest ready revision.
 When you point at explicit revision names, you are taking that decision back.
 
-```mermaid
-flowchart LR
-    AUTO[`latestRevision: true`] --> AUTOSWITCH[ACA moves traffic when latest is ready]
-    EXPL[Explicit revisionName weights] --> MANUAL[Operator moves traffic deliberately]
-```
-
+![`latestRevision: true` is convenient, but it changes who owns the switch](../../assets/azure-aca-deep-dive/03/03-09-latestrevision-true-is-convenient-but-it.en.png)
 This distinction often marks the difference between a fast-moving dev setup and a tightly controlled production rollout.
 
 ---
@@ -315,12 +247,7 @@ Active means the revision can run.
 Traffic weight decides whether the main app URL sends requests there.
 Labels can still expose it directly even if the main URL gives it zero percent.
 
-```mermaid
-flowchart LR
-    REV[Active revision] --> ZERO[0% main URL traffic]
-    REV --> LABEL[Direct label URL traffic]
-```
-
+![A hidden but important split: active revision versus traffic-receiving revision](../../assets/azure-aca-deep-dive/03/03-10-a-hidden-but-important-split-active-revi.en.png)
 This is how staging-style validation can happen without touching the main production path.
 
 ---
@@ -335,13 +262,7 @@ Replica count is scale policy per revision.
 
 They influence each other through load, but they are not the same control loop.
 
-```mermaid
-flowchart LR
-    WEIGHT[Traffic weight] --> LOAD[Observed request load]
-    LOAD --> SCALE[Scale decision]
-    SCALE --> REPS[Replica count]
-```
-
+![Revision weight and scale are related but not identical systems](../../assets/azure-aca-deep-dive/03/03-11-revision-weight-and-scale-are-related-bu.en.png)
 That is why a 5% canary can still need more than one replica, and why a 50/50 split does not mechanically force equal replica counts if the revisions differ in performance or concurrency behavior.
 
 ---
@@ -356,13 +277,7 @@ That lets ACA keep rollout control at ingress while leaving revisions immutable.
 The platform-specific step you do not see is how ACA names and manages the upstreams for revisions.
 The proxy concept is still standard.
 
-```mermaid
-flowchart LR
-    ROUTE[Route match for app host/path] --> UPSTREAMS[Weighted upstream cluster set]
-    UPSTREAMS --> A[Revision A service]
-    UPSTREAMS --> B[Revision B service]
-```
-
+![Where Envoy's weighted cluster model matters most](../../assets/azure-aca-deep-dive/03/03-12-where-envoy-s-weighted-cluster-model-mat.en.png)
 This is the cleanest explanation for the user's question, "where do the weights come from?"
 They come from app-scope ACA ingress configuration and become ingress routing weights applied to revision upstreams.
 
@@ -378,12 +293,7 @@ That sounds obvious, but it depends on two design choices holding together.
 1. Old revisions remain addressable.
 2. Traffic policy is separate from revision creation.
 
-```mermaid
-flowchart LR
-    BAD[Bad new revision] --> ZERO[Set weight to 0]
-    GOOD[Known good revision] --> FULL[Restore weight to 100]
-```
-
+![The rollback story is better because revisions stay immutable](../../assets/azure-aca-deep-dive/03/03-13-the-rollback-story-is-better-because-rev.en.png)
 The speed of that rollback is one of the strongest practical benefits of the ACA revision model.
 
 ---

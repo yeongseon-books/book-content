@@ -14,13 +14,7 @@ And custom event-driven scalers.
 Scaling remains declarative.
 You choose the signal and the replica bounds.
 
-```mermaid
-flowchart LR
-    Load[HTTP / Queue / Event / CPU] --> Rule[Scale rule]
-    Rule --> KEDA[KEDA-based scaler]
-    KEDA --> Rev[ACA revision replicas]
-```
-
+![The scaling path](../../assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
 ---
 
 ## Three rule categories

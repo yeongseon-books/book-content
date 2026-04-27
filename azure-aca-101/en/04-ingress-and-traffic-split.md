@@ -13,13 +13,7 @@ And weighted traffic movement.
 
 Envoy acts as the front door and routes to active revisions.
 
-```mermaid
-flowchart LR
-    Client[Client] --> Envoy[Envoy ingress]
-    Envoy --> R1[Revision A]
-    Envoy --> R2[Revision B]
-```
-
+![The request path](../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
 ---
 
 ## What ingress owns

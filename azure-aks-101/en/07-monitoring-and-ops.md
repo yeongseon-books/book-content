@@ -10,19 +10,7 @@ This final post is a 101-level operations map for AKS: what Container Insights g
 
 ## The operations view in one diagram
 
-```mermaid
-flowchart LR
-    CL[AKS cluster] --> AMA[Azure Monitor agent]
-    CL --> KSM[kube-state-metrics]
-    AMA --> LA[Log Analytics]
-    AMA --> AMW[Azure Monitor Workspace]
-    KSM --> AMW
-    LA --> CI[Container Insights]
-    AMW --> DASH[Grafana / metrics]
-    LA --> ALERT[Log alerts]
-    AMW --> PALERT[Prometheus alerts]
-```
-
+![The operations view in one diagram](../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
 The useful split is between two telemetry paths.
 
 - **log path**: Log Analytics, Container Insights, KQL
@@ -143,14 +131,7 @@ Those are more useful operations questions than a raw CPU graph on its own becau
 
 ## Where alerts should live
 
-```mermaid
-flowchart TB
-    A[Application layer] --> A1[5xx / latency / queue lag]
-    B[Kubernetes object layer] --> B1[replica mismatch / restarts]
-    C[Node layer] --> C1[CPU / memory / disk pressure]
-    D[Platform layer] --> D1[control-plane logs / collection failures]
-```
-
+![Where alerts should live](../../assets/azure-aks-101/07/07-02-where-alerts-should-live.en.png)
 Good alerting is layered. CPU over 80% by itself is rarely a complete operations strategy.
 
 ### Application layer

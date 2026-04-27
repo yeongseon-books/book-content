@@ -15,23 +15,7 @@ This post revisits the hosting plans from part 5 from an operations angle. When 
 - **Horizontal scaling (scale out)** — how many instances the app gets
 - **In-instance concurrency** — how many invocations one instance handles at the same time
 
-```mermaid
-flowchart LR
-    subgraph ScaleOut [Horizontal scaling]
-        I1[Instance 1]
-        I2[Instance 2]
-        I3[Instance 3]
-        Idot[...]
-    end
-
-    subgraph Concurrency [In-instance concurrency]
-        Inst[Instance]
-        Inst --> C1[Invocation 1]
-        Inst --> C2[Invocation 2]
-        Inst --> C3[Invocation 3]
-    end
-```
-
+![Scaling Has Two Axes — Instance Count and In-Instance Concurrency](../../assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png)
 Plans differ in who controls those axes and how exposed they are.
 
 | Plan | Scale-out model | What actually distinguishes it |
@@ -49,38 +33,7 @@ So target-based scaling is not a Flex-only idea. It applies more broadly across 
 
 Differences are easier to see on a timeline. Assume the app is idle, then at t=0 an HTTP spike arrives.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant T as Timeline
-    participant Cons as Consumption
-    participant Flex as Flex Consumption
-    participant Prem as Premium
-    participant Ded as Dedicated
-
-    Note over T: t=0s traffic spike begins
-    T->>Cons: First request arrives
-    Note over Cons: If scaled to zero, a new instance must be prepared
-    T->>Flex: First request arrives
-    Note over Flex: If Always Ready = 0, cold start is still possible; if greater than 0, a warm path exists
-    T->>Prem: First request arrives
-    Note over Prem: Always Ready or prewarmed capacity handles the first wave
-    T->>Ded: First request arrives
-    Note over Ded: An already-running instance handles it
-
-    Note over T: t=seconds later
-    Cons-->>T: First response, with possible startup latency
-    Flex-->>T: Additional instances scale out automatically
-    Prem-->>T: Extra instances activate after warm capacity is consumed
-    Ded-->>T: Autoscale reacts later if rules are configured
-
-    Note over T: t=minutes later
-    Cons-->>T: Instance count adjusts to load
-    Flex-->>T: Instance count adjusts by function scale group
-    Prem-->>T: Load and warm baseline shape scale behavior
-    Ded-->>T: Rules add or retain instances
-```
-
+![How the Plans React to a Traffic Spike](../../assets/azure-functions-101/06/06-02-how-the-plans-react-to-a-traffic-spike.en.png)
 Operationally, the differences are straightforward.
 
 - **Consumption**: scale to zero is normal, so cold starts are the easiest to observe.
@@ -100,14 +53,7 @@ Cold start is not just “the first request felt slow.” It is the total time n
 
 That usually looks like this:
 
-```mermaid
-flowchart LR
-    A[1. VM or container allocation] --> B[2. Functions Host boot]
-    B --> C[3. Worker process start]
-    C --> D[4. Function indexing and dependency load]
-    D --> E[5. First invocation execution]
-```
-
+![What a Cold Start Actually Includes](../../assets/azure-functions-101/06/06-03-what-a-cold-start-actually-includes.en.png)
 | Step | Typical source of latency | Typical mitigation |
 |---|---|---|
 | 1 | A new execution environment must be prepared | Warm capacity, Always Ready, platform optimizations |
@@ -173,17 +119,7 @@ Automatic scale-out does not remove the need to think about concurrency.
 
 Database pools, external API rate limits, and Redis connection limits stay fixed unless you scale them too. A function app can scale out quickly and still bottleneck immediately on the systems behind it.
 
-```mermaid
-flowchart LR
-    Evt[Trigger event] --> F1[Function Instance 1]
-    Evt --> F2[Function Instance 2]
-    Evt --> FN[Function Instance N]
-    F1 --> DB[(DB or external API)]
-    F2 --> DB
-    FN --> DB
-    DB -. bottleneck .- F1
-```
-
+![1) Downstream systems do not scale with your function app](../../assets/azure-functions-101/06/06-04-1-downstream-systems-do-not-scale-with-y.en.png)
 That is why operations work usually includes both of these:
 
 - trigger-specific batch size, prefetch, and concurrency limits

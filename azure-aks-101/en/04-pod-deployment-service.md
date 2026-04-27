@@ -10,23 +10,7 @@ This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling 
 
 ## One picture first
 
-```mermaid
-flowchart TB
-    DEP[Deployment]
-    RS[ReplicaSet]
-    POD1[Pod 1]
-    POD2[Pod 2]
-    SVC[Service]
-    CLIENT[Client]
-
-    DEP --> RS
-    RS --> POD1
-    RS --> POD2
-    CLIENT --> SVC
-    SVC --> POD1
-    SVC --> POD2
-```
-
+![One picture first](../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)
 That diagram carries most of the model.
 
 - **Pod** is the minimum scheduling unit.
@@ -197,21 +181,7 @@ That separation is why the model scales well. Lifecycle control and traffic iden
 
 Suppose you roll out a new image version. The Deployment usually does not kill every old pod at once. It creates replacement pods gradually.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant D as Deployment
-    participant R as ReplicaSet
-    participant S as Service
-    participant O as Old pods
-    participant N as New pods
-
-    D->>R: apply new template
-    R->>N: create new pods
-    S->>N: route to Ready pods
-    R->>O: scale old pods down
-```
-
+![Deployment becomes clearer when you imagine an update](../../assets/azure-aks-101/04/04-02-deployment-becomes-clearer-when-you-imag.en.png)
 That is why readiness probes matter so much. The Service starts using new pods only when they are considered ready to receive traffic.
 
 ---

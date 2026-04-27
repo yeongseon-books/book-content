@@ -24,43 +24,7 @@ KEDA is part 5.
 Dapr is part 6.
 Observability is part 7.
 
-```mermaid
-flowchart LR
-    C1[Browser / Mobile / API Client]
-    C2[Internal services]
-    subgraph ENV[ACA Environment]
-        I[Ingress\nEnvoy]
-        subgraph APP1[Container App: web-api]
-            R1[Revision A\nFastAPI + Dapr]
-            R2[Revision B\nFastAPI + Dapr]
-        end
-        subgraph APP2[Container App: worker]
-            R3[Revision A\nWorker + Dapr]
-        end
-        K[KEDA scaler]
-    end
-    ACR[Container Registry]
-    LA[Log Analytics]
-    AI[Application Insights]
-    C1 --> I
-    C2 --> I
-    I --> R1
-    I --> R2
-    I --> R3
-    K -. scale rules .-> R1
-    K -. scale rules .-> R2
-    K -. scale rules .-> R3
-    ACR --> R1
-    ACR --> R2
-    ACR --> R3
-    R1 --> LA
-    R2 --> LA
-    R3 --> LA
-    R1 --> AI
-    R2 --> AI
-    R3 --> AI
-```
-
+![The big picture — one ACA environment at a glance](../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
 ---
 
 ## A one-sentence definition
@@ -93,23 +57,7 @@ A single HTTP request is enough to make the boundary responsibilities visible.
 - choose scale and rollout rules
 - emit logs and traces deliberately
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Client as Client
-    participant Ingress as Envoy ingress
-    participant Rev as ACA revision
-    participant App as FastAPI app
-    participant Log as Log Analytics
-    Client->>Ingress: HTTPS request
-    Ingress->>Rev: Route to active revision
-    Rev->>App: Forward request to port 8000
-    App-->>Rev: Response
-    Rev-->>Ingress: 200 OK
-    Ingress-->>Client: HTTPS response
-    App->>Log: stdout / stderr logs
-```
-
+![The path of one request](../../assets/azure-aca-101/01/01-02-the-path-of-one-request.en.png)
 ---
 
 ## Workloads that fit well

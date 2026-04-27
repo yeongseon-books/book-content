@@ -38,15 +38,7 @@ One caveat matters here. Documentation examples often present **Performance Coun
 
 For a live situation, **Application Insights → Live Metrics** is the fastest starting point. It gives you near-real-time visibility into request volume, failure rate, latency movement, and the number of currently active instances.
 
-```mermaid
-flowchart LR
-    Func[Function App] -- telemetry --> AI[Application Insights]
-    AI --> LM[Live Metrics]
-    AI --> Logs[Logs and KQL]
-    AI --> Met[Metrics]
-    AI --> Alerts[Alerts]
-```
-
+![The First Screen to Open During an Incident — Live Metrics](../../assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.en.png)
 Live Metrics answers the immediate question: what is happening right now? Just keep the Linux caveat in mind. Instance activity is useful broadly, but infrastructure counters such as CPU and memory depend on OS and environment support.
 
 ---
@@ -170,18 +162,7 @@ az monitor app-insights events show \
 
 The first five minutes of an incident usually follow the same pattern.
 
-```mermaid
-flowchart TD
-    A[Alert received] --> B{Is failure rate high in Live Metrics}
-    B -- Yes --> C[Check the most frequent exceptions]
-    B -- No --> D{Has latency jumped}
-    D -- Yes --> E[Inspect slow or failing dependencies]
-    D -- No --> F{Is InstanceCount abnormal}
-    F -- Too low --> G[Check scale limits, quotas, and plan ceilings]
-    F -- Too high --> H[Trace cost runaway or retry storms]
-    F -- Normal --> I[Keep watching real-time movement]
-```
-
+![A Useful 3am Incident Order of Operations](../../assets/azure-functions-101/07/07-02-a-useful-3am-incident-order-of-operation.en.png)
 Failure rate, latency, instance count, and dependency health cover a surprising amount of ground if you check them in that order.
 
 ---

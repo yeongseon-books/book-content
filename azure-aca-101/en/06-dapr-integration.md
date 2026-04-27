@@ -15,13 +15,7 @@ And secrets are the key themes.
 The sidecar sits next to the app.
 It mediates access to Environment-level components and external services.
 
-```mermaid
-flowchart LR
-    App[FastAPI app] <--> Sidecar[Dapr sidecar]
-    Sidecar <--> Comp[Dapr components in Environment]
-    Sidecar <--> Ext[Service Bus / Redis / Key Vault / other services]
-```
-
+![Where Dapr sits](../../assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
 ---
 
 ## Enable commands

@@ -16,18 +16,7 @@ The answer to that question is **Placeholder Mode**. This part follows the code 
 
 Let's first lay out the steps a single new instance has to traverse before it's ready to run a function from scratch.
 
-```mermaid
-flowchart LR
-    A[VM/container allocation] --> B[Boot base image]
-    B --> C[Start .NET CLR]
-    C --> D[Load Functions Host assemblies]
-    D --> E[Build ScriptHost + DI container]
-    E --> F[Download user code]
-    F --> G[Start worker process<br/>Python/Node/Java]
-    G --> H[FunctionLoadRequest<br/>load all functions]
-    H --> I[First InvocationRequest]
-```
-
+![Why Cold Start Is Expensive — Decomposing the Bootstrap Cost](../../assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png)
 Steps 1 through 5 (VM allocation through DI container build) are **independent of user code**. Every customer's function goes through the same steps. Starting from step 6 (downloading code), things become user-specific.
 
 Placeholder Mode's idea exploits exactly this separation.
@@ -316,44 +305,7 @@ This is the code-level guarantee that **cold start cost is paid exactly once, on
 
 Putting everything we've seen so far into a single sequence diagram:
 
-```mermaid
-sequenceDiagram
-    participant PLAT as Functions Platform
-    participant POOL as Placeholder Pool
-    participant INST as Instance (host process)
-    participant SBM as StandbyManager
-    participant MWMID as HostWarmupMiddleware
-    participant MID as PlaceholderSpecialization<br/>Middleware
-    participant SHM as ScriptHostManager
-    participant USER as First user request
-
-    PLAT->>POOL: Maintain N warmed placeholder instances
-    POOL->>INST: Boot VM + .NET + load Functions Host
-    INST->>SBM: InitializeAsync()
-    SBM->>SBM: Create WarmUp function files
-    SBM->>SBM: Start 50 ms specialization timer
-    PLAT->>MWMID: Enter warmup invocation path
-    MWMID->>MWMID: PreJitPrepare(coldstart.jittrace)
-    Note over INST: placeholder ready<br/>(no user yet)
-
-    PLAT->>INST: Inject user app env vars + content
-    Note over INST: InStandbyMode=false<br/>IsContainerReady()=true
-
-    USER->>MID: HTTP request
-    MID->>SBM: SpecializeHostAsync()
-    SBM->>SBM: Reset TimeZone/Config/AssemblyContext
-    SBM->>INST: workerManager.SpecializeAsync()
-    SBM->>SHM: RestartHostAsync("specialization")
-    SHM->>SHM: Discover user functions + build bindings
-    SBM->>SHM: DelayUntilHostReadyAsync()
-    SHM-->>SBM: ready
-    SBM-->>MID: done
-    MID->>MID: _invoke = _next (skip check from now on)
-    MID->>USER: serve normally
-
-    Note over MID,USER: From the second request onward,<br/>no specialization check
-```
-
+![The Whole Picture — The Life of an Instance](../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.en.png)
 ---
 
 ## Why Cold Start Differs by Plan

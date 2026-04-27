@@ -19,25 +19,7 @@ and `runc` finally spawns the real process.
 
 ## The execution path in one picture
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant API as kube-apiserver
-    participant K as kubelet
-    participant CRI as CRI runtime service
-    participant IMG as CRI image service
-    participant C as containerd
-    participant R as runc
-
-    API-->>K: watch PodSpec assigned to this node
-    K->>CRI: RunPodSandbox
-    K->>IMG: PullImage
-    K->>CRI: CreateContainer
-    K->>CRI: StartContainer
-    CRI->>C: translate CRI request
-    C->>R: create / start OCI runtime process
-```
-
+![The execution path in one picture](../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
 ---
 
 ## kubelet, CRI, and runtime
@@ -60,15 +42,7 @@ and `StartContainer` are the most important names in the startup path.
 
 ## kubelet talks to a Unix socket
 
-```mermaid
-flowchart LR
-    K[kubelet] --> S[Unix socket]
-    S --> CRI[CRI plugin in containerd]
-    CRI --> C[containerd]
-    C --> R[runc]
-    R --> P[container process]
-```
-
+![kubelet talks to a Unix socket](../../assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png)
 This is a local call chain.
 The control plane does not execute here.
 The node does.
@@ -105,18 +79,7 @@ The effective chain is kubelet -> CRI -> containerd -> `runc` -> process.
 
 ## Startup path as control flow
 
-```mermaid
-flowchart TB
-    A[Pod assigned to node] --> B[kubelet watches Pod]
-    B --> C[createPodSandbox]
-    C --> D[RunPodSandbox]
-    D --> E[EnsureImageExists / PullImage]
-    E --> F[generateContainerConfig]
-    F --> G[CreateContainer]
-    G --> H[StartContainer]
-    H --> I[container process running]
-```
-
+![Startup path as control flow](../../assets/azure-aks-deep-dive/02/02-03-startup-path-as-control-flow.en.png)
 ---
 
 ## The point of this episode

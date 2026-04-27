@@ -43,20 +43,7 @@ These files tell the Host three things:
 
 When the Host boots, the component that gathers every language’s `worker.config.json` and assembles a unified catalogue is `WorkerConfigFactory`. The output is a list of `RpcWorkerConfig` objects, each one carrying everything needed to “launch this language’s worker.”
 
-```mermaid
-flowchart LR
-    subgraph Disk [Worker configs on disk]
-        N[node/worker.config.json]
-        P[python/worker.config.json]
-        J[java/worker.config.json]
-        D[dotnet-isolated/worker.config.json]
-    end
-
-    Disk --> Factory[WorkerConfigFactory]
-    Factory --> Configs[List of RpcWorkerConfig]
-    Configs --> Manager[Worker channel manager]
-```
-
+![One level up — `WorkerConfigFactory`](../../assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
 That is why language workers plug in cleanly. **The Host does not carry language-specific launch logic for each runtime; it reads a config description and builds from there.**
 
 ---
@@ -83,25 +70,7 @@ That stdout/stderr wiring matters operationally. **Every line a worker writes to
 
 A running OS process does not mean the Worker is “ready.” Process boot and the gRPC handshake are separate stages. The sequence below is the full path a single Worker takes to reach the “ready” state inside one instance.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Host as Functions Host
-    participant Channel as GrpcWorkerChannel
-    participant Proc as RpcWorkerProcess
-    participant OS as Operating System
-    participant Worker as Worker process
-
-    Host->>Channel: StartWorkerProcessAsync
-    Channel->>Proc: CreateWorkerProcess(config)
-    Proc->>OS: Process.Start(node, nodejsWorker.js, ...)
-    OS-->>Worker: New process spawned
-    Worker->>Worker: Initialize gRPC client
-    Worker->>Channel: Establish gRPC connection (StartStream)
-    Channel-->>Host: Worker registered
-    Note over Host,Worker: From here on, InvocationRequests<br/>can flow back and forth
-```
-
+![Worker lifecycle within a single instance](../../assets/azure-functions-deep-dive/02/02-02-worker-lifecycle-within-a-single-instanc.en.png)
 The `GrpcWorkerChannel` that appears here is “the Host-side handle that corresponds to one worker process.” When the worker dies, the channel is torn down with it, and the Host spins up a new worker along with a new channel.
 
 > Source: [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
@@ -124,18 +93,7 @@ Two different knobs get conflated here, and the host code keeps them separate.
 
 So `FUNCTIONS_WORKER_PROCESS_COUNT=4` means “start four workers for this instance.” `WorkerConcurrencyOptions` means “watch live worker latency and decide whether to add another one.” Dynamic concurrency is limited to a subset of runtimes such as Node.js, Python, and PowerShell, and it is skipped when `FUNCTIONS_WORKER_PROCESS_COUNT` is explicitly set.
 
-```mermaid
-flowchart TB
-    Inst[Function App instance]
-    Inst --> Host[Functions Host]
-    Host --> Ch1[Channel 1]
-    Host --> Ch2[Channel 2]
-    Host --> Chn[Channel N]
-    Ch1 --> W1[Worker 1<br/>OS process]
-    Ch2 --> W2[Worker 2<br/>OS process]
-    Chn --> Wn[Worker N<br/>OS process]
-```
-
+![`FUNCTIONS_WORKER_PROCESS_COUNT` — multiple workers per instance](../../assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.en.png)
 ---
 
 ## What happens when a worker dies
@@ -149,18 +107,7 @@ A worker process runs arbitrary user code. Which means it can always die: infini
 
 Operationally, this isolation is the reason “a function may fail occasionally while the Host itself stays perfectly healthy.” The Host is designed around detecting and recovering from the death of **a child process** — not its own.
 
-```mermaid
-stateDiagram-v2
-    [*] --> Starting
-    Starting --> Ready: gRPC connected + functions loaded
-    Ready --> Invoking: InvocationRequest received
-    Invoking --> Ready: response complete
-    Invoking --> Crashed: worker process died
-    Ready --> Crashed: worker process died
-    Crashed --> Starting: host launches a new worker
-    Ready --> [*]: graceful shutdown
-```
-
+![What happens when a worker dies](../../assets/azure-functions-deep-dive/02/02-04-what-happens-when-a-worker-dies.en.png)
 ---
 
 ## Wrapping up part 2 — before the next installment

@@ -15,13 +15,7 @@ Secret store가 중심입니다.
 앱 옆에 사이드카가 붙고.
 Environment 수준 컴포넌트와 외부 서비스를 중개합니다.
 
-```mermaid
-flowchart LR
-    App[FastAPI app] <--> Sidecar[Dapr sidecar]
-    Sidecar <--> Comp[Dapr components in Environment]
-    Sidecar <--> Ext[Service Bus / Redis / Key Vault / other services]
-```
-
+![Dapr가 붙는 위치](../../assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
 ---
 
 ## enable 명령

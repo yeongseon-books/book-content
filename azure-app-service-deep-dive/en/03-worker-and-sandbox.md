@@ -23,13 +23,7 @@ All of those symptoms start here.
 
 ## The two worker models that matter
 
-```mermaid
-flowchart LR
-    REQ[Request] --> W[Worker instance]
-    W --> WIN[Windows code app<br/>IIS + w3wp.exe + sandbox]
-    W --> LIN[Linux app<br/>container boundary]
-```
-
+![The two worker models that matter](../../assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
 “Worker” is one platform term.
 The execution boundary under it differs by OS and hosting mode.
 
@@ -57,14 +51,7 @@ The public sandbox material is especially explicit about two constraints.
   which means most User32/GDI32 calls,
   are heavily restricted
 
-```mermaid
-flowchart TB
-    APP[Your app code] --> IIS[IIS / w3wp.exe]
-    IIS --> SB[App Service sandbox]
-    SB --> ALLOW[File, network, normal web workload]
-    SB --> BLOCK[Registry writes<br/>most User32/GDI32 calls]
-```
-
+![Windows: `w3wp.exe` under the App Service sandbox](../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
 That single diagram explains the starting point for “why does this PDF or imaging library fail only on Windows App Service?”
 
 ---
@@ -111,13 +98,7 @@ the operational boundary to care about is this one:
 - readiness affects when traffic starts
 - persistent storage depends on `/home` mount behavior
 
-```mermaid
-flowchart LR
-    FE[Front-End] --> C[Linux container]
-    C --> APP[App process]
-    HOME[/home mount] --> C
-```
-
+![Linux: the container is the execution boundary](../../assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png)
 On Linux,
 you should not talk about the exact same registry or GDI restrictions as Windows.
 The public docs do not frame it that way.
@@ -138,18 +119,8 @@ one setting changes the meaning of `/home` dramatically.
 
 That gives you two very different operational pictures.
 
-```mermaid
-flowchart LR
-    C1[Container A] --> H1[/home shared storage]
-    C2[Container B] --> H1
-```
-
-```mermaid
-flowchart LR
-    C1[Container A] --> E1[Ephemeral filesystem]
-    C2[Container B] --> E2[Ephemeral filesystem]
-```
-
+![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
+![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
 If you miss this distinction,
 you eventually see one of the usual surprises.
 
@@ -192,13 +163,7 @@ the sandbox is also a quality-of-service mechanism.
 Multiple customer apps share worker infrastructure.
 The platform needs limits so that one app cannot consume or expose shared components in ways that harm others.
 
-```mermaid
-flowchart TB
-    SB[Sandbox policy] --> SEC[Security isolation]
-    SB --> FAIR[Fair resource sharing]
-    SB --> STAB[Platform stability]
-```
-
+![The sandbox is a security feature and a fairness feature](../../assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png)
 That makes the restrictions easier to reason about.
 
 - registry writes blocked

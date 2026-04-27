@@ -14,14 +14,7 @@ Ingress exposes a public FQDN.
 
 The path makes the first deployment much easier to reason about.
 
-```mermaid
-flowchart LR
-    Code[FastAPI code] --> Image[Container image]
-    Image --> Registry[Container Registry]
-    Registry --> ACA[Container App revision]
-    ACA --> URL[Public FQDN]
-```
-
+![The end-to-end path](../../assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
 ---
 
 ## Setup commands

@@ -23,18 +23,7 @@ Functions는 다릅니다. **함수 실행을 위한 프로세스가 최소 두 
 - **Host 프로세스** — .NET으로 작성된 런타임. 트리거 감지, 스케일 신호, 로깅, 바인딩 해석을 담당
 - **Worker 프로세스** — 여러분의 언어(Node.js, Python, Java 등)로 띄워지는 별도 프로세스. **여기서 여러분의 함수 코드가 실제로 실행**됨
 
-```mermaid
-flowchart LR
-    subgraph Container [Function App 인스턴스]
-        Host[Functions Host<br/>.NET 프로세스]
-        Worker[Language Worker<br/>Node.js / Python / Java 프로세스]
-        Host <-- gRPC --> Worker
-    end
-
-    Trigger[트리거 이벤트] --> Host
-    Worker --> UserCode[(여러분의 함수 코드)]
-```
-
+![가장 큰 그림 — 두 개의 프로세스](../../assets/azure-functions-101/03/03-01-the-big-picture-two-processes.ko.png)
 이 분리가 Functions의 가장 중요한 설계 결정입니다. 왜 이렇게 했을까요?
 
 ---
@@ -59,28 +48,7 @@ flowchart LR
 
 한 Function App 인스턴스가 트래픽을 처리하는 모습을 시퀀스로 그려보면 이렇습니다.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Trig as 트리거 소스
-    participant Host as Host (.NET)
-    participant Worker as Worker (Node.js)
-    participant Code as 함수 코드
-
-    Note over Host,Worker: 인스턴스 시작 시
-    Host->>Worker: 프로세스 시작 (Process.Start)
-    Worker->>Host: gRPC 연결 + 함수 메타데이터 로드
-    Host-->>Worker: 함수 초기화 완료
-
-    Note over Trig,Code: 실제 호출
-    Trig->>Host: 이벤트 발생
-    Host->>Worker: InvocationRequest (gRPC)
-    Worker->>Code: 함수 핸들러 호출
-    Code-->>Worker: 결과 반환
-    Worker-->>Host: InvocationResponse (gRPC)
-    Host-->>Trig: 처리 완료
-```
-
+![한 인스턴스 안에서 일어나는 일](../../assets/azure-functions-101/03/03-02-what-happens-inside-a-single-instance.ko.png)
 이 흐름에서 기억할 것은 두 가지입니다.
 
 1. **Host는 함수 코드를 직접 호출하지 않습니다.** “Worker야, 이 입력으로 이 함수를 실행해줘”라고 gRPC로 요청할 뿐입니다.
@@ -100,22 +68,7 @@ sequenceDiagram
 | **Host** | Function App 인스턴스에서 돌아가는 .NET 런타임 프로세스 | 인스턴스당 1개 |
 | **Worker** | Host가 띄운 언어 런타임 프로세스 | 인스턴스당 1개 이상 (`FUNCTIONS_WORKER_PROCESS_COUNT`로 조정 가능) |
 
-```mermaid
-graph TB
-    FA[Function App<br/>my-app]
-    FA --> I1[인스턴스 #1]
-    FA --> I2[인스턴스 #2]
-    FA --> Idot[...]
-
-    I1 --> H1[Host]
-    H1 --> W1a[Worker A]
-    H1 --> W1b[Worker B]
-
-    I2 --> H2[Host]
-    H2 --> W2a[Worker A]
-    H2 --> W2b[Worker B]
-```
-
+![Function App, Host, Worker — 세 단어의 위계](../../assets/azure-functions-101/03/03-03-function-app-host-worker-the-hierarchy-o.ko.png)
 Function App을 스케일아웃하면 인스턴스 수가 늘어나고, 각 인스턴스는 자기 Host와 Worker를 가집니다. **인스턴스 간에는 메모리를 공유하지 않습니다.** 함수 안에서 “전역 변수에 캐시해 두면 빠르겠지” 하는 코드는 같은 인스턴스 안에서만 의미가 있고, 다른 인스턴스에서는 그 캐시가 비어 있습니다. 이 점은 6화 스케일링 편에서 다시 짚습니다.
 
 ---

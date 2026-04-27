@@ -17,15 +17,7 @@ Linux code app에서는 빌드 단계에 **Oryx**가 강하게 연결됩니다.
 
 ## 큰 그림 — 배포 파이프라인
 
-```mermaid
-flowchart LR
-    SRC[git push / zip / publish] --> KUDU[Kudu SCM site]
-    KUDU --> DETECT[Detect build strategy]
-    DETECT --> BUILD[deploy.cmd / deploy.sh / Oryx build]
-    BUILD --> PLACE[/home/site/wwwroot<br/>or mounted package]
-    PLACE --> RELOAD[Worker reload / restart]
-```
-
+![큰 그림 — 배포 파이프라인](../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.ko.png)
 이 흐름을 기준으로 보면 배포 문제는 네 가지로 나뉩니다.
 
 1. 업로드 실패
@@ -65,20 +57,7 @@ Kudu 공개 코드에서 `ZipPushDeploy` 메서드 이름은 아주 직접적입
 zip artifact를 받아 deployment info로 만들고,
 배포 흐름으로 넘깁니다.
 
-```mermaid
-sequenceDiagram
-    participant CI as CI/CD
-    participant K as Kudu
-    participant B as Build step
-    participant F as /home/site/wwwroot
-    participant W as Worker
-
-    CI->>K: POST /api/zipdeploy
-    K->>B: Detect and run deployment
-    B->>F: Place artifacts
-    F->>W: New content visible
-```
-
+![ZipDeploy가 의미하는 것](../../assets/azure-app-service-deep-dive/04/04-02-what-zipdeploy-actually-means.ko.png)
 여기서 중요한 점은 ZipDeploy 자체가 항상 “압축 해제 후 바로 실행”과 같지 않다는 것입니다.
 앱 설정과 배포 모드에 따라 build automation 여부와 최종 배치 방식이 달라집니다.
 
@@ -114,15 +93,7 @@ Oryx README는 자신을 source repo를 runnable artifact로 바꾸는 build sys
 - 의존성 설치와 빌드 스크립트를 생성합니다.
 - Python이면 WSGI server 계열 startup script까지 생성할 수 있습니다.
 
-```mermaid
-flowchart TB
-    SRC[Source repo] --> ORYX[Oryx detect]
-    ORYX --> BS[Build script]
-    ORYX --> SS[Startup script]
-    BS --> ART[Runnable artifact]
-    SS --> RUN[Runtime start]
-```
-
+![Linux code app에서 Oryx가 끼어드는 자리](../../assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.ko.png)
 그래서 Linux App Service에서 “배포는 성공했는데 startup command가 이상하다”는 문제는,
 순수 Kudu만의 문제가 아니라 Oryx가 만든 산출물과 runtime contract를 함께 봐야 풀립니다.
 
@@ -150,13 +121,7 @@ run-from-package 문서는 가장 중요한 문장을 아주 분명하게 적습
 **ZIP 내용이 `wwwroot`로 복사되는 것이 아니라,
 ZIP 패키지 자체가 읽기 전용 `wwwroot`로 mount됩니다.**
 
-```mermaid
-flowchart LR
-    ZIP[ZIP package] --> PKG[/home/data/SitePackages]
-    PKG --> MOUNT[Mounted read-only wwwroot]
-    MOUNT --> W[Worker runtime]
-```
-
+![run-from-package는 `wwwroot`를 읽기 전용 mount로 바꾼다](../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.ko.png)
 이 모드의 장점은 분명합니다.
 
 - 파일 잠금 충돌 감소
@@ -175,13 +140,7 @@ flowchart LR
 
 slot을 쓰면 배포는 production URL 밖에서 먼저 끝납니다.
 
-```mermaid
-flowchart LR
-    BUILD[Deploy to staging slot] --> WARM[Warm up staging workers]
-    WARM --> SWAP[Swap routing]
-    SWAP --> PROD[Production traffic]
-```
-
+![slot 배포는 왜 안전한가](../../assets/azure-app-service-deep-dive/04/04-05-why-slot-deployment-feels-safer.ko.png)
 바뀌는 것은 코드 배치가 아니라 라우팅입니다.
 새 코드가 staging slot worker에서 이미 올라와 있고,
 필요한 warm-up까지 끝난 뒤 production 트래픽이 넘어가므로,

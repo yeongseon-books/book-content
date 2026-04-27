@@ -14,13 +14,7 @@ CPU와 memory 규칙.
 스케일 판단은 선언적입니다.
 신호와 replica 범위를 정하면 플랫폼이 움직입니다.
 
-```mermaid
-flowchart LR
-    Load[HTTP / Queue / Event / CPU] --> Rule[Scale rule]
-    Rule --> KEDA[KEDA-based scaler]
-    KEDA --> Rev[ACA revision replicas]
-```
-
+![스케일 경로 한 장](../../assets/azure-aca-101/05/05-01-the-scaling-path.ko.png)
 ---
 
 ## 규칙 세 부류

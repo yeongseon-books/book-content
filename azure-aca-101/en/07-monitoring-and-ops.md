@@ -13,15 +13,7 @@ Then connects KQL, revision comparison, and Application Insights.
 Log Analytics tells you what happened.
 Application Insights helps you follow where the request went.
 
-```mermaid
-flowchart LR
-    App[App container] --> LA[Log Analytics]
-    Sidecar[Dapr sidecar] --> LA
-    ACA[ACA system events] --> LA
-    App --> AI[Application Insights]
-    Sidecar --> AI
-```
-
+![The observability map](../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
 ---
 
 ## Two log types

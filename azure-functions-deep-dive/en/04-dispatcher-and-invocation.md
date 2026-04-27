@@ -18,36 +18,7 @@ Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher
 
 Let's start by drawing the entire path of a single invocation in one diagram.
 
-```mermaid
-sequenceDiagram
-    participant T as Trigger<br/>(Queue/HTTP/Timer/...)
-    participant SDK as WebJobs SDK
-    participant WFI as WorkerFunctionInvoker
-    participant DISP as IFunctionInvocationDispatcher<br/>(Rpc implementation)
-    participant GWC as GrpcWorkerChannel
-    participant OC as Per-worker Outbound Channel
-    participant IC as Per-worker Inbound Channel
-    participant FRS as FunctionRpcService
-    participant W as Worker
-
-    T->>SDK: Trigger fires (message arrives, HTTP hits, timer expires)
-    SDK->>WFI: InvokeCore (binding data)
-    WFI->>DISP: InvokeAsync(ScriptInvocationContext)
-    DISP->>GWC: SendInvocationRequest
-    GWC->>OC: OutboundGrpcEvent { InvocationRequest }
-    FRS->>OC: Read outbound.Reader
-    FRS-->>W: StreamingMessage(InvocationRequest)
-
-    W->>W: Run user function
-    W-->>FRS: StreamingMessage(InvocationResponse)
-    FRS->>IC: InboundGrpcEvent { InvocationResponse }
-    GWC->>IC: Read inbound.Reader
-    GWC->>DISP: TaskCompletionSource.SetResult
-    DISP->>WFI: Return result
-    WFI->>SDK: Return result
-    SDK->>T: Trigger complete
-```
-
+![The big picture — from trigger to worker](../../assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
 This diagram is what Part 4 is about. Let's walk through each step in code.
 
 ---
@@ -215,17 +186,7 @@ But **there's no guarantee about the order in which response messages come back.
 
 That said, **some message ordering does need to be preserved** — for example, log messages within the same invocation. That's why [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) exists — it preserves message order *within* an invocation while keeping invocations in parallel with each other.
 
-```mermaid
-flowchart LR
-    GWC[GrpcWorkerChannel] --> Dispatch[OrderedInvocation<br/>MessageDispatcher]
-    Dispatch -->|invocation_id A| QA[Queue A<br/>ordered]
-    Dispatch -->|invocation_id B| QB[Queue B<br/>ordered]
-    Dispatch -->|invocation_id C| QC[Queue C<br/>ordered]
-    QA --> Handler[per-invocation handler]
-    QB --> Handler
-    QC --> Handler
-```
-
+![Concurrent invocations — one worker handles many at once](../../assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.en.png)
 Messages with the same `invocation_id` are processed in arrival order, but different `invocation_id`s are processed in parallel.
 
 ---

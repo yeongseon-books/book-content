@@ -173,25 +173,7 @@ message FunctionLoadRequest {
 
 ### 한 화면으로
 
-```mermaid
-sequenceDiagram
-    participant H as Host (.NET)
-    participant W as Worker (Node/Python/Java/...)
-
-    Note over H,W: 워커 프로세스가 막 떴고, gRPC 채널이 열렸다
-    W->>H: StartStream { worker_id }
-    H->>W: WorkerInitRequest { host_version, capabilities, ... }
-    W->>H: WorkerInitResponse { capabilities, result, worker_metadata }
-    Note over H,W: 이제 양쪽이 서로의 capability를 안다
-
-    H->>W: FunctionLoadRequest { function_id, metadata } (반복 또는 collection)
-    W->>H: FunctionLoadResponse { function_id, result }
-
-    Note over H,W: 함수 로드 완료. 이제 호출 받을 준비 끝.
-    H->>W: InvocationRequest { invocation_id, function_id, input_data, ... }
-    W->>H: InvocationResponse { invocation_id, output_data, result }
-```
-
+![한 화면으로](../../assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
 이 시퀀스가 **모든 워커의 일생**입니다. Node 워커도, Python 워커도, Java 워커도 똑같습니다. 언어별로 다른 건 워커 측의 구현 상세이고, **프로토콜은 단일**입니다.
 
 ---
@@ -248,16 +230,7 @@ sequenceDiagram
 
 즉 `FunctionRpcService`는 호스트 쪽 gRPC 서버이면서, 동시에 **워커별 채널과 실제 gRPC 스트림 사이를 펌프하는 중계기**입니다.
 
-```mermaid
-flowchart LR
-    Worker[Worker process] <-->|StreamingMessage| Stream[gRPC EventStream]
-    Stream <-->|read / write| Rpc[FunctionRpcService]
-    Rpc --> Inbound[inbound Channel&lt;InboundGrpcEvent&gt;]
-    Outbound[outbound Channel&lt;OutboundGrpcEvent&gt;] --> Rpc
-    Inbound --> Gwc[GrpcWorkerChannel]
-    Gwc --> Outbound
-```
-
+![채널 구조 — 범용 이벤트 버스보다 워커별 `Channel<T>` 쌍에 가깝다](../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
 `IScriptEventManager`는 이 채널들을 워커 ID로 보관하고 찾는 상태 저장소로 쓰입니다. `InboundGrpcEvent`와 `OutboundGrpcEvent` 같은 래퍼 타입도 실제로 존재합니다. 다만 함수 호출 메시지의 핵심 경로를 설명할 때는, 그것들을 범용 pub-sub 버스라고 이해하기보다 **워커별 큐와 펌프 구조**로 보는 쪽이 코드와 더 가깝습니다.
 
 ---

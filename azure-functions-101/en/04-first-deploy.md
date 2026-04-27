@@ -41,15 +41,7 @@ python --version     # 3.11+
 
 ## The full flow on one page
 
-```mermaid
-flowchart LR
-    A[1. Create local project<br/>func init] --> B[2. Add a function<br/>func new]
-    B --> C[3. Run locally<br/>func start]
-    C --> D[4. Create Azure resources<br/>3 az commands]
-    D --> E[5. Deploy<br/>func azure functionapp publish]
-    E --> F[6. Call it<br/>curl https://...]
-```
-
+![The full flow on one page](../../assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png)
 ---
 
 ## 1. Create the project
@@ -139,14 +131,7 @@ Three Azure resources are required.
 | **Storage Account** | Required storage for host state, locks, and trigger metadata |
 | **Function App** | The compute resource that runs your functions |
 
-```mermaid
-flowchart TD
-    RG[Resource Group<br/>rg-hello]
-    RG --> SA[Storage Account<br/>sthello001]
-    RG --> FA[Function App<br/>func-hello-001]
-    FA -. depends on .-> SA
-```
-
+![4. Create Azure resources](../../assets/azure-functions-101/04/04-02-4-create-azure-resources.en.png)
 > Note: The Storage Account is infrastructure storage for the Functions platform itself. It holds things like trigger leases, invocation metadata, and Timer schedule state. Keep business data in a separate store.
 
 Now create the resources. Names must be globally unique, so adjust them as needed.
@@ -203,22 +188,7 @@ func azure functionapp publish $APP
 
 Under the hood, the flow looks like this.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Dev as Local (func CLI)
-    participant Kudu as Function App SCM (Kudu)
-    participant Storage as Storage Account
-    participant Host as Function App (Host)
-
-    Dev->>Dev: Package the project as zip
-    Dev->>Kudu: Upload zip
-    Kudu->>Storage: Save package
-    Storage-->>Host: Mount via WEBSITE_RUN_FROM_PACKAGE
-    Host->>Host: Index function metadata
-    Host-->>Dev: Deployment complete, print trigger URL
-```
-
+![5. Deploy](../../assets/azure-functions-101/04/04-03-5-deploy.en.png)
 You should see something like this at the end.
 
 ```

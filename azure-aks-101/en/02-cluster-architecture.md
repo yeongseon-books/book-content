@@ -10,30 +10,7 @@ This post is about reading that boundary. We'll look at what the control plane d
 
 ## Cut the cluster in half
 
-```mermaid
-flowchart LR
-    subgraph Control[Control plane - managed by Azure]
-        API[API server]
-        ETCD[etcd]
-        SCH[Scheduler]
-        CCM[Controller managers]
-    end
-
-    subgraph UserSide[User-controlled side]
-        subgraph Pools[Node pools]
-            SYS[System node pool]
-            USR[User node pool]
-        end
-        APP[Pods / Deployments / Services]
-    end
-
-    API --> Pools
-    SCH --> Pools
-    CCM --> Pools
-    APP --> SYS
-    APP --> USR
-```
-
+![Cut the cluster in half](../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
 The left side is the Azure-managed layer. The right side is the layer you shape more directly. That single picture explains a lot: why the control plane is not billed separately, why node count is your decision, and why pod scaling and node scaling are different conversations.
 
 ---
@@ -79,17 +56,7 @@ Pods are the logical unit. Node pools are the capacity and cost unit.
 
 This is the first node-pool distinction to learn in AKS.
 
-```mermaid
-flowchart TB
-    SYS[System node pool] --> C1[CoreDNS]
-    SYS --> C2[metrics-server]
-    SYS --> C3[other system pods]
-
-    USR[User node pool] --> A1[FastAPI API]
-    USR --> A2[worker]
-    USR --> A3[batch job]
-```
-
+![System node pool vs user node pool](../../assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png)
 ### System node pool
 
 System pools are where critical cluster components are expected to run.
