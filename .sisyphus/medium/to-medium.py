@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
-"""Convert en/*.md to Medium-ready medium/<NN>.md and medium/<NN>.html.
+"""Convert en/*.md to Medium import-ready medium/<NN>.md.
 
-Two outputs per source post:
-- medium/<NN>.md  — markdown, cleaned for Medium import (no toc markers, no
-  Tags last line; tags become a leading HTML comment for reference)
-- medium/<NN>.html — HTML, optimized for direct paste into the Medium editor
-  (Medium preserves headings, code blocks, blockquotes, images, links, lists)
-
-Markdown rules (confirmed by user):
+Rules (confirmed by user):
 - Image refs `![alt](../../assets/...)` -> raw.githubusercontent.com/<owner>/<repo>/<TAG>/assets/...
 - Other relative links `[text](../something)` or `[text](./something)` -> github.com/<owner>/<repo>/blob/<TAG>/<resolved>
 - H3+ (### and deeper) -> bold paragraph (`**text**`)
@@ -20,12 +14,9 @@ Markdown rules (confirmed by user):
 
 from __future__ import annotations
 
-import html
 import re
 import sys
 from pathlib import Path
-
-import markdown as md_lib
 
 REPO = "yeongseon/tech-blog"
 TAG = "e8dca42"
@@ -226,34 +217,6 @@ def finalize_md_for_medium(body: str, tags: str | None) -> str:
     return "\n".join(header_lines) + "\n\n" + cleaned
 
 
-HTML_DOC_TEMPLATE = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>{title}</title>
-<!-- Paste the contents of <body> directly into the Medium editor. -->
-{tags_comment}</head>
-<body>
-{body}
-</body>
-</html>
-"""
-
-
-def build_html(md_body: str, tags: str | None) -> str:
-    cleaned = clean_for_medium_import(md_body)
-    h1_match = re.search(r"^#\s+(.+?)\s*$", cleaned, re.MULTILINE)
-    title = h1_match.group(1).strip() if h1_match else "Untitled"
-    extensions = ["fenced_code", "tables", "sane_lists", "nl2br"]
-    body_html = md_lib.markdown(cleaned, extensions=extensions, output_format="html5")
-    tags_comment = f"<!-- Tags: {tags} -->\n" if tags else ""
-    return HTML_DOC_TEMPLATE.format(
-        title=html.escape(title),
-        tags_comment=tags_comment,
-        body=body_html,
-    )
-
-
 def numeric_prefix(name: str) -> str | None:
     m = re.match(r"^(\d+)", name)
     return m.group(1) if m else None
@@ -273,9 +236,7 @@ def process_series(en_dir: Path) -> tuple[int, int]:
         body = convert(md)
         tags = extract_tags(body)
         md_out = finalize_md_for_medium(body, tags)
-        html_out = build_html(body, tags)
         (medium_dir / f"{prefix}.md").write_text(md_out, encoding="utf-8")
-        (medium_dir / f"{prefix}.html").write_text(html_out, encoding="utf-8")
         written += 1
     return written, skipped
 
