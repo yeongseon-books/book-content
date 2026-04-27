@@ -253,7 +253,7 @@ spec:
 - [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
 - [네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
 - **스케일링 — HPA, Cluster Autoscaler, KEDA (현재 글)**
-- [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+- 모니터링과 운영 — Container Insights, 로그, 알람 (예정)
 
 <!-- toc:end -->
 

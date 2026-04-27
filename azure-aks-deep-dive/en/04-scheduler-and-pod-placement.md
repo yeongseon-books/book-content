@@ -60,8 +60,8 @@ Parts 2 and 3 covered node execution and networking; this part explains the earl
 - [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
 - [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
 - **Scheduler and Pod placement — who decides which node (current)**
-- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
-- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+- HPA and Cluster Autoscaler internals — two control loops (upcoming)
+- KEDA internals — how a ScaledObject builds an HPA (upcoming)
 
 <!-- toc:end -->
 

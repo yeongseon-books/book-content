@@ -58,7 +58,7 @@ CA는 unschedulable Pod를 보고,
 - [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
 - [Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가](./04-scheduler-and-pod-placement.md)
 - **HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프 (현재 글)**
-- [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+- KEDA 내부 — ScaledObject가 HPA를 만드는 방식 (예정)
 
 <!-- toc:end -->
 

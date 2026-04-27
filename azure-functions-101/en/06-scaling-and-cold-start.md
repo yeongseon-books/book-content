@@ -162,7 +162,7 @@ If you want the implementation details behind those behaviors, pair this post wi
 - [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
 - [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
 - **Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (current)**
-- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+- Monitoring and Operations Fundamentals (upcoming)
 
 <!-- toc:end -->
 

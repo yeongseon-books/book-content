@@ -239,9 +239,9 @@ This is part 4 of the Azure Kubernetes Service 101 series. Part 3 used Pod, Depl
 - [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
 - [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
 - **Pod, Deployment, Service — the three ways you express a workload (current)**
-- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
-- [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-- [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
+- Networking and Ingress — the path in and out of the cluster (upcoming)
+- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

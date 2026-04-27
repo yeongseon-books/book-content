@@ -255,8 +255,8 @@ This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established th
 - [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
 - [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
 - **Dispatcher and Invocation — How a Function Call Reaches the Worker (current)**
-- [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
-- [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+- Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
+- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

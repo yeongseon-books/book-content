@@ -157,11 +157,11 @@ This is part 2 of the Azure Functions 101 series. Part 1 established the mental 
 
 - [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
 - **Triggers and Bindings — Everything About Function I/O (current)**
-- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
-- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
-- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
-- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
-- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+- Host and Worker — Who Actually Runs Your Functions? (upcoming)
+- Deploy a Function App — From Localhost to Azure (upcoming)
+- Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)
+- Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
+- Monitoring and Operations Fundamentals (upcoming)
 
 <!-- toc:end -->
 

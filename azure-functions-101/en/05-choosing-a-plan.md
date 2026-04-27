@@ -186,8 +186,8 @@ This is Part 5 of Azure Functions 101. Part 4 showed the deployment path end to 
 - [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
 - [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
 - **Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (current)**
-- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
-- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+- Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
+- Monitoring and Operations Fundamentals (upcoming)
 
 <!-- toc:end -->
 

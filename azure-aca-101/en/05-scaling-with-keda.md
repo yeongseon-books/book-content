@@ -240,8 +240,8 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 - [Your first deploy — Python/FastAPI](./03-first-deploy.md)
 - [Ingress and traffic splitting — revision-based deployment strategies](./04-ingress-and-traffic-split.md)
 - **Scaling — KEDA scalers and zero-to-N (current)**
-- [Dapr integration — what you get from a sidecar](./06-dapr-integration.md)
-- [Monitoring and ops — Log Analytics and Application Insights](./07-monitoring-and-ops.md)
+- Dapr integration — what you get from a sidecar (upcoming)
+- Monitoring and ops — Log Analytics and Application Insights (upcoming)
 
 <!-- toc:end -->
 

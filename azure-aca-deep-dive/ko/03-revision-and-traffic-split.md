@@ -339,9 +339,9 @@ App 설정을 Envoy 설정으로 번역하는 ACA 내부 control-plane 코드는
 - [ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것](./01-aca-architecture.md)
 - [Environment 내부 — 네트워크·관측·Dapr 스코프의 경계](./02-environment-internals.md)
 - **Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가 (현재 글)**
-- [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
-- [Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스](./05-dapr-sidecar-internals.md)
-- [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+- ACA 안의 KEDA — Scale Rule이 만드는 것 (예정)
+- Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스 (예정)
+- Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지 (예정)
 
 <!-- toc:end -->
 

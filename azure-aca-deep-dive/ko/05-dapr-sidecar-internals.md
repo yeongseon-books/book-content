@@ -329,7 +329,7 @@ Timeout 분석에서는 이 마지막 구분이 특히 중요합니다.
 - [Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
 - [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
 - **Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스 (현재 글)**
-- [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+- Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지 (예정)
 
 <!-- toc:end -->
 

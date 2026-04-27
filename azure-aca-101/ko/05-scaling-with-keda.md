@@ -240,8 +240,8 @@ az containerapp create   --name queue-worker   --resource-group $RG   --environm
 - [첫 앱 배포하기 — Python/FastAPI](./03-first-deploy.md)
 - [Ingress와 트래픽 분할 — Revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
 - **스케일링 — KEDA scaler와 0-to-N (현재 글)**
-- [Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
-- [모니터링과 운영 — Log Analytics와 Application Insights](./07-monitoring-and-ops.md)
+- Dapr 통합 — 사이드카로 얻는 것 (예정)
+- 모니터링과 운영 — Log Analytics와 Application Insights (예정)
 
 <!-- toc:end -->
 

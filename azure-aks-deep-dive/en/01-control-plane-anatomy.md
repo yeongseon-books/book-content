@@ -131,11 +131,11 @@ If AKS 101 explained the split between the control plane and node pools for firs
 ## In this series
 
 - **Control plane anatomy — what AKS hides from you (current)**
-- [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
-- [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
-- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
-- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
-- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+- kubelet and containerd — how a container actually starts on a node (upcoming)
+- CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)
+- Scheduler and Pod placement — who decides which node (upcoming)
+- HPA and Cluster Autoscaler internals — two control loops (upcoming)
+- KEDA internals — how a ScaledObject builds an HPA (upcoming)
 
 <!-- toc:end -->
 

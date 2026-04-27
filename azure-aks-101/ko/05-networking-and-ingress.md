@@ -239,8 +239,8 @@ IPAM 방식은 나중에 바꾸기 싫은 축입니다. 클러스터 수, 노드
 - [첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
 - [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
 - **네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길 (현재 글)**
-- [스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-- [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+- 스케일링 — HPA, Cluster Autoscaler, KEDA (예정)
+- 모니터링과 운영 — Container Insights, 로그, 알람 (예정)
 
 <!-- toc:end -->
 

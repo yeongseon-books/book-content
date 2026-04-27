@@ -221,10 +221,10 @@ Linux 앱에서는 왜 container 경계가 핵심인지 이어서 다룹니다.
 
 - [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
 - **Front-End과 ARR — 요청은 어떻게 워커에 도달하는가 (현재 글)**
-- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
-- [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
-- [스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
-- [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+- Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가 (예정)
+- 배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (예정)
+- 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (예정)
+- 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
 
 <!-- toc:end -->
 

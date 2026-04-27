@@ -256,7 +256,7 @@ This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the
 - [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
 - [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
 - **Scaling — HPA, Cluster Autoscaler, KEDA (current)**
-- [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
+- Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

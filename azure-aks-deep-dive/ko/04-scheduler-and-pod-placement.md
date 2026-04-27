@@ -59,8 +59,8 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 - [kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지](./02-kubelet-and-containerd.md)
 - [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
 - **Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가 (현재 글)**
-- [HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프](./05-hpa-and-cluster-autoscaler-internals.md)
-- [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+- HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프 (예정)
+- KEDA 내부 — ScaledObject가 HPA를 만드는 방식 (예정)
 
 <!-- toc:end -->
 

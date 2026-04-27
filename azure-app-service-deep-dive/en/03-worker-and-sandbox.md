@@ -243,9 +243,9 @@ The next post follows deployment into that boundary and connects Kudu, Oryx, bui
 - [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
 - [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
 - **Workers and the sandbox — where user code actually runs (current)**
-- [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
-- [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
-- [Cold start and warmup — why the first request is expensive](./06-cold-start-and-warmup.md)
+- Deployment and Kudu — build, sync, release from the inside (upcoming)
+- Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

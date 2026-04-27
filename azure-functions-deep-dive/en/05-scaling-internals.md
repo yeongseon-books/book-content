@@ -294,7 +294,7 @@ In installment 6 we'll look at what happens **when a new instance is actually cr
 - [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
 - [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
 - **Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (current)**
-- [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

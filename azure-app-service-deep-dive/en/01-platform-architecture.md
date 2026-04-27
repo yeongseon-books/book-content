@@ -257,11 +257,11 @@ Episode 2 covers Front-End and ARR, episode 3 covers workers and the sandbox, ep
 ## In this series
 
 - **App Service platform architecture — Front-End, Worker, File Server (current)**
-- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
-- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
-- [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
-- [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
-- [Cold start and warmup — why the first request is expensive](./06-cold-start-and-warmup.md)
+- Front-End and ARR — how a request reaches a worker (upcoming)
+- Workers and the sandbox — where user code actually runs (upcoming)
+- Deployment and Kudu — build, sync, release from the inside (upcoming)
+- Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

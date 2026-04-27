@@ -408,9 +408,9 @@ In the next post, we'll cover **App Settings and Environment Variable Management
 - [Request Lifecycle: How Requests Reach Your App](./02-request-lifecycle.md)
 - [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
 - **First Deployment: From Local to Azure (Python/Flask) (current)**
-- [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
-- [Logging and Monitoring Basics](./06-logging-monitoring.md)
-- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+- Mastering Configuration: App Settings & Environment Variables (upcoming)
+- Logging and Monitoring Basics (upcoming)
+- Scaling 101: When to Scale Up vs Scale Out? (upcoming)
 
 <!-- toc:end -->
 

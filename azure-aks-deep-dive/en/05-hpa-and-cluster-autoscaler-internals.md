@@ -59,7 +59,7 @@ Part 4 explained scheduling decisions; this part explains the two control loops 
 - [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
 - [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
 - **HPA and Cluster Autoscaler internals — two control loops (current)**
-- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+- KEDA internals — how a ScaledObject builds an HPA (upcoming)
 
 <!-- toc:end -->
 

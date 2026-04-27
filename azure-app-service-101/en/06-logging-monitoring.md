@@ -470,7 +470,7 @@ In the final post, we'll cover **Scaling 101** - when to Scale Up vs Scale Out.
 - [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
 - [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
 - **Logging and Monitoring Basics (current)**
-- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+- Scaling 101: When to Scale Up vs Scale Out? (upcoming)
 
 <!-- toc:end -->
 

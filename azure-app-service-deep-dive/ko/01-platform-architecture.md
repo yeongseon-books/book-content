@@ -259,11 +259,11 @@ Front-End와 ARR이 어떻게 요청을 워커에 보내는지,
 ## 시리즈 목차
 
 - **App Service 플랫폼 아키텍처 — Front-End·Worker·File Server (현재 글)**
-- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
-- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
-- [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
-- [스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
-- [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+- Front-End과 ARR — 요청은 어떻게 워커에 도달하는가 (예정)
+- Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가 (예정)
+- 배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (예정)
+- 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (예정)
+- 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
 
 <!-- toc:end -->
 

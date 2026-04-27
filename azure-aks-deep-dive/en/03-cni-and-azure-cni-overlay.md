@@ -60,9 +60,9 @@ Part 2 followed the node-local execution path; this part explains how CNI attach
 - [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
 - [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
 - **CNI and Azure CNI Overlay — where Pod IPs come from (current)**
-- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
-- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
-- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+- Scheduler and Pod placement — who decides which node (upcoming)
+- HPA and Cluster Autoscaler internals — two control loops (upcoming)
+- KEDA internals — how a ScaledObject builds an HPA (upcoming)
 
 <!-- toc:end -->
 

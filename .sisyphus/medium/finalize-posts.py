@@ -80,13 +80,17 @@ def collect_series(series: str) -> dict[str, dict[int, dict[str, str]]]:
 
 def build_toc(entries: dict[int, dict[str, str]], current_idx: int, variant: str) -> list[str]:
     heading = TOC_HEADING_KO if variant == "ko" else TOC_HEADING_EN
+    current_label = "현재 글" if variant == "ko" else "current"
+    upcoming_label = "예정" if variant == "ko" else "upcoming"
     lines = [TOC_BEGIN, heading, ""]
     for idx in sorted(entries):
         e = entries[idx]
-        if idx == current_idx:
-            lines.append(f"- **{e['title']} (현재 글)**" if variant == "ko" else f"- **{e['title']} (current)**")
-        else:
+        if idx < current_idx:
             lines.append(f"- [{e['title']}](./{e['filename']})")
+        elif idx == current_idx:
+            lines.append(f"- **{e['title']} ({current_label})**")
+        else:
+            lines.append(f"- {e['title']} ({upcoming_label})")
     lines.append("")
     lines.append(TOC_END)
     return lines

@@ -264,9 +264,9 @@ This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at proces
 - [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
 - [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
 - **The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (current)**
-- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
-- [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
-- [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+- Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
+- Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
+- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

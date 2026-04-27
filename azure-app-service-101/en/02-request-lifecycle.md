@@ -348,11 +348,11 @@ In the next post, we'll explore **Hosting Models** - App Service Plan selection 
 
 - [What is Azure App Service? - Understanding the Platform Architecture](./01-what-is-app-service.md)
 - **Request Lifecycle: How Requests Reach Your App (current)**
-- [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
-- [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
-- [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
-- [Logging and Monitoring Basics](./06-logging-monitoring.md)
-- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+- Hosting Models: Which Plan Should You Choose? (upcoming)
+- First Deployment: From Local to Azure (Python/Flask) (upcoming)
+- Mastering Configuration: App Settings & Environment Variables (upcoming)
+- Logging and Monitoring Basics (upcoming)
+- Scaling 101: When to Scale Up vs Scale Out? (upcoming)
 
 <!-- toc:end -->
 

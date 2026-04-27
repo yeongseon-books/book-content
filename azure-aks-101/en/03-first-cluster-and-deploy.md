@@ -337,10 +337,10 @@ This is part 3 of the Azure Kubernetes Service 101 series. The first two posts s
 - [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
 - [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
 - **Your first cluster, your first deploy — Python/FastAPI (current)**
-- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
-- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
-- [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-- [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
+- Pod, Deployment, Service — the three ways you express a workload (upcoming)
+- Networking and Ingress — the path in and out of the cluster (upcoming)
+- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

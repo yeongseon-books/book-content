@@ -133,10 +133,10 @@ containerd가 OCI runtime 계층으로 내려가면서 `runc`를 사용합니다
 
 - [Control Plane 해부 — AKS가 사용자에게서 가린 것](./01-control-plane-anatomy.md)
 - **kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지 (현재 글)**
-- [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
-- [Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가](./04-scheduler-and-pod-placement.md)
-- [HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프](./05-hpa-and-cluster-autoscaler-internals.md)
-- [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+- CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가 (예정)
+- Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가 (예정)
+- HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프 (예정)
+- KEDA 내부 — ScaledObject가 HPA를 만드는 방식 (예정)
 
 <!-- toc:end -->
 

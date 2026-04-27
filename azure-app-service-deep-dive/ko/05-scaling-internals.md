@@ -184,7 +184,7 @@ scale-in은 사용 중인 capacity를 줄이는 작업입니다.
 - [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
 - [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
 - **스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (현재 글)**
-- [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+- 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
 
 <!-- toc:end -->
 

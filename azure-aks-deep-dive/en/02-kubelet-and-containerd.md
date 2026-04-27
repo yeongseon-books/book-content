@@ -101,10 +101,10 @@ Part 1 fixed the managed control-plane boundary; this part follows the exact opp
 
 - [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
 - **kubelet and containerd — how a container actually starts on a node (current)**
-- [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
-- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
-- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
-- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+- CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)
+- Scheduler and Pod placement — who decides which node (upcoming)
+- HPA and Cluster Autoscaler internals — two control loops (upcoming)
+- KEDA internals — how a ScaledObject builds an HPA (upcoming)
 
 <!-- toc:end -->
 

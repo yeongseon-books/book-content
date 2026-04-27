@@ -459,10 +459,10 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 - [Azure App Service란? - 플랫폼 아키텍처 이해하기](./01-what-is-app-service.md)
 - [Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까](./02-request-lifecycle.md)
 - **Hosting Models: 어떤 플랜을 선택해야 할까? (현재 글)**
-- [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
-- [Configuration 마스터하기: App Settings & 환경변수](./05-configuration.md)
-- [로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기](./06-logging-monitoring.md)
-- [Scaling 101: 언제 Scale Up vs Scale Out?](./07-scaling-101.md)
+- 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask) (예정)
+- Configuration 마스터하기: App Settings & 환경변수 (예정)
+- 로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기 (예정)
+- Scaling 101: 언제 Scale Up vs Scale Out? (예정)
 
 <!-- toc:end -->
 

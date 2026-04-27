@@ -191,7 +191,7 @@ The next and final episode zooms into the startup window after a worker is alloc
 - [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
 - [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
 - **Scaling internals — how Scale Out decisions become new workers (current)**
-- [Cold start and warmup — why the first request is expensive](./06-cold-start-and-warmup.md)
+- Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

@@ -468,8 +468,8 @@ logger.info("Configuration loaded", extra={
 - [Hosting Models: 어떤 플랜을 선택해야 할까?](./03-hosting-models.md)
 - [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
 - **Configuration 마스터하기: App Settings & 환경변수 (현재 글)**
-- [로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기](./06-logging-monitoring.md)
-- [Scaling 101: 언제 Scale Up vs Scale Out?](./07-scaling-101.md)
+- 로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기 (예정)
+- Scaling 101: 언제 Scale Up vs Scale Out? (예정)
 
 <!-- toc:end -->
 

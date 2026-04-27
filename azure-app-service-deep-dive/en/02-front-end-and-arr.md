@@ -225,10 +225,10 @@ The next post moves inside the worker itself and explains the sandbox boundary, 
 
 - [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
 - **Front-End and ARR — how a request reaches a worker (current)**
-- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
-- [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
-- [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
-- [Cold start and warmup — why the first request is expensive](./06-cold-start-and-warmup.md)
+- Workers and the sandbox — where user code actually runs (upcoming)
+- Deployment and Kudu — build, sync, release from the inside (upcoming)
+- Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

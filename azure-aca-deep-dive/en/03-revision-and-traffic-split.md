@@ -338,9 +338,9 @@ This episode connected the environment boundary from part 2 to the immutable rol
 - [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
 - [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
 - **Revisions and traffic splitting — where Envoy weights come from (current)**
-- [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
-- [Dapr sidecar internals — the Go process that lives next to your container](./05-dapr-sidecar-internals.md)
-- [The Envoy ingress path — how the first request reaches your container](./06-envoy-ingress-path.md)
+- KEDA inside ACA — what a scale rule actually creates (upcoming)
+- Dapr sidecar internals — the Go process that lives next to your container (upcoming)
+- The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 

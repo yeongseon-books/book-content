@@ -403,8 +403,8 @@ In the next post, we'll cover **Logging and Monitoring** - how to observe app st
 - [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
 - [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
 - **Mastering Configuration: App Settings & Environment Variables (current)**
-- [Logging and Monitoring Basics](./06-logging-monitoring.md)
-- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+- Logging and Monitoring Basics (upcoming)
+- Scaling 101: When to Scale Up vs Scale Out? (upcoming)
 
 <!-- toc:end -->
 

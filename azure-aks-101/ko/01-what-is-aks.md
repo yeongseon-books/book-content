@@ -170,12 +170,12 @@ AKS는 이 셋 중에서 가장 Kubernetes에 가깝습니다. 대신 그만큼 
 ## 시리즈 목차
 
 - **Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes (현재 글)**
-- [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
-- [첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
-- [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
-- [네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
-- [스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-- [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+- 클러스터 아키텍처 — Control Plane과 Node Pool (예정)
+- 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI (예정)
+- Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식 (예정)
+- 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길 (예정)
+- 스케일링 — HPA, Cluster Autoscaler, KEDA (예정)
+- 모니터링과 운영 — Container Insights, 로그, 알람 (예정)
 
 <!-- toc:end -->
 

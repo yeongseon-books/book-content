@@ -241,7 +241,7 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 - [Ingress and traffic splitting — revision-based deployment strategies](./04-ingress-and-traffic-split.md)
 - [Scaling — KEDA scalers and zero-to-N](./05-scaling-with-keda.md)
 - **Dapr integration — what you get from a sidecar (current)**
-- [Monitoring and ops — Log Analytics and Application Insights](./07-monitoring-and-ops.md)
+- Monitoring and ops — Log Analytics and Application Insights (upcoming)
 
 <!-- toc:end -->
 

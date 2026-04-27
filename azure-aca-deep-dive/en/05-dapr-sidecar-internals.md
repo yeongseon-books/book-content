@@ -328,7 +328,7 @@ The previous part explained how ACA scales revisions. This part explained how AC
 - [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
 - [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
 - **Dapr sidecar internals — the Go process that lives next to your container (current)**
-- [The Envoy ingress path — how the first request reaches your container](./06-envoy-ingress-path.md)
+- The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 

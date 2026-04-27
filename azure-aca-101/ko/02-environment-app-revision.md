@@ -234,11 +234,11 @@ Multiple은 Canary와 Blue-Green을 가능하게 합니다.
 
 - [Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
 - **Environment·Container App·Revision — 세 단어로 보는 ACA (현재 글)**
-- [첫 앱 배포하기 — Python/FastAPI](./03-first-deploy.md)
-- [Ingress와 트래픽 분할 — Revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
-- [스케일링 — KEDA scaler와 0-to-N](./05-scaling-with-keda.md)
-- [Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
-- [모니터링과 운영 — Log Analytics와 Application Insights](./07-monitoring-and-ops.md)
+- 첫 앱 배포하기 — Python/FastAPI (예정)
+- Ingress와 트래픽 분할 — Revision 기반 배포 전략 (예정)
+- 스케일링 — KEDA scaler와 0-to-N (예정)
+- Dapr 통합 — 사이드카로 얻는 것 (예정)
+- 모니터링과 운영 — Log Analytics와 Application Insights (예정)
 
 <!-- toc:end -->
 

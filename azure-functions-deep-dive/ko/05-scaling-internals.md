@@ -294,7 +294,7 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 - [gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가](./03-grpc-event-stream.md)
 - [Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지](./04-dispatcher-and-invocation.md)
 - **스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이 (현재 글)**
-- [콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때](./06-cold-start-placeholder.md)
+- 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때 (예정)
 
 <!-- toc:end -->
 
