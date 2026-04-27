@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Request Lifecycle: How Requests Reach Your App
 
 "Why is my app returning a 502 error?" "Response times suddenly increased—what's the cause?"
@@ -339,6 +340,21 @@ In the next post, we'll explore **Hosting Models** - App Service Plan selection 
 5. Mastering Configuration: App Settings & Environment Variables
 6. Logging and Monitoring Basics
 7. Scaling 101: When to Scale Up vs Scale Out?
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure App Service? - Understanding the Platform Architecture](./01-what-is-app-service.md)
+- **Request Lifecycle: How Requests Reach Your App (current)**
+- [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
+- [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
+- [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
+- [Logging and Monitoring Basics](./06-logging-monitoring.md)
+- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+
+<!-- toc:end -->
 
 ---
 

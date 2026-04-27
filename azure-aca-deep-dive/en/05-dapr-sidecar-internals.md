@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Dapr sidecar internals — the Go process that lives next to your container
 
 > Azure Container Apps Deep Dive series (5/6)
@@ -316,6 +317,20 @@ That is what "Dapr enabled" means at runtime.
 ## Where this fits in the series
 
 The previous part explained how ACA scales revisions. This part explained how ACA mutates the pod shape of those revisions when Dapr is enabled. The final part returns to ingress and follows the first external request through the ACA-managed load balancer, Envoy, service routing, and the pod that may now contain both your container and the sidecar described here.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
+- [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+- [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
+- [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
+- **Dapr sidecar internals — the Go process that lives next to your container (current)**
+- [The Envoy ingress path — how the first request reaches your container](./06-envoy-ingress-path.md)
+
+<!-- toc:end -->
 
 ---
 

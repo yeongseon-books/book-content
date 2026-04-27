@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
 
 > Azure App Service Deep Dive 시리즈 (3/6)
@@ -215,6 +216,20 @@ Kudu가 어떻게 배포를 받고,
 
 2화가 요청을 worker까지 데려왔다면 이번 글은 그 worker 안쪽의 실행 경계를 설명합니다.
 다음 글에서는 Kudu와 Oryx를 따라가며, 코드가 실제로 `/home/site/wwwroot`에 놓이는 배포 경로를 내부 관점에서 연결합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+- **Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가 (현재 글)**
+- [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
+- [스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
+- [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+
+<!-- toc:end -->
 
 ---
 

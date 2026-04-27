@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated
 
 > Azure Functions 101 시리즈 (5/7)
@@ -177,7 +178,22 @@ Dedicated(App Service Plan)는 이름보다 본질을 보는 편이 쉽습니다
 
 ---
 
-## References
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure Functions란? — 이벤트가 함수를 호출하는 세상](./01-what-is-azure-functions.md)
+- [트리거와 바인딩 — 함수 입출력의 모든 것](./02-triggers-and-bindings.md)
+- [Host와 Worker — 함수는 누가 실행하는가](./03-host-and-worker.md)
+- [함수 하나 배포하기 — 로컬에서 Azure까지](./04-first-deploy.md)
+- **어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated (현재 글)**
+- [스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간](./06-scaling-and-cold-start.md)
+- [모니터링과 운영 기초](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
+
+---
+
+## 참고 자료
 
 **공식 문서**
 - [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)

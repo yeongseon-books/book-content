@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # ACA architecture — what Microsoft layered on a hidden Kubernetes
 
 > Azure Container Apps Deep Dive series (1/6)
@@ -272,6 +273,20 @@ Every episode that follows just makes one noun in that paragraph concrete.
 ## Where this fits in the series
 
 This opening post is the architectural map for the Azure Container Apps Deep Dive series. The next post zooms into the environment boundary itself, then the series moves through revisions and traffic, KEDA, Dapr, and finally the ingress request path. If you want the gentler product-level setup first, read the ACA 101 series before continuing here, and compare the control-surface framing with the AKS and Azure Functions deep-dive series.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- **ACA architecture — what Microsoft layered on a hidden Kubernetes (current)**
+- [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+- [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
+- [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
+- [Dapr sidecar internals — the Go process that lives next to your container](./05-dapr-sidecar-internals.md)
+- [The Envoy ingress path — how the first request reaches your container](./06-envoy-ingress-path.md)
+
+<!-- toc:end -->
 
 ---
 

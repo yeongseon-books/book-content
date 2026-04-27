@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # kubelet and containerd — how a container actually starts on a node
 
 > Azure Kubernetes Service Deep Dive series (2/6)
@@ -92,6 +93,20 @@ The effective chain is kubelet -> CRI -> containerd -> `runc` -> process.
 
 This is part 2 of the Azure Kubernetes Service Deep Dive series.
 Part 1 fixed the managed control-plane boundary; this part follows the exact opposite end of the system, the node-local execution path. Part 3 moves naturally from `RunPodSandbox` into networking and explains where the Pod IP is actually allocated.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
+- **kubelet and containerd — how a container actually starts on a node (current)**
+- [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
+- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
+- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

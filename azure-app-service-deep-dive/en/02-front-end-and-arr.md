@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Front-End and ARR — how a request reaches a worker
 
 > Azure App Service Deep Dive series (2/6)
@@ -216,6 +217,20 @@ and why container boundaries matter on Linux.
 
 Episode 1 drew the whole map, and this post zoomed into the Front-End and ARR box on that map.
 The next post moves inside the worker itself and explains the sandbox boundary, which is where Windows-specific library failures and Linux container semantics finally start to make sense.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- **Front-End and ARR — how a request reaches a worker (current)**
+- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+- [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
+- [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
+- [Cold start and warmup — why the first request is expensive](./06-cold-start-and-warmup.md)
+
+<!-- toc:end -->
 
 ---
 

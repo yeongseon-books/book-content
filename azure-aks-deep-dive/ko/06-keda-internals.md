@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # KEDA 내부 — ScaledObject가 HPA를 만드는 방식
 
 > Azure Kubernetes Service Deep Dive 시리즈 (6/6)
@@ -52,6 +53,20 @@ HPA를 만들거나 갱신합니다.
 
 이 글은 Azure Kubernetes Service Deep Dive 시리즈 마지막 6화입니다.
 5화에서 HPA와 Cluster Autoscaler를 분리해 두었기 때문에, 이번 화에서는 KEDA가 그 위에 정확히 어떤 층으로 올라타는지 더 분명하게 볼 수 있습니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Control Plane 해부 — AKS가 사용자에게서 가린 것](./01-control-plane-anatomy.md)
+- [kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지](./02-kubelet-and-containerd.md)
+- [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가](./04-scheduler-and-pod-placement.md)
+- [HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프](./05-hpa-and-cluster-autoscaler-internals.md)
+- **KEDA 내부 — ScaledObject가 HPA를 만드는 방식 (현재 글)**
+
+<!-- toc:end -->
 
 ---
 

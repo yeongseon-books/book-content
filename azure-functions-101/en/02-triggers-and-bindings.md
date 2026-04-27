@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Triggers and Bindings — Everything About Function I/O
 
 > Azure Functions 101 series (2/7)
@@ -50,7 +51,6 @@ import json
 import azure.functions as func
 
 app = func.FunctionApp()
-
 
 @app.function_name(name="process_order")
 @app.queue_trigger(arg_name="msg", queue_name="orders-incoming", connection="StorageConnection")
@@ -149,6 +149,21 @@ The answer is two words: **Host and Worker**. That’s where Functions’ suppor
 ---
 
 This is part 2 of the Azure Functions 101 series. Part 1 established the mental model; this post defines the trigger and binding surface you work with every day. Part 3 then moves under the covers and explains the Host/Worker execution model.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- **Triggers and Bindings — Everything About Function I/O (current)**
+- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Hosting Models: Which Plan Should You Choose?
 
 When starting with App Service, the first question you face: **"Which plan should I choose?"**
@@ -298,6 +299,21 @@ In the next post, we'll walk through **deploying a Python Flask app to Azure** s
 5. Mastering Configuration: App Settings & Environment Variables
 6. Logging and Monitoring Basics
 7. Scaling 101: When to Scale Up vs Scale Out?
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure App Service? - Understanding the Platform Architecture](./01-what-is-app-service.md)
+- [Request Lifecycle: How Requests Reach Your App](./02-request-lifecycle.md)
+- **Hosting Models: Which Plan Should You Choose? (current)**
+- [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
+- [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
+- [Logging and Monitoring Basics](./06-logging-monitoring.md)
+- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+
+<!-- toc:end -->
 
 ---
 

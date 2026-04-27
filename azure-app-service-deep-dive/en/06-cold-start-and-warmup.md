@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Cold start and warmup — why the first request is expensive
 
 > Azure App Service Deep Dive series (6/6)
@@ -189,6 +190,20 @@ and warm-up all connect.
 
 This final post explains the startup window that the earlier episodes kept pointing toward: the time between worker allocation and traffic eligibility.
 Read back through the series and the whole model lines up: entry, routing, execution boundary, deployment, scaling, and warm-up are all parts of one App Service operating system.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+- [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
+- [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
+- **Cold start and warmup — why the first request is expensive (current)**
+
+<!-- toc:end -->
 
 ---
 

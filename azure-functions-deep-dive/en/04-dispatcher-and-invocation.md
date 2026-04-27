@@ -1,3 +1,4 @@
+<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Dispatcher and Invocation — How a Function Call Reaches the Worker
 
 > Azure Functions Deep Dive series (4/7)
@@ -244,6 +245,20 @@ That's the topic of Part 5 — `IScaleMonitor`, `ITargetScaler`, and Flex Consum
 ---
 
 This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established the host bootstrap path, the worker process model, and the gRPC stream between them; this installment followed a real invocation across that machinery. Part 5 moves one level up to scaling decisions, then parts 6 and 7 cover cold start mechanics and the academic view of the platform.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- **Dispatcher and Invocation — How a Function Call Reaches the Worker (current)**
+- [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
+- [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+
+<!-- toc:end -->
 
 ---
 

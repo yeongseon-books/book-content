@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
 
 > Azure Kubernetes Service 101 시리즈 (5/7)
@@ -227,6 +228,21 @@ IPAM 방식은 나중에 바꾸기 싫은 축입니다. 클러스터 수, 노드
 ---
 
 이 글은 Azure Kubernetes Service 101 시리즈의 5화입니다. 앞선 글에서 Pod, Deployment, Service가 클러스터 내부의 구조였다면, 이번 화는 그 구조를 외부 요청과 Azure 네트워크에 연결하는 층을 설명했습니다. 다음 6화에서는 이 네트워크 위로 들어오는 부하에 맞춰 Pod 수와 Node 수가 어떻게 늘어나는지 보게 됩니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes](./01-what-is-aks.md)
+- [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
+- [첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
+- **네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길 (현재 글)**
+- [스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

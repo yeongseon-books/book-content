@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # HPA and Cluster Autoscaler internals — two control loops
 
 > Azure Kubernetes Service Deep Dive series (5/6)
@@ -47,6 +48,20 @@ It asks whether extra nodes from a specific pool would make the Pods schedulable
 
 This is part 5 of the Azure Kubernetes Service Deep Dive series.
 Part 4 explained scheduling decisions; this part explains the two control loops that react to those decisions. Part 6 shows how KEDA sits above HPA and feeds it external metrics while handling the scale-to-zero boundary itself.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
+- [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
+- [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
+- **HPA and Cluster Autoscaler internals — two control loops (current)**
+- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
 
 > Azure App Service Deep Dive 시리즈 (6/6)
@@ -184,6 +185,20 @@ warm-up이 한 시스템으로 이어진 플랫폼으로 볼 수 있습니다.
 
 이번 글은 앞선 다섯 편에서 계속 예고했던 마지막 박스, 즉 새로운 worker가 실제 트래픽을 받기 전까지의 준비 시간을 정리합니다.
 시리즈 전체를 다시 따라가면 요청 진입, 실행 경계, 배포, 스케일링, warm-up이 하나의 운영 모델로 이어진다는 점이 보일 것입니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
+- [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
+- [스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
+- **콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (현재 글)**
+
+<!-- toc:end -->
 
 ---
 

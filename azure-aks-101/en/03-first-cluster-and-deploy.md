@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Your first cluster, your first deploy — Python/FastAPI
 
 > Azure Kubernetes Service 101 series (3/7)
@@ -123,11 +124,9 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
 @app.get("/")
 def read_root():
     return {"message": "hello from aks"}
-
 
 @app.get("/healthz")
 def healthz():
@@ -329,6 +328,21 @@ The next post steps back and explains the three workload primitives you just use
 ---
 
 This is part 3 of the Azure Kubernetes Service 101 series. The first two posts set the platform boundary and the cluster shape; this one turned that model into a real deployment with a small FastAPI app. Part 4 slows down and explains the exact role of Pod, Deployment, and Service in the manifest you just applied.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- **Your first cluster, your first deploy — Python/FastAPI (current)**
+- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
+- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
+- [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

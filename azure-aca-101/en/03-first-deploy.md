@@ -1,3 +1,4 @@
+<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # Your first deploy — Python/FastAPI
 
 > Azure Container Apps 101 series (3/7)
@@ -34,11 +35,9 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
 @app.get("/")
 def read_root():
     return {"message": "hello from azure container apps"}
-
 
 @app.get("/healthz")
 def healthz():
@@ -227,6 +226,21 @@ The earlier posts define the platform shape, and the later posts build deploymen
 Read in order and ACA starts to feel like an operating model instead of a feature catalog.
 
 - Revisit the checklist right after each deployment.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
+- [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
+- **Your first deploy — Python/FastAPI (current)**
+- [Ingress and traffic splitting — revision-based deployment strategies](./04-ingress-and-traffic-split.md)
+- [Scaling — KEDA scalers and zero-to-N](./05-scaling-with-keda.md)
+- [Dapr integration — what you get from a sidecar](./06-dapr-integration.md)
+- [Monitoring and ops — Log Analytics and Application Insights](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Host and Worker — Who Actually Runs Your Functions?
 
 > Azure Functions 101 series (3/7)
@@ -107,6 +108,21 @@ That wraps up the "structure of Functions" portion of the series. The next post 
 ---
 
 This is part 3 of the Azure Functions 101 series. Parts 1 and 2 covered the mental model, triggers, and bindings; this post explains the execution boundary between the Host and the Worker. The next posts build on that model with local development, deployment, plan selection, scaling, and operations.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- **Host and Worker — Who Actually Runs Your Functions? (current)**
+- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

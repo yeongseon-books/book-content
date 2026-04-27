@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Monitoring and ops — Container Insights, logs, alerts
 
 > Azure Kubernetes Service 101 series (7/7)
@@ -226,6 +227,21 @@ At this point, you should be able to picture a small FastAPI service running on 
 ---
 
 This is the final part of the Azure Kubernetes Service 101 series. The earlier posts built the cluster, workload, traffic, and scaling model; this one tied those pieces together from an operations perspective. From here, teams usually branch into deeper topics such as security, storage, GitOps, policy, or service mesh based on their own platform priorities.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
+- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
+- [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- **Monitoring and ops — Container Insights, logs, alerts (current)**
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Logging and Monitoring Basics
 
 "The app is slow." "There's an error." "When did this start?"
@@ -457,6 +458,21 @@ In the final post, we'll cover **Scaling 101** - when to Scale Up vs Scale Out.
 5. Mastering Configuration: App Settings & Environment Variables
 6. **[Current] Logging and Monitoring Basics**
 7. Scaling 101: When to Scale Up vs Scale Out?
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure App Service? - Understanding the Platform Architecture](./01-what-is-app-service.md)
+- [Request Lifecycle: How Requests Reach Your App](./02-request-lifecycle.md)
+- [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
+- [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
+- [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
+- **Logging and Monitoring Basics (current)**
+- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+
+<!-- toc:end -->
 
 ---
 

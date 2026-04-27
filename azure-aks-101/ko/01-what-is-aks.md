@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
 
 > Azure Kubernetes Service 101 시리즈 (1/7)
@@ -162,6 +163,21 @@ AKS는 이 셋 중에서 가장 Kubernetes에 가깝습니다. 대신 그만큼 
 ---
 
 이 글은 Azure Kubernetes Service 101 시리즈의 1화입니다. 이번 화에서 AKS의 책임 경계를 먼저 잡았고, 2화에서는 클러스터 내부를 구성하는 Control Plane과 Node Pool을 더 구체적으로 봅니다. 그 뒤에는 첫 배포, 워크로드 표현 방식, 네트워킹, 스케일링, 운영 순서로 연결됩니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes (현재 글)**
+- [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
+- [첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
+- [네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
+- [스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

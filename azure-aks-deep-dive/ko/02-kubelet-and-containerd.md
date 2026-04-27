@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
 
 > Azure Kubernetes Service Deep Dive 시리즈 (2/6)
@@ -124,6 +125,20 @@ containerd가 OCI runtime 계층으로 내려가면서 `runc`를 사용합니다
 
 이 글은 Azure Kubernetes Service Deep Dive 시리즈 2화입니다.
 1화가 관리형 control plane의 경계를 그렸다면 이번 화는 그 반대편 끝, 즉 노드 로컬 실행 경로를 따라갑니다. 다음 3화에서는 오늘 본 `RunPodSandbox`와 자연스럽게 이어지는 네트워킹 계층으로 넘어가서 Pod IP가 실제로 어디서 오는지 정리합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Control Plane 해부 — AKS가 사용자에게서 가린 것](./01-control-plane-anatomy.md)
+- **kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지 (현재 글)**
+- [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가](./04-scheduler-and-pod-placement.md)
+- [HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프](./05-hpa-and-cluster-autoscaler-internals.md)
+- [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Monitoring and Operations Fundamentals
 
 > Azure Functions 101 series (7/7)
@@ -172,6 +173,21 @@ Failure rate, latency, instance count, and dependency health cover a surprising 
 This post closes the Azure Functions 101 series. Taken together, the series moves from the event-driven execution model to triggers and bindings, the host/worker split, plan trade-offs, scaling and cold starts, and finally operations centered on Application Insights. Part 7 is the operational layer that turns the earlier mental model into day-2 practice.
 
 If you want to go deeper into the implementation, continue with [Deep Dive Part 5](../../azure-functions-deep-dive/en/05-scaling-internals.md) and [Part 6](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md). The 101 series is about making good engineering decisions quickly; the deep-dive series shows how those behaviors are built inside the host.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+- **Monitoring and Operations Fundamentals (current)**
+
+<!-- toc:end -->
 
 ---
 

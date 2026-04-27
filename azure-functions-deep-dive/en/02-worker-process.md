@@ -1,3 +1,4 @@
+<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Worker Processes — How One Host Hosts Many Languages
 
 > Azure Functions Deep Dive series (2/7)
@@ -123,6 +124,20 @@ By this point the worker is **running, connected to the Host, and ready to recei
 ## Where this fits in the series
 
 This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host bootstrap; this part stays beside that host and follows the worker process from configuration to `Process.Start`. Parts 3 and 4 pick up from there with the gRPC message stream and the invocation path that rides on top of it.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- **Worker Processes — How One Host Hosts Many Languages (current)**
+- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
+- [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
+- [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+
+<!-- toc:end -->
 
 ---
 

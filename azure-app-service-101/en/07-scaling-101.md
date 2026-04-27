@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Scaling 101: When to Scale Up vs Scale Out?
 
 "Traffic increased and the app is slow." "Want to reduce costs but maintain performance."
@@ -385,6 +386,21 @@ Scaling strategy essentials:
 ## Where this fits in the series
 
 This closing post ties the rest of the series together by turning deployment, configuration, and telemetry into scaling decisions. Read back through the sequence and the through-line is clear: App Service works best when you treat it as an operating platform, not just a place to push code.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure App Service? - Understanding the Platform Architecture](./01-what-is-app-service.md)
+- [Request Lifecycle: How Requests Reach Your App](./02-request-lifecycle.md)
+- [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
+- [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
+- [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
+- [Logging and Monitoring Basics](./06-logging-monitoring.md)
+- **Scaling 101: When to Scale Up vs Scale Out? (current)**
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Host Bootstrap — Following `WebJobsScriptHostService`
 
 > Azure Functions Deep Dive series (1/6)
@@ -129,6 +130,20 @@ The next episode targets one of the blind spots in that diagram: **what happens 
 ## Where this fits in the series
 
 This is part 1 of the Azure Functions Deep Dive series. With host bootstrap in place, part 2 moves to the worker processes living beside the host, and parts 3 and 4 follow the gRPC channel and invocation path between them. The later parts cover scaling, placeholder mode, and cold-start mechanics.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- **Host Bootstrap — Following `WebJobsScriptHostService` (current)**
+- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
+- [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
+- [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+
+<!-- toc:end -->
 
 ---
 

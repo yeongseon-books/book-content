@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
 
 > Azure Kubernetes Service Deep Dive 시리즈 (5/6)
@@ -46,6 +47,20 @@ CA는 unschedulable Pod를 보고,
 
 이 글은 Azure Kubernetes Service Deep Dive 시리즈 5화입니다.
 4화가 scheduler의 배치 결정을 다뤘다면 이번 화는 그 결과를 보고 반응하는 두 control loop를 설명합니다. 다음 6화에서는 KEDA가 이 HPA 위에 어떻게 올라타는지 봅니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Control Plane 해부 — AKS가 사용자에게서 가린 것](./01-control-plane-anatomy.md)
+- [kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지](./02-kubelet-and-containerd.md)
+- [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가](./04-scheduler-and-pod-placement.md)
+- **HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프 (현재 글)**
+- [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

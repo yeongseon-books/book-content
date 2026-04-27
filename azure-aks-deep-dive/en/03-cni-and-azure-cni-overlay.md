@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # CNI and Azure CNI Overlay — where Pod IPs come from
 
 > Azure Kubernetes Service Deep Dive series (3/6)
@@ -50,6 +51,20 @@ The official networking direction in AKS is moving toward Azure CNI Overlay.
 
 This is part 3 of the Azure Kubernetes Service Deep Dive series.
 Part 2 followed the node-local execution path; this part explains how CNI attaches Pod networking beside that path. Part 4 moves to placement and shows how the scheduler decides which node should receive a Pod.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
+- [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
+- **CNI and Azure CNI Overlay — where Pod IPs come from (current)**
+- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
+- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
+- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

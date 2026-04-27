@@ -1,3 +1,4 @@
+<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
 
 > Azure Functions Deep Dive series (5/7)
@@ -282,6 +283,20 @@ Different decision layers sit on top of the same host binary; the way the host i
 - Flex Consumption introduces per-function scaling and Always Ready, deciding "how many instances for which function" at the group level.
 
 In installment 6 we'll look at what happens **when a new instance is actually created** as a result of all these decisions — Placeholder Mode and specialization. The code-level mechanics behind Always ready and cold start live there.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
+- **Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (current)**
+- [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+
+<!-- toc:end -->
 
 ---
 

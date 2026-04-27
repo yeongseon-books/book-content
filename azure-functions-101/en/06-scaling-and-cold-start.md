@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t
 
 > Azure Functions 101 series (6/7)
@@ -85,13 +86,11 @@ import azure.functions as func
 app = func.FunctionApp()
 _client = None
 
-
 def get_client():
     global _client
     if _client is None:
         _client = create_cosmos_client()
     return _client
-
 
 @app.function_name(name="hello")
 @app.route(route="hello")
@@ -151,6 +150,21 @@ Operations is not only about how fast the platform can add instances. It is also
 Scaling and cold starts only become manageable once you can observe them. Part 7 moves from behavior to visibility: Application Insights, metrics, KQL, alerts, instance count, and the clues that explain why latency or cost moved.
 
 If you want the implementation details behind those behaviors, pair this post with [Deep Dive Part 5](../../azure-functions-deep-dive/en/05-scaling-internals.md) and [Part 6](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md). The 101 series is about operational judgment; the deep-dive series shows how those behaviors are implemented in the host.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- **Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (current)**
+- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

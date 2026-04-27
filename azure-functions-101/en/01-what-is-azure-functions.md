@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # What Is Azure Functions? — A World Where Events Call Your Code
 
 > Azure Functions 101 series (1/7)
@@ -32,7 +33,6 @@ A short snippet of code beats a long explanation. Here is the simplest possible 
 import azure.functions as func
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
-
 
 @app.function_name(name="hello")
 @app.route(route="hello", methods=["GET"])
@@ -131,6 +131,21 @@ The next post dives into the leftmost part of that picture: **triggers and bindi
 ---
 
 This is part 1 of the Azure Functions 101 series. With the mental model in place, part 2 moves into triggers and bindings, and part 3 explains the Host and Worker split behind execution. The later posts cover deployment, plan selection, scaling and cold starts, and day-2 operations.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- **What Is Azure Functions? — A World Where Events Call Your Code (current)**
+- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # ACA 안의 KEDA — Scale Rule이 만드는 것
 
 > Azure Container Apps Deep Dive 시리즈 (4/6)
@@ -284,6 +285,20 @@ Scale 블레이드 뒤에 숨어 있는 기계가 바로 이것입니다.
 ## 시리즈 안에서의 위치
 
 3화가 Revision이 어떻게 traffic을 받는지 설명했다면, 이번 4화는 같은 Revision이 아래에서 replica를 어떻게 늘리고 줄이는지 설명한 글입니다. 다음 5화에서는 ACA의 다른 대표적 숨은 메커니즘인 Dapr sidecar로 넘어가, injector부터 localhost API까지 따라갑니다. 마지막 6화에서는 Envoy 요청 경로로 돌아와, 이번 화의 scaling 결정과 3화의 routing 결정이 실제 요청 경로에서 어떻게 만나는지 보게 됩니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것](./01-aca-architecture.md)
+- [Environment 내부 — 네트워크·관측·Dapr 스코프의 경계](./02-environment-internals.md)
+- [Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
+- **ACA 안의 KEDA — Scale Rule이 만드는 것 (현재 글)**
+- [Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스](./05-dapr-sidecar-internals.md)
+- [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+
+<!-- toc:end -->
 
 ---
 

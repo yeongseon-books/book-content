@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Scaling — HPA, Cluster Autoscaler, KEDA
 
 > Azure Kubernetes Service 101 series (6/7)
@@ -243,6 +244,21 @@ That takes us to part 7: Container Insights, logs, kube-state-metrics, and alert
 ---
 
 This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the series focused on cluster shape, workload objects, and traffic flow. This post added the feedback loops that change capacity over time. Part 7 closes the series by showing how to observe and operate those loops in a real AKS environment.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
+- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
+- **Scaling — HPA, Cluster Autoscaler, KEDA (current)**
+- [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Scaling 101: 언제 Scale Up vs Scale Out?
 
 > Azure App Service 101 시리즈 (7/7) - 마지막
@@ -154,7 +155,6 @@ user_sessions = {}
 
 def save_session(user_id, session_data):
     user_sessions[user_id] = session_data
-
 
 # 외부 저장소에 세션 저장
 import json
@@ -501,6 +501,21 @@ az monitor metrics alert create \
 ## 이 시리즈에서의 위치
 
 이번 글은 App Service 101 시리즈를 마무리하는 편으로, 앞선 배포·설정·모니터링 내용을 바탕으로 스케일링 판단 기준을 정리합니다. 시리즈 전체를 다시 훑어 보면 App Service를 단순 배포 도구가 아니라 운영 플랫폼으로 보는 관점이 한 줄로 이어집니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure App Service란? - 플랫폼 아키텍처 이해하기](./01-what-is-app-service.md)
+- [Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까](./02-request-lifecycle.md)
+- [Hosting Models: 어떤 플랜을 선택해야 할까?](./03-hosting-models.md)
+- [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
+- [Configuration 마스터하기: App Settings & 환경변수](./05-configuration.md)
+- [로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기](./06-logging-monitoring.md)
+- **Scaling 101: 언제 Scale Up vs Scale Out? (현재 글)**
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
 
 > Azure App Service Deep Dive 시리즈 (5/6)
@@ -172,6 +173,20 @@ scale-in은 사용 중인 capacity를 줄이는 작업입니다.
 
 이번 글은 101의 스케일링 판단 기준을 내부 경로로 번역하는 편입니다.
 다음 글에서는 새 worker가 실제로 첫 요청을 받기 전 어떤 준비 과정을 거치는지, Always On과 warm-up path가 그 시간을 어떻게 줄이는지로 이어집니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
+- [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
+- **스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (현재 글)**
+- [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+
+<!-- toc:end -->
 
 ---
 

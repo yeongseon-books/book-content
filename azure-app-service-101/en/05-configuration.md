@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Mastering Configuration: App Settings & Environment Variables
 
 Your app is deployed. Now, **how do you manage environment-specific settings?**
@@ -391,6 +392,21 @@ In the next post, we'll cover **Logging and Monitoring** - how to observe app st
 5. **[Current] Mastering Configuration: App Settings & Environment Variables**
 6. Logging and Monitoring Basics
 7. Scaling 101: When to Scale Up vs Scale Out?
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure App Service? - Understanding the Platform Architecture](./01-what-is-app-service.md)
+- [Request Lifecycle: How Requests Reach Your App](./02-request-lifecycle.md)
+- [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
+- [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
+- **Mastering Configuration: App Settings & Environment Variables (current)**
+- [Logging and Monitoring Basics](./06-logging-monitoring.md)
+- [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+
+<!-- toc:end -->
 
 ---
 

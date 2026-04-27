@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
 
 > Azure Kubernetes Service 101 series (1/7)
@@ -161,6 +162,21 @@ Once that clicks, the rest of the series becomes much more concrete. Pods and De
 ---
 
 This is part 1 of the Azure Kubernetes Service 101 series. This post set the responsibility boundary; part 2 turns that boundary into the concrete cluster shape of control plane and node pools. After that, the series moves through your first deployment, the workload primitives, networking, scaling, and day-2 operations.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- **What is Azure Kubernetes Service? — what managed Kubernetes actually gives you (current)**
+- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
+- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
+- [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

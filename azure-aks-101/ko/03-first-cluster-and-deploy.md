@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
 
 > Azure Kubernetes Service 101 시리즈 (3/7)
@@ -126,11 +127,9 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
 @app.get("/")
 def read_root():
     return {"message": "hello from aks"}
-
 
 @app.get("/healthz")
 def healthz():
@@ -332,6 +331,21 @@ kubectl describe service fastapi-hello
 ---
 
 이 글은 Azure Kubernetes Service 101 시리즈의 3화입니다. 앞의 두 화에서 AKS와 클러스터 구조를 봤다면, 이번 화는 그 구조 위에 FastAPI 앱을 실제로 올리는 단계였습니다. 다음 4화에서는 오늘 매니페스트에 등장한 Pod, Deployment, Service를 각각 왜 따로 두는지 더 또렷하게 정리합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes](./01-what-is-aks.md)
+- [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
+- **첫 클러스터 만들고 앱 배포하기 — Python/FastAPI (현재 글)**
+- [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
+- [네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
+- [스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

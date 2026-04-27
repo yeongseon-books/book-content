@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # 스케일링 — HPA, Cluster Autoscaler, KEDA
 
 > Azure Kubernetes Service 101 시리즈 (6/7)
@@ -240,6 +241,21 @@ spec:
 ---
 
 이 글은 Azure Kubernetes Service 101 시리즈의 6화입니다. 5화까지가 클러스터 구조와 요청 경로를 설명하는 글이었다면, 이번 화는 부하 변화에 시스템이 어떻게 반응하는지를 설명하는 글입니다. 마지막 7화에서는 이 반응을 관찰하고 경고로 연결하는 모니터링과 운영 도구를 정리합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes](./01-what-is-aks.md)
+- [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
+- [첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
+- [네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
+- **스케일링 — HPA, Cluster Autoscaler, KEDA (현재 글)**
+- [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

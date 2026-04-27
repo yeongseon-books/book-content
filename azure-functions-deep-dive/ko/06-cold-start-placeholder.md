@@ -1,3 +1,4 @@
+<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
 
 > Azure Functions Deep Dive 시리즈 (6/6)
@@ -356,7 +357,21 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 
 ---
 
-## References
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [호스트 부팅 — `WebJobsScriptHostService`부터 따라가기](./01-host-bootstrap.md)
+- [Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법](./02-worker-process.md)
+- [gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가](./03-grpc-event-stream.md)
+- [Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지](./04-dispatcher-and-invocation.md)
+- [스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이](./05-scaling-internals.md)
+- **콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때 (현재 글)**
+
+<!-- toc:end -->
+
+---
+
+## 참고 자료
 
 ### 1차 출처 (호스트 코드, commit `5e59423`)
 

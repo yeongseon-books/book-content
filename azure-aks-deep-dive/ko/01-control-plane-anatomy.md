@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # Control Plane 해부 — AKS가 사용자에게서 가린 것
 
 > Azure Kubernetes Service Deep Dive 시리즈 (1/6)
@@ -302,6 +303,20 @@ Unix socket으로 CRI를 호출하고,
 
 이 글은 Azure Kubernetes Service Deep Dive 시리즈 1화입니다.
 AKS 101이 control plane과 node pool의 역할 분담을 입문자 관점에서 설명했다면, 이번 시리즈는 같은 구조를 업스트림 코드와 관리형 서비스 경계까지 내려가서 다시 읽습니다. Azure Functions Deep Dive 1화가 Host와 Worker의 경계를 먼저 그렸던 것처럼, 이번 1화도 AKS의 control plane과 data plane 경계를 먼저 고정합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **Control Plane 해부 — AKS가 사용자에게서 가린 것 (현재 글)**
+- [kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지](./02-kubelet-and-containerd.md)
+- [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가](./04-scheduler-and-pod-placement.md)
+- [HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프](./05-hpa-and-cluster-autoscaler-internals.md)
+- [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

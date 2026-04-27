@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
 
 > Azure Kubernetes Service Deep Dive 시리즈 (4/6)
@@ -48,6 +49,20 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 
 이 글은 Azure Kubernetes Service Deep Dive 시리즈 4화입니다.
 2화와 3화가 노드 실행과 네트워크를 다뤘다면 이번 화는 그보다 앞단의 placement 결정을 설명합니다. 다음 5화에서는 scheduler가 unschedulable로 남긴 Pod를 보고 HPA와 Cluster Autoscaler가 어떻게 반응하는지 봅니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Control Plane 해부 — AKS가 사용자에게서 가린 것](./01-control-plane-anatomy.md)
+- [kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지](./02-kubelet-and-containerd.md)
+- [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
+- **Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가 (현재 글)**
+- [HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프](./05-hpa-and-cluster-autoscaler-internals.md)
+- [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

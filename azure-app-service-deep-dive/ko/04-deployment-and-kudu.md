@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
 
 > Azure App Service Deep Dive 시리즈 (4/6)
@@ -192,6 +193,20 @@ scale up과 scale out이 무엇을 실제로 바꾸는지 이어서 다룹니다
 
 앞선 글들이 요청 경로와 worker 실행 경계를 설명했다면 이번 글은 코드가 그 worker에 도달하는 배포 경로를 설명합니다.
 다음 글에서는 이 앱 인스턴스 수가 실제로 늘어나는 control-plane 경로를 따라가며, scale-out 결정이 어떻게 새 worker로 이어지는지 정리합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
+- **배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (현재 글)**
+- [스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
+- [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+
+<!-- toc:end -->
 
 ---
 

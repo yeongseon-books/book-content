@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # KEDA internals — how a ScaledObject builds an HPA
 
 > Azure Kubernetes Service Deep Dive series (6/6)
@@ -53,6 +54,20 @@ while the generated HPA controls the 1↔N region.
 
 This is the final part of the Azure Kubernetes Service Deep Dive series.
 Because part 5 separated HPA from Cluster Autoscaler first, this episode can place KEDA more precisely: above HPA, not instead of it.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
+- [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
+- [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
+- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
+- **KEDA internals — how a ScaledObject builds an HPA (current)**
+
+<!-- toc:end -->
 
 ---
 

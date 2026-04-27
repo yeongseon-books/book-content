@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
 
 > Azure Container Apps Deep Dive 시리즈 (6/6)
@@ -270,6 +271,20 @@ Envoy는 이 모든 외부 경로를 실제로 이어 주는 router입니다.
 ## 시리즈 안에서의 위치
 
 이번 마지막 화는 시리즈 앞의 모든 개념을 실제 요청 경로에서 다시 만나는 글입니다. Environment는 네트워크 경계를 제공했고, Revision은 불변 traffic target을 제공했으며, KEDA는 replica를 준비했고, Dapr는 요청이 Pod에 닿은 뒤 추가 런타임 계층이 될 수 있었습니다. 제품 표면부터 다시 가볍게 훑고 싶다면 ACA 101 시리즈가 좋은 동반자이고, 기저 플랫폼 노출 정도를 비교해 보고 싶다면 AKS와 Azure Functions 심화 시리즈를 함께 읽는 편이 유익합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것](./01-aca-architecture.md)
+- [Environment 내부 — 네트워크·관측·Dapr 스코프의 경계](./02-environment-internals.md)
+- [Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
+- [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
+- [Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스](./05-dapr-sidecar-internals.md)
+- **Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지 (현재 글)**
+
+<!-- toc:end -->
 
 ---
 

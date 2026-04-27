@@ -1,3 +1,4 @@
+<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # Control plane anatomy — what AKS hides from you
 
 > Azure Kubernetes Service Deep Dive series (1/6)
@@ -123,6 +124,20 @@ and scheduling failures all blur together.
 
 This is part 1 of the Azure Kubernetes Service Deep Dive series.
 If AKS 101 explained the split between the control plane and node pools for first-time readers, this series re-reads the same system through upstream code paths and managed-service boundaries. In the same way that Azure Functions Deep Dive part 1 fixed the Host-versus-Worker map first, this episode fixes the AKS control-plane-versus-data-plane map before the narrower internals.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- **Control plane anatomy — what AKS hides from you (current)**
+- [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
+- [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
+- [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
+- [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
+- [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+
+<!-- toc:end -->
 
 ---
 

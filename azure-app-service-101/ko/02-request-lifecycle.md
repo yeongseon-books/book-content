@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까
 
 새벽 3시, 알람이 울립니다. 프로덕션 API가 갑자기 `502`를 뱉기 시작했습니다.  
@@ -503,6 +504,21 @@ Azure App Service의 Request Lifecycle을 이해하면, 장애가 났을 때 질
 ## 이 시리즈에서의 위치
 
 이번 글은 App Service 안으로 들어온 요청이 어디를 거쳐 실패하거나 지연되는지 읽는 방법을 정리합니다. 다음 글에서는 이 흐름을 더 안정적으로 운영하기 위해 어떤 호스팅 모델과 플랜을 골라야 하는지 이어서 다룹니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure App Service란? - 플랫폼 아키텍처 이해하기](./01-what-is-app-service.md)
+- **Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까 (현재 글)**
+- [Hosting Models: 어떤 플랜을 선택해야 할까?](./03-hosting-models.md)
+- [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
+- [Configuration 마스터하기: App Settings & 환경변수](./05-configuration.md)
+- [로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기](./06-logging-monitoring.md)
+- [Scaling 101: 언제 Scale Up vs Scale Out?](./07-scaling-101.md)
+
+<!-- toc:end -->
 
 ---
 

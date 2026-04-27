@@ -1,3 +1,4 @@
+<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # 첫 앱 배포하기 — Python/FastAPI
 
 > Azure Container Apps 101 시리즈 (3/7)
@@ -34,11 +35,9 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
 @app.get("/")
 def read_root():
     return {"message": "hello from azure container apps"}
-
 
 @app.get("/healthz")
 def healthz():
@@ -227,6 +226,21 @@ curl https://<YOUR_FQDN>/
 7편을 순서대로 읽으면 ACA를 기능 목록이 아니라 운영 모델로 이해하게 됩니다.
 
 - 운영 체크리스트는 배포 직후 다시 보는 편이 좋습니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
+- [Environment·Container App·Revision — 세 단어로 보는 ACA](./02-environment-app-revision.md)
+- **첫 앱 배포하기 — Python/FastAPI (현재 글)**
+- [Ingress와 트래픽 분할 — Revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
+- [스케일링 — KEDA scaler와 0-to-N](./05-scaling-with-keda.md)
+- [Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
+- [모니터링과 운영 — Log Analytics와 Application Insights](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

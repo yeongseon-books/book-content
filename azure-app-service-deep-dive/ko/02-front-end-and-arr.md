@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
 
 > Azure App Service Deep Dive 시리즈 (2/6)
@@ -212,6 +213,20 @@ Linux 앱에서는 왜 container 경계가 핵심인지 이어서 다룹니다.
 
 1화가 전체 지도를 펼쳤다면 이번 글은 그중 Front-End와 ARR 박스를 확대합니다.
 다음 글에서는 요청이 도착한 worker 내부의 실행 경계와 sandbox 제약을 살펴보며, 왜 일부 라이브러리가 Windows App Service에서 실패하는지도 이어서 설명합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- **Front-End과 ARR — 요청은 어떻게 워커에 도달하는가 (현재 글)**
+- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
+- [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
+- [스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로](./05-scaling-internals.md)
+- [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+
+<!-- toc:end -->
 
 ---
 

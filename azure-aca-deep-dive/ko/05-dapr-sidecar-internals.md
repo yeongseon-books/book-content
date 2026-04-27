@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
 
 > Azure Container Apps Deep Dive 시리즈 (5/6)
@@ -317,6 +318,20 @@ Timeout 분석에서는 이 마지막 구분이 특히 중요합니다.
 ## 시리즈 안에서의 위치
 
 앞선 4화가 ACA가 Revision을 어떻게 스케일하는지 설명했다면, 이번 5화는 Dapr를 켰을 때 그 Revision의 Pod 모양이 어떻게 바뀌는지 설명한 글입니다. 마지막 6화에서는 다시 ingress로 돌아가, ACA 관리 Load Balancer와 Envoy, Service, Pod를 거쳐 첫 외부 요청이 어떻게 사용자 컨테이너까지 도달하는지 따라갑니다. 그 Pod 안에는 이번 화에서 본 sidecar가 함께 있을 수도 있습니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것](./01-aca-architecture.md)
+- [Environment 내부 — 네트워크·관측·Dapr 스코프의 경계](./02-environment-internals.md)
+- [Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
+- [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
+- **Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스 (현재 글)**
+- [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+
+<!-- toc:end -->
 
 ---
 

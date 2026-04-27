@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Configuration 마스터하기: App Settings & 환경변수
 
 배포는 끝났습니다. 이제 진짜 운영이 시작됩니다.
@@ -456,6 +457,21 @@ logger.info("Configuration loaded", extra={
 ## 이 시리즈에서의 위치
 
 이번 글은 배포 뒤에 더 오래 남는 문제인 설정, 민감 정보, 슬롯별 값 관리를 다룹니다. 다음 글에서는 여기서 준비한 설정이 로그, 메트릭, Application Insights 같은 운영 가시성으로 어떻게 이어지는지 설명합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure App Service란? - 플랫폼 아키텍처 이해하기](./01-what-is-app-service.md)
+- [Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까](./02-request-lifecycle.md)
+- [Hosting Models: 어떤 플랜을 선택해야 할까?](./03-hosting-models.md)
+- [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
+- **Configuration 마스터하기: App Settings & 환경변수 (현재 글)**
+- [로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기](./06-logging-monitoring.md)
+- [Scaling 101: 언제 Scale Up vs Scale Out?](./07-scaling-101.md)
+
+<!-- toc:end -->
 
 ---
 

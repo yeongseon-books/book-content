@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
 
 > Azure Container Apps Deep Dive 시리즈 (1/6)
@@ -276,6 +277,20 @@ ACA가 모호하다는 뜻은 아닙니다.
 ## 시리즈 안에서의 위치
 
 이 1화는 Azure Container Apps Deep Dive 시리즈의 아키텍처 지도입니다. 다음 2화에서는 Environment 경계 자체를 확대하고, 그 뒤로 Revision과 트래픽, KEDA, Dapr, 마지막으로 ingress 요청 경로 순서로 들어갑니다. 제품 표면을 먼저 가볍게 잡고 싶다면 ACA 101 시리즈를 먼저 읽고, 제어면 관점 비교를 원한다면 AKS와 Azure Functions 심화 시리즈를 함께 보는 편이 좋습니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것 (현재 글)**
+- [Environment 내부 — 네트워크·관측·Dapr 스코프의 경계](./02-environment-internals.md)
+- [Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
+- [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
+- [Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스](./05-dapr-sidecar-internals.md)
+- [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+
+<!-- toc:end -->
 
 ---
 

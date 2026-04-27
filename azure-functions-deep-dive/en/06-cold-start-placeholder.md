@@ -1,3 +1,4 @@
+<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
 
 > Azure Functions Deep Dive series (6/6)
@@ -353,6 +354,20 @@ In particular, the fact that `FunctionAssemblyLoadContext.ResetSharedContext()` 
 - The host code is the same across plans, but each plan applies a different placeholder-pool policy and Always Ready setting — which is why **the cold start a user actually sees is determined by the plan**.
 
 This part closes out the Azure Functions Deep Dive series. Part 1 covered host bootstrap, Part 2 the worker process, Parts 3–4 the gRPC channel and dispatcher, Part 5 scaling, and this Part 6 followed how the same host code, layered with a plan-specific placeholder policy, ends up deciding the cold start a user actually feels.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
+- [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
+- **Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (current)**
+
+<!-- toc:end -->
 
 ---
 

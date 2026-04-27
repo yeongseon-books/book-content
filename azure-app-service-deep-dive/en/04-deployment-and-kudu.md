@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Deployment and Kudu — build, sync, release from the inside
 
 > Azure App Service Deep Dive series (4/6)
@@ -207,6 +208,20 @@ How does an Azure Monitor autoscale decision become real worker capacity?
 The previous posts explained request routing and worker execution boundaries.
 This post explained how code reaches those workers.
 The next post shifts to control-plane behavior and follows how scale-out decisions propagate into more worker capacity.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+- **Deployment and Kudu — build, sync, release from the inside (current)**
+- [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
+- [Cold start and warmup — why the first request is expensive](./06-cold-start-and-warmup.md)
+
+<!-- toc:end -->
 
 ---
 

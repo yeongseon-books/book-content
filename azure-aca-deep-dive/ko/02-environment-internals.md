@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
 
 > Azure Container Apps Deep Dive 시리즈 (2/6)
@@ -276,6 +277,20 @@ Ingress는 이 경계 안의 app endpoint로 들어갑니다.
 ## 시리즈 안에서의 위치
 
 이번 글은 뒤의 모든 런타임 동작이 기대고 있는 바깥 경계를 확대해서 본 2화입니다. 다음 3화에서는 이 경계 안의 불변 단위인 Revision과 Revision mode, traffic weight로 이동합니다. 그 뒤에는 같은 Environment 안에서 KEDA가 어떻게 숨은 오브젝트를 만들고, Dapr sidecar가 어떻게 붙고, Envoy 요청 경로가 어떻게 흐르는지를 순서대로 따라갑니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것](./01-aca-architecture.md)
+- **Environment 내부 — 네트워크·관측·Dapr 스코프의 경계 (현재 글)**
+- [Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
+- [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
+- [Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스](./05-dapr-sidecar-internals.md)
+- [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+
+<!-- toc:end -->
 
 ---
 

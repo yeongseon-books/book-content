@@ -1,3 +1,4 @@
+<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Pod, Deployment, Service — the three ways you express a workload
 
 > Azure Kubernetes Service 101 series (4/7)
@@ -228,6 +229,21 @@ you are ready for the next layer: Ingress and cluster networking.
 ---
 
 This is part 4 of the Azure Kubernetes Service 101 series. Part 3 used Pod, Deployment, and Service in a real FastAPI deployment; this post separated their responsibilities so the model is explicit. Part 5 adds networking and Ingress in front of those Services and explains how traffic moves into and through the cluster.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- **Pod, Deployment, Service — the three ways you express a workload (current)**
+- [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
+- [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Deploy a Function App — From Localhost to Azure
 
 > Azure Functions 101 series (4/7)
@@ -77,7 +78,6 @@ In the Python v2 model, the function definition lives in `function_app.py`. The 
 import azure.functions as func
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
-
 
 @app.function_name(name="hello")
 @app.route(route="hello")
@@ -241,6 +241,21 @@ Once the app is deployed, the next real question is **which hosting plan it shou
 ## Series context
 
 This is Part 4 of Azure Functions 101. The earlier posts covered triggers and bindings, then the Host and Worker split; this post turns that model into a working deployment path. Parts 5 and 6 move into plan selection, scaling, and cold-start behavior, which is where most production decisions start.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- **Deploy a Function App — From Localhost to Azure (current)**
+- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 

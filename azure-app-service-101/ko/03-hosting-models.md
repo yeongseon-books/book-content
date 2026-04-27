@@ -1,3 +1,4 @@
+<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Hosting Models: 어떤 플랜을 선택해야 할까?
 
 처음 App Service를 만들 때 헷갈리는 이유는, 선택지가 많아서가 아니라 **선택 기준이 안 보이기 때문**입니다. 포털은 OS, 배포 방식, 요금제 티어를 한 번에 물어보지만, 실제로는 이 세 가지를 따로따로 고민하면 됩니다.
@@ -409,7 +410,6 @@ Basic이 당장 싸더라도, 배포 슬롯과 자동 확장이 없으면 배포
 
 ---
 
-
 ## 최종 체크리스트: 지금 내 선택이 과한가, 부족한가
 
 배포 전에 아래 질문에 답해보세요.
@@ -450,6 +450,21 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 ## 이 시리즈에서의 위치
 
 이번 글은 App Service의 OS, 배포 모델, 플랜 티어를 어떤 기준으로 고를지 정리하는 의사결정 편입니다. 다음 글에서는 여기서 고른 Linux Code 기반 구성을 실제 Flask 앱 배포로 연결합니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Azure App Service란? - 플랫폼 아키텍처 이해하기](./01-what-is-app-service.md)
+- [Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까](./02-request-lifecycle.md)
+- **Hosting Models: 어떤 플랜을 선택해야 할까? (현재 글)**
+- [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
+- [Configuration 마스터하기: App Settings & 환경변수](./05-configuration.md)
+- [로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기](./06-logging-monitoring.md)
+- [Scaling 101: 언제 Scale Up vs Scale Out?](./07-scaling-101.md)
+
+<!-- toc:end -->
 
 ---
 

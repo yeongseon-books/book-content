@@ -1,3 +1,4 @@
+<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
 
 > Azure Container Apps Deep Dive 시리즈 (3/6)
@@ -329,6 +330,20 @@ App 설정을 Envoy 설정으로 번역하는 ACA 내부 control-plane 코드는
 ## 시리즈 안에서의 위치
 
 이번 3화는 2화에서 본 Environment 경계와, 그 안에서 실제 rollout 단위가 되는 불변 Revision을 연결했습니다. 다음 4화에서는 rollout policy에서 autoscaling policy로 넘어가, ACA scale rule이 Revision 단위 KEDA 동작으로 어떻게 번역되는지 봅니다. 그 뒤에는 Dapr sidecar와 Envoy 요청 경로를 따라가면서, 이번 화에서 본 weight가 실제 요청에 어떻게 적용되는지 다시 만나게 됩니다.
+
+---
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것](./01-aca-architecture.md)
+- [Environment 내부 — 네트워크·관측·Dapr 스코프의 경계](./02-environment-internals.md)
+- **Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가 (현재 글)**
+- [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
+- [Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스](./05-dapr-sidecar-internals.md)
+- [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+
+<!-- toc:end -->
 
 ---
 

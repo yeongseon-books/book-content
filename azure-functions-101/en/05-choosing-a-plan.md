@@ -1,3 +1,4 @@
+<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
 
 > Azure Functions 101 series (5/7)
@@ -174,6 +175,21 @@ Once the plan is chosen, the next question follows naturally: **how do instances
 ## Series context
 
 This is Part 5 of Azure Functions 101. Part 4 showed the deployment path end to end; this post decides what hosting target that deployment should land on. Part 6 picks up from here and explains how those plan choices turn into real scaling behavior and cold-start trade-offs.
+
+---
+
+<!-- toc:begin -->
+## In this series
+
+- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- **Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (current)**
+- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+- [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
+
+<!-- toc:end -->
 
 ---
 
