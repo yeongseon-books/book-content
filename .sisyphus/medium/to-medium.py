@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 REPO = "yeongseon/tech-blog"
-TAG = "bf651c9"
+TAG = "e8dca42"
 ROOT = Path(__file__).resolve().parents[2]
 
 RAW_BASE = f"https://raw.githubusercontent.com/{REPO}/{TAG}"
