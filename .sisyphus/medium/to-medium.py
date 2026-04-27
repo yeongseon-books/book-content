@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""Convert en/*.md to Medium-ready medium/<NN>.md.
+
+Rules (confirmed by user):
+- Image refs `![alt](../../assets/...)` -> raw.githubusercontent.com/<owner>/<repo>/<TAG>/assets/...
+- Other relative links `[text](../something)` or `[text](./something)` -> github.com/<owner>/<repo>/blob/<TAG>/<resolved>
+- H3+ (### and deeper) -> bold paragraph (`**text**`)
+- Tables -> bullet list, each row: "- **col1**: v1 / **col2**: v2 ..."
+- Code fences left as-is
+- Front matter (YAML between ---) stripped
+- Output written to <series>/medium/<NN>.md (filename = leading digits of source)
+"""
+
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+REPO = "yeongseon/tech-blog"
+TAG = "bf651c9"
+ROOT = Path(__file__).resolve().parents[2]
+
+RAW_BASE = f"https://raw.githubusercontent.com/{REPO}/{TAG}"
+BLOB_BASE = f"https://github.com/{REPO}/blob/{TAG}"
+
+FRONT_MATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
+IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
+LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\(([^)]+)\)")
+HEADING_RE = re.compile(r"^(#{3,6})\s+(.*)$", re.MULTILINE)
+CODE_FENCE_RE = re.compile(r"^```", re.MULTILINE)
+
+
+def strip_front_matter(text: str) -> str:
+    return FRONT_MATTER_RE.sub("", text, count=1)
+
+
+def resolve_relative(src_md: Path, target: str) -> str | None:
+    """Resolve a relative path from src_md's directory; return repo-relative POSIX path or None if absolute/external."""
+    if target.startswith(("http://", "https://", "mailto:", "#")):
+        return None
+    clean = target.split("#", 1)[0].split("?", 1)[0]
+    if not clean:
+        return None
+    base = src_md.parent
+    resolved = (base / clean).resolve()
+    try:
+        rel = resolved.relative_to(ROOT)
+    except ValueError:
+        return None
+    return rel.as_posix()
+
+
+def replace_images(text: str, src_md: Path) -> str:
+    def sub(m: re.Match) -> str:
+        alt, url = m.group(1), m.group(2)
+        rel = resolve_relative(src_md, url)
+        if rel is None:
+            return m.group(0)
+        return f"![{alt}]({RAW_BASE}/{rel})"
+
+    return IMAGE_RE.sub(sub, text)
+
+
+def replace_links(text: str, src_md: Path) -> str:
+    def sub(m: re.Match) -> str:
+        label, url = m.group(1), m.group(2)
+        rel = resolve_relative(src_md, url)
+        if rel is None:
+            return m.group(0)
+        frag = ""
+        if "#" in url:
+            frag = "#" + url.split("#", 1)[1]
+        return f"[{label}]({BLOB_BASE}/{rel}{frag})"
+
+    return LINK_RE.sub(sub, text)
+
+
+def split_code_segments(text: str) -> list[tuple[bool, str]]:
+    """Return list of (is_code, segment) preserving order. Code = inside ``` fences."""
+    segments: list[tuple[bool, str]] = []
+    in_code = False
+    buf: list[str] = []
+    for line in text.split("\n"):
+        if line.startswith("```"):
+            buf.append(line)
+            if in_code:
+                segments.append((True, "\n".join(buf)))
+                buf = []
+                in_code = False
+            else:
+                opening = buf.pop()
+                if buf:
+                    segments.append((False, "\n".join(buf)))
+                    buf = []
+                buf.append(opening)
+                in_code = True
+        else:
+            buf.append(line)
+    if buf:
+        segments.append((in_code, "\n".join(buf)))
+    return segments
+
+
+def demote_headings(prose: str) -> str:
+    def sub(m: re.Match) -> str:
+        return f"**{m.group(2).strip()}**"
+
+    return HEADING_RE.sub(sub, prose)
+
+
+TABLE_ROW_RE = re.compile(r"^\s*\|(.+)\|\s*$")
+TABLE_SEP_RE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$")
+
+
+def parse_table_block(lines: list[str], i: int) -> tuple[list[str] | None, list[list[str]] | None, int]:
+    """If lines[i] starts a markdown table, parse and return (headers, rows, next_i). Else (None, None, i)."""
+    if i >= len(lines):
+        return None, None, i
+    if not TABLE_ROW_RE.match(lines[i]):
+        return None, None, i
+    if i + 1 >= len(lines) or not TABLE_SEP_RE.match(lines[i + 1]):
+        return None, None, i
+
+    def split_row(line: str) -> list[str]:
+        s = line.strip()
+        if s.startswith("|"):
+            s = s[1:]
+        if s.endswith("|"):
+            s = s[:-1]
+        return [c.strip() for c in s.split("|")]
+
+    headers = split_row(lines[i])
+    rows: list[list[str]] = []
+    j = i + 2
+    while j < len(lines) and TABLE_ROW_RE.match(lines[j]) and not TABLE_SEP_RE.match(lines[j]):
+        rows.append(split_row(lines[j]))
+        j += 1
+    return headers, rows, j
+
+
+def tables_to_bullets(prose: str) -> str:
+    lines = prose.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        headers, rows, next_i = parse_table_block(lines, i)
+        if headers is not None and rows is not None:
+            for row in rows:
+                pairs = []
+                for h, v in zip(headers, row):
+                    h_clean = h.strip()
+                    v_clean = v.strip()
+                    if not h_clean and not v_clean:
+                        continue
+                    if h_clean:
+                        pairs.append(f"**{h_clean}**: {v_clean}" if v_clean else f"**{h_clean}**")
+                    else:
+                        pairs.append(v_clean)
+                out.append("- " + " / ".join(pairs))
+            out.append("")
+            i = next_i
+        else:
+            out.append(lines[i])
+            i += 1
+    return "\n".join(out)
+
+
+def transform_prose(prose: str) -> str:
+    prose = tables_to_bullets(prose)
+    prose = demote_headings(prose)
+    return prose
+
+
+def convert(src_md: Path) -> str:
+    text = src_md.read_text(encoding="utf-8")
+    text = strip_front_matter(text)
+    text = replace_images(text, src_md)
+    text = replace_links(text, src_md)
+
+    segments = split_code_segments(text)
+    converted = []
+    for is_code, seg in segments:
+        if is_code:
+            converted.append(seg)
+        else:
+            converted.append(transform_prose(seg))
+    return "\n".join(converted)
+
+
+def numeric_prefix(name: str) -> str | None:
+    m = re.match(r"^(\d+)", name)
+    return m.group(1) if m else None
+
+
+def process_series(en_dir: Path) -> tuple[int, int]:
+    medium_dir = en_dir.parent / "medium"
+    medium_dir.mkdir(exist_ok=True)
+    written = 0
+    skipped = 0
+    for md in sorted(en_dir.glob("*.md")):
+        prefix = numeric_prefix(md.name)
+        if not prefix:
+            print(f"  SKIP no numeric prefix: {md.name}")
+            skipped += 1
+            continue
+        out_path = medium_dir / f"{prefix}.md"
+        out_path.write_text(convert(md), encoding="utf-8")
+        written += 1
+    return written, skipped
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) > 1:
+        en_dirs = [Path(p).resolve() for p in argv[1:]]
+    else:
+        en_dirs = sorted(ROOT.glob("azure-*/en"))
+    total_w, total_s = 0, 0
+    for en_dir in en_dirs:
+        if not en_dir.is_dir():
+            print(f"SKIP missing dir: {en_dir}")
+            continue
+        print(f"== {en_dir.relative_to(ROOT)}")
+        w, s = process_series(en_dir)
+        total_w += w
+        total_s += s
+        print(f"   wrote {w}, skipped {s}")
+    print(f"\nTotal: wrote {total_w}, skipped {total_s}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))
