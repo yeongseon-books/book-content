@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dapr integration — what you get from a sidecar</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, Container Apps, Serverless, Containers -->
+</head>
+<body>
+<h1>Dapr integration — what you get from a sidecar</h1>
+<blockquote>
+<p>Azure Container Apps 101 series (6/7)</p>
+</blockquote>
+<p>This post shows where the Dapr sidecar sits and what it simplifies.<br>
+Service invocation.<br>
+Pub/Sub.<br>
+State.<br>
+And secrets are the key themes.</p>
+<hr>
+<h2>Where Dapr sits</h2>
+<p>The sidecar sits next to the app.<br>
+It mediates access to Environment-level components and external services.</p>
+<h2><img alt="Where Dapr sits" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-101/06/06-01-where-dapr-sits.en.png"></h2>
+<h2>Enable commands</h2>
+<pre><code class="language-bash">az containerapp create   --name api-app   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --ingress external   --target-port 8000   --enable-dapr true   --dapr-app-id api-app   --dapr-app-port 8000
+
+az containerapp dapr enable   --name api-app   --resource-group $RG   --dapr-app-id api-app   --dapr-app-port 8000
+</code></pre>
+<hr>
+<h2>App scope and Environment scope</h2>
+<ul>
+<li>App level — enablement, app ID, app port</li>
+<li>Environment level — component definitions and scopes</li>
+</ul>
+<hr>
+<h2>Key building blocks</h2>
+<ul>
+<li>Service invocation</li>
+<li>Pub/Sub</li>
+<li>State store</li>
+<li>Secret store</li>
+</ul>
+<hr>
+<h2>Component example</h2>
+<pre><code class="language-yaml">componentType: pubsub.azure.servicebus.queue
+version: v1
+metadata:
+  - name: namespaceName
+    value: mybus.servicebus.windows.net
+scopes:
+  - publisher-app
+  - subscriber-app
+</code></pre>
+<hr>
+<h2>Operator notes</h2>
+<ul>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+</ul>
+<hr>
+<h2>Common mistakes</h2>
+<ul>
+<li>Managed does not mean operations disappear.</li>
+<li>A failed new revision is not the same thing as automatic rollback.</li>
+<li>Scale-to-zero is not implemented the same way for every rule type.</li>
+<li>Turning on Dapr does not remove application design responsibility.</li>
+<li>Using Environment and App as if they are the same layer leads to weak boundary decisions.</li>
+</ul>
+<hr>
+<h2>Operations checklist</h2>
+<ul>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+<li>Cost and stability usually move with traffic shape and replica floors.</li>
+<li>A repeatable deployment procedure lowers operational risk quickly.</li>
+<li>ACA gets simpler once the operating units are named precisely.</li>
+<li>Do not blur app names, revision names, and environment names.</li>
+<li>Troubleshooting speed depends on how cleanly you separate layers.</li>
+<li>The platform hides a lot, but the boundaries still matter.</li>
+<li>Deployment, scaling, and observability are different faces of one flow.</li>
+<li>It is better to understand which layer a command changes than to memorize syntax alone.</li>
+<li>You need a clean split between revision-scoped changes and app-wide policy changes.</li>
+<li>Logs and metrics are most useful when read with revision context.</li>
+</ul>
+<hr>
+<p>This post is one step in the Azure Container Apps 101 series.<br>
+The earlier posts define the platform shape, and the later posts build deployment and operations decisions on top of that shape.<br>
+Read in order and ACA starts to feel like an operating model instead of a feature catalog.</p>
+<ul>
+<li>Revisit the checklist right after each deployment.</li>
+</ul>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aca-101/en/01-what-is-aca.md">What is Azure Container Apps? — running containers without Kubernetes</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aca-101/en/02-environment-app-revision.md">Environment, Container App, Revision — ACA in three words</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aca-101/en/03-first-deploy.md">Your first deploy — Python/FastAPI</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aca-101/en/04-ingress-and-traffic-split.md">Ingress and traffic splitting — revision-based deployment strategies</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aca-101/en/05-scaling-with-keda.md">Scaling — KEDA scalers and zero-to-N</a></li>
+<li><strong>Dapr integration — what you get from a sidecar (current)</strong></li>
+<li>Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/enable-dapr">Configure Dapr on an Existing Container App — Microsoft Learn</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/dapr-overview">Microservice APIs powered by Dapr — Microsoft Learn</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/dapr-components">Dapr Components in Azure Container Apps — Microsoft Learn</a><br>
+- <a href="https://docs.dapr.io/concepts/overview/">Dapr overview</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/01-what-is-app-service.md">Azure App Service 101</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en/01-what-is-aks.md">Azure AKS 101</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/01-what-is-azure-functions.md">Azure Functions 101</a></p>
+</body>
+</html>

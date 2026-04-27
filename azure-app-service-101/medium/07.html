@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scaling 101: When to Scale Up vs Scale Out?</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, App Service, Cloud, Web Apps -->
+</head>
+<body>
+<h1>Scaling 101: When to Scale Up vs Scale Out?</h1>
+<p>"Traffic increased and the app is slow." "Want to reduce costs but maintain performance."</p>
+<p><strong>Scaling</strong> is the key strategy for solving these problems. In this post, we'll cover the difference between Scale Up and Scale Out, when to choose each, and how to configure Autoscale.</p>
+<hr>
+<h2>Two Directions of Scaling</h2>
+<pre><code> ┌─────────────┐
+ │ Larger │ ← Scale Up (Vertical)
+ │ Instance │
+ └─────────────┘
+ ↑
+┌───┐ ┌───┐ ┌───┐ ┌───┐
+│ S │ │ S │ │ S │ ... │ S │ ← Scale Out (Horizontal)
+└───┘ └───┘ └───┘ └───┘
+ ↑
+More instances
+</code></pre>
+<ul>
+<li><strong>Direction</strong>: <strong>Vertical</strong> / <strong>Name</strong>: Scale Up/Down / <strong>Description</strong>: Change instance size</li>
+<li><strong>Direction</strong>: <strong>Horizontal</strong> / <strong>Name</strong>: Scale Out/In / <strong>Description</strong>: Change instance count</li>
+</ul>
+<p><img alt="Scale Up vs Scale Out" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png"></p>
+<hr>
+<h2>Scale Up (Vertical Scaling)</h2>
+<p><strong>When to Use?</strong></p>
+<ul>
+<li>When you need <strong>more memory</strong> per instance</li>
+<li>When <strong>CPU is saturated</strong> and Scale Out won't help</li>
+<li>When you need <strong>features from higher tiers</strong> (VNet, Slots, etc.)</li>
+</ul>
+<p><strong>Trade-offs</strong></p>
+<ul>
+<li><strong>Pros</strong>: Simple configuration / <strong>Cons</strong>: Triggers restart</li>
+<li><strong>Pros</strong>: Feature upgrade / <strong>Cons</strong>: Cost can spike</li>
+<li><strong>Pros</strong>: - / <strong>Cons</strong>: Upper limit exists</li>
+</ul>
+<p><strong>Scale Up with CLI</strong></p>
+<pre><code class="language-bash"># Upgrade S1 → P1v3
+az appservice plan update \
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --sku P1v3
+</code></pre>
+<p><strong>Check Current SKU</strong></p>
+<pre><code class="language-bash">az appservice plan show \
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --query &quot;sku&quot; \
+ --output json
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code class="language-json">{
+ &quot;name&quot;: &quot;P1v3&quot;,
+ &quot;tier&quot;: &quot;PremiumV3&quot;,
+ &quot;capacity&quot;: 2
+}
+</code></pre>
+<hr>
+<h2>Scale Out (Horizontal Scaling)</h2>
+<p><strong>When to Use?</strong></p>
+<ul>
+<li><strong>Traffic increase</strong> requiring more throughput</li>
+<li>Need multiple instances for <strong>high availability</strong></li>
+<li>App is designed to be <strong>stateless</strong></li>
+</ul>
+<p><img alt="Scaling decision tree" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/07/04-scaling-decision-tree.en.png"></p>
+<p><strong>Prerequisite: Stateless Design</strong></p>
+<p>For Scale Out to work, your app must <strong>store state externally</strong>.</p>
+<ul>
+<li><strong>Stateless Pattern</strong>: Store sessions in Redis / <strong>Stateful Anti-pattern</strong>: Store sessions in memory</li>
+<li><strong>Stateless Pattern</strong>: Store state in DB / <strong>Stateful Anti-pattern</strong>: Store state in local files</li>
+<li><strong>Stateless Pattern</strong>: Use distributed cache / <strong>Stateful Anti-pattern</strong>: Per-instance cache</li>
+</ul>
+<pre><code class="language-python"># Stateful example that breaks scale-out
+user_sessions = {} # Stored in memory
+
+@app.route('/login')
+def login():
+ user_sessions[user_id] = session_data
+
+# Stateless version backed by Redis
+import redis
+r = redis.Redis(host=os.environ[&quot;REDIS_HOST&quot;])
+
+@app.route('/login')
+def login():
+ r.set(f&quot;session:{user_id}&quot;, json.dumps(session_data))
+</code></pre>
+<p><strong>Scale Out with CLI</strong></p>
+<pre><code class="language-bash"># Manually scale to 3 instances
+az appservice plan update \
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --number-of-workers 3
+</code></pre>
+<hr>
+<h2>Autoscale: Automatic Scaling</h2>
+<p><strong>Automatically</strong> increase or decrease instances based on traffic.</p>
+<p><img alt="Autoscale feedback loop" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/07/02-autoscale-feedback-loop.en.png"></p>
+<p><strong>Autoscale Flow</strong></p>
+<pre><code>Collect Metrics → Evaluate Rules → Scale Action → Cooldown → Re-evaluate
+</code></pre>
+<p><strong>Basic Autoscale Configuration</strong></p>
+<pre><code class="language-bash"># Create Autoscale profile
+az monitor autoscale create \
+ --resource-group $RG \
+ --resource $PLAN_NAME \
+ --resource-type &quot;Microsoft.Web/serverfarms&quot; \
+ --name &quot;autoscale-rule&quot; \
+ --min-count 2 \
+ --max-count 10 \
+ --count 2
+</code></pre>
+<p><strong>Add Scale Out Rule</strong></p>
+<pre><code class="language-bash"># Add 1 instance when CPU &gt; 70%
+az monitor autoscale rule create \
+ --resource-group $RG \
+ --autoscale-name &quot;autoscale-rule&quot; \
+ --condition &quot;Percentage CPU &gt; 70 avg 10m&quot; \
+ --scale out 1
+</code></pre>
+<p><strong>Add Scale In Rule</strong></p>
+<pre><code class="language-bash"># Remove 1 instance when CPU &lt; 35%
+az monitor autoscale rule create \
+ --resource-group $RG \
+ --autoscale-name &quot;autoscale-rule&quot; \
+ --condition &quot;Percentage CPU &lt; 35 avg 20m&quot; \
+ --scale in 1
+</code></pre>
+<p><strong>Verify Autoscale Configuration</strong></p>
+<pre><code class="language-bash">az monitor autoscale show \
+ --resource-group $RG \
+ --name &quot;autoscale-rule&quot; \
+ --output json
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre><code class="language-json">{
+ &quot;enabled&quot;: true,
+ &quot;profiles&quot;: [{
+ &quot;capacity&quot;: {
+ &quot;default&quot;: &quot;2&quot;,
+ &quot;maximum&quot;: &quot;10&quot;,
+ &quot;minimum&quot;: &quot;2&quot;
+ },
+ &quot;rules&quot;: [
+ {&quot;metricTrigger&quot;: {&quot;metricName&quot;: &quot;Percentage CPU&quot;, &quot;operator&quot;: &quot;GreaterThan&quot;, &quot;threshold&quot;: 70}},
+ {&quot;metricTrigger&quot;: {&quot;metricName&quot;: &quot;Percentage CPU&quot;, &quot;operator&quot;: &quot;LessThan&quot;, &quot;threshold&quot;: 35}}
+ ]
+ }]
+}
+</code></pre>
+<hr>
+<h2>Autoscale Design Best Practices</h2>
+<p><strong>1. Separate Scale Out/In Thresholds</strong></p>
+<pre><code>Scale Out: CPU &gt; 70%
+Scale In: CPU &lt; 35% ← Gap prevents oscillation
+</code></pre>
+<p><strong>Oscillation</strong>: If thresholds are too close, constant scaling up/down occurs</p>
+<p><strong>2. Set Cooldown Period</strong></p>
+<pre><code class="language-bash"># Wait 5 minutes after Scale Out
+--cooldown 5
+</code></pre>
+<p><strong>3. Set Minimum/Maximum Instances</strong></p>
+<pre><code>Minimum: 2 ← Ensures availability (Health Check needs this)
+Maximum: 10 ← Cost control
+</code></pre>
+<p><strong>4. Combine Multiple Metrics</strong></p>
+<pre><code class="language-bash"># CPU + Memory combination
+az monitor autoscale rule create \
+ --condition &quot;Memory Percentage &gt; 80 avg 5m&quot; \
+ --scale out 2
+</code></pre>
+<hr>
+<h2>Consider Dependencies</h2>
+<p><strong>Side Effects of Scale Out</strong></p>
+<p>When instances increase, <strong>load on external dependencies also increases</strong>.</p>
+<p><img alt="Dependency cascade under load" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/07/03-dependency-cascade.en.png"></p>
+<pre><code>2 instances → 20 DB connections
+10 instances → 100 DB connections (!)
+</code></pre>
+<p><strong>Checklist</strong></p>
+<ul>
+<li><strong>Dependency</strong>: Database / <strong>Check</strong>: Connection pool limit, max connections</li>
+<li><strong>Dependency</strong>: External API / <strong>Check</strong>: Rate limit</li>
+<li><strong>Dependency</strong>: Cache (Redis) / <strong>Check</strong>: Throughput limit</li>
+<li><strong>Dependency</strong>: Outbound / <strong>Check</strong>: SNAT port exhaustion</li>
+</ul>
+<p><strong>Connection Pool Configuration Example</strong></p>
+<pre><code class="language-python">from sqlalchemy import create_engine
+
+engine = create_engine(
+ DATABASE_URL,
+ pool_size=5, # Connections per instance
+ max_overflow=10, # Additional allowed
+ pool_timeout=30,
+ pool_recycle=1800
+)
+</code></pre>
+<hr>
+<h2>Monitoring and Alerts</h2>
+<p><strong>Key Metrics</strong></p>
+<ul>
+<li><strong>Metric</strong>: CPU Percentage / <strong>Purpose</strong>: Compute load / <strong>Example Alert Threshold</strong>: &gt; 80% for 5min</li>
+<li><strong>Metric</strong>: Memory Percentage / <strong>Purpose</strong>: Memory pressure / <strong>Example Alert Threshold</strong>: &gt; 85% for 5min</li>
+<li><strong>Metric</strong>: HTTP Queue Length / <strong>Purpose</strong>: Request backlog / <strong>Example Alert Threshold</strong>: &gt; 100</li>
+<li><strong>Metric</strong>: Response Time / <strong>Purpose</strong>: User experience / <strong>Example Alert Threshold</strong>: p95 &gt; 2s</li>
+<li><strong>Metric</strong>: Instance Count / <strong>Purpose</strong>: Cost / <strong>Example Alert Threshold</strong>: &gt; 8</li>
+</ul>
+<p><strong>Configure Alerts</strong></p>
+<pre><code class="language-bash">az monitor metrics alert create \
+ --resource-group $RG \
+ --name &quot;High CPU Alert&quot; \
+ --scopes &quot;/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Web/serverfarms/$PLAN_NAME&quot; \
+ --condition &quot;avg Percentage CPU &gt; 80&quot; \
+ --window-size 5m
+</code></pre>
+<hr>
+<h2>Cost Optimization</h2>
+<p><strong>Schedule-based Scaling</strong></p>
+<p>Maintain higher instances only during business hours:</p>
+<pre><code class="language-bash"># Business hours: minimum 4
+# Off-hours: minimum 2
+</code></pre>
+<p>Azure Portal → Scale out → Add a scale condition → Schedule</p>
+<p><strong>Aggressive Scale In</strong></p>
+<pre><code class="language-bash"># Generous Scale In rule
+--condition &quot;Percentage CPU &lt; 30 avg 30m&quot;
+</code></pre>
+<p><strong>Choose the Right Tier</strong></p>
+<ul>
+<li><strong>Situation</strong>: Memory shortage / <strong>Recommended Approach</strong>: Consider Scale Up</li>
+<li><strong>Situation</strong>: Traffic increase / <strong>Recommended Approach</strong>: Scale Out first</li>
+<li><strong>Situation</strong>: Both / <strong>Recommended Approach</strong>: Scale Up then Scale Out</li>
+</ul>
+<hr>
+<h2>Scaling Playbook</h2>
+<p><strong>Traffic Spike Response</strong></p>
+<ol>
+<li>Immediate: Manually increase instances</li>
+<li>Check Autoscale trigger delay</li>
+<li>Check dependency bottlenecks</li>
+<li>Revert after event ends</li>
+</ol>
+<pre><code class="language-bash"># Emergency Scale Out
+az appservice plan update \
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --number-of-workers 8
+</code></pre>
+<p><strong>Memory Pressure Response</strong></p>
+<ol>
+<li>Identify memory increase pattern (gradual vs sudden)</li>
+<li>Gradual: Suspect memory leak → Review app code</li>
+<li>Sudden: Traffic-based → Scale Up or Scale Out</li>
+</ol>
+<p><strong>Cost Reduction</strong></p>
+<ol>
+<li>Set Scale In schedule for nights/weekends</li>
+<li>Review Maximum instance limit</li>
+<li>Monthly instance usage review</li>
+</ol>
+<hr>
+<h2>Summary</h2>
+<p>Scaling strategy essentials:</p>
+<ul>
+<li><strong>Situation</strong>: Memory shortage / <strong>Strategy</strong>: Scale Up</li>
+<li><strong>Situation</strong>: Traffic increase / <strong>Strategy</strong>: Scale Out</li>
+<li><strong>Situation</strong>: Availability / <strong>Strategy</strong>: Minimum 2 instances</li>
+<li><strong>Situation</strong>: Cost control / <strong>Strategy</strong>: Maximum setting + Schedule</li>
+<li><strong>Situation</strong>: Automation / <strong>Strategy</strong>: Autoscale + Alerts</li>
+</ul>
+<p><strong>Remember:</strong><br>
+- Scale Out requires <strong>Stateless design</strong><br>
+- Review dependency limits together<br>
+- Prevent Autoscale <strong>oscillation</strong> (threshold gaps)</p>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>This closing post ties the rest of the series together by turning deployment, configuration, and telemetry into scaling decisions. Read back through the sequence and the through-line is clear: App Service works best when you treat it as an operating platform, not just a place to push code.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/01-what-is-app-service.md">What is Azure App Service? - Understanding the Platform Architecture</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/02-request-lifecycle.md">Request Lifecycle: How Requests Reach Your App</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/03-hosting-models.md">Hosting Models: Which Plan Should You Choose?</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/04-first-deploy.md">First Deployment: From Local to Azure (Python/Flask)</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/05-configuration.md">Mastering Configuration: App Settings &amp; Environment Variables</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/06-logging-monitoring.md">Logging and Monitoring Basics</a></li>
+<li><strong>Scaling 101: When to Scale Up vs Scale Out? (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/azure/app-service/manage-scale-up">Scale up an app in Azure App Service (Microsoft Learn)</a><br>
+- <a href="https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-get-started">Get started with autoscale (Microsoft Learn)</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/app-service-best-practices">Best practices for Azure App Service (Microsoft Learn)</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en">Azure Functions 101</a></p>
+<hr>
+<p><strong>Tags:</strong> <code>Azure</code> <code>App Service</code> <code>Scaling</code> <code>Autoscale</code> <code>Performance</code> <code>DevOps</code></p>
+</body>
+</html>

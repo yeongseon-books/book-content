@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Environment internals — the network, observability, and Dapr scope boundary</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Container Apps, KEDA, Dapr, Envoy -->
+</head>
+<body>
+<h1>Environment internals — the network, observability, and Dapr scope boundary</h1>
+<blockquote>
+<p>Azure Container Apps Deep Dive series (2/6)</p>
+</blockquote>
+<p>Episode 1 drew the stack.<br>
+This episode narrows the focus to one resource that looks administrative from the outside and architectural from the inside: the Container Apps environment.</p>
+<p>If you remember only one sentence from the Microsoft Learn documentation, make it this one in paraphrased form: the environment is the secure boundary around one or more container apps and jobs.</p>
+<p>That sentence explains more than people first assume.</p>
+<p>It tells you where network scope lives.<br>
+It tells you where logs converge.<br>
+It tells you where Dapr components are shared.<br>
+It tells you why app placement into environments is a design decision, not a naming decision.</p>
+<hr>
+<h2>The environment is the platform's isolation unit</h2>
+<p>An environment is where ACA starts acting like a platform rather than a single app host.</p>
+<p>Apps inside the same environment can share:</p>
+<ul>
+<li>The virtual network boundary.</li>
+<li>The ingress surface and DNS suffix.</li>
+<li>The Log Analytics destination.</li>
+<li>The Dapr component registry and scopes.</li>
+<li>Environment-local service reachability.</li>
+</ul>
+<p>Apps outside the environment do not automatically share those things.</p>
+<p><img alt="The environment is the platform's isolation unit" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.en.png"><br>
+The operational consequence is straightforward.<br>
+If two apps belong to the same blast radius and observability plane, one environment can make sense.<br>
+If they require hard separation of network, logging, or Dapr configuration, split them.</p>
+<hr>
+<h2>Network scope begins at the environment, not at the revision</h2>
+<p>Revisions are runtime snapshots.<br>
+They are not network islands.</p>
+<p>The network boundary belongs to the environment.<br>
+Microsoft documents that each environment is backed by a virtual network, whether managed for you or supplied by you.<br>
+That is why internal service reachability and ingress posture are environment decisions first and app decisions second.</p>
+<p>The clean way to think about it is a layered boundary.</p>
+<p><img alt="Network scope begins at the environment, not at the revision" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-02-network-scope-begins-at-the-environment.en.png"><br>
+You can turn ingress on or off per app.<br>
+You can choose external or internal ingress per app.<br>
+But those app decisions still live inside one environment-wide network perimeter.</p>
+<p>That distinction matters when people try to use a single environment for workloads that should never sit on the same internal mesh.</p>
+<hr>
+<h2>External versus internal ingress still shares one environment surface</h2>
+<p>The ingress overview page is explicit.<br>
+An app can expose external ingress to the internet and the environment, or internal ingress only to the environment.</p>
+<p>That sounds app-local, and it is.<br>
+But it is not environment-free.</p>
+<p><img alt="External versus internal ingress still shares one environment surface" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-03-external-versus-internal-ingress-still-s.en.png"><br>
+In a microservice setup, the common pattern is one public-facing app with external ingress, then one or more internal apps with internal ingress only.<br>
+All of them still live on the same environment network plane.</p>
+<p>This is powerful because the product gives you a prewired north-south and east-west pattern.<br>
+It is also constraining because environment membership becomes the security boundary that matters most.</p>
+<hr>
+<h2>The environment owns the DNS context readers keep tripping over</h2>
+<p>ACA gives each app an FQDN.<br>
+That FQDN is based on the environment's DNS suffix.</p>
+<p>This sounds trivial until rollouts and multi-app communication enter the picture.</p>
+<p>The environment-level DNS suffix means:</p>
+<ul>
+<li>App endpoints in the same environment share a common naming context.</li>
+<li>Revision labels and app FQDNs are projected through that context.</li>
+<li>Moving an app to another environment changes more than placement; it changes the naming surface readers and callers depend on.</li>
+</ul>
+<p>This is why the environment is not a folder.<br>
+It is part of the app's network identity.</p>
+<hr>
+<h2>Observability is centralized at the environment boundary</h2>
+<p>Microsoft's environment documentation states that apps in the same environment write logs to the same logging destination, and that <code>appLogsConfiguration</code> is an environment-level property.<br>
+That one detail explains why cross-app troubleshooting inside one environment feels cohesive.</p>
+<p>The shared observability plane typically includes:</p>
+<ul>
+<li>Container stdout and stderr.</li>
+<li>Container Apps scaling events.</li>
+<li>Dapr sidecar logs when Dapr is enabled.</li>
+<li>System-level events and metrics exported into the workspace path.</li>
+</ul>
+<p><img alt="Observability is centralized at the environment boundary" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-04-observability-is-centralized-at-the-envi.en.png"><br>
+That model is convenient because one workspace can answer questions across multiple services.<br>
+It is also a governance decision.<br>
+If a team or workload requires separate telemetry retention, access control, or cost accounting, an environment split may be the cleaner boundary.</p>
+<hr>
+<h2>Shared logs do not mean all signals are identical</h2>
+<p>Readers sometimes overcorrect after learning the environment shares a workspace.<br>
+They start assuming every signal is purely environment-level.<br>
+That is not right either.</p>
+<p>The environment decides where logs go.<br>
+The app, revision, sidecar, and ingress path decide what gets emitted.</p>
+<p><img alt="Shared logs do not mean all signals are identical" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-05-shared-logs-do-not-mean-all-signals-are.en.png"><br>
+So the environment is the collector boundary.<br>
+The runtime units are still the producers.</p>
+<p>That distinction helps when a workspace contains noise from multiple apps and you need to separate platform behavior from one bad revision.</p>
+<hr>
+<h2>Dapr components are environment resources first, app resources second</h2>
+<p>ACA's Dapr integration is the cleanest example of environment scoping.</p>
+<p>Microsoft documents Dapr components in Container Apps as environment-level resources.<br>
+They can be shared by multiple apps or scoped to specific app IDs.</p>
+<p>That means there are two separate questions every time you see a component.</p>
+<ol>
+<li>In which environment does this component exist?</li>
+<li>Which Dapr-enabled apps inside that environment are allowed to load it?</li>
+</ol>
+<p><img alt="Dapr components are environment resources first, app resources second" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-06-dapr-components-are-environment-resource.en.png"><br>
+That is a strong clue about how to model shared infrastructure.<br>
+If several apps in one environment should reuse the same pub/sub or state store component, the environment is the natural home.<br>
+If the component boundary itself should split with team or trust boundary changes, the environment often has to split too.</p>
+<hr>
+<h2>Scope means Dapr app ID, not container app name</h2>
+<p>This one bites people in production.</p>
+<p>The Dapr components documentation is explicit that scopes correspond to Dapr application IDs, not the Container App resource name.<br>
+That is an important distinction because the app's Azure resource identity and its Dapr identity are related but not identical concepts.</p>
+<p><img alt="Scope means Dapr app ID, not container app name" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-07-scope-means-dapr-app-id-not-container-ap.en.png"><br>
+If a component does not load where you expect, this mapping is one of the first things to verify.</p>
+<p>The environment contains the component definition.<br>
+The Dapr scope decides which sidecars consume it.</p>
+<hr>
+<h2>Environment scope is where Dapr stops being per-app customization</h2>
+<p>There is a subtle but important product choice here.</p>
+<p>In raw upstream Dapr on Kubernetes, you think directly in terms of components, configuration resources, app IDs, and the injector.<br>
+In ACA, the sidecar still behaves like upstream Dapr, but the supported management surface is narrower.</p>
+<p>That narrowing happens at the environment level.</p>
+<ul>
+<li>Components are attached to the environment.</li>
+<li>Supported components are curated by the product.</li>
+<li>Apps then opt in to Dapr and load what their scopes allow.</li>
+</ul>
+<p>This is one reason the environment feels like a mini platform.<br>
+It is where shared middleware becomes policy.</p>
+<hr>
+<h2>Cross-app Dapr communication only makes sense inside the environment boundary</h2>
+<p>The environment documentation points out a practical rule: if multiple apps need to communicate through built-in Dapr service invocation, placing them in the same environment is the natural fit.</p>
+<p>That sentence has a converse.<br>
+If two services should not share the built-in Dapr communication plane, putting them in different environments gives you a clean separation.</p>
+<p><img alt="Cross-app Dapr communication only makes sense inside the environment boundary" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-08-cross-app-dapr-communication-only-makes.en.png"><br>
+This is less about whether cross-environment workarounds exist and more about what the product treats as its native trust and networking shape.</p>
+<hr>
+<h2>Environment choice is also a cost and operations choice</h2>
+<p>The environment page is framed in security and management terms, but there is an operational side too.</p>
+<p>Using one environment can simplify:</p>
+<ul>
+<li>Shared observability.</li>
+<li>Shared Dapr component management.</li>
+<li>Internal service communication.</li>
+<li>Fewer top-level deployment targets.</li>
+</ul>
+<p>Using multiple environments can simplify:</p>
+<ul>
+<li>Blast-radius control.</li>
+<li>Production and non-production separation.</li>
+<li>Telemetry ownership.</li>
+<li>Network segmentation.</li>
+<li>Dapr configuration isolation.</li>
+</ul>
+<p>The hidden Kubernetes layer stays hidden either way.<br>
+The difference is where you draw the product boundary around your apps.</p>
+<hr>
+<h2>Control loops that terminate at the environment boundary</h2>
+<p>Environment scoping is easiest to see when drawn as control loops.</p>
+<p><img alt="Control loops that terminate at the environment boundary" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aca-deep-dive/02/02-09-control-loops-that-terminate-at-the-envi.en.png"><br>
+Notice what is not in that loop.<br>
+There is no single revision node in the center.<br>
+The environment distributes constraints to many apps at once.</p>
+<p>That is the exact reason environment scoping is powerful and dangerous.<br>
+It is a shared control surface.</p>
+<hr>
+<h2>A practical boundary test for architects</h2>
+<p>When unsure whether two apps belong in the same environment, ask four questions.</p>
+<ol>
+<li>Should they share a network boundary?</li>
+<li>Should they land in the same Log Analytics destination?</li>
+<li>Should they load from the same Dapr component catalog?</li>
+<li>Should built-in internal communication between them feel native?</li>
+</ol>
+<p>If the answer is yes across the board, a shared environment is defensible.<br>
+If the answers diverge, that friction is usually trying to tell you the boundary is wrong.</p>
+<hr>
+<h2>What this episode sets up for the rest of the series</h2>
+<p>Everything later in ACA inherits this boundary.</p>
+<p>Revisions do not escape it.<br>
+KEDA scales replicas inside it.<br>
+Dapr sidecars load environment-scoped components from it.<br>
+Ingress reaches app endpoints that live inside it.</p>
+<p>That is why the environment has to come before all the runtime details.</p>
+<hr>
+<h2>Episode 2 wrap</h2>
+<p>The shortest accurate summary is this.</p>
+<blockquote>
+<p>In Azure Container Apps, the Environment is the isolation unit for networking, logging, and Dapr configuration. App-level features such as ingress and revisions live inside that boundary rather than replacing it.</p>
+</blockquote>
+<p>That sentence is the connective tissue for the next four episodes.</p>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>This post zoomed into the outer boundary that all later ACA runtime behavior depends on. The next episode moves from the environment perimeter to the immutable unit inside it: revisions, revision modes, and traffic weights. After that, the series follows the hidden KEDA objects, the Dapr sidecar process, and the Envoy request path that runs across the same environment boundary described here.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aca-deep-dive/en/01-aca-architecture.md">ACA architecture — what Microsoft layered on a hidden Kubernetes</a></li>
+<li><strong>Environment internals — the network, observability, and Dapr scope boundary (current)</strong></li>
+<li>Revisions and traffic splitting — where Envoy weights come from (upcoming)</li>
+<li>KEDA inside ACA — what a scale rule actually creates (upcoming)</li>
+<li>Dapr sidecar internals — the Go process that lives next to your container (upcoming)</li>
+<li>The Envoy ingress path — how the first request reaches your container (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Primary sources</strong><br>
+- <a href="https://github.com/dapr/dapr/tree/v1.13.0"><code>dapr/dapr</code> tree at <code>v1.13.0</code></a><br>
+- <a href="https://github.com/dapr/dapr/blob/v1.13.0/pkg/injector/service/pod_patch.go"><code>Dapr injector</code> pod patch logic</a><br>
+- <a href="https://github.com/dapr/dapr/blob/v1.13.0/pkg/injector/patcher/sidecar_container.go"><code>Dapr sidecar container</code> construction</a><br>
+- <a href="https://github.com/dapr/dapr/blob/v1.13.0/pkg/runtime/config.go"><code>Dapr runtime</code> config defaults</a></p>
+<p><strong>Secondary sources</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/environment">Azure Container Apps environments</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/ingress-overview">Ingress in Azure Container Apps</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/dapr-overview">Microservice APIs Powered by Dapr</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/dapr-components">Dapr Components in Azure Container Apps</a></p>
+<p><strong>Related series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aca-101/en">Azure Container Apps 101</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en">Azure AKS Deep Dive</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en">Azure Functions Deep Dive</a></p>
+</body>
+</html>

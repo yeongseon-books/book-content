@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Front-End and ARR — how a request reaches a worker</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, App Service, Distributed Systems, Platform Engineering -->
+</head>
+<body>
+<h1>Front-End and ARR — how a request reaches a worker</h1>
+<blockquote>
+<p>Azure App Service Deep Dive series (2/6)</p>
+</blockquote>
+<p>Episode 1 split App Service into Front-End, Worker, File Server, Kudu, and observability boxes.<br>
+This post zooms into the left edge of that map.</p>
+<p>The question is simple.<br>
+<strong>How does one HTTP request end up on one specific worker?</strong></p>
+<p>If you understand that path precisely,<br>
+you understand when ARR Affinity should be turned off,<br>
+why only some users keep hitting a bad instance,<br>
+and why App Service keeps pushing you toward stateless design.</p>
+<hr>
+<h2>The routing path in three stages</h2>
+<p><img alt="The routing path in three stages" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png"><br>
+At the public-documentation level, this is the safe mental model.</p>
+<ol>
+<li>The request enters the Front-End.</li>
+<li>The Front-End resolves the app and slot.</li>
+<li>ARR selects a worker and forwards the request.</li>
+</ol>
+<p>Step 2 and step 3 are not the same question.<br>
+“Which app does this request belong to?” and “which worker should run it?” are different routing decisions.</p>
+<hr>
+<h2>What the Front-End decides first</h2>
+<p>Calling the Front-End a “load balancer” is not wrong.<br>
+It is just incomplete.</p>
+<p>These decisions happen before your code runs:</p>
+<ul>
+<li>which app the host name maps to</li>
+<li>which slot the request belongs to</li>
+<li>which workers are eligible to receive traffic</li>
+<li>whether an affinity cookie should keep the client on the same worker</li>
+</ul>
+<p><img alt="What the Front-End decides first" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/02/02-02-what-the-front-end-decides-first.en.png"><br>
+This post avoids inventing undocumented selection algorithms.<br>
+But the public facts are clear enough.<br>
+<strong>When ARR Affinity is enabled, follow-up requests from the same client can keep landing on the same worker.</strong></p>
+<hr>
+<h2>Why ARR is here at all</h2>
+<p>ARR is IIS Application Request Routing.<br>
+The IIS ARR documentation describes it as a proxy-based HTTP routing module.<br>
+It also supports client affinity through cookies.</p>
+<p>App Service uses that ARR capability in the Front-End path.</p>
+<p>That means the <code>ARRAffinity</code> cookie is not an application session cookie.<br>
+It is a platform routing hint.</p>
+<p>That distinction matters.</p>
+<ul>
+<li>an app session cookie represents application state</li>
+<li>an ARR Affinity cookie represents worker stickiness</li>
+</ul>
+<p>They both look like “session” behavior from the outside.<br>
+They are not the same thing.</p>
+<hr>
+<h2>Request flow with ARR Affinity enabled</h2>
+<p><img alt="Request flow with ARR Affinity enabled" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/02/02-03-request-flow-with-arr-affinity-enabled.en.png"><br>
+This is not inherently bad.<br>
+It is often convenient for legacy apps.</p>
+<ul>
+<li>apps that keep session state in process memory</li>
+<li>apps that depend on per-instance in-memory cache</li>
+<li>apps that are more stable if a login flow stays on one instance</li>
+</ul>
+<p>The problem is that this convenience fights App Service's horizontal scaling model.</p>
+<hr>
+<h2>Request flow with ARR Affinity disabled</h2>
+<p><img alt="Request flow with ARR Affinity disabled" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/02/02-04-request-flow-with-arr-affinity-disabled.en.png"><br>
+With affinity disabled,<br>
+the platform stops assuming that the same client must keep returning to the same worker.<br>
+That is why stateless apps fit App Service so well.</p>
+<p>The benefits are straightforward.</p>
+<ul>
+<li>load spreads more evenly</li>
+<li>one bad worker is less likely to trap the same users repeatedly</li>
+<li>scale-in and worker replacement become less visible</li>
+</ul>
+<p>The price is also straightforward.<br>
+<strong>Any worker must be able to produce the same result.</strong></p>
+<hr>
+<h2>Why stateless design keeps coming up</h2>
+<p>App Service guidance and Well-Architected guidance keep nudging you to disable ARR Affinity for a reason.<br>
+The platform is built to scale horizontally.</p>
+<p>Workers can be replaced,<br>
+added,<br>
+removed,<br>
+or restarted.<br>
+There is no promise that one specific instance remains alive long enough to hold durable user state.</p>
+<p>That is why these patterns fit App Service cleanly:</p>
+<ul>
+<li>sessions in Redis or a database</li>
+<li>upload state in Blob Storage</li>
+<li>in-memory cache as optimization, not source of truth</li>
+<li>any worker can handle any request</li>
+</ul>
+<p>And these patterns tend to fight the platform:</p>
+<ul>
+<li>login session stored only in process memory</li>
+<li>task state written only to a worker-local file</li>
+<li>a critical cache that exists on only one worker</li>
+</ul>
+<hr>
+<h2>Why only some users fail sometimes</h2>
+<p>One of the most confusing production symptoms is this one.</p>
+<p>“The whole app is not down,<br>
+but a subset of users keep seeing latency or errors.”</p>
+<p>ARR Affinity is a strong suspect in that situation.</p>
+<p><img alt="Why only some users fail sometimes" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/02/02-05-why-only-some-users-fail-sometimes.en.png"><br>
+If Worker 2 is degraded because of memory pressure,<br>
+slow dependencies,<br>
+or restart churn,<br>
+and some users stay pinned there,<br>
+the incident looks like a partial outage instead of a full outage.</p>
+<p>That is one of the most practical reasons to understand ARR.</p>
+<hr>
+<h2>Reverse proxies in front make the story more layered</h2>
+<p>When Front Door or Application Gateway sits in front of App Service,<br>
+stickiness can exist at two layers.</p>
+<ol>
+<li>the external proxy deciding which origin to use</li>
+<li>App Service deciding which worker to use inside the origin</li>
+</ol>
+<p>The App Service team has explicitly documented this point in its blog posts.<br>
+Cookie affinity at the upstream proxy does not replace worker stickiness inside App Service.<br>
+App Service still owns the worker selection step.</p>
+<p>The inverse is useful too.<br>
+If you do not want internal worker stickiness,<br>
+the cleaner design is to make the app stateless and not need App Service affinity in the first place.</p>
+<hr>
+<h2>Slots are also part of request routing</h2>
+<p>Slots belong in this picture too.<br>
+The Front-End resolves host and slot context first,<br>
+then forwards into the worker set for that slot.</p>
+<p><img alt="Slots are also part of request routing" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/02/02-06-slots-are-also-part-of-request-routing.en.png"><br>
+That is why slot swap is not just a naming trick.<br>
+It changes which worker set receives production traffic.<br>
+Warm-up matters for the same reason.</p>
+<hr>
+<h2>When to keep ARR Affinity and when to turn it off</h2>
+<p><strong>Reasons to keep it for now</strong></p>
+<ul>
+<li>the app still depends heavily on in-process session state</li>
+<li>externalizing that state is not yet practical</li>
+<li>you are in an interim migration stage</li>
+</ul>
+<p><strong>Reasons to turn it off</strong></p>
+<ul>
+<li>the app is already stateless</li>
+<li>you want more even load distribution</li>
+<li>you want to reduce per-user trapping on one worker</li>
+<li>you want horizontal scaling to behave more naturally</li>
+</ul>
+<p>This is not a taste decision.<br>
+It is a state-management decision.</p>
+<hr>
+<h2>Episode 2 wrap</h2>
+<p>The core point of this episode is simple.</p>
+<blockquote>
+<p>Requests enter the App Service Front-End, and ARR selects the worker. When ARRAffinity is enabled, the platform can keep the same client on the same worker. That is convenient for stateful legacy apps, but it works against App Service's horizontal scaling model. Partial outages that affect only some users often make more sense once you remember that those users may be pinned to one degraded worker.</p>
+</blockquote>
+<p>Episode 3 moves to the next box.<br>
+Now that the request has reached a worker,<br>
+we can ask where user code actually runs,<br>
+what the sandbox restricts on Windows,<br>
+and why container boundaries matter on Linux.</p>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>Episode 1 drew the whole map, and this post zoomed into the Front-End and ARR box on that map.<br>
+The next post moves inside the worker itself and explains the sandbox boundary, which is where Windows-specific library failures and Linux container semantics finally start to make sense.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/01-platform-architecture.md">App Service platform architecture — Front-End, Worker, File Server</a></li>
+<li><strong>Front-End and ARR — how a request reaches a worker (current)</strong></li>
+<li>Workers and the sandbox — where user code actually runs (upcoming)</li>
+<li>Deployment and Kudu — build, sync, release from the inside (upcoming)</li>
+<li>Scaling internals — how Scale Out decisions become new workers (upcoming)</li>
+<li>Cold start and warmup — why the first request is expensive (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Primary sources</strong><br>
+- <a href="https://learn.microsoft.com/iis/extensions/planning-for-arr/using-the-application-request-routing-module">Using the Application Request Routing Module</a><br>
+- <a href="https://techcommunity.microsoft.com/blog/appsonazureblog/configure-arraffinity-cookie-when-accessing-azure-app-service-behind-azure-appli/3842511">Configure ARRAffinity cookie when accessing Azure App Service behind Azure Application Gateway</a></p>
+<p><strong>Secondary sources</strong><br>
+- <a href="https://learn.microsoft.com/azure/app-service/overview">Overview of Azure App Service</a><br>
+- <a href="https://learn.microsoft.com/azure/well-architected/service-guides/app-service-web-apps">Architecture best practices for Azure App Service web apps</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/deploy-staging-slots">Deployment slots in Azure App Service</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/02-request-lifecycle.md">Azure App Service 101 — Request Lifecycle</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/04-dispatcher-and-invocation.md">Azure Functions Deep Dive</a></p>
+</body>
+</html>

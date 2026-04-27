@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cluster architecture — control plane and node pools</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, AKS, Kubernetes, Cloud -->
+</head>
+<body>
+<h1>Cluster architecture — control plane and node pools</h1>
+<blockquote>
+<p>Azure Kubernetes Service 101 series (2/7)</p>
+</blockquote>
+<p>The first structural split to get right in AKS is the split between the cluster's brain and the place where containers actually run. If you blur those together, cost, upgrades, failure handling, and scaling all become harder to reason about. AKS draws that boundary pretty clearly for you.</p>
+<p>This post is about reading that boundary. We'll look at what the control plane does, why system and user node pools exist, and where Spot capacity fits into the picture.</p>
+<hr>
+<h2>Cut the cluster in half</h2>
+<p><img alt="Cut the cluster in half" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png"><br>
+The left side is the Azure-managed layer. The right side is the layer you shape more directly. That single picture explains a lot: why the control plane is not billed separately, why node count is your decision, and why pod scaling and node scaling are different conversations.</p>
+<hr>
+<h2>What the control plane actually does</h2>
+<p>The control plane is the cluster's decision-making layer.</p>
+<ul>
+<li><strong>API server</strong>: the entry point for every declaration and query.</li>
+<li><strong>etcd</strong>: the persistence layer for cluster state.</li>
+<li><strong>Scheduler</strong>: decides where new pods should run.</li>
+<li><strong>Controller loops</strong>: keep deployments, endpoints, and other resources converging toward desired state.</li>
+</ul>
+<p>In AKS, Azure runs this layer for you. You still use the API constantly, but you are not typically building, placing, and maintaining API server nodes yourself.</p>
+<p>That is the concrete meaning of managed Kubernetes. It does not remove Kubernetes. It removes a large chunk of the mechanics around operating Kubernetes.</p>
+<hr>
+<h2>What a node pool is</h2>
+<p>A node pool is a group of VMs with the same configuration.</p>
+<ul>
+<li>same VM size</li>
+<li>same OS SKU</li>
+<li>same scaling envelope</li>
+<li>same pool mode</li>
+</ul>
+<p>Every pod eventually lands on a node in one of these pools. That makes node pools the place where abstract Kubernetes intent turns into real capacity decisions.</p>
+<p>Most practical questions become node-pool questions pretty quickly.</p>
+<ul>
+<li>Which VM size should this workload use?</li>
+<li>Should system components be isolated from application pods?</li>
+<li>Should we use Spot capacity?</li>
+<li>What should the autoscaler bounds be?</li>
+</ul>
+<p>Pods are the logical unit. Node pools are the capacity and cost unit.</p>
+<hr>
+<h2>System node pool vs user node pool</h2>
+<p>This is the first node-pool distinction to learn in AKS.</p>
+<p><img alt="System node pool vs user node pool" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png"><br>
+<strong>System node pool</strong></p>
+<p>System pools are where critical cluster components are expected to run.</p>
+<ul>
+<li>CoreDNS</li>
+<li>metrics-server</li>
+<li>cluster add-ons</li>
+</ul>
+<p>AKS recommends keeping system components there and running your application on user pools instead. In a tiny learning cluster with only one pool, app pods may run on the system pool. In production, separation is the better default.</p>
+<p><strong>User node pool</strong></p>
+<p>User pools are for your workload.</p>
+<ul>
+<li>web APIs</li>
+<li>background workers</li>
+<li>batch jobs</li>
+<li>scheduled jobs</li>
+</ul>
+<p>That separation reduces the odds that a badly behaved application workload interferes with core cluster services.</p>
+<hr>
+<h2>Why the split matters</h2>
+<p>The benefit is not philosophical. It is operational.</p>
+<ol>
+<li>System pods and app pods do not compete for the same space by default.</li>
+<li>User capacity can scale independently.</li>
+<li>Spot capacity can be attached where it makes sense.</li>
+<li>Mixed pool strategies become easier, including Windows user pools alongside Linux system pools.</li>
+</ol>
+<p>The shortest useful summary is this:</p>
+<blockquote>
+<p>The system pool keeps the cluster alive. The user pool runs the business workload.</p>
+</blockquote>
+<hr>
+<h2>How many node pools should you have?</h2>
+<p>Do not over-segment too early. A common starting point is simple.</p>
+<p><strong>Small, sane starting shape</strong></p>
+<ul>
+<li>one system pool</li>
+<li>one user pool</li>
+</ul>
+<p>That is enough for most introductory clusters.</p>
+<p><strong>When clusters get larger</strong></p>
+<p>You may split user pools by workload shape.</p>
+<ul>
+<li>latency-sensitive API pool</li>
+<li>batch or worker pool</li>
+<li>Spot-only pool</li>
+<li>GPU or memory-optimized pool</li>
+</ul>
+<p>Node pools are usually better organized around <strong>workload characteristics</strong> than around team boundaries.</p>
+<hr>
+<h2>Regular pools vs Spot pools</h2>
+<p>Once cost enters the conversation, Spot capacity shows up quickly.</p>
+<p><strong>Regular node pools</strong></p>
+<p>Use regular pools when stability is the primary concern.</p>
+<ul>
+<li>baseline capacity</li>
+<li>critical APIs</li>
+<li>workloads where interruption is expensive</li>
+</ul>
+<p><strong>Spot node pools</strong></p>
+<p>Spot pools use discounted Azure capacity that can be evicted.</p>
+<ul>
+<li>lower cost</li>
+<li>lower stability</li>
+<li>best for interruption-tolerant workloads</li>
+</ul>
+<p>Good examples include queue consumers, batch processing, and retry-friendly background work. A business-critical API with no non-Spot fallback is usually the wrong place for Spot.</p>
+<hr>
+<h2>How scheduling relates to node pools</h2>
+<p>Kubernetes does not schedule “to a node pool” directly. It schedules to nodes. In AKS, the node pool identity is expressed through labels, taints, and pool configuration.</p>
+<p>The useful hierarchy is:</p>
+<ul>
+<li>node pool: management unit</li>
+<li>node: actual scheduling target</li>
+<li>pod: placed through selectors, taints, affinity, and resource requirements</li>
+</ul>
+<p>That is why pool design and placement policy are tightly connected. A tainted system pool plus explicit selectors on user workloads is not ceremony. It is how you encode intent.</p>
+<hr>
+<h2>Upgrades make the boundary even clearer</h2>
+<p>When teams say “we upgraded the cluster,” that can mean a few different things.</p>
+<ul>
+<li>control plane version upgrade</li>
+<li>node pool Kubernetes version upgrade</li>
+<li>node image upgrade</li>
+</ul>
+<p>Those are related, but not identical. The control plane can move first, with node pools following. So “the cluster version changed” is often an incomplete operational statement. You also want to know <strong>which pools have caught up</strong>.</p>
+<hr>
+<h2>Constraints worth remembering early</h2>
+<p>AKS documentation repeats a few practical rules often enough that they are worth anchoring now.</p>
+<ul>
+<li>A cluster must always have at least one system node pool.</li>
+<li>System node pools must be Linux.</li>
+<li>User node pools can be Linux or Windows.</li>
+<li>Spot capacity belongs on user pools.</li>
+<li>For production, system pools should be sized with fault tolerance in mind.</li>
+</ul>
+<p>For a beginner-friendly mental model, this is enough: the initial pool is a system pool, and your applications should graduate into user pools.</p>
+<hr>
+<h2>The five fastest architecture questions</h2>
+<p>When someone hands you an AKS cluster, these questions reveal a lot quickly.</p>
+<ol>
+<li>Are system and user pools separated?</li>
+<li>How many user pools exist, and what is each one for?</li>
+<li>Is Spot being used anywhere?</li>
+<li>What are the autoscaler bounds per pool?</li>
+<li>Are workloads actually landing on the intended pools?</li>
+</ol>
+<p>Those questions are more useful than a generic architecture diagram because they connect directly to cost and failure behavior.</p>
+<hr>
+<h2>What comes next</h2>
+<p>The next post builds a small cluster and deploys a FastAPI application onto it. <code>az aks create</code>, <code>az aks get-credentials</code>, and <code>kubectl apply -f</code> make a lot more sense once you can see where they sit relative to the control plane and node pools.</p>
+<hr>
+<p>This is part 2 of the Azure Kubernetes Service 101 series. Part 1 defined the managed-Kubernetes boundary; this post turned that boundary into a concrete cluster shape. Part 3 moves from architecture to action by creating a cluster and deploying a small FastAPI app onto it.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en/01-what-is-aks.md">What is Azure Kubernetes Service? — what managed Kubernetes actually gives you</a></li>
+<li><strong>Cluster architecture — control plane and node pools (current)</strong></li>
+<li>Your first cluster, your first deploy — Python/FastAPI (upcoming)</li>
+<li>Pod, Deployment, Service — the three ways you express a workload (upcoming)</li>
+<li>Networking and Ingress — the path in and out of the cluster (upcoming)</li>
+<li>Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)</li>
+<li>Monitoring and ops — Container Insights, logs, alerts (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/what-is-aks">What is Azure Kubernetes Service (AKS)?</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/use-system-pools">Use system node pools in Azure Kubernetes Service (AKS)</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/create-node-pools">Create node pools in Azure Kubernetes Service (AKS)</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli">Deploy an Azure Kubernetes Service (AKS) Cluster Using Azure CLI</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en">Azure App Service 101</a> — useful when contrasting AKS with a platform that has no node concept at all<br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en">Azure Functions 101</a> — useful when comparing orchestration with event-driven execution</p>
+</body>
+</html>

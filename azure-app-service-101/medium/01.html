@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What is Azure App Service? - Understanding the Platform Architecture</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, App Service, Cloud, Web Apps -->
+</head>
+<body>
+<h1>What is Azure App Service? - Understanding the Platform Architecture</h1>
+<p>When deploying a web application to Azure, <strong>Azure App Service</strong> is often the first service you encounter. It's a PaaS (Platform as a Service) where you just deploy your code without managing VMs. To use this service effectively, understanding its internals is crucial.</p>
+<p>In this post, we'll explore how the platform works, focusing on the <strong>3-Plane Architecture</strong>.</p>
+<hr>
+<h2>What is App Service?</h2>
+<p>Azure App Service is a <strong>fully managed platform</strong> for hosting web apps, REST APIs, and mobile backends.</p>
+<p>You focus on your application code, while Microsoft handles:</p>
+<ul>
+<li>Server infrastructure management and patching</li>
+<li>Load balancing and traffic routing</li>
+<li>Auto-scaling</li>
+<li>Deployment pipeline integration</li>
+</ul>
+<hr>
+<h2>3-Plane Architecture: The Core Mental Model</h2>
+<p>The most important concept for understanding App Service is the <strong>three Planes</strong>.</p>
+<ul>
+<li><strong>Plane</strong>: <strong>Management Plane</strong> / <strong>Role</strong>: Configuration and settings / <strong>Key Tools</strong>: Azure Portal, CLI, ARM/Bicep</li>
+<li><strong>Plane</strong>: <strong>Runtime Plane</strong> / <strong>Role</strong>: Actual request processing / <strong>Key Tools</strong>: Frontend + Worker instances</li>
+<li><strong>Plane</strong>: <strong>SCM Plane</strong> / <strong>Role</strong>: Deployment and diagnostics / <strong>Key Tools</strong>: Kudu (<code>.scm.azurewebsites.net</code>)</li>
+</ul>
+<p><strong>Why Does This Matter?</strong></p>
+<p>Each Plane has <strong>independent APIs and failure modes</strong>. For example:</p>
+<ul>
+<li>Changing App Settings in the Management Plane → May restart the Runtime Plane</li>
+<li>SCM (Kudu) site being inaccessible → App itself may still work fine</li>
+</ul>
+<p><img alt="App Service 3-Plane architecture" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/01/01-three-plane-architecture.en.png"></p>
+<hr>
+<h2>Management Plane: The Configuration Hub</h2>
+<p>The Management Plane is where you declare your <strong>Desired State</strong>.</p>
+<p><strong>Key Configuration Items</strong></p>
+<ul>
+<li><strong>App Service Plan</strong>: SKU, instance count</li>
+<li><strong>App Settings</strong>: Environment variables</li>
+<li><strong>Deployment Slots</strong>: Staging environments</li>
+<li><strong>Custom Domains</strong>: Domain bindings</li>
+<li><strong>Managed Identity</strong>: Secure authentication</li>
+</ul>
+<p><strong>Configuration changes can restart the app</strong></p>
+<p>Many settings are applied at process startup, so changing them restarts your app.</p>
+<p><strong>Settings that trigger restarts:</strong><br>
+- App Settings changes<br>
+- Startup Command changes<br>
+- Runtime Stack changes<br>
+- Slot Swap</p>
+<pre><code class="language-bash"># Check current app state
+az webapp show \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query &quot;{state:state, hostNames:hostNames, httpsOnly:httpsOnly}&quot; \
+ --output json
+</code></pre>
+<hr>
+<h2>Runtime Plane: Where Requests Are Processed</h2>
+<p>The Runtime Plane is where actual user requests are handled.</p>
+<p><strong>Request Flow</strong></p>
+<p><img alt="App Service request flow" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/01/02-request-flow.en.png"></p>
+<pre><code>Client → App Service Frontend → Worker Instance → App Process
+</code></pre>
+<ol>
+<li><strong>Frontend</strong>: TLS termination, host validation, routing</li>
+<li><strong>Worker</strong>: Selects healthy instance, forwards request</li>
+<li><strong>App</strong>: Executes business logic, returns response</li>
+</ol>
+<p><strong>Instance Lifecycle</strong></p>
+<p>Worker instances are recycled in these situations:</p>
+<ul>
+<li>Platform maintenance</li>
+<li>Scale Out/In</li>
+<li>Restarts due to configuration changes</li>
+</ul>
+<p><strong>Design Principles:</strong><br>
+- Store state externally (Redis, DB)<br>
+- Make startup logic idempotent<br>
+- Implement graceful shutdown<br>
+- Never store important data in local files</p>
+<hr>
+<h2>SCM Plane (Kudu): Deployment and Debugging</h2>
+<p>The SCM site is a management tool accessible at <code>&lt;app-name&gt;.scm.azurewebsites.net</code>.</p>
+<p><strong>Features Provided by Kudu</strong></p>
+<ul>
+<li><strong>Feature</strong>: ZIP Deploy / <strong>Endpoint</strong>: <code>/api/zipdeploy</code></li>
+<li><strong>Feature</strong>: Deployment History / <strong>Endpoint</strong>: <code>/api/deployments</code></li>
+<li><strong>Feature</strong>: Environment Info / <strong>Endpoint</strong>: <code>/api/environment</code></li>
+<li><strong>Feature</strong>: Log Stream / <strong>Endpoint</strong>: <code>/api/logstream</code></li>
+<li><strong>Feature</strong>: File Browser / <strong>Endpoint</strong>: <code>/api/vfs/</code></li>
+</ul>
+<p><strong>SCM is not the app container</strong></p>
+<p>When using Linux custom containers, the SCM site runs in a <strong>separate container</strong>.</p>
+<ul>
+<li>Cannot directly view app container's filesystem/processes from SCM</li>
+<li>Use app container SSH or logs for debugging</li>
+</ul>
+<pre><code class="language-bash"># Check SCM access restrictions
+az webapp config access-restriction show \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output json
+</code></pre>
+<hr>
+<h2>Differences by Hosting Mode</h2>
+<p>App Service supports multiple hosting modes, each with different behaviors.</p>
+<ul>
+<li><strong>Aspect</strong>: <strong>Startup</strong> / <strong>Windows Code</strong>: IIS/platform starts / <strong>Linux Built-in</strong>: Built-in image + command / <strong>Linux Custom Container</strong>: Image pull then start</li>
+<li><strong>Aspect</strong>: <strong>Port</strong> / <strong>Windows Code</strong>: Platform managed / <strong>Linux Built-in</strong>: <code>PORT</code> env variable / <strong>Linux Custom Container</strong>: <code>WEBSITES_PORT</code> setting</li>
+<li><strong>Aspect</strong>: <strong>Storage</strong> / <strong>Windows Code</strong>: Persistent / <strong>Linux Built-in</strong>: <code>/home</code> persistent / <strong>Linux Custom Container</strong>: Depends on config</li>
+<li><strong>Aspect</strong>: <strong>Diagnostics</strong> / <strong>Windows Code</strong>: Rich Kudu / <strong>Linux Built-in</strong>: Rich Kudu / <strong>Linux Custom Container</strong>: SSH is primary</li>
+</ul>
+<p><strong>Port Binding Rules</strong></p>
+<pre><code class="language-python"># Python (Flask) example - correct port binding
+import os
+port = int(os.environ.get(&quot;PORT&quot;, 8000))
+app.run(host=&quot;0.0.0.0&quot;, port=port)
+</code></pre>
+<hr>
+<h2>Filesystem: Ephemeral vs Persistent</h2>
+<p>Understanding storage behavior is key to preventing production issues.</p>
+<p><img alt="App Service file system layout" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/01/03-file-system-layout.en.png"></p>
+<p><strong>Ephemeral Storage</strong></p>
+<ul>
+<li>Fast local I/O</li>
+<li><strong>Deleted</strong> on instance restart</li>
+<li><strong>Not shared</strong> between instances</li>
+</ul>
+<p><strong>Good for:</strong> Temporary cache, upload staging, intermediate processing files</p>
+<p><strong>Persistent Storage (<code>/home</code>)</strong></p>
+<ul>
+<li>Network-based, slower</li>
+<li><strong>Persists</strong> after restarts</li>
+<li>
+<p><strong>Shared</strong> across all instances</p>
+</li>
+<li>
+<p><strong>Path</strong>: <code>/home/site/wwwroot</code> / <strong>Purpose</strong>: Deployed app code</p>
+</li>
+<li><strong>Path</strong>: <code>/home/LogFiles</code> / <strong>Purpose</strong>: App/platform logs</li>
+<li><strong>Path</strong>: <code>/home/data</code> / <strong>Purpose</strong>: App data</li>
+</ul>
+<p><strong>Anti-pattern: SQLite on <code>/home</code>?</strong></p>
+<p>Since <code>/home</code> is a network filesystem:<br>
+- Lock contention possible<br>
+- Latency variability<br>
+- Data corruption risk with multiple instances</p>
+<p><strong>→ Use managed databases like Azure SQL, PostgreSQL in production</strong></p>
+<hr>
+<h2>Health Check: Verifying App Status</h2>
+<p>Health Check isn't just monitoring—it's <strong>core to traffic routing</strong>.</p>
+<p><strong>How It Works</strong></p>
+<ol>
+<li>Platform periodically requests the Health endpoint</li>
+<li><code>200 OK</code> → Instance healthy, receives traffic</li>
+<li>Failure/timeout → Instance excluded, recovery attempted</li>
+</ol>
+<p><strong>Health Endpoint Design Principles</strong></p>
+<pre><code class="language-python">@app.route('/health')
+def health():
+    # Keep it lightweight
+    # Check only critical dependencies
+    # Avoid heavy DB queries
+    return {&quot;status&quot;: &quot;healthy&quot;}, 200
+</code></pre>
+<p><strong>Notes:</strong><br>
+- <code>302 Redirect</code> doesn't count as success<br>
+- 1-minute timeout = unhealthy<br>
+- Most effective with 2+ instances</p>
+<hr>
+<h2>Operations Checklist</h2>
+<p>Before production deployment, verify at minimum:</p>
+<p><strong>Reliability</strong></p>
+<ul>
+<li>[ ] Health endpoint implemented and tested</li>
+<li>[ ] Health Check setting enabled</li>
+<li>[ ] 2+ instances (for availability)</li>
+<li>[ ] Startup time measured and optimized</li>
+</ul>
+<p><strong>Deployment Safety</strong></p>
+<ul>
+<li>[ ] CI/CD producing immutable artifacts</li>
+<li>[ ] Rollback procedure documented and tested</li>
+<li>[ ] Deployment credentials minimized</li>
+</ul>
+<p><strong>Observability</strong></p>
+<ul>
+<li>[ ] Structured logging enabled</li>
+<li>[ ] Log retention/export configured</li>
+<li>[ ] Alerts for error rate, restarts, latency</li>
+</ul>
+<p><strong>Configuration</strong></p>
+<ul>
+<li>[ ] Port binding verified (per hosting mode)</li>
+<li>[ ] Storage behavior confirmed</li>
+<li>[ ] Secrets stored in Key Vault</li>
+</ul>
+<hr>
+<h2>Summary</h2>
+<p>Understanding App Service's 3-Plane model helps you:</p>
+<ul>
+<li><strong>Management Plane</strong>: Understand why config changes trigger restarts</li>
+<li><strong>Runtime Plane</strong>: Grasp request flow and instance behavior</li>
+<li><strong>SCM Plane</strong>: Leverage deployment and debugging tools</li>
+</ul>
+<p>In the next post, we'll explore the <strong>Request Lifecycle</strong> - the complete journey of a request reaching your app.</p>
+<hr>
+<h2>Series Index</h2>
+<ol>
+<li><strong>[Current] What is Azure App Service? - Understanding the Platform Architecture</strong></li>
+<li>Request Lifecycle: How Requests Reach Your App</li>
+<li>Hosting Models: Which Plan Should You Choose?</li>
+<li>First Deployment: From Local to Azure (Python/Flask)</li>
+<li>Mastering Configuration: App Settings &amp; Environment Variables</li>
+<li>Logging and Monitoring Basics</li>
+<li>Scaling 101: When to Scale Up vs Scale Out?</li>
+</ol>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><strong>What is Azure App Service? - Understanding the Platform Architecture (current)</strong></li>
+<li>Request Lifecycle: How Requests Reach Your App (upcoming)</li>
+<li>Hosting Models: Which Plan Should You Choose? (upcoming)</li>
+<li>First Deployment: From Local to Azure (Python/Flask) (upcoming)</li>
+<li>Mastering Configuration: App Settings &amp; Environment Variables (upcoming)</li>
+<li>Logging and Monitoring Basics (upcoming)</li>
+<li>Scaling 101: When to Scale Up vs Scale Out? (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/azure/app-service/overview">Azure App Service overview (Microsoft Learn)</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/resources-kudu">Kudu service overview (Microsoft Learn)</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/monitor-instances-health-check">Monitor App Service instances by using Health Check (Microsoft Learn)</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en">Azure Functions 101</a></p>
+<hr>
+<p><strong>Tags:</strong> <code>Azure</code> <code>App Service</code> <code>Cloud</code> <code>Architecture</code> <code>DevOps</code></p>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scheduler and Pod placement — who decides which node</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: AKS, Kubernetes, Distributed Systems, Containers -->
+</head>
+<body>
+<h1>Scheduler and Pod placement — who decides which node</h1>
+<blockquote>
+<p>Azure Kubernetes Service Deep Dive series (4/6)</p>
+</blockquote>
+<p>Scheduling is not a free-CPU calculator.<br>
+Affinity,<br>
+taints,<br>
+ports,<br>
+volumes,<br>
+and topology constraints all participate.<br>
+The upstream scheduler code makes the structure clear.<br>
+It filters impossible nodes,<br>
+scores feasible ones,<br>
+and records a Binding.</p>
+<hr>
+<h2>The three steps</h2>
+<h2><img alt="The three steps" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png"></h2>
+<h2>Filter and Score</h2>
+<p><code>ScheduleOne()</code> separates the scheduling cycle from the binding cycle.<br>
+Filter removes nodes where the Pod cannot run.<br>
+Score ranks the nodes that remain.<br>
+The default plugin set includes <code>NodeResourcesFit</code>, <code>NodeAffinity</code>, <code>PodTopologySpread</code>, and <code>InterPodAffinity</code>.</p>
+<h2><img alt="Filter and Score" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png"></h2>
+<h2>What Binding means</h2>
+<p>The binding cycle writes the selected node back through the API server.<br>
+Only then can kubelet pick up the Pod and start the execution path from part 2.<br>
+The scheduler's output is therefore not a running Pod.<br>
+It is a <code>Pod -&gt; Node</code> decision.</p>
+<hr>
+<h2>The point of this episode</h2>
+<blockquote>
+<p>kube-scheduler does not execute Pods. It first removes impossible nodes through Filter plugins, then ranks the feasible candidates through Score plugins, and finally records the decision as a Binding in the API server. The key diagnostic split for a Pending Pod is whether it has no feasible nodes at all, or whether it has feasible nodes but keeps losing on score.</p>
+</blockquote>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>This is part 4 of the Azure Kubernetes Service Deep Dive series.<br>
+Parts 2 and 3 covered node execution and networking; this part explains the earlier placement decision. Part 5 follows the consequences of that decision and looks at HPA and Cluster Autoscaler.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Control plane anatomy — what AKS hides from you</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">kubelet and containerd — how a container actually starts on a node</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/03-cni-and-azure-cni-overlay.md">CNI and Azure CNI Overlay — where Pod IPs come from</a></li>
+<li><strong>Scheduler and Pod placement — who decides which node (current)</strong></li>
+<li>HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
+<li>KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Primary sources</strong><br>
+- <a href="https://github.com/kubernetes/kubernetes/blob/v1.30.0/pkg/scheduler/schedule_one.go"><code>schedule_one.go</code> @ <code>v1.30.0</code></a><br>
+- <a href="https://github.com/kubernetes/kubernetes/blob/v1.30.0/pkg/scheduler/apis/config/v1/default_plugins.go"><code>default_plugins.go</code> @ <code>v1.30.0</code></a></p>
+<p><strong>Secondary sources</strong><br>
+- <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/">Kubernetes scheduler</a><br>
+- <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/">Assigning Pods to Nodes</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en">Azure AKS 101</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/04-dispatcher-and-invocation.md">Azure Functions Deep Dive part 4 — dispatcher and invocation</a></p>
+</body>
+</html>

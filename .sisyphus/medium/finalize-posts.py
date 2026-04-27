@@ -158,6 +158,8 @@ def find_toc_insert_point(lines: list[str], ref_idx: int) -> int:
 
 
 def process_post(path: Path, series: str, idx: int, variant: str, entries: dict[int, dict[str, str]]) -> str:
+    if variant == "medium":
+        return "skipped-medium"
     text = path.read_text(encoding="utf-8")
     lines = text.split("\n")
     if variant == "ko":

@@ -16,7 +16,8 @@ Each Azure series has three variants: `ko/`, `en/`, `medium/`.
 
 - `ko/<NN>-<slug>.md` — Tistory original (Korean)
 - `en/<NN>-<slug>.md` — Medium-bound English translation
-- `medium/<NN>.md` — Medium-ready conversion of `en/` (raw URLs, bullet tables, demoted headings)
+- `medium/<NN>.md` — Medium import-ready conversion of `en/` (raw URLs, bullet tables, demoted H3+, no toc markers, tags surfaced as leading HTML comment)
+- `medium/<NN>.html` — same content as `.md` but rendered to HTML5 for direct paste into the Medium editor (preserves headings, code blocks, blockquotes, images, links, lists)
 
 Plus one single-variant Korean series:
 
@@ -77,7 +78,8 @@ TOC entry titles are pulled from each post's H1 (single source of truth). Never 
 ## Pinned tag
 
 External and intra-repo URLs in `medium/` files MUST pin to a commit/tag, never `master`/`HEAD`/`main`.
-Current pin: `bf651c9` (defined in `.sisyphus/medium/to-medium.py` as `TAG`).
+Current pin: `e8dca42` (defined in `.sisyphus/medium/to-medium.py` as `TAG`).
+When regenerating medium variants, update `TAG` first, regenerate, then commit.
 When regenerating medium variants, update `TAG` first, regenerate, then commit.
 
 ## Mermaid conventions

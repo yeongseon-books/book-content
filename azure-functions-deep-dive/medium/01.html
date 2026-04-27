@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Host Bootstrap — Following `WebJobsScriptHostService`</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
+</head>
+<body>
+<h1>Host Bootstrap — Following <code>WebJobsScriptHostService</code></h1>
+<blockquote>
+<p>Azure Functions Deep Dive series (1/6)</p>
+</blockquote>
+<p>In episode 3 of the intro series, I wrote that Functions runs the Host process (.NET) and the Worker process (your language) separately, with gRPC between them. This series checks that sentence against the actual host code. It reads the <a href="https://github.com/Azure/azure-functions-host"><code>Azure/azure-functions-host</code></a> repo directly, one stage per post, from bootstrap through invocation, scaling, and cold starts.</p>
+<p>This post focuses on one question: <strong>what happens the moment a Function App instance powers on</strong>. Everything is pinned to commit <code>5e59423</code>, and every host code citation uses that commit.</p>
+<hr>
+<h2>The big picture — one Azure Functions host instance</h2>
+<p>This is the map for the rest of the series.<br>
+Each later part zooms into one box from this picture.<br>
+Get the layout in your head first; the code paths land more cleanly after that.</p>
+<p><img alt="The big picture — one Azure Functions host instance" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png"><br>
+Part 1 covers host bootstrap, Part 2 zooms into the worker process, Part 3 into the gRPC channel, Part 4 into dispatcher and invocation, Part 5 into scaling, and Part 6 into placeholder mode and cold start.</p>
+<hr>
+<h2>The big picture — host bootstrap in 4 stages</h2>
+<p>It looks complicated, but host bootstrap really compresses down to these four stages:</p>
+<p><img alt="The big picture — host bootstrap in 4 stages" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-deep-dive/01/01-02-the-big-picture-host-bootstrap-in-4-stag.en.png"><br>
+This post walks through each of these four boxes in order. After stage 4, <strong>the function is ready to run the moment a trigger fires</strong>.</p>
+<hr>
+<h2>Stage 1: Enter <code>WebJobsScriptHostService</code></h2>
+<p>The entry point is <code>Program.cs</code>, but the real protagonist of the Functions "host lifecycle" is an <code>IHostedService</code> named <code>WebJobsScriptHostService</code>. It sits on top of ASP.NET Core's standard hosting model, so its lifecycle is managed by <code>StartAsync</code> / <code>StopAsync</code> just like any other hosted service.</p>
+<p>The key method is <code>StartAsync</code>. Inside it, the following happens:</p>
+<ul>
+<li>Wire up the host health monitor (<code>HostHealthMonitor</code>)</li>
+<li>Create a <code>ScriptHost</code> instance and call <code>InitializeAsync</code></li>
+<li>Apply retry / restart policy on failure</li>
+<li>Publish bootstrap state events (Standby → Running transitions, etc.)</li>
+</ul>
+<blockquote>
+<p>Code location: <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs"><code>WebJobsScriptHostService.cs</code> (commit <code>5e59423</code>)</a></p>
+</blockquote>
+<p>One important design decision here. <strong><code>WebJobsScriptHostService</code> is not "the host itself."</strong> It's a shell that "manages" the host lifecycle. The actual host is the <code>ScriptHost</code> inside. By separating the shell from the kernel, recovery becomes possible: when the host dies, the shell can spin up a new kernel and swap it in.</p>
+<hr>
+<h2>Stage 2: <code>ScriptHost.InitializeAsync</code> — where bootstrap actually happens</h2>
+<p>Inside <code>ScriptHost.InitializeAsync</code>, called by <code>WebJobsScriptHostService</code>, the host does the work required to become a running function app.</p>
+<p><img alt="Stage 2: ScriptHost.InitializeAsync — where bootstrap actually happens" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.en.png"><br>
+The ordering matters. In <code>ScriptHost.StartAsyncCore()</code>, <code>InitializeAsync()</code> runs first and finishes before <code>base.StartAsyncCore()</code> runs. Trigger listener activation through <code>JobHost.StartAsync()</code> is therefore <strong>after</strong> initialization, not part of it. This post focuses on config loading and function indexing, leaves worker channel prep to episode 2, and picks up the invocation path in episode 4.</p>
+<blockquote>
+<p>Code location: <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs"><code>ScriptHost.cs</code> (commit <code>5e59423</code>)</a></p>
+</blockquote>
+<hr>
+<h2>Stage 3: where and how <code>host.json</code> is read</h2>
+<p><code>host.json</code> is the "single source of truth" for Functions. Concurrency, timeouts, logging, per-trigger options — they all live here. Let's follow how this file gets converted into an options tree in code.</p>
+<p>The entry point is <code>HostJsonFileConfigurationSource</code>. This class reads host.json and pushes it into .NET's <code>IConfiguration</code> tree. A constants list called <code>WellKnownHostJsonProperties</code> defines the keys this file is "expected to know about." Some representative ones:</p>
+<ul>
+<li><code>concurrency</code> — concurrent invocation limits</li>
+<li><code>extensions.queues</code> — queue trigger options (batch size, polling interval, etc.)</li>
+<li><code>extensions.http</code> — HTTP trigger routing / concurrency</li>
+<li><code>functionTimeout</code> — timeout for a single invocation</li>
+</ul>
+<blockquote>
+<p>Code location: <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/HostJsonFileConfigurationSource.cs"><code>HostJsonFileConfigurationSource.cs</code></a></p>
+</blockquote>
+<p>Values from <code>host.json</code> map straight to options objects. For example, <code>functionTimeout</code> flows into <code>ScriptJobHostOptions.FunctionTimeout</code> via <code>ScriptJobHostOptionsSetup.ConfigureFunctionTimeout</code>.</p>
+<blockquote>
+<p>Code location: <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs"><code>ScriptJobHostOptionsSetup.cs</code></a></p>
+</blockquote>
+<p><img alt="Stage 3: where and how host.json is read" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.en.png"><br>
+This diagram is the path <code>host.json</code> takes into runtime options. <strong>One key in the file → one node in IConfiguration → a Setup class → one field on an options object</strong>. The mapping stays that direct.</p>
+<p>Two things operators should know:</p>
+<ol>
+<li><strong>Environment variables land in the same IConfiguration tree.</strong> That means env vars can override values written in <code>host.json</code>. Example: the <code>AzureFunctionsJobHost__functionTimeout</code> env var beats <code>functionTimeout</code> in host.json.</li>
+<li><strong><code>FUNCTIONS_WORKER_PROCESS_COUNT</code></strong> — sets how many Worker processes to spin up inside a single instance. This option was introduced in <a href="https://github.com/Azure/azure-functions-host/pull/4210">PR #4210</a>, and it's the knob that directly controls the "in-instance concurrency" axis I covered in episode 6 of the intro series.</li>
+</ol>
+<hr>
+<h2>Stage 4: function metadata indexing</h2>
+<p>After reading host.json, <code>ScriptHost</code> indexes "what functions does this app have." The result is a list of <code>FunctionMetadata</code>. Each entry contains:</p>
+<ul>
+<li>Function name</li>
+<li>Trigger type and trigger configuration</li>
+<li>Input/output binding list</li>
+<li>Code entry point (the handler the Worker will invoke)</li>
+<li>Language used</li>
+</ul>
+<p>Why does this indexing matter? Because <strong>this metadata is the foundation for every downstream behavior</strong>.</p>
+<ul>
+<li>The Worker takes this list and registers "I know these functions" (via gRPC <code>WorkerInitRequest</code> / <code>FunctionLoadRequest</code>, covered in episode 3)</li>
+<li>Trigger listeners look at this list to decide "which queue to poll, which route to bind to" (episode 4)</li>
+<li>The Scale Controller looks at this list to decide "which trigger's metrics to collect" (episode 5)</li>
+</ul>
+<p>In other words, <strong>indexing is the stage that builds the Functions host's "function catalog."</strong></p>
+<hr>
+<h2>The host health monitor</h2>
+<p><code>WebJobsScriptHostService</code> periodically checks whether the host is alive. When it detects memory pressure, connection failures, or bootstrap timeouts, it restarts the host. This mechanism is the core of how "the Functions Host recovers itself."</p>
+<ul>
+<li>Host throws during bootstrap → retry</li>
+<li>Bootstrap takes too long → forced restart</li>
+<li>Memory/CPU thresholds exceeded → instance reclaim signal</li>
+</ul>
+<p><img alt="The host health monitor" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-deep-dive/01/01-05-the-host-health-monitor.en.png"><br>
+This state machine is the root cause of the operational symptom "my function suddenly restarted." If you see frequent "Host started" log entries in App Insights, this state machine is probably cycling more often than you'd like.</p>
+<hr>
+<h2>Episode 1 wrap — what's next</h2>
+<p>The flow this post traced, compressed into one paragraph:</p>
+<blockquote>
+<p>ASP.NET Core boots and starts an <code>IHostedService</code> named <code>WebJobsScriptHostService</code>. Inside it, a <code>ScriptHost</code> is created and <code>InitializeAsync</code> runs first, reading host.json and environment-backed options and indexing function metadata. Only after that does <code>JobHost.StartAsync</code> run and activate trigger listeners. The host health monitor watches the whole sequence and replaces the host when it fails.</p>
+</blockquote>
+<p>The next episode targets one of the blind spots in that diagram: <strong>what happens inside the box labeled "Worker channel prep" in <code>InitializeAsync</code>?</strong> How do worker processes for other languages — Node.js, Python, Java — actually get launched? We'll follow it right up to the OS-level <code>Process.Start</code> call.</p>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>This is part 1 of the Azure Functions Deep Dive series. With host bootstrap in place, part 2 moves to the worker processes living beside the host, and parts 3 and 4 follow the gRPC channel and invocation path between them. The later parts cover scaling, placeholder mode, and cold-start mechanics.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><strong>Host Bootstrap — Following <code>WebJobsScriptHostService</code> (current)</strong></li>
+<li>Worker Processes — How One Host Hosts Many Languages (upcoming)</li>
+<li>The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (upcoming)</li>
+<li>Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)</li>
+<li>Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)</li>
+<li>Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Primary sources (host code, commit <code>5e59423</code>)</strong><br>
+- <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs"><code>WebJobsScriptHostService.cs</code></a><br>
+- <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs"><code>ScriptHost.cs</code></a><br>
+- <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/HostJsonFileConfigurationSource.cs"><code>HostJsonFileConfigurationSource.cs</code></a><br>
+- <a href="https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs"><code>ScriptJobHostOptionsSetup.cs</code></a><br>
+- <a href="https://github.com/Azure/azure-functions-host/pull/4210">PR #4210 — introducing <code>FUNCTIONS_WORKER_PROCESS_COUNT</code></a></p>
+<p><strong>Secondary sources</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-host-json">host.json reference</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings">Azure Functions app settings reference</a></p>
+<p><strong>Other parts in the series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en">Azure Functions 101 — intro series</a> (especially episode 3, "Host and Worker")</p>
+</body>
+</html>

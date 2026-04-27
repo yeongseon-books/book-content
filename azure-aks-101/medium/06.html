@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scaling — HPA, Cluster Autoscaler, KEDA</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, AKS, Kubernetes, Cloud -->
+</head>
+<body>
+<h1>Scaling — HPA, Cluster Autoscaler, KEDA</h1>
+<blockquote>
+<p>Azure Kubernetes Service 101 series (6/7)</p>
+</blockquote>
+<p>Scaling in AKS gets confusing because the word “scale” points at more than one layer. Scaling pods and scaling nodes are not the same thing. Add event-driven scaling on top, and HPA, Cluster Autoscaler, and KEDA can start to look like overlapping tools.</p>
+<p>They are related, but they are not the same. This post separates them by input signal, control target, and operating layer.</p>
+<hr>
+<h2>One diagram first</h2>
+<p><img alt="One diagram first" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-101/06/06-01-one-diagram-first.en.png"><br>
+That is the whole relationship.</p>
+<ul>
+<li>HPA changes <strong>pod count</strong>.</li>
+<li>Cluster Autoscaler changes <strong>node count</strong>.</li>
+<li>KEDA extends pod autoscaling by feeding external-event signals into the HPA path.</li>
+</ul>
+<p>The biggest misconception to remove early is this one: <strong>KEDA does not replace HPA. It sits on top of it.</strong></p>
+<hr>
+<h2>HPA — automatically change pod count</h2>
+<p>HPA stands for Horizontal Pod Autoscaler.</p>
+<ul>
+<li>target is usually a Deployment</li>
+<li>signal comes from CPU, memory, or custom metrics</li>
+<li>outcome is a replica-count change</li>
+</ul>
+<p>HPA answers a very specific question: how many instances of this workload should be running right now?</p>
+<p><strong>What HPA depends on</strong></p>
+<p>HPA is a feedback loop. That means its input quality matters.</p>
+<ul>
+<li>metrics-server must be available for the standard metrics path</li>
+<li>CPU requests should be meaningful</li>
+<li>readiness behavior should reflect when a pod can truly receive traffic</li>
+</ul>
+<p>If the input signal is bad, autoscaling decisions get noisy or misleading.</p>
+<hr>
+<h2>The HPA loop</h2>
+<p><img alt="The HPA loop" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-101/06/06-02-the-hpa-loop.en.png"><br>
+Suppose a FastAPI API is running with two pods and the target CPU utilization is 60%. If the average keeps sitting around 90%, HPA will try to raise the replica count.</p>
+<p>But that is not the end of the story. If no nodes have room for the new pods, those pods go Pending. That is where Cluster Autoscaler enters.</p>
+<hr>
+<h2>Cluster Autoscaler — automatically change node count</h2>
+<p>Cluster Autoscaler works one layer lower.</p>
+<ul>
+<li>if new pods cannot be scheduled, it can add nodes</li>
+<li>if nodes stay underused for long enough, it can remove nodes</li>
+</ul>
+<p>The crucial sentence is this one:</p>
+<blockquote>
+<p>Cluster Autoscaler does not scale pods. It scales node pools when there is not enough capacity to place pods.</p>
+</blockquote>
+<p>That makes HPA and Cluster Autoscaler complementary, not competing.</p>
+<hr>
+<h2>HPA and Cluster Autoscaler together</h2>
+<p><img alt="HPA and Cluster Autoscaler together" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-101/06/06-03-hpa-and-cluster-autoscaler-together.en.png"><br>
+This explains a very common operational moment: pod count increases, but response quality does not improve immediately because the new pods still need actual node capacity.</p>
+<hr>
+<h2>KEDA — event-driven autoscaling on top of HPA</h2>
+<p>KEDA stands for Kubernetes Event-driven Autoscaling.</p>
+<p>It is useful when the best scaling signal is not CPU or memory but an external event source, such as:</p>
+<ul>
+<li>Azure Service Bus queue depth</li>
+<li>Event Hub lag</li>
+<li>cron-based schedules</li>
+<li>Kafka or RabbitMQ backlog</li>
+</ul>
+<p>KEDA introduces two critical components.</p>
+<ul>
+<li>the <strong>KEDA operator</strong>, which reads <code>ScaledObject</code> definitions</li>
+<li>the <strong>KEDA metrics server</strong>, which exposes external metrics into the autoscaling path</li>
+</ul>
+<p>That is why the most accurate short description is: KEDA translates external event pressure into the HPA model.</p>
+<hr>
+<h2>KEDA sits on top of HPA</h2>
+<p><img alt="KEDA sits on top of HPA" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-101/06/06-04-keda-sits-on-top-of-hpa.en.png"><br>
+This relationship is worth being exact about.</p>
+<ul>
+<li>HPA is the pod autoscaling mechanism.</li>
+<li>KEDA extends the set of signals that can drive that mechanism.</li>
+<li>KEDA-managed workloads usually still scale by way of HPA behavior underneath.</li>
+</ul>
+<p>That is also why you generally should not attach your own separate HPA to the same workload that KEDA is already scaling.</p>
+<hr>
+<h2>Which tool fits which workload?</h2>
+<p><strong>HPA is a good fit when</strong></p>
+<ul>
+<li>request load maps reasonably well to CPU or memory</li>
+<li>custom application metrics exist and reflect real pressure</li>
+</ul>
+<p><strong>Cluster Autoscaler is needed when</strong></p>
+<ul>
+<li>HPA can create pods faster than the cluster can place them</li>
+<li>you want node capacity to expand and contract with demand</li>
+</ul>
+<p><strong>KEDA is a good fit when</strong></p>
+<ul>
+<li>queue depth or lag is the real demand signal</li>
+<li>scale-to-zero matters</li>
+<li>workloads are event-driven or batch-heavy</li>
+</ul>
+<hr>
+<h2>Read it through a FastAPI lens</h2>
+<p>For an HTTP-serving FastAPI API, HPA is usually the first place to look.</p>
+<ul>
+<li>target CPU utilization</li>
+<li>minimum and maximum replicas</li>
+</ul>
+<p>For a FastAPI worker consuming Service Bus messages, KEDA is often a better fit.</p>
+<ul>
+<li>no messages means replica count can fall to zero</li>
+<li>backlog growth drives replicas back up</li>
+</ul>
+<p>So the question is not “which autoscaler is best?” The question is “what signal best represents demand for this workload?”</p>
+<hr>
+<h2>A minimal HPA example</h2>
+<pre><code class="language-yaml">apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fastapi-hello
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: fastapi-hello
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+</code></pre>
+<p>This uses average CPU utilization to change the Deployment replica count.</p>
+<hr>
+<h2>A minimal KEDA example</h2>
+<pre><code class="language-yaml">apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: fastapi-worker
+spec:
+  scaleTargetRef:
+    name: fastapi-worker
+  minReplicaCount: 0
+  maxReplicaCount: 20
+  triggers:
+    - type: azure-servicebus
+      metadata:
+        queueName: orders
+        namespace: mybus
+        messageCount: &quot;10&quot;
+</code></pre>
+<p>Here the queue depth becomes the pressure signal. KEDA translates that into autoscaling behavior by way of the HPA path.</p>
+<hr>
+<h2>Three common misconceptions</h2>
+<p><strong>“<code>kubectl scale</code> is basically HPA”</strong></p>
+<p>No. <code>kubectl scale</code> is a manual replica-count change. HPA is an automated metrics-driven control loop.</p>
+<p><strong>“Cluster Autoscaler scales pods”</strong></p>
+<p>No. It scales nodes.</p>
+<p><strong>“KEDA replaces HPA”</strong></p>
+<p>No. KEDA extends autoscaling by feeding event-driven signals into the HPA mechanism.</p>
+<hr>
+<h2>Scaling is also a cost story</h2>
+<p>Autoscaling is not only about elasticity. It is also a billing story.</p>
+<ul>
+<li>HPA affects application responsiveness and pod density</li>
+<li>Cluster Autoscaler affects VM count directly</li>
+<li>KEDA can save substantial money on event-driven workloads by allowing scale-to-zero</li>
+</ul>
+<p>That is why a good scaling design starts with signal selection, not with “turn every autoscaler on.”</p>
+<hr>
+<h2>The metrics you usually want nearby</h2>
+<ul>
+<li>CPU and memory utilization</li>
+<li>pod Pending count</li>
+<li>node utilization</li>
+<li>HPA current vs desired replicas</li>
+<li>queue depth or lag</li>
+</ul>
+<p>Those signals live at different layers. Looking at CPU alone can hide a node-capacity problem. Looking at queue depth alone can hide a readiness or throughput problem.</p>
+<hr>
+<h2>What the next post adds</h2>
+<p>Once you have multiple scaling layers reacting to traffic and events, observability becomes the next requirement. You need to see whether HPA is working, whether nodes are saturating, whether restarts are climbing, and whether backlog is actually falling.</p>
+<p>That takes us to part 7: Container Insights, logs, kube-state-metrics, and alerts.</p>
+<hr>
+<p>This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the series focused on cluster shape, workload objects, and traffic flow. This post added the feedback loops that change capacity over time. Part 7 closes the series by showing how to observe and operate those loops in a real AKS environment.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en/01-what-is-aks.md">What is Azure Kubernetes Service? — what managed Kubernetes actually gives you</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en/02-cluster-architecture.md">Cluster architecture — control plane and node pools</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en/03-first-cluster-and-deploy.md">Your first cluster, your first deploy — Python/FastAPI</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en/04-pod-deployment-service.md">Pod, Deployment, Service — the three ways you express a workload</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en/05-networking-and-ingress.md">Networking and Ingress — the path in and out of the cluster</a></li>
+<li><strong>Scaling — HPA, Cluster Autoscaler, KEDA (current)</strong></li>
+<li>Monitoring and ops — Container Insights, logs, alerts (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/concepts-scale">Scaling options for applications in AKS</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/cluster-autoscaler">Cluster autoscaler on AKS</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/keda-about">Kubernetes Event-driven Autoscaling (KEDA)</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale#autoscale-pods">Autoscale pods in AKS</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/07-scaling-101.md">Azure App Service 101</a> — useful when comparing instance scaling with Kubernetes pod and node scaling<br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/06-scaling-and-cold-start.md">Azure Functions 101</a> — useful when comparing orchestrated scaling with serverless scaling</p>
+</body>
+</html>

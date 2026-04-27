@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Triggers and Bindings — Everything About Function I/O</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, Azure Functions, Serverless, Cloud -->
+</head>
+<body>
+<h1>Triggers and Bindings — Everything About Function I/O</h1>
+<blockquote>
+<p>Azure Functions 101 series (2/7)</p>
+</blockquote>
+<p>In part 1, I said “every function is wired to exactly one trigger,” and “bindings are a declarative way to connect inputs and outputs.” Those two sentences are why Functions code can be so short. But for newcomers, the line between “what’s a trigger,” “what’s a binding,” and “where exactly does the magic start and end” tends to stay blurry.</p>
+<p>This post draws that line clearly. We’ll cover the main trigger types, the difference between input and output bindings, and what bindings really are once you strip away the “magic.” By the end, picking a trigger for a new function should feel mechanical.</p>
+<hr>
+<h2>A trigger is the “cause” that wakes a function up</h2>
+<p>Let’s nail the definition first. <strong>A trigger is the external event that causes a function to run.</strong> An incoming HTTP request, a message landing in a queue, a file being uploaded to Blob storage, the top of every hour — those are all triggers.</p>
+<p>The rules are simple:</p>
+<ul>
+<li>A function has <strong>exactly one trigger</strong>.</li>
+<li>A trigger both wakes the function and <strong>decides the function’s input payload</strong>. With an HTTP trigger you get the request object; with a Queue trigger you get the message body; with a Timer trigger you get schedule info.</li>
+</ul>
+<p>The point worth holding onto: a trigger decides both <em>when</em> and <em>with what</em>. Visually:</p>
+<h2><img alt="A trigger is the “cause” that wakes a function up" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png"></h2>
+<h2>Trigger catalog — the ones you’ll actually use</h2>
+<p>The full list is in the official docs, but in practice 90%+ of real-world work falls into the table below.</p>
+<ul>
+<li><strong>Category</strong>: <strong>HTTP / Webhook</strong> / <strong>Trigger</strong>: HTTP, Event Grid / <strong>Typical use case</strong>: REST APIs, receiving webhooks from external SaaS</li>
+<li><strong>Category</strong>: <strong>Schedule</strong> / <strong>Trigger</strong>: Timer / <strong>Typical use case</strong>: Settlement batches, periodic cleanup jobs</li>
+<li><strong>Category</strong>: <strong>Storage</strong> / <strong>Trigger</strong>: Blob, Queue / <strong>Typical use case</strong>: Post-processing uploaded files, async work queues</li>
+<li><strong>Category</strong>: <strong>Messaging</strong> / <strong>Trigger</strong>: Service Bus, Event Hub, Kafka / <strong>Typical use case</strong>: Async messaging between microservices, telemetry ingestion</li>
+<li><strong>Category</strong>: <strong>Database</strong> / <strong>Trigger</strong>: Cosmos DB Change Feed, SQL / <strong>Typical use case</strong>: Reacting to data changes (CDC pattern)</li>
+</ul>
+<p>When you design a new function, the question is always the same: <strong>“What should cause this function to wake up?”</strong> The answer is your trigger.</p>
+<h2><img alt="Trigger catalog — the ones you’ll actually use" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-101/02/02-02-trigger-catalog-the-ones-youll-actually.en.png"></h2>
+<h2>Bindings = a declarative wire for function I/O</h2>
+<p>This is where Functions really shines. In a regular web app, “save to Cosmos DB” usually means: instantiate a client, attach credentials, grab a container handle, call <code>upsert</code>, handle errors. The boilerplate ends up longer than the actual function body.</p>
+<p>Bindings collapse all of that into a declaration that says “send this function’s output to this Cosmos DB container.” In the Azure Functions Python v2 model, it looks like this:</p>
+<pre><code class="language-python">import json
+import azure.functions as func
+
+app = func.FunctionApp()
+
+@app.function_name(name=&quot;process_order&quot;)
+@app.queue_trigger(arg_name=&quot;msg&quot;, queue_name=&quot;orders-incoming&quot;, connection=&quot;StorageConnection&quot;)
+@app.cosmos_db_output(
+    arg_name=&quot;invoice_out&quot;,
+    database_name=&quot;orders&quot;,
+    container_name=&quot;invoices&quot;,
+    connection=&quot;CosmosConnection&quot;,
+)
+def process_order(msg: func.QueueMessage, invoice_out: func.Out[func.Document]) -&gt; None:
+    queue_item = msg.get_json()
+    invoice = build_invoice(queue_item)  # your business logic
+    invoice_out.set(func.Document.from_json(json.dumps(invoice)))
+</code></pre>
+<p>Plain English version of what this function does:</p>
+<blockquote>
+<p>“When a message arrives on the queue (<code>queue_trigger</code>), turn it into an invoice and write the result into the <code>invoices</code> container in Cosmos DB (<code>cosmos_db_output</code>).”</p>
+</blockquote>
+<p>The plumbing — connection management, auth, retries — is handled by <strong>the Functions Host on your behalf</strong>. All you declared was <em>where it should go</em>.</p>
+<hr>
+<h2>Input bindings vs. output bindings</h2>
+<p>Bindings split into two directions:</p>
+<ul>
+<li><strong>Input binding</strong> — reads external data at execution time and hands it to the function</li>
+<li><strong>Output binding</strong> — takes what the function returns and sends it outward</li>
+</ul>
+<p>One common misconception worth clearing up: <strong>a trigger is not the same as an input binding.</strong></p>
+<ul>
+<li><strong>Trigger</strong> = “the event that wakes the function + the payload of that event”</li>
+<li><strong>Input binding</strong> = “additional external data the function reads after it’s already awake”</li>
+</ul>
+<p>For example, you might have a function that says: “When an HTTP request comes in (trigger), look up the user record in Cosmos DB by <code>user_id</code> from the request (input binding), then respond.” Trigger is HTTP; input binding is Cosmos DB.</p>
+<p>The three pieces in one diagram:</p>
+<p><img alt="Input bindings vs. output bindings" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-101/02/02-03-input-bindings-vs-output-bindings.en.png"><br>
+The function sits in the middle, and it talks to the outside world through three lanes: trigger, input, output. <strong>Bindings are simply the declarative expression of those three lanes.</strong></p>
+<hr>
+<h2>Why bindings look like “magic” — and what they actually are</h2>
+<p>“There’s no DB client anywhere — how does it save?” It feels uncanny at first, but there’s no actual magic underneath.</p>
+<p>Each binding ships with an <strong>extension</strong> package. The Cosmos DB output binding, for example, lives in <code>Microsoft.Azure.WebJobs.Extensions.CosmosDB</code>. The extension does three things:</p>
+<ol>
+<li>At function registration time, it tells the Host “this function’s output goes to Cosmos DB.”</li>
+<li>Right after the function runs, when the Host signals “the function returned something,” the extension’s handler is invoked.</li>
+<li>The handler instantiates the actual Cosmos DB client and writes the data.</li>
+</ol>
+<p>In other words, <strong>the extension already wrote the code you would have written</strong>. It’s not magic — it’s delegation. So keep two things in mind:</p>
+<ul>
+<li>What bindings handle automatically: connection, auth, serialization, basic retries.</li>
+<li>What bindings <em>don’t</em> handle automatically: business validation, partial-failure policy, transaction boundaries.</li>
+</ul>
+<p>When you need complex transactions or careful error handling, sometimes it’s better to skip the output binding and use a client directly. The one-line trap to remember as a beginner: <strong>bindings reduce boilerplate; they don’t replace your domain logic.</strong></p>
+<hr>
+<h2>Five combinations you’ll see all the time</h2>
+<p>Keeping a small playbook of common trigger/binding combinations speeds up new function design.</p>
+<ul>
+<li><strong>Pattern</strong>: <strong>API + DB read</strong> / <strong>Trigger</strong>: HTTP / <strong>Input binding</strong>: Cosmos DB / <strong>Output binding</strong>: — / <strong>Common use case</strong>: Simple lookup API</li>
+<li><strong>Pattern</strong>: <strong>API + DB write</strong> / <strong>Trigger</strong>: HTTP / <strong>Input binding</strong>: — / <strong>Output binding</strong>: Cosmos DB / <strong>Common use case</strong>: Receiving and storing webhooks</li>
+<li><strong>Pattern</strong>: <strong>Queue → DB</strong> / <strong>Trigger</strong>: Queue / <strong>Input binding</strong>: — / <strong>Output binding</strong>: Cosmos DB / <strong>Common use case</strong>: Async order processing</li>
+<li><strong>Pattern</strong>: <strong>File → thumbnail</strong> / <strong>Trigger</strong>: Blob / <strong>Input binding</strong>: — / <strong>Output binding</strong>: Blob / <strong>Common use case</strong>: Image post-processing</li>
+<li><strong>Pattern</strong>: <strong>DB change → notify</strong> / <strong>Trigger</strong>: Cosmos Change Feed / <strong>Input binding</strong>: — / <strong>Output binding</strong>: Service Bus / <strong>Common use case</strong>: CDC-driven event publishing</li>
+</ul>
+<p>These five alone cover roughly 80% of the functions you’ll write while getting started.</p>
+<hr>
+<h2>Two pitfalls worth knowing up front</h2>
+<p><strong>1) An output binding failure can be tracked separately from the function’s success/failure.</strong><br>
+The function body can succeed while the output binding fails to write to the DB. In that case the function is logged as failed, and depending on the trigger’s retry policy it gets re-invoked. So you need to care about <strong>idempotency</strong>: processing the same message twice should produce the same result.</p>
+<p><strong>2) A binding’s <code>connection</code> is a <em>config key name</em>, not a literal connection string.</strong><br>
+When you write <code>connection: 'StorageConnection'</code>, it means “use the value of the <code>StorageConnection</code> environment variable as the connection string.” You don’t hardcode connection strings in code. In production this gets swapped out for Key Vault or Managed Identity (more in the operations posts starting from part 5).</p>
+<hr>
+<h2>Coming up next</h2>
+<p>So far we’ve covered the <em>outer interface</em> of a function: how triggers wake it up and how bindings declaratively handle I/O. Next time we go one layer deeper: <strong>“So who actually runs the function code, how, and inside which process?”</strong></p>
+<p>The answer is two words: <strong>Host and Worker</strong>. That’s where Functions’ support for Node.js, Python, Java, and .NET starts to make sense.</p>
+<hr>
+<p>This is part 2 of the Azure Functions 101 series. Part 1 established the mental model; this post defines the trigger and binding surface you work with every day. Part 3 then moves under the covers and explains the Host/Worker execution model.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><strong>Triggers and Bindings — Everything About Function I/O (current)</strong></li>
+<li>Host and Worker — Who Actually Runs Your Functions? (upcoming)</li>
+<li>Deploy a Function App — From Localhost to Azure (upcoming)</li>
+<li>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
+<li>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
+<li>Monitoring and Operations Fundamentals (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings">Azure Functions triggers and bindings concepts</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-example">Trigger and binding examples</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-register">Register Azure Functions binding extensions</a></p>
+<p><strong>Source Code</strong><br>
+- <a href="https://github.com/Azure/azure-functions-host"><code>Azure/azure-functions-host</code></a><br>
+- <a href="https://github.com/Azure/azure-webjobs-sdk-extensions"><code>Azure/azure-webjobs-sdk-extensions</code></a> — home of binding extensions</p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en">Azure Functions Deep Dive</a> — for the code-level view of how the Host and binding extensions behave</p>
+</body>
+</html>

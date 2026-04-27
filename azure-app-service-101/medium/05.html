@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mastering Configuration: App Settings &amp; Environment Variables</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, App Service, Cloud, Web Apps -->
+</head>
+<body>
+<h1>Mastering Configuration: App Settings &amp; Environment Variables</h1>
+<p>Your app is deployed. Now, <strong>how do you manage environment-specific settings?</strong></p>
+<p>Different environments need different connection strings, API keys, and log levels. This post shows how to manage those settings without turning deployment into guesswork.</p>
+<hr>
+<h2>Why Configuration Matters</h2>
+<p><strong>The Twelve-Factor App Principle</strong></p>
+<blockquote>
+<p>"Separate configuration from code"</p>
+</blockquote>
+<ul>
+<li>Settings hardcoded in code</li>
+<li>Different code branches per environment</li>
+<li>Settings injected via environment variables</li>
+<li>Same code, different settings</li>
+</ul>
+<p><strong>App Service's Approach</strong></p>
+<p>App Service injects environment variables through <strong>App Settings</strong>:</p>
+<p><img alt="Configuration resolution flow" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/05/configuration-flow.en.png"></p>
+<pre><code>[Azure Portal/CLI] → App Settings → [Environment Variables] → [App Process]
+</code></pre>
+<hr>
+<h2>App Settings Basics</h2>
+<p><strong>Setting App Settings</strong></p>
+<p><strong>Azure CLI:</strong></p>
+<pre><code class="language-bash">az webapp config appsettings set \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings FLASK_ENV=production APP_ENV=production LOG_LEVEL=INFO
+</code></pre>
+<p><strong>Azure Portal:</strong><br>
+1. App Service → Configuration<br>
+2. Application settings tab<br>
+3. Click "+ New application setting"</p>
+<p><strong>Reading in Your App</strong></p>
+<pre><code class="language-python">import os
+
+# Access directly as environment variables
+FLASK_ENV = os.environ.get(&quot;FLASK_ENV&quot;, &quot;production&quot;)
+APP_ENV = os.environ.get(&quot;APP_ENV&quot;, &quot;production&quot;)
+LOG_LEVEL = os.environ.get(&quot;LOG_LEVEL&quot;, &quot;INFO&quot;)
+DB_HOST = os.environ.get(&quot;DB_HOST&quot;, &quot;localhost&quot;)
+</code></pre>
+<p><strong>Verify Current Settings</strong></p>
+<pre><code class="language-bash">az webapp config appsettings list \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output table
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre><code>Name Value
+----------------------------- -----------------
+FLASK_ENV production
+APP_ENV production
+LOG_LEVEL INFO
+SCM_DO_BUILD_DURING_DEPLOYMENT true
+</code></pre>
+<hr>
+<h2>Local vs Production Strategy</h2>
+<p><strong>Environment Separation Pattern</strong></p>
+<p><img alt="Per-environment configuration strategies" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/05/environment-strategy.en.png"></p>
+<pre><code class="language-python"># config.py
+import os
+
+class Config:
+ &quot;&quot;&quot;Base configuration&quot;&quot;&quot;
+ SECRET_KEY = os.environ.get(&quot;SECRET_KEY&quot;, &quot;dev-secret-key&quot;)
+ LOG_LEVEL = os.environ.get(&quot;LOG_LEVEL&quot;, &quot;INFO&quot;)
+
+class DevelopmentConfig(Config):
+ &quot;&quot;&quot;Local development&quot;&quot;&quot;
+ DEBUG = True
+ DATABASE_URL = os.environ.get(&quot;DATABASE_URL&quot;, &quot;sqlite:///dev.db&quot;)
+
+class ProductionConfig(Config):
+ &quot;&quot;&quot;Azure App Service&quot;&quot;&quot;
+ DEBUG = False
+ DATABASE_URL = os.environ.get(&quot;DATABASE_URL&quot;) # Required
+
+# Select based on environment
+config = {
+ &quot;development&quot;: DevelopmentConfig,
+ &quot;production&quot;: ProductionConfig,
+}
+
+def get_config():
+ env = os.environ.get(&quot;APP_ENV&quot;, &quot;development&quot;)
+ return config.get(env, DevelopmentConfig)
+</code></pre>
+<p><strong>Local Development: .env File</strong></p>
+<pre><code class="language-bash"># .env (local only, add to .gitignore!)
+FLASK_ENV=development
+APP_ENV=development
+LOG_LEVEL=DEBUG
+DATABASE_URL=postgresql://localhost:5432/myapp
+SECRET_KEY=local-dev-key
+</code></pre>
+<pre><code class="language-python"># Using python-dotenv
+from dotenv import load_dotenv
+load_dotenv() # Load .env file
+</code></pre>
+<pre><code class="language-bash">pip install python-dotenv
+</code></pre>
+<p><strong>.gitignore is required</strong></p>
+<pre><code class="language-gitignore"># .gitignore
+.env
+.env.local
+*.env
+</code></pre>
+<hr>
+<h2>Connection Strings</h2>
+<p>Database connection strings are managed in a separate section.</p>
+<p><strong>Setting Connection Strings</strong></p>
+<pre><code class="language-bash">az webapp config connection-string set \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --connection-string-type PostgreSQL \
+ --settings &quot;DATABASE=Server=myserver.postgres.database.azure.com;Database=mydb;...&quot;
+</code></pre>
+<p><strong>App Settings vs Connection Strings</strong></p>
+<ul>
+<li><strong>Item</strong>: Purpose / <strong>App Settings</strong>: General settings / <strong>Connection Strings</strong>: DB connections only</li>
+<li><strong>Item</strong>: Format / <strong>App Settings</strong>: <code>KEY=VALUE</code> / <strong>Connection Strings</strong>: Type can be specified</li>
+<li><strong>Item</strong>: App Access / <strong>App Settings</strong>: <code>os.environ["KEY"]</code> / <strong>Connection Strings</strong>: <code>os.environ["SQLAZURECONNSTR_NAME"]</code></li>
+</ul>
+<blockquote>
+<p><strong>Practical Tip:</strong> App Settings alone are sufficient for most cases.</p>
+</blockquote>
+<hr>
+<h2>Slot Settings (Sticky Settings)</h2>
+<p>When using Deployment Slots, some settings should be <strong>sticky to the slot</strong>.</p>
+<p><strong>When Slot Settings Are Needed</strong></p>
+<ul>
+<li><strong>Setting</strong>: <code>APP_ENV</code> / <strong>Sticky?</strong>: Yes / <strong>Reason</strong>: Staging is staging, production is production</li>
+<li><strong>Setting</strong>: <code>DATABASE_URL</code> / <strong>Sticky?</strong>: Yes / <strong>Reason</strong>: Different DB per environment</li>
+<li><strong>Setting</strong>: <code>LOG_LEVEL</code> / <strong>Sticky?</strong>: No / <strong>Reason</strong>: Usually the same</li>
+<li><strong>Setting</strong>: <code>FEATURE_FLAG_X</code> / <strong>Sticky?</strong>: Depends / <strong>Reason</strong>: Sticky when testing per slot</li>
+</ul>
+<p><img alt="Slot setting behavior during swap" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/05/slot-settings-behavior.en.png"></p>
+<p><strong>Configuring Slot Settings</strong></p>
+<pre><code class="language-bash">az webapp config appsettings set \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings APP_ENV=production \
+ --slot-settings APP_ENV
+</code></pre>
+<p><strong>Azure Portal:</strong><br>
+1. Configuration → Application settings<br>
+2. Check "Deployment slot setting" checkbox next to setting</p>
+<hr>
+<h2>Key Vault References: Secrets Done Right</h2>
+<p>Store sensitive values like passwords and API keys in <strong>Key Vault</strong> and reference them.</p>
+<p><img alt="Key Vault Reference resolution flow" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-101/05/key-vault-reference-flow.en.png"></p>
+<p><strong>Why Key Vault?</strong></p>
+<ul>
+<li><strong>Direct App Settings</strong>: Values visible in Portal / <strong>Key Vault Reference</strong>: Values hidden</li>
+<li><strong>Direct App Settings</strong>: No version control / <strong>Key Vault Reference</strong>: Automatic versioning</li>
+<li><strong>Direct App Settings</strong>: No audit logs / <strong>Key Vault Reference</strong>: Access audit logs</li>
+<li><strong>Direct App Settings</strong>: Hard to share / <strong>Key Vault Reference</strong>: Reference from multiple apps</li>
+</ul>
+<p><strong>Step 1: Create Key Vault</strong></p>
+<pre><code class="language-bash">KEYVAULT_NAME=&quot;kv-myapp-$(openssl rand -hex 4)&quot;
+
+az keyvault create \
+ --resource-group $RG \
+ --name $KEYVAULT_NAME \
+ --location $LOCATION
+</code></pre>
+<p><strong>Step 2: Store Secret</strong></p>
+<pre><code class="language-bash">az keyvault secret set \
+ --vault-name $KEYVAULT_NAME \
+ --name &quot;DbPassword&quot; \
+ --value &quot;super-secret-password&quot;
+</code></pre>
+<p><strong>Step 3: Enable Managed Identity</strong></p>
+<pre><code class="language-bash">az webapp identity assign \
+ --resource-group $RG \
+ --name $APP_NAME
+</code></pre>
+<p><strong>Step 4: Grant Key Vault Access (RBAC)</strong></p>
+<pre><code class="language-bash">PRINCIPAL_ID=$(az webapp identity show \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query principalId \
+ --output tsv)
+
+KEYVAULT_ID=$(az keyvault show \
+ --name $KEYVAULT_NAME \
+ --query id \
+ --output tsv)
+
+az role assignment create \
+ --role &quot;Key Vault Secrets User&quot; \
+ --assignee $PRINCIPAL_ID \
+ --scope $KEYVAULT_ID
+</code></pre>
+<p><strong>Step 5: Configure Key Vault Reference</strong></p>
+<pre><code class="language-bash">az webapp config appsettings set \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings &quot;DB_PASSWORD=@Microsoft.KeyVault(SecretUri=https://$KEYVAULT_NAME.vault.azure.net/secrets/DbPassword/)&quot;
+</code></pre>
+<p><strong>Using in Your App</strong></p>
+<pre><code class="language-python"># Key Vault Reference accessed like regular environment variable
+DB_PASSWORD = os.environ.get(&quot;DB_PASSWORD&quot;)
+# Value automatically injected!
+</code></pre>
+<hr>
+<h2>Impact of Configuration Changes</h2>
+<p><strong>Configuration changes are runtime events</strong></p>
+<p>Changing App Settings <strong>restarts your app</strong>.</p>
+<p><strong>Impact:</strong><br>
+- In-flight requests may be interrupted<br>
+- Cold start occurs<br>
+- Cache cleared</p>
+<p><strong>Minimizing Change Impact</strong></p>
+<ol>
+<li><strong>Batch Updates</strong>: Change multiple settings at once</li>
+<li><strong>Deployment Slots</strong>: Test in staging first</li>
+<li><strong>Maintenance Window</strong>: Change during low traffic</li>
+</ol>
+<pre><code class="language-bash"># Change multiple settings at once (single restart)
+az webapp config appsettings set \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings KEY1=value1 KEY2=value2 KEY3=value3
+</code></pre>
+<hr>
+<h2>Verifying Configuration</h2>
+<p><strong>Check Current Settings</strong></p>
+<pre><code class="language-bash"># List all settings
+az webapp config appsettings list \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output json
+
+# Check specific setting
+az webapp config appsettings list \
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query &quot;[?name=='LOG_LEVEL']&quot;
+</code></pre>
+<p><strong>Verify Inside App (Debugging)</strong></p>
+<pre><code class="language-python">@app.route('/debug/config')
+def debug_config():
+ # Disable in production!
+ if os.environ.get(&quot;APP_ENV&quot;) != &quot;development&quot;:
+ return {&quot;error&quot;: &quot;Not allowed&quot;}, 403
+
+ return {
+ &quot;APP_ENV&quot;: os.environ.get(&quot;APP_ENV&quot;),
+ &quot;LOG_LEVEL&quot;: os.environ.get(&quot;LOG_LEVEL&quot;),
+ # Mask sensitive values
+ &quot;DB_PASSWORD&quot;: &quot;***&quot; if os.environ.get(&quot;DB_PASSWORD&quot;) else None
+ }
+</code></pre>
+<hr>
+<h2>Best Practices Checklist</h2>
+<p><strong>DO</strong></p>
+<ul>
+<li>[ ] Store sensitive values in Key Vault</li>
+<li>[ ] Use Slot Settings for environment-specific config</li>
+<li>[ ] Add .env files to .gitignore</li>
+<li>[ ] Batch configuration changes</li>
+<li>[ ] Validate required settings at app startup</li>
+</ul>
+<p><strong>DON'T</strong></p>
+<ul>
+<li>[ ] Hardcode secrets in code</li>
+<li>[ ] Commit .env files to Git</li>
+<li>[ ] Expose debug endpoints in production</li>
+<li>[ ] Change settings one at a time</li>
+</ul>
+<hr>
+<h2>Summary</h2>
+<p>Configuration management essentials:</p>
+<ul>
+<li><strong>App Settings</strong>: Injected as environment variables, restart on change</li>
+<li><strong>Environment Separation</strong>: .env (local) + App Settings (Azure)</li>
+<li><strong>Slot Settings</strong>: Settings that must be sticky per environment</li>
+<li><strong>Key Vault</strong>: Sensitive values must go here</li>
+</ul>
+<p>In the next post, we'll cover <strong>Logging and Monitoring</strong> - how to observe app state and diagnose issues.</p>
+<hr>
+<h2>Series Index</h2>
+<ol>
+<li>What is Azure App Service? - Understanding the Platform Architecture</li>
+<li>Request Lifecycle: How Requests Reach Your App</li>
+<li>Hosting Models: Which Plan Should You Choose?</li>
+<li>First Deployment: From Local to Azure (Python/Flask)</li>
+<li><strong>[Current] Mastering Configuration: App Settings &amp; Environment Variables</strong></li>
+<li>Logging and Monitoring Basics</li>
+<li>Scaling 101: When to Scale Up vs Scale Out?</li>
+</ol>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/01-what-is-app-service.md">What is Azure App Service? - Understanding the Platform Architecture</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/02-request-lifecycle.md">Request Lifecycle: How Requests Reach Your App</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/03-hosting-models.md">Hosting Models: Which Plan Should You Choose?</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/04-first-deploy.md">First Deployment: From Local to Azure (Python/Flask)</a></li>
+<li><strong>Mastering Configuration: App Settings &amp; Environment Variables (current)</strong></li>
+<li>Logging and Monitoring Basics (upcoming)</li>
+<li>Scaling 101: When to Scale Up vs Scale Out? (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/azure/app-service/configure-common">Configure an App Service app (Microsoft Learn)</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/app-service-key-vault-references">Use Key Vault references (Microsoft Learn)</a><br>
+- <a href="https://12factor.net/config">The Twelve-Factor App - Config</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en">Azure Functions 101</a></p>
+<hr>
+<p><strong>Tags:</strong> <code>Azure</code> <code>App Service</code> <code>Configuration</code> <code>Security</code> <code>DevOps</code></p>
+</body>
+</html>

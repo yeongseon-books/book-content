@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KEDA internals — how a ScaledObject builds an HPA</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: AKS, Kubernetes, Distributed Systems, Containers -->
+</head>
+<body>
+<h1>KEDA internals — how a ScaledObject builds an HPA</h1>
+<blockquote>
+<p>Azure Kubernetes Service Deep Dive series (6/6)</p>
+</blockquote>
+<p>KEDA does not replace HPA.<br>
+It watches ScaledObjects,<br>
+creates HPAs,<br>
+feeds the external metrics path,<br>
+and directly handles the scale-to-zero boundary by writing replica counts itself.</p>
+<hr>
+<h2>The KEDA structure</h2>
+<h2><img alt="The KEDA structure" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png"></h2>
+<h2>ScaledObjectReconciler and the generated HPA</h2>
+<p><code>scaledobject_controller.go</code> checks that the target exposes <code>/scale</code>,<br>
+ensures the right label exists,<br>
+and creates or updates the HPA.<br>
+A ScaledObject is the declaration.<br>
+The concrete autoscaling artifact inside Kubernetes remains an HPA.</p>
+<hr>
+<h2>The external metrics path</h2>
+<p><code>api_service.yaml</code> registers <code>v1beta1.external.metrics.k8s.io</code>.<br>
+<code>provider.go</code> shows the adapter reading the <code>scaledobject.keda.sh/name</code> selector and querying the metrics service over gRPC.</p>
+<h2><img alt="The external metrics path" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-deep-dive/06/06-02-the-external-metrics-path.en.png"></h2>
+<h2>The scale-to-zero boundary</h2>
+<p><code>scale_scaledobjects.go</code> has separate <code>scaleToZeroOrIdle()</code> and <code>scaleFromZeroOrIdle()</code> paths.<br>
+That exists because HPA does not naturally control the below-<code>minReplicas</code> boundary.<br>
+KEDA directly updates <code>/scale</code> for the 0↔1 region,<br>
+while the generated HPA controls the 1↔N region.</p>
+<h2><img alt="The scale-to-zero boundary" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.en.png"></h2>
+<h2>The point of this episode</h2>
+<blockquote>
+<p>KEDA does not replace HPA. The Operator watches ScaledObjects and creates HPAs, the Metrics Adapter provides <code>external.metrics.k8s.io</code>, and HPA uses those metrics for autoscaling above one replica. The scale-to-zero boundary is handled directly by KEDA, which writes <code>replicas: 0</code> itself when triggers are inactive long enough.</p>
+</blockquote>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>This is the final part of the Azure Kubernetes Service Deep Dive series.<br>
+Because part 5 separated HPA from Cluster Autoscaler first, this episode can place KEDA more precisely: above HPA, not instead of it.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Control plane anatomy — what AKS hides from you</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">kubelet and containerd — how a container actually starts on a node</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/03-cni-and-azure-cni-overlay.md">CNI and Azure CNI Overlay — where Pod IPs come from</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/04-scheduler-and-pod-placement.md">Scheduler and Pod placement — who decides which node</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-deep-dive/en/05-hpa-and-cluster-autoscaler-internals.md">HPA and Cluster Autoscaler internals — two control loops</a></li>
+<li><strong>KEDA internals — how a ScaledObject builds an HPA (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Primary sources</strong><br>
+- <a href="https://github.com/kedacore/keda/blob/v2.14.0/controllers/keda/scaledobject_controller.go"><code>scaledobject_controller.go</code> @ <code>v2.14.0</code></a><br>
+- <a href="https://github.com/kedacore/keda/blob/v2.14.0/pkg/provider/provider.go"><code>provider.go</code> @ <code>v2.14.0</code></a><br>
+- <a href="https://github.com/kedacore/keda/blob/v2.14.0/pkg/scaling/executor/scale_scaledobjects.go"><code>scale_scaledobjects.go</code> @ <code>v2.14.0</code></a><br>
+- <a href="https://github.com/kedacore/keda/blob/v2.14.0/config/metrics-server/api_service.yaml"><code>api_service.yaml</code> @ <code>v2.14.0</code></a></p>
+<p><strong>Secondary sources</strong><br>
+- <a href="https://keda.sh/docs/2.14/concepts/scaling-deployments/">KEDA scaling deployments and custom resources</a><br>
+- <a href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/">Horizontal Pod Autoscaling</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-aks-101/en">Azure AKS 101</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/05-scaling-internals.md">Azure Functions Deep Dive part 5 — reading control loops</a></p>
+</body>
+</html>

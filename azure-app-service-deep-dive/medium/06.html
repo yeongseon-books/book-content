@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cold start and warmup — why the first request is expensive</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, App Service, Distributed Systems, Platform Engineering -->
+</head>
+<body>
+<h1>Cold start and warmup — why the first request is expensive</h1>
+<blockquote>
+<p>Azure App Service Deep Dive series (6/6)</p>
+</blockquote>
+<p>The last question in this series is the most visible one.</p>
+<p><strong>Why is the first request so expensive,<br>
+and how does App Service try to reduce that cost?</strong></p>
+<p>Cold start is not a vague symptom.<br>
+It means there is no warm execution unit ready yet,<br>
+or the new process or container has not finished becoming traffic-eligible.</p>
+<hr>
+<h2>The cold path and the warm path</h2>
+<p><img alt="The cold path and the warm path" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png"><br>
+That one diagram is the whole story.<br>
+The cost the user feels on the first request is usually the cost of turning an execution unit from “not ready” into “ready.”</p>
+<hr>
+<h2>Are warm-up signals the same on Windows and Linux?</h2>
+<p>No.<br>
+The goal is the same.<br>
+The mechanisms are not.</p>
+<p><strong>Windows code apps</strong></p>
+<ul>
+<li>IIS <code>applicationInitialization</code> is available</li>
+<li>Always On reduces idle unload behavior</li>
+</ul>
+<p><strong>Linux apps</strong></p>
+<ul>
+<li>the platform can repeatedly call <code>WEBSITE_WARMUP_PATH</code></li>
+<li>startup timeout is shaped by <code>WEBSITES_CONTAINER_START_TIME_LIMIT</code></li>
+</ul>
+<p><img alt="Linux apps" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png"><br>
+You need that split in your head before you design a warm-up strategy.</p>
+<hr>
+<h2>What Always On really does</h2>
+<p>Microsoft documentation and the App Service team blog describe Always On in similar terms.<br>
+It reduces idle cooling by periodically pinging the app.</p>
+<p>Operationally,<br>
+that means:</p>
+<ul>
+<li>the app is less likely to fall into an idle cold path</li>
+<li>app-pool unload or equivalent idle behavior becomes less visible</li>
+<li>worst-case first-request latency often improves</li>
+</ul>
+<p><img alt="What Always On really does" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png"><br>
+Always On does not erase all startup cost.<br>
+Redeployments,<br>
+restarts,<br>
+new scale-out workers,<br>
+and container recycles can still require explicit warm-up logic.</p>
+<hr>
+<h2>When Windows needs <code>applicationInitialization</code></h2>
+<p>Sometimes hitting the root URL is not enough to fully prepare the app.<br>
+Examples include:</p>
+<ul>
+<li>opening the first database pool</li>
+<li>priming a large cache</li>
+<li>template compilation</li>
+<li>JIT or other expensive startup paths</li>
+</ul>
+<p>That is where IIS <code>applicationInitialization</code> matters.</p>
+<p><img alt="When Windows needs applicationInitialization" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png"><br>
+Endpoint design matters here.<br>
+Return success too early and incomplete instances start receiving traffic.<br>
+Make the endpoint too heavy and warm-up itself becomes a bottleneck.</p>
+<hr>
+<h2>Linux warm-up path and startup timeout</h2>
+<p>The App Service app-settings reference gives the critical Linux startup contract.</p>
+<ul>
+<li>the platform can repeatedly hit <code>WEBSITE_WARMUP_PATH</code></li>
+<li>without <code>WEBSITE_WARMUP_STATUSES</code>, almost any response can count as readiness</li>
+<li><code>WEBSITE_WARMUP_STATUSES</code> can narrow accepted status codes</li>
+<li><code>WEBSITES_CONTAINER_START_TIME_LIMIT</code> bounds how long the platform waits</li>
+</ul>
+<p><img alt="Linux warm-up path and startup timeout" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png"><br>
+That model creates two very common Linux mistakes.</p>
+<ol>
+<li>the app is not ready, but a permissive response still gets treated as readiness</li>
+<li>the startup limit is too short, so the app loops through startup failures</li>
+</ol>
+<hr>
+<h2>What makes cold start expensive</h2>
+<p>The first-request cost is usually a stack of smaller costs.</p>
+<ul>
+<li>worker or container allocation</li>
+<li>process startup</li>
+<li>framework bootstrap</li>
+<li>dependency connection warm-up</li>
+<li>cache, module import, or JIT work</li>
+<li>health and warm-up eligibility gates</li>
+</ul>
+<p><img alt="What makes cold start expensive" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png"><br>
+That is why cold-start reduction is rarely a single magic setting.<br>
+It is an app-platform contract problem.</p>
+<hr>
+<h2>What a good warm-up endpoint looks like</h2>
+<p>A warm-up endpoint overlaps with a health endpoint,<br>
+but the purpose is not identical.<br>
+Its job is to say whether the app is truly ready to enter traffic.</p>
+<p>A good warm-up endpoint usually has these properties.</p>
+<ul>
+<li>the platform can call it without authentication friction</li>
+<li>it includes the critical dependency readiness checks</li>
+<li>it does not return success before startup is actually complete</li>
+<li>it avoids repeating unnecessarily heavy work</li>
+</ul>
+<p>If that endpoint is inaccurate,<br>
+you usually get one of two bad outcomes.</p>
+<ul>
+<li>success returns too early and incomplete workers receive traffic</li>
+<li>success returns too late and scale-out or slot swap slows down badly</li>
+</ul>
+<hr>
+<h2>Why deployment slots help so much</h2>
+<p>Slots let the platform pay the cold-start cost off the production URL.</p>
+<p><img alt="Why deployment slots help so much" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png"><br>
+That is the value proposition in one line.<br>
+If staging workers have already booted and passed warm-up,<br>
+production users are much less likely to experience that startup cost directly.</p>
+<p>This is why episode 4 and episode 6 are really two halves of the same story.</p>
+<hr>
+<h2>Always On, warm-up, and health are not the same thing</h2>
+<p>These three features do related work.<br>
+They do not do the same work.</p>
+<ul>
+<li><strong>Always On</strong>: reduce idle coldness</li>
+<li><strong>warm-up path</strong>: decide readiness during startup</li>
+<li><strong>health check</strong>: decide whether the instance should keep receiving traffic</li>
+</ul>
+<p><img alt="Always On, warm-up, and health are not the same thing" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png"><br>
+If you blur them together,<br>
+the settings may be enabled while the behavior still looks wrong.<br>
+That is where questions like “Always On is enabled, so why is deployment still slow?” come from.</p>
+<hr>
+<h2>Episode 6 wrap</h2>
+<p>Compressed into one paragraph,<br>
+the core point is this.</p>
+<blockquote>
+<p>In App Service, cold start is the cost of serving a request before a warm worker is already ready, or before a new process or container has finished its readiness path. On Windows, <code>applicationInitialization</code> and Always On are the key tools. On Linux, <code>WEBSITE_WARMUP_PATH</code>, <code>WEBSITE_WARMUP_STATUSES</code>, and <code>WEBSITES_CONTAINER_START_TIME_LIMIT</code> shape the startup contract. Always On reduces idle coldness, but startup readiness after deployment, restart, or scale-out still depends on explicit warm-up behavior.</p>
+</blockquote>
+<p>That closes the series.<br>
+At this point,<br>
+App Service should look less like “a place to push code” and more like a full platform where Front-End routing,<br>
+workers,<br>
+sandbox rules,<br>
+Kudu,<br>
+shared storage,<br>
+autoscale,<br>
+and warm-up all connect.</p>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>This final post explains the startup window that the earlier episodes kept pointing toward: the time between worker allocation and traffic eligibility.<br>
+Read back through the series and the whole model lines up: entry, routing, execution boundary, deployment, scaling, and warm-up are all parts of one App Service operating system.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/01-platform-architecture.md">App Service platform architecture — Front-End, Worker, File Server</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Front-End and ARR — how a request reaches a worker</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/03-worker-and-sandbox.md">Workers and the sandbox — where user code actually runs</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/04-deployment-and-kudu.md">Deployment and Kudu — build, sync, release from the inside</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/05-scaling-internals.md">Scaling internals — how Scale Out decisions become new workers</a></li>
+<li><strong>Cold start and warmup — why the first request is expensive (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Primary sources</strong><br>
+- <a href="https://github.com/microsoft/Oryx/blob/20240408.1/README.md">Oryx README @ 20240408.1</a></p>
+<p><strong>Secondary sources</strong><br>
+- <a href="https://learn.microsoft.com/azure/app-service/reference-app-settings">Environment variables and app settings reference</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/deploy-staging-slots">Deploy staging slots in Azure App Service</a><br>
+- <a href="https://learn.microsoft.com/iis/get-started/whats-new-in-iis-8/iis-80-application-initialization">IIS 8.0 Application Initialization</a><br>
+- <a href="https://azure.github.io/AppService/2020/05/15/Robust-Apps-for-the-cloud.html">Robust Apps for the Cloud — App Service team blog</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/02-request-lifecycle.md">Azure App Service 101 — Request Lifecycle</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/06-cold-start-placeholder.md">Azure Functions Deep Dive — Cold start and Placeholder Mode</a></p>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Workers and the sandbox — where user code actually runs</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, App Service, Distributed Systems, Platform Engineering -->
+</head>
+<body>
+<h1>Workers and the sandbox — where user code actually runs</h1>
+<blockquote>
+<p>Azure App Service Deep Dive series (3/6)</p>
+</blockquote>
+<p>Episode 2 stopped when the Front-End and ARR delivered a request to a worker.<br>
+This post asks the next question.</p>
+<p><strong>Inside that worker,<br>
+where does user code actually run,<br>
+what is allowed,<br>
+and what is blocked?</strong></p>
+<p>This matters less for theory than for failure analysis.<br>
+Deployment succeeds,<br>
+but one library fails.<br>
+Local IIS works,<br>
+but App Service does not.<br>
+Linux containers work,<br>
+but Windows code apps do not.<br>
+All of those symptoms start here.</p>
+<hr>
+<h2>The two worker models that matter</h2>
+<p><img alt="The two worker models that matter" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png"><br>
+“Worker” is one platform term.<br>
+The execution boundary under it differs by OS and hosting mode.</p>
+<ul>
+<li><strong>Windows code</strong>: the app runs under IIS and inside the App Service sandbox.</li>
+<li><strong>Linux built-in or custom container</strong>: the container is the core execution boundary.</li>
+</ul>
+<p>Both provide isolation.<br>
+They do not provide the same constraints.</p>
+<hr>
+<h2>Windows: <code>w3wp.exe</code> under the App Service sandbox</h2>
+<p>The Kudu sandbox wiki describes Windows App Service as running each app inside its own sandbox.<br>
+The key points are blunt.</p>
+<ul>
+<li>each app is isolated from others on the same machine</li>
+<li>the platform enforces limits for multi-tenancy</li>
+<li>those limits affect registry access, graphics APIs, and some networking behavior</li>
+</ul>
+<p>The public sandbox material is especially explicit about two constraints.</p>
+<ul>
+<li>registry writes are blocked</li>
+<li>most Win32k-based APIs,<br>
+  which means most User32/GDI32 calls,<br>
+  are heavily restricted</li>
+</ul>
+<p><img alt="Windows: w3wp.exe under the App Service sandbox" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png"><br>
+That single diagram explains the starting point for “why does this PDF or imaging library fail only on Windows App Service?”</p>
+<hr>
+<h2>Why GDI and the registry show up so often</h2>
+<p>The OS functionality article and the sandbox wiki line up on the same pattern.</p>
+<p><strong>Registry</strong></p>
+<p>Locally hosted server software often assumes it can write to the registry.<br>
+That assumption breaks in the Windows App Service sandbox.</p>
+<p><strong>GDI / User32</strong></p>
+<p>Most web workloads do not need the Windows UI subsystem.<br>
+But some PDF,<br>
+image,<br>
+font,<br>
+and browser-automation libraries still depend on it.</p>
+<p>That is why the same failure families keep repeating.</p>
+<ul>
+<li>HTML-to-PDF libraries fail</li>
+<li>custom font rendering behaves oddly</li>
+<li>Selenium or PhantomJS paths break</li>
+<li><code>System.Drawing</code>-based code fails</li>
+</ul>
+<p>This is not mysterious platform behavior.<br>
+It is the expected result of a sandbox that is intentionally narrowed for multi-tenant web workloads.</p>
+<hr>
+<h2>Linux: the container is the execution boundary</h2>
+<p>On Linux App Service,<br>
+the public model is much simpler.<br>
+The app runs in a container.</p>
+<p>Whether you use a built-in image or a custom image,<br>
+the operational boundary to care about is this one:</p>
+<ul>
+<li>the process is inside the container</li>
+<li>readiness affects when traffic starts</li>
+<li>persistent storage depends on <code>/home</code> mount behavior</li>
+</ul>
+<p><img alt="Linux: the container is the execution boundary" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png"><br>
+On Linux,<br>
+you should not talk about the exact same registry or GDI restrictions as Windows.<br>
+The public docs do not frame it that way.<br>
+The primary concerns are the container startup contract,<br>
+port binding,<br>
+storage mounting,<br>
+and startup time limits.</p>
+<hr>
+<h2>When <code>WEBSITES_ENABLE_APP_SERVICE_STORAGE</code> changes what a worker means</h2>
+<p>For Linux custom containers,<br>
+one setting changes the meaning of <code>/home</code> dramatically.</p>
+<ul>
+<li>with <code>true</code>, persistent shared storage is mounted</li>
+<li>with <code>false</code>, the filesystem behaves much closer to ephemeral container-local state</li>
+</ul>
+<p>That gives you two very different operational pictures.</p>
+<p><img alt="When WEBSITES_ENABLE_APP_SERVICE_STORAGE changes what a worker means" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png"><br>
+<img alt="When WEBSITES_ENABLE_APP_SERVICE_STORAGE changes what a worker means" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png"><br>
+If you miss this distinction,<br>
+you eventually see one of the usual surprises.</p>
+<ul>
+<li>uploaded files disappear after restart</li>
+<li>scale-out instances do not see expected content</li>
+<li>the SCM view of files and the app's view of files appear inconsistent</li>
+</ul>
+<hr>
+<h2>Process boundaries inside the worker</h2>
+<p>When debugging a worker issue,<br>
+ask “what boundary is my code inside?” before asking “what is wrong with my code?”</p>
+<p><strong>Windows code apps</strong></p>
+<ul>
+<li>IIS owns process lifecycle</li>
+<li>sandbox restrictions apply directly</li>
+<li>some OS-dependent libraries can fail by design</li>
+</ul>
+<p><strong>Linux apps</strong></p>
+<ul>
+<li>the container entrypoint and startup command own lifecycle</li>
+<li>readiness pings determine when organic traffic can enter</li>
+<li>port configuration and startup timeout are common failure causes</li>
+</ul>
+<p>That is why the same service name,<br>
+App Service,<br>
+still produces different first diagnostic questions depending on hosting mode.</p>
+<hr>
+<h2>The sandbox is a security feature and a fairness feature</h2>
+<p>It is easy to read “sandbox” as only a security concept.<br>
+That is only half right.</p>
+<p>In App Service,<br>
+the sandbox is also a quality-of-service mechanism.<br>
+Multiple customer apps share worker infrastructure.<br>
+The platform needs limits so that one app cannot consume or expose shared components in ways that harm others.</p>
+<p><img alt="The sandbox is a security feature and a fairness feature" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png"><br>
+That makes the restrictions easier to reason about.</p>
+<ul>
+<li>registry writes blocked</li>
+<li>graphics subsystem access narrowed</li>
+<li>some local communication patterns constrained</li>
+</ul>
+<p>These are not arbitrary inconveniences.<br>
+They are part of the contract that makes multi-tenant web hosting viable.</p>
+<hr>
+<h2>A cleaner classification for “works locally, fails in App Service”</h2>
+<p><strong>Windows-heavy failure pattern</strong></p>
+<ul>
+<li>libraries that assume COM or registry customization</li>
+<li>PDF and imaging libraries with GDI dependencies</li>
+<li>code that expects desktop fonts or desktop components</li>
+</ul>
+<p><strong>Linux-heavy failure pattern</strong></p>
+<ul>
+<li>port binding mismatch</li>
+<li>startup time limit exceeded</li>
+<li>misunderstanding <code>/home</code> persistence</li>
+<li>weak entrypoint or readiness design</li>
+</ul>
+<p>Make this split first,<br>
+and you can usually tell whether the failure is an app bug,<br>
+a worker contract mismatch,<br>
+or a sandbox limitation.</p>
+<hr>
+<h2>When to consider Windows containers or another hosting path</h2>
+<p>Some workloads simply do not fit the Windows code sandbox well.</p>
+<ul>
+<li>hard dependency on GDI calls</li>
+<li>mandatory registry or OS customization</li>
+<li>heavy install-time assumptions</li>
+</ul>
+<p>In those cases,<br>
+Windows containers,<br>
+or a different hosting model entirely,<br>
+may fit better.<br>
+The important move is not to keep guessing.<br>
+First check whether the limitation is already documented in the public App Service sandbox material.</p>
+<hr>
+<h2>Episode 3 wrap</h2>
+<p>The core idea here is that the worker is not an abstract instance count.<br>
+It is a real execution boundary.</p>
+<blockquote>
+<p>On Windows App Service, user code runs under IIS and inside the App Service sandbox, where registry writes and most User32/GDI32 calls are restricted. On Linux App Service, the core boundary is the container, and the dominant concerns are startup contract, readiness, and <code>/home</code> storage semantics. The same App Service label therefore leads to different first-principles debugging paths on Windows and Linux.</p>
+</blockquote>
+<p>Episode 4 now follows how code gets into that worker.<br>
+We will trace Kudu,<br>
+Oryx,<br>
+artifact placement,<br>
+and why run-from-package changes the meaning of <code>wwwroot</code>.</p>
+<hr>
+<h2>Where this fits in the series</h2>
+<p>Episode 2 delivered requests to the worker, and this post explained the execution boundary inside that worker.<br>
+The next post follows deployment into that boundary and connects Kudu, Oryx, build automation, and file placement under <code>/home/site/wwwroot</code>.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/01-platform-architecture.md">App Service platform architecture — Front-End, Worker, File Server</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Front-End and ARR — how a request reaches a worker</a></li>
+<li><strong>Workers and the sandbox — where user code actually runs (current)</strong></li>
+<li>Deployment and Kudu — build, sync, release from the inside (upcoming)</li>
+<li>Scaling internals — how Scale Out decisions become new workers (upcoming)</li>
+<li>Cold start and warmup — why the first request is expensive (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Primary sources</strong><br>
+- <a href="https://github.com/projectkudu/kudu/wiki/Azure-Web-App-sandbox/843a564005d4f1028c5e171cf37d35da731f0572">Azure Web App sandbox</a></p>
+<p><strong>Secondary sources</strong><br>
+- <a href="https://learn.microsoft.com/azure/app-service/operating-system-functionality">Operating system functionality in Azure App Service</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/configure-custom-container">Configure a custom container for Azure App Service</a><br>
+- <a href="https://learn.microsoft.com/azure/app-service/reference-app-settings">Environment variables and app settings reference</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-app-service-101/en/03-hosting-models.md">Azure App Service 101 — Hosting Models</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/02-worker-process.md">Azure Functions Deep Dive — Worker Process</a></p>
+</body>
+</html>

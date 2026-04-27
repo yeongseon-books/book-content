@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t</title>
+<!-- Paste the contents of <body> directly into the Medium editor. -->
+<!-- Tags: Azure, Azure Functions, Serverless, Cloud -->
+</head>
+<body>
+<h1>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t</h1>
+<blockquote>
+<p>Azure Functions 101 series (6/7)</p>
+</blockquote>
+<p>Serverless is usually sold with one sentence: it scales automatically, and you only pay for what you use. True, but incomplete. In production, that sentence only becomes useful once you ask what signals drive scale-out, how much concurrency a single instance can absorb, and why the first request after idle time is sometimes noticeably slower.</p>
+<p>This post revisits the hosting plans from part 5 from an operations angle. When traffic jumps abruptly, how do Consumption, Flex Consumption, Premium, and Dedicated react? Where does cold-start time actually go? And what should you change first if the first request is too slow?</p>
+<hr>
+<h2>Scaling Has Two Axes — Instance Count and In-Instance Concurrency</h2>
+<p>“Scaling” hides two different controls.</p>
+<ul>
+<li><strong>Horizontal scaling (scale out)</strong> — how many instances the app gets</li>
+<li><strong>In-instance concurrency</strong> — how many invocations one instance handles at the same time</li>
+</ul>
+<p><img alt="Scaling Has Two Axes — Instance Count and In-Instance Concurrency" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png"><br>
+Plans differ in who controls those axes and how exposed they are.</p>
+<ul>
+<li><strong>Plan</strong>: Consumption / <strong>Scale-out model</strong>: Platform-managed automatic scaling. Depending on the trigger/extension, the platform may use event-driven or target-based decisions / <strong>What actually distinguishes it</strong>: Instance count is abstracted away; concurrency is influenced mostly by runtime and trigger settings</li>
+<li><strong>Plan</strong>: Flex Consumption / <strong>Scale-out model</strong>: Same platform-managed autoscaling foundation, but adds <strong>per-function scale groups</strong> and <strong>configurable per-instance HTTP concurrency</strong> / <strong>What actually distinguishes it</strong>: The differentiator is not “target-based scaling exists,” but <strong>function-level isolation and concurrency control</strong></li>
+<li><strong>Plan</strong>: Premium / <strong>Scale-out model</strong>: Platform-managed automatic scaling with warm capacity available / <strong>What actually distinguishes it</strong>: Always Ready and prewarmed instances reduce startup latency</li>
+<li><strong>Plan</strong>: Dedicated (App Service Plan) / <strong>Scale-out model</strong>: Scale rules are user-defined through App Service autoscale, or managed manually / <strong>What actually distinguishes it</strong>: No scale-to-zero; reaction speed depends on the autoscale rules you configured</li>
+</ul>
+<p>So target-based scaling is not a Flex-only idea. It applies more broadly across supported triggers. What makes Flex stand out is per-function scaling behavior and the ability to tune HTTP concurrency per instance.</p>
+<hr>
+<h2>How the Plans React to a Traffic Spike</h2>
+<p>Differences are easier to see on a timeline. Assume the app is idle, then at t=0 an HTTP spike arrives.</p>
+<p><img alt="How the Plans React to a Traffic Spike" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-101/06/06-02-how-the-plans-react-to-a-traffic-spike.en.png"><br>
+Operationally, the differences are straightforward.</p>
+<ul>
+<li><strong>Consumption</strong>: scale to zero is normal, so cold starts are the easiest to observe.</li>
+<li><strong>Flex Consumption</strong>: Always Ready is optional and can be set to 0, so cold starts do not disappear by default. The big advantages are per-function scaling and HTTP concurrency control.</li>
+<li><strong>Premium</strong>: warm instances are part of the design, so first-request latency is easier to suppress.</li>
+<li><strong>Dedicated</strong>: there is no scale-to-zero cold start, but automatic reaction to a sudden spike depends on your App Service autoscale policy.</li>
+</ul>
+<p>The common mistake is assuming Flex is always warm. It isn’t. A Flex app with Always Ready set to 0 can still scale to zero and cold start on the next request.</p>
+<hr>
+<h2>What a Cold Start Actually Includes</h2>
+<p>Cold start is not just “the first request felt slow.” It is the total time needed for a fresh execution environment to become ready and serve the first invocation.</p>
+<blockquote>
+<p><strong>Cold start = the time to allocate a new instance, boot the host and worker, prepare the function, and run the first invocation</strong></p>
+</blockquote>
+<p>That usually looks like this:</p>
+<p><img alt="What a Cold Start Actually Includes" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-101/06/06-03-what-a-cold-start-actually-includes.en.png"><br>
+- <strong>Step</strong>: 1 / <strong>Typical source of latency</strong>: A new execution environment must be prepared / <strong>Typical mitigation</strong>: Warm capacity, Always Ready, platform optimizations<br>
+- <strong>Step</strong>: 2 / <strong>Typical source of latency</strong>: Host initialization / <strong>Typical mitigation</strong>: Usually not much to tune directly<br>
+- <strong>Step</strong>: 3 / <strong>Typical source of latency</strong>: Language worker startup cost / <strong>Typical mitigation</strong>: Language choice, runtime startup review<br>
+- <strong>Step</strong>: 4 / <strong>Typical source of latency</strong>: Application dependencies, imports, initialization logic / <strong>Typical mitigation</strong>: Dependency trimming, lazy import, lazy init<br>
+- <strong>Step</strong>: 5 / <strong>Typical source of latency</strong>: The first invocation itself is heavy / <strong>Typical mitigation</strong>: Cache priming, warmup trigger, lighter first request</p>
+<p>In practice, step 4 often dominates more than people expect. If imports pull in large SDKs, open connections, or load models during startup, the application is manufacturing its own cold-start pain before plan choice even enters the conversation.</p>
+<hr>
+<h2>What to Change First When Cold Starts Hurt</h2>
+<p><strong>1) Plan-level choices</strong></p>
+<ul>
+<li>If first-request latency is a hard business requirement, start with <strong>Premium</strong> or <strong>Flex Consumption plus Always Ready</strong>.</li>
+<li>If occasional startup latency is acceptable, plain Consumption or baseline Flex is often good enough.</li>
+</ul>
+<p><strong>2) Code-level choices</strong></p>
+<ul>
+<li><strong>Trim dependencies</strong> — don’t pull in a large package just to use one feature.</li>
+<li><strong>Delay expensive initialization</strong> — avoid opening DB connections, loading big files, or downloading metadata at import time.</li>
+<li><strong>Reuse process-local state carefully</strong> — cache clients that are safe to reuse across invocations in module scope.</li>
+</ul>
+<pre><code class="language-python">import azure.functions as func
+
+app = func.FunctionApp()
+_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        _client = create_cosmos_client()
+    return _client
+
+@app.function_name(name=&quot;hello&quot;)
+@app.route(route=&quot;hello&quot;)
+def hello(req: func.HttpRequest) -&gt; func.HttpResponse:
+    client = get_client()
+    return func.HttpResponse(&quot;ok&quot;)
+</code></pre>
+<p>The point is simple: pay the heavy initialization cost once per worker, not once per invocation.</p>
+<p><strong>3) Operations-level choices</strong></p>
+<ul>
+<li><strong>Warmup trigger</strong> — available on every plan except classic Consumption. Flex, Premium, and Dedicated can use it when new instances are added.</li>
+<li><strong>Always Ready instances</strong> — on Flex and Premium, this is the minimum warm baseline you keep online. At 0, scale-to-zero remains possible. At 1 or higher, first-request latency is easier to suppress.</li>
+</ul>
+<p>Warmup trigger and Always Ready solve different problems. Warmup trigger is a hook that runs when an instance is being brought online. Always Ready is a capacity setting that keeps warm instances around in the first place.</p>
+<hr>
+<h2>Concurrency Shapes Reliability and Cost</h2>
+<p>Automatic scale-out does not remove the need to think about concurrency.</p>
+<p><strong>1) Downstream systems do not scale with your function app</strong></p>
+<p>Database pools, external API rate limits, and Redis connection limits stay fixed unless you scale them too. A function app can scale out quickly and still bottleneck immediately on the systems behind it.</p>
+<p><img alt="1) Downstream systems do not scale with your function app" src="https://raw.githubusercontent.com/yeongseon/tech-blog/e8dca42/assets/azure-functions-101/06/06-04-1-downstream-systems-do-not-scale-with-y.en.png"><br>
+That is why operations work usually includes both of these:</p>
+<ul>
+<li>trigger-specific batch size, prefetch, and concurrency limits</li>
+<li>a queue in front of the downstream system so consumption rate matches downstream capacity</li>
+</ul>
+<p><strong>2) One instance can still execute many invocations concurrently</strong></p>
+<p>Depending on the runtime, trigger, and configuration, multiple invocations can overlap in the same instance and worker process. Module-level state therefore has to be safe for concurrent reuse.</p>
+<p>This is one reason Flex’s HTTP concurrency setting matters. It affects not only how many instances you get, but how hard each instance is driven before the platform decides to add more.</p>
+<hr>
+<h2>Scaling Is Also a Billing Model</h2>
+<p>Any scaling discussion that ignores cost is incomplete.</p>
+<ul>
+<li><strong>Consumption</strong>: billing tracks execution time, memory, and invocation count. No traffic means little or no cost.</li>
+<li><strong>Flex Consumption</strong>: similar serverless billing, plus the cost of Always Ready instances.</li>
+<li><strong>Premium</strong>: you start paying for the warm baseline even before traffic rises.</li>
+<li><strong>Dedicated</strong>: App Service Plan instances stay allocated, so the base cost is steady regardless of traffic.</li>
+</ul>
+<p>Operations is not only about how fast the platform can add instances. It is also about how far you are willing to let it go. Maximum instance limits and concurrency settings are cost controls as much as performance controls.</p>
+<hr>
+<h2>Hand-off to Part 7 and the Deep Dive Series</h2>
+<p>Scaling and cold starts only become manageable once you can observe them. Part 7 moves from behavior to visibility: Application Insights, metrics, KQL, alerts, instance count, and the clues that explain why latency or cost moved.</p>
+<p>If you want the implementation details behind those behaviors, pair this post with <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/05-scaling-internals.md">Deep Dive Part 5</a> and <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/06-cold-start-placeholder.md">Part 6</a>. The 101 series is about operational judgment; the deep-dive series shows how those behaviors are implemented in the host.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/04-first-deploy.md">Deploy a Function App — From Localhost to Azure</a></li>
+<li><a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/05-choosing-a-plan.md">Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</a></li>
+<li><strong>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (current)</strong></li>
+<li>Monitoring and Operations Fundamentals (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale">Azure Functions hosting options</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling">Event-driven scaling in Azure Functions</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling">Target-based scaling</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-warmup">Warmup trigger for Azure Functions</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/azure-functions/manage-connections">Manage connections in Azure Functions</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/05-choosing-a-plan.md">Azure Functions 101 Part 5 — Choosing a plan</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-101/en/07-monitoring-and-ops.md">Azure Functions 101 Part 7 — Monitoring and operations fundamentals</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/05-scaling-internals.md">Azure Functions Deep Dive Part 5 — Scaling internals</a><br>
+- <a href="https://github.com/yeongseon/tech-blog/blob/e8dca42/azure-functions-deep-dive/en/06-cold-start-placeholder.md">Azure Functions Deep Dive Part 6 — Cold starts and Placeholder Mode</a></p>
+</body>
+</html>
