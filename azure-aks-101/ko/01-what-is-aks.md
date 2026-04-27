@@ -1,4 +1,4 @@
-# Azure Kubernetes Service란? — 관리형 Kubernetes가 사용자에게 주는 것
+# Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
 
 > Azure Kubernetes Service 101 시리즈 (1/7)
 

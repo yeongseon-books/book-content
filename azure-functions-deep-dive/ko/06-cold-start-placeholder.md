@@ -253,7 +253,7 @@ public async Task SpecializeHostCoreAsync()
 
 [`StandbyManager.cs#L88-L137`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L88-L137)
 
-이 메서드 안에 콜드 스타트의 비밀이 다 있습니다. 단계별로 풀어 쓰겠습니다.
+콜드 스타트의 동작은 사실상 이 메서드에 다 들어 있습니다. 단계별로 풀어 쓰겠습니다.
 
 ### 1. Cold start tagging
 

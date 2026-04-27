@@ -148,7 +148,7 @@ def translate_ko_to_en(text):
 print(translate_ko_to_en("오늘 날씨가 정말 좋네요. 산책 가고 싶어요!"))
 ```
 
-여기서 핵심은 **system role**입니다. GPT에게 페르소나를 입혀서 대답의 톤과 매너를 결정할 수 있게 해줍니다. 단순한 질문보다 훨씬 전문적인 답변을 유도할 수 있는 아주 강력한 도구입니다.
+여기서 핵심은 **system role**입니다. GPT에게 페르소나를 입혀서 대답의 톤과 매너를 정해 둘 수 있습니다. 단순한 질문보다 훨씬 전문적인 답변을 유도할 수 있는 아주 강력한 도구입니다.
 
 ![번역기의 프롬프트 구성](../assets/ai-web-dev-101/01/translation-exercise-flow.ko.png)
 

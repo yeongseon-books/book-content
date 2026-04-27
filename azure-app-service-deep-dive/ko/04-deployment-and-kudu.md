@@ -182,7 +182,7 @@ flowchart LR
     SWAP --> PROD[Production traffic]
 ```
 
-핵심은 코드 배치보다 라우팅 전환입니다.
+바뀌는 것은 코드 배치가 아니라 라우팅입니다.
 새 코드가 staging slot worker에서 이미 올라와 있고,
 필요한 warm-up까지 끝난 뒤 production 트래픽이 넘어가므로,
 사용자가 cold start를 덜 보게 됩니다.

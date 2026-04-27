@@ -274,7 +274,7 @@ flowchart LR
     A --> B
 ```
 
-핵심은 cross-environment 우회가 가능한가가 아닙니다.
+중요한 건 cross-environment 우회가 가능한가가 아닙니다.
 제품이 어떤 trust / networking shape를 native로 간주하는가입니다.
 
 ---

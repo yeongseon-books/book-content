@@ -9,7 +9,7 @@
 AKS에서는 Linux 노드 기준으로 `containerd`가 기본 runtime이고,
 Docker는 여기서 주인공이 아닙니다.
 
-핵심은 이 경로입니다.
+실제 경로는 이렇게 흐릅니다.
 API server에서 PodSpec을 본 kubelet이,
 Unix socket으로 CRI를 호출하고,
 containerd가 sandbox와 container를 만들고,

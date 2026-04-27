@@ -232,7 +232,7 @@ az webapp config connection-string set \
 
 운영에서 가장 중요한 질문은 “값을 어떻게 읽느냐”보다 **“민감 정보를 어디에 저장하느냐”** 입니다.
 
-Key Vault Reference는 App Service가 Key Vault의 민감 정보 값을 참조해, 앱 입장에서는 일반 환경 변수처럼 사용할 수 있게 해 줍니다.
+Key Vault Reference를 쓰면 App Service가 Key Vault의 민감 정보 값을 대신 참조해 주고, 앱은 일반 환경 변수처럼 읽기만 하면 됩니다.
 
 ![Key Vault Reference 동작 흐름](../../assets/azure-app-service-101/05/key-vault-reference-flow.ko.png)
 
