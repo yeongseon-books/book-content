@@ -196,20 +196,24 @@ Azure를 쓴다면 'Cost Management' 메뉴에서 예산 알람(Budget Alert)을
 
 ---
 
-## 7. 시리즈 목차
+<!-- toc:begin -->
+## 시리즈 목차
 
-1. [AI API 첫 걸음: OpenAI API로 첫 번째 요청 보내기](01-hello-ai-api.md)
-2. [프롬프트 엔지니어링 101: AI와 대화하는 기술](02-prompt-engineering.md)
-3. [나만의 챗봇 만들기: 실시간 채팅 UI 구현](03-ai-chatbot.md)
-4. [RAG의 기초: 외부 데이터로 AI의 지식 확장하기](04-rag-intro.md)
-5. [AI 에이전트 이해하기: 스스로 행동하는 AI](05-ai-agent.md)
-6. **AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (현재 글)**
-7. [AI 앱의 평가와 개선: 품질을 측정하고 더 좋게 만드는 법](07-eval-improve.md)
+- [AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)
+- [프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술](./02-prompt-engineering.md)
+- [AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현](./03-ai-chatbot.md)
+- [RAG 입문 — 내 데이터로 답하는 AI 만들기](./04-rag-intro.md)
+- [AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기](./05-ai-agent.md)
+- **AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (현재 글)**
+- AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법 (예정)
 
-### 참고 자료
+<!-- toc:end -->
+
+---
+
+## 참고 자료
 - [Vercel 공식 문서](https://vercel.com/docs)
 - [Azure App Service Python 가이드](https://learn.microsoft.com/ko-kr/azure/app-service/quickstart-python)
 - [OpenAI API 보안 권장 사항](https://platform.openai.com/docs/guides/production-best-practices/safety-and-best-practices)
 
-**Tags:** `AI` `Deployment` `Vercel` `Azure` `DevOps` `Security` `Tutorial`
-
+Tags: AI, LLM, 웹 개발, Python, Tutorial

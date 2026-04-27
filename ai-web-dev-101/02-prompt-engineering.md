@@ -117,21 +117,24 @@ function login(user, pass) {
 
 ---
 
-### 시리즈 목차
+<!-- toc:begin -->
+## 시리즈 목차
 
-1. AI 웹 개발 입문 — LLM API와 첫 만남
-2. **프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술 (현재 글)**
-3. RAG(검색 증강 생성) 이해하기 — 우리 집 강아지 이름을 아는 AI
-4. LangChain으로 만드는 AI 워크플로우
-5. 실전! 뉴스 요약 서비스 개발하기
-6. Vector DB와 임베딩의 세계
-7. 나만의 AI 에이전트 배포하고 운영하기
+- [AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)
+- **프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술 (현재 글)**
+- AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현 (예정)
+- RAG 입문 — 내 데이터로 답하는 AI 만들기 (예정)
+- AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기 (예정)
+- AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (예정)
+- AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법 (예정)
+
+<!-- toc:end -->
 
 ---
 
-### 참고 자료
+## 참고 자료
 
 - [OpenAI Prompt Engineering Guide](https://platform.openai.com/docs/guides/prompt-engineering)
 - [PromptingGuide.ai (DeepLearning.AI)](https://www.promptingguide.ai/kr)
 
-**Tags:** `AI` `Prompt Engineering` `LLM` `OpenAI` `Python` `Tutorial`
+Tags: AI, LLM, 웹 개발, Python, Tutorial

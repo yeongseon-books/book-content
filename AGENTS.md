@@ -12,11 +12,15 @@ Eight Azure series (52 posts × 3 variants = 156 markdown files):
 - `azure-aks-101/`, `azure-aks-deep-dive/`
 - `azure-aca-101/`, `azure-aca-deep-dive/`
 
-Each series has three variants: `ko/`, `en/`, `medium/`.
+Each Azure series has three variants: `ko/`, `en/`, `medium/`.
 
 - `ko/<NN>-<slug>.md` — Tistory original (Korean)
 - `en/<NN>-<slug>.md` — Medium-bound English translation
 - `medium/<NN>.md` — Medium-ready conversion of `en/` (raw URLs, bullet tables, demoted headings)
+
+Plus one single-variant Korean series:
+
+- `ai-web-dev-101/` — 7 Korean-only posts published to Tistory. Flat layout, no `ko/`/`en/`/`medium/` subfolders. Same conventions apply (H1 → tag line at the bottom → series TOC above references), with TOC heading `## 시리즈 목차` and references heading `## 참고 자료`. Series tags: `AI, LLM, 웹 개발, Python, Tutorial` (defined in `.sisyphus/medium/finalize-ai-web-dev.py`).
 
 ## Post structure (mandatory order)
 
@@ -110,10 +114,11 @@ python3 .sisyphus/medium/finalize-posts.py    # re-apply tags+TOC to new medium/
 
 - `mermaid-to-png.py` — convert mermaid blocks in ko/en bodies to PNG references
 - `to-medium.py` — convert `en/*.md` to `medium/<NN>.md` (raw URLs, bullet tables, demoted headings)
-- `finalize-posts.py` — idempotent: tag line, ko refs heading, series TOC
+- `finalize-posts.py` — idempotent: tag line, ko refs heading, series TOC (Azure series, ko/en/medium variants)
+- `finalize-ai-web-dev.py` — idempotent: same operations adapted for the single-variant `ai-web-dev-101/` series
 - `add-tags.py` — superseded by `finalize-posts.py`; kept for reference
 
-All three are idempotent. Re-run any time the series catalog changes.
+All finalizers are idempotent. Re-run any time the series catalog changes.
 
 ## When adding a new post
 

@@ -169,17 +169,25 @@ RAG는 이제 AI 웹 서비스의 표준이 되었습니다. 거창한 데이터
 
 다음 시간에는 이 RAG 시스템을 더 고도화해서, 수백 페이지의 PDF를 읽고 분석하는 서비스를 만드는 법을 알아보겠습니다.
 
-### 시리즈 목차
-1. [Hello AI World — 웹 개발자가 AI를 시작하는 법](./01-hello-ai.md)
-2. [API 하나로 끝내는 텍스트 생성 (LLM 기초)](./02-llm-basics.md)
-3. [프롬프트 엔지니어링 — AI의 대답을 조종하는 기술](./03-prompt-engineering.md)
-4. **RAG 입문 — 내 데이터로 답하는 AI 만들기 (현재 글)**
-5. PDF 봇 만들기 — 대용량 문서 처리를 위한 실전 RAG (예정)
-6. AI Agent — 스스로 도구를 사용하는 AI (예정)
-7. 실전 프로젝트 — 나만의 AI 서비스 배포하기 (예정)
+---
 
-### 참고 자료
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)
+- [프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술](./02-prompt-engineering.md)
+- [AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현](./03-ai-chatbot.md)
+- **RAG 입문 — 내 데이터로 답하는 AI 만들기 (현재 글)**
+- AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기 (예정)
+- AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기 (예정)
+- AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법 (예정)
+
+<!-- toc:end -->
+
+---
+
+## 참고 자료
 - [OpenAI Embeddings Guide](https://platform.openai.com/docs/guides/embeddings)
 - [Vector Database란 무엇인가? (Pinecone Blog)](https://www.pinecone.io/learn/vector-database/)
 
-**Tags:** `AI` `RAG` `Embeddings` `Vector Database` `LLM` `Python` `Tutorial`
+Tags: AI, LLM, 웹 개발, Python, Tutorial
