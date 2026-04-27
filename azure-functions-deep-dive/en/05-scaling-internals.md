@@ -1,0 +1,369 @@
+# Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
+
+> Azure Functions Deep Dive series (5/7)
+
+For four installments now we've stayed inside a **single** instance, watching how the host and its workers run functions. This time we step up one level.
+
+> The instance itself — **who decides to add or remove it, based on what signal, and when?**
+
+This is what people usually call "scaling out." And the decision **does not happen inside the host process.** The host only supplies the **inputs** to the decision; the actual call is made by a **Scale Controller** that lives outside the host — though the exact form of that controller depends on the plan.
+
+This installment has three goals:
+
+1. Pin down what Scale Controller, ScaleMonitor, and ITargetScaler each are, and where they live.
+2. Separate two distinct mechanisms: deciding the **number of instances** (scale-out) vs. deciding the **number of workers inside an instance** (worker concurrency).
+3. Compare how the same code behaves differently across the four plans: Consumption, Flex Consumption, Premium, and Dedicated.
+
+> All code citations are pinned to [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
+
+---
+
+## The big picture — where scaling decisions are made
+
+Before we touch any code, here's the whole thing in one diagram.
+
+```mermaid
+flowchart TB
+    subgraph CTRL["🎯 Scale Controller<br/>(platform component, outside the host)"]
+        SC[Instance count decision<br/>= desired instances]
+    end
+
+    subgraph EXT["📦 Trigger Extensions<br/>(WebJobs SDK side)"]
+        SM[IScaleMonitor<br/>queue length / lag measurement]
+        TS[ITargetScaler<br/>target-based formula]
+    end
+
+    subgraph HOST["🏠 Functions Host (N instances)"]
+        HPM[HostPerformanceManager<br/>health ping response]
+        REPO[TableStorageScaleMetricsRepository<br/>metric storage]
+        WCM[WorkerConcurrencyManager<br/>worker count within an instance]
+        TM[ConcurrencyThrottleManager<br/>host/worker load signal]
+    end
+
+    SC -->|"GET /admin/host/ping<br/>User-Agent: ScaleController"| HPM
+    SM -.->|"report metrics"| REPO
+    TS -.->|"target formula result"| SC
+    HPM -->|"200 / 429"| SC
+    SC -->|"scale-out command"| HOST
+
+    WCM -.->|"add worker processes<br/>within the same instance"| HOST
+    TM -.->|"load signal"| HPM
+```
+
+The key insight is that two different decisions are made in two different places.
+
+| Decision | Decided by | Signal | Result |
+|---|---|---|---|
+| **Instance count** (scale-out) | Scale Controller (outside the host) | ScaleMonitor / TargetScaler metrics + host health ping | Move instances from N → N±k |
+| **Workers per instance** | `WorkerConcurrencyManager` (inside the host) | Worker channel load | Add or remove worker processes on the same instance |
+
+If you blur these two together, you can't answer questions like "Why can't I just bump up the worker count on Premium myself?" Let's take them one at a time.
+
+---
+
+## What lives in the host repo — and what doesn't
+
+First, a fact worth pinning down up front: **the definitions of `IScaleMonitor` and `ITargetScaler` do not live in the `azure-functions-host` repo.** Those interfaces live in [`Azure/azure-webjobs-sdk`](https://github.com/Azure/azure-webjobs-sdk) — the WebJobs SDK repo — and each trigger extension (Storage Queue, Service Bus, Event Hubs, etc.) takes a dependency on that SDK and implements its own metric collector.
+
+The host repo's [`src/WebJobs.Script/Scale/`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale) directory has only two files:
+
+- `ApplicationPerformanceCounters.cs`: the sandbox counter DTO
+- `HostPerformanceManager.cs`: judges host load and handles the Scale Controller's health ping
+
+And in [`src/WebJobs.Script.WebHost/Scale/`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Scale) there are two more:
+
+- `TableStorageScaleMetricsRepository.cs`: persists the metrics ScaleMonitors report into Azure Table Storage
+- `TableEntityConverter.cs`: a serialization helper for it
+
+In other words, the host's job is just to **report its own load** and **store the metrics**. The decision belongs to the external Scale Controller. Once that picture is locked in, everything else falls into place.
+
+---
+
+## How the Scale Controller talks to the host — the health ping
+
+When the Scale Controller looks at a single instance and asks "should this be scaled further?", the most direct signal it relies on is an **HTTP health ping**. The code on the host that answers that ping is `HostPerformanceManager.TryHandleHealthPingAsync`.
+
+```csharp
+// src/WebJobs.Script/Scale/HostPerformanceManager.cs
+public async Task<IActionResult> TryHandleHealthPingAsync(HttpRequest request, ILogger logger)
+{
+    var healthPingEnabled = _environment.GetEnvironmentVariableOrDefault(
+        EnvironmentSettingNames.HealthPingEnabled, "1");
+    if (healthPingEnabled.Equals("0"))
+    {
+        return null;
+    }
+
+    bool checkHealth = false;
+    var userAgent = request.GetHeaderValueOrDefault("User-Agent");
+    if (!string.IsNullOrEmpty(userAgent) &&
+        (userAgent.IndexOf(ScriptConstants.HttpScaleUserAgent, StringComparison.OrdinalIgnoreCase) != -1 ||
+         userAgent.IndexOf(ScriptConstants.ScaleControllerUserAgent, StringComparison.OrdinalIgnoreCase) != -1))
+    {
+        // for these user agents, we default to true
+        checkHealth = true;
+    }
+    // ...
+    if (checkHealth)
+    {
+        int statusCode = (int)HttpStatusCode.OK;
+        if (await IsUnderHighLoadAsync(logger: logger))
+        {
+            statusCode = 429;
+        }
+        return new StatusCodeResult(statusCode);
+    }
+    return null;
+}
+```
+
+[`HostPerformanceManager.cs#L67-103`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/HostPerformanceManager.cs#L67-L103)
+
+In plain language:
+
+1. The Scale Controller (or the HTTP scale component) sends a ping to the host's admin endpoint. **It identifies itself via the User-Agent header.**
+2. The host inspects that User-Agent and decides "this is a health check."
+3. It measures current load and returns **200 OK** if it's below the threshold, **429 Too Many Requests** if it's over.
+4. The Scale Controller looks at the response, decides whether this instance can take more work, and makes its scaling call.
+
+`IsUnderHighLoadAsync` looks at two kinds of load:
+
+```csharp
+public virtual async Task<bool> IsUnderHighLoadAsync(ILogger logger = null)
+{
+    return PerformanceCountersExceeded(logger: logger) || await ProcessThresholdsExceeded(logger: logger);
+}
+```
+
+- `PerformanceCountersExceeded`: whether sandbox counters (`ActiveConnections`, `Threads`, `NamedPipes`, …) are over their limits.
+- `ProcessThresholdsExceeded`: an aggregated throttle state covering host/worker CPU, ThreadPool, and gRPC channel health.
+
+In the latter, you can see the host **directly pinging the OOP workers it owns**:
+
+```csharp
+// same file, inside ProcessThresholdsExceeded
+var workerManager = _serviceProvider.GetScriptHostServiceOrNull<IScriptHostWorkerManager>();
+if (workerManager != null)
+{
+    // TEMP: This call pings all the OOP workers, to ensure we include any channel latency
+    // in the upstream ping result.
+    await workerManager.GetWorkerStatusesAsync();
+}
+
+var throttleManager = _serviceProvider.GetScriptHostServiceOrNull<IConcurrencyThrottleManager>();
+if (throttleManager != null)
+{
+    var status = throttleManager.GetStatus();
+    return status.State == ThrottleState.Enabled;
+}
+```
+
+Put another way: **a single HTTP call from the external Scale Controller is answered by the host with a verdict that aggregates its own state and that of every worker.** That's the mechanism by which an instance signals to the outside world that it has hit its ceiling.
+
+---
+
+## ScaleMonitor and TargetScaler — the signals triggers measure directly
+
+If the health ping is the host's answer to "can you take more right now?", then **ScaleMonitor / TargetScaler** is the trigger's answer to "how much work is piling up?"
+
+The code for these lives in the SDK, but the way they flow from the host's perspective is clear.
+
+```mermaid
+sequenceDiagram
+    participant TR as Trigger Extension<br/>(e.g. Storage Queue)
+    participant SM as IScaleMonitor /<br/>ITargetScaler
+    participant REPO as TableStorage<br/>ScaleMetricsRepository
+    participant SC as Scale Controller<br/>(external)
+
+    TR->>SM: collect metrics periodically<br/>(queue length, lag, ...)
+    SM->>REPO: WriteAsync(metrics)
+    SC->>REPO: ReadAsync(metrics)
+    SC->>SC: ScaleMonitor produces voted scaleStatus<br/>OR TargetScaler produces desired count
+    SC->>TR: change instance count
+```
+
+There are two modes, introduced at different points in time.
+
+### Incremental scaling (`IScaleMonitor`)
+
+The original model. Each ScaleMonitor looks at its own metrics and casts a `ScaleVote` (ScaleOut / ScaleIn / None). At most **one instance** is added or removed per round. Every trigger type supports it.
+
+### Target-based scaling (`ITargetScaler`)
+
+Introduced in 2022 and now the **default** for several triggers. It uses a simple formula:
+
+> desired instances = event source length / target executions per instance
+
+Microsoft's official docs put it this way:
+
+> "target-based scaling allows scale up of **four instances at a time**, and the scaling decision is based on a simple target-based equation"
+> — [Target-based scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling)
+
+The supported triggers are a fixed set:
+
+| Trigger | Setting for target executions per instance | Default |
+|---|---|---|
+| Storage Queue | `extensions.queues.batchSize` | 16 |
+| Service Bus (single dispatch, v5+) | `extensions.serviceBus.maxConcurrentCalls` | 16 |
+| Service Bus (batch, v5+) | `extensions.serviceBus.maxMessageBatchSize` | 1000 |
+| Event Hubs (v5+) | `extensions.eventHubs.maxEventBatchSize` | 100 |
+| Cosmos DB | `MaxItemsPerInvocation` (function attribute) | 100 |
+| Apache Kafka | `LagThreshold` (function attribute) | 1000 |
+
+Target-based scaling is enabled by default on **Functions runtime 4.19.0 and above**, and you can disable it with `TARGET_BASED_SCALING_ENABLED=0` to fall back to incremental.
+
+> Source: [Target-based scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling)
+
+### What does the host do?
+
+In either of these models, the host plays only the role of a **metric repository**. That role is filled by `TableStorageScaleMetricsRepository` ([`src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs)). It stores the values the ScaleMonitor measures, and the Scale Controller reads them back to decide.
+
+So the host **does not participate** in the decision. It just lets the metrics flow through.
+
+---
+
+## Concurrency inside an instance — `WorkerConcurrencyManager`
+
+Everything above was the story of how "instance count" is decided. Now we look at the other decision — **how many worker processes to run inside the same instance**.
+
+For OOP workers (Python, Node, Java), a worker is typically a single process, which means **you can run more than one worker process within the same instance**. The component that decides this is [`WorkerConcurrencyManager`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs).
+
+The core idea is simple:
+
+> If a worker channel is busy (latency or queue depth crosses the threshold), spin up another worker process inside the same instance. If it's idle, drop one.
+
+This **has nothing to do with the external Scale Controller.** The instance count stays the same; only the parallelism inside the instance changes. So a single instance might be running with one worker at one moment and three workers a few seconds later.
+
+Putting these two side by side:
+
+| Aspect | Instance scale-out | Worker concurrency |
+|---|---|---|
+| Decided by | Scale Controller (external) | `WorkerConcurrencyManager` (inside the host) |
+| Unit | VM instance | Worker process within an instance |
+| Signal | ScaleMonitor metrics + health ping | Worker channel latency / queue depth |
+| Impact | Bill, cold-start time | Throughput within the instance |
+| Plan dependence | High (varies by plan) | Low (same logic everywhere) |
+
+---
+
+## Plan-by-plan — same code, different behavior
+
+The host code is identical wherever it runs. The `HostPerformanceManager.cs` we just looked at, the `TableStorageScaleMetricsRepository.cs`, the `WorkerConcurrencyManager.cs` — all one codebase. What differs is **who is making decisions outside this code**.
+
+```mermaid
+flowchart LR
+    subgraph CON["Consumption"]
+        SC1[Scale Controller<br/>classic mode]
+    end
+    subgraph FLEX["Flex Consumption"]
+        SC2[Scale Controller<br/>new platform-side]
+    end
+    subgraph PREM["Premium"]
+        SC3[Scale Controller<br/>+ runtime scale option]
+    end
+    subgraph DED["Dedicated (App Service)"]
+        SC4[App Service Auto-Scale<br/>or manual]
+    end
+
+    SC1 -->|metrics + ping| HOST
+    SC2 -->|metrics + ping<br/>+ per-function group| HOST
+    SC3 -->|metrics + ping<br/>or in-runtime monitor| HOST
+    SC4 -->|CPU/memory rules<br/>not event-driven| HOST
+
+    HOST[Functions Host<br/>same code]
+```
+
+Plan by plan, in a sentence each:
+
+### Consumption
+
+- The classic Scale Controller makes the call.
+- Scales to zero, max 200 instances.
+- Supports target-based scaling (4.19.0+).
+- No VNet integration.
+
+### Flex Consumption — the newest model
+
+Flex Consumption is the successor to Consumption and, in practice, a different platform. The host code is the same, but the decision model layered on top is different.
+
+- **Per-function scaling**: instances scale per function or per function group. The groups are fixed:
+
+| Scale group | Triggers included |
+|---|---|
+| `http` | HTTP trigger, SignalR trigger |
+| `blob` | Blob storage trigger (Event Grid–based) |
+| `durable` | Orchestration / Activity / Entity trigger |
+| `function:<NAMED_FUNCTION>` | Every other function (individually) |
+
+> Source: [Flex Consumption per-function scaling](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan#per-function-scaling)
+
+- **Always ready instances**: you can set a non-zero floor, configurable per group or per function. This is the main lever for cutting cold starts.
+- **Default quota of up to 1000 instances / 250 cores per region.**
+- **Selectable instance memory**: 512 / 2048 / 4096 MB. A larger instance can absorb more concurrency within the same function group.
+- VNet integration and Azure Files mounts are supported.
+
+> Source: [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
+
+### Premium (Elastic Premium)
+
+- Pre-warmed instances behave like an early version of Always Ready.
+- For VNet-bound triggers you can enable **runtime scale monitoring**, which moves the ScaleMonitor logic inside the host and sidesteps the problem of the external Scale Controller being walled off from the VNet.
+- Supports target-based scaling (4.19.0+; with runtime scale monitoring, certain extension package minimums apply).
+
+### Dedicated (App Service Plan)
+
+- The Functions event-driven scaler **does not run.** You use the standard App Service Auto-Scale rules (CPU/memory-based) or scale manually.
+- The host code is the same, but since nothing outside is sizing the instance count for you, the metrics ScaleMonitor reports lose their meaning.
+
+> Source: [Target-based scaling considerations](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling#considerations) — "Event-driven scaling isn't supported when running on Dedicated (App Service) plans."
+
+---
+
+## All in one table
+
+| Plan | Scale decided by | Scale to zero | Max instances | Per-function | Always ready | VNet |
+|---|---|---|---|---|---|---|
+| Consumption | Scale Controller | ✅ | 200 | ❌ | ❌ | ❌ |
+| Flex Consumption | Scale Controller (new) | ✅ | 1000 | ✅ | ✅ | ✅ |
+| Premium | Scale Controller (+ option) | ❌ (min 1) | ~100 | ❌ | pre-warmed | ✅ |
+| Dedicated | App Service Auto-Scale | ❌ | depends on plan | ❌ | (always on) | ✅ |
+
+Different decision layers sit on top of the same host binary; the way the host itself works doesn't change.
+
+---
+
+## Wrap-up — the model to take from this installment
+
+- Scale decisions happen **outside the host**. The host just reports metrics and answers health pings.
+- `IScaleMonitor` (incremental) and `ITargetScaler` (formula-based) are SDK / extension-side interfaces; the host's role is just to persist their metrics in Table Storage.
+- Deciding the **number of instances** and deciding the **number of workers inside an instance** are different mechanisms. The latter is done in-process by `WorkerConcurrencyManager`.
+- The same host code **behaves differently across Consumption / Flex / Premium / Dedicated because the external decider's model is different.** The host is unchanged.
+- Flex Consumption introduces per-function scaling and Always ready, deciding "how many instances for which function" at the group level.
+
+In installment 6 we'll look at what happens **when a new instance is actually created** as a result of all these decisions — Placeholder Mode and specialization. The code-level mechanics behind Always ready and cold start live there.
+
+---
+
+## References
+
+### Primary sources (host code, commit `5e59423`)
+
+- [`src/WebJobs.Script/Scale/HostPerformanceManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/HostPerformanceManager.cs) — Scale Controller health ping handling, throttle aggregation
+- [`src/WebJobs.Script/Scale/ApplicationPerformanceCounters.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/ApplicationPerformanceCounters.cs) — sandbox counter DTO
+- [`src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs) — persists ScaleMonitor metrics
+- [`src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs) — worker concurrency inside an instance
+
+### Secondary sources (Microsoft Learn official docs)
+
+- [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
+- [Target-based scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling)
+- [Event-driven scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling)
+- [Azure Functions hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
+
+### Other installments in the series
+
+- [Intro 5 — Choosing a Plan](../../azure-functions-101/ko/05-choosing-a-plan.md)
+- [Intro 6 — Scaling and Cold Start](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
+- [Deep Dive 4 — Dispatcher and Invocation](./04-dispatcher-and-invocation.md)
+- [Deep Dive 6 — Cold Start and Placeholder](./06-cold-start-placeholder.md) (next)
+- [Deep Dive 7 — An Academic Perspective](./07-academic-perspective.md)

@@ -1,0 +1,308 @@
+# Dispatcher and Invocation — How a Function Call Reaches the Worker
+
+> Azure Functions Deep Dive series (4/7)
+
+In Part 3 we saw that the host and the worker exchange `StreamingMessage`s over a single bidirectional gRPC stream (`EventStream`). Now we follow the most important kind of message that flows over that stream — **`InvocationRequest` / `InvocationResponse`**.
+
+The question is simple:
+
+> When a message lands in a queue, or an HTTP request comes in, how does it reach the user function inside the worker process, and how does the result get back?
+
+Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher` and `WorkerFunctionInvoker`. This post is about what each one does, and the life of the `InvocationRequest` that travels between them.
+
+> All code references are pinned to [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
+
+---
+
+## The big picture — from trigger to worker
+
+Let's start by drawing the entire path of a single invocation in one diagram.
+
+```mermaid
+sequenceDiagram
+    participant T as Trigger<br/>(Queue/HTTP/Timer/...)
+    participant SDK as WebJobs SDK
+    participant WFI as WorkerFunctionInvoker
+    participant DISP as IFunctionInvocationDispatcher<br/>(Rpc implementation)
+    participant GWC as GrpcWorkerChannel
+    participant Bus as Event Bus
+    participant FRS as FunctionRpcService
+    participant W as Worker
+
+    T->>SDK: Trigger fires (message arrives, HTTP hits, timer expires)
+    SDK->>WFI: InvokeCore (binding data)
+    WFI->>DISP: InvokeAsync(ScriptInvocationContext)
+    DISP->>GWC: SendInvocationRequest
+    GWC->>Bus: OutboundGrpcEvent { InvocationRequest }
+    Bus->>FRS: Deliver message
+    FRS-->>W: StreamingMessage(InvocationRequest)
+
+    W->>W: Run user function
+    W-->>FRS: StreamingMessage(InvocationResponse)
+    FRS->>Bus: InboundGrpcEvent { InvocationResponse }
+    Bus->>GWC: Match by invocation_id
+    GWC->>DISP: TaskCompletionSource.SetResult
+    DISP->>WFI: Return result
+    WFI->>SDK: Return result
+    SDK->>T: Trigger complete
+```
+
+This diagram is what Part 4 is about. Let's walk through each step in code.
+
+---
+
+## Step 1 — A trigger fires, the SDK calls the invoker
+
+The Azure Functions host is **built on top of the WebJobs SDK** (as we saw in Part 1). When a queue message arrives, an HTTP request comes in, or a timer expires — every one of those is detected by a trigger listener inside the WebJobs SDK and turned into a function invocation.
+
+The WebJobs SDK keeps one **`IFunctionInvoker` implementation per function**. The interface is simple: "given binding data, run this function once."
+
+The implementation the host uses to run a function inside a worker process is [`WorkerFunctionInvoker`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerFunctionInvoker.cs). Its job, in one sentence:
+
+> **Instead of calling user code directly, delegate the invocation to an `IFunctionInvocationDispatcher`.**
+
+In the in-process model (C# in-process), the invoker calls the user method directly. But in the **out-of-proc worker model** (Node, Python, Java, isolated .NET, and so on), the invoker's job is to throw the call across gRPC to a worker on the other side. The thing it delegates to is the dispatcher.
+
+---
+
+## Step 2 — The `IFunctionInvocationDispatcher` abstraction
+
+The [`IFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/IFunctionInvocationDispatcher.cs) interface is the entry point that abstracts "the host's ability to send a function invocation somewhere."
+
+Two implementations live in the same directory:
+
+| Implementation | What it does |
+|---|---|
+| **`RpcFunctionInvocationDispatcher`** (in its own file) | The default path for every non-HTTP trigger. Sends to the worker over gRPC. |
+| [`HttpFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/HttpFunctionInvocationDispatcher.cs) | The **HTTP proxy model** for HTTP triggers. Calls the worker directly over HTTP, not gRPC. |
+
+[`FunctionInvocationDispatcherFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/FunctionInvocationDispatcherFactory.cs) decides which of the two to use — the choice depends on the function's trigger type and on the worker's advertised capabilities.
+
+Two key facts:
+
+1. **Every trigger is normalized into the same `InvocationRequest` message.** Queue message, timer pulse, Blob event — to the dispatcher they all look like the same command: "invoke this once."
+2. **HTTP triggers can bypass gRPC.** When a worker advertises the "HTTP proxying" capability, the host doesn't pack the invocation request payload onto gRPC; instead it proxies straight to an HTTP endpoint exposed by the worker. (This avoids putting large HTTP bodies through a protobuf payload.)
+
+---
+
+## Step 3 — Build a `ScriptInvocationContext` and hand it to the dispatcher
+
+The object that `WorkerFunctionInvoker` carries when it hands the call to the dispatcher is **`ScriptInvocationContext`**. It holds:
+
+- Function metadata (`function_id`, which function this is)
+- Input binding data (the trigger payload plus any other input bindings)
+- Trigger metadata (HTTP trigger headers, queue message ID, etc.)
+- Trace context (`traceparent`, `tracestate` extracted from `Activity.Current`)
+- Retry context (current attempt count)
+- A `TaskCompletionSource<ScriptInvocationResult>` that will receive the result
+
+That last item is the decisive one. **The dispatcher does not expect a synchronous response.** It returns a `Task` immediately after pushing the invocation, and only when the worker sends a response does that `Task` complete. A single worker can have many in-flight invocations at once, distinguished by `invocation_id`.
+
+---
+
+## Step 4 — Building the `InvocationRequest`
+
+Let's look again at `InvocationRequest` from [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto), which we saw in Part 3.
+
+```protobuf
+message InvocationRequest {
+  string invocation_id = 1;
+  string function_id = 2;
+  repeated ParameterBinding input_data = 3;
+  map<string, TypedData> trigger_metadata = 4;
+  RpcTraceContext trace_context = 5;
+  RetryContext retry_context = 6;
+}
+```
+
+This step is about translating the fields of `ScriptInvocationContext` into that protobuf message. Two non-obvious points:
+
+**a) Input data is an array of `ParameterBinding`s.**
+
+```protobuf
+message ParameterBinding {
+  string name = 1;
+  oneof rpc_data {
+    TypedData data = 2;
+    RpcSharedMemory rpc_shared_memory = 3;
+  }
+}
+```
+
+Each input is a name plus its data, and the data either goes inline as `TypedData` (string/json/bytes/http/...) or as **metadata pointing into a shared memory region** (`RpcSharedMemory`). The latter is the practical payoff of capability negotiation — if both sides support "shared memory data transfer," large payloads aren't carried inside the gRPC message; they sit in shared memory and only their location is sent. (This is the capability exchange from Part 3 in actual use.)
+
+**b) The trace context is W3C, copied verbatim.**
+
+```protobuf
+message RpcTraceContext {
+  string trace_parent = 1;
+  string trace_state = 2;
+  map<string, string> attributes = 3;
+}
+```
+
+The host's `Activity.Current?.Id` becomes `trace_parent`, and `Activity.Current?.TraceStateString` becomes `trace_state`. Worker-side libraries (e.g. the Application Insights SDK) pick this up and stitch their own context onto the host's trace. In other words, **distributed tracing doesn't break at the host/worker boundary.**
+
+---
+
+## Step 5 — `GrpcWorkerChannel.SendInvocationRequest`
+
+[`GrpcWorkerChannel`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs), which we met in Part 3, returns. This time it's playing the sender role.
+
+`GrpcWorkerChannel` is the object that represents a single worker. When the dispatcher says "send this invocation to this worker," `GrpcWorkerChannel` does the following:
+
+1. Convert the `ScriptInvocationContext` into an `InvocationRequest`
+2. Wrap it in a `StreamingMessage` (`request_id` = a freshly minted GUID, `oneof content` = `invocation_request`)
+3. Register the call's `TaskCompletionSource` in an **in-memory dictionary keyed by invocation_id** — so the eventual response can be matched to it
+4. Wrap the message in an **`OutboundGrpcEvent`** and publish it on the in-process event bus
+5. `FunctionRpcService` picks up the event and writes it to the actual gRPC stream
+
+Step 3 is the heart of asynchronous response matching. The dictionary of `invocation_id` ↔ `TaskCompletionSource` is exactly the list of in-flight invocations on a given worker. When that dictionary is empty, the worker is idle; when it's full, it's busy. (This information feeds directly into **worker concurrency measurement in Part 5**.)
+
+---
+
+## Step 6 — What the worker does
+
+The worker is listening on the `EventStream` with its own gRPC client. When it sees a `StreamingMessage` whose `oneof content == invocation_request`, it does the following:
+
+1. Identify the function from `function_id` (a function it has already loaded via `FunctionLoadRequest`)
+2. Convert `input_data` into language-native objects (e.g. on Node, `TypedData.json` → JS object, `TypedData.bytes` → Buffer)
+3. Populate the user function's `context` object from `trigger_metadata`
+4. Call the user function
+5. Serialize the return value as `TypedData` and put it into `InvocationResponse.return_value`
+6. Put any output-binding results into `output_data`
+7. Set `result.status = Success/Failure/Cancelled` and, if there's an exception, fill `result.exception`
+8. Send back a `StreamingMessage(invocation_response)` to the host
+
+The worker implementations differ by language (Node uses the npm `@azure/functions` package, Python uses `azure-functions-worker`, Java uses `azure-functions-java-worker`, etc.), but those eight steps are identical across all of them. **That's what a single protocol means.**
+
+This post is host-centric, so I won't walk through the worker-side code. But every worker is also open source under names like `Azure/azure-functions-{nodejs|python|java|...}-worker`, so if you're curious about a particular language's behavior, those are the repos to look at.
+
+---
+
+## Step 7 — Receive the response and complete the `TaskCompletionSource`
+
+Here's the path the worker's response takes:
+
+```
+gRPC stream
+  → FunctionRpcService.EventStream (host-side handler)
+  → wrapped as InboundGrpcEvent and published on the event bus
+  → GrpcWorkerChannel subscribes to its own worker ID + invocation_response messages
+  → look up the TaskCompletionSource by invocation_id
+  → tcs.SetResult(ScriptInvocationResult)
+  → the Task the dispatcher was awaiting wakes up
+  → WorkerFunctionInvoker returns the result to the SDK
+  → the SDK finishes trigger handling (delete the queue message, send the HTTP response, etc.)
+```
+
+That is the entire life of one invocation.
+
+---
+
+## Concurrent invocations — one worker handles many at once
+
+Here's an important fact. **A single worker process can handle many invocations concurrently.**
+
+The `invocation_id ↔ TaskCompletionSource` dictionary from Step 5 is what makes that possible. The host sends concurrent invocations based on how many a worker can handle at once (settings like `maxConcurrentRequests`).
+
+But **there's no guarantee about the order in which response messages come back.** Even if invocation A was sent before B, if B finishes faster, response B arrives first. The dictionary-based matching handles that naturally.
+
+That said, **some message ordering does need to be preserved** — for example, log messages within the same invocation. That's why [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) exists — it preserves message order *within* an invocation while keeping invocations in parallel with each other.
+
+```mermaid
+flowchart LR
+    GWC[GrpcWorkerChannel] --> Dispatch[OrderedInvocation<br/>MessageDispatcher]
+    Dispatch -->|invocation_id A| QA[Queue A<br/>ordered]
+    Dispatch -->|invocation_id B| QB[Queue B<br/>ordered]
+    Dispatch -->|invocation_id C| QC[Queue C<br/>ordered]
+    QA --> Handler[per-invocation handler]
+    QB --> Handler
+    QC --> Handler
+```
+
+Messages with the same `invocation_id` are processed in arrival order, but different `invocation_id`s are processed in parallel.
+
+---
+
+## Worker concurrency — how busy the host keeps a worker
+
+[`WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs) monitors how many invocations a single worker is handling at once and, when needed, requests **that an additional worker be spun up**. So a single function app can have multiple workers running side by side — multiple worker processes inside one worker instance.
+
+[`WorkerChannelThrottleProvider.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerChannelThrottleProvider.cs) is the opposite direction — when a worker is too busy, the host throttles additional invocations on its end. Together those two objects dynamically tune **the in-instance invocation handling capacity**.
+
+An important distinction: **this is about adjusting the number of worker processes inside an instance**, not **adding instances themselves** (scale-out). The latter is the topic of Part 5.
+
+---
+
+## HTTP proxying — the path that bypasses gRPC
+
+[`HttpFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/HttpFunctionInvocationDispatcher.cs) is a separate path. For HTTP-trigger functions, when the worker advertises the "HTTP proxying" capability, the host does *not* serialize the HTTP body of the invocation request into gRPC `TypedData.http`. Instead:
+
+1. The worker spins up an additional HTTP server inside its own process
+2. The host **proxies the original HTTP request, almost as-is**, to the HTTP endpoint the worker has advertised
+3. The worker hands the HTTP request straight to the user function and returns the response to the host as an HTTP response
+
+The advantage of this path is that **large HTTP bodies (file uploads, etc.) don't have to be serialized through protobuf**. The cost is that the worker has to host its own HTTP server, and this is the standard model for the isolated worker.
+
+The invocation flow is almost identical to the gRPC path; only the message-payload transport changes from gRPC to HTTP.
+
+---
+
+## A single invocation, end to end, in one table
+
+| Step | Object | Role |
+|---|---|---|
+| 1 | WebJobs SDK trigger listener | Detects the trigger firing |
+| 2 | `WorkerFunctionInvoker` | Is invoked by the SDK when it wants to call user code |
+| 3 | `IFunctionInvocationDispatcher` impl | Receives the call and actually transports it |
+| 4 | `InvocationRequest` builder | Converts `ScriptInvocationContext` into protobuf |
+| 5 | `GrpcWorkerChannel` | Sends to one worker, registers the response-matching dictionary entry |
+| 6 | `FunctionRpcService` (gRPC) | Writes the OutboundGrpcEvent to the real stream |
+| 7 | Worker process | Runs the user function, returns an `InvocationResponse` |
+| 8 | `FunctionRpcService` (gRPC) | Wraps inbound messages as InboundGrpcEvent |
+| 9 | `OrderedInvocationMessageDispatcher` | Preserves per-invocation message order |
+| 10 | `GrpcWorkerChannel` | Matches by invocation_id, completes the TCS |
+| 11 | Dispatcher → Invoker → SDK | Propagates the result |
+
+---
+
+## Coming up next
+
+By the end of this post, the full path of a single invocation through the host to the worker and back should be clear. Part 5 climbs one level up.
+
+> So how do worker *instances* themselves multiply? When the queue gets long, who notices, and who decides "we need to spin up another worker"?
+
+That's the topic of Part 5 — `IScaleMonitor`, `ITargetScaler`, and Flex Consumption's per-function scaling.
+
+---
+
+## Series index
+
+| # | Title |
+|---|---|
+| 1 | [Host Bootstrap](./01-host-bootstrap.md) |
+| 2 | [Worker Process](./02-worker-process.md) |
+| 3 | [gRPC Event Stream](./03-grpc-event-stream.md) |
+| 4 | **Dispatcher and Invocation — How a Function Call Reaches the Worker** ← this post |
+| 5 | [Scaling Internals — How Instances Multiply](./05-scaling-internals.md) |
+| 6 | [Cold Start and Placeholder](./06-cold-start-placeholder.md) |
+| 7 | [Academic Perspective](./07-academic-perspective.md) |
+
+---
+
+## References
+
+**Host code (commit `5e59423`)**
+- [`IFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/IFunctionInvocationDispatcher.cs)
+- [`IFunctionInvocationDispatcherFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/IFunctionInvocationDispatcherFactory.cs)
+- [`FunctionInvocationDispatcherFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/FunctionInvocationDispatcherFactory.cs)
+- [`HttpFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/HttpFunctionInvocationDispatcher.cs)
+- [`WorkerFunctionInvoker.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerFunctionInvoker.cs)
+- [`WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)
+- [`WorkerChannelThrottleProvider.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerChannelThrottleProvider.cs)
+- [`Channel/GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
+- [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs)
+
+**Protocol**
+- [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto) — `InvocationRequest`, `InvocationResponse`, `ParameterBinding`, `RpcTraceContext`

@@ -1,0 +1,222 @@
+# Azure Functions란? — 이벤트가 함수를 호출하는 세상
+
+> Azure Functions 101 시리즈 (1/7)
+
+서버리스라는 말을 처음 들었을 때 가장 흔한 반응은 둘 중 하나입니다. “서버가 없다는 게 무슨 뜻이야?” 아니면 “결국 클라우드가 서버 돌리는 건데 그게 그거 아닌가?” 둘 다 절반은 맞고 절반은 틀립니다. 서버는 있습니다. 다만 **여러분이 서버를 의식할 필요가 없도록 만든 모델**이 서버리스입니다. Azure Functions는 그 모델의 Azure 측 답변입니다.
+
+이 시리즈는 Azure Functions를 처음 다뤄 보는 개발자를 위해 쓰는 7편짜리 입문 가이드입니다. 1화는 가장 기본적인 질문부터 시작합니다. **Azure Functions는 정확히 무엇이고, 왜 이 모델이 의미가 있는가.** 멘탈 모델을 먼저 잡아두면 뒤에 나오는 트리거, 바인딩, 스케일링, 배포 이야기가 훨씬 쉽게 들어옵니다.
+
+---
+
+## 한 문장 정의 — “이벤트가 들어오면 내 함수가 실행되고, 끝나면 사라진다”
+
+Azure Functions를 한 줄로 요약하면 이렇습니다.
+
+> 어떤 이벤트가 발생하면, 그 이벤트에 연결된 작은 함수가 호출되어 실행되고, 작업이 끝나면 인스턴스는 회수됩니다.
+
+이 한 줄에 이 플랫폼의 거의 모든 특성이 담겨 있습니다. 핵심 단어 셋만 짚으면 됩니다.
+
+- **이벤트** — HTTP 요청, 큐 메시지, 파일 업로드, 타이머, 데이터베이스 변경 등 “함수를 깨우는 사건”
+- **함수** — 여러분이 작성하는 코드. 보통 수십 줄 단위, 단일 책임
+- **사라진다** — 평소엔 인스턴스가 떠 있지 않을 수도 있고, 트래픽에 맞춰 늘었다 줄었다 한다
+
+기존 웹 앱이 “식당이 아침부터 밤까지 문을 열어 두고 손님을 기다리는” 모델이라면, Functions는 **호출벨을 누르는 순간 출장 요리사가 출동하는** 모델에 가깝습니다. 손님이 없을 땐 요리사가 대기실에서 다른 일을 하다가 벨이 울리면 그제야 옵니다.
+
+---
+
+## 가장 작은 예시부터 — Hello, Function
+
+말로 설명하는 것보다 짧은 코드 한 조각이 빠릅니다. 아래는 HTTP 요청이 들어오면 인사말을 돌려주는 가장 단순한 함수입니다 (Node.js, v4 프로그래밍 모델).
+
+```javascript
+const { app } = require('@azure/functions');
+
+app.http('hello', {
+    methods: ['GET'],
+    authLevel: 'anonymous',
+    handler: async (request, context) => {
+        const name = request.query.get('name') ?? 'world';
+        return { body: `Hello, ${name}!` };
+    }
+});
+```
+
+코드는 짧지만 안에는 Azure Functions의 핵심이 다 들어 있습니다.
+
+- `app.http('hello', ...)` — **이 함수는 HTTP 트리거에 묶여 있다**는 선언
+- `handler` — 트리거가 발화했을 때 실행될 본체
+- `return { body: ... }` — 결과는 이렇게 돌려 보낸다
+
+서버를 띄우는 코드, 포트를 여는 코드, 라우터를 설정하는 코드, 그 어느 것도 없습니다. **“언제 깨우는지”와 “무엇을 할지”만 적으면 끝**입니다. 나머지는 Functions Host가 책임집니다.
+
+요청이 들어와서 응답이 나가기까지 무슨 일이 벌어지는지 가장 단순하게 그리면 다음과 같습니다.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as 클라이언트
+    participant Trigger as HTTP 트리거
+    participant Host as Functions Host
+    participant Func as hello 함수
+    Client->>Trigger: GET /api/hello?name=Sisyphus
+    Trigger->>Host: 트리거 발화 알림
+    Host->>Func: handler(request, context) 호출
+    Func-->>Host: { body: "Hello, Sisyphus!" }
+    Host-->>Client: 200 OK
+```
+
+뒤에 나올 모든 이야기는 이 그림을 점점 정교하게 만드는 과정이라고 보면 됩니다. 트리거가 HTTP가 아닐 때는 어떻게 되는지(2화), Host와 함수 본체가 어떻게 분리돼 있는지(3화), 인스턴스가 부족할 때 어떻게 늘어나는지(5·6화)가 각각의 다음 글입니다.
+
+---
+
+## 기존 웹 앱과 뭐가 다른가
+
+App Service나 VM에 웹 앱을 올려 본 적이 있다면, 다음 비교가 가장 빠르게 와닿을 겁니다.
+
+| 항목 | 상시 실행형 (App Service / VM) | 이벤트 호출형 (Functions) |
+|---|---|---|
+| 배포 단위 | 애플리케이션 (전체) | 함수 단위 (Function App에 모음) |
+| 실행 시점 | 항상 켜져 있음 | 이벤트가 들어올 때만 |
+| 스케일 단위 | 인스턴스(VM) 수 | 함수 실행 동시성 |
+| 과금 모델 | 시간 단위 (인스턴스 띄워 둔 시간) | 실행 시간 + 실행 횟수 (또는 혼합) |
+
+핵심 차이는 **무엇을 단위로 비용을 매기는가**입니다. App Service는 “인스턴스를 켜 둔 시간”에 돈을 받고, Functions(특히 Consumption 계열)는 “함수가 실제로 실행된 시간과 횟수”에 돈을 받습니다. 그래서 트래픽이 한산할 때 압도적으로 쌉니다. 반대로 트래픽이 일정하게 높다면 App Service가 더 쌀 수도 있습니다. 이 트레이드오프는 5화 “플랜 선택”에서 본격적으로 다룹니다.
+
+두 모델의 라이프사이클을 그림으로 비교하면 차이가 더 명확합니다.
+
+```mermaid
+graph LR
+    subgraph AppService [상시 실행 - App Service]
+        A1[배포] --> A2[프로세스 상시 기동]
+        A2 --> A3[요청 처리]
+        A3 --> A2
+    end
+
+    subgraph Functions [이벤트 호출 - Functions]
+        F1[배포] --> F2[유휴]
+        F2 -- 이벤트 도착 --> F3[인스턴스 깨우기]
+        F3 --> F4[함수 실행]
+        F4 --> F2
+    end
+```
+
+오른쪽 그림에서 “유휴 → 깨우기 → 실행 → 다시 유휴”의 순환이 바로 서버리스의 본질입니다. 이 “깨우기” 구간이 여러분이 곧 듣게 될 **콜드 스타트(cold start)** 의 정체입니다. 6화에서 자세히 다룹니다.
+
+---
+
+## Azure Functions의 4가지 핵심 개념
+
+이 시리즈 전체를 관통할 네 단어가 있습니다. 1화에서 이름만 익히고, 다음 화부터 하나씩 깊이 들어갑니다.
+
+- **Trigger (트리거)** — 함수를 깨우는 이벤트의 종류. HTTP 요청, 타이머, 큐 메시지, Blob 업로드, Event Hub, Service Bus, Cosmos DB 변경 피드 등. **함수 하나에는 트리거 하나가 묶입니다.**
+- **Binding (바인딩)** — 함수의 입출력을 “선언적으로” 외부 리소스에 연결하는 장치. 예를 들어 출력 바인딩으로 Cosmos DB를 묶어 두면, 함수가 객체를 반환하기만 해도 자동으로 DB에 저장됩니다. 보일러플레이트가 줄어듭니다.
+- **Host** — 함수들을 실제로 띄우고 트리거를 감지하고 함수 코드를 호출하는 런타임 프로세스. 오픈소스이며, 코드는 [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) 레포에 있습니다.
+- **Function App** — 배포·과금·스케일링의 단위. **Function App 하나는 Host 하나를 가지며, 그 안에 여러 함수가 들어갑니다.** 같은 Function App 안의 함수들은 같은 프로세스에서 같이 살고 같이 죽습니다.
+
+이 네 개념의 관계를 한 장으로 그리면 다음과 같습니다.
+
+```mermaid
+flowchart LR
+    subgraph Sources [이벤트 소스]
+        S1[HTTP 클라이언트]
+        S2[Storage Queue]
+        S3[Blob Storage]
+        S4[Timer]
+        S5[Event Hub]
+    end
+
+    subgraph FunctionApp [Function App - 배포 단위]
+        Host[Functions Host]
+        subgraph Funcs [함수들]
+            F1[OrderHandler<br/>HTTP Trigger]
+            F2[InvoiceProcessor<br/>Queue Trigger]
+            F3[ThumbnailMaker<br/>Blob Trigger]
+        end
+        Host --> F1
+        Host --> F2
+        Host --> F3
+    end
+
+    subgraph Outputs [출력 바인딩 대상]
+        O1[Cosmos DB]
+        O2[Service Bus]
+    end
+
+    S1 --> F1
+    S2 --> F2
+    S3 --> F3
+    F1 --> O1
+    F2 --> O2
+```
+
+이 그림에서 기억할 것은 두 가지입니다. **(1) Host는 함수들의 공통 런타임이고, (2) 트리거와 바인딩은 함수와 외부 세계를 잇는 인터페이스**라는 것. 이 둘의 조합이 Functions를 “이벤트 주도 서비스”답게 만듭니다.
+
+> 💡 더 깊이 궁금하다면: Host가 실제로 함수를 어떻게 띄우는지(다른 언어 지원은 어떻게 가능한지)는 별도의 심화 시리즈 **Azure Functions Deep Dive**에서 소스코드를 따라가며 다룰 예정입니다.
+
+---
+
+## 어떤 시나리오에서 빛나는가
+
+추상적인 이야기를 길게 하면 와닿지 않습니다. 실무에서 Functions가 자주 쓰이는 5가지 패턴을 짧게 보여드리겠습니다.
+
+- **이벤트 처리 파이프라인** — Event Hub로 들어오는 IoT 텔레메트리를 가공해서 데이터베이스에 적재. 트래픽이 시간대별로 들쭉날쭉할 때 압도적으로 효율적입니다.
+- **예약 작업** — 매일 새벽 3시에 정산 배치를 돌리는 경우. Cron 서버를 별도로 운영할 필요가 없습니다.
+- **파일 처리** — 사용자가 Blob Storage에 이미지를 업로드하면 자동으로 썸네일을 만들어 다른 컨테이너에 저장. 입력·출력이 모두 바인딩으로 끝납니다.
+- **가벼운 HTTP API / Webhook** — 외부 SaaS의 Webhook을 받아 가공하거나, 마이크로서비스 한두 개를 가볍게 띄울 때.
+- **비동기 큐 소비자** — 상시 켜진 워커 프로세스 대신 Queue Trigger로 메시지가 있을 때만 깨어나서 처리.
+
+공통점은 “**일이 있을 때는 빠르게 처리해야 하지만 평소엔 트래픽이 적거나 불규칙하다**”는 점입니다. 이런 워크로드에 상시 실행형 인스턴스를 띄워 두는 건 명백히 낭비입니다.
+
+---
+
+## 안 어울리는 경우도 있다
+
+Functions가 만능은 아닙니다. 도입 전에 다음 세 가지는 반드시 확인해야 합니다.
+
+- **장기 실행 작업** — 기본 함수 실행 타임아웃은 플랜에 따라 5분에서 30분 사이입니다. 한 번 실행에 1시간 걸리는 작업은 Durable Functions로 쪼개거나 다른 컴퓨트(Container Apps, Batch 등)를 고려해야 합니다.
+- **매우 일관된 고부하** — 트래픽이 24시간 균일하게 높다면, 같은 처리량 기준으로 App Service 또는 컨테이너가 더 저렴할 수 있습니다. 종량제는 트래픽이 들쭉날쭉할 때 빛납니다.
+- **콜드 스타트가 치명적인 초저지연 API** — 첫 호출에 수백 ms가 추가되는 게 비즈니스적으로 허용되지 않는다면, Premium / Flex Consumption의 Always Ready 옵션을 쓰거나 다른 모델을 봐야 합니다(이 트레이드오프는 6화에서 다룹니다).
+
+“서버리스를 쓰는 게 멋있다”가 아니라, **워크로드 특성과 비용 모델이 맞을 때** 쓰는 도구입니다.
+
+---
+
+## 다음 화에서
+
+이번 글은 멘탈 모델을 잡는 데 집중했습니다. 한 줄로 요약하면 이렇습니다.
+
+> Azure Functions = **이벤트(Trigger)** 가 들어오면 **Host**가 **함수**를 깨워서 실행하고, **바인딩**으로 외부 세계와 연결한다. 단위는 **Function App**.
+
+다음 글에서는 이 그림의 가장 왼쪽, **트리거와 바인딩**을 본격적으로 파고듭니다. 어떤 트리거가 있는지, 입력·출력 바인딩이 실제로 코드를 얼마나 줄여 주는지, 그리고 “바인딩이 마법처럼 보이지만 사실은 어떤 계약(contract)인지”까지 다룰 예정입니다.
+
+---
+
+## 시리즈 목차
+
+| # | 제목 |
+|---|---|
+| 1 | **Azure Functions란? — 이벤트가 함수를 호출하는 세상** ← 현재 글 |
+| 2 | 트리거와 바인딩 — 함수 입출력의 모든 것 |
+| 3 | Host와 Worker — 함수는 누가 실행하는가 |
+| 4 | 첫 번째 함수 배포 — 로컬에서 Azure까지 |
+| 5 | 4가지 플랜 — Consumption / Flex Consumption / Premium / Dedicated |
+| 6 | 스케일링과 콜드 스타트 — 서버리스의 두 얼굴 |
+| 7 | 모니터링과 운영 기초 |
+
+---
+
+## References
+
+**공식 문서**
+- [Azure Functions overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview)
+- [Azure Functions best practices — Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices)
+- [Azure Functions triggers and bindings concepts](https://learn.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings)
+
+**오픈소스 코드**
+- [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) — Functions Host 본체
+
+**참고 글**
+- [SIOS Tech Lab — Azure Functions の概要とプラン別スケーリング](https://tech-lab.sios.jp/archives/35541) (이 시리즈의 출발점이 된 일본어 원문)
+
+**관련 시리즈**
+- [Azure App Service 101](../../azure-app-service-101/) — 상시 실행형 PaaS와의 비교가 궁금하다면
