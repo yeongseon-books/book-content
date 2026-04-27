@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
 
 > Azure Container Apps Deep Dive 시리즈 (3/6)
@@ -362,3 +361,5 @@ App 설정을 Envoy 설정으로 번역하는 ACA 내부 control-plane 코드는
 - [Azure Container Apps 101](../../azure-aca-101/ko/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

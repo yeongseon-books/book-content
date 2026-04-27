@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # KEDA 내부 — ScaledObject가 HPA를 만드는 방식
 
 > Azure Kubernetes Service Deep Dive 시리즈 (6/6)
@@ -85,3 +84,5 @@ HPA를 만들거나 갱신합니다.
 ### 관련 시리즈
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 5화 — control loop 읽는 법](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

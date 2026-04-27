@@ -1,4 +1,3 @@
-<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # Ingress와 트래픽 분할 — Revision 기반 배포 전략
 
 > Azure Container Apps 101 시리즈 (4/7)
@@ -259,3 +258,5 @@ az containerapp ingress traffic set   --name $APP_NAME   --resource-group $RG   
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
+
+Tags: Azure, Container Apps, Serverless, Containers

@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Request Lifecycle: How Requests Reach Your App
 
 "Why is my app returning a 502 error?" "Response times suddenly increased—what's the cause?"
@@ -371,3 +370,5 @@ In the next post, we'll explore **Hosting Models** - App Service Plan selection 
 ---
 
 **Tags:** `Azure` `App Service` `Cloud` `Networking` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

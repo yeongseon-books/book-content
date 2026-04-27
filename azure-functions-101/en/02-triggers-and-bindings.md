@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Triggers and Bindings — Everything About Function I/O
 
 > Azure Functions 101 series (2/7)
@@ -180,3 +179,5 @@ This is part 2 of the Azure Functions 101 series. Part 1 established the mental 
 
 **Related Series**
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/) — for the code-level view of how the Host and binding extensions behave
+
+Tags: Azure, Azure Functions, Serverless, Cloud

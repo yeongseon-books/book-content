@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t
 
 > Azure Functions 101 series (6/7)
@@ -182,3 +181,5 @@ If you want the implementation details behind those behaviors, pair this post wi
 - [Azure Functions 101 Part 7 — Monitoring and operations fundamentals](./07-monitoring-and-ops.md)
 - [Azure Functions Deep Dive Part 5 — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md)
 - [Azure Functions Deep Dive Part 6 — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md)
+
+Tags: Azure, Azure Functions, Serverless, Cloud

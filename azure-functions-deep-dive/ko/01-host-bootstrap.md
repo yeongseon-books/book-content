@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기
 
 > Azure Functions Deep Dive 시리즈 (1/6)
@@ -162,3 +161,5 @@
 
 ### 시리즈 다른 화
 - [Azure Functions 101 — 입문편](../../azure-functions-101/ko/) (특히 3화 “Host와 Worker”)
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

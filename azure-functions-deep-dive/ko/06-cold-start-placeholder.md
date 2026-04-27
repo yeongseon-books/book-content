@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
 
 > Azure Functions Deep Dive 시리즈 (6/6)
@@ -393,3 +392,5 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 - [입문 6화 — 스케일링과 콜드 스타트](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
 - [심화 1화 — Host Bootstrap](./01-host-bootstrap.md)
 - [심화 5화 — 스케일링 내부 동작](./05-scaling-internals.md)
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

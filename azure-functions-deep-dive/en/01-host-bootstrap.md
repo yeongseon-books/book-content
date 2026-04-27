@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Host Bootstrap — Following `WebJobsScriptHostService`
 
 > Azure Functions Deep Dive series (1/6)
@@ -162,3 +161,5 @@ This is part 1 of the Azure Functions Deep Dive series. With host bootstrap in p
 
 ### Other parts in the series
 - [Azure Functions 101 — intro series](../../azure-functions-101/en/) (especially episode 3, "Host and Worker")
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

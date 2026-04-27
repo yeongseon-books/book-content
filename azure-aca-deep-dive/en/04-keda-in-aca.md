@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # KEDA inside ACA — what a scale rule actually creates
 
 > Azure Container Apps Deep Dive series (4/6)
@@ -318,3 +317,5 @@ Part 3 explained how revisions receive traffic. This part explained how those sa
 - [Azure Container Apps 101](../../azure-aca-101/en/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/en/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
 
 > Azure Kubernetes Service Deep Dive 시리즈 (5/6)
@@ -81,3 +80,5 @@ CA는 unschedulable Pod를 보고,
 ### 관련 시리즈
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 5화 — scaling internals](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

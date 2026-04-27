@@ -3,11 +3,12 @@
 
 Three operations, idempotent, safe to re-run:
 
-1. Insert/update tag HTML comment as the very first line.
+1. Insert/update visible tag line ('Tags: A, B, C, D') as the very last line.
+   Any legacy '<!-- tags: ... -->' on line 1 is removed.
 2. Rename References heading to '참고 자료' (ko only).
 3. Insert/refresh series TOC immediately above the references section.
 
-Source of truth for titles: each post's H1 (first '# ' line after the tag comment).
+Source of truth for titles: each post's H1 (first '# ' line).
 Series ordering: numeric prefix of filename (01, 02, ...).
 TOC entry for the current post: bold, no link.
 TOC links: ko->ko/<file>.md, en->en/<file>.md, medium->medium/<NN>.md (relative within series dir).
@@ -37,7 +38,8 @@ TOC_HEADING_KO = "## 시리즈 목차"
 TOC_HEADING_EN = "## In this series"
 TOC_BEGIN = "<!-- toc:begin -->"
 TOC_END = "<!-- toc:end -->"
-TAG_PREFIX = "<!-- tags:"
+TAG_COMMENT_PREFIX = "<!-- tags:"
+TAG_LINE_PREFIX = "Tags: "
 H1_RE = re.compile(r"^#\s+(.+?)\s*$")
 
 
@@ -48,7 +50,7 @@ def numeric_prefix(name: str) -> str | None:
 
 def read_h1(text: str) -> str | None:
     for line in text.split("\n"):
-        if line.startswith(TAG_PREFIX):
+        if line.startswith(TAG_COMMENT_PREFIX):
             continue
         s = line.strip()
         if not s:
@@ -96,12 +98,15 @@ def build_toc(entries: dict[int, dict[str, str]], current_idx: int, variant: str
     return lines
 
 
-def replace_tag_line(lines: list[str], series: str) -> list[str]:
-    desired = f"<!-- tags: {', '.join(SERIES_TAGS[series])} -->"
-    if lines and lines[0].startswith(TAG_PREFIX):
-        lines[0] = desired
-        return lines
-    return [desired] + lines
+def apply_tag_line(lines: list[str], series: str) -> list[str]:
+    desired = f"{TAG_LINE_PREFIX}{', '.join(SERIES_TAGS[series])}"
+    out = [ln for ln in lines if not ln.startswith(TAG_COMMENT_PREFIX)]
+    out = [ln for ln in out if not ln.startswith(TAG_LINE_PREFIX)]
+    while out and out[-1].strip() == "":
+        out.pop()
+    out.append("")
+    out.append(desired)
+    return out
 
 
 def rename_ko_references(lines: list[str]) -> list[str]:
@@ -155,10 +160,11 @@ def find_toc_insert_point(lines: list[str], ref_idx: int) -> int:
 def process_post(path: Path, series: str, idx: int, variant: str, entries: dict[int, dict[str, str]]) -> str:
     text = path.read_text(encoding="utf-8")
     lines = text.split("\n")
-    lines = replace_tag_line(lines, series)
     if variant == "ko":
         lines = rename_ko_references(lines)
     lines = strip_existing_toc(lines)
+    lines = [ln for ln in lines if not ln.startswith(TAG_COMMENT_PREFIX)]
+    lines = [ln for ln in lines if not ln.startswith(TAG_LINE_PREFIX)]
     ref_idx = find_references_index(lines)
     if ref_idx is None:
         return "no-references-section"
@@ -166,7 +172,8 @@ def process_post(path: Path, series: str, idx: int, variant: str, entries: dict[
     toc_block = build_toc(entries, idx, variant)
     new_lines = lines[:insert_at] + [""] + toc_block + [""] + lines[insert_at:]
     new_lines = collapse_redundant(new_lines)
-    new_text = "\n".join(new_lines)
+    new_lines = apply_tag_line(new_lines, series)
+    new_text = "\n".join(new_lines) + "\n"
     if new_text != text:
         path.write_text(new_text, encoding="utf-8")
         return "updated"

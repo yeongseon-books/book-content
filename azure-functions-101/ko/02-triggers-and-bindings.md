@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # 트리거와 바인딩 — 함수 입출력의 모든 것
 
 > Azure Functions 101 시리즈 (2/7)
@@ -180,3 +179,5 @@ DB 연결, 인증, 재시도 같은 운영 코드는 **Functions Host가 대신 
 
 **관련 시리즈**
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/) — Host와 Binding 확장이 실제로 어떻게 움직이는지 더 안쪽까지 볼 수 있습니다
+
+Tags: Azure, Azure Functions, Serverless, Cloud

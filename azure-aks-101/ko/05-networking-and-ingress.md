@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
 
 > Azure Kubernetes Service 101 시리즈 (5/7)
@@ -258,3 +257,5 @@ IPAM 방식은 나중에 바꾸기 싫은 축입니다. 클러스터 수, 노드
 ### 관련 시리즈
 - [Azure App Service 101](../../azure-app-service-101/ko/02-request-lifecycle.md) — 외부 요청이 애플리케이션 인스턴스로 들어가는 경로를 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md) — HTTP 엔드포인트 노출이 플랫폼에 더 많이 추상화된 모델과 비교할 때
+
+Tags: Azure, AKS, Kubernetes, Cloud

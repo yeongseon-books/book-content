@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Host and Worker — Who Actually Runs Your Functions?
 
 > Azure Functions 101 series (3/7)
@@ -142,3 +141,5 @@ This is part 3 of the Azure Functions 101 series. Parts 1 and 2 covered the ment
 
 **Related Series**
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/) — a deeper series that traces the Host/Worker split at the code level
+
+Tags: Azure, Azure Functions, Serverless, Cloud

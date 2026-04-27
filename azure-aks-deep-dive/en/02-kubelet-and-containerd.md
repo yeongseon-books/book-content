@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # kubelet and containerd — how a container actually starts on a node
 
 > Azure Kubernetes Service Deep Dive series (2/6)
@@ -125,3 +124,5 @@ Part 1 fixed the managed control-plane boundary; this part follows the exact opp
 ### Related Series
 - [Azure AKS 101](../../azure-aks-101/en/)
 - [Azure Functions Deep Dive part 3 — one bidirectional RPC stream](../../azure-functions-deep-dive/en/03-grpc-event-stream.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

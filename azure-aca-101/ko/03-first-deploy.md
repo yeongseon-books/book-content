@@ -1,4 +1,3 @@
-<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # 첫 앱 배포하기 — Python/FastAPI
 
 > Azure Container Apps 101 시리즈 (3/7)
@@ -256,3 +255,5 @@ curl https://<YOUR_FQDN>/
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
+
+Tags: Azure, Container Apps, Serverless, Containers

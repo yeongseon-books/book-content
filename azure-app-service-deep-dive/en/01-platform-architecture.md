@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # App Service platform architecture — Front-End, Worker, File Server
 
 > Azure App Service Deep Dive series (1/6)
@@ -285,3 +284,5 @@ Episode 2 covers Front-End and ARR, episode 3 covers workers and the sandbox, ep
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/01-what-is-app-service.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/01-host-bootstrap.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Scaling 101: 언제 Scale Up vs Scale Out?
 
 > Azure App Service 101 시리즈 (7/7) - 마지막
@@ -533,3 +532,5 @@ az monitor metrics alert create \
 ---
 
 **Tags:** `Azure` `App Service` `Scaling` `Autoscale` `Performance` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

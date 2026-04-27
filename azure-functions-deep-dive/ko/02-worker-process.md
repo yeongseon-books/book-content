@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법
 
 > Azure Functions Deep Dive 시리즈 (2/7)
@@ -156,3 +155,5 @@ OS 프로세스가 떠 있다고 해서 Worker가 “준비 완료”인 건 아
 - [`Azure/azure-functions-nodejs-worker`의 `worker.config.json`](https://github.com/Azure/azure-functions-nodejs-worker/blob/v3.x/worker.config.json)
 - [`Azure/azure-functions-python-worker`](https://github.com/Azure/azure-functions-python-worker)
 - [`Azure/azure-functions-java-worker`의 `worker.config.json`](https://github.com/Azure/azure-functions-java-worker/blob/dev/worker.config.json)
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # ACA architecture — what Microsoft layered on a hidden Kubernetes
 
 > Azure Container Apps Deep Dive series (1/6)
@@ -318,3 +317,5 @@ This opening post is the architectural map for the Azure Container Apps Deep Div
 - [Azure Container Apps 101](../../azure-aca-101/en/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/en/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Deploy a Function App — From Localhost to Azure
 
 > Azure Functions 101 series (4/7)
@@ -267,3 +266,5 @@ This is Part 4 of Azure Functions 101. The earlier posts covered triggers and bi
 - [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
 - [Function scale and hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
 - [Run from package deployment](https://learn.microsoft.com/en-us/azure/azure-functions/run-functions-from-deployment-package)
+
+Tags: Azure, Azure Functions, Serverless, Cloud

@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
 
 > Azure App Service Deep Dive 시리즈 (5/6)
@@ -205,3 +204,5 @@ scale-in은 사용 중인 capacity를 줄이는 작업입니다.
 ### 관련 시리즈
 - [Azure App Service 101 — Scaling 101](../../azure-app-service-101/ko/07-scaling-101.md)
 - [Azure Functions Deep Dive — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

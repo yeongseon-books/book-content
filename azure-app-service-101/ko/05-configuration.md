@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Configuration 마스터하기: App Settings & 환경변수
 
 배포는 끝났습니다. 이제 진짜 운영이 시작됩니다.
@@ -488,3 +487,5 @@ logger.info("Configuration loaded", extra={
 ---
 
 **Tags:** `Azure` `App Service` `Configuration` `Security` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # App Service 플랫폼 아키텍처 — Front-End·Worker·File Server
 
 > Azure App Service Deep Dive 시리즈 (1/6)
@@ -287,3 +286,5 @@ Front-End와 ARR이 어떻게 요청을 워커에 보내는지,
 ### 관련 시리즈
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/01-host-bootstrap.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

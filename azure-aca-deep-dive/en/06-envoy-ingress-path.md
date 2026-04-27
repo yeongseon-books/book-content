@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # The Envoy ingress path — how the first request reaches your container
 
 > Azure Container Apps Deep Dive series (6/6)
@@ -303,3 +302,5 @@ This final part closed the loop on every earlier concept in the series. The envi
 - [Azure Container Apps 101](../../azure-aca-101/en/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/en/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

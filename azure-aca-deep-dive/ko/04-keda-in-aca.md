@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # ACA 안의 KEDA — Scale Rule이 만드는 것
 
 > Azure Container Apps Deep Dive 시리즈 (4/6)
@@ -318,3 +317,5 @@ Scale 블레이드 뒤에 숨어 있는 기계가 바로 이것입니다.
 - [Azure Container Apps 101](../../azure-aca-101/ko/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

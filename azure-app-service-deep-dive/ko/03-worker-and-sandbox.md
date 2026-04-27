@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
 
 > Azure App Service Deep Dive 시리즈 (3/6)
@@ -246,3 +245,5 @@ Kudu가 어떻게 배포를 받고,
 ### 관련 시리즈
 - [Azure App Service 101 — Hosting Models](../../azure-app-service-101/ko/03-hosting-models.md)
 - [Azure Functions Deep Dive — Worker Process](../../azure-functions-deep-dive/ko/02-worker-process.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
 
 > Azure App Service Deep Dive 시리즈 (6/6)
@@ -216,3 +215,5 @@ warm-up이 한 시스템으로 이어진 플랫폼으로 볼 수 있습니다.
 ### 관련 시리즈
 - [Azure App Service 101 — Request Lifecycle](../../azure-app-service-101/ko/02-request-lifecycle.md)
 - [Azure Functions Deep Dive — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

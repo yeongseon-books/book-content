@@ -1,4 +1,3 @@
-<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # Environment·Container App·Revision — 세 단어로 보는 ACA
 
 > Azure Container Apps 101 시리즈 (2/7)
@@ -256,3 +255,5 @@ Multiple은 Canary와 Blue-Green을 가능하게 합니다.
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
+
+Tags: Azure, Container Apps, Serverless, Containers

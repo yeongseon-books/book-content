@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
 
 > Azure Kubernetes Service 101 시리즈 (3/7)
@@ -361,3 +360,5 @@ kubectl describe service fastapi-hello
 ### 관련 시리즈
 - [Azure App Service 101](../../azure-app-service-101/ko/04-first-deploy.md) — 같은 FastAPI 앱을 더 높은 수준의 PaaS에 올리는 흐름과 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/) — 코드 배포 단위가 컨테이너와 어떻게 다른지 비교할 때
+
+Tags: Azure, AKS, Kubernetes, Cloud

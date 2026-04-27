@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이
 
 > Azure Functions Deep Dive 시리즈 (5/7)
@@ -319,3 +318,5 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 ### 관련 시리즈
 
 이 글은 Deep Dive 시리즈 5화입니다. 앞선 4화에서 한 번의 호출이 워커까지 도달하는 경로를 따라왔고, 이번 화에서는 그런 호출이 많아졌을 때 바깥의 Scale Controller와 안쪽의 WorkerConcurrencyManager가 각각 무엇을 하는지 갈라서 봤습니다. 다음 6화는 새 인스턴스가 실제로 만들어질 때의 Placeholder Mode와 specialization으로 이어지고, 입문 시리즈 5·6화는 같은 주제를 운영자 관점에서 더 가볍게 정리해 둔 버전입니다.
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

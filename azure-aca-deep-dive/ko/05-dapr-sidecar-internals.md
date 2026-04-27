@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
 
 > Azure Container Apps Deep Dive 시리즈 (5/6)
@@ -354,3 +353,5 @@ Timeout 분석에서는 이 마지막 구분이 특히 중요합니다.
 - [Azure Container Apps 101](../../azure-aca-101/ko/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # What is Azure App Service? - Understanding the Platform Architecture
 
 When deploying a web application to Azure, **Azure App Service** is often the first service you encounter. It's a PaaS (Platform as a Service) where you just deploy your code without managing VMs. To use this service effectively, understanding its internals is crucial.
@@ -307,3 +306,5 @@ In the next post, we'll explore the **Request Lifecycle** - the complete journey
 ---
 
 **Tags:** `Azure` `App Service` `Cloud` `Architecture` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

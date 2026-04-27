@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
 
 > Azure Kubernetes Service Deep Dive 시리즈 (2/6)
@@ -157,3 +156,5 @@ containerd가 OCI runtime 계층으로 내려가면서 `runc`를 사용합니다
 ### 관련 시리즈
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 3화 — 단일 RPC 채널 관점](../../azure-functions-deep-dive/ko/03-grpc-event-stream.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

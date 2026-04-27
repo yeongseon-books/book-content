@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated
 
 > Azure Functions 101 시리즈 (5/7)
@@ -203,3 +202,5 @@ Dedicated(App Service Plan)는 이름보다 본질을 보는 편이 쉽습니다
 - [Azure Functions Premium plan](https://learn.microsoft.com/en-us/azure/azure-functions/functions-premium-plan)
 - [Dedicated hosting plans for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/dedicated-plan)
 - [Migrate from Consumption to Flex Consumption](https://learn.microsoft.com/en-us/azure/azure-functions/migration/migrate-plan-consumption-to-flex)
+
+Tags: Azure, Azure Functions, Serverless, Cloud

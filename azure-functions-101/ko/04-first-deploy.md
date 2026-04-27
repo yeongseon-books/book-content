@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # 함수 하나 배포하기 — 로컬에서 Azure까지
 
 > Azure Functions 101 시리즈 (4/7)
@@ -267,3 +266,5 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 - [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
 - [Function scale and hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
 - [Run from package deployment](https://learn.microsoft.com/en-us/azure/azure-functions/run-functions-from-deployment-package)
+
+Tags: Azure, Azure Functions, Serverless, Cloud

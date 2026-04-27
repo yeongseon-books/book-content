@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
 
 > Azure Container Apps Deep Dive 시리즈 (2/6)
@@ -312,3 +311,5 @@ Ingress는 이 경계 안의 app endpoint로 들어갑니다.
 - [Azure Container Apps 101](../../azure-aca-101/ko/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

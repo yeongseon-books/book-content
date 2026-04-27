@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
 
 > Azure Kubernetes Service Deep Dive 시리즈 (4/6)
@@ -79,3 +78,5 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 ### 관련 시리즈
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 4화 — dispatcher와 invocation](../../azure-functions-deep-dive/ko/04-dispatcher-and-invocation.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

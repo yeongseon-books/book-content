@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Dapr sidecar internals — the Go process that lives next to your container
 
 > Azure Container Apps Deep Dive series (5/6)
@@ -353,3 +352,5 @@ The previous part explained how ACA scales revisions. This part explained how AC
 - [Azure Container Apps 101](../../azure-aca-101/en/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/en/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

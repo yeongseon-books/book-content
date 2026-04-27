@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Cluster architecture — control plane and node pools
 
 > Azure Kubernetes Service 101 series (2/7)
@@ -234,3 +233,5 @@ This is part 2 of the Azure Kubernetes Service 101 series. Part 1 defined the ma
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/) — useful when contrasting AKS with a platform that has no node concept at all
 - [Azure Functions 101](../../azure-functions-101/en/) — useful when comparing orchestration with event-driven execution
+
+Tags: Azure, AKS, Kubernetes, Cloud

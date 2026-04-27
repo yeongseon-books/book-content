@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Scaling 101: When to Scale Up vs Scale Out?
 
 "Traffic increased and the app is slow." "Want to reduce costs but maintain performance."
@@ -417,3 +416,5 @@ This closing post ties the rest of the series together by turning deployment, co
 ---
 
 **Tags:** `Azure` `App Service` `Scaling` `Autoscale` `Performance` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

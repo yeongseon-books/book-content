@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
 
 > Azure App Service Deep Dive 시리즈 (2/6)
@@ -244,3 +243,5 @@ Linux 앱에서는 왜 container 경계가 핵심인지 이어서 다룹니다.
 ### 관련 시리즈
 - [Azure App Service 101 — Request Lifecycle](../../azure-app-service-101/ko/02-request-lifecycle.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/04-dispatcher-and-invocation.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

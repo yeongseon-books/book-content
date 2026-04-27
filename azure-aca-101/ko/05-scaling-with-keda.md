@@ -1,4 +1,3 @@
-<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # 스케일링 — KEDA scaler와 0-to-N
 
 > Azure Container Apps 101 시리즈 (5/7)
@@ -258,3 +257,5 @@ az containerapp create   --name queue-worker   --resource-group $RG   --environm
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
+
+Tags: Azure, Container Apps, Serverless, Containers

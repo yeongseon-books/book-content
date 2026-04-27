@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Monitoring and ops — Container Insights, logs, alerts
 
 > Azure Kubernetes Service 101 series (7/7)
@@ -257,3 +256,5 @@ This is the final part of the Azure Kubernetes Service 101 series. The earlier p
 ### Related Series
 - [Azure Functions 101](../../azure-functions-101/en/07-monitoring-and-ops.md) — useful when comparing AKS operations with Application Insights-centric serverless operations
 - [Azure App Service 101](../../azure-app-service-101/en/06-logging-monitoring.md) — useful when comparing AKS observability with a simpler web platform model
+
+Tags: Azure, AKS, Kubernetes, Cloud

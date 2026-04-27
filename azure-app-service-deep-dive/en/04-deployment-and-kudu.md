@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Deployment and Kudu — build, sync, release from the inside
 
 > Azure App Service Deep Dive series (4/6)
@@ -243,3 +242,5 @@ The next post shifts to control-plane behavior and follows how scale-out decisio
 ### Related Series
 - [Azure App Service 101 — First Deployment](../../azure-app-service-101/en/04-first-deploy.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/03-grpc-event-stream.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

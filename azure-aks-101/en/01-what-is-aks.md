@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
 
 > Azure Kubernetes Service 101 series (1/7)
@@ -191,3 +190,5 @@ This is part 1 of the Azure Kubernetes Service 101 series. This post set the res
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/) — useful when comparing managed Kubernetes with a higher-level web app platform
 - [Azure Functions 101](../../azure-functions-101/en/) — useful when comparing serverless execution with container orchestration
+
+Tags: Azure, AKS, Kubernetes, Cloud

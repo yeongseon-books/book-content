@@ -1,4 +1,3 @@
-<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # Dapr 통합 — 사이드카로 얻는 것
 
 > Azure Container Apps 101 시리즈 (6/7)
@@ -259,3 +258,5 @@ scopes:
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
+
+Tags: Azure, Container Apps, Serverless, Containers

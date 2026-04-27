@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까
 
 새벽 3시, 알람이 울립니다. 프로덕션 API가 갑자기 `502`를 뱉기 시작했습니다.  
@@ -536,3 +535,5 @@ Azure App Service의 Request Lifecycle을 이해하면, 장애가 났을 때 질
 ---
 
 **Tags:** `Azure` `App Service` `Cloud` `Networking` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

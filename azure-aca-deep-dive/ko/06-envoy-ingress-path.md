@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
 
 > Azure Container Apps Deep Dive 시리즈 (6/6)
@@ -304,3 +303,5 @@ Envoy는 이 모든 외부 경로를 실제로 이어 주는 router입니다.
 - [Azure Container Apps 101](../../azure-aca-101/ko/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

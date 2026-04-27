@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # 모니터링과 운영 기초
 
 > Azure Functions 101 시리즈 (7/7)
@@ -204,3 +203,5 @@ Azure Functions 101 시리즈는 여기서 끝납니다. 이 시리즈 전체를
 - [Azure Functions 101 6화 — 스케일링과 콜드 스타트](./06-scaling-and-cold-start.md)
 - [Azure Functions Deep Dive 5화 — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
 - [Azure Functions Deep Dive 6화 — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)
+
+Tags: Azure, Azure Functions, Serverless, Cloud

@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Worker Processes — How One Host Hosts Many Languages
 
 > Azure Functions Deep Dive series (2/7)
@@ -156,3 +155,5 @@ This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host boot
 - [`Azure/azure-functions-nodejs-worker` `worker.config.json`](https://github.com/Azure/azure-functions-nodejs-worker/blob/v3.x/worker.config.json)
 - [`Azure/azure-functions-python-worker`](https://github.com/Azure/azure-functions-python-worker)
 - [`Azure/azure-functions-java-worker` `worker.config.json`](https://github.com/Azure/azure-functions-java-worker/blob/dev/worker.config.json)
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

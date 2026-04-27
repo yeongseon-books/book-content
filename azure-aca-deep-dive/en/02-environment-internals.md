@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Environment internals — the network, observability, and Dapr scope boundary
 
 > Azure Container Apps Deep Dive series (2/6)
@@ -306,3 +305,5 @@ This post zoomed into the outer boundary that all later ACA runtime behavior dep
 - [Azure Container Apps 101](../../azure-aca-101/en/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/en/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

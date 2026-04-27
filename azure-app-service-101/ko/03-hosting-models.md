@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Hosting Models: 어떤 플랜을 선택해야 할까?
 
 처음 App Service를 만들 때 헷갈리는 이유는, 선택지가 많아서가 아니라 **선택 기준이 안 보이기 때문**입니다. 포털은 OS, 배포 방식, 요금제 티어를 한 번에 물어보지만, 실제로는 이 세 가지를 따로따로 고민하면 됩니다.
@@ -482,3 +481,5 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 ---
 
 **Tags:** `Azure` `App Service` `Cloud` `Pricing` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

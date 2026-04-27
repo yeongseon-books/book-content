@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
 
 > Azure Container Apps Deep Dive 시리즈 (1/6)
@@ -322,3 +321,5 @@ ACA가 모호하다는 뜻은 아닙니다.
 - [Azure Container Apps 101](../../azure-aca-101/ko/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

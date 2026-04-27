@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # CNI and Azure CNI Overlay — where Pod IPs come from
 
 > Azure Kubernetes Service Deep Dive series (3/6)
@@ -82,3 +81,5 @@ Part 2 followed the node-local execution path; this part explains how CNI attach
 ### Related Series
 - [Azure AKS 101](../../azure-aks-101/en/)
 - [Azure Functions Deep Dive part 1 — start with the big picture](../../azure-functions-deep-dive/en/01-host-bootstrap.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

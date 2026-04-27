@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Scaling — HPA, Cluster Autoscaler, KEDA
 
 > Azure Kubernetes Service 101 series (6/7)
@@ -273,3 +272,5 @@ This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/07-scaling-101.md) — useful when comparing instance scaling with Kubernetes pod and node scaling
 - [Azure Functions 101](../../azure-functions-101/en/06-scaling-and-cold-start.md) — useful when comparing orchestrated scaling with serverless scaling
+
+Tags: Azure, AKS, Kubernetes, Cloud

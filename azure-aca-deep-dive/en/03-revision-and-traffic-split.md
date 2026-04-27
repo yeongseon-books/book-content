@@ -1,4 +1,3 @@
-<!-- tags: Container Apps, KEDA, Dapr, Envoy -->
 # Revisions and traffic splitting — where Envoy weights come from
 
 > Azure Container Apps Deep Dive series (3/6)
@@ -361,3 +360,5 @@ This episode connected the environment boundary from part 2 to the immutable rol
 - [Azure Container Apps 101](../../azure-aca-101/en/)
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/en/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/)
+
+Tags: Container Apps, KEDA, Dapr, Envoy

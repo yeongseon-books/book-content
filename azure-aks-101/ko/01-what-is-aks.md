@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
 
 > Azure Kubernetes Service 101 시리즈 (1/7)
@@ -192,3 +191,5 @@ AKS는 이 셋 중에서 가장 Kubernetes에 가깝습니다. 대신 그만큼 
 ### 관련 시리즈
 - [Azure App Service 101](../../azure-app-service-101/ko/) — Kubernetes까지 필요하지 않은 웹 앱 운영 모델과 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/) — 서버리스와 관리형 Kubernetes의 책임 경계를 비교할 때
+
+Tags: Azure, AKS, Kubernetes, Cloud

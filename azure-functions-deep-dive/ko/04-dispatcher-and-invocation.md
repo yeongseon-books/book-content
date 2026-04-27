@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지
 
 > Azure Functions Deep Dive 시리즈 (4/7)
@@ -279,3 +278,5 @@ gRPC stream
 
 **프로토콜**
 - [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto) — `InvocationRequest`, `InvocationResponse`, `ParameterBinding`, `RpcTraceContext`
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

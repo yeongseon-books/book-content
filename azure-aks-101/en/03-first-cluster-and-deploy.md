@@ -1,4 +1,3 @@
-<!-- tags: Azure, AKS, Kubernetes, Cloud -->
 # Your first cluster, your first deploy — Python/FastAPI
 
 > Azure Kubernetes Service 101 series (3/7)
@@ -358,3 +357,5 @@ This is part 3 of the Azure Kubernetes Service 101 series. The first two posts s
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/04-first-deploy.md) — useful when comparing the same FastAPI app on a higher-level PaaS
 - [Azure Functions 101](../../azure-functions-101/en/) — useful when comparing container deployment with function deployment
+
+Tags: Azure, AKS, Kubernetes, Cloud

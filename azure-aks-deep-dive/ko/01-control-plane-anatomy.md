@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # Control Plane 해부 — AKS가 사용자에게서 가린 것
 
 > Azure Kubernetes Service Deep Dive 시리즈 (1/6)
@@ -335,3 +334,5 @@ AKS 101이 control plane과 node pool의 역할 분담을 입문자 관점에서
 ### 관련 시리즈
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 1화 — 호스트 부팅과 큰 그림](../../azure-functions-deep-dive/ko/01-host-bootstrap.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

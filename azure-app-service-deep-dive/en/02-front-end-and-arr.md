@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Front-End and ARR — how a request reaches a worker
 
 > Azure App Service Deep Dive series (2/6)
@@ -248,3 +247,5 @@ The next post moves inside the worker itself and explains the sandbox boundary, 
 ### Related Series
 - [Azure App Service 101 — Request Lifecycle](../../azure-app-service-101/en/02-request-lifecycle.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/04-dispatcher-and-invocation.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

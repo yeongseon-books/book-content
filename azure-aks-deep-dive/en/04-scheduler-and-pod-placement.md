@@ -1,4 +1,3 @@
-<!-- tags: AKS, Kubernetes, Distributed Systems, Containers -->
 # Scheduler and Pod placement — who decides which node
 
 > Azure Kubernetes Service Deep Dive series (4/6)
@@ -80,3 +79,5 @@ Parts 2 and 3 covered node execution and networking; this part explains the earl
 ### Related Series
 - [Azure AKS 101](../../azure-aks-101/en/)
 - [Azure Functions Deep Dive part 4 — dispatcher and invocation](../../azure-functions-deep-dive/en/04-dispatcher-and-invocation.md)
+
+Tags: AKS, Kubernetes, Distributed Systems, Containers

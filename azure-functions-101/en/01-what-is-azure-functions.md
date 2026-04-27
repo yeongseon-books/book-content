@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # What Is Azure Functions? — A World Where Events Call Your Code
 
 > Azure Functions 101 series (1/7)
@@ -161,3 +160,5 @@ This is part 1 of the Azure Functions 101 series. With the mental model in place
 
 **Related Series**
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/) — if you want the code-level version of the Host/Worker story
+
+Tags: Azure, Azure Functions, Serverless, Cloud

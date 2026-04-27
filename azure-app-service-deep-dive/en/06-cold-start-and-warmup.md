@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # Cold start and warmup — why the first request is expensive
 
 > Azure App Service Deep Dive series (6/6)
@@ -221,3 +220,5 @@ Read back through the series and the whole model lines up: entry, routing, execu
 ### Related Series
 - [Azure App Service 101 — Request Lifecycle](../../azure-app-service-101/en/02-request-lifecycle.md)
 - [Azure Functions Deep Dive — Cold start and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

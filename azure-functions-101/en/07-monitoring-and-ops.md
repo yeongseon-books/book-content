@@ -1,4 +1,3 @@
-<!-- tags: Azure, Azure Functions, Serverless, Cloud -->
 # Monitoring and Operations Fundamentals
 
 > Azure Functions 101 series (7/7)
@@ -204,3 +203,5 @@ If you want to go deeper into the implementation, continue with [Deep Dive Part 
 - [Azure Functions 101 Part 6 — Scaling and cold starts](./06-scaling-and-cold-start.md)
 - [Azure Functions Deep Dive Part 5 — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md)
 - [Azure Functions Deep Dive Part 6 — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md)
+
+Tags: Azure, Azure Functions, Serverless, Cloud

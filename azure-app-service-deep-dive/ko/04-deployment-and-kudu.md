@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Distributed Systems, Platform Engineering -->
 # 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
 
 > Azure App Service Deep Dive 시리즈 (4/6)
@@ -228,3 +227,5 @@ scale up과 scale out이 무엇을 실제로 바꾸는지 이어서 다룹니다
 ### 관련 시리즈
 - [Azure App Service 101 — 첫 번째 배포](../../azure-app-service-101/ko/04-first-deploy.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/03-grpc-event-stream.md)
+
+Tags: Azure, App Service, Distributed Systems, Platform Engineering

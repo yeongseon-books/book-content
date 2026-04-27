@@ -1,4 +1,3 @@
-<!-- tags: Azure Functions, Serverless, Distributed Systems, gRPC -->
 # gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
 
 > Azure Functions Deep Dive 시리즈 (3/7)
@@ -287,3 +286,5 @@ message FunctionLoadRequest {
 
 **관련 입문편**
 - [Host와 Worker — 함수는 누가 실행하는가 (입문편 3화)](../../azure-functions-101/ko/03-host-and-worker.md)
+
+Tags: Azure Functions, Serverless, Distributed Systems, gRPC

@@ -1,4 +1,3 @@
-<!-- tags: Azure, Container Apps, Serverless, Containers -->
 # Dapr integration — what you get from a sidecar
 
 > Azure Container Apps 101 series (6/7)
@@ -259,3 +258,5 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 - [Azure App Service 101](../../azure-app-service-101/en/01-what-is-app-service.md)
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
+
+Tags: Azure, Container Apps, Serverless, Containers

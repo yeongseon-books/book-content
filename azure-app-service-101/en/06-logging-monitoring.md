@@ -1,4 +1,3 @@
-<!-- tags: Azure, App Service, Cloud, Web Apps -->
 # Logging and Monitoring Basics
 
 "The app is slow." "There's an error." "When did this start?"
@@ -489,3 +488,5 @@ In the final post, we'll cover **Scaling 101** - when to Scale Up vs Scale Out.
 ---
 
 **Tags:** `Azure` `App Service` `Monitoring` `Logging` `Application Insights` `DevOps`
+
+Tags: Azure, App Service, Cloud, Web Apps

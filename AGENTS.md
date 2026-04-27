@@ -22,13 +22,13 @@ Each series has three variants: `ko/`, `en/`, `medium/`.
 
 Every post MUST have, top to bottom:
 
-1. **Tag comment** as line 1: `<!-- tags: A, B, C, D -->` (per-series set, see `.sisyphus/medium/finalize-posts.py`)
-2. **H1 title** (`# Title`)
-3. **Body** (sections, code, images, etc.)
-4. **Series TOC block** wrapped in `<!-- toc:begin -->` / `<!-- toc:end -->`
-5. **References section** (`## 참고 자료` for ko, `## References` for en/medium)
+1. **H1 title** (`# Title`) as the first content line
+2. **Body** (sections, code, images, etc.)
+3. **Series TOC block** wrapped in `<!-- toc:begin -->` / `<!-- toc:end -->`
+4. **References section** (`## 참고 자료` for ko, `## References` for en/medium)
+5. **Tag line** as the very last line: `Tags: A, B, C, D` (visible plain text, per-series set, see `.sisyphus/medium/finalize-posts.py`)
 
-The TOC block sits immediately above the references section, separated by a single `---` divider.
+The TOC block sits immediately above the references section, separated by a single `---` divider. The tag line sits at the very bottom of the file (after the references section), separated by one blank line. Legacy `<!-- tags: ... -->` HTML comments on line 1 are removed automatically by `finalize-posts.py`.
 
 ## Series TOC rules (apply to every post, no exceptions)
 
@@ -55,12 +55,13 @@ TOC entry titles are pulled from each post's H1 (single source of truth). Never 
 - **ko**: `## 참고 자료` (never `## References`, `## 참고문헌`, `## 참고`)
 - **en/medium**: `## References`
 
-## Tag comment
+## Tag line
 
-- Format: `<!-- tags: A, B, C, D -->`
-- Position: line 1 of every post
+- Format: `Tags: A, B, C, D` (visible plain text, NOT an HTML comment)
+- Position: very last line of every post (after the references section, separated by one blank line)
 - Source of truth: `SERIES_TAGS` in `.sisyphus/medium/finalize-posts.py`
 - Same set is used for ko, en, and medium variants
+- The tag line is visible to readers (Tistory/Medium); it doubles as a copy-paste source when publishing
 
 ## Image conventions
 
@@ -109,7 +110,7 @@ python3 .sisyphus/medium/finalize-posts.py    # re-apply tags+TOC to new medium/
 
 - `mermaid-to-png.py` — convert mermaid blocks in ko/en bodies to PNG references
 - `to-medium.py` — convert `en/*.md` to `medium/<NN>.md` (raw URLs, bullet tables, demoted headings)
-- `finalize-posts.py` — idempotent: tag comment, ko refs heading, series TOC
+- `finalize-posts.py` — idempotent: tag line, ko refs heading, series TOC
 - `add-tags.py` — superseded by `finalize-posts.py`; kept for reference
 
 All three are idempotent. Re-run any time the series catalog changes.
