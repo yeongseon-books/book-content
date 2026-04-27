@@ -29,7 +29,7 @@ App Service에서 확장은 크게 두 방향으로 나뉩니다.
 | **Scale Up** | 더 큰 SKU, 더 큰 인스턴스로 변경 | 메모리 부족, 인스턴스당 CPU 부족, 상위 플랜 기능 필요 | 인스턴스당 비용 증가 |
 | **Scale Out** | 인스턴스 개수 증가 | 동시 요청 증가, 처리량 부족, 가용성 향상 | 인스턴스 수 증가 |
 
-![Scale Up vs Scale Out 비교](../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.ko.png)
+![Scale Up vs Scale Out 비교](../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.ko.png)
 
 둘 다 “리소스를 더 준다”는 점은 같지만, 적용 방식은 완전히 다릅니다.
 
@@ -62,13 +62,13 @@ App Service에서 확장은 크게 두 방향으로 나뉩니다.
 
 현실에서는 “메모리도 부족하고 트래픽도 늘었다”가 더 흔합니다. 이때는 보통 **Scale Up으로 인스턴스당 여유를 확보한 뒤, Scale Out으로 처리량을 받치는 순서**가 안정적입니다. 작은 인스턴스를 무한히 복제해도, 각 인스턴스가 이미 비좁다면 전체 구조가 불안정해지기 쉽습니다.
 
-![스케일링 의사결정 트리](../assets/azure-app-service-101/07/04-scaling-decision-tree.ko.png)
+![스케일링 의사결정 트리](../../assets/azure-app-service-101/07/04-scaling-decision-tree.ko.png)
 
 ---
 
 ## Scale Up: “한 대가 감당할 수 있는 일”의 한계를 늦춘다
 
-Scale Up은 App Service Plan의 SKU를 더 큰 등급으로 바꾸는 것입니다. 쉽게 말해 **같은 앱을 더 큰 상자에 넣는 일**입니다.
+Scale Up은 App Service Plan의 SKU를 더 큰 등급으로 바꾸는 것입니다. **같은 앱을 더 큰 상자에 넣는 일**입니다.
 
 ### Scale Up이 잘 맞는 대표 시나리오
 
@@ -141,7 +141,7 @@ az appservice plan update \
 
 App Service 인스턴스는 영원히 고정되어 있지 않습니다. 배포, 재시작, 헬스 체크, 플랫폼 유지보수, 스케일링 과정에서 계속 바뀔 수 있습니다. 따라서 인스턴스 메모리나 로컬 디스크에 상태를 붙잡아 두면, Scale Out은 구조적으로 불안정해집니다.
 
-| Stateless 패턴 ✅ | Stateful 안티패턴 ❌ |
+| Stateless 패턴 | Stateful 안티패턴 |
 |------------------|--------------------|
 | 세션을 Redis나 DB에 저장 | 세션을 프로세스 메모리에 저장 |
 | 업로드 파일을 Blob Storage에 저장 | 로컬 파일에 저장 후 다른 인스턴스가 읽길 기대 |
@@ -149,14 +149,14 @@ App Service 인스턴스는 영원히 고정되어 있지 않습니다. 배포, 
 | 인스턴스 재기동을 가정한 시작 로직 | 특정 인스턴스가 오래 살아 있길 기대 |
 
 ```python
-# ❌ 인스턴스 메모리에 세션 저장
+# 인스턴스 메모리에 세션 저장
 user_sessions = {}
 
 def save_session(user_id, session_data):
     user_sessions[user_id] = session_data
 
 
-# ✅ 외부 저장소에 세션 저장
+# 외부 저장소에 세션 저장
 import json
 import os
 import redis
@@ -191,7 +191,7 @@ Autoscale은 훌륭한 기능이지만, **사후 반응형**입니다. 메트릭
 
 웹 인스턴스를 2개에서 8개로 늘리는 일은 쉬울 수 있습니다. 하지만 DB, Redis, 외부 결제 API는 같은 속도로 늘어나지 않습니다. 이때 흔히 생기는 문제가 “앱은 더 많아졌는데, 오히려 전체 장애가 빨라졌다”는 상황입니다.
 
-![의존성 부하 전이 다이어그램](../assets/azure-app-service-101/07/03-dependency-cascade.ko.png)
+![의존성 부하 전이 다이어그램](../../assets/azure-app-service-101/07/03-dependency-cascade.ko.png)
 
 예를 들어 인스턴스당 DB 연결 풀을 20개로 잡아 두었다면,
 
@@ -220,7 +220,7 @@ Autoscale은 훌륭한 기능이지만, **사후 반응형**입니다. 메트릭
 
 Autoscale은 App Service Plan의 메트릭을 기준으로 **자동으로 인스턴스 수를 늘리고 줄이는 메커니즘**입니다. 아주 유용하지만, 이것만 켜 두면 운영이 끝난다고 생각하면 위험합니다.
 
-![Autoscale 피드백 루프](../assets/azure-app-service-101/07/02-autoscale-feedback-loop.ko.png)
+![Autoscale 피드백 루프](../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.ko.png)
 
 Autoscale이 잘하는 일은 분명합니다.
 
@@ -445,7 +445,7 @@ az monitor metrics alert create \
 
 ---
 
-## 정리: 스케일링의 핵심은 “무엇을 늘릴지 아는 것”이다
+## 정리: 스케일링에서는 무엇을 늘릴지부터 알아야 한다
 
 이 글의 핵심만 다시 묶어 보면 이렇습니다.
 
@@ -469,7 +469,7 @@ az monitor metrics alert create \
 2. **Request Lifecycle**을 따라가며 요청이 어디에서 실패할 수 있는지 이해했습니다.
 3. **Hosting Model과 Plan**을 비교하며 어떤 선택이 운영 포인트를 바꾸는지 봤습니다.
 4. **첫 배포**를 하며 로컬 코드가 실제 App Service 런타임으로 넘어가는 과정을 익혔습니다.
-5. **Configuration**을 정리하며 설정, 비밀, 환경 분리의 기준을 세웠습니다.
+5. **Configuration**을 정리하며 설정, 민감 정보, 환경 분리의 기준을 세웠습니다.
 6. **로그와 모니터링**을 붙이며 문제를 추적할 수 있는 관측성을 확보했습니다.
 7. 마지막으로 **Scaling**을 통해 트래픽과 비용, 가용성을 함께 다루는 운영 감각을 정리했습니다.
 
@@ -490,7 +490,7 @@ az monitor metrics alert create \
 - **Deployment Slots**: 무중단 배포와 안전한 롤백
 - **CI/CD**: GitHub Actions 또는 Azure DevOps로 배포 자동화
 - **네트워킹 심화**: VNet Integration, Private Endpoint, 접근 제한
-- **보안 심화**: Managed Identity, Key Vault, 비밀 회전
+- **보안 심화**: Managed Identity, Key Vault, 민감 정보 회전
 - **컨테이너 운영**: Custom Container, 시작 실패, 이미지 전략
 - **성능 최적화**: cold start, 캐시 전략, 부하 테스트, 병목 분석
 
@@ -498,24 +498,22 @@ az monitor metrics alert create \
 
 ---
 
-## 시리즈 목차
+## 이 시리즈에서의 위치
 
-1. Azure App Service란? - 플랫폼 아키텍처 이해하기
-2. Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까
-3. Hosting Models: 어떤 플랜을 선택해야 할까?
-4. 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)
-5. Configuration 마스터하기: App Settings & 환경변수
-6. 로그와 모니터링 기초
-7. **[현재 글] Scaling 101: 언제 Scale Up vs Scale Out?**
+이번 글은 App Service 101 시리즈를 마무리하는 편으로, 앞선 배포·설정·모니터링 내용을 바탕으로 스케일링 판단 기준을 정리합니다. 시리즈 전체를 다시 훑어 보면 App Service를 단순 배포 도구가 아니라 운영 플랫폼으로 보는 관점이 한 줄로 이어집니다.
 
 ---
 
 ## 참고 자료
 
+### 공식 문서
 - [Scale up an app in Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/manage-scale-up)
 - [Autoscale overview in Azure Monitor (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-overview)
 - [Get started with autoscale (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-get-started)
 - [Best practices for Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/app-service-best-practices)
+
+### 관련 시리즈
+- [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
 

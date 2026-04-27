@@ -1,7 +1,5 @@
 # Logging and Monitoring Basics
 
-> Azure App Service 101 Series (6/7)
-
 "The app is slow." "There's an error." "When did this start?"
 
 To answer these questions, **logging and monitoring** are essential. In this post, we'll explore how to collect and analyze logs in App Service.
@@ -14,11 +12,11 @@ Understanding the log flow in App Service is the first step.
 
 ```
 Flask App (logger.info) → stdout/stderr → App Service Runtime
-                                              ↓
-                           ┌─────────────────┴─────────────────┐
-                           ↓                                   ↓
-                    /home/LogFiles                    Application Insights
-                    (Filesystem)                          (Long-term analysis)
+ ↓
+ ┌─────────────────┴─────────────────┐
+ ↓ ↓
+ /home/LogFiles Application Insights
+ (Filesystem) (Long-term analysis)
 ```
 
 | Destination | Retention | Purpose |
@@ -26,8 +24,6 @@ Flask App (logger.info) → stdout/stderr → App Service Runtime
 | `/home/LogFiles/*_docker.log` | ~35MB rolling | Container crashes, startup errors |
 | `/home/LogFiles/Application/` | Max 100MB/7 days | Short-term log archive |
 | Application Insights | 90 days default | Long-term analysis, alerts, KQL |
-
-![Log flow diagram](../../assets/azure-app-service-101/06/01-log-flow-architecture.en.png)
 
 ---
 
@@ -39,42 +35,39 @@ By default, stdout/stderr is saved to the filesystem.
 
 ```bash
 az webapp log config \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --application-logging filesystem \
-    --level verbose \
-    --web-server-logging filesystem
+ --resource-group $RG \
+ --name $APP_NAME \
+ --application-logging filesystem \
+ --level verbose \
+ --web-server-logging filesystem
 ```
 
 ### Verify Configuration
 
 ```bash
 az webapp log config show \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --output json
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output json
 ```
 
 **Example output:**
 ```json
 {
-  "applicationLogs": {
-    "fileSystem": {
-      "level": "Verbose"
-    }
-  },
-  "httpLogs": {
-    "fileSystem": {
-      "enabled": true,
-      "retentionInDays": 7,
-      "retentionInMb": 100
-    }
-  }
+ "applicationLogs": {
+ "fileSystem": {
+ "level": "Verbose"
+ }
+ },
+ "httpLogs": {
+ "fileSystem": {
+ "enabled": true,
+ "retentionInDays": 7,
+ "retentionInMb": 100
+ }
+ }
 }
 ```
-
-![IMAGE: Log config settings]
-`📸 Screenshot: Azure Portal → App Service → App Service logs`
 
 ---
 
@@ -86,8 +79,8 @@ az webapp log config show \
 
 ```bash
 az webapp log tail \
-    --resource-group $RG \
-    --name $APP_NAME
+ --resource-group $RG \
+ --name $APP_NAME
 ```
 
 Send a request and logs appear immediately:
@@ -101,13 +94,10 @@ Send a request and logs appear immediately:
 
 ```bash
 az webapp log tail \
-    --resource-group $RG \
-    --name $APP_NAME \
-    | grep --line-buffered '"level"'
+ --resource-group $RG \
+ --name $APP_NAME \
+ | grep --line-buffered '"level"'
 ```
-
-![IMAGE: Log tail execution]
-`📸 Screenshot: Terminal running az webapp log tail`
 
 ---
 
@@ -123,17 +113,17 @@ import json
 from datetime import datetime
 
 class JsonFormatter(logging.Formatter):
-    def format(self, record):
-        log_obj = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-            "level": record.levelname.lower(),
-            "message": record.getMessage(),
-            "logger": record.name,
-        }
-        # Merge additional fields
-        if hasattr(record, "custom_dimensions"):
-            log_obj.update(record.custom_dimensions)
-        return json.dumps(log_obj)
+ def format(self, record):
+ log_obj = {
+ "timestamp": datetime.utcnow().isoformat() + "Z",
+ "level": record.levelname.lower(),
+ "message": record.getMessage(),
+ "logger": record.name,
+ }
+ # Merge additional fields
+ if hasattr(record, "custom_dimensions"):
+ log_obj.update(record.custom_dimensions)
+ return json.dumps(log_obj)
 
 # Handler setup
 handler = logging.StreamHandler()
@@ -148,9 +138,9 @@ logger.setLevel(logging.INFO)
 
 ```python
 logger.info("Order created", extra={"custom_dimensions": {
-    "orderId": "ORD-12345",
-    "userId": "user-789",
-    "totalAmount": 150.00
+ "orderId": "ORD-12345",
+ "userId": "user-789",
+ "totalAmount": 150.00
 }})
 ```
 
@@ -158,9 +148,6 @@ logger.info("Order created", extra={"custom_dimensions": {
 ```json
 {"timestamp": "2025-04-07T10:30:15.123Z", "level": "info", "message": "Order created", "orderId": "ORD-12345", "userId": "user-789", "totalAmount": 150.0}
 ```
-
-![IMAGE: Structured JSON log example]
-`📸 Screenshot: Log stream showing JSON format logs`
 
 ---
 
@@ -178,25 +165,25 @@ app = Flask(__name__)
 
 @app.before_request
 def set_correlation_id():
-    # Get from header or generate new
-    g.correlation_id = request.headers.get(
-        "X-Correlation-ID", 
-        str(uuid.uuid4())
-    )
+ # Get from header or generate new
+ g.correlation_id = request.headers.get(
+ "X-Correlation-ID", 
+ str(uuid.uuid4())
+ )
 
 @app.after_request
 def add_correlation_header(response):
-    response.headers["X-Correlation-ID"] = g.correlation_id
-    return response
+ response.headers["X-Correlation-ID"] = g.correlation_id
+ return response
 ```
 
 ### Auto-include in Logging
 
 ```python
 class CorrelationFilter(logging.Filter):
-    def filter(self, record):
-        record.correlation_id = getattr(g, 'correlation_id', 'N/A')
-        return True
+ def filter(self, record):
+ record.correlation_id = getattr(g, 'correlation_id', 'N/A')
+ return True
 
 logger.addFilter(CorrelationFilter())
 ```
@@ -208,7 +195,7 @@ When a user reports an error, request the `X-Correlation-ID` header value to que
 ```bash
 # Filter logs by specific Correlation ID
 az webapp log tail --resource-group $RG --name $APP_NAME \
-    | grep --line-buffered "a1b2c3d4"
+ | grep --line-buffered "a1b2c3d4"
 ```
 
 ---
@@ -221,29 +208,29 @@ Set up **Application Insights** for long-term analysis and alerting.
 
 ```bash
 az monitor app-insights component create \
-    --resource-group $RG \
-    --app $APP_NAME-insights \
-    --location $LOCATION \
-    --kind web
+ --resource-group $RG \
+ --app $APP_NAME-insights \
+ --location $LOCATION \
+ --kind web
 ```
 
 ### Get Connection String
 
 ```bash
 APPINSIGHTS_CS=$(az monitor app-insights component show \
-    --resource-group $RG \
-    --app $APP_NAME-insights \
-    --query connectionString \
-    --output tsv)
+ --resource-group $RG \
+ --app $APP_NAME-insights \
+ --query connectionString \
+ --output tsv)
 ```
 
 ### Add to App Settings
 
 ```bash
 az webapp config appsettings set \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --settings APPLICATIONINSIGHTS_CONNECTION_STRING=$APPINSIGHTS_CS
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings APPLICATIONINSIGHTS_CONNECTION_STRING=$APPINSIGHTS_CS
 ```
 
 ### Install Python SDK
@@ -259,13 +246,10 @@ from azure.monitor.opentelemetry import configure_azure_monitor
 import os
 
 if os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING"):
-    configure_azure_monitor(
-        connection_string=os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"]
-    )
+ configure_azure_monitor(
+ connection_string=os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"]
+ )
 ```
-
-![IMAGE: Application Insights overview]
-`📸 Screenshot: Azure Portal → Application Insights → Overview`
 
 ---
 
@@ -278,7 +262,7 @@ Logs stored in Application Insights are analyzed with **KQL (Kusto Query Languag
 ```kql
 AppTraces
 | where TimeGenerated > ago(1h)
-| where SeverityLevel == 3  // Error
+| where SeverityLevel == 3 // Error
 | project TimeGenerated, Message, Properties
 | order by TimeGenerated desc
 | take 20
@@ -290,9 +274,9 @@ AppTraces
 AppRequests
 | where TimeGenerated > ago(6h)
 | summarize 
-    total = count(),
-    failed = countif(Success == false)
-  by bin(TimeGenerated, 5m)
+ total = count(),
+ failed = countif(Success == false)
+ by bin(TimeGenerated, 5m)
 | extend errorRate = (failed * 100.0) / total
 | render timechart
 ```
@@ -317,9 +301,6 @@ AppTraces
 | order by TimeGenerated asc
 ```
 
-![IMAGE: Application Insights Logs]
-`📸 Screenshot: Azure Portal → Application Insights → Logs → KQL query execution`
-
 ---
 
 ## Step 7: Configure Alerts
@@ -330,12 +311,12 @@ Set up automatic notifications when issues occur.
 
 ```bash
 az monitor metrics alert create \
-    --resource-group $RG \
-    --name "High Error Rate" \
-    --scopes "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG/providers/Microsoft.Web/sites/$APP_NAME" \
-    --condition "avg Http5xx > 10" \
-    --window-size 5m \
-    --evaluation-frequency 1m
+ --resource-group $RG \
+ --name "High Error Rate" \
+ --scopes "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RG/providers/Microsoft.Web/sites/$APP_NAME" \
+ --condition "avg Http5xx > 10" \
+ --window-size 5m \
+ --evaluation-frequency 1m
 ```
 
 ### Configure in Azure Portal
@@ -343,9 +324,6 @@ az monitor metrics alert create \
 1. App Service → Alerts → + Create alert rule
 2. Condition: HTTP 5xx > 10
 3. Action group: Email/SMS/Webhook
-
-![IMAGE: Alert rule configuration]
-`📸 Screenshot: Azure Portal → Alerts → Create alert rule`
 
 ---
 
@@ -360,11 +338,11 @@ https://<app-name>.scm.azurewebsites.net
 **Paths:**
 ```
 /home/LogFiles/
-├── <hostname>_docker.log       ← Container stdout
+├── <hostname>_docker.log ← Container stdout
 ├── Application/
-│   └── <date>_<hostname>_default_docker.log
+│ └── <date>_<hostname>_default_docker.log
 └── kudu/
-    └── deployment/             ← Deployment logs
+ └── deployment/ ← Deployment logs
 ```
 
 ### Access via SSH
@@ -380,15 +358,12 @@ tail -f /home/LogFiles/*_docker.log
 
 ```bash
 az webapp log download \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --log-file ./logs.zip
+ --resource-group $RG \
+ --name $APP_NAME \
+ --log-file ./logs.zip
 
 unzip logs.zip -d ./logs
 ```
-
-![IMAGE: LogFiles in Kudu file browser]
-`📸 Screenshot: Kudu → Debug console → /home/LogFiles`
 
 ---
 
@@ -398,29 +373,29 @@ unzip logs.zip -d ./logs
 
 | Level | Purpose | Recommended for Production |
 |-------|---------|---------------------------|
-| DEBUG | Detailed debugging | ❌ |
-| INFO | Normal operation info | ✅ |
-| WARNING | Potential issues | ✅ |
-| ERROR | Error occurred | ✅ |
-| CRITICAL | Severe failure | ✅ |
+| DEBUG | Detailed debugging | No |
+| INFO | Normal operation info | Yes |
+| WARNING | Potential issues | Yes |
+| ERROR | Error occurred | Yes |
+| CRITICAL | Severe failure | Yes |
 
 ### Dynamic Level Change
 
 ```bash
 # Enable DEBUG during incident investigation
 az webapp config appsettings set \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --settings LOG_LEVEL=DEBUG
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings LOG_LEVEL=DEBUG
 
 # Revert after investigation
 az webapp config appsettings set \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --settings LOG_LEVEL=INFO
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings LOG_LEVEL=INFO
 ```
 
-> ⚠️ DEBUG level increases **costs** and risks **sensitive information exposure**, so always revert after investigation.
+> DEBUG level increases **costs** and risks **sensitive information exposure**, so always revert after investigation.
 
 ---
 
@@ -481,9 +456,13 @@ In the final post, we'll cover **Scaling 101** - when to Scale Up vs Scale Out.
 
 ## References
 
+### Official Docs
 - [Enable diagnostics logging (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/troubleshoot-diagnostic-logs)
 - [Azure Monitor OpenTelemetry for Python (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=python)
 - [KQL Quick Reference](https://learn.microsoft.com/azure/data-explorer/kql-quick-reference)
+
+### Related Series
+- [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
 

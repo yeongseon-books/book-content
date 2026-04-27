@@ -1,6 +1,6 @@
 # Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
 
-> Azure Functions Deep Dive series (6/7)
+> Azure Functions Deep Dive series (6/6)
 
 In Part 5, we watched the Scale Controller decide to grow the instance count. This part is about what happens next.
 
@@ -40,7 +40,7 @@ This is how the same host binary can shave off cold start time. The code makes t
 
 ## What a Placeholder Has Already Done — `StandbyManager.InitializeAsync`
 
-The Functions platform keeps a pool of warmed instances around even when no users are present. These instances don't start as real user apps; they start as **placeholder apps**. What the host pre-computes during the placeholder phase lives in [`StandbyManager.InitializeAsync`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L160-L186).
+The Functions platform keeps a pool of warmed instances around even when no users are present. These instances don't start as real user apps; they start as **placeholder apps**. To see what the host actually gets done during the placeholder phase, you have to read [`StandbyManager.InitializeAsync`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L173-L190) together with the warmup request path in [`HostWarmupMiddleware.WarmupInvoke`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L66-L85).
 
 ```csharp
 // src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
@@ -78,8 +78,8 @@ public async Task InitializeAsync()
 Spelling that out:
 
 1. Set the `InitializedFromPlaceholder` environment variable — a flag used later, once a real app starts up, to indicate "this instance came out of a placeholder."
-2. `CreateStandbyWarmupFunctions()` — provision a fake function directory used only during the placeholder phase.
-3. Start a 50 ms periodic timer — a fallback signal for detecting specialization in case no user request ever arrives.
+2. `CreateStandbyWarmupFunctions()` — provision the `WarmUp` function directory and files used only during the placeholder phase.
+3. Start a 50 ms periodic timer — a fallback signal for detecting specialization if no request arrives.
 
 What that fake function actually is becomes clear from `CreateStandbyWarmupFunctions` in the same file.
 
@@ -115,9 +115,9 @@ public static class WarmUpConstants
 }
 ```
 
-Names like `PreJIT` and `coldstart.jittrace` are the giveaway. **In placeholder mode, the host runs a synthetic `WarmUp` function once, JIT-compiling the methods enumerated in the JIT trace file ahead of time.** When user code arrives and walks through the same method paths, JIT cost is essentially gone.
+The important detail is that **this constants file defines the JIT trace filenames, but it does not tell you who executes them**. `StandbyManager.InitializeAsync` stops after [`CreateStandbyWarmupFunctions`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L210-L242) creates the `WarmUp` files and the timer starts. The actual JIT preparation happens later on the warmup request path, where [`HostWarmupMiddleware.WarmupInvoke`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L66-L85) calls [`PreJitPrepare`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L136-L153) with `WarmUpConstants.JitTraceFileName`. On Linux Consumption, the same method also runs `WarmUpConstants.LinuxJitTraceFileName`.
 
-That's the heart of the placeholder. From the outside it looks like just a "pool of warmed instances," but on the inside it's **a host process that has already finished the common bootstrap work and primed the JIT cache**.
+So the placeholder story has two steps. First, `StandbyManager` lays down the `WarmUp` function and starts the specialization timer. Then, on the warmup invocation path, `HostWarmupMiddleware` runs `coldstart.jittrace` to PreJIT common runtime paths. From the outside this still looks like a generic "pool of warmed instances," but inside it's **a host process that finished the shared bootstrap work and pushed JIT prep onto the warmup path**.
 
 ---
 
@@ -322,6 +322,7 @@ sequenceDiagram
     participant POOL as Placeholder Pool
     participant INST as Instance (host process)
     participant SBM as StandbyManager
+    participant MWMID as HostWarmupMiddleware
     participant MID as PlaceholderSpecialization<br/>Middleware
     participant SHM as ScriptHostManager
     participant USER as First user request
@@ -329,8 +330,10 @@ sequenceDiagram
     PLAT->>POOL: Maintain N warmed placeholder instances
     POOL->>INST: Boot VM + .NET + load Functions Host
     INST->>SBM: InitializeAsync()
-    SBM->>SBM: Create WarmUp function + run JIT trace
+    SBM->>SBM: Create WarmUp function files
     SBM->>SBM: Start 50 ms specialization timer
+    PLAT->>MWMID: Enter warmup invocation path
+    MWMID->>MWMID: PreJitPrepare(coldstart.jittrace)
     Note over INST: placeholder ready<br/>(no user yet)
 
     PLAT->>INST: Inject user app env vars + content
@@ -391,13 +394,13 @@ In particular, the fact that `FunctionAssemblyLoadContext.ResetSharedContext()` 
 ## Summary — The Mental Model to Take Away
 
 - Cold start isn't a single cost; it's the sum of **user-independent bootstrap** and **user-specific specialization**.
-- The Functions platform pre-completes the user-independent part with a placeholder pool. `StandbyManager.InitializeAsync` is the host code that builds that placeholder.
+- The Functions platform pre-completes the user-independent part with a placeholder pool. `StandbyManager.InitializeAsync` prepares the `WarmUp` files and timer, while `HostWarmupMiddleware.WarmupInvoke` runs `coldstart.jittrace` on the warmup path.
 - Once a user app gets assigned to the instance, either the first HTTP request (`PlaceholderSpecializationMiddleware`) or a 50 ms timer triggers specialization.
 - Specialization is the sequence: environment reset, worker specialization, ScriptHost restart. That elapsed time is what the user perceives as cold start.
 - After specialization, the middleware rewrites itself out of the path so hot-path cost drops to zero.
 - The host code is the same across plans, but each plan applies a different placeholder-pool policy and Always Ready setting — which is why **the cold start a user actually sees is determined by the plan**.
 
-The next part, Part 7, looks at all of this through an academic lens. We'll connect Microsoft's own ATC '20 paper to the observations that gave rise to mechanisms like the placeholder.
+This part closes out the Azure Functions Deep Dive series. Part 1 covered host bootstrap, Part 2 the worker process, Parts 3–4 the gRPC channel and dispatcher, Part 5 scaling, and this Part 6 followed how the same host code, layered with a plan-specific placeholder policy, ends up deciding the cold start a user actually feels.
 
 ---
 
@@ -420,7 +423,6 @@ The next part, Part 7, looks at all of this through an academic lens. We'll conn
 
 ### Other parts in the series
 
-- [Intro Part 6 — Scaling and Cold Start](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
+- [Intro Part 6 — Scaling and Cold Start](../../azure-functions-101/en/06-scaling-and-cold-start.md)
 - [Deep Dive Part 1 — Host Bootstrap](./01-host-bootstrap.md)
 - [Deep Dive Part 5 — Scaling Internals](./05-scaling-internals.md)
-- [Deep Dive Part 7 — Academic Perspective](./07-academic-perspective.md)

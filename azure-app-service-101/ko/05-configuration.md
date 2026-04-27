@@ -1,7 +1,5 @@
 # Configuration 마스터하기: App Settings & 환경변수
 
-> Azure App Service 101 시리즈 (5/7)
-
 배포는 끝났습니다. 이제 진짜 운영이 시작됩니다.
 
 애플리케이션은 바로 다음 질문을 던집니다. **데이터베이스 연결 문자열은 어디에 둘까? 외부 API 키는? 개발 환경에서는 DEBUG, 운영에서는 INFO 로그 레벨로 바꾸려면?** 많은 팀이 이 지점에서 처음으로 “배포”와 “운영”이 다르다는 걸 체감합니다.
@@ -20,7 +18,7 @@
 - 슬롯 스왑 후 운영이 스테이징 데이터베이스를 바라봄
 - 설정 하나만 바꿨는데 앱이 재시작되어 순간 장애가 남
 
-예전에 한 팀이 **운영 DB 자격 증명이 들어 있는 `.env` 파일을 그대로 Git에 커밋**한 걸 본 적이 있습니다. 배포는 성공했지만, 그 순간부터 문제는 애플리케이션이 아니라 비밀 정보 유출 대응이 되어 버렸습니다. 설정은 기능이 아니라 **운영 안정성과 보안의 경계선**입니다.
+예전에 한 팀이 **운영 DB 자격 증명이 들어 있는 `.env` 파일을 그대로 Git에 커밋**한 걸 본 적이 있습니다. 배포는 성공했지만, 그 순간부터 문제는 애플리케이션이 아니라 민감 정보 유출 대응이 되어 버렸습니다. 설정은 기능이 아니라 **운영 안정성과 보안의 경계선**입니다.
 
 12-Factor App에서는 설정을 코드에서 분리하라고 말합니다. 이 원칙이 중요한 이유는 철학 때문이 아니라 현실 때문입니다. **같은 코드를 서로 다른 환경에 배포하되, 달라져야 하는 것은 설정뿐**이어야 운영이 단순해집니다.
 
@@ -32,11 +30,11 @@ Azure App Service에서 가장 기본이 되는 메커니즘은 **App Settings =
 
 운영자가 Portal이나 CLI에서 값을 넣으면, App Service가 이를 앱 프로세스가 읽을 수 있는 환경 변수로 제공합니다.
 
-![Configuration 설정 흐름](../assets/azure-app-service-101/05/configuration-flow.ko.png)
+![Configuration 설정 흐름](../../assets/azure-app-service-101/05/configuration-flow.ko.png)
 
 이 구조가 중요한 이유는 단순합니다.
 
-- 애플리케이션 코드는 비밀 값을 몰라도 됨
+- 애플리케이션 코드는 민감 정보 값을 몰라도 됨
 - 환경마다 같은 아티팩트를 재사용할 수 있음
 - 재배포 없이 설정만 바꿔 동작을 제어할 수 있음
 - 다만, **설정 변경은 보통 앱 재시작을 유발**하므로 운영 타이밍을 신경 써야 함
@@ -52,7 +50,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 PAYMENTS_API_KEY = os.environ.get("PAYMENTS_API_KEY")
 ```
 
-핵심은 코드가 Azure 전용 API를 직접 호출하지 않는다는 점입니다. 앱은 그저 환경 변수를 읽고, App Service가 그 값을 공급합니다.
+여기서 봐야 할 점은 코드가 Azure 전용 API를 직접 호출하지 않는다는 점입니다. 앱은 그저 환경 변수를 읽고, App Service가 그 값을 공급합니다.
 
 ---
 
@@ -64,9 +62,9 @@ PAYMENTS_API_KEY = os.environ.get("PAYMENTS_API_KEY")
 
 `if production: ...` 식으로 코드 내부에서 환경별 값을 박아 넣기 시작하면, 결국 릴리스와 운영 설정이 얽힙니다. 코드는 동작 방식을, 설정은 실행 환경의 차이를 표현해야 합니다.
 
-### 2) 비밀 값은 “저장 위치”부터 구분한다
+### 2) 민감 정보 값은 “저장 위치”부터 구분한다
 
-로그 레벨과 DB 비밀번호는 둘 다 설정이지만, 같은 방식으로 다루면 안 됩니다. 사람이 봐도 되는 값과 보면 안 되는 값을 구분해야 합니다.
+로그 레벨과 DB 민감 정보번호는 둘 다 설정이지만, 같은 방식으로 다루면 안 됩니다. 사람이 봐도 되는 값과 보면 안 되는 값을 구분해야 합니다.
 
 ### 3) 앱 시작 시 필수 설정을 검증한다
 
@@ -96,7 +94,7 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
 환경별 전략을 나눠야 하는 이유는 “기능”이 아니라 “통제 수준”이 다르기 때문입니다.
 
-![환경별 설정 전략 비교](../assets/azure-app-service-101/05/environment-strategy.ko.png)
+![환경별 설정 전략 비교](../../assets/azure-app-service-101/05/environment-strategy.ko.png)
 
 ### 로컬 개발: `.env`
 
@@ -142,7 +140,7 @@ az webapp config appsettings set \
 
 ### 운영: App Settings + Key Vault
 
-운영은 “작동”보다 “노출 최소화”가 더 중요합니다. 일반 설정은 App Settings에 두고, **비밀번호·토큰·연결 문자열 같은 민감 값은 Key Vault를 통해 주입**하는 구성이 기본값이 되어야 합니다.
+운영은 “작동”보다 “노출 최소화”가 더 중요합니다. 일반 설정은 App Settings에 두고, **민감 정보번호·토큰·연결 문자열 같은 민감 값은 Key Vault를 통해 주입**하는 구성이 기본값이 되어야 합니다.
 
 ---
 
@@ -170,7 +168,7 @@ az webapp config appsettings list \
 
 ### 오해 1) App Settings는 보안 저장소다
 
-아닙니다. App Settings는 편리한 설정 주입 메커니즘이지, 비밀 값의 최종 보관소로 보기엔 부족합니다. 민감도가 낮은 값은 괜찮지만, **회전(rotation), 접근 감사, 중앙 집중 관리가 필요한 비밀은 Key Vault가 더 적합**합니다.
+아닙니다. App Settings는 편리한 설정 주입 메커니즘이지, 민감 정보 값의 최종 보관소로 보기엔 부족합니다. 민감도가 낮은 값은 괜찮지만, **회전(rotation), 접근 감사, 중앙 집중 관리가 필요한 민감 정보는 Key Vault가 더 적합**합니다.
 
 ### 오해 2) 설정은 언제든 안전하게 바꿀 수 있다
 
@@ -226,24 +224,24 @@ az webapp config connection-string set \
 | 앱에서 읽는 방식 | `os.environ["KEY"]` | 접두사 포함 이름으로 읽음 |
 | 팀 관점 | 단순하고 일관적 | 플랫폼 분류가 명확 |
 
-개인적으로는 **일반 설정은 App Settings, 고보안 비밀은 Key Vault Reference** 조합이 가장 관리하기 쉽습니다. Connection Strings 기능은 기존 운영 표준이 있거나 포털에서 DB 연결 값을 분리해 보고 싶을 때 유용합니다.
+개인적으로는 **일반 설정은 App Settings, 고보안 민감 정보는 Key Vault Reference** 조합이 가장 관리하기 쉽습니다. Connection Strings 기능은 기존 운영 표준이 있거나 포털에서 DB 연결 값을 분리해 보고 싶을 때 유용합니다.
 
 ---
 
-## Key Vault References: 운영 비밀을 App Service에 직접 들고 있지 않기
+## Key Vault References: 운영 민감 정보를 App Service에 직접 들고 있지 않기
 
-운영에서 가장 중요한 질문은 “값을 어떻게 읽느냐”보다 **“비밀을 어디에 저장하느냐”** 입니다.
+운영에서 가장 중요한 질문은 “값을 어떻게 읽느냐”보다 **“민감 정보를 어디에 저장하느냐”** 입니다.
 
-Key Vault Reference는 App Service가 Key Vault의 비밀 값을 참조해, 앱 입장에서는 일반 환경 변수처럼 사용할 수 있게 해 줍니다.
+Key Vault Reference는 App Service가 Key Vault의 민감 정보 값을 참조해, 앱 입장에서는 일반 환경 변수처럼 사용할 수 있게 해 줍니다.
 
-![Key Vault Reference 동작 흐름](../assets/azure-app-service-101/05/key-vault-reference-flow.ko.png)
+![Key Vault Reference 동작 흐름](../../assets/azure-app-service-101/05/key-vault-reference-flow.ko.png)
 
 이 방식을 쓰면 얻는 이점이 분명합니다.
 
-- 비밀의 원본 저장소를 Key Vault로 일원화
-- 앱 코드 변경 없이 비밀 값 회전 가능
+- 민감 정보의 원본 저장소를 Key Vault로 일원화
+- 앱 코드 변경 없이 민감 정보 값 회전 가능
 - 접근 권한을 Managed Identity와 RBAC로 통제 가능
-- 누가 어떤 비밀에 접근했는지 감사 추적 가능
+- 누가 어떤 민감 정보에 접근했는지 감사 추적 가능
 
 ### 1) Key Vault 생성
 
@@ -256,7 +254,7 @@ az keyvault create \
     --location $LOCATION
 ```
 
-### 2) 비밀 저장
+### 2) 민감 정보 저장
 
 ```bash
 az keyvault secret set \
@@ -310,9 +308,9 @@ import os
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 ```
 
-여기서 중요한 건 **애플리케이션이 Key Vault SDK를 직접 몰라도 된다**는 점입니다. 런타임에서 직접 비밀을 조회하는 패턴도 가능하지만, 단순한 구성 주입이 목적이라면 Key Vault Reference가 운영 복잡도를 훨씬 낮춰 줍니다.
+여기서 중요한 건 **애플리케이션이 Key Vault SDK를 직접 몰라도 된다**는 점입니다. 런타임에서 직접 민감 정보를 조회하는 패턴도 가능하지만, 단순한 구성 주입이 목적이라면 Key Vault Reference가 운영 복잡도를 훨씬 낮춰 줍니다.
 
-> **캐시 타이밍 참고**: Key Vault Reference 값은 앱 시작 시점에 가져오며, 이후 약 24시간 주기로 갱신됩니다. Key Vault에서 비밀을 회전한 뒤 즉시 반영하려면 앱을 재시작하거나, 새 버전의 Secret URI를 명시하는 방법이 있습니다.
+> **캐시 타이밍 참고**: Key Vault Reference 값은 앱 시작 시점에 가져오며, 이후 약 24시간 주기로 갱신됩니다. Key Vault에서 민감 정보를 회전한 뒤 즉시 반영하려면 앱을 재시작하거나, 새 버전의 Secret URI를 명시하는 방법이 있습니다.
 
 ---
 
@@ -333,7 +331,7 @@ Deployment Slot을 쓰기 시작하면 설정 관리가 한 단계 더 중요해
 - 일부 기능 플래그
 - 캐시 TTL 같은 비민감 운영 파라미터
 
-![슬롯 스왑 시 설정 동작](../assets/azure-app-service-101/05/slot-settings-behavior.ko.png)
+![슬롯 스왑 시 설정 동작](../../assets/azure-app-service-101/05/slot-settings-behavior.ko.png)
 
 CLI로 슬롯 고정 설정을 줄 때는 `--slot-settings`를 사용합니다.
 
@@ -432,8 +430,8 @@ logger.info("Configuration loaded", extra={
 
 ### 이건 피하자
 
-- 코드에 비밀 값을 하드코딩한다
-- 운영 비밀이 든 `.env` 파일을 저장소에 커밋한다
+- 코드에 민감 정보 값을 하드코딩한다
+- 운영 민감 정보이 든 `.env` 파일을 저장소에 커밋한다
 - 설정을 하나씩 여러 번 바꿔 재시작을 반복한다
 - 슬롯 스왑 전에 어떤 값이 따라 움직이는지 확인하지 않는다
 - 디버그용 설정 출력 API를 운영에 노출한다
@@ -442,9 +440,9 @@ logger.info("Configuration loaded", extra={
 
 ## 정리
 
-배포 이후의 App Service 운영에서 설정은 단순한 부가 작업이 아닙니다. **환경 변수는 앱의 실행 조건이고, 비밀 관리는 보안의 시작점이며, 슬롯 설정은 배포 안정성의 일부**입니다.
+배포 이후의 App Service 운영에서 설정은 단순한 부가 작업이 아닙니다. **환경 변수는 앱의 실행 조건이고, 민감 정보 관리는 보안의 시작점이며, 슬롯 설정은 배포 안정성의 일부**입니다.
 
-이 글에서 기억할 핵심은 네 가지입니다.
+이 글에서 기억할 내용은 네 가지입니다.
 
 - **App Settings**는 App Service가 환경 변수를 주입하는 기본 도구다
 - **로컬 `.env` / 스테이징 App Settings / 운영 Key Vault**처럼 환경별 통제 수준에 맞춰 전략을 나눈다
@@ -455,23 +453,21 @@ logger.info("Configuration loaded", extra={
 
 ---
 
-## 시리즈 목차
+## 이 시리즈에서의 위치
 
-1. Azure App Service란? - 플랫폼 아키텍처 이해하기
-2. Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까
-3. Hosting Models: 어떤 플랜을 선택해야 할까?
-4. 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)
-5. **[현재 글] Configuration 마스터하기: App Settings & 환경변수**
-6. 로그와 모니터링 기초
-7. Scaling 101: 언제 Scale Up vs Scale Out?
+이번 글은 배포 뒤에 더 오래 남는 문제인 설정, 민감 정보, 슬롯별 값 관리를 다룹니다. 다음 글에서는 여기서 준비한 설정이 로그, 메트릭, Application Insights 같은 운영 가시성으로 어떻게 이어지는지 설명합니다.
 
 ---
 
 ## 참고 자료
 
+### 공식 문서
 - [Configure an App Service app (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/configure-common)
 - [Use Key Vault references for App Service and Azure Functions (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/app-service-key-vault-references)
 - [The Twelve-Factor App - Config](https://12factor.net/config)
+
+### 관련 시리즈
+- [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
 

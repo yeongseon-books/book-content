@@ -2,24 +2,18 @@
 
 > Azure Functions 101 series (7/7)
 
-Across the previous six posts, we looked at how functions are built, what wakes them up, what environments they run in, and how they scale. This final post takes a different angle. Given a Function App that's already running, the question becomes: **as an operator, what should you watch, and what should you alert on?**
+Once the app is deployed, the questions change. You stop asking whether the function runs at all and start asking why failure rate jumped, why instance count climbed, whether the bottleneck is downstream, and where cost is leaking. This post covers the screens, metrics, queries, and alert priorities that matter first when you operate Azure Functions.
 
-By the end of this post, you'll be able to:
-
-- See invocation count, failure rate, response time, and exceptions on a single screen
-- Measure cold start frequency
-- Check "how many instances are running right now"
-- Find where money is leaking
-- Know which alerts to prioritize
+The scope is practical: the baseline observability view, a small KQL toolkit for incident response, the right signals for instance count and cost, and the first alerts worth wiring up.
 
 ---
 
-## There's only one starting point — Application Insights
+## Application Insights Is the Starting Point
 
-Ninety percent of Functions operations happens inside Application Insights (App Insights from here on). Function execution logs, exceptions, dependency calls, and custom metrics all flow into it. That makes wiring up App Insights when you create the Function App the single most important operational decision.
+Most of the operational data you need for Azure Functions ends up in Application Insights. Requests, exceptions, dependency calls, logs, and custom metrics converge there, which makes App Insights integration one of the most important choices you make when standing up a Function App.
 
 ```bash
-# 만들 때 연결하는 가장 단순한 방법
+# Simplest way to connect Application Insights after app creation
 az monitor app-insights component create \
     --app ai-hello --location koreacentral --resource-group $RG
 
@@ -28,43 +22,38 @@ az functionapp config appsettings set \
     --settings APPLICATIONINSIGHTS_CONNECTION_STRING="<your-connection-string>"
 ```
 
-Once it's connected, the following are collected automatically on every invocation:
+Once connected, these are the main operational building blocks:
 
-- **Requests** — one invocation = one row
-- **Exceptions** — exceptions thrown inside the function
-- **Dependencies** — external systems the function called (HTTP, DB, Storage, etc.)
-- **Traces** — logs you wrote with `context.log()`
-- **Performance counters** — CPU, memory (per instance)
+- **Requests** — invocation records
+- **Exceptions** — failures thrown inside the function
+- **Dependencies** — outbound calls to HTTP, databases, Storage, and other services
+- **Traces** — logs written from Python with calls such as `logging.info()`
+- **Metrics / customMetrics** — platform metrics, custom metrics, and in some environments additional warm-up related signals
 
-These five are the raw materials of operations.
+One caveat matters here. Documentation examples often present **Performance Counters = CPU and memory collected automatically**, but that is not universal. Automatic Performance Counters collection is not supported on Linux. Since Flex Consumption is Linux-only, do not assume a Windows-style per-instance CPU/memory view is always available there.
 
 ---
 
-## The first screen to open — Live Metrics
+## The First Screen to Open During an Incident — Live Metrics
 
-When you suspect something is wrong, the first place to open is **Application Insights → Live Metrics**. Almost in real time (down to the second), it shows:
-
-- Requests per second
-- Failure rate
-- Response time distribution
-- **Number of currently live servers (instances) and the CPU/memory of each**
-
-You can see "how many instances the function is currently running on" at a glance. It's the fastest way to confirm whether the scale-out we discussed in post 6 actually happened.
+For a live situation, **Application Insights → Live Metrics** is the fastest starting point. It gives you near-real-time visibility into request volume, failure rate, latency movement, and the number of currently active instances.
 
 ```mermaid
 flowchart LR
-    Func[Function App<br/>running] -- telemetry --> AI[Application Insights]
-    AI --> LM[Live Metrics<br/>real-time view]
-    AI --> KQL[Logs - KQL queries]
-    AI --> Met[Metrics - time-series graphs]
-    AI --> Alert[Alerts]
+    Func[Function App] -- telemetry --> AI[Application Insights]
+    AI --> LM[Live Metrics]
+    AI --> Logs[Logs and KQL]
+    AI --> Met[Metrics]
+    AI --> Alerts[Alerts]
 ```
+
+Live Metrics answers the immediate question: what is happening right now? Just keep the Linux caveat in mind. Instance activity is useful broadly, but infrastructure counters such as CPU and memory depend on OS and environment support.
 
 ---
 
-## A 30-second KQL primer — five queries operators reach for
+## Five Query and Lookup Patterns Worth Keeping Close
 
-The real power of App Insights comes from **KQL (Kusto Query Language)**. The reason is simple: canned dashboards can't surface every pattern you care about. Here are five queries worth memorizing as a starter.
+Dashboards help, but incident response usually needs direct queries plus metric lookups. These five patterns cover a large share of day-2 work.
 
 **1) Invocation count and failure rate over the last hour**
 
@@ -85,7 +74,7 @@ exceptions
 | top 10 by Count
 ```
 
-**3) Top 10 slowest functions (by P95)**
+**3) Top 10 slowest functions by P95**
 
 ```kusto
 requests
@@ -94,16 +83,23 @@ requests
 | top 10 by p95
 ```
 
-**4) Estimating cold start frequency**
+**4) Cold starts are inferred, not measured directly**
 
-Functions doesn't expose cold starts as an explicit metric. Instead, you measure them indirectly through the trace log that says "the host re-indexed".
+Azure Functions does not emit one universal “cold start count” metric you can trust across plans. Using `Host started` traces as a stand-in is too loose for publication-quality guidance because restart, deployment, scale-out, and other host lifecycle events can all produce similar signals.
 
-```kusto
-traces
-| where timestamp > ago(24h)
-| where message has "Host started"
-| summarize ColdStarts=count() by bin(timestamp, 1h)
-| order by timestamp desc
+In practice, operators usually correlate these instead:
+
+- **`InstanceCount`** trends — when the platform added or removed instances
+- **`FunctionExecutionUnits`** trends — when actual execution load increased
+- **warm-up related signals in App Insights `customMetrics` where available** — Premium and Flex can surface extra warm-up clues in some environments
+
+That gives you a heuristic, not a direct measurement. You can estimate periods where cold starts were likely, but you cannot turn those signals into an exact cold-start counter without losing accuracy.
+
+```bash
+az monitor metrics list \
+    --resource "/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Web/sites/$APP" \
+    --metric "InstanceCount" "FunctionExecutionUnits" \
+    --interval PT5M
 ```
 
 **5) Downstream dependency failures**
@@ -115,47 +111,54 @@ dependencies
 | order by Count desc
 ```
 
-If you can reach for these five queries comfortably, you're already halfway to running Functions in production.
-
 ---
 
-## What to alert on — a four-tier priority
+## Four Alert Priorities Are Enough to Start
 
-With alerts, "accurate" matters more than "many". If you're new to operating this, I recommend starting with the following four-tier priority.
+With alerts, signal quality matters more than alert volume. These four are a solid baseline.
 
-| Priority | Alert target | Threshold example | Why |
+| Priority | Alert target | Example threshold | Why |
 |---|---|---|---|
-| **P0** | Spike in function failure rate | Failure rate > 5% over 5 minutes | Direct user impact |
-| **P0** | Spike in response time | P95 is 3× the baseline | Not a failure, but heavy user impact |
-| **P1** | Reaching the instance ceiling | Current instance count ≥ Max - 1 | About to lose ability to absorb more traffic |
-| **P2** | Cost spike | Daily invocation count is 5× the baseline | Possible bug or attack |
+| P0 | Spike in function failure rate | Failure rate > 5% over 5 minutes | Direct user impact |
+| P0 | Spike in response time | P95 is 3× the baseline | Users feel this before a full outage |
+| P1 | Approaching the instance ceiling | `InstanceCount` is near the configured limit | The app may stop absorbing more load |
+| P2 | Cost spike | Daily invocation count is 5× baseline | Bug, retry storm, or abnormal traffic |
 
-Starting out, just the two P0s are enough. **The moment a noisy alert wakes you up unnecessarily, you start ignoring all alerts.** Add more slowly.
-
----
-
-## How do you find the instance count?
-
-There are three ways to see "how many instances are running right now":
-
-1. **The Servers panel in Live Metrics** — most intuitive
-2. **The `FunctionInstanceCount` metric** (Premium/Dedicated)
-3. **The HostController's `/admin/host/scale/status` endpoint** — a diagnostic endpoint the Functions Host exposes to the external Scale Controller. You won't be staring at it day-to-day, but it's useful when investigating an incident.
-
-In the Deep Dive series, post 5 walks through this endpoint at the code level.
+Start with the two P0 alerts if you want the smallest reliable set. Noisy alerts train teams to ignore the whole system.
 
 ---
 
-## Watching cost deliberately
+## Where to Check Instance Count
 
-The last axis of operations is cost. The three most common patterns where money leaks in Functions are:
+There are three common ways to answer “how many instances are active right now?”
 
-- **Infinite retries** — if a queue trigger keeps retrying forever after a failure, the same message gets re-invoked repeatedly and your invocation count explodes. **maxDeliveryCount + a dead-letter queue** is the basic safety net.
-- **Timer firing too often** — the difference between "every minute" and "every 5 seconds" is a 12× invocation count. Check often whether you really need 5-second granularity.
-- **Log floods** — `JSON.stringify`-ing a large object on every invocation and writing it to logs drives up App Insights ingestion cost. In production, lower the log level appropriately.
+1. **The Servers panel in Live Metrics** — the quickest visual answer.
+2. **The Azure Monitor `InstanceCount` metric** — the current metric name is **`InstanceCount`**, not `FunctionInstanceCount`. In the portal it appears as *Automatic Scaling Instance Count*.
+3. **The `/admin/host/scale/status` endpoint** — a diagnostic endpoint exposed by the host for scale-related troubleshooting.
+
+Deep Dive Part 5 walks through that scale-status path and the surrounding control flow in code.
+
+---
+
+## Cost Analysis Starts with Trigger-Specific Retry Semantics
+
+When cost rises unexpectedly, the usual suspects are invocation spikes, retry storms, and excessive logging. Queue triggers need special care because retry semantics differ by service.
+
+**Service Bus triggers**
+
+Service Bus uses `maxDeliveryCount` and a dead-letter queue. A repeatedly failing message increments delivery count and is eventually moved aside when it crosses the configured threshold. That is the first safety rail to inspect when the same work appears to be happening over and over.
+
+**Storage Queue triggers**
+
+Storage Queue does not use the same dead-letter terminology or delivery-count model. Messages become visible again with an increasing dequeue count, and after the retry limit they typically move to a **poison queue**. So “queue triggers are protected by maxDeliveryCount and DLQ” is correct for Service Bus, not for Storage Queue.
+
+Two other common cost leaks show up often:
+
+- **Timer frequency is too aggressive** — every 5 seconds multiplies invocations quickly.
+- **Logs are too verbose** — large payloads written every invocation increase App Insights ingestion cost.
 
 ```bash
-# 일일 호출 수 추세를 가장 빠르게 보는 명령
+# Quickest CLI example to inspect daily invocation count trend
 az monitor app-insights events show \
     --app ai-hello --resource-group $RG \
     --type requests --start-time -7d
@@ -163,68 +166,44 @@ az monitor app-insights events show \
 
 ---
 
-## A "production is on fire" checklist
+## A Useful 3am Incident Order of Operations
 
-Finally, here's the order I follow when an alert wakes me up at 3am. Walk through it and you'll have the rough shape of the incident within the first five minutes.
+The first five minutes of an incident usually follow the same pattern.
 
 ```mermaid
 flowchart TD
-    A[Alert received] --> B{Is failure rate<br/>high in Live Metrics?}
-    B -- Yes --> C[Check Exceptions panel<br/>Most frequent exception = suspect #1]
-    B -- No --> D{Is response time slow?}
-    D -- Yes --> E[Check Dependencies<br/>Is an external dependency slow?]
-    D -- No --> F{Is the instance count<br/>abnormal?}
-    F -- Too few --> G[Scale-out is blocked<br/>Check plan limits / quotas]
-    F -- Too many --> H[Possible cost runaway<br/>Trace the invocation source]
-    F -- Normal --> I[Re-check Live Metrics<br/>Watch for real-time changes]
+    A[Alert received] --> B{Is failure rate high in Live Metrics}
+    B -- Yes --> C[Check the most frequent exceptions]
+    B -- No --> D{Has latency jumped}
+    D -- Yes --> E[Inspect slow or failing dependencies]
+    D -- No --> F{Is InstanceCount abnormal}
+    F -- Too low --> G[Check scale limits, quotas, and plan ceilings]
+    F -- Too high --> H[Trace cost runaway or retry storms]
+    F -- Normal --> I[Keep watching real-time movement]
 ```
 
----
-
-## Closing the series
-
-This wraps up the seven-post intro series. Here are the five sentences I hope you take with you.
-
-1. **Azure Functions = a model where an event wakes a function and the function disappears when it's done.** Every design decision starts from this one line.
-2. **Triggers and bindings are the "external interface" of a function.** They make your code shorter, but they don't replace your domain logic.
-3. **Host and Worker are separate processes that talk over gRPC.** That's the secret to multi-language support, and the clue for where to look for logs in production.
-4. **Choosing a plan is a trade-off between cost, cold starts, and concurrency.** "Serverless, so Consumption" is not always the right answer.
-5. **Monitoring starts with "did you wire up Application Insights?"** Just five KQL queries in your back pocket make operations significantly smoother.
-
-I also want to underline that serverless isn't a silver bullet. A tool only shines when it fits the workload. If you decide Functions doesn't fit, that's a perfectly reasonable conclusion. If this series gave you the material to reach that judgment a little faster, it's done its job.
+Failure rate, latency, instance count, and dependency health cover a surprising amount of ground if you check them in that order.
 
 ---
 
-## If you want to go deeper
+## Closing the 101 Series
 
-If the internals piqued your curiosity, check out the **Azure Functions Deep Dive** series. If this series was the "user manual", that one is the "anatomical atlas". With the same seven-post structure, it leans on code and academic papers to answer questions like:
+This post closes the Azure Functions 101 series. Taken together, the series moves from the event-driven execution model to triggers and bindings, the host/worker split, plan trade-offs, scaling and cold starts, and finally operations centered on Application Insights. Part 7 is the operational layer that turns the earlier mental model into day-2 practice.
 
-- When the Host boots, exactly which classes are called in what order?
-- How is the Worker process spawned? How is multi-language support implemented in code?
-- What does the gRPC EventStream handshake look like?
-- Where in the code lives Placeholder Mode, the trick that reduces cold starts?
-- How has academia analyzed this system? (Shahrad et al., USENIX ATC 2020, and others)
-
----
-
-## Series table of contents
-
-| # | Title |
-|---|---|
-| 1 | [What is Azure Functions? — A world where events call functions](./01-what-is-azure-functions.md) |
-| 2 | [Triggers and bindings — Everything about function I/O](./02-triggers-and-bindings.md) |
-| 3 | [Host and Worker — Who actually runs the function](./03-host-and-worker.md) |
-| 4 | [Deploying your first function — From local to Azure](./04-first-deploy.md) |
-| 5 | The four plans — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | [Scaling and cold starts — The two faces of serverless](./06-scaling-and-cold-start.md) |
-| 7 | **Monitoring and operations fundamentals** ← this post |
+If you want to go deeper into the implementation, continue with [Deep Dive Part 5](../../azure-functions-deep-dive/en/05-scaling-internals.md) and [Part 6](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md). The 101 series is about making good engineering decisions quickly; the deep-dive series shows how those behaviors are built inside the host.
 
 ---
 
 ## References
 
-**Official docs**
+**Official Docs**
 - [Monitor Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-monitoring)
 - [Application Insights overview](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
+- [Metrics supported for Microsoft.Web/sites](https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-web-sites-metrics)
 - [Kusto Query Language reference](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/)
 - [Configure monitoring for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/configure-monitoring)
+
+**Related Series**
+- [Azure Functions 101 Part 6 — Scaling and cold starts](./06-scaling-and-cold-start.md)
+- [Azure Functions Deep Dive Part 5 — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md)
+- [Azure Functions Deep Dive Part 6 — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md)

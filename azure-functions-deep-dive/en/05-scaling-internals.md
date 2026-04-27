@@ -24,16 +24,16 @@ Before we touch any code, here's the whole thing in one diagram.
 
 ```mermaid
 flowchart TB
-    subgraph CTRL["🎯 Scale Controller<br/>(platform component, outside the host)"]
+    subgraph CTRL["Scale Controller<br/>(platform component, outside the host)"]
         SC[Instance count decision<br/>= desired instances]
     end
 
-    subgraph EXT["📦 Trigger Extensions<br/>(WebJobs SDK side)"]
+    subgraph EXT["Trigger Extensions<br/>(WebJobs SDK side)"]
         SM[IScaleMonitor<br/>queue length / lag measurement]
         TS[ITargetScaler<br/>target-based formula]
     end
 
-    subgraph HOST["🏠 Functions Host (N instances)"]
+    subgraph HOST["Functions Host (N instances)"]
         HPM[HostPerformanceManager<br/>health ping response]
         REPO[TableStorageScaleMetricsRepository<br/>metric storage]
         WCM[WorkerConcurrencyManager<br/>worker count within an instance]
@@ -55,7 +55,7 @@ The key insight is that two different decisions are made in two different places
 | Decision | Decided by | Signal | Result |
 |---|---|---|---|
 | **Instance count** (scale-out) | Scale Controller (outside the host) | ScaleMonitor / TargetScaler metrics + host health ping | Move instances from N → N±k |
-| **Workers per instance** | `WorkerConcurrencyManager` (inside the host) | Worker channel load | Add or remove worker processes on the same instance |
+| **Workers per instance** | `WorkerConcurrencyManager` (inside the host) | Latency history from worker status responses | Add worker processes on the same instance |
 
 If you blur these two together, you can't answer questions like "Why can't I just bump up the worker count on Premium myself?" Let's take them one at a time.
 
@@ -228,11 +228,13 @@ Everything above was the story of how "instance count" is decided. Now we look a
 
 For OOP workers (Python, Node, Java), a worker is typically a single process, which means **you can run more than one worker process within the same instance**. The component that decides this is [`WorkerConcurrencyManager`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs).
 
-The core idea is simple:
+This path is narrower than it first appears. `StartAsync` only enables dynamic worker concurrency for **Node, PowerShell, and Python**. It explicitly skips the `HttpFunctionInvocationDispatcher` path, and it does not start at all when `FUNCTIONS_WORKER_PROCESS_COUNT` is set. That environment variable is a **static worker-count setting** per instance.
 
-> If a worker channel is busy (latency or queue depth crosses the threshold), spin up another worker process inside the same instance. If it's idle, drop one.
+`WorkerConcurrencyOptions` is something else: it defines the thresholds for the **dynamic add-a-worker loop**. The two knobs solve different problems. `FUNCTIONS_WORKER_PROCESS_COUNT` says "start with this many worker processes." `WorkerConcurrencyOptions` says "given recent latency, should I add one more?"
 
-This **has nothing to do with the external Scale Controller.** The instance count stays the same; only the parallelism inside the instance changes. So a single instance might be running with one worker at one moment and three workers a few seconds later.
+`IsOverloaded` does not look at queue depth. It looks at `LatencyHistory`. Once the history has at least `HistorySize` samples, it counts how many are at or above `LatencyThreshold`, divides that by `HistorySize`, and compares the result to `NewWorkerThreshold`. Then `NewWorkerIsRequired` adds a worker only when at least one worker is overloaded and the current worker count is still below `MaxWorkerCount`.
+
+There is no symmetric scale-in path here. This code is about **adding** workers when recent latency stays high. That makes it an in-instance parallelism mechanism, not a miniature version of external scale-out.
 
 Putting these two side by side:
 
@@ -240,9 +242,9 @@ Putting these two side by side:
 |---|---|---|
 | Decided by | Scale Controller (external) | `WorkerConcurrencyManager` (inside the host) |
 | Unit | VM instance | Worker process within an instance |
-| Signal | ScaleMonitor metrics + health ping | Worker channel latency / queue depth |
+| Signal | ScaleMonitor metrics + health ping | Proportion of overloaded samples in `LatencyHistory` |
 | Impact | Bill, cold-start time | Throughput within the instance |
-| Plan dependence | High (varies by plan) | Low (same logic everywhere) |
+| Scope | Varies by plan | Node / PowerShell / Python only; excludes HTTP worker; disabled when static process count is set |
 
 ---
 
@@ -323,22 +325,23 @@ Flex Consumption is the successor to Consumption and, in practice, a different p
 
 | Plan | Scale decided by | Scale to zero | Max instances | Per-function | Always ready | VNet |
 |---|---|---|---|---|---|---|
-| Consumption | Scale Controller | ✅ | 200 | ❌ | ❌ | ❌ |
-| Flex Consumption | Scale Controller (new) | ✅ | 1000 | ✅ | ✅ | ✅ |
-| Premium | Scale Controller (+ option) | ❌ (min 1) | ~100 | ❌ | pre-warmed | ✅ |
-| Dedicated | App Service Auto-Scale | ❌ | depends on plan | ❌ | (always on) | ✅ |
+| Consumption | Scale Controller | Yes | 200 | No | No | No |
+| Flex Consumption | Scale Controller (new) | Yes | 1000 | Yes | Yes | Yes |
+| Premium | Scale Controller (+ option) | No (min 1) | Varies by SKU/region | No | pre-warmed | Yes |
+| Dedicated | App Service Auto-Scale | No | Depends on plan | No | Always On available | Yes |
 
 Different decision layers sit on top of the same host binary; the way the host itself works doesn't change.
 
 ---
 
-## Wrap-up — the model to take from this installment
+## Wrap-up — the model to keep
 
-- Scale decisions happen **outside the host**. The host just reports metrics and answers health pings.
-- `IScaleMonitor` (incremental) and `ITargetScaler` (formula-based) are SDK / extension-side interfaces; the host's role is just to persist their metrics in Table Storage.
-- Deciding the **number of instances** and deciding the **number of workers inside an instance** are different mechanisms. The latter is done in-process by `WorkerConcurrencyManager`.
-- The same host code **behaves differently across Consumption / Flex / Premium / Dedicated because the external decider's model is different.** The host is unchanged.
-- Flex Consumption introduces per-function scaling and Always ready, deciding "how many instances for which function" at the group level.
+- Scale decisions happen **outside the host**. The host reports metrics and answers health pings.
+- `IScaleMonitor` (incremental) and `ITargetScaler` (formula-based) are SDK / extension-side interfaces; the host just persists their metrics in Table Storage.
+- Deciding the **number of instances** and deciding the **number of workers inside an instance** are different mechanisms. The latter is handled in-process by `WorkerConcurrencyManager`, and in this code path it only **adds** workers.
+- `FUNCTIONS_WORKER_PROCESS_COUNT` is a static worker-count setting. `WorkerConcurrencyOptions` controls the thresholds for dynamic worker addition. They are not interchangeable.
+- The same host code behaves differently across Consumption / Flex / Premium / Dedicated because the external decision layer is different. The host itself is unchanged.
+- Flex Consumption introduces per-function scaling and Always Ready, deciding "how many instances for which function" at the group level.
 
 In installment 6 we'll look at what happens **when a new instance is actually created** as a result of all these decisions — Placeholder Mode and specialization. The code-level mechanics behind Always ready and cold start live there.
 
@@ -360,10 +363,6 @@ In installment 6 we'll look at what happens **when a new instance is actually cr
 - [Event-driven scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling)
 - [Azure Functions hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
 
-### Other installments in the series
+### Related series
 
-- [Intro 5 — Choosing a Plan](../../azure-functions-101/ko/05-choosing-a-plan.md)
-- [Intro 6 — Scaling and Cold Start](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
-- [Deep Dive 4 — Dispatcher and Invocation](./04-dispatcher-and-invocation.md)
-- [Deep Dive 6 — Cold Start and Placeholder](./06-cold-start-placeholder.md) (next)
-- [Deep Dive 7 — An Academic Perspective](./07-academic-perspective.md)
+This is part 5 of the Deep Dive series. Part 4 followed a single invocation into the worker; this one separated the outside scale controller from the inside worker-concurrency logic that can add more worker processes on the same instance. Part 6 moves to what happens when a fresh instance is actually created, while the intro series' parts 5 and 6 cover the same territory from an operator-facing angle.

@@ -1,7 +1,5 @@
 # 로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기
 
-> Azure App Service 101 시리즈 (6/7)
-
 월요일 오전 9시 07분. Slack이 시끄럽습니다.
 
 > “앱이 느려요.”  
@@ -19,7 +17,7 @@
 
 문제를 풀기 전에 로그의 목적지를 먼저 이해해야 합니다. 같은 `logger.info()`라도 **어디에 남느냐에 따라 쓸모가 완전히 달라지기 때문**입니다.
 
-![로그 흐름 아키텍처](../assets/azure-app-service-101/06/01-log-flow-architecture.ko.png)
+![로그 흐름 아키텍처](../../assets/azure-app-service-101/06/01-log-flow-architecture.ko.png)
 
 App Service에서 가장 먼저 기억할 포인트는 다음입니다.
 
@@ -47,7 +45,7 @@ App Service에서 가장 먼저 기억할 포인트는 다음입니다.
 
 대부분의 팀은 처음부터 완성형 observability를 갖추지 못합니다. 보통 아래 단계로 올라갑니다.
 
-![관측 성숙도 단계](../assets/azure-app-service-101/06/02-observability-maturity.ko.png)
+![관측 성숙도 단계](../../assets/azure-app-service-101/06/02-observability-maturity.ko.png)
 
 이 글도 그 순서대로 갑니다.
 
@@ -233,7 +231,7 @@ logger.info(
 - `dependency`: DB, Redis, 외부 API 등 병목 후보
 - `resultCode` / `success`: 성공/실패 여부
 
-반대로 **비밀번호, 토큰, 카드번호, 주민등록번호 같은 민감 정보는 로그에 남기면 안 됩니다.** 구조화 로그는 검색이 쉬운 만큼, 잘못 남긴 정보도 더 빨리 퍼집니다.
+반대로 **민감 정보번호, 토큰, 카드번호, 주민등록번호 같은 민감 정보는 로그에 남기면 안 됩니다.** 구조화 로그는 검색이 쉬운 만큼, 잘못 남긴 정보도 더 빨리 퍼집니다.
 
 ---
 
@@ -245,7 +243,7 @@ logger.info(
 
 이 질문에 답하는 핵심이 **Correlation ID**입니다.
 
-![Correlation ID 흐름](../assets/azure-app-service-101/06/03-correlation-id-flow.ko.png)
+![Correlation ID 흐름](../../assets/azure-app-service-101/06/03-correlation-id-flow.ko.png)
 
 요청이 들어올 때 ID를 하나 만들고, 그 ID를 **모든 로그에 붙이고**, 응답 헤더로도 돌려주면 다음이 가능해집니다.
 
@@ -316,7 +314,7 @@ class RequestContextFilter(logging.Filter):
 - 특정 배포 이후 실패가 늘었나?
 - 500 에러가 앱 코드 때문인가, 외부 의존성 때문인가?
 
-이 시점부터는 **Application Insights**가 필요합니다. 핵심은 “로그 저장소 하나 더 추가”가 아니라, **요청(Requests), 예외(Exceptions), traces, dependencies를 함께 분석할 수 있게 되는 것**입니다.
+이 시점부터는 **Application Insights**가 필요합니다. 중요한 이유는 “로그 저장소 하나 더 추가”가 아니라, **요청(Requests), 예외(Exceptions), traces, dependencies를 함께 분석할 수 있게 되는 것**입니다.
 
 ### Application Insights 연결
 
@@ -654,7 +652,7 @@ az webapp config appsettings set \
 
 ## 정리
 
-App Service에서 로그와 모니터링의 핵심은 도구 이름이 아니라 **문제 해결 순서**입니다.
+App Service에서 로그와 모니터링에서 먼저 봐야 할 것은 도구 이름이 아니라 **문제 해결 순서**입니다.
 
 - 파일 시스템 로그로 **지금 당장** 무슨 일이 일어나는지 본다
 - 구조화된 JSON 로그로 **검색 가능한 증거**를 만든다
@@ -673,25 +671,23 @@ App Service에서 로그와 모니터링의 핵심은 도구 이름이 아니라
 
 ---
 
-## 시리즈 목차
+## 이 시리즈에서의 위치
 
-1. Azure App Service란? - 플랫폼 아키텍처 이해하기
-2. Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까
-3. Hosting Models: 어떤 플랜을 선택해야 할까?
-4. 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)
-5. Configuration 마스터하기: App Settings & 환경변수
-6. **[현재 글] 로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기**
-7. Scaling 101: 언제 Scale Up vs Scale Out?
+이번 글은 App Service 위 애플리케이션을 보이는 시스템으로 바꾸기 위한 로그와 모니터링의 기본 구성을 정리합니다. 마지막 글에서는 이 관측 데이터를 바탕으로 언제 Scale Up과 Scale Out을 선택해야 하는지 이어서 다룹니다.
 
 ---
 
 ## 참고 자료
 
+### 공식 문서
 - [Enable diagnostics logging for apps in Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/troubleshoot-diagnostic-logs)
 - [Monitor Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/monitor-app-service)
 - [Enable Azure Monitor OpenTelemetry for Python applications (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=python)
 - [Application Insights telemetry data model (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/app/data-model-complete)
 - [Kusto Query Language quick reference (Microsoft Learn)](https://learn.microsoft.com/azure/data-explorer/kql-quick-reference)
+
+### 관련 시리즈
+- [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
 

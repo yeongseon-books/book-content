@@ -4,7 +4,7 @@
 
 1화에서 “함수 하나에는 트리거 하나가 묶인다”고 했습니다. 그리고 “바인딩은 입출력을 선언적으로 연결하는 장치”라고 했습니다. 이 두 문장이 Functions 코드를 짧게 만들어 주는 핵심입니다. 그런데 처음 입문하는 사람 입장에서는 “트리거가 뭐고 바인딩이 뭐고 어디서 어디까지가 마법인가”가 잘 안 잡힙니다.
 
-이 글에서는 그 경계를 분명하게 그어 보겠습니다. 트리거의 종류, 입력 바인딩과 출력 바인딩의 차이, 그리고 “바인딩이 마법처럼 보이지만 실제로는 어떤 계약(contract)인가”까지. 끝나면 새 함수를 만들 때 “어떤 트리거를 골라야 하지?”에서 망설이지 않게 되는 게 목표입니다.
+이 글에서는 그 경계를 분명하게 정리합니다. 트리거의 종류, 입력 바인딩과 출력 바인딩의 차이, 그리고 “바인딩이 마법처럼 보이지만 실제로는 어떤 계약인가”까지 다룹니다. 읽고 나면 새 함수를 만들 때 “어떤 트리거를 골라야 하지?”에서 오래 멈추지 않게 됩니다.
 
 ---
 
@@ -79,32 +79,32 @@ graph TD
 
 여기서부터가 Functions의 진짜 매력입니다. 일반 웹 앱에서 “Cosmos DB에 저장”을 하려면 보통 이런 코드를 씁니다. 클라이언트 객체 만들고, 인증 붙이고, 컬렉션 핸들 잡고, `upsert` 호출하고, 에러 처리하고. 함수 본체보다 보일러플레이트가 더 깁니다.
 
-바인딩은 이 보일러플레이트를 “이 함수의 출력은 Cosmos DB의 이 컨테이너로 보내 주세요” 한 줄 선언으로 줄입니다. 진짜 그렇게 됩니다. 예를 들어 보겠습니다.
+바인딩은 이 보일러플레이트를 “이 함수의 출력은 Cosmos DB의 이 컨테이너로 보내 주세요”라는 선언으로 줄입니다. Azure Functions Python v2 모델에서는 아래처럼 적습니다.
 
-```javascript
-const { app, output } = require('@azure/functions');
+```python
+import json
+import azure.functions as func
 
-const cosmosOut = output.cosmosDB({
-    databaseName: 'orders',
-    containerName: 'invoices',
-    connection: 'CosmosConnection'
-});
+app = func.FunctionApp()
 
-app.storageQueue('processOrder', {
-    queueName: 'orders-incoming',
-    connection: 'StorageConnection',
-    extraOutputs: [cosmosOut],
-    handler: async (queueItem, context) => {
-        const invoice = buildInvoice(queueItem);   // 여러분의 비즈니스 로직
-        context.extraOutputs.set(cosmosOut, invoice);
-        // 이게 끝입니다. DB 클라이언트도, upsert 호출도 없습니다.
-    }
-});
+
+@app.function_name(name="process_order")
+@app.queue_trigger(arg_name="msg", queue_name="orders-incoming", connection="StorageConnection")
+@app.cosmos_db_output(
+    arg_name="invoice_out",
+    database_name="orders",
+    container_name="invoices",
+    connection="CosmosConnection",
+)
+def process_order(msg: func.QueueMessage, invoice_out: func.Out[func.Document]) -> None:
+    queue_item = msg.get_json()
+    invoice = build_invoice(queue_item)  # 여러분의 비즈니스 로직
+    invoice_out.set(func.Document.from_json(json.dumps(invoice)))
 ```
 
 이 함수가 하는 일을 평어로 풀면 다음과 같습니다.
 
-> “큐에 메시지가 들어오면(`storageQueue` 트리거) 그것을 invoice로 가공하고, 그 결과를 Cosmos DB의 `invoices` 컨테이너에 저장한다(`cosmosOut` 출력 바인딩).”
+> “큐에 메시지가 들어오면(`queue_trigger`) 그것을 invoice로 가공하고, 그 결과를 Cosmos DB의 `invoices` 컨테이너에 저장한다(`cosmos_db_output`).”
 
 DB 연결, 인증, 재시도 같은 운영 코드는 **Functions Host가 대신 처리**합니다. 여러분은 “어디로 보낼지”만 선언했을 뿐입니다.
 
@@ -189,21 +189,11 @@ flowchart LR
 
 지금까지 “함수의 바깥 인터페이스”를 봤습니다. 트리거가 함수를 어떻게 깨우는지, 바인딩이 입출력을 어떻게 선언적으로 처리하는지. 다음 글에서는 한 단계 더 안으로 들어갑니다. **“그래서 함수 코드는 누가, 어떻게, 어떤 프로세스 안에서 실행되는가?”**
 
-답은 **Host와 Worker**라는 두 단어입니다. Functions가 Node.js, Python, Java, .NET 등 여러 언어를 어떻게 동시에 지원하는지의 비밀이 거기에 있습니다.
+답은 **Host와 Worker**라는 두 단어입니다. Functions가 Node.js, Python, Java, .NET 같은 여러 언어 런타임을 어떻게 붙이는지는 거기에서 갈립니다.
 
 ---
 
-## 시리즈 목차
-
-| # | 제목 |
-|---|---|
-| 1 | [Azure Functions란? — 이벤트가 함수를 호출하는 세상](./01-what-is-azure-functions.md) |
-| 2 | **트리거와 바인딩 — 함수 입출력의 모든 것** ← 현재 글 |
-| 3 | Host와 Worker — 함수는 누가 실행하는가 |
-| 4 | 첫 번째 함수 배포 — 로컬에서 Azure까지 |
-| 5 | 4가지 플랜 — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | 스케일링과 콜드 스타트 — 서버리스의 두 얼굴 |
-| 7 | 모니터링과 운영 기초 |
+이 글은 Azure Functions 101 시리즈의 2화입니다. 1화에서 전체 멘탈 모델을 잡았다면, 이번 글은 Trigger와 Binding이 그 모델의 입출력을 어떻게 구성하는지 설명합니다. 다음 3화에서는 Host와 Worker가 실제 실행을 어떻게 나누는지 이어집니다.
 
 ---
 
@@ -214,6 +204,9 @@ flowchart LR
 - [Trigger and binding examples](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-example)
 - [Register Azure Functions binding extensions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-register)
 
-**오픈소스 코드**
+**소스코드**
 - [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host)
 - [`Azure/azure-webjobs-sdk-extensions`](https://github.com/Azure/azure-webjobs-sdk-extensions) — 바인딩 확장의 본거지
+
+**관련 시리즈**
+- [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/) — Host와 Binding 확장이 실제로 어떻게 움직이는지 더 안쪽까지 볼 수 있습니다

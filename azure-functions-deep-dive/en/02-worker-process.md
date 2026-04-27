@@ -1,4 +1,4 @@
-# The Worker Process — How Multi-Language Support Actually Works
+# Worker Processes — How One Host Hosts Many Languages
 
 > Azure Functions Deep Dive series (2/7)
 
@@ -10,7 +10,7 @@ The reference commit is the same as in part 1: `5e59423`.
 
 ## Starting point — `worker.config.json`
 
-The secret to multi-language support is mundane. The Host does not hard-code “how to launch each language.” Instead it reads **a `worker.config.json` file that ships inside each language’s worker package** and follows it verbatim. In other words, adding a new language is not a matter of “patching the Host” — it is a matter of “adding a worker package.”
+The answer is straightforward. The Host does not hard-code how to launch each language runtime. It reads **a `worker.config.json` file that ships with each language worker package** and follows that description. Adding a new language is therefore closer to adding a worker package than patching the Host.
 
 The Node.js worker’s configuration, for example, looks like this:
 
@@ -25,11 +25,11 @@ The Node.js worker’s configuration, for example, looks like this:
 }
 ```
 
-> 📎 Source: [Node.js worker’s worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/node/worker.config.json)
+> Source: [Node.js worker repo `worker.config.json`](https://github.com/Azure/azure-functions-nodejs-worker/blob/v3.x/worker.config.json)
 
 The Java worker’s configuration follows the same shape, in its own file:
 
-> 📎 Source: [Java worker’s worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/java/worker.config.json)
+> Source: [Java worker repo `worker.config.json`](https://github.com/Azure/azure-functions-java-worker/blob/dev/worker.config.json)
 
 These files tell the Host three things:
 
@@ -57,7 +57,7 @@ flowchart LR
     Configs --> Manager[Worker channel manager]
 ```
 
-The reason language-specific workers plug in “like plugins” is right there in the diagram. **The Host knows nothing about the workers themselves — it only knows their config files.**
+That is why language workers plug in cleanly. **The Host does not carry language-specific launch logic for each runtime; it reads a config description and builds from there.**
 
 ---
 
@@ -65,7 +65,7 @@ The reason language-specific workers plug in “like plugins” is right there i
 
 Once the configs are gathered, the next step is to launch an actual OS process. The class responsible is `RpcWorkerProcess`. Its `CreateWorkerProcess` method assembles the launch command by combining `defaultExecutablePath` and `defaultWorkerPath` from the worker.config.
 
-> 📎 Source: [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/RpcWorkerProcess.cs)
+> Source: [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Rpc/RpcWorkerProcess.cs)
 
 The assembled command is then handed off to the `Start()` method on the abstract base class `WorkerProcess`. Three things happen there:
 
@@ -73,7 +73,7 @@ The assembled command is then handed off to the `Start()` method on the abstract
 2. **Intercept stdout/stderr and wire them into the Host’s logging pipeline**
 3. Register a callback for when the process dies (the `Exited` event)
 
-> 📎 Source: [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/WorkerProcess.cs)
+> Source: [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/ProcessManagement/WorkerProcess.cs)
 
 That stdout/stderr wiring matters operationally. **Every line a worker writes to standard output flows through the Host’s logging system into Application Insights.** A large fraction of the rows you see in the `traces` table — the one we toured in part 7 of the introductory series — are, in fact, lines the worker wrote to stdout. That is the answer to “how does a single `console.log` end up in cloud logs.”
 
@@ -104,7 +104,7 @@ sequenceDiagram
 
 The `GrpcWorkerChannel` that appears here is “the Host-side handle that corresponds to one worker process.” When the worker dies, the channel is torn down with it, and the Host spins up a new worker along with a new channel.
 
-> 📎 Source: [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
+> Source: [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
 
 ---
 
@@ -117,7 +117,12 @@ This is meaningful in two cases:
 - **Single-threaded, event-loop languages like Node.js / Python** — when a single worker is blocked on CPU work, no other invocation can squeeze in. Running multiple workers parallelizes execution at the OS multi-process level.
 - **Multi-threaded languages like Java / .NET** — there is little reason to need extra workers, but you can still use the option when you want memory isolation or separate GCs.
 
-The PR that introduced this option is [PR #4210](https://github.com/Azure/azure-functions-host/pull/4210); in code it shows up on the options tree as something like `WorkerConcurrencyOptions`. Actually creating and managing those N workers is the responsibility of the Worker channel manager (the parent of `RpcFunctionInvocationDispatcher` that we will meet in the next part).
+Two different knobs get conflated here, and the host code keeps them separate.
+
+- **`FUNCTIONS_WORKER_PROCESS_COUNT` / `WorkerProcessCountOptions`** sets the **static number of worker processes per instance**.
+- **`WorkerConcurrencyOptions` / `WorkerConcurrencyManager`** governs **dynamic worker concurrency**: the runtime watches latency history and may add more workers at runtime.
+
+So `FUNCTIONS_WORKER_PROCESS_COUNT=4` means “start four workers for this instance.” `WorkerConcurrencyOptions` means “watch live worker latency and decide whether to add another one.” Dynamic concurrency is limited to a subset of runtimes such as Node.js, Python, and PowerShell, and it is skipped when `FUNCTIONS_WORKER_PROCESS_COUNT` is explicitly set.
 
 ```mermaid
 flowchart TB
@@ -168,31 +173,24 @@ By this point the worker is **running, connected to the Host, and ready to recei
 
 ---
 
-## Series table of contents
+## Where this fits in the series
 
-| # | Title |
-|---|---|
-| 1 | [Host bootstrap — following `WebJobsScriptHostService`](./01-host-bootstrap.md) |
-| 2 | **The Worker process — how multi-language support actually works** ← current post |
-| 3 | gRPC EventStream — the conversation protocol between Host and Worker |
-| 4 | The mechanics of a function invocation — Dispatcher and InvocationRequest |
-| 5 | Inside per-plan scaling — what the Scale Controller sees |
-| 6 | The war on cold start — Placeholder Mode and Specialization |
-| 7 | Azure Functions through an academic lens — what the papers say |
+This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host bootstrap; this part stays beside that host and follows the worker process from configuration to `Process.Start`. Parts 3 and 4 pick up from there with the gRPC message stream and the invocation path that rides on top of it.
 
 ---
 
 ## References
 
 **Source code (commit `5e59423`)**
-- [Node.js worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/node/worker.config.json)
-- [Java worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/java/worker.config.json)
-- [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/RpcWorkerProcess.cs)
-- [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/WorkerProcess.cs)
+- [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Rpc/RpcWorkerProcess.cs)
+- [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/ProcessManagement/WorkerProcess.cs)
 - [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
 - [PR #4210 — `FUNCTIONS_WORKER_PROCESS_COUNT`](https://github.com/Azure/azure-functions-host/pull/4210)
+- [`WorkerProcessCountOptions.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Workers/WorkerProcessCountOptions.cs)
+- [`WorkerConcurrencyOptions.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/WorkerConcurrencyOptions.cs)
+- [`WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)
 
 **Related worker repos**
-- [`Azure/azure-functions-nodejs-worker`](https://github.com/Azure/azure-functions-nodejs-worker)
+- [`Azure/azure-functions-nodejs-worker` `worker.config.json`](https://github.com/Azure/azure-functions-nodejs-worker/blob/v3.x/worker.config.json)
 - [`Azure/azure-functions-python-worker`](https://github.com/Azure/azure-functions-python-worker)
-- [`Azure/azure-functions-java-worker`](https://github.com/Azure/azure-functions-java-worker)
+- [`Azure/azure-functions-java-worker` `worker.config.json`](https://github.com/Azure/azure-functions-java-worker/blob/dev/worker.config.json)

@@ -8,7 +8,7 @@ That channel is a single **bidirectional gRPC stream**. In this post, we'll walk
 
 > All code citations in this post are based on these two repositories:
 > - Host: [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
-> - Protocol: [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) (included in the host repo as a git submodule)
+> - Protocol: [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) — the protocol lives in a separate repo.
 
 ---
 
@@ -30,7 +30,7 @@ That single line carries a lot of weight. **Everything that can go inside `Strea
 
 ## `StreamingMessage` — the all-purpose message multiplexed via `oneof`
 
-[`StreamingMessage` in `FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto) looks like this:
+[`StreamingMessage` in `FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto) looks like this:
 
 ```protobuf
 message StreamingMessage {
@@ -226,54 +226,39 @@ Messages received by the server eventually need someone to **read and route** th
 | [`WorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/WorkerChannel.cs) | The shared base layered on top of gRPC |
 | [`GrpcWorkerChannelFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannelFactory.cs) | The factory that produces `GrpcWorkerChannel` instances |
 | [`GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs) | Constants for capability keys |
-| [`OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) | Dispatches invocation messages per-function, preserving order |
+| [`OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) | Preserves ordering for messages that belong to the same `invocation_id` |
 
 In the next post (Part 4) we'll dig into `GrpcWorkerChannel.SendInvocationRequest` and `OrderedInvocationMessageDispatcher` properly. For now, just remember that **this object handles the EventStream in both directions**.
 
 ---
 
-## Eventing — turning gRPC messages into an in-process event bus
+## The channel layout — closer to per-worker `Channel<T>` pairs than a generic event bus
 
-Inside the host, **multiple components want to listen to the same gRPC messages simultaneously**. For example:
+This part is easier to reason about if you stay close to the code. The main invocation path is not a broad pub-sub event bus. It is **a pair of inbound/outbound `Channel<T>` instances created per worker**.
 
-- `GrpcWorkerChannel` itself needs to listen so it can match responses.
-- The logging component wants to listen for `RpcLog` messages.
-- The diagnostics component wants to listen for worker state changes.
+`GrpcEventExtensions.AddGrpcChannels(workerId)` allocates two channels for each worker ID:
 
-To handle this cleanly, the host **wraps gRPC messages one more time as in-process events and pushes them onto an event bus**. That's what the [`Eventing/`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing) directory is for.
+- inbound: `InboundGrpcEvent` flowing from worker to host
+- outbound: `OutboundGrpcEvent` flowing from host to worker
 
-| File | Role |
-|---|---|
-| [`GrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/GrpcEvent.cs) | Base event class. Carries `WorkerId` and `Message` (StreamingMessage) |
-| [`InboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/InboundGrpcEvent.cs) | Worker → Host messages |
-| [`OutboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/OutboundGrpcEvent.cs) | Host → Worker messages |
+`FunctionRpcService.EventStream()` confirms the worker identity from `StartStream`, then calls `TryGetGrpcChannels(workerId, out inbound, out outbound)`. After that, the server-side loop is mechanical:
 
-The flow looks like this:
+- read `StreamingMessage` from gRPC and write it to the inbound channel
+- read outbound messages from the outbound channel and write them to the gRPC response stream
+
+That makes `FunctionRpcService` the pump between the real gRPC stream and the host-side per-worker queues.
 
 ```mermaid
 flowchart LR
-    Worker[Worker<br/>process]
-    EventStream[EventStream<br/>gRPC bidi]
-    FRS[FunctionRpcService<br/>host-side gRPC handler]
-    EventBus[(In-process<br/>Event Bus)]
-    GWC[GrpcWorkerChannel]
-    Logger[Logger / Diagnostics]
-    Dispatcher[Invocation<br/>Dispatcher]
-
-    Worker <-->|StreamingMessage| EventStream
-    EventStream --> FRS
-    FRS -->|InboundGrpcEvent| EventBus
-    EventBus --> GWC
-    EventBus --> Logger
-    EventBus --> Dispatcher
-    GWC -->|OutboundGrpcEvent| EventBus
-    EventBus --> FRS
-    FRS -->|StreamingMessage| EventStream
+    Worker[Worker process] <-->|StreamingMessage| Stream[gRPC EventStream]
+    Stream <-->|read / write| Rpc[FunctionRpcService]
+    Rpc --> Inbound[inbound Channel&lt;InboundGrpcEvent&gt;]
+    Outbound[outbound Channel&lt;OutboundGrpcEvent&gt;] --> Rpc
+    Inbound --> Gwc[GrpcWorkerChannel]
+    Gwc --> Outbound
 ```
 
-The key insight: **gRPC doesn't directly call business logic.** Every message is first converted into an `Inbound`/`OutboundGrpcEvent` and dropped onto the in-process event bus, where interested components **subscribe and filter for the message types they care about**.
-
-Thanks to this design, `GrpcWorkerChannel` doesn't bloat into "a giant switch that branches on which kind of message arrived" — instead, **it can split per-message-type handlers into small subscriptions**. (The actual implementation uses the observable pattern based on Reactive Extensions.)
+`IScriptEventManager` still exists here, but mainly as keyed storage for those channels. `InboundGrpcEvent` and `OutboundGrpcEvent` are real wrapper types, and other components can observe them around the edges. But for function invocation traffic, the mental model that matches the source is **per-worker queues plus a gRPC pump**, not “everything goes through one generic in-process event bus.”
 
 ---
 
@@ -281,7 +266,7 @@ Thanks to this design, `GrpcWorkerChannel` doesn't bloat into "a giant switch th
 
 If we boil everything down to one sentence:
 
-> Inside the host, `FunctionRpcService` receives a `StreamingMessage` from the worker, turns it into an `InboundGrpcEvent`, and pushes it onto the event bus. `GrpcWorkerChannel` is listening, picks out only the messages for its own worker ID, and processes them. The reverse direction is symmetric.
+> Inside the host, `FunctionRpcService` reads `StreamingMessage` frames from a worker and writes them into that worker's inbound channel, then drains the outbound channel back onto the gRPC stream. `GrpcWorkerChannel` sits on top of that channel pair and matches requests with responses for its worker.
 
 That's the "communication infrastructure." From the next post onward, we'll cover how an actual function invocation flows on top of this infrastructure — how an `InvocationRequest` is constructed, how responses are paired with requests, and how things recover when a function dies abnormally.
 
@@ -293,32 +278,24 @@ In Part 4, we'll follow **`FunctionInvocationDispatcher` and `InvocationRequest`
 
 ---
 
-## Series index
+## Where this fits in the series
 
-| # | Title |
-|---|---|
-| 1 | [Host bootstrap — from `WebJobsScriptHostService` to `ScriptHost`](./01-host-bootstrap.md) |
-| 2 | [The worker process — `RpcWorkerProcess` and the language worker startup](./02-worker-process.md) |
-| 3 | **The gRPC event stream — what do the host and worker actually exchange** ← current post |
-| 4 | [Dispatcher and Invocation — how a function call reaches the worker](./04-dispatcher-and-invocation.md) |
-| 5 | [Scaling internals — how instances actually grow](./05-scaling-internals.md) |
-| 6 | [Cold start and Placeholder — why the first call can still be fast](./06-cold-start-placeholder.md) |
-| 7 | [An academic perspective — papers that have analyzed Azure Functions](./07-academic-perspective.md) |
+This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at process startup; this part covers the wire protocol that takes over once the worker connects. Part 4 stays on the same path and follows `InvocationRequest` and `InvocationResponse` through the dispatcher.
 
 ---
 
 ## References
 
-**Protocol (submodule)**
-- [FunctionRpc.proto](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto) — `service FunctionRpc`, `StreamingMessage`, all message types
+**Protocol (separate repo)**
+- [FunctionRpc.proto](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto) — `service FunctionRpc`, `StreamingMessage`, all message types
 
 **Host code (commit `5e59423`)**
 - [`Server/FunctionRpcService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)
 - [`Server/AspNetCoreGrpcServer.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcServer.cs)
 - [`Channel/GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
 - [`Channel/GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs)
-- [`Eventing/InboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/InboundGrpcEvent.cs)
-- [`Eventing/OutboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/OutboundGrpcEvent.cs)
+- [`Eventing/GrpcEventExtensions.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/GrpcEventExtensions.cs)
+- [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs)
 
 **Related introductory series**
-- [Host and Worker — who actually runs your functions (101 series, Part 3)](../../azure-functions-101/ko/03-host-and-worker.md)
+- [Host and Worker — who actually runs your functions (101 series, Part 3)](../../azure-functions-101/en/03-host-and-worker.md)

@@ -1,7 +1,5 @@
 # What is Azure App Service? - Understanding the Platform Architecture
 
-> Azure App Service 101 Series (1/7)
-
 When deploying a web application to Azure, **Azure App Service** is often the first service you encounter. It's a PaaS (Platform as a Service) where you just deploy your code without managing VMs. To use this service effectively, understanding its internals is crucial.
 
 In this post, we'll explore how the platform works, focusing on the **3-Plane Architecture**.
@@ -18,9 +16,6 @@ You focus on your application code, while Microsoft handles:
 - Load balancing and traffic routing
 - Auto-scaling
 - Deployment pipeline integration
-
-![IMAGE: App Service overview in Azure Portal]
-`📸 Screenshot: Azure Portal → App Service → Overview page`
 
 ---
 
@@ -41,8 +36,6 @@ Each Plane has **independent APIs and failure modes**. For example:
 - Changing App Settings in the Management Plane → May restart the Runtime Plane
 - SCM (Kudu) site being inaccessible → App itself may still work fine
 
-![3-Plane Architecture Diagram](../../assets/azure-app-service-101/01/01-three-plane-architecture.en.png)
-
 ---
 
 ## Management Plane: The Configuration Hub
@@ -57,7 +50,7 @@ The Management Plane is where you declare your **Desired State**.
 - **Custom Domains**: Domain bindings
 - **Managed Identity**: Secure authentication
 
-### ⚠️ Warning: Configuration Changes May Trigger Restarts
+### Configuration changes can restart the app
 
 Many settings are applied at process startup, so changing them restarts your app.
 
@@ -70,14 +63,11 @@ Many settings are applied at process startup, so changing them restarts your app
 ```bash
 # Check current app state
 az webapp show \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --query "{state:state, hostNames:hostNames, httpsOnly:httpsOnly}" \
-    --output json
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query "{state:state, hostNames:hostNames, httpsOnly:httpsOnly}" \
+ --output json
 ```
-
-![IMAGE: Configuration screen in Azure Portal]
-`📸 Screenshot: Azure Portal → App Service → Configuration → Application settings`
 
 ---
 
@@ -104,13 +94,10 @@ Worker instances are recycled in these situations:
 - Restarts due to configuration changes
 
 **Design Principles:**
-- ✅ Store state externally (Redis, DB)
-- ✅ Make startup logic idempotent
-- ✅ Implement graceful shutdown
-- ❌ Never store important data in local files
-
-![IMAGE: App Service Metrics screen]
-`📸 Screenshot: Azure Portal → App Service → Monitoring → Metrics (CPU, Memory)`
+- Store state externally (Redis, DB)
+- Make startup logic idempotent
+- Implement graceful shutdown
+- Never store important data in local files
 
 ---
 
@@ -128,7 +115,7 @@ The SCM site is a management tool accessible at `<app-name>.scm.azurewebsites.ne
 | Log Stream | `/api/logstream` |
 | File Browser | `/api/vfs/` |
 
-### 🚨 Important: SCM ≠ App Container
+### SCM is not the app container
 
 When using Linux custom containers, the SCM site runs in a **separate container**.
 
@@ -138,13 +125,10 @@ When using Linux custom containers, the SCM site runs in a **separate container*
 ```bash
 # Check SCM access restrictions
 az webapp config access-restriction show \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --output json
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output json
 ```
-
-![IMAGE: Kudu dashboard]
-`📸 Screenshot: https://<app-name>.scm.azurewebsites.net main page`
 
 ---
 
@@ -167,9 +151,6 @@ import os
 port = int(os.environ.get("PORT", 8000))
 app.run(host="0.0.0.0", port=port)
 ```
-
-![IMAGE: Startup Command in App Service Configuration]
-`📸 Screenshot: Azure Portal → App Service → Configuration → General settings → Startup Command`
 
 ---
 
@@ -197,7 +178,7 @@ Understanding storage behavior is key to preventing production issues.
 | `/home/LogFiles` | App/platform logs |
 | `/home/data` | App data |
 
-### ❌ Anti-pattern: SQLite on `/home`?
+### Anti-pattern: SQLite on `/home`?
 
 Since `/home` is a network filesystem:
 - Lock contention possible
@@ -223,9 +204,9 @@ Health Check isn't just monitoring—it's **core to traffic routing**.
 ```python
 @app.route('/health')
 def health():
-    # ✅ Keep it lightweight
-    # ✅ Check only critical dependencies
-    # ❌ Avoid heavy DB queries
+    # Keep it lightweight
+    # Check only critical dependencies
+    # Avoid heavy DB queries
     return {"status": "healthy"}, 200
 ```
 
@@ -234,35 +215,32 @@ def health():
 - 1-minute timeout = unhealthy
 - Most effective with 2+ instances
 
-![IMAGE: Health Check settings in Azure Portal]
-`📸 Screenshot: Azure Portal → App Service → Monitoring → Health check`
-
 ---
 
 ## Operations Checklist
 
 Before production deployment, verify at minimum:
 
-### ✅ Reliability
+### Reliability
 
 - [ ] Health endpoint implemented and tested
 - [ ] Health Check setting enabled
 - [ ] 2+ instances (for availability)
 - [ ] Startup time measured and optimized
 
-### ✅ Deployment Safety
+### Deployment Safety
 
 - [ ] CI/CD producing immutable artifacts
 - [ ] Rollback procedure documented and tested
 - [ ] Deployment credentials minimized
 
-### ✅ Observability
+### Observability
 
 - [ ] Structured logging enabled
 - [ ] Log retention/export configured
 - [ ] Alerts for error rate, restarts, latency
 
-### ✅ Configuration
+### Configuration
 
 - [ ] Port binding verified (per hosting mode)
 - [ ] Storage behavior confirmed
@@ -296,9 +274,13 @@ In the next post, we'll explore the **Request Lifecycle** - the complete journey
 
 ## References
 
+### Official Docs
 - [Azure App Service overview (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/overview)
 - [Kudu service overview (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/resources-kudu)
 - [Monitor App Service instances by using Health Check (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/monitor-instances-health-check)
+
+### Related Series
+- [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
 

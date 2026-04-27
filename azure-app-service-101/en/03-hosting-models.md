@@ -1,7 +1,5 @@
 # Hosting Models: Which Plan Should You Choose?
 
-> Azure App Service 101 Series (3/7)
-
 When starting with App Service, the first question you face: **"Which plan should I choose?"**
 
 Free? Basic? Standard? Premium? And Windows vs Linux? Code vs Container?
@@ -16,13 +14,11 @@ The flow for deciding your App Service hosting strategy:
 
 ```
 1. Choose OS (Linux / Windows)
-   ↓
+ ↓
 2. Choose Deployment Model (Code / Container)
-   ↓
+ ↓
 3. Choose Plan Tier (Dev → Production)
 ```
-
-![Hosting Model decision flowchart](../../assets/azure-app-service-101/03/01-decision-flow.en.png)
 
 ---
 
@@ -46,12 +42,9 @@ Deploying multiple apps to the same Plan means they **share compute resources**.
 ```
 [App Service Plan: Standard S1]
 ├── Web App A
-├── Web App B  
-└── API App C   ← All share the same VM pool
+├── Web App B 
+└── API App C ← All share the same VM pool
 ```
-
-![IMAGE: App Service Plan overview]
-`📸 Screenshot: Azure Portal → App Service Plans → Select a Plan → Overview`
 
 ---
 
@@ -62,7 +55,7 @@ Deploying multiple apps to the same Plan means they **share compute resources**.
 | Tier | Use Case | Key Limitations |
 |------|----------|-----------------|
 | **Free/Shared** | Learning, experiments | Shared resources, limited features |
-| **Basic** | Low traffic | No advanced features |
+| **Basic** | Low traffic | Limited operational features |
 | **Standard** | Basic production | Medium scale limits |
 | **Premium** | High performance, networking | Higher cost |
 | **Isolated** | Compliance, network isolation | Highest cost, complexity |
@@ -79,12 +72,9 @@ Deploying multiple apps to the same Plan means they **share compute resources**.
 | Private Endpoint | Premium |
 | Zone Redundancy | Premium |
 
-### 💡 Practical Advice
+### Practical Advice
 
 > "Start with Standard minimum for production. Operating without Autoscale and Deployment Slots is asking for trouble."
-
-![IMAGE: App Service Plan pricing comparison]
-`📸 Screenshot: Azure Portal → App Service Plan → Scale up (App Service plan)`
 
 ---
 
@@ -113,15 +103,12 @@ Deploying multiple apps to the same Plan means they **share compute resources**.
 ```bash
 # Create Linux Plan
 az appservice plan create \
-    --resource-group $RG \
-    --name $PLAN_NAME \
-    --location koreacentral \
-    --sku S1 \
-    --is-linux
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --location koreacentral \
+ --sku S1 \
+ --is-linux
 ```
-
-![IMAGE: OS selection when creating App Service Plan]
-`📸 Screenshot: Azure Portal → Create App Service Plan → Operating System selection`
 
 ---
 
@@ -132,21 +119,21 @@ az appservice plan create \
 Platform provides the runtime; you just deploy code.
 
 **Pros:**
-- ✅ Fast onboarding
-- ✅ No container management overhead
-- ✅ Strong platform integration
+- Fast onboarding
+- container management overhead
+- Strong platform integration
 
 **Cons:**
-- ❌ No control over base image
-- ❌ Runtime updates follow platform policy
+- Limited control over the base image
+- Runtime updates follow platform policy
 
 ```bash
 # Create code-based web app
 az webapp create \
-    --resource-group $RG \
-    --plan $PLAN_NAME \
-    --name $APP_NAME \
-    --runtime "PYTHON|3.11"
+ --resource-group $RG \
+ --plan $PLAN_NAME \
+ --name $APP_NAME \
+ --runtime "PYTHON|3.11"
 ```
 
 ### Container-based Deployment
@@ -154,26 +141,23 @@ az webapp create \
 Build and deploy your own OCI images.
 
 **Pros:**
-- ✅ Full control over runtime stack
-- ✅ Local-cloud environment consistency
-- ✅ OS-level dependency freedom
+- Full control over runtime stack
+- Local-cloud environment consistency
+- OS-level dependency freedom
 
 **Cons:**
-- ❌ Manage patching cycles yourself
-- ❌ Registry governance required
-- ❌ Image quality directly impacts startup performance
+- Manage patching cycles yourself
+- Registry governance required
+- Image quality directly impacts startup performance
 
 ```bash
 # Create container-based web app
 az webapp create \
-    --resource-group $RG \
-    --plan $PLAN_NAME \
-    --name $APP_NAME \
-    --deployment-container-image-name myregistry.azurecr.io/myapp:latest
+ --resource-group $RG \
+ --plan $PLAN_NAME \
+ --name $APP_NAME \
+ --deployment-container-image-name myregistry.azurecr.io/myapp:latest
 ```
-
-![IMAGE: Publish option when creating Web App]
-`📸 Screenshot: Azure Portal → Create Web App → Publish: Code vs Docker Container`
 
 ---
 
@@ -203,15 +187,12 @@ Separate Plan for each critical app:
 **Cons:**
 - Increased cost
 
-### 💡 Recommended Approach
+### Recommended Approach
 
 ```
 Business-critical apps → Dedicated Plan
 Internal tools, low traffic apps → Shared Plan
 ```
-
-![IMAGE: Multiple apps in same Plan]
-`📸 Screenshot: Azure Portal → App Service Plan → Apps tab`
 
 ---
 
@@ -221,12 +202,12 @@ Which features depend on Plan vs Deployment Model:
 
 | Feature | Plan Dependent | Deployment Model Dependent |
 |---------|----------------|---------------------------|
-| Autoscale | ✅ | ❌ |
-| Deployment Slots | ✅ | ❌ |
-| Private Endpoint | ✅ | ❌ |
-| VNet Integration | ✅ | ❌ |
-| Custom Startup Image | ❌ | ✅ (Container) |
-| Platform Build | ❌ | ✅ (Code) |
+| Autoscale | Yes | No |
+| Deployment Slots | Yes | No |
+| Private Endpoint | Yes | No |
+| VNet Integration | Yes | No |
+| Custom Startup Image | No | Yes (Container) |
+| Platform Build | No | Yes (Code) |
 
 ---
 
@@ -254,64 +235,24 @@ Which features depend on Plan vs Deployment Model:
 
 ```bash
 az appservice plan show \
-    --resource-group $RG \
-    --name $PLAN_NAME \
-    --query "{sku:sku, workers:numberOfWorkers, reserved:reserved}" \
-    --output json
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --query "{sku:sku, workers:numberOfWorkers, reserved:reserved}" \
+ --output json
 ```
 
 **Example output:**
 ```json
 {
-  "sku": {
-    "name": "S1",
-    "tier": "Standard",
-    "capacity": 2
-  },
-  "workers": 2,
-  "reserved": true
+ "sku": {
+ "name": "S1",
+ "tier": "Standard",
+ "capacity": 2
+ },
+ "workers": 2,
+ "reserved": true
 }
 ```
-
-![IMAGE: Scale up screen for App Service Plan]
-`📸 Screenshot: Azure Portal → App Service Plan → Scale up (App Service plan)`
-
----
-
-## Bicep Example: Reproducible Infrastructure
-
-```bicep
-param location string = resourceGroup().location
-param planName string
-param appName string
-
-// App Service Plan
-resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
-  name: planName
-  location: location
-  sku: {
-    name: 'S1'
-    tier: 'Standard'
-    capacity: 1
-  }
-  properties: {
-    reserved: true  // Linux
-  }
-}
-
-// Web App
-resource app 'Microsoft.Web/sites@2023-12-01' = {
-  name: appName
-  location: location
-  properties: {
-    serverFarmId: plan.id
-    httpsOnly: true
-  }
-}
-```
-
-![IMAGE: Bicep deployment result]
-`📸 Screenshot: Azure Portal → Resource Group → Deployed resources`
 
 ---
 
@@ -321,11 +262,11 @@ Verify before choosing a Plan:
 
 | Question | Check |
 |----------|-------|
-| Does it support required networking features? | ☐ |
-| Does it support required deployment patterns? (Slots) | ☐ |
-| Will Autoscale react before saturation? | ☐ |
-| Is memory per instance sufficient at peak? | ☐ |
-| Can dependent services handle increased load? | ☐ |
+| Does it support required networking features? | |
+| Does it support required deployment patterns? (Slots) | |
+| Will Autoscale react before saturation? | |
+| Is memory per instance sufficient at peak? | |
+| Can dependent services handle increased load? | |
 
 ---
 
@@ -356,9 +297,13 @@ In the next post, we'll walk through **deploying a Python Flask app to Azure** s
 
 ## References
 
+### Official Docs
 - [App Service plan overview (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/overview-hosting-plans)
 - [Custom container in App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/tutorial-custom-container)
 - [App Service pricing (Azure)](https://azure.microsoft.com/pricing/details/app-service/)
+
+### Related Series
+- [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
 

@@ -1,10 +1,70 @@
 # Host Bootstrap — Following `WebJobsScriptHostService`
 
-> Azure Functions Deep Dive series (1/7)
+> Azure Functions Deep Dive series (1/6)
 
-In episode 3 of the intro series, I wrote that "Functions runs the Host process (.NET) and the Worker process (your language) as separate processes that talk over gRPC." Time to actually verify that single sentence. This deep dive series reads the [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) repo directly, one stage per episode — from host bootstrap through function invocation, scaling, cold starts, and finally what academia has to say about it.
+In episode 3 of the intro series, I wrote that Functions runs the Host process (.NET) and the Worker process (your language) separately, with gRPC between them. This series checks that sentence against the actual host code. It reads the [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) repo directly, one stage per post, from bootstrap through invocation, scaling, and cold starts.
 
-This post is the first step. The topic is exactly one thing: **what happens the moment a Function App instance powers on**. I've pinned everything to commit `5e59423`. Every code citation comes with a line-level permalink so you can click through and verify it yourself.
+This post focuses on one question: **what happens the moment a Function App instance powers on**. Everything is pinned to commit `5e59423`, and every host code citation uses that commit.
+
+---
+
+## The big picture — one Azure Functions host instance
+
+This is the map for the rest of the series.
+Each later part zooms into one box from this picture.
+Get the layout in your head first; the code paths land more cleanly after that.
+
+```mermaid
+flowchart LR
+    subgraph SRC[Event sources]
+        direction TB
+        HTTP[HTTP]
+        TIMER[Timer]
+        QUEUE[Queue]
+        BLOB[Blob]
+        SB[Service Bus]
+        EH[Event Hub]
+        COSMOSIN[Cosmos DB]
+    end
+
+    subgraph HOST[Functions Host (.NET)]
+        direction TB
+        WJSHS[WebJobsScriptHostService] --> SHM[ScriptHostManager] --> SH[ScriptHost]
+        SH --> IDX[Indexer]
+        SH --> WRK[Workers]
+        SH --> LSN[Listeners]
+        SH --> JH[JobHost]
+    end
+
+    subgraph WORKER[Worker process]
+        direction TB
+        LW[Language Worker<br/>Python / Node / Java / ...]
+    end
+
+    subgraph OUT[Output bindings / external systems]
+        direction TB
+        HTTPRES[HTTP response]
+        QUEUEOUT[Queue]
+        BLOBOUT[Blob]
+        COSMOSOUT[Cosmos DB]
+    end
+
+    HTTP --> LSN
+    TIMER --> LSN
+    QUEUE --> LSN
+    BLOB --> LSN
+    SB --> LSN
+    EH --> LSN
+    COSMOSIN --> LSN
+
+    WRK -->|gRPC (FunctionRpcService)| LW
+    JH --> HTTPRES
+    JH --> QUEUEOUT
+    JH --> BLOBOUT
+    JH --> COSMOSOUT
+```
+
+Part 1 covers host bootstrap, Part 2 zooms into the worker process, Part 3 into the gRPC channel, Part 4 into dispatcher and invocation, Part 5 into scaling, and Part 6 into placeholder mode and cold start.
 
 ---
 
@@ -34,7 +94,7 @@ The key method is `StartAsync`. Inside it, the following happens:
 - Apply retry / restart policy on failure
 - Publish bootstrap state events (Standby → Running transitions, etc.)
 
-> 📎 Code: [`WebJobsScriptHostService.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs)
+> Code location: [`WebJobsScriptHostService.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs)
 
 One important design decision here. **`WebJobsScriptHostService` is not "the host itself."** It's a shell that "manages" the host lifecycle. The actual host is the `ScriptHost` inside. By separating the shell from the kernel, recovery becomes possible: when the host dies, the shell can spin up a new kernel and swap it in.
 
@@ -42,7 +102,7 @@ One important design decision here. **`WebJobsScriptHostService` is not "the hos
 
 ## Stage 2: `ScriptHost.InitializeAsync` — where bootstrap actually happens
 
-Inside `ScriptHost.InitializeAsync`, called by `WebJobsScriptHostService`, every preparation needed for Functions to "behave like a function app" takes place. Let's break it down step by step.
+Inside `ScriptHost.InitializeAsync`, called by `WebJobsScriptHostService`, the host does the work required to become a running function app.
 
 ```mermaid
 sequenceDiagram
@@ -59,15 +119,17 @@ sequenceDiagram
     Config-->>Script: Options tree complete
     Script->>Indexer: Index function metadata
     Indexer-->>Script: N functions discovered
-    Script->>Workers: Prepare Language Worker channels
+    Script->>Workers: Prepare language worker channels
+    Script-->>Service: InitializeAsync complete
+    Script->>Script: base.StartAsyncCore()
     Script->>Job: JobHost.StartAsync()
     Job-->>Script: Trigger listeners activated
     Script-->>Service: Bootstrap complete
 ```
 
-Each step in this sequence is the topic of a future episode. This post focuses on stages 1 and 2 (config loading and function indexing), pushes Worker channel prep to episode 2, and JobHost to episode 4.
+The ordering matters. In `ScriptHost.StartAsyncCore()`, `InitializeAsync()` runs first and finishes before `base.StartAsyncCore()` runs. Trigger listener activation through `JobHost.StartAsync()` is therefore **after** initialization, not part of it. This post focuses on config loading and function indexing, leaves worker channel prep to episode 2, and picks up the invocation path in episode 4.
 
-> 📎 Code: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
+> Code location: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
 
 ---
 
@@ -82,11 +144,11 @@ The entry point is `HostJsonFileConfigurationSource`. This class reads host.json
 - `extensions.http` — HTTP trigger routing / concurrency
 - `functionTimeout` — timeout for a single invocation
 
-> 📎 Code: [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Configuration/HostJsonFileConfigurationSource.cs)
+> Code location: [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/HostJsonFileConfigurationSource.cs)
 
 Values from `host.json` map straight to options objects. For example, `functionTimeout` flows into `ScriptJobHostOptions.FunctionTimeout` via `ScriptJobHostOptionsSetup.ConfigureFunctionTimeout`.
 
-> 📎 Code: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
+> Code location: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 
 ```mermaid
 graph LR
@@ -100,7 +162,7 @@ graph LR
     Setup3 --> Opts3[QueuesOptions]
 ```
 
-This diagram is the entire secret of `host.json`. **One key in the file → one node in IConfiguration → a Setup class → one field on an options object** — that clean 1:1 mapping holds all the way through.
+This diagram is the path `host.json` takes into runtime options. **One key in the file → one node in IConfiguration → a Setup class → one field on an options object**. The mapping stays that direct.
 
 Two things operators should know:
 
@@ -156,38 +218,30 @@ This state machine is the root cause of the operational symptom "my function sud
 
 The flow this post traced, compressed into one paragraph:
 
-> ASP.NET Core boots and starts an `IHostedService` called `WebJobsScriptHostService`. Inside it, a `ScriptHost` is created and `InitializeAsync` runs — reading options from host.json and env vars, indexing function metadata, then standing up the JobHost to activate trigger listeners. The host health monitor watches this whole process, and swaps the host out when something goes wrong.
+> ASP.NET Core boots and starts an `IHostedService` named `WebJobsScriptHostService`. Inside it, a `ScriptHost` is created and `InitializeAsync` runs first, reading host.json and environment-backed options and indexing function metadata. Only after that does `JobHost.StartAsync` run and activate trigger listeners. The host health monitor watches the whole sequence and replaces the host when it fails.
 
 The next episode targets one of the blind spots in that diagram: **what happens inside the box labeled "Worker channel prep" in `InitializeAsync`?** How do worker processes for other languages — Node.js, Python, Java — actually get launched? We'll follow it right up to the OS-level `Process.Start` call.
 
 ---
 
-## Series table of contents
+## Where this fits in the series
 
-| # | Title |
-|---|---|
-| 1 | **Host Bootstrap — Following `WebJobsScriptHostService`** ← this post |
-| 2 | The Worker Process — How is multi-language possible? |
-| 3 | gRPC EventStream — The conversation protocol between Host and Worker |
-| 4 | Function invocation in practice — Dispatcher and InvocationRequest |
-| 5 | Inside per-plan scaling — what the Scale Controller sees |
-| 6 | The war on cold starts — Placeholder Mode and Specialization |
-| 7 | Azure Functions through an academic lens — what the papers say |
+This is part 1 of the Azure Functions Deep Dive series. With host bootstrap in place, part 2 moves to the worker processes living beside the host, and parts 3 and 4 follow the gRPC channel and invocation path between them. The later parts cover scaling, placeholder mode, and cold-start mechanics.
 
 ---
 
 ## References
 
-**Source code (commit `5e59423`)**
+### Primary sources (host code, commit `5e59423`)
 - [`WebJobsScriptHostService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs)
 - [`ScriptHost.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
-- [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Configuration/HostJsonFileConfigurationSource.cs)
+- [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/HostJsonFileConfigurationSource.cs)
 - [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 - [PR #4210 — introducing `FUNCTIONS_WORKER_PROCESS_COUNT`](https://github.com/Azure/azure-functions-host/pull/4210)
 
-**Official docs**
+### Secondary sources
 - [host.json reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-host-json)
 - [Azure Functions app settings reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings)
 
-**Related series**
-- [Azure Functions 101 — intro series](../../azure-functions-101/ko/) (especially episode 3, "Host and Worker")
+### Other parts in the series
+- [Azure Functions 101 — intro series](../../azure-functions-101/en/) (especially episode 3, "Host and Worker")

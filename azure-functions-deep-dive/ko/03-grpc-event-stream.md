@@ -8,7 +8,7 @@
 
 > 이 글의 모든 코드 인용은 다음 두 저장소를 기준으로 합니다.
 > - 호스트: [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
-> - 프로토콜: [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) (호스트 저장소에 git submodule로 포함)
+> - 프로토콜: [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) — 프로토콜은 호스트와 분리된 별도 저장소에 정의되어 있습니다.
 
 ---
 
@@ -30,7 +30,7 @@ service FunctionRpc {
 
 ## `StreamingMessage` — `oneof`로 다중화된 만능 메시지
 
-[`FunctionRpc.proto`의 `StreamingMessage`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto)는 이렇게 생겼습니다.
+[`FunctionRpc.proto`의 `StreamingMessage`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto)는 이렇게 생겼습니다.
 
 ```protobuf
 message StreamingMessage {
@@ -226,54 +226,39 @@ sequenceDiagram
 | [`WorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/WorkerChannel.cs) | gRPC 위에 있는 공통 베이스 |
 | [`GrpcWorkerChannelFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannelFactory.cs) | `GrpcWorkerChannel`을 만드는 팩토리 |
 | [`GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs) | capability 키 상수 모음 |
-| [`OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) | invocation 메시지를 함수별로 순서를 지켜 디스패치 |
+| [`OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) | 같은 `invocation_id`에 속한 메시지를 순서대로 처리 |
 
 다음 화(4화)에서 `GrpcWorkerChannel.SendInvocationRequest`와 `OrderedInvocationMessageDispatcher`를 본격적으로 따라갈 겁니다. 여기서는 **이 객체가 EventStream을 양쪽 방향에서 다룬다**는 사실만 기억해 두면 됩니다.
 
 ---
 
-## Eventing — gRPC 메시지를 in-process 이벤트 버스로
+## 채널 구조 — 범용 이벤트 버스보다 워커별 `Channel<T>` 쌍에 가깝다
 
-호스트 안에서는 gRPC 메시지를 **여러 컴포넌트가 동시에 듣고 싶어합니다**. 예를 들어:
+이 부분은 그림을 과장 없이 보는 편이 좋습니다. 호출 메시지의 주 경로는 “광범위한 in-process 이벤트 버스”가 아니라, **워커 하나마다 만들어지는 inbound/outbound `Channel<T>` 쌍**입니다.
 
-- `GrpcWorkerChannel` 자신은 응답을 매칭하기 위해 들어야 함
-- 로깅 컴포넌트는 `RpcLog` 메시지를 듣고 싶어함
-- 진단 컴포넌트는 워커 상태 변화를 듣고 싶어함
+`GrpcEventExtensions.AddGrpcChannels(workerId)`는 워커 ID별로 다음 두 채널을 만듭니다.
 
-이걸 깔끔하게 풀려고 호스트는 **gRPC 메시지를 in-process 이벤트로 한 번 더 감싸서 이벤트 버스에 흘립니다**. 그게 [`Eventing/`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing) 디렉토리입니다.
+- inbound: 워커 → 호스트로 들어오는 `InboundGrpcEvent`
+- outbound: 호스트 → 워커로 나가는 `OutboundGrpcEvent`
 
-| 파일 | 역할 |
-|---|---|
-| [`GrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/GrpcEvent.cs) | 베이스 이벤트 클래스. `WorkerId`, `Message` (StreamingMessage)를 보유 |
-| [`InboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/InboundGrpcEvent.cs) | 워커 → 호스트 메시지 |
-| [`OutboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/OutboundGrpcEvent.cs) | 호스트 → 워커 메시지 |
+`FunctionRpcService.EventStream()`은 `StartStream`으로 워커 ID를 확인한 뒤 `TryGetGrpcChannels(workerId, out inbound, out outbound)`를 호출합니다. 그 다음 동작은 단순합니다.
 
-흐름은 이렇게 됩니다.
+- gRPC에서 읽은 `StreamingMessage`를 inbound 채널에 씁니다.
+- outbound 채널에서 읽은 메시지를 gRPC 응답 스트림으로 씁니다.
+
+즉 `FunctionRpcService`는 호스트 쪽 gRPC 서버이면서, 동시에 **워커별 채널과 실제 gRPC 스트림 사이를 펌프하는 중계기**입니다.
 
 ```mermaid
 flowchart LR
-    Worker[Worker<br/>process]
-    EventStream[EventStream<br/>gRPC bidi]
-    FRS[FunctionRpcService<br/>호스트 측 gRPC 핸들러]
-    EventBus[(In-process<br/>Event Bus)]
-    GWC[GrpcWorkerChannel]
-    Logger[Logger / Diagnostics]
-    Dispatcher[Invocation<br/>Dispatcher]
-
-    Worker <-->|StreamingMessage| EventStream
-    EventStream --> FRS
-    FRS -->|InboundGrpcEvent| EventBus
-    EventBus --> GWC
-    EventBus --> Logger
-    EventBus --> Dispatcher
-    GWC -->|OutboundGrpcEvent| EventBus
-    EventBus --> FRS
-    FRS -->|StreamingMessage| EventStream
+    Worker[Worker process] <-->|StreamingMessage| Stream[gRPC EventStream]
+    Stream <-->|read / write| Rpc[FunctionRpcService]
+    Rpc --> Inbound[inbound Channel&lt;InboundGrpcEvent&gt;]
+    Outbound[outbound Channel&lt;OutboundGrpcEvent&gt;] --> Rpc
+    Inbound --> Gwc[GrpcWorkerChannel]
+    Gwc --> Outbound
 ```
 
-핵심: **gRPC가 직접 비즈니스 로직을 호출하지 않는다.** 모든 메시지는 일단 `Inbound/OutboundGrpcEvent`로 변환되어 in-process 이벤트 버스에 떨어지고, 관심 있는 컴포넌트들이 거기서 **자기가 원하는 메시지 종류만 필터링해서** 받습니다.
-
-이 디자인 덕분에 `GrpcWorkerChannel`은 "어떤 종류의 메시지가 왔는지 분기하는 거대한 switch"로 부풀지 않고, **각 메시지 종류별 핸들러를 작은 구독으로 나눠** 가질 수 있습니다. (실제 구현은 Reactive Extensions 기반의 옵저버블 패턴을 사용합니다.)
+`IScriptEventManager`는 이 채널들을 워커 ID로 보관하고 찾는 상태 저장소로 쓰입니다. `InboundGrpcEvent`와 `OutboundGrpcEvent` 같은 래퍼 타입도 실제로 존재합니다. 다만 함수 호출 메시지의 핵심 경로를 설명할 때는, 그것들을 범용 pub-sub 버스라고 이해하기보다 **워커별 큐와 펌프 구조**로 보는 쪽이 코드와 더 가깝습니다.
 
 ---
 
@@ -281,7 +266,7 @@ flowchart LR
 
 지금까지의 모든 걸 한 줄로 줄이면 다음과 같습니다.
 
-> 호스트 안의 `FunctionRpcService`가 워커가 보낸 `StreamingMessage`를 받아 `InboundGrpcEvent`로 만들어 이벤트 버스에 흘리면, `GrpcWorkerChannel`이 그걸 듣고 있다가 자기 워커 ID의 메시지만 골라 처리한다. 반대 방향도 대칭이다.
+> 호스트 안의 `FunctionRpcService`는 워커가 보낸 `StreamingMessage`를 받아 해당 워커의 inbound 채널에 넣고, outbound 채널에서 꺼낸 메시지를 다시 gRPC 스트림으로 씁니다. `GrpcWorkerChannel`은 자기 워커에 연결된 그 채널 쌍을 통해 요청과 응답을 처리합니다.
 
 여기까지가 "통신 인프라"입니다. 다음 화부터는 이 인프라 위에서 실제 함수 호출이 어떻게 흘러가는지 — `InvocationRequest`가 어떻게 만들어지고, 응답이 어떻게 짝지어지고, 함수가 비정상 종료되면 어떻게 복구되는지 — 를 다룹니다.
 
@@ -293,32 +278,24 @@ flowchart LR
 
 ---
 
-## 시리즈 목차
+## 시리즈 안에서의 위치
 
-| # | 제목 |
-|---|---|
-| 1 | [호스트 부트스트랩 — `WebJobsScriptHostService`부터 `ScriptHost`까지](./01-host-bootstrap.md) |
-| 2 | [워커 프로세스 — `RpcWorkerProcess`와 언어 워커의 시작](./02-worker-process.md) |
-| 3 | **gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가** ← 현재 글 |
-| 4 | [Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지](./04-dispatcher-and-invocation.md) |
-| 5 | [스케일링 내부 — 인스턴스는 어떻게 늘어나는가](./05-scaling-internals.md) |
-| 6 | [콜드 스타트와 Placeholder — 첫 호출은 왜 빠를 수 있는가](./06-cold-start-placeholder.md) |
-| 7 | [학술적 관점 — Azure Functions를 분석한 논문들](./07-academic-perspective.md) |
+이 글은 Azure Functions Deep Dive 시리즈 3화입니다. 2화에서 Worker 프로세스를 띄우는 데까지 왔다면, 이번 화는 그 워커가 호스트와 실제로 어떤 프로토콜을 쓰는지 보는 자리입니다. 다음 4화에서는 여기서 본 채널 위로 `InvocationRequest`와 `InvocationResponse`가 어떻게 오가는지 더 깊게 들어갑니다.
 
 ---
 
 ## References
 
-**프로토콜 (submodule)**
-- [FunctionRpc.proto](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto) — `service FunctionRpc`, `StreamingMessage`, 모든 메시지 타입
+**프로토콜 (별도 저장소)**
+- [FunctionRpc.proto](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto) — `service FunctionRpc`, `StreamingMessage`, 모든 메시지 타입
 
 **호스트 코드 (commit `5e59423`)**
 - [`Server/FunctionRpcService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)
 - [`Server/AspNetCoreGrpcServer.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcServer.cs)
 - [`Channel/GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
 - [`Channel/GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs)
-- [`Eventing/InboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/InboundGrpcEvent.cs)
-- [`Eventing/OutboundGrpcEvent.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/OutboundGrpcEvent.cs)
+- [`Eventing/GrpcEventExtensions.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/GrpcEventExtensions.cs)
+- [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs)
 
 **관련 입문편**
 - [Host와 Worker — 함수는 누가 실행하는가 (입문편 3화)](../../azure-functions-101/ko/03-host-and-worker.md)

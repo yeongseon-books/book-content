@@ -1,4 +1,4 @@
-# Worker 프로세스 — 다국어는 어떻게 가능한가
+# Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법
 
 > Azure Functions Deep Dive 시리즈 (2/7)
 
@@ -10,7 +10,7 @@
 
 ## 출발점 — `worker.config.json`
 
-다국어 지원의 비밀은 단순합니다. Host는 “어떤 언어를 어떻게 띄울지”를 직접 알지 않습니다. 대신 **각 언어 워커 패키지에 들어 있는 `worker.config.json` 파일**을 읽어서 그대로 따릅니다. 즉 새 언어를 추가하는 일은 “Host 코드를 고치는” 게 아니라 “워커 패키지를 추가하는” 일입니다.
+여러 언어 런타임을 어떻게 같이 띄우는지의 답은 단순합니다. Host는 “어떤 언어를 어떻게 띄울지”를 직접 하드코딩하지 않습니다. 대신 **각 언어 워커 패키지에 들어 있는 `worker.config.json`**을 읽고 그 설명을 따릅니다. 새 언어를 붙이는 일은 Host 코드를 뜯어고치는 작업이 아니라, 해당 언어 워커 패키지를 추가하는 작업에 가깝습니다.
 
 대표적으로 Node.js 워커의 설정은 다음과 같이 생겼습니다.
 
@@ -25,11 +25,11 @@
 }
 ```
 
-> 📎 코드: [Node.js 워커의 worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/node/worker.config.json)
+> 코드 위치: [Node.js worker repo의 `worker.config.json`](https://github.com/Azure/azure-functions-nodejs-worker/blob/v3.x/worker.config.json)
 
 Java 워커의 설정도 비슷한 구조로 별도 파일에 들어 있습니다.
 
-> 📎 코드: [Java 워커의 worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/java/worker.config.json)
+> 코드 위치: [Java worker repo의 `worker.config.json`](https://github.com/Azure/azure-functions-java-worker/blob/dev/worker.config.json)
 
 이 파일들이 Host에게 알려주는 정보는 셋입니다.
 
@@ -57,7 +57,7 @@ flowchart LR
     Configs --> Manager[Worker 채널 매니저]
 ```
 
-언어별 워커가 “플러그인처럼” 붙는 이유가 이 그림에 다 있습니다. **Host는 워커 자체를 알지 않고, 워커 설정 파일만 압니다.**
+언어별 워커가 플러그인처럼 붙는 이유가 이 그림에 있습니다. **Host는 워커 구현을 직접 품지 않고, 워커 설정 파일이 설명하는 실행 규칙만 읽습니다.**
 
 ---
 
@@ -65,7 +65,7 @@ flowchart LR
 
 설정이 모이면 다음 단계는 실제 OS 프로세스를 띄우는 일입니다. 이 책임을 지는 클래스가 `RpcWorkerProcess`입니다. 그 안의 `CreateWorkerProcess` 메서드가 worker.config의 `defaultExecutablePath`와 `defaultWorkerPath`를 조립해서 실행 명령을 만듭니다.
 
-> 📎 코드: [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/RpcWorkerProcess.cs)
+> 코드 위치: [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Rpc/RpcWorkerProcess.cs)
 
 조립된 명령은 추상 베이스 클래스 `WorkerProcess`의 `Start()` 메서드로 넘어갑니다. 여기서 일어나는 일은 다음 셋입니다.
 
@@ -73,7 +73,7 @@ flowchart LR
 2. **stdout/stderr를 가로채서 Host의 로그 파이프라인에 연결**
 3. 프로세스가 죽으면 콜백 등록 (`Exited` 이벤트)
 
-> 📎 코드: [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/WorkerProcess.cs)
+> 코드 위치: [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/ProcessManagement/WorkerProcess.cs)
 
 stdout/stderr 와이어링이 운영 관점에서 중요합니다. **워커가 표준 출력으로 쓴 모든 글이 Host의 로깅 시스템을 통해 Application Insights로 흘러갑니다.** 입문편 7화에서 본 traces 테이블의 상당수가 사실은 워커가 stdout으로 쓴 줄들입니다. `console.log` 한 줄이 어떻게 클라우드 로그에 들어가는지의 답이 여기에 있습니다.
 
@@ -104,7 +104,7 @@ sequenceDiagram
 
 여기서 등장한 `GrpcWorkerChannel`은 “하나의 워커 프로세스에 대응하는 호스트 측 핸들”입니다. 워커가 죽으면 이 채널도 정리되고, 호스트는 새 워커를 띄우면서 새 채널을 만듭니다.
 
-> 📎 코드: [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
+> 코드 위치: [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
 
 ---
 
@@ -117,7 +117,12 @@ sequenceDiagram
 - **Node.js / Python처럼 단일 스레드 이벤트 루프 기반 언어** — 한 워커가 CPU 작업으로 블록되면 다른 호출이 못 들어옵니다. 워커를 여럿 띄우면 OS 레벨 멀티프로세스로 병렬화가 됩니다.
 - **Java / .NET 등 멀티스레드 언어** — 굳이 워커를 여럿 띄울 필요는 적지만, 메모리 격리나 GC 분리를 원할 때 쓸 수 있습니다.
 
-이 옵션의 도입 PR이 [PR #4210](https://github.com/Azure/azure-functions-host/pull/4210)이며, 코드상으로는 `WorkerConcurrencyOptions` 같은 옵션 클래스로 옵션 트리에 들어옵니다. 실제로 이 N개의 워커를 만들고 관리하는 책임은 Worker 채널 매니저(다음 화의 `RpcFunctionInvocationDispatcher` 어머니쪽)에 있습니다.
+이 지점에서 두 개념을 분리해서 봐야 합니다.
+
+- **`FUNCTIONS_WORKER_PROCESS_COUNT` / `WorkerProcessCountOptions`**: 한 인스턴스 안에 기본으로 몇 개의 워커 프로세스를 띄울지 정하는 **정적 개수 설정**입니다.
+- **`WorkerConcurrencyOptions` / `WorkerConcurrencyManager`**: 런타임이 지연 시간 이력을 보고 워커를 더 붙일지 판단하는 **동적 동시성 제어**입니다.
+
+즉 `FUNCTIONS_WORKER_PROCESS_COUNT=4`는 시작 시점에 워커 4개를 준비하는 설정이고, `WorkerConcurrencyOptions`는 실행 중 상태를 보고 추가 워커를 붙일지 감시하는 쪽입니다. 게다가 동적 동시성은 Node.js, Python, PowerShell 같은 일부 런타임에서만 동작하고, `FUNCTIONS_WORKER_PROCESS_COUNT`가 설정돼 있으면 비활성화됩니다.
 
 ```mermaid
 flowchart TB
@@ -168,31 +173,24 @@ stateDiagram-v2
 
 ---
 
-## 시리즈 목차
+## 시리즈 안에서의 위치
 
-| # | 제목 |
-|---|---|
-| 1 | [호스트 부팅 — `WebJobsScriptHostService`부터 따라가기](./01-host-bootstrap.md) |
-| 2 | **Worker 프로세스 — 다국어는 어떻게 가능한가** ← 현재 글 |
-| 3 | gRPC EventStream — Host와 Worker의 대화 프로토콜 |
-| 4 | 함수 호출의 실제 — Dispatcher와 InvocationRequest |
-| 5 | 플랜별 스케일링의 내부 — Scale Controller가 보는 것 |
-| 6 | 콜드 스타트와의 전쟁 — Placeholder Mode와 Specialization |
-| 7 | 학계가 본 Azure Functions — 논문이 말하는 것 |
+이 글은 Azure Functions Deep Dive 시리즈 2화입니다. 1화에서 호스트가 어떻게 올라오는지 봤다면, 이번 화는 그 호스트 옆에서 실제 사용자 코드를 실행할 Worker 프로세스가 어떻게 선택되고 시작되는지를 다룹니다. 다음 3화와 4화에서는 이 워커가 호스트와 어떤 gRPC 메시지를 주고받고, 실제 호출이 어느 경로로 흘러가는지 이어서 봅니다.
 
 ---
 
 ## References
 
 **소스코드 (commit `5e59423`)**
-- [Node.js worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/node/worker.config.json)
-- [Java worker.config.json](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/workers/java/worker.config.json)
-- [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/RpcWorkerProcess.cs)
-- [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/WorkerProcess.cs)
+- [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Rpc/RpcWorkerProcess.cs)
+- [`WorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/ProcessManagement/WorkerProcess.cs)
 - [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
 - [PR #4210 — `FUNCTIONS_WORKER_PROCESS_COUNT`](https://github.com/Azure/azure-functions-host/pull/4210)
+- [`WorkerProcessCountOptions.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Workers/WorkerProcessCountOptions.cs)
+- [`WorkerConcurrencyOptions.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/WorkerConcurrencyOptions.cs)
+- [`WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)
 
 **관련 워커 레포**
-- [`Azure/azure-functions-nodejs-worker`](https://github.com/Azure/azure-functions-nodejs-worker)
+- [`Azure/azure-functions-nodejs-worker`의 `worker.config.json`](https://github.com/Azure/azure-functions-nodejs-worker/blob/v3.x/worker.config.json)
 - [`Azure/azure-functions-python-worker`](https://github.com/Azure/azure-functions-python-worker)
-- [`Azure/azure-functions-java-worker`](https://github.com/Azure/azure-functions-java-worker)
+- [`Azure/azure-functions-java-worker`의 `worker.config.json`](https://github.com/Azure/azure-functions-java-worker/blob/dev/worker.config.json)

@@ -1,45 +1,45 @@
-# 첫 번째 함수 배포 — 로컬에서 Azure까지
+# 함수 하나 배포하기 — 로컬에서 Azure까지
 
 > Azure Functions 101 시리즈 (4/7)
 
-지금까지 세 화는 개념이었습니다. 이제 손을 움직일 차례입니다. 이 글의 목표는 단 하나입니다. **로컬에서 함수를 만들어서, Azure에 배포해서, 인터넷에서 호출되는 URL을 받기까지 가장 짧은 경로**를 끝까지 보여드립니다.
+지금까지 세 화는 개념을 정리하는 단계였습니다. 이번 글에서는 **로컬에서 함수를 만들고, Azure에 배포하고, 실제 호출 가능한 URL을 받기까지의 가장 짧은 경로**를 끝까지 따라갑니다.
 
-이 글이 끝나면 여러분 앞에 다음이 남습니다.
+이 글이 끝나면 다음이 손에 남습니다.
 
-- 로컬에서 `npm test`처럼 함수를 실행해 볼 수 있는 환경
-- Azure에 떠 있는 진짜 Function App
-- HTTPS URL 하나 (인터넷에서 호출 가능)
-- “재배포”가 어떻게 되는지에 대한 감각
+- 로컬에서 함수를 실행해 볼 수 있는 환경
+- Azure에 올라간 실제 Function App
+- 인터넷에서 호출 가능한 HTTPS URL
+- 재배포가 어떤 흐름으로 이뤄지는지에 대한 감각
 
-언어는 Node.js로 가겠습니다. Python이나 .NET을 쓰는 분도 큰 흐름은 동일합니다.
+예제 언어는 Python v2 프로그래밍 모델로 맞춥니다. 흐름 자체는 다른 런타임에서도 거의 같습니다.
+
+또 하나 먼저 짚고 가겠습니다. 이 글의 배포 예제는 **가장 단순한 데모 경로**를 보여 주기 위해 classic Consumption 플랜을 사용합니다. 다만 2025년 기준으로 Consumption은 레거시 플랜이고, **새 서버리스 앱의 기본 선택지는 Flex Consumption**으로 보는 편이 맞습니다. Flex는 5화에서 비교하고, 여기서는 먼저 가장 짧은 배포 흐름을 익힙니다.
 
 ---
 
-## 도구 셋팅 — 세 가지면 충분
+## 도구 준비 — 세 가지면 충분합니다
 
 배포까지 가는 데 필요한 도구는 셋입니다.
 
 | 도구 | 역할 | 설치 |
 |---|---|---|
-| **Azure Functions Core Tools** | 로컬에서 함수를 실행 + 배포 명령(`func`) | `npm i -g azure-functions-core-tools@4` |
-| **Azure CLI** | Azure 리소스를 명령줄로 만들고 관리 | OS별 설치 ([공식 문서](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)) |
-| **Node.js 20+** | Worker 런타임 | nvm 또는 공식 설치 |
+| **Azure Functions Core Tools** | 로컬 실행 + 배포 명령(`func`) | `npm i -g azure-functions-core-tools@4` |
+| **Azure CLI** | Azure 리소스를 명령줄로 생성하고 관리 | OS별 설치 ([공식 문서](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)) |
+| **Python 3.11+** | Worker 런타임 | pyenv, 공식 설치 프로그램 등 |
 
-VS Code의 “Azure Functions” 확장을 쓰는 사람도 많지만, 이 글은 **CLI로만** 진행합니다. 이유는 명확합니다. CLI에서 한 번 끝까지 해 보면 IDE가 무엇을 자동화해 주는지가 명확하게 보입니다. 거꾸로는 어렵습니다.
+VS Code의 Azure Functions 확장을 써도 되지만, 이 글은 **CLI만으로** 진행합니다. 한 번 끝까지 직접 해 보면 IDE가 자동화하는 범위가 분명해집니다.
 
 설치가 끝나면 버전을 확인합니다.
 
 ```bash
 func --version       # 4.x
 az --version         # 2.x
-node --version       # v20+
+python --version     # 3.11+
 ```
 
 ---
 
 ## 전체 흐름 한 장
-
-이 글에서 할 일을 미리 그려 두면 길을 잃지 않습니다.
 
 ```mermaid
 flowchart LR
@@ -58,16 +58,16 @@ flowchart LR
 
 ```bash
 mkdir hello-functions && cd hello-functions
-func init . --worker-runtime node --language javascript --model V4
+func init . --worker-runtime python --model V2
 ```
 
-명령 하나로 프로젝트 골격이 잡힙니다. 핵심 파일은 셋입니다.
+이 명령으로 기본 골격이 만들어집니다. 먼저 눈에 들어오는 파일은 다음 셋입니다.
 
-- `host.json` — Host 설정 (확장 버전, 로깅, 동시성 등)
-- `local.settings.json` — 로컬 실행용 환경 변수 (커밋하면 안 됩니다)
-- `package.json` — 평범한 npm 프로젝트
+- `host.json` — Host 설정
+- `local.settings.json` — 로컬 실행용 환경 변수
+- `requirements.txt` — Python 의존성 목록
 
-`local.settings.json`은 운영 환경의 **App Settings**와 같은 역할을 합니다. 로컬에서는 이 파일을 읽고, Azure에서는 Azure 리소스에 설정된 App Settings를 읽습니다. **로컬 → 운영 전환 시 코드는 그대로**라는 게 핵심입니다.
+`local.settings.json`은 운영 환경의 **App Settings**와 같은 역할을 합니다. 로컬에서는 이 파일을 읽고, Azure에서는 Function App에 설정된 App Settings를 읽습니다. **로컬에서 운영으로 넘어갈 때 코드가 바뀌지 않는다**는 점이 중요합니다.
 
 ---
 
@@ -76,35 +76,38 @@ func init . --worker-runtime node --language javascript --model V4
 가장 단순한 HTTP 트리거 함수를 추가합니다.
 
 ```bash
-func new --template "HTTP trigger" --name hello --authlevel anonymous
+func new --template "Http Trigger" --name hello --authlevel anonymous
 ```
 
-생성되는 파일은 `src/functions/hello.js` 한 개. 안을 들여다보면 1화에서 본 것과 비슷합니다.
+Python v2 모델에서는 함수 정의가 `function_app.py`에 모입니다. 생성 직후 구조는 대략 이런 형태입니다.
 
-```javascript
-const { app } = require('@azure/functions');
+```python
+import azure.functions as func
 
-app.http('hello', {
-    methods: ['GET', 'POST'],
-    authLevel: 'anonymous',
-    handler: async (request, context) => {
-        context.log(`Http function processed request for url "${request.url}"`);
-        const name = request.query.get('name')
-            || (await request.text())
-            || 'world';
-        return { body: `Hello, ${name}!` };
-    }
-});
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+
+@app.function_name(name="hello")
+@app.route(route="hello")
+def hello(req: func.HttpRequest) -> func.HttpResponse:
+    name = req.params.get("name")
+
+    if not name:
+        name = req.get_body().decode("utf-8") if req.get_body() else "world"
+
+    return func.HttpResponse(f"Hello, {name}!")
 ```
 
-수정 없이 그대로 갑니다.
+이 정도면 바로 실행해 볼 수 있습니다.
 
 ---
 
 ## 3. 로컬에서 실행
 
 ```bash
-npm install
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 func start
 ```
 
@@ -122,18 +125,18 @@ curl "http://localhost:7071/api/hello?name=Sisyphus"
 # Hello, Sisyphus!
 ```
 
-이 시점에서 `func start`는 **로컬에 미니 Functions Host를 띄운 상태**입니다. 3화에서 본 Host와 Worker가 진짜로 둘 다 떠 있고, 둘 사이에 gRPC 채널이 연결돼 있습니다. 즉 운영 환경과 같은 구조가 여러분의 노트북에서 돌아갑니다.
+이 시점에서 `func start`는 **로컬에 Functions Host를 띄운 상태**입니다. 3화에서 본 Host와 Worker가 실제로 올라오고, 둘 사이에 gRPC 채널이 연결됩니다. 운영과 같은 구조를 노트북에서 그대로 보는 셈입니다.
 
 ---
 
 ## 4. Azure 리소스 만들기
 
-이제 클라우드 차례입니다. Azure에 함수를 띄우려면 세 개의 리소스가 필요합니다.
+Azure에 함수를 올리려면 세 개의 리소스가 필요합니다.
 
 | 리소스 | 역할 |
 |---|---|
-| **Resource Group** | 모든 리소스를 묶는 폴더 |
-| **Storage Account** | Functions Host의 상태/락/큐 저장소. **필수**. |
+| **Resource Group** | 관련 리소스를 묶는 단위 |
+| **Storage Account** | Functions Host의 상태, 락, 큐 메타데이터를 저장하는 필수 저장소 |
 | **Function App** | 함수를 담는 컴퓨트 리소스 |
 
 ```mermaid
@@ -144,9 +147,9 @@ flowchart TD
     FA -. 의존 .-> SA
 ```
 
-> 💡 Storage Account는 Functions가 “자기 동작용으로 쓰는” 인프라 저장소입니다. 함수 코드, 트리거 락, 호출 로그 메타데이터, Timer 트리거의 schedule 상태 등이 여기 저장됩니다. 비즈니스 데이터를 여기에 저장하지는 않습니다(별도 Storage를 따로 만드는 걸 권장).
+> Note: Storage Account는 Functions가 자기 동작을 유지하는 데 쓰는 인프라 저장소입니다. 트리거 락, 호출 메타데이터, Timer 스케줄 상태 같은 값이 여기에 들어갑니다. 비즈니스 데이터는 별도 저장소를 두는 편이 안전합니다.
 
-명령은 다음 셋입니다. 이름은 전 세계 유일해야 하므로 적당히 바꾸세요.
+이제 리소스를 만듭니다. 이름은 전역 고유해야 하므로 적절히 바꿔서 쓰면 됩니다.
 
 ```bash
 RG=rg-hello
@@ -157,22 +160,36 @@ APP=func-hello-$RANDOM
 # 1) Resource Group
 az group create --name $RG --location $LOC
 
-# 2) Storage Account (Standard LRS면 충분)
+# 2) Storage Account
 az storage account create \
     --name $SA --resource-group $RG \
     --location $LOC --sku Standard_LRS
 
-# 3) Function App (Consumption 플랜, Node 20)
+# 3) Function App (classic Consumption, Python 3.11)
 az functionapp create \
     --name $APP --resource-group $RG \
     --storage-account $SA \
     --consumption-plan-location $LOC \
-    --runtime node --runtime-version 20 --functions-version 4
+    --runtime python --runtime-version 3.11 --functions-version 4
 ```
 
-마지막 명령이 끝나면 Azure 포털에서 Function App이 보입니다. 아직 함수 코드는 비어 있는 상태입니다.
+마지막 명령이 끝나면 Azure 포털에서 Function App이 보입니다. 아직 코드만 배포하지 않았을 뿐, 실행할 자리까지는 준비된 상태입니다.
 
-> 📝 5화에서 다룰 거지만, `--consumption-plan-location` 자리에 Premium·Flex Consumption·App Service Plan을 지정할 수도 있습니다. 입문에서는 가장 단순한 Consumption으로 갑니다.
+`az functionapp create` 옵션은 플랜별로 다릅니다. 여기서 쓴 `--consumption-plan-location`은 classic Consumption용입니다. **Premium**이나 **Dedicated(App Service Plan)** 에서는 미리 만든 App Service Plan을 `--plan`으로 넘기고, **Flex Consumption**은 `--flexconsumption-location`과 `--flexconsumption-runtime`을 쓰는 별도 생성 경로를 사용합니다.
+
+예를 들면 Flex Consumption은 이런 식입니다.
+
+```bash
+az functionapp create \
+    --name $APP --resource-group $RG \
+    --storage-account $SA \
+    --runtime python --runtime-version 3.11 \
+    --functions-version 4 \
+    --flexconsumption-location $LOC \
+    --flexconsumption-runtime python
+```
+
+실무에서 새 서버리스 앱을 만든다면 Flex Consumption부터 검토하는 편이 맞습니다. 이 글에서는 설명을 단순하게 유지하려고 Consumption을 예제로 썼습니다.
 
 ---
 
@@ -184,7 +201,7 @@ az functionapp create \
 func azure functionapp publish $APP
 ```
 
-내부적으로 일어나는 일을 풀어 보면 다음과 같습니다.
+내부 흐름은 다음과 같습니다.
 
 ```mermaid
 sequenceDiagram
@@ -195,14 +212,14 @@ sequenceDiagram
     participant Host as Function App (Host)
 
     Dev->>Dev: 프로젝트를 zip으로 패키징
-    Dev->>Kudu: zip 업로드 (zip deploy)
-    Kudu->>Storage: zip을 Storage에 저장
+    Dev->>Kudu: zip 업로드
+    Kudu->>Storage: 패키지 저장
     Storage-->>Host: WEBSITE_RUN_FROM_PACKAGE로 마운트
     Host->>Host: 함수 메타데이터 인덱싱
     Host-->>Dev: 배포 완료, 트리거 URL 출력
 ```
 
-마지막에 다음과 같은 출력이 나옵니다.
+마지막에 다음과 비슷한 출력이 나옵니다.
 
 ```
 Functions in func-hello-xxxxx:
@@ -210,7 +227,7 @@ Functions in func-hello-xxxxx:
         Invoke url: https://func-hello-xxxxx.azurewebsites.net/api/hello
 ```
 
-이 URL이 여러분이 받은 인터넷 주소입니다.
+이 URL이 인터넷에서 호출 가능한 엔드포인트입니다.
 
 ---
 
@@ -221,47 +238,39 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 # Hello, Sisyphus!
 ```
 
-여기까지가 “0에서 1로” 가는 가장 짧은 경로입니다. 같은 명령(`func azure functionapp publish $APP`)을 다시 실행하면 재배포됩니다.
+여기까지가 로컬에서 클라우드까지 가는 가장 짧은 경로입니다. 같은 명령(`func azure functionapp publish $APP`)을 다시 실행하면 재배포됩니다.
 
 ---
 
-## 운영 단계로 가기 전에 알아두면 좋은 다섯 가지
+## 운영 전에 알아둘 다섯 가지
 
-이 글의 흐름은 **가장 짧은 데모 경로**입니다. 운영에 들어가려면 다음 다섯 가지를 차근차근 채워 나가야 합니다. 이 시리즈의 후반부와 별도 운영 시리즈에서 다룰 주제이기도 합니다.
+위 흐름은 **가장 짧은 데모 경로**입니다. 운영으로 가져가려면 다음 항목을 따로 챙겨야 합니다.
 
-1. **App Settings = 환경 변수** — `local.settings.json`의 값들은 운영에서는 `az functionapp config appsettings set`으로 옮깁니다. 비밀값은 Key Vault 참조로.
-2. **인증** — `authLevel: 'anonymous'`는 데모용입니다. 실제로는 `function` 키, AAD 인증, API Management 등을 앞에 둡니다.
-3. **CI/CD** — `func ... publish`는 로컬 데모용입니다. 운영은 GitHub Actions / Azure DevOps에서 동일 명령을 실행하거나 ARM/Bicep으로 인프라를 코드화합니다.
-4. **로그와 모니터링** — Application Insights를 함께 만들고 연결하면 호출 로그/예외/성능 지표를 한 곳에서 볼 수 있습니다(7화).
-5. **플랜 선택** — Consumption은 시작하기엔 좋지만 모든 워크로드의 정답은 아닙니다(5·6화).
+1. **App Settings = 환경 변수** — `local.settings.json` 값은 운영에서 `az functionapp config appsettings set`으로 옮깁니다. 비밀값은 Key Vault 참조를 쓰는 편이 낫습니다.
+2. **인증** — `anonymous`는 데모용입니다. 실제 환경에서는 함수 키, Microsoft Entra ID, API Management 같은 계층을 둡니다.
+3. **CI/CD** — `func ... publish`는 로컬 데모에는 좋지만, 운영에서는 GitHub Actions나 Azure DevOps에서 같은 흐름을 자동화합니다.
+4. **로그와 모니터링** — Application Insights를 붙이면 호출 로그, 예외, 성능 지표를 한곳에서 볼 수 있습니다.
+5. **플랜 선택** — Consumption은 입문과 데모에는 편하지만, 새 서비스의 기본 선택지는 대개 Flex Consumption입니다.
 
 ---
 
-## 자주 막히는 지점 3가지
+## 자주 막히는 지점 세 가지
 
-- **Storage Account 이름 충돌** — Storage 이름은 전 세계 유일해야 합니다. `sthello$RANDOM` 같은 패턴을 쓰면 충돌을 피하기 좋습니다.
-- **`func` 명령이 동작하지 않음** — Core Tools는 v4가 최신입니다. v3 이하가 깔려 있으면 `func` 명령이 다른 동작을 합니다. `func --version`으로 먼저 확인.
-- **배포는 됐는데 함수 URL이 404** — 함수 인덱싱 실패가 가장 흔한 원인입니다. 포털 → Function App → Log stream에서 부팅 로그를 보면 실마리가 보입니다. 모듈 누락(`npm install` 빠짐)이 자주 등장합니다.
+- **Storage Account 이름 충돌** — Storage 이름은 전역 고유입니다. `sthello$RANDOM` 같은 패턴이 편합니다.
+- **`func` 명령이 예상과 다르게 동작함** — Core Tools v4인지 먼저 확인합니다.
+- **배포는 됐는데 URL이 404를 반환함** — 함수 인덱싱 실패가 흔한 원인입니다. 포털의 Log stream에서 부팅 로그를 보면 원인을 찾기 쉽습니다.
 
 ---
 
 ## 다음 화에서
 
-배포까지 됐으니 이제 “**어떤 플랜에서 돌릴 것인가**”가 진짜 질문입니다. Consumption으로 시작했지만, 실서비스에서는 Flex Consumption, Premium, Dedicated(App Service Plan) 중 하나를 골라야 합니다. 다음 글에서는 이 4가지 플랜의 차이를 한 번에 정리합니다.
+배포까지 끝냈다면 이제 질문은 하나입니다. **어떤 플랜에서 돌릴 것인가**입니다. 다음 글에서는 Consumption, Flex Consumption, Premium, Dedicated의 차이를 실제 선택 기준 중심으로 정리합니다.
 
 ---
 
-## 시리즈 목차
+## 시리즈 맥락
 
-| # | 제목 |
-|---|---|
-| 1 | [Azure Functions란? — 이벤트가 함수를 호출하는 세상](./01-what-is-azure-functions.md) |
-| 2 | [트리거와 바인딩 — 함수 입출력의 모든 것](./02-triggers-and-bindings.md) |
-| 3 | [Host와 Worker — 함수는 누가 실행하는가](./03-host-and-worker.md) |
-| 4 | **첫 번째 함수 배포 — 로컬에서 Azure까지** ← 현재 글 |
-| 5 | 4가지 플랜 — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | 스케일링과 콜드 스타트 — 서버리스의 두 얼굴 |
-| 7 | 모니터링과 운영 기초 |
+이 글은 Azure Functions 101의 4화입니다. 앞선 세 글에서 트리거와 바인딩, Host와 Worker 구조를 정리했다면, 이번 글은 그 개념을 실제 배포 흐름으로 연결하는 자리입니다. 다음 5화와 6화에서는 플랜 선택, 스케일링, 콜드 스타트처럼 운영 판단에 직접 영향을 주는 주제로 넘어갑니다.
 
 ---
 
@@ -270,5 +279,6 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 **공식 문서**
 - [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [`az functionapp` CLI reference](https://learn.microsoft.com/en-us/cli/azure/functionapp)
+- [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
+- [Function scale and hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
 - [Run from package deployment](https://learn.microsoft.com/en-us/azure/azure-functions/run-functions-from-deployment-package)
-- [Continuous deployment for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-continuous-deployment)

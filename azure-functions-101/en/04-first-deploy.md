@@ -1,45 +1,45 @@
-# Your First Function Deployment — From Localhost to Azure
+# Deploy a Function App — From Localhost to Azure
 
 > Azure Functions 101 series (4/7)
 
-The first three posts were all concepts. Time to get our hands dirty. This post has exactly one goal: show you **the shortest path from writing a function locally, deploying it to Azure, and getting back a URL the internet can call**.
+The first three posts set up the mental model. This one is about execution: **create a function locally, deploy it to Azure, and get back a real URL you can call**.
 
 By the end, you'll have:
 
-- A local environment where you can run functions like `npm test`
-- A real Function App running on Azure
-- An HTTPS URL (callable from anywhere on the internet)
-- An intuition for what "redeploy" actually means
+- A local environment for running functions
+- A real Function App on Azure
+- An HTTPS endpoint you can call from anywhere
+- A concrete sense of what redeploy actually does
 
-We'll use Node.js. If you prefer Python or .NET, the broad strokes are the same.
+The sample uses the Python v2 programming model. The overall flow is nearly identical for the other runtimes.
+
+One more framing note before we start. This walkthrough uses the **classic Consumption plan** because it is still the shortest demo path. As of 2025, though, Consumption is a legacy plan, and **Flex Consumption is the default serverless recommendation for new apps**. We will compare the plans in Part 5; here the goal is to keep the first deployment path simple.
 
 ---
 
-## Tooling — three things, that's it
+## Tooling — three pieces
 
-You need exactly three tools to get to deployment.
+You need three tools.
 
 | Tool | Role | Install |
 |---|---|---|
-| **Azure Functions Core Tools** | Run functions locally + the deploy command (`func`) | `npm i -g azure-functions-core-tools@4` |
-| **Azure CLI** | Create and manage Azure resources from the command line | OS-specific install ([official docs](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)) |
-| **Node.js 20+** | The Worker runtime | nvm or the official installer |
+| **Azure Functions Core Tools** | Local runs + deployment command (`func`) | `npm i -g azure-functions-core-tools@4` |
+| **Azure CLI** | Create and manage Azure resources | OS-specific install ([official docs](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)) |
+| **Python 3.11+** | Worker runtime | pyenv or the official installer |
 
-Many people use the "Azure Functions" extension for VS Code, but this post sticks to **the CLI only**. The reason is simple: once you've done it end-to-end on the CLI, it becomes obvious what the IDE is automating for you. Going the other direction is much harder.
+You can do all of this from VS Code, but the post sticks to **the CLI only**. Once you've done the full path by hand, the IDE automation is easier to reason about.
 
-After installation, sanity-check the versions:
+Check versions first.
 
 ```bash
 func --version       # 4.x
 az --version         # 2.x
-node --version       # v20+
+python --version     # 3.11+
 ```
 
 ---
 
-## The whole flow on one page
-
-Sketching out the journey ahead of time keeps you from getting lost.
+## The full flow on one page
 
 ```mermaid
 flowchart LR
@@ -54,87 +54,90 @@ flowchart LR
 
 ## 1. Create the project
 
-Start in an empty folder.
+Start from an empty directory.
 
 ```bash
 mkdir hello-functions && cd hello-functions
-func init . --worker-runtime node --language javascript --model V4
+func init . --worker-runtime python --model V2
 ```
 
-One command scaffolds the whole project. The three files that matter:
+That gives you the basic scaffold. The first three files worth noticing are:
 
-- `host.json` — Host configuration (extension version, logging, concurrency, etc.)
-- `local.settings.json` — Environment variables for local runs (don't commit this)
-- `package.json` — A perfectly ordinary npm project
+- `host.json` — Host configuration
+- `local.settings.json` — Environment variables for local runs
+- `requirements.txt` — Python dependencies
 
-`local.settings.json` plays the same role as **App Settings** in production. Locally, the runtime reads from this file; on Azure, it reads from the App Settings on your Azure resource. The key insight: **your code stays the same when going from local to production**.
+`local.settings.json` plays the same role as **App Settings** in Azure. Local execution reads from this file; the deployed app reads from App Settings on the Function App. **The code stays the same across that boundary.**
 
 ---
 
 ## 2. Add a function
 
-Add the simplest possible HTTP-triggered function.
+Add the simplest HTTP-triggered function.
 
 ```bash
-func new --template "HTTP trigger" --name hello --authlevel anonymous
+func new --template "Http Trigger" --name hello --authlevel anonymous
 ```
 
-This generates a single file: `src/functions/hello.js`. Look inside and it'll feel familiar from Part 1.
+In the Python v2 model, the function definition lives in `function_app.py`. The generated result looks roughly like this.
 
-```javascript
-const { app } = require('@azure/functions');
+```python
+import azure.functions as func
 
-app.http('hello', {
-    methods: ['GET', 'POST'],
-    authLevel: 'anonymous',
-    handler: async (request, context) => {
-        context.log(`Http function processed request for url "${request.url}"`);
-        const name = request.query.get('name')
-            || (await request.text())
-            || 'world';
-        return { body: `Hello, ${name}!` };
-    }
-});
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+
+@app.function_name(name="hello")
+@app.route(route="hello")
+def hello(req: func.HttpRequest) -> func.HttpResponse:
+    name = req.params.get("name")
+
+    if not name:
+        name = req.get_body().decode("utf-8") if req.get_body() else "world"
+
+    return func.HttpResponse(f"Hello, {name}!")
 ```
 
-We'll ship it as is.
+That is enough to run immediately.
 
 ---
 
 ## 3. Run it locally
 
 ```bash
-npm install
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 func start
 ```
 
-If you see this line near the bottom of the output, you're in business:
+If you see this near the bottom of the output, you're set:
 
 ```
 Functions:
         hello: [GET,POST] http://localhost:7071/api/hello
 ```
 
-Hit it from another terminal:
+Call it from another terminal.
 
 ```bash
 curl "http://localhost:7071/api/hello?name=Sisyphus"
 # Hello, Sisyphus!
 ```
 
-At this moment, `func start` is running **a miniature Functions Host on your machine**. The Host and Worker we discussed in Part 3 are both running for real, with a live gRPC channel between them. In other words: the same architecture as production, on your laptop.
+At this point, `func start` is running **a real Functions Host on your machine**. The Host and Worker from Part 3 are both alive, with a gRPC channel between them. It is the same architecture as production, just running on your laptop.
 
 ---
 
 ## 4. Create Azure resources
 
-Now for the cloud side. Three resources are required to host a function on Azure.
+Three Azure resources are required.
 
 | Resource | Role |
 |---|---|
-| **Resource Group** | A folder that groups related resources |
-| **Storage Account** | The Functions Host's state/lock/queue store. **Required.** |
-| **Function App** | The compute resource that holds your functions |
+| **Resource Group** | Logical container for related resources |
+| **Storage Account** | Required storage for host state, locks, and trigger metadata |
+| **Function App** | The compute resource that runs your functions |
 
 ```mermaid
 flowchart TD
@@ -144,9 +147,9 @@ flowchart TD
     FA -. depends on .-> SA
 ```
 
-> 💡 The Storage Account is infrastructure storage that Functions uses "for its own bookkeeping": function code, trigger leases, invocation log metadata, Timer trigger schedule state, and so on. You should not store business data here (use a separate Storage Account for that).
+> Note: The Storage Account is infrastructure storage for the Functions platform itself. It holds things like trigger leases, invocation metadata, and Timer schedule state. Keep business data in a separate store.
 
-Three commands. Names have to be globally unique, so adjust as needed.
+Now create the resources. Names must be globally unique, so adjust them as needed.
 
 ```bash
 RG=rg-hello
@@ -157,34 +160,48 @@ APP=func-hello-$RANDOM
 # 1) Resource Group
 az group create --name $RG --location $LOC
 
-# 2) Storage Account (Standard LRS is fine)
+# 2) Storage Account
 az storage account create \
     --name $SA --resource-group $RG \
     --location $LOC --sku Standard_LRS
 
-# 3) Function App (Consumption plan, Node 20)
+# 3) Function App (classic Consumption, Python 3.11)
 az functionapp create \
     --name $APP --resource-group $RG \
     --storage-account $SA \
     --consumption-plan-location $LOC \
-    --runtime node --runtime-version 20 --functions-version 4
+    --runtime python --runtime-version 3.11 --functions-version 4
 ```
 
-Once the last command finishes, you'll see the Function App in the Azure portal. The function code itself is still empty at this point.
+When the last command finishes, the Function App exists in Azure. The compute target is ready; the code just is not deployed yet.
 
-> 📝 We'll cover this in Part 5, but the `--consumption-plan-location` slot can also be used for Premium, Flex Consumption, or App Service Plans. For an intro, we'll stick with the simplest option: Consumption.
+The `az functionapp create` shape changes by hosting plan. `--consumption-plan-location` is for classic Consumption only. **Premium** and **Dedicated (App Service Plan)** use `--plan` with an existing plan resource. **Flex Consumption** uses a Flex-specific path with `--flexconsumption-location` and `--flexconsumption-runtime`.
+
+For example, a Flex Consumption create flow looks like this.
+
+```bash
+az functionapp create \
+    --name $APP --resource-group $RG \
+    --storage-account $SA \
+    --runtime python --runtime-version 3.11 \
+    --functions-version 4 \
+    --flexconsumption-location $LOC \
+    --flexconsumption-runtime python
+```
+
+For a new serverless production app, start by evaluating Flex Consumption. This post keeps Consumption only because it is the smallest end-to-end demo.
 
 ---
 
 ## 5. Deploy
 
-Deployment is one line.
+Deployment is one command.
 
 ```bash
 func azure functionapp publish $APP
 ```
 
-Here's what's actually happening under the hood:
+Under the hood, the flow looks like this.
 
 ```mermaid
 sequenceDiagram
@@ -194,15 +211,15 @@ sequenceDiagram
     participant Storage as Storage Account
     participant Host as Function App (Host)
 
-    Dev->>Dev: Package the project as a zip
-    Dev->>Kudu: Upload zip (zip deploy)
-    Kudu->>Storage: Save zip to Storage
+    Dev->>Dev: Package the project as zip
+    Dev->>Kudu: Upload zip
+    Kudu->>Storage: Save package
     Storage-->>Host: Mount via WEBSITE_RUN_FROM_PACKAGE
     Host->>Host: Index function metadata
-    Host-->>Dev: Deployment complete, prints trigger URL
+    Host-->>Dev: Deployment complete, print trigger URL
 ```
 
-At the end you'll see something like:
+You should see something like this at the end.
 
 ```
 Functions in func-hello-xxxxx:
@@ -210,7 +227,7 @@ Functions in func-hello-xxxxx:
         Invoke url: https://func-hello-xxxxx.azurewebsites.net/api/hello
 ```
 
-That URL is your address on the internet.
+That URL is your public endpoint.
 
 ---
 
@@ -221,47 +238,39 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 # Hello, Sisyphus!
 ```
 
-That's the shortest path from "zero to one." Run the same command (`func azure functionapp publish $APP`) again and it redeploys.
+That is the shortest path from local code to a live endpoint on Azure. Run the same command again and you redeploy.
 
 ---
 
-## Five things worth knowing before you go to production
+## Five production concerns to keep in mind
 
-The flow above is **the shortest demo path**. To take this to production, you'll want to fill in these five gaps. They're topics for later in this series and a separate operations series.
+The flow above is **the shortest demo path**. Production work adds a few layers.
 
-1. **App Settings = environment variables** — Values in `local.settings.json` move to production via `az functionapp config appsettings set`. For secrets, use Key Vault references.
-2. **Authentication** — `authLevel: 'anonymous'` is for demos. In real systems you put `function` keys, AAD authentication, or API Management in front.
-3. **CI/CD** — `func ... publish` is fine for a local demo. Production runs the same command from GitHub Actions / Azure DevOps, or codifies the infrastructure with ARM/Bicep.
-4. **Logs and monitoring** — Provision an Application Insights instance alongside and connect it; you'll get invocation logs, exceptions, and performance metrics in one place (Part 7).
-5. **Plan choice** — Consumption is great for getting started, but it's not the right answer for every workload (Parts 5 and 6).
+1. **App Settings = environment variables** — Values in `local.settings.json` move to Azure through `az functionapp config appsettings set`. Secrets usually belong behind Key Vault references.
+2. **Authentication** — `anonymous` is fine for a demo. Real systems usually front functions with function keys, Microsoft Entra ID, or API Management.
+3. **CI/CD** — `func ... publish` is good for local demos. Production teams automate the same flow in GitHub Actions or Azure DevOps.
+4. **Logs and monitoring** — Connect Application Insights and you get invocation logs, exceptions, and performance metrics in one place.
+5. **Plan choice** — Consumption is a fine teaching path, but for new serverless apps the default candidate is usually Flex Consumption.
 
 ---
 
-## 3 spots where people get stuck
+## Three places people usually get stuck
 
-- **Storage Account name collision** — Storage names must be globally unique. Patterns like `sthello$RANDOM` are a good way to dodge collisions.
-- **`func` doesn't behave** — Core Tools v4 is the current major version. If you have v3 or older installed, `func` does different things. Check `func --version` first.
-- **Deployment succeeded but the URL returns 404** — The most common cause is a function indexing failure. Check the boot logs in the portal under Function App → Log stream — that's where the clues are. Missing modules (forgot `npm install`) is a frequent culprit.
+- **Storage Account name collision** — Storage names are globally unique. Patterns like `sthello$RANDOM` help.
+- **`func` behaves differently than expected** — Check that Core Tools v4 is installed.
+- **Deployment succeeded but the URL returns 404** — Function indexing failures are common. The portal's Log stream usually shows the reason.
 
 ---
 
 ## Next up
 
-Now that we've got something deployed, the real question becomes "**which plan should it run on?**" We started with Consumption, but in real services you'll be picking between Flex Consumption, Premium, and Dedicated (App Service Plan). The next post lays out the differences between all four plans in one place.
+Once the app is deployed, the next real question is **which hosting plan it should live on**. Part 5 compares Consumption, Flex Consumption, Premium, and Dedicated with actual trade-offs instead of marketing labels.
 
 ---
 
-## Series index
+## Series context
 
-| # | Title |
-|---|---|
-| 1 | [What is Azure Functions? — A world where events call functions](./01-what-is-azure-functions.md) |
-| 2 | [Triggers and Bindings — Everything about function I/O](./02-triggers-and-bindings.md) |
-| 3 | [Host and Worker — Who actually runs the function?](./03-host-and-worker.md) |
-| 4 | **Your First Function Deployment — From Localhost to Azure** ← you are here |
-| 5 | The four plans — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | Scaling and cold starts — the two faces of serverless |
-| 7 | Monitoring and operations basics |
+This is Part 4 of Azure Functions 101. The earlier posts covered triggers and bindings, then the Host and Worker split; this post turns that model into a working deployment path. Parts 5 and 6 move into plan selection, scaling, and cold-start behavior, which is where most production decisions start.
 
 ---
 
@@ -270,5 +279,6 @@ Now that we've got something deployed, the real question becomes "**which plan s
 **Official docs**
 - [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [`az functionapp` CLI reference](https://learn.microsoft.com/en-us/cli/azure/functionapp)
+- [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
+- [Function scale and hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
 - [Run from package deployment](https://learn.microsoft.com/en-us/azure/azure-functions/run-functions-from-deployment-package)
-- [Continuous deployment for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-continuous-deployment)

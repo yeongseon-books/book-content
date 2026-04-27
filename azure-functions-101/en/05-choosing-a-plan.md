@@ -1,234 +1,230 @@
-# The Four Plans — Consumption / Flex Consumption / Premium / Dedicated
+# Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
 
 > Azure Functions 101 series (5/7)
 
-In Part 4, we shipped our first function on the Consumption plan. That was the simplest path to "just get it running," but for production you have to consciously pick one of four hosting plans: **Consumption / Flex Consumption / Premium / Dedicated (App Service Plan).** Skip this decision and you'll either bleed money, get burned by cold starts, or rebuild everything because VNet integration isn't available on the plan you chose.
+Part 4 deployed a function on the classic Consumption plan. That is still the shortest path for a demo. In current Microsoft Learn guidance, though, **classic Consumption is now a legacy plan**, and **Flex Consumption is the default serverless recommendation for new apps**.
 
-The goal of this post is simple: by the end, you should know **what each plan adds, what it takes away, and which one fits your workload**. There's a decision tree at the bottom.
+That does not make Consumption irrelevant. You still need to understand all four hosting models to make a sound decision. This post covers **Consumption / Flex Consumption / Premium / Dedicated (App Service Plan)** side by side, with the current caveats left intact.
+
+The goal is simple: **understand what each plan gives you, what it constrains, and which one fits your workload**.
 
 ---
 
-## One-line definitions — the four plans
-
-Let's lock down the terminology first.
+## One-line definitions
 
 | Plan | One-line definition |
 |---|---|
-| **Consumption** | The simplest pay-per-use plan. Zero traffic = zero cost. Cold starts included. |
-| **Flex Consumption** | The next-gen pay-per-use plan that fixes Consumption's biggest pain points (cold starts, no VNet, fixed instance memory). **Linux only**, GA in 2024. |
-| **Premium** | A premium plan that avoids cold starts via Always Ready / Pre-warmed instances. VNet supported. Always-on, so you always pay. |
-| **Dedicated (App Service Plan)** | Functions sharing infrastructure with other App Service apps. **No event-driven autoscale** — you write your own metric-based rules. |
+| **Consumption** | The simplest pay-per-use serverless plan. Today it is a legacy option and should be treated as Windows-first. |
+| **Flex Consumption** | Microsoft's recommended Linux-based pay-per-use plan for new serverless apps, with VNet support, selectable memory, and per-function scaling. |
+| **Premium** | A higher-end plan that reduces or avoids cold starts through Always Ready and prewarmed capacity, with VNet support and larger SKUs. |
+| **Dedicated (App Service Plan)** | Functions running on regular App Service infrastructure, where scaling is managed through App Service rules instead of event-driven platform scaling. |
 
-If your mental shortcut is "Functions = autoscale," the starting point of this post is that **that autoscale behaves differently across all four plans**.
+If your mental shortcut has been “Functions = autoscale,” this is where that model needs refinement. **The scaling model and operating posture change quite a bit across these plans.**
 
 ---
 
-## Big picture — what's actually different
+## Big picture
 
 ```mermaid
 flowchart TB
     subgraph Cons [Consumption]
         C1[Pay-per-use]
-        C2[Windows / Linux]
+        C2[Windows-first legacy]
         C3[Cold starts present]
-        C4[VNet ❌]
-        C5[Up to 200 instances]
+        C4[No VNet integration]
+        C5[App-level scale]
     end
     subgraph Flex [Flex Consumption]
-        F1[Pay-per-use + Always Ready]
+        F1[Pay-per-use]
         F2[Linux only]
-        F3[Cold starts mitigated]
-        F4[VNet ✅]
-        F5[Up to 1000 instances]
-        F6[per-function scaling]
+        F3[Optional Always Ready]
+        F4[VNet integration]
+        F5[Per-function scaling]
     end
     subgraph Prem [Premium]
-        P1[Always-on instances]
-        P2[Windows / Linux]
-        P3[Cold starts avoided]
-        P4[VNet ✅]
-        P5[Pre-warmed support]
+        P1[Always-on baseline capacity]
+        P2[Windows or Linux]
+        P3[Cold starts can be avoided]
+        P4[VNet integration]
+        P5[Larger SKU choices]
     end
     subgraph Ded [Dedicated]
-        D1[Fixed instances]
-        D2[Windows / Linux]
-        D3[No cold starts]
-        D4[VNet ✅]
-        D5[No event-driven autoscale ❌]
+        D1[Fixed infrastructure]
+        D2[Windows or Linux]
+        D3[Cold start usually not the issue]
+        D4[VNet integration]
+        D5[Manual metric-based scaling]
     end
 ```
 
-Let's unpack those boxes by category.
+Now put the differences on one table.
 
 ---
 
-## Comparison table — everything on one screen
+## Comparison table
 
 | Feature | Consumption | Flex Consumption | Premium | Dedicated |
 |---|---|---|---|---|
-| **Pay-per-use** | ✅ | ✅ + Always Ready hours billed | ❌ (instance-hour billing) | ❌ (App Service Plan SKU) |
-| **Cost when traffic is 0** | 0 | Only Always Ready minutes | Minimum instance cost | Always charged |
-| **Cold starts** | Yes | Avoidable via Always Ready | Avoided (Always Ready / Pre-warmed) | None (already running) |
-| **OS** | Windows / Linux | Linux only | Windows / Linux | Windows / Linux |
-| **VNet integration** | ❌ | ✅ | ✅ | ✅ |
-| **Max instances** | 200 | 1000 | 100 | Depends on App Service Plan |
-| **Event-driven autoscale** | ✅ | ✅ (target-based) | ✅ (target-based) | ❌ (write metric rules yourself) |
-| **Per-function scaling** | ❌ | ✅ | ❌ | ❌ |
-| **Instance memory** | 1.5 GB fixed | 512 / 2048 / 4096 MB selectable | Various SKUs | App Service Plan SKU |
-| **Deployment slots** | Limited | ❌ (replaced by rolling updates) | ✅ | ✅ |
-| **Warmup trigger** | ❌ | ✅ (Always Ready based) | ✅ | ✅ |
+| **Current status** | Legacy | Default serverless recommendation | Advanced serverless | App Service family |
+| **Billing model** | Execution-based pay-per-use | Execution-based pay-per-use, plus Always Ready capacity if enabled | Instance time and provisioned capacity | App Service Plan SKU |
+| **Cost at zero traffic** | 0 | 0 if Always Ready stays at 0 | Minimum instance cost remains | Always billed |
+| **Cold starts** | Present | Reduced when needed via Always Ready | Usually avoidable | Effectively absent when always running |
+| **OS** | Windows legacy; Linux Consumption retired/retiring | Linux only | Windows / Linux | Windows / Linux |
+| **VNet integration** | No | Yes | Yes | Yes |
+| **Max instances** | Roughly 200; lower in some OS and platform cases | Up to 1000, subject to regional 250-core default quota | Roughly 20-100+, depending on OS, region, and restrictions | Defined by App Service Plan SKU and autoscale rules |
+| **Event-driven autoscale** | Yes (event-driven) | Yes (per-function, target-based) | Yes (target-based optional) | Manual via App Service autoscale rules |
+| **Per-function scaling** | No | Yes | No | No |
+| **Instance memory** | Fixed at 1.5 GB | 512 / 2048 / 4096 MB | Varies by SKU | Depends on App Service Plan SKU |
+| **Deployment slots** | Limited | No; use the rolling update path | Yes | Yes |
+| **Warmup trigger** | No | Yes | Yes | Yes |
 
-> Sources: Microsoft Learn — [Flex Consumption plan](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan), [Function scale and hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale), [Event-driven scaling](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling), [Target-based scaling](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling). Instance limits and memory options reflect official docs at time of writing and may change.
+> Sources: Microsoft Learn — [Function scale and hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale), [Flex Consumption plan](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan), [Event-driven scaling](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling), and [Target-based scaling](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling). Instance ceilings vary by plan, OS, region, and platform restrictions.
 
-This table is half the post. The other half is "how do you actually use it to make a decision."
+When you read the table, the three columns that eliminate options fastest are usually **OS, VNet, and scale behavior**. Cost often comes after those constraints, not before.
 
 ---
 
-## Consumption — the simplest starting point
+## Consumption — still the simplest, now clearly legacy
 
-Still the right answer in the majority of scenarios. If your traffic is bursty, you're not calling resources inside a VNet, and you can tolerate a light cold start, Consumption is plenty.
+Consumption is still easy to explain. No traffic means no bill, and the setup path is simple. The problem is that it is no longer the default answer for a new serverless app.
 
 **Pick it when:**
 
-- Traffic swings between 0 and N
-- You only call public internet resources (no VPN/VNet)
-- A few hundred extra ms on the first call is acceptable
-- You need Windows (Flex is Linux only)
+- You need the simplest demo, experiment, or PoC path
+- You have Windows-specific constraints
+- You do not need VNet integration
+- Some first-request latency is acceptable
 
 **Weaknesses:**
 
 - Cold starts
 - No VNet integration
-- Fixed 1.5 GB instance memory (hard to load large ML models)
-- Capped at 200 instances
+- Fixed 1.5 GB memory
+- Long-term risk from being a legacy plan
+- Linux Consumption is already retired or retiring, so it is not a stable target for new architecture decisions
+
+That is why Part 4 used Consumption for deployment, but only as **the smallest demo path**. For a fresh production design, the case for starting here is much weaker than it used to be.
 
 ---
 
-## Flex Consumption — Microsoft's "recommended" new pay-per-use plan
+## Flex Consumption — the default candidate for new serverless apps
 
-A relatively new plan that went GA in 2024, and Microsoft explicitly calls it [the recommended serverless hosting plan for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan). It **fixes nearly every weakness of Consumption**.
+Flex Consumption is the plan Microsoft now recommends for new serverless workloads. It keeps the economic shape of serverless while removing several of the platform limits that used to push teams toward Premium.
 
 **Key differentiators:**
 
-- **VNet integration** — the limitation that hurt the most on Consumption is gone.
-- **Selectable instance memory** — pick 512 / 2048 / 4096 MB to match the workload. Makes patterns like "load the ML model into the instance" actually viable.
-- **Always Ready instances** — for call paths where cold starts are fatal, you can configure "keep at least N warm at all times" (default is 0).
-- **Per-function scaling** — HTTP, blob, and durable functions scale independently. A traffic spike on one function has less spillover on the others.
-- **Up to 1000 instances** — 5x Consumption.
-- **Azure Files mounts** — large binaries, ML models, and shared data can be mounted instead of bundled into the deployment package.
+- **VNet integration** for private resources
+- **Selectable memory sizes** at 512 MB, 2048 MB, and 4096 MB
+- **Always Ready** for keeping chosen function groups warm; the default is still 0
+- **Per-function scaling** instead of scaling the whole app as one unit
+- **Large scale range** up to 1000 instances per app, though regional core quota can become the real limit earlier
 
-**Weaknesses:**
+**Important caveats:**
 
-- **Linux only** — Windows workloads can't migrate
-- **No deployment slots** — teams that relied on slot swaps need to switch to rolling updates
-- **No in-place migration from other plans** — moving to Flex means creating a new function app
-- **30-second in-app initialization timeout** — if startup takes longer than 30 seconds, you'll get a `System.TimeoutException` (currently not tunable)
-- **No support for the C# in-process model** — you have to migrate to the isolated worker model
+- It is **Linux only**.
+- **Blob trigger support requires the Event Grid source.** Do not assume the same polling-based blob trigger behavior you may be used to on classic Consumption.
+- **Some bindings and platform features have Flex-specific constraints.** No deployment slots and no in-place migration from another hosting plan are examples.
+- **Per-function scaling still uses scale groups.** HTTP triggers scale together, Blob Event Grid triggers scale together, and Durable Functions scale together. It is not “every function always gets fully isolated scale behavior.”
 
 **Pick it when:**
 
-- You need to call resources inside a VNet (Cosmos DB private endpoint, Key Vault, etc.)
-- You want to reduce cold starts but can't justify Premium's always-on cost
-- You're starting on Linux or willing to move there
-- You want to size instance memory to your workload
-- It's a new project — Flex is effectively the default first candidate
+- You are starting a new serverless project
+- You need to reach resources inside a VNet
+- You want better scaling flexibility than classic Consumption
+- Linux is acceptable
+
+This is the first candidate for a new build. The safe mental model is “Flex fixes many of Consumption's practical limits,” not “Flex removes every meaningful constraint.”
 
 ---
 
-## Premium — the head-on solution to cold starts
+## Premium — when cold-start control and Windows support both matter
 
-Premium **keeps instances permanently warm**. Always Ready guarantees "N instances are always up," and Pre-warmed maintains "extra warmed instances ready for scale-out."
+Premium solves the problem by keeping baseline capacity ready. You pay for that baseline, but you gain much stronger control over startup latency.
 
 **Pick it when:**
 
-- Cold starts are a hard business no-go (low-latency APIs)
-- You need VNet integration *and* Windows (Flex is Linux only)
-- Traffic is high and steady enough that the always-on cost isn't a burden
-- You need fine-grained warming control like Pre-warmed
+- First-request latency is a business problem
+- You need Windows and VNet at the same time
+- You need larger CPU or memory SKUs
+- You want to place multiple Function Apps on the same Premium plan
 
 **Weaknesses:**
 
-- You pay the minimum instance cost even at zero traffic
-- The most expensive option in the "pay-per-use family"
-- For new scenarios, Flex Consumption is often the better deal (if you're on Linux)
+- Minimum instance cost remains even at zero traffic
+- New Linux workloads almost always deserve a Flex comparison first
+- The effective max instance count varies enough by OS, region, and networking constraints that “it scales to 100” is too blunt to rely on
+
+Premium is less about pure serverless billing and more about keeping the Functions operating model while buying stronger performance guarantees.
 
 ---
 
-## Dedicated (App Service Plan) — putting Functions on "regular PaaS"
+## Dedicated — Functions with App Service operating rules
 
-The name is confusing, but the model is straightforward: **run Functions on top of a regular App Service Plan**, sharing infrastructure with other web apps.
+Dedicated is easier to understand if you ignore the label and look at the behavior. It is **Functions running on top of a regular App Service Plan**. That means you can colocate it with other web apps and budget it like App Service.
 
 **Pick it when:**
 
-- You already have an App Service Plan running and stacking Functions on it is cheaper
-- Traffic is consistently high and "always-on instances" works out cheaper
-- You don't need event-driven autoscale
+- You already have an App Service Plan with spare capacity
+- You want Functions on the same infrastructure as other web apps
+- You want predictable fixed-plan billing
+- Event-driven autoscale is not a requirement
 
-**The one weakness that matters most:**
+**The defining trade-off:**
 
-- **Event-driven autoscale doesn't work.** You don't get the "watch the queue length and add instances" behavior that Consumption / Flex / Premium give you. You have to write your own metric-based autoscale rules on the App Service Plan.
+- **You do not get Consumption/Flex/Premium-style event-driven autoscale.** Scaling is manual or driven by App Service autoscale rules that you define yourself.
 
-People who don't know this often pick Dedicated on intuition ("it feels more stable") and then watch their queues back up during a traffic spike because the instances never scale out. **The plans that actually behave the way "Functions" implies are Consumption / Flex / Premium.**
+Teams often choose Dedicated on instinct and then discover that queues do not automatically fan out the way they expected. Dedicated uses the Functions programming model, but operationally it behaves much more like App Service.
 
 ---
 
 ## Decision tree
 
-Three questions, in order, will resolve most cases.
-
 ```mermaid
 graph TD
-    Q1{Need to call resources<br/>inside a VNet?}
-    Q1 -- No --> Q2{Are cold starts<br/>a deal-breaker?}
-    Q1 -- Yes --> Q3{Linux OK?}
+    Q1{Need to reach resources<br/>inside a VNet?}
+    Q1 -- No --> Q2{Is this a new<br/>serverless app?}
+    Q1 -- Yes --> Q3{Is Linux acceptable?}
 
-    Q2 -- No --> CONS[Consumption<br/>Simplest starting point]
-    Q2 -- Yes --> Q4{Linux OK?}
+    Q2 -- Yes --> FLEX0[Flex Consumption<br/>Default candidate]
+    Q2 -- No --> Q4{Do you want the smallest<br/>demo path?}
 
-    Q3 -- Yes --> FLEX[Flex Consumption<br/>VNet + pay-per-use]
+    Q3 -- Yes --> FLEX1[Flex Consumption<br/>VNet + pay-per-use]
     Q3 -- No --> PREM1[Premium<br/>VNet + Windows]
 
-    Q4 -- Yes --> FLEX2[Flex Consumption<br/>+ Always Ready]
-    Q4 -- No --> PREM2[Premium<br/>Always Ready + Pre-warmed]
+    Q4 -- Yes --> CONS[Consumption<br/>Simple demo or existing app]
+    Q4 -- No --> Q5{Are cold starts<br/>a hard problem?}
 
-    DED[Dedicated<br/>When you already have an<br/>App Service Plan and steady traffic]
+    Q5 -- Yes --> PREM2[Premium<br/>Baseline warm capacity]
+    Q5 -- No --> FLEX2[Flex Consumption<br/>Current default choice]
+
+    DED[Dedicated<br/>Existing App Service Plan or manual scaling]
 ```
 
-Dedicated is intentionally absent from the main path. It's a plan you only pick when you can **explicitly afford to give up event-driven autoscale**.
+Dedicated sits outside the main path on purpose. It is not a bad plan. It is a plan for cases where you can **explicitly give up event-driven platform scaling**.
 
 ---
 
-## Recommendation for new projects — one paragraph
+## Recommendation for new projects
 
-Three lines:
+The short version is straightforward.
 
-1. **For Linux + new projects, make Flex Consumption the first candidate.** It's Microsoft's official recommendation and resolves nearly every Consumption pain point.
-2. **If you're on Windows, or cold starts are absolutely unacceptable, go Premium.**
-3. **For the simplest demos, experiments, and PoCs, use Consumption.** When traffic is zero, your bill is genuinely zero.
+1. **For a new serverless app, start with Flex Consumption.** That is the current official direction.
+2. **If you need Windows or tighter cold-start control, evaluate Premium.**
+3. **Use Consumption only for the simplest demo path or for existing assets you are intentionally keeping.**
 
-Only pick Dedicated if you're already operating an App Service Plan or you've explicitly decided to run Functions like a regular PaaS app.
-
----
-
-## Coming up next
-
-Once you've picked a plan, the next question is: **so when traffic shows up, how exactly do instances scale, and why is that first call slow?** Part 6 puts the scaling decision models (event-driven / target-based / metric-based) and the anatomy of the cold start on a single screen, and walks through five practical patterns for cutting cold starts.
-
-If you're curious about what's happening under the hood, Parts 5 and 6 of the deep-dive series take you through the Scale Controller's source code and the specialization logic in Placeholder mode.
+One more qualifier matters. Flex Consumption is strong, but **Blob triggers require the Event Grid source, some bindings and features have Flex-specific constraints, and scaling behavior should be understood in terms of per-function scale groups.** The accurate message is not “always use Flex.” It is “Flex is the default candidate, then validate the plan-specific constraints.”
 
 ---
 
-## Series index
+## Next up
 
-| # | Title |
-|---|---|
-| 1 | [What is Azure Functions? — A world where events call functions](./01-what-is-azure-functions.md) |
-| 2 | [Triggers and Bindings — Everything about function I/O](./02-triggers-and-bindings.md) |
-| 3 | [Host and Worker — Who actually runs your function](./03-host-and-worker.md) |
-| 4 | [Deploying your first function — From local to Azure](./04-first-deploy.md) |
-| 5 | **The Four Plans — Consumption / Flex Consumption / Premium / Dedicated** ← this post |
-| 6 | [Scaling and cold starts — The two faces of serverless](./06-scaling-and-cold-start.md) |
-| 7 | [Monitoring and operations basics](./07-monitoring-and-ops.md) |
+Once the plan is chosen, the next question follows naturally: **how do instances actually scale, and why is the first call slower?** Part 6 walks through event-driven scaling, target-based scaling, and cold starts in one model.
+
+---
+
+## Series context
+
+This is Part 5 of Azure Functions 101. Part 4 showed the deployment path end to end; this post decides what hosting target that deployment should land on. Part 6 picks up from here and explains how those plan choices turn into real scaling behavior and cold-start trade-offs.
 
 ---
 
@@ -242,6 +238,3 @@ If you're curious about what's happening under the hood, Parts 5 and 6 of the de
 - [Azure Functions Premium plan](https://learn.microsoft.com/en-us/azure/azure-functions/functions-premium-plan)
 - [Dedicated hosting plans for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/dedicated-plan)
 - [Migrate from Consumption to Flex Consumption](https://learn.microsoft.com/en-us/azure/azure-functions/migration/migrate-plan-consumption-to-flex)
-
-**Further reading**
-- [SIOS Tech Lab — Azure Functions 概要とプラン別スケーリング](https://tech-lab.sios.jp/archives/35541)

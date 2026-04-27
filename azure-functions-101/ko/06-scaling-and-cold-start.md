@@ -1,19 +1,19 @@
-# 스케일링과 콜드 스타트 — 서버리스의 두 얼굴
+# 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간
 
 > Azure Functions 101 시리즈 (6/7)
 
-서버리스를 한 줄로 광고할 때 자주 등장하는 문장은 “자동으로 스케일링되고, 사용한 만큼만 낸다”입니다. 사실입니다. 그런데 그 문장 뒤에는 거의 항상 별표(*)가 붙어 있습니다. 별표 안에 적힌 이야기가 두 개입니다. **(1) 어떻게 스케일링되는가**, 그리고 **(2) 콜드 스타트 때문에 첫 호출이 느릴 수 있다**. 이 두 가지가 “서버리스의 두 얼굴”입니다.
+서버리스 설명에는 늘 “자동으로 스케일링된다”는 문장이 붙습니다. 맞는 말이지만, 운영에서는 그 한 줄만으로 충분하지 않습니다. 어떤 신호를 보고 인스턴스를 늘리는지, 한 인스턴스가 동시에 몇 개 요청을 처리하는지, 그리고 0에서 다시 깨어날 때 왜 첫 요청이 느려지는지를 같이 봐야 합니다.
 
-이번 글은 5화에서 본 4가지 플랜의 표를 **운영 관점**으로 다시 그립니다. 트래픽이 갑자기 10배가 됐을 때 각 플랜이 어떻게 반응하는지, 콜드 스타트는 왜 생기고 어떻게 줄이는지, 그리고 배포 직후 첫 요청을 빠르게 만드는 실무 패턴을 정리합니다.
+이번 글은 5화에서 정리한 플랜 선택을 운영 관점으로 다시 읽습니다. 트래픽이 갑자기 치솟을 때 Consumption, Flex Consumption, Premium, Dedicated가 각각 어떻게 반응하는지, 콜드 스타트는 어디서 생기는지, 줄이려면 무엇부터 손대야 하는지를 정리합니다.
 
 ---
 
-## “스케일링”의 두 축 — 인스턴스 vs 동시성
+## 스케일링은 두 축으로 봐야 합니다 — 인스턴스 수와 인스턴스 내 동시성
 
-먼저 단어를 분리해야 합니다. 스케일링이라는 한 단어 안에는 사실 두 가지 축이 있습니다.
+Azure Functions의 스케일링은 한 단어로 뭉뚱그리기 어렵습니다. 실제 운영에서는 최소한 두 축을 분리해서 봐야 합니다.
 
-- **수평 스케일링(scale out)** — 인스턴스 수를 늘림. 트래픽이 N배 되면 인스턴스도 N배쯤.
-- **인스턴스 내 동시성(in-instance concurrency)** — 한 인스턴스 안에서 함수를 몇 개나 동시에 실행하는가.
+- **수평 스케일링(scale out)** — 인스턴스 수가 늘어나는가
+- **인스턴스 내 동시성(in-instance concurrency)** — 한 인스턴스가 동시에 몇 개 호출을 처리하는가
 
 ```mermaid
 flowchart LR
@@ -26,28 +26,28 @@ flowchart LR
 
     subgraph Concurrency [인스턴스 내 동시성]
         Inst[Instance]
-        Inst --> C1[호출 #1]
-        Inst --> C2[호출 #2]
-        Inst --> C3[호출 #3]
+        Inst --> C1[호출 1]
+        Inst --> C2[호출 2]
+        Inst --> C3[호출 3]
     end
 ```
 
-플랜별 차이는 **이 두 축 중 어느 쪽을 어떻게 다루는가**에서 갈립니다.
+플랜 차이는 이 두 축을 누가, 어떤 방식으로 다루느냐에서 갈립니다.
 
-| 플랜 | 수평 스케일링 결정 주체 | 인스턴스 내 동시성 |
+| 플랜 | 스케일아웃 방식 | 플랜에서 특히 봐야 할 점 |
 |---|---|---|
-| Consumption | 플랫폼이 자동 (event-driven) | 자동, 사용자 제어 어려움 |
-| Flex Consumption | 플랫폼이 자동 (target-based) | **사용자가 per-instance concurrency 직접 설정** |
-| Premium | 플랫폼이 자동 + Always Ready/Pre-warmed | 사용자가 host.json으로 조정 |
-| Dedicated (App Service Plan) | 사용자가 메트릭 기반 룰로 설정 | host.json으로 조정 |
+| Consumption | 플랫폼이 자동으로 확장. 트리거 종류에 따라 event-driven 또는 target-based 판단이 적용됨 | 사용자는 인스턴스 개수를 직접 다루지 않음. 동시성도 런타임/트리거 설정 영향이 큼 |
+| Flex Consumption | 플랫폼 자동 확장 기반은 같지만, **함수별 scale group**과 **인스턴스당 HTTP 동시성 설정**을 제공 | Flex의 차별점은 “더 똑똑한 자동 확장”보다 **함수 단위 격리와 동시성 제어**에 가까움 |
+| Premium | 플랫폼 자동 확장 + warm capacity 활용 | Always Ready, prewarmed 인스턴스로 지연을 줄일 수 있음 |
+| Dedicated (App Service Plan) | App Service autoscale 규칙을 사용자가 설정하거나 수동 운영 | scale to zero는 없고, 자동 반응성은 사용자가 만든 규칙 품질에 좌우됨 |
 
-이 표가 핵심입니다. **Functions의 “자동 스케일링”은 플랜에 따라 의미가 다릅니다.** Consumption은 진짜로 0~N까지 자동이지만, Dedicated는 “자동 스케일 규칙을 여러분이 직접 설정”하는 모델입니다.
+정리하면, target-based scaling은 Flex만의 전용 기능이 아닙니다. 여러 트리거 확장에서 더 넓게 쓰입니다. Flex를 따로 봐야 하는 이유는 함수별 scale group, 그리고 HTTP 트리거의 인스턴스당 동시성 제어를 제공한다는 점입니다.
 
 ---
 
-## 트래픽 폭증 시나리오 — 4가지 플랜의 반응
+## 트래픽이 갑자기 늘면 플랜별로 어떻게 반응할까
 
-말로 비교하면 안 와닿습니다. 같은 자극을 줬을 때 4가지 플랜이 어떻게 다르게 반응하는지를 시간축으로 그려보겠습니다. 자극은 “0초까지 트래픽 0, 0초에 갑자기 RPS가 100으로 치솟음”이라고 가정합니다.
+동일한 상황을 놓고 비교해야 차이가 분명해집니다. 아래 그림은 “평소에는 트래픽이 없다가 t=0에 HTTP 요청이 몰리기 시작한다”는 상황을 단순화한 것입니다.
 
 ```mermaid
 sequenceDiagram
@@ -58,177 +58,177 @@ sequenceDiagram
     participant Prem as Premium
     participant Ded as Dedicated
 
-    Note over T: t=0s 트래픽 폭증 시작
+    Note over T: t=0s 트래픽 급증 시작
     T->>Cons: 첫 요청 도착
-    Note over Cons: 인스턴스 깨움 시작 (콜드 스타트)
+    Note over Cons: 인스턴스가 0이면 새 인스턴스 준비 시작
     T->>Flex: 첫 요청 도착
-    Note over Flex: Always Ready가 즉시 처리
+    Note over Flex: Always Ready가 0이면 콜드 스타트 가능, 1 이상이면 warm 처리 가능
     T->>Prem: 첫 요청 도착
-    Note over Prem: Always Ready가 즉시 처리
+    Note over Prem: Always Ready 또는 prewarmed 인스턴스가 먼저 받음
     T->>Ded: 첫 요청 도착
-    Note over Ded: 이미 떠 있는 인스턴스가 처리
+    Note over Ded: 이미 실행 중인 인스턴스가 처리
 
     Note over T: t=수초 후
-    Cons-->>T: 첫 응답 (지연 발생)
+    Cons-->>T: 첫 응답, 초기 지연 가능
     Flex-->>T: 추가 인스턴스 자동 확장
-    Prem-->>T: Pre-warmed 인스턴스 활성화
-    Ded-->>T: 메트릭 기반 룰이 발동될 때까지 대기
+    Prem-->>T: warm capacity 소진 시 추가 인스턴스 활성화
+    Ded-->>T: autoscale 규칙이 있으면 뒤늦게 반응
 
     Note over T: t=분 단위
-    Cons-->>T: 인스턴스 N개로 자동 확장
-    Ded-->>T: 룰 발동 후 인스턴스 추가 (가장 느림)
+    Cons-->>T: 부하에 맞춰 인스턴스 수 조정
+    Flex-->>T: 함수별 scale group 기준으로 인스턴스 수 조정
+    Prem-->>T: 부하와 warm baseline을 함께 고려하며 확장
+    Ded-->>T: 규칙 발동 후 인스턴스 추가 또는 유지
 ```
 
-요약하면 다음 4가지가 핵심 차이입니다.
+운영 관점에서 보면 차이는 이렇게 정리할 수 있습니다.
 
-- **Consumption**: 첫 요청 = 콜드 스타트. 단, 아주 빠르게 0→N으로 확장.
-- **Flex Consumption**: Always Ready로 첫 요청 처리, target-based로 빠른 확장.
-- **Premium**: Always Ready + Pre-warmed로 콜드 스타트 회피, 같은 패밀리에서 가장 비쌈.
-- **Dedicated**: 콜드 스타트 자체가 없음(이미 떠 있음). 대신 트래픽 폭증에 자동 반응이 가장 느리거나, 아예 수동.
+- **Consumption**: scale to zero가 가능하므로 첫 요청에서 콜드 스타트가 가장 쉽게 드러납니다.
+- **Flex Consumption**: 기본값에서는 Always Ready가 0일 수 있으므로 콜드 스타트가 완전히 사라지지 않습니다. 대신 함수별 스케일링과 HTTP 동시성 설정이 강점입니다.
+- **Premium**: warm 인스턴스를 유지해 첫 요청 지연을 줄이기 좋습니다.
+- **Dedicated**: 인스턴스가 계속 떠 있으니 일반적인 의미의 scale-to-zero 콜드 스타트는 없습니다. 다만 급격한 부하 증가에 대한 자동 반응은 autoscale 규칙에 달려 있습니다.
+
+“Flex면 항상 따뜻하다”는 이해는 틀립니다. Flex도 Always Ready를 따로 잡지 않으면 0으로 내려갈 수 있고, 그 상태의 첫 요청은 콜드 스타트를 겪을 수 있습니다.
 
 ---
 
-## 콜드 스타트가 정확히 무엇인가
+## 콜드 스타트는 정확히 어디에서 생길까
 
-“콜드 스타트”라는 단어를 책임 있게 쓰려면 정의가 필요합니다.
+콜드 스타트는 단순히 “첫 요청이 느리다”는 현상 이름이 아닙니다. 새 인스턴스가 실제로 요청을 처리할 준비를 마칠 때까지의 여러 단계를 묶어 부르는 말입니다.
 
-> **콜드 스타트 = 함수를 처리할 새 인스턴스가 0에서 1이 되는 데 걸리는 시간**
+> **콜드 스타트 = 새 인스턴스가 할당되고, Host와 Worker가 올라오고, 함수가 준비된 뒤 첫 호출을 처리하기까지 걸리는 시간**
 
-이 시간이 어디로 가는지 분해해 보면 다음과 같습니다.
+대개 다음 순서로 나뉩니다.
 
 ```mermaid
 flowchart LR
-    A[1. VM/컨테이너 할당] --> B[2. Functions Host 부팅]
+    A[1. VM 또는 컨테이너 할당] --> B[2. Functions Host 부팅]
     B --> C[3. Worker 프로세스 시작]
-    C --> D[4. 함수 인덱싱 + 의존성 로드]
+    C --> D[4. 함수 인덱싱과 의존성 로드]
     D --> E[5. 첫 호출 실행]
 ```
 
-각 단계에서 시간이 줄어들거나 늘어나는 요인은 다음과 같습니다.
-
-| 단계 | 시간 결정 요인 | 대표적인 절감 방법 |
+| 단계 | 시간이 늘어나는 주된 이유 | 줄이는 방법 |
 |---|---|---|
-| 1 | 플랫폼이 placeholder 인스턴스를 미리 띄워두면 거의 0 | (플랫폼 책임 — 6장에서 심화편 6화 참고) |
-| 2 | Host 자체는 빠름 | 일반적으로 손댈 곳 없음 |
-| 3 | Worker 시작 시간 (Java/.NET이 Node/Python보다 무거운 편) | 언어 선택, isolated vs in-proc |
-| 4 | **여러분의 코드 의존성 양** | 의존성 줄이기, lazy import |
-| 5 | 첫 호출 자체 비용 | warmup trigger, ping 트래픽 |
+| 1 | 새 실행 환경을 준비해야 함 | warm capacity, Always Ready, 플랫폼 최적화 활용 |
+| 2 | Host 초기화 | 일반적으로 사용자가 직접 줄일 여지는 적음 |
+| 3 | 언어 Worker 시작 비용 | 언어 선택, 런타임 초기화 비용 점검 |
+| 4 | 애플리케이션 의존성, import, 초기화 코드 | 의존성 정리, lazy import, lazy init |
+| 5 | 첫 호출 자체가 무거움 | 캐시 예열, warmup trigger, 요청 경량화 |
 
-여기서 중요한 사실 하나. **콜드 스타트 시간의 절반 이상은 4번에서 결정되는 경우가 많습니다.** 플랜을 비싼 걸로 바꾸기 전에 의존성을 줄이는 것이 항상 우선입니다.
+실무에서는 4단계 비중이 꽤 큽니다. 패키지가 크고 import 시점에 연결을 만들고 모델을 로드하면, 플랜을 바꾸기 전에 이미 애플리케이션이 콜드 스타트를 키우고 있는 셈입니다.
 
 ---
 
-## 콜드 스타트를 줄이는 실무 패턴
+## 콜드 스타트를 줄일 때 먼저 손댈 것들
 
-플래닝 단계에서, 코드 단계에서, 운영 단계에서 각각 할 수 있는 일이 있습니다.
+### 1) 플랜 관점
 
-**플래닝 단계**
+- 첫 요청 지연이 곧 매출 손실이나 SLA 위반으로 이어진다면 **Premium** 또는 **Flex Consumption + Always Ready**를 먼저 검토합니다.
+- 간헐적 지연을 받아들일 수 있다면 Consumption이나 Flex 기본 구성으로도 충분한 경우가 많습니다.
 
-- 콜드 스타트가 비즈니스적으로 치명적이라면 처음부터 Premium 또는 Flex Consumption + Always Ready를 검토합니다.
-- 그렇지 않다면 Consumption + “콜드 스타트 절감 코드 패턴”으로 충분한 경우가 많습니다.
+### 2) 코드 관점
 
-**코드 단계**
+- **의존성 줄이기** — 큰 SDK를 통째로 가져오지 말고 필요한 기능만 씁니다.
+- **초기화 시점 늦추기** — import 시점에 DB 연결, 대용량 파일 로드, 인증 메타데이터 다운로드를 하지 않습니다.
+- **프로세스 재사용 활용** — 같은 Worker 안에서 재사용 가능한 클라이언트는 모듈 전역에 캐시합니다.
 
-- **의존성 다이어트** — 거대한 SDK를 한 줄 쓰려고 통째로 import하지 마세요. tree-shake 또는 분해된 패키지(`@azure/cosmos` 대신 필요한 모듈만)를 우선합니다.
-- **lazy import / lazy init** — 모듈 로드 시점에 무거운 작업(DB 연결, 큰 파일 읽기)을 하지 마세요. 첫 호출 안에서 늦게 초기화하고 캐시합니다.
-- **글로벌 캐시** — Functions의 모듈 스코프 변수는 같은 Worker 안에서 살아남습니다. DB 클라이언트, JWKS 키 같은 건 모듈 스코프에 한 번 만들고 재사용합니다.
+```python
+import azure.functions as func
 
-```javascript
-// 좋은 예: 모듈 스코프 캐시 + lazy 초기화
-let cachedClient;
+app = func.FunctionApp()
+_client = None
 
-function getClient() {
-    if (!cachedClient) {
-        cachedClient = createCosmosClient();   // 첫 호출에서만 만들어짐
-    }
-    return cachedClient;
-}
 
-app.http('hello', {
-    handler: async (request, context) => {
-        const client = getClient();
-        // ...
-    }
-});
+def get_client():
+    global _client
+    if _client is None:
+        _client = create_cosmos_client()
+    return _client
+
+
+@app.function_name(name="hello")
+@app.route(route="hello")
+def hello(req: func.HttpRequest) -> func.HttpResponse:
+    client = get_client()
+    return func.HttpResponse("ok")
 ```
 
-**운영 단계**
+이 패턴의 목적은 단순합니다. 첫 호출에서만 무거운 초기화를 하고, 같은 Worker가 살아 있는 동안은 다시 만들지 않는 것입니다.
 
-- **Warmup trigger** — Premium/Dedicated에서 인스턴스가 추가될 때 한 번 실행되는 트리거. 캐시 워밍 같은 작업을 여기에 올립니다. (Consumption에서는 사용 불가)
-- **Always Ready 인스턴스** — Premium / Flex Consumption에서 “기본으로 N개는 항상 켜 두기”를 설정합니다. N=1이면 첫 요청은 항상 따뜻하게 받습니다.
+### 3) 운영 관점
+
+- **Warmup trigger** — Consumption을 제외한 플랜에서 사용할 수 있습니다. Flex, Premium, Dedicated에서 새 인스턴스가 준비될 때 캐시 예열 같은 작업을 넣을 수 있습니다.
+- **Always Ready 인스턴스** — Flex와 Premium에서 “항상 켜 둘 최소 인스턴스 수”를 정합니다. 0이면 scale to zero가 가능하고, 1 이상이면 첫 요청 지연을 줄일 수 있습니다.
+
+Warmup trigger와 Always Ready는 같은 기능이 아닙니다. Warmup trigger는 인스턴스가 추가될 때 실행되는 훅이고, Always Ready는 아예 warm 인스턴스를 유지하는 설정입니다.
 
 ---
 
-## 동시성을 의식적으로 다루기
+## 동시성은 비용과 다운스트림 안정성을 같이 흔듭니다
 
-“스케일아웃이 자동이니까 동시성은 신경 안 써도 되겠지”는 흔한 함정입니다. 실제로는 다음 두 가지 때문에 동시성을 알아야 합니다.
+자동 스케일링이 있다고 해서 동시성을 무시하면 운영이 불안정해집니다. 이유는 두 가지입니다.
 
-**1) 다운스트림 의존성의 한계**
+### 1) 다운스트림 용량은 함수와 같이 늘어나지 않습니다
 
-DB 커넥션 풀, 외부 API의 RPS 한도 같은 건 스케일아웃과 함께 늘어나지 않습니다. 인스턴스가 100개로 늘어났는데 DB 커넥션 풀이 10이면, 99개 인스턴스가 커넥션 대기 상태가 됩니다. **함수의 스케일은 다운스트림의 캐파시티를 넘지 못합니다.** 이 사실이 종종 잊힙니다.
+DB 커넥션 풀, 외부 API rate limit, Redis 연결 수는 Functions 인스턴스 수와 함께 자동으로 늘어나지 않습니다. 함수 앱이 빠르게 scale out되더라도, 뒤쪽 시스템이 받지 못하면 병목은 그대로 남습니다.
 
 ```mermaid
 flowchart LR
-    LB[트리거 이벤트] --> F1[Function Instance 1]
-    LB --> F2[Function Instance 2]
-    LB --> Fn[Function Instance N]
-    F1 --> DB[(DB / API<br/>제한된 캐파)]
+    Evt[트리거 이벤트] --> F1[Function Instance 1]
+    Evt --> F2[Function Instance 2]
+    Evt --> FN[Function Instance N]
+    F1 --> DB[(DB 또는 외부 API)]
     F2 --> DB
-    Fn --> DB
-    DB -.병목.- F1
+    FN --> DB
+    DB -. 병목 .- F1
 ```
 
-대응책은 보통 두 가지입니다.
+그래서 운영에서는 다음 둘을 같이 봅니다.
 
-- **함수 동시성 제한** — host.json의 `extensions.queues.batchSize` 같은 설정으로 트리거당 처리량을 제한.
-- **다운스트림 격리** — Service Bus 같은 큐로 백프레셔를 받고, 다운스트림 처리 속도에 맞춰 천천히 소비.
+- 트리거별 배치 크기, prefetch, 동시 처리 수 제한
+- 큐를 앞단에 두고 다운스트림 속도에 맞게 소비하는 구조
 
-**2) 같은 인스턴스 안의 동시 실행**
+### 2) 한 인스턴스 안에서도 여러 호출이 동시에 실행될 수 있습니다
 
-3화에서 본 것처럼 한 Worker 안에서 여러 호출이 동시 실행될 수 있습니다(언어/설정에 따라). 이 말은 **모듈 스코프 변수가 동시 호출 사이에 공유된다**는 뜻입니다. 전역 변수에 “현재 처리 중인 사용자”를 박아두는 코드는 그래서 위험합니다.
+HTTP 동시성, 큐 배치, 언어 런타임 특성 때문에 같은 인스턴스와 같은 Worker에서 여러 호출이 겹칠 수 있습니다. 따라서 모듈 전역 상태를 쓸 때는 thread-safe 여부, 재진입성, 연결 재사용 방식을 같이 봐야 합니다.
 
----
-
-## 비용 모델과 스케일링의 관계
-
-비용을 빼고 스케일링을 이야기하면 반쪽입니다. 한 줄씩만 정리해 둡니다.
-
-- **Consumption**: 실행 시간 × 메모리 + 실행 횟수. 트래픽 0이면 비용 0.
-- **Flex Consumption**: 위와 비슷 + Always Ready 인스턴스에 대한 시간당 과금.
-- **Premium**: 인스턴스를 띄워둔 시간 (수평 스케일된 만큼). 트래픽 적어도 최소 인스턴스 비용은 발생.
-- **Dedicated**: App Service Plan의 인스턴스 수 × SKU 시간당 단가. 트래픽과 무관하게 일정.
-
-“자동 스케일아웃은 좋지만 비용도 자동으로 늘어난다”는 점을 기억하세요. 트래픽 폭증이 곧 비용 폭증입니다. **상한(Maximum scale-out limit)을 반드시 의식적으로 설정**하는 게 운영 기본기입니다.
+Flex의 HTTP concurrency 설정이 중요한 이유도 여기에 있습니다. 인스턴스 수만 볼 것이 아니라, 한 인스턴스에 몇 요청을 밀어 넣을지까지 결정하기 때문입니다.
 
 ---
 
-## 7화 예고
+## 스케일링은 곧 비용 모델입니다
 
-스케일링 이야기는 “이 함수가 지금 몇 개 인스턴스에서 어떻게 돌아가고 있는지”를 **볼 수 있어야** 의미가 있습니다. 다음 글에서는 Application Insights를 중심으로 한 모니터링과 운영 기초를 다룹니다. 호출 수, 실패율, 콜드 스타트 빈도, 이런 것들을 어디서 보고 어떻게 알람을 거는지가 주제입니다.
+스케일링을 비용과 분리해서 보면 판단이 자주 어긋납니다.
 
-콜드 스타트와 스케일링의 **내부 메커니즘**(Scale Controller, Placeholder, Specialization)이 궁금하다면 심화편 5·6화로 가시면 됩니다. 거기서는 코드를 직접 따라갑니다.
+- **Consumption**: 실행 시간, 메모리, 호출 수에 따라 비용이 붙습니다. 트래픽이 없으면 비용도 거의 없습니다.
+- **Flex Consumption**: Consumption 계열 과금에 더해 Always Ready 인스턴스 비용을 따로 의식해야 합니다.
+- **Premium**: 최소로 유지하는 warm 인스턴스부터 비용이 시작됩니다.
+- **Dedicated**: App Service Plan 인스턴스를 계속 확보하므로 트래픽이 적어도 기본 비용이 고정됩니다.
+
+운영에서는 “얼마나 빨리 늘어나는가”만큼 “어디까지 늘어나게 둘 것인가”도 중요합니다. 최대 인스턴스 수와 동시성 설정을 방치하면, 성능 문제 대신 비용 문제가 먼저 터질 수 있습니다.
 
 ---
 
-## 시리즈 목차
+## 다음 글과 심화편 연결
 
-| # | 제목 |
-|---|---|
-| 1 | [Azure Functions란? — 이벤트가 함수를 호출하는 세상](./01-what-is-azure-functions.md) |
-| 2 | [트리거와 바인딩 — 함수 입출력의 모든 것](./02-triggers-and-bindings.md) |
-| 3 | [Host와 Worker — 함수는 누가 실행하는가](./03-host-and-worker.md) |
-| 4 | [첫 번째 함수 배포 — 로컬에서 Azure까지](./04-first-deploy.md) |
-| 5 | 4가지 플랜 — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | **스케일링과 콜드 스타트 — 서버리스의 두 얼굴** ← 현재 글 |
-| 7 | 모니터링과 운영 기초 |
+스케일링과 콜드 스타트는 보이지 않으면 관리할 수 없습니다. 다음 글에서는 Application Insights, 메트릭, KQL, 알람을 중심으로 “지금 몇 개 인스턴스가 돌고 있는가”, “실패율이 언제 튀는가”, “비용이 왜 늘었는가”를 어떻게 추적하는지 정리합니다.
+
+콜드 스타트와 스케일링 내부 구현이 궁금하면 [Azure Functions Deep Dive 5화](../../azure-functions-deep-dive/ko/05-scaling-internals.md)와 [6화](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)를 같이 보면 좋습니다. 101 시리즈가 운영 판단 기준을 잡는 글이라면, 심화편은 그 판단이 코드에서 어떻게 구현됐는지를 따라갑니다.
 
 ---
 
 ## References
 
 **공식 문서**
+- [Azure Functions hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
 - [Event-driven scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling)
 - [Target-based scaling](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling)
 - [Warmup trigger for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-warmup)
 - [Manage connections in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/manage-connections)
-- [host.json reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-host-json)
+
+**관련 시리즈**
+- [Azure Functions 101 5화 — 어떤 플랜을 선택해야 할까](./05-choosing-a-plan.md)
+- [Azure Functions 101 7화 — 모니터링과 운영 기초](./07-monitoring-and-ops.md)
+- [Azure Functions Deep Dive 5화 — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
+- [Azure Functions Deep Dive 6화 — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)

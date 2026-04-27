@@ -25,7 +25,8 @@ sequenceDiagram
     participant WFI as WorkerFunctionInvoker
     participant DISP as IFunctionInvocationDispatcher<br/>(Rpc 구현체)
     participant GWC as GrpcWorkerChannel
-    participant Bus as Event Bus
+    participant OC as 워커별 Outbound Channel
+    participant IC as 워커별 Inbound Channel
     participant FRS as FunctionRpcService
     participant W as Worker
 
@@ -33,14 +34,14 @@ sequenceDiagram
     SDK->>WFI: InvokeCore (binding 데이터)
     WFI->>DISP: InvokeAsync(ScriptInvocationContext)
     DISP->>GWC: SendInvocationRequest
-    GWC->>Bus: OutboundGrpcEvent { InvocationRequest }
-    Bus->>FRS: 메시지 전달
+    GWC->>OC: OutboundGrpcEvent { InvocationRequest }
+    FRS->>OC: outbound.Reader 읽기
     FRS-->>W: StreamingMessage(InvocationRequest)
 
     W->>W: 사용자 함수 실행
     W-->>FRS: StreamingMessage(InvocationResponse)
-    FRS->>Bus: InboundGrpcEvent { InvocationResponse }
-    Bus->>GWC: invocation_id로 매칭
+    FRS->>IC: InboundGrpcEvent { InvocationResponse }
+    GWC->>IC: inbound.Reader 읽기
     GWC->>DISP: TaskCompletionSource.SetResult
     DISP->>WFI: 결과 반환
     WFI->>SDK: 결과 반환
@@ -73,15 +74,17 @@ WebJobs SDK는 함수마다 **`IFunctionInvoker` 구현체**를 하나씩 갖습
 
 | 구현체 | 무엇 |
 |---|---|
-| **`RpcFunctionInvocationDispatcher`** (별도 파일에 위치) | 모든 비-HTTP 트리거의 기본 경로. gRPC를 통해 워커에 보냄. |
-| [`HttpFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/HttpFunctionInvocationDispatcher.cs) | HTTP 트리거를 위한 **HTTP 프록시 모델**. gRPC가 아니라 HTTP로 워커에 직접 요청. |
+| **`RpcFunctionInvocationDispatcher`** (별도 파일에 위치) | 기본 경로입니다. 워커와의 호출 운반은 gRPC 채널을 사용합니다. |
+| [`HttpFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/HttpFunctionInvocationDispatcher.cs) | `httpWorkerOptions.Value.Description`이 있을 때 선택되는 HTTP worker/custom handler 전용 경로입니다. |
 
-[`FunctionInvocationDispatcherFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/FunctionInvocationDispatcherFactory.cs)는 위의 두 구현체 중 어느 것을 쓸지 결정합니다 — 함수의 트리거 타입과 워커 capability에 따라 갈립니다.
+[`FunctionInvocationDispatcherFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/FunctionInvocationDispatcherFactory.cs)는 분기 조건을 아주 단순하게 둡니다. `httpWorkerOptions.Value.Description != null`이면 `HttpFunctionInvocationDispatcher`를 만들고, 아니면 `RpcFunctionInvocationDispatcher`를 만듭니다. 즉 선택 기준은 트리거 종류가 아니라 **HTTP worker/custom handler 구성이 존재하는가**입니다.
 
 핵심 사실 두 가지:
 
 1. **모든 트리거가 같은 `InvocationRequest` 메시지로 평준화됩니다.** 큐 메시지든, 타이머 펄스든, Blob 이벤트든, Dispatcher 입장에서는 똑같이 "한 번 호출하라"는 명령입니다.
-2. **HTTP 트리거는 예외적으로 gRPC를 우회할 수 있습니다.** 워커가 "HTTP proxying" capability를 광고하면 호스트는 invocation request 페이로드를 gRPC에 싣지 않고, 대신 워커가 노출한 HTTP 엔드포인트로 직접 프록시합니다. (대용량 HTTP 바디 전송 시 gRPC 페이로드 부담을 피하기 위함)
+2. **HTTP 관련 경로는 두 층으로 나뉩니다.** 첫째, 방금 본 `HttpFunctionInvocationDispatcher`는 factory 단계에서 아예 선택되는 별도 dispatcher입니다. 이건 HTTP worker/custom handler가 구성됐을 때의 경로입니다.
+
+둘째, gRPC 워커가 광고하는 "HTTP proxying" capability는 다른 이야기입니다. 이 경우 dispatcher 자체는 여전히 `RpcFunctionInvocationDispatcher`이고, 워커 채널도 그대로 살아 있습니다. 다만 HTTP 트리거 호출에서 본문 전달만 worker가 연 HTTP 엔드포인트로 우회해 큰 HTTP payload를 protobuf `TypedData.http`에 그대로 싣지 않게 만드는 것입니다. 이름은 비슷하지만, **dispatcher 선택**과 **gRPC 워커의 HTTP 본문 프록시**는 같은 메커니즘이 아닙니다.
 
 ---
 
@@ -102,7 +105,7 @@ WebJobs SDK는 함수마다 **`IFunctionInvoker` 구현체**를 하나씩 갖습
 
 ## 4단계 — `InvocationRequest` 만들기
 
-3화에서 본 [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto)의 `InvocationRequest`를 다시 봅니다.
+3화에서 본 [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto)의 `InvocationRequest`를 다시 봅니다.
 
 ```protobuf
 message InvocationRequest {
@@ -154,10 +157,12 @@ message RpcTraceContext {
 1. `ScriptInvocationContext`를 `InvocationRequest`로 변환
 2. `StreamingMessage`로 감싼다 (`request_id` = 새로 생성한 GUID, `oneof content` = `invocation_request`)
 3. 그 호출의 `TaskCompletionSource`를 **invocation_id 기반 인메모리 사전**에 등록 — 응답이 올 때 짝지을 수 있도록
-4. 메시지를 **`OutboundGrpcEvent`** 로 감싸 in-process 이벤트 버스에 발행
-5. `FunctionRpcService`가 그 이벤트를 받아 실제 gRPC 스트림에 쓴다
+4. 메시지를 `OutboundGrpcEvent`로 감싸, **이 워커에 할당된 outbound `Channel<OutboundGrpcEvent>`** 에 쓴다
+5. [`FunctionRpcService`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)가 `TryGetGrpcChannels(workerId, out var inbound, out var outbound)`로 같은 워커의 채널 쌍을 잡아 두고, 그중 `outbound.Reader`를 읽어 실제 gRPC 스트림에 쓴다
 
-3번이 비동기 응답 매칭의 핵심입니다. `invocation_id` ↔ `TaskCompletionSource`의 사전이 곧 한 워커의 in-flight 호출 목록입니다. 이 사전이 비어 있으면 그 워커는 idle, 가득 차면 busy입니다. (이 정보가 **5화의 워커 동시성 측정**으로 그대로 이어집니다.)
+여기서 중요한 점은 "공용 이벤트 버스"보다 **워커별 채널 쌍**이 실제 운반 경로라는 것입니다. `WorkerChannel` 생성자에서 워커 ID로 `TryGetGrpcChannels`를 호출해 inbound/outbound 채널을 받아 두고, `SendStreamingMessageAsync`는 `_outbound` writer에 직접 적습니다.
+
+3번의 `invocation_id` ↔ `TaskCompletionSource` 사전은 비동기 응답 매칭의 핵심입니다. 응답이 순서 없이 돌아와도 같은 `invocation_id`로 정확히 짝을 맞출 수 있습니다.
 
 ---
 
@@ -187,8 +192,8 @@ message RpcTraceContext {
 ```
 gRPC stream
   → FunctionRpcService.EventStream (호스트 측 핸들러)
-  → InboundGrpcEvent로 감싸 이벤트 버스에 발행
-  → GrpcWorkerChannel이 자기 워커 ID + invocation_response 메시지를 구독
+  → workerId별 inbound Channel<InboundGrpcEvent>에 write
+  → GrpcWorkerChannel / WorkerChannel의 inbound.Reader가 읽음
   → invocation_id로 TaskCompletionSource 조회
   → tcs.SetResult(ScriptInvocationResult)
   → Dispatcher가 await하던 Task가 깨어남
@@ -237,15 +242,15 @@ flowchart LR
 
 ## HTTP 프록시 — gRPC를 우회하는 길
 
-[`HttpFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/HttpFunctionInvocationDispatcher.cs)는 별도의 길입니다. HTTP 트리거 함수에서 워커가 "HTTP proxying" capability를 광고하면, 호스트는 invocation request의 HTTP 본문을 gRPC `TypedData.http`에 직렬화하지 않습니다. 대신:
+앞에서 구분한 두 메커니즘을 여기서 다시 정리하겠습니다. [`HttpFunctionInvocationDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/HttpFunctionInvocationDispatcher.cs)는 factory가 선택하는 **HTTP worker/custom handler 경로**입니다. 반면 gRPC 워커의 HTTP proxying은 `WorkerChannel.SendInvocationRequest` 안에서 `IsHttpProxyingWorker && context.FunctionMetadata.IsHttpTriggerFunction()` 조건이 맞을 때 `_httpProxyService.StartForwarding(...)`를 호출하는 방식으로 붙습니다.
+
+즉 HTTP 트리거라고 해서 자동으로 `HttpFunctionInvocationDispatcher`로 가는 것은 아닙니다. 일반적인 언어 워커의 HTTP 트리거는 여전히 `RpcFunctionInvocationDispatcher` 경로를 타되, 워커 capability가 있으면 HTTP 본문 전달만 우회합니다. 이때 흐름은 대략 다음과 같습니다.
 
 1. 워커가 자기 프로세스 안에 HTTP 서버를 추가로 띄움
 2. 호스트는 워커가 알려준 HTTP 엔드포인트로 **원본 HTTP 요청을 거의 그대로 프록시**
 3. 워커는 사용자 함수에 HTTP 요청을 그대로 넘기고, 응답을 호스트에 HTTP 응답으로 돌려보냄
 
-이 길의 장점은 **큰 HTTP 본문(파일 업로드 등)을 protobuf로 직렬화하지 않는다**는 것입니다. 단점은 워커가 자체 HTTP 서버를 들고 있어야 한다는 것이고, 이게 isolated worker 모델에서 일반화되어 있습니다.
-
-호출 흐름은 gRPC 경로와 거의 같지만, 메시지 페이로드 운반만 HTTP로 바뀐 것입니다.
+장점은 **큰 HTTP 본문(파일 업로드 등)을 protobuf로 직렬화하지 않는다**는 것입니다. 다만 제어 평면 자체가 완전히 바뀌는 것은 아닙니다. 호출 등록, invocation ID 관리, 최종 응답 매칭은 계속 같은 워커 채널과 dispatcher 흐름 안에서 움직입니다.
 
 ---
 
@@ -258,9 +263,9 @@ flowchart LR
 | 3 | `IFunctionInvocationDispatcher` 구현체 | 호출을 받아 실제 운반 |
 | 4 | `InvocationRequest` 빌더 | `ScriptInvocationContext`를 protobuf로 변환 |
 | 5 | `GrpcWorkerChannel` | 워커 1대에 보냄, 응답 매칭용 사전 등록 |
-| 6 | `FunctionRpcService` (gRPC) | OutboundGrpcEvent를 실제 스트림에 쓴다 |
+| 6 | `FunctionRpcService` (gRPC) | 워커별 outbound 채널을 읽어 실제 스트림에 쓴다 |
 | 7 | Worker process | 사용자 함수 실행, `InvocationResponse` 회신 |
-| 8 | `FunctionRpcService` (gRPC) | 인바운드 메시지를 InboundGrpcEvent로 |
+| 8 | `FunctionRpcService` (gRPC) | 인바운드 메시지를 워커별 inbound 채널에 쓴다 |
 | 9 | `OrderedInvocationMessageDispatcher` | invocation별 메시지 순서 보장 |
 | 10 | `GrpcWorkerChannel` | invocation_id로 TCS 매칭, 결과 완료 |
 | 11 | Dispatcher → Invoker → SDK | 결과 전파 |
@@ -277,17 +282,7 @@ flowchart LR
 
 ---
 
-## 시리즈 목차
-
-| # | 제목 |
-|---|---|
-| 1 | [호스트 부트스트랩](./01-host-bootstrap.md) |
-| 2 | [워커 프로세스](./02-worker-process.md) |
-| 3 | [gRPC 이벤트 스트림](./03-grpc-event-stream.md) |
-| 4 | **Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지** ← 현재 글 |
-| 5 | [스케일링 내부 — 인스턴스는 어떻게 늘어나는가](./05-scaling-internals.md) |
-| 6 | [콜드 스타트와 Placeholder](./06-cold-start-placeholder.md) |
-| 7 | [학술적 관점](./07-academic-perspective.md) |
+이 글은 Azure Functions Deep Dive 시리즈 4화입니다. 1~3화에서 호스트 부팅, 워커 프로세스, gRPC 스트림의 뼈대를 세웠다면, 이번 화는 그 위를 실제 호출이 어떻게 지나가는지 따라갔습니다. 다음 5화에서는 같은 호출이 많아졌을 때 인스턴스 수를 누가 어떤 신호로 늘리는지, 6화에서는 그 인스턴스가 새로 떠야 할 때 발생하는 콜드 스타트와 placeholder 메커니즘으로 이어집니다.
 
 ---
 
@@ -302,7 +297,9 @@ flowchart LR
 - [`WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)
 - [`WorkerChannelThrottleProvider.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerChannelThrottleProvider.cs)
 - [`Channel/GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
+- [`Channel/WorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/WorkerChannel.cs)
 - [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs)
+- [`Server/FunctionRpcService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)
 
 **프로토콜**
-- [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/main/src/proto/FunctionRpc.proto) — `InvocationRequest`, `InvocationResponse`, `ParameterBinding`, `RpcTraceContext`
+- [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto) — `InvocationRequest`, `InvocationResponse`, `ParameterBinding`, `RpcTraceContext`

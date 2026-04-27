@@ -1,8 +1,6 @@
 # First Deployment: From Local to Azure (Python/Flask)
 
-> Azure App Service 101 Series (4/7)
-
-Enough theory. Let's actually **deploy a Flask app to Azure App Service**.
+This is where the series turns into a real deployment. We will deploy a Flask app to Azure App Service and verify the full runtime path.
 
 This post covers the entire process from local development environment setup to Azure deployment and verifying everything works.
 
@@ -10,12 +8,7 @@ This post covers the entire process from local development environment setup to 
 
 ## Goals
 
-By the end of this tutorial, you'll have:
-
-- ✅ Run a Flask app locally in production mode
-- ✅ Created an App Service Plan and Web App in Azure
-- ✅ Deployed source code to Azure
-- ✅ Verified the app works via Health endpoint
+By the end, you will have a Flask app running locally, an App Service app in Azure, and a repeatable deployment path you can verify with logs and a health endpoint.
 
 ---
 
@@ -33,9 +26,6 @@ az --version
 az login
 ```
 
-![IMAGE: az login success screen]
-`📸 Screenshot: Terminal showing az login success with subscription list`
-
 ---
 
 ## Step 1: Prepare Project Structure
@@ -45,7 +35,7 @@ az login
 ```
 my-flask-app/
 ├── src/
-│   └── app.py
+│ └── app.py
 ├── requirements.txt
 └── README.md
 ```
@@ -61,18 +51,18 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return jsonify({
-        "message": "Hello from Azure App Service!",
-        "environment": os.environ.get("APP_ENV", "development")
-    })
+ return jsonify({
+ "message": "Hello from Azure App Service!",
+ "environment": os.environ.get("APP_ENV", "development")
+ })
 
 @app.route('/health')
 def health():
-    return jsonify({"status": "healthy"}), 200
+ return jsonify({"status": "healthy"}), 200
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
+ port = int(os.environ.get("PORT", 8000))
+ app.run(host="0.0.0.0", port=port)
 ```
 
 ### requirements.txt
@@ -81,9 +71,6 @@ if __name__ == '__main__':
 Flask==3.0.0
 gunicorn==21.2.0
 ```
-
-![IMAGE: Project structure in VS Code]
-`📸 Screenshot: Project folder structure in VS Code or editor`
 
 ---
 
@@ -94,7 +81,7 @@ gunicorn==21.2.0
 ```bash
 cd my-flask-app
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+source .venv/bin/activate # Windows: .venv\Scripts\activate
 ```
 
 ### Install Dependencies
@@ -125,9 +112,6 @@ curl http://localhost:8000/health
 {"status": "healthy"}
 ```
 
-![IMAGE: Local Flask server running]
-`📸 Screenshot: Terminal with flask run and curl tests`
-
 ---
 
 ## Step 3: Run Locally (Production Mode)
@@ -154,9 +138,6 @@ curl http://localhost:8000/health
 - Concurrency varies with timeout and worker count
 - Prevents "works locally but not in Azure" issues
 
-![IMAGE: Gunicorn running]
-`📸 Screenshot: gunicorn startup logs (Starting gunicorn, worker info)`
-
 ---
 
 ## Step 4: Create Azure Resources
@@ -165,7 +146,7 @@ curl http://localhost:8000/health
 
 ```bash
 RG="rg-flask-tutorial"
-APP_NAME="app-flask-demo-$(openssl rand -hex 4)"  # Unique name
+APP_NAME="app-flask-demo-$(openssl rand -hex 4)" # Unique name
 PLAN_NAME="plan-flask-tutorial"
 LOCATION="koreacentral"
 
@@ -176,32 +157,29 @@ echo "App Name: $APP_NAME"
 
 ```bash
 az group create \
-    --name $RG \
-    --location $LOCATION
+ --name $RG \
+ --location $LOCATION
 ```
 
 ### Create App Service Plan
 
 ```bash
 az appservice plan create \
-    --resource-group $RG \
-    --name $PLAN_NAME \
-    --is-linux \
-    --sku B1
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --is-linux \
+ --sku B1
 ```
 
 ### Create Web App
 
 ```bash
 az webapp create \
-    --resource-group $RG \
-    --plan $PLAN_NAME \
-    --name $APP_NAME \
-    --runtime "PYTHON|3.11"
+ --resource-group $RG \
+ --plan $PLAN_NAME \
+ --name $APP_NAME \
+ --runtime "PYTHON|3.11"
 ```
-
-![IMAGE: Created resources in Azure Portal]
-`📸 Screenshot: Azure Portal → Resource Group → Created Plan and Web App`
 
 ---
 
@@ -213,24 +191,21 @@ Enable App Service's Oryx build system to detect `requirements.txt` and automati
 
 ```bash
 az webapp config appsettings set \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+ --resource-group $RG \
+ --name $APP_NAME \
+ --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
 ```
 
 ### Set Startup Command
 
 ```bash
 az webapp config set \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --startup-file "gunicorn --bind=0.0.0.0:\$PORT src.app:app"
+ --resource-group $RG \
+ --name $APP_NAME \
+ --startup-file "gunicorn --bind=0.0.0.0:\$PORT src.app:app"
 ```
 
-> ⚠️ `$PORT` is an environment variable automatically injected by App Service. Escape it with backslash.
-
-![IMAGE: Startup Command in Configuration]
-`📸 Screenshot: Azure Portal → App Service → Configuration → General settings → Startup Command`
+> `$PORT` is an environment variable automatically injected by App Service. Escape it with backslash.
 
 ---
 
@@ -240,9 +215,9 @@ az webapp config set \
 
 ```bash
 az webapp up \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --runtime "PYTHON|3.11"
+ --resource-group $RG \
+ --name $APP_NAME \
+ --runtime "PYTHON|3.11"
 ```
 
 This command:
@@ -255,16 +230,13 @@ This command:
 
 ```bash
 az webapp show \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --query "state" \
-    --output tsv
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query "state" \
+ --output tsv
 ```
 
 **Output:** `Running`
-
-![IMAGE: Deployment terminal output]
-`📸 Screenshot: az webapp up deployment logs in terminal`
 
 ---
 
@@ -274,10 +246,10 @@ az webapp show \
 
 ```bash
 APP_URL="https://$(az webapp show \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --query defaultHostName \
-    --output tsv)"
+ --resource-group $RG \
+ --name $APP_NAME \
+ --query defaultHostName \
+ --output tsv)"
 
 echo "App URL: $APP_URL"
 ```
@@ -304,9 +276,6 @@ curl $APP_URL/
 {"message": "Hello from Azure App Service!", "environment": "development"}
 ```
 
-![IMAGE: App in browser]
-`📸 Screenshot: Browser accessing https://<app-name>.azurewebsites.net`
-
 ---
 
 ## Step 8: Check Logs
@@ -315,24 +284,21 @@ curl $APP_URL/
 
 ```bash
 az webapp log config \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --application-logging filesystem \
-    --level information
+ --resource-group $RG \
+ --name $APP_NAME \
+ --application-logging filesystem \
+ --level information
 ```
 
 ### Real-time Log Stream
 
 ```bash
 az webapp log tail \
-    --resource-group $RG \
-    --name $APP_NAME
+ --resource-group $RG \
+ --name $APP_NAME
 ```
 
 Send a request and logs appear in real-time.
-
-![IMAGE: Log stream]
-`📸 Screenshot: az webapp log tail output`
 
 ---
 
@@ -343,9 +309,6 @@ Send a request and logs appear in real-time.
 View deployment history and status.
 
 **Path:** App Service → Deployment Center
-
-![IMAGE: Deployment Center]
-`📸 Screenshot: Azure Portal → App Service → Deployment Center`
 
 ### Kudu (SCM) Site
 
@@ -359,9 +322,6 @@ https://<app-name>.scm.azurewebsites.net
 - File browser: Check `/home/site/wwwroot`
 - Bash console: Run commands inside container
 - Environment variables
-
-![IMAGE: Kudu file browser]
-`📸 Screenshot: Kudu → Debug console → Bash → /home/site/wwwroot`
 
 ---
 
@@ -380,9 +340,9 @@ https://<app-name>.scm.azurewebsites.net
 ```bash
 # Deployment logs
 az webapp log deployment list \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --output table
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output table
 
 # App logs
 az webapp log tail --resource-group $RG --name $APP_NAME
@@ -436,9 +396,13 @@ In the next post, we'll cover **App Settings and Environment Variable Management
 
 ## References
 
+### Official Docs
 - [Quickstart: Deploy a Python web app (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/quickstart-python)
 - [Configure a Linux Python app (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/configure-language-python)
 - [Kudu service overview (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/resources-kudu)
+
+### Related Series
+- [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
 

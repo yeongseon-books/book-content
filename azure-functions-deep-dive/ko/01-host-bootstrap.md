@@ -1,10 +1,70 @@
 # 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기
 
-> Azure Functions Deep Dive 시리즈 (1/7)
+> Azure Functions Deep Dive 시리즈 (1/6)
 
-입문 시리즈의 3화에서 “Functions는 Host 프로세스(.NET)와 Worker 프로세스(여러분의 언어)를 분리해서 띄우고, 둘은 gRPC로 대화한다”고 적었습니다. 그 한 줄을 진짜로 검증할 시간입니다. 이 심화 시리즈는 [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) 레포를 직접 읽으며 한 화에 한 단계씩, 호스트 부팅부터 함수 호출, 스케일링, 콜드 스타트, 그리고 학계의 분석까지 따라갑니다.
+입문 시리즈 3화에서 “Functions는 Host 프로세스(.NET)와 Worker 프로세스(여러분의 언어)를 분리해서 띄우고, 둘은 gRPC로 대화한다”고 적었습니다. 이번 심화 시리즈는 그 문장을 실제 호스트 코드로 확인하는 작업입니다. [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) 저장소를 직접 읽으면서, 호스트 부팅부터 함수 호출, 스케일링, 콜드 스타트까지 순서대로 따라갑니다.
 
-이 글은 그 첫걸음입니다. 주제는 단 하나, **Function App 인스턴스가 켜진 직후 무슨 일이 벌어지는가**입니다. 기준 커밋은 `5e59423`로 고정합니다. 모든 코드 인용에는 라인 단위 permalink가 달려 있어서 직접 클릭해 검증할 수 있습니다.
+이번 글의 주제는 하나입니다. **Function App 인스턴스가 켜진 직후 무슨 일이 벌어지는가**입니다. 기준 커밋은 `5e59423`입니다. 모든 코드 인용은 이 커밋에 고정합니다.
+
+---
+
+## 전체 그림 — Azure Functions 호스트 한 인스턴스
+
+이 그림이 이번 심화 시리즈 전체의 지도입니다.
+뒤의 화들은 아래 박스 하나씩을 확대해서 보는 구조입니다.
+먼저 위치를 잡아 두면, 이후의 세부 코드가 훨씬 덜 낯섭니다.
+
+```mermaid
+flowchart LR
+    subgraph SRC[Event sources]
+        direction TB
+        HTTP[HTTP]
+        TIMER[Timer]
+        QUEUE[Queue]
+        BLOB[Blob]
+        SB[Service Bus]
+        EH[Event Hub]
+        COSMOSIN[Cosmos DB]
+    end
+
+    subgraph HOST[Functions Host (.NET)]
+        direction TB
+        WJSHS[WebJobsScriptHostService] --> SHM[ScriptHostManager] --> SH[ScriptHost]
+        SH --> IDX[Indexer]
+        SH --> WRK[Workers]
+        SH --> LSN[Listeners]
+        SH --> JH[JobHost]
+    end
+
+    subgraph WORKER[Worker process]
+        direction TB
+        LW[Language Worker<br/>Python / Node / Java / ...]
+    end
+
+    subgraph OUT[Output bindings / external systems]
+        direction TB
+        HTTPRES[HTTP response]
+        QUEUEOUT[Queue]
+        BLOBOUT[Blob]
+        COSMOSOUT[Cosmos DB]
+    end
+
+    HTTP --> LSN
+    TIMER --> LSN
+    QUEUE --> LSN
+    BLOB --> LSN
+    SB --> LSN
+    EH --> LSN
+    COSMOSIN --> LSN
+
+    WRK -->|gRPC (FunctionRpcService)| LW
+    JH --> HTTPRES
+    JH --> QUEUEOUT
+    JH --> BLOBOUT
+    JH --> COSMOSOUT
+```
+
+이번 1화는 가운데 Host가 어떻게 부팅되는지를 보고, 2화는 Worker 프로세스, 3화는 둘 사이의 `gRPC (FunctionRpcService)` 채널, 4화는 dispatcher와 invocation, 5화는 스케일링, 6화는 placeholder와 콜드 스타트를 확대합니다.
 
 ---
 
@@ -27,14 +87,14 @@ flowchart LR
 
 진입점은 `Program.cs`이지만, Functions의 “호스트 라이프사이클”의 진짜 주인공은 `WebJobsScriptHostService`라는 이름의 `IHostedService`입니다. ASP.NET Core의 표준 호스팅 모델 위에 얹혀 있어서, 다른 서비스들과 마찬가지로 `StartAsync` / `StopAsync`로 라이프사이클이 관리됩니다.
 
-핵심 메서드는 `StartAsync`입니다. 이 안에서 다음 일이 일어납니다.
+핵심 메서드는 `StartAsync`입니다. 여기서 다음 일이 일어납니다.
 
 - 호스트 헬스 모니터(`HostHealthMonitor`) 와이어링
 - `ScriptHost` 인스턴스를 만들고 `InitializeAsync` 호출
 - 실패 시 재시도 / 재시작 정책 적용
 - 부팅 상태 이벤트 publish (Standby → Running 전이 등)
 
-> 📎 코드: [`WebJobsScriptHostService.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs)
+> 코드 위치: [`WebJobsScriptHostService.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs)
 
 여기서 중요한 설계 결정 하나. **`WebJobsScriptHostService`는 “호스트 자체”가 아닙니다.** 호스트 라이프사이클을 “관리”하는 외피입니다. 진짜 호스트는 안쪽의 `ScriptHost`입니다. 외피와 알맹이를 분리한 덕분에, 호스트가 죽었을 때 외피가 새 알맹이를 만들어 갈아끼우는 식의 회복이 가능합니다.
 
@@ -42,7 +102,7 @@ flowchart LR
 
 ## 2단계: `ScriptHost.InitializeAsync` — 진짜 부팅이 일어나는 곳
 
-`WebJobsScriptHostService`가 호출하는 `ScriptHost.InitializeAsync` 안에서, Functions가 “함수 앱답게” 행동하기 위한 모든 준비가 일어납니다. 단계별로 풀어 보겠습니다.
+`WebJobsScriptHostService`가 호출하는 `ScriptHost.InitializeAsync` 안에서, Functions가 함수 앱으로 동작하기 위한 준비가 진행됩니다.
 
 ```mermaid
 sequenceDiagram
@@ -60,14 +120,16 @@ sequenceDiagram
     Script->>Indexer: 함수 메타데이터 인덱싱
     Indexer-->>Script: 함수 N개 발견
     Script->>Workers: Language Worker 채널 준비
+    Script-->>Service: InitializeAsync 완료
+    Script->>Script: base.StartAsyncCore()
     Script->>Job: JobHost.StartAsync()
     Job-->>Script: 트리거 리스너 활성화 완료
     Script-->>Service: 부팅 완료
 ```
 
-이 시퀀스의 각 단계가 다음 화들의 주제입니다. 이번 화에서는 1·2단계(설정 로드·함수 인덱싱)에 집중하고, Worker 채널 준비는 2화로, JobHost는 4화로 넘깁니다.
+여기서 순서가 중요합니다. `ScriptHost.StartAsyncCore()`는 먼저 `InitializeAsync()`를 끝까지 실행한 뒤, 그 다음에 `base.StartAsyncCore()`를 호출합니다. 즉 `JobHost.StartAsync()`에 따른 트리거 리스너 활성화는 `InitializeAsync` 내부가 아니라 **그 다음 단계**입니다. 이번 화에서는 설정 로드와 함수 인덱싱에 집중하고, Worker 채널 준비는 2화로, 실제 호출 경로는 4화로 넘깁니다.
 
-> 📎 코드: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
+> 코드 위치: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
 
 ---
 
@@ -82,11 +144,11 @@ sequenceDiagram
 - `extensions.http` — HTTP 트리거 라우팅 / 동시성
 - `functionTimeout` — 단일 호출 타임아웃
 
-> 📎 코드: [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Configuration/HostJsonFileConfigurationSource.cs)
+> 코드 위치: [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/HostJsonFileConfigurationSource.cs)
 
 `host.json`의 값은 곧장 옵션 객체로 매핑됩니다. 예를 들어 `functionTimeout`은 `ScriptJobHostOptionsSetup.ConfigureFunctionTimeout`에서 `ScriptJobHostOptions.FunctionTimeout`에 들어갑니다.
 
-> 📎 코드: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
+> 코드 위치: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 
 ```mermaid
 graph LR
@@ -100,7 +162,7 @@ graph LR
     Setup3 --> Opts3[QueuesOptions]
 ```
 
-이 그림이 `host.json`의 모든 비밀입니다. **파일의 한 키 → IConfiguration의 한 노드 → Setup 클래스 → 옵션 객체 한 필드**라는 깔끔한 1:1 매핑이 끝까지 유지됩니다.
+이 그림이 `host.json`이 코드로 들어오는 경로입니다. **파일의 한 키 → IConfiguration의 한 노드 → Setup 클래스 → 옵션 객체 한 필드**라는 매핑이 끝까지 유지됩니다.
 
 운영자가 알면 좋은 사실 두 개:
 
@@ -156,38 +218,30 @@ stateDiagram-v2
 
 이번 글에서 따라간 흐름을 한 문단으로 압축하면 다음과 같습니다.
 
-> ASP.NET Core 호스트가 부팅하면서 `WebJobsScriptHostService`라는 `IHostedService`를 시작한다. 그 안에서 `ScriptHost`가 만들어지고, `InitializeAsync`가 호출되어 host.json과 환경변수에서 옵션을 읽고, 함수 메타데이터를 인덱싱한 뒤, JobHost를 띄워 트리거 리스너를 활성화한다. 호스트 헬스 모니터가 이 모든 과정을 지켜보고 있고, 문제가 생기면 호스트를 갈아끼운다.
+> ASP.NET Core 호스트가 부팅하면서 `WebJobsScriptHostService`라는 `IHostedService`를 시작합니다. 그 안에서 `ScriptHost`가 만들어지고 `InitializeAsync`가 먼저 실행되어 host.json과 환경변수에서 옵션을 읽고 함수 메타데이터를 인덱싱합니다. 그 단계가 끝난 뒤에 `JobHost.StartAsync`가 실행되어 트리거 리스너가 활성화됩니다. 호스트 헬스 모니터는 이 전체 과정을 감시하고, 문제가 생기면 호스트를 다시 만듭니다.
 
 다음 화의 주제는 이 그림의 사각지대 하나입니다. **`InitializeAsync` 안에서 “Worker 채널 준비”라고 적힌 박스에서 무슨 일이 벌어지는가.** Node.js·Python·Java 같은 다른 언어 워커 프로세스가 어떻게 띄워지는지, OS의 `Process.Start` 직전까지 따라갑니다.
 
 ---
 
-## 시리즈 목차
+## 시리즈 안에서의 위치
 
-| # | 제목 |
-|---|---|
-| 1 | **호스트 부팅 — `WebJobsScriptHostService`부터 따라가기** ← 현재 글 |
-| 2 | Worker 프로세스 — 다국어는 어떻게 가능한가 |
-| 3 | gRPC EventStream — Host와 Worker의 대화 프로토콜 |
-| 4 | 함수 호출의 실제 — Dispatcher와 InvocationRequest |
-| 5 | 플랜별 스케일링의 내부 — Scale Controller가 보는 것 |
-| 6 | 콜드 스타트와의 전쟁 — Placeholder Mode와 Specialization |
-| 7 | 학계가 본 Azure Functions — 논문이 말하는 것 |
+이 글은 Azure Functions Deep Dive 시리즈 1화입니다. 이번 화에서 호스트 부팅 순서를 잡았으니, 2화에서는 같은 인스턴스 옆에서 뜨는 Worker 프로세스로 넘어가고, 3화와 4화에서는 호스트와 워커 사이의 gRPC 채널과 실제 함수 호출 경로를 따라갑니다. 그 뒤로 5화의 스케일링, 6화의 placeholder와 콜드 스타트로 이어집니다.
 
 ---
 
 ## References
 
-**소스코드 (commit `5e59423`)**
+### 1차 출처 (호스트 코드, commit `5e59423`)
 - [`WebJobsScriptHostService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs)
 - [`ScriptHost.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
-- [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Configuration/HostJsonFileConfigurationSource.cs)
+- [`HostJsonFileConfigurationSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/HostJsonFileConfigurationSource.cs)
 - [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 - [PR #4210 — `FUNCTIONS_WORKER_PROCESS_COUNT` 도입](https://github.com/Azure/azure-functions-host/pull/4210)
 
-**공식 문서**
+### 2차 출처
 - [host.json reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-host-json)
 - [Azure Functions app settings reference](https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings)
 
-**관련 시리즈**
+### 시리즈 다른 화
 - [Azure Functions 101 — 입문편](../../azure-functions-101/ko/) (특히 3화 “Host와 Worker”)

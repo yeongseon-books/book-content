@@ -6,11 +6,11 @@ Over the last two posts, we built up a mental model: triggers wake your function
 
 The Azure Functions Host is written in .NET. Yet we happily write functions in Python, Node.js, and Java. **How does code in another language end up running inside a .NET host?** That's what this post is about.
 
-Here's the one-line answer up front:
+Here’s the one-line answer up front:
 
 > Functions runs the **Host process (.NET)** and a **Worker process (in your language)** as two separate processes, and they talk to each other over **gRPC**.
 
-Let's unpack that line, with diagrams.
+Let’s unpack that line with diagrams.
 
 ---
 
@@ -39,9 +39,9 @@ This split is the single most important design decision in Functions. So why was
 
 ---
 
-## Why split them — the secret behind multi-language support
+## Why split them — how one host works with multiple runtimes
 
-If Host and Worker lived in the same process, the Host would have to embed every language runtime directly — V8, CPython, JVM, and friends. That's effectively impossible. Each language has its own GC, memory model, and dependency story, and cramming them into one process is a recipe for endless conflicts.
+If Host and Worker lived in the same process, the Host would have to embed every language runtime directly: V8, CPython, the JVM, and everything around them. That is a messy architecture. Each runtime brings its own GC, memory model, and dependency story, and packing them into one process is an invitation to conflict.
 
 Splitting them makes the answer simple.
 
@@ -49,9 +49,9 @@ Splitting them makes the answer simple.
 - The Worker **runs on its language's standard runtime, unmodified.** A Node.js Worker is just a regular Node.js process. A Python Worker is just a regular Python process.
 - The two sides only ever talk through a **language-neutral protocol (gRPC + Protobuf).**
 
-Adding a new language becomes "implement a gRPC client in that language." You don't have to touch the Host at all. In fact, the [`azure-functions-host`](https://github.com/Azure/azure-functions-host) repo has per-language config files like `worker.config.json` that describe which executable to launch and how.
+Adding a new language becomes “implement a Worker for that language and make it speak the protocol.” The Host-side process management lives in [`azure-functions-host`](https://github.com/Azure/azure-functions-host), while per-language `worker.config.json` files live in the language worker repositories. Those config files tell the platform which executable to launch and with which arguments.
 
-> ⚠️ **One exception**: the .NET in-process model runs inside the Host process itself. That's a historical quirk, and Microsoft is consolidating .NET onto the isolated worker (separate process) model going forward. For new projects, isolated is the recommended path.
+> Note: the .NET in-process model runs inside the Host process itself. It is the historical exception. For new projects, the isolated worker model is the safer default.
 
 ---
 
@@ -132,9 +132,9 @@ This is a third axis sitting between "scale up" and "scale out." On top of **gro
 
 ---
 
-## How to verify any of this — it's all open source
+## How to verify any of this — the architecture is open source
 
-None of the above is speculation. The Functions Host is fully open source at [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host), and anyone can read the code. The protobuf file that defines how Host and Worker communicate lives at [`FunctionRpc.proto`](https://github.com/Azure/azure-functions-host). In other words, every claim in this post is verifiable.
+None of the above is speculative. The Functions Host is open source at [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host), and the protocol contract between Host and Worker is published separately at [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf). Every core claim in this post is traceable to code.
 
 The companion series, **Azure Functions Deep Dive**, walks through that code directly to answer questions like:
 
@@ -153,32 +153,23 @@ That wraps up the "structure of Functions" portion of the series. The next post 
 
 ---
 
-## Series table of contents
-
-| # | Title |
-|---|---|
-| 1 | [What is Azure Functions? — A world where events call your functions](./01-what-is-azure-functions.md) |
-| 2 | [Triggers and Bindings — Everything about function I/O](./02-triggers-and-bindings.md) |
-| 3 | **Host and Worker — Who actually runs your functions** ← current post |
-| 4 | Deploying your first function — From local to Azure |
-| 5 | The four plans — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | Scaling and cold starts — The two faces of serverless |
-| 7 | Monitoring and operational basics |
+This is part 3 of the Azure Functions 101 series. Parts 1 and 2 covered the mental model, triggers, and bindings; this post explains the execution boundary between the Host and the Worker. The next posts build on that model with local development, deployment, plan selection, scaling, and operations.
 
 ---
 
 ## References
 
-**Official documentation**
+**Official Docs**
 - [Azure Functions runtime versions overview](https://learn.microsoft.com/en-us/azure/azure-functions/functions-versions)
 - [Use multiple worker processes (`FUNCTIONS_WORKER_PROCESS_COUNT`)](https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings)
 - [.NET isolated worker model](https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-isolated-process-guide)
 
-**Open source code**
+**Source Code**
 - [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) — the Host itself
+- [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) — the Host/Worker protocol contract
 - [`Azure/azure-functions-nodejs-worker`](https://github.com/Azure/azure-functions-nodejs-worker)
 - [`Azure/azure-functions-python-worker`](https://github.com/Azure/azure-functions-python-worker)
 - [`Azure/azure-functions-java-worker`](https://github.com/Azure/azure-functions-java-worker)
 
-**Related series**
-- Azure Functions Deep Dive — a deeper series that traces the Host/Worker split at the code level
+**Related Series**
+- [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/) — a deeper series that traces the Host/Worker split at the code level

@@ -1,7 +1,5 @@
 # Request Lifecycle: How Requests Reach Your App
 
-> Azure App Service 101 Series (2/7)
-
 "Why is my app returning a 502 error?" "Response times suddenly increased—what's the cause?"
 
 To answer these questions, you need to understand the **complete journey of a request reaching your app**. In this post, we'll walk through the Azure App Service Request Lifecycle step by step.
@@ -17,8 +15,6 @@ Client → DNS → Azure Load Balancer → App Service Frontend → Worker Insta
 ```
 
 Issues can occur at each stage, resulting in different error messages.
-
-![Request Lifecycle flow diagram](../../assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
 
 ---
 
@@ -46,9 +42,6 @@ nslookup myapp.azurewebsites.net
 openssl s_client -connect myapp.azurewebsites.net:443 -servername myapp.azurewebsites.net
 ```
 
-![IMAGE: Custom Domain settings]
-`📸 Screenshot: Azure Portal → App Service → Custom domains`
-
 ---
 
 ## Stage 2: Frontend Routing
@@ -62,7 +55,7 @@ The App Service Frontend performs these roles:
 | Access Restriction Evaluation | IP restrictions, auth checks |
 | Instance Selection | Routes to healthy Worker |
 
-### ⚠️ What If Frontend Fails?
+### When the frontend is the failure point
 
 If no healthy backend exists, requests fail **before your app code even runs**.
 
@@ -75,27 +68,24 @@ If no healthy backend exists, requests fail **before your app code even runs**.
 ```bash
 # Check access restriction settings
 az webapp config access-restriction show \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --output json
+ --resource-group $RG \
+ --name $APP_NAME \
+ --output json
 ```
 
 **Example output:**
 ```json
 {
-  "ipSecurityRestrictions": [
-    {
-      "action": "Allow",
-      "ipAddress": "203.0.113.0/24",
-      "name": "corp-office",
-      "priority": 100
-    }
-  ]
+ "ipSecurityRestrictions": [
+ {
+ "action": "Allow",
+ "ipAddress": "203.0.113.0/24",
+ "name": "corp-office",
+ "priority": 100
+ }
+ ]
 }
 ```
-
-![IMAGE: Access Restrictions settings]
-`📸 Screenshot: Azure Portal → App Service → Networking → Access restrictions`
 
 ---
 
@@ -108,10 +98,10 @@ Inside the Worker instance, a local reverse proxy forwards requests to the app p
 **Key point:** Your app must bind to the **port provided by the platform**.
 
 ```python
-# ❌ Wrong - hardcoded port
+# Hardcoded local port
 app.run(host="0.0.0.0", port=5000)
 
-# ✅ Correct - read port from environment variable
+# Read the port from the environment
 import os
 port = int(os.environ.get("PORT", 8000))
 app.run(host="0.0.0.0", port=port)
@@ -120,9 +110,6 @@ app.run(host="0.0.0.0", port=port)
 **Common mistakes:**
 - Works locally but fails after deployment
 - Starts successfully but requests fail
-
-![IMAGE: Startup Command in General Settings]
-`📸 Screenshot: Azure Portal → App Service → Configuration → General settings`
 
 ---
 
@@ -169,17 +156,17 @@ App Service has multiple levels of timeouts:
 ### Design Guidelines
 
 ```python
-# ❌ Bad pattern - long-running work in HTTP request
+# Long-running work inside the request path
 @app.route('/export')
 def export():
-    # 10-minute data processing...
-    return huge_result  # Timeout risk!
+ # 10-minute data processing...
+ return huge_result # Timeout risk!
 
-# ✅ Good pattern - async processing
+# Hand the long job off to async processing
 @app.route('/export')
 def export():
-    job_id = queue_export_job()
-    return {"status": "accepted", "jobId": job_id}, 202
+ job_id = queue_export_job()
+ return {"status": "accepted", "jobId": job_id}, 202
 ```
 
 **Principles:**
@@ -216,13 +203,10 @@ Client B ─(Affinity Cookie)─→ Instance 1
 ```bash
 # Disable ARR Affinity
 az webapp update \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --client-affinity-enabled false
+ --resource-group $RG \
+ --name $APP_NAME \
+ --client-affinity-enabled false
 ```
-
-![IMAGE: ARR Affinity in Configuration]
-`📸 Screenshot: Azure Portal → App Service → Configuration → General settings → ARR affinity`
 
 ---
 
@@ -234,8 +218,8 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 
 | State | Traffic |
 |-------|---------|
-| Healthy | Included in routing pool ✅ |
-| Unhealthy | Excluded from pool ❌ |
+| Healthy | Included in the routing pool |
+| Unhealthy | Removed from the routing pool |
 | Recovering | Re-included after probes pass |
 
 ### Health Probe Design Principles
@@ -243,20 +227,17 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 ```python
 @app.route('/health')
 def health():
-    # 1. Keep it lightweight
-    # 2. Check only dependencies critical for traffic handling
-    # 3. Avoid slow external calls
-    
-    try:
-        # Simple check of critical dependencies
-        db.execute("SELECT 1")
-        return {"status": "healthy"}, 200
-    except Exception as e:
-        return {"status": "unhealthy", "reason": str(e)}, 503
+ # 1. Keep it lightweight
+ # 2. Check only dependencies critical for traffic handling
+ # 3. Avoid slow external calls
+ 
+ try:
+ # Simple check of critical dependencies
+ db.execute("SELECT 1")
+ return {"status": "healthy"}, 200
+ except Exception as e:
+ return {"status": "unhealthy", "reason": str(e)}, 503
 ```
-
-![IMAGE: Health check settings]
-`📸 Screenshot: Azure Portal → App Service → Monitoring → Health check`
 
 ---
 
@@ -274,9 +255,6 @@ Deployment Slots help minimize user impact during deployments.
 **Benefits:**
 - Reduces cold start exposure
 - Easy rollback of failed deployments
-
-![IMAGE: Deployment slots]
-`📸 Screenshot: Azure Portal → App Service → Deployment slots`
 
 ---
 
@@ -299,21 +277,18 @@ Connect each stage to diagnose issues:
 ```bash
 # Enable HTTP logging
 az webapp log config \
-    --resource-group $RG \
-    --name $APP_NAME \
-    --application-logging filesystem \
-    --detailed-error-messages true \
-    --failed-request-tracing true \
-    --web-server-logging filesystem
+ --resource-group $RG \
+ --name $APP_NAME \
+ --application-logging filesystem \
+ --detailed-error-messages true \
+ --failed-request-tracing true \
+ --web-server-logging filesystem
 
 # Real-time log stream
 az webapp log tail \
-    --resource-group $RG \
-    --name $APP_NAME
+ --resource-group $RG \
+ --name $APP_NAME
 ```
-
-![IMAGE: Log stream]
-`📸 Screenshot: Azure Portal → App Service → Monitoring → Log stream`
 
 ---
 
@@ -361,9 +336,13 @@ In the next post, we'll explore **Hosting Models** - App Service Plan selection 
 
 ## References
 
+### Official Docs
 - [Deployment Slots in App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/deploy-staging-slots)
 - [Inbound and outbound IPs (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/overview-inbound-outbound-ips)
 - [Troubleshoot diagnostic logs (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/troubleshoot-diagnostic-logs)
+
+### Related Series
+- [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
 

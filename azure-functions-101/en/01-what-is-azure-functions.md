@@ -26,26 +26,26 @@ If a traditional web app is a restaurant that keeps its doors open from morning 
 
 ## Start With the Smallest Example — Hello, Function
 
-A short snippet of code beats a long explanation. Here is the simplest possible function that returns a greeting when an HTTP request comes in (Node.js, v4 programming model).
+A short snippet of code beats a long explanation. Here is the simplest possible function that returns a greeting when an HTTP request comes in, using the Azure Functions Python v2 programming model.
 
-```javascript
-const { app } = require('@azure/functions');
+```python
+import azure.functions as func
 
-app.http('hello', {
-    methods: ['GET'],
-    authLevel: 'anonymous',
-    handler: async (request, context) => {
-        const name = request.query.get('name') ?? 'world';
-        return { body: `Hello, ${name}!` };
-    }
-});
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+
+@app.function_name(name="hello")
+@app.route(route="hello", methods=["GET"])
+def hello(request: func.HttpRequest) -> func.HttpResponse:
+    name = request.params.get("name", "world")
+    return func.HttpResponse(f"Hello, {name}!")
 ```
 
 Short, but the heart of Azure Functions is all in there.
 
-- `app.http('hello', ...)` — a declaration that **this function is bound to an HTTP trigger**.
-- `handler` — the body that runs when the trigger fires.
-- `return { body: ... }` — that's how you send the result back.
+- `@app.route(...)` — a declaration that **this function is bound to an HTTP trigger**.
+- `def hello(...)` — the body that runs when the trigger fires.
+- `func.HttpResponse(...)` — that's how you send the result back.
 
 There's no code to start a server, open a port, or configure a router. **You only describe "when to wake up" and "what to do."** Everything else is the Functions Host's job.
 
@@ -60,8 +60,8 @@ sequenceDiagram
     participant Func as hello function
     Client->>Trigger: GET /api/hello?name=Sisyphus
     Trigger->>Host: Trigger fired
-    Host->>Func: handler(request, context) called
-    Func-->>Host: { body: "Hello, Sisyphus!" }
+    Host->>Func: hello(request) called
+    Func-->>Host: HttpResponse("Hello, Sisyphus!")
     Host-->>Client: 200 OK
 ```
 
@@ -111,7 +111,7 @@ Four words run through this entire series. In Part 1, just learn the names; from
 - **Trigger** — the kind of event that wakes a function. HTTP requests, timers, queue messages, Blob uploads, Event Hub, Service Bus, Cosmos DB change feed, and so on. **Each function is bound to exactly one trigger.**
 - **Binding** — a mechanism that "declaratively" connects a function's input and output to external resources. Wire up Cosmos DB as an output binding, for example, and just returning an object from your function is enough to save it to the DB. Less boilerplate.
 - **Host** — the runtime process that actually loads functions, listens for triggers, and invokes your function code. It's open source; the code lives in the [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) repo.
-- **Function App** — the unit of deployment, billing, and scaling. **One Function App has one Host, and contains multiple functions inside it.** Functions in the same Function App live and die together in the same process.
+- **Function App** — the unit of deployment, billing, and scaling. Functions are grouped into a Function App, but execution happens **per instance**. When a Function App scales out, Azure creates multiple instances, and **each instance gets its own Host**. For Node.js, Python, and Java, your function code does not run inside that Host process; it runs in a separate **language worker process**.
 
 Here are those four concepts on a single diagram:
 
@@ -125,21 +125,24 @@ flowchart LR
         S5[Event Hub]
     end
 
-    subgraph FunctionApp [Function App - deployment unit]
+    subgraph FunctionApp [Function App instance]
         Host[Functions Host]
+        Worker[Language Worker<br/>Python / Node.js / Java]
         subgraph Funcs [Functions]
             F1[OrderHandler<br/>HTTP Trigger]
             F2[InvoiceProcessor<br/>Queue Trigger]
             F3[ThumbnailMaker<br/>Blob Trigger]
         end
-        Host --> F1
-        Host --> F2
-        Host --> F3
+        Host --> Worker
+        Worker --> F1
+        Worker --> F2
+        Worker --> F3
     end
 
     subgraph Outputs [Output binding targets]
         O1[Cosmos DB]
         O2[Service Bus]
+        O3[Blob Storage]
     end
 
     S1 --> F1
@@ -147,11 +150,12 @@ flowchart LR
     S3 --> F3
     F1 --> O1
     F2 --> O2
+    F3 --> O3
 ```
 
-Two things to remember from this picture: **(1) the Host is the shared runtime for the functions, and (2) triggers and bindings are the interface between your functions and the outside world.** The combination of those two is what makes Functions feel like a real "event-driven service."
+Two things matter in this picture: **(1) the Host is a per-instance runtime, while your code runs in a worker process for non-.NET languages, and (2) triggers and bindings are the interface between your functions and the outside world.** That combination is what makes Functions work as an event-driven platform.
 
-> 💡 If you want to go deeper: how the Host actually loads functions (and how it pulls off support for multiple languages) is something we'll cover by walking through the source code in a separate deep-dive series, **Azure Functions Deep Dive**.
+If you want to go deeper, the companion series **Azure Functions Deep Dive** walks through how the Host starts functions and how it works with multiple language runtimes.
 
 ---
 
@@ -191,32 +195,19 @@ The next post dives into the leftmost part of that picture: **triggers and bindi
 
 ---
 
-## Series Table of Contents
-
-| # | Title |
-|---|---|
-| 1 | **What Is Azure Functions? — A World Where Events Call Your Code** ← current post |
-| 2 | Triggers and Bindings — Everything About Function I/O |
-| 3 | Host and Worker — Who Actually Runs Your Function |
-| 4 | Your First Function Deployment — From Local to Azure |
-| 5 | The Four Plans — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | Scaling and Cold Starts — The Two Faces of Serverless |
-| 7 | Monitoring and Operations Basics |
+This is part 1 of the Azure Functions 101 series. With the mental model in place, part 2 moves into triggers and bindings, and part 3 explains the Host and Worker split behind execution. The later posts cover deployment, plan selection, scaling and cold starts, and day-2 operations.
 
 ---
 
 ## References
 
-**Official documentation**
+**Official Docs**
 - [Azure Functions overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview)
 - [Azure Functions best practices — Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-functions/functions-best-practices)
 - [Azure Functions triggers and bindings concepts](https://learn.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings)
 
-**Open-source code**
+**Source Code**
 - [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) — the Functions Host itself
 
-**Further reading**
-- [SIOS Tech Lab — Azure Functions の概要とプラン別スケーリング](https://tech-lab.sios.jp/archives/35541) (the Japanese article that was the starting point for this series)
-
-**Related series**
-- [Azure App Service 101](../../azure-app-service-101/) — if you're curious about the comparison with always-on PaaS
+**Related Series**
+- [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/) — if you want the code-level version of the Host/Worker story

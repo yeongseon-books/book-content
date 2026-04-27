@@ -4,7 +4,7 @@
 
 In part 1, I said “every function is wired to exactly one trigger,” and “bindings are a declarative way to connect inputs and outputs.” Those two sentences are why Functions code can be so short. But for newcomers, the line between “what’s a trigger,” “what’s a binding,” and “where exactly does the magic start and end” tends to stay blurry.
 
-This post draws that line clearly. We’ll cover the kinds of triggers, the difference between input and output bindings, and what contract bindings actually are once you peel back the “magic.” By the end, you shouldn’t hesitate when you ask yourself “which trigger should I pick?” for a new function.
+This post draws that line clearly. We’ll cover the main trigger types, the difference between input and output bindings, and what bindings really are once you strip away the “magic.” By the end, picking a trigger for a new function should feel mechanical.
 
 ---
 
@@ -79,32 +79,32 @@ graph TD
 
 This is where Functions really shines. In a regular web app, “save to Cosmos DB” usually means: instantiate a client, attach credentials, grab a container handle, call `upsert`, handle errors. The boilerplate ends up longer than the actual function body.
 
-Bindings collapse all of that into a one-line declaration: “send this function’s output to this Cosmos DB container.” No exaggeration. Here’s an example:
+Bindings collapse all of that into a declaration that says “send this function’s output to this Cosmos DB container.” In the Azure Functions Python v2 model, it looks like this:
 
-```javascript
-const { app, output } = require('@azure/functions');
+```python
+import json
+import azure.functions as func
 
-const cosmosOut = output.cosmosDB({
-    databaseName: 'orders',
-    containerName: 'invoices',
-    connection: 'CosmosConnection'
-});
+app = func.FunctionApp()
 
-app.storageQueue('processOrder', {
-    queueName: 'orders-incoming',
-    connection: 'StorageConnection',
-    extraOutputs: [cosmosOut],
-    handler: async (queueItem, context) => {
-        const invoice = buildInvoice(queueItem);   // your business logic
-        context.extraOutputs.set(cosmosOut, invoice);
-        // That's it. No DB client, no upsert call.
-    }
-});
+
+@app.function_name(name="process_order")
+@app.queue_trigger(arg_name="msg", queue_name="orders-incoming", connection="StorageConnection")
+@app.cosmos_db_output(
+    arg_name="invoice_out",
+    database_name="orders",
+    container_name="invoices",
+    connection="CosmosConnection",
+)
+def process_order(msg: func.QueueMessage, invoice_out: func.Out[func.Document]) -> None:
+    queue_item = msg.get_json()
+    invoice = build_invoice(queue_item)  # your business logic
+    invoice_out.set(func.Document.from_json(json.dumps(invoice)))
 ```
 
 Plain English version of what this function does:
 
-> “When a message arrives on the queue (`storageQueue` trigger), turn it into an invoice and write the result into the `invoices` container in Cosmos DB (the `cosmosOut` output binding).”
+> “When a message arrives on the queue (`queue_trigger`), turn it into an invoice and write the result into the `invoices` container in Cosmos DB (`cosmos_db_output`).”
 
 The plumbing — connection management, auth, retries — is handled by **the Functions Host on your behalf**. All you declared was *where it should go*.
 
@@ -189,31 +189,24 @@ When you write `connection: 'StorageConnection'`, it means “use the value of t
 
 So far we’ve covered the *outer interface* of a function: how triggers wake it up and how bindings declaratively handle I/O. Next time we go one layer deeper: **“So who actually runs the function code, how, and inside which process?”**
 
-The answer is two words: **Host and Worker**. That’s where the secret lives behind how Functions can support Node.js, Python, Java, and .NET all at the same time.
+The answer is two words: **Host and Worker**. That’s where Functions’ support for Node.js, Python, Java, and .NET starts to make sense.
 
 ---
 
-## Series index
-
-| # | Title |
-|---|---|
-| 1 | [What is Azure Functions? — A world where events call functions](./01-what-is-azure-functions.md) |
-| 2 | **Triggers and Bindings — Everything about function I/O** ← current post |
-| 3 | Host and Worker — Who actually runs your function |
-| 4 | Your first function deployment — From local to Azure |
-| 5 | The four plans — Consumption / Flex Consumption / Premium / Dedicated |
-| 6 | Scaling and cold starts — The two faces of serverless |
-| 7 | Monitoring and operations basics |
+This is part 2 of the Azure Functions 101 series. Part 1 established the mental model; this post defines the trigger and binding surface you work with every day. Part 3 then moves under the covers and explains the Host/Worker execution model.
 
 ---
 
 ## References
 
-**Official documentation**
+**Official Docs**
 - [Azure Functions triggers and bindings concepts](https://learn.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings)
 - [Trigger and binding examples](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-example)
 - [Register Azure Functions binding extensions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-register)
 
-**Open source code**
+**Source Code**
 - [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host)
 - [`Azure/azure-webjobs-sdk-extensions`](https://github.com/Azure/azure-webjobs-sdk-extensions) — home of binding extensions
+
+**Related Series**
+- [Azure Functions Deep Dive](../../azure-functions-deep-dive/en/) — for the code-level view of how the Host and binding extensions behave

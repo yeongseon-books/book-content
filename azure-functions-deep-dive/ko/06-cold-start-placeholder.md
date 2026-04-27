@@ -1,6 +1,6 @@
 # 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
 
-> Azure Functions Deep Dive 시리즈 (6/7)
+> Azure Functions Deep Dive 시리즈 (6/6)
 
 5화에서 Scale Controller가 인스턴스 수를 늘리기로 결정하는 과정을 봤습니다. 이번 화는 그 다음에 일어나는 일입니다.
 
@@ -38,9 +38,9 @@ Placeholder Mode의 아이디어는 정확히 이 분리를 이용합니다.
 
 ---
 
-## Placeholder가 만들어 두는 것 — `StandbyManager.InitializeAsync`
+## Placeholder가 이미 해둔 것 — `StandbyManager.InitializeAsync`
 
-Functions 플랫폼은 사용자가 없는 상태에서도 워밍된 인스턴스 풀을 미리 만들어 둡니다. 이 인스턴스들은 진짜 사용자 앱이 아니라 **placeholder 앱**으로 시작합니다. placeholder 상태에서 호스트가 무엇을 미리 해두는지가 [`StandbyManager.InitializeAsync`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L160-L186)에 들어 있습니다.
+Functions 플랫폼은 사용자가 없는 상태에서도 워밍된 인스턴스 풀을 미리 만들어 둡니다. 이 인스턴스들은 진짜 사용자 앱이 아니라 **placeholder 앱**으로 시작합니다. placeholder 상태에서 호스트가 무엇을 미리 해두는지는 [`StandbyManager.InitializeAsync`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L173-L190)와 그 뒤 warmup 요청을 처리하는 [`HostWarmupMiddleware.WarmupInvoke`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L66-L85)를 같이 봐야 보입니다.
 
 ```csharp
 // src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
@@ -78,8 +78,8 @@ public async Task InitializeAsync()
 코드를 풀어 쓰면:
 
 1. `InitializedFromPlaceholder` 환경변수를 세팅 — 이 플래그는 나중에 진짜 앱이 시작됐을 때 "이 인스턴스는 placeholder에서 출발했다"는 표시로 쓰입니다.
-2. `CreateStandbyWarmupFunctions()` — placeholder 시점에서 쓸 가짜 함수 디렉토리를 만듭니다.
-3. 50ms 주기 타이머를 시작 — 사용자 요청이 오지 않더라도 specialization을 감지하기 위한 폴백 신호.
+2. `CreateStandbyWarmupFunctions()` — placeholder 시점에서 쓸 `WarmUp` 함수 디렉토리와 파일을 만듭니다.
+3. 50ms 주기 타이머를 시작 — 요청이 안 와도 specialization을 감지하기 위한 폴백 신호입니다.
 
 가짜 함수가 무엇인지는 같은 파일의 `CreateStandbyWarmupFunctions`를 보면 분명해집니다.
 
@@ -115,9 +115,9 @@ public static class WarmUpConstants
 }
 ```
 
-`PreJIT`, `coldstart.jittrace`라는 이름들이 보입니다. 이게 결정적인 단서입니다. **placeholder 모드에서 호스트는 가짜 `WarmUp` 함수를 한 번 실행하면서, JIT 트레이스 파일에 기록된 메서드들을 미리 컴파일해 둡니다.** 사용자 코드가 도착해서 같은 메서드 경로를 타면 JIT 비용이 거의 없는 상태로 실행됩니다.
+여기서 중요한 건 **이 상수 파일이 JIT 트레이스 파일 이름을 정의할 뿐, 실행 주체는 아니라는 점**입니다. `StandbyManager.InitializeAsync`는 [`CreateStandbyWarmupFunctions`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L210-L242)로 `WarmUp` 함수 파일을 만들고 타이머를 시작한 뒤 끝납니다. JIT 준비는 warmup 요청 경로에서 [`HostWarmupMiddleware.WarmupInvoke`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L66-L85)가 맡고, 그 안에서 [`PreJitPrepare`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L136-L153)를 호출해 `WarmUpConstants.JitTraceFileName`을 읽습니다. Linux Consumption이면 같은 경로에서 `WarmUpConstants.LinuxJitTraceFileName`도 추가로 처리합니다.
 
-이게 placeholder의 핵심입니다. 외부에서 보면 그냥 "워밍된 인스턴스 풀"이지만, 내부에서는 **공통 부트스트랩 + JIT 캐시까지 끝낸 상태의 호스트 프로세스**입니다.
+즉 placeholder의 실체는 두 단계입니다. 먼저 `StandbyManager`가 `WarmUp` 함수와 타이머를 준비하고, 그다음 warmup invocation 경로에서 `HostWarmupMiddleware`가 `coldstart.jittrace`를 돌려 공통 메서드 경로를 PreJIT합니다. 외부에서 보면 그냥 "워밍된 인스턴스 풀"이지만, 내부에서는 **공통 부트스트랩을 끝낸 뒤 warmup 경로에서 JIT까지 앞당겨 놓은 호스트 프로세스**입니다.
 
 ---
 
@@ -322,6 +322,7 @@ sequenceDiagram
     participant POOL as Placeholder Pool
     participant INST as Instance (호스트 프로세스)
     participant SBM as StandbyManager
+    participant MWMID as HostWarmupMiddleware
     participant MID as PlaceholderSpecialization<br/>Middleware
     participant SHM as ScriptHostManager
     participant USER as 첫 사용자 요청
@@ -329,8 +330,10 @@ sequenceDiagram
     PLAT->>POOL: 워밍된 placeholder 인스턴스 N개 유지
     POOL->>INST: VM 부팅 + .NET + Functions Host 로드
     INST->>SBM: InitializeAsync()
-    SBM->>SBM: WarmUp 함수 생성 + JIT 트레이스 실행
+    SBM->>SBM: WarmUp 함수 파일 생성
     SBM->>SBM: 50ms specialization timer 시작
+    PLAT->>MWMID: warmup invocation 경로 진입
+    MWMID->>MWMID: PreJitPrepare(coldstart.jittrace)
     Note over INST: placeholder ready<br/>(사용자 무관)
 
     PLAT->>INST: 사용자 앱 환경변수·콘텐츠 주입
@@ -391,13 +394,13 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 ## 정리 — 이 화에서 잡고 갈 모델
 
 - 콜드 스타트는 단일 비용이 아니라 **사용자 무관 부트스트랩 + 사용자별 specialization**의 합이다.
-- Functions 플랫폼은 placeholder 풀로 사용자 무관 부분을 미리 끝내 둔다. 호스트 코드의 `StandbyManager.InitializeAsync`가 그 placeholder를 만든다.
+- Functions 플랫폼은 placeholder 풀로 사용자 무관 부분을 미리 끝내 둔다. `StandbyManager.InitializeAsync`는 `WarmUp` 함수 파일과 타이머를 준비하고, `HostWarmupMiddleware.WarmupInvoke`가 warmup 경로에서 `coldstart.jittrace`를 실행한다.
 - 사용자 앱이 인스턴스에 할당되면 첫 HTTP 요청(`PlaceholderSpecializationMiddleware`) 또는 50ms 타이머가 specialization을 트리거한다.
 - specialization은 환경 리셋 + 워커 specialization + ScriptHost 재시작의 시퀀스다. 이 시간이 사용자가 체감하는 콜드 스타트다.
 - 한 번 specialization이 끝나면 미들웨어가 자기 자신을 우회하도록 만들어 hot path 비용을 0으로 만든다.
 - 같은 호스트 코드지만 placeholder 풀 관리 정책과 Always Ready 설정이 플랜마다 달라서, **사용자가 체감하는 콜드 스타트는 플랜에 의해 결정된다.**
 
-다음 7화는 이 모든 메커니즘에 대한 학술적 관점을 봅니다. Microsoft 연구진이 직접 발표한 ATC'20 논문을 통해 placeholder와 같은 메커니즘이 어떤 관찰에서 나왔는지를 연결합니다.
+이 글로 Azure Functions Deep Dive 시리즈를 마무리합니다. 1화에서 호스트 부팅, 2화에서 워커 프로세스, 3·4화에서 gRPC와 dispatcher, 5화에서 스케일링을 다뤘고, 이번 6화에서는 같은 호스트 코드 위에 플랜이 어떻게 placeholder 정책을 다르게 얹어 콜드 스타트가 결정되는지를 따라갔습니다.
 
 ---
 
@@ -423,4 +426,3 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 - [입문 6화 — 스케일링과 콜드 스타트](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
 - [심화 1화 — Host Bootstrap](./01-host-bootstrap.md)
 - [심화 5화 — 스케일링 내부 동작](./05-scaling-internals.md)
-- [심화 7화 — 학술적 관점](./07-academic-perspective.md)

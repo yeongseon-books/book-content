@@ -1,7 +1,5 @@
 # Scaling 101: When to Scale Up vs Scale Out?
 
-> Azure App Service 101 Series (7/7) - Final
-
 "Traffic increased and the app is slow." "Want to reduce costs but maintain performance."
 
 **Scaling** is the key strategy for solving these problems. In this post, we'll cover the difference between Scale Up and Scale Out, when to choose each, and how to configure Autoscale.
@@ -11,15 +9,15 @@
 ## Two Directions of Scaling
 
 ```
-                    ┌─────────────┐
-                    │ Larger      │ ← Scale Up (Vertical)
-                    │ Instance    │
-                    └─────────────┘
-                           ↑
-┌───┐ ┌───┐ ┌───┐     ┌───┐
+ ┌─────────────┐
+ │ Larger │ ← Scale Up (Vertical)
+ │ Instance │
+ └─────────────┘
+ ↑
+┌───┐ ┌───┐ ┌───┐ ┌───┐
 │ S │ │ S │ │ S │ ... │ S │ ← Scale Out (Horizontal)
-└───┘ └───┘ └───┘     └───┘
-  ↑
+└───┘ └───┘ └───┘ └───┘
+ ↑
 More instances
 ```
 
@@ -27,8 +25,6 @@ More instances
 |-----------|------|-------------|
 | **Vertical** | Scale Up/Down | Change instance size |
 | **Horizontal** | Scale Out/In | Change instance count |
-
-![Scaling concept diagram](../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
 
 ---
 
@@ -53,32 +49,29 @@ More instances
 ```bash
 # Upgrade S1 → P1v3
 az appservice plan update \
-    --resource-group $RG \
-    --name $PLAN_NAME \
-    --sku P1v3
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --sku P1v3
 ```
 
 ### Check Current SKU
 
 ```bash
 az appservice plan show \
-    --resource-group $RG \
-    --name $PLAN_NAME \
-    --query "sku" \
-    --output json
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --query "sku" \
+ --output json
 ```
 
 **Output:**
 ```json
 {
-  "name": "P1v3",
-  "tier": "PremiumV3",
-  "capacity": 2
+ "name": "P1v3",
+ "tier": "PremiumV3",
+ "capacity": 2
 }
 ```
-
-![IMAGE: Scale up screen]
-`📸 Screenshot: Azure Portal → App Service Plan → Scale up (App Service plan)`
 
 ---
 
@@ -94,27 +87,27 @@ az appservice plan show \
 
 For Scale Out to work, your app must **store state externally**.
 
-| Stateless Pattern ✅ | Stateful Anti-pattern ❌ |
+| Stateless Pattern | Stateful Anti-pattern |
 |---------------------|-------------------------|
 | Store sessions in Redis | Store sessions in memory |
 | Store state in DB | Store state in local files |
 | Use distributed cache | Per-instance cache |
 
 ```python
-# ❌ Stateful - Problems with Scale Out
-user_sessions = {}  # Stored in memory
+# Stateful example that breaks scale-out
+user_sessions = {} # Stored in memory
 
 @app.route('/login')
 def login():
-    user_sessions[user_id] = session_data
+ user_sessions[user_id] = session_data
 
-# ✅ Stateless - Using Redis
+# Stateless version backed by Redis
 import redis
 r = redis.Redis(host=os.environ["REDIS_HOST"])
 
 @app.route('/login')
 def login():
-    r.set(f"session:{user_id}", json.dumps(session_data))
+ r.set(f"session:{user_id}", json.dumps(session_data))
 ```
 
 ### Scale Out with CLI
@@ -122,13 +115,10 @@ def login():
 ```bash
 # Manually scale to 3 instances
 az appservice plan update \
-    --resource-group $RG \
-    --name $PLAN_NAME \
-    --number-of-workers 3
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --number-of-workers 3
 ```
-
-![IMAGE: Scale out screen]
-`📸 Screenshot: Azure Portal → App Service Plan → Scale out (App Service plan) → Manual scale`
 
 ---
 
@@ -147,13 +137,13 @@ Collect Metrics → Evaluate Rules → Scale Action → Cooldown → Re-evaluate
 ```bash
 # Create Autoscale profile
 az monitor autoscale create \
-    --resource-group $RG \
-    --resource $PLAN_NAME \
-    --resource-type "Microsoft.Web/serverfarms" \
-    --name "autoscale-rule" \
-    --min-count 2 \
-    --max-count 10 \
-    --count 2
+ --resource-group $RG \
+ --resource $PLAN_NAME \
+ --resource-type "Microsoft.Web/serverfarms" \
+ --name "autoscale-rule" \
+ --min-count 2 \
+ --max-count 10 \
+ --count 2
 ```
 
 ### Add Scale Out Rule
@@ -161,10 +151,10 @@ az monitor autoscale create \
 ```bash
 # Add 1 instance when CPU > 70%
 az monitor autoscale rule create \
-    --resource-group $RG \
-    --autoscale-name "autoscale-rule" \
-    --condition "Percentage CPU > 70 avg 10m" \
-    --scale out 1
+ --resource-group $RG \
+ --autoscale-name "autoscale-rule" \
+ --condition "Percentage CPU > 70 avg 10m" \
+ --scale out 1
 ```
 
 ### Add Scale In Rule
@@ -172,41 +162,38 @@ az monitor autoscale rule create \
 ```bash
 # Remove 1 instance when CPU < 35%
 az monitor autoscale rule create \
-    --resource-group $RG \
-    --autoscale-name "autoscale-rule" \
-    --condition "Percentage CPU < 35 avg 20m" \
-    --scale in 1
+ --resource-group $RG \
+ --autoscale-name "autoscale-rule" \
+ --condition "Percentage CPU < 35 avg 20m" \
+ --scale in 1
 ```
 
 ### Verify Autoscale Configuration
 
 ```bash
 az monitor autoscale show \
-    --resource-group $RG \
-    --name "autoscale-rule" \
-    --output json
+ --resource-group $RG \
+ --name "autoscale-rule" \
+ --output json
 ```
 
 **Example output:**
 ```json
 {
-  "enabled": true,
-  "profiles": [{
-    "capacity": {
-      "default": "2",
-      "maximum": "10",
-      "minimum": "2"
-    },
-    "rules": [
-      {"metricTrigger": {"metricName": "Percentage CPU", "operator": "GreaterThan", "threshold": 70}},
-      {"metricTrigger": {"metricName": "Percentage CPU", "operator": "LessThan", "threshold": 35}}
-    ]
-  }]
+ "enabled": true,
+ "profiles": [{
+ "capacity": {
+ "default": "2",
+ "maximum": "10",
+ "minimum": "2"
+ },
+ "rules": [
+ {"metricTrigger": {"metricName": "Percentage CPU", "operator": "GreaterThan", "threshold": 70}},
+ {"metricTrigger": {"metricName": "Percentage CPU", "operator": "LessThan", "threshold": 35}}
+ ]
+ }]
 }
 ```
-
-![IMAGE: Autoscale configuration]
-`📸 Screenshot: Azure Portal → App Service Plan → Scale out → Custom autoscale`
 
 ---
 
@@ -216,7 +203,7 @@ az monitor autoscale show \
 
 ```
 Scale Out: CPU > 70%
-Scale In:  CPU < 35%  ← Gap prevents oscillation
+Scale In: CPU < 35% ← Gap prevents oscillation
 ```
 
 **Oscillation**: If thresholds are too close, constant scaling up/down occurs
@@ -231,7 +218,7 @@ Scale In:  CPU < 35%  ← Gap prevents oscillation
 ### 3. Set Minimum/Maximum Instances
 
 ```
-Minimum: 2  ← Ensures availability (Health Check needs this)
+Minimum: 2 ← Ensures availability (Health Check needs this)
 Maximum: 10 ← Cost control
 ```
 
@@ -240,8 +227,8 @@ Maximum: 10 ← Cost control
 ```bash
 # CPU + Memory combination
 az monitor autoscale rule create \
-    --condition "Memory Percentage > 80 avg 5m" \
-    --scale out 2
+ --condition "Memory Percentage > 80 avg 5m" \
+ --scale out 2
 ```
 
 ---
@@ -272,11 +259,11 @@ When instances increase, **load on external dependencies also increases**.
 from sqlalchemy import create_engine
 
 engine = create_engine(
-    DATABASE_URL,
-    pool_size=5,        # Connections per instance
-    max_overflow=10,    # Additional allowed
-    pool_timeout=30,
-    pool_recycle=1800
+ DATABASE_URL,
+ pool_size=5, # Connections per instance
+ max_overflow=10, # Additional allowed
+ pool_timeout=30,
+ pool_recycle=1800
 )
 ```
 
@@ -298,15 +285,12 @@ engine = create_engine(
 
 ```bash
 az monitor metrics alert create \
-    --resource-group $RG \
-    --name "High CPU Alert" \
-    --scopes "/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Web/serverfarms/$PLAN_NAME" \
-    --condition "avg Percentage CPU > 80" \
-    --window-size 5m
+ --resource-group $RG \
+ --name "High CPU Alert" \
+ --scopes "/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Web/serverfarms/$PLAN_NAME" \
+ --condition "avg Percentage CPU > 80" \
+ --window-size 5m
 ```
-
-![IMAGE: Metrics dashboard]
-`📸 Screenshot: Azure Portal → App Service Plan → Metrics (CPU, Memory, Instances)`
 
 ---
 
@@ -352,9 +336,9 @@ Azure Portal → Scale out → Add a scale condition → Schedule
 ```bash
 # Emergency Scale Out
 az appservice plan update \
-    --resource-group $RG \
-    --name $PLAN_NAME \
-    --number-of-workers 8
+ --resource-group $RG \
+ --name $PLAN_NAME \
+ --number-of-workers 8
 ```
 
 ### Memory Pressure Response
@@ -390,41 +374,21 @@ Scaling strategy essentials:
 
 ---
 
-## Wrapping Up the Series
+## Where this fits in the series
 
-Through the **Azure App Service 101 Series**, you learned:
-
-1. ✅ Platform Architecture (3-Plane Model)
-2. ✅ Request Flow (Request Lifecycle)
-3. ✅ Hosting Selection (Plan, OS, Deployment Model)
-4. ✅ First Deployment (Python/Flask)
-5. ✅ Configuration Management (App Settings, Key Vault)
-6. ✅ Logging and Monitoring (Application Insights)
-7. ✅ Scaling Strategy (Scale Up/Out, Autoscale)
-
-Build on this foundation with advanced topics like **Deployment Slots**, **CI/CD**, **Networking**, and **Security**.
-
-Happy deploying! 🚀
-
----
-
-## Series Index
-
-1. What is Azure App Service? - Understanding the Platform Architecture
-2. Request Lifecycle: How Requests Reach Your App
-3. Hosting Models: Which Plan Should You Choose?
-4. First Deployment: From Local to Azure (Python/Flask)
-5. Mastering Configuration: App Settings & Environment Variables
-6. Logging and Monitoring Basics
-7. **[Current] Scaling 101: When to Scale Up vs Scale Out?**
+This closing post ties the rest of the series together by turning deployment, configuration, and telemetry into scaling decisions. Read back through the sequence and the through-line is clear: App Service works best when you treat it as an operating platform, not just a place to push code.
 
 ---
 
 ## References
 
+### Official Docs
 - [Scale up an app in Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/manage-scale-up)
 - [Get started with autoscale (Microsoft Learn)](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-get-started)
 - [Best practices for Azure App Service (Microsoft Learn)](https://learn.microsoft.com/azure/app-service/app-service-best-practices)
+
+### Related Series
+- [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
 
