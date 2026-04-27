@@ -25,7 +25,7 @@ This is the map for the rest of the series.
 Each later episode zooms into one of these boxes.
 Get the layout into your head first and the lower-level details land much more cleanly.
 
-![The big picture — one request through App Service](../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
+![Request path through App Service](../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
 The global entry and client edge are intro-series territory.
 The Front-End and ARR path are episode 2.
 Workers and the per-worker sandbox are episode 3.

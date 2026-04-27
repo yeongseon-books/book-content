@@ -26,7 +26,7 @@ Microsoft가 관리하는 Kubernetes 계층 위에, Revision, Ingress, Autoscali
 뒤의 글들은 아래 박스 하나씩을 확대해서 보는 구조입니다.
 먼저 모양을 잡아 두면, 이후의 세부 동작이 훨씬 덜 낯섭니다.
 
-![전체 그림 — Azure Container Apps Environment](../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.ko.png)
+![Azure Container Apps 환경 아키텍처](../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.ko.png)
 왼쪽은 사용자가 보는 요청 경로입니다.
 가운데는 여러분이 Container Apps라는 이름으로 다루는 런타임 표면입니다.
 점선 경계는 직접 제어할 수 없는 Kubernetes 계층입니다.

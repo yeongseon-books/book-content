@@ -18,7 +18,7 @@ Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher
 
 Let's start by drawing the entire path of a single invocation in one diagram.
 
-![The big picture — from trigger to worker](../../assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
+![Trigger-to-worker path](../../assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
 This diagram is what Part 4 is about. Let's walk through each step in code.
 
 ---

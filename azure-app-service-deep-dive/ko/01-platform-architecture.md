@@ -26,7 +26,7 @@ Functions Deep Dive가 프로세스 안쪽을 봤다면,
 뒤의 다섯 편은 여기 있는 박스를 하나씩 확대하는 구조입니다.
 먼저 위치를 잡아 두면 세부 동작을 읽을 때 길을 잃지 않습니다.
 
-![전체 그림 — App Service 한 인스턴스가 받는 요청](../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.ko.png)
+![App Service 요청 경로](../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.ko.png)
 왼쪽의 외부 클라이언트와 글로벌 진입점은 101에서 다룬 요청 진입부입니다.
 가운데의 Front-End와 ARR은 2화에서,
 오른쪽의 Worker와 샌드박스는 3화에서,

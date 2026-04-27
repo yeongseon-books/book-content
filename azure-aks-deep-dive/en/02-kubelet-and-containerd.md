@@ -19,7 +19,7 @@ and `runc` finally spawns the real process.
 
 ## The execution path in one picture
 
-![The execution path in one picture](../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
+![Execution path](../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
 ---
 
 ## kubelet, CRI, and runtime

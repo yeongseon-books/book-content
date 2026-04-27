@@ -19,7 +19,7 @@ This post follows that path end to end.
 
 ## The deployment pipeline in one picture
 
-![The deployment pipeline in one picture](../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
+![Deployment pipeline](../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
 Read deployment incidents through these four stages.
 
 1. artifact upload failed

@@ -10,7 +10,7 @@
 
 ## 세 객체를 한 장으로 보면
 
-![세 객체를 한 장으로 보면](../../assets/azure-aks-101/04/04-01-one-picture-first.ko.png)
+![Pod·Deployment·Service 관계](../../assets/azure-aks-101/04/04-01-one-picture-first.ko.png)
 이 그림이 거의 전부입니다.
 
 - **Pod**는 컨테이너를 실행하는 최소 단위

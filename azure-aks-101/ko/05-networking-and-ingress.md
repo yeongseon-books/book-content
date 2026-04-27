@@ -10,7 +10,7 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 왜
 
 ## 요청 경로부터 먼저 보자
 
-![요청 경로부터 먼저 보자](../../assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)
+![요청 경로](../../assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)
 외부 요청 관점에서 보면 이 그림입니다. 4화에서 본 Service가 클러스터 내부의 고정 진입점이라면, Ingress는 그 앞단의 HTTP 라우터입니다.
 
 반면 Pod IP와 노드 서브넷 문제는 이 그림의 더 아래층입니다. 즉 **트래픽 경로 설계**와 **IP 할당 모델**은 관련 있지만 같은 문제는 아닙니다.

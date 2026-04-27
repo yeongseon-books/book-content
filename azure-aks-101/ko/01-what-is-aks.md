@@ -13,7 +13,7 @@ AKS는 그 부담을 줄이기 위해 나온 Azure의 관리형 Kubernetes입니
 이 그림이 이번 시리즈 전체의 지도입니다.
 뒤의 화들은 아래 상자 하나씩을 확대해서 보는 구조입니다.
 
-![전체 그림 — AKS 클러스터 한 장면](../../assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.ko.png)
+![AKS 클러스터 아키텍처](../../assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.ko.png)
 이 시리즈는 2화에서 Control Plane과 Node Pool 경계를, 3화와 4화에서 Deployment·Pod·Service를, 5화에서 Ingress와 네트워킹을, 6화에서 스케일링을, 7화에서 모니터링과 운영을 각각 확대합니다.
 
 ---

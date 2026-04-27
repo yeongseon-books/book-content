@@ -23,7 +23,7 @@ Functions is different. **At a minimum, two processes are involved** in running 
 - **Host process** — the .NET runtime. Handles trigger detection, scale signals, logging, and binding resolution.
 - **Worker process** — a separate process running your language (Node.js, Python, Java, etc.). **This is where your function code actually executes.**
 
-![The big picture — two processes](../../assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
+![Host and worker processes](../../assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
 This split is the single most important design decision in Functions. So why was it done this way?
 
 ---

@@ -23,7 +23,7 @@ This diagram is the map for the whole series.
 Later parts zoom into one box at a time.
 Get the boundaries straight now and kubelet, CNI, scheduler, and autoscaling all line up cleanly.
 
-![The big picture — AKS control vs data plane](../../assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png)
+![AKS control vs data plane](../../assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png)
 The `kube-apiserver`, `etcd`, `kube-controller-manager`, and `kube-scheduler` boxes belong to this episode,
 node-side `kubelet + containerd` belong to part 2,
 `CNI` to part 3,

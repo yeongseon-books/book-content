@@ -41,7 +41,7 @@ python --version     # 3.11+
 
 ## 전체 흐름 한 장
 
-![전체 흐름 한 장](../../assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.ko.png)
+![배포 전체 흐름](../../assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.ko.png)
 ---
 
 ## 1. 프로젝트 만들기

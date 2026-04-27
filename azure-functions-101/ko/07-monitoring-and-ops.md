@@ -38,7 +38,7 @@ az functionapp config appsettings set \
 
 실시간 상황을 볼 때는 **Application Insights → Live Metrics**가 가장 빠릅니다. 거의 초 단위로 요청량, 실패율, 응답 시간 변화, 현재 살아 있는 인스턴스 수를 확인할 수 있습니다.
 
-![장애가 의심될 때 가장 먼저 여는 화면 — Live Metrics](../../assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
+![Live Metrics 화면](../../assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
 Live Metrics는 “지금 무슨 일이 벌어지고 있는가”를 가장 빨리 보여줍니다. 다만 CPU/메모리 같은 인프라 성능 카운터는 플랜과 OS에 따라 표시 범위가 다를 수 있습니다. 인스턴스 수와 요청 흐름은 빠르게 확인하되, 세부 리소스 수치는 환경별 지원 여부를 같이 봐야 합니다.
 
 ---

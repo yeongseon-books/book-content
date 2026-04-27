@@ -19,7 +19,7 @@ containerd가 sandbox와 container를 만들고,
 
 ## 한 장으로 보는 실행 경로
 
-![한 장으로 보는 실행 경로](../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.ko.png)
+![실행 경로](../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.ko.png)
 이 다이어그램이 이번 화 전체입니다.
 앞의 절반은 kubelet의 책임이고,
 뒤의 절반은 runtime 계층의 책임입니다.

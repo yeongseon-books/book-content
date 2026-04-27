@@ -26,7 +26,7 @@ This is the map for the whole series.
 Every later post expands one box from this picture.
 Get the shape first, then the platform behaviors stop looking like isolated features.
 
-![The big picture — one Container Apps environment](../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
+![Container Apps environment architecture](../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
 The left edge is the user-facing path.
 The middle is the runtime surface you configure as Container Apps.
 The dotted boundary is the Kubernetes layer you do not directly control.

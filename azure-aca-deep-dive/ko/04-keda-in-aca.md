@@ -266,7 +266,7 @@ ACA도 이 모양을 개념적으로 상속합니다.
 
 ## autoscaling 전체 그림을 한 장으로
 
-![autoscaling 전체 그림을 한 장으로](../../assets/azure-aca-deep-dive/04/04-13-the-whole-autoscaling-picture-in-one-dia.ko.png)
+![Autoscaling 전체 구조](../../assets/azure-aca-deep-dive/04/04-13-the-whole-autoscaling-picture-in-one-dia.ko.png)
 이 그림만 기억해도 ACA autoscaling 내부는 충분히 올바른 해상도로 머릿속에 남습니다.
 
 ---

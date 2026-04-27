@@ -25,7 +25,7 @@ KEDA는 5화.
 Dapr는 6화.
 관측성은 7화입니다.
 
-![전체 그림 — Azure Container Apps 환경 한 장면](../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.ko.png)
+![Azure Container Apps 환경 아키텍처](../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.ko.png)
 ---
 
 ## 한 문장 정의

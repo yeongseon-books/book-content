@@ -25,7 +25,7 @@ Along the way, Envoy terminates TLS, matches the route, applies any revision wei
 The first mistake in ingress debugging is to start at the user container.
 The request has already crossed several platform layers before that point.
 
-![Start with the full path, not with the app](../../assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
+![Full ingress path](../../assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
 If you keep this order in your head, ingress incidents become easier to localize.
 
 - No connection at all may be outside the pod entirely.

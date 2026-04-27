@@ -23,7 +23,7 @@ data plane은 어디서 시작되며,
 이후 화들은 아래 박스 하나씩을 확대해서 보는 구조입니다.
 먼저 경계를 눈에 익혀 두면 뒤의 kubelet, CNI, scheduler, autoscaler 이야기가 한 줄로 이어집니다.
 
-![전체 그림 — AKS 클러스터의 control vs data plane](../../assets/azure-aks-deep-dive/01/01-01-aks-control-vs-data-plane.ko.png)
+![AKS control vs data plane](../../assets/azure-aks-deep-dive/01/01-01-aks-control-vs-data-plane.ko.png)
 이 그림에서 `kube-apiserver`, `etcd`, `kube-controller-manager`, `kube-scheduler`는 이번 1화의 주인공이고,
 노드의 `kubelet + containerd`는 2화,
 `CNI`는 3화,

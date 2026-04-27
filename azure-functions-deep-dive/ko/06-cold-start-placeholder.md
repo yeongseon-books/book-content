@@ -305,7 +305,7 @@ if (Interlocked.CompareExchange(ref _specialized, 1, 0) == 0)
 
 지금까지 본 것을 한 장의 sequence diagram으로 정리하겠습니다.
 
-![전체 그림 — 한 인스턴스의 일생](../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.ko.png)
+![인스턴스 생명주기](../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.ko.png)
 ---
 
 ## 플랜별로 콜드 스타트가 다른 이유

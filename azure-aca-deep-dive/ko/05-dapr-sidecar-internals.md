@@ -283,7 +283,7 @@ ACA가 관리 세부사항을 감추더라도, 런타임 복잡도 자체는 남
 
 ## Sidecar 전체 생명주기를 한 장으로
 
-![Sidecar 전체 생명주기를 한 장으로](../../assets/azure-aca-deep-dive/05/05-12-putting-the-whole-sidecar-lifecycle-in-o.ko.png)
+![Sidecar 전체 생명주기](../../assets/azure-aca-deep-dive/05/05-12-putting-the-whole-sidecar-lifecycle-in-o.ko.png)
 이 그림이 체크박스 하나가 Pod 안의 두 번째 런타임 프로세스로 이어지는 전체 압축본입니다.
 
 ---

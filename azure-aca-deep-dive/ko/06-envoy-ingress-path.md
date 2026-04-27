@@ -25,7 +25,7 @@ external client -> ACA-managed load balancer -> Envoy ingress -> Service -> Pod
 Ingress 디버깅에서 가장 흔한 실수는 사용자 컨테이너부터 보는 것입니다.
 요청은 그 지점에 도달하기 전에 이미 여러 플랫폼 계층을 지납니다.
 
-![시작점은 앱이 아니라 전체 경로입니다](../../assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.ko.png)
+![Ingress 전체 경로](../../assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.ko.png)
 이 순서를 머릿속에 두면 ingress 사고를 훨씬 빨리 국소화할 수 있습니다.
 
 - 아예 연결이 안 되면 Pod 바깥 문제일 수 있습니다.
@@ -246,7 +246,7 @@ Edge 쪽 transport는 달라집니다.
 
 ## 전체 요청 경로를 한 장으로
 
-![전체 요청 경로를 한 장으로](../../assets/azure-aca-deep-dive/06/06-14-the-whole-request-path-in-one-diagram.ko.png)
+![전체 요청 경로](../../assets/azure-aca-deep-dive/06/06-14-the-whole-request-path-in-one-diagram.ko.png)
 이 그림이 시리즈 전체를 다시 묶는 마지막 도식입니다.
 
 Environment는 네트워크 경계를 제공했습니다.

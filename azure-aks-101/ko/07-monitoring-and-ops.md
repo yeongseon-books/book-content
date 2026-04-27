@@ -10,7 +10,7 @@ AKS는 배포가 끝났다고 운영이 끝나지 않습니다. 오히려 그때
 
 ## 운영 시야를 한 장으로 보면
 
-![운영 시야를 한 장으로 보면](../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
+![운영 관측 구조](../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
 이 그림에서 기억할 것은 두 축입니다.
 
 - **로그 축**: Log Analytics, Container Insights, KQL

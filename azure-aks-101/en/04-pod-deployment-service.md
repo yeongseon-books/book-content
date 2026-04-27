@@ -10,7 +10,7 @@ This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling 
 
 ## One picture first
 
-![One picture first](../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)
+![Pod, Deployment, and Service](../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)
 That diagram carries most of the model.
 
 - **Pod** is the minimum scheduling unit.

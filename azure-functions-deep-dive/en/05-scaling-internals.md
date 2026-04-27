@@ -22,7 +22,7 @@ This installment has three goals:
 
 Before we touch any code, here's the whole thing in one diagram.
 
-![The big picture — where scaling decisions are made](../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
+![Scaling decision points](../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
 The key insight is that two different decisions are made in two different places.
 
 | Decision | Decided by | Signal | Result |

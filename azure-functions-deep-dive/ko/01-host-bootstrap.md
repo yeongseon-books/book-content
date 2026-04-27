@@ -14,7 +14,7 @@
 뒤의 화들은 아래 박스 하나씩을 확대해서 보는 구조입니다.
 먼저 위치를 잡아 두면, 이후의 세부 코드가 훨씬 덜 낯섭니다.
 
-![전체 그림 — Azure Functions 호스트 한 인스턴스](../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.ko.png)
+![Azure Functions 호스트 인스턴스](../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.ko.png)
 이번 1화는 가운데 Host가 어떻게 부팅되는지를 보고, 2화는 Worker 프로세스, 3화는 둘 사이의 `gRPC (FunctionRpcService)` 채널, 4화는 dispatcher와 invocation, 5화는 스케일링, 6화는 placeholder와 콜드 스타트를 확대합니다.
 
 ---

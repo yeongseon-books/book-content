@@ -24,7 +24,7 @@ KEDA is part 5.
 Dapr is part 6.
 Observability is part 7.
 
-![The big picture — one ACA environment at a glance](../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
+![One ACA environment](../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
 ---
 
 ## A one-sentence definition
