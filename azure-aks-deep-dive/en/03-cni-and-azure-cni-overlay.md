@@ -1,0 +1,99 @@
+# CNI and Azure CNI Overlay — where Pod IPs come from
+
+> Azure Kubernetes Service Deep Dive series (3/6)
+
+Pod IPs come from different address models depending on the networking mode.
+In traditional Azure CNI, Pods directly consume VNet-facing IP space.
+In Azure CNI Overlay, Pod IPs come from a separate overlay CIDR while the VNet mostly sees node IPs.
+
+---
+
+## Put both models side by side
+
+```mermaid
+flowchart LR
+    subgraph A[Azure CNI node subnet mode]
+        P1[Pod] --> B1[veth / bridge]
+        B1 --> N1[Node NIC]
+        N1 --> V1[VNet IP directly assigned to Pod path]
+    end
+
+    subgraph B[Azure CNI Overlay]
+        P2[Pod] --> B2[veth / bridge]
+        B2 --> O[Overlay Pod CIDR]
+        O --> NAT[SNAT on node]
+        NAT --> N2[Node primary VNet IP]
+        N2 --> V2[VNet]
+    end
+```
+
+---
+
+## What CNI does
+
+CNI is the contract that attaches networking to the Pod sandbox.
+It creates interfaces,
+assigns IPs,
+and installs routes and rules.
+That means part 2's `RunPodSandbox` path and part 3's Pod IP story are tightly connected.
+
+---
+
+## Azure CNI versus Overlay
+
+Traditional Azure CNI keeps the routing model direct but spends address space aggressively.
+Overlay allocates Pod IPs from a non-routable overlay range and uses node-side NAT when traffic exits toward the VNet.
+That lets you plan the node subnet and the Pod CIDR separately.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Pod as Pod IP from overlay CIDR
+    participant Bridge as Node bridge / veth pair
+    participant NAT as Node SNAT
+    participant VNet as Azure VNet
+    participant Dst as Destination
+
+    Pod->>Bridge: packet from Pod namespace
+    Bridge->>NAT: forward to node network stack
+    NAT->>VNet: source translated to node VNet IP
+    VNet->>Dst: routed inside Azure network
+```
+
+---
+
+## Where kubenet stands now
+
+AKS documentation now carries a kubenet retirement timeline.
+That means kubenet is no longer a safe long-term default for new designs.
+The official networking direction in AKS is moving toward Azure CNI Overlay.
+
+---
+
+## The point of this episode
+
+> In traditional Azure CNI, Pods directly receive VNet IPs, which keeps the model simple but burns address space fast. In Azure CNI Overlay, Pods get addresses from a separate overlay range and exit toward the VNet through node-side NAT, which makes address planning much more efficient and much better aligned with long-term AKS operations.
+
+---
+
+## Where this fits in the series
+
+This is part 3 of the Azure Kubernetes Service Deep Dive series.
+Part 2 followed the node-local execution path; this part explains how CNI attaches Pod networking beside that path. Part 4 moves to placement and shows how the scheduler decides which node should receive a Pod.
+
+---
+
+## References
+
+### Primary sources
+- [CRI network status fields — `api.proto` @ `v1.30.0`](https://github.com/kubernetes/kubernetes/blob/v1.30.0/staging/src/k8s.io/cri-api/pkg/apis/runtime/v1/api.proto)
+- [`kuberuntime_sandbox.go` @ `v1.30.0`](https://github.com/kubernetes/kubernetes/blob/v1.30.0/pkg/kubelet/kuberuntime/kuberuntime_sandbox.go)
+
+### Secondary sources
+- [Azure CNI Overlay](https://learn.microsoft.com/en-us/azure/aks/azure-cni-overlay)
+- [Configure kubenet networking in AKS](https://learn.microsoft.com/en-us/azure/aks/configure-kubenet)
+- [Update Azure CNI IPAM mode and data plane technology](https://learn.microsoft.com/en-us/azure/aks/update-azure-cni)
+
+### Related Series
+- [Azure AKS 101](../../azure-aks-101/en/)
+- [Azure Functions Deep Dive part 1 — start with the big picture](../../azure-functions-deep-dive/en/01-host-bootstrap.md)

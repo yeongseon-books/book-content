@@ -26,6 +26,8 @@ More instances
 | **Vertical** | Scale Up/Down | Change instance size |
 | **Horizontal** | Scale Out/In | Change instance count |
 
+![Scale Up vs Scale Out](../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
+
 ---
 
 ## Scale Up (Vertical Scaling)
@@ -83,6 +85,8 @@ az appservice plan show \
 - Need multiple instances for **high availability**
 - App is designed to be **stateless**
 
+![Scaling decision tree](../../assets/azure-app-service-101/07/04-scaling-decision-tree.en.png)
+
 ### Prerequisite: Stateless Design
 
 For Scale Out to work, your app must **store state externally**.
@@ -125,6 +129,8 @@ az appservice plan update \
 ## Autoscale: Automatic Scaling
 
 **Automatically** increase or decrease instances based on traffic.
+
+![Autoscale feedback loop](../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.en.png)
 
 ### Autoscale Flow
 
@@ -238,6 +244,8 @@ az monitor autoscale rule create \
 ### Side Effects of Scale Out
 
 When instances increase, **load on external dependencies also increases**.
+
+![Dependency cascade under load](../../assets/azure-app-service-101/07/03-dependency-cascade.en.png)
 
 ```
 2 instances → 20 DB connections

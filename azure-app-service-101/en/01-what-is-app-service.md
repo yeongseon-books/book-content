@@ -36,6 +36,8 @@ Each Plane has **independent APIs and failure modes**. For example:
 - Changing App Settings in the Management Plane → May restart the Runtime Plane
 - SCM (Kudu) site being inaccessible → App itself may still work fine
 
+![App Service 3-Plane architecture](../../assets/azure-app-service-101/01/01-three-plane-architecture.en.png)
+
 ---
 
 ## Management Plane: The Configuration Hub
@@ -76,6 +78,8 @@ az webapp show \
 The Runtime Plane is where actual user requests are handled.
 
 ### Request Flow
+
+![App Service request flow](../../assets/azure-app-service-101/01/02-request-flow.en.png)
 
 ```
 Client → App Service Frontend → Worker Instance → App Process
@@ -157,6 +161,8 @@ app.run(host="0.0.0.0", port=port)
 ## Filesystem: Ephemeral vs Persistent
 
 Understanding storage behavior is key to preventing production issues.
+
+![App Service file system layout](../../assets/azure-app-service-101/01/03-file-system-layout.en.png)
 
 ### Ephemeral Storage
 

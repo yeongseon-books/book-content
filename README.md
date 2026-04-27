@@ -59,6 +59,73 @@ Azure Functions Host의 내부 동작을 코드 레벨로 따라가는 시리즈
 | 5 | 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 플랜별 차이 | [ko](./azure-functions-deep-dive/ko/05-scaling-internals.md) | [en](./azure-functions-deep-dive/en/05-scaling-internals.md) |
 | 6 | 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때 | [ko](./azure-functions-deep-dive/ko/06-cold-start-placeholder.md) | [en](./azure-functions-deep-dive/en/06-cold-start-placeholder.md) |
 
+### Azure App Service Deep Dive
+
+App Service 플랫폼이 Front-End·Worker·File Server 위에서 사용자 요청을 어떻게 처리하는지를 코드와 공식 문서로 따라가는 시리즈. Azure Functions가 이 인프라 위에서 돈다는 사실을 ep01에서 명시적으로 연결합니다.
+
+| # | 제목 | 한국어 (Tistory) | English (Medium) |
+|---|---|---|---|
+| 1 | App Service 플랫폼 아키텍처 — Front-End·Worker·File Server | [ko](./azure-app-service-deep-dive/ko/01-platform-architecture.md) | [en](./azure-app-service-deep-dive/en/01-platform-architecture.md) |
+| 2 | Front-End과 ARR — 요청은 어떻게 워커에 도달하는가 | [ko](./azure-app-service-deep-dive/ko/02-front-end-and-arr.md) | [en](./azure-app-service-deep-dive/en/02-front-end-and-arr.md) |
+| 3 | Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가 | [ko](./azure-app-service-deep-dive/ko/03-worker-and-sandbox.md) | [en](./azure-app-service-deep-dive/en/03-worker-and-sandbox.md) |
+| 4 | 배포와 Kudu — 빌드·동기화·릴리스의 안쪽 | [ko](./azure-app-service-deep-dive/ko/04-deployment-and-kudu.md) | [en](./azure-app-service-deep-dive/en/04-deployment-and-kudu.md) |
+| 5 | 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 | [ko](./azure-app-service-deep-dive/ko/05-scaling-internals.md) | [en](./azure-app-service-deep-dive/en/05-scaling-internals.md) |
+| 6 | 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 | [ko](./azure-app-service-deep-dive/ko/06-cold-start-and-warmup.md) | [en](./azure-app-service-deep-dive/en/06-cold-start-and-warmup.md) |
+
+### Azure Kubernetes Service 101
+
+AKS 입문자를 위한 실전 가이드 시리즈. 관리형 Kubernetes가 사용자에게 무엇을 주는지부터 클러스터 아키텍처, 첫 배포, 워크로드 모델, 네트워킹, 스케일링, 운영까지 이어집니다.
+
+| # | 제목 | 한국어 (Tistory) | English (Medium) |
+|---|---|---|---|
+| 1 | Azure Kubernetes Service란? — 관리형 Kubernetes가 사용자에게 주는 것 | [ko](./azure-aks-101/ko/01-what-is-aks.md) | [en](./azure-aks-101/en/01-what-is-aks.md) |
+| 2 | 클러스터 아키텍처 — Control Plane과 Node Pool | [ko](./azure-aks-101/ko/02-cluster-architecture.md) | [en](./azure-aks-101/en/02-cluster-architecture.md) |
+| 3 | 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI | [ko](./azure-aks-101/ko/03-first-cluster-and-deploy.md) | [en](./azure-aks-101/en/03-first-cluster-and-deploy.md) |
+| 4 | Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식 | [ko](./azure-aks-101/ko/04-pod-deployment-service.md) | [en](./azure-aks-101/en/04-pod-deployment-service.md) |
+| 5 | 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길 | [ko](./azure-aks-101/ko/05-networking-and-ingress.md) | [en](./azure-aks-101/en/05-networking-and-ingress.md) |
+| 6 | 스케일링 — HPA, Cluster Autoscaler, KEDA | [ko](./azure-aks-101/ko/06-scaling-hpa-ca-keda.md) | [en](./azure-aks-101/en/06-scaling-hpa-ca-keda.md) |
+| 7 | 모니터링과 운영 — Container Insights, 로그, 알람 | [ko](./azure-aks-101/ko/07-monitoring-and-ops.md) | [en](./azure-aks-101/en/07-monitoring-and-ops.md) |
+
+### Azure Kubernetes Service Deep Dive
+
+AKS가 사용자에게서 가린 control plane과, 사용자가 손대는 data plane(노드 위 kubelet·containerd·CNI) 양쪽을 commit-pinned 소스로 따라가는 시리즈.
+
+| # | 제목 | 한국어 (Tistory) | English (Medium) |
+|---|---|---|---|
+| 1 | Control Plane 해부 — AKS가 사용자에게서 가린 것 | [ko](./azure-aks-deep-dive/ko/01-control-plane-anatomy.md) | [en](./azure-aks-deep-dive/en/01-control-plane-anatomy.md) |
+| 2 | kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지 | [ko](./azure-aks-deep-dive/ko/02-kubelet-and-containerd.md) | [en](./azure-aks-deep-dive/en/02-kubelet-and-containerd.md) |
+| 3 | CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가 | [ko](./azure-aks-deep-dive/ko/03-cni-and-azure-cni-overlay.md) | [en](./azure-aks-deep-dive/en/03-cni-and-azure-cni-overlay.md) |
+| 4 | Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가 | [ko](./azure-aks-deep-dive/ko/04-scheduler-and-pod-placement.md) | [en](./azure-aks-deep-dive/en/04-scheduler-and-pod-placement.md) |
+| 5 | HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프 | [ko](./azure-aks-deep-dive/ko/05-hpa-and-cluster-autoscaler-internals.md) | [en](./azure-aks-deep-dive/en/05-hpa-and-cluster-autoscaler-internals.md) |
+| 6 | KEDA 내부 — ScaledObject가 HPA를 만드는 방식 | [ko](./azure-aks-deep-dive/ko/06-keda-internals.md) | [en](./azure-aks-deep-dive/en/06-keda-internals.md) |
+
+### Azure Container Apps 101
+
+ACA 입문자를 위한 실전 가이드 시리즈. Kubernetes를 직접 운영하지 않고 컨테이너를 띄우고 싶을 때 필요한 모든 개념을 다룹니다.
+
+| # | 제목 | 한국어 (Tistory) | English (Medium) |
+|---|---|---|---|
+| 1 | Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기 | [ko](./azure-aca-101/ko/01-what-is-aca.md) | [en](./azure-aca-101/en/01-what-is-aca.md) |
+| 2 | Environment·Container App·Revision — 세 단어로 보는 ACA | [ko](./azure-aca-101/ko/02-environment-app-revision.md) | [en](./azure-aca-101/en/02-environment-app-revision.md) |
+| 3 | 첫 앱 배포하기 — Python/FastAPI | [ko](./azure-aca-101/ko/03-first-deploy.md) | [en](./azure-aca-101/en/03-first-deploy.md) |
+| 4 | Ingress와 트래픽 분할 — Revision 기반 배포 전략 | [ko](./azure-aca-101/ko/04-ingress-and-traffic-split.md) | [en](./azure-aca-101/en/04-ingress-and-traffic-split.md) |
+| 5 | 스케일링 — KEDA scaler와 0-to-N | [ko](./azure-aca-101/ko/05-scaling-with-keda.md) | [en](./azure-aca-101/en/05-scaling-with-keda.md) |
+| 6 | Dapr 통합 — 사이드카로 얻는 것 | [ko](./azure-aca-101/ko/06-dapr-integration.md) | [en](./azure-aca-101/en/06-dapr-integration.md) |
+| 7 | 모니터링과 운영 — Log Analytics와 Application Insights | [ko](./azure-aca-101/ko/07-monitoring-and-ops.md) | [en](./azure-aca-101/en/07-monitoring-and-ops.md) |
+
+### Azure Container Apps Deep Dive
+
+Microsoft가 ACA라는 추상 위에 KEDA·Dapr·Envoy를 어떻게 얹었는지를 commit-pinned 오픈소스 코드와 공식 문서로 따라가는 시리즈.
+
+| # | 제목 | 한국어 (Tistory) | English (Medium) |
+|---|---|---|---|
+| 1 | ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것 | [ko](./azure-aca-deep-dive/ko/01-aca-architecture.md) | [en](./azure-aca-deep-dive/en/01-aca-architecture.md) |
+| 2 | Environment 내부 — 네트워크·관측·Dapr 스코프의 경계 | [ko](./azure-aca-deep-dive/ko/02-environment-internals.md) | [en](./azure-aca-deep-dive/en/02-environment-internals.md) |
+| 3 | Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가 | [ko](./azure-aca-deep-dive/ko/03-revision-and-traffic-split.md) | [en](./azure-aca-deep-dive/en/03-revision-and-traffic-split.md) |
+| 4 | ACA 안의 KEDA — Scale Rule이 만드는 것 | [ko](./azure-aca-deep-dive/ko/04-keda-in-aca.md) | [en](./azure-aca-deep-dive/en/04-keda-in-aca.md) |
+| 5 | Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스 | [ko](./azure-aca-deep-dive/ko/05-dapr-sidecar-internals.md) | [en](./azure-aca-deep-dive/en/05-dapr-sidecar-internals.md) |
+| 6 | Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지 | [ko](./azure-aca-deep-dive/ko/06-envoy-ingress-path.md) | [en](./azure-aca-deep-dive/en/06-envoy-ingress-path.md) |
+
 ## 폴더 구조
 
 ```
@@ -87,6 +154,41 @@ tech-blog/
 │   │   └── ... (06까지)
 │   └── en/
 │       ├── 01-host-bootstrap.md
+│       └── ... (06까지)
+├── azure-app-service-deep-dive/
+│   ├── ko/
+│   │   ├── 01-platform-architecture.md
+│   │   └── ... (06까지)
+│   └── en/
+│       ├── 01-platform-architecture.md
+│       └── ... (06까지)
+├── azure-aks-101/
+│   ├── ko/
+│   │   ├── 01-what-is-aks.md
+│   │   └── ... (07까지)
+│   └── en/
+│       ├── 01-what-is-aks.md
+│       └── ... (07까지)
+├── azure-aks-deep-dive/
+│   ├── ko/
+│   │   ├── 01-control-plane-anatomy.md
+│   │   └── ... (06까지)
+│   └── en/
+│       ├── 01-control-plane-anatomy.md
+│       └── ... (06까지)
+├── azure-aca-101/
+│   ├── ko/
+│   │   ├── 01-what-is-aca.md
+│   │   └── ... (07까지)
+│   └── en/
+│       ├── 01-what-is-aca.md
+│       └── ... (07까지)
+├── azure-aca-deep-dive/
+│   ├── ko/
+│   │   ├── 01-aca-architecture.md
+│   │   └── ... (06까지)
+│   └── en/
+│       ├── 01-aca-architecture.md
 │       └── ... (06까지)
 └── assets/
     ├── azure-app-service-101/
@@ -122,6 +224,12 @@ tech-blog/
 - [ ] 코드 블록 syntax highlighting 확인
 - [ ] 1차 출처 링크가 commit-pinned (`5e59423`) 상태인지 확인 (Deep Dive 시리즈 한정)
 - [ ] 태그 추가
+  - Azure App Service 101: `Azure`, `App Service`, `Cloud`, `Web Apps`
+  - Azure App Service Deep Dive: `Azure`, `App Service`, `Distributed Systems`, `Platform Engineering`
   - Azure Functions 101: `Azure`, `Azure Functions`, `Serverless`, `Cloud`
   - Azure Functions Deep Dive: `Azure Functions`, `Serverless`, `Distributed Systems`, `gRPC`
+  - Azure Kubernetes Service 101: `Azure`, `AKS`, `Kubernetes`, `Cloud`
+  - Azure Kubernetes Service Deep Dive: `AKS`, `Kubernetes`, `Distributed Systems`, `Containers`
+  - Azure Container Apps 101: `Azure`, `Container Apps`, `Serverless`, `Containers`
+  - Azure Container Apps Deep Dive: `Container Apps`, `KEDA`, `Dapr`, `Envoy`
 - [ ] 시리즈 내 상호 링크 연결

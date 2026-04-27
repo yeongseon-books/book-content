@@ -1,0 +1,250 @@
+# Scaling — KEDA scalers and zero-to-N
+
+> Azure Container Apps 101 series (5/7)
+
+This post explains the KEDA-based scaling path.
+It separates HTTP rules.
+CPU and memory rules.
+And custom event-driven scalers.
+
+---
+
+## The scaling path
+
+Scaling remains declarative.
+You choose the signal and the replica bounds.
+
+```mermaid
+flowchart LR
+    Load[HTTP / Queue / Event / CPU] --> Rule[Scale rule]
+    Rule --> KEDA[KEDA-based scaler]
+    KEDA --> Rev[ACA revision replicas]
+```
+
+---
+
+## Three rule categories
+
+- HTTP
+- CPU and memory
+- custom KEDA scaler
+
+---
+
+## Scale-to-zero
+
+HTTP and custom KEDA scalers can reach zero.
+CPU and memory-based scaling do not scale to zero according to Microsoft Learn.
+
+---
+
+## HTTP example
+
+```bash
+az containerapp create   --name $APP_NAME   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --ingress external   --target-port 8000   --min-replicas 0   --max-replicas 5   --scale-rule-name http-rule   --scale-rule-type http   --scale-rule-http-concurrency 100
+```
+
+---
+
+## Service Bus example
+
+```bash
+az containerapp create   --name queue-worker   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --min-replicas 0   --max-replicas 10   --secrets "sb-connection=<SERVICE_BUS_CONNECTION_STRING>"   --scale-rule-name servicebus-rule   --scale-rule-type azure-servicebus   --scale-rule-metadata "queueName=orders" "namespace=mybus.servicebus.windows.net" "messageCount=5"   --scale-rule-auth "connection=sb-connection"
+```
+
+---
+
+## Operator notes
+
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+
+---
+
+## Common mistakes
+
+- Managed does not mean operations disappear.
+- A failed new revision is not the same thing as automatic rollback.
+- Scale-to-zero is not implemented the same way for every rule type.
+- Turning on Dapr does not remove application design responsibility.
+- Using Environment and App as if they are the same layer leads to weak boundary decisions.
+
+---
+
+## Operations checklist
+
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+
+---
+
+This post is one step in the Azure Container Apps 101 series.
+The earlier posts define the platform shape, and the later posts build deployment and operations decisions on top of that shape.
+Read in order and ACA starts to feel like an operating model instead of a feature catalog.
+
+- Revisit the checklist right after each deployment.
+
+---
+
+## References
+
+### Official Docs
+- [Scaling in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/scale-app)
+- [Azure Container Apps overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/overview)
+- [KEDA scalers documentation](https://keda.sh/docs/scalers/)
+
+### Related Series
+- [Azure App Service 101](../../azure-app-service-101/en/01-what-is-app-service.md)
+- [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
+- [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)

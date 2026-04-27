@@ -1,0 +1,108 @@
+# HPA and Cluster Autoscaler internals — two control loops
+
+> Azure Kubernetes Service Deep Dive series (5/6)
+
+HPA changes replica count.
+Cluster Autoscaler changes node count.
+They live under the same autoscaling umbrella,
+but they do not replace each other.
+HPA runs inside `kube-controller-manager` and computes desired replicas from metrics.
+Cluster Autoscaler runs as a separate Deployment and simulates node-pool expansion for unschedulable Pods.
+
+---
+
+## Put both loops in one diagram
+
+```mermaid
+flowchart LR
+    M[Metrics] --> HPA[HPA controller]
+    HPA --> R[desired replicas]
+    R --> API1[update Scale]
+    API1 --> Pods[more or fewer Pods]
+
+    Pods --> U[unschedulable Pods]
+    U --> CA[Cluster Autoscaler]
+    CA --> Sim[binpacking simulation]
+    Sim --> NG[node group scale-up]
+    NG --> Nodes[more nodes]
+    Nodes --> Pods
+```
+
+---
+
+## The HPA side
+
+The default sync period is 15 seconds.
+A representative model is `desiredReplicas = ceil(currentReplicas * (currentMetric / targetMetric))`.
+The real code layers in tolerance,
+missing metrics handling,
+and stabilization windows.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant H as HPA controller
+    participant Metrics as metrics APIs
+    participant API as kube-apiserver
+    participant Scale as target /scale
+
+    H->>Metrics: fetch current metrics
+    Metrics-->>H: currentMetric
+    H->>Scale: read current replicas
+    Scale-->>H: currentReplicas
+    H->>H: compute desiredReplicas
+    H->>API: update target scale
+```
+
+---
+
+## The CA side
+
+CA watches unschedulable Pods,
+builds template nodes for each node pool,
+and runs a binpacking estimator.
+It asks whether extra nodes from a specific pool would make the Pods schedulable before changing the node count.
+
+```mermaid
+flowchart TB
+    A[Unschedulable Pods] --> B[group pods by equivalence]
+    B --> C[For each node pool]
+    C --> D[Build template node]
+    D --> E[Binpacking estimator]
+    E --> F[Expansion option]
+    F --> G[Pick best node group]
+    G --> H[Increase node count]
+```
+
+---
+
+## The point of this episode
+
+> HPA is a ratio controller that polls metrics every 15 seconds by default and adjusts replica count. Cluster Autoscaler is a separate component that watches unschedulable Pods and simulates whether extra nodes from each node pool would make them schedulable. HPA scales Pods. CA scales nodes.
+
+---
+
+## Where this fits in the series
+
+This is part 5 of the Azure Kubernetes Service Deep Dive series.
+Part 4 explained scheduling decisions; this part explains the two control loops that react to those decisions. Part 6 shows how KEDA sits above HPA and feeds it external metrics while handling the scale-to-zero boundary itself.
+
+---
+
+## References
+
+### Primary sources
+- [`horizontal.go` @ `v1.30.0`](https://github.com/kubernetes/kubernetes/blob/v1.30.0/pkg/controller/podautoscaler/horizontal.go)
+- [`replica_calculator.go` @ `v1.30.0`](https://github.com/kubernetes/kubernetes/blob/v1.30.0/pkg/controller/podautoscaler/replica_calculator.go)
+- [`hpacontroller.go` @ `v1.30.0`](https://github.com/kubernetes/kubernetes/blob/v1.30.0/cmd/kube-controller-manager/app/options/hpacontroller.go)
+- [`static_autoscaler.go` @ `cluster-autoscaler-1.30.0`](https://github.com/kubernetes/autoscaler/blob/cluster-autoscaler-1.30.0/cluster-autoscaler/core/static_autoscaler.go)
+- [`orchestrator.go` @ `cluster-autoscaler-1.30.0`](https://github.com/kubernetes/autoscaler/blob/cluster-autoscaler-1.30.0/cluster-autoscaler/core/scaleup/orchestrator/orchestrator.go)
+- [`binpacking_estimator.go` @ `cluster-autoscaler-1.30.0`](https://github.com/kubernetes/autoscaler/blob/cluster-autoscaler-1.30.0/cluster-autoscaler/estimator/binpacking_estimator.go)
+
+### Secondary sources
+- [Use the cluster autoscaler in AKS](https://learn.microsoft.com/en-us/azure/aks/cluster-autoscaler)
+- [Horizontal Pod Autoscaling](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+
+### Related Series
+- [Azure AKS 101](../../azure-aks-101/en/)
+- [Azure Functions Deep Dive part 5 — scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md)

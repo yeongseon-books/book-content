@@ -20,6 +20,8 @@ The flow for deciding your App Service hosting strategy:
 3. Choose Plan Tier (Dev → Production)
 ```
 
+![App Service plan decision flow](../../assets/azure-app-service-101/03/01-decision-flow.en.png)
+
 ---
 
 ## What is an App Service Plan?
@@ -163,6 +165,8 @@ az webapp create \
 
 ## Shared Plan vs Dedicated Plan
 
+![Shared vs dedicated plans](../../assets/azure-app-service-101/03/03-shared-vs-dedicated.en.png)
+
 ### Shared Plan Strategy
 
 Place multiple apps on one Plan:
@@ -199,6 +203,8 @@ Internal tools, low traffic apps → Shared Plan
 ## Feature Mapping
 
 Which features depend on Plan vs Deployment Model:
+
+![Per-tier feature unlock matrix](../../assets/azure-app-service-101/03/02-tier-feature-matrix.en.png)
 
 | Feature | Plan Dependent | Deployment Model Dependent |
 |---------|----------------|---------------------------|

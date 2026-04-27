@@ -21,6 +21,8 @@ Different environments need different connection strings, API keys, and log leve
 
 App Service injects environment variables through **App Settings**:
 
+![Configuration resolution flow](../../assets/azure-app-service-101/05/configuration-flow.en.png)
+
 ```
 [Azure Portal/CLI] → App Settings → [Environment Variables] → [App Process]
 ```
@@ -80,6 +82,8 @@ SCM_DO_BUILD_DURING_DEPLOYMENT true
 ## Local vs Production Strategy
 
 ### Environment Separation Pattern
+
+![Per-environment configuration strategies](../../assets/azure-app-service-101/05/environment-strategy.en.png)
 
 ```python
 # config.py
@@ -182,6 +186,8 @@ When using Deployment Slots, some settings should be **sticky to the slot**.
 | `LOG_LEVEL` | No | Usually the same |
 | `FEATURE_FLAG_X` | Depends | Sticky when testing per slot |
 
+![Slot setting behavior during swap](../../assets/azure-app-service-101/05/slot-settings-behavior.en.png)
+
 ### Configuring Slot Settings
 
 ```bash
@@ -201,6 +207,8 @@ az webapp config appsettings set \
 ## Key Vault References: Secrets Done Right
 
 Store sensitive values like passwords and API keys in **Key Vault** and reference them.
+
+![Key Vault Reference resolution flow](../../assets/azure-app-service-101/05/key-vault-reference-flow.en.png)
 
 ### Why Key Vault?
 
