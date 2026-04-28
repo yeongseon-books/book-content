@@ -89,7 +89,11 @@ exports/medium/<series>/<NN>.md
 - H3 이상의 헤딩은 demote한다 (Medium 호환).
 - 내부 상대 링크는 GitHub 절대 URL로 변환한다.
 - Medium 제목은 front matter `medium_title` → `seo_title` → `title` 순으로 fallback (front matter 도입 후).
-- 하단 `Tags: A, B, C, D` 라인은 유지하되, Medium UI에서는 `to-medium.py` 가 leading HTML comment(`<!-- tags: ... -->`)로도 동시에 노출한다 (붙여넣기 편의).
+- 태그 처리(현행 `to-medium.py` 기준):
+  - 하단 visible `Tags:` 라인은 **제거**한다 (Medium UI 가 자체 태그 입력칸을 갖기 때문).
+  - 파일 첫 줄에 `<!-- tags: A, B, C, D -->` HTML comment 한 줄로 surface 한다 (Medium 발행 시 태그칸에 그대로 복사할 수 있도록).
+  - `finalize-posts.py` 는 `medium/` 디렉토리를 스킵하므로, medium 변형의 태그/TOC 는 `to-medium.py` 단독 책임이다.
+- TOC 처리: `<!-- toc:begin --> ... <!-- toc:end -->` 마커는 제거되지만 TOC 본문 라인은 유지된다 (Medium 에는 자체 nav 가 없으므로 시리즈 인덱스 역할).
 
 ### 명령 (예정)
 
@@ -119,11 +123,11 @@ docs/en/<series>/...
 
 ### 규칙
 
-- `content/` 에서 `docs/` 로 복사 또는 변환한다 (`scripts/build_docs.py`).
+- `content/` 에서 `docs/` 로 복사 또는 변환한다 (`scripts/build_docs.py` 가 파일을 materialize).
 - 하단 visible `Tags:` 라인과 `<!-- toc:begin -->...<!-- toc:end -->` 블록은 MkDocs 빌드 시 제거한다 (사이트 nav가 같은 역할 수행).
 - `blog-only` 블록은 기본적으로 제거한다.
 - `ebook-only` 블록은 MkDocs 웹북에서는 선택적으로 포함한다 (옵션 플래그).
-- nav는 `series.yaml` 에서 생성한다.
+- nav 메타데이터는 `scripts/build_series_index.py` 가 `series.yaml` 에서 생성하여 `mkdocs.yml` 에 inject 한다 (단일 소유자). `build_docs.py` 는 nav 를 만지지 않는다.
 
 ### 명령 (예정)
 
@@ -180,11 +184,13 @@ mkdocs-ebook build exports/ebook-source/azure-functions-101-ko
 | --- | --- | --- | --- | --- |
 | `blog-only` 블록 | 유지 | 유지 | 제거 | 제거 |
 | `ebook-only` 블록 | 제거 | 제거 | 옵션 | 유지 |
-| Visible `Tags:` 라인 | 유지 | 유지 | 제거 | 제거 |
-| TOC `<!-- toc:* -->` 블록 | 유지 | 유지 | 제거 | 제거 |
+| Visible 하단 `Tags:` 라인 | 유지 | **제거** (leading HTML comment 로 대체) | 제거 | 제거 |
+| Leading `<!-- tags: ... -->` 라인 | 없음 | **있음** (`to-medium.py` 가 첫 줄에 삽입) | 없음 | 없음 |
+| TOC `<!-- toc:* -->` 마커 | 유지 | 제거 (마커만; TOC 본문은 유지) | 제거 (전체) | 제거 (전체) |
 | 이미지 경로 | 상대 / 호스팅 | commit-pinned 절대 URL | 상대 (`docs/` 기준) | 번들 내부 상대 |
 | Mermaid | PNG | PNG | mermaid 또는 PNG | PNG |
 | H3+ demote | 그대로 | demote | 그대로 | 그대로 |
+| `finalize-posts.py` 적용 | 적용 | **스킵** (`to-medium.py` 단독 책임) | N/A | N/A |
 
 ---
 

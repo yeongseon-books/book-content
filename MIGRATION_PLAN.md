@@ -31,7 +31,7 @@ tech-writing = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파
 
 `tech-blog`는 블로그 전용 저장소처럼 보인다. 이 저장소는 Tistory, Medium, MkDocs, eBook을 모두 대상으로 하므로 더 포괄적인 이름이 필요하다. `cloud-*`, `azure-*` 계열은 부적절하다(AI, AX, 기술 글쓰기 등을 모두 다룸).
 
-> **수동 단계**: 리포지토리 rename은 GitHub UI 또는 `gh repo rename tech-writing` 명령으로 직접 수행해야 한다. 자동화 범위 밖이므로 [`ROADMAP.md`](./ROADMAP.md) Phase 1에 수동 작업으로 표시한다.
+> **수동 단계**: 리포지토리 rename은 GitHub UI 또는 `gh repo rename tech-writing` 명령으로 직접 수행해야 한다. 자동화 범위 밖이므로 [`ROADMAP.md`](./ROADMAP.md) Phase 9에 수동 작업으로 표시한다.
 
 ## 3. 저장소 정체성
 
@@ -43,7 +43,9 @@ tech-writing = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파
 
 > Technical writing source repository for blog posts, MkDocs web books, and eBook publishing.
 
-## 4. 핵심 설계 원칙
+## 4. 핵심 설계 원칙 (목표 상태 — Phase 6 이후)
+
+> 본 절은 Phase 6 시리즈 이동이 끝난 뒤의 목표 상태를 기술한다. Phase 6 이전에는 시리즈가 여전히 루트(`<series>/`)에 있고, [`AGENTS.md`](./AGENTS.md) 의 기존 규칙이 그대로 적용된다.
 
 ### 4.1 원본은 하나여야 한다
 
@@ -204,12 +206,13 @@ tech-writing/
 | --- | --- | --- | --- |
 | 1 | 문서 분리 (SERIES/PUBLISHING/STYLE_GUIDE/EBOOK/ROADMAP) + README 재작성 | 낮음 | 완료 |
 | 2 | 디렉토리 스캐폴딩 (content/ docs/ exports/ templates/ scripts/) | 낮음 | 완료 |
-| 3 | 메타데이터 (root series.yaml + per-series series.yaml) | 낮음 | 완료 |
-| 4 | MkDocs 셋업 (mkdocs.yml + requirements.txt + build_docs.py) | 낮음 | 완료 (스크립트는 skeleton) |
+| 3 | 메타데이터 (root `series.yaml`) | 낮음 | 완료 (per-series `series.yaml` 는 Phase 6 동시) |
+| 4 | MkDocs 셋업 (mkdocs.yml + requirements.txt + build_docs.py skeleton) | 낮음 | 완료 (스크립트는 skeleton, 실제 빌드는 Phase 6 이후) |
 | 5 | 스크립트 skeleton (export_tistory/medium/ebook_source, check_*) | 낮음 | 완료 (skeleton) |
-| 6 | 시리즈 파일 이동 (`<series>/` → `content/<series>/`) | **높음** | 시리즈별 원자 커밋 |
+| 6 | 시리즈 파일 이동 (`<series>/` → `content/<series>/`) + per-series `series.yaml` 동시 추가 | **높음** | 시리즈별 원자 커밋 |
 | 7 | 콘텐츠 품질 (front matter 도입, AI 시리즈 갱신, Deep Dive Source Version) | 중간 | 시리즈별 |
-| 8 | 리포지토리 rename (`tech-blog` → `tech-writing`) | 낮음 | 수동 (`gh repo rename`) |
+| 8 | eBook source bundle 통합 (`export_ebook_source.py` 실 동작 + private `mkdocs-ebook` 빌드) | 중간 | 부분 자동화 |
+| 9 | 리포지토리 rename (`tech-blog` → `tech-writing`) + medium URL 일괄 재생성 | 낮음 | 수동 (`gh repo rename`) |
 
 ## 9. 산출물 목록
 
@@ -217,10 +220,11 @@ tech-writing/
 
 - `MIGRATION_PLAN.md` (본 문서)
 - `SERIES.md`, `PUBLISHING.md`, `STYLE_GUIDE.md`, `EBOOK.md`, `ROADMAP.md`
-- `mkdocs.yml`, `requirements.txt`, `requirements-dev.txt`, `series.yaml`
+- `mkdocs.yml`, `requirements.txt`, `requirements-dev.txt`, `series.yaml` (루트 카탈로그)
 - `content/`, `docs/`, `exports/`, `templates/`, `scripts/` 디렉토리 스캐폴딩
 - `scripts/{build_docs,export_tistory,export_medium,export_ebook_source,check_links,check_frontmatter,build_series_index}.py` (skeleton)
-- 각 시리즈별 `series.yaml` (skeleton, 실제 content/ 이동 전이라도 메타는 정의)
+
+각 시리즈별 `series.yaml` 은 본 사이클이 아닌 Phase 6 시리즈 이동 커밋 안에서 함께 추가된다 (이동과 메타가 같은 원자 커밋이어야 경로 정합성이 유지됨).
 
 ## 10. 명시적으로 보류되는 작업
 

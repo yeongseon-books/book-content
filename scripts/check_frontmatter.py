@@ -4,6 +4,9 @@ Status: skeleton. Activated once Phase 7 introduces front matter.
 
 Required fields (per STYLE_GUIDE.md and templates/article.{ko,en}.md):
     title, seo_title, series, episode, language, status, targets, tags, last_reviewed
+
+Note on status enum: `planned` is a series-level state (in series.yaml) only.
+Article-level front matter must be one of: draft, ready, published, needs-update.
 """
 
 from __future__ import annotations
@@ -25,7 +28,7 @@ REQUIRED_FIELDS = {
     "last_reviewed",
 }
 
-VALID_STATUS = {"draft", "ready", "published", "needs-update", "planned"}
+VALID_STATUS = {"draft", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 
 

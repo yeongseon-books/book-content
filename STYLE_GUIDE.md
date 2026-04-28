@@ -14,18 +14,19 @@
 4. **References section** — `## 참고 자료` (ko) 또는 `## References` (en/medium)
 5. **Tag line** — 마지막 라인: `Tags: A, B, C, D`
 
-권장 본문 구조:
+권장 본문 구조 (위 mandatory order 와 일치):
 
 ```text
-1. Title
+1. Title (H1)
 2. Intro (왜 이 글이 필요한가)
 3. Mental Model (개념 모델 / 그림)
 4. Main Explanation
 5. Practical Example (코드)
 6. Common Mistakes / Checklist
 7. Summary
-8. References
-9. Series Navigation (TOC + 다음 글)
+8. Series TOC block (`<!-- toc:begin --> ... <!-- toc:end -->`)
+9. References (`## 참고 자료` / `## References`)
+10. Tag line (`Tags: A, B, C, D`) — 마지막 줄
 ```
 
 ---

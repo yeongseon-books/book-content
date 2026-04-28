@@ -1,6 +1,9 @@
 """Build MkDocs `docs/` from `content/`.
 
 Status: skeleton. The actual content/ directory is empty until Phase 6 file moves.
+
+Scope: this script materializes content -> docs files only. It does NOT touch
+mkdocs.yml `nav`; nav generation is owned by scripts/build_series_index.py.
 """
 
 from __future__ import annotations

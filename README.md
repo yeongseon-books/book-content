@@ -196,19 +196,19 @@ tech-blog/
 ├── README.md
 ├── MIGRATION_PLAN.md, SERIES.md, PUBLISHING.md, STYLE_GUIDE.md, EBOOK.md, ROADMAP.md
 ├── mkdocs.yml, requirements.txt, requirements-dev.txt
-├── series.yaml                          # 루트 시리즈 카탈로그
+├── series.yaml                          # 루트 시리즈 카탈로그 (단일 출처)
 ├── <series>/                            # 시리즈는 아직 루트에 위치
-│   ├── series.yaml                      # 시리즈별 메타
-│   ├── ko/, en/, medium/                # ko/en 원본 + medium 변형
+│   └── ko/, en/, medium/                # ko/en 원본 + medium 변형
 ├── ai-web-dev-101/                      # 단일 변형 (ko-only)
 ├── llm-from-scratch-101/                # ko/en/medium 3변형
+├── azure-functions-host/                # Azure 업스트림 vendored 소스 (시리즈 아님, Phase 6 제외)
 ├── content/, docs/, exports/,           # scaffold (.gitkeep)
 │   templates/, scripts/
 └── assets/<series>/<NN>/...
 
 # 목표 (Phase 6+)
 tech-writing/
-├── content/<series>/{series.yaml, ko/, en/}
+├── content/<series>/{series.yaml, ko/, en/}   # per-series series.yaml은 Phase 6에서 추가
 ├── docs/{ko,en}/<series>/...
 ├── exports/{tistory,medium,ebook-source}/...
 └── assets/<series>/<NN>/...             # 위치는 보존

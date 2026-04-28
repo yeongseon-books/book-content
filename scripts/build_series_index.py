@@ -1,7 +1,12 @@
-"""Generate SERIES.md and mkdocs nav from series.yaml.
+"""Generate SERIES.md tables and mkdocs.yml `nav` from series.yaml.
 
 Status: skeleton. Will replace the hand-maintained tables in SERIES.md once
-front matter is in place and per-series series.yaml episodes are populated.
+front matter is in place and per-series series.yaml episodes are populated
+(per-series series.yaml files are added in Phase 6, alongside file moves).
+
+Scope: this script is the single owner of mkdocs.yml `nav` generation.
+scripts/build_docs.py only materializes content -> docs files and never
+edits nav.
 """
 
 from __future__ import annotations

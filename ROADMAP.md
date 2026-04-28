@@ -15,9 +15,8 @@
 - [x] `EBOOK.md` 추가
 - [x] `ROADMAP.md` 추가
 - [x] `README.md` 재작성 (publishing-targets 프레임 + 기존 시리즈 표 유지)
-- [ ] **수동**: GitHub 리포지토리 rename (`tech-blog` → `tech-writing`)
-  - 명령: `gh repo rename tech-writing` (또는 GitHub UI Settings → Rename)
-  - rename 후 `.sisyphus/medium/to-medium.py` 의 `OWNER/REPO` 상수와 README/문서 내 URL 갱신 필요
+
+리포지토리 rename 은 Phase 9 에서 진행한다.
 
 ## Phase 2 — Directory Restructure (scaffolding)
 
@@ -30,19 +29,19 @@
 
 ## Phase 3 — Metadata
 
-- [x] 루트 `series.yaml` 추가 (시리즈 카탈로그)
-- [x] 시리즈별 `series.yaml` 추가 (현재 위치 기준 — `<series>/series.yaml`)
+- [x] 루트 `series.yaml` 추가 (시리즈 카탈로그 단일 출처)
+- [ ] 시리즈별 `series.yaml` 추가 — Phase 6 시리즈 이동 커밋 안에서 동시 추가 (이동과 메타가 같은 원자 커밋이어야 경로 정합성 유지)
 - [ ] 모든 글에 YAML front matter 추가 (Phase 7)
 - [ ] `finalize-posts.py` 의 `SERIES_TAGS` 와 `series.yaml` 동기화 검증 추가
 
 ## Phase 4 — MkDocs
 
-- [x] `mkdocs.yml` 추가
+- [x] `mkdocs.yml` 추가 (현재는 placeholder nav — Phase 6 전까지 빌드되지 않음)
 - [x] `requirements.txt` 추가 (mkdocs + material + pymdown + pyyaml + frontmatter)
 - [x] `requirements-dev.txt` 추가 (mkdocs-ebook 옵션 설치 주석)
-- [x] `scripts/build_docs.py` skeleton
-- [ ] `docs/` 자동 생성 로직 구현
-- [ ] `mkdocs serve` 로 ko/en 사이트 정상 빌드 확인
+- [x] `scripts/build_docs.py` skeleton (content -> docs materialization 만 담당)
+- [ ] `docs/` 자동 생성 로직 구현 (Phase 6 이후)
+- [ ] `mkdocs serve` 로 ko/en 사이트 정상 빌드 확인 (Phase 6 이후)
 
 ## Phase 5 — Exporters (skeleton)
 
@@ -51,13 +50,23 @@
 - [x] `scripts/export_ebook_source.py` skeleton
 - [x] `scripts/check_links.py` skeleton
 - [x] `scripts/check_frontmatter.py` skeleton
-- [x] `scripts/build_series_index.py` skeleton
+- [x] `scripts/build_series_index.py` skeleton (mkdocs.yml `nav` 단일 소유자)
 - [ ] 각 스크립트 실제 변환 로직 구현
 - [ ] 기존 `.sisyphus/medium/{to-medium.py, finalize-posts.py, mermaid-to-png.py}` 와 통합/병행 정책 결정
 
 ## Phase 6 — Series file moves (시리즈별, 원자 커밋)
 
-각 시리즈를 `<series>/` → `content/<series>/` 로 이동하고, 같은 커밋에서 모든 상대 경로(이미지, TOC 링크, references)를 갱신한다.
+각 시리즈를 `<series>/` → `content/<series>/` 로 이동하고, **같은 커밋에서** (1) 모든 상대 경로(이미지, TOC 링크, references) 갱신 (2) `content/<series>/series.yaml` 추가를 함께 수행한다.
+
+**Scope rule (catalog whitelist):** 이동 대상은 `series.yaml` 에 등재된 `path:` 값만이다. 루트의 다른 디렉토리는 절대 건드리지 않는다. 특히 다음을 명시적으로 제외한다.
+
+- `azure-functions-host/` — Azure/azure-functions-host 의 vendored upstream source (Deep Dive 시리즈 인용용). 시리즈 아님.
+- `assets/` — 위치 보존 (모든 ko/en/medium 파일 경로 동시 갱신 위험 회피)
+- `.sisyphus/`, `docs/`, `exports/`, `templates/`, `scripts/`, `content/` — 인프라 디렉토리
+- 루트 문서 (`README.md`, `MIGRATION_PLAN.md`, `ROADMAP.md`, `SERIES.md`, `PUBLISHING.md`, `STYLE_GUIDE.md`, `EBOOK.md`, `AGENTS.md`)
+- 설정 (`mkdocs.yml`, `series.yaml`, `requirements*.txt`)
+
+이동 대상 (catalog 등재):
 
 - [ ] `azure-app-service-101`
 - [ ] `azure-app-service-deep-dive`
@@ -98,8 +107,10 @@ python3 .sisyphus/medium/finalize-posts.py
 
 ## Phase 9 — Repository rename & cutover
 
-- [ ] **수동**: `gh repo rename tech-writing`
+- [ ] **수동**: `gh repo rename tech-writing` (또는 GitHub UI Settings → Rename)
+- [ ] `.sisyphus/medium/to-medium.py` 의 `OWNER/REPO` 상수 업데이트
 - [ ] medium 변형 `OWNER/REPO` URL 일괄 재생성 (`to-medium.py` 의 `TAG` 도 함께 갱신)
+- [ ] 이미 발행된 Medium 글의 raw URL 은 GitHub redirect 에 의존 — 장기 신뢰 보증 아님, 가능하면 재발행
 - [ ] README badge / 외부 링크 업데이트
 - [ ] 새 이름으로 첫 announcement post (선택)
 

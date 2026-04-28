@@ -31,7 +31,10 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
 
-# nav is rewritten by scripts/build_docs.py from series.yaml; the entries below are placeholders.
+# nav is rewritten by scripts/build_series_index.py from series.yaml (single owner);
+# scripts/build_docs.py only materializes content/ -> docs/ files and does not touch nav.
+# The entries below are placeholders for the scaffold phase (Phase 4) and are not
+# expected to build until Phase 6 file moves populate content/ and docs/.
 nav:
   - Home: index.md
   - Korean:
