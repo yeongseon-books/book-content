@@ -1,0 +1,203 @@
+# Style Guide
+
+이 문서는 기술 글의 문체, 구조, 이미지, 태그, 참고자료 규칙을 정의한다. ko 글의 추가 규칙은 [`.sisyphus/skills/humanize-korean/quick-rules.md`](./.sisyphus/skills/humanize-korean/quick-rules.md) (S1 패턴) 을 함께 따른다.
+
+---
+
+## 1. 글 구조 (mandatory order)
+
+모든 글은 다음 순서를 지킨다 ([`AGENTS.md`](./AGENTS.md) "Post structure" 와 동일).
+
+1. **H1 title** (`# Title`) — 첫 본문 라인
+2. **Body** (sections, code, images, ...)
+3. **Series TOC block** — `<!-- toc:begin --> ... <!-- toc:end -->`
+4. **References section** — `## 참고 자료` (ko) 또는 `## References` (en/medium)
+5. **Tag line** — 마지막 라인: `Tags: A, B, C, D`
+
+권장 본문 구조:
+
+```text
+1. Title
+2. Intro (왜 이 글이 필요한가)
+3. Mental Model (개념 모델 / 그림)
+4. Main Explanation
+5. Practical Example (코드)
+6. Common Mistakes / Checklist
+7. Summary
+8. References
+9. Series Navigation (TOC + 다음 글)
+```
+
+---
+
+## 2. 한국어 글 스타일 (`ko/`)
+
+### 기본 톤
+
+- 자연스러운 `~입니다` 체. 시니어 엔지니어 voice.
+- 번역체(translation smell) 회피. `.sisyphus/style/check-ko.sh` 가 `translation-smells.txt` 와 humanize-korean S1 패턴을 grep으로 자동 검증한다.
+- 기술 용어는 필요 시 영어 병기 (`이벤트 기반(event-driven) 실행 모델`).
+- 비유는 핵심 기술 설명을 흐리지 않는 선에서만.
+
+### im-not-ai S1 패턴 (자동 검증 대상)
+
+`.sisyphus/skills/humanize-korean/quick-rules.md` 의 S1 패턴은 첫 줄부터 회피한다. 자주 적발되는 것:
+
+- `~에 대해(서)` → 목적격 조사 직결
+- `~에 있어서` → `~에서`, `~을 볼 때`
+- `~을 가지고 있다` → 형용사형
+- 이중 피동 `되어진다` → 능동/단일 피동
+- 종결 공식 `요약하면`, `정리하자면`, `종합하면`
+- hype 어휘 `획기적인`, `압도적인`, `폭발적인`
+- 결말 공식 `~할 때입니다`, `~할 시점입니다`
+- `~한 것이다`, `~다는 뜻이다` 결말
+- 문두 접속사 `나아가,`, `아울러,`, `게다가,`, `더욱이,`
+
+### 좋은 예 / 나쁜 예
+
+```text
+좋음:
+Azure Functions는 이벤트가 들어올 때 함수를 깨우는 실행 모델입니다.
+
+피함:
+Azure Functions는 혁신적인 클라우드 네이티브 서버리스 컴퓨팅 패러다임입니다.
+```
+
+---
+
+## 3. 영어 글 스타일 (`en/`, `medium/`)
+
+- Medium 독자를 고려해 짧은 문단.
+- 공식 문서 톤(`It is recommended that one should consider...`) 회피. 시니어 엔지니어 voice.
+- 실무 문제 중심 제목 (`How to fix cold start in Azure Functions Premium plan` ≫ `An overview of cold start`).
+- 복잡한 문장은 분해.
+- AI slop 회피: `In today's rapidly evolving landscape...`, `It's worth noting that...`, `Let's dive in!`, `In conclusion,...` 등 금지.
+
+---
+
+## 4. Deep Dive 글 추가 규칙
+
+`*-deep-dive` 시리즈는 신뢰성이 핵심이므로 다음 두 섹션을 반드시 포함한다.
+
+### Source Version
+
+```markdown
+## Source Version
+
+- Repository: Azure/azure-functions-host
+- Commit: 5e59423
+- Runtime family: Azure Functions Host v4
+- Last reviewed: 2026-04-28
+```
+
+### Call Path Summary (가능 시)
+
+```markdown
+## Call Path Summary
+
+Program.cs
+  → WebJobsScriptHostService.StartAsync()
+    → ScriptHost.InitializeAsync()
+      → Read host.json
+      → Index function metadata
+      → Prepare worker channels
+    → JobHost.StartAsync()
+      → Start trigger listeners
+```
+
+---
+
+## 5. 101 글 추가 규칙
+
+`*-101` 및 입문 시리즈는 다음을 포함한다.
+
+- **Common Mistakes** 또는 **Checklist** 섹션
+- 첫 deploy/실행이 가능한 최소 코드 스니펫
+- 다음 글로의 자연스러운 bridge
+
+---
+
+## 6. 이미지 규칙
+
+### 위치
+
+```text
+assets/<series>/<NN>/<NN>-<idx>-<slug>.{ko|en}.png
+```
+
+- ko slug = en counterpart heading slug (ko/en 파일명 대칭 유지)
+- 공통 이미지는 `assets/shared/`
+
+### 출처
+
+- 모든 다이어그램의 source는 본문 내 mermaid 코드 블록.
+- `flowchart LR` 권장 (이벤트 소스가 왼쪽).
+- `()`, `/`, `;`, `(.NET)` 같은 특수문자가 든 라벨은 따옴표로 감싼다: `["Label (with parens)"]`.
+- en 다이어그램은 영어 라벨만, ko 다이어그램은 한국어 라벨만.
+
+### 변환
+
+```bash
+python3 .sisyphus/medium/mermaid-to-png.py <ko-file> <en-file>
+```
+
+ko/en 본문은 로컬 상대 경로를, medium 본문은 commit-pinned `raw.githubusercontent.com/...` 절대 URL을 참조한다.
+
+---
+
+## 7. 태그 규칙
+
+태그의 단일 출처는 `.sisyphus/medium/finalize-posts.py` 의 `SERIES_TAGS` dict이다.
+
+- 하단 `Tags: A, B, C, D` visible 라인은 **반드시 유지** (Tistory/Medium 입력 칸에 직접 복사).
+- YAML front matter `tags:` 가 도입되면 `finalize-posts.py` 가 두 위치를 동기화한다.
+- visible 라인을 직접 손으로 편집하지 않는다 — `SERIES_TAGS` 만 수정한 뒤 finalizer 재실행.
+
+---
+
+## 8. 참고자료 규칙
+
+```markdown
+## References
+
+### Official Docs
+
+- [Azure Functions overview](https://learn.microsoft.com/...)
+
+### Source Code
+
+- [Azure/azure-functions-host @ 5e59423](https://github.com/Azure/azure-functions-host/tree/5e59423)
+```
+
+- ko 글: 헤딩은 `## 참고 자료` (`## References`, `## 참고문헌`, `## 참고` 사용 금지). `finalize-posts.py` 가 자동 정규화.
+- Deep Dive: 가능한 한 commit-pinned 링크 사용.
+
+---
+
+## 9. blog-only / ebook-only 블록
+
+플랫폼별 분기를 위한 마커.
+
+```markdown
+<!-- blog-only:start -->
+다음 글에서는 ...
+<!-- blog-only:end -->
+
+<!-- ebook-only:start -->
+이 장은 책 전체 흐름에서 ...
+<!-- ebook-only:end -->
+```
+
+플랫폼별 처리는 [`PUBLISHING.md`](./PUBLISHING.md) §6 비교 표 참조.
+
+---
+
+## 10. 금지 사항
+
+- 이모지 (`✅`, `❌` 대신 `Pass` / `Fail` 텍스트).
+- 모든 사용자 코드는 Python 기반 (FastAPI 또는 Flask).
+- AI slop 표현 (한/영 모두).
+- visible Tags 라인을 손으로 편집.
+- mermaid를 PNG로 대체하지 않은 채 Tistory 업로드.
+- medium 변형에서 `master`/`HEAD`/`main` URL 사용 (반드시 commit-pinned `TAG`).
+- 타입/린트 에러 suppression (`as any`, `# type: ignore` 등) 코드 예제에서 사용.

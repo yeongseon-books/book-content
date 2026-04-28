@@ -1,6 +1,50 @@
-# Tech Blog
+# Tech Writing
 
-블로그 포스트 원고 저장소. **한국어는 Tistory**, **영어는 Medium**에 발행합니다.
+> 본 저장소는 `tech-blog` 에서 `tech-writing` 으로 단계적으로 개편 중입니다. 자세한 내용은 [`MIGRATION_PLAN.md`](./MIGRATION_PLAN.md) · [`ROADMAP.md`](./ROADMAP.md) 참조.
+
+Tistory, Medium, MkDocs, eBook 발행을 위한 기술 콘텐츠 원본 저장소. 한 번 작성한 글을 여러 채널로 변환하기 위한 멀티채널 퍼블리싱 파이프라인입니다.
+
+## Publishing Targets
+
+| Target | 용도 | 언어 |
+| --- | --- | --- |
+| Tistory | 한국어 블로그 | ko |
+| Medium | 영어 블로그 | en |
+| MkDocs | 웹북 / 문서 사이트 | ko + en |
+| eBook source | private `mkdocs-ebook` 입력 번들 | ko + en |
+
+## Content Areas
+
+- Azure (App Service, Functions, AKS, Container Apps; 101 + Deep Dive)
+- AI (AI Web Dev 101, LLM from Scratch 101)
+- AX (planned)
+- Developer Productivity (planned)
+- Open Source (planned)
+- Technical Writing (planned)
+
+## Key Documents
+
+- [`SERIES.md`](./SERIES.md) — 전체 시리즈 카탈로그와 상태
+- [`PUBLISHING.md`](./PUBLISHING.md) — Tistory/Medium/MkDocs/eBook 변환 규칙
+- [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) — 문체, 구조, 이미지, 태그, 참고자료 규칙
+- [`EBOOK.md`](./EBOOK.md) — eBook source bundle 정책 (private builder 연동)
+- [`ROADMAP.md`](./ROADMAP.md) — 개편 로드맵과 진행 상황
+- [`MIGRATION_PLAN.md`](./MIGRATION_PLAN.md) — `tech-blog` → `tech-writing` 마스터 플랜
+- [`AGENTS.md`](./AGENTS.md) — 에이전트(인간/AI) 운영 규칙
+
+## Quality Gates
+
+```bash
+python3 .sisyphus/medium/finalize-posts.py    # idempotent: tags + TOC + ko refs
+.sisyphus/style/check-ko.sh                   # ko translation-smell + im-not-ai S1 check
+```
+
+medium 변형 재생성 시:
+
+```bash
+python3 .sisyphus/medium/to-medium.py <series>/en
+python3 .sisyphus/medium/finalize-posts.py
+```
 
 ## 시리즈
 
@@ -142,80 +186,32 @@ Microsoft가 ACA라는 추상 위에 KEDA·Dapr·Envoy를 어떻게 얹었는지
 | 5 | Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스 | [ko](./azure-aca-deep-dive/ko/05-dapr-sidecar-internals.md) | [en](./azure-aca-deep-dive/en/05-dapr-sidecar-internals.md) |
 | 6 | Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지 | [ko](./azure-aca-deep-dive/ko/06-envoy-ingress-path.md) | [en](./azure-aca-deep-dive/en/06-envoy-ingress-path.md) |
 
-## 폴더 구조
+## 폴더 구조 (현재 / 목표)
 
-```
+현재(이행 중)와 목표 상태가 다릅니다. 시리즈별 이동은 [`ROADMAP.md`](./ROADMAP.md) Phase 6 에서 추적합니다.
+
+```text
+# 현재 (Phase 1-5 완료, Phase 6 대기)
 tech-blog/
 ├── README.md
-├── azure-app-service-101/
-│   ├── ko/                 # Tistory 발행본 (한국어 원본)
-│   │   ├── 01-what-is-app-service.md
-│   │   └── ... (07까지)
-│   └── en/                 # Medium 발행본 (영어 번역본)
-│       ├── 01-what-is-app-service.md
-│       └── ... (07까지)
-├── ai-web-dev-101/
-│   ├── 01-hello-ai-api.md
-│   └── ... (07까지)
-├── azure-functions-101/
-│   ├── ko/                 # Tistory 발행본 (한국어 원본)
-│   │   ├── 01-what-is-azure-functions.md
-│   │   └── ... (07까지)
-│   └── en/                 # Medium 발행본 (영어 번역본)
-│       ├── 01-what-is-azure-functions.md
-│       └── ... (07까지)
-├── azure-functions-deep-dive/
-│   ├── ko/
-│   │   ├── 01-host-bootstrap.md
-│   │   └── ... (06까지)
-│   └── en/
-│       ├── 01-host-bootstrap.md
-│       └── ... (06까지)
-├── azure-app-service-deep-dive/
-│   ├── ko/
-│   │   ├── 01-platform-architecture.md
-│   │   └── ... (06까지)
-│   └── en/
-│       ├── 01-platform-architecture.md
-│       └── ... (06까지)
-├── azure-aks-101/
-│   ├── ko/
-│   │   ├── 01-what-is-aks.md
-│   │   └── ... (07까지)
-│   └── en/
-│       ├── 01-what-is-aks.md
-│       └── ... (07까지)
-├── azure-aks-deep-dive/
-│   ├── ko/
-│   │   ├── 01-control-plane-anatomy.md
-│   │   └── ... (06까지)
-│   └── en/
-│       ├── 01-control-plane-anatomy.md
-│       └── ... (06까지)
-├── azure-aca-101/
-│   ├── ko/
-│   │   ├── 01-what-is-aca.md
-│   │   └── ... (07까지)
-│   └── en/
-│       ├── 01-what-is-aca.md
-│       └── ... (07까지)
-├── azure-aca-deep-dive/
-│   ├── ko/
-│   │   ├── 01-aca-architecture.md
-│   │   └── ... (06까지)
-│   └── en/
-│       ├── 01-aca-architecture.md
-│       └── ... (06까지)
-└── assets/
-    ├── azure-app-service-101/
-    │   ├── ko/<번호>/
-    │   └── en/<번호>/
-    ├── azure-functions-101/
-    │   ├── ko/<번호>/
-    │   └── en/<번호>/
-    └── azure-functions-deep-dive/
-        ├── ko/<번호>/
-        └── en/<번호>/
+├── MIGRATION_PLAN.md, SERIES.md, PUBLISHING.md, STYLE_GUIDE.md, EBOOK.md, ROADMAP.md
+├── mkdocs.yml, requirements.txt, requirements-dev.txt
+├── series.yaml                          # 루트 시리즈 카탈로그
+├── <series>/                            # 시리즈는 아직 루트에 위치
+│   ├── series.yaml                      # 시리즈별 메타
+│   ├── ko/, en/, medium/                # ko/en 원본 + medium 변형
+├── ai-web-dev-101/                      # 단일 변형 (ko-only)
+├── llm-from-scratch-101/                # ko/en/medium 3변형
+├── content/, docs/, exports/,           # scaffold (.gitkeep)
+│   templates/, scripts/
+└── assets/<series>/<NN>/...
+
+# 목표 (Phase 6+)
+tech-writing/
+├── content/<series>/{series.yaml, ko/, en/}
+├── docs/{ko,en}/<series>/...
+├── exports/{tistory,medium,ebook-source}/...
+└── assets/<series>/<NN>/...             # 위치는 보존
 ```
 
 ## 이미지 규칙

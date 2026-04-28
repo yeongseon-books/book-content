@@ -3,6 +3,8 @@
 > Persistent conventions for any agent (human or AI) working in this repository.
 > Apply these rules to every post, every commit, every script run.
 
+> **Migration in progress**: this repo is moving from `tech-blog` to `tech-writing` (multi-channel publishing pipeline). See [`MIGRATION_PLAN.md`](./MIGRATION_PLAN.md) and [`ROADMAP.md`](./ROADMAP.md). The rules below describe the **current** workflow (pre-Phase 6); they remain authoritative for any series still living at the repo root. Once a series is moved under `content/`, the new rules in [`PUBLISHING.md`](./PUBLISHING.md) and [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) take precedence for that series.
+
 ## Series catalog
 
 Eight Azure series (52 posts × 3 variants = 156 markdown files):
@@ -18,9 +20,15 @@ Each Azure series has three variants: `ko/`, `en/`, `medium/`.
 - `en/<NN>-<slug>.md` — Medium-bound English translation
 - `medium/<NN>.md` — Medium import-ready conversion of `en/` (raw URLs, bullet tables, demoted H3+, no toc markers, tags surfaced as leading HTML comment)
 
-Plus one single-variant Korean series:
+Plus the single-variant Korean series:
 
 - `ai-web-dev-101/` — 7 Korean-only posts published to Tistory. Flat layout, no `ko/`/`en/`/`medium/` subfolders. Same conventions apply (H1 → tag line at the bottom → series TOC above references), with TOC heading `## 시리즈 목차` and references heading `## 참고 자료`. Series tags: `AI, LLM, 웹 개발, Python, Tutorial` (defined in `.sisyphus/medium/finalize-ai-web-dev.py`).
+
+And the LLM series (3-variant like Azure):
+
+- `llm-from-scratch-101/` — 9-part series (`ko/`, `en/`, `medium/`). PyTorch 2.x, ~720 LOC tiny GPT, TinyShakespeare. Series tags: `LLM, PyTorch, Transformer, Tutorial`.
+
+The single source of truth for the catalog is now [`series.yaml`](./series.yaml); [`SERIES.md`](./SERIES.md) is the human-readable summary.
 
 ## Post structure (mandatory order)
 
