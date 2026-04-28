@@ -101,8 +101,10 @@ Run from repo root:
 
 ```bash
 python3 .sisyphus/medium/finalize-posts.py    # idempotent: tags + TOC + ko refs
-.sisyphus/style/check-ko.sh                   # ko translation-smell check (must exit 0)
+.sisyphus/style/check-ko.sh                   # ko translation-smell + im-not-ai S1 check (must exit 0)
 ```
+
+Korean writing additionally follows the **humanize-korean** ruleset mirrored at `.sisyphus/skills/humanize-korean/` (source: [epoko77-ai/im-not-ai](https://github.com/epoko77-ai/im-not-ai), MIT). Before drafting any `ko/*.md`, scan `.sisyphus/skills/humanize-korean/quick-rules.md` S1 patterns and avoid them from the first line. `check-ko.sh` enforces grep-detectable S1 patterns automatically.
 
 After regenerating medium variants:
 
