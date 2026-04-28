@@ -1,0 +1,15 @@
+# Runtime dependencies for MkDocs build and helper scripts.
+# Do NOT add private mkdocs-ebook here — see requirements-dev.txt for the
+# optional dev install path.
+
+mkdocs>=1.6,<2
+mkdocs-material>=9.5,<10
+pymdown-extensions>=10.7,<11
+
+# Front matter / YAML helpers used by scripts/.
+pyyaml>=6.0,<7
+python-frontmatter>=1.1,<2
+
+# Markdown post-processing.
+markdown>=3.5,<4
+beautifulsoup4>=4.12,<5

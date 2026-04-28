@@ -1,0 +1,19 @@
+-r requirements.txt
+
+# ---------------------------------------------------------------------------
+# Optional private eBook builder.
+#
+# `mkdocs-ebook` lives in a private repository (yeongseon/mkdocs-ebook).
+# Do NOT enable this by default — CI environments without SSH access to that
+# repository will fail.
+#
+# To install in a local environment that has access:
+#
+#   pip install git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+#
+# Once installed, the build flow is documented in EBOOK.md.
+# ---------------------------------------------------------------------------
+# git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+
+# Lint/format dev tools.
+ruff>=0.5,<1

@@ -1,0 +1,165 @@
+# Single source of truth for the series catalog.
+# SERIES.md is the human-readable summary; scripts/build_series_index.py will
+# generate SERIES.md and mkdocs.yml nav from this file.
+# status enum: planned | draft | ready | published | needs-update
+
+series:
+  # Azure
+  - id: azure-app-service-101
+    category: azure
+    title:
+      ko: Azure App Service 101
+      en: Azure App Service 101
+    description:
+      ko: Azure App Service 입문 7부작 — 호스팅, 설정, 로그, 스케일링.
+      en: A 7-part beginner guide to Azure App Service.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-app-service-101
+
+  - id: azure-app-service-deep-dive
+    category: azure
+    title:
+      ko: Azure App Service Deep Dive
+      en: Azure App Service Deep Dive
+    description:
+      ko: App Service 내부 — Front-End, Worker, Sandbox, Kudu, Scaling.
+      en: Inside App Service — Front-End, Worker, Sandbox, Kudu, Scaling.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-app-service-deep-dive
+
+  - id: azure-functions-101
+    category: azure
+    title:
+      ko: Azure Functions 101
+      en: Azure Functions 101
+    description:
+      ko: Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
+      en: A 7-part beginner guide to Azure Functions.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-functions-101
+
+  - id: azure-functions-deep-dive
+    category: azure
+    title:
+      ko: Azure Functions Deep Dive
+      en: Azure Functions Deep Dive
+    description:
+      ko: Azure Functions Host 소스 분석 시리즈 (commit-pinned).
+      en: Source-level dive into Azure Functions Host (commit-pinned).
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-functions-deep-dive
+
+  - id: azure-aks-101
+    category: azure
+    title:
+      ko: Azure Kubernetes Service 101
+      en: Azure Kubernetes Service 101
+    description:
+      ko: AKS 입문 시리즈.
+      en: AKS beginner guide.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-aks-101
+
+  - id: azure-aks-deep-dive
+    category: azure
+    title:
+      ko: Azure Kubernetes Service Deep Dive
+      en: Azure Kubernetes Service Deep Dive
+    description:
+      ko: AKS control plane / data plane 내부 동작.
+      en: AKS control plane / data plane internals.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-aks-deep-dive
+
+  - id: azure-aca-101
+    category: azure
+    title:
+      ko: Azure Container Apps 101
+      en: Azure Container Apps 101
+    description:
+      ko: Container Apps 입문 시리즈.
+      en: Container Apps beginner guide.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-aca-101
+
+  - id: azure-aca-deep-dive
+    category: azure
+    title:
+      ko: Azure Container Apps Deep Dive
+      en: Azure Container Apps Deep Dive
+    description:
+      ko: ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
+      en: Inside ACA — KEDA, Dapr, Envoy.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: azure-aca-deep-dive
+
+  # AI
+  - id: ai-web-dev-101
+    category: ai
+    title:
+      ko: AI 웹 개발 입문
+      en: AI Web Development 101
+    description:
+      ko: AI API 부터 배포까지, 초급 개발자를 위한 7부작.
+      en: 7-part guide for junior developers — from AI API basics to deployment.
+    languages: [ko]
+    targets: { tistory: true, medium: false, mkdocs: true, ebook: true }
+    status: needs-update
+    path: ai-web-dev-101
+
+  - id: llm-from-scratch-101
+    category: ai
+    title:
+      ko: LLM from Scratch 101
+      en: LLM from Scratch 101
+    description:
+      ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
+      en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: llm-from-scratch-101
+
+  # AX (planned)
+  - id: ax-practical-guide
+    category: ax
+    title:
+      ko: AX 실전 가이드
+      en: AI Transformation Practical Guide
+    description:
+      ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
+      en: Practical strategies for AI Transformation in real organizations.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: ax-practical-guide
+
+  # Technical writing (planned)
+  - id: technical-writing
+    category: writing
+    title:
+      ko: 엔지니어를 위한 기술 글쓰기
+      en: Technical Writing for Engineers
+    description:
+      ko: 시리즈를 설계하고, 한 편을 다듬는 법.
+      en: Designing a series and shipping a single article.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: technical-writing

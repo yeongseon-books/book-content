@@ -1,0 +1,40 @@
+site_name: Tech Writing
+site_description: Technical writing source for blog posts, MkDocs web books, and eBook publishing.
+site_author: Yeongseon Choe
+
+# docs/ is generated from content/ by scripts/build_docs.py before `mkdocs build`.
+docs_dir: docs
+
+theme:
+  name: material
+  language: ko
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.tabs.link
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+# nav is rewritten by scripts/build_docs.py from series.yaml; the entries below are placeholders.
+nav:
+  - Home: index.md
+  - Korean:
+      - ko/index.md
+  - English:
+      - en/index.md
