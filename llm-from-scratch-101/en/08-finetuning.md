@@ -1,0 +1,126 @@
+# Adapting the Base Model to Specific Tasks
+
+> LLM from Scratch 101 series (8/9)
+
+The model from the previous post can mimic Shakespearian rhythms, but it can't answer questions. It's just a next-character predictor trained on a single book. To make it useful, we need to adapt it.
+
+The primary effect of Supervised Fine-Tuning (SFT) is a change in format rather than a massive gain in knowledge. By using even a tiny dataset of 50 examples, we can observe how the model's output habits shift toward a conversational structure.
+
+Today's mental model is this: **Fine-tuning isn't about discarding the base model. It's about painting over its output habits using a small, specialized dataset.**
+
+---
+
+## Pre-training vs Fine-tuning vs RLHF — A Quick Summary
+
+Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.
+
+![Pre-training vs Fine-tuning vs RLHF — A Quick Summary](../../assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
+## Anatomy of an Instruction Data Row
+
+A single line in our `instructions.jsonl` follows a simple `{"instruction": ..., "response": ...}` structure. During training, we concatenate these into a `Q: {q}\nA: {a}` template.
+
+## Creating a Tiny Dataset — Are 50 Rows Enough?
+
+The following five rows are examples from `instructions.jsonl`. We fill the actual file with 50 such lines to provide enough variety for the model to recognize the pattern.
+
+```json
+{"instruction":"Who is ROMEO?","response":"A young lover who loves Juliet."}
+{"instruction":"What is Juliet's last name?","response":"Capulet."}
+{"instruction":"Who said 'To be, or not to be'?","response":"Hamlet."}
+{"instruction":"Write one sentence swearing loyalty to the King.","response":"My lord, I keep my faith."}
+{"instruction":"Give one sentence of advice on guarding against jealousy.","response":"Jealousy first harms one's own heart."}
+```
+
+The model quickly learns the pattern that a response `A:` should follow a question `Q:`.
+
+## The Training Loop — Only Two Changes
+
+The fine-tuning script is almost identical to `train.py`. We only make two adjustments: we lower the learning rate to `3e-5` and we avoid calculating loss on the prompt section of the input.
+
+## Loss Masking — Ignoring the Instruction
+
+We encode the entire `Q: ...\nA: ...` sequence but mask the labels for the question section with `-100`. This ensures the model is only penalized for failing to predict the answer, not the prompt.
+
+## finetune.py — Adding 30 Lines to train.py
+
+```python
+# finetune.py
+import json, torch, torch.nn.functional as F
+from dataclasses import asdict
+from data import encode
+from model import GPT, GPTConfig
+
+def load_rows(path="instructions.jsonl"):
+    with open(path, encoding="utf-8") as f: return [json.loads(line) for line in f]
+
+def build_example(row, block_size):
+    prompt = f"Q: {row['instruction']}\nA:"
+    full = f"{prompt} {row['response']}"
+    x = torch.tensor(encode(full[:block_size]), dtype=torch.long)
+    y = x.clone(); y[: len(encode(prompt[:block_size]))] = -100
+    return x, y
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+ckpt = torch.load("ckpt.pt", map_location=device)
+config = GPTConfig(**ckpt["config"])
+model = GPT(config).to(device); model.load_state_dict(ckpt["model"])
+optimizer = torch.optim.AdamW(model.parameters(), lr=3e-5)
+rows = load_rows()
+
+for step in range(500):
+    row = rows[step % len(rows)]
+    xb, yb = build_example(row, config.block_size)
+    xb, yb = xb[None, :].to(device), yb[None, :].to(device)
+    logits, _ = model(xb)
+    loss = F.cross_entropy(logits.view(-1, config.vocab_size), yb.view(-1), ignore_index=-100)
+    optimizer.zero_grad(set_to_none=True)
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    optimizer.step()
+
+torch.save({"model": model.state_dict(), "config": asdict(config)}, "ckpt_sft.pt")
+```
+
+## Comparing Before and After
+
+Even a single held-out prompt reveals a clear difference in behavior.
+
+```text
+[base]
+Q: Write one sentence swearing loyalty to the King.
+A: Wha, the thoue of thine me,
+
+[sft]
+Q: Write one sentence swearing loyalty to the King.
+A: My lord, I serve thee with a faithful heart.
+```
+
+While it's far from a polished chatbot, the shift in format is unmistakable.
+
+## What's next
+
+In the final post, we'll wrap this model in a FastAPI server so you can talk to it directly through a browser. We'll implement multi-turn prompts and SSE streaming to complete the series.
+
+<!-- toc:begin -->
+## In this series
+
+- [Turning Text into Numbers](./01-tokenizer.md)
+- [From Integers to Vectors and Positions](./02-embedding.md)
+- [Deciding Which Tokens to Focus On](./03-attention.md)
+- [The Transformer Block: A Unit of Depth](./04-transformer-block.md)
+- [Assembly: Completing the GPT Model Class](./05-gpt-model.md)
+- [Learning via Gradients](./06-training-loop.md)
+- [Sampling — Generating Text from a Trained Model](./07-inference.md)
+- **Adapting the Base Model to Specific Tasks (current)**
+- Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
+
+<!-- toc:end -->
+
+## References
+
+- [Finetuned Language Models Are Zero-Shot Learners (arXiv:2109.01652)](https://arxiv.org/abs/2109.01652)
+- [Training language models to follow instructions with human feedback (arXiv:2203.02155)](https://arxiv.org/abs/2203.02155)
+- [Stanford Alpaca (GitHub)](https://github.com/tatsu-lab/stanford_alpaca)
+- [PyTorch cross_entropy (Documentation)](https://pytorch.org/docs/stable/generated/torch.nn.functional.cross_entropy.html)
+
+Tags: LLM, PyTorch, Transformer, Tutorial
