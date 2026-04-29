@@ -36,7 +36,7 @@ last_reviewed: '2026-04-29'
 
 트리거가 “언제”와 “무엇을 가지고” 둘 다 결정한다는 점이 중요합니다. 이걸 그림으로 보면 다음과 같습니다.
 
-![트리거 = 함수를 깨우는 “원인”](../../../assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.ko.png)
+![트리거가 입력과 실행 시점을 정하는 구조](../../../assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.ko.png)
 ---
 
 ## 트리거 카탈로그 — 자주 쓰는 것부터
@@ -53,7 +53,7 @@ last_reviewed: '2026-04-29'
 
 새 함수를 설계할 때 던질 질문은 항상 같습니다. **“이 함수는 무엇 때문에 깨어나야 하는가?”** 그 답이 곧 트리거 선택입니다.
 
-![트리거 카탈로그 — 자주 쓰는 것부터](../../../assets/azure-functions-101/02/02-02-trigger-catalog-the-ones-youll-actually.ko.png)
+![대표 트리거와 주요 사용 사례 비교](../../../assets/azure-functions-101/02/02-02-trigger-catalog-the-ones-youll-actually.ko.png)
 ---
 
 ## 바인딩 = 함수 입출력의 “선언적 연결선”
@@ -109,7 +109,7 @@ DB 연결, 인증, 재시도 같은 운영 코드는 **Functions Host가 대신 
 
 세 종류의 관계를 한 그림으로 정리하면 이렇습니다.
 
-![입력 바인딩과 출력 바인딩](../../../assets/azure-functions-101/02/02-03-input-bindings-vs-output-bindings.ko.png)
+![트리거와 입출력 바인딩의 역할 차이](../../../assets/azure-functions-101/02/02-03-input-bindings-vs-output-bindings.ko.png)
 함수는 가운데에 있고, 외부 세계와는 트리거·입력·출력 세 갈래로 연결됩니다. **이 세 갈래를 선언적으로 표현한 것이 바인딩의 본질**입니다.
 
 ---

@@ -55,7 +55,7 @@ One caveat matters here. Documentation examples often present **Performance Coun
 
 For a live situation, **Application Insights → Live Metrics** is the fastest starting point. It gives you near-real-time visibility into request volume, failure rate, latency movement, and the number of currently active instances.
 
-![The First Screen to Open During an Incident — Live Metrics](../../../assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.en.png)
+![Live Metrics signals for early triage](../../../assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.en.png)
 Live Metrics answers the immediate question: what is happening right now? Just keep the Linux caveat in mind. Instance activity is useful broadly, but infrastructure counters such as CPU and memory depend on OS and environment support.
 
 ---
@@ -182,7 +182,7 @@ Use `--offset` for a relative window such as “the last 7 days.” If you prefe
 
 The first five minutes of an incident usually follow the same pattern.
 
-![A Useful 3am Incident Order of Operations](../../../assets/azure-functions-101/07/07-02-a-useful-3am-incident-order-of-operation.en.png)
+![First-response checks during an incident](../../../assets/azure-functions-101/07/07-02-a-useful-3am-incident-order-of-operation.en.png)
 Failure rate, latency, instance count, and dependency health cover a surprising amount of ground if you check them in that order.
 
 ---

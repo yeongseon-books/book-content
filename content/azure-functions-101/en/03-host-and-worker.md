@@ -40,7 +40,7 @@ Functions is different. **At a minimum, two processes are involved** in running 
 - **Host process** — the .NET runtime. Handles trigger detection, scale signals, logging, and binding resolution.
 - **Worker process** — a separate process running your language (Node.js, Python, Java, etc.). **This is where your function code actually executes.**
 
-![Host and worker processes](../../../assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
+![Host and worker role split](../../../assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
 This split is the single most important design decision in Functions. So why was it done this way?
 
 ---
@@ -65,7 +65,7 @@ Adding a new language becomes “implement a Worker for that language and make i
 
 Here's a sequence diagram of one Function App instance handling traffic.
 
-![What happens inside a single instance](../../../assets/azure-functions-101/03/03-02-what-happens-inside-a-single-instance.en.png)
+![Invocation flow inside one instance](../../../assets/azure-functions-101/03/03-02-what-happens-inside-a-single-instance.en.png)
 Two things to remember from this flow:
 
 1. **The Host never calls your function code directly.** It just sends a gRPC request that says, "Hey Worker, run this function with this input."
@@ -85,7 +85,7 @@ Three similar-sounding words, easy to mix up at first. Here's how they line up:
 | **Host** | The .NET runtime process running on a Function App instance | One per instance |
 | **Worker** | The language runtime process the Host spawns | One or more per instance (tunable via `FUNCTIONS_WORKER_PROCESS_COUNT`) |
 
-![Function App, Host, Worker — the hierarchy of three terms](../../../assets/azure-functions-101/03/03-03-function-app-host-worker-the-hierarchy-o.en.png)
+![Hierarchy among Function App, host, worker](../../../assets/azure-functions-101/03/03-03-function-app-host-worker-the-hierarchy-o.en.png)
 When a Function App scales out, the number of instances grows, and each instance gets its own Host and Workers. **Instances don't share memory.** That clever "let me cache this in a global variable for speed" trick only works within a single instance — on every other instance, that cache is empty. We will come back to this in the scaling chapter.
 
 ---
