@@ -49,17 +49,19 @@ ASSETS_DIR = REPO_ROOT / "assets"
 TEMPLATES = REPO_ROOT / "templates"
 
 _meta = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8")).get("meta") or {}
-if "repo" not in _meta or "tag" not in _meta:
+if "repo" not in _meta or "published_ref" not in _meta:
     raise SystemExit(
-        "series.yaml is missing meta.repo or meta.tag — both are required to "
-        "build commit-pinned absolute URLs in ebook bundles. Add a top-level "
-        "meta: {repo: <owner>/<repo>, tag: <commit-sha>} block."
+        "series.yaml is missing meta.repo or meta.published_ref — both are "
+        "required to build commit-pinned absolute URLs in ebook bundles. "
+        "Add a top-level meta: {repo: <owner>/<repo>, published_ref: <sha>} "
+        "block. (published_ref is the immutable publishing snapshot baked "
+        "into ebook canonical/cross-series URLs.)"
     )
 REPO = _meta["repo"]
-TAG = _meta["tag"]
+TAG = _meta["published_ref"]
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _transform import transform_for_ebook
+from _transform import rewrite_outside_fences, transform_for_ebook
 
 IMG_PATH_RE = re.compile(r"(!\[[^\]]*\]\()\.\./\.\./\.\./assets/")
 LINK_PATH_RE = re.compile(r"(?<!!)(\[[^\]]+\]\()\.\./\.\./\.\./assets/")
@@ -72,30 +74,23 @@ CROSS_SERIES_REWRITE_RE = re.compile(
 
 
 def rewrite_assets(text: str) -> str:
-    text = IMG_PATH_RE.sub(r"\1assets/", text)
-    text = LINK_PATH_RE.sub(r"\1assets/", text)
-    return text
+    def rewrite(line: str) -> str:
+        line = IMG_PATH_RE.sub(r"\1assets/", line)
+        line = LINK_PATH_RE.sub(r"\1assets/", line)
+        return line
+    return rewrite_outside_fences(text, rewrite)
 
 
 def rewrite_cross_series_links(text: str) -> str:
-    out: list[str] = []
-    in_fence = False
-    for line in text.splitlines(keepends=True):
-        stripped = line.lstrip()
-        if stripped.startswith("```") or stripped.startswith("~~~"):
-            in_fence = not in_fence
-            out.append(line)
-            continue
-        if in_fence:
-            out.append(line)
-            continue
-        out.append(
-            CROSS_SERIES_REWRITE_RE.sub(
-                rf"\1https://github.com/{REPO}/tree/{TAG}/content/\2)",
-                line,
-            )
-        )
-    return "".join(out)
+    replacement = rf"\1https://github.com/{REPO}/tree/{TAG}/content/\2)"
+    return rewrite_outside_fences(
+        text,
+        lambda line: CROSS_SERIES_REWRITE_RE.sub(replacement, line),
+    )
+
+
+def chapter_label(idx: int, lang: str) -> str:
+    return f"제 {idx} 장" if lang == "ko" else f"Chapter {idx}"
 
 
 def validate_catalog(series_id: str, lang: str, series_path: Path, per: dict) -> None:
@@ -148,15 +143,19 @@ def load_per_series(series_path: Path) -> dict:
     return yaml.safe_load(f.read_text(encoding="utf-8"))
 
 
-def article_title(md: Path, fallback: str) -> str:
+def article_title(md: Path) -> str:
     try:
         post = frontmatter.loads(md.read_text(encoding="utf-8"))
-        t = post.metadata.get("title")
-        if isinstance(t, str) and t.strip():
-            return t.strip()
-    except Exception:
-        pass
-    return fallback
+    except Exception as exc:
+        raise SystemExit(f"front matter parse error in {md}: {exc}") from exc
+    t = post.metadata.get("title")
+    if not isinstance(t, str) or not t.strip():
+        raise SystemExit(
+            f"missing or empty front matter title in {md} "
+            f"(ebook bundles require every chapter to have a title; "
+            f"run scripts/check_frontmatter.py to find all violations)"
+        )
+    return t.strip()
 
 
 def render_template(path: Path, vars_: dict[str, str]) -> str:
@@ -216,7 +215,7 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
             print(f"  skip ch{idx}: missing {src.relative_to(REPO_ROOT)}")
             continue
         raw = src.read_text(encoding="utf-8")
-        title = article_title(src, slug)
+        title = article_title(src)
         text = transform_for_ebook(raw)
         text = rewrite_assets(text)
         for m in CROSS_SERIES_LINK_RE.finditer(text):
@@ -237,7 +236,9 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         f"- [{c['title']}](https://github.com/{REPO}/blob/{TAG}/{s['path']}/{lang}/{per['articles'][i]['slug']}.md)"
         for i, c in enumerate(chapters) if i < len(per.get("articles", []))
     )
-    series_overview = "\n".join(f"- 제 {c['idx']} 장: {c['title']}" for c in chapters)
+    series_overview = "\n".join(
+        f"- {chapter_label(c['idx'], lang)}: {c['title']}" for c in chapters
+    )
 
     index_md = render_template(TEMPLATES / "ebook-index.md", {
         "ebook_title": title_field,
@@ -264,7 +265,7 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
 
     nav_lines = ["nav:", "  - Cover: index.md", "  - Preface: preface.md"]
     for c in chapters:
-        nav_lines.append(f"  - 제 {c['idx']} 장: {c['filename']}")
+        nav_lines.append(f"  - {chapter_label(c['idx'], lang)}: {c['filename']}")
     mkdocs_yml = (
         f"site_name: {title_field}\n"
         f"site_description: {desc_field}\n"

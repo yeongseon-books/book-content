@@ -35,7 +35,7 @@ ASSETS_DIR = REPO_ROOT / "assets"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _transform import transform_for_mkdocs
+from _transform import rewrite_outside_fences, transform_for_mkdocs
 
 IMG_PATH_RE = re.compile(r"(!\[[^\]]*\]\()\.\./\.\./\.\./assets/")
 LINK_PATH_RE = re.compile(r"(?<!!)(\[[^\]]+\]\()\.\./\.\./\.\./assets/")
@@ -45,9 +45,11 @@ CROSS_SERIES_LINK_RE = re.compile(
 
 
 def rewrite_asset_paths(text: str) -> str:
-    text = IMG_PATH_RE.sub(r"\1../../assets/", text)
-    text = LINK_PATH_RE.sub(r"\1../../assets/", text)
-    return text
+    def rewrite(line: str) -> str:
+        line = IMG_PATH_RE.sub(r"\1../../assets/", line)
+        line = LINK_PATH_RE.sub(r"\1../../assets/", line)
+        return line
+    return rewrite_outside_fences(text, rewrite)
 
 
 def rewrite_cross_series_links(text: str, current_lang: str) -> str:
@@ -56,7 +58,7 @@ def rewrite_cross_series_links(text: str, current_lang: str) -> str:
         if lang != current_lang:
             return m.group(0)
         return f"{prefix}../{other_series}/"
-    return CROSS_SERIES_LINK_RE.sub(repl, text)
+    return rewrite_outside_fences(text, lambda line: CROSS_SERIES_LINK_RE.sub(repl, line))
 
 
 def load_catalog() -> list[dict]:

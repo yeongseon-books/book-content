@@ -22,9 +22,15 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 
-_meta = yaml.safe_load((ROOT / "series.yaml").read_text(encoding="utf-8")).get("meta", {})
-REPO = _meta.get("repo", "yeongseon/tech-blog")
-TAG = _meta.get("tag", "master")
+_meta = yaml.safe_load((ROOT / "series.yaml").read_text(encoding="utf-8")).get("meta") or {}
+if "repo" not in _meta or "published_ref" not in _meta:
+    raise SystemExit(
+        "series.yaml is missing meta.repo or meta.published_ref. Both are "
+        "required to build the immutable raw URLs that get baked into "
+        "Medium articles. Add a top-level meta: {repo, published_ref} block."
+    )
+REPO = _meta["repo"]
+TAG = _meta["published_ref"]
 
 from _catalog import is_present, load_catalog
 

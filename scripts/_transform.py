@@ -23,6 +23,7 @@ Conventions per PUBLISHING.md (the spec):
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 
 BLOG_ONLY_RE = re.compile(
     r"<!--\s*blog-only:start\s*-->.*?<!--\s*blog-only:end\s*-->\s*\n?",
@@ -80,6 +81,30 @@ def strip_toc_block(text: str) -> str:
 
 def strip_bottom_tags_line(text: str) -> str:
     return TAGS_LINE_RE.sub("\n", text).rstrip() + "\n"
+
+
+def rewrite_outside_fences(text: str, rewrite_line: Callable[[str], str]) -> str:
+    """Apply `rewrite_line` only to lines outside fenced code blocks.
+
+    Lines inside ``` or ~~~ fences are passed through unchanged. The fence
+    delimiter lines themselves (the opening and closing ``` ) are also passed
+    through. This protects example code in tutorials from accidental link
+    rewriting (e.g. cross-series link rewrites or asset path rewrites should
+    not silently mutate URL strings shown to readers as code).
+    """
+    out: list[str] = []
+    in_fence = False
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("```") or stripped.startswith("~~~"):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if in_fence:
+            out.append(line)
+        else:
+            out.append(rewrite_line(line))
+    return "".join(out)
 
 
 def transform_for_mkdocs(text: str, include_ebook_blocks: bool = False) -> str:

@@ -7,11 +7,21 @@ meta:
   # GitHub coordinates used to build absolute URLs (commit-pinned) in:
   #   - .sisyphus/medium/to-medium.py     (Medium import-ready raw image URLs)
   #   - scripts/export_ebook_source.py    (ebook bundle cross-series + canonical links)
-  # When the repo is renamed (Phase 9: tech-blog -> tech-writing), update `repo`
-  # here AND re-run to-medium.py / export_ebook_source.py to regenerate artifacts.
-  # When publishing a new pinned snapshot, update `tag` to a new commit/tag SHA.
+  #
+  # `repo`: When the repo is renamed (Phase 9: tech-blog -> tech-writing), update
+  # this AND re-run to-medium.py / export_ebook_source.py to regenerate artifacts.
+  #
+  # `published_ref`: IMMUTABLE publishing snapshot. All external-facing absolute
+  # URLs (Medium raw images, ebook canonical/cross-series links) point here.
+  # Bump only when publishing a new snapshot of the content; readers of already-
+  # published Medium articles depend on this commit existing forever.
+  #
+  # `validated_ref`: optional internal tracking of "latest commit that passed
+  # all gates". Not consumed by any URL builder. Useful for humans answering
+  # "is published_ref behind master?". Update freely.
   repo: yeongseon/tech-blog
-  tag: e8dca42
+  published_ref: e8dca42
+  validated_ref: 1706d5fb9a2ff19b39efa80282c63ccf039153ca
 
 series:
   # Azure

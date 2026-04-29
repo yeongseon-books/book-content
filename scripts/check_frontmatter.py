@@ -31,6 +31,8 @@ REQUIRED_FIELDS = {"title", "series", "episode", "language", "status", "targets"
 OPTIONAL_FIELDS = {"seo_title", "medium_title", "published"}
 VALID_STATUS = {"draft", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
+TARGET_KEYS = {"tistory", "medium", "mkdocs", "ebook"}
+PUBLISHED_KEYS = {"tistory_url", "medium_url", "mkdocs_url"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PREFIX_RE = re.compile(r"^(\d+)")
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
@@ -85,8 +87,31 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> list[str]:
             errors.append(f"episode is not an integer: {fm['episode']!r}")
 
     targets = fm.get("targets")
-    if targets is not None and not isinstance(targets, dict):
-        errors.append(f"targets must be a mapping, got {type(targets).__name__}")
+    if targets is not None:
+        if not isinstance(targets, dict):
+            errors.append(f"targets must be a mapping, got {type(targets).__name__}")
+        else:
+            missing_targets = TARGET_KEYS - set(targets.keys())
+            unknown_targets = set(targets.keys()) - TARGET_KEYS
+            if missing_targets:
+                errors.append(f"targets missing required channels: {sorted(missing_targets)}")
+            if unknown_targets:
+                errors.append(f"targets has unknown channels: {sorted(unknown_targets)} (allowed: {sorted(TARGET_KEYS)})")
+            for k, v in targets.items():
+                if not isinstance(v, bool):
+                    errors.append(f"targets.{k} must be boolean, got {type(v).__name__}")
+
+    published = fm.get("published")
+    if published is not None:
+        if not isinstance(published, dict):
+            errors.append(f"published must be a mapping, got {type(published).__name__}")
+        else:
+            unknown_pub = set(published.keys()) - PUBLISHED_KEYS
+            if unknown_pub:
+                errors.append(f"published has unknown fields: {sorted(unknown_pub)} (allowed: {sorted(PUBLISHED_KEYS)})")
+            for k, v in published.items():
+                if not isinstance(v, str):
+                    errors.append(f"published.{k} must be string URL, got {type(v).__name__}")
 
     tags = fm.get("tags")
     if tags is not None and not (isinstance(tags, list) and all(isinstance(t, str) for t in tags)):
