@@ -58,7 +58,16 @@ def numeric_prefix(name: str) -> str | None:
 
 
 def read_h1(text: str) -> str | None:
-    for line in text.split("\n"):
+    lines = text.split("\n")
+    i = 0
+    if lines and lines[0].rstrip() == "---":
+        i = 1
+        while i < len(lines) and lines[i].rstrip() != "---":
+            i += 1
+        i += 1
+    while i < len(lines):
+        line = lines[i]
+        i += 1
         s = line.strip()
         if not s:
             continue
