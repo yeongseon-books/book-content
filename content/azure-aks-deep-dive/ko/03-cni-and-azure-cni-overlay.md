@@ -11,7 +11,7 @@ VNet 쪽에는 주로 노드 IP가 보입니다.
 
 ## 두 모델을 먼저 나란히 보기
 
-![두 모델을 먼저 나란히 보기](../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.ko.png)
+![두 모델을 먼저 나란히 보기](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.ko.png)
 ---
 
 ## CNI가 하는 일
@@ -31,7 +31,7 @@ Overlay는 Pod IP를 non-routable overlay 대역에서 가져오고,
 VNet 리소스로 나갈 때 node-side NAT를 사용합니다.
 그래서 node subnet과 Pod CIDR을 분리해서 설계할 수 있습니다.
 
-![Azure CNI와 Overlay의 차이](../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.ko.png)
+![Azure CNI와 Overlay의 차이](../../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.ko.png)
 ---
 
 ## kubenet의 위치

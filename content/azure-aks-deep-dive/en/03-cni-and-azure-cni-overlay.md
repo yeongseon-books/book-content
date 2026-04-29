@@ -10,7 +10,7 @@ In Azure CNI Overlay, Pod IPs come from a separate overlay CIDR while the VNet m
 
 ## Put both models side by side
 
-![Put both models side by side](../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
+![Put both models side by side](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
 ---
 
 ## What CNI does
@@ -29,7 +29,7 @@ Traditional Azure CNI keeps the routing model direct but spends address space ag
 Overlay allocates Pod IPs from a non-routable overlay range and uses node-side NAT when traffic exits toward the VNet.
 That lets you plan the node subnet and the Pod CIDR separately.
 
-![Azure CNI versus Overlay](../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.en.png)
+![Azure CNI versus Overlay](../../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.en.png)
 ---
 
 ## Where kubenet stands now

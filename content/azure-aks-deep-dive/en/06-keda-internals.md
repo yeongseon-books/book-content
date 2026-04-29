@@ -12,7 +12,7 @@ and directly handles the scale-to-zero boundary by writing replica counts itself
 
 ## The KEDA structure
 
-![The KEDA structure](../../assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png)
+![The KEDA structure](../../../assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png)
 ---
 
 ## ScaledObjectReconciler and the generated HPA
@@ -30,7 +30,7 @@ The concrete autoscaling artifact inside Kubernetes remains an HPA.
 `api_service.yaml` registers `v1beta1.external.metrics.k8s.io`.
 `provider.go` shows the adapter reading the `scaledobject.keda.sh/name` selector and querying the metrics service over gRPC.
 
-![The external metrics path](../../assets/azure-aks-deep-dive/06/06-02-the-external-metrics-path.en.png)
+![The external metrics path](../../../assets/azure-aks-deep-dive/06/06-02-the-external-metrics-path.en.png)
 ---
 
 ## The scale-to-zero boundary
@@ -40,7 +40,7 @@ That exists because HPA does not naturally control the below-`minReplicas` bound
 KEDA directly updates `/scale` for the 0↔1 region,
 while the generated HPA controls the 1↔N region.
 
-![The scale-to-zero boundary](../../assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.en.png)
+![The scale-to-zero boundary](../../../assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.en.png)
 ---
 
 ## The point of this episode

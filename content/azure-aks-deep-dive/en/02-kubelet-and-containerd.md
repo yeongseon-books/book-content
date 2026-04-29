@@ -19,7 +19,7 @@ and `runc` finally spawns the real process.
 
 ## The execution path in one picture
 
-![Execution path](../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
+![Execution path](../../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
 ---
 
 ## kubelet, CRI, and runtime
@@ -42,7 +42,7 @@ and `StartContainer` are the most important names in the startup path.
 
 ## kubelet talks to a Unix socket
 
-![kubelet talks to a Unix socket](../../assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png)
+![kubelet talks to a Unix socket](../../../assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png)
 This is a local call chain.
 The control plane does not execute here.
 The node does.
@@ -79,7 +79,7 @@ The effective chain is kubelet -> CRI -> containerd -> `runc` -> process.
 
 ## Startup path as control flow
 
-![Startup path as control flow](../../assets/azure-aks-deep-dive/02/02-03-startup-path-as-control-flow.en.png)
+![Startup path as control flow](../../../assets/azure-aks-deep-dive/02/02-03-startup-path-as-control-flow.en.png)
 ---
 
 ## The point of this episode

@@ -81,7 +81,7 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: draft
-    path: azure-aks-deep-dive
+    path: content/azure-aks-deep-dive
 
   - id: azure-aca-101
     category: azure

@@ -12,7 +12,7 @@ Cluster Autoscaler는 별도 Deployment로 떠서 unschedulable Pod를 보고 no
 
 ## 두 루프를 한 그림으로 보기
 
-![두 루프를 한 그림으로 보기](../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.ko.png)
+![두 루프를 한 그림으로 보기](../../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.ko.png)
 ---
 
 ## HPA의 핵심
@@ -23,7 +23,7 @@ Cluster Autoscaler는 별도 Deployment로 떠서 unschedulable Pod를 보고 no
 missing metrics,
 stabilization window를 더 고려합니다.
 
-![HPA의 핵심](../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.ko.png)
+![HPA의 핵심](../../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.ko.png)
 ---
 
 ## CA의 핵심
@@ -33,7 +33,7 @@ CA는 unschedulable Pod를 보고,
 새 노드가 생기면 scheduler가 이 Pod를 배치할 수 있을지 먼저 시뮬레이션한 뒤,
 가장 적절한 pool을 선택해 node 수를 늘립니다.
 
-![CA의 핵심](../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.ko.png)
+![CA의 핵심](../../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.ko.png)
 ---
 
 ## 이번 화의 요점

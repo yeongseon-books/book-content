@@ -17,7 +17,7 @@ Binding을 기록합니다.
 
 ## 스케줄링의 세 단계
 
-![스케줄링의 세 단계](../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.ko.png)
+![스케줄링의 세 단계](../../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.ko.png)
 ---
 
 ## Filter와 Score
@@ -27,7 +27,7 @@ Filter는 불가능한 노드를 지우고,
 Score는 가능한 노드 중 더 나은 후보를 고릅니다.
 기본 plugin 집합에는 `NodeResourcesFit`, `NodeAffinity`, `PodTopologySpread`, `InterPodAffinity` 같은 이름이 보입니다.
 
-![Filter와 Score](../../assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png)
+![Filter와 Score](../../../assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png)
 ---
 
 ## Binding이 뜻하는 것

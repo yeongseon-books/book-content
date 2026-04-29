@@ -13,7 +13,7 @@ Cluster Autoscaler runs as a separate Deployment and simulates node-pool expansi
 
 ## Put both loops in one diagram
 
-![Put both loops in one diagram](../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
+![Put both loops in one diagram](../../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
 ---
 
 ## The HPA side
@@ -24,7 +24,7 @@ The real code layers in tolerance,
 missing metrics handling,
 and stabilization windows.
 
-![The HPA side](../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.en.png)
+![The HPA side](../../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.en.png)
 ---
 
 ## The CA side
@@ -34,7 +34,7 @@ builds template nodes for each node pool,
 and runs a binpacking estimator.
 It asks whether extra nodes from a specific pool would make the Pods schedulable before changing the node count.
 
-![The CA side](../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.en.png)
+![The CA side](../../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.en.png)
 ---
 
 ## The point of this episode
