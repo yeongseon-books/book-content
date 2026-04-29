@@ -362,7 +362,7 @@ That is what "Dapr enabled" means at runtime.
 
 ## Where this fits in the series
 
-The previous part explained how ACA scales revisions. This part explained how ACA mutates the pod shape of those revisions when Dapr is enabled. The final part returns to ingress and follows the first external request through the ACA-managed load balancer, Envoy, service routing, and the pod that may now contain both your container and the sidecar described here.
+The previous part explained how ACA scales revisions. This part explained how ACA changes the runtime shape of those revisions when Dapr is enabled. The practical gain is that scaling state and sidecar state can now be treated as separate layers of the same revision rather than one blurred "app runtime" story.
 
 ---
 

@@ -309,7 +309,7 @@ Ingress는 이 경계 안의 app endpoint로 들어갑니다.
 
 ## 시리즈 안에서의 위치
 
-이번 글은 뒤의 모든 런타임 동작이 기대고 있는 바깥 경계를 확대해서 본 2화입니다. 다음 3화에서는 이 경계 안의 불변 단위인 Revision과 Revision mode, traffic weight로 이동합니다. 그 뒤에는 같은 Environment 안에서 KEDA가 어떻게 숨은 오브젝트를 만들고, Dapr sidecar가 어떻게 붙고, Envoy 요청 경로가 어떻게 흐르는지를 순서대로 따라갑니다.
+이번 글은 뒤의 모든 런타임 동작이 기대고 있는 바깥 경계를 확대해서 본 2화입니다. 여기서 얻어야 할 감각은 Revision, scaling, sidecar, ingress를 따로 노는 기능이 아니라 하나의 Environment 경계 안에서 벌어지는 동작으로 읽는 것입니다.
 
 ---
 

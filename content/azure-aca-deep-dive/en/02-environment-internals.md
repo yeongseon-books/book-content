@@ -303,7 +303,7 @@ That sentence is the connective tissue for the next four episodes.
 
 ## Where this fits in the series
 
-This post zoomed into the outer boundary that all later ACA runtime behavior depends on. The next episode moves from the environment perimeter to the immutable unit inside it: revisions, revision modes, and traffic weights. After that, the series follows the hidden KEDA objects, the Dapr sidecar process, and the Envoy request path that runs across the same environment boundary described here.
+This post zoomed into the outer boundary that all later ACA runtime behavior depends on. The practical value is that revisions, scaling, sidecars, and ingress can now be read as behaviors happening inside one shared environment boundary rather than as unrelated product features.
 
 ---
 

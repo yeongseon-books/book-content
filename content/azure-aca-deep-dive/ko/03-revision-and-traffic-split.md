@@ -362,7 +362,7 @@ App 설정을 Envoy 설정으로 번역하는 ACA 내부 control-plane 코드는
 
 ## 시리즈 안에서의 위치
 
-이번 3화는 2화에서 본 Environment 경계와, 그 안에서 실제 rollout 단위가 되는 불변 Revision을 연결했습니다. 다음 4화에서는 rollout policy에서 autoscaling policy로 넘어가, ACA scale rule이 Revision 단위 KEDA 동작으로 어떻게 번역되는지 봅니다. 그 뒤에는 Dapr sidecar와 Envoy 요청 경로를 따라가면서, 이번 화에서 본 weight가 실제 요청에 어떻게 적용되는지 다시 만나게 됩니다.
+이번 3화는 2화에서 본 Environment 경계와, 그 안에서 실제 rollout 단위가 되는 불변 Revision을 연결했습니다. 여기서 얻는 핵심은 rollout policy와 ingress routing을 분리해서 읽는 감각입니다. Revision은 안정적인 타깃을 만들고, traffic weight는 그 타깃들에 앱 URL의 요청을 얼마씩 보낼지 정합니다.
 
 ---
 

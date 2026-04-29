@@ -317,7 +317,7 @@ That is the hidden machinery behind the friendly Scale blade.
 
 ## Where this fits in the series
 
-Part 3 explained how revisions receive traffic. This part explained how those same revisions gain or lose replicas underneath the traffic policy. The next part follows the other major hidden sidecar mechanism in ACA, Dapr, from injection to localhost APIs, before the final part returns to Envoy and traces the request path that meets both scaling and routing decisions in motion.
+Part 3 explained how revisions receive traffic. This part explained how those same revisions gain or lose replicas underneath the traffic policy. The practical value is keeping routing policy and scaling policy in separate mental buckets even though both act on the same revision targets.
 
 ---
 
