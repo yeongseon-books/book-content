@@ -54,7 +54,7 @@ This is the map for the rest of the series.
 Each later episode zooms into one of these boxes.
 Get the layout into your head first and the lower-level details land much more cleanly.
 
-![Request path through App Service](../../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
+![One request path from Front-End to warm-up](../../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
 The global entry and client edge are intro-series territory.
 The Front-End and ARR path are episode 2.
 Workers and the per-worker sandbox are episode 3.
@@ -99,7 +99,7 @@ App content is stored in a durable shared content store,
 and multiple instances look at that same mounted content path.
 That default model applies to Windows code apps and Linux code apps.
 
-![Canonical public architecture — Front-End, Worker, shared storage](../../../assets/azure-app-service-deep-dive/01/01-02-canonical-public-architecture-front-end.en.png)
+![Front-End, workers, and shared storage layout](../../../assets/azure-app-service-deep-dive/01/01-02-canonical-public-architecture-front-end.en.png)
 The critical property here is not raw speed.
 It is shared visibility.
 In the default model, the storage is shared,
@@ -152,7 +152,7 @@ The more accurate picture is this:
 - Apps are placed on that capacity.
 - Scale-out increases the app's running instances across workers.
 
-![Workers are what “instance count” actually means](../../../assets/azure-app-service-deep-dive/01/01-03-workers-are-what-instance-count-actually.en.png)
+![Instance count mapped to worker capacity](../../../assets/azure-app-service-deep-dive/01/01-03-workers-are-what-instance-count-actually.en.png)
 Workers are where user code really runs.
 For Windows code apps, the key process is IIS-hosted `w3wp.exe`.
 For Linux apps, the key execution unit is a container.
@@ -195,7 +195,7 @@ It is the deployment engine.
 It is the public code path for ZipDeploy and publish APIs.
 And for Windows App Service deployment internals, it is the primary open-source window.
 
-![Kudu is the deployment buddy site](../../../assets/azure-app-service-deep-dive/01/01-01-kudu-is-the-deployment-buddy-site.en.png)
+![Kudu SCM site beside the live site](../../../assets/azure-app-service-deep-dive/01/01-01-kudu-is-the-deployment-buddy-site.en.png)
 Kudu ultimately affects file placement and app reload behavior.
 That is why deployment incidents belong in Kudu logs,
 while runtime incidents belong in app logs plus platform signals.
@@ -214,7 +214,7 @@ Inside the worker.
 - The Functions host starts on top of that substrate.
 - That host then launches language workers and opens the gRPC channel.
 
-![Where Functions fits in this picture](../../../assets/azure-app-service-deep-dive/01/01-05-where-functions-fits-in-this-picture.en.png)
+![Functions host layered on an App Service worker](../../../assets/azure-app-service-deep-dive/01/01-05-where-functions-fits-in-this-picture.en.png)
 The two series therefore complement each other.
 The Functions series zooms into a specific runtime living on App Service.
 This series zooms into the general-purpose web platform underneath it.
