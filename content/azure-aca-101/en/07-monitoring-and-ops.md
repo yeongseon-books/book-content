@@ -21,9 +21,7 @@ last_reviewed: '2026-04-29'
 
 > Azure Container Apps 101 series (7/7)
 
-This post covers logs, traces, and day-two operations.
-It separates console logs from system logs.
-Then connects KQL, revision comparison, and Application Insights.
+This post covers logs, traces, and day-two operations. The most important distinction is that ACA gives you platform logs through Log Analytics, while Application Insights is still an application instrumentation story. Those two signals complement each other, but they are not configured in the same place.
 
 ---
 
@@ -71,60 +69,21 @@ ContainerAppConsoleLogs_CL
 
 ## Application Insights
 
-It is strong at distributed tracing and dependency analysis.
-Application code should be instrumented with SDKs.
+Application Insights is strong at distributed tracing and dependency analysis, but ACA does not magically emit full app traces just because the environment exists.
 
-```bash
-az containerapp env create   --name $ACA_ENV   --resource-group $RG   --location eastus   --dapr-connection-string "$APPLICATIONINSIGHTS_CONNECTION_STRING"
-```
+- **Log Analytics** stores ACA platform and container logs for the environment.
+- **Application Insights** needs your app to emit telemetry through an SDK or OpenTelemetry pipeline.
+- **Dapr telemetry** is a third signal. The `--dapr-connection-string` setting applies to Dapr sidecar telemetry, not to general application tracing.
 
----
-
-## Operator notes
-
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
+In other words: connect the environment to Log Analytics for platform visibility, instrument the app itself for Application Insights, and only use Dapr-specific telemetry settings when you actually need sidecar-level traces.
 
 ---
 
-## Common mistakes
+## What matters operationally
 
-- Managed does not mean operations disappear.
-- A failed new revision is not the same thing as automatic rollback.
-- Scale-to-zero is not implemented the same way for every rule type.
-- Turning on Dapr does not remove application design responsibility.
-- Using Environment and App as if they are the same layer leads to weak boundary decisions.
-
----
-
-## Operations checklist
-
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-
----
-
-This post is one step in the Azure Container Apps 101 series.
-The earlier posts define the platform shape, and the later posts build deployment and operations decisions on top of that shape.
-Read in order and ACA starts to feel like an operating model instead of a feature catalog.
-
-- Revisit the checklist right after each deployment.
+- Read every log query with revision context first.
+- Use system logs to understand platform decisions and console logs to understand app behavior.
+- Treat Application Insights and Dapr telemetry as opt-in layers on top of the platform logging baseline.
 
 ---
 

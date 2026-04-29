@@ -49,7 +49,7 @@ Observability is part 7.
 ## A one-sentence definition
 
 ACA is a managed serverless platform for running containerized applications.
-It uses a Microsoft-managed Kubernetes layer plus components such as KEDA, Dapr, and Envoy, but the cluster is not exposed to the user.
+It uses a Microsoft-managed Kubernetes foundation plus built-in capabilities such as KEDA-backed scaling, optional Dapr integration, and managed ingress, but the cluster itself is not exposed to the user.
 
 - Container images remain the deployment unit.
 - Replicas can shrink aggressively, often to zero.
@@ -88,51 +88,11 @@ A single HTTP request is enough to make the boundary responsibilities visible.
 
 ---
 
-## Operator notes
+## What should stick from the overview
 
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-
----
-
-## Common mistakes
-
-- Managed does not mean operations disappear.
-- A failed new revision is not the same thing as automatic rollback.
-- Scale-to-zero is not implemented the same way for every rule type.
-- Turning on Dapr does not remove application design responsibility.
-- Using Environment and App as if they are the same layer leads to weak boundary decisions.
-
----
-
-## Operations checklist
-
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-
----
-
-This post is one step in the Azure Container Apps 101 series.
-The earlier posts define the platform shape, and the later posts build deployment and operations decisions on top of that shape.
-Read in order and ACA starts to feel like an operating model instead of a feature catalog.
-
-- Revisit the checklist right after each deployment.
+- The environment is the shared boundary; apps and revisions are the units you will operate day to day.
+- ACA hides the cluster, not the need to make explicit decisions about ingress, scaling, rollout, and telemetry.
+- If those boundaries feel clear, the rest of the series becomes much easier to read.
 
 ---
 

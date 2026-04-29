@@ -21,9 +21,7 @@ last_reviewed: '2026-04-29'
 
 > Azure Container Apps 101 시리즈 (7/7)
 
-이번 글은 로그와 추적과 운영 절차를 다룹니다.
-Console logs와 system logs를 나누고.
-KQL과 Revision 비교와 Application Insights를 연결합니다.
+이번 글은 로그, 추적, 운영 절차를 함께 다룹니다. 여기서 가장 중요한 구분은 ACA가 기본으로 주는 플랫폼 로그와, 애플리케이션이 직접 내보내야 하는 Application Insights 추적이 같은 계층이 아니라는 점입니다.
 
 ---
 
@@ -71,60 +69,21 @@ ContainerAppConsoleLogs_CL
 
 ## Application Insights
 
-분산 추적과 dependency 분석에 강합니다.
-앱 코드는 SDK로 계측해야 합니다.
+Application Insights는 분산 추적과 dependency 분석에 강하지만, Environment를 만들었다고 해서 앱 추적이 자동으로 완성되지는 않습니다.
 
-```bash
-az containerapp env create   --name $ACA_ENV   --resource-group $RG   --location eastus   --dapr-connection-string "$APPLICATIONINSIGHTS_CONNECTION_STRING"
-```
+- **Log Analytics**는 ACA 환경의 플랫폼 로그와 컨테이너 로그를 저장합니다.
+- **Application Insights**는 앱 코드가 SDK나 OpenTelemetry를 통해 직접 텔레메트리를 보내야 의미가 생깁니다.
+- **Dapr telemetry**는 별도 신호입니다. `--dapr-connection-string`은 Dapr 사이드카 텔레메트리용이지, 일반 애플리케이션 추적 설정이 아닙니다.
 
----
-
-## 실무 메모
-
-- 운영 단위를 먼저 명확히 잡으면 ACA가 훨씬 단순하게 보입니다.
-- Environment와 App와 Revision을 섞어 부르지 않는 습관이 중요합니다.
-- 문제 해결 속도는 구조를 얼마나 정확히 나눠 보느냐에 크게 좌우됩니다.
-- 플랫폼이 많은 것을 숨겨 주지만 경계를 이해해야 운영이 쉬워집니다.
-- 배포와 스케일링과 관측성은 같은 흐름의 다른 면입니다.
-- CLI 명령을 외우는 것보다 어떤 계층을 바꾸는지 이해하는 편이 오래 갑니다.
-- 새 Revision을 만드는 변경과 앱 전체 정책을 바꾸는 변경을 구분해야 합니다.
-- 로그와 메트릭은 항상 Revision과 함께 읽는 습관이 좋습니다.
-- 비용과 안정성은 대개 replica 바닥값과 트래픽 패턴과 함께 움직입니다.
-- 팀 규약으로 배포 절차를 고정하면 운영 리스크가 크게 줄어듭니다.
+즉, 플랫폼 가시성은 Log Analytics로 확보하고, 애플리케이션 추적은 앱 계측으로 붙이고, Dapr 연결 문자열은 정말 사이드카 수준 텔레메트리가 필요할 때만 구분해서 써야 합니다.
 
 ---
 
-## 자주 하는 오해
+## 운영에서 기억할 점
 
-- 플랫폼이 관리형이라고 해서 운영 판단이 사라지는 것은 아닙니다.
-- 새 Revision 준비 실패를 자동 롤백과 같은 뜻으로 읽으면 안 됩니다.
-- scale-to-zero는 모든 규칙이 같은 방식으로 제공하는 기능이 아닙니다.
-- Dapr를 켠다고 설계 책임이 사라지는 것은 아닙니다.
-- Environment와 App를 같은 뜻으로 쓰면 경계 설계가 흔들립니다.
-
----
-
-## 운영 체크리스트
-
-- 비용과 안정성은 대개 replica 바닥값과 트래픽 패턴과 함께 움직입니다.
-- 팀 규약으로 배포 절차를 고정하면 운영 리스크가 크게 줄어듭니다.
-- 운영 단위를 먼저 명확히 잡으면 ACA가 훨씬 단순하게 보입니다.
-- Environment와 App와 Revision을 섞어 부르지 않는 습관이 중요합니다.
-- 문제 해결 속도는 구조를 얼마나 정확히 나눠 보느냐에 크게 좌우됩니다.
-- 플랫폼이 많은 것을 숨겨 주지만 경계를 이해해야 운영이 쉬워집니다.
-- 배포와 스케일링과 관측성은 같은 흐름의 다른 면입니다.
-- CLI 명령을 외우는 것보다 어떤 계층을 바꾸는지 이해하는 편이 오래 갑니다.
-- 새 Revision을 만드는 변경과 앱 전체 정책을 바꾸는 변경을 구분해야 합니다.
-- 로그와 메트릭은 항상 Revision과 함께 읽는 습관이 좋습니다.
-
----
-
-이 글은 Azure Container Apps 101 시리즈의 한 부분입니다.
-앞의 글이 구조를 설명했다면 다음 글은 그 구조 위에서 배포와 운영 판단을 쌓습니다.
-7편을 순서대로 읽으면 ACA를 기능 목록이 아니라 운영 모델로 이해하게 됩니다.
-
-- 운영 체크리스트는 배포 직후 다시 보는 편이 좋습니다.
+- 로그 조회는 항상 Revision 기준으로 시작하는 편이 빠릅니다.
+- system logs는 플랫폼 판단을, console logs는 앱 동작을 읽는 데 더 적합합니다.
+- Application Insights와 Dapr telemetry는 플랫폼 로그 위에 선택적으로 얹는 별도 계층으로 이해해야 합니다.
 
 ---
 

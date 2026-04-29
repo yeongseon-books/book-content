@@ -21,16 +21,13 @@ last_reviewed: '2026-04-29'
 
 > Azure Container Apps 101 series (4/7)
 
-This post connects ingress with revision-based rollout control.
-It focuses on TLS termination.
-Single versus multiple mode.
-And weighted traffic movement.
+This post connects ingress with revision-based rollout control. The goal is not proxy internals. The goal is to understand which ACA knobs change public exposure, which knobs keep old revisions alive, and how weighted traffic lets you turn revisions into a safe rollout tool.
 
 ---
 
 ## The request path
 
-Envoy acts as the front door and routes to active revisions.
+ACA's managed ingress layer acts as the public entry point and routes traffic to active revisions.
 
 ![The request path](../../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
 ---
@@ -68,51 +65,11 @@ az containerapp ingress traffic set   --name $APP_NAME   --resource-group $RG   
 
 ---
 
-## Operator notes
+## What matters operationally
 
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-
----
-
-## Common mistakes
-
-- Managed does not mean operations disappear.
-- A failed new revision is not the same thing as automatic rollback.
-- Scale-to-zero is not implemented the same way for every rule type.
-- Turning on Dapr does not remove application design responsibility.
-- Using Environment and App as if they are the same layer leads to weak boundary decisions.
-
----
-
-## Operations checklist
-
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-
----
-
-This post is one step in the Azure Container Apps 101 series.
-The earlier posts define the platform shape, and the later posts build deployment and operations decisions on top of that shape.
-Read in order and ACA starts to feel like an operating model instead of a feature catalog.
-
-- Revisit the checklist right after each deployment.
+- Single revision mode optimizes for simplicity.
+- Multiple revision mode optimizes for controlled rollout and rollback.
+- Traffic weights only help if you compare revisions with logs, latency, and error rate rather than moving percentages blindly.
 
 ---
 

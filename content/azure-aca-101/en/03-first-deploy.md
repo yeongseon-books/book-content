@@ -21,11 +21,7 @@ last_reviewed: '2026-04-29'
 
 > Azure Container Apps 101 series (3/7)
 
-This post builds the first FastAPI deployment path.
-Local code becomes an image.
-The image lands in a registry.
-ACA pulls it into a revision.
-Ingress exposes a public FQDN.
+This post walks through the first complete FastAPI deployment path. The important shift is that ACA does not build your image for you: you prepare a container image, push it to a registry, and then tell ACA which image a new revision should run.
 
 ---
 
@@ -42,6 +38,24 @@ The path makes the first deployment much easier to reason about.
 az extension add --name containerapp --upgrade
 az provider register --namespace Microsoft.App
 az provider register --namespace Microsoft.OperationalInsights
+```
+
+You also need four concrete resources before the first deployment works end to end:
+
+- a resource group
+- an Azure Container Apps environment
+- a container registry ACA can pull from
+- an image tag that already exists in that registry
+
+Using variables keeps the CLI examples readable.
+
+```bash
+RG="rg-aca-101-demo"
+LOCATION="eastus"
+ACA_ENV="aca-env-101-demo"
+ACR_NAME="aca101demo$RANDOM"
+APP_NAME="fastapi-aca-demo"
+IMAGE="$ACR_NAME.azurecr.io/fastapi-hello:v1"
 ```
 
 ---
@@ -77,7 +91,33 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ---
 
-## First deployment
+## Build and push the image first
+
+For a real first deploy, the registry step is part of the story rather than a hidden prerequisite.
+
+```bash
+az acr create --name $ACR_NAME --resource-group $RG --location $LOCATION --sku Basic
+az acr build --registry $ACR_NAME --image fastapi-hello:v1 .
+```
+
+If your environment already uses GitHub Actions or another CI system, that pipeline can build and push the image instead. The key point is unchanged: ACA deploys an existing image reference.
+
+---
+
+## Create the ACA environment
+
+```bash
+az containerapp env create \
+  --name $ACA_ENV \
+  --resource-group $RG \
+  --location $LOCATION
+```
+
+The environment is the shared boundary for networking, logs, and optional integrations. The app revision you deploy later lives inside this environment.
+
+---
+
+## Create the first app revision
 
 - ingress external
 - target-port 8000
@@ -86,6 +126,8 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```bash
 az containerapp create   --name $APP_NAME   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --ingress external   --target-port 8000   --cpu 0.5   --memory 1.0Gi   --min-replicas 0   --max-replicas 3
 ```
+
+This is the point where ACA stops being “a container service” in the abstract and starts behaving like a revision platform. The command binds one image tag to one app definition, and ACA creates a new revision from that combination.
 
 ---
 
@@ -98,51 +140,11 @@ curl https://<YOUR_FQDN>/
 
 ---
 
-## Operator notes
+## What should stick from the first deploy
 
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-
----
-
-## Common mistakes
-
-- Managed does not mean operations disappear.
-- A failed new revision is not the same thing as automatic rollback.
-- Scale-to-zero is not implemented the same way for every rule type.
-- Turning on Dapr does not remove application design responsibility.
-- Using Environment and App as if they are the same layer leads to weak boundary decisions.
-
----
-
-## Operations checklist
-
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-
----
-
-This post is one step in the Azure Container Apps 101 series.
-The earlier posts define the platform shape, and the later posts build deployment and operations decisions on top of that shape.
-Read in order and ACA starts to feel like an operating model instead of a feature catalog.
-
-- Revisit the checklist right after each deployment.
+- Build and push the image before you expect ACA to run anything.
+- Treat the environment and the app as separate layers with different responsibilities.
+- Read every verification result in revision terms: which revision was created, did it become healthy, and which FQDN is serving it.
 
 ---
 
