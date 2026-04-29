@@ -1,3 +1,22 @@
+---
+title: The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
+series: azure-functions-deep-dive
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
 
 > Azure Functions Deep Dive series (3/7)

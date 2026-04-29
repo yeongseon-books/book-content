@@ -1,3 +1,22 @@
+---
+title: Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
+series: azure-app-service-deep-dive
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
 
 > Azure App Service Deep Dive 시리즈 (2/6)

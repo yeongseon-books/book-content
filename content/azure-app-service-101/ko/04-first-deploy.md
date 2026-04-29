@@ -1,3 +1,22 @@
+---
+title: '첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)'
+series: azure-app-service-101
+episode: 4
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)
 
 이론은 여기까지입니다. **이제 진짜로 배포해 봅시다.**

@@ -1,3 +1,22 @@
+---
+title: 모니터링과 운영 — Container Insights, 로그, 알람
+series: azure-aks-101
+episode: 7
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 모니터링과 운영 — Container Insights, 로그, 알람
 
 > Azure Kubernetes Service 101 시리즈 (7/7)

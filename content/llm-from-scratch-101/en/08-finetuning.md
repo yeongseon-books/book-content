@@ -1,3 +1,22 @@
+---
+title: Adapting the Base Model to Specific Tasks
+series: llm-from-scratch-101
+episode: 8
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # Adapting the Base Model to Specific Tasks
 
 > LLM from Scratch 101 series (8/9)

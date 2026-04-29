@@ -1,3 +1,22 @@
+---
+title: Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
+series: azure-aca-deep-dive
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
 
 > Azure Container Apps Deep Dive 시리즈 (2/6)

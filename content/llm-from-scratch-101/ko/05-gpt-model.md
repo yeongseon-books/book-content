@@ -1,3 +1,22 @@
+---
+title: '조립: GPT 모델 클래스 완성'
+series: llm-from-scratch-101
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 조립: GPT 모델 클래스 완성
 
 > LLM from Scratch 101 시리즈 (5/9)

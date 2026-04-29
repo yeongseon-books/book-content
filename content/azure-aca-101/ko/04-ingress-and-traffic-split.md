@@ -1,3 +1,22 @@
+---
+title: Ingress와 트래픽 분할 — Revision 기반 배포 전략
+series: azure-aca-101
+episode: 4
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Ingress와 트래픽 분할 — Revision 기반 배포 전략
 
 > Azure Container Apps 101 시리즈 (4/7)

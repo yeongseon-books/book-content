@@ -1,3 +1,22 @@
+---
+title: 베이스 모델을 우리 작업에 맞추기
+series: llm-from-scratch-101
+episode: 8
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 베이스 모델을 우리 작업에 맞추기
 
 > LLM from Scratch 101 시리즈 (8/9)

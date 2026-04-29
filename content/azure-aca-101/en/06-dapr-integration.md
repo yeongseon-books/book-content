@@ -1,3 +1,22 @@
+---
+title: Dapr integration — what you get from a sidecar
+series: azure-aca-101
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Dapr integration — what you get from a sidecar
 
 > Azure Container Apps 101 series (6/7)

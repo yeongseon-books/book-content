@@ -1,3 +1,22 @@
+---
+title: 글자를 숫자로 바꾸기
+series: llm-from-scratch-101
+episode: 1
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 글자를 숫자로 바꾸기
 
 > LLM from Scratch 101 시리즈 (1/9)

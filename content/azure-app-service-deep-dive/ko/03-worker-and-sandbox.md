@@ -1,3 +1,22 @@
+---
+title: Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
+series: azure-app-service-deep-dive
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
 
 > Azure App Service Deep Dive 시리즈 (3/6)

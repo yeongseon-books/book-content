@@ -1,3 +1,22 @@
+---
+title: 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기
+series: azure-functions-deep-dive
+episode: 1
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기
 
 > Azure Functions Deep Dive 시리즈 (1/6)

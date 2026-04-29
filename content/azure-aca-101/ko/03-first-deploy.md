@@ -1,3 +1,22 @@
+---
+title: 첫 앱 배포하기 — Python/FastAPI
+series: azure-aca-101
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # 첫 앱 배포하기 — Python/FastAPI
 
 > Azure Container Apps 101 시리즈 (3/7)

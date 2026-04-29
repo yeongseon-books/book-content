@@ -1,3 +1,22 @@
+---
+title: kubelet and containerd — how a container actually starts on a node
+series: azure-aks-deep-dive
+episode: 2
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # kubelet and containerd — how a container actually starts on a node
 
 > Azure Kubernetes Service Deep Dive series (2/6)

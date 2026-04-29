@@ -1,3 +1,22 @@
+---
+title: Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식
+series: azure-aks-101
+episode: 4
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식
 
 > Azure Kubernetes Service 101 시리즈 (4/7)

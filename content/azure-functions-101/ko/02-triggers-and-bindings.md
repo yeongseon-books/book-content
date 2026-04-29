@@ -1,3 +1,22 @@
+---
+title: 트리거와 바인딩 — 함수 입출력의 모든 것
+series: azure-functions-101
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 트리거와 바인딩 — 함수 입출력의 모든 것
 
 > Azure Functions 101 시리즈 (2/7)

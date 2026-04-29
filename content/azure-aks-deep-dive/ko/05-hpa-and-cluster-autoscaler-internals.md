@@ -1,3 +1,22 @@
+---
+title: HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
+series: azure-aks-deep-dive
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
 
 > Azure Kubernetes Service Deep Dive 시리즈 (5/6)

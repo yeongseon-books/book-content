@@ -1,3 +1,22 @@
+---
+title: 'The Transformer Block: A Unit of Depth'
+series: llm-from-scratch-101
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # The Transformer Block: A Unit of Depth
 
 > LLM from Scratch 101 series (4/9)

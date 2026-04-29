@@ -1,3 +1,22 @@
+---
+title: Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법
+series: azure-functions-deep-dive
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법
 
 > Azure Functions Deep Dive 시리즈 (2/7)

@@ -1,3 +1,22 @@
+---
+title: HPA and Cluster Autoscaler internals — two control loops
+series: azure-aks-deep-dive
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # HPA and Cluster Autoscaler internals — two control loops
 
 > Azure Kubernetes Service Deep Dive series (5/6)

@@ -15,6 +15,11 @@ targets:
   mkdocs: true
   ebook: true
 status: draft
+tags:
+  - Container Apps
+  - KEDA
+  - Dapr
+  - Envoy
 articles:
 - idx: 1
   slug: 01-aca-architecture

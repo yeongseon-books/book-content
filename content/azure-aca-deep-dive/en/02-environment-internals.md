@@ -1,3 +1,22 @@
+---
+title: Environment internals — the network, observability, and Dapr scope boundary
+series: azure-aca-deep-dive
+episode: 2
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # Environment internals — the network, observability, and Dapr scope boundary
 
 > Azure Container Apps Deep Dive series (2/6)

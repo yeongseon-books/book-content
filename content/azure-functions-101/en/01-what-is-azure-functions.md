@@ -1,3 +1,22 @@
+---
+title: What Is Azure Functions? — A World Where Events Call Your Code
+series: azure-functions-101
+episode: 1
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # What Is Azure Functions? — A World Where Events Call Your Code
 
 > Azure Functions 101 series (1/7)

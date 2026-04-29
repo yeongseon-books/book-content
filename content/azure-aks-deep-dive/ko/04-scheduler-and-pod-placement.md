@@ -1,3 +1,22 @@
+---
+title: Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
+series: azure-aks-deep-dive
+episode: 4
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
 
 > Azure Kubernetes Service Deep Dive 시리즈 (4/6)

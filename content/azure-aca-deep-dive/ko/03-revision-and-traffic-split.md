@@ -1,3 +1,22 @@
+---
+title: Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
+series: azure-aca-deep-dive
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
 
 > Azure Container Apps Deep Dive 시리즈 (3/6)

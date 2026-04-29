@@ -1,3 +1,22 @@
+---
+title: 함수 하나 배포하기 — 로컬에서 Azure까지
+series: azure-functions-101
+episode: 4
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 함수 하나 배포하기 — 로컬에서 Azure까지
 
 > Azure Functions 101 시리즈 (4/7)

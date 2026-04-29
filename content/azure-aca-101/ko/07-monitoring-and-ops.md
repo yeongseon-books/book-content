@@ -1,3 +1,22 @@
+---
+title: 모니터링과 운영 — Log Analytics와 Application Insights
+series: azure-aca-101
+episode: 7
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # 모니터링과 운영 — Log Analytics와 Application Insights
 
 > Azure Container Apps 101 시리즈 (7/7)

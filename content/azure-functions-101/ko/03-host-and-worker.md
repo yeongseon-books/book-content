@@ -1,3 +1,22 @@
+---
+title: Host와 Worker — 함수는 누가 실행하는가
+series: azure-functions-101
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Host와 Worker — 함수는 누가 실행하는가
 
 > Azure Functions 101 시리즈 (3/7)

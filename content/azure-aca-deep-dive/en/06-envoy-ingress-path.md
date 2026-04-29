@@ -1,3 +1,22 @@
+---
+title: The Envoy ingress path — how the first request reaches your container
+series: azure-aca-deep-dive
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # The Envoy ingress path — how the first request reaches your container
 
 > Azure Container Apps Deep Dive series (6/6)

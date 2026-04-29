@@ -1,3 +1,22 @@
+---
+title: Your first cluster, your first deploy — Python/FastAPI
+series: azure-aks-101
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Your first cluster, your first deploy — Python/FastAPI
 
 > Azure Kubernetes Service 101 series (3/7)

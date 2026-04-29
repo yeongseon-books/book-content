@@ -1,3 +1,22 @@
+---
+title: Ingress and traffic splitting — revision-based deployment strategies
+series: azure-aca-101
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Ingress and traffic splitting — revision-based deployment strategies
 
 > Azure Container Apps 101 series (4/7)

@@ -1,3 +1,23 @@
+---
+title: 'AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기'
+series: ai-web-dev-101
+episode: 6
+language: ko
+status: needs-update
+targets:
+  tistory: true
+  medium: false
+  mkdocs: true
+  ebook: true
+tags:
+- AI
+- LLM
+- 웹 개발
+- Python
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기
 
 > AI 웹 개발 입문 시리즈 (6/7)

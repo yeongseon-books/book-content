@@ -1,3 +1,22 @@
+---
+title: Environment·Container App·Revision — 세 단어로 보는 ACA
+series: azure-aca-101
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Environment·Container App·Revision — 세 단어로 보는 ACA
 
 > Azure Container Apps 101 시리즈 (2/7)

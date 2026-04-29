@@ -1,3 +1,22 @@
+---
+title: 'Scaling 101: 언제 Scale Up vs Scale Out?'
+series: azure-app-service-101
+episode: 7
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Scaling 101: 언제 Scale Up vs Scale Out?
 
 > Azure App Service 101 시리즈 (7/7) - 마지막

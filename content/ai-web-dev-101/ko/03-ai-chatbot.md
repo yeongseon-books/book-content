@@ -1,3 +1,23 @@
+---
+title: AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
+series: ai-web-dev-101
+episode: 3
+language: ko
+status: needs-update
+targets:
+  tistory: true
+  medium: false
+  mkdocs: true
+  ebook: true
+tags:
+- AI
+- LLM
+- 웹 개발
+- Python
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
 
 > AI 웹 개발 입문 시리즈 (3/7)

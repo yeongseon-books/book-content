@@ -1,3 +1,22 @@
+---
+title: Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지
+series: azure-functions-deep-dive
+episode: 4
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지
 
 > Azure Functions Deep Dive 시리즈 (4/7)

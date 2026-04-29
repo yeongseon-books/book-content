@@ -1,3 +1,22 @@
+---
+title: Deciding Which Tokens to Focus On
+series: llm-from-scratch-101
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # Deciding Which Tokens to Focus On
 
 > LLM from Scratch 101 series (3/9)

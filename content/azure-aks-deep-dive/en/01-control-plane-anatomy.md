@@ -1,3 +1,22 @@
+---
+title: Control plane anatomy — what AKS hides from you
+series: azure-aks-deep-dive
+episode: 1
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Control plane anatomy — what AKS hides from you
 
 > Azure Kubernetes Service Deep Dive series (1/6)

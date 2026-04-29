@@ -1,3 +1,22 @@
+---
+title: Monitoring and ops — Container Insights, logs, alerts
+series: azure-aks-101
+episode: 7
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Monitoring and ops — Container Insights, logs, alerts
 
 > Azure Kubernetes Service 101 series (7/7)

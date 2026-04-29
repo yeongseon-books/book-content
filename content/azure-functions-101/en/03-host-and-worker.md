@@ -1,3 +1,22 @@
+---
+title: Host and Worker — Who Actually Runs Your Functions?
+series: azure-functions-101
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Host and Worker — Who Actually Runs Your Functions?
 
 > Azure Functions 101 series (3/7)

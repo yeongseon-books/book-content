@@ -1,3 +1,22 @@
+---
+title: 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated
+series: azure-functions-101
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated
 
 > Azure Functions 101 시리즈 (5/7)

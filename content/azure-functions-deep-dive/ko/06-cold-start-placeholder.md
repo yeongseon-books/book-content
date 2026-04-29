@@ -1,3 +1,22 @@
+---
+title: 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
+series: azure-functions-deep-dive
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
 
 > Azure Functions Deep Dive 시리즈 (6/6)

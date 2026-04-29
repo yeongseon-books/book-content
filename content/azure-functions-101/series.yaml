@@ -15,6 +15,11 @@ targets:
   mkdocs: true
   ebook: true
 status: draft
+tags:
+  - Azure
+  - Azure Functions
+  - Serverless
+  - Cloud
 articles:
 - idx: 1
   slug: 01-what-is-azure-functions

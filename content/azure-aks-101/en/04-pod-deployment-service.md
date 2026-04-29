@@ -1,3 +1,22 @@
+---
+title: Pod, Deployment, Service — the three ways you express a workload
+series: azure-aks-101
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Pod, Deployment, Service — the three ways you express a workload
 
 > Azure Kubernetes Service 101 series (4/7)

@@ -1,3 +1,22 @@
+---
+title: Dispatcher and Invocation — How a Function Call Reaches the Worker
+series: azure-functions-deep-dive
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # Dispatcher and Invocation — How a Function Call Reaches the Worker
 
 > Azure Functions Deep Dive series (4/7)

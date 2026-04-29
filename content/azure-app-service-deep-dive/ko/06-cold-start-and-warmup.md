@@ -1,3 +1,22 @@
+---
+title: 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
+series: azure-app-service-deep-dive
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
 
 > Azure App Service Deep Dive 시리즈 (6/6)

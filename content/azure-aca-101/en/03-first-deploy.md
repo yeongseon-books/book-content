@@ -1,3 +1,22 @@
+---
+title: Your first deploy — Python/FastAPI
+series: azure-aca-101
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Your first deploy — Python/FastAPI
 
 > Azure Container Apps 101 series (3/7)

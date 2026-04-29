@@ -1,3 +1,22 @@
+---
+title: Dapr 통합 — 사이드카로 얻는 것
+series: azure-aca-101
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Dapr 통합 — 사이드카로 얻는 것
 
 > Azure Container Apps 101 시리즈 (6/7)

@@ -1,3 +1,22 @@
+---
+title: CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가
+series: azure-aks-deep-dive
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가
 
 > Azure Kubernetes Service Deep Dive 시리즈 (3/6)

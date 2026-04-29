@@ -1,3 +1,22 @@
+---
+title: Host Bootstrap — Following `WebJobsScriptHostService`
+series: azure-functions-deep-dive
+episode: 1
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # Host Bootstrap — Following `WebJobsScriptHostService`
 
 > Azure Functions Deep Dive series (1/6)

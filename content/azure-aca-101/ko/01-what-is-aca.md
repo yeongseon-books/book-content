@@ -1,3 +1,22 @@
+---
+title: Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기
+series: azure-aca-101
+episode: 1
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기
 
 > Azure Container Apps 101 시리즈 (1/7)

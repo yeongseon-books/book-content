@@ -1,3 +1,22 @@
+---
+title: Revisions and traffic splitting — where Envoy weights come from
+series: azure-aca-deep-dive
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # Revisions and traffic splitting — where Envoy weights come from
 
 > Azure Container Apps Deep Dive series (3/6)

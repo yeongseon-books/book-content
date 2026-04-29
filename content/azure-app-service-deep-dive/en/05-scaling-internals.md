@@ -1,3 +1,22 @@
+---
+title: Scaling internals — how Scale Out decisions become new workers
+series: azure-app-service-deep-dive
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # Scaling internals — how Scale Out decisions become new workers
 
 > Azure App Service Deep Dive series (5/6)

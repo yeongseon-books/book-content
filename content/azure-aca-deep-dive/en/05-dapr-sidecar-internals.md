@@ -1,3 +1,22 @@
+---
+title: Dapr sidecar internals — the Go process that lives next to your container
+series: azure-aca-deep-dive
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # Dapr sidecar internals — the Go process that lives next to your container
 
 > Azure Container Apps Deep Dive series (5/6)

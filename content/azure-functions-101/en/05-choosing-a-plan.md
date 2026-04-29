@@ -1,3 +1,22 @@
+---
+title: Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
+series: azure-functions-101
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
 
 > Azure Functions 101 series (5/7)

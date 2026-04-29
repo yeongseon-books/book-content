@@ -1,3 +1,22 @@
+---
+title: 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이
+series: azure-functions-deep-dive
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이
 
 > Azure Functions Deep Dive 시리즈 (5/7)

@@ -1,3 +1,22 @@
+---
+title: '로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기'
+series: azure-app-service-101
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # 로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기
 
 월요일 오전 9시 07분. Slack이 시끄럽습니다.

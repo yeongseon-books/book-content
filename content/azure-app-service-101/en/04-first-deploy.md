@@ -1,3 +1,22 @@
+---
+title: 'First Deployment: From Local to Azure (Python/Flask)'
+series: azure-app-service-101
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # First Deployment: From Local to Azure (Python/Flask)
 
 This is where the series turns into a real deployment. We will deploy a Flask app to Azure App Service and verify the full runtime path.

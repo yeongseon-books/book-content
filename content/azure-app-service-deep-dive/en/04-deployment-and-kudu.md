@@ -1,3 +1,22 @@
+---
+title: Deployment and Kudu — build, sync, release from the inside
+series: azure-app-service-deep-dive
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # Deployment and Kudu — build, sync, release from the inside
 
 > Azure App Service Deep Dive series (4/6)

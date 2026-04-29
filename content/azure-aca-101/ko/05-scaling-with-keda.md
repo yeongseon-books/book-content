@@ -1,3 +1,22 @@
+---
+title: 스케일링 — KEDA scaler와 0-to-N
+series: azure-aca-101
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # 스케일링 — KEDA scaler와 0-to-N
 
 > Azure Container Apps 101 시리즈 (5/7)

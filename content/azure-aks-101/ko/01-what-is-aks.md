@@ -1,3 +1,22 @@
+---
+title: Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
+series: azure-aks-101
+episode: 1
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
 
 > Azure Kubernetes Service 101 시리즈 (1/7)

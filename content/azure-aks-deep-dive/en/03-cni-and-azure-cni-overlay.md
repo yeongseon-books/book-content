@@ -1,3 +1,22 @@
+---
+title: CNI and Azure CNI Overlay — where Pod IPs come from
+series: azure-aks-deep-dive
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # CNI and Azure CNI Overlay — where Pod IPs come from
 
 > Azure Kubernetes Service Deep Dive series (3/6)

@@ -1,3 +1,22 @@
+---
+title: KEDA internals — how a ScaledObject builds an HPA
+series: azure-aks-deep-dive
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # KEDA internals — how a ScaledObject builds an HPA
 
 > Azure Kubernetes Service Deep Dive series (6/6)

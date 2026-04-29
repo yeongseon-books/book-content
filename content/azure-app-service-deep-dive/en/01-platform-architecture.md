@@ -1,3 +1,22 @@
+---
+title: App Service platform architecture — Front-End, Worker, File Server
+series: azure-app-service-deep-dive
+episode: 1
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # App Service platform architecture — Front-End, Worker, File Server
 
 > Azure App Service Deep Dive series (1/6)

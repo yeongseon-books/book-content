@@ -1,3 +1,22 @@
+---
+title: Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
+series: azure-functions-deep-dive
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
 
 > Azure Functions Deep Dive series (6/6)

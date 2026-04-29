@@ -1,3 +1,22 @@
+---
+title: 'Hosting Models: Which Plan Should You Choose?'
+series: azure-app-service-101
+episode: 3
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Hosting Models: Which Plan Should You Choose?
 
 When starting with App Service, the first question you face: **"Which plan should I choose?"**

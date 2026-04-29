@@ -1,3 +1,22 @@
+---
+title: ACA architecture — what Microsoft layered on a hidden Kubernetes
+series: azure-aca-deep-dive
+episode: 1
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # ACA architecture — what Microsoft layered on a hidden Kubernetes
 
 > Azure Container Apps Deep Dive series (1/6)

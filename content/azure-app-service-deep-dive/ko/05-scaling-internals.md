@@ -1,3 +1,22 @@
+---
+title: 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
+series: azure-app-service-deep-dive
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
 
 > Azure App Service Deep Dive 시리즈 (5/6)

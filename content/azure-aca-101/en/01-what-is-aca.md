@@ -1,3 +1,22 @@
+---
+title: What is Azure Container Apps? — running containers without Kubernetes
+series: azure-aca-101
+episode: 1
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # What is Azure Container Apps? — running containers without Kubernetes
 
 > Azure Container Apps 101 series (1/7)

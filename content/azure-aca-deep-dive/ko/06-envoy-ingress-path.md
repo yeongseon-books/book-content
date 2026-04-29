@@ -1,3 +1,22 @@
+---
+title: Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
+series: azure-aca-deep-dive
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
 
 > Azure Container Apps Deep Dive 시리즈 (6/6)

@@ -1,3 +1,22 @@
+---
+title: 클러스터 아키텍처 — Control Plane과 Node Pool
+series: azure-aks-101
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 클러스터 아키텍처 — Control Plane과 Node Pool
 
 > Azure Kubernetes Service 101 시리즈 (2/7)

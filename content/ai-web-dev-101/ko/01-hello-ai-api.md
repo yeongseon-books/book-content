@@ -1,3 +1,23 @@
+---
+title: AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기
+series: ai-web-dev-101
+episode: 1
+language: ko
+status: needs-update
+targets:
+  tistory: true
+  medium: false
+  mkdocs: true
+  ebook: true
+tags:
+- AI
+- LLM
+- 웹 개발
+- Python
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기
 
 > AI 웹 개발 입문 시리즈 (1/7)

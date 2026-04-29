@@ -1,3 +1,22 @@
+---
+title: 'Scaling 101: When to Scale Up vs Scale Out?'
+series: azure-app-service-101
+episode: 7
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Scaling 101: When to Scale Up vs Scale Out?
 
 "Traffic increased and the app is slow." "Want to reduce costs but maintain performance."

@@ -1,3 +1,22 @@
+---
+title: Azure Functions란? — 이벤트가 함수를 호출하는 세상
+series: azure-functions-101
+episode: 1
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Azure Functions란? — 이벤트가 함수를 호출하는 세상
 
 > Azure Functions 101 시리즈 (1/7)

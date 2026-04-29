@@ -1,3 +1,22 @@
+---
+title: 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간
+series: azure-functions-101
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간
 
 > Azure Functions 101 시리즈 (6/7)

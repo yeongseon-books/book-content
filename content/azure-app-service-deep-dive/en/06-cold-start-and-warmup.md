@@ -1,3 +1,22 @@
+---
+title: Cold start and warmup — why the first request is expensive
+series: azure-app-service-deep-dive
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # Cold start and warmup — why the first request is expensive
 
 > Azure App Service Deep Dive series (6/6)

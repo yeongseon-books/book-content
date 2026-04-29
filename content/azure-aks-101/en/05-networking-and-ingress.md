@@ -1,3 +1,22 @@
+---
+title: Networking and Ingress — the path in and out of the cluster
+series: azure-aks-101
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Networking and Ingress — the path in and out of the cluster
 
 > Azure Kubernetes Service 101 series (5/7)

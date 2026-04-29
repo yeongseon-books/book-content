@@ -1,3 +1,22 @@
+---
+title: 정수에서 벡터로, 그리고 위치
+series: llm-from-scratch-101
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 정수에서 벡터로, 그리고 위치
 
 > LLM from Scratch 101 시리즈 (2/9)

@@ -1,3 +1,23 @@
+---
+title: 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술
+series: ai-web-dev-101
+episode: 2
+language: ko
+status: needs-update
+targets:
+  tistory: true
+  medium: false
+  mkdocs: true
+  ebook: true
+tags:
+- AI
+- LLM
+- 웹 개발
+- Python
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술
 
 > AI 웹 개발 입문 시리즈 (2/7)

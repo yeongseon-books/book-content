@@ -1,3 +1,22 @@
+---
+title: Scheduler and Pod placement — who decides which node
+series: azure-aks-deep-dive
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Scheduler and Pod placement — who decides which node
 
 > Azure Kubernetes Service Deep Dive series (4/6)

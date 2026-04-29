@@ -1,3 +1,22 @@
+---
+title: 'Request Lifecycle: How Requests Reach Your App'
+series: azure-app-service-101
+episode: 2
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Request Lifecycle: How Requests Reach Your App
 
 "Why is my app returning a 502 error?" "Response times suddenly increased—what's the cause?"

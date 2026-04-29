@@ -15,6 +15,11 @@ targets:
   mkdocs: true
   ebook: true
 status: draft
+tags:
+  - Azure Functions
+  - Serverless
+  - Distributed Systems
+  - gRPC
 articles:
 - idx: 1
   slug: 01-host-bootstrap

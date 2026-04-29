@@ -1,3 +1,22 @@
+---
+title: Turning Your LLM into a Chatbot — FastAPI + Streaming
+series: llm-from-scratch-101
+episode: 9
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # Turning Your LLM into a Chatbot — FastAPI + Streaming
 
 > LLM from Scratch 101 series (9/9)

@@ -1,3 +1,22 @@
+---
+title: Worker Processes — How One Host Hosts Many Languages
+series: azure-functions-deep-dive
+episode: 2
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # Worker Processes — How One Host Hosts Many Languages
 
 > Azure Functions Deep Dive series (2/7)

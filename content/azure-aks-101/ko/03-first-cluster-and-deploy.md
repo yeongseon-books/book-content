@@ -1,3 +1,22 @@
+---
+title: 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
+series: azure-aks-101
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
 
 > Azure Kubernetes Service 101 시리즈 (3/7)

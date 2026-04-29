@@ -1,3 +1,22 @@
+---
+title: 'Assembly: Completing the GPT Model Class'
+series: llm-from-scratch-101
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # Assembly: Completing the GPT Model Class
 
 > LLM from Scratch 101 series (5/9)

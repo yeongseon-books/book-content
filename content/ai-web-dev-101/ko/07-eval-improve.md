@@ -1,3 +1,23 @@
+---
+title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
+series: ai-web-dev-101
+episode: 7
+language: ko
+status: needs-update
+targets:
+  tistory: true
+  medium: false
+  mkdocs: true
+  ebook: true
+tags:
+- AI
+- LLM
+- 웹 개발
+- Python
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
 
 > AI 웹 개발 입문 시리즈 (7/7)

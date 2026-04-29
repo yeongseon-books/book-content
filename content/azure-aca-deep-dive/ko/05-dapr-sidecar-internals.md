@@ -1,3 +1,22 @@
+---
+title: Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
+series: azure-aca-deep-dive
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
 
 > Azure Container Apps Deep Dive 시리즈 (5/6)

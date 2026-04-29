@@ -1,3 +1,23 @@
+---
+title: AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
+series: ai-web-dev-101
+episode: 5
+language: ko
+status: needs-update
+targets:
+  tistory: true
+  medium: false
+  mkdocs: true
+  ebook: true
+tags:
+- AI
+- LLM
+- 웹 개발
+- Python
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
 
 > AI 웹 개발 입문 시리즈 (5/7)

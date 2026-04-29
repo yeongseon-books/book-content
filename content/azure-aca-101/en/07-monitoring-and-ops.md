@@ -1,3 +1,22 @@
+---
+title: Monitoring and ops — Log Analytics and Application Insights
+series: azure-aca-101
+episode: 7
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Monitoring and ops — Log Analytics and Application Insights
 
 > Azure Container Apps 101 series (7/7)

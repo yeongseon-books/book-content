@@ -1,3 +1,22 @@
+---
+title: 'Mastering Configuration: App Settings & Environment Variables'
+series: azure-app-service-101
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Mastering Configuration: App Settings & Environment Variables
 
 Your app is deployed. Now, **how do you manage environment-specific settings?**

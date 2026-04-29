@@ -1,3 +1,22 @@
+---
+title: 기울기로 배우기
+series: llm-from-scratch-101
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 기울기로 배우기
 
 > LLM from Scratch 101 시리즈 (6/9)

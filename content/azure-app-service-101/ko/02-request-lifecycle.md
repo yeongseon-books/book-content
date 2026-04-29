@@ -1,3 +1,22 @@
+---
+title: 'Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까'
+series: azure-app-service-101
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까
 
 새벽 3시, 알람이 울립니다. 프로덕션 API가 갑자기 `502`를 뱉기 시작했습니다.  

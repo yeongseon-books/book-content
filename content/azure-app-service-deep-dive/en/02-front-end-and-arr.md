@@ -1,3 +1,22 @@
+---
+title: Front-End and ARR — how a request reaches a worker
+series: azure-app-service-deep-dive
+episode: 2
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # Front-End and ARR — how a request reaches a worker
 
 > Azure App Service Deep Dive series (2/6)

@@ -1,3 +1,22 @@
+---
+title: Learning via Gradients
+series: llm-from-scratch-101
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # Learning via Gradients
 
 > LLM from Scratch 101 series (6/9)

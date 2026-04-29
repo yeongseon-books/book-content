@@ -1,3 +1,22 @@
+---
+title: 어떤 토큰을 얼마나 볼지 스스로 정하기
+series: llm-from-scratch-101
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 어떤 토큰을 얼마나 볼지 스스로 정하기
 
 > LLM from Scratch 101 시리즈 (3/9)

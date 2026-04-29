@@ -1,3 +1,23 @@
+---
+title: Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across
+  Plans
+series: azure-functions-deep-dive
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
 
 > Azure Functions Deep Dive series (5/7)

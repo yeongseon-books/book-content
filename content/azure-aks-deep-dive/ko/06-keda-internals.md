@@ -1,3 +1,22 @@
+---
+title: KEDA 내부 — ScaledObject가 HPA를 만드는 방식
+series: azure-aks-deep-dive
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # KEDA 내부 — ScaledObject가 HPA를 만드는 방식
 
 > Azure Kubernetes Service Deep Dive 시리즈 (6/6)

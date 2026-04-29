@@ -1,3 +1,22 @@
+---
+title: 'Configuration 마스터하기: App Settings & 환경변수'
+series: azure-app-service-101
+episode: 5
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Configuration 마스터하기: App Settings & 환경변수
 
 배포는 끝났습니다. 이제 진짜 운영이 시작됩니다.

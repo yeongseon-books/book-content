@@ -1,3 +1,22 @@
+---
+title: Environment, Container App, Revision — ACA in three words
+series: azure-aca-101
+episode: 2
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Environment, Container App, Revision — ACA in three words
 
 > Azure Container Apps 101 series (2/7)

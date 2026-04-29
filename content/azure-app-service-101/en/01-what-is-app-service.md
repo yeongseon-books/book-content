@@ -1,3 +1,22 @@
+---
+title: What is Azure App Service? - Understanding the Platform Architecture
+series: azure-app-service-101
+episode: 1
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # What is Azure App Service? - Understanding the Platform Architecture
 
 When deploying a web application to Azure, **Azure App Service** is often the first service you encounter. It's a PaaS (Platform as a Service) where you just deploy your code without managing VMs. To use this service effectively, understanding its internals is crucial.

@@ -1,3 +1,22 @@
+---
+title: KEDA inside ACA — what a scale rule actually creates
+series: azure-aca-deep-dive
+episode: 4
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # KEDA inside ACA — what a scale rule actually creates
 
 > Azure Container Apps Deep Dive series (4/6)

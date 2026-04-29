@@ -1,3 +1,22 @@
+---
+title: Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t
+series: azure-functions-101
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t
 
 > Azure Functions 101 series (6/7)

@@ -1,3 +1,22 @@
+---
+title: 모니터링과 운영 기초
+series: azure-functions-101
+episode: 7
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Azure Functions
+- Serverless
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 모니터링과 운영 기초
 
 > Azure Functions 101 시리즈 (7/7)

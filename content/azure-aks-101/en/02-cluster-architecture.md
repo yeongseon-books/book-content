@@ -1,3 +1,22 @@
+---
+title: Cluster architecture — control plane and node pools
+series: azure-aks-101
+episode: 2
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # Cluster architecture — control plane and node pools
 
 > Azure Kubernetes Service 101 series (2/7)

@@ -1,3 +1,22 @@
+---
+title: 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
+series: azure-app-service-deep-dive
+episode: 4
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+---
+
 # 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
 
 > Azure App Service Deep Dive 시리즈 (4/6)

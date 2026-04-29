@@ -1,3 +1,22 @@
+---
+title: ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
+series: azure-aca-deep-dive
+episode: 1
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Container Apps
+- KEDA
+- Dapr
+- Envoy
+last_reviewed: '2026-04-29'
+---
+
 # ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
 
 > Azure Container Apps Deep Dive 시리즈 (1/6)

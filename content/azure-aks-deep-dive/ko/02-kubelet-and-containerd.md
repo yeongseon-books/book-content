@@ -1,3 +1,22 @@
+---
+title: kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
+series: azure-aks-deep-dive
+episode: 2
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AKS
+- Kubernetes
+- Distributed Systems
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
 
 > Azure Kubernetes Service Deep Dive 시리즈 (2/6)

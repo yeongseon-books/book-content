@@ -1,3 +1,22 @@
+---
+title: Logging and Monitoring Basics
+series: azure-app-service-101
+episode: 6
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Logging and Monitoring Basics
 
 "The app is slow." "There's an error." "When did this start?"

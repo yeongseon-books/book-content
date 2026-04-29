@@ -1,3 +1,22 @@
+---
+title: Azure App Service란? - 플랫폼 아키텍처 이해하기
+series: azure-app-service-101
+episode: 1
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Cloud
+- Web Apps
+last_reviewed: '2026-04-29'
+---
+
 # Azure App Service란? - 플랫폼 아키텍처 이해하기
 
 처음 Azure App Service를 접하면 대개 이렇게 생각합니다. “좋네. 서버 안 만져도 되고, 그냥 코드만 올리면 되네.” 실제로 맞는 말입니다. 그런데 운영에 들어가면 그다음 질문이 바로 따라옵니다. “그런데 왜 설정 하나 바꿨는데 앱이 재시작됐지?” “배포는 끝났는데 왜 요청이 이상하게 들어오지?” “Kudu는 보이는데 앱은 왜 안 뜨지?”

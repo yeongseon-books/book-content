@@ -1,3 +1,22 @@
+---
+title: gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
+series: azure-functions-deep-dive
+episode: 3
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure Functions
+- Serverless
+- Distributed Systems
+- gRPC
+last_reviewed: '2026-04-29'
+---
+
 # gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
 
 > Azure Functions Deep Dive 시리즈 (3/7)

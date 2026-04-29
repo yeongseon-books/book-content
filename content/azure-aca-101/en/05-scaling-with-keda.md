@@ -1,3 +1,22 @@
+---
+title: Scaling — KEDA scalers and zero-to-N
+series: azure-aca-101
+episode: 5
+language: en
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- Container Apps
+- Serverless
+- Containers
+last_reviewed: '2026-04-29'
+---
+
 # Scaling — KEDA scalers and zero-to-N
 
 > Azure Container Apps 101 series (5/7)

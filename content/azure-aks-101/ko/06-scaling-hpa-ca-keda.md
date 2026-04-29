@@ -1,3 +1,22 @@
+---
+title: 스케일링 — HPA, Cluster Autoscaler, KEDA
+series: azure-aks-101
+episode: 6
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- AKS
+- Kubernetes
+- Cloud
+last_reviewed: '2026-04-29'
+---
+
 # 스케일링 — HPA, Cluster Autoscaler, KEDA
 
 > Azure Kubernetes Service 101 시리즈 (6/7)

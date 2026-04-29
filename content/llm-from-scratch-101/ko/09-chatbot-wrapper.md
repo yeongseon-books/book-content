@@ -1,3 +1,22 @@
+---
+title: 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
+series: llm-from-scratch-101
+episode: 9
+language: ko
+status: ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- PyTorch
+- Transformer
+- Tutorial
+last_reviewed: '2026-04-29'
+---
+
 # 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
 
 > LLM from Scratch 101 시리즈 (9/9)
