@@ -21,6 +21,10 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive series (1/6)
 
+## Source Version
+
+All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
+
 In episode 3 of the intro series, I wrote that Functions runs the Host process (.NET) and the Worker process (your language) separately, with gRPC between them. This series checks that sentence against the actual host code. It reads the [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) repo directly, one stage per post, from bootstrap through invocation, scaling, and cold starts.
 
 This post focuses on one question: **what happens the moment a Function App instance powers on**. Everything is pinned to commit `5e59423`, and every host code citation uses that commit.
@@ -53,7 +57,8 @@ The entry point is `Program.cs`, but the real protagonist of the Functions "host
 
 The key method is `StartAsync`. Inside it, the following happens:
 
-- Wire up the host health monitor (`HostHealthMonitor`)
+- Set up the `WebJobsScriptHostService` timer-driven host health loop
+- Feed that loop into `HostPerformanceManager` so the host can evaluate current load and health
 - Create a `ScriptHost` instance and call `InitializeAsync`
 - Apply retry / restart policy on failure
 - Publish bootstrap state events (Standby → Running transitions, etc.)
@@ -114,9 +119,9 @@ After reading host.json, `ScriptHost` indexes "what functions does this app have
 
 Why does this indexing matter? Because **this metadata is the foundation for every downstream behavior**.
 
-- The Worker takes this list and registers "I know these functions" (via gRPC `WorkerInitRequest` / `FunctionLoadRequest`, covered in episode 3)
+- The Worker first receives host init/capability data through `WorkerInitRequest`, then receives actual function metadata through `FunctionLoadRequest` or `FunctionLoadRequestCollection` (covered in episode 3)
 - Trigger listeners look at this list to decide "which queue to poll, which route to bind to" (episode 4)
-- The Scale Controller looks at this list to decide "which trigger's metrics to collect" (episode 5)
+- The Scale Controller is architecturally downstream of this metadata, but that controller itself is out of tree for this vendored source. Episode 5 stays on the host-side scale signals.
 
 In other words, **indexing is the stage that builds the Functions host's "function catalog."**
 
@@ -124,7 +129,7 @@ In other words, **indexing is the stage that builds the Functions host's "functi
 
 ## The host health monitor
 
-`WebJobsScriptHostService` periodically checks whether the host is alive. When it detects memory pressure, connection failures, or bootstrap timeouts, it restarts the host. This mechanism is the core of how "the Functions Host recovers itself."
+`WebJobsScriptHostService` creates `_hostHealthCheckTimer` in its constructor and periodically runs `OnHostHealthCheckTimer`. That loop works with `HostPerformanceManager` to decide whether the current instance is overloaded or unhealthy. In other words, there is no separate wired health-monitor component in this source tree; the health-monitoring behavior is the combination of **the timer inside `WebJobsScriptHostService` plus `HostPerformanceManager`**.
 
 - Host throws during bootstrap → retry
 - Bootstrap takes too long → forced restart
@@ -148,6 +153,14 @@ The next episode targets one of the blind spots in that diagram: **what happens 
 ## Where this fits in the series
 
 This is part 1 of the Azure Functions Deep Dive series. With host bootstrap in place, part 2 moves to the worker processes living beside the host, and parts 3 and 4 follow the gRPC channel and invocation path between them. The later parts cover scaling, placeholder mode, and cold-start mechanics.
+
+---
+
+## Call Path Summary
+
+- `Program.Main()` → ASP.NET Core host bootstrap → `WebJobsScriptHostService.StartAsync()` → `ScriptHost.InitializeAsync()` → `JobHost.StartAsync()`
+- `HostJsonFileConfigurationSource` → `IConfiguration` → `ScriptJobHostOptionsSetup` → `ScriptJobHostOptions`
+- `WebJobsScriptHostService` health timer → `OnHostHealthCheckTimer(...)` → `HostPerformanceManager`
 
 ---
 

@@ -19,7 +19,11 @@ last_reviewed: '2026-04-29'
 
 # Worker Processes — How One Host Hosts Many Languages
 
-> Azure Functions Deep Dive series (2/7)
+> Azure Functions Deep Dive series (2/6)
+
+## Source Version
+
+All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
 At the end of part 1 I left a question hanging: *what exactly happens inside the “Worker channel preparation” box of `InitializeAsync`?* That is the topic for this installment. How does the Functions Host — written in .NET — launch and connect to Worker processes for Node.js, Python, Java, and PowerShell? We follow the trail **all the way down to the moment the OS-level `Process.Start` is called**.
 
@@ -58,22 +62,24 @@ These files tell the Host three things:
 
 ---
 
-## One level up — `WorkerConfigFactory`
+## One level up — `WorkerConfigurationResolver`
 
-When the Host boots, the component that gathers every language’s `worker.config.json` and assembles a unified catalogue is `WorkerConfigFactory`. The output is a list of `RpcWorkerConfig` objects, each one carrying everything needed to “launch this language’s worker.”
+When the Host boots, the object at the center of worker-config aggregation is `WorkerConfigurationResolver`. It does not scan everything by itself. Instead, multiple providers populate a `Dictionary<string, RpcWorkerConfig>`, and `WorkerConfigurationResolver.GetWorkerConfigs()` aggregates their results in priority order.
 
-![One level up — `WorkerConfigFactory`](../../../assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
+At `5e59423`, those providers are `DefaultWorkerConfigurationProvider`, `DynamicWorkerConfigurationProvider`, and `ExplicitWorkerConfigurationProvider`, all sharing `WorkerConfigurationProviderBase`. The default provider scans the host's built-in `workers/` directory, the dynamic provider resolves versioned workers from probing paths, and the explicit provider applies app-setting overrides for a specific worker directory.
+
+![One level up — the worker configuration resolver/provider split](../../../assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
 That is why language workers plug in cleanly. **The Host does not carry language-specific launch logic for each runtime; it reads a config description and builds from there.**
 
 ---
 
 ## Launching the Worker process — `RpcWorkerProcess`
 
-Once the configs are gathered, the next step is to launch an actual OS process. The class responsible is `RpcWorkerProcess`. Its `CreateWorkerProcess` method assembles the launch command by combining `defaultExecutablePath` and `defaultWorkerPath` from the worker.config.
+Once the configs are gathered, the next step is to launch an actual OS process. The class responsible is `RpcWorkerProcess`. But `RpcWorkerProcess` does not directly instantiate the child process on its own. Its `CreateWorkerProcess()` method builds a `RpcWorkerContext` and delegates to the injected `_processFactory.CreateWorkerProcess(workerContext)`.
 
 > Source: [`RpcWorkerProcess.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Rpc/RpcWorkerProcess.cs)
 
-The assembled command is then handed off to the `Start()` method on the abstract base class `WorkerProcess`. Three things happen there:
+The actual start happens in `WorkerProcess.StartProcessAsync()`. Three things happen there:
 
 1. Spin up an OS process via `System.Diagnostics.Process`
 2. **Intercept stdout/stderr and wire them into the Host’s logging pipeline**
@@ -133,7 +139,7 @@ Operationally, this isolation is the reason “a function may fail occasionally 
 
 If I had to compress this part into a single paragraph, it would be this:
 
-> Each language’s worker package drops a `worker.config.json` on disk. At boot, the Host gathers those configs into a catalogue (a list of `RpcWorkerConfig`). When it is time to launch a worker, `RpcWorkerProcess.CreateWorkerProcess` assembles the command from the config, and `WorkerProcess.Start` calls the OS-level `Process.Start` to spawn the actual process. stdout/stderr are wired into the Host’s logging pipeline. The worker then initializes its gRPC client and establishes a connection to the Host’s `GrpcWorkerChannel`.
+> Each language's worker package drops a `worker.config.json` on disk. At boot, the Host gathers those configs through `WorkerConfigurationResolver` and its providers into a `RpcWorkerConfig` catalogue. When it is time to launch a worker, `RpcWorkerProcess.CreateWorkerProcess()` builds a `RpcWorkerContext` and delegates to `_processFactory.CreateWorkerProcess(...)`, then `WorkerProcess.StartProcessAsync()` makes the final OS-level `Process.Start()` call. stdout/stderr are wired into the Host's logging pipeline.
 
 By this point the worker is **running, connected to the Host, and ready to receive function metadata**. The next installment is about the true identity of that final “readiness” step. Exactly which protobuf messages do the Host and Worker exchange, and in what order? **We will open up `FunctionRpc.proto` and walk through the EventStream messages one by one.**
 
@@ -142,6 +148,13 @@ By this point the worker is **running, connected to the Host, and ready to recei
 ## Where this fits in the series
 
 This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host bootstrap; this part stays beside that host and follows the worker process from configuration to `Process.Start`. Parts 3 and 4 pick up from there with the gRPC message stream and the invocation path that rides on top of it.
+
+---
+
+## Call Path Summary
+
+- `WorkerConfigurationResolver.GetWorkerConfigs()` → `DynamicWorkerConfigurationProvider` / `DefaultWorkerConfigurationProvider` / `ExplicitWorkerConfigurationProvider` → `RpcWorkerConfig`
+- `GrpcWorkerChannel.StartWorkerProcessAsync()` → `IWorkerProcess.StartProcessAsync()` → `RpcWorkerProcess.CreateWorkerProcess()` → `_processFactory.CreateWorkerProcess(workerContext)` → `Process.Start()`
 
 ---
 

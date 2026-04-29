@@ -19,13 +19,19 @@ last_reviewed: '2026-04-29'
 
 # 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이
 
-> Azure Functions Deep Dive 시리즈 (5/7)
+> Azure Functions Deep Dive 시리즈 (5/6)
+
+## Source Version
+
+이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
 
 지금까지 4화 동안 인스턴스 **하나** 안에서 호스트와 워커가 어떻게 함수를 실행하는지 봤습니다. 이번 화는 한 단계 위로 올라갑니다.
 
 > 인스턴스 자체는 **누가, 무엇을 보고, 언제 늘리고 줄이는가?**
 
 이게 우리가 흔히 말하는 "스케일아웃"입니다. 그리고 이 결정은 **호스트 프로세스 안에서 일어나지 않습니다.** 호스트는 결정의 **재료**를 제공할 뿐이고, 실제 결정은 호스트 바깥의 **Scale Controller**가 합니다 — 단, 플랜에 따라 다른 방식으로요.
+
+먼저 선을 분명히 긋겠습니다. **Scale Controller 자체 구현은 이 vendored `azure-functions-host` 저장소에 없습니다.** 이 글은 Azure 내부 컴포넌트의 세부 구현을 추측하지 않고, 호스트가 바깥으로 내보내는 scale signal과 플랜별 의미만 다룹니다.
 
 이 화의 목표는 세 가지입니다.
 
@@ -301,6 +307,14 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 - Flex Consumption은 per-function scaling과 Always ready를 도입해 "어느 함수에 얼마나 인스턴스를 둘지"를 그룹 단위로 결정합니다.
 
 다음 6화에서는 이 모든 결정의 결과로 **새 인스턴스가 만들어질 때** 일어나는 일 — Placeholder Mode와 specialization — 을 봅니다. Always ready와 콜드 스타트의 코드 레벨 메커니즘이 거기 있습니다.
+
+---
+
+## Call Path Summary
+
+- external scale component → `HostPerformanceManager.TryHandleHealthPingAsync(...)` → `IsUnderHighLoadAsync()` → host/worker 상태 기반 200 또는 429
+- trigger-side `IScaleMonitor` / `ITargetScaler` metrics → `TableStorageScaleMetricsRepository` → external Scale Controller consumes persisted metrics
+- `WorkerConcurrencyManager` timer loop → `WorkerStatus.LatencyHistory` 평가 → 필요 시 인스턴스 내부 worker 추가
 
 ---
 

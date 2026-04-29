@@ -21,6 +21,10 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive 시리즈 (1/6)
 
+## Source Version
+
+이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+
 입문 시리즈 3화에서 “Functions는 Host 프로세스(.NET)와 Worker 프로세스(여러분의 언어)를 분리해서 띄우고, 둘은 gRPC로 대화한다”고 적었습니다. 이번 심화 시리즈는 그 문장을 실제 호스트 코드로 확인하는 작업입니다. [`Azure/azure-functions-host`](https://github.com/Azure/azure-functions-host) 저장소를 직접 읽으면서, 호스트 부팅부터 함수 호출, 스케일링, 콜드 스타트까지 순서대로 따라갑니다.
 
 이번 글의 주제는 하나입니다. **Function App 인스턴스가 켜진 직후 무슨 일이 벌어지는가**입니다. 기준 커밋은 `5e59423`입니다. 모든 코드 인용은 이 커밋에 고정합니다.
@@ -53,7 +57,8 @@ last_reviewed: '2026-04-29'
 
 핵심 메서드는 `StartAsync`입니다. 여기서 다음 일이 일어납니다.
 
-- 호스트 헬스 모니터(`HostHealthMonitor`) 와이어링
+- `WebJobsScriptHostService`가 `Timer` 기반 호스트 헬스 체크 루프를 준비
+- 그 루프가 `HostPerformanceManager`와 함께 현재 부하와 상태를 평가
 - `ScriptHost` 인스턴스를 만들고 `InitializeAsync` 호출
 - 실패 시 재시도 / 재시작 정책 적용
 - 부팅 상태 이벤트 publish (Standby → Running 전이 등)
@@ -114,9 +119,9 @@ last_reviewed: '2026-04-29'
 
 이 인덱싱이 왜 중요할까요? **이 메타데이터가 모든 후속 동작의 기반**이기 때문입니다.
 
-- Worker는 이 목록을 받아서 “나는 이 함수들을 안다”고 등록 (3화에서 다룰 gRPC `WorkerInitRequest` / `FunctionLoadRequest`)
+- Worker는 먼저 `WorkerInitRequest`로 호스트 버전·capability를 받고, 실제 함수 메타데이터는 뒤이어 `FunctionLoadRequest` 또는 `FunctionLoadRequestCollection`으로 받습니다. (3화에서 다룹니다.)
 - 트리거 리스너는 이 목록을 보고 “어떤 큐를 폴링할지, 어떤 라우트에 바인드할지”를 결정 (4화)
-- Scale Controller는 이 목록을 보고 “어떤 트리거의 메트릭을 수집할지”를 결정 (5화)
+- Scale Controller가 어떤 트리거 메트릭을 보게 되는지는 아키텍처상 이 메타데이터와 연결되지만, 그 Controller 자체는 이 vendored host 소스 바깥에 있습니다. 5화에서는 호스트 쪽 scale signal만 다룹니다.
 
 즉, **인덱싱은 Functions 호스트의 “함수 카탈로그”를 만드는 단계**입니다.
 
@@ -124,7 +129,7 @@ last_reviewed: '2026-04-29'
 
 ## 호스트 헬스 모니터
 
-`WebJobsScriptHostService`는 호스트가 살아있는지 주기적으로 점검합니다. 메모리 압박, 연결 실패, 부팅 타임아웃 등을 감지하면 호스트를 다시 시작합니다. 이 메커니즘이 “Functions Host가 자기 자신을 회복하는” 핵심입니다.
+`WebJobsScriptHostService`는 생성자에서 `_hostHealthCheckTimer`를 만들고, 주기적으로 `OnHostHealthCheckTimer`를 호출합니다. 이 루프는 `HostPerformanceManager`와 연계해 현재 인스턴스가 고부하 상태인지, 헬스 윈도우에서 실패가 누적되는지를 판단합니다. 즉 별도 헬스 모니터 컴포넌트가 있다기보다, **`WebJobsScriptHostService` 안의 timer 루프 + `HostPerformanceManager` 조합**이 헬스 감시 역할을 맡습니다.
 
 - 호스트가 부팅 중 예외를 던지면 → 재시도
 - 부팅이 너무 오래 걸리면 → 강제 재시작
@@ -148,6 +153,14 @@ last_reviewed: '2026-04-29'
 ## 시리즈 안에서의 위치
 
 이 글은 Azure Functions Deep Dive 시리즈 1화입니다. 이번 화에서 호스트 부팅 순서를 잡았으니, 2화에서는 같은 인스턴스 옆에서 뜨는 Worker 프로세스로 넘어가고, 3화와 4화에서는 호스트와 워커 사이의 gRPC 채널과 실제 함수 호출 경로를 따라갑니다. 그 뒤로 5화의 스케일링, 6화의 placeholder와 콜드 스타트로 이어집니다.
+
+---
+
+## Call Path Summary
+
+- `Program.Main()` → ASP.NET Core host bootstrap → `WebJobsScriptHostService.StartAsync()` → `ScriptHost.InitializeAsync()` → `JobHost.StartAsync()`
+- `HostJsonFileConfigurationSource` → `IConfiguration` → `ScriptJobHostOptionsSetup` → `ScriptJobHostOptions`
+- `WebJobsScriptHostService` health timer → `OnHostHealthCheckTimer(...)` → `HostPerformanceManager`
 
 ---
 

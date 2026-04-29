@@ -19,9 +19,13 @@ last_reviewed: '2026-04-29'
 
 # gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
 
-> Azure Functions Deep Dive 시리즈 (3/7)
+> Azure Functions Deep Dive 시리즈 (3/6)
 
-2화에서 워커 프로세스가 떠지는 것까지 봤습니다. `RpcWorkerProcess.Start()`가 `Process.Start()`를 호출하면, Node/Python/Java 같은 외부 프로세스가 실행됩니다. 그러나 그것만으로는 아무 일도 일어나지 않습니다. **호스트와 워커가 서로 말을 걸 채널이 필요**합니다.
+## Source Version
+
+이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+
+2화에서 워커 프로세스가 떠지는 것까지 봤습니다. `WorkerProcess.StartProcessAsync()`가 최종적으로 `Process.Start()`를 호출하면, Node/Python/Java 같은 외부 프로세스가 실행됩니다. 그러나 그것만으로는 아무 일도 일어나지 않습니다. **호스트와 워커가 서로 말을 걸 채널이 필요**합니다.
 
 그 채널은 단 하나의 **양방향 gRPC 스트림**입니다. 이 글에서는 그 스트림이 어떻게 생겼는지, 어떤 메시지가 오가는지, 그리고 호스트 측에서 그것을 어떻게 받고 라우팅하는지를 코드로 따라갑니다.
 
@@ -107,7 +111,7 @@ message StreamingMessage {
 
 | 그룹 | 메시지 | 누가 보내는가 |
 |---|---|---|
-| **수명주기** | StartStream, WorkerInitRequest/Response, WorkerTerminate | 양방향 |
+| **수명주기** | StartStream, WorkerInitRequest/Response, WorkerTerminate | StartStream은 워커 → 호스트, WorkerInitRequest는 호스트 → 워커, WorkerInitResponse는 워커 → 호스트, WorkerTerminate는 호스트 → 워커 |
 | **상태 점검** | WorkerStatusRequest/Response | 호스트 → 워커 |
 | **함수 로드** | FunctionLoadRequest/Response, FunctionsMetadataRequest, FunctionMetadataResponse | 호스트 ↔ 워커 |
 | **호출** | InvocationRequest/Response, InvocationCancel | 호스트 → 워커 (응답 역방향) |
@@ -174,7 +178,7 @@ message WorkerInitResponse {
 }
 ```
 
-이번엔 반대로 **워커가 자기 capabilities를 광고**합니다. 호스트는 양쪽 capability의 **교집합**을 가지고 이후 통신합니다. (호스트는 shared memory를 지원하는데 워커는 안 한다면, 그 메시지는 안 씁니다.) 또한 `WorkerMetadata`로 런타임 종류, 버전, 비트성 같은 텔레메트리용 메타데이터가 함께 옵니다.
+이번엔 반대로 **워커가 자기 capabilities를 광고**합니다. 호스트는 `WorkerChannel.ApplyCapabilities()`로 기존 capability 상태를 갱신하며, 기본 전략은 merge입니다. 즉 “양쪽 capability의 단순 교집합을 한 번 계산한다”기보다, **호스트가 알고 있는 capability 집합을 업데이트하고 그 결과로 shared memory·HTTP proxying 같은 동작을 켜거나 끄는 모델**에 가깝습니다. 또한 `WorkerMetadata`로 런타임 종류, 버전, 비트성 같은 텔레메트리용 메타데이터가 함께 옵니다.
 
 ### 4단계 — 호스트가 `FunctionLoadRequest`로 함수를 로드시킨다
 
@@ -207,7 +211,7 @@ message FunctionLoadRequest {
 
 - [`AspNetCoreGrpcServer.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcServer.cs) — Kestrel + ASP.NET Core gRPC를 호스트 안에 서버로 띄우는 진입점
 - [`AspNetCoreGrpcHostBuilder.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcHostBuilder.cs) — gRPC 서버용 IHost를 빌드
-- [`Startup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/Startup.cs) — DI 등록 (`MapGrpcService<FunctionRpcService>` 패턴)
+- [`Startup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/Startup.cs) — `endpoints.MapGrpcService<FunctionRpc.FunctionRpcBase>()`로 gRPC 엔드포인트 매핑
 
 즉, **함수 호스트 안에서 ASP.NET Core gRPC 서버가 함께 떠 있고**, 워커 프로세스들은 그 서버에 gRPC 클라이언트로 접속해 `EventStream`을 부릅니다. localhost gRPC 통신입니다.
 
@@ -223,7 +227,7 @@ message FunctionLoadRequest {
 
 | 파일 | 역할 |
 |---|---|
-| `GrpcWorkerChannel.cs` | 워커 1대를 대표하는 손잡이. SendStartStreamMessage, SendWorkerInitRequest, SendInvocationRequest, ReceiveWorkerStatusResponse 등을 보유 |
+| `GrpcWorkerChannel.cs` | 워커 1대를 대표하는 손잡이. `StartWorkerProcessAsync()`, `SendWorkerInitRequest`, `SendInvocationRequest`, `StopWorkerProcess()` 같은 흐름이 여기와 베이스 `WorkerChannel`에 걸쳐 있습니다. |
 | [`WorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/WorkerChannel.cs) | gRPC 위에 있는 공통 베이스 |
 | [`GrpcWorkerChannelFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannelFactory.cs) | `GrpcWorkerChannel`을 만드는 팩토리 |
 | [`GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs) | capability 키 상수 모음 |
@@ -273,6 +277,14 @@ message FunctionLoadRequest {
 ## 시리즈 안에서의 위치
 
 이 글은 Azure Functions Deep Dive 시리즈 3화입니다. 2화에서 Worker 프로세스를 띄우는 데까지 왔다면, 이번 화는 그 워커가 호스트와 실제로 어떤 프로토콜을 쓰는지 보는 자리입니다. 다음 4화에서는 여기서 본 채널 위로 `InvocationRequest`와 `InvocationResponse`가 어떻게 오가는지 더 깊게 들어갑니다.
+
+---
+
+## Call Path Summary
+
+- Worker bootstrap → `StartStream(worker_id)` → `FunctionRpcService.EventStream(...)` → `TryGetGrpcChannels(workerId, out inbound, out outbound)`
+- `WorkerChannel.SendWorkerInitRequest()` → `WorkerInitResponse` → `ApplyCapabilities(...)`
+- `WorkerChannel.SendFunctionLoadRequest()` / `SendFunctionLoadRequestCollection()` → worker load ack → per-worker invocation path becomes ready
 
 ---
 

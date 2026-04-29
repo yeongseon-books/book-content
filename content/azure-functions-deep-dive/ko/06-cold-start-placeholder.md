@@ -21,6 +21,10 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive 시리즈 (6/6)
 
+## Source Version
+
+이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+
 5화에서 Scale Controller가 인스턴스 수를 늘리기로 결정하는 과정을 봤습니다. 이번 화는 그 다음에 일어나는 일입니다.
 
 > 새 인스턴스가 추가될 때, 그 안에서는 정확히 무슨 일이 일어나는가? 그리고 왜 어떤 인스턴스는 1초 안에 첫 요청을 처리하고, 어떤 인스턴스는 5초 넘게 걸리는가?
@@ -200,7 +204,7 @@ private async void OnSpecializationTimerTick(object state)
 }
 ```
 
-요약하면 specialization 트리거는 두 개 — **첫 HTTP 요청** 또는 **50ms 타이머의 컨테이너 ready 감지**. 어느 쪽이 먼저 오든 결과는 같습니다.
+specialization 트리거는 두 개입니다. **첫 HTTP 요청** 또는 **50ms 타이머의 컨테이너 ready 감지**입니다. 어느 쪽이 먼저 오든 결과는 같습니다.
 
 ---
 
@@ -288,9 +292,26 @@ placeholder 시점에 캐시된 환경 정보(타임존·구성·호스트네임
 await _workerManager.SpecializeAsync();
 ```
 
-OOP 워커(Python·Node·Java)의 경우 placeholder 시점에는 일반적인 워커가 떠 있지 않거나, 있더라도 사용자 코드가 없는 상태입니다. 이 호출이 사용자 앱에 맞는 워커를 띄우거나 기존 워커를 사용자 코드 로딩 단계로 진입시킵니다.
+OOP 워커(Python·Node·Java)의 경우 이 호출이 실제 specialization 분기를 시작합니다. 다만 이 경로를 “placeholder worker를 무조건 버리고 새 워커를 띄운다”로 이해하면 정확하지 않습니다. `StandbyManager`는 `_workerManager.SpecializeAsync()`까지만 알고, 실제 판단은 `WebHostRpcWorkerChannelManager.SpecializeAsync()` 안에서 이뤄집니다.
 
-### 4. 호스트 재시작
+이 메서드는 현재 runtime의 채널을 가져온 뒤 `UsePlaceholderChannel(rpcWorkerChannel)`을 평가합니다. 재사용 가능하면 기존 placeholder 채널을 유지한 채 `rpcWorkerChannel.SendFunctionEnvironmentReloadRequest()`를 호출해 `FunctionEnvironmentReloadRequest`를 워커 프로세스로 보냅니다. 반대로 재사용이 불가능하거나 reload가 실패하면, 그때 placeholder 채널을 종료하고 새 워커 경로로 넘어갑니다.
+
+즉 specialization의 실제 호출 경로는 다음처럼 읽는 편이 정확합니다.
+
+> `StandbyManager.SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel(...)` 판정 → `SendFunctionEnvironmentReloadRequest()` 또는 placeholder 채널 종료
+
+### 4. placeholder 채널을 언제 재사용할 수 있나
+
+`UsePlaceholderChannel(...)`의 분기 조건도 구체적입니다.
+
+- 공통 전제: custom `languageWorkers:<runtime>:arguments`가 지정돼 있으면 재사용하지 않습니다.
+- `dotnet-isolated`: `UsePlaceholderDotNetIsolated()`가 켜져 있어야 하고, 64비트 프로세스여야 하며, 사이트 runtime version과 placeholder worker runtime version이 일치해야 합니다.
+- `node` / `python` / `powershell`: 파일 시스템이 read-only여야 하고, `~3` 확장의 v2 compatibility 경로가 아니어야 합니다.
+- 마지막 공통 조건: `_profileManager.IsCorrectProfileLoaded(workerRuntime)`가 true여야 합니다.
+
+즉 분기 조건은 막연한 “호환되면 재사용”이 아니라, **runtime 종류·bitness·runtime version·read-only 여부·profile 일치**를 모두 확인하는 코드입니다.
+
+### 5. 호스트 재시작
 
 ```csharp
 await _scriptHostManager.RestartHostAsync("Host specialization.");
@@ -299,7 +320,7 @@ await _scriptHostManager.DelayUntilHostReadyAsync();
 
 ScriptHost 자체를 재구성합니다 — 1화에서 본 부트스트랩 과정을 한 번 더 도는 셈인데, 이번에는 .NET CLR·DI 컨테이너·assembly load context는 이미 워밍된 상태에서 시작합니다. **이 재시작 비용이 콜드 스타트의 가시적인 부분의 대부분**입니다.
 
-`RestartHostAsync`는 사용자 코드를 새로 발견(`functions.json` 스캔, function.json 파싱, 트리거 바인딩 생성)하고, `DelayUntilHostReadyAsync`는 그 결과 호스트가 invocation을 받을 수 있는 상태가 될 때까지 기다립니다.
+`RestartHostAsync`는 specialization 이후의 설정과 환경으로 `ScriptHost`를 다시 올리고, `DelayUntilHostReadyAsync`는 그 결과 호스트가 invocation을 받을 수 있는 상태가 될 때까지 기다립니다. 이 시점의 핵심은 **placeholder 상태에서 specialized host 상태로 전환하는 재구성**이지, 별도의 파일 스캔 단계 하나로 specialization을 설명할 수 있다는 뜻은 아닙니다.
 
 ---
 
@@ -367,11 +388,19 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 - 콜드 스타트는 단일 비용이 아니라 **사용자 무관 부트스트랩 + 사용자별 specialization**의 합이다.
 - Functions 플랫폼은 placeholder 풀로 사용자 무관 부분을 미리 끝내 둔다. `StandbyManager.InitializeAsync`는 `WarmUp` 함수 파일과 타이머를 준비하고, `HostWarmupMiddleware.WarmupInvoke`가 warmup 경로에서 `coldstart.jittrace`를 실행한다.
 - 사용자 앱이 인스턴스에 할당되면 첫 HTTP 요청(`PlaceholderSpecializationMiddleware`) 또는 50ms 타이머가 specialization을 트리거한다.
-- specialization은 환경 리셋 + 워커 specialization + ScriptHost 재시작의 시퀀스다. 이 시간이 사용자가 체감하는 콜드 스타트다.
+- specialization은 환경 리셋 + placeholder 채널 재사용 여부 판정 + 필요 시 `FunctionEnvironmentReloadRequest` 전송 + ScriptHost 재시작의 시퀀스다. 이 시간이 사용자가 체감하는 콜드 스타트다.
 - 한 번 specialization이 끝나면 미들웨어가 자기 자신을 우회하도록 만들어 hot path 비용을 0으로 만든다.
 - 같은 호스트 코드지만 placeholder 풀 관리 정책과 Always Ready 설정이 플랜마다 달라서, **사용자가 체감하는 콜드 스타트는 플랜에 의해 결정된다.**
 
 이 글로 Azure Functions Deep Dive 시리즈를 마무리합니다. 1화에서 호스트 부팅, 2화에서 워커 프로세스, 3·4화에서 gRPC와 dispatcher, 5화에서 스케일링을 다뤘고, 이번 6화에서는 같은 호스트 코드 위에 플랜이 어떻게 placeholder 정책을 다르게 얹어 콜드 스타트가 결정되는지를 따라갔습니다.
+
+---
+
+## Call Path Summary
+
+- `StandbyManager.InitializeAsync()` → `CreateStandbyWarmupFunctions()` → specialization timer 시작
+- 첫 요청의 `PlaceholderSpecializationMiddleware.Invoke(...)` 또는 `OnSpecializationTimerTick(...)` → `StandbyManager.SpecializeHostAsync()` → `SpecializeHostCoreAsync()`
+- `SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel()` → `SendFunctionEnvironmentReloadRequest()` → `RestartHostAsync()`
 
 ---
 

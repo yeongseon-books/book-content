@@ -19,7 +19,11 @@ last_reviewed: '2026-04-29'
 
 # Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지
 
-> Azure Functions Deep Dive 시리즈 (4/7)
+> Azure Functions Deep Dive 시리즈 (4/6)
+
+## Source Version
+
+이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
 
 3화에서 호스트와 워커가 단 하나의 양방향 gRPC 스트림(`EventStream`)으로 `StreamingMessage`를 주고받는다는 것까지 봤습니다. 이제 그 위에서 일어나는 가장 중요한 메시지 종류 — **`InvocationRequest` / `InvocationResponse`** — 의 흐름을 따라갑니다.
 
@@ -80,16 +84,16 @@ WebJobs SDK는 함수마다 **`IFunctionInvoker` 구현체**를 하나씩 갖습
 
 ## 3단계 — `ScriptInvocationContext`를 만들고 Dispatcher에 던진다
 
-`WorkerFunctionInvoker`가 Dispatcher에 호출을 넘길 때 들고 가는 객체가 **`ScriptInvocationContext`**입니다. 이 객체에는 다음이 들어 있습니다.
+`WorkerFunctionInvoker`가 Dispatcher에 호출을 넘길 때 들고 가는 객체가 **`ScriptInvocationContext`**입니다. `5e59423` 기준 실제 필드는 다음 축으로 정리할 수 있습니다.
 
-- 함수 메타데이터 (`function_id`, 어느 함수인가)
-- 입력 바인딩 데이터 (트리거 페이로드 + 다른 input binding들)
-- 트리거 메타데이터 (HTTP 트리거의 헤더, 큐 메시지 ID 등)
-- 추적 컨텍스트 (`Activity.Current`로부터 추출한 traceparent, tracestate)
-- 재시도 컨텍스트 (현재 시도 횟수)
-- 결과를 받을 `TaskCompletionSource<ScriptInvocationResult>`
+- 함수 메타데이터 (`FunctionMetadata`)
+- 실행 컨텍스트 (`ExecutionContext`)
+- 입력 데이터 (`Inputs`)와 바인딩 데이터 (`BindingData`)
+- 추적 컨텍스트 (`Traceparent`, `Tracestate`, `Attributes`)
+- 취소와 로깅 관련 정보 (`CancellationToken`, `Logger`, `AsyncExecutionContext`, `Properties`)
+- 결과를 받을 `TaskCompletionSource<ScriptInvocationResult>` (`ResultSource`)
 
-마지막 항목이 결정적입니다. **Dispatcher는 동기 응답을 기대하지 않습니다.** 호출을 던진 직후 곧바로 `Task`를 반환하고, 워커가 응답을 보내면 그때 비로소 그 `Task`가 완료됩니다. 한 워커에 여러 개의 in-flight 호출이 동시에 있을 수 있고, 그것들은 `invocation_id`로 구별됩니다.
+여기서 중요한 점은 `RetryContext`가 `ScriptInvocationContext`의 직접 필드는 아니라는 것입니다. 재시도 정보는 이후 `ToRpcInvocationRequest()` 변환 과정에서 `InvocationRequest.RetryContext`로 채워집니다. 마지막 항목인 `ResultSource`가 특히 결정적입니다. **Dispatcher는 동기 응답을 기대하지 않습니다.** 호출을 던진 직후 곧바로 `Task`를 반환하고, 워커가 응답을 보내면 그때 비로소 그 `Task`가 완료됩니다. 한 워커에 여러 개의 in-flight 호출이 동시에 있을 수 있고, 그것들은 `invocation_id`로 구별됩니다.
 
 ---
 
@@ -145,12 +149,13 @@ message RpcTraceContext {
 `GrpcWorkerChannel`은 워커 1대를 대표하는 객체입니다. Dispatcher가 "이 워커에 이 호출을 보내라"고 하면, `GrpcWorkerChannel`은 다음 일을 합니다.
 
 1. `ScriptInvocationContext`를 `InvocationRequest`로 변환
-2. `StreamingMessage`로 감싼다 (`request_id` = 새로 생성한 GUID, `oneof content` = `invocation_request`)
-3. 그 호출의 `TaskCompletionSource`를 **invocation_id 기반 인메모리 사전**에 등록 — 응답이 올 때 짝지을 수 있도록
-4. 메시지를 `OutboundGrpcEvent`로 감싸, **이 워커에 할당된 outbound `Channel<OutboundGrpcEvent>`** 에 쓴다
-5. [`FunctionRpcService`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)가 `TryGetGrpcChannels(workerId, out var inbound, out var outbound)`로 같은 워커의 채널 쌍을 잡아 두고, 그중 `outbound.Reader`를 읽어 실제 gRPC 스트림에 쓴다
+2. 그 호출의 `TaskCompletionSource`를 **invocation_id 기반 인메모리 사전**에 등록 — 응답이 올 때 짝지을 수 있도록
+3. `new StreamingMessage { InvocationRequest = invocationRequest }`를 만들어 `_outbound` writer 쪽으로 보낸다
+4. [`FunctionRpcService`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)가 `TryGetGrpcChannels(workerId, out var inbound, out var outbound)`로 같은 워커의 채널 쌍을 잡아 두고, 그중 `outbound.Reader`를 읽어 실제 gRPC 스트림에 쓴다
 
-여기서 중요한 점은 "공용 이벤트 버스"보다 **워커별 채널 쌍**이 실제 운반 경로라는 것입니다. `WorkerChannel` 생성자에서 워커 ID로 `TryGetGrpcChannels`를 호출해 inbound/outbound 채널을 받아 두고, `SendStreamingMessageAsync`는 `_outbound` writer에 직접 적습니다.
+여기서 중요한 점은 `SendInvocationRequest`가 **새 `request_id` GUID를 만들어 correlation key로 쓰는 경로가 아니라는 것**입니다. 이 메서드는 `InvocationRequest` payload를 그대로 `StreamingMessage`에 넣어 보냅니다. 응답 매칭의 핵심 키는 `InvocationRequest`에 이미 들어 있던 `invocation_id`입니다.
+
+또 한 가지 중요한 점은 "공용 이벤트 버스"보다 **워커별 채널 쌍**이 실제 운반 경로라는 것입니다. `WorkerChannel` 생성자에서 워커 ID로 `TryGetGrpcChannels`를 호출해 inbound/outbound 채널을 받아 두고, `SendStreamingMessageAsync`는 `_outbound` writer에 직접 적습니다.
 
 3번의 `invocation_id` ↔ `TaskCompletionSource` 사전은 비동기 응답 매칭의 핵심입니다. 응답이 순서 없이 돌아와도 같은 `invocation_id`로 정확히 짝을 맞출 수 있습니다.
 
@@ -199,7 +204,7 @@ gRPC stream
 
 여기서 중요한 사실 하나. **한 워커 프로세스는 동시에 여러 개의 invocation을 처리할 수 있습니다.**
 
-위의 5단계에서 본 `invocation_id ↔ TaskCompletionSource` 사전이 그걸 가능하게 합니다. 호스트는 워커가 한 번에 몇 개를 처리할 수 있는지(`maxConcurrentRequests` 같은 설정)에 따라 동시 호출을 보냅니다.
+위의 5단계에서 본 `invocation_id ↔ TaskCompletionSource` 사전이 그걸 가능하게 합니다. 호스트는 워커가 준비한 버퍼와 현재 워커 수를 바탕으로 호출을 흘려보내며, 인스턴스 내부에서 워커를 더 붙일지의 임계치는 `WorkerConcurrencyOptions` 같은 실제 옵션으로 제어됩니다.
 
 하지만 **응답 메시지가 어떤 순서로 돌아올지는 보장되지 않습니다.** 호출 A를 먼저 보내고 B를 나중에 보냈더라도, B가 더 빨리 끝나면 응답 B가 먼저 옵니다. 그건 사전 매칭으로 자연스럽게 처리됩니다.
 
@@ -212,7 +217,7 @@ gRPC stream
 
 ## 워커 동시성 — 호스트가 워커를 얼마나 바쁘게 만들지
 
-[`WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)는 한 워커가 동시에 받는 invocation 수를 모니터링하고, 필요하면 **워커 추가 생성**을 요청합니다. 즉 같은 함수 앱 안에서도 워커가 여러 개 떠 있을 수 있습니다 — 한 워커 인스턴스 안에 여러 개의 워커 프로세스.
+[`WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)는 단순 invocation 개수 임계치가 아니라 `WorkerStatus.LatencyHistory`를 기반으로 overload를 판단하고, 필요하면 **워커 추가 생성**을 요청합니다. 즉 같은 함수 앱 안에서도 워커가 여러 개 떠 있을 수 있습니다 — 같은 인스턴스 안에 여러 개의 워커 프로세스가 존재할 수 있다는 뜻입니다.
 
 [`WorkerChannelThrottleProvider.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerChannelThrottleProvider.cs)는 그 반대 방향 — 워커가 너무 바쁘면 호스트 측에서 추가 호출을 throttling합니다. 이 두 객체가 **인스턴스 내부의 호출 처리 능력**을 동적으로 조정합니다.
 
@@ -263,6 +268,14 @@ gRPC stream
 ---
 
 이 글은 Azure Functions Deep Dive 시리즈 4화입니다. 1~3화에서 호스트 부팅, 워커 프로세스, gRPC 스트림의 뼈대를 세웠다면, 이번 화는 그 위를 실제 호출이 어떻게 지나가는지 따라갔습니다. 다음 5화에서는 같은 호출이 많아졌을 때 인스턴스 수를 누가 어떤 신호로 늘리는지, 6화에서는 그 인스턴스가 새로 떠야 할 때 발생하는 콜드 스타트와 placeholder 메커니즘으로 이어집니다.
+
+---
+
+## Call Path Summary
+
+- `WorkerFunctionInvoker.InvokeCore()` → `IFunctionInvocationDispatcher.InvokeAsync()` → `RpcFunctionInvocationDispatcher.InvokeAsync()` → `GrpcWorkerChannel.SendInvocationRequest()`
+- `ScriptInvocationContext.ToRpcInvocationRequest()` → `new StreamingMessage { InvocationRequest = invocationRequest }` → worker-specific outbound channel → `FunctionRpcService.EventStream()`
+- worker `InvocationResponse` → worker-specific inbound channel → invocation ID lookup in `WorkerChannel` → `TaskCompletionSource<ScriptInvocationResult>` 완료
 
 ---
 

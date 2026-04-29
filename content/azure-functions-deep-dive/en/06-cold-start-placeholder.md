@@ -21,6 +21,10 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive series (6/6)
 
+## Source Version
+
+All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
+
 In Part 5, we watched the Scale Controller decide to grow the instance count. This part is about what happens next.
 
 > When a new instance is added, what exactly goes on inside it? And why does one instance serve its first request in under a second while another takes more than five?
@@ -288,9 +292,26 @@ Any environment data cached during the placeholder phase (timezone, configuratio
 await _workerManager.SpecializeAsync();
 ```
 
-For OOP workers (Python, Node, Java), the placeholder phase either has no general worker running, or has one but without user code. This call brings up a worker matched to the user app, or pushes the existing worker into the user-code-loading phase.
+For OOP workers (Python, Node, Java), this is where specialization actually branches. But the accurate model is not “always throw away the placeholder worker and start a fresh one.” `StandbyManager` only knows about `_workerManager.SpecializeAsync()`. The real decision lives inside `WebHostRpcWorkerChannelManager.SpecializeAsync()`.
 
-### 4. Host restart
+That method fetches the current runtime channel, evaluates `UsePlaceholderChannel(rpcWorkerChannel)`, and, if reuse is allowed, keeps the placeholder channel and calls `rpcWorkerChannel.SendFunctionEnvironmentReloadRequest()` to send a `FunctionEnvironmentReloadRequest` into the worker process. Only if reuse is disallowed, or the environment reload fails, does the host shut down that placeholder channel and fall back to the non-reuse path.
+
+So the host-side specialization path is more accurately summarized as:
+
+> `StandbyManager.SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel(...)` → `SendFunctionEnvironmentReloadRequest()` or placeholder-channel shutdown
+
+### 4. When can the placeholder channel be reused?
+
+`UsePlaceholderChannel(...)` is also more concrete than a vague “reuse it if compatible.”
+
+- Shared gate: if custom `languageWorkers:<runtime>:arguments` are configured, the placeholder channel is not reused.
+- `dotnet-isolated`: `UsePlaceholderDotNetIsolated()` must be enabled, the host must be 64-bit, and the site runtime version must match the placeholder worker's runtime version.
+- `node` / `python` / `powershell`: the file system must be read-only, and the app must not be on the `~3` + v2-compatibility path.
+- Final shared gate: `_profileManager.IsCorrectProfileLoaded(workerRuntime)` must return true.
+
+So the branch is grounded in actual code checks for **runtime kind, bitness, runtime version, read-only filesystem, and profile compatibility**.
+
+### 5. Host restart
 
 ```csharp
 await _scriptHostManager.RestartHostAsync("Host specialization.");
@@ -299,7 +320,7 @@ await _scriptHostManager.DelayUntilHostReadyAsync();
 
 The ScriptHost itself is reconfigured — effectively a second pass through the bootstrap process we saw in Part 1, except this time the .NET CLR, DI container, and assembly load context are already warm. **The cost of this restart accounts for most of the visible cold-start time.**
 
-`RestartHostAsync` re-discovers user code (scanning for `functions.json`, parsing each `function.json`, building trigger bindings), and `DelayUntilHostReadyAsync` waits until the host can actually accept invocations.
+`RestartHostAsync` brings `ScriptHost` back up under the specialized configuration, and `DelayUntilHostReadyAsync` waits until the host can actually accept invocations. The important point is the host reconfiguration itself; this specialization path should not be reduced to a separate file-scanning phase.
 
 ---
 
@@ -367,11 +388,19 @@ In particular, the fact that `FunctionAssemblyLoadContext.ResetSharedContext()` 
 - Cold start isn't a single cost; it's the sum of **user-independent bootstrap** and **user-specific specialization**.
 - The Functions platform pre-completes the user-independent part with a placeholder pool. `StandbyManager.InitializeAsync` prepares the `WarmUp` files and timer, while `HostWarmupMiddleware.WarmupInvoke` runs `coldstart.jittrace` on the warmup path.
 - Once a user app gets assigned to the instance, either the first HTTP request (`PlaceholderSpecializationMiddleware`) or a 50 ms timer triggers specialization.
-- Specialization is the sequence: environment reset, worker specialization, ScriptHost restart. That elapsed time is what the user perceives as cold start.
+- Specialization is the sequence: environment reset, placeholder-channel reuse decision, `FunctionEnvironmentReloadRequest` when reuse is allowed, then ScriptHost restart. That elapsed time is what the user perceives as cold start.
 - After specialization, the middleware rewrites itself out of the path so hot-path cost drops to zero.
 - The host code is the same across plans, but each plan applies a different placeholder-pool policy and Always Ready setting — which is why **the cold start a user actually sees is determined by the plan**.
 
 This part closes out the Azure Functions Deep Dive series. Part 1 covered host bootstrap, Part 2 the worker process, Parts 3–4 the gRPC channel and dispatcher, Part 5 scaling, and this Part 6 followed how the same host code, layered with a plan-specific placeholder policy, ends up deciding the cold start a user actually feels.
+
+---
+
+## Call Path Summary
+
+- `StandbyManager.InitializeAsync()` → `CreateStandbyWarmupFunctions()` → specialization timer starts
+- first-request `PlaceholderSpecializationMiddleware.Invoke(...)` or `OnSpecializationTimerTick(...)` → `StandbyManager.SpecializeHostAsync()` → `SpecializeHostCoreAsync()`
+- `SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel()` → `SendFunctionEnvironmentReloadRequest()` → `RestartHostAsync()`
 
 ---
 

@@ -19,9 +19,13 @@ last_reviewed: '2026-04-29'
 
 # The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
 
-> Azure Functions Deep Dive series (3/7)
+> Azure Functions Deep Dive series (3/6)
 
-In Part 2, we watched the worker process get spawned. When `RpcWorkerProcess.Start()` calls `Process.Start()`, an external process like Node, Python, or Java starts running. But on its own, that does nothing. **The host and the worker need a channel to talk over.**
+## Source Version
+
+All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
+
+In Part 2, we watched the worker process get spawned. When `WorkerProcess.StartProcessAsync()` ultimately calls `Process.Start()`, an external process like Node, Python, or Java starts running. But on its own, that does nothing. **The host and the worker need a channel to talk over.**
 
 That channel is a single **bidirectional gRPC stream**. In this post, we'll walk through what the stream looks like, what messages travel across it, and how the host receives and routes them — all in code.
 
@@ -107,7 +111,7 @@ If we group them, the messages fall into roughly five categories:
 
 | Group | Messages | Direction |
 |---|---|---|
-| **Lifecycle** | StartStream, WorkerInitRequest/Response, WorkerTerminate | Both ways |
+| **Lifecycle** | StartStream, WorkerInitRequest/Response, WorkerTerminate | `StartStream` is worker → host, `WorkerInitRequest` is host → worker, `WorkerInitResponse` is worker → host, `WorkerTerminate` is host → worker |
 | **Health checks** | WorkerStatusRequest/Response | Host → Worker |
 | **Function loading** | FunctionLoadRequest/Response, FunctionsMetadataRequest, FunctionMetadataResponse | Host ↔ Worker |
 | **Invocation** | InvocationRequest/Response, InvocationCancel | Host → Worker (response goes the other way) |
@@ -174,7 +178,7 @@ message WorkerInitResponse {
 }
 ```
 
-This time, **the worker advertises its own capabilities**. The host then communicates using the **intersection** of both sides' capabilities. (If the host supports shared memory but the worker doesn't, that message simply isn't used.) `WorkerMetadata` also rides along, carrying telemetry such as the runtime type, version, and bitness.
+This time, **the worker advertises its own capabilities**. The host updates its capability state through `WorkerChannel.ApplyCapabilities()`, whose default strategy is merge. So the runtime behavior is not “calculate one static common set once,” but rather **update the host-side capability set and derive features like shared memory transfer or HTTP proxying from that merged view**. `WorkerMetadata` also rides along, carrying telemetry such as the runtime type, version, and bitness.
 
 ### Step 4 — the host loads functions via `FunctionLoadRequest`
 
@@ -207,7 +211,7 @@ The `Server/` directory also contains the following files:
 
 - [`AspNetCoreGrpcServer.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcServer.cs) — the entry point that brings up Kestrel + ASP.NET Core gRPC as a server inside the host
 - [`AspNetCoreGrpcHostBuilder.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcHostBuilder.cs) — builds the IHost for the gRPC server
-- [`Startup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/Startup.cs) — DI registration (the `MapGrpcService<FunctionRpcService>` pattern)
+- [`Startup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/Startup.cs) — gRPC endpoint registration via `endpoints.MapGrpcService<FunctionRpc.FunctionRpcBase>()`
 
 In other words, **an ASP.NET Core gRPC server is running inside the Functions host**, and worker processes connect to it as gRPC clients to call `EventStream`. It's localhost gRPC.
 
@@ -223,7 +227,7 @@ Messages received by the server eventually need someone to **read and route** th
 
 | File | Role |
 |---|---|
-| `GrpcWorkerChannel.cs` | The handle that represents one worker. Holds SendStartStreamMessage, SendWorkerInitRequest, SendInvocationRequest, ReceiveWorkerStatusResponse, etc. |
+| `GrpcWorkerChannel.cs` | The handle that represents one worker. The concrete flow is split between `StartWorkerProcessAsync()`, `SendWorkerInitRequest`, `SendInvocationRequest`, and `StopWorkerProcess()` across this class and the base `WorkerChannel`. |
 | [`WorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/WorkerChannel.cs) | The shared base layered on top of gRPC |
 | [`GrpcWorkerChannelFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannelFactory.cs) | The factory that produces `GrpcWorkerChannel` instances |
 | [`GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs) | Constants for capability keys |
@@ -273,6 +277,14 @@ In Part 4, we'll follow **`FunctionInvocationDispatcher` and `InvocationRequest`
 ## Where this fits in the series
 
 This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at process startup; this part covers the wire protocol that takes over once the worker connects. Part 4 stays on the same path and follows `InvocationRequest` and `InvocationResponse` through the dispatcher.
+
+---
+
+## Call Path Summary
+
+- Worker bootstrap → `StartStream(worker_id)` → `FunctionRpcService.EventStream(...)` → `TryGetGrpcChannels(workerId, out inbound, out outbound)`
+- `WorkerChannel.SendWorkerInitRequest()` → `WorkerInitResponse` → `ApplyCapabilities(...)`
+- `WorkerChannel.SendFunctionLoadRequest()` / `SendFunctionLoadRequestCollection()` → worker load ack → per-worker invocation path becomes ready
 
 ---
 
