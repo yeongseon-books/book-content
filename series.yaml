@@ -20,8 +20,8 @@ meta:
   # all gates". Not consumed by any URL builder. Useful for humans answering
   # "is published_ref behind master?". Update freely.
   repo: yeongseon/tech-writing
-  published_ref: cb179c5
-  validated_ref: 36c02d3
+  published_ref: f24a126
+  validated_ref: f24a126
 
 series:
   # Azure
