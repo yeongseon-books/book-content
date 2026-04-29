@@ -40,7 +40,7 @@ Pod IP는 네트워킹 모드에 따라 다른 주소 모델에서 옵니다.
 
 ## 세 모델을 먼저 나란히 보기
 
-![두 모델을 먼저 나란히 보기](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.ko.png)
+![세 가지 AKS 네트워크 모델 비교 구조](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.ko.png)
 ---
 
 ## CNI가 하는 일
@@ -63,7 +63,7 @@ IP 할당,
 
 Pod Subnet과 Node Subnet은 Pod IP가 VNet 공간에 있기 때문에 연결된 네트워크에서 Pod를 직접 보는 모델입니다. Overlay는 VNet IP 절약에는 가장 유리하지만, 클러스터 간에 native Pod IP로 직접 라우팅하는 모델은 아닙니다.
 
-![Azure CNI와 Overlay의 차이](../../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.ko.png)
+![세 AKS 네트워크 모델의 IP 경로 차이](../../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.ko.png)
 ---
 
 ## kubenet의 위치
