@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-"""Render medium/<NN>.md to medium/<NN>.html for browser-copy publishing.
+"""Helper module: render Medium-flavored markdown text to a self-contained HTML document.
 
-Workflow:
+Imported by to-medium.py to convert en/<NN>-<slug>.md (after Medium markdown
+transforms) directly to medium/<NN>.html. No standalone CLI; the only
+intended caller is to-medium.py.
+
+Workflow (from the author's perspective):
 1. Open medium/<NN>.html in Chrome/Chromium.
 2. Ctrl+A, Ctrl+C.
 3. Open a fresh empty Medium draft.
@@ -25,9 +29,6 @@ Table handling:
   rendered as native HTML <table>. Whether Medium preserves the table on
   paste is empirical (Oracle bg_2b10ce72 flagged this as the highest-risk
   element); the TODO marker stays as an HTML comment for the author.
-
-This script is read-only on its inputs (medium/*.md). It writes only
-medium/*.html alongside, and is idempotent.
 """
 
 from __future__ import annotations
@@ -35,15 +36,9 @@ from __future__ import annotations
 import base64
 import mimetypes
 import re
-import sys
 from pathlib import Path
 
 import markdown
-
-ROOT = Path(__file__).resolve().parents[2]
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _catalog import is_present, load_catalog  # noqa: E402
 
 MD_EXTENSIONS = [
     "fenced_code",
@@ -52,13 +47,7 @@ MD_EXTENSIONS = [
     "nl2br",
 ]
 
-NUMERIC_PREFIX_RE = re.compile(r"^(\d+)")
 IMG_SRC_RE = re.compile(r'<img\b[^>]*\bsrc="([^"]+)"', re.IGNORECASE)
-
-
-def numeric_prefix(name: str) -> str | None:
-    m = NUMERIC_PREFIX_RE.match(name)
-    return m.group(1) if m else None
 
 
 def inline_local_image(src: str, base_dir: Path) -> str:
@@ -156,12 +145,15 @@ def extract_title(md_text: str) -> str:
     return m.group(1).strip() if m else "Untitled"
 
 
-def render_md_to_html(md_path: Path) -> str:
-    md_text = md_path.read_text(encoding="utf-8")
+def render_md_text_to_html(md_text: str, base_dir: Path) -> str:
+    """Render Medium-flavored markdown text to a self-contained HTML document.
+
+    base_dir is the directory used to resolve relative image paths (so
+    in-memory markdown produced by to-medium.py can be rendered without
+    writing an intermediate .md file)."""
     title = extract_title(md_text)
     body_html = markdown.markdown(md_text, extensions=MD_EXTENSIONS, output_format="html5")
-    body_html = rewrite_image_srcs(body_html, md_path.parent)
-    # Highlight the tag line so the author notices it during copy-paste prep.
+    body_html = rewrite_image_srcs(body_html, base_dir)
     body_html = re.sub(
         r"<p>Tags:\s*([^<]+)</p>",
         r'<p class="tags-line">Tags: \1</p>',
@@ -169,44 +161,3 @@ def render_md_to_html(md_path: Path) -> str:
         count=1,
     )
     return HTML_DOC_TEMPLATE.format(title=title, body=body_html)
-
-
-def process_series_medium_dir(medium_dir: Path) -> tuple[int, int]:
-    written = 0
-    skipped = 0
-    for md in sorted(medium_dir.glob("*.md")):
-        if not numeric_prefix(md.name):
-            skipped += 1
-            continue
-        html = render_md_to_html(md)
-        out_path = md.with_suffix(".html")
-        out_path.write_text(html, encoding="utf-8")
-        written += 1
-    return written, skipped
-
-
-def main(argv: list[str]) -> int:
-    if len(argv) > 1:
-        medium_dirs = [Path(p).resolve() for p in argv[1:]]
-    else:
-        medium_dirs = [
-            entry.path / "medium"
-            for entry in load_catalog()
-            if is_present(entry) and (entry.path / "medium").is_dir()
-        ]
-    total_w, total_s = 0, 0
-    for medium_dir in medium_dirs:
-        if not medium_dir.is_dir():
-            print(f"SKIP missing dir: {medium_dir}")
-            continue
-        print(f"== {medium_dir.relative_to(ROOT)}")
-        w, s = process_series_medium_dir(medium_dir)
-        total_w += w
-        total_s += s
-        print(f"   wrote {w}, skipped {s}")
-    print(f"\nTotal: wrote {total_w}, skipped {total_s}")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main(sys.argv))

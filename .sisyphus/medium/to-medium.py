@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""Convert en/*.md to Medium import-ready medium/<NN>.md.
+"""Convert en/*.md to Medium browser-paste-ready medium/<NN>.html.
 
-Rules (confirmed by user):
+Output is a self-contained HTML document (PNG images base64-inlined) for
+the workflow: open in Chrome, select-all, copy, paste into a fresh empty
+Medium draft. The first H1 lands in Medium's title slot; the trailing
+'Tags: ...' line is visually separated for the author to copy into
+Medium's tag input field.
+
+HTML rendering is delegated to the to-medium-html helper module; this
+module owns the Medium-specific markdown transforms first:
+
 - Image refs `![alt](../../assets/...)` -> kept as-is (relative local path).
   Medium import does not fetch private-repo raw URLs, so PNGs are uploaded
-  manually via Medium's UI (drag-and-drop). The local path doubles as a
-  reference so the author knows which PNG to attach where.
+  manually via Medium's UI (drag-and-drop) when the base64 inline doesn't
+  survive paste. The local path doubles as a reference so the author knows
+  which PNG to attach where.
 - Other relative links `[text](../something)` or `[text](./something)` -> github.com/<owner>/<repo>/blob/<TAG>/<resolved>
 - H3+ (### and deeper) -> bold paragraph (`**text**`)
 - Tables -> bullet list, each row: "- **col1**: v1 / **col2**: v2 ..."
@@ -41,6 +50,10 @@ REPO = _meta["repo"]
 TAG = _meta["published_ref"]
 
 from _catalog import is_present, load_catalog
+from importlib import import_module
+
+_html_renderer = import_module("to-medium-html")
+render_md_text_to_html = _html_renderer.render_md_text_to_html
 
 BLOB_BASE = f"https://github.com/{REPO}/blob/{TAG}"
 
@@ -282,7 +295,8 @@ def process_series(en_dir: Path) -> tuple[int, int]:
         body = convert(md)
         tags = extract_tags(body)
         md_out = finalize_md_for_medium(body, tags)
-        (medium_dir / f"{prefix}.md").write_text(md_out, encoding="utf-8")
+        html_out = render_md_text_to_html(md_out, md.parent)
+        (medium_dir / f"{prefix}.html").write_text(html_out, encoding="utf-8")
         written += 1
     return written, skipped
 
