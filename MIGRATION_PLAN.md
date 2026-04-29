@@ -1,11 +1,11 @@
 # tech-blog → tech-writing 개편 계획
 
-> 이 문서는 본 저장소(`yeongseon/tech-blog`)를 다채널 기술 콘텐츠 파이프라인 저장소(`tech-writing`)로 단계적으로 개편하기 위한 마스터 플랜이다.
-> 실제 진행 상황은 [`ROADMAP.md`](./ROADMAP.md)에서 추적한다.
+> 이 문서는 본 저장소(`yeongseon/tech-writing`, 구 `yeongseon/tech-blog`)를 다채널 기술 콘텐츠 파이프라인 저장소로 단계적으로 개편하기 위한 마스터 플랜이다.
+> 실제 진행 상황은 [`ROADMAP.md`](./ROADMAP.md)에서 추적한다. **Phase 9 리포지토리 rename 은 완료되었다 (`cb179c5`).**
 
 ## 1. 개편 목적
 
-현재 `yeongseon/tech-blog`는 기술 블로그 원고를 저장하는 저장소로 시작했지만, 앞으로는 단순 블로그 저장소를 넘어 다음 목적을 모두 지원해야 한다.
+`yeongseon/tech-writing`(구 `yeongseon/tech-blog`)은 기술 블로그 원고를 저장하는 저장소로 시작했지만, 단순 블로그 저장소를 넘어 다음 목적을 모두 지원한다.
 
 - Tistory 한국어 글 발행
 - Medium 영어 글 발행
@@ -26,12 +26,12 @@ tech-writing = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파
 
 ## 2. 리포지토리 이름 변경
 
-- 현재: `yeongseon/tech-blog`
-- 변경 예정: `yeongseon/tech-writing`
+- 구: `yeongseon/tech-blog`
+- 현재: `yeongseon/tech-writing` (rename 완료, `cb179c5`)
 
 `tech-blog`는 블로그 전용 저장소처럼 보인다. 이 저장소는 Tistory, Medium, MkDocs, eBook을 모두 대상으로 하므로 더 포괄적인 이름이 필요하다. `cloud-*`, `azure-*` 계열은 부적절하다(AI, AX, 기술 글쓰기 등을 모두 다룸).
 
-> **수동 단계**: 리포지토리 rename은 GitHub UI 또는 `gh repo rename tech-writing` 명령으로 직접 수행해야 한다. 자동화 범위 밖이므로 [`ROADMAP.md`](./ROADMAP.md) Phase 9에 수동 작업으로 표시한다.
+> **완료**: 리포지토리 rename 은 `gh repo rename tech-writing` 으로 수행 완료. `series.yaml` `meta.repo` 갱신, medium/ 변형 재생성, 모든 raw URL 새 pin (`cb179c5`) 으로 일괄 갱신.
 
 ## 3. 저장소 정체성
 
