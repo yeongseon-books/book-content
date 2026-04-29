@@ -24,7 +24,7 @@ last_reviewed: '2026-04-29'
 This post uses the following upstream versions as external reference points:
 - Kubernetes: v1.30.x (https://github.com/kubernetes/kubernetes)
 - containerd: v1.7.x (https://github.com/containerd/containerd)
-- KEDA: v2.13.x (https://github.com/kedacore/keda)
+- KEDA: v2.14.0 (https://github.com/kedacore/keda/tree/v2.14.0)
 
 AKS control plane is managed by Microsoft, so the upstream code here is a behavioral comparison baseline, not a statement about the exact binaries running in the service.
 
@@ -114,7 +114,7 @@ Because part 5 separated HPA from Cluster Autoscaler first, this episode can pla
 
 ### Primary sources
 - [`scaledobject_controller.go` @ `v2.14.0`](https://github.com/kedacore/keda/blob/v2.14.0/controllers/keda/scaledobject_controller.go)
-- [`scaler.go` @ `v2.13.0`](https://github.com/kedacore/keda/blob/v2.13.0/pkg/scalers/scaler.go)
+- [`scaler.go` @ `v2.14.0`](https://github.com/kedacore/keda/blob/v2.14.0/pkg/scalers/scaler.go)
 - [`provider.go` @ `v2.14.0`](https://github.com/kedacore/keda/blob/v2.14.0/pkg/provider/provider.go)
 - [`scale_scaledobjects.go` @ `v2.14.0`](https://github.com/kedacore/keda/blob/v2.14.0/pkg/scaling/executor/scale_scaledobjects.go)
 - [`api_service.yaml` @ `v2.14.0`](https://github.com/kedacore/keda/blob/v2.14.0/config/metrics-server/api_service.yaml)

@@ -75,7 +75,7 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 ## 시리즈 안에서의 위치
 
 이 글은 Azure Kubernetes Service Deep Dive 시리즈 4화입니다.
-2화와 3화가 노드 실행과 네트워크를 다뤘다면 이번 화는 그보다 앞단의 placement 결정을 설명합니다. 다음 5화에서는 scheduler가 unschedulable로 남긴 Pod를 보고 HPA와 Cluster Autoscaler가 어떻게 반응하는지 봅니다.
+2화와 3화가 노드 실행과 네트워크를 다뤘다면 이번 화는 그보다 앞단의 placement 결정을 설명합니다. 이 구분이 있어야 Pending Pod를 placement 실패, binding 시점 실패, 노드 실행 지연으로 나눠 읽을 수 있습니다.
 
 ---
 

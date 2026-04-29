@@ -76,7 +76,7 @@ It is a `Pod -> Node` decision.
 ## Where this fits in the series
 
 This is part 4 of the Azure Kubernetes Service Deep Dive series.
-Parts 2 and 3 covered node execution and networking; this part explains the earlier placement decision. Part 5 follows the consequences of that decision and looks at HPA and Cluster Autoscaler.
+Parts 2 and 3 covered node execution and networking; this part explains the earlier placement decision. The diagnostic value is that Pending Pods can now be split cleanly into placement failures, binding-time failures, and node-side execution delays.
 
 ---
 

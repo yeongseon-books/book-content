@@ -314,15 +314,13 @@ AKS를 쓴다고 control plane을 몰라도 되는 것은 아닙니다.
 
 ---
 
-## 다음 화로 이어지는 질문
+## 이번 화가 남기는 실행 경계
 
-control plane이 Binding까지 기록했다면,
-그다음에는 누가 실제 프로세스를 띄울까요.
+control plane이 Binding까지 기록해도,
+실제 프로세스를 띄우는 단계는 아직 노드 쪽에 남아 있습니다.
 
-다음 2화에서는 노드 위로 내려갑니다.
-`kubelet`이 API server에서 PodSpec을 받고,
-Unix socket으로 CRI를 호출하고,
-`containerd`와 `runc`를 거쳐 실제 컨테이너 프로세스가 생기는 경로를 따라갑니다.
+즉 AKS 진단에서는 API server·scheduler·controller-manager가 맡는 일과,
+노드 위 kubelet·CRI·runtime이 맡는 일을 반드시 갈라서 읽어야 합니다.
 
 ---
 
