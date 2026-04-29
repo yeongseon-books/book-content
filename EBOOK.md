@@ -34,6 +34,53 @@ pip install "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mk
 pandoc, xelatex, Nanum 폰트, playwright, poppler-utils, epubcheck 가 추가로 필요하며
 `mkdocs-ebook doctor` 로 확인할 수 있다.
 
+### 1.2 PDF/EPUB 빌드용 시스템 의존성 (Ubuntu/Debian 기준)
+
+```bash
+# Pandoc + XeLaTeX 코어 + 한국어/CJK 패키지
+sudo apt install -y --no-install-recommends \
+    pandoc \
+    texlive-xetex texlive-latex-recommended texlive-latex-extra \
+    texlive-luatex texlive-plain-generic texlive-fonts-extra \
+    texlive-pictures texlive-science \
+    texlive-lang-cjk texlive-lang-korean texlive-lang-chinese \
+    lmodern
+
+# 한국어 본문 / 코드 / 이모지 폰트
+sudo apt install -y --no-install-recommends \
+    fonts-nanum fonts-nanum-coding fonts-nanum-extra \
+    fonts-noto-cjk fonts-noto-color-emoji fonts-noto-core fonts-symbola
+
+# EPUB 검증 + PDF 후처리
+sudo apt install -y --no-install-recommends epubcheck poppler-utils default-jre-headless
+
+# Mermaid 렌더링 (mkdocs-ebook 가 chromium 헤드리스로 실행)
+pip install playwright && playwright install chromium
+
+# 모노크롬 NotoEmoji (apt repo에 없음 — Google Fonts에서 직접)
+sudo mkdir -p /usr/share/fonts/truetype/noto-emoji
+NOTO_EMOJI_REGULAR=$(curl -sSL -H "User-Agent: Mozilla/5.0" \
+    "https://fonts.googleapis.com/css2?family=Noto+Emoji&display=swap" \
+    | grep -oE "https://[^)]+\.ttf" | head -1)
+NOTO_EMOJI_BOLD=$(curl -sSL -H "User-Agent: Mozilla/5.0" \
+    "https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@700&display=swap" \
+    | grep -oE "https://[^)]+\.ttf" | head -1)
+sudo curl -sSL "$NOTO_EMOJI_REGULAR" \
+    -o /usr/share/fonts/truetype/noto-emoji/NotoEmoji-Regular.ttf
+sudo curl -sSL "$NOTO_EMOJI_BOLD" \
+    -o /usr/share/fonts/truetype/noto-emoji/NotoEmoji-Bold.ttf
+sudo ln -sf /usr/share/fonts/truetype/noto-emoji/NotoEmoji-Regular.ttf \
+    /usr/share/fonts/truetype/noto-emoji/NotoEmoji.ttf
+sudo fc-cache -fv
+
+# 검증
+mkdocs-ebook doctor
+```
+
+`NotoEmoji.ttf` 심볼릭 링크가 필요한 이유: `mkdocs-ebook` 의 `templates/emoji-fallback.tex`
+가 `\newfontfamily\emojifont{NotoEmoji.ttf}` 로 파일명 직접 참조한다. Apt 의 `fonts-noto-color-emoji`
+는 컬러 변형(`NotoColorEmoji.ttf`)만 제공하고, XeLaTeX 는 컬러 비트맵 폰트를 못 쓴다.
+
 ---
 
 ## 2. 책임 분리

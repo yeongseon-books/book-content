@@ -115,7 +115,7 @@ python3 .sisyphus/medium/finalize-posts.py
 - [x] Azure Functions 101 ko/en eBook source bundle 첫 빌드 (Phase 8: strict-pass)
 - [x] 19/19 ebook-target 시리즈 번들 strict-pass (Phase 8)
 - [x] private `mkdocs-ebook` 통합 테스트 — `pip install "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mkdocs-ebook.git"` 로 설치 후 19/19 번들 `mkdocs-ebook lint` 통과 (0 error / 0 warning each)
-- [ ] 첫 PDF 산출물 — 추가 시스템 의존성 (pandoc / xelatex / Nanum fonts / playwright / poppler / epubcheck) 설치 환경에서 진행
+- [x] 첫 PDF 산출물 — 시스템 toolchain (pandoc + texlive-xetex + texlive-lang-korean + Nanum + NotoEmoji 등) 설치 후 5개 시리즈 cross-section 빌드 성공: `azure-functions-101` (en+ko PDF + en EPUB, 126/124 pages), `azure-app-service-101-ko` (1.9MB), `azure-aks-101-ko` (0.78MB), `azure-aca-101-ko` (0.44MB), `llm-from-scratch-101-ko` (PDF + EPUB). 시스템 의존성 설치 절차는 EBOOK.md §1.2; 전체 19개 빌드는 `scripts/build_ebook_artifacts.py` 로 일괄 가능.
 
 ## Phase 9 — Repository rename & cutover
 
