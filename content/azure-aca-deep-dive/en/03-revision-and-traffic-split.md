@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # Revisions and traffic splitting — where Envoy weights come from
 
+## Source Version
+
+External references in this post are pinned to these upstream baselines:
+- Dapr: v1.13.x (https://github.com/dapr/dapr)
+- KEDA: v2.14.x (https://github.com/kedacore/keda)
+- Envoy: v1.30.x (https://github.com/envoyproxy/envoy)
+
+ACA's internal implementation is not published by Microsoft, so these versions are used only as comparison anchors.
+
 > Azure Container Apps Deep Dive series (3/6)
 
 Azure Container Apps makes rollout mechanics look gentler than they are.
@@ -37,7 +46,7 @@ And the final request path has to apply weights somewhere concrete.
 That final step is the reason for this episode.
 If traffic is split 80/20 in the portal or ARM template, where does that number actually matter?
 
-The short answer is: at the Envoy routing layer, via weighted upstream selection.
+The short answer is: most likely at the Envoy routing layer, via weighted upstream selection.
 The long answer starts with revision immutability.
 
 ---
@@ -184,12 +193,12 @@ It does not mean a Kubernetes cluster.
 
 That matters because revision traffic splitting is naturally expressed as weighted cluster selection.
 
-The upstream Envoy route schema defines weighted clusters in the route configuration API.
+Microsoft documents that ACA traffic split rules are enforced at ingress, and the upstream Envoy route schema defines weighted clusters in the route configuration API.
 That is the right conceptual anchor for ACA traffic splitting.
 
 ![From revision weight to Envoy weight](../../../assets/azure-aca-deep-dive/03/03-05-from-revision-weight-to-envoy-weight.en.png)
-ACA itself is closed-source, so you do not see the exact product adapter code.
-But the combination of Microsoft's traffic-splitting docs and Envoy's weighted-cluster model is enough to explain the mechanism accurately.
+ACA itself is closed-source, so you do not see the exact product adapter code or translation pipeline.
+The prose below therefore describes the most defensible inference: Microsoft's traffic-splitting docs describe the product behavior, and Envoy's weighted-cluster model is the upstream mechanism that most consistently explains it.
 
 ---
 
@@ -298,7 +307,7 @@ The proxy concept is still standard.
 
 ![Where Envoy's weighted cluster model matters most](../../../assets/azure-aca-deep-dive/03/03-12-where-envoy-s-weighted-cluster-model-mat.en.png)
 This is the cleanest explanation for the user's question, "where do the weights come from?"
-They come from app-scope ACA ingress configuration and become ingress routing weights applied to revision upstreams.
+They start as app-scope ACA ingress configuration and, by the most defensible inference, become ingress routing weights applied to revision upstreams.
 
 ---
 
@@ -338,7 +347,7 @@ That is enough to reason accurately without pretending the product is open-sourc
 
 Here is the compact model.
 
-> A revision in ACA is an immutable runtime snapshot. Traffic splitting is an application-scope ingress decision that chooses which active revisions are exposed on the app URL. The percentages ultimately belong to the Envoy routing layer, where revision upstreams can be treated as weighted destinations.
+> A revision in ACA is an immutable runtime snapshot. Traffic splitting is an application-scope ingress decision that chooses which active revisions are exposed on the app URL. The percentages are best explained as Envoy routing-layer weights, where revision upstreams can be treated as weighted destinations.
 
 Once you have that model, canary and blue-green stop looking like magic portal features.
 
@@ -349,6 +358,22 @@ Once you have that model, canary and blue-green stop looking like magic portal f
 This episode connected the environment boundary from part 2 to the immutable rollout unit inside it. The next part moves from rollout policy to autoscaling policy, following how ACA scale rules create KEDA-driven behavior per revision. After that, the series drops into the Dapr sidecar and finally comes back to Envoy for the full ingress request path that actually applies the weights described here.
 
 ---
+
+## Evidence Boundaries
+
+This chapter intentionally separates ACA product facts from the hidden routing implementation.
+
+**Documented (Microsoft Learn / primary sources):**
+- Revisions are immutable snapshots.
+- ACA distinguishes revision-scope changes from application-scope changes.
+- Traffic splitting, labels, revision modes, and readiness gates are part of the documented ingress and revisions surface.
+
+**Inferred from upstream behavior:**
+- Envoy weighted-cluster behavior is the most defensible explanation for where revision traffic percentages are applied.
+- Multiple active revisions being treated as ingress upstream candidates is an inference from documented ACA behavior plus upstream Envoy routing semantics.
+
+**Speculation (ACA-internal, not exposed):**
+- The exact private translation pipeline, internal object names, and internal Envoy configuration layout inside ACA are not public.
 
 <!-- toc:begin -->
 ## In this series

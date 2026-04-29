@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
 
+## Source Version
+
+이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다:
+- Dapr: v1.13.x (https://github.com/dapr/dapr)
+- KEDA: v2.14.x (https://github.com/kedacore/keda)
+- Envoy: v1.30.x (https://github.com/envoyproxy/envoy)
+
+ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
+
 > Azure Container Apps Deep Dive 시리즈 (2/6)
 
 1화에서는 스택 전체 지도를 그렸습니다.
@@ -297,6 +306,22 @@ Ingress는 이 경계 안의 app endpoint로 들어갑니다.
 이번 글은 뒤의 모든 런타임 동작이 기대고 있는 바깥 경계를 확대해서 본 2화입니다. 다음 3화에서는 이 경계 안의 불변 단위인 Revision과 Revision mode, traffic weight로 이동합니다. 그 뒤에는 같은 Environment 안에서 KEDA가 어떻게 숨은 오브젝트를 만들고, Dapr sidecar가 어떻게 붙고, Envoy 요청 경로가 어떻게 흐르는지를 순서대로 따라갑니다.
 
 ---
+
+## Evidence Boundaries
+
+이 장은 대부분 Microsoft 문서가 직접 정의한 제품 경계를 다루고, 일부만 런타임 추론을 사용합니다.
+
+**Documented (Microsoft Learn / 1차 출처):**
+- Container Apps Environment는 하나 이상의 앱과 잡을 감싸는 secure boundary입니다.
+- Environment 수준 네트워크, ingress posture, DNS 맥락, 공용 logging destination, Dapr component scope는 ACA 제품 표면입니다.
+- Dapr component는 environment-level resource이며, scope는 Dapr app ID에 대응합니다.
+
+**Inferred from upstream behavior:**
+- 본문에서 sidecar가 scoped component를 로드한다고 설명하는 부분은, ACA의 문서화된 component 모델을 upstream Dapr runtime 동작으로 해석한 것입니다.
+- Environment 안의 service reachability 언급은 ACA가 공개한 내부 오브젝트 다이어그램이 아니라, 표준 Kubernetes형 service discovery 패턴에 기대고 있습니다.
+
+**Speculation (ACA-internal, not exposed):**
+- Environment 내부의 숨은 Kubernetes object, mesh wiring, control-plane 구현 세부사항은 공개되지 않았습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

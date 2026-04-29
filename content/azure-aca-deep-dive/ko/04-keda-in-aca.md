@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # ACA 안의 KEDA — Scale Rule이 만드는 것
 
+## Source Version
+
+이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다:
+- Dapr: v1.13.x (https://github.com/dapr/dapr)
+- KEDA: v2.14.x (https://github.com/kedacore/keda)
+- Envoy: v1.30.x (https://github.com/envoyproxy/envoy)
+
+ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
+
 > Azure Container Apps Deep Dive 시리즈 (4/6)
 
 Azure Container Apps의 제품 표면에서 스케일링은 몇 개 필드로 끝납니다.
@@ -305,6 +314,23 @@ Scale 블레이드 뒤에 숨어 있는 기계가 바로 이것입니다.
 3화가 Revision이 어떻게 traffic을 받는지 설명했다면, 이번 4화는 같은 Revision이 아래에서 replica를 어떻게 늘리고 줄이는지 설명한 글입니다. 다음 5화에서는 ACA의 다른 대표적 숨은 메커니즘인 Dapr sidecar로 넘어가, injector부터 localhost API까지 따라갑니다. 마지막 6화에서는 Envoy 요청 경로로 돌아와, 이번 화의 scaling 결정과 3화의 routing 결정이 실제 요청 경로에서 어떻게 만나는지 보게 됩니다.
 
 ---
+
+## Evidence Boundaries
+
+이 장은 Microsoft가 문서화한 KEDA 기반 스케일링 계약 위에, upstream KEDA로 숨은 control loop 모양을 설명합니다.
+
+**Documented (Microsoft Learn / 1차 출처):**
+- ACA 스케일링은 KEDA 기반입니다.
+- Scale rule은 revision template에 붙고, `minReplicas`는 0이 될 수 있습니다.
+- ACA는 built-in HTTP/TCP scaling과 custom rule 번역 개념을 문서화합니다.
+
+**Inferred from upstream behavior:**
+- 숨은 ACA scale rule은 upstream KEDA의 `ScaledObject`, HPA, metrics adapter, polling, cooldown 동작으로 이해하는 편이 맞습니다.
+- Activation path와 per-revision autoscaling loop 설명은 ACA 내부 오브젝트가 아니라 upstream KEDA controller 설계에 기대고 있습니다.
+
+**Speculation (ACA-internal, not exposed):**
+- ACA가 각 scale rule마다 실제로 어떤 hidden Kubernetes object나 private controller를 만드는지는 공개되지 않았습니다.
+- ACA HTTP scaling을 upstream KEDA HTTP add-on의 1:1 배포라고 단정하면 안 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
