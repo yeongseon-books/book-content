@@ -38,7 +38,7 @@ last_reviewed: '2026-04-29'
 먼저 위치를 잡아 두면, 이후의 세부 코드가 훨씬 덜 낯섭니다.
 
 ![Azure Functions 호스트 인스턴스](../../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.ko.png)
-이번 1화는 가운데 Host가 어떻게 부팅되는지를 보고, 2화는 Worker 프로세스, 3화는 둘 사이의 `gRPC (FunctionRpcService)` 채널, 4화는 dispatcher와 invocation, 5화는 스케일링, 6화는 placeholder와 콜드 스타트를 확대합니다.
+이번 글에서는 가운데 Host가 어떻게 부팅되는지만 붙잡습니다. 나머지 박스들은 시리즈 목차에 고정해 두고, 여기서는 부팅 경계가 어디까지인지부터 또렷하게 잡겠습니다.
 
 ---
 

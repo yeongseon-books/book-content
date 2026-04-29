@@ -351,6 +351,6 @@ The model in this post stops at the boundary where an external component has alr
 
 ### Related series
 
-This is part 5 of the Deep Dive series. Part 4 followed a single invocation into the worker; this one separated the outside scale controller from the inside worker-concurrency logic that can add more worker processes on the same instance. Part 6 moves to what happens when a fresh instance is actually created, while the intro series' parts 5 and 6 cover the same territory from an operator-facing angle.
+This is part 5 of the Deep Dive series. Part 4 followed a single invocation into the worker; this one separated the outside scale controller from the inside worker-concurrency logic that can add more worker processes on the same instance. The intro series' parts 5 and 6 cover the same territory from an operator-facing angle.
 
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC

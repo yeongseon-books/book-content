@@ -38,7 +38,7 @@ Each later part zooms into one box from this picture.
 Get the layout in your head first; the code paths land more cleanly after that.
 
 ![Azure Functions host instance](../../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
-Part 1 covers host bootstrap, Part 2 zooms into the worker process, Part 3 into the gRPC channel, Part 4 into dispatcher and invocation, Part 5 into scaling, and Part 6 into placeholder mode and cold start.
+This post stays on host bootstrap only. The rest of the boxes are pinned in the series TOC below; here the job is to make the bootstrap boundary itself explicit.
 
 ---
 
