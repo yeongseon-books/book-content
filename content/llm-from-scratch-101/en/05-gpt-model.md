@@ -16,7 +16,7 @@ The mental model for today is this: **GPT is an autoregressive model that stacks
 
 The input is a tensor of token IDs with shape `(B, T)`. We add token and position embeddings, then pass them through six blocks sequentially. After a final `ln_f` layer, we project to the vocab dimension via `lm_head` to produce logits of shape `(B, T, vocab_size)`.
 
-![The Forward Pass at a Glance](../../assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
+![The Forward Pass at a Glance](../../../assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
 All the components we created earlier appear here. The model class acts more as assembly code than a new algorithm.
 
 ## class GPT(nn.Module) — An 80-line Model

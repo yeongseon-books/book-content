@@ -47,7 +47,7 @@ class FeedForward(nn.Module):
 
 이번 시리즈도 Pre-norm으로 갑니다. 입력을 먼저 정규화하고, 그 결과를 어텐션과 FFN에 넣은 뒤, 마지막에 잔차를 더합니다. 코드 한 줄 차이처럼 보여도 학습감은 꽤 다릅니다.
 
-![LayerNorm — Pre-norm vs Post-norm](../../assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png)
+![LayerNorm — Pre-norm vs Post-norm](../../../assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png)
 ## Block 한 개 PyTorch 구현 — 25줄
 
 이제 `model.py`에 블록을 붙입니다. 지난 글의 `CausalSelfAttention`을 그대로 쓰고, 오늘 만든 `FeedForward`와 `LayerNorm` 두 개를 더하면 끝입니다.

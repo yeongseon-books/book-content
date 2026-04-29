@@ -30,7 +30,7 @@ Without scaling, the softmax can become extremely sharp early in training. If on
 
 A language model is essentially a next-token predictor. The current position shouldn't be allowed to see the future answer. We enforce this by masking the upper triangular part of the score matrix, setting future values to `-inf`.
 
-![Causal Mask — No Peeking at the Future](../../assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
+![Causal Mask — No Peeking at the Future](../../../assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
 This single line is the core discipline of an autoregressive model. It prevents the model from "cheating" by looking at future lines while it's still learning to predict the next character in Shakespeare.
 
 ## Softmax → V Weighted Sum → Output

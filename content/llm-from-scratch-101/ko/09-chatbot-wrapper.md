@@ -16,7 +16,7 @@
 
 필요한 부품은 모델, 대화 히스토리, 스트리밍, 브라우저 화면입니다.
 
-![챗봇 = 모델 + 대화 히스토리 + 스트리밍 + UI](../../assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.ko.png)
+![챗봇 = 모델 + 대화 히스토리 + 스트리밍 + UI](../../../assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.ko.png)
 ## 멀티턴 프롬프트 포맷 디자인
 
 이번 글에서는 대화 이력을 아래처럼 평문으로 이어 붙입니다.

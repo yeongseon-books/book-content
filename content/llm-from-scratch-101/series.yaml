@@ -1,0 +1,22 @@
+id: llm-from-scratch-101
+category: ai
+title:
+  ko: LLM from Scratch 101
+  en: LLM from Scratch 101
+description:
+  ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
+  en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
+languages: [ko, en]
+targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+status: draft
+tags: [LLM, PyTorch, Transformer, Tutorial]
+articles:
+  - { idx: 1, slug: 01-tokenizer,         status: ready }
+  - { idx: 2, slug: 02-embedding,         status: ready }
+  - { idx: 3, slug: 03-attention,         status: ready }
+  - { idx: 4, slug: 04-transformer-block, status: ready }
+  - { idx: 5, slug: 05-gpt-model,         status: ready }
+  - { idx: 6, slug: 06-training-loop,     status: ready }
+  - { idx: 7, slug: 07-inference,         status: ready }
+  - { idx: 8, slug: 08-finetuning,        status: ready }
+  - { idx: 9, slug: 09-chatbot-wrapper,   status: ready }

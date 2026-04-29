@@ -16,7 +16,7 @@
 
 현재 문맥 `idx`를 넣고 마지막 logits만 꺼낸 뒤, 샘플링한 토큰을 다시 붙입니다.
 
-![자기회귀 생성 — 한 토큰 뽑고 다시 입력](../../assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.ko.png)
+![자기회귀 생성 — 한 토큰 뽑고 다시 입력](../../../assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.ko.png)
 ## Greedy Decoding — argmax는 왜 지루한가
 
 `argmax`만 쓰면 결과는 금방 굳습니다.

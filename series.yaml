@@ -134,7 +134,7 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: draft
-    path: llm-from-scratch-101
+    path: content/llm-from-scratch-101
 
   # AX (planned)
   - id: ax-practical-guide
