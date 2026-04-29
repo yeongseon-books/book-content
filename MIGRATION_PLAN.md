@@ -206,10 +206,10 @@ tech-writing/
 | --- | --- | --- | --- |
 | 1 | 문서 분리 (SERIES/PUBLISHING/STYLE_GUIDE/EBOOK/ROADMAP) + README 재작성 | 낮음 | 완료 |
 | 2 | 디렉토리 스캐폴딩 (content/ docs/ exports/ templates/ scripts/) | 낮음 | 완료 |
-| 3 | 메타데이터 (root `series.yaml`) | 낮음 | 완료 (per-series `series.yaml` 는 Phase 6 동시) |
-| 4 | MkDocs 셋업 (mkdocs.yml + requirements.txt + build_docs.py skeleton) | 낮음 | 완료 (스크립트는 skeleton, 실제 빌드는 Phase 6 이후) |
+| 3 | 메타데이터 (root `series.yaml`) | 낮음 | 완료 (per-series `series.yaml` 는 Phase 6 에서 시리즈별로 함께 추가됨) |
+| 4 | MkDocs 셋업 (mkdocs.yml + requirements.txt + build_docs.py skeleton) | 낮음 | 완료 (스크립트는 skeleton, 실제 빌드는 Phase 7 이후) |
 | 5 | 스크립트 skeleton (export_tistory/medium/ebook_source, check_*) | 낮음 | 완료 (skeleton) |
-| 6 | 시리즈 파일 이동 (`<series>/` → `content/<series>/`) + per-series `series.yaml` 동시 추가 | **높음** | 시리즈별 원자 커밋 |
+| 6 | 시리즈 파일 이동 (`<series>/` → `content/<series>/`) + per-series `series.yaml` 동시 추가 | **높음** | 완료 (10/10 시리즈, 시리즈별 원자 커밋) |
 | 7 | 콘텐츠 품질 (front matter 도입, AI 시리즈 갱신, Deep Dive Source Version) | 중간 | 시리즈별 |
 | 8 | eBook source bundle 통합 (`export_ebook_source.py` 실 동작 + private `mkdocs-ebook` 빌드) | 중간 | 부분 자동화 |
 | 9 | 리포지토리 rename (`tech-blog` → `tech-writing`) + medium URL 일괄 재생성 | 낮음 | 수동 (`gh repo rename`) |

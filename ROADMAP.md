@@ -25,12 +25,12 @@
 - [x] `exports/{tistory,medium,ebook-source}/` 생성
 - [x] `templates/` 생성 + 빈 템플릿 5개
 - [x] `scripts/` 생성 + skeleton 스크립트
-- [ ] 기존 시리즈 폴더를 `content/` 로 실제 이동 (Phase 6에서 시리즈별)
+- [x] 기존 시리즈 폴더를 `content/` 로 실제 이동 (Phase 6에서 시리즈별)
 
 ## Phase 3 — Metadata
 
 - [x] 루트 `series.yaml` 추가 (시리즈 카탈로그 단일 출처)
-- [ ] 시리즈별 `series.yaml` 추가 — Phase 6 시리즈 이동 커밋 안에서 동시 추가 (이동과 메타가 같은 원자 커밋이어야 경로 정합성 유지)
+- [x] 시리즈별 `series.yaml` 추가 — Phase 6 시리즈 이동 커밋 안에서 동시 추가 (이동과 메타가 같은 원자 커밋이어야 경로 정합성 유지)
 - [ ] 모든 글에 YAML front matter 추가 (Phase 7)
 - [ ] `finalize-posts.py` 의 `SERIES_TAGS` 와 `series.yaml` 동기화 검증 추가
 
@@ -68,16 +68,16 @@
 
 이동 대상 (catalog 등재):
 
-- [ ] `azure-app-service-101`
-- [ ] `azure-app-service-deep-dive`
-- [ ] `azure-functions-101`
-- [ ] `azure-functions-deep-dive`
-- [ ] `azure-aks-101`
-- [ ] `azure-aks-deep-dive`
-- [ ] `azure-aca-101`
-- [ ] `azure-aca-deep-dive`
-- [ ] `ai-web-dev-101` (현재 flat → `content/ai-web-dev-101/{ko,en}/` 로 정규화)
-- [ ] `llm-from-scratch-101`
+- [x] `azure-app-service-101`
+- [x] `azure-app-service-deep-dive`
+- [x] `azure-functions-101`
+- [x] `azure-functions-deep-dive`
+- [x] `azure-aks-101`
+- [x] `azure-aks-deep-dive`
+- [x] `azure-aca-101`
+- [x] `azure-aca-deep-dive`
+- [x] `ai-web-dev-101` (현재 flat → `content/ai-web-dev-101/{ko,en}/` 로 정규화)
+- [x] `llm-from-scratch-101`
 
 이동 후 시리즈별 검증:
 

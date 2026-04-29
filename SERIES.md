@@ -1,6 +1,6 @@
 # Series Index
 
-이 문서는 전체 콘텐츠 시리즈의 목록과 발행 상태를 관리한다. 단일 출처는 [`series.yaml`](./series.yaml)이며, 본 문서는 사람이 읽기 쉬운 요약이다. (per-series `series.yaml` 은 Phase 6 시리즈 이동 커밋 안에서 함께 추가될 예정이다.)
+이 문서는 전체 콘텐츠 시리즈의 목록과 발행 상태를 관리한다. 단일 출처는 [`series.yaml`](./series.yaml)이며, 본 문서는 사람이 읽기 쉬운 요약이다. 시리즈별 `series.yaml` 은 각 시리즈 디렉토리(`content/<series>/series.yaml`) 안에 article-level status 와 함께 들어 있다.
 
 ## Status Legend
 

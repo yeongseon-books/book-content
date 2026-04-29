@@ -3,7 +3,7 @@
 > Persistent conventions for any agent (human or AI) working in this repository.
 > Apply these rules to every post, every commit, every script run.
 
-> **Migration in progress**: this repo is moving from `tech-blog` to `tech-writing` (multi-channel publishing pipeline). See [`MIGRATION_PLAN.md`](./MIGRATION_PLAN.md) and [`ROADMAP.md`](./ROADMAP.md). The rules below describe the **current** workflow (pre-Phase 6); they remain authoritative for any series still living at the repo root. Once a series is moved under `content/`, the new rules in [`PUBLISHING.md`](./PUBLISHING.md) and [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) take precedence for that series.
+> **Migration in progress**: this repo is moving from `tech-blog` to `tech-writing` (multi-channel publishing pipeline). See [`MIGRATION_PLAN.md`](./MIGRATION_PLAN.md) and [`ROADMAP.md`](./ROADMAP.md). All 10 series have been moved under `content/<series>/` (Phase 6 complete). Path examples below use `content/<series>/...` accordingly. Tooling (`finalize-posts.py`, `to-medium.py`, `finalize-ai-web-dev.py`) resolves series paths via `series.yaml`'s `path:` field; never hardcode `ROOT/<series-id>`.
 
 ## Series catalog
 
