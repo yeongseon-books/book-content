@@ -2,7 +2,10 @@
 """Convert en/*.md to Medium import-ready medium/<NN>.md.
 
 Rules (confirmed by user):
-- Image refs `![alt](../../assets/...)` -> raw.githubusercontent.com/<owner>/<repo>/<TAG>/assets/...
+- Image refs `![alt](../../assets/...)` -> kept as-is (relative local path).
+  Medium import does not fetch private-repo raw URLs, so PNGs are uploaded
+  manually via Medium's UI (drag-and-drop). The local path doubles as a
+  reference so the author knows which PNG to attach where.
 - Other relative links `[text](../something)` or `[text](./something)` -> github.com/<owner>/<repo>/blob/<TAG>/<resolved>
 - H3+ (### and deeper) -> bold paragraph (`**text**`)
 - Tables -> bullet list, each row: "- **col1**: v1 / **col2**: v2 ..."
@@ -34,7 +37,6 @@ TAG = _meta["published_ref"]
 
 from _catalog import is_present, load_catalog
 
-RAW_BASE = f"https://raw.githubusercontent.com/{REPO}/{TAG}"
 BLOB_BASE = f"https://github.com/{REPO}/blob/{TAG}"
 
 FRONT_MATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
@@ -68,14 +70,11 @@ def resolve_relative(src_md: Path, target: str) -> str | None:
 
 
 def replace_images(text: str, src_md: Path) -> str:
-    def sub(m: re.Match) -> str:
-        alt, url = m.group(1), m.group(2)
-        rel = resolve_relative(src_md, url)
-        if rel is None:
-            return m.group(0)
-        return f"![{alt}]({RAW_BASE}/{rel})"
-
-    return IMAGE_RE.sub(sub, text)
+    # Images are kept as relative local paths. Medium import doesn't fetch
+    # private-repo raw URLs anyway; the author uploads PNGs manually via
+    # Medium's UI, using the local path as a guide for which file to attach.
+    _ = src_md
+    return text
 
 
 def replace_links(text: str, src_md: Path) -> str:

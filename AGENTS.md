@@ -50,7 +50,7 @@ The TOC block sits immediately above the references section, separated by a sing
 
 - Tag surface: leading `<!-- tags: A, B, C, D -->` HTML comment on line 1 (NOT a visible bottom `Tags:` line). This matches Medium's separate tag input field — paste the comment value into the field on publish.
 - TOC: the `<!-- toc:begin -->` / `<!-- toc:end -->` markers are stripped, but the TOC body lines are kept (Medium has no native series nav).
-- Image URLs: rewritten to commit-pinned `raw.githubusercontent.com/<owner>/<repo>/<TAG>/...`.
+- Image refs: kept as relative local paths (`../../../assets/...`), NOT rewritten to raw URLs. The publishing repo is private, so `raw.githubusercontent.com` URLs return 404. PNGs are uploaded manually via Medium's UI (drag-and-drop) when publishing; the local path tells the author which file to attach where.
 - Headings: H3+ are demoted (Medium import compatibility).
 - Tables: rewritten as bullet lists.
 
@@ -92,7 +92,7 @@ TOC entry titles are pulled from each post's H1 (single source of truth). Never 
 - Path pattern: `assets/<series>/<NN>/<NN>-<idx>-<slug>.{ko|en}.png`
 - ko slug = en counterpart heading slug (preserves ko/en file-name symmetry)
 - All diagrams source: Mermaid → PNG via `.sisyphus/medium/mermaid-to-png.py`
-- ko/en bodies reference local relative path; medium bodies reference `raw.githubusercontent.com/<owner>/<repo>/<TAG>/...`
+- ko/en/medium bodies all reference local relative paths (`../../../assets/...`); Medium PNGs are uploaded manually via Medium's UI on publish
 
 ## Image caption (alt text) policy
 
@@ -145,8 +145,7 @@ python3 scripts/lint_captions.py    # exits 1 on banned patterns
 ## Pinned tag
 
 External and intra-repo URLs in `medium/` files MUST pin to a commit/tag, never `master`/`HEAD`/`main`.
-Current pin: `e8dca42` (defined in `.sisyphus/medium/to-medium.py` as `TAG`).
-When regenerating medium variants, update `TAG` first, regenerate, then commit.
+Current pin: `f24a126` (defined in `.sisyphus/medium/to-medium.py` as `TAG`).
 When regenerating medium variants, update `TAG` first, regenerate, then commit.
 
 ## Mermaid conventions
