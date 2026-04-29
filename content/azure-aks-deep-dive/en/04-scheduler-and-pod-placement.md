@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # Scheduler and Pod placement — who decides which node
 
+## Source Version
+
+This post uses the following upstream versions as external reference points:
+- Kubernetes: v1.30.x (https://github.com/kubernetes/kubernetes)
+- containerd: v1.7.x (https://github.com/containerd/containerd)
+- KEDA: v2.13.x (https://github.com/kedacore/keda)
+
+AKS control plane is managed by Microsoft, so the upstream code here is a behavioral comparison baseline, not a statement about the exact binaries running in the service.
+
 > Azure Kubernetes Service Deep Dive series (4/6)
 
 Scheduling is not a free-CPU calculator.
@@ -60,7 +69,7 @@ It is a `Pod -> Node` decision.
 
 ## The point of this episode
 
-> kube-scheduler does not execute Pods. It first removes impossible nodes through Filter plugins, then ranks the feasible candidates through Score plugins, and finally records the decision as a Binding in the API server. The key diagnostic split for a Pending Pod is whether it has no feasible nodes at all, or whether it has feasible nodes but keeps losing on score.
+> kube-scheduler does not execute Pods. It first removes impossible nodes through Filter plugins, then ranks the feasible candidates through Score plugins, and finally records the decision as a Binding in the API server. The key diagnostic split for a Pending Pod is whether it has no feasible nodes at all because Filter rejected every candidate, or whether feasible nodes existed but binding still failed later because of preemption, reservation conflicts, or another rare post-score issue.
 
 ---
 
@@ -70,6 +79,14 @@ This is part 4 of the Azure Kubernetes Service Deep Dive series.
 Parts 2 and 3 covered node execution and networking; this part explains the earlier placement decision. Part 5 follows the consequences of that decision and looks at HPA and Cluster Autoscaler.
 
 ---
+
+## Call Path Summary
+
+- Pod without `nodeName` → scheduler queue
+- Filter plugins remove impossible nodes
+- Score plugins rank feasible nodes
+- scheduler writes Binding through the API server
+- kubelet on the chosen node starts the node-local execution path
 
 <!-- toc:begin -->
 ## In this series

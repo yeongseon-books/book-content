@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
 
+## Source Version
+
+이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+- Kubernetes: v1.30.x (https://github.com/kubernetes/kubernetes)
+- containerd: v1.7.x (https://github.com/containerd/containerd)
+- KEDA: v2.13.x (https://github.com/kedacore/keda)
+
+AKS의 control plane은 Microsoft가 관리하므로, 여기서 보는 upstream 코드는 실제 서비스 내부 바이너리 단정이 아니라 동작 모델 비교 기준입니다.
+
 > Azure Kubernetes Service Deep Dive 시리즈 (2/6)
 
 1화에서 control plane은 Pod를 어느 노드에 둘지 결정하고 Binding을 기록하는 층이라고 정리했습니다.
@@ -145,6 +154,14 @@ containerd가 OCI runtime 계층으로 내려가면서 `runc`를 사용합니다
 1화가 관리형 control plane의 경계를 그렸다면 이번 화는 그 반대편 끝, 즉 노드 로컬 실행 경로를 따라갑니다. 다음 3화에서는 오늘 본 `RunPodSandbox`와 자연스럽게 이어지는 네트워킹 계층으로 넘어가서 Pod IP가 실제로 어디서 오는지 정리합니다.
 
 ---
+
+## Call Path Summary
+
+- kubelet → CRI gRPC
+- CRI runtime endpoint → containerd
+- containerd → `containerd-shim`
+- `containerd-shim` → `runc`
+- `runc` → container process
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # Control plane anatomy — what AKS hides from you
 
+## Source Version
+
+This post uses the following upstream versions as external reference points:
+- Kubernetes: v1.30.x (https://github.com/kubernetes/kubernetes)
+- containerd: v1.7.x (https://github.com/containerd/containerd)
+- KEDA: v2.13.x (https://github.com/kedacore/keda)
+
+AKS control plane is managed by Microsoft, so the upstream code here is a behavioral comparison baseline, not a statement about the exact binaries running in the service.
+
 > Azure Kubernetes Service Deep Dive series (1/6)
 
 The AKS 101 series calls AKS a managed Kubernetes service.
@@ -144,6 +153,14 @@ This is part 1 of the Azure Kubernetes Service Deep Dive series.
 If AKS 101 explained the split between the control plane and node pools for first-time readers, this series re-reads the same system through upstream code paths and managed-service boundaries. In the same way that Azure Functions Deep Dive part 1 fixed the Host-versus-Worker map first, this episode fixes the AKS control-plane-versus-data-plane map before the narrower internals.
 
 ---
+
+## Call Path Summary
+
+- `kubectl` / client → `kube-apiserver`
+- `kube-apiserver` → `etcd` read/write
+- controller loops in `kube-controller-manager` reconcile desired vs actual state
+- `kube-scheduler` writes a `Pod → Node` binding
+- kubelet and node-side runtime execute the work on the chosen node
 
 <!-- toc:begin -->
 ## In this series

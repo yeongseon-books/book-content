@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # kubelet and containerd — how a container actually starts on a node
 
+## Source Version
+
+This post uses the following upstream versions as external reference points:
+- Kubernetes: v1.30.x (https://github.com/kubernetes/kubernetes)
+- containerd: v1.7.x (https://github.com/containerd/containerd)
+- KEDA: v2.13.x (https://github.com/kedacore/keda)
+
+AKS control plane is managed by Microsoft, so the upstream code here is a behavioral comparison baseline, not a statement about the exact binaries running in the service.
+
 > Azure Kubernetes Service Deep Dive series (2/6)
 
 Part 1 framed the control plane as the layer that records desired state and placement.
@@ -113,6 +122,14 @@ This is part 2 of the Azure Kubernetes Service Deep Dive series.
 Part 1 fixed the managed control-plane boundary; this part follows the exact opposite end of the system, the node-local execution path. Part 3 moves naturally from `RunPodSandbox` into networking and explains where the Pod IP is actually allocated.
 
 ---
+
+## Call Path Summary
+
+- kubelet → CRI gRPC
+- CRI runtime endpoint → containerd
+- containerd → `containerd-shim`
+- `containerd-shim` → `runc`
+- `runc` → container process
 
 <!-- toc:begin -->
 ## In this series

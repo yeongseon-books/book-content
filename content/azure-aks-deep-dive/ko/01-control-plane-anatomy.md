@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # Control Plane 해부 — AKS가 사용자에게서 가린 것
 
+## Source Version
+
+이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+- Kubernetes: v1.30.x (https://github.com/kubernetes/kubernetes)
+- containerd: v1.7.x (https://github.com/containerd/containerd)
+- KEDA: v2.13.x (https://github.com/kedacore/keda)
+
+AKS의 control plane은 Microsoft가 관리하므로, 여기서 보는 upstream 코드는 실제 서비스 내부 바이너리 단정이 아니라 동작 모델 비교 기준입니다.
+
 > Azure Kubernetes Service Deep Dive 시리즈 (1/6)
 
 AKS 101 시리즈에서는 AKS를 "관리형 Kubernetes"라고 설명합니다.
@@ -323,6 +332,14 @@ Unix socket으로 CRI를 호출하고,
 AKS 101이 control plane과 node pool의 역할 분담을 입문자 관점에서 설명했다면, 이번 시리즈는 같은 구조를 업스트림 코드와 관리형 서비스 경계까지 내려가서 다시 읽습니다. Azure Functions Deep Dive 1화가 Host와 Worker의 경계를 먼저 그렸던 것처럼, 이번 1화도 AKS의 control plane과 data plane 경계를 먼저 고정합니다.
 
 ---
+
+## Call Path Summary
+
+- `kubectl` / 클라이언트 → `kube-apiserver`
+- `kube-apiserver` → `etcd` read/write
+- `kube-controller-manager`의 컨트롤 루프가 desired state와 actual state를 수렴
+- `kube-scheduler`가 `Pod → Node` binding 기록
+- 선택된 노드에서 kubelet과 runtime이 실제 실행 수행
 
 <!-- toc:begin -->
 ## 시리즈 목차

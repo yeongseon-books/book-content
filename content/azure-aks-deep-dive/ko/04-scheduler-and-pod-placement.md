@@ -19,6 +19,15 @@ last_reviewed: '2026-04-29'
 
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
 
+## Source Version
+
+이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+- Kubernetes: v1.30.x (https://github.com/kubernetes/kubernetes)
+- containerd: v1.7.x (https://github.com/containerd/containerd)
+- KEDA: v2.13.x (https://github.com/kedacore/keda)
+
+AKS의 control plane은 Microsoft가 관리하므로, 여기서 보는 upstream 코드는 실제 서비스 내부 바이너리 단정이 아니라 동작 모델 비교 기준입니다.
+
 > Azure Kubernetes Service Deep Dive 시리즈 (4/6)
 
 스케줄링은 단순한 잔여 CPU 계산이 아닙니다.
@@ -59,7 +68,7 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 
 ## 이번 화의 요점
 
-> kube-scheduler는 Pod를 직접 실행하지 않습니다. 먼저 Filter plugin으로 불가능한 노드를 제거하고, Score plugin으로 남은 후보를 순위화한 뒤, 마지막에 Binding을 API server에 기록합니다. Pending Pod를 읽을 때 핵심은 후보가 아예 없는지, 아니면 후보는 있는데 점수 때문에 다른 노드가 선택되는지 구분하는 것입니다.
+> kube-scheduler는 Pod를 직접 실행하지 않습니다. 먼저 Filter plugin으로 불가능한 노드를 제거하고, Score plugin으로 남은 후보를 순위화한 뒤, 마지막에 Binding을 API server에 기록합니다. Pending Pod를 읽을 때 핵심은 Filter 단계에서 feasible node가 아예 없었는지, 아니면 feasible node는 있었지만 preemption, reservation conflict, bind 실패 같은 드문 후속 이유로 배치가 끝나지 않았는지 구분하는 것입니다.
 
 ---
 
@@ -69,6 +78,14 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 2화와 3화가 노드 실행과 네트워크를 다뤘다면 이번 화는 그보다 앞단의 placement 결정을 설명합니다. 다음 5화에서는 scheduler가 unschedulable로 남긴 Pod를 보고 HPA와 Cluster Autoscaler가 어떻게 반응하는지 봅니다.
 
 ---
+
+## Call Path Summary
+
+- `nodeName`이 없는 Pod → scheduler queue
+- Filter plugin이 불가능한 노드 제거
+- Score plugin이 feasible node 순위화
+- scheduler가 API server에 Binding 기록
+- 선택된 노드의 kubelet이 후속 실행 경로 시작
 
 <!-- toc:begin -->
 ## 시리즈 목차
