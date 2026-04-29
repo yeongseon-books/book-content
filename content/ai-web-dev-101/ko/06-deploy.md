@@ -102,7 +102,7 @@ git push origin main
 
 배포가 끝나면 `[프로젝트명].vercel.app` 형태의 도메인이 생성됩니다. 이 주소로 접속해 친구들과 공유해 보세요.
 
-![Vercel 배포 파이프라인](../../../assets/ai-web-dev-101/06/production-request-path.ko.png)
+![배포된 앱으로 사용자 요청이 들어오는 운영 경로](../../../assets/ai-web-dev-101/06/production-request-path.ko.png)
 
 ### 운영 팁: 환경 변수 업데이트하기
 OpenAI API 키를 교체했거나, 다른 설정을 바꿔야 할 때가 있습니다.
@@ -217,7 +217,7 @@ node_modules/
 ```
 
 **[그림] 안전한 API 키 관리 vs 위험한 하드코딩**
-![안전한 API 키 관리 vs 위험한 하드코딩](../../../assets/ai-web-dev-101/06/secret-key-boundary.ko.png)
+![환경 변수 관리와 하드코딩 노출의 차이](../../../assets/ai-web-dev-101/06/secret-key-boundary.ko.png)
 
 ---
 
@@ -237,7 +237,7 @@ Azure를 쓴다면 'Cost Management' 메뉴에서 예산 알람(Budget Alert)을
 - **HTTP 500 에러 추적**: 만약 "서버 내부 오류"가 뜬다면, Vercel의 'Runtime Logs'나 Azure의 'Log Stream'을 열어보세요. 코드 한 줄의 오타나 누락된 환경 변수 때문일 확률이 90%입니다.
 - **사용자 질문 분석**: 사용자가 어떤 질문을 하는지, AI가 적절한 정보를 제공하는지 정기적으로 확인해 보세요. 이는 다음 7편에서 다룰 '서비스 개선'을 위한 가장 소중한 데이터가 됩니다.
 
-![비용 관리 체크포인트](../../../assets/ai-web-dev-101/06/cost-guardrails-flow.ko.png)
+![예산 제한과 오류 확인으로 이어지는 운영 점검 흐름](../../../assets/ai-web-dev-101/06/cost-guardrails-flow.ko.png)
 
 ---
 
