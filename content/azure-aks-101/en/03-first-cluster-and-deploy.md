@@ -203,14 +203,25 @@ spec:
           image: <your-registry>/fastapi-hello:latest
           ports:
             - containerPort: 8000
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 12
           readinessProbe:
             httpGet:
               path: /healthz
               port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /healthz
               port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
           resources:
             requests:
               cpu: 100m
@@ -232,11 +243,14 @@ spec:
   type: LoadBalancer
 ```
 
-Three lines matter most for the first pass.
+For a first deploy, four lines matter most.
 
 - `replicas: 2` means “keep two copies of this pod shape.”
 - `nodeSelector` expresses intent to run on the user pool.
+- `startupProbe` gives the container time to boot before liveness checks can kill it.
 - `type: LoadBalancer` asks for an Azure load balancer-backed external entry point.
+
+Using the same probe for every lifecycle stage is fine for a toy demo, but it becomes noisy fast in a real cluster. A short readiness probe tells Kubernetes when the pod can receive traffic, while a slower liveness probe avoids restart loops during cold starts, dependency warm-up, or image pulls.
 
 ---
 
@@ -341,11 +355,11 @@ The example is small, but the main AKS layers are already in play.
 - user node pool placement
 - Service-based exposure
 
-The next post steps back and explains the three workload primitives you just used: Pod, Deployment, and Service.
+The three workload primitives you just used—Pod, Deployment, and Service—are also the place where most first-cluster misunderstandings show up.
 
 ---
 
-This is part 3 of the Azure Kubernetes Service 101 series. The first two posts set the platform boundary and the cluster shape; this one turned that model into a real deployment with a small FastAPI app. Part 4 slows down and explains the exact role of Pod, Deployment, and Service in the manifest you just applied.
+This is part 3 of the Azure Kubernetes Service 101 series. The first two posts set the platform boundary and the cluster shape; this one turned that model into a real deployment with a small FastAPI app. The next step is to unpack the exact role of Pod, Deployment, and Service in the manifest you just applied.
 
 ---
 

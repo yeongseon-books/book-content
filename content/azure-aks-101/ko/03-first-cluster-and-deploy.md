@@ -206,14 +206,25 @@ spec:
           image: <your-registry>/fastapi-hello:latest
           ports:
             - containerPort: 8000
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 12
           readinessProbe:
             httpGet:
               path: /healthz
               port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /healthz
               port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
           resources:
             requests:
               cpu: 100m
@@ -235,11 +246,14 @@ spec:
   type: LoadBalancer
 ```
 
-여기서 오늘 기억할 라인은 세 줄입니다.
+여기서 오늘 기억할 라인은 네 줄입니다.
 
 - `replicas: 2` — 같은 앱 Pod를 두 개 원한다는 선언
 - `nodeSelector` — user node pool에 올리겠다는 의도 표현
+- `startupProbe` — 앱이 처음 뜨는 동안 liveness probe가 성급하게 재시작시키지 않게 하는 안전장치
 - `type: LoadBalancer` — Azure Load Balancer를 붙여 외부 진입점을 만들겠다는 선언
+
+실습 예제라고 해서 probe를 모두 같은 값으로 두면 운영 감각이 흐려집니다. readiness probe는 “이제 트래픽을 받아도 되는가”를 빠르게 판단하고, liveness probe는 시작 지연이나 초기 의존성 연결 때문에 컨테이너를 불필요하게 죽이지 않도록 더 느슨하게 두는 편이 안전합니다.
 
 ---
 
@@ -344,11 +358,11 @@ kubectl describe service fastapi-hello
 - user node pool에 워크로드 배치
 - Service로 외부 노출
 
-다음 화에서는 오늘 쓴 객체 셋 중에서 가장 자주 보게 되는 세 개, Pod·Deployment·Service를 따로 떼어 더 정확하게 설명하겠습니다.
+오늘 쓴 객체 셋 중에서도 Pod·Deployment·Service는 이후 모든 예제의 기본 문법이 됩니다.
 
 ---
 
-이 글은 Azure Kubernetes Service 101 시리즈의 3화입니다. 앞의 두 화에서 AKS와 클러스터 구조를 봤다면, 이번 화는 그 구조 위에 FastAPI 앱을 실제로 올리는 단계였습니다. 다음 4화에서는 오늘 매니페스트에 등장한 Pod, Deployment, Service를 각각 왜 따로 두는지 더 또렷하게 정리합니다.
+이 글은 Azure Kubernetes Service 101 시리즈의 3화입니다. 앞의 두 화에서 AKS와 클러스터 구조를 봤다면, 이번 화는 그 구조 위에 FastAPI 앱을 실제로 올리는 단계였습니다. 이제 남은 일은 오늘 매니페스트에 등장한 Pod, Deployment, Service를 각각 왜 따로 두는지 더 또렷하게 이해하는 것입니다.
 
 ---
 
