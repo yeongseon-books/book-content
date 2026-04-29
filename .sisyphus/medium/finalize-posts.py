@@ -19,7 +19,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+from _catalog import ROOT, is_present, load_catalog
 
 SERIES_TAGS: dict[str, list[str]] = {
     "azure-app-service-101": ["Azure", "App Service", "Cloud", "Web Apps"],
@@ -63,10 +63,11 @@ def read_h1(text: str) -> str | None:
     return None
 
 
-def collect_series(series: str) -> dict[str, dict[int, dict[str, str]]]:
+def collect_series(series_dir: Path) -> dict[str, dict[int, dict[str, str]]]:
     """Return {variant: {idx: {'title':..., 'filename':...}}} for ko/en/medium."""
     result: dict[str, dict[int, dict[str, str]]] = {"ko": {}, "en": {}, "medium": {}}
-    series_dir = ROOT / series
+    if not series_dir.is_dir():
+        return result
     for variant in ("ko", "en", "medium"):
         sub = series_dir / variant
         if not sub.is_dir():
@@ -204,20 +205,25 @@ def collapse_redundant(lines: list[str]) -> list[str]:
 
 
 def main() -> int:
-    totals = {"updated": 0, "unchanged": 0, "no-references-section": 0}
-    for series in sorted(SERIES_TAGS):
-        series_dir = ROOT / series
-        if not series_dir.is_dir():
-            print(f"SKIP missing: {series}")
+    totals = {"updated": 0, "unchanged": 0, "no-references-section": 0, "skipped-medium": 0}
+    catalog = {e.id: e for e in load_catalog()}
+    for series_id in sorted(SERIES_TAGS):
+        entry = catalog.get(series_id)
+        if entry is None:
+            print(f"SKIP not in series.yaml: {series_id}")
             continue
-        print(f"== {series}")
-        catalog = collect_series(series)
-        for variant, entries in catalog.items():
+        if not is_present(entry):
+            print(f"SKIP not on disk: {series_id} ({entry.path.relative_to(ROOT)})")
+            continue
+        series_dir = entry.path
+        print(f"== {series_id} ({series_dir.relative_to(ROOT)})")
+        variants = collect_series(series_dir)
+        for variant, entries in variants.items():
             for idx, info in sorted(entries.items()):
                 path = series_dir / variant / info["filename"]
-                r = process_post(path, series, idx, variant, entries)
+                r = process_post(path, series_id, idx, variant, entries)
                 totals[r] = totals.get(r, 0) + 1
-                if r != "unchanged":
+                if r != "unchanged" and r != "skipped-medium":
                     print(f"  {r:8s} {path.relative_to(ROOT)}")
     print("\nTotals:")
     for k, v in sorted(totals.items()):

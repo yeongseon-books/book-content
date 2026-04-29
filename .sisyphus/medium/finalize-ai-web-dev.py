@@ -23,9 +23,17 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-SERIES = "ai-web-dev-101"
-SERIES_DIR = ROOT / SERIES
+from _catalog import ROOT, is_present, load_catalog
+
+SERIES_ID = "ai-web-dev-101"
+
+
+def resolve_series_dir() -> Path | None:
+    for entry in load_catalog():
+        if entry.id == SERIES_ID:
+            return entry.path if is_present(entry) else None
+    return None
+
 
 SERIES_TAGS = ["AI", "LLM", "웹 개발", "Python", "Tutorial"]
 
@@ -61,17 +69,20 @@ def read_h1(text: str) -> str | None:
     return None
 
 
-def collect_series() -> dict[int, dict[str, str]]:
-    """Return {idx: {'title':..., 'filename':...}} for the series."""
+def collect_series(series_dir: Path) -> tuple[Path, dict[int, dict[str, str]]]:
+    """Return (posts_dir, {idx: {'title','filename'}}). Posts live in series_dir/ko/
+    if that subdir exists (post-Phase-6 layout), otherwise series_dir itself
+    (pre-Phase-6 flat layout)."""
+    posts_dir = series_dir / "ko" if (series_dir / "ko").is_dir() else series_dir
     result: dict[int, dict[str, str]] = {}
-    for md in sorted(SERIES_DIR.glob("*.md")):
+    for md in sorted(posts_dir.glob("*.md")):
         prefix = numeric_prefix(md.name)
         if not prefix:
             continue
         idx = int(prefix)
         title = read_h1(md.read_text(encoding="utf-8")) or md.stem
         result[idx] = {"title": title, "filename": md.name}
-    return result
+    return posts_dir, result
 
 
 def build_toc(entries: dict[int, dict[str, str]], current_idx: int) -> list[str]:
@@ -226,14 +237,15 @@ def process_post(path: Path, idx: int, entries: dict[int, dict[str, str]]) -> st
 
 
 def main() -> int:
-    if not SERIES_DIR.is_dir():
-        print(f"SKIP missing: {SERIES}")
+    series_dir = resolve_series_dir()
+    if series_dir is None:
+        print(f"SKIP missing: {SERIES_ID}")
         return 1
-    entries = collect_series()
-    print(f"== {SERIES} ({len(entries)} posts)")
+    posts_dir, entries = collect_series(series_dir)
+    print(f"== {SERIES_ID} ({posts_dir.relative_to(ROOT)}, {len(entries)} posts)")
     totals = {"updated": 0, "unchanged": 0, "no-references-section": 0}
     for idx, info in sorted(entries.items()):
-        path = SERIES_DIR / info["filename"]
+        path = posts_dir / info["filename"]
         r = process_post(path, idx, entries)
         totals[r] = totals.get(r, 0) + 1
         print(f"  {r:8s} {path.relative_to(ROOT)}")

@@ -12,5 +12,9 @@ Thumbs.db
 *.tmp
 *.bak
 
+# Python
+__pycache__/
+*.pyc
+
 # Reference checkouts (not part of this repo)
 azure-functions-host/

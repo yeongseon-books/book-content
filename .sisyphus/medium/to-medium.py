@@ -22,6 +22,8 @@ REPO = "yeongseon/tech-blog"
 TAG = "e8dca42"
 ROOT = Path(__file__).resolve().parents[2]
 
+from _catalog import is_present, load_catalog
+
 RAW_BASE = f"https://raw.githubusercontent.com/{REPO}/{TAG}"
 BLOB_BASE = f"https://github.com/{REPO}/blob/{TAG}"
 
@@ -245,7 +247,11 @@ def main(argv: list[str]) -> int:
     if len(argv) > 1:
         en_dirs = [Path(p).resolve() for p in argv[1:]]
     else:
-        en_dirs = sorted(ROOT.glob("azure-*/en"))
+        en_dirs = [
+            entry.path / "en"
+            for entry in load_catalog()
+            if is_present(entry) and "en" in entry.languages and (entry.path / "en").is_dir()
+        ]
     total_w, total_s = 0, 0
     for en_dir in en_dirs:
         if not en_dir.is_dir():
