@@ -61,7 +61,7 @@ This is the map for the whole series.
 Every later post expands one box from this picture.
 Get the shape first, then the platform behaviors stop looking like isolated features.
 
-![Container Apps environment architecture](../../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
+![Request path and hidden substrate layers](../../../assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
 The left edge is the user-facing path.
 The middle is the runtime surface you configure as Container Apps.
 The dotted boundary is the Kubernetes layer you do not directly control.
@@ -111,7 +111,7 @@ That is the frame for the rest of the series.
 
 The stack is easier to reason about when split into layers.
 
-![A simpler model: ACA is a product surface over several lower layers](../../../assets/azure-aca-deep-dive/01/01-02-a-simpler-model-aca-is-a-product-surface.en.png)
+![Declared layers and runtime translation path](../../../assets/azure-aca-deep-dive/01/01-02-a-simpler-model-aca-is-a-product-surface.en.png)
 The top layer is what you declare.
 The middle layers are how the declaration becomes runtime behavior.
 The bottom layer is where the actual execution capacity lives.
@@ -144,7 +144,7 @@ That means the Environment is where several platform-wide concerns become real.
 
 This is why an environment choice is architectural, not cosmetic.
 
-![What the Environment really is](../../../assets/azure-aca-deep-dive/01/01-03-what-the-environment-really-is.en.png)
+![Environment-scoped network, logging, and Dapr boundary](../../../assets/azure-aca-deep-dive/01/01-03-what-the-environment-really-is.en.png)
 If two apps must never share those boundaries, they do not belong in the same environment.
 If they should communicate through built-in Dapr service invocation and land in the same telemetry plane, the environment is exactly where you group them.
 
@@ -163,7 +163,7 @@ That revision is immutable.
 
 You can think of the runtime expansion like this:
 
-![What a Container App becomes at runtime](../../../assets/azure-aca-deep-dive/01/01-04-what-a-container-app-becomes-at-runtime.en.png)
+![App-to-revision-to-replica runtime expansion](../../../assets/azure-aca-deep-dive/01/01-04-what-a-container-app-becomes-at-runtime.en.png)
 The user experience says, "I updated my app."
 The runtime reality is closer to, "the platform minted a new immutable revision template, attached traffic and scale policy to it, then ran replicas from that snapshot."
 
@@ -189,7 +189,7 @@ You can:
 
 This is why ACA can do canary and blue-green without making you design that wiring from scratch.
 
-![Revisions are the operational center of gravity](../../../assets/azure-aca-deep-dive/01/01-05-revisions-are-the-operational-center-of.en.png)
+![Revision-centered rollout and scaling control](../../../assets/azure-aca-deep-dive/01/01-05-revisions-are-the-operational-center-of.en.png)
 The important nuance is that traffic policy is app-facing, but scale happens per revision.
 That separation explains a lot of rollout behavior.
 
@@ -218,7 +218,7 @@ For HTTP, ACA exposes a built-in HTTP scaling feature based on request concurren
 That resembles the KEDA HTTP add-on idea, but it is not a promise that ACA literally runs the upstream `kedacore/http-add-on` project one-to-one.
 The product surface is ACA's own.
 
-![Why KEDA matters even if you never see a ScaledObject](../../../assets/azure-aca-deep-dive/01/01-06-why-keda-matters-even-if-you-never-see-a.en.png)
+![ACA scale rules and KEDA translation path](../../../assets/azure-aca-deep-dive/01/01-06-why-keda-matters-even-if-you-never-see-a.en.png)
 Episode 4 opens that black box.
 
 ---
@@ -237,7 +237,7 @@ The most useful way to picture this is simple.
 - ACA documents the Dapr HTTP API on port 3500 and the Dapr gRPC API on port 50001.
 - Components are configured at the environment level, then loaded according to Dapr scopes.
 
-![Dapr in ACA is not a mock integration](../../../assets/azure-aca-deep-dive/01/01-07-dapr-in-aca-is-not-a-mock-integration.en.png)
+![App container with daprd sidecar runtime](../../../assets/azure-aca-deep-dive/01/01-07-dapr-in-aca-is-not-a-mock-integration.en.png)
 That is a real sidecar process, not a control-plane simulation.
 
 Episode 5 traces the injector and the Go runtime process itself.
@@ -257,7 +257,7 @@ The critical detail for this series is how weights are applied.
 In Envoy terminology, a cluster is an upstream service target, not a Kubernetes cluster.
 Traffic splitting across ACA revisions maps most naturally onto weighted upstream cluster selection, which is the best-supported inference rather than an ACA-public implementation guarantee.
 
-![Envoy is where ingress becomes runtime routing](../../../assets/azure-aca-deep-dive/01/01-08-envoy-is-where-ingress-becomes-runtime-r.en.png)
+![Ingress settings to Envoy routing path](../../../assets/azure-aca-deep-dive/01/01-08-envoy-is-where-ingress-becomes-runtime-r.en.png)
 Episode 6 follows this path in full.
 
 ---
@@ -266,7 +266,7 @@ Episode 6 follows this path in full.
 
 This split helps when debugging.
 
-![Control plane versus data plane in ACA](../../../assets/azure-aca-deep-dive/01/01-09-control-plane-versus-data-plane-in-aca.en.png)
+![ACA control plane and data plane split](../../../assets/azure-aca-deep-dive/01/01-09-control-plane-versus-data-plane-in-aca.en.png)
 If a new revision exists but serves no traffic, that is usually a control-plane decision.
 If traffic reaches the revision but fails before the app responds, that is a data-plane path problem.
 If scale rules exist but replicas stay at zero, the boundary is KEDA metrics and activation logic.
