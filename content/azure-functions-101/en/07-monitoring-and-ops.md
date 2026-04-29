@@ -19,9 +19,7 @@ last_reviewed: '2026-04-29'
 
 # Monitoring and Operations Fundamentals
 
-> Azure Functions 101 series (7/7)
-
-Once the app is deployed, the questions change. You stop asking whether the function runs at all and start asking why failure rate jumped, why instance count climbed, whether the bottleneck is downstream, and where cost is leaking. This post covers the screens, metrics, queries, and alert priorities that matter first when you operate Azure Functions.
+Once the app is deployed, the questions change. You stop asking whether the function runs at all and start asking why failure rate jumped, why instance count climbed, whether the bottleneck is downstream, and where cost is leaking. This chapter covers the screens, metrics, queries, and alert priorities that matter first when you operate Azure Functions.
 
 The scope is practical: the baseline observability view, a small KQL toolkit for incident response, the right signals for instance count and cost, and the first alerts worth wiring up.
 
@@ -191,9 +189,9 @@ Failure rate, latency, instance count, and dependency health cover a surprising 
 
 ## Closing the 101 Series
 
-This post closes the Azure Functions 101 series. Taken together, the series moves from the event-driven execution model to triggers and bindings, the host/worker split, plan trade-offs, scaling and cold starts, and finally operations centered on Application Insights. Part 7 is the operational layer that turns the earlier mental model into day-2 practice.
+This chapter closes the Azure Functions 101 series. Taken together, the series moves from the event-driven execution model to triggers and bindings, the host/worker split, plan trade-offs, scaling and cold starts, and finally operations centered on Application Insights. This chapter is the operational layer that turns the earlier mental model into day-2 practice.
 
-If you want to go deeper into the implementation, continue with [Deep Dive Part 5](../../azure-functions-deep-dive/en/05-scaling-internals.md) and [Part 6](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md). The 101 series is about making good engineering decisions quickly; the deep-dive series shows how those behaviors are built inside the host.
+If you want to go deeper into the implementation, continue with [Deep Dive — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md) and [Deep Dive — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md). The 101 series is about making good engineering decisions quickly; the deep-dive series shows how those behaviors are built inside the host.
 
 ---
 
@@ -222,8 +220,8 @@ If you want to go deeper into the implementation, continue with [Deep Dive Part 
 - [Configure monitoring for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/configure-monitoring)
 
 **Related Series**
-- [Azure Functions 101 Part 6 — Scaling and cold starts](./06-scaling-and-cold-start.md)
-- [Azure Functions Deep Dive Part 5 — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md)
-- [Azure Functions Deep Dive Part 6 — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md)
+- [Azure Functions 101 — Scaling and cold starts](./06-scaling-and-cold-start.md)
+- [Azure Functions Deep Dive — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md)
+- [Azure Functions Deep Dive — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md)
 
 Tags: Azure, Azure Functions, Serverless, Cloud

@@ -19,11 +19,9 @@ last_reviewed: '2026-04-29'
 
 # 함수 하나 배포하기 — 로컬에서 Azure까지
 
-> Azure Functions 101 시리즈 (4/7)
+앞선 세 장은 개념을 정리하는 단계였습니다. 여기서는 **로컬에서 함수를 만들고, Azure에 배포하고, 실제 호출 가능한 URL을 받기까지의 가장 짧은 경로**를 끝까지 따라갑니다.
 
-지금까지 세 화는 개념을 정리하는 단계였습니다. 이번 글에서는 **로컬에서 함수를 만들고, Azure에 배포하고, 실제 호출 가능한 URL을 받기까지의 가장 짧은 경로**를 끝까지 따라갑니다.
-
-이 글이 끝나면 다음이 손에 남습니다.
+여기까지 읽고 나면 다음이 손에 남습니다.
 
 - 로컬에서 함수를 실행해 볼 수 있는 환경
 - Azure에 올라간 실제 Function App
@@ -32,7 +30,7 @@ last_reviewed: '2026-04-29'
 
 예제 언어는 Python v2 프로그래밍 모델로 맞춥니다. 흐름 자체는 다른 런타임에서도 거의 같습니다.
 
-또 하나 먼저 짚고 가겠습니다. 이 글의 배포 예제는 **가장 단순한 데모 경로**를 보여 주기 위해 classic Consumption 플랜을 사용합니다. 다만 2025년 기준으로 Consumption은 레거시 플랜이고, **새 서버리스 앱의 기본 선택지는 Flex Consumption**으로 보는 편이 맞습니다. Flex는 5화에서 비교하고, 여기서는 먼저 가장 짧은 배포 흐름을 익힙니다.
+먼저 기준점을 분명히 하겠습니다. 여기서 잡는 기본 배포 경로는 **Flex Consumption**입니다. 현재 Azure 기준에서 새 서버리스 앱의 기본 후보가 여기에 가깝기 때문입니다. classic Consumption도 기존 자산 유지나 아주 단순한 시연에는 여전히 쓸 수 있지만, 첫 배포 예제를 설명할 기본값으로 두기에는 이제 오래된 경로입니다.
 
 ---
 
@@ -46,7 +44,7 @@ last_reviewed: '2026-04-29'
 | **Azure CLI** | Azure 리소스를 명령줄로 생성하고 관리 | OS별 설치 ([공식 문서](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)) |
 | **Python 3.11+** | Worker 런타임 | pyenv, 공식 설치 프로그램 등 |
 
-VS Code의 Azure Functions 확장을 써도 되지만, 이 글은 **CLI만으로** 진행합니다. 한 번 끝까지 직접 해 보면 IDE가 자동화하는 범위가 분명해집니다.
+VS Code의 Azure Functions 확장을 써도 되지만, 여기서는 **CLI만으로** 진행합니다. 한 번 끝까지 직접 해 보면 IDE가 자동화하는 범위가 분명해집니다.
 
 설치가 끝나면 버전을 확인합니다.
 
@@ -135,7 +133,7 @@ curl "http://localhost:7071/api/hello?name=Sisyphus"
 # Hello, Sisyphus!
 ```
 
-이 시점에서 `func start`는 **로컬에 Functions Host를 띄운 상태**입니다. 3화에서 본 Host와 Worker가 실제로 올라오고, 둘 사이에 gRPC 채널이 연결됩니다. 운영과 같은 구조를 노트북에서 그대로 보는 셈입니다.
+이 시점에서 `func start`는 **로컬에 Functions Host를 띄운 상태**입니다. 앞에서 본 Host와 Worker 구조가 실제로 올라오고, 둘 사이에 gRPC 채널이 연결됩니다. 운영과 같은 구조를 노트북에서 그대로 보는 셈입니다.
 
 ---
 
@@ -168,31 +166,37 @@ az storage account create \
     --name $SA --resource-group $RG \
     --location $LOC --sku Standard_LRS
 
-# 3) Function App (classic Consumption, Python 3.11)
-az functionapp create \
-    --name $APP --resource-group $RG \
-    --storage-account $SA \
-    --consumption-plan-location $LOC \
-    --runtime python --runtime-version 3.11 --functions-version 4
-```
-
-마지막 명령이 끝나면 Azure 포털에서 Function App이 보입니다. 아직 코드만 배포하지 않았을 뿐, 실행할 자리까지는 준비된 상태입니다.
-
-`az functionapp create` 옵션은 플랜별로 다릅니다. 여기서 쓴 `--consumption-plan-location`은 classic Consumption용입니다. **Premium**이나 **Dedicated(App Service Plan)** 에서는 미리 만든 App Service Plan을 `--plan`으로 넘기고, **Flex Consumption**은 `--flexconsumption-location`과 `--flexconsumption-runtime`을 쓰는 별도 생성 경로를 사용합니다.
-
-예를 들면 Flex Consumption은 이런 식입니다.
-
-```bash
+# 3) Function App (Flex Consumption, Python 3.11)
 az functionapp create \
     --name $APP --resource-group $RG \
     --storage-account $SA \
     --runtime python --runtime-version 3.11 \
     --functions-version 4 \
     --flexconsumption-location $LOC \
-    --flexconsumption-runtime python
+    --instance-memory 2048 \
+    --maximum-instance-count 100
 ```
 
-실무에서 새 서버리스 앱을 만든다면 Flex Consumption부터 검토하는 편이 맞습니다. 이 글에서는 설명을 단순하게 유지하려고 Consumption을 예제로 썼습니다.
+마지막 명령이 끝나면 Azure 포털에서 Function App이 보입니다. 아직 코드만 배포하지 않았을 뿐, 새 서버리스 앱의 기본 후보에 맞는 실행 자리는 준비된 상태입니다.
+
+`az functionapp create` 옵션은 플랜별로 다릅니다. Flex에서는 `--flexconsumption-location`이 핵심이고, 여기에 런타임·Functions 버전·스토리지 계정·선택적인 용량 상한을 함께 넘깁니다. `--instance-memory 2048`은 Python에서 import 비용과 일반적인 SDK 사용을 감안할 때 무난한 시작점입니다.
+
+이렇게 만들면 새 서버리스 앱이 가장 먼저 검토해야 할 형태로 Azure 쪽 골격이 만들어집니다.
+
+### 레거시 경로 — classic Consumption이 필요할 때만
+
+classic Consumption은 기존 앱을 유지하거나, Windows 중심 레거시 경로를 따라가야 하거나, 오래된 예제를 그대로 재현해야 할 때는 여전히 의미가 있습니다. 그 경우에는 Consumption 전용 위치 옵션으로 생성 경로가 바뀝니다.
+
+```bash
+az functionapp create \
+    --name $APP --resource-group $RG \
+    --storage-account $SA \
+    --consumption-plan-location $LOC \
+    --runtime python --runtime-version 3.11 \
+    --functions-version 4
+```
+
+다만 이 경로는 의도적으로 선택하는 예외여야 합니다. 새 앱이라면 특별한 제약이 없는 한 Flex부터 검토하는 편이 맞습니다.
 
 ---
 
@@ -250,15 +254,15 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 
 ---
 
-## 다음 화에서
+## 배포 다음에 남는 질문
 
-배포까지 끝냈다면 이제 질문은 하나입니다. **어떤 플랜에서 돌릴 것인가**입니다. 다음 글에서는 Consumption, Flex Consumption, Premium, Dedicated의 차이를 실제 선택 기준 중심으로 정리합니다.
+배포까지 끝냈다면 이제 질문은 하나입니다. **이 워크로드를 어떤 플랜에 두는 것이 맞는가**입니다. 이어지는 플랜 선택 장에서는 Flex Consumption, classic Consumption, Premium, Dedicated의 차이를 실제 선택 기준 중심으로 정리합니다.
 
 ---
 
 ## 시리즈 맥락
 
-이 글은 Azure Functions 101의 4화입니다. 앞선 세 글에서 트리거와 바인딩, Host와 Worker 구조를 정리했다면, 이번 글은 그 개념을 실제 배포 흐름으로 연결하는 자리입니다. 다음 5화와 6화에서는 플랜 선택, 스케일링, 콜드 스타트처럼 운영 판단에 직접 영향을 주는 주제로 넘어갑니다.
+앞선 장에서 트리거와 바인딩, Host와 Worker 구조를 정리했다면, 여기서는 그 개념을 실제 배포 흐름으로 연결하는 자리입니다. 이어지는 장에서는 플랜 선택, 스케일링, 콜드 스타트처럼 운영 판단에 직접 영향을 주는 주제로 넘어갑니다.
 
 ---
 

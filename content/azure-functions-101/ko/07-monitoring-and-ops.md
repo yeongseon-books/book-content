@@ -19,11 +19,9 @@ last_reviewed: '2026-04-29'
 
 # 모니터링과 운영 기초
 
-> Azure Functions 101 시리즈 (7/7)
+함수 앱을 배포한 뒤부터는 질문이 달라집니다. 함수가 실행되느냐보다, 지금 실패율이 튀는지, 인스턴스 수가 왜 늘었는지, 외부 의존성이 병목인지, 비용이 어느 지점에서 새고 있는지를 계속 확인해야 합니다. 이 장은 Azure Functions를 운영할 때 가장 먼저 붙잡아야 할 화면, 메트릭, 쿼리, 알람 기준을 정리합니다.
 
-함수 앱을 배포한 뒤부터는 질문이 달라집니다. 함수가 실행되느냐보다, 지금 실패율이 튀는지, 인스턴스 수가 왜 늘었는지, 외부 의존성이 병목인지, 비용이 어느 지점에서 새고 있는지를 계속 확인해야 합니다. 이 글은 Azure Functions를 운영할 때 가장 먼저 붙잡아야 할 화면, 메트릭, 쿼리, 알람 기준을 정리합니다.
-
-이 글에서 다루는 범위는 네 가지입니다. 호출 수와 실패율을 보는 기본 화면, KQL로 장애 원인을 좁히는 최소 쿼리, 인스턴스 수와 비용 신호를 읽는 방법, 그리고 알람을 어디부터 거는지가 중심입니다.
+여기서 다루는 범위는 네 가지입니다. 호출 수와 실패율을 보는 기본 화면, KQL로 장애 원인을 좁히는 최소 쿼리, 인스턴스 수와 비용 신호를 읽는 방법, 그리고 알람을 어디부터 거는지가 중심입니다.
 
 ---
 
@@ -191,9 +189,9 @@ az monitor app-insights events show \
 
 ## 시리즈를 마무리하며
 
-Azure Functions 101 시리즈는 여기서 끝납니다. 이 시리즈 전체를 한 줄씩 다시 접으면, 이벤트가 함수를 깨우는 실행 모델, 트리거와 바인딩의 입출력 구조, Host와 Worker의 분리, 플랜 선택의 trade-off, 그리고 Application Insights 중심 운영으로 이어집니다. 지금 읽은 7화는 그중 마지막 단계인 운영 판단 기준을 정리하는 글입니다.
+Azure Functions 101 시리즈는 여기서 끝납니다. 이 시리즈 전체를 한 줄씩 다시 접으면, 이벤트가 함수를 깨우는 실행 모델, 트리거와 바인딩의 입출력 구조, Host와 Worker의 분리, 플랜 선택의 trade-off, 그리고 Application Insights 중심 운영으로 이어집니다. 지금 읽은 이 장은 그중 마지막 단계인 운영 판단 기준을 정리하는 글입니다.
 
-내부 구현이 더 궁금하면 [Azure Functions Deep Dive 5화](../../azure-functions-deep-dive/ko/05-scaling-internals.md)와 [6화](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)를 이어서 보면 좋습니다. 101 시리즈가 실무 감각을 잡는 데 초점을 맞췄다면, 심화편은 Host 코드와 논문을 바탕으로 내부 동작을 해부합니다.
+내부 구현이 더 궁금하면 [Azure Functions Deep Dive — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)과 [Azure Functions Deep Dive — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)를 이어서 보면 좋습니다. 101 시리즈가 실무 감각을 잡는 데 초점을 맞췄다면, 심화편은 Host 코드와 논문을 바탕으로 내부 동작을 해부합니다.
 
 ---
 
@@ -222,8 +220,8 @@ Azure Functions 101 시리즈는 여기서 끝납니다. 이 시리즈 전체를
 - [Configure monitoring for Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/configure-monitoring)
 
 **관련 시리즈**
-- [Azure Functions 101 6화 — 스케일링과 콜드 스타트](./06-scaling-and-cold-start.md)
-- [Azure Functions Deep Dive 5화 — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
-- [Azure Functions Deep Dive 6화 — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)
+- [Azure Functions 101 — 스케일링과 콜드 스타트](./06-scaling-and-cold-start.md)
+- [Azure Functions Deep Dive — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
+- [Azure Functions Deep Dive — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)
 
 Tags: Azure, Azure Functions, Serverless, Cloud

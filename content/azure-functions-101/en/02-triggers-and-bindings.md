@@ -19,11 +19,9 @@ last_reviewed: '2026-04-29'
 
 # Triggers and Bindings — Everything About Function I/O
 
-> Azure Functions 101 series (2/7)
+The opening mental model established two key ideas: every function is wired to exactly one trigger, and bindings are a declarative way to connect inputs and outputs. Those two ideas are why Functions code can be so short. But for newcomers, the line between “what’s a trigger,” “what’s a binding,” and “where exactly does the magic start and end” tends to stay blurry.
 
-In part 1, I said “every function is wired to exactly one trigger,” and “bindings are a declarative way to connect inputs and outputs.” Those two sentences are why Functions code can be so short. But for newcomers, the line between “what’s a trigger,” “what’s a binding,” and “where exactly does the magic start and end” tends to stay blurry.
-
-This post draws that line clearly. We’ll cover the main trigger types, the difference between input and output bindings, and what bindings really are once you strip away the “magic.” By the end, picking a trigger for a new function should feel mechanical.
+This chapter draws that line clearly. We’ll cover the main trigger types, the difference between input and output bindings, and what bindings really are once you strip away the “magic.” By the end, picking a trigger for a new function should feel mechanical.
 
 ---
 
@@ -157,19 +155,19 @@ These five alone cover roughly 80% of the functions you’ll write while getting
 The function body can succeed while the output binding fails to write to the DB. In that case the function is logged as failed, and depending on the trigger’s retry policy it gets re-invoked. So you need to care about **idempotency**: processing the same message twice should produce the same result.
 
 **2) A binding’s `connection` is a *config key name*, not a literal connection string.**
-When you write `connection: 'StorageConnection'`, it means “use the value of the `StorageConnection` environment variable as the connection string.” You don’t hardcode connection strings in code. In production this gets swapped out for Key Vault or Managed Identity (more in the operations posts starting from part 5).
+When you write `connection: 'StorageConnection'`, it means “use the value of the `StorageConnection` environment variable as the connection string.” You don’t hardcode connection strings in code. In production this gets swapped out for Key Vault or Managed Identity, which the operations chapters revisit from an operator’s point of view.
 
 ---
 
-## Coming up next
+## Why this boundary matters
 
-So far we’ve covered the *outer interface* of a function: how triggers wake it up and how bindings declaratively handle I/O. Next time we go one layer deeper: **“So who actually runs the function code, how, and inside which process?”**
+So far we’ve covered the *outer interface* of a function: how triggers wake it up and how bindings declaratively handle I/O. The next architectural boundary to understand is **who actually runs the function code, how, and inside which process**.
 
 The answer is two words: **Host and Worker**. That’s where Functions’ support for Node.js, Python, Java, and .NET starts to make sense.
 
 ---
 
-This is part 2 of the Azure Functions 101 series. Part 1 established the mental model; this post defines the trigger and binding surface you work with every day. Part 3 then moves under the covers and explains the Host/Worker execution model.
+The mental model from the opening chapter becomes much more concrete once you see how triggers and bindings shape the surface area you work with every day. From there, the Host/Worker chapter explains what sits underneath that surface.
 
 ---
 

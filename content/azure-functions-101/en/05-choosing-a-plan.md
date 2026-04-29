@@ -19,11 +19,9 @@ last_reviewed: '2026-04-29'
 
 # Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
 
-> Azure Functions 101 series (5/7)
+The deployment chapter created the app on Flex Consumption because that is the current default candidate for new serverless work. Classic Consumption still matters historically and operationally, but in current Microsoft Learn guidance **it is a legacy plan**, while **Flex Consumption is the default serverless recommendation for new apps**.
 
-Part 4 deployed a function on the classic Consumption plan. That is still the shortest path for a demo. In current Microsoft Learn guidance, though, **classic Consumption is now a legacy plan**, and **Flex Consumption is the default serverless recommendation for new apps**.
-
-That does not make Consumption irrelevant. You still need to understand all four hosting models to make a sound decision. This post covers **Consumption / Flex Consumption / Premium / Dedicated (App Service Plan)** side by side, with the current caveats left intact.
+That does not make Consumption irrelevant. You still need to understand all four hosting models to make a sound decision. This chapter covers **Consumption / Flex Consumption / Premium / Dedicated (App Service Plan)** side by side, with the current caveats left intact.
 
 The goal is simple: **understand what each plan gives you, what it constrains, and which one fits your workload**.
 
@@ -91,7 +89,7 @@ Consumption is still easy to explain. No traffic means no bill, and the setup pa
 - Long-term risk from being a legacy plan
 - Linux Consumption is already retired or retiring, so it is not a stable target for new architecture decisions
 
-That is why Part 4 used Consumption for deployment, but only as **the smallest demo path**. For a fresh production design, the case for starting here is much weaker than it used to be.
+That is why the deployment chapter treated Consumption only as a legacy path note. For a fresh production design, the case for starting here is much weaker than it used to be.
 
 ---
 
@@ -184,15 +182,15 @@ One more qualifier matters. Flex Consumption is strong, but **Blob triggers requ
 
 ---
 
-## Next up
+## Where this leads operationally
 
-Once the plan is chosen, the next question follows naturally: **how do instances actually scale, and why is the first call slower?** Part 6 walks through event-driven scaling, target-based scaling, and cold starts in one model.
+Once the plan is chosen, the next question follows naturally: **how do instances actually scale, and why is the first call slower?** The scaling chapter walks through event-driven scaling, target-based scaling, and cold starts in one model.
 
 ---
 
 ## Series context
 
-This is Part 5 of Azure Functions 101. Part 4 showed the deployment path end to end; this post decides what hosting target that deployment should land on. Part 6 picks up from here and explains how those plan choices turn into real scaling behavior and cold-start trade-offs.
+The deployment chapter showed the path end to end; this chapter decides what hosting target that deployment should land on. The scaling chapter picks up from here and explains how those plan choices turn into real scaling behavior and cold-start trade-offs.
 
 ---
 
