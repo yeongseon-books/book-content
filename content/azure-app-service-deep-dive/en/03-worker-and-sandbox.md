@@ -23,7 +23,7 @@ All of those symptoms start here.
 
 ## The two worker models that matter
 
-![The two worker models that matter](../../assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
+![The two worker models that matter](../../../assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
 “Worker” is one platform term.
 The execution boundary under it differs by OS and hosting mode.
 
@@ -51,7 +51,7 @@ The public sandbox material is especially explicit about two constraints.
   which means most User32/GDI32 calls,
   are heavily restricted
 
-![Windows: `w3wp.exe` under the App Service sandbox](../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
+![Windows: `w3wp.exe` under the App Service sandbox](../../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
 That single diagram explains the starting point for “why does this PDF or imaging library fail only on Windows App Service?”
 
 ---
@@ -98,7 +98,7 @@ the operational boundary to care about is this one:
 - readiness affects when traffic starts
 - persistent storage depends on `/home` mount behavior
 
-![Linux: the container is the execution boundary](../../assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png)
+![Linux: the container is the execution boundary](../../../assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png)
 On Linux,
 you should not talk about the exact same registry or GDI restrictions as Windows.
 The public docs do not frame it that way.
@@ -119,8 +119,8 @@ one setting changes the meaning of `/home` dramatically.
 
 That gives you two very different operational pictures.
 
-![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
-![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
+![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
+![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
 If you miss this distinction,
 you eventually see one of the usual surprises.
 
@@ -163,7 +163,7 @@ the sandbox is also a quality-of-service mechanism.
 Multiple customer apps share worker infrastructure.
 The platform needs limits so that one app cannot consume or expose shared components in ways that harm others.
 
-![The sandbox is a security feature and a fairness feature](../../assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png)
+![The sandbox is a security feature and a fairness feature](../../../assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png)
 That makes the restrictions easier to reason about.
 
 - registry writes blocked

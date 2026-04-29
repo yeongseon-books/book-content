@@ -15,7 +15,7 @@ or the new process or container has not finished becoming traffic-eligible.
 
 ## The cold path and the warm path
 
-![The cold path and the warm path](../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
+![The cold path and the warm path](../../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
 That one diagram is the whole story.
 The cost the user feels on the first request is usually the cost of turning an execution unit from “not ready” into “ready.”
 
@@ -37,7 +37,7 @@ The mechanisms are not.
 - the platform can repeatedly call `WEBSITE_WARMUP_PATH`
 - startup timeout is shaped by `WEBSITES_CONTAINER_START_TIME_LIMIT`
 
-![Linux apps](../../assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png)
+![Linux apps](../../../assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png)
 You need that split in your head before you design a warm-up strategy.
 
 ---
@@ -54,7 +54,7 @@ that means:
 - app-pool unload or equivalent idle behavior becomes less visible
 - worst-case first-request latency often improves
 
-![What Always On really does](../../assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png)
+![What Always On really does](../../../assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png)
 Always On does not erase all startup cost.
 Redeployments,
 restarts,
@@ -75,7 +75,7 @@ Examples include:
 
 That is where IIS `applicationInitialization` matters.
 
-![When Windows needs `applicationInitialization`](../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
+![When Windows needs `applicationInitialization`](../../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
 Endpoint design matters here.
 Return success too early and incomplete instances start receiving traffic.
 Make the endpoint too heavy and warm-up itself becomes a bottleneck.
@@ -91,7 +91,7 @@ The App Service app-settings reference gives the critical Linux startup contract
 - `WEBSITE_WARMUP_STATUSES` can narrow accepted status codes
 - `WEBSITES_CONTAINER_START_TIME_LIMIT` bounds how long the platform waits
 
-![Linux warm-up path and startup timeout](../../assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png)
+![Linux warm-up path and startup timeout](../../../assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png)
 That model creates two very common Linux mistakes.
 
 1. the app is not ready, but a permissive response still gets treated as readiness
@@ -110,7 +110,7 @@ The first-request cost is usually a stack of smaller costs.
 - cache, module import, or JIT work
 - health and warm-up eligibility gates
 
-![What makes cold start expensive](../../assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png)
+![What makes cold start expensive](../../../assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png)
 That is why cold-start reduction is rarely a single magic setting.
 It is an app-platform contract problem.
 
@@ -141,7 +141,7 @@ you usually get one of two bad outcomes.
 
 Slots let the platform pay the cold-start cost off the production URL.
 
-![Why deployment slots help so much](../../assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png)
+![Why deployment slots help so much](../../../assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png)
 That is the value proposition in one line.
 If staging workers have already booted and passed warm-up,
 production users are much less likely to experience that startup cost directly.
@@ -159,7 +159,7 @@ They do not do the same work.
 - **warm-up path**: decide readiness during startup
 - **health check**: decide whether the instance should keep receiving traffic
 
-![Always On, warm-up, and health are not the same thing](../../assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png)
+![Always On, warm-up, and health are not the same thing](../../../assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png)
 If you blur them together,
 the settings may be enabled while the behavior still looks wrong.
 That is where questions like “Always On is enabled, so why is deployment still slow?” come from.

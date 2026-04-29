@@ -1,0 +1,36 @@
+id: azure-app-service-deep-dive
+category: azure
+title:
+  ko: Azure App Service Deep Dive
+  en: Azure App Service Deep Dive
+description:
+  ko: App Service 내부 — Front-End, Worker, Sandbox, Kudu, Scaling.
+  en: Inside App Service — Front-End, Worker, Sandbox, Kudu, Scaling.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+articles:
+- idx: 1
+  slug: 01-platform-architecture
+  status: ready
+- idx: 2
+  slug: 02-front-end-and-arr
+  status: ready
+- idx: 3
+  slug: 03-worker-and-sandbox
+  status: ready
+- idx: 4
+  slug: 04-deployment-and-kudu
+  status: ready
+- idx: 5
+  slug: 05-scaling-internals
+  status: ready
+- idx: 6
+  slug: 06-cold-start-and-warmup
+  status: ready

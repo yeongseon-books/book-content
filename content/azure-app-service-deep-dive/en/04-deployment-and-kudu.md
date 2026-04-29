@@ -19,7 +19,7 @@ This post follows that path end to end.
 
 ## The deployment pipeline in one picture
 
-![Deployment pipeline](../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
+![Deployment pipeline](../../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
 Read deployment incidents through these four stages.
 
 1. artifact upload failed
@@ -62,7 +62,7 @@ It accepts a zip artifact,
 turns it into deployment metadata,
 and feeds it into the deployment flow.
 
-![What ZipDeploy actually means](../../assets/azure-app-service-deep-dive/04/04-02-what-zipdeploy-actually-means.en.png)
+![What ZipDeploy actually means](../../../assets/azure-app-service-deep-dive/04/04-02-what-zipdeploy-actually-means.en.png)
 ZipDeploy is not always the same as “unzip and run.”
 Build automation,
 startup behavior,
@@ -104,7 +104,7 @@ that means:
 - Oryx installs dependencies and builds artifacts
 - Oryx can also generate runtime startup behavior
 
-![Where Oryx enters for Linux code apps](../../assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.en.png)
+![Where Oryx enters for Linux code apps](../../../assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.en.png)
 That is why “deployment succeeded but startup failed” on Linux App Service is often a joint Kudu-plus-Oryx problem rather than a pure Kudu problem.
 
 ---
@@ -132,7 +132,7 @@ The run-from-package documentation states the critical fact very clearly.
 
 **The ZIP contents are not copied into `wwwroot`; the ZIP package itself is mounted as the read-only `wwwroot`.**
 
-![Run-from-package turns `wwwroot` into a mounted package](../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.en.png)
+![Run-from-package turns `wwwroot` into a mounted package](../../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.en.png)
 The benefits are real.
 
 - fewer file-lock conflicts
@@ -151,7 +151,7 @@ But the meaning of the runtime filesystem changes.
 
 Slots keep deployment off the production URL until the new version is already running.
 
-![Why slot deployment feels safer](../../assets/azure-app-service-deep-dive/04/04-05-why-slot-deployment-feels-safer.en.png)
+![Why slot deployment feels safer](../../../assets/azure-app-service-deep-dive/04/04-05-why-slot-deployment-feels-safer.en.png)
 The key is routing,
 not just file copy.
 If the new code is already running on staging workers,
