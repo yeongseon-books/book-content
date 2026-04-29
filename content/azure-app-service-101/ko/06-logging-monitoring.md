@@ -36,7 +36,7 @@ last_reviewed: '2026-04-29'
 
 문제를 풀기 전에 로그의 목적지를 먼저 이해해야 합니다. 같은 `logger.info()`라도 **어디에 남느냐에 따라 쓸모가 완전히 달라지기 때문**입니다.
 
-![로그 흐름 아키텍처](../../../assets/azure-app-service-101/06/01-log-flow-architecture.ko.png)
+![앱 로그가 파일과 모니터링으로 가는 흐름](../../../assets/azure-app-service-101/06/01-log-flow-architecture.ko.png)
 
 App Service에서 가장 먼저 기억할 포인트는 다음입니다.
 
@@ -64,7 +64,7 @@ App Service에서 가장 먼저 기억할 포인트는 다음입니다.
 
 대부분의 팀은 처음부터 완성형 observability를 갖추지 못합니다. 보통 아래 단계로 올라갑니다.
 
-![관측 성숙도 단계](../../../assets/azure-app-service-101/06/02-observability-maturity.ko.png)
+![로그에서 추적까지 올라가는 관측 단계](../../../assets/azure-app-service-101/06/02-observability-maturity.ko.png)
 
 이 글도 그 순서대로 갑니다.
 
@@ -260,7 +260,7 @@ logger.info(
 
 이 질문에 답하는 핵심이 **Correlation ID**입니다.
 
-![Correlation ID 흐름](../../../assets/azure-app-service-101/06/03-correlation-id-flow.ko.png)
+![한 요청에 Correlation ID가 이어지는 흐름](../../../assets/azure-app-service-101/06/03-correlation-id-flow.ko.png)
 
 요청이 들어올 때 ID를 하나 만들고, 그 ID를 **모든 로그에 붙이고**, 응답 헤더로도 돌려주면 다음이 가능해집니다.
 

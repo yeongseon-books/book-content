@@ -35,7 +35,7 @@ Client → DNS → Azure Load Balancer → App Service Frontend → Worker Insta
 
 Issues can occur at each stage, resulting in different error messages.
 
-![End-to-end request lifecycle through App Service](../../../assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
+![Request path from client to app](../../../assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
 
 ---
 
@@ -76,7 +76,7 @@ The App Service Frontend performs these roles:
 | Access Restriction Evaluation | IP restrictions, auth checks |
 | Instance Selection | Routes to healthy Worker |
 
-![Front-end routing decision flow](../../../assets/azure-app-service-101/02/02-frontend-routing-decision.en.png)
+![Frontend routing and rejection checks](../../../assets/azure-app-service-101/02/02-frontend-routing-decision.en.png)
 
 ### When the frontend is the failure point
 
@@ -245,7 +245,7 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 | Unhealthy | Removed from the routing pool |
 | Recovering | Re-included after probes pass |
 
-![Health check state machine](../../../assets/azure-app-service-101/02/03-health-check-state-machine.en.png)
+![Instance state changes from health checks](../../../assets/azure-app-service-101/02/03-health-check-state-machine.en.png)
 
 ### Health Probe Design Principles
 
@@ -319,7 +319,7 @@ az webapp log tail \
 
 ## Common Failure Patterns
 
-![Mapping error codes to failure layers](../../../assets/azure-app-service-101/02/04-failure-pattern-map.en.png)
+![Status codes mapped to failure layers](../../../assets/azure-app-service-101/02/04-failure-pattern-map.en.png)
 
 | Symptom | Suspected Layer | First Check |
 |---------|----------------|-------------|

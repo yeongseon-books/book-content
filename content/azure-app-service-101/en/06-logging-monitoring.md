@@ -29,7 +29,7 @@ To answer these questions, **logging and monitoring** are essential. In this pos
 
 Understanding the log flow in App Service is the first step.
 
-![Log flow architecture](../../../assets/azure-app-service-101/06/01-log-flow-architecture.en.png)
+![App logs flowing to files and monitoring](../../../assets/azure-app-service-101/06/01-log-flow-architecture.en.png)
 
 ```
 Flask App (logger.info) → stdout/stderr → App Service Runtime
@@ -46,7 +46,7 @@ Flask App (logger.info) → stdout/stderr → App Service Runtime
 | `/home/LogFiles/Application/` | Max 100MB/7 days | Short-term log archive |
 | Application Insights | 90 days default | Long-term analysis, alerts, KQL |
 
-![Observability maturity stages](../../../assets/azure-app-service-101/06/02-observability-maturity.en.png)
+![Observability stages from logs to tracing](../../../assets/azure-app-service-101/06/02-observability-maturity.en.png)
 
 ---
 
@@ -178,7 +178,7 @@ logger.info("Order created", extra={"custom_dimensions": {
 
 To link all logs from a single request, you need a **Correlation ID**.
 
-![Correlation ID propagation](../../../assets/azure-app-service-101/06/03-correlation-id-flow.en.png)
+![Correlation ID across a single request](../../../assets/azure-app-service-101/06/03-correlation-id-flow.en.png)
 
 ### Middleware Implementation
 

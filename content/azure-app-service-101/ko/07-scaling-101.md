@@ -48,7 +48,7 @@ App Service에서 확장은 크게 두 방향으로 나뉩니다.
 | **Scale Up** | 더 큰 SKU, 더 큰 인스턴스로 변경 | 메모리 부족, 인스턴스당 CPU 부족, 상위 플랜 기능 필요 | 인스턴스당 비용 증가 |
 | **Scale Out** | 인스턴스 개수 증가 | 동시 요청 증가, 처리량 부족, 가용성 향상 | 인스턴스 수 증가 |
 
-![Scale Up vs Scale Out 비교](../../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.ko.png)
+![인스턴스 크기 확장과 수평 확장의 차이](../../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.ko.png)
 
 둘 다 “리소스를 더 준다”는 점은 같지만, 적용 방식은 완전히 다릅니다.
 
@@ -81,7 +81,7 @@ App Service에서 확장은 크게 두 방향으로 나뉩니다.
 
 현실에서는 “메모리도 부족하고 트래픽도 늘었다”가 더 흔합니다. 이때는 보통 **Scale Up으로 인스턴스당 여유를 확보한 뒤, Scale Out으로 처리량을 받치는 순서**가 안정적입니다. 작은 인스턴스를 무한히 복제해도, 각 인스턴스가 이미 비좁다면 전체 구조가 불안정해지기 쉽습니다.
 
-![스케일링 의사결정 트리](../../../assets/azure-app-service-101/07/04-scaling-decision-tree.ko.png)
+![병목 유형에 따른 스케일링 선택 흐름](../../../assets/azure-app-service-101/07/04-scaling-decision-tree.ko.png)
 
 ---
 
@@ -209,7 +209,7 @@ Autoscale은 훌륭한 기능이지만, **사후 반응형**입니다. 메트릭
 
 웹 인스턴스를 2개에서 8개로 늘리는 일은 쉬울 수 있습니다. 하지만 DB, Redis, 외부 결제 API는 같은 속도로 늘어나지 않습니다. 이때 흔히 생기는 문제가 “앱은 더 많아졌는데, 오히려 전체 장애가 빨라졌다”는 상황입니다.
 
-![의존성 부하 전이 다이어그램](../../../assets/azure-app-service-101/07/03-dependency-cascade.ko.png)
+![인스턴스 증가가 의존성 부하로 번지는 흐름](../../../assets/azure-app-service-101/07/03-dependency-cascade.ko.png)
 
 예를 들어 인스턴스당 DB 연결 풀을 20개로 잡아 두었다면,
 
@@ -238,7 +238,7 @@ Autoscale은 훌륭한 기능이지만, **사후 반응형**입니다. 메트릭
 
 Autoscale은 App Service Plan의 메트릭을 기준으로 **자동으로 인스턴스 수를 늘리고 줄이는 메커니즘**입니다. 아주 유용하지만, 이것만 켜 두면 운영이 끝난다고 생각하면 위험합니다.
 
-![Autoscale 피드백 루프](../../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.ko.png)
+![메트릭 기반 Autoscale 판단과 조정 흐름](../../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.ko.png)
 
 Autoscale이 잘하는 일은 분명합니다.
 

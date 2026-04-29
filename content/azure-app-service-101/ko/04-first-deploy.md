@@ -472,7 +472,7 @@ curl "$APP_URL/health"
 
 첫 배포에서 가장 자주 만나는 에러는 `502 Bad Gateway`입니다. 겁먹을 필요는 없습니다. 대부분 원인이 몇 가지로 좁혀집니다.
 
-![502 오류를 좁혀 가는 문제 해결 흐름도](../../../assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
+![502 원인을 단계별로 좁혀 가는 흐름](../../../assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
 
 아래 순서로 보면 거의 항상 실마리가 잡힙니다.
 

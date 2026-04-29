@@ -352,7 +352,7 @@ https://<app-name>.scm.azurewebsites.net
 
 ### 502 Bad Gateway
 
-![Narrowing down a 502 error](../../../assets/azure-app-service-101/04/03-troubleshooting-502.en.png)
+![Stepwise path to isolate 502 causes](../../../assets/azure-app-service-101/04/03-troubleshooting-502.en.png)
 
 | Cause | Solution |
 |-------|----------|
