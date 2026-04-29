@@ -47,7 +47,7 @@ last_reviewed: '2026-04-29'
 
 코드를 보기 전에 한 장의 그림으로 정리하겠습니다.
 
-![큰 그림 — 스케일링은 어디에서 결정되는가](../../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
+![외부 스케일아웃과 내부 워커 확장 경계](../../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
 눈여겨볼 점은 두 개의 다른 결정이 서로 다른 곳에서 일어난다는 것입니다.
 
 | 결정 | 결정자 | 신호 | 결과 |
@@ -166,7 +166,7 @@ health ping이 호스트의 "지금 더 받을 수 있냐"라면, **ScaleMonitor
 
 이 두 개념은 코드는 SDK에 있지만 호스트 입장에서 어떻게 흘러가는지는 명확합니다.
 
-![ScaleMonitor와 TargetScaler — 트리거가 직접 측정하는 신호](../../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
+![트리거 메트릭이 스케일 결정에 닿는 경로](../../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
 두 가지 모드가 있고, 각각 다른 시기에 도입됐습니다.
 
 ### Incremental scaling (`IScaleMonitor`)
@@ -237,7 +237,7 @@ OOP 워커(Python·Node·Java)에서 한 워커는 보통 단일 프로세스라
 
 호스트 코드는 어디서 돌든 똑같습니다. 위에 본 `HostPerformanceManager.cs`도, `TableStorageScaleMetricsRepository.cs`도, `WorkerConcurrencyManager.cs`도 모두 한 코드베이스입니다. 다른 건 **누가 이 코드 바깥에서 결정을 내리느냐**입니다.
 
-![플랜별 차이 — 같은 코드, 다른 동작](../../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
+![플랜별 결정 주체와 실행 차이](../../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
 플랜별로 한 줄씩 정리하면:
 
 ### Consumption
