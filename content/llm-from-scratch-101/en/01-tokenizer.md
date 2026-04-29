@@ -49,7 +49,12 @@ chars = sorted(set(text))
 stoi = {ch: i for i, ch in enumerate(chars)}
 itos = {i: ch for ch, i in stoi.items()}
 
-encode = lambda s: [stoi[c] for c in s]
+def encode(s: str) -> list[int]:
+    dropped = sorted({c for c in s if c not in stoi})
+    if dropped:
+        print(f"dropped unsupported characters: {dropped}")
+    return [stoi[c] for c in s if c in stoi]
+
 decode = lambda ids: "".join(itos[i] for i in ids)
 
 ids = encode(text)
@@ -57,7 +62,7 @@ print(ids)
 print(decode(ids))
 ```
 
-Running this code gives you an immediate sense of how text moves back and forth between characters and numbers without losing any information. This simplicity is quite valuable when you're just starting out.
+Running this code gives you an immediate sense of how text moves back and forth between characters and numbers. One caveat is that a char-level tokenizer can only encode characters already present in its vocabulary, so unsupported input is dropped with a warning.
 
 ## Word-Level vs. Subword: The Trade-off
 
@@ -127,7 +132,10 @@ stoi = {ch: i for i, ch in enumerate(chars)}
 itos = {i: ch for ch, i in stoi.items()}
 
 def encode(s: str) -> list[int]:
-    return [stoi[c] for c in s]
+    dropped = sorted({c for c in s if c not in stoi})
+    if dropped:
+        print(f"dropped unsupported characters: {dropped}")
+    return [stoi[c] for c in s if c in stoi]
 
 def decode(ids: list[int]) -> str:
     return "".join(itos[i] for i in ids)

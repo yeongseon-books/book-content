@@ -49,7 +49,12 @@ chars = sorted(set(text))
 stoi = {ch: i for i, ch in enumerate(chars)}
 itos = {i: ch for ch, i in stoi.items()}
 
-encode = lambda s: [stoi[c] for c in s]
+def encode(s: str) -> list[int]:
+    dropped = sorted({c for c in s if c not in stoi})
+    if dropped:
+        print(f"지원하지 않는 문자를 건너뜁니다: {dropped}")
+    return [stoi[c] for c in s if c in stoi]
+
 decode = lambda ids: "".join(itos[i] for i in ids)
 
 ids = encode(text)
@@ -57,7 +62,7 @@ print(ids)
 print(decode(ids))
 ```
 
-한 번 돌려 보면 "문자를 잃지 않고 숫자로 왕복한다"는 감각이 바로 옵니다. 처음에는 이 단순함이 꽤 소중합니다.
+한 번 돌려 보면 문자열이 숫자 시퀀스로 바뀌는 감각이 바로 옵니다. 다만 char-level 토크나이저는 자기 vocab에 있는 문자만 다룰 수 있어서, 처음 보는 문자는 경고를 찍고 건너뜁니다.
 
 ## 단어 단위 vs 서브워드 — 트레이드오프 한 장
 
@@ -127,7 +132,10 @@ stoi = {ch: i for i, ch in enumerate(chars)}
 itos = {i: ch for ch, i in stoi.items()}
 
 def encode(s: str) -> list[int]:
-    return [stoi[c] for c in s]
+    dropped = sorted({c for c in s if c not in stoi})
+    if dropped:
+        print(f"지원하지 않는 문자를 건너뜁니다: {dropped}")
+    return [stoi[c] for c in s if c in stoi]
 
 def decode(ids: list[int]) -> str:
     return "".join(itos[i] for i in ids)

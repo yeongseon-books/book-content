@@ -89,7 +89,7 @@ class Block(nn.Module):
         return x
 ```
 
-The logic is straightforward: normalize, run attention, and add to the original. Normalize again, run the MLP, and add again. That is the entirety of a single block's responsibility.
+The logic is straightforward: normalize, run attention, and add to the original. Normalize again, run the MLP, and add again. Because `CausalSelfAttention.forward()` now returns only the residual-stream tensor, the residual addition stays shape-consistent all the way through.
 
 ## Stacking Blocks N Times
 

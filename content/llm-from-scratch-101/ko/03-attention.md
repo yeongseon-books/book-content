@@ -146,17 +146,18 @@ class CausalSelfAttention(nn.Module):
         out = wei @ v
         out = out.transpose(1, 2).contiguous().view(b, t, c)
         out = self.proj(out)
-        return out, wei
+        self.last_attn = wei
+        return out
 
 config = GPTConfig()
 attn = CausalSelfAttention(config)
 x = torch.randn(2, 8, config.n_embd)
-out, wei = attn(x)
+out = attn(x)
 print(out.shape)
-print(wei.shape)
+print(attn.last_attn.shape)
 ```
 
-반환값 모양은 각각 `(2, 8, 128)`과 `(2, 4, 8, 8)`입니다. 헤드 4개가 각자 8개 토큰을 보는 그림이 그대로 나옵니다.
+출력 모양은 `(2, 8, 128)`입니다. 가중치를 보고 싶다면 `attn.last_attn`을 읽으면 되고, 이 예제에서는 모양이 `(2, 4, 8, 8)`로 나옵니다.
 
 ## 단일 head 출력 한 번 찍어보기
 

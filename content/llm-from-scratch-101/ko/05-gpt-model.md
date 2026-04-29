@@ -96,7 +96,7 @@ class GPT(nn.Module):
         return logits, loss
 ```
 
-여기까지 오면 모델은 이미 학습 직전입니다. 입력 ID를 넣으면 logits가 나오고, 정답 ID까지 같이 넣으면 loss도 바로 계산됩니다.
+여기까지 오면 모델은 이미 학습 직전입니다. 각 `Block`이 받은 `(B, T, C)` residual stream을 같은 모양으로 다시 넘겨주기 때문에, 임베딩부터 logits까지 조립된 GPT 전체가 일관된 텐서 흐름으로 연결됩니다.
 
 ## LM Head는 사실 Embedding 행렬과 묶을 수 있다 (weight tying)
 

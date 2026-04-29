@@ -45,7 +45,7 @@ User: Who is Romeo?
 Bot:
 ```
 
-Every time a new question arrives, we append it to the history and let the model fill in everything after the final `Bot:` marker.
+Every time a new question arrives, we append it to the history and let the model fill in everything after the final `Bot:` marker. Because this series uses an English char-level vocabulary, any unsupported characters should be dropped with a warning before generation starts.
 
 ## Loading the Model Once — FastAPI Lifespan
 
@@ -68,11 +68,11 @@ The `GET /chat/stream` endpoint returns a `StreamingResponse`, allowing the serv
 from contextlib import asynccontextmanager
 
 import torch
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from data import decode, encode
+from data import decode, stoi
 from model import GPT, GPTConfig
 templates = Jinja2Templates(directory="templates"); state = {}
 
@@ -87,6 +87,13 @@ def build_prompt(history, prompt):
     lines.append(f"User: {prompt}")
     lines.append("Bot:")
     return "\n".join(lines)
+
+def encode_chat_text(text: str):
+    dropped = sorted({c for c in text if c not in stoi})
+    ids = [stoi[c] for c in text if c in stoi]
+    if not ids:
+        raise ValueError("Prompt became empty after dropping unsupported characters.")
+    return ids, dropped
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -106,14 +113,27 @@ async def index(request: Request):
 @app.post("/chat")
 async def chat(body: ChatBody):
     text = build_prompt(body.history, body.prompt)
-    idx = torch.tensor([encode(text)], dtype=torch.long, device=state["device"])
+    try:
+        ids, dropped = encode_chat_text(text)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    idx = torch.tensor([ids], dtype=torch.long, device=state["device"])
     with torch.no_grad(): out = state["model"].generate(idx, body.max_new_tokens, 0.8, 20, 0.9)
-    return {"response": decode(out[0].tolist())[len(text):]}
+    response = {"response": decode(out[0].tolist())[len(ids):]}
+    if dropped:
+        response["warning"] = f"Dropped unsupported characters: {''.join(dropped)}"
+    return response
 
 @app.get("/chat/stream")
 async def chat_stream(prompt: str):
     async def event_gen():
-        current = torch.tensor([encode(build_prompt([], prompt))], dtype=torch.long, device=state["device"])
+        try:
+            ids, dropped = encode_chat_text(build_prompt([], prompt))
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        if dropped:
+            yield f"data: [warning] Dropped unsupported characters: {''.join(dropped)}\n\n"
+        current = torch.tensor([ids], dtype=torch.long, device=state["device"])
         for _ in range(120):
             with torch.no_grad(): next_ids = state["model"].generate(current, 1, 0.8, 20, 0.9)
             current = next_ids; token_id = next_ids[0, -1].item()
@@ -138,6 +158,8 @@ source=new EventSource(`/chat/stream?prompt=${encodeURIComponent(promptEl.value)
 source.onmessage=e=>out.textContent+=e.data;source.onerror=()=>source.close();};
 </script></body></html>
 ```
+
+The sample stays English-only on purpose. If a user pastes unsupported characters, the server drops them, returns a warning, and rejects the request when nothing usable remains.
 
 You can run the server with `uvicorn server:app --reload`.
 

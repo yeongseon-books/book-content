@@ -38,16 +38,16 @@ last_reviewed: '2026-04-29'
 ![챗봇 = 모델 + 대화 히스토리 + 스트리밍 + UI](../../../assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.ko.png)
 ## 멀티턴 프롬프트 포맷 디자인
 
-이번 글에서는 대화 이력을 아래처럼 평문으로 이어 붙입니다.
+이번 글에서는 대화 이력을 아래처럼 평문으로 이어 붙입니다. 이번 시리즈의 모델은 영어 char-level vocab으로 학습됐기 때문에, 데모 대화도 영어 기준으로 맞춥니다.
 
 ```text
-User: 안녕?
-Bot: 반갑습니다.
-User: 로미오는 누구야?
+User: Hello!
+Bot: Nice to meet you.
+User: Who is Romeo?
 Bot:
 ```
 
-새 질문이 들어올 때마다 마지막 `Bot:` 뒤를 모델이 채우게 하면 됩니다.
+새 질문이 들어올 때마다 마지막 `Bot:` 뒤를 모델이 채우게 하면 됩니다. 한국어 입력은 vocab에 없는 문자가 대부분이라 경고와 함께 무시됩니다. 한국어 챗봇을 만들려면 한국어 코퍼스로 토크나이저와 vocab을 다시 구축해야 합니다.
 
 ## 모델을 한 번만 로드 — FastAPI lifespan
 
@@ -70,11 +70,11 @@ Bot:
 from contextlib import asynccontextmanager
 
 import torch
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from data import decode, encode
+from data import decode, stoi
 from model import GPT, GPTConfig
 templates = Jinja2Templates(directory="templates"); state = {}
 
@@ -89,6 +89,13 @@ def build_prompt(history, prompt):
     lines.append(f"User: {prompt}")
     lines.append("Bot:")
     return "\n".join(lines)
+
+def encode_chat_text(text: str):
+    dropped = sorted({c for c in text if c not in stoi})
+    ids = [stoi[c] for c in text if c in stoi]
+    if not ids:
+        raise ValueError("지원되는 문자가 하나도 남지 않았습니다.")
+    return ids, dropped
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -108,14 +115,27 @@ async def index(request: Request):
 @app.post("/chat")
 async def chat(body: ChatBody):
     text = build_prompt(body.history, body.prompt)
-    idx = torch.tensor([encode(text)], dtype=torch.long, device=state["device"])
+    try:
+        ids, dropped = encode_chat_text(text)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    idx = torch.tensor([ids], dtype=torch.long, device=state["device"])
     with torch.no_grad(): out = state["model"].generate(idx, body.max_new_tokens, 0.8, 20, 0.9)
-    return {"response": decode(out[0].tolist())[len(text):]}
+    response = {"response": decode(out[0].tolist())[len(ids):]}
+    if dropped:
+        response["warning"] = f"지원하지 않는 문자를 건너뛰었습니다: {''.join(dropped)}"
+    return response
 
 @app.get("/chat/stream")
 async def chat_stream(prompt: str):
     async def event_gen():
-        current = torch.tensor([encode(build_prompt([], prompt))], dtype=torch.long, device=state["device"])
+        try:
+            ids, dropped = encode_chat_text(build_prompt([], prompt))
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        if dropped:
+            yield f"data: [warning] 지원하지 않는 문자를 건너뛰었습니다: {''.join(dropped)}\n\n"
+        current = torch.tensor([ids], dtype=torch.long, device=state["device"])
         for _ in range(120):
             with torch.no_grad(): next_ids = state["model"].generate(current, 1, 0.8, 20, 0.9)
             current = next_ids; token_id = next_ids[0, -1].item()
@@ -140,6 +160,8 @@ source=new EventSource(`/chat/stream?prompt=${encodeURIComponent(promptEl.value)
 source.onmessage=e=>out.textContent+=e.data;source.onerror=()=>source.close();};
 </script></body></html>
 ```
+
+이 데모는 영어 vocab 위에서만 안전하게 동작합니다. 지원하지 않는 문자가 섞이면 서버가 해당 문자를 건너뛰고 경고를 돌려주며, 남는 문자가 하나도 없으면 요청을 거절합니다.
 
 실행은 `uvicorn server:app --reload`입니다.
 

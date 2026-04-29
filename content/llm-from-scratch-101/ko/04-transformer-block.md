@@ -89,7 +89,7 @@ class Block(nn.Module):
         return x
 ```
 
-구조를 말로 풀면 더 단순합니다. 정규화하고, 어텐션 돌리고, 원본에 더합니다. 한 번 더 정규화하고, MLP 돌리고, 다시 더합니다. 블록 하나가 하는 일은 여기까지입니다.
+구조를 말로 풀면 더 단순합니다. 정규화하고, 어텐션 돌리고, 원본에 더합니다. 한 번 더 정규화하고, MLP 돌리고, 다시 더합니다. `CausalSelfAttention.forward()`가 이제 residual stream 텐서만 돌려주기 때문에 이 residual addition도 끝까지 모양이 맞게 흘러갑니다.
 
 ## 같은 블록을 N번 쌓는다
 
