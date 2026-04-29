@@ -1,63 +1,71 @@
-# Environment, Container App, Revision — ACA in three words
+# What is Azure Container Apps? — running containers without Kubernetes
 
-> Azure Container Apps 101 series (2/7)
+> Azure Container Apps 101 series (1/7)
 
-Part 1 positioned ACA on the map.
-Part 2 turns the three core nouns into operating units.
-
----
-
-## Start with the hierarchy
-
-Environment is the boundary.
-Container App is the logical service.
-Revision is the immutable snapshot of image and config.
-
-![ACA hierarchy](../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
----
-
-## Environment
-
-- shared network boundary
-- shared log destination
-- shared Dapr configuration surface
-- boundary for related services
+Teams can usually build an image and run it locally.
+The confusion starts one step later.
+Where does it run.
+Who handles HTTPS.
+What is the deployment unit.
+Where do logs and traces go.
+Azure Container Apps fits that gap.
+It keeps the container workflow while hiding direct Kubernetes cluster operations from the user.
 
 ---
 
-## Container App
+## The big picture — one ACA environment at a glance
 
-A Container App can accumulate several revisions over time.
+This diagram is the map for the whole series.
+Later posts zoom into each box.
+Clients and ingress return in part 4.
+Environment, Container App, and Revision are part 2.
+First deployment is part 3.
+KEDA is part 5.
+Dapr is part 6.
+Observability is part 7.
 
-- image
-- environment variables
-- secrets
-- ingress
-- resources
-- scale rules
+![One ACA environment](../../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
+---
+
+## A one-sentence definition
+
+ACA is a managed serverless platform for running containerized applications.
+It uses a Microsoft-managed Kubernetes layer plus components such as KEDA, Dapr, and Envoy, but the cluster is not exposed to the user.
+
+- Container images remain the deployment unit.
+- Replicas can shrink aggressively, often to zero.
+- Ingress, revisioning, and observability are built into the product.
 
 ---
 
-## Revision
+## Why teams reach for ACA
 
-- immutable snapshot of image and config
-- can be a live traffic target
-- not the same thing as automatic rollback
-
----
-
-## Single and multiple mode
-
-Single is the default.
-Multiple enables canary and blue-green strategies.
+- APIs and workers on one platform
+- lower idle cost
+- revision-based canary and blue-green
+- optional Dapr integration
 
 ---
 
-## Which changes create a new revision
+## The path of one request
 
-- image changes
-- CPU or memory changes
-- scale rule changes
+A single HTTP request is enough to make the boundary responsibilities visible.
+
+- build the image correctly
+- listen on the right port
+- define health paths and config safely
+- choose scale and rollout rules
+- emit logs and traces deliberately
+
+![The path of one request](../../../assets/azure-aca-101/01/01-02-the-path-of-one-request.en.png)
+---
+
+## Workloads that fit well
+
+- FastAPI APIs
+- bursty workers
+- microservice groups
+- services that need canary or blue-green
 
 ---
 
@@ -88,57 +96,6 @@ Multiple enables canary and blue-green strategies.
 
 ## Operations checklist
 
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
-- ACA gets simpler once the operating units are named precisely.
-- Do not blur app names, revision names, and environment names.
-- Troubleshooting speed depends on how cleanly you separate layers.
-- The platform hides a lot, but the boundaries still matter.
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
-- Cost and stability usually move with traffic shape and replica floors.
-- A repeatable deployment procedure lowers operational risk quickly.
 - ACA gets simpler once the operating units are named precisely.
 - Do not blur app names, revision names, and environment names.
 - Troubleshooting speed depends on how cleanly you separate layers.
@@ -231,8 +188,8 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
-- **Environment, Container App, Revision — ACA in three words (current)**
+- **What is Azure Container Apps? — running containers without Kubernetes (current)**
+- Environment, Container App, Revision — ACA in three words (upcoming)
 - Your first deploy — Python/FastAPI (upcoming)
 - Ingress and traffic splitting — revision-based deployment strategies (upcoming)
 - Scaling — KEDA scalers and zero-to-N (upcoming)
@@ -246,10 +203,10 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 ## References
 
 ### Official Docs
+- [Azure Container Apps overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/overview)
 - [Azure Container Apps environments — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/environment)
 - [Update and deploy changes in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/revisions)
-- [Manage revisions in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/revisions-manage)
-- [Azure Container Apps overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/overview)
+- [Ingress in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/ingress-overview)
 
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/01-what-is-app-service.md)

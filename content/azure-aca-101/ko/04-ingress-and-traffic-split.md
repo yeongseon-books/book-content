@@ -13,7 +13,7 @@ Single과 Multiple 모드가 어떻게 다른지.
 
 Envoy가 앞문 역할을 맡고 활성 Revision으로 라우팅합니다.
 
-![요청 경로](../../assets/azure-aca-101/04/04-01-the-request-path.ko.png)
+![요청 경로](../../../assets/azure-aca-101/04/04-01-the-request-path.ko.png)
 ---
 
 ## Ingress가 맡는 일

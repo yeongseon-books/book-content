@@ -1,60 +1,62 @@
-# Dapr integration — what you get from a sidecar
+# Monitoring and ops — Log Analytics and Application Insights
 
-> Azure Container Apps 101 series (6/7)
+> Azure Container Apps 101 series (7/7)
 
-This post shows where the Dapr sidecar sits and what it simplifies.
-Service invocation.
-Pub/Sub.
-State.
-And secrets are the key themes.
+This post covers logs, traces, and day-two operations.
+It separates console logs from system logs.
+Then connects KQL, revision comparison, and Application Insights.
 
 ---
 
-## Where Dapr sits
+## The observability map
 
-The sidecar sits next to the app.
-It mediates access to Environment-level components and external services.
+Log Analytics tells you what happened.
+Application Insights helps you follow where the request went.
 
-![Where Dapr sits](../../assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
+![The observability map](../../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
 ---
 
-## Enable commands
+## Two log types
 
-```bash
-az containerapp create   --name api-app   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --ingress external   --target-port 8000   --enable-dapr true   --dapr-app-id api-app   --dapr-app-port 8000
+- ContainerAppConsoleLogs_CL
+- ContainerAppSystemLogs_CL
 
-az containerapp dapr enable   --name api-app   --resource-group $RG   --dapr-app-id api-app   --dapr-app-port 8000
+---
+
+## KQL examples
+
+```kusto
+ContainerAppConsoleLogs_CL
+| where ContainerAppName_s == "fastapi-aca-demo"
+| project Time=TimeGenerated, Revision=RevisionName_s, Message=Log_s
+| take 100
+
+ContainerAppSystemLogs_CL
+| where ContainerAppName_s == "fastapi-aca-demo"
+| project Time=TimeGenerated, Revision=RevisionName_s, Message=Log_s
+| take 100
 ```
 
 ---
 
-## App scope and Environment scope
+## Revision comparison
 
-- App level — enablement, app ID, app port
-- Environment level — component definitions and scopes
-
----
-
-## Key building blocks
-
-- Service invocation
-- Pub/Sub
-- State store
-- Secret store
+```kusto
+ContainerAppConsoleLogs_CL
+| where ContainerAppName_s == "fastapi-aca-demo"
+| summarize count() by RevisionName_s
+| order by count_ desc
+```
 
 ---
 
-## Component example
+## Application Insights
 
-```yaml
-componentType: pubsub.azure.servicebus.queue
-version: v1
-metadata:
-  - name: namespaceName
-    value: mybus.servicebus.windows.net
-scopes:
-  - publisher-app
-  - subscriber-app
+It is strong at distributed tracing and dependency analysis.
+Application code should be instrumented with SDKs.
+
+```bash
+az containerapp env create   --name $ACA_ENV   --resource-group $RG   --location eastus   --dapr-connection-string "$APPLICATIONINSIGHTS_CONNECTION_STRING"
 ```
 
 ---
@@ -86,10 +88,6 @@ scopes:
 
 ## Operations checklist
 
-- Deployment, scaling, and observability are different faces of one flow.
-- It is better to understand which layer a command changes than to memorize syntax alone.
-- You need a clean split between revision-scoped changes and app-wide policy changes.
-- Logs and metrics are most useful when read with revision context.
 - Cost and stability usually move with traffic shape and replica floors.
 - A repeatable deployment procedure lowers operational risk quickly.
 - ACA gets simpler once the operating units are named precisely.
@@ -239,8 +237,8 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 - [Your first deploy — Python/FastAPI](./03-first-deploy.md)
 - [Ingress and traffic splitting — revision-based deployment strategies](./04-ingress-and-traffic-split.md)
 - [Scaling — KEDA scalers and zero-to-N](./05-scaling-with-keda.md)
-- **Dapr integration — what you get from a sidecar (current)**
-- Monitoring and ops — Log Analytics and Application Insights (upcoming)
+- [Dapr integration — what you get from a sidecar](./06-dapr-integration.md)
+- **Monitoring and ops — Log Analytics and Application Insights (current)**
 
 <!-- toc:end -->
 
@@ -249,10 +247,10 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 ## References
 
 ### Official Docs
-- [Configure Dapr on an Existing Container App — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/enable-dapr)
-- [Microservice APIs powered by Dapr — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/dapr-overview)
-- [Dapr Components in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/dapr-components)
-- [Dapr overview](https://docs.dapr.io/concepts/overview/)
+- [Monitor logs in Azure Container Apps with Log Analytics — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/log-monitoring)
+- [Observability in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/observability)
+- [Azure Monitor Application Insights overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
+- [Azure Container Apps environments — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/environment)
 
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/01-what-is-app-service.md)

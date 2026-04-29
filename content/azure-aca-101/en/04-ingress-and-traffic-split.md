@@ -1,81 +1,51 @@
-# Your first deploy — Python/FastAPI
+# Ingress and traffic splitting — revision-based deployment strategies
 
-> Azure Container Apps 101 series (3/7)
+> Azure Container Apps 101 series (4/7)
 
-This post builds the first FastAPI deployment path.
-Local code becomes an image.
-The image lands in a registry.
-ACA pulls it into a revision.
-Ingress exposes a public FQDN.
+This post connects ingress with revision-based rollout control.
+It focuses on TLS termination.
+Single versus multiple mode.
+And weighted traffic movement.
 
 ---
 
-## The end-to-end path
+## The request path
 
-The path makes the first deployment much easier to reason about.
+Envoy acts as the front door and routes to active revisions.
 
-![The end-to-end path](../../assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
+![The request path](../../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
 ---
 
-## Setup commands
+## What ingress owns
+
+- TLS termination
+- external or internal exposure
+- traffic distribution across revisions
+
+---
+
+## Single and multiple mode
+
+Single deactivates the previous revision after the new one is ready.
+Multiple keeps more than one revision active.
+
+---
+
+## Traffic commands
 
 ```bash
-az extension add --name containerapp --upgrade
-az provider register --namespace Microsoft.App
-az provider register --namespace Microsoft.OperationalInsights
+az containerapp revision set-mode   --name $APP_NAME   --resource-group $RG   --mode multiple
+
+az containerapp ingress traffic set   --name $APP_NAME   --resource-group $RG   --revision-weight myapp--rev-a=80 myapp--rev-b=20
 ```
 
 ---
 
-## The FastAPI app
+## Canary and blue-green
 
-```python
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"message": "hello from azure container apps"}
-
-@app.get("/healthz")
-def healthz():
-    return {"status": "ok"}
-```
-
----
-
-## Dockerfile
-
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY app ./app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
----
-
-## First deployment
-
-- ingress external
-- target-port 8000
-- min-replicas 0
-
-```bash
-az containerapp create   --name $APP_NAME   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --ingress external   --target-port 8000   --cpu 0.5   --memory 1.0Gi   --min-replicas 0   --max-replicas 3
-```
-
----
-
-## Verification commands
-
-```bash
-az containerapp show --name $APP_NAME --resource-group $RG --query properties.configuration.ingress.fqdn --output tsv
-curl https://<YOUR_FQDN>/
-```
+- start with a small percentage
+- compare logs and latency
+- move traffic back if needed
 
 ---
 
@@ -106,6 +76,39 @@ curl https://<YOUR_FQDN>/
 
 ## Operations checklist
 
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
+- Logs and metrics are most useful when read with revision context.
+- Cost and stability usually move with traffic shape and replica floors.
+- A repeatable deployment procedure lowers operational risk quickly.
+- ACA gets simpler once the operating units are named precisely.
+- Do not blur app names, revision names, and environment names.
+- Troubleshooting speed depends on how cleanly you separate layers.
+- The platform hides a lot, but the boundaries still matter.
+- Deployment, scaling, and observability are different faces of one flow.
+- It is better to understand which layer a command changes than to memorize syntax alone.
+- You need a clean split between revision-scoped changes and app-wide policy changes.
 - Logs and metrics are most useful when read with revision context.
 - Cost and stability usually move with traffic shape and replica floors.
 - A repeatable deployment procedure lowers operational risk quickly.
@@ -233,8 +236,8 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 
 - [What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
 - [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
-- **Your first deploy — Python/FastAPI (current)**
-- Ingress and traffic splitting — revision-based deployment strategies (upcoming)
+- [Your first deploy — Python/FastAPI](./03-first-deploy.md)
+- **Ingress and traffic splitting — revision-based deployment strategies (current)**
 - Scaling — KEDA scalers and zero-to-N (upcoming)
 - Dapr integration — what you get from a sidecar (upcoming)
 - Monitoring and ops — Log Analytics and Application Insights (upcoming)
@@ -246,10 +249,10 @@ Read in order and ACA starts to feel like an operating model instead of a featur
 ## References
 
 ### Official Docs
-- [Quickstart: Deploy your first container app with containerapp up — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/get-started)
-- [az containerapp create — Microsoft Learn](https://learn.microsoft.com/en-us/cli/azure/containerapp#az-containerapp-create)
-- [Azure Container Apps environments — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/environment)
-- [Run containers from any registry — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/containers)
+- [Ingress in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/ingress-overview)
+- [Configure ingress for your app in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/ingress-how-to)
+- [Traffic splitting in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/traffic-splitting)
+- [Update and deploy changes in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/revisions)
 
 ### Related Series
 - [Azure App Service 101](../../azure-app-service-101/en/01-what-is-app-service.md)

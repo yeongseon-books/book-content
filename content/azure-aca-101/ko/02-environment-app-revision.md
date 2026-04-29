@@ -1,63 +1,63 @@
-# 모니터링과 운영 — Log Analytics와 Application Insights
+# Environment·Container App·Revision — 세 단어로 보는 ACA
 
-> Azure Container Apps 101 시리즈 (7/7)
+> Azure Container Apps 101 시리즈 (2/7)
 
-이번 글은 로그와 추적과 운영 절차를 다룹니다.
-Console logs와 system logs를 나누고.
-KQL과 Revision 비교와 Application Insights를 연결합니다.
-
----
-
-## 관측성 지도
-
-무슨 일이 있었는지는 Log Analytics에서 찾고.
-요청이 어디를 거쳤는지는 Application Insights에서 따라갑니다.
-
-![관측성 지도](../../assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
----
-
-## 두 종류 로그
-
-- ContainerAppConsoleLogs_CL
-- ContainerAppSystemLogs_CL
+1화에서 전체 그림을 잡았다면 이번 글은 가운데 구조를 분해하는 시간입니다.
+Environment와 Container App과 Revision을 운영 단위로 읽어야 ACA가 쉬워집니다.
 
 ---
 
-## KQL 예시
+## 계층 먼저 보기
 
-```kusto
-ContainerAppConsoleLogs_CL
-| where ContainerAppName_s == "fastapi-aca-demo"
-| project Time=TimeGenerated, Revision=RevisionName_s, Message=Log_s
-| take 100
+Environment는 경계입니다.
+Container App은 논리 서비스입니다.
+Revision은 이미지와 설정의 불변 스냅샷입니다.
 
-ContainerAppSystemLogs_CL
-| where ContainerAppName_s == "fastapi-aca-demo"
-| project Time=TimeGenerated, Revision=RevisionName_s, Message=Log_s
-| take 100
-```
+![ACA 계층 구조](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.ko.png)
+---
+
+## Environment
+
+- 같은 VNet 경계
+- 같은 로그 대상
+- 같은 Dapr 공통 구성
+- 관련 앱 묶음의 경계
 
 ---
 
-## Revision 비교
+## Container App
 
-```kusto
-ContainerAppConsoleLogs_CL
-| where ContainerAppName_s == "fastapi-aca-demo"
-| summarize count() by RevisionName_s
-| order by count_ desc
-```
+Container App은 시간을 따라 여러 Revision을 가질 수 있습니다.
+
+- 이미지
+- 환경변수
+- 비밀 값
+- Ingress
+- 리소스
+- 스케일 규칙
 
 ---
 
-## Application Insights
+## Revision
 
-분산 추적과 dependency 분석에 강합니다.
-앱 코드는 SDK로 계측해야 합니다.
+- 이미지와 설정의 불변 스냅샷
+- 트래픽 대상이 될 수 있음
+- 자동 롤백과 같은 뜻은 아님
 
-```bash
-az containerapp env create   --name $ACA_ENV   --resource-group $RG   --location eastus   --dapr-connection-string "$APPLICATIONINSIGHTS_CONNECTION_STRING"
-```
+---
+
+## Single과 Multiple 모드
+
+Single은 기본값입니다.
+Multiple은 Canary와 Blue-Green을 가능하게 합니다.
+
+---
+
+## 어떤 변경이 새 Revision을 만드는가
+
+- 이미지 변경
+- CPU/메모리 변경
+- 스케일 규칙 변경
 
 ---
 
@@ -88,7 +88,6 @@ az containerapp env create   --name $ACA_ENV   --resource-group $RG   --location
 
 ## 운영 체크리스트
 
-- 비용과 안정성은 대개 replica 바닥값과 트래픽 패턴과 함께 움직입니다.
 - 팀 규약으로 배포 절차를 고정하면 운영 리스크가 크게 줄어듭니다.
 - 운영 단위를 먼저 명확히 잡으면 ACA가 훨씬 단순하게 보입니다.
 - Environment와 App와 Revision을 섞어 부르지 않는 습관이 중요합니다.
@@ -233,12 +232,12 @@ az containerapp env create   --name $ACA_ENV   --resource-group $RG   --location
 ## 시리즈 목차
 
 - [Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
-- [Environment·Container App·Revision — 세 단어로 보는 ACA](./02-environment-app-revision.md)
-- [첫 앱 배포하기 — Python/FastAPI](./03-first-deploy.md)
-- [Ingress와 트래픽 분할 — Revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
-- [스케일링 — KEDA scaler와 0-to-N](./05-scaling-with-keda.md)
-- [Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
-- **모니터링과 운영 — Log Analytics와 Application Insights (현재 글)**
+- **Environment·Container App·Revision — 세 단어로 보는 ACA (현재 글)**
+- 첫 앱 배포하기 — Python/FastAPI (예정)
+- Ingress와 트래픽 분할 — Revision 기반 배포 전략 (예정)
+- 스케일링 — KEDA scaler와 0-to-N (예정)
+- Dapr 통합 — 사이드카로 얻는 것 (예정)
+- 모니터링과 운영 — Log Analytics와 Application Insights (예정)
 
 <!-- toc:end -->
 
@@ -247,10 +246,10 @@ az containerapp env create   --name $ACA_ENV   --resource-group $RG   --location
 ## 참고 자료
 
 ### 공식 문서
-- [Monitor logs in Azure Container Apps with Log Analytics — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/log-monitoring)
-- [Observability in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/observability)
-- [Azure Monitor Application Insights overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
 - [Azure Container Apps environments — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/environment)
+- [Update and deploy changes in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/revisions)
+- [Manage revisions in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/revisions-manage)
+- [Azure Container Apps overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/overview)
 
 ### 관련 시리즈
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)

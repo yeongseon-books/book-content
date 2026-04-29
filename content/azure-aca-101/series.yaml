@@ -1,0 +1,39 @@
+id: azure-aca-101
+category: azure
+title:
+  ko: Azure Container Apps 101
+  en: Azure Container Apps 101
+description:
+  ko: Container Apps 입문 시리즈.
+  en: Container Apps beginner guide.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+articles:
+- idx: 1
+  slug: 01-what-is-aca
+  status: ready
+- idx: 2
+  slug: 02-environment-app-revision
+  status: ready
+- idx: 3
+  slug: 03-first-deploy
+  status: ready
+- idx: 4
+  slug: 04-ingress-and-traffic-split
+  status: ready
+- idx: 5
+  slug: 05-scaling-with-keda
+  status: ready
+- idx: 6
+  slug: 06-dapr-integration
+  status: ready
+- idx: 7
+  slug: 07-monitoring-and-ops
+  status: ready
