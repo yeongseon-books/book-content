@@ -21,7 +21,7 @@ meta:
   # "is published_ref behind master?". Update freely.
   repo: yeongseon/tech-writing
   published_ref: cb179c5
-  validated_ref: 2d1f591
+  validated_ref: 8242ac8
 
 series:
   # Azure
