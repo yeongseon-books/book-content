@@ -155,6 +155,8 @@ AKS가 제공하는 관리형 NGINX 경로입니다.
 
 입문 단계에서는 “NGINX는 가장 흔한 형태, AGIC는 Application Gateway 기반, Application Routing add-on은 AKS가 관리해 주는 NGINX” 정도로 잡아 두면 충분합니다.
 
+다만 2026년 기준으로는 한 문장을 더 붙여야 합니다. 업스트림 `kubernetes/ingress-nginx`는 이미 retirement 단계에 들어가 read-only 아카이브 상태이므로, 새 설계의 장기 투자 방향으로 보기는 어렵습니다. 그렇다고 AKS의 Application Routing add-on까지 바로 버려야 한다는 뜻은 아닙니다. AKS 관리형 NGINX 경로는 Microsoft가 계속 지원하고 있어서, 빠르게 관리형 Ingress를 쓰고 싶은 새 클러스터에도 여전히 유효합니다. 다만 장기 방향은 `gateway.networking.k8s.io` 기반의 **Gateway API**입니다. AKS도 application routing의 Gateway API 구현을 제공하므로, 기존 ingress-nginx 워크로드는 App Routing으로 옮기기 쉽고, 2026년 이후 신규 설계는 Gateway API를 먼저 평가하는 편이 더 미래지향적입니다.
+
 ---
 
 ## Ingress 예시

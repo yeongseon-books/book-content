@@ -188,27 +188,47 @@ spec:
 
 ---
 
-## 아주 단순한 KEDA 예시
+## 바로 실행 가능한 KEDA Service Bus 예시
 
 ```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: servicebus-secret
+type: Opaque
+stringData:
+  connection: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=...;SharedAccessKey=..."
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: servicebus-trigger-auth
+spec:
+  secretTargetRef:
+    - parameter: connection
+      name: servicebus-secret
+      key: connection
+---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: fastapi-worker
+  name: orders-scaler
 spec:
   scaleTargetRef:
-    name: fastapi-worker
+    name: orders-deployment
+  pollingInterval: 30
   minReplicaCount: 0
   maxReplicaCount: 20
   triggers:
     - type: azure-servicebus
       metadata:
         queueName: orders
-        namespace: mybus
-        messageCount: "10"
+        messageCount: "5"
+      authenticationRef:
+        name: servicebus-trigger-auth
 ```
 
-이 예시는 Service Bus 큐 길이를 보고 Deployment를 스케일합니다. 내부적으로는 KEDA가 메트릭을 제공하고, HPA 메커니즘을 이용해 복제본 수를 바꾸게 됩니다.
+이 예시는 Service Bus 큐 길이를 보고 Deployment를 스케일합니다. 여기서 핵심은 인증 wiring입니다. `TriggerAuthentication`이 KEDA에 `connection` 파라미터를 어디서 읽을지 알려 주고, Secret이 실제 Service Bus 연결 문자열을 담고 있으며, `authenticationRef`가 `ScaledObject`의 trigger를 그 인증 정의와 연결합니다. 이미 애플리케이션 환경 변수에 연결 문자열이 들어 있다면 trigger metadata에서 `connectionFromEnv`를 쓰는 방법도 있습니다.
 
 ---
 
