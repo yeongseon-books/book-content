@@ -12,7 +12,12 @@ Rules (confirmed by user):
 - Code fences left as-is
 - Front matter (YAML between ---) stripped
 - TOC marker comments (<!-- toc:begin --> / <!-- toc:end -->) removed
-- Trailing `Tags: ...` line removed; surfaced as leading <!-- Tags: ... --> comment
+- Output starts with H1 on line 1 (no leading HTML comments). Medium's web
+  editor maps the first H1 in a fresh empty draft to the title slot, so any
+  preface garbage breaks title detection on paste.
+- Tag line preserved as the very last line in the form `Tags: A, B, C, D`
+  (sourced from SERIES_TAGS, same as Tistory ko/en posts). Author copies the
+  comma list manually into Medium's tag input field on publish.
 """
 
 from __future__ import annotations
@@ -252,13 +257,10 @@ def clean_for_medium_import(text: str) -> str:
 
 
 def finalize_md_for_medium(body: str, tags: str | None) -> str:
-    cleaned = clean_for_medium_import(body)
-    header_lines = [
-        "<!-- Medium import-ready. Tags go in Medium's tag field, not the body. -->",
-    ]
+    cleaned = clean_for_medium_import(body).rstrip()
     if tags:
-        header_lines.append(f"<!-- Tags: {tags} -->")
-    return "\n".join(header_lines) + "\n\n" + cleaned
+        cleaned = f"{cleaned}\n\nTags: {tags}"
+    return cleaned + "\n"
 
 
 def numeric_prefix(name: str) -> str | None:

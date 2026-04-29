@@ -23,3 +23,5 @@ azure-functions-host/
 docs/
 site/
 exports/
+.playwright-mcp/
+medium-test.html
