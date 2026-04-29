@@ -13,7 +13,7 @@ AKS는 그 부담을 줄이기 위해 나온 Azure의 관리형 Kubernetes입니
 이 그림이 이번 시리즈 전체의 지도입니다.
 뒤의 화들은 아래 상자 하나씩을 확대해서 보는 구조입니다.
 
-![AKS 클러스터 아키텍처](../../assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.ko.png)
+![AKS 클러스터 아키텍처](../../../assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.ko.png)
 이 시리즈는 2화에서 Control Plane과 Node Pool 경계를, 3화와 4화에서 Deployment·Pod·Service를, 5화에서 Ingress와 네트워킹을, 6화에서 스케일링을, 7화에서 모니터링과 운영을 각각 확대합니다.
 
 ---
@@ -36,7 +36,7 @@ AKS를 써도 Kubernetes가 사라지는 것은 아닙니다. `kubectl`, YAML, I
 
 관리형이라는 말은 마케팅 문구처럼 들리기 쉽지만, 실무에서는 꽤 구체적입니다.
 
-![AKS가 “관리형”이라는 말의 정확한 뜻](../../assets/azure-aks-101/01/01-02-what-managed-means-in-practice.ko.png)
+![AKS가 “관리형”이라는 말의 정확한 뜻](../../../assets/azure-aks-101/01/01-02-what-managed-means-in-practice.ko.png)
 AKS를 도입한다고 해서 “운영을 안 해도 된다”는 뜻은 아닙니다. 운영의 초점이 바뀝니다. 직접 etcd와 API server를 만지던 운영에서, **워크로드 배치와 비용, 네트워크, 릴리스, 관측성**을 설계하는 운영으로 이동합니다.
 
 이 구분이 중요한 이유는 두 가지입니다.

@@ -1,0 +1,39 @@
+id: azure-aks-101
+category: azure
+title:
+  ko: Azure Kubernetes Service 101
+  en: Azure Kubernetes Service 101
+description:
+  ko: AKS 입문 시리즈.
+  en: AKS beginner guide.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+articles:
+- idx: 1
+  slug: 01-what-is-aks
+  status: ready
+- idx: 2
+  slug: 02-cluster-architecture
+  status: ready
+- idx: 3
+  slug: 03-first-cluster-and-deploy
+  status: ready
+- idx: 4
+  slug: 04-pod-deployment-service
+  status: ready
+- idx: 5
+  slug: 05-networking-and-ingress
+  status: ready
+- idx: 6
+  slug: 06-scaling-hpa-ca-keda
+  status: ready
+- idx: 7
+  slug: 07-monitoring-and-ops
+  status: ready

@@ -10,7 +10,7 @@ This post is about reading that boundary. We'll look at what the control plane d
 
 ## Cut the cluster in half
 
-![Cut the cluster in half](../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
+![Cut the cluster in half](../../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
 The left side is the Azure-managed layer. The right side is the layer you shape more directly. That single picture explains a lot: why the control plane is not billed separately, why node count is your decision, and why pod scaling and node scaling are different conversations.
 
 ---
@@ -56,7 +56,7 @@ Pods are the logical unit. Node pools are the capacity and cost unit.
 
 This is the first node-pool distinction to learn in AKS.
 
-![System node pool vs user node pool](../../assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png)
+![System node pool vs user node pool](../../../assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png)
 ### System node pool
 
 System pools are where critical cluster components are expected to run.

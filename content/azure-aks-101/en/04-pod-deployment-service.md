@@ -10,7 +10,7 @@ This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling 
 
 ## One picture first
 
-![Pod, Deployment, and Service](../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)
+![Pod, Deployment, and Service](../../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)
 That diagram carries most of the model.
 
 - **Pod** is the minimum scheduling unit.
@@ -181,7 +181,7 @@ That separation is why the model scales well. Lifecycle control and traffic iden
 
 Suppose you roll out a new image version. The Deployment usually does not kill every old pod at once. It creates replacement pods gradually.
 
-![Deployment becomes clearer when you imagine an update](../../assets/azure-aks-101/04/04-02-deployment-becomes-clearer-when-you-imag.en.png)
+![Deployment becomes clearer when you imagine an update](../../../assets/azure-aks-101/04/04-02-deployment-becomes-clearer-when-you-imag.en.png)
 That is why readiness probes matter so much. The Service starts using new pods only when they are considered ready to receive traffic.
 
 ---

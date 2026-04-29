@@ -10,7 +10,7 @@
 
 ## 오늘 할 일의 순서
 
-![오늘 할 일의 순서](../../assets/azure-aks-101/03/03-01-today-s-flow.ko.png)
+![오늘 할 일의 순서](../../../assets/azure-aks-101/03/03-01-today-s-flow.ko.png)
 여기서 `az` 명령은 Azure 쪽 리소스를 만들고, `kubectl`은 Kubernetes API에 원하는 상태를 선언합니다. 이 분리를 체감하는 것이 오늘 실습의 절반입니다.
 
 ---
@@ -246,7 +246,7 @@ kubectl get services
 
 ## 8. 요청이 들어가고 응답이 나오는 길
 
-![8. 요청이 들어가고 응답이 나오는 길](../../assets/azure-aks-101/03/03-02-8-the-request-path.ko.png)
+![8. 요청이 들어가고 응답이 나오는 길](../../../assets/azure-aks-101/03/03-02-8-the-request-path.ko.png)
 이 그림은 5화의 Ingress 이야기 전 단계입니다. 지금은 Service가 외부 진입점까지 맡고 있습니다. 조금 더 복잡한 HTTP 라우팅이 필요해지면 여기 앞단에 Ingress를 추가하게 됩니다.
 
 ---
