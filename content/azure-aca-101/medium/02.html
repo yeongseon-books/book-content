@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Environment, Container App, Revision — ACA in three words</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Environment, Container App, Revision — ACA in three words</h1>
+<blockquote>
+<p>Azure Container Apps 101 series (2/7)</p>
+</blockquote>
+<p>Part 1 positioned ACA on the map.<br>
+Part 2 turns the three core nouns into operating units.</p>
+<hr>
+<h2>Start with the hierarchy</h2>
+<p>Environment is the boundary.<br>
+Container App is the logical service.<br>
+Revision is the immutable snapshot of image and config.</p>
+<h2><img alt="Hierarchy of environment, app, and revision" src="data:image/png;base64,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"></h2>
+<h2>Environment</h2>
+<ul>
+<li>shared network boundary</li>
+<li>shared log destination</li>
+<li>shared Dapr configuration surface</li>
+<li>boundary for related services</li>
+</ul>
+<hr>
+<h2>Container App</h2>
+<p>A Container App can accumulate several revisions over time.</p>
+<ul>
+<li>image</li>
+<li>environment variables</li>
+<li>secrets</li>
+<li>ingress</li>
+<li>resources</li>
+<li>scale rules</li>
+</ul>
+<hr>
+<h2>Revision</h2>
+<ul>
+<li>immutable snapshot of image and config</li>
+<li>can be a live traffic target</li>
+<li>not the same thing as automatic rollback</li>
+</ul>
+<hr>
+<h2>Single and multiple mode</h2>
+<p>Single is the default.<br>
+Multiple enables canary and blue-green strategies.</p>
+<hr>
+<h2>Which changes create a new revision</h2>
+<ul>
+<li>image changes</li>
+<li>CPU or memory changes</li>
+<li>scale rule changes</li>
+</ul>
+<hr>
+<h2>What should stick from the model</h2>
+<ul>
+<li>The environment is the shared platform boundary.</li>
+<li>The app is the long-lived service identity.</li>
+<li>The revision is the versioned execution snapshot you observe during rollout, rollback, and troubleshooting.</li>
+</ul>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/azure-aca-101/en/01-what-is-aca.md">What is Azure Container Apps? — running containers without Kubernetes</a></li>
+<li><strong>Environment, Container App, Revision — ACA in three words (current)</strong></li>
+<li>Your first deploy — Python/FastAPI (upcoming)</li>
+<li>Ingress and traffic splitting — revision-based deployment strategies (upcoming)</li>
+<li>Scaling — KEDA scalers and zero-to-N (upcoming)</li>
+<li>Dapr integration — what you get from a sidecar (upcoming)</li>
+<li>Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<p><strong>Official Docs</strong><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/environment">Azure Container Apps environments — Microsoft Learn</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/revisions">Update and deploy changes in Azure Container Apps — Microsoft Learn</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/revisions-manage">Manage revisions in Azure Container Apps — Microsoft Learn</a><br>
+- <a href="https://learn.microsoft.com/en-us/azure/container-apps/overview">Azure Container Apps overview — Microsoft Learn</a></p>
+<p><strong>Related Series</strong><br>
+- <a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/azure-app-service-101/en/01-what-is-app-service.md">Azure App Service 101</a><br>
+- <a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/azure-aks-101/en/01-what-is-aks.md">Azure AKS 101</a><br>
+- <a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/azure-functions-101/en/01-what-is-azure-functions.md">Azure Functions 101</a></p>
+<p class="tags-line">Tags: Azure, Container Apps, Serverless, Containers</p>
+</body>
+</html>

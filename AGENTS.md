@@ -19,6 +19,7 @@ Each Azure series has three variants: `ko/`, `en/`, `medium/`.
 - `ko/<NN>-<slug>.md` — Tistory original (Korean)
 - `en/<NN>-<slug>.md` — Medium-bound English translation
 - `medium/<NN>.md` — Medium import-ready conversion of `en/` (raw URLs, bullet tables, demoted H3+, no toc markers, tags surfaced as trailing visible `Tags: ...` line)
+- `medium/<NN>.html` — rendered HTML for browser-copy publishing. Generated from `medium/<NN>.md` by `.sisyphus/medium/to-medium-html.py`. Open in Chrome, select-all, copy, paste into a fresh empty Medium draft. PNGs are inlined as base64 `data:` URIs.
 
 Plus the single-variant Korean series:
 
