@@ -22,7 +22,9 @@ last_reviewed: '2026-04-29'
 
 > AI 웹 개발 입문 시리즈 (3/7)
 
-지금까지 터미널에서만 AI를 불렀는데, 이제 브라우저에서 사용자가 직접 대화할 수 있는 UI를 만들어 봅시다. 단순히 API를 연결하는 수준을 넘어, 글자가 한 글자씩 타이핑되는 스트리밍 효과와 시스템 프롬프트를 활용한 페르소나 설정까지 다뤄보겠습니다.
+지금까지 터미널에서만 AI를 불렀는데, 이제 브라우저에서 사용자가 직접 대화할 수 있는 UI를 만들어 봅시다. 단순히 API를 연결하는 수준을 넘어, 글자가 한 글자씩 타이핑되는 스트리밍 효과와 시스템 프롬프트를 활용한 페르소나 설정까지 살펴보겠습니다.
+
+이번 편은 시리즈 안에서 잠시 프론트엔드로 이동하는 인터루드입니다. Python 예제를 잠깐 벗어나므로 Node.js, npm, React 기본기와 Next.js App Router 구조를 알고 있다는 전제로 진행하겠습니다.
 
 ---
 
@@ -56,11 +58,14 @@ cd my-ai-chatbot
 npm install ai @ai-sdk/react @ai-sdk/openai
 ```
 
-`.env.local` 파일에 여러분의 OpenAI API Key를 설정하는 것도 잊지 마세요.
+실제 키는 저장소에 올리지 말고, 예시 파일만 남긴 뒤 로컬에서 별도 파일로 복사해 사용하세요.
 
 ```text
-OPENAI_API_KEY=your_actual_api_key_here
+# .env.local.example
+OPENAI_API_KEY=your_api_key_here
 ```
+
+`.env.local.example`만 커밋하고, 실제 `.env.local`은 `.gitignore`에 넣어 GitHub에 올라가지 않게 관리하는 방식이 안전합니다.
 
 ---
 
@@ -168,7 +173,7 @@ export default function Chat() {
 
 별도의 설정을 하지 않아도 `useChat`과 `streamText`를 조합하면 이미 스트리밍이 동작합니다. 사용자가 `sendMessage`를 호출하면 서버는 `toUIMessageStreamResponse()`로 응답을 흘려 보내고, 브라우저는 그 조각을 이어 붙여 화면을 갱신합니다.
 
-이는 사용자 경험(UX) 측면에서 매우 중요합니다. 전체 답변이 올 때까지 수 초를 기다리는 대신, 첫 글자가 바로 나타나기 때문에 사용자는 서비스가 빠르다고 느낍니다.
+이는 사용자 경험(UX) 측면에서 중요합니다. 전체 답변이 올 때까지 몇 초를 기다리는 대신 첫 글자가 바로 나타나기 때문에 사용자는 서비스가 빠르다고 느낍니다.
 
 **[그림 2] 스트리밍 방식의 데이터 흐름**
 

@@ -42,7 +42,7 @@ last_reviewed: '2026-04-29'
 
 ### System Prompt vs User Prompt
 
-OpenAI의 Chat Completion API를 보면 `role`이라는 필드가 있습니다. 여기서 가장 중요한 두 가지 역할이 `system`과 `user`입니다.
+OpenAI의 Chat Completions API를 보면 `role`이라는 필드가 있습니다. 여기서 가장 중요한 두 가지 역할이 `system`과 `user`입니다.
 
 - **System Prompt (시스템 프롬프트):** AI에게 '페르소나'를 부여합니다. "너는 10년 차 시니어 풀스택 개발자야", "너는 유머러스한 마케팅 전문가야"처럼 AI의 기본 태도와 전문성 수준을 정합니다.
 - **User Prompt (사용자 프롬프트):** 우리가 실제로 시킬 구체적인 작업 내용입니다. "이 함수를 리팩토링해줘", "이 상품의 카피를 써줘" 같은 내용이 들어갑니다.
