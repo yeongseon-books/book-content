@@ -70,6 +70,9 @@ import azure.functions as func
 
 app = func.FunctionApp()
 
+def build_invoice(payload):
+    return {"id": payload["order_id"], "amount": payload["total"]}
+
 @app.function_name(name="process_order")
 @app.queue_trigger(arg_name="msg", queue_name="orders-incoming", connection="StorageConnection")
 @app.cosmos_db_output(
@@ -80,7 +83,7 @@ app = func.FunctionApp()
 )
 def process_order(msg: func.QueueMessage, invoice_out: func.Out[func.Document]) -> None:
     queue_item = msg.get_json()
-    invoice = build_invoice(queue_item)  # 여러분의 비즈니스 로직
+    invoice = build_invoice(queue_item)
     invoice_out.set(func.Document.from_json(json.dumps(invoice)))
 ```
 

@@ -130,7 +130,7 @@ The common thread is "**when there's work, it has to be processed quickly, but n
 
 Functions isn't a silver bullet. Three things to verify before you adopt it:
 
-- **Long-running work** — The default function execution timeout is between 5 and 30 minutes, depending on the plan. If a single run takes an hour, break it up with Durable Functions or look at other compute (Container Apps, Batch, etc.).
+- **Long-running work** — Timeout limits depend on the hosting plan. Consumption defaults to 5 minutes and can be raised to 10 minutes. Flex Consumption, Premium, and Dedicated/App Service Plan default to 30 minutes and do not have the same hard upper cap. If a single run takes an hour, break it up with Durable Functions or look at other compute (Container Apps, Batch, etc.).
 - **Very steady, high load** — If traffic is uniformly high 24/7, App Service or containers may be cheaper for the same throughput. Pay-per-use shines when traffic is uneven.
 - **Ultra-low-latency APIs where cold starts are unacceptable** — If hundreds of milliseconds added to the first call is a non-starter for the business, you should use the Always Ready option on Premium / Flex Consumption or look at a different model. (Part 6 covers this trade-off.)
 

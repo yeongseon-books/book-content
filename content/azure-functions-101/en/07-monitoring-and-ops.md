@@ -141,13 +141,14 @@ Start with the two P0 alerts if you want the smallest reliable set. Noisy alerts
 
 ## Where to Check Instance Count
 
-There are three common ways to answer “how many instances are active right now?”
+There are two supported answers to “how many instances are active right now?” that operators should reach for first.
 
 1. **The Servers panel in Live Metrics** — the quickest visual answer.
 2. **The Azure Monitor `InstanceCount` metric** — the current metric name is **`InstanceCount`**, not `FunctionInstanceCount`. In the portal it appears as *Automatic Scaling Instance Count*.
-3. **The `/admin/host/scale/status` endpoint** — a diagnostic endpoint exposed by the host for scale-related troubleshooting.
 
-Deep Dive Part 5 walks through that scale-status path and the surrounding control flow in code.
+If you want the app's current site configuration from the CLI, `az functionapp show --name $APP --resource-group $RG --query siteConfig` is the supported operator path. You can combine that with Application Insights and Azure Monitor metrics for the day-to-day scaling view.
+
+You may still see **`/admin/host/scale/status`** mentioned in deep-dive discussions or diagnostics, but treat it as an internal troubleshooting endpoint rather than a stable public surface for normal operations.
 
 ---
 
@@ -172,8 +173,10 @@ Two other common cost leaks show up often:
 # Quickest CLI example to inspect daily invocation count trend
 az monitor app-insights events show \
     --app ai-hello --resource-group $RG \
-    --type requests --start-time -7d
+    --type requests --offset 7d
 ```
+
+Use `--offset` for a relative window such as “the last 7 days.” If you prefer `--start-time`, pass an explicit ISO-8601 timestamp.
 
 ---
 

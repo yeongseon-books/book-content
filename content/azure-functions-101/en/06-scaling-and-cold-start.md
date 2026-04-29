@@ -98,6 +98,8 @@ In practice, step 4 often dominates more than people expect. If imports pull in 
 - **Delay expensive initialization** — avoid opening DB connections, loading big files, or downloading metadata at import time.
 - **Reuse process-local state carefully** — cache clients that are safe to reuse across invocations in module scope.
 
+The next snippet is intentionally schematic. `create_cosmos_client()` stands in for your own client-construction code so the example can stay focused on lazy initialization.
+
 ```python
 import azure.functions as func
 

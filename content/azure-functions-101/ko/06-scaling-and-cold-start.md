@@ -98,6 +98,8 @@ Azure Functions의 스케일링은 한 단어로 뭉뚱그리기 어렵습니다
 - **초기화 시점 늦추기** — import 시점에 DB 연결, 대용량 파일 로드, 인증 메타데이터 다운로드를 하지 않습니다.
 - **프로세스 재사용 활용** — 같은 Worker 안에서 재사용 가능한 클라이언트는 모듈 전역에 캐시합니다.
 
+아래 코드는 lazy initialization 패턴에만 집중하기 위한 개략 예시입니다. `create_cosmos_client()`는 여러분 프로젝트의 실제 클라이언트 생성 코드로 바꿔 읽으면 됩니다.
+
 ```python
 import azure.functions as func
 
