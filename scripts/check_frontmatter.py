@@ -33,6 +33,7 @@ VALID_STATUS = {"draft", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PREFIX_RE = re.compile(r"^(\d+)")
+H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 
 
 def load_catalog() -> dict[str, dict]:
@@ -94,6 +95,19 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> list[str]:
     last = fm.get("last_reviewed")
     if last is not None and not (isinstance(last, str) and DATE_RE.match(last)):
         errors.append(f"last_reviewed must be YYYY-MM-DD string, got {last!r}")
+
+    fm_title = fm.get("title")
+    if fm_title is not None:
+        body = post.content
+        m_h1 = H1_RE.search(body)
+        if m_h1 is None:
+            errors.append("body has no H1 (`# Title`) — front matter title cannot be cross-checked")
+        elif m_h1.group(1).strip() != str(fm_title).strip():
+            errors.append(
+                f"H1 disagrees with front matter title:\n"
+                f"      H1:    {m_h1.group(1).strip()!r}\n"
+                f"      title: {str(fm_title).strip()!r}"
+            )
 
     unknown = set(fm.keys()) - REQUIRED_FIELDS - OPTIONAL_FIELDS
     if unknown:

@@ -207,8 +207,8 @@ tech-writing/
 | 1 | 문서 분리 (SERIES/PUBLISHING/STYLE_GUIDE/EBOOK/ROADMAP) + README 재작성 | 낮음 | 완료 |
 | 2 | 디렉토리 스캐폴딩 (content/ docs/ exports/ templates/ scripts/) | 낮음 | 완료 |
 | 3 | 메타데이터 (root `series.yaml`) | 낮음 | 완료 (per-series `series.yaml` 는 Phase 6 에서 시리즈별로 함께 추가됨) |
-| 4 | MkDocs 셋업 (mkdocs.yml + requirements.txt + build_docs.py skeleton) | 낮음 | 완료 (스크립트는 skeleton, 실제 빌드는 Phase 7 이후) |
-| 5 | 스크립트 skeleton (export_tistory/medium/ebook_source, check_*) | 낮음 | 완료 (skeleton) |
+| 4 | MkDocs 셋업 (mkdocs.yml + requirements.txt + build_docs.py) | 낮음 | 완료 (Phase 7d: mkdocs build --strict 통과, 129 파일) |
+| 5 | 스크립트 실 동작 (export_tistory/medium/ebook_source, check_*, build_series_index, _transform) | 중간 | 완료 (Phase 7c-h: 7개 스크립트 + 공유 transform 모듈) |
 | 6 | 시리즈 파일 이동 (`<series>/` → `content/<series>/`) + per-series `series.yaml` 동시 추가 | **높음** | 완료 (10/10 시리즈, 시리즈별 원자 커밋) |
 | 7 | 콘텐츠 품질 (front matter 도입, 스크립트 실 동작, mkdocs build 검증) | 중간 | 완료 (129/129 front matter, 7개 스크립트 실 동작, mkdocs build --strict 통과) |
 | 8 | eBook source bundle 통합 (`export_ebook_source.py` 실 동작 + private `mkdocs-ebook` 빌드) | 중간 | 완료 (19/19 번들 strict-pass; 빌더 contract 는 EBOOK.md §4.1) |
@@ -219,9 +219,11 @@ tech-writing/
 1. `gh repo rename tech-writing` (또는 GitHub UI).
 2. 로컬: `git remote set-url origin git@github.com:yeongseon/tech-writing.git`.
 3. `series.yaml` `meta.repo` 를 `yeongseon/tech-writing` 으로 변경하고 (선택) `meta.tag` 도 새 commit SHA 로 갱신.
-4. `python3 .sisyphus/medium/to-medium.py` — Medium 변형 (`content/<series>/medium/*.md`) 의 raw 이미지 URL 일괄 재생성.
-5. `python3 scripts/export_ebook_source.py <each ebook series> --lang <ko|en>` — 새 URL 로 ebook 번들 재생성 후 `mkdocs build --strict` 로 모두 통과 확인.
-6. 이미 발행된 Tistory/Medium 게시물은 본문 URL 이 자동 변경되지 않으므로 (Medium은 raw URL이 본문에 박힘) 새 URL 로 본문 갱신이 필요한 글만 수동으로 다시 import 한다.
+4. Medium 변형 재생성 (URL 이 변경되므로 두 단계 모두 필요):
+   - `python3 .sisyphus/medium/to-medium.py` — `content/<series>/medium/*.md` 의 raw 이미지 URL 갱신
+   - `python3 scripts/export_medium.py <series> --all` — 발행용 사본 (`exports/medium/`) 갱신; 발행 직전이라면 이 단계 생략 가능 (`exports/` 는 disposable)
+5. ebook 번들 재생성: `python3 scripts/export_ebook_source.py <each ebook series> --lang <ko|en>` — 새 URL 로 ebook 번들을 다시 만들고 `mkdocs build --strict` 로 모두 통과 확인.
+6. 이미 발행된 Tistory/Medium 게시물은 본문 URL 이 자동 변경되지 않으므로 (Medium 은 raw URL 이 본문에 박힘) 새 URL 로 본문 갱신이 필요한 글만 수동으로 다시 import 한다.
 
 ## 9. 산출물 목록
 
@@ -231,7 +233,7 @@ tech-writing/
 - `SERIES.md`, `PUBLISHING.md`, `STYLE_GUIDE.md`, `EBOOK.md`, `ROADMAP.md`
 - `mkdocs.yml`, `requirements.txt`, `requirements-dev.txt`, `series.yaml` (루트 카탈로그)
 - `content/`, `docs/`, `exports/`, `templates/`, `scripts/` 디렉토리 스캐폴딩
-- `scripts/{build_docs,export_tistory,export_medium,export_ebook_source,check_links,check_frontmatter,build_series_index}.py` (skeleton)
+- `scripts/{build_docs,export_tistory,export_medium,export_ebook_source,check_links,check_frontmatter,build_series_index}.py` + `_transform.py` (실 동작)
 
 각 시리즈별 `series.yaml` 은 본 사이클이 아닌 Phase 6 시리즈 이동 커밋 안에서 함께 추가된다 (이동과 메타가 같은 원자 커밋이어야 경로 정합성이 유지됨).
 

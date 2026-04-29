@@ -40,6 +40,10 @@ BLOG_MARKERS_RE = re.compile(
 )
 TOC_BEGIN_RE = re.compile(r"^<!--\s*toc:begin\s*-->\s*\n?", re.MULTILINE)
 TOC_END_RE = re.compile(r"^<!--\s*toc:end\s*-->\s*\n?", re.MULTILINE)
+TOC_BLOCK_RE = re.compile(
+    r"\n*^---\s*\n+<!--\s*toc:begin\s*-->.*?<!--\s*toc:end\s*-->\s*\n?",
+    re.DOTALL | re.MULTILINE,
+)
 TAGS_LINE_RE = re.compile(r"\n*^Tags:[^\n]*\n?\s*\Z", re.MULTILINE)
 FRONT_MATTER_RE = re.compile(r"\A---\n.*?\n---\n", re.DOTALL)
 
@@ -70,6 +74,10 @@ def strip_toc_markers(text: str) -> str:
     return text
 
 
+def strip_toc_block(text: str) -> str:
+    return TOC_BLOCK_RE.sub("\n", text)
+
+
 def strip_bottom_tags_line(text: str) -> str:
     return TAGS_LINE_RE.sub("\n", text).rstrip() + "\n"
 
@@ -80,7 +88,7 @@ def transform_for_mkdocs(text: str, include_ebook_blocks: bool = False) -> str:
         text = strip_ebook_only_markers_keep_body(text)
     else:
         text = strip_ebook_only(text)
-    text = strip_toc_markers(text)
+    text = strip_toc_block(text)
     text = strip_bottom_tags_line(text)
     return text
 
@@ -89,7 +97,7 @@ def transform_for_ebook(text: str) -> str:
     text = strip_front_matter(text)
     text = strip_blog_only(text)
     text = strip_ebook_only_markers_keep_body(text)
-    text = strip_toc_markers(text)
+    text = strip_toc_block(text)
     text = strip_bottom_tags_line(text)
     return text
 

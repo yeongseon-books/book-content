@@ -99,21 +99,27 @@ bundle 을 소비하는 빌더(예: private `mkdocs-ebook`) 가 의존하는 보
 
 - `<!-- blog-only:start --> ... <!-- blog-only:end -->` 블록
 - 하단 `Tags: A, B, C, D` visible 라인
-- `<!-- toc:begin --> ... <!-- toc:end -->` 시리즈 TOC 블록 (책 자체 TOC가 대체)
-- 블로그용 문장 ("다음 글에서는...", "이번 글에서는...", "Tistory/Medium에 발행한 ...")
-- 너무 강한 SEO형 제목 → 책 챕터 제목으로 정규화 (`series.yaml` `episodes[].title.ebook` 사용 가능)
+- `<!-- toc:begin --> ... <!-- toc:end -->` 시리즈 TOC 블록 전체 (책 자체 TOC가 대체)
+- YAML front matter 블록 전체 (책에서는 본문만 필요; 메타는 빌더가 별도 관리)
 
 ### 유지 대상
 
 - `<!-- ebook-only:start --> ... <!-- ebook-only:end -->` 블록 (마커는 제거하고 내용은 유지)
 - Source Version / Call Path Summary 섹션 (Deep Dive)
-- 코드 블록, 이미지, 표, 각주
+- 코드 블록, 이미지, 표, 각주, H1 챕터 제목, 본문 모든 prose
+
+### 재작성 대상
+
+- 본문 내 cross-series 링크 (`../../<other-series>/<lang>/...`) 는
+  `https://github.com/<repo>/tree/<TAG>/content/<other-series>/<lang>/...`
+  절대 GitHub URL 로 재작성된다 (책은 self-contained, 외부 참조는 commit-pinned).
+- 본문 내 이미지 참조 (`../../../assets/...`) 는 `assets/<series>/<NN>/...` 로 재작성되어
+  `docs/assets/...` 에 복사된 사본을 가리킨다.
 
 ### 추가 대상
 
-- **Preface** (`templates/ebook-preface.md` 기반): 이 책을 읽는 방법, 시리즈 전체 구조, 챕터 간 연결.
-- **Index page** (`templates/ebook-index.md`): 책 표지 다음의 안내 페이지.
-- (선택) **Appendix / Glossary**.
+- **Preface** (`templates/ebook-preface.md` 기반): 이 책을 읽는 방법, 시리즈 전체 구조, 책 자체 목차, 원본 블로그 글 canonical URL 목록.
+- **Index page** (`templates/ebook-index.md`): 책 표지 다음의 안내 페이지 (제목, 부제, 저자, 한눈에 보는 목차).
 
 ---
 
@@ -148,31 +154,46 @@ References
 
 ---
 
-## 8. Front matter 필드 (eBook 관련)
+## 8. Front matter / 카탈로그 필드 (eBook 빌드가 실제로 읽는 것)
 
-front matter 도입(Phase 7) 후 다음 필드가 eBook 빌드에 사용된다.
+**현재 ebook 빌드가 실제로 사용하는 필드만 명시한다.** 미래에 추가될 ebook-specific 메타필드는 본 절에 추가될 때 비로소 contract 의 일부가 된다.
 
-```yaml
-targets:
-  ebook: true
-ebook:
-  chapter_title: "Azure Functions란?"   # 책 본문에서 사용할 짧은 제목 (선택)
-  include_in_toc: true
-  preface_only: false                   # true면 본문에 포함하지 않고 preface 자료로만 사용
-```
-
-`series.yaml` 측:
+### 시리즈 (`series.yaml` 루트)
 
 ```yaml
-ebook:
-  title:
-    ko: "Azure Functions 101 — 입문에서 운영까지"
-    en: "Azure Functions 101 — From First Deploy to Production"
-  subtitle:
-    ko: "이벤트 기반 실행 모델을 손에 익히는 7단계"
-  cover_image: assets/azure-functions-101/cover.png
-  preface: templates/ebook-preface.md
+meta:
+  repo: <owner>/<repo>      # 절대 URL 빌드용
+  tag: <commit-sha>         # commit-pinned 절대 URL 빌드용
+
+series:
+  - id: <series-id>
+    title:
+      ko: ...               # ebook 표지 제목 (lang 별)
+      en: ...
+    description:
+      ko: ...               # ebook 부제
+      en: ...
+    languages: [ko, en]     # ebook 빌드 가능한 언어 집합
+    targets:
+      ebook: true           # false 면 export_ebook_source.py 가 거부
+    path: content/<series>/ # canonical URL 빌드용
 ```
+
+### 시리즈 (`content/<series>/series.yaml` 카탈로그)
+
+```yaml
+articles:
+  - idx: 1
+    slug: 01-what-is-azure-functions   # docs/<NN>-<slug-tail>.md 생성에 사용
+```
+
+### Article front matter
+
+```yaml
+title: ...                  # H1 과 동일해야 한다 (build_series_index 가 이 필드를 읽음)
+```
+
+article 의 front matter 블록 자체는 ebook 본문에서 제거된다.
 
 ---
 
@@ -183,8 +204,8 @@ eBook 파이프라인은 다음 순서로 활성화된다.
 | Step | 상태 | 비고 |
 | --- | --- | --- |
 | `EBOOK.md` 정책 문서 | 완료 | 본 문서 |
-| `templates/ebook-preface.md`, `ebook-index.md` skeleton | 완료 | 비어 있는 템플릿 |
-| `scripts/export_ebook_source.py` skeleton | 완료 | 동작은 TODO |
-| 실제 변환 로직 구현 | 보류 | front matter 도입 후 |
-| Azure Functions 101 첫 빌드 | 보류 | 콘텐츠 이행 후 |
+| `templates/ebook-preface.md`, `ebook-index.md` | 완료 | 렌더 시점에 `# Template:` 헤더 자동 제거 |
+| `scripts/export_ebook_source.py` 실 동작 | 완료 (Phase 7g + 8) | 19/19 시리즈 번들이 `mkdocs build --strict` 통과 |
+| 모든 ebook-target 시리즈에 front matter 도입 | 완료 (Phase 7b) | 129/129 article |
+| Azure Functions 101 첫 빌드 | 완료 | `exports/ebook-source/azure-functions-101-{ko,en}/` |
 | private mkdocs-ebook 통합 테스트 | 보류 | private repo 접근 환경에서 |

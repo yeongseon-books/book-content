@@ -31,7 +31,7 @@
 
 - [x] 루트 `series.yaml` 추가 (시리즈 카탈로그 단일 출처)
 - [x] 시리즈별 `series.yaml` 추가 — Phase 6 시리즈 이동 커밋 안에서 동시 추가 (이동과 메타가 같은 원자 커밋이어야 경로 정합성 유지)
-- [ ] 모든 글에 YAML front matter 추가 (Phase 7)
+- [x] 모든 글에 YAML front matter 추가 (Phase 7b: 129/129)
 - [ ] `finalize-posts.py` 의 `SERIES_TAGS` 와 `series.yaml` 동기화 검증 추가
 
 ## Phase 4 — MkDocs
@@ -39,20 +39,20 @@
 - [x] `mkdocs.yml` 추가 (현재는 placeholder nav — Phase 6 전까지 빌드되지 않음)
 - [x] `requirements.txt` 추가 (mkdocs + material + pymdown + pyyaml + frontmatter)
 - [x] `requirements-dev.txt` 추가 (mkdocs-ebook 옵션 설치 주석)
-- [x] `scripts/build_docs.py` skeleton (content -> docs materialization 만 담당)
-- [ ] `docs/` 자동 생성 로직 구현 (Phase 6 이후)
-- [ ] `mkdocs serve` 로 ko/en 사이트 정상 빌드 확인 (Phase 6 이후)
+- [x] `scripts/build_docs.py` (content -> docs materialization)
+- [x] `docs/` 자동 생성 동작 (Phase 7d: 129 파일)
+- [x] `mkdocs build --strict` ko/en 정상 빌드 (Phase 7d)
 
-## Phase 5 — Exporters (skeleton)
+## Phase 5 — Exporters
 
-- [x] `scripts/export_tistory.py` skeleton
-- [x] `scripts/export_medium.py` skeleton
-- [x] `scripts/export_ebook_source.py` skeleton
-- [x] `scripts/check_links.py` skeleton
-- [x] `scripts/check_frontmatter.py` skeleton
-- [x] `scripts/build_series_index.py` skeleton (mkdocs.yml `nav` 단일 소유자)
-- [ ] 각 스크립트 실제 변환 로직 구현
-- [ ] 기존 `.sisyphus/medium/{to-medium.py, finalize-posts.py, mermaid-to-png.py}` 와 통합/병행 정책 결정
+- [x] `scripts/export_tistory.py` (Phase 7g)
+- [x] `scripts/export_medium.py` (Phase 7g)
+- [x] `scripts/export_ebook_source.py` (Phase 7g + 8: 19/19 strict-pass)
+- [x] `scripts/check_links.py` (Phase 7e: 0 failures)
+- [x] `scripts/check_frontmatter.py` (Phase 7a: H1==title 검증 포함)
+- [x] `scripts/build_series_index.py` (Phase 7c: mkdocs.yml `nav` 단일 소유자)
+- [x] `scripts/_transform.py` 공유 변환 매트릭스 (Phase 7h)
+- [ ] `.sisyphus/medium/{to-medium.py, finalize-posts.py, mermaid-to-png.py}` 와 통합/병행 정책 결정 (현 상태: 병행)
 
 ## Phase 6 — Series file moves (시리즈별, 원자 커밋)
 
@@ -94,23 +94,26 @@ python3 .sisyphus/medium/finalize-posts.py
 - [ ] Deep Dive 글에 `Call Path Summary` 섹션 추가
 - [ ] 101 글에 `Common Mistakes` 또는 `Checklist` 섹션 추가
 - [ ] 모든 글에 `seo_title` front matter 필드 추가
-- [ ] 모든 글에 `last_reviewed` 갱신
+- [x] 모든 글에 `last_reviewed` 갱신 (Phase 7b: 2026-04-29)
 - [ ] `blog-only` / `ebook-only` 블록 도입 (필요한 글에 한해)
 
 ## Phase 8 — eBook integration
 
-- [ ] `templates/ebook-preface.md`, `ebook-index.md` 채우기
-- [ ] `export_ebook_source.py` 실 동작 구현
-- [ ] Azure Functions 101 ko/en eBook source bundle 첫 빌드
-- [ ] private `mkdocs-ebook` 와 통합 테스트
+- [x] `templates/ebook-preface.md`, `ebook-index.md` 채우기 (Phase 8: 렌더 시 `# Template:` 헤더 자동 제거)
+- [x] `export_ebook_source.py` 실 동작 구현 (Phase 7g + 8: catalog validator + rmtree guard + cross-series rewrite)
+- [x] Azure Functions 101 ko/en eBook source bundle 첫 빌드 (Phase 8: strict-pass)
+- [x] 19/19 ebook-target 시리즈 번들 strict-pass (Phase 8)
+- [ ] private `mkdocs-ebook` 와 통합 테스트 (private repo 접근 환경에서)
 - [ ] 첫 PDF 산출물 확인
 
 ## Phase 9 — Repository rename & cutover
 
 - [ ] **수동**: `gh repo rename tech-writing` (또는 GitHub UI Settings → Rename)
-- [ ] `.sisyphus/medium/to-medium.py` 의 `OWNER/REPO` 상수 업데이트
-- [ ] medium 변형 `OWNER/REPO` URL 일괄 재생성 (`to-medium.py` 의 `TAG` 도 함께 갱신)
-- [ ] 이미 발행된 Medium 글의 raw URL 은 GitHub redirect 에 의존 — 장기 신뢰 보증 아님, 가능하면 재발행
+- [ ] `series.yaml` `meta.repo` 를 `yeongseon/tech-writing` 으로 갱신, `meta.tag` 도 새 commit SHA 로 갱신
+- [ ] `python3 .sisyphus/medium/to-medium.py` — medium 변형 raw URL 일괄 재생성
+- [ ] `python3 scripts/export_medium.py <series> --all` — `exports/medium/` 발행 사본 재생성 (선택; disposable)
+- [ ] `python3 scripts/export_ebook_source.py <series> --lang <lang>` — 19개 ebook 번들 재생성 + strict-build 확인
+- [ ] 이미 발행된 Medium 글의 raw URL 은 GitHub redirect 에 의존 — 장기 신뢰 보증 아님, 가능하면 본문 다시 import
 - [ ] README badge / 외부 링크 업데이트
 - [ ] 새 이름으로 첫 announcement post (선택)
 

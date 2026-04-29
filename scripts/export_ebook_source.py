@@ -1,6 +1,6 @@
 """Export an ebook source bundle for the private mkdocs-ebook builder.
 
-Per EBOOK.md (sections 4 and 5), this writes a self-contained directory
+Per EBOOK.md sections 4 and 4.1, this writes a self-contained directory
 the private builder can consume:
 
     exports/ebook-source/<series>-<lang>/
@@ -11,21 +11,24 @@ the private builder can consume:
             01-<slug>.md
             02-<slug>.md
             ...
-        assets/<series>/...
+            assets/<series>/...
 
 Transforms applied (per EBOOK.md section 5):
-- strip front matter (private builder uses its own metadata)
+- strip front matter block (private builder uses its own metadata)
 - strip blog-only blocks
 - keep ebook-only blocks (markers stripped, body kept)
-- strip TOC marker block (book TOC replaces series TOC)
+- strip TOC block entirely (book has its own native nav)
 - strip bottom Tags line
-- rewrite image paths from `../../../assets/...` to `../assets/...` so the
-  flat docs/ tree resolves to the bundle's assets/
+- rewrite image paths from `../../../assets/...` to `assets/...`
+  (matches the relocated `docs/assets/<series>/...` copy)
+- rewrite cross-series links from `../../<other-series>/<lang>/...` to
+  absolute `https://github.com/<repo>/tree/<TAG>/content/<other-series>/<lang>/...`
+  GitHub URLs (book is self-contained; cross-series refs become
+  commit-pinned external pointers)
 
-Cross-series links are left as-is and reported as warnings; the book is
-self-contained, so cross-series references should be footnoted manually
-or removed before publishing. (We don't auto-strip them — that's an
-editorial decision.)
+Cross-series link rewrites are also surfaced as a WARN list so an editor
+can decide whether to footnote them, drop them, or replace them with a
+book-internal cross-reference before publishing.
 """
 
 from __future__ import annotations
@@ -45,9 +48,15 @@ SERIES_YAML = REPO_ROOT / "series.yaml"
 ASSETS_DIR = REPO_ROOT / "assets"
 TEMPLATES = REPO_ROOT / "templates"
 
-_meta = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8")).get("meta", {})
-REPO = _meta.get("repo", "yeongseon/tech-blog")
-TAG = _meta.get("tag", "master")
+_meta = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8")).get("meta") or {}
+if "repo" not in _meta or "tag" not in _meta:
+    raise SystemExit(
+        "series.yaml is missing meta.repo or meta.tag — both are required to "
+        "build commit-pinned absolute URLs in ebook bundles. Add a top-level "
+        "meta: {repo: <owner>/<repo>, tag: <commit-sha>} block."
+    )
+REPO = _meta["repo"]
+TAG = _meta["tag"]
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _transform import transform_for_ebook
@@ -69,10 +78,59 @@ def rewrite_assets(text: str) -> str:
 
 
 def rewrite_cross_series_links(text: str) -> str:
-    return CROSS_SERIES_REWRITE_RE.sub(
-        rf"\1https://github.com/{REPO}/tree/{TAG}/content/\2)",
-        text,
-    )
+    out: list[str] = []
+    in_fence = False
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("```") or stripped.startswith("~~~"):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if in_fence:
+            out.append(line)
+            continue
+        out.append(
+            CROSS_SERIES_REWRITE_RE.sub(
+                rf"\1https://github.com/{REPO}/tree/{TAG}/content/\2)",
+                line,
+            )
+        )
+    return "".join(out)
+
+
+def validate_catalog(series_id: str, lang: str, series_path: Path, per: dict) -> None:
+    """Ensure per-series catalog matches files on disk before building.
+
+    The bundle is assembled from per['articles']; if catalog drifts from
+    disk, we either skip real chapters or write empty stubs. Fail loudly
+    instead of silently producing a malformed book.
+    """
+    declared = {(a["idx"], a["slug"]) for a in per.get("articles", [])}
+    if not declared:
+        raise SystemExit(f"per-series catalog has no articles: {series_path}/series.yaml")
+    lang_dir = series_path / lang
+    if not lang_dir.is_dir():
+        raise SystemExit(f"missing language directory: {lang_dir}")
+    on_disk_files = sorted(p.name for p in lang_dir.glob("*.md"))
+    declared_files = sorted(f"{slug}.md" for _, slug in declared)
+    missing_on_disk = sorted(set(declared_files) - set(on_disk_files))
+    extra_on_disk = sorted(set(on_disk_files) - set(declared_files))
+    problems: list[str] = []
+    if missing_on_disk:
+        problems.append(f"declared in catalog but missing from {lang}/: {missing_on_disk}")
+    if extra_on_disk:
+        problems.append(f"present in {lang}/ but missing from catalog: {extra_on_disk}")
+    for art in per.get("articles", []):
+        slug = art["slug"]
+        idx = art["idx"]
+        m = re.match(r"^(\d+)-", slug)
+        if m and int(m.group(1)) != int(idx):
+            problems.append(f"slug prefix disagrees with idx: idx={idx} slug={slug!r}")
+    if problems:
+        raise SystemExit(
+            f"catalog/disk mismatch for series {series_id} ({lang}):\n  - "
+            + "\n  - ".join(problems)
+        )
 
 
 def load_root_series(series_id: str) -> dict:
@@ -133,7 +191,15 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         raise SystemExit(f"series {series_id} does not target ebook")
     series_path = REPO_ROOT / s["path"]
     per = load_per_series(series_path)
+    validate_catalog(series_id, lang, series_path, per)
 
+    out_resolved = out_dir.resolve()
+    base_resolved = EXPORT_BASE.resolve()
+    if base_resolved not in out_resolved.parents and out_resolved != base_resolved:
+        raise SystemExit(
+            f"refusing to wipe {out_dir}: not under {EXPORT_BASE} "
+            f"(rmtree guard)"
+        )
     if out_dir.exists():
         shutil.rmtree(out_dir)
     docs = out_dir / "docs"
@@ -156,7 +222,7 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         for m in CROSS_SERIES_LINK_RE.finditer(text):
             cross_warnings.append((src.name, m.group(0)))
         text = rewrite_cross_series_links(text)
-        dst = docs / f"{idx:02d}-{slug.split('-', 1)[1] if '-' in slug else slug}.md"
+        dst = docs / f"{slug}.md"
         dst.write_text(text, encoding="utf-8")
         chapters.append({"idx": idx, "title": title, "filename": dst.name})
 
@@ -210,8 +276,8 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
 
     print(f"wrote {len(chapters)} chapters to {out_dir.relative_to(REPO_ROOT)}/")
     if cross_warnings:
-        print(f"\nWARN: {len(cross_warnings)} cross-series link(s) preserved verbatim")
-        print("  (book is self-contained; review these manually before publishing):")
+        print(f"\nWARN: {len(cross_warnings)} cross-series link(s) rewritten to absolute GitHub URLs")
+        print("  (book is self-contained; review whether to footnote, drop, or replace each):")
         for fname, link in cross_warnings[:10]:
             print(f"    {fname}: {link}")
         if len(cross_warnings) > 10:
