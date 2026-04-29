@@ -42,7 +42,7 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: draft
-    path: azure-functions-101
+    path: content/azure-functions-101
 
   - id: azure-functions-deep-dive
     category: azure

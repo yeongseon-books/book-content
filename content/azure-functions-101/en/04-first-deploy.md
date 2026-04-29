@@ -41,7 +41,7 @@ python --version     # 3.11+
 
 ## The full flow on one page
 
-![The full flow on one page](../../assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png)
+![The full flow on one page](../../../assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png)
 ---
 
 ## 1. Create the project
@@ -130,7 +130,7 @@ Three Azure resources are required.
 | **Storage Account** | Required storage for host state, locks, and trigger metadata |
 | **Function App** | The compute resource that runs your functions |
 
-![4. Create Azure resources](../../assets/azure-functions-101/04/04-02-4-create-azure-resources.en.png)
+![4. Create Azure resources](../../../assets/azure-functions-101/04/04-02-4-create-azure-resources.en.png)
 > Note: The Storage Account is infrastructure storage for the Functions platform itself. It holds things like trigger leases, invocation metadata, and Timer schedule state. Keep business data in a separate store.
 
 Now create the resources. Names must be globally unique, so adjust them as needed.
@@ -187,7 +187,7 @@ func azure functionapp publish $APP
 
 Under the hood, the flow looks like this.
 
-![5. Deploy](../../assets/azure-functions-101/04/04-03-5-deploy.en.png)
+![5. Deploy](../../../assets/azure-functions-101/04/04-03-5-deploy.en.png)
 You should see something like this at the end.
 
 ```

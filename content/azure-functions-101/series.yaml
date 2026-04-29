@@ -1,0 +1,39 @@
+id: azure-functions-101
+category: azure
+title:
+  ko: Azure Functions 101
+  en: Azure Functions 101
+description:
+  ko: Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
+  en: A 7-part beginner guide to Azure Functions.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+articles:
+- idx: 1
+  slug: 01-what-is-azure-functions
+  status: ready
+- idx: 2
+  slug: 02-triggers-and-bindings
+  status: ready
+- idx: 3
+  slug: 03-host-and-worker
+  status: ready
+- idx: 4
+  slug: 04-first-deploy
+  status: ready
+- idx: 5
+  slug: 05-choosing-a-plan
+  status: ready
+- idx: 6
+  slug: 06-scaling-and-cold-start
+  status: ready
+- idx: 7
+  slug: 07-monitoring-and-ops
+  status: ready
