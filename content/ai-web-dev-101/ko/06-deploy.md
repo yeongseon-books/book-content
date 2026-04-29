@@ -132,6 +132,17 @@ az account list --output table
 
 Azure에는 수많은 설정 메뉴가 있지만, 초보자라면 `az webapp up` 명령어가 마법과도 같은 경험을 줄 겁니다. 이 명령어는 자동으로 리소스 그룹(Resource Group)을 만들고, 요금제(App Service Plan)를 정하고, 코드를 압축해서 올려줍니다.
 
+FastAPI를 올릴 때는 이 명령만으로 끝나지 않는다는 점을 먼저 기억하세요. App Service는 Python 앱을 받으면 배포 자체는 완료하지만, 어떤 ASGI 서버로 `main:app`을 띄울지 모르면 Azure 기본 플레이스홀더 페이지를 보여줄 수 있습니다.
+
+예를 들어 프로젝트 루트에는 최소한 아래와 같은 `requirements.txt`가 있어야 합니다.
+
+```text
+fastapi
+uvicorn[standard]
+gunicorn
+openai
+```
+
 ```bash
 # 루트 폴더에서 실행 (requirements.txt가 있어야 합니다)
 az webapp up --sku F1 --name my-ai-chatbot-app --location koreacentral
@@ -143,16 +154,29 @@ az webapp up --sku F1 --name my-ai-chatbot-app --location koreacentral
 
 배포가 끝나면 터미널 창에 JSON 형태의 결과가 나옵니다. 여기서 **Resource Group**의 이름(예: `[이름]_rg_Windows_koreacentral`)을 잘 메모해 두세요. 다음 단계에서 꼭 필요합니다.
 
+그다음 FastAPI 앱의 시작 명령을 명시적으로 설정합니다.
+
+```bash
+az webapp config set \
+  --resource-group myResourceGroup \
+  --name <app-name> \
+  --startup-file "gunicorn -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 main:app"
+```
+
+이 설정이 없으면 App Service가 내 FastAPI 앱 대신 기본 플레이스홀더 페이지를 반환할 수 있습니다. `gunicorn`이 워커 프로세스를 띄우고, `uvicorn.workers.UvicornWorker`가 ASGI 앱인 `main:app`을 실제로 실행한다고 이해하면 됩니다.
+
 ### 3단계: 환경 변수로 API 키 주입하기
 
 로컬 `.env` 파일은 GitHub에 올리지 않았으니, Azure 서버도 내 OpenAI API 키를 모르는 상태입니다. 앱 설정(App Settings) 메뉴를 통해 이를 알려줘야 합니다.
+
+아래 명령을 실행하기 전에 로컬 셸에서 `export OPENAI_API_KEY="..."`처럼 환경 변수를 먼저 잡아 두세요. 그래야 실제 비밀 키 문자열이 셸 히스토리에 그대로 남지 않습니다.
 
 ```bash
 # 메모해둔 리소스 그룹 이름을 --resource-group 뒤에 넣으세요.
 az webapp config appsettings set \
   --name my-ai-chatbot-app \
   --resource-group [메모한-리소스-그룹-이름] \
-  --settings OPENAI_API_KEY=sk-xxxx...
+  --settings OPENAI_API_KEY="$OPENAI_API_KEY"
 ```
 
 이제 서버가 기지개를 켜고 OpenAI 서버와 대화할 준비를 마쳤습니다!
