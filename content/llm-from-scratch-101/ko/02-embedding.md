@@ -74,7 +74,7 @@ print(emb(idx).shape)
 
 원 논문은 사인·코사인 기반 위치 인코딩을 썼습니다. 좌표를 함수로 계산하니 길이가 달라도 일반화가 쉽다는 장점이 있습니다. GPT 계열은 learned positional embedding을 많이 씁니다. 이번 시리즈도 그쪽으로 갑니다. 구현이 짧고, 작은 모델에서 직관적으로 보기 좋기 때문입니다.
 
-![Sinusoidal vs Learned Positional Embedding](../../../assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
+![사인파형과 학습형 위치 임베딩의 차이](../../../assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
 한 토큰 벡터에 "무슨 글자냐"와 "몇 번째냐"를 같이 실어 보내는 구조입니다.
 
 ## 한 토큰의 입력 벡터 = token_emb + pos_emb

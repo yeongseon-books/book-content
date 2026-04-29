@@ -35,7 +35,7 @@ last_reviewed: '2026-04-29'
 
 입력은 `(B, T)` 모양의 토큰 ID입니다. 여기서 토큰 임베딩과 위치 임베딩을 더하고, 블록 여섯 개를 순서대로 지나가게 합니다. 마지막 `ln_f`를 거친 뒤 `lm_head`로 vocab 차원에 투사하면 `(B, T, vocab_size)` logits가 나옵니다.
 
-![전체 forward 패스 한눈에 보기](../../../assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.ko.png)
+![GPT 순전파 경로의 전체 구조](../../../assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.ko.png)
 앞에서 만든 부품 이름이 전부 그대로 등장합니다. 그래서 모델 클래스는 새 알고리즘보다 조립 코드에 가깝습니다.
 
 ## class GPT(nn.Module) — 80줄짜리 모델

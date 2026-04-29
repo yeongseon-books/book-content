@@ -33,7 +33,7 @@ Today's mental model is this: **A chatbot isn't just a model. It's a small syste
 
 To build a functional chatbot, we need four components working together: the model itself, a way to track the conversation, a streaming protocol, and a browser-based frontend.
 
-![Chatbot = Model + History + Streaming + UI](../../../assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png)
+![Chatbot pipeline across model, history, streaming, UI](../../../assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png)
 ## Designing the Multi-turn Prompt Format
 
 For this project, we'll concatenate the conversation history into a plain text block.

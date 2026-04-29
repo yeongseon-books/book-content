@@ -35,7 +35,7 @@ SFT의 첫 효과는 지식보다 형식 변화입니다.
 
 pre-training은 다음 토큰 예측, SFT는 instruction-response 형식 적응, RLHF는 사람 선호 반영 단계입니다.
 
-![Pre-training vs Fine-tuning vs RLHF — 1분 정리](../../../assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.ko.png)
+![사전학습과 SFT와 RLHF의 역할 차이](../../../assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.ko.png)
 ## Instruction 데이터 한 줄의 형태
 
 JSONL 한 줄은 `{"instruction": ..., "response": ...}` 형태로 둡니다. 학습할 때는 `Q: {q}\nA: {a}` 템플릿으로 이어 붙입니다.

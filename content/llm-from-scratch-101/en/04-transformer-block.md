@@ -66,7 +66,7 @@ The original Transformer placed LayerNorm after the sub-layers, known as Post-no
 
 We will use Pre-norm for this series. We normalize the input first, pass it through Attention and FeedForward, and then add the residual. It might look like a single-line change in code, but the training stability feels quite different.
 
-![LayerNorm — Pre-norm vs Post-norm](../../../assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png)
+![Pre-norm and post-norm LayerNorm placement](../../../assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png)
 ## Implementing a Single Block in PyTorch — 25 Lines
 
 Now we add the block to `model.py`. Using the `CausalSelfAttention` from the previous post, we combine it with the `FeedForward` and two `LayerNorm` layers.

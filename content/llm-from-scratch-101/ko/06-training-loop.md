@@ -35,7 +35,7 @@ last_reviewed: '2026-04-29'
 
 학습 루프의 중심은 정말 다섯 줄입니다. `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, `step()`이 전부입니다. 나머지는 평가 주기, 로그, 학습률 계산 같은 운영 코드입니다.
 
-![학습 루프 5줄의 구조](../../../assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
+![순전파부터 업데이트까지의 학습 단계](../../../assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
 처음에는 `backward()`가 거대한 마법처럼 보입니다. 실제로는 autograd가 그래프를 거꾸로 따라가며 각 파라미터에 `grad`를 채워 줍니다. optimizer는 그 값을 읽어 한 걸음 움직일 뿐입니다.
 
 ## AdamW가 SGD보다 잘 되는 이유 — 짧게
