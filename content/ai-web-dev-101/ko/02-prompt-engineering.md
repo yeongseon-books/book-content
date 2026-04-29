@@ -29,7 +29,7 @@ OpenAI의 Chat Completion API를 보면 `role`이라는 필드가 있습니다. 
 
 사람도 "전문가로서 답변해 주세요"라는 말을 들으면 마음가짐이 달라지듯, AI도 시스템 프롬프트를 통해 답변의 톤과 깊이를 조절합니다.
 
-![System Prompt와 User Prompt의 역할](../assets/ai-web-dev-101/02/prompt-role-layering.ko.png)
+![System Prompt와 User Prompt의 역할](../../../assets/ai-web-dev-101/02/prompt-role-layering.ko.png)
 
 ---
 
@@ -49,9 +49,9 @@ OpenAI의 Chat Completion API를 보면 `role`이라는 필드가 있습니다. 
 #### 4. 제약 사항 걸기
 "전문 용어는 빼고 설명해줘", "비속어는 절대 쓰지 마", "답변은 한국어로만 해줘" 같은 제약을 명확히 두면 엉뚱한 대답을 막을 수 있습니다.
 
-![좋은 프롬프트의 4가지 원칙](../assets/ai-web-dev-101/02/four-prompt-principles.ko.png)
+![좋은 프롬프트의 4가지 원칙](../../../assets/ai-web-dev-101/02/four-prompt-principles.ko.png)
 
-![모호한 프롬프트를 구체적으로 개선하는 과정](../assets/ai-web-dev-101/02/prompt-improvement-example.ko.png)
+![모호한 프롬프트를 구체적으로 개선하는 과정](../../../assets/ai-web-dev-101/02/prompt-improvement-example.ko.png)
 
 ---
 
@@ -64,7 +64,7 @@ API 설정값 중 답변의 성격을 결정짓는 중요한 파라미터가 두
     - 소설 쓰기나 아이디어 브레인스토밍: **0.7 ~ 1.0** 권장
 - **Max Tokens:** 답변의 최대 길이를 제한합니다. 너무 짧게 설정하면 답변이 중간에 끊길 수 있으니 주의해야 합니다.
 
-![Temperature와 Max Tokens의 영향](../assets/ai-web-dev-101/02/temperature-max-tokens.ko.png)
+![Temperature와 Max Tokens의 영향](../../../assets/ai-web-dev-101/02/temperature-max-tokens.ko.png)
 
 ---
 
@@ -113,7 +113,7 @@ function login(user, pass) {
 3. **단계별로 생각하게 했는가?** 복잡한 문제는 "차근차근 단계별로 생각해서 답변해줘"라고 덧붙여 보세요. (Chain of Thought)
 4. **예시가 적절한가?** 내가 원하는 출력 형태와 가장 유사한 예시를 다시 넣어보세요.
 
-![프롬프트 개선 반복 과정](../assets/ai-web-dev-101/02/prompt-iteration-loop.ko.png)
+![프롬프트 개선 반복 과정](../../../assets/ai-web-dev-101/02/prompt-iteration-loop.ko.png)
 
 ---
 

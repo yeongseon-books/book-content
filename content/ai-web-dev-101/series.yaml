@@ -1,0 +1,20 @@
+id: ai-web-dev-101
+category: ai
+title:
+  ko: AI 웹 개발 입문
+  en: AI Web Development 101
+description:
+  ko: AI API 부터 배포까지, 초급 개발자를 위한 7부작.
+  en: 7-part guide for junior developers — from AI API basics to deployment.
+languages: [ko]
+targets: { tistory: true, medium: false, mkdocs: true, ebook: true }
+status: needs-update
+tags: [AI, LLM, 웹 개발, Python, Tutorial]
+articles:
+  - { idx: 1, slug: 01-hello-ai-api,        status: needs-update }
+  - { idx: 2, slug: 02-prompt-engineering,  status: needs-update }
+  - { idx: 3, slug: 03-ai-chatbot,          status: needs-update }
+  - { idx: 4, slug: 04-rag-intro,           status: needs-update }
+  - { idx: 5, slug: 05-ai-agent,            status: needs-update }
+  - { idx: 6, slug: 06-deploy,              status: needs-update }
+  - { idx: 7, slug: 07-eval-improve,        status: needs-update }

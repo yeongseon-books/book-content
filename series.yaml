@@ -121,7 +121,7 @@ series:
     languages: [ko]
     targets: { tistory: true, medium: false, mkdocs: true, ebook: true }
     status: needs-update
-    path: ai-web-dev-101
+    path: content/ai-web-dev-101
 
   - id: llm-from-scratch-101
     category: ai
