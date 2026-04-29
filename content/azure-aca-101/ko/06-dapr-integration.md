@@ -30,7 +30,7 @@ last_reviewed: '2026-04-29'
 앱 옆에 사이드카가 붙고.
 Environment 수준 컴포넌트와 외부 서비스를 중개합니다.
 
-![Dapr가 붙는 위치](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
+![앱 옆 Dapr 사이드카와 외부 서비스 연결 구조](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
 ---
 
 ## enable 명령

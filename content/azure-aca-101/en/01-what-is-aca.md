@@ -43,7 +43,7 @@ KEDA is part 5.
 Dapr is part 6.
 Observability is part 7.
 
-![One ACA environment](../../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
+![Ingress and app layout in one ACA environment](../../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
 ---
 
 ## A one-sentence definition
@@ -76,7 +76,7 @@ A single HTTP request is enough to make the boundary responsibilities visible.
 - choose scale and rollout rules
 - emit logs and traces deliberately
 
-![The path of one request](../../../assets/azure-aca-101/01/01-02-the-path-of-one-request.en.png)
+![Client request flow to an active revision](../../../assets/azure-aca-101/01/01-02-the-path-of-one-request.en.png)
 ---
 
 ## Workloads that fit well

@@ -32,7 +32,7 @@ And custom KEDA rules such as Service Bus, CPU, and memory.
 Scaling remains declarative.
 You choose the signal and the replica bounds.
 
-![The scaling path](../../../assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
+![Scale signals changing replica counts](../../../assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
 ---
 
 ## Three rule categories

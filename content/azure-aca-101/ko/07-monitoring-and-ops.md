@@ -30,7 +30,7 @@ last_reviewed: '2026-04-29'
 무슨 일이 있었는지는 Log Analytics에서 찾고.
 요청이 어디를 거쳤는지는 Application Insights에서 따라갑니다.
 
-![관측성 지도](../../../assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
+![로그와 추적이 모이는 관측 경로](../../../assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
 ---
 
 ## 두 종류 로그

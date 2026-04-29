@@ -30,7 +30,7 @@ This post shows where the Dapr sidecar sits and what it simplifies. Service invo
 The sidecar sits next to the app.
 It mediates access to Environment-level components and external services.
 
-![Where Dapr sits](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
+![Dapr sidecar between app and services](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
 ---
 
 ## Enable commands

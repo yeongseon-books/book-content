@@ -30,7 +30,7 @@ This post covers logs, traces, and day-two operations. The most important distin
 Log Analytics tells you what happened.
 Application Insights helps you follow where the request went.
 
-![The observability map](../../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
+![Observability paths for logs and traces](../../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
 ---
 
 ## Two log types

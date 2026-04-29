@@ -32,7 +32,7 @@ Environment is the boundary.
 Container App is the logical service.
 Revision is the immutable snapshot of image and config.
 
-![ACA hierarchy](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
+![Hierarchy of environment, app, and revision](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
 ---
 
 ## Environment

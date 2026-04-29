@@ -29,7 +29,7 @@ This post connects ingress with revision-based rollout control. The goal is not 
 
 ACA's managed ingress layer acts as the public entry point and routes traffic to active revisions.
 
-![The request path](../../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
+![Ingress routing path to active revisions](../../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
 ---
 
 ## What ingress owns

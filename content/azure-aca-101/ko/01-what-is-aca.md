@@ -44,7 +44,7 @@ KEDA는 5화.
 Dapr는 6화.
 관측성은 7화입니다.
 
-![Azure Container Apps 환경 아키텍처](../../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.ko.png)
+![ACA Environment 안의 ingress와 앱 배치 구조](../../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.ko.png)
 ---
 
 ## 한 문장 정의
@@ -77,7 +77,7 @@ Microsoft가 관리하는 Kubernetes 기반 위에 KEDA 기반 스케일링, 선
 - 트래픽 전략 정하기
 - 로그와 추적 남기기
 
-![요청 하나의 흐름](../../../assets/azure-aca-101/01/01-02-the-path-of-one-request.ko.png)
+![클라이언트 요청이 Revision에 닿는 흐름](../../../assets/azure-aca-101/01/01-02-the-path-of-one-request.ko.png)
 ---
 
 ## 어떤 시나리오에 맞나

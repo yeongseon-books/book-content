@@ -29,7 +29,7 @@ last_reviewed: '2026-04-29'
 
 경로를 먼저 보면 배포가 훨씬 단순하게 느껴집니다.
 
-![배포 경로 전체 보기](../../../assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png)
+![로컬 코드가 ACA 배포로 이어지는 경로](../../../assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png)
 ---
 
 ## 준비 명령

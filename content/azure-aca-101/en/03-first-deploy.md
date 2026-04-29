@@ -29,7 +29,7 @@ This post walks through the first complete FastAPI deployment path. The importan
 
 The path makes the first deployment much easier to reason about.
 
-![The end-to-end path](../../../assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
+![Path from local code to ACA deployment](../../../assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
 ---
 
 ## Setup commands

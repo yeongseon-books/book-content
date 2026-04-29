@@ -32,7 +32,7 @@ Environment는 경계입니다.
 Container App은 논리 서비스입니다.
 Revision은 이미지와 설정의 불변 스냅샷입니다.
 
-![ACA 계층 구조](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.ko.png)
+![Environment와 Container App와 Revision의 계층 관계](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.ko.png)
 ---
 
 ## Environment
