@@ -550,6 +550,4 @@ az monitor metrics alert create \
 
 ---
 
-**Tags:** `Azure` `App Service` `Scaling` `Autoscale` `Performance` `DevOps`
-
 Tags: Azure, App Service, Cloud, Web Apps

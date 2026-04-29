@@ -443,6 +443,4 @@ This closing post ties the rest of the series together by turning deployment, co
 
 ---
 
-**Tags:** `Azure` `App Service` `Scaling` `Autoscale` `Performance` `DevOps`
-
 Tags: Azure, App Service, Cloud, Web Apps

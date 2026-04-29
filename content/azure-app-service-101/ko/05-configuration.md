@@ -83,7 +83,7 @@ PAYMENTS_API_KEY = os.environ.get("PAYMENTS_API_KEY")
 
 ### 2) 민감 정보 값은 “저장 위치”부터 구분한다
 
-로그 레벨과 DB 민감 정보번호는 둘 다 설정이지만, 같은 방식으로 다루면 안 됩니다. 사람이 봐도 되는 값과 보면 안 되는 값을 구분해야 합니다.
+로그 레벨과 DB 자격 증명은 둘 다 설정이지만, 같은 방식으로 다루면 안 됩니다. 사람이 봐도 되는 값과 보면 안 되는 값을 구분해야 합니다.
 
 ### 3) 앱 시작 시 필수 설정을 검증한다
 
@@ -159,7 +159,7 @@ az webapp config appsettings set \
 
 ### 운영: App Settings + Key Vault
 
-운영은 “작동”보다 “노출 최소화”가 더 중요합니다. 일반 설정은 App Settings에 두고, **민감 정보번호·토큰·연결 문자열 같은 민감 값은 Key Vault를 통해 주입**하는 구성이 기본값이 되어야 합니다.
+운영은 “작동”보다 “노출 최소화”가 더 중요합니다. 일반 설정은 App Settings에 두고, **자격 증명·토큰·연결 문자열 같은 민감 값은 Key Vault를 통해 주입**하는 구성이 기본값이 되어야 합니다.
 
 ---
 
@@ -468,13 +468,7 @@ logger.info("Configuration loaded", extra={
 - **민감한 값은 Key Vault Reference**로 다루는 습관이 장기적으로 안전하다
 - **설정 변경은 앱 재시작을 유발할 수 있으므로** 운영 이벤트처럼 검증해야 한다
 
-다음 글에서는 이 설정들이 실제 운영 가시성으로 어떻게 이어지는지 살펴봅니다. `LOG_LEVEL`, Application Insights 연결 문자열, 구조화된 로그 필드처럼 **지금 넣어 둔 설정이 06편의 로그와 모니터링 전략에서 어떻게 활용되는지** 연결해서 보시면 흐름이 더 분명해집니다.
-
----
-
-## 이 시리즈에서의 위치
-
-이번 글은 배포 뒤에 더 오래 남는 문제인 설정, 민감 정보, 슬롯별 값 관리를 다룹니다. 다음 글에서는 여기서 준비한 설정이 로그, 메트릭, Application Insights 같은 운영 가시성으로 어떻게 이어지는지 설명합니다.
+이번 글은 배포 뒤에 더 오래 남는 문제인 설정, 민감 정보, 슬롯별 값 관리를 다룹니다. `LOG_LEVEL`, Application Insights 연결 문자열, 구조화된 로그 필드처럼 여기서 정한 기준이 이후의 로그·메트릭·추적 품질을 직접 좌우합니다.
 
 ---
 
@@ -504,7 +498,5 @@ logger.info("Configuration loaded", extra={
 - [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
-
-**Tags:** `Azure` `App Service` `Configuration` `Security` `DevOps`
 
 Tags: Azure, App Service, Cloud, Web Apps

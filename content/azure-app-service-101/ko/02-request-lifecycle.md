@@ -515,13 +515,7 @@ Azure App Service의 Request Lifecycle을 이해하면, 장애가 났을 때 질
 
 이게 바로 운영에서 큰 차이를 만듭니다. Request Lifecycle은 이론이 아니라, **502·503·504를 읽는 지도**이기 때문입니다.
 
-다음 글에서는 이 지도를 바탕으로, 아예 **어떤 Hosting Model과 Plan을 선택해야 이런 문제를 덜 만들 수 있는지**로 넘어가 보겠습니다. 같은 App Service라도 Free, Basic, Standard, Premium, Linux, Windows, Code, Container의 선택이 운영 경험을 완전히 바꿉니다.
-
----
-
-## 이 시리즈에서의 위치
-
-이번 글은 App Service 안으로 들어온 요청이 어디를 거쳐 실패하거나 지연되는지 읽는 방법을 정리합니다. 다음 글에서는 이 흐름을 더 안정적으로 운영하기 위해 어떤 호스팅 모델과 플랜을 골라야 하는지 이어서 다룹니다.
+이번 글은 App Service 안으로 들어온 요청이 어디를 거쳐 실패하거나 지연되는지 읽는 방법을 정리합니다. 같은 App Service라도 Free, Basic, Standard, Premium, Linux, Windows, Code, Container의 선택이 운영 경험을 크게 바꾼다는 점까지 함께 염두에 두면 이후 의사결정이 훨씬 쉬워집니다.
 
 ---
 
@@ -552,7 +546,5 @@ Azure App Service의 Request Lifecycle을 이해하면, 장애가 났을 때 질
 - [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
-
-**Tags:** `Azure` `App Service` `Cloud` `Networking` `DevOps`
 
 Tags: Azure, App Service, Cloud, Web Apps

@@ -403,20 +403,6 @@ What you learned in this tutorial:
 3. **Deployment**: Simple deployment with `az webapp up`
 4. **Verification**: Status check via Health endpoint and logs
 
-In the next post, we'll cover **App Settings and Environment Variable Management** - Mastering Configuration.
-
----
-
-## Series Index
-
-1. What is Azure App Service? - Understanding the Platform Architecture
-2. Request Lifecycle: How Requests Reach Your App
-3. Hosting Models: Which Plan Should You Choose?
-4. **[Current] First Deployment: From Local to Azure (Python/Flask)**
-5. Mastering Configuration: App Settings & Environment Variables
-6. Logging and Monitoring Basics
-7. Scaling 101: When to Scale Up vs Scale Out?
-
 ---
 
 <!-- toc:begin -->
@@ -445,7 +431,5 @@ In the next post, we'll cover **App Settings and Environment Variable Management
 - [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
-
-**Tags:** `Azure` `App Service` `Python` `Flask` `DevOps` `Tutorial`
 
 Tags: Azure, App Service, Cloud, Web Apps

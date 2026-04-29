@@ -281,20 +281,6 @@ Understanding App Service's 3-Plane model helps you:
 - **Runtime Plane**: Grasp request flow and instance behavior
 - **SCM Plane**: Leverage deployment and debugging tools
 
-In the next post, we'll explore the **Request Lifecycle** - the complete journey of a request reaching your app.
-
----
-
-## Series Index
-
-1. **[Current] What is Azure App Service? - Understanding the Platform Architecture**
-2. Request Lifecycle: How Requests Reach Your App
-3. Hosting Models: Which Plan Should You Choose?
-4. First Deployment: From Local to Azure (Python/Flask)
-5. Mastering Configuration: App Settings & Environment Variables
-6. Logging and Monitoring Basics
-7. Scaling 101: When to Scale Up vs Scale Out?
-
 ---
 
 <!-- toc:begin -->
@@ -323,7 +309,5 @@ In the next post, we'll explore the **Request Lifecycle** - the complete journey
 - [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
-
-**Tags:** `Azure` `App Service` `Cloud` `Architecture` `DevOps`
 
 Tags: Azure, App Service, Cloud, Web Apps

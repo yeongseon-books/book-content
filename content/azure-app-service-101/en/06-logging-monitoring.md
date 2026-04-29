@@ -466,20 +466,6 @@ Logging and monitoring essentials:
 - **Application Insights**: Long-term analysis and alerting
 - **KQL**: Powerful query language
 
-In the final post, we'll cover **Scaling 101** - when to Scale Up vs Scale Out.
-
----
-
-## Series Index
-
-1. What is Azure App Service? - Understanding the Platform Architecture
-2. Request Lifecycle: How Requests Reach Your App
-3. Hosting Models: Which Plan Should You Choose?
-4. First Deployment: From Local to Azure (Python/Flask)
-5. Mastering Configuration: App Settings & Environment Variables
-6. **[Current] Logging and Monitoring Basics**
-7. Scaling 101: When to Scale Up vs Scale Out?
-
 ---
 
 <!-- toc:begin -->
@@ -508,7 +494,5 @@ In the final post, we'll cover **Scaling 101** - when to Scale Up vs Scale Out.
 - [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
-
-**Tags:** `Azure` `App Service` `Monitoring` `Logging` `Application Insights` `DevOps`
 
 Tags: Azure, App Service, Cloud, Web Apps

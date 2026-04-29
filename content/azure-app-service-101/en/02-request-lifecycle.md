@@ -345,20 +345,6 @@ Understanding each stage of the Request Lifecycle helps you:
 - **Check the right logs/metrics**
 - **Apply the correct solutions**
 
-In the next post, we'll explore **Hosting Models** - App Service Plan selection and deployment models.
-
----
-
-## Series Index
-
-1. What is Azure App Service? - Understanding the Platform Architecture
-2. **[Current] Request Lifecycle: How Requests Reach Your App**
-3. Hosting Models: Which Plan Should You Choose?
-4. First Deployment: From Local to Azure (Python/Flask)
-5. Mastering Configuration: App Settings & Environment Variables
-6. Logging and Monitoring Basics
-7. Scaling 101: When to Scale Up vs Scale Out?
-
 ---
 
 <!-- toc:begin -->
@@ -387,7 +373,5 @@ In the next post, we'll explore **Hosting Models** - App Service Plan selection 
 - [Azure Functions 101](../../azure-functions-101/en/)
 
 ---
-
-**Tags:** `Azure` `App Service` `Cloud` `Networking` `DevOps`
 
 Tags: Azure, App Service, Cloud, Web Apps

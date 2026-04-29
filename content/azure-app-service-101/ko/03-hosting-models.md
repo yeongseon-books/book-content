@@ -461,13 +461,7 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 
 이 조합은 과하지 않으면서도, 실서비스 운영에 필요한 안전장치를 갖추기 쉽습니다.
 
-다음 글에서는 여기서 내린 결정을 실제 리소스로 바꿉니다. 즉, **Python Flask 앱을 App Service에 처음 배포하는 과정**을 단계별로 진행합니다. 이번 글이 “무엇을 고를까”였다면, 다음 글은 “이제 정말 올려보자”입니다.
-
----
-
-## 이 시리즈에서의 위치
-
-이번 글은 App Service의 OS, 배포 모델, 플랜 티어를 어떤 기준으로 고를지 정리하는 의사결정 편입니다. 다음 글에서는 여기서 고른 Linux Code 기반 구성을 실제 Flask 앱 배포로 연결합니다.
+이번 글은 App Service의 OS, 배포 모델, 플랜 티어를 어떤 기준으로 고를지 정리하는 의사결정 편입니다. 여기서 고른 Linux Code 기반 구성을 실제 배포와 운영 절차로 연결할 수 있어야 선택이 비로소 검증됩니다.
 
 ---
 
@@ -498,7 +492,5 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 - [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
-
-**Tags:** `Azure` `App Service` `Cloud` `Pricing` `DevOps`
 
 Tags: Azure, App Service, Cloud, Web Apps
