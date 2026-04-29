@@ -18,9 +18,13 @@ import re
 import sys
 from pathlib import Path
 
-REPO = "yeongseon/tech-blog"
-TAG = "e8dca42"
+import yaml
+
 ROOT = Path(__file__).resolve().parents[2]
+
+_meta = yaml.safe_load((ROOT / "series.yaml").read_text(encoding="utf-8")).get("meta", {})
+REPO = _meta.get("repo", "yeongseon/tech-blog")
+TAG = _meta.get("tag", "master")
 
 from _catalog import is_present, load_catalog
 

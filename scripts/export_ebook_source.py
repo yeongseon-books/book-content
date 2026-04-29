@@ -45,6 +45,10 @@ SERIES_YAML = REPO_ROOT / "series.yaml"
 ASSETS_DIR = REPO_ROOT / "assets"
 TEMPLATES = REPO_ROOT / "templates"
 
+_meta = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8")).get("meta", {})
+REPO = _meta.get("repo", "yeongseon/tech-blog")
+TAG = _meta.get("tag", "master")
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _transform import transform_for_ebook
 
@@ -53,12 +57,22 @@ LINK_PATH_RE = re.compile(r"(?<!!)(\[[^\]]+\]\()\.\./\.\./\.\./assets/")
 CROSS_SERIES_LINK_RE = re.compile(
     r"(?<!!)\[[^\]]+\]\(\.\./\.\./[a-z][a-z0-9-]+/(ko|en)/[^)]+\)"
 )
+CROSS_SERIES_REWRITE_RE = re.compile(
+    r"(?<!!)(\[[^\]]+\]\()\.\./\.\./([a-z][a-z0-9-]+/(?:ko|en)/?[^)]*)\)"
+)
 
 
 def rewrite_assets(text: str) -> str:
-    text = IMG_PATH_RE.sub(r"\1../assets/", text)
-    text = LINK_PATH_RE.sub(r"\1../assets/", text)
+    text = IMG_PATH_RE.sub(r"\1assets/", text)
+    text = LINK_PATH_RE.sub(r"\1assets/", text)
     return text
+
+
+def rewrite_cross_series_links(text: str) -> str:
+    return CROSS_SERIES_REWRITE_RE.sub(
+        rf"\1https://github.com/{REPO}/tree/{TAG}/content/\2)",
+        text,
+    )
 
 
 def load_root_series(series_id: str) -> dict:
@@ -88,7 +102,24 @@ def article_title(md: Path, fallback: str) -> str:
 
 
 def render_template(path: Path, vars_: dict[str, str]) -> str:
+    """Render a template, stripping its leading self-doc comment block.
+
+    Templates start with a `# Template: ...` doc header (a few `#`-prefixed
+    lines, terminated by a blank line) so they're self-explanatory when read
+    directly. That header is meta and must not leak into the rendered page.
+
+    The strip rule: if the file starts with `# Template:`, drop every line up
+    to and including the first blank line. Otherwise, leave the file alone.
+    """
     text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    if lines and lines[0].startswith("# Template:"):
+        i = 1
+        while i < len(lines) and lines[i].strip() != "":
+            i += 1
+        while i < len(lines) and lines[i].strip() == "":
+            i += 1
+        text = "\n".join(lines[i:])
     for k, v in vars_.items():
         text = text.replace("{{ " + k + " }}", v)
     return text
@@ -124,19 +155,20 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         text = rewrite_assets(text)
         for m in CROSS_SERIES_LINK_RE.finditer(text):
             cross_warnings.append((src.name, m.group(0)))
+        text = rewrite_cross_series_links(text)
         dst = docs / f"{idx:02d}-{slug.split('-', 1)[1] if '-' in slug else slug}.md"
         dst.write_text(text, encoding="utf-8")
         chapters.append({"idx": idx, "title": title, "filename": dst.name})
 
     asset_src = ASSETS_DIR / series_id
-    asset_dst = out_dir / "assets" / series_id
+    asset_dst = docs / "assets" / series_id
     if asset_src.is_dir():
         shutil.copytree(asset_src, asset_dst)
 
     title_field = s.get("title", {}).get(lang, series_id)
     desc_field = s.get("description", {}).get(lang, "")
     canonical_links = "\n  ".join(
-        f"- [{c['title']}](../../{s['path']}/{lang}/{per['articles'][i]['slug']}.md)"
+        f"- [{c['title']}](https://github.com/{REPO}/blob/{TAG}/{s['path']}/{lang}/{per['articles'][i]['slug']}.md)"
         for i, c in enumerate(chapters) if i < len(per.get("articles", []))
     )
     series_overview = "\n".join(f"- 제 {c['idx']} 장: {c['title']}" for c in chapters)
@@ -164,7 +196,7 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
     })
     (docs / "preface.md").write_text(preface_md, encoding="utf-8")
 
-    nav_lines = ["nav:", "  - Preface: preface.md"]
+    nav_lines = ["nav:", "  - Cover: index.md", "  - Preface: preface.md"]
     for c in chapters:
         nav_lines.append(f"  - 제 {c['idx']} 장: {c['filename']}")
     mkdocs_yml = (

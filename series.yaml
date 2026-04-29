@@ -3,6 +3,16 @@
 # generate SERIES.md and mkdocs.yml nav from this file.
 # status enum: planned | draft | ready | published | needs-update
 
+meta:
+  # GitHub coordinates used to build absolute URLs (commit-pinned) in:
+  #   - .sisyphus/medium/to-medium.py     (Medium import-ready raw image URLs)
+  #   - scripts/export_ebook_source.py    (ebook bundle cross-series + canonical links)
+  # When the repo is renamed (Phase 9: tech-blog -> tech-writing), update `repo`
+  # here AND re-run to-medium.py / export_ebook_source.py to regenerate artifacts.
+  # When publishing a new pinned snapshot, update `tag` to a new commit/tag SHA.
+  repo: yeongseon/tech-blog
+  tag: e8dca42
+
 series:
   # Azure
   - id: azure-app-service-101

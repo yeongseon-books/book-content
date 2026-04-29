@@ -52,31 +52,42 @@ mkdocs-ebook (private)
 
 ---
 
-## 4. 명령 (예정)
+## 4. 명령
 
 ```bash
-python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
+python3 scripts/export_ebook_source.py <series-id> --lang <ko|en>
 ```
 
-생성 결과:
+생성 결과 (`exports/ebook-source/<series-id>-<lang>/`):
 
 ```text
-exports/ebook-source/azure-functions-101-ko/
-├── mkdocs.yml
-├── docs/
-│   ├── index.md                          # ebook-index 템플릿 + 시리즈 목차
-│   ├── preface.md                        # ebook-preface 템플릿
-│   ├── 01-what-is-azure-functions.md
-│   ├── 02-triggers-and-bindings.md
-│   └── ...
-└── assets/                               # 시리즈가 사용하는 모든 이미지 복사본
+mkdocs.yml                                # site_name, theme=material, nav (Cover / Preface / 제 N 장)
+docs/
+├── index.md                              # 표지 다음 안내 페이지 (templates/ebook-index.md 렌더)
+├── preface.md                            # 서문 (templates/ebook-preface.md 렌더)
+├── 01-<slug>.md ... NN-<slug>.md         # 본문 챕터 (transform_for_ebook 적용)
+└── assets/<series-id>/<NN>/...           # 본문이 참조하는 모든 이미지
 ```
+
+`mkdocs build --strict` 가 번들 안에서 그대로 통과해야 한다. 19/19 시리즈가 현재 통과한다.
 
 private builder 에서:
 
 ```bash
-mkdocs-ebook build exports/ebook-source/azure-functions-101-ko
+mkdocs-ebook build exports/ebook-source/<series-id>-<lang>
 ```
+
+### 4.1 번들 contract
+
+bundle 을 소비하는 빌더(예: private `mkdocs-ebook`) 가 의존하는 보증:
+
+- `mkdocs.yml` 의 `docs_dir: docs`, `theme.name: material`, `theme.language: <lang>`.
+- `docs/` 안의 모든 markdown 은 YAML front matter 가 제거된 순수 본문이다.
+- `docs/index.md` 와 `docs/preface.md` 는 항상 존재하고 nav 에 등록되어 있다.
+- 본문 챕터의 이미지 참조는 `assets/<series-id>/<NN>/...` (즉 `docs/assets/...` 기준) 로만 적힌다.
+- 본문 안의 cross-series 링크는 `https://github.com/<owner>/<repo>/tree/<TAG>/content/<other-series>/<lang>/...` 형태의 절대 URL 로 재작성되어 번들 외부를 가리킨다 (책은 self-contained, 외부 참조는 자료 링크).
+- preface 의 "원본 블로그 글" 링크 또한 절대 URL 이다.
+- 시리즈 TOC, 하단 `Tags:` 라인, `blog-only` 블록은 모두 제거되어 있다. `ebook-only` 블록은 마커만 제거하고 본문은 유지한다.
 
 ---
 
