@@ -1,0 +1,36 @@
+id: azure-aca-deep-dive
+category: azure
+title:
+  ko: Azure Container Apps Deep Dive
+  en: Azure Container Apps Deep Dive
+description:
+  ko: ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
+  en: Inside ACA — KEDA, Dapr, Envoy.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+articles:
+- idx: 1
+  slug: 01-aca-architecture
+  status: ready
+- idx: 2
+  slug: 02-environment-internals
+  status: ready
+- idx: 3
+  slug: 03-revision-and-traffic-split
+  status: ready
+- idx: 4
+  slug: 04-keda-in-aca
+  status: ready
+- idx: 5
+  slug: 05-dapr-sidecar-internals
+  status: ready
+- idx: 6
+  slug: 06-envoy-ingress-path
+  status: ready

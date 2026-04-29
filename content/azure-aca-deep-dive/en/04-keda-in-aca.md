@@ -33,7 +33,7 @@ The platform has to translate that rule into something KEDA can reconcile.
 
 The right mental model is this.
 
-![The short version: a scale rule is not the scaler itself](../../assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.en.png)
+![The short version: a scale rule is not the scaler itself](../../../assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.en.png)
 You never see the hidden object directly.
 You still need to understand it, because the behavior you observe is downstream of that translation.
 
@@ -61,7 +61,7 @@ Even though ACA itself is closed-source, KEDA behavior explains the shape of the
 
 The mapping becomes easier when put side by side.
 
-![What ACA exposes versus what KEDA needs](../../assets/azure-aca-deep-dive/04/04-02-what-aca-exposes-versus-what-keda-needs.en.png)
+![What ACA exposes versus what KEDA needs](../../../assets/azure-aca-deep-dive/04/04-02-what-aca-exposes-versus-what-keda-needs.en.png)
 KEDA needs a scale target, metrics or trigger definitions, and limits.
 ACA already has those ideas in its revision template.
 
@@ -79,7 +79,7 @@ Microsoft's revisions documentation says so directly.
 
 This matters because the scaling engine is attached to immutable revision snapshots, not to one endlessly mutable deployment identity.
 
-![The first key behavior: scaling is per revision](../../assets/azure-aca-deep-dive/04/04-03-the-first-key-behavior-scaling-is-per-re.en.png)
+![The first key behavior: scaling is per revision](../../../assets/azure-aca-deep-dive/04/04-03-the-first-key-behavior-scaling-is-per-re.en.png)
 If two revisions are active at once, they can each carry their own scaling behavior while sharing one app-level ingress surface.
 
 That is one of the reasons rollout math and scaling math should never be collapsed into the same concept.
@@ -96,7 +96,7 @@ Upstream KEDA source shows this clearly.
 The controller reconciles `ScaledObject` resources and builds HPA specs.
 The HPA creation logic sets min and max replica counts, metric targets, and scale target references.
 
-![A `ScaledObject` creates HPA behavior, not a replacement for HPA](../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.en.png)
+![A `ScaledObject` creates HPA behavior, not a replacement for HPA](../../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.en.png)
 In ACA, you should assume the same broad division of labor.
 The product surface gives KEDA enough information to produce HPA-like decisions for the revision.
 
@@ -111,7 +111,7 @@ This is where KEDA's event-driven model matters more than a plain HPA mental mod
 A traditional HPA-only framing does not naturally explain activation from zero against event signals.
 KEDA does.
 
-![minReplicas can be zero, and that changes everything](../../assets/azure-aca-deep-dive/04/04-05-minreplicas-can-be-zero-and-that-changes.en.png)
+![minReplicas can be zero, and that changes everything](../../../assets/azure-aca-deep-dive/04/04-05-minreplicas-can-be-zero-and-that-changes.en.png)
 Microsoft's scaling docs also note that cooldown behavior is especially relevant when scaling from the final replica down to zero.
 That is exactly the kind of lifecycle that makes KEDA the right conceptual anchor.
 
@@ -121,7 +121,7 @@ That is exactly the kind of lifecycle that makes KEDA the right conceptual ancho
 
 For custom rules, the flow is easiest to visualize.
 
-![The control loop: how a custom rule becomes replicas](../../assets/azure-aca-deep-dive/04/04-06-the-control-loop-how-a-custom-rule-becom.en.png)
+![The control loop: how a custom rule becomes replicas](../../../assets/azure-aca-deep-dive/04/04-06-the-control-loop-how-a-custom-rule-becom.en.png)
 That flow is the right abstraction even when you cannot inspect the actual Kubernetes objects under the product.
 
 ---
@@ -142,7 +142,7 @@ Do say this instead.
 - The scaling model is conceptually aligned with KEDA's event-driven autoscaling design.
 - The trigger input is request concurrency.
 
-![HTTP scaling is built in, but the shape still resembles KEDA thinking](../../assets/azure-aca-deep-dive/04/04-07-http-scaling-is-built-in-but-the-shape-s.en.png)
+![HTTP scaling is built in, but the shape still resembles KEDA thinking](../../../assets/azure-aca-deep-dive/04/04-07-http-scaling-is-built-in-but-the-shape-s.en.png)
 That wording stays accurate without pretending the product uses the upstream HTTP add-on one-to-one.
 
 ---
@@ -169,7 +169,7 @@ It even walks the reader through translating KEDA scaler metadata and authentica
 
 That is as close as the product gets to saying, "yes, think in KEDA terms here."
 
-![Custom rules are the clearest KEDA-shaped part of ACA](../../assets/azure-aca-deep-dive/04/04-08-custom-rules-are-the-clearest-keda-shape.en.png)
+![Custom rules are the clearest KEDA-shaped part of ACA](../../../assets/azure-aca-deep-dive/04/04-08-custom-rules-are-the-clearest-keda-shape.en.png)
 This documentation pattern is a giveaway.
 The product is intentionally exposing a curated KEDA surface, not inventing an unrelated autoscaling language.
 
@@ -185,7 +185,7 @@ Instead, the product lets you express the same intent with:
 - secrets referenced by scale rule auth fields
 - managed identity settings for supported Azure triggers
 
-![Authentication for scale rules is another translation boundary](../../assets/azure-aca-deep-dive/04/04-09-authentication-for-scale-rules-is-anothe.en.png)
+![Authentication for scale rules is another translation boundary](../../../assets/azure-aca-deep-dive/04/04-09-authentication-for-scale-rules-is-anothe.en.png)
 The shape remains recognizable.
 The resource model is productized.
 
@@ -198,7 +198,7 @@ The KEDA HPA logic attaches external metric selectors so the adapter can answer 
 
 That is an important hidden link.
 
-![Why the metrics adapter matters, even when you never name it](../../assets/azure-aca-deep-dive/04/04-10-why-the-metrics-adapter-matters-even-whe.en.png)
+![Why the metrics adapter matters, even when you never name it](../../../assets/azure-aca-deep-dive/04/04-10-why-the-metrics-adapter-matters-even-whe.en.png)
 In ACA you never configure the adapter directly.
 You still see its consequences every time an external event source or concurrency rule changes replica count.
 
@@ -226,7 +226,7 @@ ACA docs also point out that if multiple scale rules exist, the app begins to sc
 
 That is exactly how you should picture the activation logic.
 
-![One rule can wake the revision up](../../assets/azure-aca-deep-dive/04/04-11-one-rule-can-wake-the-revision-up.en.png)
+![One rule can wake the revision up](../../../assets/azure-aca-deep-dive/04/04-11-one-rule-can-wake-the-revision-up.en.png)
 The deep-dive implication is that rules are not averaged into one giant threshold.
 They are multiple activation paths into the same scaling target.
 
@@ -243,7 +243,7 @@ A new version could change request handling efficiency and therefore justify a d
 
 If scale rules were app-scope only, rollout experiments would lose one of the most important control knobs.
 
-![Scale rules belong to the revision template for a reason](../../assets/azure-aca-deep-dive/04/04-12-scale-rules-belong-to-the-revision-templ.en.png)
+![Scale rules belong to the revision template for a reason](../../../assets/azure-aca-deep-dive/04/04-12-scale-rules-belong-to-the-revision-templ.en.png)
 Revision-scope scaling is what makes that split possible.
 
 ---
@@ -266,7 +266,7 @@ Those two corrections keep the story accurate.
 
 ## The whole autoscaling picture in one diagram
 
-![The whole autoscaling picture in one diagram](../../assets/azure-aca-deep-dive/04/04-13-the-whole-autoscaling-picture-in-one-dia.en.png)
+![The whole autoscaling picture in one diagram](../../../assets/azure-aca-deep-dive/04/04-13-the-whole-autoscaling-picture-in-one-dia.en.png)
 If you remember this diagram, you have the autoscaling internals at the right level of fidelity.
 
 ---

@@ -107,7 +107,7 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: draft
-    path: azure-aca-deep-dive
+    path: content/azure-aca-deep-dive
 
   # AI
   - id: ai-web-dev-101
