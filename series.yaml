@@ -19,7 +19,7 @@ meta:
   # `validated_ref`: optional internal tracking of "latest commit that passed
   # all gates". Not consumed by any URL builder. Useful for humans answering
   # "is published_ref behind master?". Update freely.
-  repo: yeongseon/tech-blog
+  repo: yeongseon/tech-writing
   published_ref: e8dca42
   validated_ref: 776d639
 
