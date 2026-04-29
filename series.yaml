@@ -21,7 +21,7 @@ meta:
   # "is published_ref behind master?". Update freely.
   repo: yeongseon/tech-blog
   published_ref: e8dca42
-  validated_ref: 1706d5fb9a2ff19b39efa80282c63ccf039153ca
+  validated_ref: 776d639
 
 series:
   # Azure

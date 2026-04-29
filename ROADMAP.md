@@ -88,14 +88,25 @@ python3 .sisyphus/medium/finalize-posts.py
 
 ## Phase 7 — Content Quality
 
-- [ ] AI Web Dev 101 OpenAI API 예제 갱신 (모델/SDK/가격 stale 제거)
-- [ ] AI Web Dev 101 영어 변형 작성
-- [ ] Deep Dive 글에 `Source Version` 섹션 추가
-- [ ] Deep Dive 글에 `Call Path Summary` 섹션 추가
-- [ ] 101 글에 `Common Mistakes` 또는 `Checklist` 섹션 추가
-- [ ] 모든 글에 `seo_title` front matter 필드 추가
+- [x] Oracle content review Waves 1-6 완료 (활성 9개 시리즈 전체)
+- [x] P0 이슈 해결 완료 (`fix(...): P0 ...`, `fix(...): ebook prep ...`, Wave 1-4 반영)
+- [x] P1 이슈 해결 완료 (Wave 5 + Wave 6 커밋 반영)
+- [x] P2 후속 정리는 대부분 Wave 6 에서 반영 완료
 - [x] 모든 글에 `last_reviewed` 갱신 (Phase 7b: 2026-04-29)
-- [ ] `blog-only` / `ebook-only` 블록 도입 (필요한 글에 한해)
+- [x] 리뷰 증적은 로컬 `.sisyphus/reviews/` 에 보존 (의도적으로 untracked, 비커밋)
+
+시리즈별 완료 현황:
+
+- [x] `azure-app-service-101`
+- [x] `azure-app-service-deep-dive`
+- [x] `azure-functions-101`
+- [x] `azure-functions-deep-dive`
+- [x] `azure-aks-101`
+- [x] `azure-aks-deep-dive`
+- [x] `azure-aca-101`
+- [x] `azure-aca-deep-dive`
+- [x] `ai-web-dev-101`
+- [x] `llm-from-scratch-101`
 
 ## Phase 8 — eBook integration
 
