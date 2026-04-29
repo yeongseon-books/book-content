@@ -79,7 +79,7 @@ In AKS, the default `scan-interval` is 10 seconds. The node provisioning wait bu
 ## Where this fits in the series
 
 This is part 5 of the Azure Kubernetes Service Deep Dive series.
-Part 4 explained scheduling decisions; this part explains the two control loops that react to those decisions. Part 6 shows how KEDA sits above HPA and feeds it external metrics while handling the scale-to-zero boundary itself.
+Part 4 explained scheduling decisions; this part explains the two control loops that react to those decisions. The key value here is keeping replica decisions, node decisions, and later scale-to-zero behavior in separate mental buckets.
 
 ---
 

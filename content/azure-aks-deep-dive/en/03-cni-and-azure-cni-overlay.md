@@ -83,7 +83,7 @@ The official networking direction in AKS is moving toward Azure CNI Overlay.
 ## Where this fits in the series
 
 This is part 3 of the Azure Kubernetes Service Deep Dive series.
-Part 2 followed the node-local execution path; this part explains how CNI attaches Pod networking beside that path. Part 4 moves to placement and shows how the scheduler decides which node should receive a Pod.
+Part 2 followed the node-local execution path; this part explains how CNI attaches Pod networking beside that path. The key diagnostic gain is that node execution and Pod addressing no longer blur into the same failure domain.
 
 ---
 

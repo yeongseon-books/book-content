@@ -78,7 +78,7 @@ AKS 기본값도 같이 기억해 두면 좋습니다. `scan-interval` 기본값
 ## 시리즈 안에서의 위치
 
 이 글은 Azure Kubernetes Service Deep Dive 시리즈 5화입니다.
-4화가 scheduler의 배치 결정을 다뤘다면 이번 화는 그 결과를 보고 반응하는 두 control loop를 설명합니다. 다음 6화에서는 KEDA가 이 HPA 위에 어떻게 올라타는지 봅니다.
+4화가 scheduler의 배치 결정을 다뤘다면 이번 화는 그 결과를 보고 반응하는 두 control loop를 설명합니다. 여기서 얻어야 할 감각은 replica 결정, node 결정, scale-to-zero 경계를 서로 다른 버킷으로 나눠 보는 것입니다.
 
 ---
 
