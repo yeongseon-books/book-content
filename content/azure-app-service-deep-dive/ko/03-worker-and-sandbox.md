@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
 
+## Source Version
+
+이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+
+- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+
+App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
+따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+
 > Azure App Service Deep Dive 시리즈 (3/6)
 
 2화에서는 Front-End와 ARR이 요청을 특정 worker로 보낸다는 데서 멈췄습니다.
@@ -152,7 +162,7 @@ worker 내부를 디버깅할 때는 “내 코드”보다 먼저 “내 코드
 ### Linux app
 
 - 컨테이너 entrypoint와 startup command가 생명주기를 잡습니다.
-- readiness ping이 organic traffic 진입 시점을 좌우합니다.
+- readiness ping이 실제 사용자 트래픽 진입 시점을 좌우합니다.
 - 포트와 startup timeout이 실패 원인으로 자주 등장합니다.
 
 이 차이가 있기 때문에 같은 “App Service”라도 문제 해결 첫 질문이 달라집니다.
@@ -236,6 +246,10 @@ Kudu가 어떻게 배포를 받고,
 다음 글에서는 Kudu와 Oryx를 따라가며, 코드가 실제로 `/home/site/wwwroot`에 놓이는 배포 경로를 내부 관점에서 연결합니다.
 
 ---
+
+## Call Path Summary
+
+App Service Front-End (ARR) → worker instance → IIS `w3wp.exe` on Windows or container entrypoint on Linux → App Service sandbox or container boundary → user code
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # Front-End and ARR — how a request reaches a worker
 
+## Source Version
+
+This post grounds its claims in the following public sources.
+
+- Microsoft Learn — Azure App Service documentation (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — only for deployment-engine and Windows-sandbox context
+
+Microsoft doesn't publicly document the full implementation details of the App Service Front-End, Worker, and File Server layers.
+In this series, Learn is the primary source of truth, and Kudu material is used only as supporting evidence where it is actually public.
+
 > Azure App Service Deep Dive series (2/6)
 
 Episode 1 split App Service into Front-End, Worker, File Server, Kudu, and observability boxes.
@@ -187,13 +197,23 @@ the cleaner design is to make the app stateless and not need App Service affinit
 ## Slots are also part of request routing
 
 Slots belong in this picture too.
-The Front-End resolves host and slot context first,
-then forwards into the worker set for that slot.
+But this is also where one of the most common slot misconceptions appears.
+Production and staging do **not** mean two separate App Service Plan worker pools.
+Slots share the same plan capacity.
+The Front-End resolves host and slot context,
+then routes into the correct slot on that shared plan.
 
-![Slots are also part of request routing](../../../assets/azure-app-service-deep-dive/02/02-06-slots-are-also-part-of-request-routing.en.png)
-That is why slot swap is not just a naming trick.
-It changes which worker set receives production traffic.
-Warm-up matters for the same reason.
+![Slots are also part of request routing](../../../assets/azure-app-service-deep-dive/02/02-01-slots-are-also-part-of-request-routing.en.png)
+The Learn slot-swap flow is more precise than “swap the workers.”
+
+1. App Service applies target-slot settings to the source slot.
+2. It waits for every source-slot instance to restart and warm successfully.
+3. Only then does the Front-End switch the routing rules that define which slot receives production traffic.
+
+So slot swap is not a naming trick,
+but it is also not “production workers replaced by staging workers.”
+It is **warm the target app instances first, then flip the Front-End routing rule inside the same plan**.
+Warm-up matters precisely because of that sequence.
 
 ---
 
@@ -237,6 +257,12 @@ Episode 1 drew the whole map, and this post zoomed into the Front-End and ARR bo
 The next post moves inside the worker itself and explains the sandbox boundary, which is where Windows-specific library failures and Linux container semantics finally start to make sense.
 
 ---
+
+## Call Path Summary
+
+Client → App Service Front-End → host/slot resolution → ARR worker selection inside the shared App Service Plan → slot-specific app instance
+
+Slot-swap path: apply target-slot settings to the source slot → warm every source-slot instance → switch Front-End routing rules
 
 <!-- toc:begin -->
 ## In this series

@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # App Service 플랫폼 아키텍처 — Front-End·Worker·File Server
 
+## Source Version
+
+이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+
+- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+
+App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
+따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+
 > Azure App Service Deep Dive 시리즈 (1/6)
 
 App Service 101에서는 Management Plane, Runtime Plane, SCM Plane이라는 운영 관점을 먼저 잡았습니다.
@@ -85,18 +95,23 @@ Microsoft가 공개적으로 반복 설명하는 App Service의 표준 아키텍
 - **Worker machines**: 실제 사용자 앱을 실행합니다.
 - **shared storage**: 모든 워커가 같은 앱 파일을 보게 합니다.
 
-특히 Windows 로컬 캐시 문서는 이 shared content store가 여러 VM 인스턴스에 공유된다고 분명히 설명합니다.
-즉,
-멀티 인스턴스 App Service는 각 워커가 제각기 다른 코드 복사본을 들고 있는 구조가 아니라,
-공유된 앱 콘텐츠를 같은 기준점으로 본다고 이해하는 편이 맞습니다.
+특히 로컬 캐시와 Linux App Service 문서는,
+배포된 콘텐츠가 공유 스토리지에 놓이고 여러 인스턴스가 같은 기준점을 본다고 설명합니다.
+즉 Windows code app과 Linux code app에서는 보통 각 워커가 서로 다른 코드 복사본을 들고 있는 것이 아니라,
+공유된 앱 콘텐츠 경로를 함께 바라본다고 이해하는 편이 맞습니다.
 
 ![표준 아키텍처 — Front-End, Worker, shared storage](../../../assets/azure-app-service-deep-dive/01/01-02-canonical-public-architecture-front-end.ko.png)
 여기서 중요한 건 속도가 아니라 성질입니다.
-이 스토리지는
-공유되고,
+기본 모델에서는 이 스토리지가 공유되고,
 재시작 뒤에도 남고,
-모든 워커가 같은 경로로 보게 됩니다.
+모든 워커가 같은 경로를 보게 됩니다.
 그래서 `/home/site/wwwroot`에 배포된 결과가 scale-out 뒤에도 워커마다 달라지지 않습니다.
+
+다만 Linux **custom container**는 예외가 있습니다.
+`WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`이면 `/home`이 공유 영속 스토리지로 마운트되지 않으므로,
+그 쓰기 경로는 컨테이너 로컬 계층에 더 가깝게 동작합니다.
+이 경우에는 `/home/site/wwwroot`를 “여러 인스턴스가 함께 보는 공유 기준점”으로 일반화하면 안 됩니다.
+이 storage 의미 차이는 3화에서 더 자세히 다시 다룹니다.
 
 ---
 
@@ -272,6 +287,13 @@ Front-End와 ARR이 어떻게 요청을 워커에 보내는지,
 2화는 Front-End와 ARR, 3화는 worker와 sandbox, 4화는 Kudu와 배포, 5화는 scale-out 경로, 6화는 cold start와 warm-up으로 이어집니다.
 
 ---
+
+## Documented Behavior Summary
+
+- App Service의 공개 아키텍처는 Front-End, Worker, shared content store를 기준으로 설명됩니다.
+- Windows code app과 Linux code app은 기본적으로 공유된 앱 콘텐츠 경로를 여러 인스턴스가 함께 봅니다.
+- Linux custom container는 `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`일 때 `/home` 공유 영속 스토리지 마운트를 사용하지 않을 수 있습니다.
+- Kudu는 앱 옆의 SCM buddy site로서 배포와 진단 경로를 담당합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

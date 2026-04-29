@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
 
+## Source Version
+
+이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+
+- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+
+App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
+따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+
 > Azure App Service Deep Dive 시리즈 (5/6)
 
 스케일링 101에서는 무엇을 언제 늘릴지 판단 기준을 다뤘습니다.
@@ -34,7 +44,9 @@ last_reviewed: '2026-04-29'
 - autoscale 규칙은 Azure Monitor autoscale이 평가합니다.
 - 대상은 app이 아니라 App Service Plan입니다.
 
-그 위에서 worker pool 관점의 멘탈 모델을 정리하는 것이 이번 화의 목표입니다.
+이번 글은 여기서 한 단계 더 들어갑니다.
+비공개 배치 엔진을 추측하지 않고,
+**공개 문서가 보여 주는 scale decision loop의 관측 가능한 내부 동작**을 정리하는 것이 목표입니다.
 
 ---
 
@@ -100,6 +112,60 @@ scale-in이 AND처럼 행동한다는 뜻이기 때문입니다.
 그래서 확장은 빠르고,
 축소는 더 보수적이어야 합니다.
 
+여기에 autoscale 문서가 하나를 더 붙입니다.
+autoscale job은 리소스 종류에 따라 대략 **30~60초마다** 실행되고,
+scale action이 발생한 뒤에는 cooldown 동안 다시 판단하지 않습니다.
+즉 이 시스템은 인터럽트가 아니라 주기적 control loop입니다.
+
+---
+
+## autoscale 설정은 실제로 어떤 모양인가
+
+Azure Monitor 문서가 공개하는 `Microsoft.Insights/autoscaleSettings` 스키마를 보면,
+App Service scale-out을 읽는 시선도 더 선명해집니다.
+
+- `targetResourceUri` — 실제 확장 대상 리소스
+- `profiles` — 시간대별 또는 기본 확장 정책
+- `capacity.minimum/default/maximum` — 하한, fallback, 상한
+- `rules[].metricTrigger` — 어떤 메트릭을 어떤 창으로 볼지
+- `rules[].scaleAction` — 몇 대를 늘리거나 줄일지와 cooldown
+
+즉 autoscale은 “CPU 70%면 늘린다” 수준의 포털 토글이 아니라,
+메트릭 창과 행동 규칙을 가진 ARM 리소스입니다.
+
+---
+
+## 메트릭 창이 반응 속도를 결정한다
+
+autoscale 규칙은 임계값만 보지 않습니다.
+문서는 `timeGrain`, `timeWindow`, `statistic`, `timeAggregation`을 함께 봐야 한다고 설명합니다.
+
+- `timeGrain` — 메트릭 샘플링 단위
+- `timeWindow` — 얼마 동안의 샘플을 볼지
+- `statistic` / `timeAggregation` — 평균, 합계, 최대값 등 어떤 방식으로 집계할지
+
+이 뜻은 단순합니다.
+같은 CPU 80% 규칙이라도,
+1분 평균을 10분 창으로 볼 때와 1분 창으로 볼 때의 반응 속도는 다릅니다.
+autoscale은 스파이크를 즉시 반영하는 장치가 아니라,
+메트릭 창을 통과한 신호에 반응하는 장치입니다.
+
+---
+
+## cooldown은 확장 속도보다 안정성을 위해 존재한다
+
+autoscale 문서는 scale-out과 scale-in 모두에 cooldown이 적용된다고 명시합니다.
+예시 스키마의 기본값도 흔히 `PT5M`입니다.
+
+운영적으로 보면 cooldown의 의미는 분명합니다.
+
+- worker를 하나 추가한 직후 메트릭이 안정될 시간을 줍니다.
+- 막 줄인 capacity를 다시 바로 늘리는 출렁임을 줄입니다.
+- startup과 warm-up 지연이 있는 App Service에서 과잉 반응을 줄입니다.
+
+이 특성 때문에 scale-up이나 scale-out 판단은 “규칙을 만족한 시점”보다,
+`timeWindow + evaluation cadence + cooldown + startup readiness` 전체를 같이 봐야 정확합니다.
+
 ---
 
 ## 새 worker가 추가된다는 말의 실제 의미
@@ -126,6 +192,7 @@ autoscale은 예언이 아니라 반응입니다.
 그래서 예측 가능한 이벤트에는 선제적 확장이 더 안전합니다.
 메트릭이 쌓이고,
 규칙이 평가되고,
+cooldown이 지나고,
 새 worker가 준비되기까지 시간차가 있기 때문입니다.
 
 이 시간차를 무시하면 “autoscale 켰는데도 첫 5분이 아프다”가 반복됩니다.
@@ -173,6 +240,27 @@ scale-in은 사용 중인 capacity를 줄이는 작업입니다.
 
 공개 autoscale best practice 문서가 scale-in을 더 보수적으로 다루라고 하는 이유가 여기에 있습니다.
 
+autoscale 문서는 여기서 한 단계 더 나갑니다.
+축소 결과가 다시 곧바로 scale-out 조건을 만들면 flapping으로 간주할 수 있고,
+이 경우 autoscale은 축소를 미루거나 덜 줄이는 식으로 반응할 수 있습니다.
+즉 scale-in은 단순 역연산이 아니라,
+서비스 가용성을 우선하는 안정화 로직이 덧붙은 동작입니다.
+
+---
+
+## 진짜로 무슨 판단이 있었는지는 로그에서 본다
+
+이 주제에서 가장 deep-dive다운 공개 정보는 Azure Monitor 진단 로그입니다.
+autoscale 진단 문서는 다음 두 로그 범주를 명시합니다.
+
+- `AutoscaleEvaluationsLog` — 어떤 규칙과 메트릭을 어떻게 평가했는지
+- `AutoscaleScaleActionsLog` — 실제 scale action을 언제 시작했고 결과가 어땠는지
+
+또 Activity Log에는 scale-up/scale-down initiated/completed 이벤트가 남습니다.
+
+즉 App Service scaling을 운영에서 추적할 때는 “늘어난 것 같다”가 아니라,
+**autoscale setting 리소스가 어떤 평가를 했고 어떤 action을 찍었는지**를 Log Analytics와 Activity Log에서 확인할 수 있습니다.
+
 ---
 
 ## 5화 정리
@@ -182,7 +270,7 @@ scale-in은 사용 중인 capacity를 줄이는 작업입니다.
 > App Service의 scale-out은 app 자체가 서버를 직접 추가하는 모델이 아니라, Azure Monitor autoscale 또는 수동 설정이 App Service Plan의 desired instance count를 바꾸고, App Service control plane이 그 상태를 반영해 worker capacity를 늘리는 과정입니다. 그 뒤 새 worker가 앱 startup과 health 통과를 마쳐야 Front-End가 실제 트래픽을 보내기 시작합니다. scale up은 SKU 변경이고, scale out은 worker count 변경이며, 둘 모두 plan 단위로 생각해야 정확합니다.
 
 다음 6화에서는 바로 그 마지막 구간,
-새 worker가 organic traffic을 받기 전까지의 비싼 시간,
+새 worker가 실제 사용자 트래픽을 받기 전까지의 비싼 시간,
 즉 cold start와 warm-up을 다룹니다.
 
 ---
@@ -193,6 +281,13 @@ scale-in은 사용 중인 capacity를 줄이는 작업입니다.
 다음 글에서는 새 worker가 실제로 첫 요청을 받기 전 어떤 준비 과정을 거치는지, Always On과 warm-up path가 그 시간을 어떻게 줄이는지로 이어집니다.
 
 ---
+
+## Documented Behavior Summary
+
+- App Service autoscale의 실제 대상 리소스는 개별 앱이 아니라 App Service Plan입니다.
+- Azure Monitor autoscale은 30~60초 주기의 평가 job, time window, cooldown, flapping 방지 로직으로 동작합니다.
+- scale-out은 하나 이상의 확장 규칙이 충족되면 실행될 수 있지만, scale-in은 모든 축소 규칙이 충족되어야 합니다.
+- `AutoscaleEvaluationsLog`, `AutoscaleScaleActionsLog`, Activity Log를 통해 실제 평가와 실행 결과를 추적할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -211,13 +306,15 @@ scale-in은 사용 중인 capacity를 줄이는 작업입니다.
 ## 참고 자료
 
 ### 1차 출처
-- [Oryx README @ 20240408.1](https://github.com/microsoft/Oryx/blob/20240408.1/README.md)
+- [Understand autoscale settings in Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-understanding-settings)
+- [Diagnostic settings in autoscale](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-diagnostics)
 
 ### 2차 출처
 - [Scale up an app in Azure App Service](https://learn.microsoft.com/azure/app-service/manage-scale-up)
 - [Get started with autoscale in Azure](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-get-started)
 - [Autoscale in Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-overview)
 - [Best practices for autoscale](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-best-practices)
+- [Monitoring data reference for Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/monitor-reference)
 - [Architecture best practices for Azure App Service web apps](https://learn.microsoft.com/azure/well-architected/service-guides/app-service-web-apps)
 
 ### 관련 시리즈

@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
 
+## Source Version
+
+이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+
+- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+
+App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
+따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+
 > Azure App Service Deep Dive 시리즈 (4/6)
 
 App Service에 코드를 올린다는 말은 너무 넓습니다.
@@ -213,6 +223,10 @@ scale up과 scale out이 무엇을 실제로 바꾸는지 이어서 다룹니다
 다음 글에서는 이 앱 인스턴스 수가 실제로 늘어나는 control-plane 경로를 따라가며, scale-out 결정이 어떻게 새 worker로 이어지는지 정리합니다.
 
 ---
+
+## Call Path Summary
+
+Push (zip, git, publish profile, container image reference) → Kudu SCM endpoint → optional build automation (`SCM_DO_BUILD_DURING_DEPLOYMENT`, Oryx on Linux code apps) → content placement in `wwwroot` or mounted package path → app restart / worker process recycle → worker serves the new artifact
 
 <!-- toc:begin -->
 ## 시리즈 목차

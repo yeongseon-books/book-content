@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
 
+## Source Version
+
+이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+
+- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+
+App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
+따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+
 > Azure App Service Deep Dive 시리즈 (2/6)
 
 1화에서는 App Service를 Front-End, Worker, File Server, Kudu, 관측성 박스로 나눠 봤습니다.
@@ -185,12 +195,21 @@ App Service의 affinity도 필요 없게 가져가는 편이 구조가 단순합
 ## 요청 라우팅과 deployment slot
 
 slot도 이 흐름에 들어갑니다.
-Front-End는 host와 slot 문맥을 구분해서 해당 slot의 worker 집합으로 요청을 보냅니다.
+다만 여기서 가장 흔한 오해를 바로잡아야 합니다.
+production slot과 staging slot은 **서로 다른 App Service Plan worker pool**을 갖는 것이 아닙니다.
+같은 plan 안의 같은 compute를 공유하고,
+Front-End가 host와 slot 문맥에 따라 어느 slot 설정으로 라우팅할지 결정합니다.
 
-![요청 라우팅과 deployment slot](../../../assets/azure-app-service-deep-dive/02/02-06-slots-are-also-part-of-request-routing.ko.png)
-그래서 slot swap은 단순 URL 장난이 아닙니다.
-트래픽을 어느 worker 집합으로 보낼지의 기준점이 바뀌는 작업입니다.
-warm-up이 중요한 이유도 여기에 있습니다.
+![요청 라우팅과 deployment slot](../../../assets/azure-app-service-deep-dive/02/02-01-slots-are-also-part-of-request-routing.ko.png)
+Learn 문서가 설명하는 slot swap의 핵심은 이렇습니다.
+
+1. source slot 인스턴스에 target slot 설정을 적용합니다.
+2. source slot의 각 인스턴스가 restart와 warm-up을 마칠 때까지 기다립니다.
+3. 그 뒤 Front-End가 라우팅 규칙을 바꿔 production 트래픽의 목적 slot을 뒤집습니다.
+
+그래서 slot swap은 “production worker 집합 ↔ staging worker 집합 교체”가 아니라,
+**같은 plan 안에서 준비를 먼저 끝낸 slot으로 Front-End 라우팅 기준을 바꾸는 작업**으로 이해해야 맞습니다.
+warm-up이 중요한 이유도 바로 여기에 있습니다.
 
 ---
 
@@ -233,6 +252,12 @@ Linux 앱에서는 왜 container 경계가 핵심인지 이어서 다룹니다.
 다음 글에서는 요청이 도착한 worker 내부의 실행 경계와 sandbox 제약을 살펴보며, 왜 일부 라이브러리가 Windows App Service에서 실패하는지도 이어서 설명합니다.
 
 ---
+
+## Call Path Summary
+
+Client → App Service Front-End → host/slot resolution → ARR worker selection inside the shared App Service Plan → slot-specific app instance
+
+Slot swap path: apply target-slot settings to the source slot → warm every source-slot instance → switch Front-End routing rules
 
 <!-- toc:begin -->
 ## 시리즈 목차

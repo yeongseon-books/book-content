@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
 
+## Source Version
+
+이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+
+- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+
+App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
+따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+
 > Azure App Service Deep Dive 시리즈 (6/6)
 
 이번 시리즈의 마지막 질문은 가장 체감이 강한 질문입니다.
@@ -88,9 +98,9 @@ container recycle은 여전히 별도 warm-up이 필요할 수 있습니다.
 예를 들면,
 
 - 첫 DB connection pool 준비
-- large cache priming
+- 큰 메모리 캐시 채우기
 - 템플릿 컴파일
-- JIT 또는 expensive startup path
+- JIT 또는 무거운 초기화 경로
 
 이때 IIS `applicationInitialization`은 warm-up endpoint를 명시적으로 호출하게 해 줍니다.
 
@@ -113,7 +123,7 @@ App settings reference는 Linux startup에 대해 매우 중요한 사실을 적
 ![Linux: warm-up path와 startup timeout](../../../assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.ko.png)
 이 설정을 모르면 Linux 앱은 아주 자주 두 가지 실수를 합니다.
 
-1. 아직 준비 안 됐는데 404/500도 readiness로 받아들여짐
+1. 아직 준비 안 됐는데도 404/500이 readiness로 받아들여짐
 2. startup time limit이 짧아 초기화 중 재시작 루프에 빠짐
 
 ---
@@ -206,6 +216,13 @@ warm-up이 한 시스템으로 이어진 플랫폼으로 볼 수 있습니다.
 
 ---
 
+## Documented Behavior Summary
+
+- Always On은 idle 상태로 식는 빈도를 줄이지만, 재배포·재시작·새 scale-out worker의 startup 비용까지 없애지는 않습니다.
+- Linux App Service는 `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, `WEBSITES_CONTAINER_START_TIME_LIMIT`으로 startup readiness 계약을 조정합니다.
+- Windows App Service는 IIS `applicationInitialization`과 slot warm-up 흐름을 통해 production 전 준비를 앞당길 수 있습니다.
+- slot swap은 warm-up이 끝난 뒤 Front-End 라우팅 규칙을 바꾸므로, cold start 비용을 production URL 바깥에서 치르게 해 줍니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -223,12 +240,11 @@ warm-up이 한 시스템으로 이어진 플랫폼으로 볼 수 있습니다.
 ## 참고 자료
 
 ### 1차 출처
-- [Oryx README @ 20240408.1](https://github.com/microsoft/Oryx/blob/20240408.1/README.md)
-
-### 2차 출처
 - [Environment variables and app settings reference](https://learn.microsoft.com/azure/app-service/reference-app-settings)
 - [Deploy staging slots in Azure App Service](https://learn.microsoft.com/azure/app-service/deploy-staging-slots)
 - [IIS 8.0 Application Initialization](https://learn.microsoft.com/iis/get-started/whats-new-in-iis-8/iis-80-application-initialization)
+
+### 2차 출처
 - [Robust Apps for the Cloud — App Service team blog](https://azure.github.io/AppService/2020/05/15/Robust-Apps-for-the-cloud.html)
 
 ### 관련 시리즈

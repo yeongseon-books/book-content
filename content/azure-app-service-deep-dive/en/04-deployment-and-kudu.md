@@ -19,6 +19,16 @@ last_reviewed: '2026-04-29'
 
 # Deployment and Kudu — build, sync, release from the inside
 
+## Source Version
+
+This post grounds its claims in the following public sources.
+
+- Microsoft Learn — Azure App Service documentation (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — only for deployment-engine and Windows-sandbox context
+
+Microsoft doesn't publicly document the full implementation details of the App Service Front-End, Worker, and File Server layers.
+In this series, Learn is the primary source of truth, and Kudu material is used only as supporting evidence where it is actually public.
+
 > Azure App Service Deep Dive series (4/6)
 
 “Deploying code to App Service” is too broad to be useful.
@@ -228,6 +238,10 @@ This post explained how code reaches those workers.
 The next post shifts to control-plane behavior and follows how scale-out decisions propagate into more worker capacity.
 
 ---
+
+## Call Path Summary
+
+Push (zip, git, publish profile, container image reference) → Kudu SCM endpoint → optional build automation (`SCM_DO_BUILD_DURING_DEPLOYMENT`, Oryx on Linux code apps) → content placement in `wwwroot` or mounted package path → app restart / worker process recycle → worker serves the new artifact
 
 <!-- toc:begin -->
 ## In this series
