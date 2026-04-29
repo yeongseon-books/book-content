@@ -266,7 +266,7 @@ It is also a shift in control.
 When you point at `latestRevision: true`, you are telling ACA to keep the app URL attached to the newest ready revision.
 When you point at explicit revision names, you are taking that decision back.
 
-![`latestRevision: true` is convenient, but it changes who owns the switch](../../../assets/azure-aca-deep-dive/03/03-09-latestrevision-true-is-convenient-but-it.en.png)
+![latestRevision: true is convenient, but it changes who owns the switch](../../../assets/azure-aca-deep-dive/03/03-09-latestrevision-true-is-convenient-but-it.en.png)
 This distinction often marks the difference between a fast-moving dev setup and a tightly controlled production rollout.
 
 ---

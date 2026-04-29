@@ -253,7 +253,7 @@ message FunctionLoadRequest {
 
 즉 `FunctionRpcService`는 호스트 쪽 gRPC 서버이면서, 동시에 **워커별 채널과 실제 gRPC 스트림 사이를 펌프하는 중계기**입니다.
 
-![채널 구조 — 범용 이벤트 버스보다 워커별 `Channel<T>` 쌍에 가깝다](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
+![채널 구조 — 범용 이벤트 버스보다 워커별 Channel<T> 쌍에 가깝다](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
 `IScriptEventManager`는 이 채널들을 워커 ID로 보관하고 찾는 상태 저장소로 쓰입니다. `InboundGrpcEvent`와 `OutboundGrpcEvent` 같은 래퍼 타입도 실제로 존재합니다. 다만 함수 호출 메시지의 핵심 경로를 설명할 때는, 그것들을 범용 pub-sub 버스라고 이해하기보다 **워커별 큐와 펌프 구조**로 보는 쪽이 코드와 더 가깝습니다.
 
 ---

@@ -80,7 +80,7 @@ The public sandbox material is especially explicit about two constraints.
   which means most User32/GDI32 calls,
   are heavily restricted
 
-![Windows: `w3wp.exe` under the App Service sandbox](../../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
+![Windows: w3wp.exe under the App Service sandbox](../../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
 That single diagram explains the starting point for “why does this PDF or imaging library fail only on Windows App Service?”
 
 ---
@@ -148,8 +148,8 @@ one setting changes the meaning of `/home` dramatically.
 
 That gives you two very different operational pictures.
 
-![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
-![When `WEBSITES_ENABLE_APP_SERVICE_STORAGE` changes what a worker means](../../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
+![When WEBSITES_ENABLE_APP_SERVICE_STORAGE changes what a worker means](../../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
+![When WEBSITES_ENABLE_APP_SERVICE_STORAGE changes what a worker means](../../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
 If you miss this distinction,
 you eventually see one of the usual surprises.
 

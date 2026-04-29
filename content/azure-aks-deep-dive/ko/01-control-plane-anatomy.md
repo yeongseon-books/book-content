@@ -210,7 +210,7 @@ ServiceAccount token 관련 루프,
 "현재 상태"와 "원하는 상태" 사이의 차이를 계속 계산하고,
 차이가 있으면 API server에 다시 씁니다.
 
-![`kube-controller-manager` — 상태 차이를 메우는 루프 모음](../../../assets/azure-aks-deep-dive/01/01-03-kube-controller-manager.ko.png)
+![kube-controller-manager — 상태 차이를 메우는 루프 모음](../../../assets/azure-aks-deep-dive/01/01-03-kube-controller-manager.ko.png)
 운영자가 이 루프를 이해해야 하는 이유는,
 Kubernetes의 많은 동작이 즉시 실행이 아니라 "언젠가 수렴"이기 때문입니다.
 리소스를 만들었다고 바로 끝나는 것이 아니라,

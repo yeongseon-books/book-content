@@ -104,7 +104,7 @@ Examples include:
 
 That is where IIS `applicationInitialization` matters.
 
-![When Windows needs `applicationInitialization`](../../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
+![When Windows needs applicationInitialization](../../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
 Endpoint design matters here.
 Return success too early and incomplete instances start receiving traffic.
 Make the endpoint too heavy and warm-up itself becomes a bottleneck.

@@ -75,7 +75,7 @@ Kudu sandbox 문서는 특히 이렇게 말합니다.
 - Win32k 기반 API 대부분,
 즉 User32/GDI32 계열 호출이 크게 제한됩니다.
 
-![Windows: `w3wp.exe`와 App Service sandbox](../../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.ko.png)
+![Windows: w3wp.exe와 App Service sandbox](../../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.ko.png)
 이 한 그림이 Windows App Service에서 “왜 PDF 변환기 하나가 유독 안 되지?”라는 질문의 시작점입니다.
 
 ---
@@ -141,8 +141,8 @@ Linux custom container에서는 `/home`의 성질이 설정 하나로 크게 달
 
 그래서 같은 앱이라도 다음 두 그림은 운영 의미가 다릅니다.
 
-![`WEBSITES_ENABLE_APP_SERVICE_STORAGE`가 worker 의미를 바꾸는 순간](../../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.ko.png)
-![`WEBSITES_ENABLE_APP_SERVICE_STORAGE`가 worker 의미를 바꾸는 순간](../../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.ko.png)
+![WEBSITES_ENABLE_APP_SERVICE_STORAGE가 worker 의미를 바꾸는 순간](../../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.ko.png)
+![WEBSITES_ENABLE_APP_SERVICE_STORAGE가 worker 의미를 바꾸는 순간](../../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.ko.png)
 이 차이를 모르면 scale-out 뒤 업로드 파일이 보이지 않는다거나,
 재시작 후 생성 파일이 사라진다거나,
 SCM에서 본 파일과 앱이 본 파일이 다르다고 느끼는 일이 생깁니다.

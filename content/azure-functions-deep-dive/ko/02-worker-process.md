@@ -118,7 +118,7 @@ OS 프로세스가 떠 있다고 해서 Worker가 “준비 완료”인 건 아
 
 즉 `FUNCTIONS_WORKER_PROCESS_COUNT=4`는 시작 시점에 워커 4개를 준비하는 설정이고, `WorkerConcurrencyOptions`는 실행 중 상태를 보고 추가 워커를 붙일지 감시하는 쪽입니다. 동적 동시성은 Node.js, Python, PowerShell 같은 일부 런타임에서만 동작하고, `FUNCTIONS_WORKER_PROCESS_COUNT`가 설정돼 있으면 비활성화됩니다.
 
-![`FUNCTIONS_WORKER_PROCESS_COUNT` — 한 인스턴스에 워커 여러 개](../../../assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.ko.png)
+![FUNCTIONS_WORKER_PROCESS_COUNT — 한 인스턴스에 워커 여러 개](../../../assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.ko.png)
 ---
 
 ## 워커가 죽으면 어떻게 되는가

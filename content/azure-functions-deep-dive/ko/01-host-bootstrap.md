@@ -73,7 +73,7 @@ last_reviewed: '2026-04-29'
 
 `WebJobsScriptHostService`가 호출하는 `ScriptHost.InitializeAsync` 안에서, Functions가 함수 앱으로 동작하기 위한 준비가 진행됩니다.
 
-![2단계: `ScriptHost.InitializeAsync` — 진짜 부팅이 일어나는 곳](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.ko.png)
+![2단계: ScriptHost.InitializeAsync — 진짜 부팅이 일어나는 곳](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.ko.png)
 여기서 순서가 중요합니다. `ScriptHost.StartAsyncCore()`는 먼저 `InitializeAsync()`를 끝까지 실행한 뒤, 그 다음에 `base.StartAsyncCore()`를 호출합니다. 즉 `JobHost.StartAsync()`에 따른 트리거 리스너 활성화는 `InitializeAsync` 내부가 아니라 **그 다음 단계**입니다. 이번 화는 설정 로드와 함수 인덱싱에 집중해, 호스트 부팅의 경계를 또렷하게 잡습니다.
 
 > 코드 위치: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
@@ -97,7 +97,7 @@ last_reviewed: '2026-04-29'
 
 > 코드 위치: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 
-![3단계: `host.json`은 어디서 어떻게 읽히는가](../../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.ko.png)
+![3단계: host.json은 어디서 어떻게 읽히는가](../../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.ko.png)
 이 그림이 `host.json`이 코드로 들어오는 경로입니다. **파일의 한 키 → IConfiguration의 한 노드 → Setup 클래스 → 옵션 객체 한 필드**라는 매핑이 끝까지 유지됩니다.
 
 운영자가 알면 좋은 사실 두 개:

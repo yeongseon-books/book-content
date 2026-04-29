@@ -130,7 +130,7 @@ Upstream KEDA source shows this clearly.
 The controller reconciles `ScaledObject` resources and builds HPA specs.
 The HPA creation logic sets min and max replica counts, metric targets, and scale target references.
 
-![A `ScaledObject` creates HPA behavior, not a replacement for HPA](../../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.en.png)
+![A ScaledObject creates HPA behavior, not a replacement for HPA](../../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.en.png)
 In ACA, you should assume the same broad division of labor.
 The product surface gives KEDA enough information to produce HPA-like decisions for the revision.
 

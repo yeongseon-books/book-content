@@ -276,7 +276,7 @@ The `-o wide` output is especially useful because it shows where the pods actual
 
 ## 8. The request path
 
-![8. The request path](../../../assets/azure-aks-101/03/03-02-8-the-request-path.en.png)
+![The request path](../../../assets/azure-aks-101/03/03-02-8-the-request-path.en.png)
 This is the pre-Ingress version of exposure. The Service is carrying both the stable service identity and the external publication path. In the next networking post, an Ingress layer will sit in front of ClusterIP services instead.
 
 ---

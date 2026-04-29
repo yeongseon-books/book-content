@@ -279,7 +279,7 @@ kubectl get services
 
 ## 8. 요청이 들어가고 응답이 나오는 길
 
-![8. 요청이 들어가고 응답이 나오는 길](../../../assets/azure-aks-101/03/03-02-8-the-request-path.ko.png)
+![요청이 들어가고 응답이 나오는 길](../../../assets/azure-aks-101/03/03-02-8-the-request-path.ko.png)
 이 그림은 5화의 Ingress 이야기 전 단계입니다. 지금은 Service가 외부 진입점까지 맡고 있습니다. 조금 더 복잡한 HTTP 라우팅이 필요해지면 여기 앞단에 Ingress를 추가하게 됩니다.
 
 ---

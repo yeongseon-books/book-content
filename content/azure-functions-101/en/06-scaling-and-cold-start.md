@@ -144,7 +144,7 @@ Automatic scale-out does not remove the need to think about concurrency.
 
 Database pools, external API rate limits, and Redis connection limits stay fixed unless you scale them too. A function app can scale out quickly and still bottleneck immediately on the systems behind it.
 
-![1) Downstream systems do not scale with your function app](../../../assets/azure-functions-101/06/06-04-1-downstream-systems-do-not-scale-with-y.en.png)
+![Downstream systems do not scale with your function app](../../../assets/azure-functions-101/06/06-04-1-downstream-systems-do-not-scale-with-y.en.png)
 That is why operations work usually includes both of these:
 
 - trigger-specific batch size, prefetch, and concurrency limits

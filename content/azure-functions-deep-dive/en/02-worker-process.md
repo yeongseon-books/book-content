@@ -118,7 +118,7 @@ Two different knobs get conflated here, and the host code keeps them separate.
 
 So `FUNCTIONS_WORKER_PROCESS_COUNT=4` means “start four workers for this instance.” `WorkerConcurrencyOptions` means “watch live worker latency and decide whether to add another one.” Dynamic concurrency is limited to a subset of runtimes such as Node.js, Python, and PowerShell, and it is skipped when `FUNCTIONS_WORKER_PROCESS_COUNT` is explicitly set.
 
-![`FUNCTIONS_WORKER_PROCESS_COUNT` — multiple workers per instance](../../../assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.en.png)
+![FUNCTIONS_WORKER_PROCESS_COUNT — multiple workers per instance](../../../assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.en.png)
 ---
 
 ## What happens when a worker dies

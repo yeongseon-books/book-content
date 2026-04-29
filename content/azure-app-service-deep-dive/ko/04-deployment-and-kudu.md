@@ -150,7 +150,7 @@ run-from-package 문서는 가장 중요한 문장을 아주 분명하게 적습
 **ZIP 내용이 `wwwroot`로 복사되는 것이 아니라,
 ZIP 패키지 자체가 읽기 전용 `wwwroot`로 mount됩니다.**
 
-![run-from-package는 `wwwroot`를 읽기 전용 mount로 바꾼다](../../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.ko.png)
+![run-from-package는 wwwroot를 읽기 전용 mount로 바꾼다](../../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.ko.png)
 이 모드의 장점은 분명합니다.
 
 - 파일 잠금 충돌 감소

@@ -253,7 +253,7 @@ This part is easier to reason about if you stay close to the code. The main invo
 
 That makes `FunctionRpcService` the pump between the real gRPC stream and the host-side per-worker queues.
 
-![The channel layout — closer to per-worker `Channel<T>` pairs than a generic event bus](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.en.png)
+![The channel layout — closer to per-worker Channel<T> pairs than a generic event bus](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.en.png)
 `IScriptEventManager` still exists here, but mainly as keyed storage for those channels. `InboundGrpcEvent` and `OutboundGrpcEvent` are real wrapper types, and other components can observe them around the edges. But for function invocation traffic, the mental model that matches the source is **per-worker queues plus a gRPC pump**, not “everything goes through one generic in-process event bus.”
 
 ---

@@ -128,7 +128,7 @@ That one file tells you most of what you need to know.
 - It exposes explicit ports.
 - It receives readiness and liveness probes.
 
-![The sidecar container is literally `daprd`](../../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.en.png)
+![The sidecar container is literally daprd](../../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.en.png)
 This is the right resolution for understanding Dapr in ACA.
 The product toggles Dapr at the app surface.
 The runtime ends up launching a Go process with a nontrivial configuration surface.
@@ -162,7 +162,7 @@ Pinned upstream Dapr code makes the bootstrap path readable.
 It calls into `app.Run()`.
 That bootstrap path then constructs runtime options, logging, security, and finally the Dapr runtime object before calling `Run`.
 
-![Boot path: `main.go` to `app.Run()` to runtime creation](../../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.en.png)
+![Boot path: main.go to app.Run() to runtime creation](../../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.en.png)
 For ACA readers, the important takeaway is not every bootstrap detail.
 It is that enabling Dapr does in fact launch a complete runtime program, with a normal process lifecycle and configuration pipeline.
 

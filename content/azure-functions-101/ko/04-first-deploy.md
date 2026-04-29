@@ -147,7 +147,7 @@ Azure에 함수를 올리려면 세 개의 리소스가 필요합니다.
 | **Storage Account** | Functions Host의 상태, 락, 큐 메타데이터를 저장하는 필수 저장소 |
 | **Function App** | 함수를 담는 컴퓨트 리소스 |
 
-![4. Azure 리소스 만들기](../../../assets/azure-functions-101/04/04-02-4-create-azure-resources.ko.png)
+![Azure 리소스 만들기](../../../assets/azure-functions-101/04/04-02-4-create-azure-resources.ko.png)
 > Note: Storage Account는 Functions가 자기 동작을 유지하는 데 쓰는 인프라 저장소입니다. 트리거 락, 호출 메타데이터, Timer 스케줄 상태 같은 값이 여기에 들어갑니다. 비즈니스 데이터는 별도 저장소를 두는 편이 안전합니다.
 
 이제 리소스를 만듭니다. 이름은 전역 고유해야 하므로 적절히 바꿔서 쓰면 됩니다.
@@ -210,7 +210,7 @@ func azure functionapp publish $APP
 
 내부 흐름은 다음과 같습니다.
 
-![5. 배포](../../../assets/azure-functions-101/04/04-03-5-deploy.ko.png)
+![배포](../../../assets/azure-functions-101/04/04-03-5-deploy.ko.png)
 마지막에 다음과 비슷한 출력이 나옵니다.
 
 ```

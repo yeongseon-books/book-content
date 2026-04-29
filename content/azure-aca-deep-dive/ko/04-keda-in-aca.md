@@ -131,7 +131,7 @@ Upstream KEDA source를 보면 이 사실이 분명합니다.
 Controller는 `ScaledObject`를 reconcile하고 HPA spec을 생성합니다.
 HPA 생성 로직은 min/max replica, metric target, scale target reference를 채웁니다.
 
-![`ScaledObject`는 HPA를 대체하는 것이 아니라 HPA를 만들어 냅니다](../../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.ko.png)
+![ScaledObject는 HPA를 대체하는 것이 아니라 HPA를 만들어 냅니다](../../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.ko.png)
 ACA에서도 이 큰 역할 분담은 그대로라고 보는 편이 맞습니다.
 제품 표면이 KEDA에게 Revision에 대한 HPA류 결정을 만들 정보만 전달하는 구조입니다.
 
@@ -146,7 +146,7 @@ ACA는 `minReplicas: 0`을 명시적으로 허용합니다.
 전통적인 HPA만으로는 event signal에 의해 0에서 깨어나는 activation을 자연스럽게 설명하기 어렵습니다.
 KEDA는 그 부분을 설명합니다.
 
-![`minReplicas`가 0일 수 있다는 점이 모든 것을 바꿉니다](../../../assets/azure-aca-deep-dive/04/04-05-minreplicas-can-be-zero-and-that-changes.ko.png)
+![minReplicas가 0일 수 있다는 점이 모든 것을 바꿉니다](../../../assets/azure-aca-deep-dive/04/04-05-minreplicas-can-be-zero-and-that-changes.ko.png)
 Microsoft의 scaling 문서도 마지막 replica에서 0으로 내려갈 때 cooldown이 특히 중요하다고 설명합니다.
 이건 바로 KEDA식 event-driven lifecycle이 잘 드러나는 지점입니다.
 

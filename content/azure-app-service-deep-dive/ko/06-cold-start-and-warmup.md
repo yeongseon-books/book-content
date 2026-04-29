@@ -104,7 +104,7 @@ container recycle은 여전히 별도 warm-up이 필요할 수 있습니다.
 
 이때 IIS `applicationInitialization`은 warm-up endpoint를 명시적으로 호출하게 해 줍니다.
 
-![Windows: `applicationInitialization`이 필요한 경우](../../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.ko.png)
+![Windows: applicationInitialization이 필요한 경우](../../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.ko.png)
 중요한 포인트는 endpoint 설계입니다.
 200을 너무 빨리 주면 아직 안 된 인스턴스가 traffic pool에 들어갑니다.
 반대로 너무 무거우면 warm-up 자체가 병목이 됩니다.

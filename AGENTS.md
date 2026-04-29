@@ -94,6 +94,54 @@ TOC entry titles are pulled from each post's H1 (single source of truth). Never 
 - All diagrams source: Mermaid → PNG via `.sisyphus/medium/mermaid-to-png.py`
 - ko/en bodies reference local relative path; medium bodies reference `raw.githubusercontent.com/<owner>/<repo>/<TAG>/...`
 
+## Image caption (alt text) policy
+
+Image alt text in `![alt](src)` is **double duty**: it renders as a visible caption on Medium / in ebooks AND it is read aloud by screen readers. Treat captions as short descriptive fragments that name what the diagram is showing — not headlines, not body sentences, not questions.
+
+### Korean (ko)
+
+- 형태: **서술형 명사구** (subject + relationship/flow/comparison)
+- 길이: **4–12어절**, 한 줄 안에서 끝낼 것
+- 끝맺음: `흐름`, `구조`, `경로`, `관계`, `차이`, `비교`, `경계`, `단계`, `조건`, `반응` 같은 명사로 마무리
+- **금지**: `~입니다` / `~습니다` 종결어미, 의문형 (`~할까`, `~인가`), 마침표/물음표/느낌표
+- 좋음: `트리거가 함수를 깨우는 흐름`, `트래픽 급증 시 플랜별 확장 반응`, `Revision weight와 scale의 관계`
+- 나쁨: `트리거는 함수를 깨우는 원인입니다`, `트래픽이 늘면 어떻게 반응할까`
+
+### English (en)
+
+- 형태: **sentence-case descriptive fragment** (subject + relationship/flow/comparison)
+- 길이: **4–10 words**
+- 케이싱: **sentence case only** (no Title Case)
+- **금지**: 의문형, full sentences, trailing punctuation, Title Case
+- 좋음: `Request flow with ARR Affinity enabled`, `Pre-norm and post-norm LayerNorm placement`
+- 나쁨: `How Is This Different From a Traditional Web App?`, `What ZipDeploy actually means`
+
+### Universal rules
+
+- **절 번호 prefix 항상 제거** (`4.`, `5.`, `1)`)
+- **나란한 H2/H3 그대로 복붙 금지** — 캡션은 그림이 보여주는 관점을 더한다
+- **백틱 금지** in alt text — 식별자는 평문으로 (`host.json`, `FUNCTIONS_WORKER_PROCESS_COUNT`)
+- **Em dash 기본 회피** — 필요하면 `:` 한 번만
+- **scare quotes 금지** — 강조용 따옴표 쓰지 않음
+- **위치 어휘 금지** (`left side`, `blue box`, `top arrow`) unless position itself is the point
+- **Vague 라벨 금지**: `Big picture`, `한 화면으로`, `Decision tree`, `One diagram first`
+- ko/en counterpart 이미지는 **같은 의미 기반 paired rewrite**, 독립적 스타일 선택 아님
+
+### Anti-patterns (lint blocks these)
+
+- Heading clones: `배포`, `Big picture`
+- Question captions: `기존 웹 앱과 뭐가 다른가`, `Why only some users fail sometimes`
+- Body sentences: `Worker는 ... 실체입니다`
+- Section/list prefixes: `4.`, `5.`, `1)`
+- Formatting noise: backticks, scare quotes, multiple separators, emoji
+- Editorial slogans: `No Peeking at the Future`, `3am`
+
+### Verification
+
+```bash
+python3 scripts/lint_captions.py    # exits 1 on banned patterns
+```
+
 ## Pinned tag
 
 External and intra-repo URLs in `medium/` files MUST pin to a commit/tag, never `master`/`HEAD`/`main`.

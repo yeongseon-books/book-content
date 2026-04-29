@@ -87,7 +87,7 @@ The key difference is **what you're being billed by the unit of**. App Service c
 
 The lifecycle difference becomes clearer side by side.
 
-![How Is This Different From a Traditional Web App?](../../../assets/azure-functions-101/01/01-02-how-is-this-different-from-a-traditional.en.png)
+![How Is This Different From a Traditional Web App](../../../assets/azure-functions-101/01/01-02-how-is-this-different-from-a-traditional.en.png)
 The "idle → wake → run → idle again" cycle on the right is the essence of serverless. That "wake" segment is the source of what you'll hear called a **cold start**. A later chapter breaks down where that startup time actually goes.
 
 ---

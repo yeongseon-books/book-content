@@ -73,7 +73,7 @@ One important design decision here. **`WebJobsScriptHostService` is not "the hos
 
 Inside `ScriptHost.InitializeAsync`, called by `WebJobsScriptHostService`, the host does the work required to become a running function app.
 
-![Stage 2: `ScriptHost.InitializeAsync` — where bootstrap actually happens](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.en.png)
+![Stage 2: ScriptHost.InitializeAsync — where bootstrap actually happens](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.en.png)
 The ordering matters. In `ScriptHost.StartAsyncCore()`, `InitializeAsync()` runs first and finishes before `base.StartAsyncCore()` runs. Trigger listener activation through `JobHost.StartAsync()` is therefore **after** initialization, not part of it. This post stays on config loading and function indexing so the bootstrap boundary itself is clear.
 
 > Code location: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
@@ -97,7 +97,7 @@ Values from `host.json` map straight to options objects. For example, `functionT
 
 > Code location: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 
-![Stage 3: where and how `host.json` is read](../../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.en.png)
+![Stage 3: where and how host.json is read](../../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.en.png)
 This diagram is the path `host.json` takes into runtime options. **One key in the file → one node in IConfiguration → a Setup class → one field on an options object**. The mapping stays that direct.
 
 Two things operators should know:

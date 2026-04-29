@@ -127,7 +127,7 @@ Upstream `sidecar_container.go` 파일은 주입되는 컨테이너의 실체를
 - 명시적인 port를 엽니다.
 - readiness / liveness probe를 가집니다.
 
-![Sidecar container의 실체는 `daprd`입니다](../../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.ko.png)
+![Sidecar container의 실체는 daprd입니다](../../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.ko.png)
 즉 제품 표면에서 Dapr를 켠다는 짧은 설정은, 런타임에서는 이렇게 구성된 두 번째 프로세스를 Pod 안에 띄우는 일입니다.
 
 ---
@@ -159,7 +159,7 @@ Pinned upstream Dapr code는 이 부팅 경로를 깔끔하게 보여 줍니다.
 `app.Run()`을 호출합니다.
 그 뒤 bootstrap 경로가 runtime option, logging, security, 최종 Dapr runtime object를 만든 뒤 `Run`을 호출합니다.
 
-![부팅 경로: `main.go`에서 `app.Run()`을 거쳐 runtime 생성까지](../../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.ko.png)
+![부팅 경로: main.go에서 app.Run()을 거쳐 runtime 생성까지](../../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.ko.png)
 ACA 독자에게 중요한 것은 부팅 세부사항 전부가 아닙니다.
 Dapr를 켜면 실제로 완전한 런타임 프로그램이 하나 더 떠서, 정상적인 프로세스 생명주기와 설정 파이프라인을 돈다는 사실입니다.
 
