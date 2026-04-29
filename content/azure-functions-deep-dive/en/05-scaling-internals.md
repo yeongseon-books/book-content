@@ -22,7 +22,7 @@ This installment has three goals:
 
 Before we touch any code, here's the whole thing in one diagram.
 
-![Scaling decision points](../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
+![Scaling decision points](../../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
 The key insight is that two different decisions are made in two different places.
 
 | Decision | Decided by | Signal | Result |
@@ -141,7 +141,7 @@ If the health ping is the host's answer to "can you take more right now?", then 
 
 The code for these lives in the SDK, but the way they flow from the host's perspective is clear.
 
-![ScaleMonitor and TargetScaler — the signals triggers measure directly](../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.en.png)
+![ScaleMonitor and TargetScaler — the signals triggers measure directly](../../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.en.png)
 There are two modes, introduced at different points in time.
 
 ### Incremental scaling (`IScaleMonitor`)
@@ -212,7 +212,7 @@ Putting these two side by side:
 
 The host code is identical wherever it runs. The `HostPerformanceManager.cs` we just looked at, the `TableStorageScaleMetricsRepository.cs`, the `WorkerConcurrencyManager.cs` — all one codebase. What differs is **who is making decisions outside this code**.
 
-![Plan-by-plan — same code, different behavior](../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.en.png)
+![Plan-by-plan — same code, different behavior](../../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.en.png)
 Plan by plan, in a sentence each:
 
 ### Consumption

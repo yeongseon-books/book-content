@@ -14,7 +14,7 @@ This is the map for the rest of the series.
 Each later part zooms into one box from this picture.
 Get the layout in your head first; the code paths land more cleanly after that.
 
-![Azure Functions host instance](../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
+![Azure Functions host instance](../../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
 Part 1 covers host bootstrap, Part 2 zooms into the worker process, Part 3 into the gRPC channel, Part 4 into dispatcher and invocation, Part 5 into scaling, and Part 6 into placeholder mode and cold start.
 
 ---
@@ -23,7 +23,7 @@ Part 1 covers host bootstrap, Part 2 zooms into the worker process, Part 3 into 
 
 It looks complicated, but host bootstrap really compresses down to these four stages:
 
-![Host bootstrap in 4 stages](../../assets/azure-functions-deep-dive/01/01-02-the-big-picture-host-bootstrap-in-4-stag.en.png)
+![Host bootstrap in 4 stages](../../../assets/azure-functions-deep-dive/01/01-02-the-big-picture-host-bootstrap-in-4-stag.en.png)
 This post walks through each of these four boxes in order. After stage 4, **the function is ready to run the moment a trigger fires**.
 
 ---
@@ -49,7 +49,7 @@ One important design decision here. **`WebJobsScriptHostService` is not "the hos
 
 Inside `ScriptHost.InitializeAsync`, called by `WebJobsScriptHostService`, the host does the work required to become a running function app.
 
-![Stage 2: `ScriptHost.InitializeAsync` — where bootstrap actually happens](../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.en.png)
+![Stage 2: `ScriptHost.InitializeAsync` — where bootstrap actually happens](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.en.png)
 The ordering matters. In `ScriptHost.StartAsyncCore()`, `InitializeAsync()` runs first and finishes before `base.StartAsyncCore()` runs. Trigger listener activation through `JobHost.StartAsync()` is therefore **after** initialization, not part of it. This post focuses on config loading and function indexing, leaves worker channel prep to episode 2, and picks up the invocation path in episode 4.
 
 > Code location: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
@@ -73,7 +73,7 @@ Values from `host.json` map straight to options objects. For example, `functionT
 
 > Code location: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 
-![Stage 3: where and how `host.json` is read](../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.en.png)
+![Stage 3: where and how `host.json` is read](../../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.en.png)
 This diagram is the path `host.json` takes into runtime options. **One key in the file → one node in IConfiguration → a Setup class → one field on an options object**. The mapping stays that direct.
 
 Two things operators should know:
@@ -111,7 +111,7 @@ In other words, **indexing is the stage that builds the Functions host's "functi
 - Bootstrap takes too long → forced restart
 - Memory/CPU thresholds exceeded → instance reclaim signal
 
-![The host health monitor](../../assets/azure-functions-deep-dive/01/01-05-the-host-health-monitor.en.png)
+![The host health monitor](../../../assets/azure-functions-deep-dive/01/01-05-the-host-health-monitor.en.png)
 This state machine is the root cause of the operational symptom "my function suddenly restarted." If you see frequent "Host started" log entries in App Insights, this state machine is probably cycling more often than you'd like.
 
 ---

@@ -16,7 +16,7 @@ The answer to that question is **Placeholder Mode**. This part follows the code 
 
 Let's first lay out the steps a single new instance has to traverse before it's ready to run a function from scratch.
 
-![Why Cold Start Is Expensive — Decomposing the Bootstrap Cost](../../assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png)
+![Why Cold Start Is Expensive — Decomposing the Bootstrap Cost](../../../assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png)
 Steps 1 through 5 (VM allocation through DI container build) are **independent of user code**. Every customer's function goes through the same steps. Starting from step 6 (downloading code), things become user-specific.
 
 Placeholder Mode's idea exploits exactly this separation.
@@ -305,7 +305,7 @@ This is the code-level guarantee that **cold start cost is paid exactly once, on
 
 Putting everything we've seen so far into a single sequence diagram:
 
-![The Whole Picture — The Life of an Instance](../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.en.png)
+![The Whole Picture — The Life of an Instance](../../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.en.png)
 ---
 
 ## Why Cold Start Differs by Plan

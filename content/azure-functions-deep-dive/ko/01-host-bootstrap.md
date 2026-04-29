@@ -14,7 +14,7 @@
 뒤의 화들은 아래 박스 하나씩을 확대해서 보는 구조입니다.
 먼저 위치를 잡아 두면, 이후의 세부 코드가 훨씬 덜 낯섭니다.
 
-![Azure Functions 호스트 인스턴스](../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.ko.png)
+![Azure Functions 호스트 인스턴스](../../../assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.ko.png)
 이번 1화는 가운데 Host가 어떻게 부팅되는지를 보고, 2화는 Worker 프로세스, 3화는 둘 사이의 `gRPC (FunctionRpcService)` 채널, 4화는 dispatcher와 invocation, 5화는 스케일링, 6화는 placeholder와 콜드 스타트를 확대합니다.
 
 ---
@@ -23,7 +23,7 @@
 
 복잡해 보여도 호스트 부팅은 결국 다음 4단계로 압축됩니다.
 
-![큰 그림 — 호스트 부팅의 4단계](../../assets/azure-functions-deep-dive/01/01-02-the-big-picture-host-bootstrap-in-4-stag.ko.png)
+![큰 그림 — 호스트 부팅의 4단계](../../../assets/azure-functions-deep-dive/01/01-02-the-big-picture-host-bootstrap-in-4-stag.ko.png)
 이 글은 이 네 박스를 차례로 깊게 들어갑니다. 4단계가 끝나면 **트리거가 들어오기만 하면 함수가 실행될 준비**가 끝납니다.
 
 ---
@@ -49,7 +49,7 @@
 
 `WebJobsScriptHostService`가 호출하는 `ScriptHost.InitializeAsync` 안에서, Functions가 함수 앱으로 동작하기 위한 준비가 진행됩니다.
 
-![2단계: `ScriptHost.InitializeAsync` — 진짜 부팅이 일어나는 곳](../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.ko.png)
+![2단계: `ScriptHost.InitializeAsync` — 진짜 부팅이 일어나는 곳](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.ko.png)
 여기서 순서가 중요합니다. `ScriptHost.StartAsyncCore()`는 먼저 `InitializeAsync()`를 끝까지 실행한 뒤, 그 다음에 `base.StartAsyncCore()`를 호출합니다. 즉 `JobHost.StartAsync()`에 따른 트리거 리스너 활성화는 `InitializeAsync` 내부가 아니라 **그 다음 단계**입니다. 이번 화에서는 설정 로드와 함수 인덱싱에 집중하고, Worker 채널 준비는 2화로, 실제 호출 경로는 4화로 넘깁니다.
 
 > 코드 위치: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
@@ -73,7 +73,7 @@
 
 > 코드 위치: [`ScriptJobHostOptionsSetup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs)
 
-![3단계: `host.json`은 어디서 어떻게 읽히는가](../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.ko.png)
+![3단계: `host.json`은 어디서 어떻게 읽히는가](../../../assets/azure-functions-deep-dive/01/01-04-stage-3-where-and-how-host-json-is-read.ko.png)
 이 그림이 `host.json`이 코드로 들어오는 경로입니다. **파일의 한 키 → IConfiguration의 한 노드 → Setup 클래스 → 옵션 객체 한 필드**라는 매핑이 끝까지 유지됩니다.
 
 운영자가 알면 좋은 사실 두 개:
@@ -111,7 +111,7 @@
 - 부팅이 너무 오래 걸리면 → 강제 재시작
 - 메모리/CPU 임계치 초과 → 인스턴스 회수 신호
 
-![호스트 헬스 모니터](../../assets/azure-functions-deep-dive/01/01-05-the-host-health-monitor.ko.png)
+![호스트 헬스 모니터](../../../assets/azure-functions-deep-dive/01/01-05-the-host-health-monitor.ko.png)
 이 상태 머신은 운영 시 “함수가 갑자기 재시작됐다”는 현상의 근원입니다. App Insights에서 “Host started” 로그가 자주 보인다면, 이 상태 머신이 빈번하게 도는 중일 가능성이 큽니다.
 
 ---

@@ -55,7 +55,7 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: draft
-    path: azure-functions-deep-dive
+    path: content/azure-functions-deep-dive
 
   - id: azure-aks-101
     category: azure

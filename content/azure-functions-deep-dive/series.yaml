@@ -1,0 +1,36 @@
+id: azure-functions-deep-dive
+category: azure
+title:
+  ko: Azure Functions Deep Dive
+  en: Azure Functions Deep Dive
+description:
+  ko: Azure Functions Host 소스 분석 시리즈 (commit-pinned).
+  en: Source-level dive into Azure Functions Host (commit-pinned).
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+articles:
+- idx: 1
+  slug: 01-host-bootstrap
+  status: ready
+- idx: 2
+  slug: 02-worker-process
+  status: ready
+- idx: 3
+  slug: 03-grpc-event-stream
+  status: ready
+- idx: 4
+  slug: 04-dispatcher-and-invocation
+  status: ready
+- idx: 5
+  slug: 05-scaling-internals
+  status: ready
+- idx: 6
+  slug: 06-cold-start-placeholder
+  status: ready
