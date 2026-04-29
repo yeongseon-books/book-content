@@ -22,9 +22,8 @@ last_reviewed: '2026-04-29'
 > Azure Container Apps 101 시리즈 (5/7)
 
 이번 글은 KEDA 기반 스케일링을 다룹니다.
-HTTP 스케일 규칙.
-CPU와 memory 규칙.
-그리고 Service Bus 같은 custom scaler를 구분해서 봅니다.
+내장 HTTP/TCP 규칙.
+그리고 Service Bus, CPU, memory 같은 custom KEDA 규칙을 구분해서 봅니다.
 
 ---
 
@@ -38,16 +37,17 @@ CPU와 memory 규칙.
 
 ## 규칙 세 부류
 
-- HTTP
-- CPU와 memory
-- Custom KEDA scaler
+- **HTTP 스케일 규칙** — ingress가 켜진 HTTP 앱에서 쓰는 내장 규칙이며, 동시 요청 수를 기준으로 스케일합니다.
+- **TCP 스케일 규칙** — TCP 앱에서 쓰는 내장 규칙이며, 동시 연결 수를 기준으로 스케일합니다.
+- **Custom KEDA 규칙** — Service Bus, Event Hubs, Kafka, Redis 같은 이벤트 소스와 CPU, memory 같은 리소스 기반 scaler를 모두 포함합니다.
 
 ---
 
 ## scale-to-zero
 
-HTTP와 custom KEDA scaler는 0까지 내려갈 수 있습니다.
-CPU와 memory 기반 스케일링은 문서 기준 0까지 내려가지 않습니다.
+HTTP와 TCP 규칙은 0까지 내려갈 수 있습니다.
+많은 custom 이벤트 기반 KEDA 규칙도 0까지 내려갈 수 있습니다.
+CPU와 memory는 custom 규칙 범주에 속하지만, 문서 기준 scale-to-zero 대상은 아닙니다.
 
 ---
 

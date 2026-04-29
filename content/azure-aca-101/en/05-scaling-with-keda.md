@@ -22,9 +22,8 @@ last_reviewed: '2026-04-29'
 > Azure Container Apps 101 series (5/7)
 
 This post explains the KEDA-based scaling path.
-It separates HTTP rules.
-CPU and memory rules.
-And custom event-driven scalers.
+It separates built-in HTTP and TCP rules.
+And custom KEDA rules such as Service Bus, CPU, and memory.
 
 ---
 
@@ -38,16 +37,17 @@ You choose the signal and the replica bounds.
 
 ## Three rule categories
 
-- HTTP
-- CPU and memory
-- custom KEDA scaler
+- **HTTP scale rule** — the built-in rule used for ingress-enabled HTTP apps, based on concurrent requests.
+- **TCP scale rule** — the built-in rule used for TCP apps, based on concurrent connections.
+- **Custom scale rules** — any KEDA scaler you attach, including Service Bus, Event Hubs, Kafka, Redis, and resource-based scalers such as CPU and memory.
 
 ---
 
 ## Scale-to-zero
 
-HTTP and custom KEDA scalers can reach zero.
-CPU and memory-based scaling do not scale to zero according to Microsoft Learn.
+HTTP and TCP rules can scale to zero.
+Many custom event-driven KEDA rules can also scale to zero.
+CPU and memory live under the custom-rule bucket, but they still do not scale to zero according to Microsoft Learn.
 
 ---
 
