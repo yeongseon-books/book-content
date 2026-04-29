@@ -19,6 +19,21 @@ yeongseon/mkdocs-ebook  (private)
 - 본 저장소는 private eBook compiler 가 사용할 source bundle 까지만 생성한다.
 - private builder를 가진 환경에서만 `requirements-dev.txt` 를 통해 옵션 설치한다.
 
+### 1.1 설치 방법 (둘 중 하나)
+
+```bash
+# A) SSH (권장 — 로컬 개발):
+pip install git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+
+# B) HTTPS + gh token (CI / SSH 키 미등록 환경):
+pip install "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mkdocs-ebook.git"
+```
+
+`gh auth token` 은 `gh auth login` 으로 인증된 토큰을 반환한다 (`repo` scope 필요).
+`mkdocs-ebook lint` 만 돌리는 데는 추가 시스템 의존성이 필요 없다. PDF/EPUB 빌드 시
+pandoc, xelatex, Nanum 폰트, playwright, poppler-utils, epubcheck 가 추가로 필요하며
+`mkdocs-ebook doctor` 로 확인할 수 있다.
+
 ---
 
 ## 2. 책임 분리

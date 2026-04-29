@@ -114,8 +114,8 @@ python3 .sisyphus/medium/finalize-posts.py
 - [x] `export_ebook_source.py` 실 동작 구현 (Phase 7g + 8: catalog validator + rmtree guard + cross-series rewrite)
 - [x] Azure Functions 101 ko/en eBook source bundle 첫 빌드 (Phase 8: strict-pass)
 - [x] 19/19 ebook-target 시리즈 번들 strict-pass (Phase 8)
-- [ ] private `mkdocs-ebook` 와 통합 테스트 (private repo 접근 환경에서)
-- [ ] 첫 PDF 산출물 확인
+- [x] private `mkdocs-ebook` 통합 테스트 — `pip install "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mkdocs-ebook.git"` 로 설치 후 19/19 번들 `mkdocs-ebook lint` 통과 (0 error / 0 warning each)
+- [ ] 첫 PDF 산출물 — 추가 시스템 의존성 (pandoc / xelatex / Nanum fonts / playwright / poppler / epubcheck) 설치 환경에서 진행
 
 ## Phase 9 — Repository rename & cutover
 

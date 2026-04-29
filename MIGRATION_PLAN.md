@@ -247,7 +247,7 @@ tech-writing/
 - AI Web Dev 101 OpenAI API 예제 갱신
 - Deep Dive 글에 Source Version / Call Path Summary 추가
 - GitHub repository rename
-- private `mkdocs-ebook` 와 실제 통합 테스트
+- private `mkdocs-ebook` 통합 테스트 — gh-token HTTPS 설치 경로로 19/19 번들 lint 통과 (Phase 8)
 
 각 항목은 [`ROADMAP.md`](./ROADMAP.md)의 Phase 6/7/8에 추적된다.
 

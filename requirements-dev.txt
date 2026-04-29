@@ -4,12 +4,20 @@
 # Optional private eBook builder.
 #
 # `mkdocs-ebook` lives in a private repository (yeongseon/mkdocs-ebook).
-# Do NOT enable this by default — CI environments without SSH access to that
-# repository will fail.
+# Do NOT enable this by default — CI environments without access will fail.
 #
-# To install in a local environment that has access:
+# Install (pick one):
 #
+#   # A) SSH — preferred for local dev with a registered key:
 #   pip install git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+#
+#   # B) HTTPS + gh token — for CI or environments without SSH access:
+#   pip install "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mkdocs-ebook.git"
+#
+# `gh auth token` returns the token from `gh auth login` (needs `repo` scope).
+# `mkdocs-ebook lint` works with just the Python install. Full PDF/EPUB build
+# additionally needs pandoc, xelatex, Nanum fonts, playwright, poppler-utils,
+# and epubcheck — run `mkdocs-ebook doctor` to see what's missing.
 #
 # Once installed, the build flow is documented in EBOOK.md.
 # ---------------------------------------------------------------------------
