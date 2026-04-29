@@ -1,9 +1,23 @@
-"""Export a single article to `exports/tistory/<series>/<NN>-<slug>.md`.
+"""Export a Korean source post for Tistory paste-publishing.
 
-Status: skeleton. Real conversion logic lands in Phase 5 follow-up.
+Reads `content/<series>/ko/<NN>-<slug>.md` and writes to
+`exports/tistory/<series>/<NN>-<slug>.md`.
 
-Usage (target):
-    python3 scripts/export_tistory.py <series-id> --episode <N>
+Per PUBLISHING.md (Tistory column):
+- strip YAML front matter (Tistory has its own meta fields)
+- keep blog-only blocks (markers stripped, body kept)
+- strip ebook-only blocks
+- keep TOC and series nav (visible to readers)
+- keep visible bottom `Tags: A, B, C, D` line — this is the copy-paste source
+  for Tistory's tag input field
+
+Image references are left as relative `../../../assets/...` paths since
+Tistory uploads happen interactively; the human pastes the body and
+attaches images via the editor.
+
+Usage:
+    python3 scripts/export_tistory.py <series-id> --episode N
+    python3 scripts/export_tistory.py <series-id> --all
 """
 
 from __future__ import annotations
@@ -12,22 +26,62 @@ import argparse
 import sys
 from pathlib import Path
 
+import yaml
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
+EXPORT_DIR = REPO_ROOT / "exports" / "tistory"
+SERIES_YAML = REPO_ROOT / "series.yaml"
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _transform import transform_for_tistory
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Export a Korean article to Tistory format.")
-    parser.add_argument("series", help="series id, e.g. azure-functions-101")
-    parser.add_argument("--episode", "-e", type=int, required=True, help="episode number (1-based)")
-    parser.add_argument("--out", default=None, help="override output path")
-    return parser.parse_args()
+def load_series(series_id: str) -> dict:
+    catalog = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8"))["series"]
+    for s in catalog:
+        if s["id"] == series_id:
+            return s
+    raise SystemExit(f"unknown series: {series_id}")
+
+
+def find_article(series_dir: Path, episode: int) -> Path:
+    matches = sorted(series_dir.glob(f"{episode:02d}-*.md"))
+    if not matches:
+        raise SystemExit(f"no article found for episode {episode} in {series_dir}")
+    return matches[0]
+
+
+def export_one(src: Path, dst: Path) -> None:
+    text = src.read_text(encoding="utf-8")
+    out = transform_for_tistory(text)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_text(out, encoding="utf-8")
 
 
 def main() -> int:
-    args = parse_args()
-    print(f"export_tistory: series={args.series} episode={args.episode}")
-    print("TODO: read content/<series>/ko/<NN>-*.md, strip ebook-only blocks, "
-          "keep blog-only and visible Tags line, write to exports/tistory/.")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("series", help="series id, e.g. azure-functions-101")
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--episode", "-e", type=int, help="episode number (1-based)")
+    g.add_argument("--all", action="store_true", help="export every episode in the series")
+    args = ap.parse_args()
+
+    s = load_series(args.series)
+    if "ko" not in s.get("languages", []):
+        raise SystemExit(f"series {args.series} has no ko/ language")
+    series_ko = REPO_ROOT / s["path"] / "ko"
+    series_out = EXPORT_DIR / args.series
+
+    if args.all:
+        sources = sorted(series_ko.glob("*.md"))
+    else:
+        sources = [find_article(series_ko, args.episode)]
+
+    for src in sources:
+        dst = series_out / src.name
+        export_one(src, dst)
+        print(f"wrote {dst.relative_to(REPO_ROOT)}")
+    print(f"\ntotal: {len(sources)} file(s) -> {series_out.relative_to(REPO_ROOT)}/")
     return 0
 
 

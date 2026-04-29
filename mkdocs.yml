@@ -35,9 +35,163 @@ markdown_extensions:
 # scripts/build_docs.py only materializes content/ -> docs/ files and does not touch nav.
 # The entries below are placeholders for the scaffold phase (Phase 4) and are not
 # expected to build until Phase 6 file moves populate content/ and docs/.
+# AUTOGEN-NAV-START
 nav:
   - Home: index.md
   - Korean:
       - ko/index.md
+      - Azure:
+          - Azure App Service 101:
+              - "Azure App Service란? - 플랫폼 아키텍처 이해하기": ko/azure-app-service-101/01-what-is-app-service.md
+              - "Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까": ko/azure-app-service-101/02-request-lifecycle.md
+              - "Hosting Models: 어떤 플랜을 선택해야 할까?": ko/azure-app-service-101/03-hosting-models.md
+              - "첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)": ko/azure-app-service-101/04-first-deploy.md
+              - "Configuration 마스터하기: App Settings & 환경변수": ko/azure-app-service-101/05-configuration.md
+              - "로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기": ko/azure-app-service-101/06-logging-monitoring.md
+              - "Scaling 101: 언제 Scale Up vs Scale Out?": ko/azure-app-service-101/07-scaling-101.md
+          - Azure App Service Deep Dive:
+              - "App Service 플랫폼 아키텍처 — Front-End·Worker·File Server": ko/azure-app-service-deep-dive/01-platform-architecture.md
+              - "Front-End과 ARR — 요청은 어떻게 워커에 도달하는가": ko/azure-app-service-deep-dive/02-front-end-and-arr.md
+              - "Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가": ko/azure-app-service-deep-dive/03-worker-and-sandbox.md
+              - "배포와 Kudu — 빌드·동기화·릴리스의 안쪽": ko/azure-app-service-deep-dive/04-deployment-and-kudu.md
+              - "스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로": ko/azure-app-service-deep-dive/05-scaling-internals.md
+              - "콜드 스타트와 Warmup — 첫 요청이 비싼 이유": ko/azure-app-service-deep-dive/06-cold-start-and-warmup.md
+          - Azure Functions 101:
+              - "Azure Functions란? — 이벤트가 함수를 호출하는 세상": ko/azure-functions-101/01-what-is-azure-functions.md
+              - "트리거와 바인딩 — 함수 입출력의 모든 것": ko/azure-functions-101/02-triggers-and-bindings.md
+              - "Host와 Worker — 함수는 누가 실행하는가": ko/azure-functions-101/03-host-and-worker.md
+              - "함수 하나 배포하기 — 로컬에서 Azure까지": ko/azure-functions-101/04-first-deploy.md
+              - "어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated": ko/azure-functions-101/05-choosing-a-plan.md
+              - "스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간": ko/azure-functions-101/06-scaling-and-cold-start.md
+              - "모니터링과 운영 기초": ko/azure-functions-101/07-monitoring-and-ops.md
+          - Azure Functions Deep Dive:
+              - "호스트 부팅 — `WebJobsScriptHostService`부터 따라가기": ko/azure-functions-deep-dive/01-host-bootstrap.md
+              - "Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법": ko/azure-functions-deep-dive/02-worker-process.md
+              - "gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가": ko/azure-functions-deep-dive/03-grpc-event-stream.md
+              - "Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지": ko/azure-functions-deep-dive/04-dispatcher-and-invocation.md
+              - "스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이": ko/azure-functions-deep-dive/05-scaling-internals.md
+              - "콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때": ko/azure-functions-deep-dive/06-cold-start-placeholder.md
+          - Azure Kubernetes Service 101:
+              - "Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes": ko/azure-aks-101/01-what-is-aks.md
+              - "클러스터 아키텍처 — Control Plane과 Node Pool": ko/azure-aks-101/02-cluster-architecture.md
+              - "첫 클러스터 만들고 앱 배포하기 — Python/FastAPI": ko/azure-aks-101/03-first-cluster-and-deploy.md
+              - "Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식": ko/azure-aks-101/04-pod-deployment-service.md
+              - "네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길": ko/azure-aks-101/05-networking-and-ingress.md
+              - "스케일링 — HPA, Cluster Autoscaler, KEDA": ko/azure-aks-101/06-scaling-hpa-ca-keda.md
+              - "모니터링과 운영 — Container Insights, 로그, 알람": ko/azure-aks-101/07-monitoring-and-ops.md
+          - Azure Kubernetes Service Deep Dive:
+              - "Control Plane 해부 — AKS가 사용자에게서 가린 것": ko/azure-aks-deep-dive/01-control-plane-anatomy.md
+              - "kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지": ko/azure-aks-deep-dive/02-kubelet-and-containerd.md
+              - "CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가": ko/azure-aks-deep-dive/03-cni-and-azure-cni-overlay.md
+              - "Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가": ko/azure-aks-deep-dive/04-scheduler-and-pod-placement.md
+              - "HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프": ko/azure-aks-deep-dive/05-hpa-and-cluster-autoscaler-internals.md
+              - "KEDA 내부 — ScaledObject가 HPA를 만드는 방식": ko/azure-aks-deep-dive/06-keda-internals.md
+          - Azure Container Apps 101:
+              - "Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기": ko/azure-aca-101/01-what-is-aca.md
+              - "Environment·Container App·Revision — 세 단어로 보는 ACA": ko/azure-aca-101/02-environment-app-revision.md
+              - "첫 앱 배포하기 — Python/FastAPI": ko/azure-aca-101/03-first-deploy.md
+              - "Ingress와 트래픽 분할 — Revision 기반 배포 전략": ko/azure-aca-101/04-ingress-and-traffic-split.md
+              - "스케일링 — KEDA scaler와 0-to-N": ko/azure-aca-101/05-scaling-with-keda.md
+              - "Dapr 통합 — 사이드카로 얻는 것": ko/azure-aca-101/06-dapr-integration.md
+              - "모니터링과 운영 — Log Analytics와 Application Insights": ko/azure-aca-101/07-monitoring-and-ops.md
+          - Azure Container Apps Deep Dive:
+              - "ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것": ko/azure-aca-deep-dive/01-aca-architecture.md
+              - "Environment 내부 — 네트워크·관측·Dapr 스코프의 경계": ko/azure-aca-deep-dive/02-environment-internals.md
+              - "Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가": ko/azure-aca-deep-dive/03-revision-and-traffic-split.md
+              - "ACA 안의 KEDA — Scale Rule이 만드는 것": ko/azure-aca-deep-dive/04-keda-in-aca.md
+              - "Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스": ko/azure-aca-deep-dive/05-dapr-sidecar-internals.md
+              - "Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지": ko/azure-aca-deep-dive/06-envoy-ingress-path.md
+      - AI:
+          - AI 웹 개발 입문:
+              - "AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기": ko/ai-web-dev-101/01-hello-ai-api.md
+              - "프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술": ko/ai-web-dev-101/02-prompt-engineering.md
+              - "AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현": ko/ai-web-dev-101/03-ai-chatbot.md
+              - "RAG 입문 — 내 데이터로 답하는 AI 만들기": ko/ai-web-dev-101/04-rag-intro.md
+              - "AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기": ko/ai-web-dev-101/05-ai-agent.md
+              - "AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기": ko/ai-web-dev-101/06-deploy.md
+              - "AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법": ko/ai-web-dev-101/07-eval-improve.md
+          - LLM from Scratch 101:
+              - "글자를 숫자로 바꾸기": ko/llm-from-scratch-101/01-tokenizer.md
+              - "정수에서 벡터로, 그리고 위치": ko/llm-from-scratch-101/02-embedding.md
+              - "어떤 토큰을 얼마나 볼지 스스로 정하기": ko/llm-from-scratch-101/03-attention.md
+              - "블록 하나, 깊이의 단위": ko/llm-from-scratch-101/04-transformer-block.md
+              - "조립: GPT 모델 클래스 완성": ko/llm-from-scratch-101/05-gpt-model.md
+              - "기울기로 배우기": ko/llm-from-scratch-101/06-training-loop.md
+              - "샘플링 — 학습된 모델에서 글 뽑아내기": ko/llm-from-scratch-101/07-inference.md
+              - "베이스 모델을 우리 작업에 맞추기": ko/llm-from-scratch-101/08-finetuning.md
+              - "직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍": ko/llm-from-scratch-101/09-chatbot-wrapper.md
   - English:
       - en/index.md
+      - Azure:
+          - Azure App Service 101:
+              - "What is Azure App Service? - Understanding the Platform Architecture": en/azure-app-service-101/01-what-is-app-service.md
+              - "Request Lifecycle: How Requests Reach Your App": en/azure-app-service-101/02-request-lifecycle.md
+              - "Hosting Models: Which Plan Should You Choose?": en/azure-app-service-101/03-hosting-models.md
+              - "First Deployment: From Local to Azure (Python/Flask)": en/azure-app-service-101/04-first-deploy.md
+              - "Mastering Configuration: App Settings & Environment Variables": en/azure-app-service-101/05-configuration.md
+              - "Logging and Monitoring Basics": en/azure-app-service-101/06-logging-monitoring.md
+              - "Scaling 101: When to Scale Up vs Scale Out?": en/azure-app-service-101/07-scaling-101.md
+          - Azure App Service Deep Dive:
+              - "App Service platform architecture — Front-End, Worker, File Server": en/azure-app-service-deep-dive/01-platform-architecture.md
+              - "Front-End and ARR — how a request reaches a worker": en/azure-app-service-deep-dive/02-front-end-and-arr.md
+              - "Workers and the sandbox — where user code actually runs": en/azure-app-service-deep-dive/03-worker-and-sandbox.md
+              - "Deployment and Kudu — build, sync, release from the inside": en/azure-app-service-deep-dive/04-deployment-and-kudu.md
+              - "Scaling internals — how Scale Out decisions become new workers": en/azure-app-service-deep-dive/05-scaling-internals.md
+              - "Cold start and warmup — why the first request is expensive": en/azure-app-service-deep-dive/06-cold-start-and-warmup.md
+          - Azure Functions 101:
+              - "What Is Azure Functions? — A World Where Events Call Your Code": en/azure-functions-101/01-what-is-azure-functions.md
+              - "Triggers and Bindings — Everything About Function I/O": en/azure-functions-101/02-triggers-and-bindings.md
+              - "Host and Worker — Who Actually Runs Your Functions?": en/azure-functions-101/03-host-and-worker.md
+              - "Deploy a Function App — From Localhost to Azure": en/azure-functions-101/04-first-deploy.md
+              - "Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated": en/azure-functions-101/05-choosing-a-plan.md
+              - "Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t": en/azure-functions-101/06-scaling-and-cold-start.md
+              - "Monitoring and Operations Fundamentals": en/azure-functions-101/07-monitoring-and-ops.md
+          - Azure Functions Deep Dive:
+              - "Host Bootstrap — Following `WebJobsScriptHostService`": en/azure-functions-deep-dive/01-host-bootstrap.md
+              - "Worker Processes — How One Host Hosts Many Languages": en/azure-functions-deep-dive/02-worker-process.md
+              - "The gRPC Event Stream — What Do the Host and Worker Actually Exchange?": en/azure-functions-deep-dive/03-grpc-event-stream.md
+              - "Dispatcher and Invocation — How a Function Call Reaches the Worker": en/azure-functions-deep-dive/04-dispatcher-and-invocation.md
+              - "Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans": en/azure-functions-deep-dive/05-scaling-internals.md
+              - "Cold Start and Placeholder Mode — What Happens When a New Instance Is Born": en/azure-functions-deep-dive/06-cold-start-placeholder.md
+          - Azure Kubernetes Service 101:
+              - "What is Azure Kubernetes Service? — what managed Kubernetes actually gives you": en/azure-aks-101/01-what-is-aks.md
+              - "Cluster architecture — control plane and node pools": en/azure-aks-101/02-cluster-architecture.md
+              - "Your first cluster, your first deploy — Python/FastAPI": en/azure-aks-101/03-first-cluster-and-deploy.md
+              - "Pod, Deployment, Service — the three ways you express a workload": en/azure-aks-101/04-pod-deployment-service.md
+              - "Networking and Ingress — the path in and out of the cluster": en/azure-aks-101/05-networking-and-ingress.md
+              - "Scaling — HPA, Cluster Autoscaler, KEDA": en/azure-aks-101/06-scaling-hpa-ca-keda.md
+              - "Monitoring and ops — Container Insights, logs, alerts": en/azure-aks-101/07-monitoring-and-ops.md
+          - Azure Kubernetes Service Deep Dive:
+              - "Control plane anatomy — what AKS hides from you": en/azure-aks-deep-dive/01-control-plane-anatomy.md
+              - "kubelet and containerd — how a container actually starts on a node": en/azure-aks-deep-dive/02-kubelet-and-containerd.md
+              - "CNI and Azure CNI Overlay — where Pod IPs come from": en/azure-aks-deep-dive/03-cni-and-azure-cni-overlay.md
+              - "Scheduler and Pod placement — who decides which node": en/azure-aks-deep-dive/04-scheduler-and-pod-placement.md
+              - "HPA and Cluster Autoscaler internals — two control loops": en/azure-aks-deep-dive/05-hpa-and-cluster-autoscaler-internals.md
+              - "KEDA internals — how a ScaledObject builds an HPA": en/azure-aks-deep-dive/06-keda-internals.md
+          - Azure Container Apps 101:
+              - "What is Azure Container Apps? — running containers without Kubernetes": en/azure-aca-101/01-what-is-aca.md
+              - "Environment, Container App, Revision — ACA in three words": en/azure-aca-101/02-environment-app-revision.md
+              - "Your first deploy — Python/FastAPI": en/azure-aca-101/03-first-deploy.md
+              - "Ingress and traffic splitting — revision-based deployment strategies": en/azure-aca-101/04-ingress-and-traffic-split.md
+              - "Scaling — KEDA scalers and zero-to-N": en/azure-aca-101/05-scaling-with-keda.md
+              - "Dapr integration — what you get from a sidecar": en/azure-aca-101/06-dapr-integration.md
+              - "Monitoring and ops — Log Analytics and Application Insights": en/azure-aca-101/07-monitoring-and-ops.md
+          - Azure Container Apps Deep Dive:
+              - "ACA architecture — what Microsoft layered on a hidden Kubernetes": en/azure-aca-deep-dive/01-aca-architecture.md
+              - "Environment internals — the network, observability, and Dapr scope boundary": en/azure-aca-deep-dive/02-environment-internals.md
+              - "Revisions and traffic splitting — where Envoy weights come from": en/azure-aca-deep-dive/03-revision-and-traffic-split.md
+              - "KEDA inside ACA — what a scale rule actually creates": en/azure-aca-deep-dive/04-keda-in-aca.md
+              - "Dapr sidecar internals — the Go process that lives next to your container": en/azure-aca-deep-dive/05-dapr-sidecar-internals.md
+              - "The Envoy ingress path — how the first request reaches your container": en/azure-aca-deep-dive/06-envoy-ingress-path.md
+      - AI:
+          - LLM from Scratch 101:
+              - "Turning Text into Numbers": en/llm-from-scratch-101/01-tokenizer.md
+              - "From Integers to Vectors and Positions": en/llm-from-scratch-101/02-embedding.md
+              - "Deciding Which Tokens to Focus On": en/llm-from-scratch-101/03-attention.md
+              - "The Transformer Block: A Unit of Depth": en/llm-from-scratch-101/04-transformer-block.md
+              - "Assembly: Completing the GPT Model Class": en/llm-from-scratch-101/05-gpt-model.md
+              - "Learning via Gradients": en/llm-from-scratch-101/06-training-loop.md
+              - "Sampling — Generating Text from a Trained Model": en/llm-from-scratch-101/07-inference.md
+              - "Adapting the Base Model to Specific Tasks": en/llm-from-scratch-101/08-finetuning.md
+              - "Turning Your LLM into a Chatbot — FastAPI + Streaming": en/llm-from-scratch-101/09-chatbot-wrapper.md
+# AUTOGEN-NAV-END
