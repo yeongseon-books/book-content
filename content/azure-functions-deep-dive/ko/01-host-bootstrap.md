@@ -74,7 +74,7 @@ last_reviewed: '2026-04-29'
 `WebJobsScriptHostService`가 호출하는 `ScriptHost.InitializeAsync` 안에서, Functions가 함수 앱으로 동작하기 위한 준비가 진행됩니다.
 
 ![2단계: `ScriptHost.InitializeAsync` — 진짜 부팅이 일어나는 곳](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.ko.png)
-여기서 순서가 중요합니다. `ScriptHost.StartAsyncCore()`는 먼저 `InitializeAsync()`를 끝까지 실행한 뒤, 그 다음에 `base.StartAsyncCore()`를 호출합니다. 즉 `JobHost.StartAsync()`에 따른 트리거 리스너 활성화는 `InitializeAsync` 내부가 아니라 **그 다음 단계**입니다. 이번 화에서는 설정 로드와 함수 인덱싱에 집중하고, Worker 채널 준비는 2화로, 실제 호출 경로는 4화로 넘깁니다.
+여기서 순서가 중요합니다. `ScriptHost.StartAsyncCore()`는 먼저 `InitializeAsync()`를 끝까지 실행한 뒤, 그 다음에 `base.StartAsyncCore()`를 호출합니다. 즉 `JobHost.StartAsync()`에 따른 트리거 리스너 활성화는 `InitializeAsync` 내부가 아니라 **그 다음 단계**입니다. 이번 화는 설정 로드와 함수 인덱싱에 집중해, 호스트 부팅의 경계를 또렷하게 잡습니다.
 
 > 코드 위치: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
 
@@ -119,8 +119,8 @@ last_reviewed: '2026-04-29'
 
 이 인덱싱이 왜 중요할까요? **이 메타데이터가 모든 후속 동작의 기반**이기 때문입니다.
 
-- Worker는 먼저 `WorkerInitRequest`로 호스트 버전·capability를 받고, 실제 함수 메타데이터는 뒤이어 `FunctionLoadRequest` 또는 `FunctionLoadRequestCollection`으로 받습니다. (3화에서 다룹니다.)
-- 트리거 리스너는 이 목록을 보고 “어떤 큐를 폴링할지, 어떤 라우트에 바인드할지”를 결정 (4화)
+- Worker는 먼저 `WorkerInitRequest`로 호스트 버전·capability를 받고, 실제 함수 메타데이터는 뒤이어 `FunctionLoadRequest` 또는 `FunctionLoadRequestCollection`으로 받습니다.
+- 트리거 리스너는 이 목록을 보고 “어떤 큐를 폴링할지, 어떤 라우트에 바인드할지”를 결정합니다.
 - Scale Controller가 어떤 트리거 메트릭을 보게 되는지는 아키텍처상 이 메타데이터와 연결되지만, 그 Controller 자체는 이 vendored host 소스 바깥에 있습니다. 5화에서는 호스트 쪽 scale signal만 다룹니다.
 
 즉, **인덱싱은 Functions 호스트의 “함수 카탈로그”를 만드는 단계**입니다.
@@ -140,19 +140,19 @@ last_reviewed: '2026-04-29'
 
 ---
 
-## 1화 정리 — 다음 화에서
+## 1화 정리
 
 이번 글에서 따라간 흐름을 한 문단으로 압축하면 다음과 같습니다.
 
 > ASP.NET Core 호스트가 부팅하면서 `WebJobsScriptHostService`라는 `IHostedService`를 시작합니다. 그 안에서 `ScriptHost`가 만들어지고 `InitializeAsync`가 먼저 실행되어 host.json과 환경변수에서 옵션을 읽고 함수 메타데이터를 인덱싱합니다. 그 단계가 끝난 뒤에 `JobHost.StartAsync`가 실행되어 트리거 리스너가 활성화됩니다. 호스트 헬스 모니터는 이 전체 과정을 감시하고, 문제가 생기면 호스트를 다시 만듭니다.
 
-다음 화의 주제는 이 그림의 사각지대 하나입니다. **`InitializeAsync` 안에서 “Worker 채널 준비”라고 적힌 박스에서 무슨 일이 벌어지는가.** Node.js·Python·Java 같은 다른 언어 워커 프로세스가 어떻게 띄워지는지, OS의 `Process.Start` 직전까지 따라갑니다.
+이번 글에서 남는 핵심 경계는 분명합니다. 호스트 부팅은 `ScriptHost`를 구성하고 함수 메타데이터를 인덱싱해 리스너 시작 직전 상태까지 끌어올리는 과정입니다. 이 선을 잡아 두면, 이후에 만나는 언어 워커와 통신 경로도 훨씬 덜 헷갈립니다.
 
 ---
 
 ## 시리즈 안에서의 위치
 
-이 글은 Azure Functions Deep Dive 시리즈 1화입니다. 이번 화에서 호스트 부팅 순서를 잡았으니, 2화에서는 같은 인스턴스 옆에서 뜨는 Worker 프로세스로 넘어가고, 3화와 4화에서는 호스트와 워커 사이의 gRPC 채널과 실제 함수 호출 경로를 따라갑니다. 그 뒤로 5화의 스케일링, 6화의 placeholder와 콜드 스타트로 이어집니다.
+이 글은 Azure Functions Deep Dive 시리즈 1화입니다. 시리즈 전체에서 가장 바깥쪽의 부팅 경계를 먼저 고정한 뒤, 나머지 화들은 그 안팎에서 벌어지는 워커 수명주기, 통신, 스케일 신호, specialization을 세분화해 다룹니다.
 
 ---
 

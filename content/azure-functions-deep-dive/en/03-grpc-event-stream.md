@@ -233,7 +233,7 @@ Messages received by the server eventually need someone to **read and route** th
 | [`GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs) | Constants for capability keys |
 | [`OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) | Preserves ordering for messages that belong to the same `invocation_id` |
 
-In the next post (Part 4) we'll dig into `GrpcWorkerChannel.SendInvocationRequest` and `OrderedInvocationMessageDispatcher` properly. For now, just remember that **this object handles the EventStream in both directions**.
+For the purpose of this post, the important point is simply that **this object handles the EventStream in both directions**.
 
 ---
 
@@ -264,19 +264,19 @@ If we boil everything down to one sentence:
 
 > Inside the host, `FunctionRpcService` reads `StreamingMessage` frames from a worker and writes them into that worker's inbound channel, then drains the outbound channel back onto the gRPC stream. `GrpcWorkerChannel` sits on top of that channel pair and matches requests with responses for its worker.
 
-That's the "communication infrastructure." From the next post onward, we'll cover how an actual function invocation flows on top of this infrastructure — how an `InvocationRequest` is constructed, how responses are paired with requests, and how things recover when a function dies abnormally.
+That's the communication infrastructure. Once you keep the per-worker channel pair and the gRPC pump in mind, the rest of the host's invocation machinery stops looking like a generic event bus and starts looking like a concrete request/response transport.
 
 ---
 
-## Coming up next
+## What this post establishes
 
-In Part 4, we'll follow **`FunctionInvocationDispatcher` and `InvocationRequest`**. When a trigger fires, we'll see in code how it becomes an `InvocationRequest`, which worker it's handed to, and how the response is matched back.
+At this point, the protocol boundary is explicit: one worker connects over one bidirectional gRPC stream, the host maps that worker to a pair of in-memory channels, and `GrpcWorkerChannel` lives on top as the worker-specific control object.
 
 ---
 
 ## Where this fits in the series
 
-This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at process startup; this part covers the wire protocol that takes over once the worker connects. Part 4 stays on the same path and follows `InvocationRequest` and `InvocationResponse` through the dispatcher.
+This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at process startup; this part covers the wire protocol that takes over once the worker connects, making the host-side transport boundary concrete.
 
 ---
 

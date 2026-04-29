@@ -257,17 +257,13 @@ The benefit is straightforward: **large HTTP bodies do not have to be serialized
 
 ---
 
-## Coming up next
+## What this post establishes
 
-By the end of this post, the full path of a single invocation through the host to the worker and back should be clear. Part 5 climbs one level up.
-
-> So how do worker *instances* themselves multiply? When the queue gets long, who notices, and who decides "we need to spin up another worker"?
-
-That's the topic of Part 5 — `IScaleMonitor`, `ITargetScaler`, and Flex Consumption's per-function scaling.
+By the end of this post, the full path of a single invocation through the host to the worker and back should be clear. The important distinction is that the host uses one dispatcher abstraction, one invocation context shape, and one worker-channel correlation path even when transport details differ.
 
 ---
 
-This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established the host bootstrap path, the worker process model, and the gRPC stream between them; this installment followed a real invocation across that machinery. Part 5 moves one level up to scaling decisions, then part 6 covers cold-start mechanics.
+This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established the host bootstrap path, the worker process model, and the gRPC stream between them; this installment followed a real invocation across that machinery and pinned down the worker-channel correlation path.
 
 ---
 

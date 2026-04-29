@@ -233,7 +233,7 @@ message FunctionLoadRequest {
 | [`GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs) | capability 키 상수 모음 |
 | [`OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) | 같은 `invocation_id`에 속한 메시지를 순서대로 처리 |
 
-다음 화(4화)에서 `GrpcWorkerChannel.SendInvocationRequest`와 `OrderedInvocationMessageDispatcher`를 본격적으로 따라갈 겁니다. 여기서는 **이 객체가 EventStream을 양쪽 방향에서 다룬다**는 사실만 기억해 두면 됩니다.
+이번 글에서 붙잡아 둘 핵심은 하나입니다. **이 객체가 EventStream을 양쪽 방향에서 다룬다**는 사실입니다.
 
 ---
 
@@ -264,19 +264,19 @@ message FunctionLoadRequest {
 
 > 호스트 안의 `FunctionRpcService`는 워커가 보낸 `StreamingMessage`를 받아 해당 워커의 inbound 채널에 넣고, outbound 채널에서 꺼낸 메시지를 다시 gRPC 스트림으로 씁니다. `GrpcWorkerChannel`은 자기 워커에 연결된 그 채널 쌍을 통해 요청과 응답을 처리합니다.
 
-여기까지가 "통신 인프라"입니다. 다음 화부터는 이 인프라 위에서 실제 함수 호출이 어떻게 흘러가는지 — `InvocationRequest`가 어떻게 만들어지고, 응답이 어떻게 짝지어지고, 함수가 비정상 종료되면 어떻게 복구되는지 — 를 다룹니다.
+여기까지가 "통신 인프라"입니다. 워커별 채널 쌍과 gRPC 펌프 구조를 머릿속에 넣고 나면, 이후의 호출 경로도 범용 이벤트 버스가 아니라 구체적인 요청/응답 전송으로 읽히기 시작합니다.
 
 ---
 
-## 다음 화에서
+## 이 글이 고정해 주는 것
 
-4화에서는 **`FunctionInvocationDispatcher`와 `InvocationRequest`**를 따라갑니다. 트리거가 한 번 발화하면, 그게 어떻게 `InvocationRequest`로 만들어지고, 어느 워커에게 전달되고, 응답이 어떻게 매칭되는지 코드로 봅니다.
+여기까지 오면 프로토콜 경계가 선명해집니다. 워커 하나가 양방향 gRPC 스트림 하나로 호스트에 붙고, 호스트는 그 워커를 채널 쌍으로 매핑하며, `GrpcWorkerChannel`이 그 위에서 워커별 제어 객체 역할을 맡습니다.
 
 ---
 
 ## 시리즈 안에서의 위치
 
-이 글은 Azure Functions Deep Dive 시리즈 3화입니다. 2화에서 Worker 프로세스를 띄우는 데까지 왔다면, 이번 화는 그 워커가 호스트와 실제로 어떤 프로토콜을 쓰는지 보는 자리입니다. 다음 4화에서는 여기서 본 채널 위로 `InvocationRequest`와 `InvocationResponse`가 어떻게 오가는지 더 깊게 들어갑니다.
+이 글은 Azure Functions Deep Dive 시리즈 3화입니다. 2화가 워커 프로세스를 띄우는 문제였다면, 이번 화는 그 워커가 호스트와 어떤 전송 경계로 붙는지 분해해 보여 줍니다.
 
 ---
 

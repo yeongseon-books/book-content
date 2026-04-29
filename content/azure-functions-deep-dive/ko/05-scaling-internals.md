@@ -306,7 +306,7 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 - 같은 호스트 코드가 Consumption / Flex / Premium / Dedicated에서 다르게 보이는 이유는 외부 결정자의 모델이 다르기 때문입니다. 호스트 자체는 그대로입니다.
 - Flex Consumption은 per-function scaling과 Always ready를 도입해 "어느 함수에 얼마나 인스턴스를 둘지"를 그룹 단위로 결정합니다.
 
-다음 6화에서는 이 모든 결정의 결과로 **새 인스턴스가 만들어질 때** 일어나는 일 — Placeholder Mode와 specialization — 을 봅니다. Always ready와 콜드 스타트의 코드 레벨 메커니즘이 거기 있습니다.
+이번 화의 모델은 외부 결정자가 인스턴스 수를 판단하고, 호스트는 메트릭·health ping·워커 지연 시간 신호로 응답하는 경계에서 멈춥니다. 이 선을 분명히 그어야, 호스트 안의 근거와 Azure 관리 영역의 스케일 결정 로직을 섞지 않게 됩니다.
 
 ---
 
@@ -350,6 +350,6 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 
 ### 관련 시리즈
 
-이 글은 Deep Dive 시리즈 5화입니다. 앞선 4화에서 한 번의 호출이 워커까지 도달하는 경로를 따라왔고, 이번 화에서는 그런 호출이 많아졌을 때 바깥의 Scale Controller와 안쪽의 WorkerConcurrencyManager가 각각 무엇을 하는지 갈라서 봤습니다. 다음 6화는 새 인스턴스가 실제로 만들어질 때의 Placeholder Mode와 specialization으로 이어지고, 입문 시리즈 5·6화는 같은 주제를 운영자 관점에서 더 가볍게 정리해 둔 버전입니다.
+이 글은 Deep Dive 시리즈 5화입니다. 앞선 4화에서 한 번의 호출이 워커까지 도달하는 경로를 따라왔다면, 이번 화는 그런 호출이 많아졌을 때 바깥의 Scale Controller와 안쪽의 `WorkerConcurrencyManager`가 각각 무엇을 하는지 갈라서 보여 줍니다. 입문 시리즈 5·6화는 같은 주제를 운영자 관점에서 더 가볍게 정리한 버전입니다.
 
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC

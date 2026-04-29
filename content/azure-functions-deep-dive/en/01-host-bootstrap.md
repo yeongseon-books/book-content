@@ -74,7 +74,7 @@ One important design decision here. **`WebJobsScriptHostService` is not "the hos
 Inside `ScriptHost.InitializeAsync`, called by `WebJobsScriptHostService`, the host does the work required to become a running function app.
 
 ![Stage 2: `ScriptHost.InitializeAsync` — where bootstrap actually happens](../../../assets/azure-functions-deep-dive/01/01-03-stage-2-scripthost-initializeasync-where.en.png)
-The ordering matters. In `ScriptHost.StartAsyncCore()`, `InitializeAsync()` runs first and finishes before `base.StartAsyncCore()` runs. Trigger listener activation through `JobHost.StartAsync()` is therefore **after** initialization, not part of it. This post focuses on config loading and function indexing, leaves worker channel prep to episode 2, and picks up the invocation path in episode 4.
+The ordering matters. In `ScriptHost.StartAsyncCore()`, `InitializeAsync()` runs first and finishes before `base.StartAsyncCore()` runs. Trigger listener activation through `JobHost.StartAsync()` is therefore **after** initialization, not part of it. This post stays on config loading and function indexing so the bootstrap boundary itself is clear.
 
 > Code location: [`ScriptHost.cs` (commit `5e59423`)](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script/Host/ScriptHost.cs)
 
@@ -119,8 +119,8 @@ After reading host.json, `ScriptHost` indexes "what functions does this app have
 
 Why does this indexing matter? Because **this metadata is the foundation for every downstream behavior**.
 
-- The Worker first receives host init/capability data through `WorkerInitRequest`, then receives actual function metadata through `FunctionLoadRequest` or `FunctionLoadRequestCollection` (covered in episode 3)
-- Trigger listeners look at this list to decide "which queue to poll, which route to bind to" (episode 4)
+- The Worker first receives host init/capability data through `WorkerInitRequest`, then receives actual function metadata through `FunctionLoadRequest` or `FunctionLoadRequestCollection`
+- Trigger listeners look at this list to decide "which queue to poll, which route to bind to"
 - The Scale Controller is architecturally downstream of this metadata, but that controller itself is out of tree for this vendored source. Episode 5 stays on the host-side scale signals.
 
 In other words, **indexing is the stage that builds the Functions host's "function catalog."**
@@ -140,19 +140,19 @@ This state machine is the root cause of the operational symptom "my function sud
 
 ---
 
-## Episode 1 wrap — what's next
+## Episode 1 wrap
 
 The flow this post traced, compressed into one paragraph:
 
 > ASP.NET Core boots and starts an `IHostedService` named `WebJobsScriptHostService`. Inside it, a `ScriptHost` is created and `InitializeAsync` runs first, reading host.json and environment-backed options and indexing function metadata. Only after that does `JobHost.StartAsync` run and activate trigger listeners. The host health monitor watches the whole sequence and replaces the host when it fails.
 
-The next episode targets one of the blind spots in that diagram: **what happens inside the box labeled "Worker channel prep" in `InitializeAsync`?** How do worker processes for other languages — Node.js, Python, Java — actually get launched? We'll follow it right up to the OS-level `Process.Start` call.
+The key boundary to keep from this post is simple: host bootstrap is the work required to get `ScriptHost` configured, indexed, and ready for listener startup. That gives us a clean line between host bring-up and everything that happens after the host begins talking to language workers.
 
 ---
 
 ## Where this fits in the series
 
-This is part 1 of the Azure Functions Deep Dive series. With host bootstrap in place, part 2 moves to the worker processes living beside the host, and parts 3 and 4 follow the gRPC channel and invocation path between them. The later parts cover scaling, placeholder mode, and cold-start mechanics.
+This is part 1 of the Azure Functions Deep Dive series. It isolates the host-bootstrap boundary before the series moves into worker lifecycle, transport, invocation, scale signals, and specialization.
 
 ---
 

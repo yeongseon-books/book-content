@@ -307,7 +307,7 @@ Different decision layers sit on top of the same host binary; the way the host i
 - The same host code behaves differently across Consumption / Flex / Premium / Dedicated because the external decision layer is different. The host itself is unchanged.
 - Flex Consumption introduces per-function scaling and Always Ready, deciding "how many instances for which function" at the group level.
 
-In installment 6 we'll look at what happens **when a new instance is actually created** as a result of all these decisions — Placeholder Mode and specialization. The code-level mechanics behind Always ready and cold start live there.
+The model in this post stops at the boundary where an external component has already decided instance count and the host has answered with metrics, health pings, or worker-latency signals. That boundary matters because it keeps host-side evidence separate from Azure-managed scale-controller behavior.
 
 ---
 
