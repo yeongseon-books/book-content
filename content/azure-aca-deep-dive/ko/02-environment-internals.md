@@ -28,6 +28,12 @@ last_reviewed: '2026-04-29'
 
 ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
 
+## Evidence Model
+
+- **Microsoft가 문서로 직접 밝힌 범위**: Environment가 네트워크, 로그, 공유 Dapr component의 범위를 정한다는 점.
+- **업스트림 동작을 바탕으로 한 추론**: 이 문서화된 경계가 런타임 격리와 sidecar 범위에 어떻게 대응될지에 대한 설명.
+- **이 글이 넘지 않는 선**: ACA Environment 내부의 private cluster layout과 비공개 control plane 구현.
+
 > Azure Container Apps Deep Dive 시리즈 (2/6)
 
 1화에서는 스택 전체 지도를 그렸습니다.

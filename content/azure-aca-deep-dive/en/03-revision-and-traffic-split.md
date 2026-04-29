@@ -28,6 +28,12 @@ External references in this post are pinned to these upstream baselines:
 
 ACA's internal implementation is not published by Microsoft, so these versions are used only as comparison anchors.
 
+## Evidence Model
+
+- **Documented by Microsoft**: revisions are immutable deployment targets, can be activated together, and can receive weighted traffic.
+- **Inferred from upstream behavior**: those weights most plausibly become Envoy-style weighted upstream routing rules.
+- **Out of bounds**: the exact private config objects ACA generates to express revision routing internally.
+
 > Azure Container Apps Deep Dive series (3/6)
 
 Azure Container Apps makes rollout mechanics look gentler than they are.

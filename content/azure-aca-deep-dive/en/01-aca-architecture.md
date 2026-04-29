@@ -28,6 +28,12 @@ External references in this post are pinned to these upstream baselines:
 
 ACA's internal implementation is not published by Microsoft, so these versions are used only as comparison anchors.
 
+## Evidence Model
+
+- **Documented by Microsoft**: ACA is Kubernetes-powered, environment-scoped, revision-based, and integrates ingress, Dapr, and autoscaling as product features.
+- **Inferred from upstream behavior**: the hidden substrate most plausibly composes Kubernetes primitives with Envoy, KEDA, and Dapr-like runtime pieces.
+- **Out of bounds**: exact cluster topology, private control-plane binaries, and per-environment implementation details Microsoft does not publish.
+
 > Azure Container Apps Deep Dive series (1/6)
 
 The public story for Azure Container Apps is intentionally simple.
@@ -300,7 +306,7 @@ Every episode that follows just makes one noun in that paragraph concrete.
 
 ## Where this fits in the series
 
-This opening post is the architectural map for the Azure Container Apps Deep Dive series. The next post zooms into the environment boundary itself, then the series moves through revisions and traffic, KEDA, Dapr, and finally the ingress request path. If you want the gentler product-level setup first, read the ACA 101 series before continuing here, and compare the control-surface framing with the AKS and Azure Functions deep-dive series.
+This opening post is the architectural map for the Azure Container Apps Deep Dive series. If you want the gentler product-level setup first, read the ACA 101 series before continuing here, and compare the control-surface framing with the AKS and Azure Functions deep-dive series.
 
 ---
 

@@ -28,6 +28,12 @@ External references in this post are pinned to these upstream baselines:
 
 ACA's internal implementation is not published by Microsoft, so these versions are used only as comparison anchors.
 
+## Evidence Model
+
+- **Documented by Microsoft**: environment scope for networking, logging, and shared Dapr components.
+- **Inferred from upstream behavior**: how those documented boundaries most likely map onto runtime isolation and sidecar scoping.
+- **Out of bounds**: the exact private cluster layout and non-public control-plane implementation inside an ACA environment.
+
 > Azure Container Apps Deep Dive series (2/6)
 
 Episode 1 drew the stack.

@@ -28,6 +28,12 @@ last_reviewed: '2026-04-29'
 
 ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
 
+## Evidence Model
+
+- **Microsoft가 문서로 직접 밝힌 범위**: ACA는 Kubernetes 기반이며, Environment·Revision·Ingress·Dapr·Autoscaling을 제품 기능으로 노출합니다.
+- **업스트림 동작을 바탕으로 한 추론**: 숨겨진 기저 계층은 Kubernetes primitive 위에 Envoy, KEDA, Dapr류 런타임 조각을 조합한 형태일 가능성이 높습니다.
+- **이 글이 넘지 않는 선**: Microsoft가 공개하지 않은 정확한 클러스터 토폴로지, private control plane 바이너리, 환경별 내부 구현 세부사항.
+
 > Azure Container Apps Deep Dive 시리즈 (1/6)
 
 Azure Container Apps의 공개 설명은 일부러 단순합니다.
@@ -304,7 +310,7 @@ ACA가 모호하다는 뜻은 아닙니다.
 
 ## 시리즈 안에서의 위치
 
-이 1화는 Azure Container Apps Deep Dive 시리즈의 아키텍처 지도입니다. 다음 2화에서는 Environment 경계 자체를 확대하고, 그 뒤로 Revision과 트래픽, KEDA, Dapr, 마지막으로 ingress 요청 경로 순서로 들어갑니다. 제품 표면을 먼저 가볍게 잡고 싶다면 ACA 101 시리즈를 먼저 읽고, 제어면 관점 비교를 원한다면 AKS와 Azure Functions 심화 시리즈를 함께 보는 편이 좋습니다.
+이 1화는 Azure Container Apps Deep Dive 시리즈의 아키텍처 지도입니다. 제품 표면을 먼저 가볍게 잡고 싶다면 ACA 101 시리즈를 먼저 읽고, 제어면 관점 비교를 원한다면 AKS와 Azure Functions 심화 시리즈를 함께 보는 편이 좋습니다.
 
 ---
 

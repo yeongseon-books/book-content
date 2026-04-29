@@ -28,6 +28,12 @@ last_reviewed: '2026-04-29'
 
 ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
 
+## Evidence Model
+
+- **Microsoft가 문서로 직접 밝힌 범위**: ACA에서 Dapr를 켜면 localhost API와 Environment 범위 component 모델이 노출된다는 점.
+- **업스트림 동작을 바탕으로 한 추론**: sidecar injection 세부, 포트 동작, mTLS/control-plane plumbing은 ACA 문서가 없는 한 upstream Dapr 패턴을 기준으로 읽습니다.
+- **이 글이 넘지 않는 선**: ACA 전용 webhook 내부, 숨겨진 인증서 배포 세부, 비공개 runtime argument.
+
 > Azure Container Apps Deep Dive 시리즈 (5/6)
 
 독자가 Azure Container Apps에서 Dapr를 처음 켜 보면 기능이 놀랄 만큼 가볍게 보입니다.

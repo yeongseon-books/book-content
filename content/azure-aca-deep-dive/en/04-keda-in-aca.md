@@ -28,6 +28,12 @@ External references in this post are pinned to these upstream baselines:
 
 ACA's internal implementation is not published by Microsoft, so these versions are used only as comparison anchors.
 
+## Evidence Model
+
+- **Documented by Microsoft**: ACA scaling is KEDA-powered and exposes HTTP, TCP, and custom scale rules at the product surface.
+- **Inferred from upstream behavior**: those rules most likely materialize as KEDA/HPA-style control loops behind the service boundary.
+- **Out of bounds**: the exact managed KEDA deployment shape and private wiring Microsoft uses inside ACA.
+
 > Azure Container Apps Deep Dive series (4/6)
 
 At the product surface, scaling in Azure Container Apps is only a handful of fields.

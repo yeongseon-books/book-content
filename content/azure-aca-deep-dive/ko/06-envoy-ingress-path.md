@@ -28,6 +28,12 @@ last_reviewed: '2026-04-29'
 
 ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
 
+## Evidence Model
+
+- **Microsoft가 문서로 직접 밝힌 범위**: FQDN, TLS termination, traffic splitting, session affinity, ingress 쪽 readiness 동작.
+- **업스트림 동작을 바탕으로 한 추론**: ingress 상태에서 ready replica까지 이어지는 경로는 Envoy류 라우팅과 Kubernetes형 service hop으로 읽는 것이 가장 타당합니다.
+- **이 글이 넘지 않는 선**: 정확한 private 0 -> 1 요청 경로, buffering 동작, 비공개 ingress control plane 토폴로지.
+
 > Azure Container Apps Deep Dive 시리즈 (6/6)
 
 Azure Container Apps의 ingress 공개 설명은 짧습니다.

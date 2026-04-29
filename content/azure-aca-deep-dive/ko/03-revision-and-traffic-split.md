@@ -28,6 +28,12 @@ last_reviewed: '2026-04-29'
 
 ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
 
+## Evidence Model
+
+- **Microsoft가 문서로 직접 밝힌 범위**: Revision은 불변 배포 단위이며, 동시에 활성화될 수 있고, weighted traffic을 받을 수 있습니다.
+- **업스트림 동작을 바탕으로 한 추론**: 이 weight는 Envoy류 weighted upstream 라우팅 규칙으로 구체화될 가능성이 높습니다.
+- **이 글이 넘지 않는 선**: ACA가 revision 라우팅을 내부에서 표현하는 정확한 private config object.
+
 > Azure Container Apps Deep Dive 시리즈 (3/6)
 
 Azure Container Apps는 rollout을 실제보다 훨씬 부드럽게 보이게 만듭니다.

@@ -28,6 +28,12 @@ External references in this post are pinned to these upstream baselines:
 
 ACA's internal implementation is not published by Microsoft, so these versions are used only as comparison anchors.
 
+## Evidence Model
+
+- **Documented by Microsoft**: enabling Dapr exposes localhost APIs and environment-scoped components in ACA.
+- **Inferred from upstream behavior**: sidecar injection details, port behavior, and mTLS/control-plane plumbing follow upstream Dapr patterns unless ACA documents otherwise.
+- **Out of bounds**: ACA-specific webhook internals, hidden cert distribution details, and private runtime arguments Microsoft does not publish.
+
 > Azure Container Apps Deep Dive series (5/6)
 
 When readers first enable Dapr in Azure Container Apps, the feature looks deceptively light.

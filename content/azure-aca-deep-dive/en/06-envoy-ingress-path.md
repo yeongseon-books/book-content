@@ -28,6 +28,12 @@ External references in this post are pinned to these upstream baselines:
 
 ACA's internal implementation is not published by Microsoft, so these versions are used only as comparison anchors.
 
+## Evidence Model
+
+- **Documented by Microsoft**: FQDN, TLS termination, traffic splitting, session affinity, and ingress-facing readiness behavior.
+- **Inferred from upstream behavior**: Envoy-style routing and Kubernetes-style service hops from ingress state to ready revision replicas.
+- **Out of bounds**: the exact private 0 -> 1 request path, buffering behavior, and hidden ingress control-plane topology.
+
 > Azure Container Apps Deep Dive series (6/6)
 
 The public story for ingress in Azure Container Apps is concise.

@@ -28,6 +28,12 @@ last_reviewed: '2026-04-29'
 
 ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
 
+## Evidence Model
+
+- **Microsoft가 문서로 직접 밝힌 범위**: ACA scaling이 KEDA 기반이며, 제품 표면에는 HTTP, TCP, custom scale rule이 노출된다는 점.
+- **업스트림 동작을 바탕으로 한 추론**: 이 규칙들은 서비스 경계 뒤에서 KEDA/HPA류 control loop로 물질화될 가능성이 높습니다.
+- **이 글이 넘지 않는 선**: ACA 내부의 정확한 managed KEDA 배치 형태와 private wiring.
+
 > Azure Container Apps Deep Dive 시리즈 (4/6)
 
 Azure Container Apps의 제품 표면에서 스케일링은 몇 개 필드로 끝납니다.
