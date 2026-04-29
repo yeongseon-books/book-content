@@ -16,7 +16,7 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: draft
-    path: azure-app-service-101
+    path: content/azure-app-service-101
 
   - id: azure-app-service-deep-dive
     category: azure

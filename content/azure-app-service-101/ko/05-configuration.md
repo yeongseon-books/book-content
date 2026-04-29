@@ -30,7 +30,7 @@ Azure App Service에서 가장 기본이 되는 메커니즘은 **App Settings =
 
 운영자가 Portal이나 CLI에서 값을 넣으면, App Service가 이를 앱 프로세스가 읽을 수 있는 환경 변수로 제공합니다.
 
-![Configuration 설정 흐름](../../assets/azure-app-service-101/05/configuration-flow.ko.png)
+![Configuration 설정 흐름](../../../assets/azure-app-service-101/05/configuration-flow.ko.png)
 
 이 구조가 중요한 이유는 단순합니다.
 
@@ -94,7 +94,7 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
 환경별 전략을 나눠야 하는 이유는 “기능”이 아니라 “통제 수준”이 다르기 때문입니다.
 
-![환경별 설정 전략 비교](../../assets/azure-app-service-101/05/environment-strategy.ko.png)
+![환경별 설정 전략 비교](../../../assets/azure-app-service-101/05/environment-strategy.ko.png)
 
 ### 로컬 개발: `.env`
 
@@ -234,7 +234,7 @@ az webapp config connection-string set \
 
 Key Vault Reference를 쓰면 App Service가 Key Vault의 민감 정보 값을 대신 참조해 주고, 앱은 일반 환경 변수처럼 읽기만 하면 됩니다.
 
-![Key Vault Reference 동작 흐름](../../assets/azure-app-service-101/05/key-vault-reference-flow.ko.png)
+![Key Vault Reference 동작 흐름](../../../assets/azure-app-service-101/05/key-vault-reference-flow.ko.png)
 
 이 방식을 쓰면 얻는 이점이 분명합니다.
 
@@ -331,7 +331,7 @@ Deployment Slot을 쓰기 시작하면 설정 관리가 한 단계 더 중요해
 - 일부 기능 플래그
 - 캐시 TTL 같은 비민감 운영 파라미터
 
-![슬롯 스왑 시 설정 동작](../../assets/azure-app-service-101/05/slot-settings-behavior.ko.png)
+![슬롯 스왑 시 설정 동작](../../../assets/azure-app-service-101/05/slot-settings-behavior.ko.png)
 
 CLI로 슬롯 고정 설정을 줄 때는 `--slot-settings`를 사용합니다.
 

@@ -53,7 +53,7 @@ az account show --output table
 
 배포는 아래 순서로 진행됩니다.
 
-![로컬 개발부터 Azure 배포까지의 전체 흐름](../../assets/azure-app-service-101/04/01-deployment-pipeline.ko.png)
+![로컬 개발부터 Azure 배포까지의 전체 흐름](../../../assets/azure-app-service-101/04/01-deployment-pipeline.ko.png)
 
 여기서 봐야 할 점은 하나입니다.
 
@@ -219,7 +219,7 @@ gunicorn --bind=0.0.0.0:$PORT --workers 2 --timeout 120 src.app:app
 
 이제 Azure 쪽입니다. 배포 전에 리소스 관계를 먼저 한 번 머릿속에 그려두면 CLI 명령이 훨씬 덜 헷갈립니다.
 
-![구독부터 웹앱까지 이어지는 Azure 리소스 계층](../../assets/azure-app-service-101/04/02-resource-hierarchy.ko.png)
+![구독부터 웹앱까지 이어지는 Azure 리소스 계층](../../../assets/azure-app-service-101/04/02-resource-hierarchy.ko.png)
 
 요약하면:
 
@@ -453,7 +453,7 @@ curl "$APP_URL/health"
 
 첫 배포에서 가장 자주 만나는 에러는 `502 Bad Gateway`입니다. 겁먹을 필요는 없습니다. 대부분 원인이 몇 가지로 좁혀집니다.
 
-![502 오류를 좁혀 가는 문제 해결 흐름도](../../assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
+![502 오류를 좁혀 가는 문제 해결 흐름도](../../../assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
 
 아래 순서로 보면 거의 항상 실마리가 잡힙니다.
 
