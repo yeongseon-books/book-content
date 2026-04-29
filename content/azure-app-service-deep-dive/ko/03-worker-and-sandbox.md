@@ -233,17 +233,17 @@ App Service Windows code sandbox가 맞지 않는 워크로드도 있습니다.
 
 > Windows App Service에서는 사용자 코드가 IIS와 App Service sandbox 안에서 실행되며 registry write와 많은 User32/GDI32 호출이 제한됩니다. Linux App Service에서는 container가 핵심 경계이고, startup contract와 `/home` storage mount가 더 중요한 변수입니다. 그래서 같은 App Service라도 Windows는 sandbox 제약을, Linux는 container readiness와 storage semantics를 먼저 봐야 합니다.
 
-다음 4화에서는 이 worker에 코드가 도달하는 경로를 봅니다.
-Kudu가 어떻게 배포를 받고,
-어떻게 빌드와 sync를 실행하고,
-왜 run-from-package는 `wwwroot`의 의미를 바꾸는지 이어서 다룹니다.
+여기서부터는 실행 경계와 artifact 경계를 구분해 보는 눈이 중요합니다.
+코드가 어디서 실행되는지 이해하고 나면,
+배포 실패와 sandbox 제약,
+mounted package 동작,
+startup contract 문제를 훨씬 정확하게 분리할 수 있습니다.
 
 ---
 
 ## 이 시리즈에서의 위치
 
-2화가 요청을 worker까지 데려왔다면 이번 글은 그 worker 안쪽의 실행 경계를 설명합니다.
-다음 글에서는 Kudu와 Oryx를 따라가며, 코드가 실제로 `/home/site/wwwroot`에 놓이는 배포 경로를 내부 관점에서 연결합니다.
+2화가 요청을 worker까지 데려왔다면 이번 글은 그 worker 안쪽의 실행 경계를 설명합니다. 두 글을 함께 보면 “요청이 도달했다”와 “사용자 코드가 실제로 안전하게 실행된다”는 것이 다른 단계라는 점이 분명해집니다.
 
 ---
 

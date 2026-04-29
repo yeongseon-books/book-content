@@ -243,9 +243,9 @@ The core point of this episode is simple.
 
 > Requests enter the App Service Front-End, and ARR selects the worker. When ARRAffinity is enabled, the platform can keep the same client on the same worker. That is convenient for stateful legacy apps, but it works against App Service's horizontal scaling model. Partial outages that affect only some users often make more sense once you remember that those users may be pinned to one degraded worker.
 
-Episode 3 moves to the next box.
-Now that the request has reached a worker,
-we can ask where user code actually runs,
+At this point the request path is clear up to worker selection.
+The remaining operational questions now live inside the worker boundary itself:
+where user code actually runs,
 what the sandbox restricts on Windows,
 and why container boundaries matter on Linux.
 
@@ -253,8 +253,7 @@ and why container boundaries matter on Linux.
 
 ## Where this fits in the series
 
-Episode 1 drew the whole map, and this post zoomed into the Front-End and ARR box on that map.
-The next post moves inside the worker itself and explains the sandbox boundary, which is where Windows-specific library failures and Linux container semantics finally start to make sense.
+Episode 1 drew the whole map, and this post zoomed into the Front-End and ARR box on that map. Together they explain the handoff from public ingress to worker selection inside the App Service Plan.
 
 ---
 

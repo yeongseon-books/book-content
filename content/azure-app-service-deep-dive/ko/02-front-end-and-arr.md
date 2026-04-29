@@ -239,17 +239,16 @@ warm-up이 중요한 이유도 바로 여기에 있습니다.
 
 > App Service 요청은 Front-End로 들어오고, ARR이 worker를 선택합니다. ARRAffinity 쿠키가 있으면 같은 사용자를 같은 worker에 붙일 수 있습니다. 이 기능은 stateful 레거시 앱에는 편하지만, 수평 확장과 worker 교체 관점에서는 stateless 설계보다 불리합니다. 특정 사용자만 문제를 겪는 partial outage도 이 구조에서 자주 발생합니다.
 
-다음 3화에서는 이 요청이 도착한 자리,
-즉 worker 내부와 sandbox를 봅니다.
+여기까지 오면 요청이 worker에 도달하기까지의 경로가 분명해집니다.
+이제 남는 질문은 worker 내부입니다.
 Windows 코드 앱에서는 무엇이 `w3wp.exe` 안에서 제한되는지,
-Linux 앱에서는 왜 container 경계가 핵심인지 이어서 다룹니다.
+Linux 앱에서는 왜 container 경계가 핵심인지가 그 실행 경계에서 갈립니다.
 
 ---
 
 ## 이 시리즈에서의 위치
 
-1화가 전체 지도를 펼쳤다면 이번 글은 그중 Front-End와 ARR 박스를 확대합니다.
-다음 글에서는 요청이 도착한 worker 내부의 실행 경계와 sandbox 제약을 살펴보며, 왜 일부 라이브러리가 Windows App Service에서 실패하는지도 이어서 설명합니다.
+1화가 전체 지도를 펼쳤다면 이번 글은 그중 Front-End와 ARR 박스를 확대합니다. 두 글을 함께 보면 공개 진입점에서 worker selection까지의 handoff가 한 흐름으로 이어집니다.
 
 ---
 

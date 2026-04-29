@@ -250,18 +250,17 @@ It is a real execution boundary.
 
 > On Windows App Service, user code runs under IIS and inside the App Service sandbox, where registry writes and most User32/GDI32 calls are restricted. On Linux App Service, the core boundary is the container, and the dominant concerns are startup contract, readiness, and `/home` storage semantics. The same App Service label therefore leads to different first-principles debugging paths on Windows and Linux.
 
-Episode 4 now follows how code gets into that worker.
-We will trace Kudu,
-Oryx,
-artifact placement,
-and why run-from-package changes the meaning of `wwwroot`.
+From here, the key shift is from execution boundary to artifact boundary.
+Once you know where code is allowed to run,
+you can separate sandbox failures from deployment-shape failures,
+mounted-package behavior,
+and startup-contract problems.
 
 ---
 
 ## Where this fits in the series
 
-Episode 2 delivered requests to the worker, and this post explained the execution boundary inside that worker.
-The next post follows deployment into that boundary and connects Kudu, Oryx, build automation, and file placement under `/home/site/wwwroot`.
+Episode 2 delivered requests to the worker, and this post explained the execution boundary inside that worker. Together they define the difference between “request reached the app” and “user code is allowed to execute successfully.”
 
 ---
 

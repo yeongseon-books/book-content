@@ -211,16 +211,17 @@ Kudu 성공은 보통 이런 뜻입니다.
 
 > App Service 배포는 Kudu SCM 사이트가 artifact를 받고, 필요하면 build automation을 실행하고, 결과를 `wwwroot` 또는 mounted package 형태로 worker가 보는 경로에 배치하는 과정입니다. Linux code app에서는 Oryx가 detect-build-startup 단계를 담당할 수 있습니다. run-from-package를 켜면 `wwwroot`는 ZIP이 풀린 폴더가 아니라 읽기 전용 mount가 됩니다. Kudu success는 배포 success일 뿐, 앱 startup success와는 별개입니다.
 
-다음 5화에서는 이 worker 수 자체가 어떻게 늘어나는지 봅니다.
-Azure Monitor autoscale의 결정이 어떻게 App Service Plan과 worker allocation으로 이어지는지,
-scale up과 scale out이 무엇을 실제로 바꾸는지 이어서 다룹니다.
+이번 글에서 붙잡아 둘 핵심은 배포 성공과 런타임 준비 완료가 서로 다른 경계라는 점입니다.
+Kudu가 artifact를 정상적으로 받아도,
+startup contract,
+mounted package 의미,
+worker recycle 이후 readiness가 실제 서비스 가능 여부를 다시 결정합니다.
 
 ---
 
 ## 이 시리즈에서의 위치
 
-앞선 글들이 요청 경로와 worker 실행 경계를 설명했다면 이번 글은 코드가 그 worker에 도달하는 배포 경로를 설명합니다.
-다음 글에서는 이 앱 인스턴스 수가 실제로 늘어나는 control-plane 경로를 따라가며, scale-out 결정이 어떻게 새 worker로 이어지는지 정리합니다.
+앞선 글들이 요청 경로와 worker 실행 경계를 설명했다면 이번 글은 코드가 그 worker에 도달하는 배포 경로를 설명합니다. 즉 라우팅 문제, 실행 경계 문제, 배포 경로 문제를 서로 다른 층위로 나눠 보게 해 주는 글입니다.
 
 ---
 

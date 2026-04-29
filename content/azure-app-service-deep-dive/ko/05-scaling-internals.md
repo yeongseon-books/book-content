@@ -269,16 +269,15 @@ autoscale 진단 문서는 다음 두 로그 범주를 명시합니다.
 
 > App Service의 scale-out은 app 자체가 서버를 직접 추가하는 모델이 아니라, Azure Monitor autoscale 또는 수동 설정이 App Service Plan의 desired instance count를 바꾸고, App Service control plane이 그 상태를 반영해 worker capacity를 늘리는 과정입니다. 그 뒤 새 worker가 앱 startup과 health 통과를 마쳐야 Front-End가 실제 트래픽을 보내기 시작합니다. scale up은 SKU 변경이고, scale out은 worker count 변경이며, 둘 모두 plan 단위로 생각해야 정확합니다.
 
-다음 6화에서는 바로 그 마지막 구간,
-새 worker가 실제 사용자 트래픽을 받기 전까지의 비싼 시간,
-즉 cold start와 warm-up을 다룹니다.
+이번 글의 경계는 여기까지입니다.
+외부 autoscale 결정으로 worker capacity가 늘어난 뒤에도,
+그 실행 단위가 실제 트래픽을 받기까지는 별도의 startup·readiness 구간이 남습니다.
 
 ---
 
 ## 이 시리즈에서의 위치
 
-이번 글은 101의 스케일링 판단 기준을 내부 경로로 번역하는 편입니다.
-다음 글에서는 새 worker가 실제로 첫 요청을 받기 전 어떤 준비 과정을 거치는지, Always On과 warm-up path가 그 시간을 어떻게 줄이는지로 이어집니다.
+이번 글은 101의 스케일링 판단 기준을 내부 경로로 번역하는 편입니다. 여기서 얻는 가치는 scale-out 판단과 worker readiness를 한 덩어리로 보지 않고, control plane과 실행 경계를 분리해 이해하게 된다는 점입니다.
 
 ---
 

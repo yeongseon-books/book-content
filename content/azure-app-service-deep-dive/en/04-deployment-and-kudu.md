@@ -225,17 +225,16 @@ the core idea is this.
 
 > App Service deployment is a path where the Kudu SCM site receives the artifact, optionally runs build automation, and places the result in either `wwwroot` or a mounted package path that workers consume. On Linux code apps, Oryx can supply detect-build-startup behavior in the middle of that flow. With run-from-package enabled, `wwwroot` is no longer an extracted folder but a read-only mounted ZIP package. Kudu success means deployment success, not necessarily runtime startup success.
 
-Episode 5 now follows the next platform question.
-How does the worker count itself increase?
-How does an Azure Monitor autoscale decision become real worker capacity?
+The key model to keep from this post is that deployment success and runtime readiness are separate boundaries.
+Kudu can receive and place an artifact correctly,
+while startup behavior, mounted-package semantics,
+and worker replacement still decide whether the app is actually ready.
 
 ---
 
 ## Where this fits in the series
 
-The previous posts explained request routing and worker execution boundaries.
-This post explained how code reaches those workers.
-The next post shifts to control-plane behavior and follows how scale-out decisions propagate into more worker capacity.
+The previous posts explained request routing and worker execution boundaries. This post explained how code reaches those workers and why that path must be debugged separately from request routing or startup behavior.
 
 ---
 
