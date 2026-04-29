@@ -29,7 +29,7 @@ AKS는 배포가 끝났다고 운영이 끝나지 않습니다. 오히려 그때
 
 ## 운영 시야를 한 장으로 보면
 
-![운영 관측 구조](../../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
+![로그와 메트릭 기반 운영 관측 구조](../../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
 이 그림에서 기억할 것은 두 축입니다.
 
 - **로그 축**: Log Analytics, Container Insights, KQL
@@ -150,7 +150,7 @@ Azure Monitor managed Prometheus의 기본 스크레이프 대상에도 kube-sta
 
 ## 알람은 어느 층에 걸어야 하나
 
-![알람은 어느 층에 걸어야 하나](../../../assets/azure-aks-101/07/07-02-where-alerts-should-live.ko.png)
+![운영 알람을 나누는 계층 구조](../../../assets/azure-aks-101/07/07-02-where-alerts-should-live.ko.png)
 좋은 알람은 여러 층에 나뉘어 있습니다. CPU 80% 알람 하나만으로는 운영이 잘 되지 않습니다.
 
 ### 애플리케이션 층
