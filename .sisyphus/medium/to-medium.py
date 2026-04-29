@@ -154,6 +154,48 @@ def parse_table_block(lines: list[str], i: int) -> tuple[list[str] | None, list[
     return headers, rows, j
 
 
+def render_table_as_nested_bullets(headers: list[str], rows: list[list[str]]) -> list[str]:
+    def strip_bold(s: str) -> str:
+        s = s.strip()
+        while s.startswith("**") and s.endswith("**") and len(s) >= 4:
+            s = s[2:-2].strip()
+        return s
+
+    out: list[str] = []
+    for row in rows:
+        first_header = strip_bold(headers[0]) if headers else ""
+        first_value = strip_bold(row[0]) if row else ""
+        label = first_value or first_header
+        out.append(f"**{label}**")
+        for h, v in list(zip(headers, row))[1:]:
+            h_clean = h.strip()
+            v_clean = v.strip()
+            if not h_clean and not v_clean:
+                continue
+            if h_clean and v_clean:
+                out.append(f"- {h_clean}: {v_clean}")
+            elif v_clean:
+                out.append(f"- {v_clean}")
+            else:
+                out.append(f"- {h_clean}")
+        out.append("")
+    return out
+
+
+def render_table_as_markdown(headers: list[str], rows: list[list[str]]) -> list[str]:
+    def fmt_row(cells: list[str]) -> str:
+        return "| " + " | ".join(c.strip() for c in cells) + " |"
+
+    out = [
+        "<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->",
+        fmt_row(headers),
+        "| " + " | ".join("---" for _ in headers) + " |",
+    ]
+    out.extend(fmt_row(r) for r in rows)
+    out.append("")
+    return out
+
+
 def tables_to_bullets(prose: str) -> str:
     lines = prose.split("\n")
     out: list[str] = []
@@ -161,19 +203,10 @@ def tables_to_bullets(prose: str) -> str:
     while i < len(lines):
         headers, rows, next_i = parse_table_block(lines, i)
         if headers is not None and rows is not None:
-            for row in rows:
-                pairs = []
-                for h, v in zip(headers, row):
-                    h_clean = h.strip()
-                    v_clean = v.strip()
-                    if not h_clean and not v_clean:
-                        continue
-                    if h_clean:
-                        pairs.append(f"**{h_clean}**: {v_clean}" if v_clean else f"**{h_clean}**")
-                    else:
-                        pairs.append(v_clean)
-                out.append("- " + " / ".join(pairs))
-            out.append("")
+            if len(headers) <= 3:
+                out.extend(render_table_as_nested_bullets(headers, rows))
+            else:
+                out.extend(render_table_as_markdown(headers, rows))
             i = next_i
         else:
             out.append(lines[i])

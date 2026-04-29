@@ -52,7 +52,7 @@ The TOC block sits immediately above the references section, separated by a sing
 - TOC: the `<!-- toc:begin -->` / `<!-- toc:end -->` markers are stripped, but the TOC body lines are kept (Medium has no native series nav).
 - Image refs: kept as relative local paths (`../../../assets/...`), NOT rewritten to raw URLs. The publishing repo is private, so `raw.githubusercontent.com` URLs return 404. PNGs are uploaded manually via Medium's UI (drag-and-drop) when publishing; the local path tells the author which file to attach where.
 - Headings: H3+ are demoted (Medium import compatibility).
-- Tables: rewritten as bullet lists.
+- Tables: 2-col → `- **key**: value` bullets; 3-col → `**label**` header + nested `- key: value` bullets; 4+ col → kept as raw GFM table with `<!-- TODO: render this table as PNG -->` marker (Medium has no native table renderer; wide tables need manual PNG conversion on publish).
 
 ## Series TOC rules (apply to every post, no exceptions)
 
