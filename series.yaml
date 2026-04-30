@@ -326,7 +326,7 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: planned
-    path: ax-practical-guide
+    path: content/ax-practical-guide
 
   # Technical writing (planned)
   - id: technical-writing
@@ -340,4 +340,4 @@ series:
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
     status: planned
-    path: technical-writing
+    path: content/technical-writing

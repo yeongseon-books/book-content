@@ -1,18 +1,21 @@
-"""Export an English post to Medium import-ready Markdown.
+"""Export an English post to Medium browser-paste-ready HTML.
 
 Thin wrapper around `.sisyphus/medium/to-medium.py`, which already produces
-the canonical Medium artifact at `content/<series>/medium/<NN>.md` with:
-- raw.githubusercontent.com asset URLs (commit-pinned via TAG)
-- bullet-list tables (Medium import quirk)
-- demoted H3+ as bold paragraphs (Medium import quirk)
-- TOC marker comments stripped
-- bottom Tags line surfaced as leading <!-- Tags: ... --> HTML comment
+the canonical Medium artifact at `content/<series>/medium/<NN>.html` with:
+- base64-inlined PNG images (self-contained; no external asset URLs needed)
+- native HTML headings, lists, code blocks
+- H3+ headings demoted for Medium compatibility
+- TOC marker comments stripped (TOC body lines retained)
+- trailing visible Tags line for manual copy into Medium's tag input
 
 This wrapper:
 1. Runs `to-medium.py` to (re)generate `content/<series>/medium/`
-2. Copies the requested file(s) to `exports/medium/<series>/<NN>.md`
+2. Copies the requested file(s) to `exports/medium/<series>/<NN>.html`
 
-The exports/ copy is what the human uploads to Medium's import URL.
+Publishing workflow:
+- Open the exported .html in Chrome, Select All, Copy, paste into a fresh
+  empty Medium draft. The first H1 maps to Medium's title slot.
+- Copy the trailing "Tags: A, B, C" line manually into Medium's tag input.
 
 Usage:
     python3 scripts/export_medium.py <series-id> --episode N
@@ -79,9 +82,9 @@ def main() -> int:
     series_out.mkdir(parents=True, exist_ok=True)
 
     if args.all:
-        sources = sorted(medium_dir.glob("*.md"))
+        sources = sorted(medium_dir.glob("*.html"))
     else:
-        src = medium_dir / f"{args.episode:02d}.md"
+        src = medium_dir / f"{args.episode:02d}.html"
         if not src.is_file():
             raise SystemExit(f"missing {src}; run without --skip-regen?")
         sources = [src]

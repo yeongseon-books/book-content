@@ -1,0 +1,48 @@
+name: content-pipeline
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "content/**"
+      - "series.yaml"
+      - ".sisyphus/medium/**"
+      - "scripts/**"
+  pull_request:
+    branches: [master]
+    paths:
+      - "content/**"
+      - "series.yaml"
+      - ".sisyphus/medium/**"
+      - "scripts/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Check finalize-posts idempotency
+        run: |
+          python3 .sisyphus/medium/finalize-posts.py
+          git diff --exit-code content/ || {
+            echo "finalize-posts.py made changes — commit the updated files."
+            exit 1
+          }
+
+      - name: Check Korean style
+        run: bash .sisyphus/style/check-ko.sh
+
+      - name: Verify series.yaml paths exist
+        run: python3 scripts/check_catalog.py
+
+      - name: Verify medium HTML artifacts
+        run: python3 scripts/check_exports.py

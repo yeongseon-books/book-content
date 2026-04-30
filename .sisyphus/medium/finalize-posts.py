@@ -202,7 +202,7 @@ def find_toc_insert_point(lines: list[str], ref_idx: int) -> int:
     return i + 1
 
 
-def process_post(path: Path, series: str, idx: int, variant: str, entries: dict[int, dict[str, str]]) -> str:
+def process_post(path: Path, series: str, idx: int, variant: str, entries: dict[int, dict[str, str]], dry_run: bool = False) -> str:
     if variant == "medium":
         return "skipped-medium"
     text = path.read_text(encoding="utf-8")
@@ -222,7 +222,8 @@ def process_post(path: Path, series: str, idx: int, variant: str, entries: dict[
     new_lines = apply_tag_line(new_lines, series)
     new_text = "\n".join(new_lines) + "\n"
     if new_text != text:
-        path.write_text(new_text, encoding="utf-8")
+        if not dry_run:
+            path.write_text(new_text, encoding="utf-8")
         return "updated"
     return "unchanged"
 
@@ -248,7 +249,14 @@ def collapse_redundant(lines: list[str]) -> list[str]:
 
 
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser(description="Finalize tags, TOC, and ko refs for all series.")
+    ap.add_argument("--check", action="store_true",
+                    help="Dry-run: report files that would change and exit 1 if any found.")
+    args = ap.parse_args()
+
     totals = {"updated": 0, "unchanged": 0, "no-references-section": 0, "skipped-medium": 0}
+    would_change: list[str] = []
     catalog = {e.id: e for e in load_catalog()}
     for series_id in sorted(SERIES_TAGS):
         entry = catalog.get(series_id)
@@ -266,13 +274,23 @@ def main() -> int:
                 path = series_dir / variant / info["filename"]
                 if not path.exists():
                     continue
-                r = process_post(path, series_id, idx, variant, entries)
+                if args.check:
+                    r = process_post(path, series_id, idx, variant, entries, dry_run=True)
+                else:
+                    r = process_post(path, series_id, idx, variant, entries)
                 totals[r] = totals.get(r, 0) + 1
-                if r != "unchanged" and r != "skipped-medium":
-                    print(f"  {r:8s} {path.relative_to(ROOT)}")
+                if r == "updated":
+                    rel = str(path.relative_to(ROOT))
+                    would_change.append(rel)
+                    print(f"  {'would-update' if args.check else 'updated':12s} {rel}")
+                elif r not in ("unchanged", "skipped-medium"):
+                    print(f"  {r:12s} {path.relative_to(ROOT)}")
     print("\nTotals:")
     for k, v in sorted(totals.items()):
         print(f"  {k}: {v}")
+    if args.check and would_change:
+        print(f"\nCheck failed: {len(would_change)} file(s) need finalize-posts.py to be run.")
+        return 1
     return 0
 
 
