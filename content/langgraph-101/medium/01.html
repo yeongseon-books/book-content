@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LangGraph introduction and graph basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>LangGraph introduction and graph basics</h1>
+<blockquote>
+<p>LangGraph 101 (1/6)</p>
+</blockquote>
+<p>LangChain handles linear chains well. Real agents are different — they use a tool, look at the result, decide what to do next, and use another tool. This loop is what LangGraph is built to express. This post introduces the core concepts: StateGraph, nodes, and edges, and builds the first graph.</p>
+<hr>
+<h2>Core concepts</h2>
+<p>LangGraph represents LLM workflows as <strong>directed graphs</strong>.</p>
+<ul>
+<li><strong>Node</strong>: a unit of work. Any processing step — LLM call, tool execution, data transformation.</li>
+<li><strong>Edge</strong>: flow between nodes. Unconditional (always go there) or conditional (branch based on state).</li>
+<li><strong>State</strong>: data that flows through the entire graph. Each node receives state, optionally modifies it, and returns the update.</li>
+<li><strong>Checkpoint</strong>: a state snapshot. The foundation for pause/resume and memory.</li>
+</ul>
+<hr>
+<h2>First graph: echo bot</h2>
+<p>Start with the simplest possible graph — receive user input, process with LLM, return.</p>
+<pre><code class="language-python">import os
+from typing import TypedDict, Annotated
+
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_groq import ChatGroq
+
+class BasicState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+
+def call_llm(state: BasicState) -&gt; BasicState:
+    llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+        temperature=0.0,
+    )
+    response = llm.invoke(state[&quot;messages&quot;])
+    return {&quot;messages&quot;: [response]}
+
+def build_basic_graph():
+    graph = StateGraph(BasicState)
+    graph.add_node(&quot;llm&quot;, call_llm)
+    graph.set_entry_point(&quot;llm&quot;)
+    graph.add_edge(&quot;llm&quot;, END)
+    return graph.compile()
+
+if __name__ == &quot;__main__&quot;:
+    app = build_basic_graph()
+    result = app.invoke({&quot;messages&quot;: [HumanMessage(content=&quot;Explain Python list comprehensions.&quot;)]})
+    print(result[&quot;messages&quot;][-1].content)
+</code></pre>
+<hr>
+<h2>Multi-node pipeline</h2>
+<p>Add nodes and define order to build a pipeline.</p>
+<pre><code class="language-python">from langchain_core.messages import SystemMessage
+
+class PipelineState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+    topic: str
+    summary: str
+
+def extract_topic(state: PipelineState) -&gt; PipelineState:
+    last_msg = state[&quot;messages&quot;][-1].content
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    response = llm.invoke([
+        SystemMessage(content=&quot;Extract the core topic of the user message as a single word. Return only the word.&quot;),
+        HumanMessage(content=last_msg),
+    ])
+    return {&quot;topic&quot;: response.content.strip()}
+
+def generate_answer(state: PipelineState) -&gt; PipelineState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    response = llm.invoke([
+        SystemMessage(content=f&quot;You are an expert in {state['topic']}. Explain clearly and practically.&quot;),
+        *state[&quot;messages&quot;],
+    ])
+    return {&quot;messages&quot;: [response]}
+
+def summarize_answer(state: PipelineState) -&gt; PipelineState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    last_answer = state[&quot;messages&quot;][-1].content
+    response = llm.invoke([
+        SystemMessage(content=&quot;Summarize the following in exactly one sentence.&quot;),
+        HumanMessage(content=last_answer),
+    ])
+    return {&quot;summary&quot;: response.content}
+
+def build_pipeline_graph():
+    graph = StateGraph(PipelineState)
+    graph.add_node(&quot;extract_topic&quot;, extract_topic)
+    graph.add_node(&quot;generate_answer&quot;, generate_answer)
+    graph.add_node(&quot;summarize&quot;, summarize_answer)
+
+    graph.set_entry_point(&quot;extract_topic&quot;)
+    graph.add_edge(&quot;extract_topic&quot;, &quot;generate_answer&quot;)
+    graph.add_edge(&quot;generate_answer&quot;, &quot;summarize&quot;)
+    graph.add_edge(&quot;summarize&quot;, END)
+    return graph.compile()
+
+if __name__ == &quot;__main__&quot;:
+    pipeline = build_pipeline_graph()
+    result = pipeline.invoke({
+        &quot;messages&quot;: [HumanMessage(content=&quot;Explain the difference between generators and iterators.&quot;)],
+        &quot;topic&quot;: &quot;&quot;,
+        &quot;summary&quot;: &quot;&quot;,
+    })
+    print(f&quot;topic: {result['topic']}&quot;)
+    print(f&quot;summary: {result['summary']}&quot;)
+    print(f&quot;\nfull answer:\n{result['messages'][-1].content}&quot;)
+</code></pre>
+<hr>
+<h2>State design principles</h2>
+<p>State is the shared memory flowing through the graph. Two decisions matter at design time.</p>
+<p><strong>Field type</strong>: <code>Annotated[list, add_messages]</code> appends rather than overwrites. Use it for cumulative data like message history. Plain typed fields are overwritten by each update.</p>
+<p><strong>Field scope</strong>: only put data in state that another node needs. Keep intermediate results as local variables; write to state only what the next node must see.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>LangGraph introduction and graph basics (current)</strong></li>
+<li>State management and checkpoints (upcoming)</li>
+<li>Conditional edges and branching (upcoming)</li>
+<li>Tool-calling agents (upcoming)</li>
+<li>Multi-agent systems (upcoming)</li>
+<li>Completing LangGraph (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/">LangGraph documentation</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/concepts/">LangGraph concepts guide</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/reference/graphs/">StateGraph API reference</a></li>
+</ul>
+<p class="tags-line">Tags: LangGraph, Agent, Python, LLM</p>
+</body>
+</html>

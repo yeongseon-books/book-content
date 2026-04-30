@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Completing LangGraph</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Completing LangGraph</h1>
+<blockquote>
+<p>LangGraph 101 (6/6)</p>
+</blockquote>
+<p>This post assembles graph basics, checkpoints, conditional edges, tool calling, and multi-agent coordination from across the series into one complete production agent: conversation memory, tool use, quality validation, and multi-turn dialogue.</p>
+<hr>
+<h2>Complete production agent</h2>
+<pre><code class="language-python">import json
+import math
+import os
+import sqlite3
+from typing import TypedDict, Annotated, Literal
+
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+
+@tool
+def calculator(expression: str) -&gt; str:
+    &quot;&quot;&quot;Evaluate a math expression. E.g.: '2 + 3 * 4', 'sqrt(16)', 'pi * 5**2'&quot;&quot;&quot;
+    try:
+        allowed = {k: v for k, v in math.__dict__.items() if not k.startswith(&quot;_&quot;)}
+        return str(eval(expression, {&quot;__builtins__&quot;: {}}, allowed))
+    except Exception as e:
+        return f&quot;error: {e}&quot;
+
+@tool
+def word_stats(text: str) -&gt; str:
+    &quot;&quot;&quot;Return word count and character count for text.&quot;&quot;&quot;
+    return json.dumps({&quot;words&quot;: len(text.split()), &quot;chars&quot;: len(text)})
+
+TOOLS = [calculator, word_stats]
+TOOL_MAP = {t.name: t for t in TOOLS}
+
+SYSTEM_PROMPT = &quot;&quot;&quot;You are a helpful Python tutor agent.
+Use tools to perform accurate calculations and analysis.
+Remember the conversation history and respond in context.
+Be honest when you don't know something.&quot;&quot;&quot;
+
+class AgentState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+    iterations: int
+
+MAX_ITERATIONS = 10
+
+def agent_node(state: AgentState) -&gt; AgentState:
+    llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+        temperature=0.0,
+    ).bind_tools(TOOLS)
+    messages = [SystemMessage(content=SYSTEM_PROMPT)] + state[&quot;messages&quot;]
+    response = llm.invoke(messages)
+    return {&quot;messages&quot;: [response], &quot;iterations&quot;: state[&quot;iterations&quot;] + 1}
+
+def tool_node(state: AgentState) -&gt; AgentState:
+    last = state[&quot;messages&quot;][-1]
+    results = []
+    for call in last.tool_calls:
+        t = TOOL_MAP.get(call[&quot;name&quot;])
+        result = t.invoke(call[&quot;args&quot;]) if t else f&quot;unknown tool: {call['name']}&quot;
+        results.append(ToolMessage(content=str(result), tool_call_id=call[&quot;id&quot;]))
+    return {&quot;messages&quot;: results}
+
+def route_agent(state: AgentState) -&gt; Literal[&quot;tools&quot;, &quot;end&quot;]:
+    if state[&quot;iterations&quot;] &gt;= MAX_ITERATIONS:
+        return &quot;end&quot;
+    last = state[&quot;messages&quot;][-1]
+    if hasattr(last, &quot;tool_calls&quot;) and last.tool_calls:
+        return &quot;tools&quot;
+    return &quot;end&quot;
+
+def build_production_agent(persist: bool = False):
+    graph = StateGraph(AgentState)
+    graph.add_node(&quot;agent&quot;, agent_node)
+    graph.add_node(&quot;tools&quot;, tool_node)
+
+    graph.set_entry_point(&quot;agent&quot;)
+    graph.add_conditional_edges(&quot;agent&quot;, route_agent, {&quot;tools&quot;: &quot;tools&quot;, &quot;end&quot;: END})
+    graph.add_edge(&quot;tools&quot;, &quot;agent&quot;)
+
+    if persist:
+        conn = sqlite3.connect(&quot;agent.db&quot;, check_same_thread=False)
+        from langgraph.checkpoint.sqlite import SqliteSaver
+        checkpointer = SqliteSaver(conn)
+    else:
+        checkpointer = MemorySaver()
+
+    return graph.compile(checkpointer=checkpointer)
+</code></pre>
+<hr>
+<h2>Batch evaluation</h2>
+<p>Production agents need quality validation before deployment.</p>
+<pre><code class="language-python">def evaluate_agent(app, test_cases: list[dict]) -&gt; dict:
+    results = []
+    for tc in test_cases:
+        config = {&quot;configurable&quot;: {&quot;thread_id&quot;: f&quot;eval_{tc['id']}&quot;}}
+        result = app.invoke(
+            {&quot;messages&quot;: [HumanMessage(content=tc[&quot;question&quot;])], &quot;iterations&quot;: 0},
+            config=config,
+        )
+        answer = result[&quot;messages&quot;][-1].content
+        kw_hits = [kw for kw in tc[&quot;expected_keywords&quot;] if kw.lower() in answer.lower()]
+        results.append({
+            &quot;id&quot;: tc[&quot;id&quot;],
+            &quot;passed&quot;: len(kw_hits) == len(tc[&quot;expected_keywords&quot;]),
+            &quot;keyword_coverage&quot;: len(kw_hits) / len(tc[&quot;expected_keywords&quot;]) if tc[&quot;expected_keywords&quot;] else 1.0,
+        })
+
+    pass_rate = sum(1 for r in results if r[&quot;passed&quot;]) / len(results) if results else 0.0
+    return {&quot;total&quot;: len(results), &quot;pass_rate&quot;: round(pass_rate, 2), &quot;details&quot;: results}
+
+if __name__ == &quot;__main__&quot;:
+    app = build_production_agent()
+    test_cases = [
+        {&quot;id&quot;: 1, &quot;question&quot;: &quot;What is sqrt(256)?&quot;, &quot;expected_keywords&quot;: [&quot;16&quot;]},
+        {&quot;id&quot;: 2, &quot;question&quot;: &quot;What is a Python list comprehension?&quot;,
+         &quot;expected_keywords&quot;: [&quot;list&quot;, &quot;expression&quot;]},
+    ]
+    print(json.dumps(evaluate_agent(app, test_cases), indent=2))
+</code></pre>
+<hr>
+<h2>Multi-turn conversation</h2>
+<pre><code class="language-python">def run_conversation(thread_id: str = &quot;demo&quot;):
+    app = build_production_agent()
+    config = {&quot;configurable&quot;: {&quot;thread_id&quot;: thread_id}}
+    print(&quot;Python tutor agent (type 'quit' to exit)&quot;)
+    print(&quot;-&quot; * 40)
+    while True:
+        user_input = input(&quot;\nuser: &quot;).strip()
+        if user_input.lower() in (&quot;quit&quot;, &quot;q&quot;, &quot;exit&quot;):
+            break
+        if not user_input:
+            continue
+        result = app.invoke(
+            {&quot;messages&quot;: [HumanMessage(content=user_input)], &quot;iterations&quot;: 0},
+            config=config,
+        )
+        print(f&quot;\nagent: {result['messages'][-1].content}&quot;)
+</code></pre>
+<hr>
+<h2>Series summary</h2>
+<p>The agent built across this series has six layers.</p>
+<ol>
+<li><strong>Graph basics</strong>: StateGraph, nodes, and edges define the workflow explicitly</li>
+<li><strong>Checkpointer</strong>: conversation memory and session management</li>
+<li><strong>Conditional edges</strong>: dynamic flow control based on state</li>
+<li><strong>Tool calling</strong>: the agent loop that lets the LLM use external functions</li>
+<li><strong>Multi-agent</strong>: specialized agents coordinating through shared state</li>
+<li><strong>Production integration</strong>: all layers combined with quality validation</li>
+</ol>
+<p>LangGraph's key insight is that complex workflows should be expressed as explicit graphs. When flow is visible in the graph definition rather than hidden in code, debugging, testing, and extension become straightforward.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/01-graph-basics.md">LangGraph introduction and graph basics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/02-state-and-checkpoints.md">State management and checkpoints</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/03-conditional-edges.md">Conditional edges and branching</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/04-tool-calling-agent.md">Tool-calling agents</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/05-multi-agent.md">Multi-agent systems</a></li>
+<li><strong>Completing LangGraph (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/">LangGraph documentation</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/tutorials/">LangGraph tutorials</a></li>
+<li><a href="https://github.com/langchain-ai/langgraph/tree/main/examples">LangGraph examples repository</a></li>
+</ul>
+<p class="tags-line">Tags: LangGraph, Agent, Python, LLM</p>
+</body>
+</html>

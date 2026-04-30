@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Multi-agent systems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Multi-agent systems</h1>
+<blockquote>
+<p>LangGraph 101 (5/6)</p>
+</blockquote>
+<p>Complex tasks benefit from multiple specialized agents working together. One agent orchestrates the work; the others focus on their specific roles. This post implements the supervisor-worker pattern as a multi-agent system in LangGraph.</p>
+<hr>
+<h2>Supervisor-worker pattern</h2>
+<p>The supervisor analyzes the request, delegates to the appropriate worker agent, and integrates the results into a final answer.</p>
+<pre><code>user → [supervisor] → [research agent] → result
+                    → [code agent]     → result
+                    → [summary agent]  → final answer
+</code></pre>
+<hr>
+<h2>Agent implementation</h2>
+<pre><code class="language-python">import os
+from typing import TypedDict, Annotated, Literal
+
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
+from langchain_groq import ChatGroq
+
+class MultiAgentState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+    task_type: str
+    research_result: str
+    code_result: str
+    final_answer: str
+
+def _llm(temperature: float = 0.0) -&gt; ChatGroq:
+    return ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+        temperature=temperature,
+    )
+
+def supervisor_node(state: MultiAgentState) -&gt; MultiAgentState:
+    last_msg = state[&quot;messages&quot;][-1].content
+    response = _llm().invoke([
+        SystemMessage(content=&quot;&quot;&quot;Analyze the user request and determine the task type.
+
+- research: information gathering, concept explanation, fact checking
+- code: code writing, debugging, code explanation
+- summary: summarizing or organizing information
+
+Return only one of: research, code, summary.&quot;&quot;&quot;),
+        HumanMessage(content=last_msg),
+    ])
+    task_type = response.content.strip().lower()
+    return {&quot;task_type&quot;: task_type if task_type in (&quot;research&quot;, &quot;code&quot;, &quot;summary&quot;) else &quot;research&quot;}
+
+def research_agent_node(state: MultiAgentState) -&gt; MultiAgentState:
+    last_msg = state[&quot;messages&quot;][-1].content
+    response = _llm().invoke([
+        SystemMessage(content=&quot;You are a research expert. Provide accurate and detailed information with clear key points.&quot;),
+        HumanMessage(content=last_msg),
+    ])
+    return {
+        &quot;research_result&quot;: response.content,
+        &quot;messages&quot;: [AIMessage(content=f&quot;[research agent] {response.content}&quot;)],
+    }
+
+def code_agent_node(state: MultiAgentState) -&gt; MultiAgentState:
+    last_msg = state[&quot;messages&quot;][-1].content
+    response = _llm().invoke([
+        SystemMessage(content=&quot;You are a senior Python developer. Write clear, practical code with type hints, docstrings, and explanations.&quot;),
+        HumanMessage(content=last_msg),
+    ])
+    return {
+        &quot;code_result&quot;: response.content,
+        &quot;messages&quot;: [AIMessage(content=f&quot;[code agent] {response.content}&quot;)],
+    }
+
+def summary_agent_node(state: MultiAgentState) -&gt; MultiAgentState:
+    parts = []
+    if state.get(&quot;research_result&quot;):
+        parts.append(f&quot;Research:\n{state['research_result']}&quot;)
+    if state.get(&quot;code_result&quot;):
+        parts.append(f&quot;Code:\n{state['code_result']}&quot;)
+    context = &quot;\n\n&quot;.join(parts) if parts else state[&quot;messages&quot;][-1].content
+
+    response = _llm().invoke([
+        SystemMessage(content=&quot;Synthesize the following information into a clear, structured final answer.&quot;),
+        HumanMessage(content=f&quot;Original question: {state['messages'][0].content}\n\n{context}&quot;),
+    ])
+    return {
+        &quot;final_answer&quot;: response.content,
+        &quot;messages&quot;: [AIMessage(content=response.content)],
+    }
+
+def route_by_task_type(state: MultiAgentState) -&gt; Literal[&quot;research&quot;, &quot;code&quot;, &quot;summary&quot;]:
+    return state[&quot;task_type&quot;]
+
+def build_multi_agent_graph():
+    graph = StateGraph(MultiAgentState)
+    graph.add_node(&quot;supervisor&quot;, supervisor_node)
+    graph.add_node(&quot;research&quot;, research_agent_node)
+    graph.add_node(&quot;code&quot;, code_agent_node)
+    graph.add_node(&quot;summary&quot;, summary_agent_node)
+
+    graph.set_entry_point(&quot;supervisor&quot;)
+    graph.add_conditional_edges(
+        &quot;supervisor&quot;,
+        route_by_task_type,
+        {&quot;research&quot;: &quot;research&quot;, &quot;code&quot;: &quot;code&quot;, &quot;summary&quot;: &quot;summary&quot;},
+    )
+    graph.add_edge(&quot;research&quot;, &quot;summary&quot;)
+    graph.add_edge(&quot;code&quot;, &quot;summary&quot;)
+    graph.add_edge(&quot;summary&quot;, END)
+    return graph.compile()
+
+if __name__ == &quot;__main__&quot;:
+    app = build_multi_agent_graph()
+    initial: MultiAgentState = {
+        &quot;messages&quot;: [], &quot;task_type&quot;: &quot;&quot;,
+        &quot;research_result&quot;: &quot;&quot;, &quot;code_result&quot;: &quot;&quot;, &quot;final_answer&quot;: &quot;&quot;,
+    }
+    questions = [
+        &quot;What is Python asynchronous programming?&quot;,
+        &quot;Implement a Fibonacci sequence generator in Python.&quot;,
+    ]
+    for q in questions:
+        result = app.invoke({**initial, &quot;messages&quot;: [HumanMessage(content=q)]})
+        print(f&quot;\nQ: {q}&quot;)
+        print(f&quot;task type: {result['task_type']}&quot;)
+        print(f&quot;answer:\n{result['final_answer'][:300]}...&quot;)
+</code></pre>
+<hr>
+<h2>Inter-agent communication</h2>
+<p>Agents communicate through shared state. Each agent writes its result to a dedicated state field; the next agent reads from it.</p>
+<p>This keeps coupling low. The summary agent does not need to know how the code agent is implemented — it only reads <code>code_result</code>. Adding a new agent type requires no changes to existing agents, only a new node and routing entry.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/01-graph-basics.md">LangGraph introduction and graph basics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/02-state-and-checkpoints.md">State management and checkpoints</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/03-conditional-edges.md">Conditional edges and branching</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/04-tool-calling-agent.md">Tool-calling agents</a></li>
+<li><strong>Multi-agent systems (current)</strong></li>
+<li>Completing LangGraph (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/how-tos/multi-agent-network/">LangGraph multi-agent documentation</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/">LangGraph supervisor pattern</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/concepts/multi_agent/">LangGraph agent network concepts</a></li>
+</ul>
+<p class="tags-line">Tags: LangGraph, Agent, Python, LLM</p>
+</body>
+</html>

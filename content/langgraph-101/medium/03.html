@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Conditional edges and branching</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Conditional edges and branching</h1>
+<blockquote>
+<p>LangGraph 101 (3/6)</p>
+</blockquote>
+<p>Linear pipelines always take the same path. Agents need to choose different paths depending on what they encounter. LangGraph's conditional edges inspect state and dynamically select the next node. This post implements routing patterns, loops, and escape conditions.</p>
+<hr>
+<h2>Conditional edge basics</h2>
+<p><code>add_conditional_edges</code> takes a routing function that receives state and returns the next node name.</p>
+<pre><code class="language-python">import os
+from typing import TypedDict, Annotated, Literal
+
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_groq import ChatGroq
+
+class RouterState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+    category: str
+    response: str
+
+def classify_question(state: RouterState) -&gt; RouterState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    last_msg = state[&quot;messages&quot;][-1].content
+    response = llm.invoke([
+        SystemMessage(content=&quot;&quot;&quot;Classify the question as one of:
+- code: code writing, debugging, programming
+- concept: explanations, theory, principles
+- other: everything else
+
+Return only the label: code, concept, or other.&quot;&quot;&quot;),
+        HumanMessage(content=last_msg),
+    ])
+    category = response.content.strip().lower()
+    return {&quot;category&quot;: category if category in (&quot;code&quot;, &quot;concept&quot;, &quot;other&quot;) else &quot;other&quot;}
+
+def handle_code_question(state: RouterState) -&gt; RouterState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    response = llm.invoke([
+        SystemMessage(content=&quot;Answer with code examples. Always include a code block.&quot;),
+        *state[&quot;messages&quot;],
+    ])
+    return {&quot;messages&quot;: [response], &quot;response&quot;: response.content}
+
+def handle_concept_question(state: RouterState) -&gt; RouterState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    response = llm.invoke([
+        SystemMessage(content=&quot;Explain step by step with analogies and examples.&quot;),
+        *state[&quot;messages&quot;],
+    ])
+    return {&quot;messages&quot;: [response], &quot;response&quot;: response.content}
+
+def handle_other_question(state: RouterState) -&gt; RouterState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    response = llm.invoke([SystemMessage(content=&quot;Be helpful.&quot;), *state[&quot;messages&quot;]])
+    return {&quot;messages&quot;: [response], &quot;response&quot;: response.content}
+
+def route_by_category(state: RouterState) -&gt; Literal[&quot;code&quot;, &quot;concept&quot;, &quot;other&quot;]:
+    return state[&quot;category&quot;]
+
+def build_router_graph():
+    graph = StateGraph(RouterState)
+    graph.add_node(&quot;classify&quot;, classify_question)
+    graph.add_node(&quot;code&quot;, handle_code_question)
+    graph.add_node(&quot;concept&quot;, handle_concept_question)
+    graph.add_node(&quot;other&quot;, handle_other_question)
+
+    graph.set_entry_point(&quot;classify&quot;)
+    graph.add_conditional_edges(
+        &quot;classify&quot;,
+        route_by_category,
+        {&quot;code&quot;: &quot;code&quot;, &quot;concept&quot;: &quot;concept&quot;, &quot;other&quot;: &quot;other&quot;},
+    )
+    for node in (&quot;code&quot;, &quot;concept&quot;, &quot;other&quot;):
+        graph.add_edge(node, END)
+
+    return graph.compile()
+
+if __name__ == &quot;__main__&quot;:
+    app = build_router_graph()
+    questions = [
+        &quot;Write code to sort a list in Python.&quot;,
+        &quot;What is recursion?&quot;,
+        &quot;Why is Python popular?&quot;,
+    ]
+    for q in questions:
+        result = app.invoke({&quot;messages&quot;: [HumanMessage(content=q)], &quot;category&quot;: &quot;&quot;, &quot;response&quot;: &quot;&quot;})
+        print(f&quot;\nQ: {q}\ncategory: {result['category']}\nanswer: {result['response'][:150]}...&quot;)
+</code></pre>
+<hr>
+<h2>Loops and escape conditions</h2>
+<p>Agent loops repeat until a task is done. Always include an escape condition to prevent infinite loops.</p>
+<pre><code class="language-python">class ReflectionState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+    draft: str
+    critique: str
+    iteration: int
+    max_iterations: int
+    final: str
+
+def generate_draft(state: ReflectionState) -&gt; ReflectionState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.7)
+    prompt = state[&quot;messages&quot;][-1].content if not state[&quot;draft&quot;] else \
+        f&quot;Previous answer: {state['draft']}\n\nCritique: {state['critique']}\n\nRevise based on the critique.&quot;
+    response = llm.invoke([HumanMessage(content=prompt)])
+    return {&quot;draft&quot;: response.content, &quot;iteration&quot;: state[&quot;iteration&quot;] + 1}
+
+def critique_draft(state: ReflectionState) -&gt; ReflectionState:
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    response = llm.invoke([
+        SystemMessage(content=&quot;&quot;&quot;Critique the following answer.
+If it is good enough, return 'APPROVED'.
+Otherwise, give one specific improvement in a single sentence.&quot;&quot;&quot;),
+        HumanMessage(content=state[&quot;draft&quot;]),
+    ])
+    return {&quot;critique&quot;: response.content}
+
+def should_continue(state: ReflectionState) -&gt; Literal[&quot;generate&quot;, &quot;finish&quot;]:
+    if state[&quot;iteration&quot;] &gt;= state[&quot;max_iterations&quot;] or &quot;APPROVED&quot; in state[&quot;critique&quot;]:
+        return &quot;finish&quot;
+    return &quot;generate&quot;
+
+def finish(state: ReflectionState) -&gt; ReflectionState:
+    return {&quot;final&quot;: state[&quot;draft&quot;]}
+
+def build_reflection_graph():
+    graph = StateGraph(ReflectionState)
+    graph.add_node(&quot;generate&quot;, generate_draft)
+    graph.add_node(&quot;critique&quot;, critique_draft)
+    graph.add_node(&quot;finish&quot;, finish)
+
+    graph.set_entry_point(&quot;generate&quot;)
+    graph.add_edge(&quot;generate&quot;, &quot;critique&quot;)
+    graph.add_conditional_edges(&quot;critique&quot;, should_continue, {&quot;generate&quot;: &quot;generate&quot;, &quot;finish&quot;: &quot;finish&quot;})
+    graph.add_edge(&quot;finish&quot;, END)
+    return graph.compile()
+
+if __name__ == &quot;__main__&quot;:
+    app = build_reflection_graph()
+    result = app.invoke({
+        &quot;messages&quot;: [HumanMessage(content=&quot;Explain Python async/await.&quot;)],
+        &quot;draft&quot;: &quot;&quot;, &quot;critique&quot;: &quot;&quot;, &quot;iteration&quot;: 0, &quot;max_iterations&quot;: 3, &quot;final&quot;: &quot;&quot;,
+    })
+    print(f&quot;iterations: {result['iteration']}&quot;)
+    print(f&quot;final answer:\n{result['final']}&quot;)
+</code></pre>
+<hr>
+<h2>Routing function design</h2>
+<p>Routing functions must be pure: they receive state and return a node name, with no side effects. LLM calls and API requests belong in nodes, not routing functions.</p>
+<p>Always combine a quality-based escape (<code>"APPROVED"</code>) with an iteration cap (<code>max_iterations</code>). The quality check exits early when the result is good; the cap guarantees termination when it is not.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/01-graph-basics.md">LangGraph introduction and graph basics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/02-state-and-checkpoints.md">State management and checkpoints</a></li>
+<li><strong>Conditional edges and branching (current)</strong></li>
+<li>Tool-calling agents (upcoming)</li>
+<li>Multi-agent systems (upcoming)</li>
+<li>Completing LangGraph (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/how-tos/branching/">LangGraph conditional edges</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/">LangGraph recursion limit</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/concepts/low_level/#cycles">LangGraph cycles guide</a></li>
+</ul>
+<p class="tags-line">Tags: LangGraph, Agent, Python, LLM</p>
+</body>
+</html>

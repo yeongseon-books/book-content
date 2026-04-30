@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tool-calling agents</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tool-calling agents</h1>
+<blockquote>
+<p>LangGraph 101 (4/6)</p>
+</blockquote>
+<p>The defining capability of an agent is choosing tools, observing results, and deciding what to do next. This post builds a tool-calling agent with LangGraph: tool definitions, a tool execution node, and the agent loop that ties them together.</p>
+<hr>
+<h2>Tool definitions</h2>
+<p>LangChain's <code>@tool</code> decorator turns functions into tools. The docstring becomes the tool description passed to the LLM.</p>
+<pre><code class="language-python">import json
+import math
+import os
+from typing import TypedDict, Annotated
+
+from langchain_core.tools import tool
+from langchain_core.messages import BaseMessage, HumanMessage, ToolMessage
+from langchain_groq import ChatGroq
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+
+@tool
+def calculator(expression: str) -&gt; str:
+    &quot;&quot;&quot;Evaluate a mathematical expression.
+
+    Args:
+        expression: math expression to evaluate (e.g., '2 + 3 * 4', 'sqrt(16)')
+
+    Returns:
+        result as a string
+    &quot;&quot;&quot;
+    try:
+        allowed = {k: v for k, v in math.__dict__.items() if not k.startswith(&quot;_&quot;)}
+        result = eval(expression, {&quot;__builtins__&quot;: {}}, allowed)
+        return str(result)
+    except Exception as e:
+        return f&quot;calculation error: {e}&quot;
+
+@tool
+def word_counter(text: str) -&gt; str:
+    &quot;&quot;&quot;Count words, characters, and sentences in text.
+
+    Args:
+        text: text to analyze
+
+    Returns:
+        JSON with word, char, and sentence counts
+    &quot;&quot;&quot;
+    return json.dumps({
+        &quot;words&quot;: len(text.split()),
+        &quot;chars&quot;: len(text),
+        &quot;sentences&quot;: text.count(&quot;.&quot;) + text.count(&quot;!&quot;) + text.count(&quot;?&quot;),
+    })
+
+@tool
+def unit_converter(value: float, from_unit: str, to_unit: str) -&gt; str:
+    &quot;&quot;&quot;Convert between units. Supported: km/mile, kg/lb, celsius/fahrenheit.
+
+    Args:
+        value: numeric value to convert
+        from_unit: source unit
+        to_unit: target unit
+
+    Returns:
+        converted value with units
+    &quot;&quot;&quot;
+    conversions = {
+        (&quot;km&quot;, &quot;mile&quot;): lambda x: x * 0.621371,
+        (&quot;mile&quot;, &quot;km&quot;): lambda x: x * 1.60934,
+        (&quot;kg&quot;, &quot;lb&quot;): lambda x: x * 2.20462,
+        (&quot;lb&quot;, &quot;kg&quot;): lambda x: x / 2.20462,
+        (&quot;celsius&quot;, &quot;fahrenheit&quot;): lambda x: x * 9/5 + 32,
+        (&quot;fahrenheit&quot;, &quot;celsius&quot;): lambda x: (x - 32) * 5/9,
+    }
+    key = (from_unit.lower(), to_unit.lower())
+    fn = conversions.get(key)
+    if not fn:
+        return f&quot;unsupported conversion: {from_unit} -&gt; {to_unit}&quot;
+    return f&quot;{value} {from_unit} = {fn(value):.4f} {to_unit}&quot;
+</code></pre>
+<hr>
+<h2>Tool-calling agent graph</h2>
+<pre><code class="language-python">TOOLS = [calculator, word_counter, unit_converter]
+TOOL_MAP = {t.name: t for t in TOOLS}
+
+class AgentState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+
+def agent_node(state: AgentState) -&gt; AgentState:
+    llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+        temperature=0.0,
+    ).bind_tools(TOOLS)
+    response = llm.invoke(state[&quot;messages&quot;])
+    return {&quot;messages&quot;: [response]}
+
+def tool_node(state: AgentState) -&gt; AgentState:
+    last_message = state[&quot;messages&quot;][-1]
+    results = []
+    for call in last_message.tool_calls:
+        tool = TOOL_MAP.get(call[&quot;name&quot;])
+        result = tool.invoke(call[&quot;args&quot;]) if tool else f&quot;unknown tool: {call['name']}&quot;
+        results.append(ToolMessage(content=str(result), tool_call_id=call[&quot;id&quot;]))
+    return {&quot;messages&quot;: results}
+
+def should_use_tool(state: AgentState) -&gt; str:
+    last = state[&quot;messages&quot;][-1]
+    if hasattr(last, &quot;tool_calls&quot;) and last.tool_calls:
+        return &quot;tools&quot;
+    return &quot;end&quot;
+
+def build_tool_agent():
+    graph = StateGraph(AgentState)
+    graph.add_node(&quot;agent&quot;, agent_node)
+    graph.add_node(&quot;tools&quot;, tool_node)
+
+    graph.set_entry_point(&quot;agent&quot;)
+    graph.add_conditional_edges(&quot;agent&quot;, should_use_tool, {&quot;tools&quot;: &quot;tools&quot;, &quot;end&quot;: END})
+    graph.add_edge(&quot;tools&quot;, &quot;agent&quot;)
+
+    return graph.compile()
+
+if __name__ == &quot;__main__&quot;:
+    app = build_tool_agent()
+    questions = [
+        &quot;What is sqrt(144) + 5^2?&quot;,
+        &quot;How many miles is 100 km?&quot;,
+        &quot;Count the words in: An agent is a system where an LLM chooses and executes tools.&quot;,
+    ]
+    for q in questions:
+        print(f&quot;\nQ: {q}&quot;)
+        result = app.invoke({&quot;messages&quot;: [HumanMessage(content=q)]})
+        print(f&quot;A: {result['messages'][-1].content}&quot;)
+</code></pre>
+<hr>
+<h2>Tool design principles</h2>
+<p><strong>Single responsibility</strong>: one tool does one thing. Don't bundle calculation and search into the same tool.</p>
+<p><strong>Clear docstrings</strong>: the LLM selects tools based on docstrings alone. Specify input format, return format, and supported range explicitly.</p>
+<p><strong>Fail gracefully</strong>: if a tool raises an exception, the agent loop halts. Catch exceptions internally and return an error string instead.</p>
+<p><strong>Determinism</strong>: tools should return the same output for the same input. Random or time-dependent tools make agent debugging unnecessarily hard.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/01-graph-basics.md">LangGraph introduction and graph basics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/02-state-and-checkpoints.md">State management and checkpoints</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langgraph-101/en/03-conditional-edges.md">Conditional edges and branching</a></li>
+<li><strong>Tool-calling agents (current)</strong></li>
+<li>Multi-agent systems (upcoming)</li>
+<li>Completing LangGraph (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/how-tos/tool-calling/">LangGraph tool node documentation</a></li>
+<li><a href="https://python.langchain.com/docs/modules/tools/">LangChain tool definitions</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/concepts/agentic_concepts/">LangGraph agent patterns</a></li>
+</ul>
+<p class="tags-line">Tags: LangGraph, Agent, Python, LLM</p>
+</body>
+</html>
