@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tool calling — connecting external tools</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tool calling — connecting external tools</h1>
+<blockquote>
+<p>LangChain 101 (4/6)</p>
+</blockquote>
+<p>LLMs generate text. Calculation, weather lookup, database queries — those require external tools. Tool calling is the pattern where the LLM produces a structured request ("call this function with these arguments"), the application executes the actual function, and the result goes back to the LLM.</p>
+<p>This post covers defining tools with the <code>@tool</code> decorator, connecting them to an LLM with <code>bind_tools()</code>, and handling tool results in a simple loop.</p>
+<p>Topics:</p>
+<ul>
+<li>defining tools with <code>@tool</code></li>
+<li>connecting tools to an LLM with <code>bind_tools()</code></li>
+<li>a minimal tool-call loop</li>
+<li>a multi-tool example</li>
+<li>what to watch out for</li>
+</ul>
+<hr>
+<h2>Defining tools</h2>
+<p>The <code>@tool</code> decorator turns a Python function into a LangChain tool. The docstring tells the LLM what the tool does and when to use it. Type hints define the input schema.</p>
+<pre><code class="language-python">from langchain_core.tools import tool
+
+@tool
+def add_numbers(a: float, b: float) -&gt; float:
+    &quot;&quot;&quot;Add two numbers. Use this when addition is needed.&quot;&quot;&quot;
+    return a + b
+
+@tool
+def get_word_count(text: str) -&gt; int:
+    &quot;&quot;&quot;Return the word count of a text string.&quot;&quot;&quot;
+    return len(text.split())
+
+@tool
+def celsius_to_fahrenheit(celsius: float) -&gt; float:
+    &quot;&quot;&quot;Convert a temperature from Celsius to Fahrenheit.&quot;&quot;&quot;
+    return celsius * 9 / 5 + 32
+
+print(f&quot;name: {add_numbers.name}&quot;)
+print(f&quot;description: {add_numbers.description}&quot;)
+print(f&quot;schema: {add_numbers.args_schema.model_json_schema()}&quot;)
+</code></pre>
+<hr>
+<h2>Connecting tools with bind_tools()</h2>
+<p><code>bind_tools()</code> informs the LLM which tools are available.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+
+@tool
+def add_numbers(a: float, b: float) -&gt; float:
+    &quot;&quot;&quot;Add two numbers.&quot;&quot;&quot;
+    return a + b
+
+@tool
+def multiply_numbers(a: float, b: float) -&gt; float:
+    &quot;&quot;&quot;Multiply two numbers.&quot;&quot;&quot;
+    return a * b
+
+tools = [add_numbers, multiply_numbers]
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+llm_with_tools = llm.bind_tools(tools)
+
+response = llm_with_tools.invoke(&quot;What is 15 plus 27?&quot;)
+
+print(f&quot;content: {response.content!r}&quot;)
+print(f&quot;tool_calls: {response.tool_calls}&quot;)
+</code></pre>
+<p>When <code>tool_calls</code> is non-empty, the LLM is requesting a tool execution.</p>
+<pre><code>content: ''
+tool_calls: [{'name': 'add_numbers', 'args': {'a': 15.0, 'b': 27.0}, 'id': 'call_...'}]
+</code></pre>
+<hr>
+<h2>A minimal tool-call loop</h2>
+<p>After the LLM requests a tool call, the application must execute the function and return the result as a <code>ToolMessage</code>.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+
+@tool
+def add_numbers(a: float, b: float) -&gt; float:
+    &quot;&quot;&quot;Add two numbers.&quot;&quot;&quot;
+    return a + b
+
+@tool
+def multiply_numbers(a: float, b: float) -&gt; float:
+    &quot;&quot;&quot;Multiply two numbers.&quot;&quot;&quot;
+    return a * b
+
+tools = [add_numbers, multiply_numbers]
+tool_map = {t.name: t for t in tools}
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+llm_with_tools = llm.bind_tools(tools)
+
+def run_with_tools(question: str) -&gt; str:
+    &quot;&quot;&quot;Simple tool-call loop.&quot;&quot;&quot;
+    messages = [HumanMessage(content=question)]
+
+    while True:
+        response = llm_with_tools.invoke(messages)
+        messages.append(response)
+
+        if not response.tool_calls:
+            return response.content
+
+        for tool_call in response.tool_calls:
+            tool_name = tool_call[&quot;name&quot;]
+            tool_args = tool_call[&quot;args&quot;]
+            tool_id = tool_call[&quot;id&quot;]
+
+            if tool_name in tool_map:
+                result = tool_map[tool_name].invoke(tool_args)
+                messages.append(
+                    ToolMessage(
+                        content=str(result),
+                        tool_call_id=tool_id,
+                    )
+                )
+                print(f&quot;  executed: {tool_name}({tool_args}) = {result}&quot;)
+
+questions = [
+    &quot;What is 15 plus 27?&quot;,
+    &quot;What is 7 times 8?&quot;,
+    &quot;Add 5 and 3, then multiply the result by 4. What do you get?&quot;,
+]
+
+for q in questions:
+    print(f&quot;\nquestion: {q}&quot;)
+    answer = run_with_tools(q)
+    print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<p>The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a <code>ToolMessage</code> and appended to the conversation history.</p>
+<hr>
+<h2>Multi-tool example</h2>
+<p>Real applications mix different types of tools.</p>
+<pre><code class="language-python">import os
+from datetime import datetime
+
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+
+@tool
+def get_current_time() -&gt; str:
+    &quot;&quot;&quot;Return the current date and time.&quot;&quot;&quot;
+    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+
+@tool
+def calculate_bmi(weight_kg: float, height_m: float) -&gt; float:
+    &quot;&quot;&quot;Calculate BMI from weight in kg and height in meters.&quot;&quot;&quot;
+    return round(weight_kg / (height_m ** 2), 2)
+
+@tool
+def word_frequency(text: str, word: str) -&gt; int:
+    &quot;&quot;&quot;Count how many times a word appears in a text.&quot;&quot;&quot;
+    return text.lower().split().count(word.lower())
+
+tools = [get_current_time, calculate_bmi, word_frequency]
+tool_map = {t.name: t for t in tools}
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+llm_with_tools = llm.bind_tools(tools)
+
+def run_with_tools(question: str) -&gt; str:
+    messages = [HumanMessage(content=question)]
+    while True:
+        response = llm_with_tools.invoke(messages)
+        messages.append(response)
+        if not response.tool_calls:
+            return response.content
+        for tc in response.tool_calls:
+            result = tool_map[tc[&quot;name&quot;]].invoke(tc[&quot;args&quot;])
+            messages.append(ToolMessage(content=str(result), tool_call_id=tc[&quot;id&quot;]))
+            print(f&quot;  {tc['name']}({tc['args']}) = {result}&quot;)
+
+print(run_with_tools(&quot;What time is it now?&quot;))
+print(run_with_tools(&quot;What is the BMI for someone weighing 70 kg at 1.75 m?&quot;))
+</code></pre>
+<hr>
+<h2>What to watch out for</h2>
+<p><strong>Docstrings drive tool selection.</strong> The LLM reads docstrings to decide which tool to use and when. Vague or overlapping descriptions cause wrong tool selection.</p>
+<p><strong>Validate inputs inside the tool.</strong> Type hints define the schema but do not prevent the LLM from passing invalid values at runtime. For tools with side effects, validate inputs before executing.</p>
+<p><strong>Guard against infinite loops.</strong> Add a maximum iteration count when the loop is not bounded by a known termination condition.</p>
+<pre><code class="language-python">MAX_ITERATIONS = 10
+
+def run_with_tools_safe(question: str) -&gt; str:
+    messages = [HumanMessage(content=question)]
+    for _ in range(MAX_ITERATIONS):
+        response = llm_with_tools.invoke(messages)
+        messages.append(response)
+        if not response.tool_calls:
+            return response.content
+        for tc in response.tool_calls:
+            result = tool_map[tc[&quot;name&quot;]].invoke(tc[&quot;args&quot;])
+            messages.append(ToolMessage(content=str(result), tool_call_id=tc[&quot;id&quot;]))
+    return &quot;Max iterations reached.&quot;
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>The tool-calling loop has three moving parts: define tools with <code>@tool</code>, connect them with <code>bind_tools()</code>, and feed results back as <code>ToolMessage</code>. The loop runs until the LLM stops requesting tools.</p>
+<p>The next post covers streaming — receiving LLM output token by token as it is generated.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/02-prompt-llm-chain.md">Prompt and LLM chain — assembling your first chain</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/03-retriever.md">Retriever — document search and context injection</a></li>
+<li><strong>Tool calling — connecting external tools (current)</strong></li>
+<li>Streaming — handling real-time output (upcoming)</li>
+<li>Putting it together — a complete chain in one file (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/how_to/tool_calling/">LangChain tool calling guide</a></li>
+<li><a href="https://python.langchain.com/docs/how_to/custom_tools/">Defining custom tools</a></li>
+<li><a href="https://console.groq.com/docs/tool-use">Groq tool use</a></li>
+</ul>
+<p class="tags-line">Tags: LangChain, LCEL, Python, LLM</p>
+</body>
+</html>

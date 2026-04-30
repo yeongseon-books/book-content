@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Streaming — handling real-time output</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Streaming — handling real-time output</h1>
+<blockquote>
+<p>LangChain 101 (5/6)</p>
+</blockquote>
+<p>When an LLM generates a long response, waiting for the full text before displaying anything makes the experience feel slow. Streaming sends tokens to the output as they are generated. That is what you see in ChatGPT or Claude when text appears character by character.</p>
+<p>In LangChain, streaming starts with <code>stream()</code>. Chain construction is identical to <code>invoke()</code> — only the call method changes.</p>
+<p>Topics:</p>
+<ul>
+<li>using <code>stream()</code> with an LLM and a chain</li>
+<li>async streaming with <code>astream()</code></li>
+<li>collecting streamed output into a string</li>
+<li>a practical FastAPI streaming endpoint</li>
+<li><code>astream_events()</code> for fine-grained event control</li>
+</ul>
+<hr>
+<h2>Basic streaming</h2>
+<p><code>stream()</code> returns a generator. Iterate over it with a <code>for</code> loop.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+# stream directly from the LLM
+print(&quot;=== LLM direct streaming ===&quot;)
+for chunk in llm.stream(&quot;List five advantages of Python.&quot;):
+    print(chunk.content, end=&quot;&quot;, flush=True)
+
+print(&quot;\n\n=== chain streaming ===&quot;)
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;human&quot;, &quot;Explain {topic} in three paragraphs.&quot;),
+])
+
+chain = prompt | llm | StrOutputParser()
+
+for chunk in chain.stream({&quot;topic&quot;: &quot;vector search&quot;}):
+    print(chunk, end=&quot;&quot;, flush=True)
+
+print()
+</code></pre>
+<p><code>end=""</code> and <code>flush=True</code> suppress the newline and force immediate output. <code>StrOutputParser()</code> extracts the string content from each <code>AIMessageChunk</code> during streaming.</p>
+<hr>
+<h2>Collecting streamed output</h2>
+<p>When you need the full text after streaming, accumulate chunks in a list.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = (
+    ChatPromptTemplate.from_messages([(&quot;human&quot;, &quot;{question}&quot;)])
+    | llm
+    | StrOutputParser()
+)
+
+chunks = []
+print(&quot;streaming: &quot;, end=&quot;&quot;)
+for chunk in chain.stream({&quot;question&quot;: &quot;What is FAISS?&quot;}):
+    print(chunk, end=&quot;&quot;, flush=True)
+    chunks.append(chunk)
+
+full_text = &quot;&quot;.join(chunks)
+print(f&quot;\n\ntotal characters: {len(full_text)}&quot;)
+</code></pre>
+<hr>
+<h2>astream() — async streaming</h2>
+<p>In async frameworks like FastAPI, use <code>astream()</code> with <code>async for</code>.</p>
+<pre><code class="language-python">import asyncio
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = (
+    ChatPromptTemplate.from_messages([(&quot;human&quot;, &quot;Explain {topic} briefly.&quot;)])
+    | llm
+    | StrOutputParser()
+)
+
+async def stream_response(topic: str) -&gt; None:
+    print(f&quot;streaming: {topic}&quot;)
+    async for chunk in chain.astream({&quot;topic&quot;: topic}):
+        print(chunk, end=&quot;&quot;, flush=True)
+    print()
+
+async def main() -&gt; None:
+    await stream_response(&quot;embedding vectors&quot;)
+    await stream_response(&quot;FAISS indexes&quot;)
+
+asyncio.run(main())
+</code></pre>
+<hr>
+<h2>FastAPI streaming endpoint</h2>
+<p>In production, stream to the client over HTTP using Server-Sent Events.</p>
+<pre><code class="language-python">import os
+
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+app = FastAPI()
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = (
+    ChatPromptTemplate.from_messages([(&quot;human&quot;, &quot;{question}&quot;)])
+    | llm
+    | StrOutputParser()
+)
+
+@app.get(&quot;/stream&quot;)
+async def stream_endpoint(question: str):
+    async def generate():
+        async for chunk in chain.astream({&quot;question&quot;: question}):
+            yield chunk
+
+    return StreamingResponse(generate(), media_type=&quot;text/plain&quot;)
+</code></pre>
+<p>Start the server:</p>
+<pre><code class="language-bash">pip install fastapi uvicorn
+uvicorn main:app --reload
+</code></pre>
+<p>Test it:</p>
+<pre><code class="language-bash">curl &quot;http://localhost:8000/stream?question=What+is+RAG&quot;
+</code></pre>
+<hr>
+<h2>astream_events() for fine-grained control</h2>
+<p><code>astream_events()</code> exposes individual events from each component in the chain.</p>
+<pre><code class="language-python">import asyncio
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = (
+    ChatPromptTemplate.from_messages([(&quot;human&quot;, &quot;Explain {topic}.&quot;)])
+    | llm
+    | StrOutputParser()
+)
+
+async def main() -&gt; None:
+    async for event in chain.astream_events({&quot;topic&quot;: &quot;FAISS&quot;}, version=&quot;v2&quot;):
+        event_type = event[&quot;event&quot;]
+        if event_type == &quot;on_llm_stream&quot;:
+            chunk = event[&quot;data&quot;].get(&quot;chunk&quot;, &quot;&quot;)
+            if hasattr(chunk, &quot;content&quot;) and chunk.content:
+                print(chunk.content, end=&quot;&quot;, flush=True)
+    print()
+
+asyncio.run(main())
+</code></pre>
+<p><code>astream_events()</code> is useful when a chain has multiple components and you need to distinguish which one is producing output. For simple streaming, <code>astream()</code> is easier.</p>
+<hr>
+<h2>Conclusion</h2>
+<p>Streaming in LangChain requires one change: replace <code>invoke()</code> with <code>stream()</code> or <code>astream()</code>. Chain structure stays the same. With FastAPI, <code>StreamingResponse</code> delivers the output to clients in real time.</p>
+<p>The final post assembles all the components covered in this series into one complete chain.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/02-prompt-llm-chain.md">Prompt and LLM chain — assembling your first chain</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/03-retriever.md">Retriever — document search and context injection</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/04-tool-calling.md">Tool calling — connecting external tools</a></li>
+<li><strong>Streaming — handling real-time output (current)</strong></li>
+<li>Putting it together — a complete chain in one file (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/expression_language/streaming/">LangChain streaming guide</a></li>
+<li><a href="https://python.langchain.com/docs/expression_language/interface/">astream_events reference</a></li>
+<li><a href="https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse">FastAPI StreamingResponse</a></li>
+</ul>
+<p class="tags-line">Tags: LangChain, LCEL, Python, LLM</p>
+</body>
+</html>

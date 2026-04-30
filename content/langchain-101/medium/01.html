@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LangChain introduction — LCEL and the Runnable interface</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>LangChain introduction — LCEL and the Runnable interface</h1>
+<blockquote>
+<p>LangChain 101 (1/6)</p>
+</blockquote>
+<p>LangChain throws a lot of terminology at you before the code makes sense: LCEL, Runnable, Chain, Pipe. This post cuts through that by focusing on what LCEL (LangChain Expression Language) and the Runnable interface actually are and why the library is structured around them.</p>
+<p>This series covers LangChain as an API — how to use its components. Application-level patterns such as chatbots, RAG, and agents are in a separate series (ai-app-patterns-101).</p>
+<p>Topics:</p>
+<ul>
+<li>the problem LangChain addresses</li>
+<li>the Runnable interface: <code>invoke()</code>, <code>batch()</code>, <code>stream()</code></li>
+<li>building a chain with the LCEL pipe operator <code>|</code></li>
+<li>running the simplest possible chain</li>
+<li>why this structure is worth learning</li>
+</ul>
+<hr>
+<h2>The problem LangChain addresses</h2>
+<p>LLM application code develops a recurring pattern: assemble a prompt, call the model, parse the output, pass it to the next step. The plumbing between those steps accumulates.</p>
+<pre><code class="language-python"># typical accumulation of glue code
+prompt_text = f&quot;Summarize this text: {user_input}&quot;
+response = client.chat.completions.create(model=&quot;...&quot;, messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt_text}])
+raw_output = response.choices[0].message.content
+parsed = raw_output.strip()
+next_prompt = f&quot;Translate this summary: {parsed}&quot;
+# ...repeats
+</code></pre>
+<p>LangChain abstracts that glue code into components. The core insight is simple: if every component implements the same interface, components can be connected like pipe fittings.</p>
+<hr>
+<h2>The Runnable interface</h2>
+<p>Almost every LangChain component implements the Runnable interface. Three methods are essential.</p>
+<ul>
+<li><code>invoke(input)</code> — accepts one input, returns one output. Synchronous.</li>
+<li><code>batch(inputs)</code> — accepts a list of inputs, returns a list of outputs.</li>
+<li><code>stream(input)</code> — yields output incrementally, token by token.</li>
+</ul>
+<p>The consistency of this interface makes every component substitutable and composable.</p>
+<pre><code class="language-python">import os
+
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+response = llm.invoke(&quot;Explain the advantages of Python in two sentences.&quot;)
+print(response.content)
+</code></pre>
+<p><code>ChatGroq</code> implements Runnable, so <code>invoke()</code> is available directly.</p>
+<hr>
+<h2>LCEL and the pipe operator</h2>
+<p>LCEL uses <code>|</code> to connect Runnable components. The output of the left component becomes the input of the right component.</p>
+<pre><code class="language-python">chain = component_a | component_b | component_c
+result = chain.invoke(input)
+</code></pre>
+<p>This is the most common pattern in LangChain code. A concrete example:</p>
+<pre><code class="language-bash">pip install langchain langchain-groq
+</code></pre>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are an expert at concise explanations.&quot;),
+    (&quot;human&quot;, &quot;Explain {topic} in two sentences.&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+parser = StrOutputParser()
+
+chain = prompt | llm | parser
+
+result = chain.invoke({&quot;topic&quot;: &quot;embedding vectors&quot;})
+print(result)
+</code></pre>
+<p>What each component does:</p>
+<p><strong><code>ChatPromptTemplate</code></strong>: receives a dict, returns a list of messages with <code>{topic}</code> filled in.</p>
+<p><strong><code>ChatGroq</code></strong>: receives the message list, returns an <code>AIMessage</code> object.</p>
+<p><strong><code>StrOutputParser</code></strong>: receives an <code>AIMessage</code>, returns its <code>.content</code> string.</p>
+<p>The pipe operator composes these three steps into one chain. <code>chain.invoke({"topic": "embedding vectors"})</code> runs all three in order.</p>
+<hr>
+<h2>Running each component individually</h2>
+<p>Seeing each step in isolation makes the data flow concrete.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are an expert at concise explanations.&quot;),
+    (&quot;human&quot;, &quot;Explain {topic} in two sentences.&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+parser = StrOutputParser()
+
+# step 1: render the prompt
+messages = prompt.invoke({&quot;topic&quot;: &quot;embedding vectors&quot;})
+print(&quot;=== step 1: messages ===&quot;)
+for m in messages.messages:
+    print(f&quot;  [{m.type}] {m.content}&quot;)
+
+# step 2: call the LLM
+ai_message = llm.invoke(messages)
+print(f&quot;\n=== step 2: AIMessage ===&quot;)
+print(f&quot;  type: {type(ai_message).__name__}&quot;)
+print(f&quot;  content: {ai_message.content[:80]}...&quot;)
+
+# step 3: parse to string
+text = parser.invoke(ai_message)
+print(f&quot;\n=== step 3: string ===&quot;)
+print(f&quot;  {text}&quot;)
+</code></pre>
+<hr>
+<h2>RunnableLambda — wrapping a plain function</h2>
+<p>To insert a custom Python function into a pipe chain, use <code>RunnableLambda</code>.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;human&quot;, &quot;Summarize {text} in one sentence.&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+def add_char_count(text: str) -&gt; str:
+    return f&quot;{text}\n\n(character count: {len(text)})&quot;
+
+chain = prompt | llm | StrOutputParser() | RunnableLambda(add_char_count)
+
+result = chain.invoke({
+    &quot;text&quot;: &quot;Vector search converts text into numeric vectors for meaning-based retrieval.&quot;
+})
+print(result)
+</code></pre>
+<p><code>RunnableLambda</code> lets any plain Python function participate in a pipe chain. It is useful for output post-processing, logging, and lightweight transforms.</p>
+<hr>
+<h2>batch() for multiple inputs</h2>
+<p><code>batch()</code> accepts a list of inputs and returns a list of outputs.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;human&quot;, &quot;Explain {topic} in one sentence.&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = prompt | llm | StrOutputParser()
+
+topics = [
+    {&quot;topic&quot;: &quot;embeddings&quot;},
+    {&quot;topic&quot;: &quot;FAISS&quot;},
+    {&quot;topic&quot;: &quot;RAG&quot;},
+]
+
+results = chain.batch(topics)
+
+for topic_dict, result in zip(topics, results):
+    print(f&quot;[{topic_dict['topic']}] {result}\n&quot;)
+</code></pre>
+<p><code>batch()</code> attempts parallel processing internally. Use <code>max_concurrency</code> to cap simultaneous requests when working within API rate limits.</p>
+<pre><code class="language-python">results = chain.batch(topics, config={&quot;max_concurrency&quot;: 2})
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>LCEL and the Runnable interface reduce LLM application plumbing to a sequence of composable components connected by <code>|</code>. Every component exposes <code>invoke</code>, <code>batch</code>, and <code>stream</code> consistently, so any component can replace any other component that accepts the same input type.</p>
+<p>The next post goes deeper into <code>ChatPromptTemplate</code> and builds a more realistic chain with system messages, conditional formatting, and output parsing variants.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>LangChain introduction — LCEL and the Runnable interface (current)</strong></li>
+<li>Prompt and LLM chain — assembling your first chain (upcoming)</li>
+<li>Retriever — document search and context injection (upcoming)</li>
+<li>Tool calling — connecting external tools (upcoming)</li>
+<li>Streaming — handling real-time output (upcoming)</li>
+<li>Putting it together — a complete chain in one file (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/expression_language/">LangChain LCEL documentation</a></li>
+<li><a href="https://python.langchain.com/docs/expression_language/interface/">Runnable interface</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/chat/groq/">ChatGroq integration</a></li>
+<li><a href="https://pypi.org/project/langchain-groq/">langchain-groq on PyPI</a></li>
+</ul>
+<p class="tags-line">Tags: LangChain, LCEL, Python, LLM</p>
+</body>
+</html>

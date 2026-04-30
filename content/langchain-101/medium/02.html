@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prompt and LLM chain — assembling your first chain</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Prompt and LLM chain — assembling your first chain</h1>
+<blockquote>
+<p>LangChain 101 (2/6)</p>
+</blockquote>
+<p>Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.</p>
+<p>Topics:</p>
+<ul>
+<li>the message roles in <code>ChatPromptTemplate</code></li>
+<li>building prompts with multiple variables</li>
+<li>choosing between <code>StrOutputParser</code> and <code>JsonOutputParser</code></li>
+<li>using <code>RunnablePassthrough</code> to forward inputs unchanged</li>
+<li>testing a completed chain</li>
+</ul>
+<hr>
+<h2>ChatPromptTemplate structure</h2>
+<p><code>ChatPromptTemplate</code> constructs conversation-style prompts and renders them into the message format the LLM expects.</p>
+<p>Three message roles are available:</p>
+<ul>
+<li><code>system</code>: sets the model's behavior — persona, constraints, output format</li>
+<li><code>human</code>: represents user input</li>
+<li><code>ai</code>: represents previous assistant responses, used to inject conversation history in multi-turn setups</li>
+</ul>
+<pre><code class="language-python">import os
+
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are a {language} expert. Explain things clearly and concisely.&quot;),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = prompt | llm
+
+response = chain.invoke({
+    &quot;language&quot;: &quot;Python&quot;,
+    &quot;question&quot;: &quot;When is a list comprehension a better choice than a for loop?&quot;,
+})
+
+print(response.content)
+</code></pre>
+<p>Placeholder names like <code>{language}</code> and <code>{question}</code> must match the keys in the dict passed to <code>invoke()</code>.</p>
+<hr>
+<h2>Prompts with multiple variables</h2>
+<p>More complex tasks need more template variables. Pass them all in the same dict.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You are a code review expert. &quot;
+        &quot;Language: {language}. Review focus: {review_focus}.&quot;,
+    ),
+    (&quot;human&quot;, &quot;Review the following code:\n\n```{language}\n{code}\n```&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = prompt | llm | StrOutputParser()
+
+result = chain.invoke({
+    &quot;language&quot;: &quot;python&quot;,
+    &quot;review_focus&quot;: &quot;readability and error handling&quot;,
+    &quot;code&quot;: &quot;&quot;&quot;
+def read_file(path):
+    f = open(path)
+    return f.read()
+&quot;&quot;&quot;,
+})
+
+print(result)
+</code></pre>
+<hr>
+<h2>StrOutputParser vs JsonOutputParser</h2>
+<p>Output parsers convert the LLM response into the format you need.</p>
+<p><strong>StrOutputParser</strong>: extracts <code>AIMessage.content</code> as a plain string. This covers most use cases.</p>
+<p><strong>JsonOutputParser</strong>: prompts the model to output JSON and parses the result into a Python dict. The prompt must explicitly request JSON format.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You output JSON only. Do not include any other text.&quot;,
+    ),
+    (
+        &quot;human&quot;,
+        &quot;Output information about {topic} in this JSON format:\n&quot;
+        '{{&quot;name&quot;: &quot;name&quot;, &quot;description&quot;: &quot;description&quot;, &quot;use_case&quot;: &quot;use case&quot;}}',
+    ),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = prompt | llm | JsonOutputParser()
+
+result = chain.invoke({&quot;topic&quot;: &quot;FAISS&quot;})
+
+print(f&quot;type: {type(result)}&quot;)
+print(f&quot;name: {result.get('name')}&quot;)
+print(f&quot;description: {result.get('description')}&quot;)
+print(f&quot;use_case: {result.get('use_case')}&quot;)
+</code></pre>
+<p>If JSON parsing is unreliable, <code>with_structured_output()</code> is more robust. That method is covered in the llm-api-production-101 series.</p>
+<hr>
+<h2>RunnablePassthrough — forwarding inputs unchanged</h2>
+<p><code>RunnablePassthrough</code> passes its input through to the next step without modification. It becomes useful when one part of a chain needs data from a previous step that was not modified along the way.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Answer the question using the provided document.&quot;),
+    (&quot;human&quot;, &quot;Document: {context}\n\nQuestion: {question}&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+chain = prompt | llm | StrOutputParser()
+
+result = chain.invoke({
+    &quot;context&quot;: &quot;FAISS is a vector search library developed at Facebook AI Research.&quot;,
+    &quot;question&quot;: &quot;Who developed FAISS?&quot;,
+})
+
+print(result)
+</code></pre>
+<p><code>RunnablePassthrough</code> appears most often when connecting a Retriever to a prompt. Post 3 shows that pattern in detail.</p>
+<hr>
+<h2>Adding a fallback to a chain</h2>
+<p><code>.with_fallbacks()</code> runs an alternative chain when the primary call fails.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+primary_llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+fallback_llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+primary_chain = prompt | primary_llm | StrOutputParser()
+fallback_chain = prompt | fallback_llm | StrOutputParser()
+
+chain_with_fallback = primary_chain.with_fallbacks([fallback_chain])
+
+result = chain_with_fallback.invoke({&quot;question&quot;: &quot;How does Python handle exceptions?&quot;})
+print(result)
+</code></pre>
+<p>This pattern switches automatically to the fallback model when the primary model is unavailable or rate-limited.</p>
+<hr>
+<h2>Conclusion</h2>
+<p>You can now build prompt templates with multiple variables, select the right output parser for the job, and pass inputs unchanged when a chain step needs earlier data.</p>
+<p>The next post connects a Retriever to a chain and uses retrieved document chunks as context for the LLM.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>
+<li><strong>Prompt and LLM chain — assembling your first chain (current)</strong></li>
+<li>Retriever — document search and context injection (upcoming)</li>
+<li>Tool calling — connecting external tools (upcoming)</li>
+<li>Streaming — handling real-time output (upcoming)</li>
+<li>Putting it together — a complete chain in one file (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/modules/model_io/prompts/quick_start/">ChatPromptTemplate documentation</a></li>
+<li><a href="https://python.langchain.com/docs/modules/model_io/output_parsers/">Output parsers</a></li>
+<li><a href="https://python.langchain.com/docs/expression_language/primitives/passthrough/">RunnablePassthrough</a></li>
+</ul>
+<p class="tags-line">Tags: LangChain, LCEL, Python, LLM</p>
+</body>
+</html>

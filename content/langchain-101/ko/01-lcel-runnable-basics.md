@@ -1,0 +1,267 @@
+# LangChain 소개 — LCEL과 Runnable 기본
+
+> LangChain 101 시리즈 (1/6)
+
+LangChain을 처음 접하면 코드보다 용어가 더 먼저 막힙니다. LCEL, Runnable, Chain, Pipe — 개념은 많은데 어떤 게 핵심인지 잘 보이지 않습니다. 이번 글은 LangChain의 설계 중심인 LCEL(LangChain Expression Language)과 Runnable 인터페이스가 무엇인지, 그리고 왜 이런 구조를 썼는지부터 잡습니다.
+
+이 시리즈는 LangChain을 API로 사용하는 방법에 집중합니다. 챗봇, RAG, 에이전트 같은 애플리케이션 패턴은 별도 시리즈(ai-app-patterns-101)에서 다룹니다.
+
+이번 글에서 다룰 내용은 다음과 같습니다.
+
+- LangChain이 해결하려는 문제
+- Runnable 인터페이스와 `invoke()`, `batch()`, `stream()`
+- LCEL 파이프 연산자 `|`로 체인 만들기
+- 가장 단순한 체인 실행
+- 왜 이 구조가 유용한가
+
+---
+
+## LangChain이 해결하려는 문제
+
+LLM 앱을 만들면 반복되는 작업이 나타납니다. 프롬프트를 조립하고, LLM에 보내고, 응답을 파싱해서, 다음 단계로 넘기는 패턴입니다. 이 과정에서 연결 코드가 점점 늘어납니다.
+
+```python
+# 연결 코드가 늘어나는 전형적인 패턴
+prompt_text = f"다음 텍스트를 요약하세요: {user_input}"
+response = client.chat.completions.create(model="...", messages=[{"role": "user", "content": prompt_text}])
+raw_output = response.choices[0].message.content
+parsed = raw_output.strip()
+next_prompt = f"이 요약을 번역하세요: {parsed}"
+# ...반복
+```
+
+LangChain은 이 연결 코드를 컴포넌트로 추상화합니다. 핵심 아이디어는 단순합니다. 모든 컴포넌트가 같은 인터페이스를 가지면, 파이프처럼 연결할 수 있습니다.
+
+---
+
+## Runnable 인터페이스
+
+LangChain의 거의 모든 컴포넌트는 `Runnable` 인터페이스를 구현합니다. 세 가지 핵심 메서드가 있습니다.
+
+- `invoke(input)` — 입력을 받아 출력을 반환합니다. 동기 단일 호출입니다.
+- `batch(inputs)` — 입력 목록을 받아 출력 목록을 반환합니다.
+- `stream(input)` — 출력을 토큰 단위로 순차 반환합니다.
+
+이 세 메서드가 일관되게 있기 때문에, 어떤 컴포넌트든 교체 가능하고 조합 가능합니다.
+
+```python
+import os
+
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+# invoke: 단일 호출
+response = llm.invoke("파이썬의 장점을 두 문장으로 설명해 주세요.")
+print(response.content)
+```
+
+`ChatGroq`는 `Runnable`을 구현하므로 `invoke()`를 바로 쓸 수 있습니다.
+
+---
+
+## LCEL과 파이프 연산자
+
+LCEL은 `|` 연산자로 Runnable 컴포넌트를 연결하는 문법입니다. 왼쪽 컴포넌트의 출력이 오른쪽 컴포넌트의 입력이 됩니다.
+
+```python
+chain = component_a | component_b | component_c
+result = chain.invoke(input)
+```
+
+이것이 LangChain에서 가장 자주 보이는 패턴입니다. 구체적인 예를 보겠습니다.
+
+```bash
+pip install langchain langchain-groq
+```
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+# 컴포넌트 준비
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "당신은 간결하게 설명하는 전문가입니다."),
+    ("human", "{topic}을 두 문장으로 설명해 주세요."),
+])
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+parser = StrOutputParser()
+
+# 체인 조립
+chain = prompt | llm | parser
+
+# 실행
+result = chain.invoke({"topic": "임베딩 벡터"})
+print(result)
+```
+
+세 컴포넌트가 하는 일을 각각 보겠습니다.
+
+**`ChatPromptTemplate`**: 딕셔너리를 받아 메시지 목록을 반환합니다. `{topic}` 자리에 입력값을 넣습니다.
+
+**`ChatGroq`**: 메시지 목록을 받아 `AIMessage` 객체를 반환합니다.
+
+**`StrOutputParser`**: `AIMessage`를 받아 `.content` 문자열을 반환합니다.
+
+파이프 연산자가 이 세 단계를 하나의 체인으로 묶습니다. `chain.invoke({"topic": "임베딩 벡터"})`를 부르면 세 단계가 순서대로 실행됩니다.
+
+---
+
+## 각 컴포넌트를 개별 실행해 보기
+
+파이프로 묶기 전에 각 컴포넌트를 따로 실행해 보면 내부 흐름이 더 명확해집니다.
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "당신은 간결하게 설명하는 전문가입니다."),
+    ("human", "{topic}을 두 문장으로 설명해 주세요."),
+])
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+parser = StrOutputParser()
+
+# 1단계: 프롬프트 렌더링
+messages = prompt.invoke({"topic": "임베딩 벡터"})
+print("=== 1단계: 메시지 ===")
+for m in messages.messages:
+    print(f"  [{m.type}] {m.content}")
+
+# 2단계: LLM 호출
+ai_message = llm.invoke(messages)
+print(f"\n=== 2단계: AIMessage ===")
+print(f"  타입: {type(ai_message).__name__}")
+print(f"  내용: {ai_message.content[:80]}...")
+
+# 3단계: 파싱
+text = parser.invoke(ai_message)
+print(f"\n=== 3단계: 문자열 ===")
+print(f"  {text}")
+```
+
+---
+
+## RunnableLambda — 함수를 Runnable로
+
+파이프 체인에 커스텀 Python 함수를 끼워 넣으려면 `RunnableLambda`를 씁니다.
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    ("human", "{text}를 한 문장으로 요약해 주세요."),
+])
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+def add_word_count(text: str) -> str:
+    return f"{text}\n\n(글자 수: {len(text)}자)"
+
+chain = prompt | llm | StrOutputParser() | RunnableLambda(add_word_count)
+
+result = chain.invoke({"text": "벡터 검색은 텍스트를 숫자 벡터로 변환해 의미 기반으로 검색합니다."})
+print(result)
+```
+
+`RunnableLambda`는 일반 Python 함수를 파이프 체인에 넣을 수 있게 해줍니다. 출력 후처리, 로깅, 변환 같은 간단한 작업에 유용합니다.
+
+---
+
+## batch()로 여러 입력 처리
+
+`batch()`는 입력 목록을 받아 각각 처리한 뒤 결과 목록을 반환합니다.
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    ("human", "{topic}을 한 문장으로 설명해 주세요."),
+])
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+chain = prompt | llm | StrOutputParser()
+
+topics = [
+    {"topic": "임베딩"},
+    {"topic": "FAISS"},
+    {"topic": "RAG"},
+]
+
+results = chain.batch(topics)
+
+for topic_dict, result in zip(topics, results):
+    print(f"[{topic_dict['topic']}] {result}\n")
+```
+
+`batch()`는 내부적으로 병렬 처리를 시도합니다. API 속도 제한이 있는 환경에서는 `max_concurrency` 옵션으로 동시 요청 수를 제어할 수 있습니다.
+
+```python
+results = chain.batch(topics, config={"max_concurrency": 2})
+```
+
+---
+
+## 마무리
+
+LCEL과 Runnable 인터페이스가 왜 편리한지 이해했습니다. 모든 컴포넌트가 같은 `invoke` / `batch` / `stream` 인터페이스를 가지므로, `|`로 연결하는 것만으로 파이프라인이 됩니다.
+
+다음 글에서는 `ChatPromptTemplate`을 더 깊이 다루고, `ChatGroq`와 연결해서 실용적인 체인을 만들어 봅니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **LangChain 소개 — LCEL과 Runnable 기본 (현재 글)**
+- Prompt와 LLM Chain — 체인 첫 번째 구성 (예정)
+- Retriever — 문서 검색과 컨텍스트 주입 (예정)
+- Tool Calling — 외부 도구 연결하기 (예정)
+- Streaming — 실시간 출력 처리 (예정)
+- 실전 체인 조립 — 컴포넌트를 하나로 연결하기 (예정)
+
+<!-- toc:end -->
+
+---
+
+## 참고 자료
+
+- [LangChain LCEL 공식 문서](https://python.langchain.com/docs/expression_language/)
+- [Runnable 인터페이스](https://python.langchain.com/docs/expression_language/interface/)
+- [ChatGroq 통합](https://python.langchain.com/docs/integrations/chat/groq/)
+- [langchain-groq PyPI](https://pypi.org/project/langchain-groq/)
+
+Tags: LangChain, LCEL, Python, LLM

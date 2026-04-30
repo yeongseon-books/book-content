@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Retriever — document search and context injection</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Retriever — document search and context injection</h1>
+<blockquote>
+<p>LangChain 101 (3/6)</p>
+</blockquote>
+<p>A Retriever accepts a query and returns a list of relevant documents. LangChain defines the Retriever interface around a single method: <code>get_relevant_documents(query)</code>. Whatever search system sits behind it — FAISS, Chroma, Elasticsearch — the chain uses it the same way.</p>
+<p>This post builds a FAISS-based Retriever, connects it to a prompt, and assembles the basic form of a RAG pattern.</p>
+<p>Topics:</p>
+<ul>
+<li>creating a FAISS VectorStore and Retriever</li>
+<li><code>as_retriever()</code> and its search parameters</li>
+<li>connecting a Retriever to a chain</li>
+<li>injecting retrieved documents as context</li>
+<li>combining multiple documents into one context string</li>
+</ul>
+<hr>
+<h2>Creating a FAISS VectorStore</h2>
+<p>LangChain's <code>FAISS</code> class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.</p>
+<pre><code class="language-bash">pip install langchain langchain-community faiss-cpu sentence-transformers langchain-groq
+</code></pre>
+<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library developed at Facebook AI Research.&quot;,
+    &quot;Cosine similarity measures the directional similarity between two vectors.&quot;,
+    &quot;Embedding models project text into a high-dimensional vector space.&quot;,
+    &quot;sentence-transformers specializes in sentence-level embeddings.&quot;,
+    &quot;Vector search captures semantic similarity that keyword search misses.&quot;,
+    &quot;RAG combines retrieved documents with an LLM prompt.&quot;,
+    &quot;Chunking strategies split long documents into embedding-sized units.&quot;,
+]
+
+vectorstore = FAISS.from_texts(
+    texts=documents,
+    embedding=embedding_model,
+)
+
+print(f&quot;index vector count: {vectorstore.index.ntotal}&quot;)
+</code></pre>
+<hr>
+<h2>Creating a Retriever</h2>
+<p><code>as_retriever()</code> wraps the VectorStore in the Retriever interface.</p>
+<pre><code class="language-python">retriever = vectorstore.as_retriever(
+    search_type=&quot;similarity&quot;,  # default: cosine similarity
+    search_kwargs={&quot;k&quot;: 3},    # number of results to return
+)
+
+docs = retriever.invoke(&quot;how vector search works&quot;)
+
+for i, doc in enumerate(docs):
+    print(f&quot;[{i}] {doc.page_content}&quot;)
+</code></pre>
+<p>Three <code>search_type</code> options are available:</p>
+<ul>
+<li><code>"similarity"</code>: cosine similarity, returns top k results</li>
+<li><code>"mmr"</code>: maximal marginal relevance — balances relevance and diversity</li>
+<li><code>"similarity_score_threshold"</code>: returns only documents above a similarity threshold</li>
+</ul>
+<pre><code class="language-python"># MMR — prioritize diversity
+retriever_mmr = vectorstore.as_retriever(
+    search_type=&quot;mmr&quot;,
+    search_kwargs={&quot;k&quot;: 3, &quot;fetch_k&quot;: 10, &quot;lambda_mult&quot;: 0.5},
+)
+</code></pre>
+<hr>
+<h2>Connecting a Retriever to a chain</h2>
+<p>The standard RAG pattern: retrieve relevant documents, inject them as context, pass to the LLM.</p>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+def format_docs(docs: list) -&gt; str:
+    &quot;&quot;&quot;Combine a list of documents into a single context string.&quot;&quot;&quot;
+    return &quot;\n\n&quot;.join(doc.page_content for doc in docs)
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library developed at Facebook AI Research.&quot;,
+    &quot;Cosine similarity measures the directional similarity between two vectors.&quot;,
+    &quot;Embedding models project text into a high-dimensional vector space.&quot;,
+    &quot;sentence-transformers specializes in sentence-level embeddings.&quot;,
+    &quot;Vector search captures semantic similarity that keyword search misses.&quot;,
+    &quot;RAG combines retrieved documents with an LLM prompt.&quot;,
+]
+
+vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the question using only the provided documents. &quot;
+        &quot;If the answer is not in the documents, say you don't know.\n\n&quot;
+        &quot;Documents:\n{context}&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+rag_chain = (
+    {
+        &quot;context&quot;: retriever | format_docs,
+        &quot;question&quot;: RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+questions = [
+    &quot;What is FAISS?&quot;,
+    &quot;How does the RAG pattern work?&quot;,
+    &quot;What do embedding models do?&quot;,
+]
+
+for question in questions:
+    print(f&quot;\nquestion: {question}&quot;)
+    answer = rag_chain.invoke(question)
+    print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<p>The key is the chain input dict:</p>
+<pre><code class="language-python">{
+    &quot;context&quot;: retriever | format_docs,
+    &quot;question&quot;: RunnablePassthrough(),
+}
+</code></pre>
+<p><code>retriever | format_docs</code> receives the query → retrieves relevant documents → combines them into a string. <code>RunnablePassthrough()</code> forwards the query unchanged to the <code>"question"</code> key.</p>
+<hr>
+<h2>Saving and reloading a VectorStore</h2>
+<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library developed at Facebook AI Research.&quot;,
+    &quot;RAG combines retrieved documents with an LLM prompt.&quot;,
+]
+
+vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
+
+# save
+vectorstore.save_local(&quot;faiss_store&quot;)
+print(&quot;saved&quot;)
+
+# reload
+loaded_store = FAISS.load_local(
+    &quot;faiss_store&quot;,
+    embeddings=embedding_model,
+    allow_dangerous_deserialization=True,
+)
+print(f&quot;reloaded: {loaded_store.index.ntotal} vectors&quot;)
+
+# verify
+results = loaded_store.similarity_search(&quot;vector search&quot;, k=1)
+print(f&quot;\nresult: {results[0].page_content}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>The Retriever interface abstracts whatever search system sits behind it. The <code>context: retriever | format_docs, question: RunnablePassthrough()</code> pattern is the standard structure for RAG chains in LangChain.</p>
+<p>The next post covers Tool Calling — how an LLM can call external functions and incorporate their results into its response.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/02-prompt-llm-chain.md">Prompt and LLM chain — assembling your first chain</a></li>
+<li><strong>Retriever — document search and context injection (current)</strong></li>
+<li>Tool calling — connecting external tools (upcoming)</li>
+<li>Streaming — handling real-time output (upcoming)</li>
+<li>Putting it together — a complete chain in one file (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/modules/data_connection/retrievers/">LangChain Retriever interface</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/vectorstores/faiss/">FAISS VectorStore</a></li>
+<li><a href="https://python.langchain.com/docs/use_cases/question_answering/">Building a RAG chain</a></li>
+</ul>
+<p class="tags-line">Tags: LangChain, LCEL, Python, LLM</p>
+</body>
+</html>

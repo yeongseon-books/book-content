@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Putting it together — a complete chain in one file</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Putting it together — a complete chain in one file</h1>
+<blockquote>
+<p>LangChain 101 (6/6)</p>
+</blockquote>
+<p>The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.</p>
+<p>Topics:</p>
+<ul>
+<li>document chunking → embedding → FAISS index</li>
+<li>assembling a RAG chain with streaming output</li>
+<li>multi-turn RAG with conversation history</li>
+<li>a self-contained application in one file</li>
+</ul>
+<hr>
+<h2>Document indexing pipeline</h2>
+<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=300,
+    chunk_overlap=30,
+    separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;, &quot;&quot;],
+)
+
+documents = [
+    &quot;&quot;&quot;
+Vector search converts text into numeric vectors for meaning-based retrieval.
+Unlike keyword search, it matches content even when phrasing differs.
+Embedding models place semantically similar text close together in vector space.
+&quot;&quot;&quot;,
+    &quot;&quot;&quot;
+FAISS is a high-speed vector search library developed at Facebook AI Research.
+It supports both exact and approximate search and can handle billions of vectors.
+IndexFlatIP is an exact inner-product index.
+&quot;&quot;&quot;,
+    &quot;&quot;&quot;
+LangChain connects LLM components as a pipeline using LCEL.
+Retriever, Tool, and OutputParser all implement the Runnable interface.
+The pipe operator (|) composes components into a chain.
+&quot;&quot;&quot;,
+    &quot;&quot;&quot;
+RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt.
+The system retrieves relevant chunks for the question and provides them as context.
+Vector search is the core retrieval component in most RAG pipelines.
+&quot;&quot;&quot;,
+]
+
+chunks = []
+for doc in documents:
+    chunks.extend(splitter.split_text(doc))
+
+vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+print(f&quot;index vector count: {vectorstore.index.ntotal}&quot;)
+</code></pre>
+<hr>
+<h2>Assembling the RAG chain</h2>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+def format_docs(docs: list) -&gt; str:
+    return &quot;\n\n&quot;.join(doc.page_content for doc in docs)
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the question using only the provided documents. &quot;
+        &quot;If the answer is not in the documents, say so.\n\n&quot;
+        &quot;Documents:\n{context}&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+rag_chain = (
+    {
+        &quot;context&quot;: retriever | format_docs,
+        &quot;question&quot;: RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+</code></pre>
+<hr>
+<h2>Running with streaming</h2>
+<pre><code class="language-python">questions = [
+    &quot;How is vector search different from keyword search?&quot;,
+    &quot;Where was FAISS developed?&quot;,
+    &quot;Why does RAG improve LLM accuracy?&quot;,
+    &quot;What is LCEL in LangChain?&quot;,
+]
+
+for question in questions:
+    print(f&quot;\nquestion: {question}&quot;)
+    print(&quot;answer: &quot;, end=&quot;&quot;)
+    for chunk in rag_chain.stream(question):
+        print(chunk, end=&quot;&quot;, flush=True)
+    print()
+</code></pre>
+<hr>
+<h2>Multi-turn RAG with conversation history</h2>
+<p>A simple RAG chain treats each question independently. To reference earlier turns, pass conversation history to the chain.</p>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library developed at Facebook AI Research.&quot;,
+    &quot;Embedding models project text into a high-dimensional vector space.&quot;,
+    &quot;RAG combines retrieved documents with an LLM prompt.&quot;,
+    &quot;LangChain connects LLM components using LCEL.&quot;,
+]
+
+vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 2})
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the question using only the provided documents.\n\nDocuments:\n{context}&quot;,
+    ),
+    MessagesPlaceholder(&quot;chat_history&quot;),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+rag_chain = (
+    {
+        &quot;context&quot;: retriever | (lambda docs: &quot;\n\n&quot;.join(d.page_content for d in docs)),
+        &quot;question&quot;: RunnablePassthrough(),
+        &quot;chat_history&quot;: lambda x: x.get(&quot;chat_history&quot;, []),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+def chat(question: str, history: list) -&gt; tuple[str, list]:
+    result = rag_chain.invoke({&quot;question&quot;: question, &quot;chat_history&quot;: history})
+    history.append(HumanMessage(content=question))
+    history.append(AIMessage(content=result))
+    return result, history
+
+chat_history: list = []
+
+turn1, chat_history = chat(&quot;What is FAISS?&quot;, chat_history)
+print(f&quot;[1] {turn1}\n&quot;)
+
+turn2, chat_history = chat(&quot;What are its main features?&quot;, chat_history)
+print(f&quot;[2] {turn2}\n&quot;)
+
+turn3, chat_history = chat(&quot;How does it connect to LangChain?&quot;, chat_history)
+print(f&quot;[3] {turn3}&quot;)
+</code></pre>
+<hr>
+<h2>Self-contained application</h2>
+<pre><code class="language-python">&quot;&quot;&quot;
+langchain_rag_app.py
+
+Run: python langchain_rag_app.py
+Requires: langchain langchain-community langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
+&quot;&quot;&quot;
+import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def build_rag_chain(documents: list[str]):
+    embedding_model = HuggingFaceEmbeddings(
+        model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+
+    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
+    chunks = []
+    for doc in documents:
+        chunks.extend(splitter.split_text(doc))
+
+    vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
+    retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+    llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+    )
+
+    prompt = ChatPromptTemplate.from_messages([
+        (
+            &quot;system&quot;,
+            &quot;Answer the question using only the provided documents.\n\nDocuments:\n{context}&quot;,
+        ),
+        (&quot;human&quot;, &quot;{question}&quot;),
+    ])
+
+    return (
+        {
+            &quot;context&quot;: retriever | (lambda docs: &quot;\n\n&quot;.join(d.page_content for d in docs)),
+            &quot;question&quot;: RunnablePassthrough(),
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+def main() -&gt; None:
+    documents = [
+        &quot;FAISS is a high-speed vector search library developed at Facebook AI Research.&quot;,
+        &quot;Embedding models project text into a high-dimensional vector space.&quot;,
+        &quot;RAG combines retrieved documents with an LLM prompt.&quot;,
+        &quot;LangChain connects LLM components using LCEL.&quot;,
+    ]
+
+    chain = build_rag_chain(documents)
+
+    while True:
+        question = input(&quot;\nQuestion (q to quit): &quot;).strip()
+        if question.lower() == &quot;q&quot;:
+            break
+        if not question:
+            continue
+
+        print(&quot;Answer: &quot;, end=&quot;&quot;)
+        for chunk in chain.stream(question):
+            print(chunk, end=&quot;&quot;, flush=True)
+        print()
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>This series covered the LangChain API from first principles: LCEL and the Runnable interface, prompt templates, Retrievers, Tool Calling, Streaming, and a full RAG chain. Each component implements the same interface, which is why they compose cleanly with <code>|</code>.</p>
+<p>The next series, ai-app-patterns-101, applies these components to real application patterns: chatbots, document Q&amp;A, agents, and workflow automation.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/02-prompt-llm-chain.md">Prompt and LLM chain — assembling your first chain</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/03-retriever.md">Retriever — document search and context injection</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/04-tool-calling.md">Tool calling — connecting external tools</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/langchain-101/en/05-streaming.md">Streaming — handling real-time output</a></li>
+<li><strong>Putting it together — a complete chain in one file (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/use_cases/question_answering/">LangChain RAG tutorial</a></li>
+<li><a href="https://python.langchain.com/docs/expression_language/">LCEL reference</a></li>
+<li><a href="https://python.langchain.com/docs/modules/model_io/prompts/quick_start/#messagesplaceholder">MessagesPlaceholder</a></li>
+</ul>
+<p class="tags-line">Tags: LangChain, LCEL, Python, LLM</p>
+</body>
+</html>
