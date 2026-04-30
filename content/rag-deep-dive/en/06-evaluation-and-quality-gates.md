@@ -234,6 +234,8 @@ One versioning detail matters. In `ragas==0.1.22`, the executable dataset uses `
 
 This script shows a small but realistic quality gate. It runs faithfulness, answer relevancy, and context precision over a fixed dataset, computes mean scores, and fails immediately when average faithfulness falls below 0.8.
 
+The example uses `ChatGroq` with `llama-3.1-8b-instant` as the judge LLM. Groq offers a free API tier, so the code runs without a paid account. The tradeoff is judge quality: smaller open-source models are less consistent than GPT-4o-mini or Claude on borderline cases, so scores can fluctuate more between runs. For a personal project or early-stage pipeline, Groq is a practical starting point. For production CI gates where score stability matters, swap in `ChatOpenAI(model="gpt-4o-mini")` as the judge. The rest of the code is identical.
+
 ```python
 import numpy as np
 from datasets import Dataset

@@ -1,0 +1,39 @@
+ko:
+  1:
+    title: "LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기"
+    filename: "01-llm-api-first-call.md"
+  2:
+    title: "토큰 이해하기 — 비용, 한계, 컨텍스트 창"
+    filename: "02-understanding-tokens.md"
+  3:
+    title: "프롬프트 엔지니어링 기초 — System·User·Assistant 역할"
+    filename: "03-prompt-engineering-basics.md"
+  4:
+    title: "Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기"
+    filename: "04-few-shot-and-cot.md"
+  5:
+    title: "대화 상태 관리 — 멀티턴 챗봇 만들기"
+    filename: "05-conversation-state.md"
+  6:
+    title: "스트리밍 응답 처리 — 실시간으로 출력 받기"
+    filename: "06-streaming-responses.md"
+
+en:
+  1:
+    title: "LLM API first call — sending your first request"
+    filename: "01-llm-api-first-call.md"
+  2:
+    title: "Understanding tokens — cost, limits, and context windows"
+    filename: "02-understanding-tokens.md"
+  3:
+    title: "Prompt engineering basics — system, user, and assistant roles"
+    filename: "03-prompt-engineering-basics.md"
+  4:
+    title: "Few-shot and chain-of-thought — steering better answers"
+    filename: "04-few-shot-and-cot.md"
+  5:
+    title: "Managing conversation state — building a multi-turn chatbot"
+    filename: "05-conversation-state.md"
+  6:
+    title: "Handling streaming responses — real-time output"
+    filename: "06-streaming-responses.md"

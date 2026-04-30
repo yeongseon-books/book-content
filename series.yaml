@@ -170,6 +170,150 @@ series:
     status: draft
     path: content/rag-deep-dive
 
+  # LLM / AI application series (new roadmap — sequential 101s)
+  - id: llm-app-foundations-101
+    category: ai
+    title:
+      ko: LLM 앱 기초
+      en: LLM App Foundations 101
+    description:
+      ko: LLM API 기초, 토큰, 프롬프트 엔지니어링 — 6부작.
+      en: LLM API basics, tokens, and prompt engineering in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/llm-app-foundations-101
+
+  - id: llm-api-production-101
+    category: ai
+    title:
+      ko: LLM API 프로덕션 101
+      en: LLM API Production 101
+    description:
+      ko: Structured Output, Tool Calling, Streaming, Caching, Retry, Rate Limit — 6부작.
+      en: Structured Output, Tool Calling, Streaming, Caching, Retry, and Rate Limit in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/llm-api-production-101
+
+  - id: vector-search-101
+    category: ai
+    title:
+      ko: 벡터 검색 101
+      en: Vector Search 101
+    description:
+      ko: 임베딩, FAISS, 유사도, 청크 전략 — 6부작.
+      en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/vector-search-101
+
+  - id: langchain-101
+    category: ai
+    title:
+      ko: LangChain 101
+      en: LangChain 101
+    description:
+      ko: LCEL, Runnable, Retriever, Tool Calling 기본, Streaming — LangChain API 사용법 6부작.
+      en: LCEL, Runnable, Retriever, Tool Calling, and Streaming — LangChain API in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/langchain-101
+
+  - id: ai-app-patterns-101
+    category: ai
+    title:
+      ko: AI 앱 패턴 101
+      en: AI App Patterns 101
+    description:
+      ko: 챗봇, RAG Q&A, 문서비서, Agent, Workflow, Human-in-the-loop — LLM 앱 설계 패턴 6부작.
+      en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/ai-app-patterns-101
+
+  - id: korean-ai-stack-101
+    category: ai
+    title:
+      ko: 한국어 AI 스택 101
+      en: Korean AI Stack 101
+    description:
+      ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
+      en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/korean-ai-stack-101
+
+  - id: document-ingestion-101
+    category: ai
+    title:
+      ko: 문서 수집과 인덱싱 101
+      en: Document Ingestion 101
+    description:
+      ko: PDF 파싱, 메타데이터, 증분 인덱싱 — 6부작.
+      en: PDF parsing, metadata, and incremental indexing in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/document-ingestion-101
+
+  - id: llm-apps-ops-101
+    category: ai
+    title:
+      ko: LLM 앱 운영 101
+      en: LLM Apps Ops 101
+    description:
+      ko: 관측, 평가, 비용, 보안, 배포 — 6부작.
+      en: Observability, evaluation, cost, security, and deployment in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/llm-apps-ops-101
+
+  - id: rag-benchmark-101
+    category: ai
+    title:
+      ko: RAG 벤치마크 101
+      en: RAG Benchmark 101
+    description:
+      ko: VectorDB, Embedding, Retriever, RAG 평가 비교 — 6부작.
+      en: VectorDB, embedding model, retriever, and RAG pipeline evaluation in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/rag-benchmark-101
+
+  - id: langgraph-101
+    category: ai
+    title:
+      ko: LangGraph 101
+      en: LangGraph 101
+    description:
+      ko: 그래프 에이전트, 체크포인트, 멀티에이전트 — 6부작.
+      en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/langgraph-101
+
+  - id: llm-finetuning-101
+    category: ai
+    title:
+      ko: LLM 파인튜닝 101
+      en: LLM Fine-tuning 101
+    description:
+      ko: LoRA, 데이터셋, 서빙 — 6부작 (선택).
+      en: LoRA, datasets, and serving in 6 parts (optional).
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: planned
+    path: content/llm-finetuning-101
+
   # AX (planned)
   - id: ax-practical-guide
     category: ax

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prompt engineering basics — system, user, and assistant roles</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Prompt engineering basics — system, user, and assistant roles</h1>
+<blockquote>
+<p>LLM App Foundations 101 (3/6)</p>
+</blockquote>
+<p>Prompt engineering is often described as clever wording. In application work, that is too narrow. The real job is to separate instructions by role, decide which rules stay stable across requests, and shape how the model responds. The difference between a weak prompt and a dependable prompt is usually the structure of the <code>messages</code> array.</p>
+<p>That structure matters early. Without it, tone drifts, output format changes between calls, follow-up questions lose context, and parameter tuning feels random. Many “model reliability” problems are really input-structure problems.</p>
+<p>In this post, we will use Groq's <code>llama-3.1-8b-instant</code> to build the core mental model for prompt design with chat completions. We will cover seven things:</p>
+<ul>
+<li>what <code>system</code>, <code>user</code>, and <code>assistant</code> roles mean</li>
+<li>how a system message changes overall behavior</li>
+<li>how assistant messages carry multi-turn history</li>
+<li>how <code>temperature</code> and <code>top_p</code> shape the creativity vs consistency trade-off</li>
+<li>a practical prompt structure pattern</li>
+<li>how to place few-shot examples inside the <code>messages</code> array</li>
+<li>common prompt design mistakes</li>
+</ul>
+<p>The main idea is simple: <strong>good prompts start as structured message roles, not as one long user sentence</strong>.</p>
+<hr>
+<h2>Why prompt engineering is more than wording</h2>
+<p>In Post 01, one <code>user</code> message was enough to make the first API call. Real applications move beyond that quickly. They need stable behavior across users, consistent output shape, and memory of earlier turns. Once those requirements appear, one free-form user string stops being enough.</p>
+<p>Chat-based LLM APIs solve this with role-tagged messages. That is not cosmetic syntax. It separates operating policy from the current request and from prior conversation state.</p>
+<ul>
+<li><code>system</code>: global behavior and boundaries</li>
+<li><code>user</code>: the current request</li>
+<li><code>assistant</code>: what the model said earlier in the conversation</li>
+</ul>
+<p>Once you think in those layers, prompt design becomes easier to maintain.</p>
+<hr>
+<h2>Understanding the three roles</h2>
+<p>Each role has a different purpose.</p>
+<p><strong><code>system</code></strong></p>
+<p>The <code>system</code> message defines the model's default behavior. Put tone, response language, safety boundaries, output conventions, and high-level identity here.</p>
+<p>The operational point is that <code>system</code> is not about the current task details. It is about <strong>cross-request policy</strong>. If a rule should apply almost every time your app calls the model, it probably belongs here.</p>
+<p><strong><code>user</code></strong></p>
+<p>The <code>user</code> message holds the current request. The question, task description, attached context, and request-specific constraints belong here.</p>
+<p><strong><code>assistant</code></strong></p>
+<p>The <code>assistant</code> role is used when you replay the model's earlier answer back into the next request. If you want the next turn to know what the model already said, your application needs to include that history explicitly.</p>
+<p>That means multi-turn conversation is not a hidden built-in memory feature. It is <strong>application-managed reconstruction of the <code>messages</code> array</strong>.</p>
+<hr>
+<h2>How a system message changes the answer</h2>
+<p>It is easier to understand <code>system</code> by comparing outputs directly. The script below sends the same user question twice. The first request has no system message. The second adds a system instruction that constrains language, audience, and output structure. The contrast is usually obvious.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+question = &quot;Explain the difference between a Python dictionary and a list.&quot;
+
+without_system = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question},
+    ],
+    temperature=0.2,
+)
+
+with_system = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: (
+                &quot;You are a Python tutor for beginners. &quot;
+                &quot;Always answer in English. &quot;
+                &quot;Start with one short paragraph, then end with exactly three bullet points. &quot;
+                &quot;Do not guess, and keep the explanation beginner-friendly.&quot;
+            ),
+        },
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question},
+    ],
+    temperature=0.2,
+)
+
+print(&quot;[without system]&quot;)
+print(without_system.choices[0].message.content)
+print()
+print(&quot;[with system]&quot;)
+print(with_system.choices[0].message.content)
+</code></pre>
+<p>The facts may overlap, but the style usually does not. A good system message makes these parts more stable:</p>
+<ul>
+<li>response language</li>
+<li>tone and audience level</li>
+<li>output structure</li>
+<li>answer length tendencies</li>
+<li>behavior under uncertainty</li>
+</ul>
+<p>A system message is not a perfect hard lock. It is the strongest steering input, not an absolute guarantee.</p>
+<hr>
+<h2>Building multi-turn history with assistant messages</h2>
+<p>In many application flows, the provider does not remember the full conversation for you. If the next request only includes the latest user message, the model only sees that latest message.</p>
+<p>To preserve context, the application has to replay the conversation, including the model's earlier answer as an <code>assistant</code> message.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+messages = [
+    {
+        &quot;role&quot;: &quot;system&quot;,
+        &quot;content&quot;: &quot;You are a Python learning assistant. Be brief and precise.&quot;,
+    },
+    {
+        &quot;role&quot;: &quot;user&quot;,
+        &quot;content&quot;: &quot;Explain the difference between Python lists and tuples in one paragraph.&quot;,
+    },
+]
+
+first = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=messages,
+    temperature=0.2,
+)
+
+assistant_text = first.choices[0].message.content
+print(&quot;[assistant turn 1]&quot;)
+print(assistant_text)
+print()
+
+messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: assistant_text})
+messages.append(
+    {
+        &quot;role&quot;: &quot;user&quot;,
+        &quot;content&quot;: &quot;Add a short code example in no more than five lines.&quot;,
+    }
+)
+
+second = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=messages,
+    temperature=0.2,
+)
+
+print(&quot;[assistant turn 2]&quot;)
+print(second.choices[0].message.content)
+</code></pre>
+<p>That append step is the core of chatbot memory.</p>
+<p>This cannot grow forever. As Post 02 showed, conversation history consumes tokens. In practice, applications usually choose one of three strategies:</p>
+<ul>
+<li>keep only the most recent turns</li>
+<li>summarize older turns into a shorter memory</li>
+<li>store key facts separately in structured state</li>
+</ul>
+<p>Post 05 will cover conversation state in more depth. For now, the key takeaway is simple: multi-turn chat is explicit message replay.</p>
+<hr>
+<h2>Temperature and top_p: consistency versus variety</h2>
+<p>Prompt wording is only part of output control. Sampling parameters matter too. The first two to learn are <code>temperature</code> and <code>top_p</code>.</p>
+<p><strong><code>temperature</code></strong></p>
+<p><code>temperature</code> affects how broadly the model explores likely next-token choices. Lower values usually make the answer more conservative and repeatable. Higher values usually allow more variation in wording and structure.</p>
+<ul>
+<li>values near <code>0.0</code> favor consistency</li>
+<li>higher values such as <code>0.7</code> or <code>0.9</code> allow more variation</li>
+<li>extraction, classification, and strict formatting usually start low</li>
+<li>brainstorming or copy ideation can tolerate higher values</li>
+</ul>
+<p>This script compares <code>temperature=0.0</code> and <code>temperature=0.9</code> with the same prompt.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+prompt = &quot;Introduce FastAPI to a beginner in three sentences.&quot;
+
+for temperature in (0.0, 0.9):
+    completion = client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=[
+            {
+                &quot;role&quot;: &quot;system&quot;,
+                &quot;content&quot;: &quot;You are a technical editor. Keep answers concise.&quot;,
+            },
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt},
+        ],
+        temperature=temperature,
+    )
+
+    print(f&quot;[temperature={temperature}]&quot;)
+    print(completion.choices[0].message.content)
+    print()
+</code></pre>
+<p><strong><code>top_p</code></strong></p>
+<p><code>top_p</code> constrains token selection by cumulative probability mass. Lower values keep the model inside a narrower band of likely continuations. Higher values admit a wider range.</p>
+<p>At the beginner stage, two habits are enough:</p>
+<ul>
+<li>start by adjusting <code>temperature</code> first</li>
+<li>avoid making large changes to both <code>temperature</code> and <code>top_p</code> at the same time unless you have a specific reason</li>
+</ul>
+<p>Both parameters influence output diversity, so changing both aggressively makes results harder to explain.</p>
+<hr>
+<h2>A practical prompt structure pattern</h2>
+<p>The most reusable beginner-friendly pattern is <strong>instruction + context + output format</strong>. Instead of writing one long request blob, split the prompt into three explicit parts.</p>
+<pre><code class="language-text">Instruction: what the model should do
+Context: who the answer is for or what situation matters
+Output format: how the answer should be shaped
+</code></pre>
+<p>That pattern maps cleanly into chat messages.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: (
+                &quot;You are a Python tutor for backend beginners. &quot;
+                &quot;Answer in English and do not guess.&quot;
+            ),
+        },
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: (
+                &quot;Instruction: explain what a dataclass is.\n&quot;
+                &quot;Context: the reader knows basic Python syntax but has never used dataclasses.\n&quot;
+                &quot;Output format: 1) two-sentence explanation 2) code example in six lines or less 3) one-line use case&quot;
+            ),
+        },
+    ],
+    temperature=0.2,
+)
+
+print(completion.choices[0].message.content)
+</code></pre>
+<p>This works well because the task is explicit, the background stays visible, and the output shape becomes testable.</p>
+<hr>
+<h2>Placing few-shot examples inside the messages array</h2>
+<p>Few-shot prompting means showing the model one or more examples of the behavior you want before asking for the real answer. Post 04 will go deeper, but the basic mechanism is straightforward: the examples also live inside the same <code>messages</code> array.</p>
+<p>One common pattern is to add paired <code>user</code> and <code>assistant</code> examples before the final user request.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+messages = [
+    {
+        &quot;role&quot;: &quot;system&quot;,
+        &quot;content&quot;: &quot;You explain Python concepts as a one-line definition followed by a one-line analogy.&quot;,
+    },
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is a class?&quot;},
+    {
+        &quot;role&quot;: &quot;assistant&quot;,
+        &quot;content&quot;: &quot;Definition: A class is a blueprint for creating objects.\nAnalogy: It is like a mold used to produce many objects with the same shape.&quot;,
+    },
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is inheritance?&quot;},
+    {
+        &quot;role&quot;: &quot;assistant&quot;,
+        &quot;content&quot;: &quot;Definition: Inheritance lets a new class reuse attributes and behavior from an existing class.\nAnalogy: It is like starting from a base template and extending it instead of rebuilding from scratch.&quot;,
+    },
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is a decorator?&quot;},
+]
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=messages,
+    temperature=0.2,
+)
+
+print(completion.choices[0].message.content)
+</code></pre>
+<p>This can be very effective, but every example consumes tokens. Short, representative examples usually work better than long ones.</p>
+<hr>
+<h2>Common prompt design mistakes</h2>
+<p>These mistakes show up repeatedly in first-generation LLM apps.</p>
+<p><strong>Putting shared policy only in the user message</strong></p>
+<p>If every request repeats “answer in English,” “be concise,” and “return bullet points,” the prompt becomes harder to manage. Shared policy belongs in <code>system</code> unless there is a strong reason not to.</p>
+<p><strong>Mixing instructions and raw data into one blob</strong></p>
+<p>If the task, background, input data, and output rules are all packed into one paragraph, the model has to infer priorities. Explicit structure usually improves repeatability before it improves brilliance.</p>
+<p><strong>Expecting memory without replaying history</strong></p>
+<p>If you do not re-send the earlier turns, the model cannot reliably refer back to them. Multi-turn quality problems often start here.</p>
+<p><strong>Using high temperature while demanding strict formatting</strong></p>
+<p>Creative sampling and rigid structure pull in different directions. If the task is extraction, classification, or stable formatting, start with a lower temperature.</p>
+<p><strong>Overspending tokens on long few-shot examples</strong></p>
+<p>Examples should be compact and pattern-rich. Verbose examples often waste context budget without adding much steering value.</p>
+<p><strong>Using vague terms such as “better,” “nicely,” or “in detail”</strong></p>
+<p>Vague adjectives are weak control surfaces. Concrete constraints such as paragraph count, bullet count, JSON keys, or line limits are easier to evaluate.</p>
+<p><strong>Over-trusting one good sample</strong></p>
+<p>A prompt is not validated because it worked once. Test it against different question types, edge cases, and parameter settings. Otherwise you end up shipping a lucky demo instead of a reliable pattern.</p>
+<hr>
+<h2>Closing thoughts</h2>
+<p>The starting point of prompt engineering is not elegant phrasing. It is role-aware structure. Use <code>system</code> for persistent policy, <code>user</code> for the current request, and <code>assistant</code> for the history you want the next turn to see. Add careful parameter choices on top of that, and the same model becomes much more predictable.</p>
+<p>The next post goes deeper into few-shot prompting and chain-of-thought.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/02-understanding-tokens.md">Understanding tokens — cost, limits, and context windows</a></li>
+<li><strong>Prompt engineering basics — system, user, and assistant roles (current)</strong></li>
+<li>Few-shot and chain-of-thought — steering better answers (upcoming)</li>
+<li>Managing conversation state — building a multi-turn chatbot (upcoming)</li>
+<li>Handling streaming responses — real-time output (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li>Groq Docs, "Text chat"</li>
+<li>Groq Python Library: <a href="https://github.com/groq/groq-python">https://github.com/groq/groq-python</a></li>
+<li>OpenAI Platform Docs, "Messages and roles": <a href="https://platform.openai.com/docs/guides/text">https://platform.openai.com/docs/guides/text</a></li>
+<li>Anthropic Docs, "Prompt engineering overview": <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview">https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Prompt Engineering, Python</p>
+</body>
+</html>

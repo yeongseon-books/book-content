@@ -19,6 +19,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import yaml
+
 from _catalog import ROOT, is_present, load_catalog
 
 SERIES_TAGS: dict[str, list[str]] = {
@@ -32,6 +34,17 @@ SERIES_TAGS: dict[str, list[str]] = {
     "azure-aca-deep-dive": ["Container Apps", "KEDA", "Dapr", "Envoy"],
     "llm-from-scratch-101": ["LLM", "PyTorch", "Transformer", "Tutorial"],
     "rag-deep-dive": ["RAG", "LangChain", "Vector Search", "LLM"],
+    "llm-app-foundations-101": ["LLM", "OpenAI", "Prompt Engineering", "Python"],
+    "llm-api-production-101": ["LLM", "OpenAI", "Streaming", "Python"],
+    "vector-search-101": ["Vector Search", "FAISS", "Embeddings", "Python"],
+    "langchain-101": ["LangChain", "LCEL", "Python", "LLM"],
+    "ai-app-patterns-101": ["LLM", "RAG", "Agent", "Python"],
+    "korean-ai-stack-101": ["Korean NLP", "LLM", "Embeddings", "OCR"],
+    "document-ingestion-101": ["RAG", "Document Processing", "LangChain", "Python"],
+    "llm-apps-ops-101": ["LLMOps", "Observability", "Python", "LLM"],
+    "rag-benchmark-101": ["RAG", "VectorDB", "Benchmarking", "LLM"],
+    "langgraph-101": ["LangGraph", "Agent", "Python", "LLM"],
+    "llm-finetuning-101": ["Fine-tuning", "LoRA", "LLM", "Python"],
 }
 
 REFERENCES_HEADINGS_ANY = ("## References", "## 참고 자료", "## 참고문헌", "## 참고")
@@ -73,22 +86,42 @@ def read_h1(text: str) -> str | None:
     return None
 
 
+def load_planned(series_dir: Path) -> dict[str, dict[int, dict[str, str]]]:
+    """Load planned.yaml if present; returns {variant: {idx: {title, filename}}}."""
+    planned_path = series_dir / "planned.yaml"
+    if not planned_path.exists():
+        return {}
+    raw = yaml.safe_load(planned_path.read_text(encoding="utf-8")) or {}
+    result: dict[str, dict[int, dict[str, str]]] = {}
+    for variant, posts in raw.items():
+        if not isinstance(posts, dict):
+            continue
+        result[variant] = {int(k): v for k, v in posts.items()}
+    return result
+
+
 def collect_series(series_dir: Path) -> dict[str, dict[int, dict[str, str]]]:
-    """Return {variant: {idx: {'title':..., 'filename':...}}} for ko/en/medium."""
+    """Return {variant: {idx: {'title':..., 'filename':...}}} for ko/en/medium.
+
+    Actual files on disk take priority. planned.yaml fills in missing entries.
+    """
+    planned = load_planned(series_dir)
     result: dict[str, dict[int, dict[str, str]]] = {"ko": {}, "en": {}, "medium": {}}
     if not series_dir.is_dir():
         return result
     for variant in ("ko", "en", "medium"):
         sub = series_dir / variant
-        if not sub.is_dir():
-            continue
-        for md in sorted(sub.glob("*.md")):
-            prefix = numeric_prefix(md.name)
-            if not prefix:
-                continue
-            idx = int(prefix)
-            title = read_h1(md.read_text(encoding="utf-8")) or md.stem
-            result[variant][idx] = {"title": title, "filename": md.name}
+        if sub.is_dir():
+            for md in sorted(sub.glob("*.md")):
+                prefix = numeric_prefix(md.name)
+                if not prefix:
+                    continue
+                idx = int(prefix)
+                title = read_h1(md.read_text(encoding="utf-8")) or md.stem
+                result[variant][idx] = {"title": title, "filename": md.name}
+        for idx, info in planned.get(variant, {}).items():
+            if idx not in result[variant]:
+                result[variant][idx] = info
     return result
 
 
@@ -231,6 +264,8 @@ def main() -> int:
         for variant, entries in variants.items():
             for idx, info in sorted(entries.items()):
                 path = series_dir / variant / info["filename"]
+                if not path.exists():
+                    continue
                 r = process_post(path, series_id, idx, variant, entries)
                 totals[r] = totals.get(r, 0) + 1
                 if r != "unchanged" and r != "skipped-medium":

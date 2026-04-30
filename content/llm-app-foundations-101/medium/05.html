@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Managing conversation state — building a multi-turn chatbot</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Managing conversation state — building a multi-turn chatbot</h1>
+<blockquote>
+<p>LLM App Foundations 101 (5/6)</p>
+</blockquote>
+<p>One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.</p>
+<p>An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.</p>
+<p>This post uses Groq's <code>llama-3.1-8b-instant</code> to build that mental model and turn it into runnable Python. We will cover seven things:</p>
+<ul>
+<li>why LLM calls are fundamentally stateless</li>
+<li>how multi-turn chat emerges from accumulated <code>messages</code></li>
+<li>the simplest memory pattern: keep the full history</li>
+<li>sliding windows that retain only the last N turns</li>
+<li>summary-based compression for long conversations</li>
+<li>a practical CLI chatbot with an input loop and history management</li>
+<li>how to detect and handle context window overflow</li>
+</ul>
+<p>The main idea is simple: <strong>conversation memory lives in your application layer, not inside the model session</strong>.</p>
+<hr>
+<h2>Why LLM calls are stateless</h2>
+<p>At the API boundary, each chat completion request is independent. The model sees only the payload you send. If you do not include earlier turns, those turns do not exist from the model's point of view.</p>
+<p>Suppose your first request is:</p>
+<pre><code class="language-python">messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;My name is Mina. Please remember that.&quot;}
+]
+</code></pre>
+<p>The model can answer using the name <code>Mina</code> because that information is present in the prompt. But if the next request is only:</p>
+<pre><code class="language-python">messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is my name?&quot;}
+]
+</code></pre>
+<p>then the model has no way to recover the missing fact. It is not refusing to remember. It was never sent the earlier turn.</p>
+<p>This statelessness is easy to misread as a limitation, but it is also what makes chat systems debuggable. A request can be replayed exactly, the sent context is inspectable, and privacy or retention policy stays under application control. The provider offers generation. Your application decides what counts as memory.</p>
+<hr>
+<h2>Multi-turn chat comes from replaying history in messages</h2>
+<p>Every new request includes prior turns alongside the latest user input. The model reads the whole array and continues from there.</p>
+<p>In chat APIs, that history is usually represented with three roles:</p>
+<ul>
+<li><code>system</code> for global rules</li>
+<li><code>user</code> for user turns</li>
+<li><code>assistant</code> for earlier model replies</li>
+</ul>
+<p>Here is the smallest useful example.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+messages = [
+    {
+        &quot;role&quot;: &quot;system&quot;,
+        &quot;content&quot;: &quot;You are a concise Python tutor.&quot;,
+    },
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain the difference between a list and a tuple.&quot;},
+    {
+        &quot;role&quot;: &quot;assistant&quot;,
+        &quot;content&quot;: &quot;A list is mutable, while a tuple is immutable.&quot;,
+    },
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Which one is better as a dictionary key then?&quot;},
+]
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=messages,
+    temperature=0.3,
+)
+
+print(completion.choices[0].message.content)
+</code></pre>
+<p>The important part is not just the last question. It is the replayed context before it. Terms like “which one” and “then” become meaningful only because the earlier turns are present in the same request. In application code, the loop is simple: append the new user message, send the current history, append the assistant reply, and repeat.</p>
+<hr>
+<h2>Keeping the full history is the simplest memory pattern</h2>
+<p>The first implementation most teams write is also the easiest to understand: keep the entire conversation and resend it every time. For short sessions, that is still a perfectly reasonable design.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+history = [
+    {
+        &quot;role&quot;: &quot;system&quot;,
+        &quot;content&quot;: &quot;You are a concise technical support assistant.&quot;,
+    }
+]
+
+def ask(user_text: str) -&gt; str:
+    history.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_text})
+
+    completion = client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=history,
+        temperature=0.2,
+    )
+
+    answer = completion.choices[0].message.content or &quot;&quot;
+    history.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: answer})
+    return answer
+
+print(ask(&quot;My product is a monthly SaaS service. Please remember that.&quot;))
+print(ask(&quot;Now write a one-line refund policy statement.&quot;))
+</code></pre>
+<p>The appeal is obvious: implementation is trivial, context retention is strong, and debugging stays easy because nothing is hidden or compressed. The weakness is just as obvious. Prompt size, latency, and cost grow with every turn until the request hits the model's context window.</p>
+<hr>
+<h2>Sliding windows retain only the last N turns</h2>
+<p>In many conversations, the most important details live near the end. Sliding-window memory takes advantage of that. You keep the fixed <code>system</code> message, then preserve only the most recent N user and assistant turns.</p>
+<pre><code class="language-python">import os
+from collections import deque
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+system_message = {
+    &quot;role&quot;: &quot;system&quot;,
+    &quot;content&quot;: &quot;You are a chatbot that helps users learn Python.&quot;,
+}
+recent_turns = deque(maxlen=6)  # last 3 user/assistant pairs
+
+def ask(user_text: str) -&gt; str:
+    recent_turns.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_text})
+
+    messages = [system_message, *recent_turns]
+    completion = client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=messages,
+        temperature=0.3,
+    )
+
+    answer = completion.choices[0].message.content or &quot;&quot;
+    recent_turns.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: answer})
+    return answer
+</code></pre>
+<p>This pattern makes token usage much easier to bound because raw history cannot grow forever. The trade-off is equally clear: once a fact falls out of the window, the model no longer sees it. If something must survive the whole session, it belongs in <code>system</code> or in a persistent summary rather than in rolling history. Sliding windows are strong for short support or Q&amp;A sessions, and weaker for long task-oriented chats where old decisions still matter later.</p>
+<hr>
+<h2>Summary-based compression handles longer conversations</h2>
+<p>Sometimes discarding old turns is too aggressive, but keeping everything is too expensive. Summary-based compression sits in the middle: keep a fixed <code>system</code> prompt, preserve a summary of older context, and retain only the latest raw turns.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+system_message = {
+    &quot;role&quot;: &quot;system&quot;,
+    &quot;content&quot;: &quot;You are a project-planning chatbot.&quot;,
+}
+summary_text = &quot;&quot;
+recent_turns = []
+
+def summarize_history(history_chunk: list[dict[str, str]], current_summary: str) -&gt; str:
+    prompt = [
+        {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: (
+                &quot;Compress the conversation. Preserve user goals, confirmed facts, &quot;
+                &quot;preferences, and unresolved questions.&quot;
+            ),
+        },
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: (
+                f&quot;Current summary:\n{current_summary or '(none)'}\n\n&quot;
+                f&quot;New history chunk:\n{history_chunk}&quot;
+            ),
+        },
+    ]
+
+    completion = client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=prompt,
+        temperature=0.1,
+    )
+    return completion.choices[0].message.content or &quot;&quot;
+
+def build_messages(user_text: str) -&gt; list[dict[str, str]]:
+    messages = [system_message]
+    if summary_text:
+        messages.append(
+            {
+                &quot;role&quot;: &quot;system&quot;,
+                &quot;content&quot;: f&quot;Conversation summary:\n{summary_text}&quot;,
+            }
+        )
+    messages.extend(recent_turns)
+    messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_text})
+    return messages
+</code></pre>
+<p>The practical risk here is information loss. A summary is lossy. If it drops a crucial constraint, the rest of the session continues from a distorted memory. That is why summary prompts should preserve durable facts: goals, constraints, user preferences, decisions already made, and open issues.</p>
+<hr>
+<h2>Detecting context overflow before the request fails</h2>
+<p>Long conversations usually fail because the prompt gets too large. Once accumulated history grows past the usable context budget, the provider may reject the request or force trade-offs between prompt size and completion length.</p>
+<p>The best approach is to estimate prompt size before sending. Exact token counting is ideal, but even a rough estimate is enough to trigger trimming and summarization.</p>
+<pre><code class="language-python">def rough_token_count(messages: list[dict[str, str]]) -&gt; int:
+    total_chars = sum(len(message[&quot;content&quot;]) for message in messages)
+    overhead = len(messages) * 12
+    return (total_chars // 4) + overhead
+
+def enforce_budget(messages: list[dict[str, str]], max_input_tokens: int = 6000) -&gt; list[dict[str, str]]:
+    if rough_token_count(messages) &lt;= max_input_tokens:
+        return messages
+
+    trimmed = messages[:1] + messages[-8:]
+    if rough_token_count(trimmed) &lt;= max_input_tokens:
+        return trimmed
+
+    raise ValueError(&quot;Conversation is too long. A more aggressive summary is required.&quot;)
+</code></pre>
+<p>Even this crude estimate is enough to trigger useful actions: summarize older turns, shrink the sliding window, reduce completion length, or ask the user to reset the session. It is also worth logging <code>completion.usage</code> after every successful call. That is how you spot which sessions are expanding prompt cost and where the memory policy starts to break down.</p>
+<hr>
+<h2>Building a practical CLI chatbot</h2>
+<p>Now let us combine the ideas into one script. The example below supports:</p>
+<ul>
+<li>a CLI input loop</li>
+<li>rolling raw history</li>
+<li>summary-based compression when the estimated budget is exceeded</li>
+<li>simple session commands for reset and inspection</li>
+</ul>
+<pre><code class="language-python">import os
+from typing import List, Dict
+
+from groq import Groq
+
+MODEL = &quot;llama-3.1-8b-instant&quot;
+MAX_INPUT_TOKENS = 6000
+RAW_TURN_LIMIT = 6  # last 3 user/assistant pairs
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+system_message = {
+    &quot;role&quot;: &quot;system&quot;,
+    &quot;content&quot;: (
+        &quot;You are a practical assistant for Python and LLM application development. &quot;
+        &quot;Be concise, accurate, and explicit when something is uncertain.&quot;
+    ),
+}
+
+summary_text = &quot;&quot;
+recent_turns: List[Dict[str, str]] = []
+
+def rough_token_count(messages: List[Dict[str, str]]) -&gt; int:
+    total_chars = sum(len(message[&quot;content&quot;]) for message in messages)
+    overhead = len(messages) * 12
+    return (total_chars // 4) + overhead
+
+def summarize_old_turns(old_turns: List[Dict[str, str]], current_summary: str) -&gt; str:
+    completion = client.chat.completions.create(
+        model=MODEL,
+        temperature=0.1,
+        messages=[
+            {
+                &quot;role&quot;: &quot;system&quot;,
+                &quot;content&quot;: (
+                    &quot;Compress the conversation history. Preserve user goals, confirmed facts, &quot;
+                    &quot;preferences, and unresolved questions.&quot;
+                ),
+            },
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: (
+                    f&quot;Current summary:\n{current_summary or '(none)'}\n\n&quot;
+                    f&quot;History to merge:\n{old_turns}&quot;
+                ),
+            },
+        ],
+    )
+    return completion.choices[0].message.content or current_summary
+
+def build_messages(user_text: str) -&gt; List[Dict[str, str]]:
+    messages: List[Dict[str, str]] = [system_message]
+
+    if summary_text:
+        messages.append(
+            {
+                &quot;role&quot;: &quot;system&quot;,
+                &quot;content&quot;: f&quot;Conversation summary:\n{summary_text}&quot;,
+            }
+        )
+
+    messages.extend(recent_turns)
+    messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_text})
+    return messages
+
+def compress_if_needed(next_user_text: str) -&gt; None:
+    global summary_text, recent_turns
+
+    candidate = build_messages(next_user_text)
+    if rough_token_count(candidate) &lt;= MAX_INPUT_TOKENS:
+        return
+
+    if len(recent_turns) &gt; RAW_TURN_LIMIT:
+        old_turns = recent_turns[:-RAW_TURN_LIMIT]
+        recent_turns = recent_turns[-RAW_TURN_LIMIT:]
+        summary_text = summarize_old_turns(old_turns, summary_text)
+
+    candidate = build_messages(next_user_text)
+    if rough_token_count(candidate) &gt; MAX_INPUT_TOKENS:
+        raise ValueError(&quot;Input is still too large. Start a new session with /reset.&quot;)
+
+def ask(user_text: str) -&gt; str:
+    compress_if_needed(user_text)
+
+    messages = build_messages(user_text)
+    completion = client.chat.completions.create(
+        model=MODEL,
+        messages=messages,
+        temperature=0.3,
+    )
+
+    answer = completion.choices[0].message.content or &quot;&quot;
+    recent_turns.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_text})
+    recent_turns.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: answer})
+
+    usage = completion.usage
+    print(f&quot;[tokens] prompt={usage.prompt_tokens} total={usage.total_tokens}&quot;)
+    return answer
+
+def main() -&gt; None:
+    global summary_text, recent_turns
+
+    print(&quot;Multi-turn chatbot started. Commands: /reset, /summary, /quit&quot;)
+
+    while True:
+        user_text = input(&quot;you&gt; &quot;).strip()
+
+        if not user_text:
+            continue
+        if user_text == &quot;/quit&quot;:
+            break
+        if user_text == &quot;/reset&quot;:
+            summary_text = &quot;&quot;
+            recent_turns = []
+            print(&quot;assistant&gt; Session cleared.&quot;)
+            continue
+        if user_text == &quot;/summary&quot;:
+            print(f&quot;assistant&gt; Current summary:\n{summary_text or '(none)'}&quot;)
+            continue
+
+        try:
+            answer = ask(user_text)
+            print(f&quot;assistant&gt; {answer}\n&quot;)
+        except ValueError as exc:
+            print(f&quot;assistant&gt; {exc}\n&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The point of this example is the location of the state. <code>summary_text</code>, <code>recent_turns</code>, and <code>MAX_INPUT_TOKENS</code> all belong to your application. In production, you would usually move session state into Redis or a database, persist summaries separately from raw turns, and add logging plus retry logic around summarization.</p>
+<hr>
+<h2>Choosing the right memory pattern</h2>
+<p>The practical rule is simple. If sessions are short, full-history replay is often enough. If token budgets must stay predictable, sliding windows are a strong default. If conversations are long, summary-based compression becomes necessary.</p>
+<p>Most real systems combine all three. Keep stable global rules in <code>system</code>, preserve the last few raw turns for local coherence, and fold older history into a summary.</p>
+<p>When you design memory for a chatbot, three questions matter more than anything else:</p>
+<ul>
+<li>which facts must survive the whole session</li>
+<li>which details are safe to forget</li>
+<li>how will you recover if the summary becomes wrong</li>
+</ul>
+<p>If you can answer those clearly, conversation memory stops being magic and becomes an ordinary engineering component.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/02-understanding-tokens.md">Understanding tokens — cost, limits, and context windows</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">Prompt engineering basics — system, user, and assistant roles</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/04-few-shot-and-cot.md">Few-shot and chain-of-thought — steering better answers</a></li>
+<li><strong>Managing conversation state — building a multi-turn chatbot (current)</strong></li>
+<li>Handling streaming responses — real-time output (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://console.groq.com/docs/quickstart">Groq quickstart</a></li>
+<li><a href="https://console.groq.com/docs/api-reference">Groq API reference</a></li>
+<li><a href="https://console.groq.com/docs/models">Groq models</a></li>
+<li><a href="https://platform.openai.com/docs/guides/prompt-engineering">OpenAI prompt engineering guide</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Prompt Engineering, Python</p>
+</body>
+</html>

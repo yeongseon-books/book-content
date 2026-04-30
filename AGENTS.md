@@ -32,6 +32,22 @@ And the RAG series (3-variant like Azure):
 
 - `rag-deep-dive/` — 6-part series (`ko/`, `en/`, `medium/`). LangChain, FAISS, RAGAS source-pinned. Series tags: `RAG, LangChain, Vector Search, LLM`.
 
+And the new LLM/AI application 101 series (3-variant, sequential roadmap — write one at a time in order):
+
+1. `llm-app-foundations-101/` — 6-part. LLM API basics, tokens, prompt engineering. Tags: `LLM, OpenAI, Prompt Engineering, Python`.
+2. `llm-api-production-101/` — 6-part. Structured Output, Tool Calling, Streaming, Caching, Retry, Rate Limit. Tags: `LLM, OpenAI, Streaming, Python`.
+3. `vector-search-101/` — 6-part. Embeddings, FAISS, similarity, chunking. Tags: `Vector Search, FAISS, Embeddings, Python`.
+4. `langchain-101/` — 6-part. LCEL, Runnable, Retriever, Tool Calling basics, Streaming. Positioning: LangChain API usage only (not app design patterns). Tags: `LangChain, LCEL, Python, LLM`.
+5. `ai-app-patterns-101/` — 6-part. Chatbot, RAG Q&A, Document Assistant, Agent+Tool, Workflow Automation, Human-in-the-loop design patterns. Positioning: product/service patterns using LangChain components (not API syntax). Tags: `LLM, RAG, Agent, Python`.
+6. `korean-ai-stack-101/` — 6-part. Korean embeddings (KoSimCSE, bge-m3, Solar), OCR (CLOVA), domestic LLM APIs (HyperCLOVA X, Upstage Solar, Kakao KoGPT). Tags: `Korean NLP, LLM, Embeddings, OCR`.
+7. `document-ingestion-101/` — 6-part. PDF parsing, metadata, incremental indexing. Tags: `RAG, Document Processing, LangChain, Python`.
+8. `llm-apps-ops-101/` — 6-part. Observability, evaluation, cost, security, deployment. Tags: `LLMOps, Observability, Python, LLM`.
+9. `rag-benchmark-101/` — 6-part. VectorDB, embedding model, retriever, RAG pipeline evaluation. Tags: `RAG, VectorDB, Benchmarking, LLM`.
+10. `langgraph-101/` — 6-part. Graph agents, checkpoints, multi-agent. Tags: `LangGraph, Agent, Python, LLM`.
+11. `llm-finetuning-101/` — 6-part (optional). LoRA, datasets, serving. Tags: `Fine-tuning, LoRA, LLM, Python`.
+
+All new series: `ko/`, `en/`, `medium/` three-variant layout. Code samples use Groq (free tier) + HuggingFaceEmbeddings (`sentence-transformers/all-MiniLM-L6-v2`) unless the topic specifically requires a different model. No OpenAI API key required for readers.
+
 The single source of truth for the catalog is now [`series.yaml`](./series.yaml); [`SERIES.md`](./SERIES.md) is the human-readable summary.
 
 ## Post structure (mandatory order)

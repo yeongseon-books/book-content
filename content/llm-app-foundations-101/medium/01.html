@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LLM API first call — sending your first request</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>LLM API first call — sending your first request</h1>
+<blockquote>
+<p>LLM App Foundations 101 (1/6)</p>
+</blockquote>
+<p>The first confusing thing about LLM application development is not the model. It is the boundary between your code and the model service. A chat UI makes the whole thing feel magical, but the runtime reality is plain: your application sends an HTTP request and receives a JSON response. That round trip is the foundation.</p>
+<p>That is why Post 01 starts here. If you do not understand what goes into the request body, what comes back in the response, and where token usage shows up, every later feature feels blurry.</p>
+<p>In this post, we will build that first call with the Groq API. The setup is intentionally small. You need one environment variable, <code>GROQ_API_KEY</code>, and the official Python SDK, <code>groq</code>. The model for every example in this article is <code>llama-3.1-8b-instant</code>.</p>
+<p>We will cover seven things:</p>
+<ul>
+<li>what an LLM API actually is</li>
+<li>how to create a Groq account and issue an API key</li>
+<li>how to install <code>groq</code></li>
+<li>how to send your first request with <code>client.chat.completions.create()</code></li>
+<li>how to read <code>choices[0].message.content</code>, <code>usage</code>, and <code>model</code></li>
+<li>how synchronous and asynchronous patterns differ</li>
+<li>one complete executable example you can keep as a starting point</li>
+</ul>
+<p>The main idea is simple: <strong>an LLM app begins with request and response structure, not with prompt cleverness</strong>.</p>
+<hr>
+<h2>What an LLM API is</h2>
+<p>An LLM API is still an API. The transport is HTTP. The payload is usually JSON. Your code sends input to a remote service, and that service sends structured output back.</p>
+<p>From the application's point of view, a typical request answers three questions:</p>
+<ul>
+<li>which model should handle the request</li>
+<li>which messages should be sent as input</li>
+<li>which generation options should shape the output</li>
+</ul>
+<p>The response usually answers a different set of questions:</p>
+<ul>
+<li>what text the model generated</li>
+<li>which model produced it</li>
+<li>how many tokens were consumed</li>
+<li>which metadata the provider attached to the result</li>
+</ul>
+<p>An SDK makes this feel like a method call, but the underlying contract does not change. <code>client.chat.completions.create()</code> still creates a JSON request under the hood and parses a JSON response into a Python object. SDK syntax changes over time, while the mental model of <strong>JSON in, JSON out</strong> stays stable.</p>
+<p>Conceptually, the request body looks like this:</p>
+<pre><code class="language-json">{
+  &quot;model&quot;: &quot;llama-3.1-8b-instant&quot;,
+  &quot;messages&quot;: [
+    {
+      &quot;role&quot;: &quot;user&quot;,
+      &quot;content&quot;: &quot;Show me a small Python example that reads an environment variable.&quot;
+    }
+  ]
+}
+</code></pre>
+<p>The real response includes more fields, but these three blocks are the ones you should care about first:</p>
+<pre><code class="language-json">{
+  &quot;model&quot;: &quot;llama-3.1-8b-instant&quot;,
+  &quot;choices&quot;: [
+    {
+      &quot;message&quot;: {
+        &quot;role&quot;: &quot;assistant&quot;,
+        &quot;content&quot;: &quot;import os\nprint(os.environ['HOME'])&quot;
+      }
+    }
+  ],
+  &quot;usage&quot;: {
+    &quot;prompt_tokens&quot;: 24,
+    &quot;completion_tokens&quot;: 31,
+    &quot;total_tokens&quot;: 55
+  }
+}
+</code></pre>
+<p>Keep that shape in mind while using the SDK. It will help when you later move to streaming responses, tool calling, or structured outputs.</p>
+<hr>
+<h2>Creating a Groq account and API key</h2>
+<p>The account setup is short:</p>
+<ol>
+<li>Open <a href="https://console.groq.com">https://console.groq.com</a>.</li>
+<li>Sign up with GitHub or email.</li>
+<li>After logging in, open the API Keys section.</li>
+<li>Create a new key and copy it.</li>
+<li>Store it in your shell as <code>GROQ_API_KEY</code>.</li>
+</ol>
+<p>On macOS or Linux, you can start with:</p>
+<pre><code class="language-bash">export GROQ_API_KEY=&quot;your-issued-key&quot;
+</code></pre>
+<p>On PowerShell:</p>
+<pre><code class="language-powershell">$env:GROQ_API_KEY=&quot;your-issued-key&quot;
+</code></pre>
+<p>The important habit is keeping the key out of source code. Do not hardcode API keys into Python files. Read them from the environment instead. Every example in this post uses <code>os.environ["GROQ_API_KEY"]</code>, which means a missing variable fails immediately.</p>
+<p>This tiny script is enough to verify the environment is wired correctly:</p>
+<pre><code class="language-python">import os
+
+api_key = os.environ[&quot;GROQ_API_KEY&quot;]
+print(f&quot;API key loaded: {api_key[:6]}...&quot;)
+</code></pre>
+<p>You would not print the full key in a real application. A short prefix is enough for local verification.</p>
+<hr>
+<h2>Installing the SDK</h2>
+<p>The examples here assume Python 3.10 or later. To install the official SDK:</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+pip install groq
+</code></pre>
+<p>If you already have a virtual environment, only <code>pip install groq</code> is necessary.</p>
+<p>It is also useful to confirm which package version your runtime sees:</p>
+<pre><code class="language-bash">python -c &quot;import groq; print(groq.__version__)&quot;
+</code></pre>
+<p>At this point, you have everything you need for a first request.</p>
+<hr>
+<h2>Sending your first request</h2>
+<p>Start with the smallest successful program. The code below sends one request in synchronous style and prints only the generated text. This block is self-contained.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Explain Python list comprehensions in one paragraph.&quot;,
+        }
+    ],
+)
+
+print(completion.choices[0].message.content)
+</code></pre>
+<p>Three lines matter most.</p>
+<p><code>Groq(...)</code> creates the client object that will talk to the API.</p>
+<p><code>model="llama-3.1-8b-instant"</code> selects the model.</p>
+<p><code>messages=[...]</code> provides the chat input. In this first post, one <code>user</code> message is enough. Later posts will show how <code>system</code>, <code>user</code>, and <code>assistant</code> messages work together across multiple turns.</p>
+<p>Do not focus on the exact wording of the answer. The important result is structural: the request succeeds, and the generated text is available at <code>choices[0].message.content</code>.</p>
+<hr>
+<h2>Inspecting the response object</h2>
+<p>Many beginners stop after printing the answer text. That is fine for a smoke test, but it is not enough for a working application. You also need token usage, model identity, and the overall response shape.</p>
+<p>The Groq Python SDK returns Pydantic models, so you can convert the response into a dictionary with <code>to_dict()</code>. This block is also self-contained.</p>
+<pre><code class="language-python">import json
+import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Explain the difference between an HTTP API and an SDK in three sentences.&quot;,
+        }
+    ],
+)
+
+print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
+</code></pre>
+<p>When you look through that output, pay attention to three fields first.</p>
+<p><strong><code>choices[0].message.content</code></strong></p>
+<p>This is the actual answer text.</p>
+<pre><code class="language-python">text = completion.choices[0].message.content
+print(text)
+</code></pre>
+<p>Why <code>choices[0]</code>? Because the API shape is designed around a list of candidate outputs. For a beginner app, the first one is usually enough.</p>
+<p><strong><code>usage</code></strong></p>
+<p>This is where token accounting lives.</p>
+<pre><code class="language-python">usage = completion.usage
+print(f&quot;prompt_tokens={usage.prompt_tokens}&quot;)
+print(f&quot;completion_tokens={usage.completion_tokens}&quot;)
+print(f&quot;total_tokens={usage.total_tokens}&quot;)
+</code></pre>
+<p>Those numbers are not just nice-to-have metadata. They drive cost tracking, context budgeting, latency analysis, and later optimization work. Token usage becomes a major topic in the next post for exactly that reason.</p>
+<p><strong><code>model</code></strong></p>
+<p>The response also records which model generated the output.</p>
+<pre><code class="language-python">print(completion.model)
+</code></pre>
+<p>In a small script this may feel redundant, but in real systems it is worth logging. It makes debugging model changes much easier.</p>
+<p>There are more fields you will eventually care about. Two worth noting now:</p>
+<pre><code class="language-python">print(completion.id)                              # unique request ID, useful for support queries
+print(completion.choices[0].finish_reason)        # &quot;stop&quot;, &quot;length&quot;, or &quot;tool_calls&quot;
+</code></pre>
+<p><code>finish_reason</code> tells you why the model stopped generating. <code>"stop"</code> means a natural end. <code>"length"</code> means the model ran out of allowed tokens. Logging both from day one saves debugging time later.</p>
+<hr>
+<h2>Why the HTTP mental model still matters</h2>
+<p>The SDK handles authentication headers, JSON serialization, response parsing, and typed errors. It does not remove the network boundary.</p>
+<p>That boundary explains a lot of beginner problems:</p>
+<ul>
+<li>if the request is slow, network latency may matter more than Python code</li>
+<li>if you get a <code>401</code>, check credentials before touching the prompt</li>
+<li>if you get a <code>429</code>, think about request rate before model quality</li>
+<li>if a response looks odd, log the full object before guessing</li>
+</ul>
+<p>This is the real value of seeing the first call clearly. You stop treating the model as magic and start treating it as a remote service with explicit contracts and failure modes.</p>
+<hr>
+<h2>Synchronous and asynchronous patterns</h2>
+<p>Python gives you two common ways to call an LLM API: synchronous code and asynchronous code.</p>
+<p>Synchronous code is usually the better teaching tool. It works well for scripts, notebooks, and small command-line programs.</p>
+<p>Asynchronous code becomes important when the rest of your application is already async, or when you want to coordinate multiple I/O-bound tasks. FastAPI services, concurrent LLM fan-out calls, and apps that talk to several external APIs at once are typical examples.</p>
+<p>Here is the synchronous pattern again:</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Explain asynchronous programming in one paragraph.&quot;,
+        }
+    ],
+)
+
+print(completion.choices[0].message.content)
+</code></pre>
+<p>And here is the async version. This block is also executable on its own.</p>
+<pre><code class="language-python">import asyncio
+import os
+
+from groq import AsyncGroq
+
+client = AsyncGroq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+async def main() -&gt; None:
+    completion = await client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=[
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: &quot;Give me two situations where asyncio is useful.&quot;,
+            }
+        ],
+    )
+
+    print(completion.choices[0].message.content)
+
+asyncio.run(main())
+</code></pre>
+<p>The structure barely changes. Replace <code>Groq</code> with <code>AsyncGroq</code>, add <code>await</code>, and run the top-level coroutine with <code>asyncio.run()</code>.</p>
+<p>That small syntax shift matters once you want concurrency. The next example sends three requests in parallel. It is a complete runnable script.</p>
+<pre><code class="language-python">import asyncio
+import os
+
+from groq import AsyncGroq
+
+client = AsyncGroq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+async def ask(question: str) -&gt; str:
+    completion = await client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question}],
+    )
+    return completion.choices[0].message.content or &quot;&quot;
+
+async def main() -&gt; None:
+    questions = [
+        &quot;Explain the difference between a list and a tuple.&quot;,
+        &quot;Explain the key property of a Python dictionary.&quot;,
+        &quot;Explain why exception handling matters.&quot;,
+    ]
+    answers = await asyncio.gather(*(ask(question) for question in questions))
+
+    for index, answer in enumerate(answers, start=1):
+        print(f&quot;[{index}] {answer}\n&quot;)
+
+asyncio.run(main())
+</code></pre>
+<p>This is where async becomes a design choice. Once several requests are in flight, you also need to think about rate limits, retries, backoff, and timeouts.</p>
+<hr>
+<h2>A complete example you can keep</h2>
+<p>Now let us combine everything into one small script. This is a good baseline for future experiments. It reads the environment variable, sends a request, prints the generated answer, and also prints the metadata you should start watching from day one.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+def main() -&gt; None:
+    client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+    completion = client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=[
+            {
+                &quot;role&quot;: &quot;system&quot;,
+                &quot;content&quot;: &quot;You are a concise Python tutor.&quot;,
+            },
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: (
+                    &quot;Explain the difference between a Python function and a method &quot;
+                    &quot;in no more than five sentences, and add one short example line.&quot;
+                ),
+            },
+        ],
+    )
+
+    content = completion.choices[0].message.content or &quot;&quot;
+    usage = completion.usage
+
+    print(&quot;=== answer ===&quot;)
+    print(content)
+    print()
+    print(&quot;=== metadata ===&quot;)
+    print(f&quot;model: {completion.model}&quot;)
+    print(f&quot;prompt_tokens: {usage.prompt_tokens}&quot;)
+    print(f&quot;completion_tokens: {usage.completion_tokens}&quot;)
+    print(f&quot;total_tokens: {usage.total_tokens}&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>If you save it as <code>first_call.py</code>, run it with:</p>
+<pre><code class="language-bash">python first_call.py
+</code></pre>
+<p>You should expect three things:</p>
+<ul>
+<li>generated answer text</li>
+<li><code>model: llama-3.1-8b-instant</code></li>
+<li>numeric token counts for prompt, completion, and total</li>
+</ul>
+<p>That is enough to say you have completed the first real milestone of LLM app development.</p>
+<hr>
+<h2>Closing thoughts</h2>
+<p>The program we wrote today is short, but it already contains the core loop of an LLM application: load the key from the environment, build a client, send messages to a model, and read text plus metadata from the response.</p>
+<p>In the next post, we will stay close to the same API call and zoom in on token accounting. Once prompts get longer, token count becomes the thing that shapes cost, limits, and response behavior. That is the next foundation to put in place.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>LLM API first call — sending your first request (current)</strong></li>
+<li>Understanding tokens — cost, limits, and context windows (upcoming)</li>
+<li>Prompt engineering basics — system, user, and assistant roles (upcoming)</li>
+<li>Few-shot and chain-of-thought — steering better answers (upcoming)</li>
+<li>Managing conversation state — building a multi-turn chatbot (upcoming)</li>
+<li>Handling streaming responses — real-time output (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://console.groq.com/docs/quickstart">Groq quickstart</a></li>
+<li><a href="https://github.com/groq/groq-python">Groq Python SDK</a></li>
+<li><a href="https://console.groq.com/docs/api-reference">Groq API reference</a></li>
+<li><a href="https://console.groq.com/docs/models">Groq models</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Prompt Engineering, Python</p>
+</body>
+</html>

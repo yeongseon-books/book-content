@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Handling streaming responses — real-time output</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Handling streaming responses — real-time output</h1>
+<blockquote>
+<p>LLM App Foundations 101 (6/6)</p>
+</blockquote>
+<p>One of the easiest ways to make an LLM application feel slow is to treat it like an ordinary blocking API call. The server sends a prompt, waits in silence, and only returns once the entire answer is finished. The feature works, but the experience feels worse than it needs to. A user stares at a blank box for several seconds and has no idea whether the model is thinking, the network is stalled, or the app is broken.</p>
+<p>That is the real value of streaming. It does not magically reduce the model's total generation time. What it changes is visibility. The first partial output can reach the user quickly, the UI can start rendering immediately, and long answers stop feeling like dead time. In practice, that difference matters a lot. A five-second wait with no feedback feels suspicious. A five-second wait where text starts appearing after a few hundred milliseconds feels responsive.</p>
+<p>Streaming also changes how you think about the response itself. Without streaming, a completion is one object with one final text field. With streaming, the answer becomes a sequence of chunks. Each chunk may contain new text, metadata, or just a signal that generation is ending. Once you start building chat UIs, drafting tools, or browser-based copilots, that event-oriented model becomes much more natural than waiting for one large string.</p>
+<p>This post closes the series by building that mental model with the Groq Python SDK. We will cover seven things:</p>
+<ul>
+<li>why blocking calls create UX friction</li>
+<li>how Groq streaming works with <code>stream=True</code> and <code>for chunk in stream:</code></li>
+<li>how to extract text from <code>chunk.choices[0].delta.content</code></li>
+<li>how streaming differs from synchronous and asynchronous execution models</li>
+<li>how to read token usage from the final chunk's <code>x_groq</code> metadata or from separate aggregation</li>
+<li>how to write streamed output to a file or pipe it into another stage</li>
+<li>where to go next after the foundations series ends</li>
+</ul>
+<p>The main idea is simple: <strong>streaming does not make the model smarter or faster, but it makes waiting legible</strong>.</p>
+<hr>
+<h2>Why streaming matters</h2>
+<p>From a backend point of view, blocking calls are attractive. The implementation is easy to explain. Send the request, wait for completion, read the final text, return the result. That is perfectly fine for small scripts and offline jobs.</p>
+<p>The problem shows up at the user boundary. When the application waits for the full answer before sending anything back, the user gets no evidence that progress is happening. The model may already be generating tokens, but the interface remains frozen until the last token arrives.</p>
+<p>Compare the two flows.</p>
+<p>In a non-streaming path:</p>
+<ol>
+<li>the user submits a prompt</li>
+<li>the server calls the model</li>
+<li>the model generates tokens internally</li>
+<li>the server waits for all of them</li>
+<li>the application returns one final payload</li>
+</ol>
+<p>In a streaming path:</p>
+<ol>
+<li>the user submits a prompt</li>
+<li>the server calls the model</li>
+<li>the first chunk is returned as soon as it is available</li>
+<li>later chunks keep arriving and are appended in the UI</li>
+<li>the final chunk closes the stream and may carry usage metadata</li>
+</ol>
+<p>The total wall-clock time may be similar, but the perceived latency is very different. Users can see that the request started, begin reading early, and decide whether to keep waiting. That opens the door to better interaction design:</p>
+<ul>
+<li>partial rendering instead of blank waiting</li>
+<li>cancellation during long generations</li>
+<li>incremental logging or persistence</li>
+<li>chaining downstream consumers before the full response is complete</li>
+</ul>
+<p>Streaming is especially valuable when answers are long or variable in length: chatbot replies, structured explanations, summaries, drafts, code generation, and assistant-style interfaces. It matters less for internal batch jobs where no human is waiting on the response in real time.</p>
+<p>That distinction is worth keeping in mind throughout this article. Streaming is not a rule. It is a design choice driven by who is waiting and what they need to see while they wait.</p>
+<hr>
+<h2>The smallest Groq streaming example</h2>
+<p>With the Groq SDK, streaming starts with one parameter: <code>stream=True</code>. Instead of receiving one completed response object, you receive an iterable stream of chunks.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+stream = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;You are a concise Python tutor.&quot;,
+        },
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Explain Python generators in five sentences.&quot;,
+        },
+    ],
+    temperature=0.3,
+    stream=True,
+)
+
+for chunk in stream:
+    print(chunk)
+</code></pre>
+<p>That small change is enough to shift your mental model. A streamed response is not one text value. It is a sequence of events. Some events carry new text. Some carry only structural metadata. One of them ends the interaction.</p>
+<p>In practice, most applications care about three separate tasks while consuming a stream:</p>
+<ul>
+<li>extracting visible text for the user</li>
+<li>accumulating a full final string for storage or later processing</li>
+<li>reading final metadata such as usage and finish state</li>
+</ul>
+<p>You usually want all three, not just the first one.</p>
+<hr>
+<h2>Extracting text from each chunk</h2>
+<p>In chat streaming, the text you usually want to render lives in <code>chunk.choices[0].delta.content</code>. Not every chunk contains visible text, so your loop should treat missing content as normal.</p>
+<p>Here is the most useful baseline pattern.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+stream = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Explain the difference between FastAPI and Flask for beginners.&quot;,
+        }
+    ],
+    temperature=0.2,
+    stream=True,
+)
+
+parts: list[str] = []
+
+for chunk in stream:
+    delta = chunk.choices[0].delta.content
+    if delta:
+        print(delta, end=&quot;&quot;, flush=True)
+        parts.append(delta)
+
+final_text = &quot;&quot;.join(parts)
+print(&quot;\n---&quot;)
+print(final_text)
+</code></pre>
+<p>This pattern does two jobs at once. It renders incremental text immediately, and it keeps a stable final copy of the answer in memory. That second part matters more than beginners often expect. Once you want to save the completion to a database, run moderation, cache the result, or feed it into another step, you need the full reconstructed string.</p>
+<p>There is also an important defensive habit here: always expect some chunks to contain no text. Depending on the SDK and provider behavior, a chunk may carry role information, a stop marker, or usage metadata without any new output content. Treating <code>None</code> or empty deltas as normal keeps the consumer loop simple and robust.</p>
+<hr>
+<h2>Streaming versus sync and async patterns</h2>
+<p>Streaming and async are related in practice, but they are not the same concept.</p>
+<p>Streaming describes <strong>how the response arrives</strong>. Instead of one final payload, the result arrives in pieces.</p>
+<p>Async describes <strong>how your application waits</strong>. An async runtime can keep doing other work while one network operation is in flight.</p>
+<p>That means you can have:</p>
+<ul>
+<li>synchronous non-streaming calls</li>
+<li>synchronous streaming calls</li>
+<li>asynchronous non-streaming calls</li>
+<li>asynchronous streaming calls</li>
+</ul>
+<p>For a small CLI tool, synchronous streaming is often the simplest choice. For a web server with multiple users, asynchronous streaming is usually the better fit because one connection waiting for the next chunk should not block the whole worker.</p>
+<p>Here is an async version using <code>AsyncGroq</code> and <code>async for</code>.</p>
+<pre><code class="language-python">import asyncio
+import os
+
+from groq import AsyncGroq
+
+client = AsyncGroq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+async def main() -&gt; None:
+    stream = await client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=[
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: &quot;Explain why asyncio helps in web servers.&quot;,
+            }
+        ],
+        temperature=0.2,
+        stream=True,
+    )
+
+    parts: list[str] = []
+
+    async for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            print(delta, end=&quot;&quot;, flush=True)
+            parts.append(delta)
+
+    final_text = &quot;&quot;.join(parts)
+    print(&quot;\n---&quot;)
+    print(final_text)
+
+asyncio.run(main())
+</code></pre>
+<p>The body of the loop is almost identical to the synchronous version. The real difference is where this pattern belongs architecturally.</p>
+<ul>
+<li>Use synchronous streaming for local experiments, command-line tools, and one-shot automation.</li>
+<li>Use asynchronous streaming for FastAPI services, multi-user chat systems, or apps that combine model output with other concurrent I/O.</li>
+</ul>
+<p>If you keep those boundaries clear, the decision becomes much easier. Pick streaming when partial output improves the experience. Pick async when concurrency and non-blocking I/O matter. Often you will use both, but for different reasons.</p>
+<hr>
+<h2>Reading token usage during or after streaming</h2>
+<p>In non-streaming responses, reading usage is straightforward: check <code>completion.usage</code> after the request finishes. Streaming changes the timing. Intermediate chunks often contain only incremental deltas, while usage metadata usually appears at the end.</p>
+<p>With Groq, the final chunk may expose provider metadata under <code>x_groq</code>, including usage details. The safest pattern is to keep a reference to the last chunk you saw and inspect it after the loop completes.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+stream = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain Python decorators.&quot;}],
+    stream=True,
+)
+
+parts: list[str] = []
+last_chunk = None
+
+for chunk in stream:
+    last_chunk = chunk
+    delta = chunk.choices[0].delta.content
+    if delta:
+        parts.append(delta)
+
+final_text = &quot;&quot;.join(parts)
+print(final_text)
+
+usage = None
+if last_chunk is not None:
+    groq_meta = getattr(last_chunk, &quot;x_groq&quot;, None)
+    if groq_meta is not None:
+        usage = getattr(groq_meta, &quot;usage&quot;, None)
+
+if usage is not None:
+    print(&quot;prompt_tokens:&quot;, usage.prompt_tokens)
+    print(&quot;completion_tokens:&quot;, usage.completion_tokens)
+    print(&quot;total_tokens:&quot;, usage.total_tokens)
+else:
+    print(&quot;usage metadata was not present in the final chunk&quot;)
+</code></pre>
+<p>That works well as a local reference pattern, but production systems usually add a second layer of accounting. Why? Because streaming paths are operationally messy. An SDK version may change, a reverse proxy may behave differently, or a client may disconnect before you finish relaying the final event.</p>
+<p>For that reason, many teams keep two views of usage:</p>
+<ol>
+<li>provider metadata read from the final chunk when available</li>
+<li>request-level metrics recorded independently by the server</li>
+</ol>
+<p>That second layer is also where response-quality telemetry starts to become useful. In a streaming app, you usually care about more than token count alone. Good operational metrics include:</p>
+<ul>
+<li>request start time</li>
+<li>time to first token</li>
+<li>time to final token</li>
+<li>prompt tokens, completion tokens, and total tokens</li>
+<li>whether the client cancelled before completion</li>
+</ul>
+<p>Once you measure those values, streaming becomes easier to evaluate as an actual product decision rather than just a code pattern.</p>
+<hr>
+<h2>Writing streamed output to a file or piping it onward</h2>
+<p>Streaming is not only about UI rendering. It is also a useful systems pattern because partial output can be consumed immediately by another destination.</p>
+<p>The most obvious example is writing directly to a file.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+stream = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Write a ten-line beginner summary of Redis.&quot;,
+        }
+    ],
+    stream=True,
+)
+
+with open(&quot;summary.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as file:
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            file.write(delta)
+            file.flush()
+            print(delta, end=&quot;&quot;, flush=True)
+</code></pre>
+<p>This is a small pattern, but it is operationally useful. If the process fails halfway through a long generation, you still keep the already emitted content. You also avoid holding the entire answer in memory before persisting it.</p>
+<p>A slightly more advanced pattern is piping the stream into another stage. The key idea is to buffer just enough text to create meaningful units for the next consumer. Sentence-level buffering is a simple example.</p>
+<pre><code class="language-python">def sentence_chunks(stream):
+    buffer = &quot;&quot;
+
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if not delta:
+            continue
+
+        buffer += delta
+
+        while &quot;. &quot; in buffer:
+            sentence, buffer = buffer.split(&quot;. &quot;, 1)
+            yield sentence + &quot;.&quot;
+
+    if buffer.strip():
+        yield buffer
+
+stream = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain vector databases simply.&quot;}],
+    stream=True,
+)
+
+for sentence in sentence_chunks(stream):
+    print(&quot;[consumer]&quot;, sentence)
+</code></pre>
+<p>The downstream consumer here could be almost anything: a moderation layer, a translator, a speech synthesizer, a logger, or a second model stage. The important shift is conceptual. A stream is not just text for the terminal. It is a live data flow that can be routed.</p>
+<hr>
+<h2>Relaying the stream through FastAPI</h2>
+<p>In a browser-based product, your frontend usually should not call the model provider directly. The server remains the right place for API keys, authentication, prompt policy, logging, and usage tracking. That means the server needs to receive the provider stream and relay it onward.</p>
+<p>FastAPI's <code>StreamingResponse</code> is a clean starting point for that.</p>
+<pre><code class="language-python">import os
+
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from groq import AsyncGroq
+
+app = FastAPI()
+client = AsyncGroq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+@app.get(&quot;/chat/stream&quot;)
+async def chat_stream(prompt: str) -&gt; StreamingResponse:
+    async def event_gen():
+        stream = await client.chat.completions.create(
+            model=&quot;llama-3.1-8b-instant&quot;,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.2,
+            stream=True,
+        )
+
+        async for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield f&quot;data: {delta}\n\n&quot;
+
+        yield &quot;data: [done]\n\n&quot;
+
+    return StreamingResponse(event_gen(), media_type=&quot;text/event-stream&quot;)
+</code></pre>
+<p>The frontend can consume this with <code>EventSource</code> or a fetch-based stream reader. The server sits in the middle and keeps control of the real operational concerns:</p>
+<ul>
+<li>the browser never sees the provider API key</li>
+<li>authentication and authorization stay in one place</li>
+<li>prompt shaping and policy checks stay server-side</li>
+<li>usage and latency metrics can be logged centrally</li>
+</ul>
+<p>One practical detail matters a lot here: explicit termination events. A real UI needs to distinguish between normal completion, network failure, and user cancellation. Sending control messages such as <code>[done]</code> or structured error events makes the client much easier to reason about.</p>
+<hr>
+<h2>Choosing the right pattern</h2>
+<p>At this point, the design space is small enough to summarize clearly.</p>
+<ul>
+<li>If a human is waiting and partial output has value, streaming is usually worth it.</li>
+<li>If the route is a local script or a one-off tool, synchronous streaming is often enough.</li>
+<li>If the route is a web service or a multi-user system, asynchronous streaming is usually the natural fit.</li>
+<li>If the user only cares about the final result and there is no interaction benefit from partial output, a non-streaming call is still a valid choice.</li>
+</ul>
+<p>What matters is not whether streaming is available. It is whether the product actually benefits from exposing generation as it happens.</p>
+<p>That is also why the best teams evaluate streaming with metrics, not taste. Time to first token, time to last token, token usage, cancellation rate, and completion rate are far more informative than “it feels faster.” In a mature system, streaming is a measurable UX improvement strategy.</p>
+<hr>
+<h2>Wrapping up</h2>
+<p>In this post, we covered why blocking LLM calls create avoidable UX friction, how Groq streaming works with <code>stream=True</code>, how to read incremental text from <code>chunk.choices[0].delta.content</code>, how synchronous and asynchronous streaming differ, how to inspect final usage through <code>x_groq</code> or separate server-side aggregation, and how to route streamed output into files, downstream consumers, and a FastAPI <code>StreamingResponse</code>. Looking back across the full series, we started with the shape of a single LLM API call, then built up through tokens and costs, prompt roles, few-shot steering, conversation state, and finally real-time output handling. That foundation is enough to build small but credible LLM applications. The next step is to make them more production-ready. In <code>llm-api-production-101</code>, we will move into structured output, tool calling, deeper streaming patterns, caching, and the reliability concerns that turn a working demo into a predictable service.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/02-understanding-tokens.md">Understanding tokens — cost, limits, and context windows</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">Prompt engineering basics — system, user, and assistant roles</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/04-few-shot-and-cot.md">Few-shot and chain-of-thought — steering better answers</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-app-foundations-101/en/05-conversation-state.md">Managing conversation state — building a multi-turn chatbot</a></li>
+<li><strong>Handling streaming responses — real-time output (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://console.groq.com/docs/text-chat">Groq text generation docs</a></li>
+<li><a href="https://github.com/groq/groq-python">Groq Python SDK repository</a></li>
+<li><a href="https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse">FastAPI StreamingResponse</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events">MDN Server-sent events</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Prompt Engineering, Python</p>
+</body>
+</html>
