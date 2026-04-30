@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rate limit management — patterns for staying within limits</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Rate limit management — patterns for staying within limits</h1>
+<blockquote>
+<p>LLM API Production 101 (6/6)</p>
+</blockquote>
+<p>Any team that runs APIs long enough eventually sees the same scene. A path that usually works fine starts failing at a busy moment, and the logs begin to fill with 429s or rate-limit warnings. LLM APIs are not different. In some ways they are harsher, because each request can be large in token volume and expensive in downstream compute. When traffic spikes, the pain shows up quickly.</p>
+<p>Systems usually fail here in one of two directions. The first is doing nothing and letting every request hit the provider as fast as it arrives. The second is overcorrecting and serializing far more traffic than necessary, which wastes available throughput. Good production behavior sits between those extremes. Send requests aggressively enough to use the allowed budget, but conservatively enough that your own application becomes the first line of control.</p>
+<p>This post implements two simple local limiters for that job: a token bucket and a sliding-window limiter. The goal is not to model every provider policy in abstract detail. It is to build the smallest application-side control layer that can shape request flow before the provider has to reject it.</p>
+<p>The main idea is simple: <strong>rate-limit handling is not apologizing after a 429, it is controlling request flow before the 429 happens</strong>.</p>
+<hr>
+<h2>Runtime setup</h2>
+<p>The examples assume Python 3.10 or later and the official <code>groq</code> SDK.</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+pip install groq
+export GROQ_API_KEY=&quot;your-issued-key&quot;
+</code></pre>
+<hr>
+<h2>Why the application needs its own limiter</h2>
+<p>Retries and backoff are necessary, but they are still reactive once you have already exceeded the provider’s allowance. A local limiter is useful for three reasons:</p>
+<ul>
+<li>it absorbs short traffic spikes before they reach the provider</li>
+<li>it controls the combined flow from multiple internal code paths</li>
+<li>it turns rate limits into an application policy instead of a remote surprise</li>
+</ul>
+<p>Imagine twenty web requests arriving at the same moment, all triggering the same LLM call. Without a local control layer, they all rush to the provider together. With a limiter, some are allowed immediately and others wait in a controlled way.</p>
+<hr>
+<h2>Where a token bucket fits best</h2>
+<p>A token bucket refills at a steady rate. Each request consumes one or more tokens. That gives you a useful balance: short bursts are allowed up to the bucket size, but the long-term average stays bounded.</p>
+<p>For example, if five tokens are added per second and the bucket capacity is ten, a quiet period can accumulate enough room for a burst of ten requests. After that, sustained traffic still settles back to about five per second.</p>
+<p>That makes token buckets a good fit for user-facing traffic with short spikes.</p>
+<hr>
+<h2>Implementing a token bucket</h2>
+<pre><code class="language-python">import time
+
+class TokenBucket:
+    def __init__(self, capacity: int, refill_rate_per_second: float) -&gt; None:
+        self.capacity = capacity
+        self.tokens = float(capacity)
+        self.refill_rate_per_second = refill_rate_per_second
+        self.last_refill = time.monotonic()
+
+    def _refill(self) -&gt; None:
+        now = time.monotonic()
+        elapsed = now - self.last_refill
+        self.tokens = min(
+            self.capacity,
+            self.tokens + elapsed * self.refill_rate_per_second,
+        )
+        self.last_refill = now
+
+    def allow(self, cost: float = 1.0) -&gt; bool:
+        self._refill()
+        if self.tokens &gt;= cost:
+            self.tokens -= cost
+            return True
+        return False
+</code></pre>
+<p>Usage is small and clear:</p>
+<pre><code class="language-python">bucket = TokenBucket(capacity=10, refill_rate_per_second=5)
+
+if bucket.allow():
+    print(&quot;request allowed&quot;)
+else:
+    print(&quot;wait before sending&quot;)
+</code></pre>
+<p>In a first implementation, treating every request as cost <code>1</code> is often enough. Later, some systems also scale cost by expected token usage.</p>
+<p>That token-based variant matters for LLM workloads because provider limits are often a mix of RPM and TPM. A small request and a 20,000-token request should not necessarily consume the same local budget.</p>
+<pre><code class="language-python">def estimate_token_cost(prompt_tokens: int, reserved_completion_tokens: int) -&gt; int:
+    return prompt_tokens + reserved_completion_tokens
+
+bucket = TokenBucket(capacity=40_000, refill_rate_per_second=20_000 / 60)
+cost = estimate_token_cost(prompt_tokens=1200, reserved_completion_tokens=800)
+
+if bucket.allow(cost=cost):
+    print(&quot;token-budget request allowed&quot;)
+else:
+    print(&quot;wait for token budget to refill&quot;)
+</code></pre>
+<hr>
+<h2>Where a sliding window fits best</h2>
+<p>A sliding-window limiter counts how many requests occurred inside the most recent time window. If the policy is “no more than 100 requests in the last 60 seconds,” this model maps directly onto that rule.</p>
+<p>It is less burst-friendly than a token bucket, but it is easier to reason about when the provider policy is stated in explicit window terms such as requests per minute.</p>
+<hr>
+<h2>Implementing a sliding-window limiter</h2>
+<pre><code class="language-python">import time
+from collections import deque
+
+class SlidingWindowLimiter:
+    def __init__(self, max_requests: int, window_seconds: int) -&gt; None:
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self.events: deque[float] = deque()
+
+    def allow(self) -&gt; bool:
+        now = time.monotonic()
+
+        while self.events and now - self.events[0] &gt;= self.window_seconds:
+            self.events.popleft()
+
+        if len(self.events) &gt;= self.max_requests:
+            return False
+
+        self.events.append(now)
+        return True
+</code></pre>
+<p>This keeps only recent events inside the active window and rejects requests once the count is full.</p>
+<hr>
+<h2>Putting a limiter in front of Groq calls</h2>
+<p>Here is a small end-to-end example using a token bucket as a gate before the provider call.</p>
+<pre><code class="language-python">import os
+import time
+
+from groq import Groq
+
+class TokenBucket:
+    def __init__(self, capacity: int, refill_rate_per_second: float) -&gt; None:
+        self.capacity = capacity
+        self.tokens = float(capacity)
+        self.refill_rate_per_second = refill_rate_per_second
+        self.last_refill = time.monotonic()
+
+    def _refill(self) -&gt; None:
+        now = time.monotonic()
+        elapsed = now - self.last_refill
+        self.tokens = min(
+            self.capacity,
+            self.tokens + elapsed * self.refill_rate_per_second,
+        )
+        self.last_refill = now
+
+    def wait_for_token(self, cost: float = 1.0) -&gt; None:
+        while True:
+            self._refill()
+            if self.tokens &gt;= cost:
+                self.tokens -= cost
+                return
+            time.sleep(0.1)
+
+bucket = TokenBucket(capacity=10, refill_rate_per_second=5)
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+def limited_completion(prompt: str) -&gt; str:
+    bucket.wait_for_token()
+    completion = client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+        temperature=0,
+    )
+    return completion.choices[0].message.content
+
+print(limited_completion(&quot;Explain the difference between a list and a tuple in Python.&quot;))
+</code></pre>
+<p>The important detail is ordering: the application acquires local permission before it talks to the provider. That turns a remote hard limit into a local flow-control decision.</p>
+<hr>
+<h2>What to do after a 429 anyway</h2>
+<p>Even with a local limiter, you may still receive a 429. Multiple workers may be competing. The provider may enforce token-based limits that your simple request counter does not see. That is why 429 handling still matters.</p>
+<p>A good default rule is:</p>
+<ul>
+<li>treat 429 as retryable</li>
+<li>apply longer backoff than for ordinary transient errors</li>
+<li>optionally make the local limiter more conservative for a short period</li>
+</ul>
+<p>In other words, the local limiter is the proactive layer, and 429 handling is the reactive recovery layer.</p>
+<p>Here is a runnable recovery example that honors <code>Retry-After</code> when present, adds bounded exponential backoff with jitter, and reacquires local permission before retrying.</p>
+<pre><code class="language-python">import os
+import random
+import time
+
+from groq import APIStatusError, Groq
+
+class TokenBucket:
+    def __init__(self, capacity: int, refill_rate_per_second: float) -&gt; None:
+        self.capacity = capacity
+        self.tokens = float(capacity)
+        self.refill_rate_per_second = refill_rate_per_second
+        self.last_refill = time.monotonic()
+
+    def _refill(self) -&gt; None:
+        now = time.monotonic()
+        elapsed = now - self.last_refill
+        self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_rate_per_second)
+        self.last_refill = now
+
+    def wait_for_token(self, cost: float = 1.0) -&gt; None:
+        while True:
+            self._refill()
+            if self.tokens &gt;= cost:
+                self.tokens -= cost
+                return
+            time.sleep(0.1)
+
+bucket = TokenBucket(capacity=10, refill_rate_per_second=5)
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;], max_retries=0)
+
+def retry_after_seconds(exc: APIStatusError) -&gt; float | None:
+    value = exc.response.headers.get(&quot;retry-after&quot;)
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except ValueError:
+        return None
+
+def limited_completion_with_429(prompt: str) -&gt; str:
+    for attempt in range(3):
+        bucket.wait_for_token()
+        try:
+            completion = client.chat.completions.create(
+                model=&quot;llama-3.1-8b-instant&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+                temperature=0,
+            )
+            return completion.choices[0].message.content
+        except APIStatusError as exc:
+            if exc.status_code != 429 or attempt == 2:
+                raise
+
+            retry_after = retry_after_seconds(exc)
+            sleep_seconds = retry_after if retry_after is not None else min(2**attempt, 8) + random.uniform(0, 0.5)
+            time.sleep(sleep_seconds)
+
+    raise RuntimeError(&quot;unreachable&quot;)
+</code></pre>
+<hr>
+<h2>Choosing token bucket versus sliding window</h2>
+<p>Both are valid. The better choice depends on the traffic pattern.</p>
+<p><strong>Token bucket works well when</strong></p>
+<ul>
+<li>short bursts are acceptable</li>
+<li>you want smooth average-rate control</li>
+<li>traffic has user-driven spikes</li>
+</ul>
+<p><strong>Sliding window works well when</strong></p>
+<ul>
+<li>the provider policy is stated as requests per minute or similar</li>
+<li>you want a direct “how many in the last N seconds” rule</li>
+<li>operator clarity matters more than burst smoothing</li>
+</ul>
+<p>In many systems, starting with a token bucket is a reasonable default, then switching to a window-based limiter when a provider policy maps more naturally onto it.</p>
+<hr>
+<h2>Limits of a single-process limiter</h2>
+<p>The examples in this post are intentionally local to one process. That means they have obvious boundaries:</p>
+<ul>
+<li>multiple workers do not share state</li>
+<li>multiple servers do not share state</li>
+<li>user-specific quotas and global quotas are harder to combine</li>
+</ul>
+<p>Those are not reasons to ignore the pattern. They are reasons to treat this as the conceptual baseline before moving to shared counters in Redis or another coordination layer.</p>
+<hr>
+<h2>Closing</h2>
+<p>In this final post, we implemented a token bucket and a sliding-window limiter, then used a local gate in front of a Groq API call to control flow before the provider had to reject it. The practical lesson is simple: rate limits are easier to live with when your application manages them deliberately instead of discovering them through avoidable 429s.</p>
+<p>That closes the series. Structured output fixed the response contract. Tool calling connected the model to functions. Streaming changed how partial output is consumed. Caching reduced repeated cost. Retries handled temporary failure. Rate-limit control shaped the outer traffic boundary. Together, those pieces form a workable baseline for production LLM API integrations.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/01-structured-output.md">Structured output — JSON mode and response schemas</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/02-tool-calling.md">Tool calling — connecting functions to the model</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/03-streaming-in-depth.md">Streaming in depth — chunk handling and error recovery</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/04-caching-strategies.md">Caching strategies — reducing cost and latency</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/05-retry-and-error-handling.md">Retry and error handling — making API calls reliable</a></li>
+<li><strong>Rate limit management — patterns for staying within limits (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://console.groq.com/docs/errors">https://console.groq.com/docs/errors</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Token_bucket">https://en.wikipedia.org/wiki/Token_bucket</a></li>
+<li><a href="https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm">https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Streaming, Python</p>
+</body>
+</html>

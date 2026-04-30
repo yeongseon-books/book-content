@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tool calling — connecting functions to the model</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tool calling — connecting functions to the model</h1>
+<blockquote>
+<p>LLM API Production 101 (2/6)</p>
+</blockquote>
+<p>Once structured output is working, the next request usually arrives quickly: the model should not stop at answering the user, it should connect to application functions. A customer asks about an order, and you want the model to trigger <code>get_order_status()</code>. Someone asks about exchange rates, and you want the model to call an internal lookup. A scheduling request should lead to a calendar action instead of a paragraph about calendars.</p>
+<p>At that point, many first implementations still rely on string conventions. The model is asked to emit a function name and some arguments in text, and the application maps that result with custom parsing or a pile of <code>if</code> statements. It works for a toy example, but it creates a loose execution boundary. Typos in function names, missing parameters, extra keys, and unsafe dispatch logic start accumulating quickly.</p>
+<p>Tool calling is a cleaner contract. The application publishes an explicit toolbox: allowed function names, descriptions, and argument schemas. The model does not execute code. It chooses from that toolbox and proposes arguments. The application still owns permission, validation, side effects, and the final decision to run anything.</p>
+<p>In this post, we will build the full loop with Groq's <code>tools</code> parameter and the <code>tool_calls</code> response field. The model will decide when a tool is needed, the application will parse and execute the requested call, and the tool result will be fed back into the conversation so the model can produce a final answer.</p>
+<p>The main idea is straightforward: <strong>tool calling is not model autonomy, it is an execution boundary designed by the application</strong>.</p>
+<hr>
+<h2>Runtime setup</h2>
+<p>If you want to run the examples end to end, start with Python 3.10 or later and install the required packages first.</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+pip install groq pydantic
+export GROQ_API_KEY=&quot;your-issued-key&quot;
+</code></pre>
+<p>This post uses the official <code>groq</code> SDK and Pydantic for argument validation.</p>
+<hr>
+<h2>Why string-based dispatch does not scale</h2>
+<p>Early implementations often start with something like this:</p>
+<pre><code class="language-python">if &quot;shipping&quot; in user_question:
+    result = get_order_status(order_id)
+elif &quot;refund&quot; in user_question:
+    result = get_refund_policy()
+</code></pre>
+<p>Or the model is told to emit text such as <code>{"function": "get_order_status", "order_id": "ORD-1001"}</code> and the application parses it manually.</p>
+<p>The problem is not that this is impossible. The problem is that the contract is hidden. Function names live partly in prompts, partly in code. Argument requirements are implied rather than enforced. If the model invents a new key or misses a required field, the error shows up late.</p>
+<p>Tool calling helps because it makes three things explicit:</p>
+<ul>
+<li>the finite set of callable functions</li>
+<li>the JSON-schema-like shape of each function's arguments</li>
+<li>the structured response path that carries requested tool calls</li>
+</ul>
+<p>That makes the system easier to reason about. The model proposes. The application decides.</p>
+<hr>
+<h2>What goes into the <code>tools</code> parameter</h2>
+<p>With Groq chat completions, tools are typically defined as function descriptors. Each tool includes a name, a description, and an argument schema. Here is a small order-status example.</p>
+<pre><code class="language-python">tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_order_status&quot;,
+            &quot;description&quot;: &quot;Look up shipping status by order ID.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;order_id&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;description&quot;: &quot;An order identifier such as ORD-1001&quot;,
+                    }
+                },
+                &quot;required&quot;: [&quot;order_id&quot;],
+                &quot;additionalProperties&quot;: False,
+            },
+        },
+    }
+]
+</code></pre>
+<p>This definition matters because it communicates function intent to the model without giving up execution control. The description tells the model when the tool is appropriate. The parameter schema tells it which arguments exist and which ones are required. <code>additionalProperties=False</code> is also worth including when you want to reduce noisy or invented parameters.</p>
+<hr>
+<h2>Sending the first tool-enabled request</h2>
+<p>The request itself is still a normal chat completion call. The difference is that the model now receives the <code>tools</code> list and may return <code>tool_calls</code> instead of a final natural-language answer.</p>
+<pre><code class="language-python">import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_order_status&quot;,
+            &quot;description&quot;: &quot;Look up shipping status by order ID.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;order_id&quot;: {&quot;type&quot;: &quot;string&quot;}
+                },
+                &quot;required&quot;: [&quot;order_id&quot;],
+                &quot;additionalProperties&quot;: False,
+            },
+        },
+    }
+]
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: &quot;Use tools when order questions require a live lookup.&quot;,
+        },
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Please check the shipping status for order ORD-1001.&quot;,
+        },
+    ],
+    tools=tools,
+    tool_choice=&quot;auto&quot;,
+    temperature=0,
+)
+
+message = completion.choices[0].message
+print(message.tool_calls)
+</code></pre>
+<p><code>tool_choice="auto"</code> lets the model decide whether a tool is needed. In practice, the interesting case is when the assistant message contains one or more <code>tool_calls</code>. That means your application has more work to do before a final user-facing answer exists.</p>
+<hr>
+<h2>Parsing <code>tool_calls</code> and routing them safely</h2>
+<p>A tool call usually includes a function name and a JSON string containing arguments. Before execution, two checks matter: is the function name in the allowlist, and do the arguments parse into the expected shape?</p>
+<pre><code class="language-python">import json
+import os
+
+from groq import Groq
+from pydantic import BaseModel
+
+class OrderStatusArgs(BaseModel):
+    order_id: str
+
+def get_order_status(order_id: str) -&gt; dict:
+    fake_db = {
+        &quot;ORD-1001&quot;: {&quot;status&quot;: &quot;in_transit&quot;, &quot;eta_days&quot;: 2},
+        &quot;ORD-1002&quot;: {&quot;status&quot;: &quot;delivered&quot;, &quot;eta_days&quot;: 0},
+    }
+    return fake_db.get(order_id, {&quot;status&quot;: &quot;not_found&quot;, &quot;eta_days&quot;: None})
+
+available_tools = {
+    &quot;get_order_status&quot;: get_order_status,
+}
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_order_status&quot;,
+            &quot;description&quot;: &quot;Look up shipping status by order ID.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;order_id&quot;: {&quot;type&quot;: &quot;string&quot;}
+                },
+                &quot;required&quot;: [&quot;order_id&quot;],
+                &quot;additionalProperties&quot;: False,
+            },
+        },
+    }
+]
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Use tools for order lookup requests.&quot;},
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Check ORD-1001 for me.&quot;},
+    ],
+    tools=tools,
+    tool_choice=&quot;auto&quot;,
+    temperature=0,
+)
+
+message = completion.choices[0].message
+
+for tool_call in message.tool_calls or []:
+    function_name = tool_call.function.name
+    arguments = json.loads(tool_call.function.arguments)
+
+    if function_name not in available_tools:
+        raise ValueError(f&quot;unknown tool: {function_name}&quot;)
+
+    validated_args = OrderStatusArgs.model_validate(arguments)
+    result = available_tools[function_name](https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/**validated_args.model_dump())
+    print(function_name, arguments, result)
+</code></pre>
+<p>At this stage, the model has not fully answered the user yet. It has only requested a tool. The application has executed that request. The final conversational answer comes after the tool result is fed back to the model.</p>
+<hr>
+<h2>Building the full function-execution loop</h2>
+<p>The normal production pattern looks like this:</p>
+<ol>
+<li>send the user message and tool definitions</li>
+<li>receive one or more <code>tool_calls</code></li>
+<li>execute the requested tools in application code</li>
+<li>append tool results to the conversation</li>
+<li>send the updated message list back to the model</li>
+<li>read the final user-facing answer</li>
+</ol>
+<p>Here is a complete version of that loop.</p>
+<pre><code class="language-python">import json
+import os
+
+from groq import Groq
+from pydantic import BaseModel
+
+class OrderStatusArgs(BaseModel):
+    order_id: str
+
+def get_order_status(order_id: str) -&gt; dict:
+    fake_db = {
+        &quot;ORD-1001&quot;: {
+            &quot;status&quot;: &quot;in_transit&quot;,
+            &quot;location&quot;: &quot;Seoul hub&quot;,
+            &quot;eta_days&quot;: 2,
+        }
+    }
+    return fake_db.get(order_id, {&quot;status&quot;: &quot;not_found&quot;})
+
+tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_order_status&quot;,
+            &quot;description&quot;: &quot;Look up shipping status by order ID.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;order_id&quot;: {&quot;type&quot;: &quot;string&quot;}
+                },
+                &quot;required&quot;: [&quot;order_id&quot;],
+                &quot;additionalProperties&quot;: False,
+            },
+        },
+    }
+]
+
+available_tools = {&quot;get_order_status&quot;: get_order_status}
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Use tools for order lookups, then answer briefly.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is happening with order ORD-1001?&quot;},
+]
+
+first = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=messages,
+    tools=tools,
+    tool_choice=&quot;auto&quot;,
+    temperature=0,
+)
+
+assistant_message = first.choices[0].message
+messages.append(assistant_message.model_dump())
+
+if not assistant_message.tool_calls:
+    print(assistant_message.content)
+    raise SystemExit(0)
+
+for tool_call in assistant_message.tool_calls or []:
+    function_name = tool_call.function.name
+    if function_name not in available_tools:
+        raise ValueError(f&quot;unknown tool: {function_name}&quot;)
+
+    try:
+        arguments = json.loads(tool_call.function.arguments)
+        validated_args = OrderStatusArgs.model_validate(arguments)
+    except json.JSONDecodeError as exc:
+        raise ValueError(&quot;tool arguments were not valid JSON&quot;) from exc
+
+    tool_result = available_tools[function_name](https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/**validated_args.model_dump())
+
+    messages.append(
+        {
+            &quot;role&quot;: &quot;tool&quot;,
+            &quot;tool_call_id&quot;: tool_call.id,
+            &quot;name&quot;: function_name,
+            &quot;content&quot;: json.dumps(tool_result, ensure_ascii=False),
+        }
+    )
+
+final = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=messages,
+    tools=tools,
+    temperature=0,
+)
+
+print(final.choices[0].message.content)
+</code></pre>
+<p>This loop is the important mental model. The model chooses a tool. The application performs the side-effect-free lookup. The tool output becomes another message in the conversation. Then the model turns that structured result into a user-facing answer.</p>
+<hr>
+<h2>What to guard in production</h2>
+<p>Tool calling makes a system more useful, but it also introduces new failure paths. A few controls are worth adding early.</p>
+<p>First, <strong>never dispatch against arbitrary function names</strong>. Do not let model output resolve against <code>globals()</code> or anything equivalent. Use an explicit allowlist.</p>
+<p>Second, <strong>validate arguments before execution</strong>. In the unsafe toy pattern, it is easy to go straight from <code>json.loads()</code> to <code>**arguments</code>, but real systems should usually validate arguments with Pydantic or another schema layer before invoking the function.</p>
+<p>Third, <strong>separate read-only tools from state-changing tools</strong>. Looking up an order and cancelling an order should not live behind the same trust assumptions. Side-effecting tools deserve stricter confirmation and often a human or policy gate.</p>
+<p>Fourth, <strong>log every tool request and result in a traceable form</strong>. When a user says, "the assistant gave me the wrong status," you will want the tool name, arguments, raw tool result, and final answer in one timeline.</p>
+<hr>
+<h2>Closing</h2>
+<p>In this post, we used the <code>tools</code> parameter to expose a controlled function interface, parsed <code>tool_calls</code> from the model response, and completed the full execution loop that runs a Python function and feeds the result back into the conversation. The important design point is that the model chooses from a toolbox, but the application still owns validation, permissions, and execution.</p>
+<p>Structured output gave us a contract for data. Tool calling extends that contract to function requests. The next topic applies the same production mindset to streamed responses, where the result arrives in pieces and error handling must account for partial output instead of one final string.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/01-structured-output.md">Structured output — JSON mode and response schemas</a></li>
+<li><strong>Tool calling — connecting functions to the model (current)</strong></li>
+<li>Streaming in depth — chunk handling and error recovery (upcoming)</li>
+<li>Caching strategies — reducing cost and latency (upcoming)</li>
+<li>Retry and error handling — making API calls reliable (upcoming)</li>
+<li>Rate limit management — patterns for staying within limits (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://console.groq.com/docs/tool-use">https://console.groq.com/docs/tool-use</a></li>
+<li><a href="https://json-schema.org/understanding-json-schema/">https://json-schema.org/understanding-json-schema/</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Streaming, Python</p>
+</body>
+</html>

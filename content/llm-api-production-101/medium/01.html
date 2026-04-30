@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Structured output — JSON mode and response schemas</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Structured output — JSON mode and response schemas</h1>
+<blockquote>
+<p>LLM API Production 101 (1/6)</p>
+</blockquote>
+<p>The first production problem in an LLM application is often not answer quality. It is output shape. A demo can render one paragraph of model text and stop there. A real service usually cannot. It needs fields that can be inserted into a database, validated against business rules, passed to another service, or used to drive control flow. At that point, pretty prose is secondary. The important question is whether the application can trust the response format.</p>
+<p>Teams often lose time here because the early version looks deceptively easy. The prompt says, "Return JSON," the code calls <code>json.loads()</code>, and the first few tests pass. Then the prompt grows, an edge case appears, the model adds a sentence before the payload, wraps the object in a code fence, or renames a key. The failure is not really about model intelligence. It is about the absence of a contract between text generation and application logic.</p>
+<p>This article turns that loose boundary into an explicit interface. We will use Groq's JSON mode with <code>response_format={"type": "json_object"}</code> and then validate the parsed object with a Pydantic model. Those two steps matter for different reasons. JSON mode narrows the syntactic shape of the output. Pydantic enforces semantic rules such as allowed values, ranges, and required fields. Together they give you a response path that can fail loudly instead of corrupting state quietly.</p>
+<p>We will cover five things: why natural-language parsing breaks under production pressure, what JSON mode does and does not guarantee, how to request structured output with the Groq Python SDK, how to validate it with Pydantic, and how to think about logging and recovery when the contract fails.</p>
+<p>The main idea is simple: <strong>structured output in production is a contract design problem, not a prompt trick</strong>.</p>
+<hr>
+<h2>Runtime setup</h2>
+<p>To run the examples as written, start with Python 3.10 or later and install the two packages used in this article.</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+pip install groq pydantic
+export GROQ_API_KEY=&quot;your-issued-key&quot;
+</code></pre>
+<p>All examples in this post assume <code>llama-3.1-8b-instant</code> and the official <code>groq</code> SDK.</p>
+<hr>
+<h2>Why plain-text parsing does not age well</h2>
+<p>An early implementation often looks like this: ask the model to classify a support ticket, get a small text answer back, and split the string.</p>
+<pre><code class="language-python">raw_text = &quot;positive, confidence=0.91&quot;
+label, confidence = raw_text.split(&quot;,&quot;)
+</code></pre>
+<p>It feels fast because it is short. It is also fragile because nothing in that code defines a durable interface. If the model changes <code>positive</code> to <code>Positive</code>, inserts a short explanation, or emits <code>confidence: 0.91</code> instead of <code>confidence=0.91</code>, the parser breaks. Worse, the logs rarely make it obvious whether the problem came from prompt behavior, model variability, or parsing assumptions.</p>
+<p>Production systems usually need three guarantees at the same time:</p>
+<ul>
+<li>field names should stay stable</li>
+<li>value types should stay stable</li>
+<li>invalid or missing data should fail immediately</li>
+</ul>
+<p>Imagine a ticket classifier. <code>category</code> should come from a finite set. <code>priority</code> should be an integer inside a specific range. <code>summary</code> should not be empty. If you rely on plain text plus custom parsing, those rules end up scattered across prompts, regexes, and post-processing code. JSON mode plus schema validation brings them back into one place.</p>
+<hr>
+<h2>What JSON mode guarantees and what it does not</h2>
+<p>Groq's <code>response_format={"type": "json_object"}</code> pushes the model toward returning a JSON object instead of free-form prose. That is useful because it creates a minimum syntactic contract. Your response is much more likely to be machine-readable without string surgery.</p>
+<p>Still, JSON mode is not the whole solution. It reduces formatting failures. It does not automatically guarantee business correctness.</p>
+<p>For example, this is valid JSON:</p>
+<pre><code class="language-json">{
+  &quot;sentiment&quot;: &quot;positive&quot;,
+  &quot;confidence&quot;: &quot;high&quot;
+}
+</code></pre>
+<p>The syntax is fine, but <code>confidence</code> is a string instead of the numeric value your application may expect. Or the object may omit a required field entirely. That is why it helps to separate the response path into two steps:</p>
+<ol>
+<li>make the model return a JSON object</li>
+<li>validate that object against an application schema</li>
+</ol>
+<p>If the first step is missing, parsing becomes unreliable. If the second step is missing, your code accepts structurally valid but semantically wrong data. Production stability needs both.</p>
+<hr>
+<h2>Sending a JSON-mode request with the Groq SDK</h2>
+<p>The example below extracts <code>category</code>, <code>priority</code>, and <code>summary</code> from a customer support message.</p>
+<pre><code class="language-python">import json
+import os
+
+from groq import Groq
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+messages = [
+    {
+        &quot;role&quot;: &quot;system&quot;,
+        &quot;content&quot;: (
+            &quot;You classify customer support tickets. &quot;
+            &quot;category must be one of billing/account/bug/shipping. &quot;
+            &quot;priority must be an integer from 1 to 5. &quot;
+            &quot;summary must be a string between 8 and 120 characters. &quot;
+            &quot;Return exactly one JSON object with the keys category, priority, and summary.&quot;
+        ),
+    },
+    {
+        &quot;role&quot;: &quot;user&quot;,
+        &quot;content&quot;: (
+            &quot;Ticket: payment succeeded but the order is missing from my order history. &quot;
+            &quot;I do not want a refund yet. I need the status checked quickly.&quot;
+        ),
+    },
+]
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=messages,
+    response_format={&quot;type&quot;: &quot;json_object&quot;},
+    temperature=0,
+)
+
+content = completion.choices[0].message.content
+payload = json.loads(content)
+
+print(payload)
+</code></pre>
+<p>Three details matter here.</p>
+<p>First, the system prompt still says "exactly one JSON object." JSON mode is a provider-side constraint, but it is still helpful to make the contract legible in the prompt itself.</p>
+<p>Second, <code>temperature=0</code> reduces variation. For extraction work, consistency matters more than creativity.</p>
+<p>Third, <code>json.loads()</code> only answers one question: is this string parseable JSON? It does not answer whether the payload matches your domain rules. That is why validation comes next.</p>
+<hr>
+<h2>Locking the response with Pydantic</h2>
+<p>This is where structured output becomes operationally useful. The code below parses the model output and validates it against a typed schema.</p>
+<pre><code class="language-python">import json
+import os
+from enum import Enum
+
+from groq import Groq
+from pydantic import BaseModel, Field, ValidationError
+
+class Category(str, Enum):
+    billing = &quot;billing&quot;
+    account = &quot;account&quot;
+    bug = &quot;bug&quot;
+    shipping = &quot;shipping&quot;
+
+class TicketClassification(BaseModel):
+    category: Category
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+    customer_needs_followup: bool
+
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+completion = client.chat.completions.create(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: (
+                &quot;Classify the support request. &quot;
+                &quot;category must be one of billing/account/bug/shipping. &quot;
+                &quot;priority must be an integer from 1 to 5. &quot;
+                &quot;summary must be a string between 8 and 120 characters. &quot;
+                &quot;customer_needs_followup must be a boolean. &quot;
+                &quot;Return exactly one JSON object with the keys category, priority, summary, and customer_needs_followup.&quot;
+            ),
+        },
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: (
+                &quot;Ticket: password reset emails never arrive. &quot;
+                &quot;I need access restored today because work is blocked.&quot;
+            ),
+        },
+    ],
+    response_format={&quot;type&quot;: &quot;json_object&quot;},
+    temperature=0,
+)
+
+raw = completion.choices[0].message.content
+data = json.loads(raw)
+
+try:
+    ticket = TicketClassification.model_validate(data)
+except ValidationError as exc:
+    print(&quot;validation failed&quot;)
+    print(exc)
+    raise
+
+print(ticket.model_dump())
+</code></pre>
+<p>This gives you a much stronger application boundary. If the model returns an unknown category, an out-of-range priority, a missing field, or the wrong type, validation fails immediately. That is a good thing. In production, explicit failure is safer than silently storing bad data and discovering the damage later.</p>
+<p>There is also a downstream benefit. Once validation succeeds, the rest of your code gets real typed values. <code>ticket.priority</code> is already an integer. <code>ticket.category</code> is already a constrained enum. <code>ticket.customer_needs_followup</code> is already a boolean. The rest of the pipeline becomes simpler because defensive parsing logic is no longer spread everywhere.</p>
+<hr>
+<h2>Thinking in failure layers</h2>
+<p>Structured output failures are easier to operate if you separate them into layers.</p>
+<p>The first layer is the <strong>request layer</strong>. Authentication problems, timeouts, and network failures belong here. These are normal API concerns and may be retryable.</p>
+<p>The second layer is the <strong>JSON parsing layer</strong>. Even with JSON mode, you should still assume that empty strings, truncated payloads, or malformed data are possible in edge cases. When parsing fails, keep the raw response for inspection.</p>
+<p>The third layer is the <strong>schema validation layer</strong>. This is often the most informative one. The payload is valid JSON, but it violates domain rules. Maybe <code>priority=7</code>, maybe <code>summary</code> is empty, maybe <code>category</code> is outside the enum.</p>
+<p>A layered implementation keeps logging precise:</p>
+<pre><code class="language-python">import json
+import logging
+import os
+
+from groq import Groq
+from pydantic import BaseModel, Field, ValidationError
+from enum import Enum
+
+class Category(str, Enum):
+    billing = &quot;billing&quot;
+    account = &quot;account&quot;
+    bug = &quot;bug&quot;
+    shipping = &quot;shipping&quot;
+
+class TicketClassification(BaseModel):
+    category: Category
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+    customer_needs_followup: bool
+
+logger = logging.getLogger(__name__)
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;])
+
+try:
+    completion = client.chat.completions.create(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        messages=[
+            {
+                &quot;role&quot;: &quot;system&quot;,
+                &quot;content&quot;: (
+                    &quot;Classify the support request. &quot;
+                    &quot;category must be one of billing/account/bug/shipping. &quot;
+                    &quot;priority must be an integer from 1 to 5. &quot;
+                    &quot;summary must be a string between 8 and 120 characters. &quot;
+                    &quot;customer_needs_followup must be a boolean. &quot;
+                    &quot;Return exactly one JSON object with the keys category, priority, summary, and customer_needs_followup.&quot;
+                ),
+            },
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: &quot;Ticket: payment was approved but the order is missing.&quot;,
+            },
+        ],
+        response_format={&quot;type&quot;: &quot;json_object&quot;},
+        temperature=0,
+    )
+    raw = completion.choices[0].message.content
+    data = json.loads(raw)
+    ticket = TicketClassification.model_validate(data)
+except json.JSONDecodeError:
+    logger.exception(&quot;json parse failed&quot;)
+except ValidationError:
+    logger.exception(&quot;schema validation failed&quot;)
+except Exception:
+    logger.exception(&quot;llm request failed&quot;)
+</code></pre>
+<p>That split also leads to better recovery decisions. A transport failure may justify a retry. A JSON parse failure may justify a prompt adjustment or raw-response capture. A schema failure may justify tighter instructions, simpler field definitions, or a fallback path that asks the model again with narrower constraints.</p>
+<hr>
+<h2>Contract first, prompt second</h2>
+<p>It is tempting to keep tuning prompt wording whenever structured output feels unstable. Prompt quality matters, but it should not be the first line of defense. In production, the order is better reversed: define the contract, validate the contract, then improve prompt quality inside that boundary.</p>
+<p>Three practical rules help:</p>
+<ul>
+<li>start with a small field set</li>
+<li>encode enums and ranges in code, not only in prose</li>
+<li>log the raw response when validation fails</li>
+</ul>
+<p>Trying to extract too many fields at once increases both model error surface and validation complexity. A smaller schema is easier to stabilize. Also, values such as <code>priority: 1..5</code> are much easier to enforce than vague instructions like "high priority when urgent." And when validation fails, the raw model output is usually the fastest way to see whether the schema is too ambitious or the prompt is too loose.</p>
+<hr>
+<h2>Closing</h2>
+<p>In this first production-focused post, we turned model output into an application contract. <code>response_format={"type": "json_object"}</code> narrows the response shape to machine-readable JSON. Pydantic adds typed validation on top of that shape. Together they move you away from brittle string parsing and toward explicit, observable boundaries.</p>
+<p>If the earlier series taught the basic request and response loop, this is the point where that loop becomes safe to automate. The next step is to put function execution on top of the same contract and let the model choose tools without letting the surrounding system become ambiguous.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>Structured output — JSON mode and response schemas (current)</strong></li>
+<li>Tool calling — connecting functions to the model (upcoming)</li>
+<li>Streaming in depth — chunk handling and error recovery (upcoming)</li>
+<li>Caching strategies — reducing cost and latency (upcoming)</li>
+<li>Retry and error handling — making API calls reliable (upcoming)</li>
+<li>Rate limit management — patterns for staying within limits (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://console.groq.com/docs/text-chat">https://console.groq.com/docs/text-chat</a></li>
+<li><a href="https://console.groq.com/docs/text-chat#json-mode">https://console.groq.com/docs/text-chat#json-mode</a></li>
+<li><a href="https://docs.pydantic.dev/latest/concepts/models/">https://docs.pydantic.dev/latest/concepts/models/</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Streaming, Python</p>
+</body>
+</html>

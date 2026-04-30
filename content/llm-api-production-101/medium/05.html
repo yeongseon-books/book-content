@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Retry and error handling — making API calls reliable</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Retry and error handling — making API calls reliable</h1>
+<blockquote>
+<p>LLM API Production 101 (5/6)</p>
+</blockquote>
+<p>Once an LLM API call sits on a production path, failure stops being an exception in the human sense. It becomes part of the runtime. Networks stall. Providers slow down. Requests hit time limits. A client process can lose connectivity at the wrong moment. The real question is not whether failures happen. It is whether the application reacts to them predictably.</p>
+<p>One of the most common mistakes is retrying everything. Teams catch a broad exception, sleep, try again, and call that resilience. The problem is that not all failures are temporary. Authentication problems are not fixed by waiting two seconds. Invalid request payloads are not fixed by a second attempt. Schema-validation failures are not fixed just because the same call was repeated three times.</p>
+<p>That is why retries work only when they begin with error classification. A retry policy is not “try again when something goes wrong.” It is “retry only the failures that are likely to be transient, with bounded backoff and explicit stop conditions.” In this post, we will use <code>tenacity</code> to build that policy around a Groq API call.</p>
+<p>The main idea is simple: <strong>a retry is not a friendly loop, it is a bounded recovery strategy built on top of error classification</strong>.</p>
+<hr>
+<h2>Runtime setup</h2>
+<p>The examples assume Python 3.10 or later with <code>groq</code> and <code>tenacity</code> installed.</p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+pip install groq tenacity
+export GROQ_API_KEY=&quot;your-issued-key&quot;
+</code></pre>
+<hr>
+<h2>Why all failures should not share one retry policy</h2>
+<p>Retries help only when the failure is likely to go away. A short network interruption may resolve on the next attempt. A temporary timeout may succeed after a brief pause. Some 5xx provider failures are also retry candidates.</p>
+<p>Other failures are different:</p>
+<ul>
+<li>invalid API credentials</li>
+<li>malformed request payloads</li>
+<li>application-side parsing bugs</li>
+<li>schema-validation failures caused by bad output contracts</li>
+</ul>
+<p>If you retry those blindly, you do not increase reliability. You only increase latency, noise, and wasted quota. The first step is to separate retryable failures from failures that should stop immediately.</p>
+<hr>
+<h2>What <code>tenacity</code> gives you</h2>
+<p><code>tenacity</code> lets you describe retry conditions, wait strategy, and stop rules as policy instead of scattering <code>while True</code>, counters, and <code>sleep()</code> calls through the code.</p>
+<p>The smallest example looks like this:</p>
+<pre><code class="language-python">from tenacity import retry, stop_after_attempt, wait_exponential
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
+)
+def flaky_operation() -&gt; str:
+    raise RuntimeError(&quot;temporary failure&quot;)
+</code></pre>
+<p>That is only the shape. In a real LLM path, the important part is constraining <strong>which exceptions</strong> trigger the retry.</p>
+<hr>
+<h2>Creating an error hierarchy for retry decisions</h2>
+<p>One practical pattern is to normalize low-level exceptions into application-level categories.</p>
+<pre><code class="language-python">class RetryableLLMError(Exception):
+    pass
+
+class NonRetryableLLMError(Exception):
+    pass
+</code></pre>
+<p>Once those exist, the retry layer can ignore provider-specific details and focus on the higher-level decision: retryable or not. That keeps the retry policy easy to read even if the provider SDK evolves later.</p>
+<hr>
+<h2>Adding exponential backoff to a Groq call</h2>
+<p>The example below retries only errors that the application classifies as transient. One operational detail matters before the code starts: the Groq client can apply its own retries. To avoid stacking SDK retries on top of <code>tenacity</code> retries by accident, the sample disables SDK retries and lets the application policy own the loop.</p>
+<pre><code class="language-python">import logging
+import os
+
+from groq import APIConnectionError, APIStatusError, Groq, RateLimitError
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential_jitter,
+)
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+client = Groq(api_key=os.environ[&quot;GROQ_API_KEY&quot;], max_retries=0)
+
+class RetryableLLMError(Exception):
+    pass
+
+class NonRetryableLLMError(Exception):
+    pass
+
+@retry(
+    retry=retry_if_exception_type(RetryableLLMError),
+    wait=wait_exponential_jitter(initial=1, max=8),
+    stop=stop_after_attempt(3),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    reraise=True,
+)
+def call_llm(messages: list[dict]) -&gt; str:
+    try:
+        completion = client.chat.completions.create(
+            model=&quot;llama-3.1-8b-instant&quot;,
+            messages=messages,
+            temperature=0,
+        )
+        return completion.choices[0].message.content
+    except RateLimitError as exc:
+        raise RetryableLLMError(&quot;provider rate limit hit&quot;) from exc
+    except APIConnectionError as exc:
+        raise RetryableLLMError(&quot;provider connection failed&quot;) from exc
+    except APIStatusError as exc:
+        if exc.status_code &gt;= 500:
+            raise RetryableLLMError(f&quot;provider server error: {exc.status_code}&quot;) from exc
+        raise NonRetryableLLMError(f&quot;provider request failed: {exc.status_code}&quot;) from exc
+
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a concise Python tutor.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain Python context managers in three sentences.&quot;},
+]
+
+try:
+    text = call_llm(messages)
+    print(text)
+except NonRetryableLLMError as exc:
+    logger.error(&quot;request failed without retry: %s&quot;, exc)
+except RetryableLLMError as exc:
+    logger.error(&quot;request still failed after retries: %s&quot;, exc)
+</code></pre>
+<p>Three things matter here.</p>
+<p>First, <code>retry_if_exception_type(RetryableLLMError)</code> makes the retry scope explicit.</p>
+<p>Second, <code>wait_exponential_jitter(initial=1, max=8)</code> creates bounded exponential backoff with jitter instead of immediate hammering.</p>
+<p>Third, <code>reraise=True</code> ensures that the final failure is not swallowed after all attempts are exhausted.</p>
+<hr>
+<h2>Which failures are retryable</h2>
+<p>In practice, a useful first-pass classification looks like this.</p>
+<p><strong>Usually retryable</strong></p>
+<ul>
+<li>network interruptions</li>
+<li>connection failures and transport-level timeouts</li>
+<li>transient 5xx responses</li>
+<li>some rate-limit responses such as 429</li>
+</ul>
+<p><strong>Usually not retryable or separately handled</strong></p>
+<ul>
+<li>authentication failures</li>
+<li>malformed request bodies</li>
+<li>missing or invalid model names</li>
+<li>application bugs</li>
+<li>schema-validation failures in structured output</li>
+</ul>
+<p>That last case is worth stressing. If a Pydantic validation step fails because the model returned the wrong shape, retrying the exact same request may not help. A prompt adjustment, fallback path, or user-visible error is often more honest than blind repetition.</p>
+<hr>
+<h2>Moving classification into a dedicated function</h2>
+<p>If the retry wrapper grows too many <code>except</code> branches, pull classification into its own function.</p>
+<pre><code class="language-python">def classify_exception(exc: Exception) -&gt; Exception:
+    if isinstance(exc, (RateLimitError, APIConnectionError)):
+        return RetryableLLMError(str(exc))
+
+    if isinstance(exc, APIStatusError):
+        if exc.status_code &gt;= 500:
+            return RetryableLLMError(str(exc))
+        return NonRetryableLLMError(str(exc))
+
+    return NonRetryableLLMError(f&quot;unexpected error: {exc}&quot;)
+</code></pre>
+<p>Then the call path becomes smaller:</p>
+<pre><code class="language-python">try:
+    completion = client.chat.completions.create(...)
+except Exception as exc:
+    raise classify_exception(exc) from exc
+</code></pre>
+<p>This is easier to maintain when you later add more provider-specific exception types or change your retry policy.</p>
+<hr>
+<h2>Choosing attempt count and backoff</h2>
+<p>More retries do not automatically mean more resilience. The right values depend on three questions:</p>
+<ul>
+<li>how long can the user wait</li>
+<li>how much value is there in another attempt</li>
+<li>how expensive is a repeated call in latency and quota</li>
+</ul>
+<p>For interactive UI paths, two or three attempts are often enough. Background jobs can justify longer retry windows. <code>wait_exponential_jitter(initial=1, max=8)</code> is a reasonable starting point, not a universal answer. Immediate five-attempt retry loops are usually too aggressive.</p>
+<hr>
+<h2>What the user should see after final failure</h2>
+<p>Retries do not eliminate failure. They shape failure.</p>
+<p>After the last allowed attempt, the application should make at least three things clear:</p>
+<ul>
+<li>what short message the user receives</li>
+<li>what details are logged internally</li>
+<li>where automatic recovery stops</li>
+</ul>
+<p>In practice, that often means logging fields such as <code>retryable</code>, <code>attempt_count</code>, and <code>final_error_type</code>, while keeping the user-facing message stable and short. Raw provider exception text is usually too noisy or too revealing to display directly.</p>
+<hr>
+<h2>Closing</h2>
+<p>In this post, we used <code>tenacity</code>, exponential backoff, and a small error hierarchy to build a more reliable LLM call path. The central lesson is that retry policy starts with classification, not with a loop. Decide what deserves another attempt first. Only then decide how many attempts and how much delay are acceptable.</p>
+<p>Caching reduced repeated work. Retries smooth over temporary failure. The final post steps even further out and looks at the outer constraint around all of this: how to keep request flow inside the provider’s rate limits without turning traffic spikes into outages.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/01-structured-output.md">Structured output — JSON mode and response schemas</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/02-tool-calling.md">Tool calling — connecting functions to the model</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/03-streaming-in-depth.md">Streaming in depth — chunk handling and error recovery</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/04-caching-strategies.md">Caching strategies — reducing cost and latency</a></li>
+<li><strong>Retry and error handling — making API calls reliable (current)</strong></li>
+<li>Rate limit management — patterns for staying within limits (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://tenacity.readthedocs.io/en/latest/">https://tenacity.readthedocs.io/en/latest/</a></li>
+<li><a href="https://console.groq.com/docs/text-chat">https://console.groq.com/docs/text-chat</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, OpenAI, Streaming, Python</p>
+</body>
+</html>
