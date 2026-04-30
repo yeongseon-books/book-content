@@ -209,9 +209,11 @@ print(average_precision(ranking))
 <p>This script shows a small but realistic quality gate. It runs faithfulness, answer relevancy, and context precision over a fixed dataset, computes mean scores, and fails immediately when average faithfulness falls below 0.8.</p>
 <pre><code class="language-python">import numpy as np
 from datasets import Dataset
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_groq import ChatGroq
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from ragas import evaluate
 from ragas.metrics import answer_relevancy, context_precision, faithfulness
+from ragas.llms import LangchainLLMWrapper
 
 def build_eval_dataset() -&gt; Dataset:
     rows = {
@@ -242,18 +244,13 @@ def build_eval_dataset() -&gt; Dataset:
 
 def run_quality_gate() -&gt; dict[str, float]:
     dataset = build_eval_dataset()
-    judge_llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
-    embeddings = OpenAIEmbeddings(model=&quot;text-embedding-3-small&quot;)
+    judge_llm = LangchainLLMWrapper(ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, temperature=0))
 
-    result = evaluate(
-        dataset=dataset,
-        metrics=[faithfulness, answer_relevancy, context_precision],
-        llm=judge_llm,
-        embeddings=embeddings,
-        in_ci=True,
-        column_map={},
-        raise_exceptions=True,
-    )
+    metrics = [faithfulness, answer_relevancy, context_precision]
+    for m in metrics:
+        m.llm = judge_llm
+
+    result = evaluate(dataset=dataset, metrics=metrics)
 
     summary = {
         &quot;faithfulness&quot;: float(np.nanmean(result[&quot;faithfulness&quot;])),

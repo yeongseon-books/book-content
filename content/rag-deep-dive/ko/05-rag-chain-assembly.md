@@ -61,7 +61,7 @@ from typing import List
 from langchain.chains import RetrievalQA
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
-from langchain_community.llms.fake import FakeListLLM
+from langchain_groq import ChatGroq
 
 class KeywordRetriever(BaseRetriever):
     docs: List[Document]
@@ -82,9 +82,7 @@ def main() -> None:
             Document(page_content="After the final retry, the job moves to the dead-letter queue.", metadata={"source": "ops.md"}),
         ]
     )
-    llm = FakeListLLM(
-        responses=["The worker retries the job three times and then moves it to the dead-letter queue."]
-    )
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
 
     qa = RetrievalQA.from_chain_type(
         llm=llm,
@@ -352,7 +350,7 @@ if __name__ == "__main__":
 
 배치도 마찬가지입니다. `Runnable.batch()` 기본 구현은 thread pool executor로 여러 `invoke()`를 병렬 호출합니다. `abatch()`는 여러 `ainvoke()` 코루틴을 모아 `asyncio.gather` 계열 유틸리티로 함께 기다립니다. 그래서 같은 질문-답변 그래프를 여러 질의에 동시에 적용할 때 별도 래퍼를 짤 필요가 없습니다. 실무적으로는 오프라인 평가, synthetic question 세트 생성, 회귀 테스트에서 특히 유용합니다. 문서 코퍼스는 같고 질문만 수십 개 바뀌는 상황이라면, LCEL 체인 하나를 만든 뒤 `batch()`나 `abatch()`로 돌리면 됩니다.
 
-아래 코드는 한 체인에서 `invoke()`, `stream()`, `batch()`가 각각 어떤 사용감을 주는지 보여 줍니다. 스트리밍을 눈에 보이게 만들기 위해 마지막 단계를 토큰 생성 iterator로 구현했습니다.
+아래 코드는 한 체인에서 `invoke()`, `stream()`, `batch()`가 각각 어떤 사용감을 주는지 보여 줍니다. `answer_chain`은 일반 문자열 응답을 만들고, `stream_chain`은 `Iterator[Any] -> Iterator[str]` 형태의 generator runnable을 붙여 청크 전파를 흉내 냅니다.
 
 ```python
 from typing import Any, Iterator
@@ -365,9 +363,16 @@ def fake_llm(prompt_value: Any) -> str:
     rendered = prompt_value.to_string() if hasattr(prompt_value, "to_string") else str(prompt_value)
     return f"Answer: {rendered.split('Question:')[-1].strip()}"
 
-def token_stream(text: str) -> Iterator[str]:
-    for token in text.split():
-        yield token + " "
+def fake_streaming_llm(prompt_values: Iterator[Any]) -> Iterator[str]:
+    for prompt_value in prompt_values:
+        rendered = (
+            prompt_value.to_string()
+            if hasattr(prompt_value, "to_string")
+            else str(prompt_value)
+        )
+        answer = f"Answer: {rendered.split('Question:')[-1].strip()}"
+        for token in answer.split():
+            yield token + " "
 
 prompt = PromptTemplate.from_template("Context: {context}\nQuestion: {question}")
 
@@ -378,7 +383,11 @@ answer_chain = (
     | StrOutputParser()
 )
 
-stream_chain = answer_chain | token_stream
+stream_chain = (
+    RunnableLambda(lambda x: {"context": "retry budget is 3", "question": x})
+    | prompt
+    | fake_streaming_llm
+)
 
 def main() -> None:
     print(answer_chain.invoke("When does dead-lettering happen?"))
@@ -401,6 +410,8 @@ if __name__ == "__main__":
     main()
 ```
 
+실전에서는 `fake_streaming_llm` 자리에 실제 streaming chat model runnable이 들어갑니다. 여기서는 LCEL이 generator 기반 runnable에서 나온 청크를 다음 단계로 흘려보낼 수 있다는 점만 작게 보여 준 것입니다.
+
 정리하면 `RetrievalQA`는 고전적인 “질문 하나 -> 최종 답 하나” 모델에 최적화된 래퍼입니다. 빠르게 시작할 수 있지만, 스트리밍·중간 결과 재사용·출력 구조 확장·스키마 반사 같은 현대적 요구가 붙는 순간 답답해집니다. 반대로 LCEL은 처음에는 조금 더 장황해 보여도, retrieval과 prompt와 generation을 같은 runnable 언어로 다룰 수 있기 때문에 장기적으로 훨씬 다루기 쉽습니다.
 
 이 시리즈의 흐름으로 보면 이 결론은 자연스럽습니다. 1화부터 4화까지는 각 층을 따로 읽으며 어디서 정보가 손실되는지 봤습니다. 이제 5화에서는 그 층들을 하나의 실행 그래프로 묶었습니다. 결국 좋은 RAG는 “좋은 retriever를 고른다”에서 끝나지 않습니다. **검색 결과가 어떤 체인 구조를 통과해 어떤 타입으로 모델에 전달되고, 답과 출처가 어떤 인터페이스로 밖으로 나오느냐**까지 포함해 설계해야 합니다. 다음 6화에서는 이 조립된 체인을 어떻게 평가하고, 실패를 어떻게 측정하고, 품질 게이트를 어디에 둘지로 넘어가겠습니다.
@@ -415,6 +426,7 @@ if __name__ == "__main__":
 - [Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
 - [프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
 - **RAG Chain 조립 — RetrievalQA vs LCEL (현재 글)**
+- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

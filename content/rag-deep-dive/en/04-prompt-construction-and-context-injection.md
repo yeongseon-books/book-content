@@ -312,6 +312,8 @@ The broader lesson is the same one that has repeated through this series. Retrie
 - [Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
 - [Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
 - **Prompt Construction and Context Injection — Inside PromptTemplate (current)**
+- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

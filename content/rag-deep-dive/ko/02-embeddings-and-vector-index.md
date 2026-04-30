@@ -46,17 +46,10 @@ LangChain 0.2.17에서 우리가 흔히 쓰는 `OpenAIEmbeddings`는 `langchain_
 API 호출 모양도 단순합니다. `embed_with_retry()`는 `embeddings.client.create(**kwargs)`를 호출하고, OpenAI v1 경로에서 `_invocation_params`는 기본적으로 `model=self.model`과 `model_kwargs`만 담습니다. 인증과 timeout은 이 딕셔너리에 실리는 것이 아니라, 환경 검증 단계에서 생성된 `openai.OpenAI(...)` 클라이언트 객체에 이미 설정됩니다. 실제 호출 형태는 대략 아래와 같습니다.
 
 ```python
-import os
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from langchain_community.embeddings import OpenAIEmbeddings
-
-def build_embeddings() -> OpenAIEmbeddings:
-    return OpenAIEmbeddings(
-        model="text-embedding-3-large",
-        openai_api_key=os.environ["OPENAI_API_KEY"],
-        chunk_size=128,
-        max_retries=3,
-    )
+def build_embeddings() -> HuggingFaceEmbeddings:
+    return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 def demo() -> None:
     embeddings = build_embeddings()
@@ -147,7 +140,7 @@ LangChain에서 `FAISS.from_documents()`를 호출하면 한 줄로 끝나는 �
 ```python
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_vector_store() -> FAISS:
     docs = [
@@ -161,7 +154,7 @@ def build_vector_store() -> FAISS:
         ),
     ]
 
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     return FAISS.from_documents(docs, embeddings)
 
 def main() -> None:
@@ -253,7 +246,7 @@ LangChain의 FAISS 래퍼는 `save_local()`과 `load_local()`을 제공합니다
 ```python
 from pathlib import Path
 
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
@@ -262,7 +255,7 @@ def main() -> None:
         Document(page_content="Rotate secrets every 90 days.", metadata={"source": "policy.md"}),
         Document(page_content="Retry HTTP 429 with exponential backoff.", metadata={"source": "api.md"}),
     ]
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     store = FAISS.from_documents(docs, embeddings)
 
     target = Path("artifacts/faiss-demo")
@@ -297,6 +290,10 @@ if __name__ == "__main__":
 
 - [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
 - **임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리 (현재 글)**
+- Retriever 설계 — VectorStoreRetriever와 MMR (예정)
+- 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
+- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

@@ -61,7 +61,7 @@ from typing import List
 from langchain.chains import RetrievalQA
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
-from langchain_community.llms.fake import FakeListLLM
+from langchain_groq import ChatGroq
 
 class KeywordRetriever(BaseRetriever):
     docs: List[Document]
@@ -82,9 +82,7 @@ def main() -> None:
             Document(page_content="After the final retry, the job moves to the dead-letter queue.", metadata={"source": "ops.md"}),
         ]
     )
-    llm = FakeListLLM(
-        responses=["The worker retries the job three times and then moves it to the dead-letter queue."]
-    )
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
 
     qa = RetrievalQA.from_chain_type(
         llm=llm,
@@ -352,7 +350,7 @@ If retrieval takes 150 ms and generation takes 4 seconds, classic chains force t
 
 Batching follows the same compositional logic. The default `Runnable.batch()` implementation fans out multiple `invoke()` calls in parallel with an executor. The default `abatch()` implementation uses `asyncio.gather`-style orchestration for multiple `ainvoke()` calls. That means the exact same LCEL graph you use for one interactive query can be reused for offline evaluation, regression suites, or synthetic question sets with almost no extra code.
 
-This example shows `invoke()`, `batch()`, and `stream()` on one simple runnable chain. The last stage is an iterator-based token streamer so you can see chunk propagation directly:
+This example shows `invoke()`, `batch()`, and `stream()` on one simple runnable chain. `answer_chain` produces a normal string response, while `stream_chain` appends a generator runnable with the shape `Iterator[Any] -> Iterator[str]` so you can see chunk propagation directly:
 
 ```python
 from typing import Any, Iterator
@@ -365,9 +363,16 @@ def fake_llm(prompt_value: Any) -> str:
     rendered = prompt_value.to_string() if hasattr(prompt_value, "to_string") else str(prompt_value)
     return f"Answer: {rendered.split('Question:')[-1].strip()}"
 
-def token_stream(text: str) -> Iterator[str]:
-    for token in text.split():
-        yield token + " "
+def fake_streaming_llm(prompt_values: Iterator[Any]) -> Iterator[str]:
+    for prompt_value in prompt_values:
+        rendered = (
+            prompt_value.to_string()
+            if hasattr(prompt_value, "to_string")
+            else str(prompt_value)
+        )
+        answer = f"Answer: {rendered.split('Question:')[-1].strip()}"
+        for token in answer.split():
+            yield token + " "
 
 prompt = PromptTemplate.from_template("Context: {context}\nQuestion: {question}")
 
@@ -378,7 +383,11 @@ answer_chain = (
     | StrOutputParser()
 )
 
-stream_chain = answer_chain | token_stream
+stream_chain = (
+    RunnableLambda(lambda x: {"context": "retry budget is 3", "question": x})
+    | prompt
+    | fake_streaming_llm
+)
 
 def main() -> None:
     print(answer_chain.invoke("When does dead-lettering happen?"))
@@ -401,6 +410,8 @@ if __name__ == "__main__":
     main()
 ```
 
+In a real system, `fake_streaming_llm` would be replaced by a streaming chat model runnable. The point here is only to show that LCEL can propagate chunks emitted by a generator-style runnable through the chain surface.
+
 That is why the practical recommendation in 0.2.x is fairly clear. `RetrievalQA` remains useful for understanding the older assembly model and for reading a compact source path. But once you care about richer outputs, schema-aware chaining, streaming UX, or large-scale evaluation, LCEL is the better default.
 
 Episodes 1 through 4 decomposed the layers and showed where information can be lost. Episode 5 puts those layers back together and shows that chain structure is not an implementation detail. The way documents are routed, preserved, flattened, streamed, and returned determines how trustworthy and operable the final RAG application will be. In Episode 6, we will move from assembly to evaluation: how to measure whether this chain is actually good, where to place quality gates, and how to catch failure before users do.
@@ -415,6 +426,7 @@ Episodes 1 through 4 decomposed the layers and showed where information can be l
 - [Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
 - [Prompt Construction and Context Injection — Inside PromptTemplate](./04-prompt-construction-and-context-injection.md)
 - **Assembling the RAG Chain — RetrievalQA vs LCEL (current)**
+- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

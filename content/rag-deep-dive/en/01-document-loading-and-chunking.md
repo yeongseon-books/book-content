@@ -339,6 +339,11 @@ That baseline matters because the vector index is not neutral. It geometrizes th
 ## In this series
 
 - **Document Loading and Chunking — Inside LangChain TextSplitter (current)**
+- Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (upcoming)
+- Retriever Design — VectorStoreRetriever and MMR (upcoming)
+- Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
+- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

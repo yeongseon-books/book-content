@@ -237,9 +237,11 @@ This script shows a small but realistic quality gate. It runs faithfulness, answ
 ```python
 import numpy as np
 from datasets import Dataset
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_groq import ChatGroq
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from ragas import evaluate
 from ragas.metrics import answer_relevancy, context_precision, faithfulness
+from ragas.llms import LangchainLLMWrapper
 
 def build_eval_dataset() -> Dataset:
     rows = {
@@ -270,18 +272,13 @@ def build_eval_dataset() -> Dataset:
 
 def run_quality_gate() -> dict[str, float]:
     dataset = build_eval_dataset()
-    judge_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    judge_llm = LangchainLLMWrapper(ChatGroq(model="llama-3.1-8b-instant", temperature=0))
 
-    result = evaluate(
-        dataset=dataset,
-        metrics=[faithfulness, answer_relevancy, context_precision],
-        llm=judge_llm,
-        embeddings=embeddings,
-        in_ci=True,
-        column_map={},
-        raise_exceptions=True,
-    )
+    metrics = [faithfulness, answer_relevancy, context_precision]
+    for m in metrics:
+        m.llm = judge_llm
+
+    result = evaluate(dataset=dataset, metrics=metrics)
 
     summary = {
         "faithfulness": float(np.nanmean(result["faithfulness"])),

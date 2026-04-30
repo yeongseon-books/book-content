@@ -312,6 +312,8 @@ if __name__ == "__main__":
 - [임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
 - [Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
 - **프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (현재 글)**
+- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

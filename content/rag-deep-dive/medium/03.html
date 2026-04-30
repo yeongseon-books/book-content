@@ -118,11 +118,10 @@ if __name__ == &quot;__main__&quot;:
 <p>The dispatch logic itself is direct. For <code>similarity</code>, <code>_get_relevant_documents()</code> calls <code>self.vectorstore.similarity_search(query, **self.search_kwargs)</code>. For <code>similarity_score_threshold</code>, it calls <code>self.vectorstore.similarity_search_with_relevance_scores(query, **self.search_kwargs)</code> and strips away the scores, keeping only documents. For <code>mmr</code>, it calls <code>self.vectorstore.max_marginal_relevance_search(query, **self.search_kwargs)</code>. The async method <code>_aget_relevant_documents()</code> follows the same shape with <code>asimilarity_search</code>, <code>asimilarity_search_with_relevance_scores</code>, and <code>amax_marginal_relevance_search</code>.</p>
 <p><code>k</code> exists in all three modes, but its meaning shifts slightly. In plain similarity search it is the number of top documents returned by the backend. In threshold mode it is the maximum number returned after relevance-score conversion and filtering. In MMR mode it is the final output size after a larger candidate pool has been diversified.</p>
 <p><code>fetch_k</code> matters only for MMR and is passed straight through to the vector store. <code>score_threshold</code> matters only for threshold mode and is applied after relevance-score conversion, not on raw backend distances. That is why <code>VectorStoreRetriever</code> calls <code>similarity_search_with_relevance_scores()</code> rather than <code>similarity_search_with_score()</code>.</p>
-<p>The examples below use <code>FakeEmbeddings</code>, so any rankings or scores are illustrative rather than semantically meaningful.</p>
 <p>This small script makes the three modes visible.</p>
 <pre><code class="language-python">from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_store() -&gt; FAISS:
     docs = [
@@ -130,7 +129,7 @@ def build_store() -&gt; FAISS:
         Document(page_content=&quot;Dead-letter queues preserve the original payload.&quot;, metadata={&quot;source&quot;: &quot;runbook&quot;}),
         Document(page_content=&quot;HTTP 429 means the caller exceeded quota.&quot;, metadata={&quot;source&quot;: &quot;api&quot;}),
     ]
-    return FAISS.from_documents(docs, FakeEmbeddings(size=8))
+    return FAISS.from_documents(docs, HuggingFaceEmbeddings(model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;))
 
 def main() -&gt; None:
     store = build_store()
@@ -177,8 +176,8 @@ if __name__ == &quot;__main__&quot;:
 <p>That matters most in corpora with repeated templates or many chunks that share the same lead-in. In practice, <code>lambda_mult=0.5</code> is a reasonable starting point, values around <code>0.2</code> to <code>0.4</code> often work well when duplication is severe, and values above <code>0.7</code> behave much more like ordinary similarity search.</p>
 <p>Here is a runnable sketch.</p>
 <pre><code class="language-python">from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def main() -&gt; None:
     docs = [
@@ -189,7 +188,8 @@ def main() -&gt; None:
         Document(page_content=&quot;Operators inspect exception chains after the final retry.&quot;),
     ]
 
-    store = FAISS.from_documents(docs, FakeEmbeddings(size=16))
+    embeddings = HuggingFaceEmbeddings(model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
+    store = FAISS.from_documents(docs, embeddings)
 
     print(&quot;lambda_mult=0.8&quot;)
     for doc in store.max_marginal_relevance_search(
@@ -223,8 +223,8 @@ if __name__ == &quot;__main__&quot;:
 <p>One more distinction matters in practice. FAISS also accepts <code>score_threshold</code> in its raw <code>similarity_search_with_score_by_vector()</code> path, but there it compares against the backend score directly: <code>&lt;=</code> for Euclidean distance and <code>&gt;=</code> for max inner product. <code>VectorStoreRetriever</code> threshold mode compares after relevance-score conversion. Same parameter name, different layer.</p>
 <p>This script shows both views.</p>
 <pre><code class="language-python">from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def main() -&gt; None:
     docs = [
@@ -233,7 +233,8 @@ def main() -&gt; None:
         Document(page_content=&quot;Dead-letter queues preserve payloads.&quot;, metadata={&quot;source&quot;: &quot;ops&quot;}),
     ]
 
-    store = FAISS.from_documents(docs, FakeEmbeddings(size=12))
+    embeddings = HuggingFaceEmbeddings(model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
+    store = FAISS.from_documents(docs, embeddings)
 
     print(&quot;raw scores&quot;)
     for doc, score in store.similarity_search_with_score(&quot;retry budget&quot;, k=3):
@@ -268,9 +269,10 @@ from typing import Dict, List
 
 from langchain_core.callbacks.manager import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
-from langchain_core.embeddings import Embeddings, FakeEmbeddings
+from langchain_core.embeddings import Embeddings
 from langchain_core.retrievers import BaseRetriever
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_source_indexes(
     documents: List[Document], embeddings: Embeddings
@@ -299,7 +301,7 @@ class SourceScopedRetriever(BaseRetriever):
         return store.similarity_search(query, k=self.k)
 
 def main() -&gt; None:
-    embeddings = FakeEmbeddings(size=10)
+    embeddings = HuggingFaceEmbeddings(model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
     documents = [
         Document(
             page_content=&quot;Workers retry failed jobs three times before dead-lettering.&quot;,

@@ -110,14 +110,12 @@ if __name__ == "__main__":
 
 `score_threshold`는 threshold 검색에서만 의미가 있고, 더 정확히는 `similarity_search_with_relevance_scores()` 경로에서 해석됩니다. 여기서 중요한 점은 `VectorStoreRetriever`가 raw FAISS distance를 직접 비교하지 않는다는 것입니다. 먼저 vector store가 raw distance를 relevance score로 변환하고, 그다음 threshold를 적용합니다. 같은 이름의 파라미터라도 raw distance 기준인지, normalized relevance 기준인지가 다를 수 있으므로 이 호출 체인을 분리해서 봐야 합니다.
 
-아래 예시들은 `FakeEmbeddings`를 쓰므로 출력 순서는 설명용일 뿐이며, 의미적으로 타당한 검색 결과를 보장하지는 않습니다.
-
 이 경로를 가장 작은 코드로 보면 아래와 같습니다.
 
 ```python
 from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_store() -> FAISS:
     docs = [
@@ -125,7 +123,7 @@ def build_store() -> FAISS:
         Document(page_content="Dead-letter queues preserve the original payload.", metadata={"source": "runbook"}),
         Document(page_content="HTTP 429 means the caller exceeded quota.", metadata={"source": "api"}),
     ]
-    embeddings = FakeEmbeddings(size=8)
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     return FAISS.from_documents(docs, embeddings)
 
 def main() -> None:
@@ -186,8 +184,8 @@ FAISS가 실제로 호출하는 MMR 핵심 함수는 `langchain_community.vector
 
 ```python
 from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def main() -> None:
     docs = [
@@ -198,7 +196,8 @@ def main() -> None:
         Document(page_content="Operators inspect exception chains after the final retry."),
     ]
 
-    store = FAISS.from_documents(docs, FakeEmbeddings(size=16))
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    store = FAISS.from_documents(docs, embeddings)
 
     print("lambda_mult=0.8")
     for doc in store.max_marginal_relevance_search(
@@ -244,8 +243,8 @@ L2 경로의 기본 함수도 소스에 명시돼 있습니다. `_euclidean_rele
 
 ```python
 from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def main() -> None:
     docs = [
@@ -254,7 +253,8 @@ def main() -> None:
         Document(page_content="Dead-letter queues preserve payloads.", metadata={"source": "ops"}),
     ]
 
-    store = FAISS.from_documents(docs, FakeEmbeddings(size=12))
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    store = FAISS.from_documents(docs, embeddings)
 
     print("raw scores")
     for doc, score in store.similarity_search_with_score("retry budget", k=3):
@@ -298,9 +298,10 @@ from typing import Dict, List
 
 from langchain_core.callbacks.manager import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
-from langchain_core.embeddings import Embeddings, FakeEmbeddings
+from langchain_core.embeddings import Embeddings
 from langchain_core.retrievers import BaseRetriever
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_source_indexes(
     documents: List[Document], embeddings: Embeddings
@@ -329,7 +330,7 @@ class SourceScopedRetriever(BaseRetriever):
         return store.similarity_search(query, k=self.k)
 
 def main() -> None:
-    embeddings = FakeEmbeddings(size=10)
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     documents = [
         Document(
             page_content="Workers retry failed jobs three times before dead-lettering.",
@@ -379,6 +380,9 @@ if __name__ == "__main__":
 - [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
 - [임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
 - **Retriever 설계 — VectorStoreRetriever와 MMR (현재 글)**
+- 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
+- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

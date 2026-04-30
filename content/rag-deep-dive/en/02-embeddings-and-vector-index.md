@@ -48,17 +48,10 @@ The more interesting source function is `_get_len_safe_embeddings()`. That metho
 At the API layer, the request shape is straightforward. `embed_with_retry()` calls `embeddings.client.create(**kwargs)`, and in the OpenAI v1 path `_invocation_params` carries only `model` plus any `model_kwargs`. Auth, timeout, and related transport settings are configured earlier on the `openai.OpenAI(...)` client object during environment validation rather than packed into this dict. In practice the call shape looks like this:
 
 ```python
-import os
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from langchain_community.embeddings import OpenAIEmbeddings
-
-def build_embeddings() -> OpenAIEmbeddings:
-    return OpenAIEmbeddings(
-        model="text-embedding-3-large",
-        openai_api_key=os.environ["OPENAI_API_KEY"],
-        chunk_size=128,
-        max_retries=3,
-    )
+def build_embeddings() -> HuggingFaceEmbeddings:
+    return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 def demo() -> None:
     embeddings = build_embeddings()
@@ -159,7 +152,7 @@ This is a realistic example of the full call path.
 ```python
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_vector_store() -> FAISS:
     docs = [
@@ -173,7 +166,7 @@ def build_vector_store() -> FAISS:
         ),
     ]
 
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     return FAISS.from_documents(docs, embeddings)
 
 def main() -> None:
@@ -279,7 +272,7 @@ This is the normal trusted-path example.
 ```python
 from pathlib import Path
 
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
@@ -288,7 +281,7 @@ def main() -> None:
         Document(page_content="Rotate secrets every 90 days.", metadata={"source": "policy.md"}),
         Document(page_content="Retry HTTP 429 with exponential backoff.", metadata={"source": "api.md"}),
     ]
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     store = FAISS.from_documents(docs, embeddings)
 
     target = Path("artifacts/faiss-demo")
@@ -323,6 +316,10 @@ That baseline matters because the next layer is not just “top-k retrieval.” 
 
 - [Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
 - **Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (current)**
+- Retriever Design — VectorStoreRetriever and MMR (upcoming)
+- Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
+- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

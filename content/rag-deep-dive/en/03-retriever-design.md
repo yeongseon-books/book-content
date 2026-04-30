@@ -107,14 +107,12 @@ The dispatch logic itself is direct. For `similarity`, `_get_relevant_documents(
 
 `fetch_k` matters only for MMR and is passed straight through to the vector store. `score_threshold` matters only for threshold mode and is applied after relevance-score conversion, not on raw backend distances. That is why `VectorStoreRetriever` calls `similarity_search_with_relevance_scores()` rather than `similarity_search_with_score()`.
 
-The examples below use `FakeEmbeddings`, so any rankings or scores are illustrative rather than semantically meaningful.
-
 This small script makes the three modes visible.
 
 ```python
 from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_store() -> FAISS:
     docs = [
@@ -122,7 +120,7 @@ def build_store() -> FAISS:
         Document(page_content="Dead-letter queues preserve the original payload.", metadata={"source": "runbook"}),
         Document(page_content="HTTP 429 means the caller exceeded quota.", metadata={"source": "api"}),
     ]
-    return FAISS.from_documents(docs, FakeEmbeddings(size=8))
+    return FAISS.from_documents(docs, HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2"))
 
 def main() -> None:
     store = build_store()
@@ -184,8 +182,8 @@ Here is a runnable sketch.
 
 ```python
 from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def main() -> None:
     docs = [
@@ -196,7 +194,8 @@ def main() -> None:
         Document(page_content="Operators inspect exception chains after the final retry."),
     ]
 
-    store = FAISS.from_documents(docs, FakeEmbeddings(size=16))
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    store = FAISS.from_documents(docs, embeddings)
 
     print("lambda_mult=0.8")
     for doc in store.max_marginal_relevance_search(
@@ -242,8 +241,8 @@ This script shows both views.
 
 ```python
 from langchain_core.documents import Document
-from langchain_core.embeddings import FakeEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def main() -> None:
     docs = [
@@ -252,7 +251,8 @@ def main() -> None:
         Document(page_content="Dead-letter queues preserve payloads.", metadata={"source": "ops"}),
     ]
 
-    store = FAISS.from_documents(docs, FakeEmbeddings(size=12))
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    store = FAISS.from_documents(docs, embeddings)
 
     print("raw scores")
     for doc, score in store.similarity_search_with_score("retry budget", k=3):
@@ -298,9 +298,10 @@ from typing import Dict, List
 
 from langchain_core.callbacks.manager import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
-from langchain_core.embeddings import Embeddings, FakeEmbeddings
+from langchain_core.embeddings import Embeddings
 from langchain_core.retrievers import BaseRetriever
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def build_source_indexes(
     documents: List[Document], embeddings: Embeddings
@@ -329,7 +330,7 @@ class SourceScopedRetriever(BaseRetriever):
         return store.similarity_search(query, k=self.k)
 
 def main() -> None:
-    embeddings = FakeEmbeddings(size=10)
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     documents = [
         Document(
             page_content="Workers retry failed jobs three times before dead-lettering.",
@@ -379,6 +380,9 @@ That baseline leads directly into episode 4. Retrieval output is still not final
 - [Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
 - [Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
 - **Retriever Design — VectorStoreRetriever and MMR (current)**
+- Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
+- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

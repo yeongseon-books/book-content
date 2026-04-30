@@ -82,7 +82,7 @@
 from langchain.chains import RetrievalQA
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
-from langchain_community.llms.fake import FakeListLLM
+from langchain_groq import ChatGroq
 
 class KeywordRetriever(BaseRetriever):
     docs: List[Document]
@@ -103,9 +103,7 @@ def main() -&gt; None:
             Document(page_content=&quot;After the final retry, the job moves to the dead-letter queue.&quot;, metadata={&quot;source&quot;: &quot;ops.md&quot;}),
         ]
     )
-    llm = FakeListLLM(
-        responses=[&quot;The worker retries the job three times and then moves it to the dead-letter queue.&quot;]
-    )
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, temperature=0)
 
     qa = RetrievalQA.from_chain_type(
         llm=llm,
