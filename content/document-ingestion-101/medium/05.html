@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Multi-format document pipeline</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Multi-format document pipeline</h1>
+<blockquote>
+<p>Document Ingestion 101 (5/6)</p>
+</blockquote>
+<p>Real services do not process only PDFs. Word documents, HTML pages, Markdown files, and plain text files arrive together. The pipeline needs to select the right parser for each format and convert every source into a common representation.</p>
+<p>Topics:</p>
+<ul>
+<li>LangChain DocumentLoaders by format</li>
+<li>automatic format detection</li>
+<li>unified document processing pipeline</li>
+<li>stripping noise from HTML</li>
+</ul>
+<hr>
+<h2>LangChain DocumentLoader catalog</h2>
+<pre><code class="language-python">from langchain_community.document_loaders import (
+    PyMuPDFLoader,               # PDF — most accurate
+    Docx2txtLoader,              # Word (.docx)
+    UnstructuredHTMLLoader,      # HTML (requires unstructured package)
+    BSHTMLLoader,                # HTML (BeautifulSoup4)
+    TextLoader,                  # plain text
+    UnstructuredMarkdownLoader,  # Markdown
+    CSVLoader,                   # CSV
+    JSONLoader,                  # JSON
+)
+</code></pre>
+<hr>
+<h2>Per-format loader functions</h2>
+<pre><code class="language-python">from pathlib import Path
+
+from langchain.schema import Document
+from langchain_community.document_loaders import (
+    BSHTMLLoader,
+    Docx2txtLoader,
+    PyMuPDFLoader,
+    TextLoader,
+)
+
+def load_pdf(file_path: str) -&gt; list[Document]:
+    loader = PyMuPDFLoader(file_path)
+    docs = loader.load()
+    for doc in docs:
+        doc.metadata[&quot;format&quot;] = &quot;pdf&quot;
+        doc.metadata[&quot;source&quot;] = Path(file_path).name
+    return docs
+
+def load_word(file_path: str) -&gt; list[Document]:
+    loader = Docx2txtLoader(file_path)
+    docs = loader.load()
+    for doc in docs:
+        doc.metadata[&quot;format&quot;] = &quot;docx&quot;
+        doc.metadata[&quot;source&quot;] = Path(file_path).name
+    return docs
+
+def load_html(file_path: str) -&gt; list[Document]:
+    loader = BSHTMLLoader(file_path, bs_kwargs={&quot;features&quot;: &quot;html.parser&quot;})
+    docs = loader.load()
+    for doc in docs:
+        doc.metadata[&quot;format&quot;] = &quot;html&quot;
+        doc.metadata[&quot;source&quot;] = Path(file_path).name
+    return docs
+
+def load_text(file_path: str, encoding: str = &quot;utf-8&quot;) -&gt; list[Document]:
+    loader = TextLoader(file_path, encoding=encoding)
+    docs = loader.load()
+    for doc in docs:
+        doc.metadata[&quot;format&quot;] = &quot;txt&quot;
+        doc.metadata[&quot;source&quot;] = Path(file_path).name
+    return docs
+
+def load_markdown(file_path: str) -&gt; list[Document]:
+    loader = TextLoader(file_path, encoding=&quot;utf-8&quot;)
+    docs = loader.load()
+    for doc in docs:
+        doc.metadata[&quot;format&quot;] = &quot;md&quot;
+        doc.metadata[&quot;source&quot;] = Path(file_path).name
+    return docs
+</code></pre>
+<hr>
+<h2>Format-detection router</h2>
+<pre><code class="language-python">LOADER_MAP = {
+    &quot;.pdf&quot;: load_pdf,
+    &quot;.docx&quot;: load_word,
+    &quot;.doc&quot;: load_word,
+    &quot;.html&quot;: load_html,
+    &quot;.htm&quot;: load_html,
+    &quot;.txt&quot;: load_text,
+    &quot;.md&quot;: load_markdown,
+    &quot;.markdown&quot;: load_markdown,
+}
+
+def load_document(file_path: str) -&gt; list[Document]:
+    &quot;&quot;&quot;Select the appropriate loader based on file extension.&quot;&quot;&quot;
+    suffix = Path(file_path).suffix.lower()
+    loader_fn = LOADER_MAP.get(suffix)
+
+    if loader_fn is None:
+        raise ValueError(
+            f&quot;unsupported format: {suffix}\nsupported: {list(LOADER_MAP.keys())}&quot;
+        )
+
+    docs = loader_fn(file_path)
+    print(f&quot;  [{suffix[1:].upper()}] {Path(file_path).name}: {len(docs)} page(s)/section(s)&quot;)
+    return docs
+</code></pre>
+<hr>
+<h2>Unified pipeline</h2>
+<pre><code class="language-python">import tempfile
+from pathlib import Path
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def process_directory(
+    directory: str,
+    patterns: list[str] = None,
+    chunk_size: int = 400,
+    chunk_overlap: int = 80,
+) -&gt; FAISS:
+    &quot;&quot;&quot;Load, chunk, and index all supported documents in a directory.&quot;&quot;&quot;
+    if patterns is None:
+        patterns = [&quot;*.pdf&quot;, &quot;*.docx&quot;, &quot;*.html&quot;, &quot;*.txt&quot;, &quot;*.md&quot;]
+
+    directory = Path(directory)
+    all_files = []
+    for pattern in patterns:
+        all_files.extend(directory.glob(pattern))
+
+    print(f&quot;files found: {len(all_files)}&quot;)
+
+    all_docs = []
+    for file_path in all_files:
+        try:
+            docs = load_document(str(file_path))
+            all_docs.extend(docs)
+        except Exception as e:
+            print(f&quot;  [error] {file_path.name}: {e}&quot;)
+
+    if not all_docs:
+        raise ValueError(&quot;no documents to process&quot;)
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;],
+    )
+    chunks = splitter.split_documents(all_docs)
+    print(f&quot;total chunks: {len(chunks)}&quot;)
+
+    format_counts: dict[str, int] = {}
+    for chunk in chunks:
+        fmt = chunk.metadata.get(&quot;format&quot;, &quot;unknown&quot;)
+        format_counts[fmt] = format_counts.get(fmt, 0) + 1
+    print(f&quot;chunks by format: {format_counts}&quot;)
+
+    embedding_model = HuggingFaceEmbeddings(
+        model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+    vectorstore = FAISS.from_documents(chunks, embedding_model)
+    print(f&quot;index ready: {vectorstore.index.ntotal} vectors&quot;)
+    return vectorstore
+
+# Test with temporary files
+with tempfile.TemporaryDirectory() as tmpdir:
+    tmpdir = Path(tmpdir)
+
+    (tmpdir / &quot;guide.txt&quot;).write_text(
+        &quot;Python Installation Guide\n\nDownload Python 3.10 or later from python.org.\nInstall packages with: pip install &lt;name&gt;.&quot;,
+        encoding=&quot;utf-8&quot;,
+    )
+    (tmpdir / &quot;readme.md&quot;).write_text(
+        &quot;# Project overview\n\nThis project implements a RAG pipeline.\n\n## Features\n\n- Document indexing\n- Question answering&quot;,
+        encoding=&quot;utf-8&quot;,
+    )
+    (tmpdir / &quot;index.html&quot;).write_text(
+        &quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Product introduction&lt;/h1&gt;&lt;p&gt;AI-powered document search system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&quot;,
+        encoding=&quot;utf-8&quot;,
+    )
+
+    vectorstore = process_directory(str(tmpdir))
+
+    results = vectorstore.similarity_search(&quot;Python installation&quot;, k=2)
+    print(&quot;\nsearch results:&quot;)
+    for r in results:
+        print(f&quot;  [{r.metadata.get('format')}] {r.page_content[:80]}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>The key to multi-format pipelines is the common interface: every format converter returns <code>list[Document]</code>. The router maps file extensions to converter functions. Adding a new format means writing one loader function and one LOADER_MAP entry — the chunking and indexing stages remain unchanged.</p>
+<p>The final post assembles all components into a complete production document ingestion pipeline.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/01-pdf-parsing.md">PDF parsing and text extraction</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/02-chunking-strategies.md">Chunking strategies — optimizing by document type</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/03-metadata-filtering.md">Metadata design and filtering</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/04-incremental-indexing.md">Incremental indexing — updating only changed documents</a></li>
+<li><strong>Multi-format document pipeline (current)</strong></li>
+<li>Completing the document ingestion pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/integrations/document_loaders/">LangChain DocumentLoaders</a></li>
+<li><a href="https://unstructured.io/">Unstructured.io library</a></li>
+<li><a href="https://python-docx.readthedocs.io/">python-docx</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, Document Processing, LangChain, Python</p>
+</body>
+</html>

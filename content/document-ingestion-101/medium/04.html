@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Incremental indexing — updating only changed documents</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Incremental indexing — updating only changed documents</h1>
+<blockquote>
+<p>Document Ingestion 101 (4/6)</p>
+</blockquote>
+<p>With 1,000 documents, the initial indexing run happens once. But if new documents arrive daily and existing ones get revised, rebuilding the full index every time is expensive. Incremental indexing identifies which documents changed and processes only those, leaving unchanged documents untouched.</p>
+<p>Topics:</p>
+<ul>
+<li>detecting file changes (hash or modification time)</li>
+<li>designing an index state store</li>
+<li>handling additions, modifications, and deletions</li>
+<li>applying incremental updates to a FAISS index</li>
+</ul>
+<hr>
+<h2>Change detection strategies</h2>
+<p>Two approaches for detecting file changes:</p>
+<p><strong>Modification time comparison</strong>: store the filesystem <code>mtime</code> and compare. Fast but may reprocess files whose content did not actually change (e.g., touch without editing).</p>
+<p><strong>Content hash comparison</strong>: store an MD5/SHA-256 hash of the file content and compare. Accurate but requires reading the full file every run.</p>
+<p>In practice, combine both: check <code>mtime</code> first (fast path), and only compute the hash when <code>mtime</code> changed.</p>
+<hr>
+<h2>Index state store</h2>
+<pre><code class="language-python">import hashlib
+import json
+from datetime import datetime
+from pathlib import Path
+
+class IndexStateStore:
+    &quot;&quot;&quot;
+    Manages per-document indexing state in a JSON file.
+    Schema: {file_path: {&quot;hash&quot;: str, &quot;mtime&quot;: float, &quot;indexed_at&quot;: str, &quot;chunk_ids&quot;: [str]}}
+    &quot;&quot;&quot;
+
+    def __init__(self, state_file: str = &quot;.index_state.json&quot;):
+        self.state_file = Path(state_file)
+        self.state = self._load()
+
+    def _load(self) -&gt; dict:
+        if self.state_file.exists():
+            with open(self.state_file, encoding=&quot;utf-8&quot;) as f:
+                return json.load(f)
+        return {}
+
+    def save(self) -&gt; None:
+        with open(self.state_file, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+            json.dump(self.state, f, ensure_ascii=False, indent=2)
+
+    def get_file_hash(self, file_path: str) -&gt; str:
+        hasher = hashlib.md5()
+        with open(file_path, &quot;rb&quot;) as f:
+            for chunk in iter(lambda: f.read(8192), b&quot;&quot;):
+                hasher.update(chunk)
+        return hasher.hexdigest()
+
+    def is_changed(self, file_path: str) -&gt; bool:
+        &quot;&quot;&quot;Return True if the file changed since it was last indexed.&quot;&quot;&quot;
+        path = Path(file_path)
+        if not path.exists():
+            return False
+
+        current_mtime = path.stat().st_mtime
+        stored = self.state.get(str(file_path), {})
+
+        if stored.get(&quot;mtime&quot;) == current_mtime:
+            return False  # fast path: mtime unchanged
+
+        return stored.get(&quot;hash&quot;) != self.get_file_hash(file_path)
+
+    def is_deleted(self, file_path: str) -&gt; bool:
+        &quot;&quot;&quot;Return True if the file was previously indexed but no longer exists.&quot;&quot;&quot;
+        return str(file_path) in self.state and not Path(file_path).exists()
+
+    def mark_indexed(self, file_path: str, chunk_ids: list[str]) -&gt; None:
+        path = Path(file_path)
+        self.state[str(file_path)] = {
+            &quot;hash&quot;: self.get_file_hash(file_path),
+            &quot;mtime&quot;: path.stat().st_mtime,
+            &quot;indexed_at&quot;: datetime.now().isoformat(),
+            &quot;chunk_ids&quot;: chunk_ids,
+        }
+
+    def get_chunk_ids(self, file_path: str) -&gt; list[str]:
+        return self.state.get(str(file_path), {}).get(&quot;chunk_ids&quot;, [])
+
+    def remove(self, file_path: str) -&gt; None:
+        self.state.pop(str(file_path), None)
+
+store = IndexStateStore(&quot;/tmp/test_index_state.json&quot;)
+print(&quot;state store initialized&quot;)
+</code></pre>
+<hr>
+<h2>Incremental indexer</h2>
+<pre><code class="language-python">import hashlib
+from pathlib import Path
+
+from langchain.schema import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+class IncrementalIndexer:
+    &quot;&quot;&quot;Indexes only documents that changed since the last run.&quot;&quot;&quot;
+
+    def __init__(self, index_path: str, state_file: str = &quot;.index_state.json&quot;):
+        self.index_path = Path(index_path)
+        self.state_store = IndexStateStore(state_file)
+        self.embedding_model = HuggingFaceEmbeddings(
+            model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+            model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+            encode_kwargs={&quot;normalize_embeddings&quot;: True},
+        )
+        self.splitter = RecursiveCharacterTextSplitter(
+            chunk_size=400,
+            chunk_overlap=80,
+            separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;],
+        )
+        self.vectorstore = self._load_or_create_index()
+
+    def _load_or_create_index(self) -&gt; FAISS:
+        if self.index_path.exists():
+            print(f&quot;loading existing index: {self.index_path}&quot;)
+            return FAISS.load_local(
+                str(self.index_path),
+                self.embedding_model,
+                allow_dangerous_deserialization=True,
+            )
+        print(&quot;creating new index&quot;)
+        dummy = Document(page_content=&quot;init&quot;, metadata={&quot;_dummy&quot;: True})
+        return FAISS.from_documents([dummy], self.embedding_model)
+
+    def _text_to_chunks(self, text: str, file_path: str) -&gt; list[Document]:
+        chunks = self.splitter.split_text(text)
+        docs = []
+        for idx, chunk in enumerate(chunks):
+            chunk_id = f&quot;{Path(file_path).stem}_c{idx}_{hashlib.md5(chunk.encode()).hexdigest()[:6]}&quot;
+            docs.append(Document(
+                page_content=chunk,
+                metadata={
+                    &quot;source_file&quot;: Path(file_path).name,
+                    &quot;chunk_id&quot;: chunk_id,
+                    &quot;chunk_idx&quot;: idx,
+                },
+            ))
+        return docs
+
+    def process_file(self, file_path: str, text: str) -&gt; str:
+        &quot;&quot;&quot;Process one file. Returns: 'added' | 'updated' | 'skipped'.&quot;&quot;&quot;
+        if not self.state_store.is_changed(file_path) and str(file_path) in self.state_store.state:
+            return &quot;skipped&quot;
+
+        old_chunk_ids = self.state_store.get_chunk_ids(file_path)
+        if old_chunk_ids:
+            print(f&quot;  removing {len(old_chunk_ids)} previous chunks&quot;)
+
+        docs = self._text_to_chunks(text, file_path)
+        if docs:
+            self.vectorstore.add_documents(docs)
+            self.state_store.mark_indexed(file_path, [d.metadata[&quot;chunk_id&quot;] for d in docs])
+            return &quot;updated&quot; if old_chunk_ids else &quot;added&quot;
+
+        return &quot;skipped&quot;
+
+    def sync_directory(self, directory: str, pattern: str = &quot;*.txt&quot;) -&gt; dict:
+        &quot;&quot;&quot;Sync all matching files in a directory.&quot;&quot;&quot;
+        directory = Path(directory)
+        files = list(directory.glob(pattern))
+        stats = {&quot;added&quot;: 0, &quot;updated&quot;: 0, &quot;skipped&quot;: 0, &quot;deleted&quot;: 0}
+
+        for file_path in files:
+            text = file_path.read_text(encoding=&quot;utf-8&quot;)
+            status = self.process_file(str(file_path), text)
+            stats[status] += 1
+            print(f&quot;  [{status}] {file_path.name}&quot;)
+
+        for stored_path in list(self.state_store.state.keys()):
+            if self.state_store.is_deleted(stored_path):
+                self.state_store.remove(stored_path)
+                stats[&quot;deleted&quot;] += 1
+                print(f&quot;  [deleted] {stored_path}&quot;)
+
+        self.state_store.save()
+        self.vectorstore.save_local(str(self.index_path))
+        return stats
+
+# Test with a temporary directory
+import tempfile
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    tmpdir = Path(tmpdir)
+
+    (tmpdir / &quot;doc1.txt&quot;).write_text(&quot;Python async programming basics. Uses asyncio.&quot;, encoding=&quot;utf-8&quot;)
+    (tmpdir / &quot;doc2.txt&quot;).write_text(&quot;Machine learning model training and evaluation.&quot;, encoding=&quot;utf-8&quot;)
+
+    indexer = IncrementalIndexer(str(tmpdir / &quot;.faiss_index&quot;))
+    stats = indexer.sync_directory(str(tmpdir))
+    print(f&quot;\nfirst sync: {stats}&quot;)
+
+    # modify doc1, add doc3
+    (tmpdir / &quot;doc1.txt&quot;).write_text(&quot;Build async HTTP clients with Python asyncio and aiohttp.&quot;, encoding=&quot;utf-8&quot;)
+    (tmpdir / &quot;doc3.txt&quot;).write_text(&quot;Deep learning model deployment and serving strategies.&quot;, encoding=&quot;utf-8&quot;)
+
+    stats = indexer.sync_directory(str(tmpdir))
+    print(f&quot;second sync: {stats}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>Incremental indexing is necessary for any service where documents change regularly. A JSON state file is a simple starting point; swap it for Redis or SQLite as the document corpus grows. The pattern is always the same: detect changes via mtime + hash, remove stale chunks, add new chunks, persist the updated state.</p>
+<p>The next post covers multi-format document pipelines: handling Word documents, HTML pages, and Markdown alongside PDFs.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/01-pdf-parsing.md">PDF parsing and text extraction</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/02-chunking-strategies.md">Chunking strategies — optimizing by document type</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/03-metadata-filtering.md">Metadata design and filtering</a></li>
+<li><strong>Incremental indexing — updating only changed documents (current)</strong></li>
+<li>Multi-format document pipeline (upcoming)</li>
+<li>Completing the document ingestion pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/modules/data_connection/indexing/">LangChain RecordManager (incremental indexing)</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/vectorstores/faiss/#saving-and-loading">FAISS save/load</a></li>
+<li><a href="https://realpython.com/python-hashlib/">File hash change detection patterns</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, Document Processing, LangChain, Python</p>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Completing the document ingestion pipeline</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Completing the document ingestion pipeline</h1>
+<blockquote>
+<p>Document Ingestion 101 (6/6)</p>
+</blockquote>
+<p>This post assembles all components from the series into one complete pipeline: PDF/Word/HTML/Markdown parsing, format-aware chunking, metadata attachment, incremental indexing, FAISS retrieval, and a LangChain RAG chain.</p>
+<hr>
+<h2>Complete document ingestion pipeline</h2>
+<pre><code class="language-python">import hashlib
+import json
+import os
+from datetime import datetime
+from pathlib import Path
+
+from langchain.schema import Document
+from langchain_community.document_loaders import (
+    BSHTMLLoader,
+    Docx2txtLoader,
+    PyMuPDFLoader,
+    TextLoader,
+)
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# ── chunking config ─────────────────────────────────────────────────────────
+CHUNKING_CONFIG = {
+    &quot;pdf&quot;:  {&quot;chunk_size&quot;: 500, &quot;chunk_overlap&quot;: 100},
+    &quot;docx&quot;: {&quot;chunk_size&quot;: 500, &quot;chunk_overlap&quot;: 100},
+    &quot;html&quot;: {&quot;chunk_size&quot;: 300, &quot;chunk_overlap&quot;: 50},
+    &quot;txt&quot;:  {&quot;chunk_size&quot;: 400, &quot;chunk_overlap&quot;: 80},
+    &quot;md&quot;:   {&quot;chunk_size&quot;: 400, &quot;chunk_overlap&quot;: 80},
+}
+
+SEPARATORS = [&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;]
+
+# ── format loaders ──────────────────────────────────────────────────────────
+def _add_base_metadata(docs: list[Document], file_path: str, fmt: str) -&gt; list[Document]:
+    path = Path(file_path)
+    stat = path.stat()
+    for doc in docs:
+        doc.metadata.update({
+            &quot;format&quot;: fmt,
+            &quot;source&quot;: path.name,
+            &quot;source_path&quot;: str(path),
+            &quot;modified_date&quot;: datetime.fromtimestamp(stat.st_mtime).strftime(&quot;%Y-%m-%d&quot;),
+            &quot;file_size_kb&quot;: stat.st_size // 1024,
+        })
+    return docs
+
+LOADERS = {
+    &quot;.pdf&quot;:      lambda p: _add_base_metadata(PyMuPDFLoader(p).load(), p, &quot;pdf&quot;),
+    &quot;.docx&quot;:     lambda p: _add_base_metadata(Docx2txtLoader(p).load(), p, &quot;docx&quot;),
+    &quot;.doc&quot;:      lambda p: _add_base_metadata(Docx2txtLoader(p).load(), p, &quot;docx&quot;),
+    &quot;.html&quot;:     lambda p: _add_base_metadata(BSHTMLLoader(p, bs_kwargs={&quot;features&quot;: &quot;html.parser&quot;}).load(), p, &quot;html&quot;),
+    &quot;.htm&quot;:      lambda p: _add_base_metadata(BSHTMLLoader(p, bs_kwargs={&quot;features&quot;: &quot;html.parser&quot;}).load(), p, &quot;html&quot;),
+    &quot;.txt&quot;:      lambda p: _add_base_metadata(TextLoader(p, encoding=&quot;utf-8&quot;).load(), p, &quot;txt&quot;),
+    &quot;.md&quot;:       lambda p: _add_base_metadata(TextLoader(p, encoding=&quot;utf-8&quot;).load(), p, &quot;md&quot;),
+    &quot;.markdown&quot;: lambda p: _add_base_metadata(TextLoader(p, encoding=&quot;utf-8&quot;).load(), p, &quot;md&quot;),
+}
+
+def load_file(file_path: str) -&gt; list[Document]:
+    suffix = Path(file_path).suffix.lower()
+    loader = LOADERS.get(suffix)
+    if not loader:
+        raise ValueError(f&quot;unsupported format: {suffix}&quot;)
+    return loader(file_path)
+
+# ── state store ─────────────────────────────────────────────────────────────
+class StateStore:
+    def __init__(self, path: str):
+        self.path = Path(path)
+        self.data = json.loads(self.path.read_text()) if self.path.exists() else {}
+
+    def save(self):
+        self.path.write_text(json.dumps(self.data, ensure_ascii=False, indent=2))
+
+    def hash_file(self, fp: str) -&gt; str:
+        h = hashlib.md5()
+        with open(fp, &quot;rb&quot;) as f:
+            for chunk in iter(lambda: f.read(8192), b&quot;&quot;):
+                h.update(chunk)
+        return h.hexdigest()
+
+    def needs_update(self, fp: str) -&gt; bool:
+        stored = self.data.get(fp, {})
+        mtime = Path(fp).stat().st_mtime
+        if stored.get(&quot;mtime&quot;) == mtime:
+            return False
+        return stored.get(&quot;hash&quot;) != self.hash_file(fp)
+
+    def mark(self, fp: str, chunk_ids: list[str]):
+        self.data[fp] = {
+            &quot;hash&quot;: self.hash_file(fp),
+            &quot;mtime&quot;: Path(fp).stat().st_mtime,
+            &quot;indexed_at&quot;: datetime.now().isoformat(),
+            &quot;chunk_ids&quot;: chunk_ids,
+        }
+
+# ── chunking ────────────────────────────────────────────────────────────────
+def chunk_documents(docs: list[Document]) -&gt; list[Document]:
+    all_chunks = []
+    for doc in docs:
+        fmt = doc.metadata.get(&quot;format&quot;, &quot;txt&quot;)
+        cfg = CHUNKING_CONFIG.get(fmt, CHUNKING_CONFIG[&quot;txt&quot;])
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=cfg[&quot;chunk_size&quot;],
+            chunk_overlap=cfg[&quot;chunk_overlap&quot;],
+            separators=SEPARATORS,
+        )
+        chunks = splitter.split_documents([doc])
+        for idx, chunk in enumerate(chunks):
+            cid = hashlib.md5(chunk.page_content.encode()).hexdigest()[:8]
+            chunk.metadata[&quot;chunk_id&quot;] = f&quot;{Path(doc.metadata['source']).stem}_c{idx}_{cid}&quot;
+            chunk.metadata[&quot;chunk_idx&quot;] = idx
+        all_chunks.extend(chunks)
+    return all_chunks
+
+# ── main pipeline ───────────────────────────────────────────────────────────
+class DocumentIngestionPipeline:
+    def __init__(self, index_dir: str):
+        self.index_dir = Path(index_dir)
+        self.index_dir.mkdir(parents=True, exist_ok=True)
+        self.state = StateStore(str(self.index_dir / &quot;state.json&quot;))
+        self.embedding = HuggingFaceEmbeddings(
+            model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+            model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+            encode_kwargs={&quot;normalize_embeddings&quot;: True},
+        )
+        faiss_path = self.index_dir / &quot;faiss&quot;
+        if faiss_path.exists():
+            self.vectorstore = FAISS.load_local(
+                str(faiss_path), self.embedding, allow_dangerous_deserialization=True
+            )
+        else:
+            dummy = Document(page_content=&quot;__init__&quot;, metadata={&quot;_dummy&quot;: True})
+            self.vectorstore = FAISS.from_documents([dummy], self.embedding)
+
+    def ingest(self, file_paths: list[str]) -&gt; dict:
+        stats = {&quot;added&quot;: 0, &quot;updated&quot;: 0, &quot;skipped&quot;: 0, &quot;errors&quot;: 0}
+
+        for fp in file_paths:
+            try:
+                if not self.state.needs_update(fp) and fp in self.state.data:
+                    stats[&quot;skipped&quot;] += 1
+                    continue
+
+                is_update = fp in self.state.data
+                docs = load_file(fp)
+                chunks = chunk_documents(docs)
+
+                if chunks:
+                    self.vectorstore.add_documents(chunks)
+                    self.state.mark(fp, [c.metadata[&quot;chunk_id&quot;] for c in chunks])
+                    stats[&quot;updated&quot; if is_update else &quot;added&quot;] += 1
+                    label = &quot;updated&quot; if is_update else &quot;added&quot;
+                    print(f&quot;  [{label}] {Path(fp).name}: {len(chunks)} chunks&quot;)
+
+            except Exception as e:
+                stats[&quot;errors&quot;] += 1
+                print(f&quot;  [error] {fp}: {e}&quot;)
+
+        self.state.save()
+        self.vectorstore.save_local(str(self.index_dir / &quot;faiss&quot;))
+        return stats
+
+    def build_rag_chain(self, llm):
+        retriever = self.vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                &quot;system&quot;,
+                &quot;Answer the question using the documents below.\n&quot;
+                &quot;If the answer is not in the documents, say so.\n\n&quot;
+                &quot;Documents:\n{context}&quot;,
+            ),
+            (&quot;human&quot;, &quot;{question}&quot;),
+        ])
+
+        def format_docs(docs: list) -&gt; str:
+            parts = []
+            for doc in docs:
+                src = doc.metadata.get(&quot;source&quot;, &quot;unknown&quot;)
+                parts.append(f&quot;[source: {src}]\n{doc.page_content}&quot;)
+            return &quot;\n\n&quot;.join(parts)
+
+        return (
+            {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+            | prompt
+            | llm
+            | StrOutputParser()
+        )
+</code></pre>
+<hr>
+<h2>Usage</h2>
+<pre><code class="language-python">import tempfile
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    tmpdir = Path(tmpdir)
+
+    (tmpdir / &quot;python_guide.txt&quot;).write_text(
+        &quot;Python Basics Guide\n\n&quot;
+        &quot;Python is a high-level programming language created in 1991.\n&quot;
+        &quot;It prioritizes readability above all else.\n\n&quot;
+        &quot;Installation:\nDownload the latest version from python.org.\n&quot;
+        &quot;Install packages with: pip install &lt;name&gt;.&quot;,
+        encoding=&quot;utf-8&quot;,
+    )
+    (tmpdir / &quot;faq.md&quot;).write_text(
+        &quot;# Frequently asked questions\n\n&quot;
+        &quot;## What is the difference between Python and Java?\n\n&quot;
+        &quot;Python is interpreted, Java is compiled.\n&quot;
+        &quot;Python code is shorter and more readable.\n\n&quot;
+        &quot;## Can I build web apps with Python?\n\n&quot;
+        &quot;Yes. Django and FastAPI are the leading web frameworks.&quot;,
+        encoding=&quot;utf-8&quot;,
+    )
+
+    pipeline = DocumentIngestionPipeline(str(tmpdir / &quot;.index&quot;))
+    files = [str(tmpdir / &quot;python_guide.txt&quot;), str(tmpdir / &quot;faq.md&quot;)]
+    stats = pipeline.ingest(files)
+    print(f&quot;ingestion result: {stats}&quot;)
+
+    llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+    )
+    chain = pipeline.build_rag_chain(llm)
+
+    questions = [
+        &quot;When was Python created?&quot;,
+        &quot;Can Python be used for web development?&quot;,
+    ]
+    for question in questions:
+        answer = chain.invoke(question)
+        print(f&quot;\nquestion: {question}&quot;)
+        print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>This series covered the full document ingestion lifecycle: parsing, chunking, metadata, incremental indexing, multi-format support, and RAG chain assembly. Each stage is independently replaceable — swap the parser to support a new format, tune the chunking config to improve retrieval quality, replace the JSON state store with SQLite or Redis to scale further.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/01-pdf-parsing.md">PDF parsing and text extraction</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/02-chunking-strategies.md">Chunking strategies — optimizing by document type</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/03-metadata-filtering.md">Metadata design and filtering</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/04-incremental-indexing.md">Incremental indexing — updating only changed documents</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/05-multi-format-pipeline.md">Multi-format document pipeline</a></li>
+<li><strong>Completing the document ingestion pipeline (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/modules/data_connection/indexing/">LangChain indexing API</a></li>
+<li><a href="https://faiss.ai/">FAISS documentation</a></li>
+<li><a href="https://pymupdf.readthedocs.io/">pymupdf documentation</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, Document Processing, LangChain, Python</p>
+</body>
+</html>

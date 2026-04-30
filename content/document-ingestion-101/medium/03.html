@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Metadata design and filtering</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Metadata design and filtering</h1>
+<blockquote>
+<p>Document Ingestion 101 (3/6)</p>
+</blockquote>
+<p>Consider the query "find marketing-related content from the Q4 2024 report." Embedding similarity alone cannot filter by date and category simultaneously. Metadata filtering handles this: attach structured metadata to each chunk, then apply metadata conditions alongside semantic similarity at query time.</p>
+<p>Topics:</p>
+<ul>
+<li>designing a metadata schema</li>
+<li>attaching metadata to chunks</li>
+<li>post-retrieval metadata filtering with FAISS</li>
+<li>filtering by date, category, and source</li>
+</ul>
+<hr>
+<h2>Designing a metadata schema</h2>
+<p>A good schema predefines the filter conditions you will use at query time.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class DocumentMetadata:
+    # identifiers
+    doc_id: str
+    chunk_id: str
+
+    # source
+    source_file: str
+    source_type: str          # pdf, txt, html, docx
+
+    # content classification
+    category: str             # legal, news, technical, faq
+    subcategory: Optional[str] = None
+
+    # dates
+    created_date: Optional[str] = None   # ISO 8601: &quot;2024-01-15&quot;
+    modified_date: Optional[str] = None
+
+    # position
+    page_num: Optional[int] = None
+    chunk_idx: int = 0
+
+    # quality signals
+    char_count: int = 0
+    language: str = &quot;en&quot;
+
+    def to_dict(self) -&gt; dict:
+        return {k: v for k, v in self.__dict__.items() if v is not None}
+
+meta = DocumentMetadata(
+    doc_id=&quot;doc_001&quot;,
+    chunk_id=&quot;doc_001_chunk_003&quot;,
+    source_file=&quot;2024q4_report.pdf&quot;,
+    source_type=&quot;pdf&quot;,
+    category=&quot;business&quot;,
+    subcategory=&quot;marketing&quot;,
+    created_date=&quot;2024-10-01&quot;,
+    page_num=5,
+    chunk_idx=3,
+    char_count=320,
+    language=&quot;en&quot;,
+)
+print(meta.to_dict())
+</code></pre>
+<hr>
+<h2>Attaching metadata to chunks</h2>
+<pre><code class="language-python">import hashlib
+from datetime import datetime
+from pathlib import Path
+
+import fitz
+from langchain.schema import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def load_pdf_with_metadata(
+    pdf_path: str,
+    category: str,
+    chunk_size: int = 400,
+    chunk_overlap: int = 80,
+) -&gt; list[Document]:
+    &quot;&quot;&quot;
+    Load a PDF and return LangChain Documents with per-chunk metadata.
+    &quot;&quot;&quot;
+    pdf_path = Path(pdf_path)
+    doc = fitz.open(str(pdf_path))
+
+    file_stat = pdf_path.stat()
+    pdf_meta = {
+        &quot;source_file&quot;: pdf_path.name,
+        &quot;source_type&quot;: &quot;pdf&quot;,
+        &quot;category&quot;: category,
+        &quot;page_count&quot;: len(doc),
+        &quot;file_size_kb&quot;: file_stat.st_size // 1024,
+        &quot;modified_date&quot;: datetime.fromtimestamp(file_stat.st_mtime).strftime(&quot;%Y-%m-%d&quot;),
+    }
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;],
+    )
+
+    langchain_docs = []
+    for page_num in range(len(doc)):
+        page = doc[page_num]
+        text = page.get_text(&quot;text&quot;).strip()
+        if not text:
+            continue
+
+        chunks = splitter.split_text(text)
+        for chunk_idx, chunk in enumerate(chunks):
+            chunk_hash = hashlib.md5(chunk.encode()).hexdigest()[:8]
+            chunk_id = f&quot;{pdf_path.stem}_p{page_num + 1}_c{chunk_idx}_{chunk_hash}&quot;
+
+            metadata = {
+                **pdf_meta,
+                &quot;page_num&quot;: page_num + 1,
+                &quot;chunk_idx&quot;: chunk_idx,
+                &quot;chunk_id&quot;: chunk_id,
+                &quot;char_count&quot;: len(chunk),
+            }
+            langchain_docs.append(Document(page_content=chunk, metadata=metadata))
+
+    doc.close()
+    return langchain_docs
+
+docs = load_pdf_with_metadata(&quot;/tmp/sample_en.pdf&quot;, category=&quot;technical&quot;)
+print(f&quot;documents created: {len(docs)}&quot;)
+for doc in docs[:2]:
+    print(f&quot;\nchunk id: {doc.metadata['chunk_id']}&quot;)
+    print(f&quot;metadata: {doc.metadata}&quot;)
+    print(f&quot;content: {doc.page_content[:100]}...&quot;)
+</code></pre>
+<hr>
+<h2>Post-retrieval metadata filtering</h2>
+<p>FAISS's native metadata filtering is limited. The standard approach is to retrieve more candidates than needed, then filter by metadata in Python.</p>
+<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain.schema import Document
+
+def build_index_with_metadata(documents: list[Document]) -&gt; FAISS:
+    embedding_model = HuggingFaceEmbeddings(
+        model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+    vectorstore = FAISS.from_documents(documents, embedding_model)
+    print(f&quot;index ready: {vectorstore.index.ntotal} vectors&quot;)
+    return vectorstore
+
+def filtered_search(
+    vectorstore: FAISS,
+    query: str,
+    k: int = 10,
+    filter_fn=None,
+) -&gt; list[Document]:
+    &quot;&quot;&quot;
+    Semantic search followed by metadata filter.
+    filter_fn: Document -&gt; bool
+    &quot;&quot;&quot;
+    results = vectorstore.similarity_search(query, k=k)
+    if filter_fn:
+        results = [doc for doc in results if filter_fn(doc)]
+    return results
+
+# Build a mixed-category index
+all_docs = [
+    Document(
+        page_content=&quot;Implementing async HTTP clients with Python asyncio.&quot;,
+        metadata={&quot;category&quot;: &quot;technical&quot;, &quot;source_file&quot;: &quot;python_async.pdf&quot;, &quot;page_num&quot;: 1, &quot;created_date&quot;: &quot;2024-01-15&quot;},
+    ),
+    Document(
+        page_content=&quot;FAISS IVF indexing speeds up large-scale vector search.&quot;,
+        metadata={&quot;category&quot;: &quot;technical&quot;, &quot;source_file&quot;: &quot;faiss_guide.pdf&quot;, &quot;page_num&quot;: 3, &quot;created_date&quot;: &quot;2024-03-10&quot;},
+    ),
+    Document(
+        page_content=&quot;Personal information means any information that identifies a living individual.&quot;,
+        metadata={&quot;category&quot;: &quot;legal&quot;, &quot;source_file&quot;: &quot;privacy_law.pdf&quot;, &quot;page_num&quot;: 1, &quot;created_date&quot;: &quot;2023-09-01&quot;},
+    ),
+    Document(
+        page_content=&quot;A controller may not provide personal information to a third party without consent.&quot;,
+        metadata={&quot;category&quot;: &quot;legal&quot;, &quot;source_file&quot;: &quot;privacy_law.pdf&quot;, &quot;page_num&quot;: 5, &quot;created_date&quot;: &quot;2023-09-01&quot;},
+    ),
+]
+
+vectorstore = build_index_with_metadata(all_docs)
+
+# Filter: technical documents only
+tech_results = filtered_search(
+    vectorstore,
+    query=&quot;vector search methods&quot;,
+    k=10,
+    filter_fn=lambda doc: doc.metadata.get(&quot;category&quot;) == &quot;technical&quot;,
+)
+print(f&quot;\ntechnical filter results: {len(tech_results)}&quot;)
+for r in tech_results:
+    print(f&quot;  [{r.metadata['category']}] {r.page_content[:60]}&quot;)
+
+# Filter: documents from 2024 or later
+recent_results = filtered_search(
+    vectorstore,
+    query=&quot;async processing&quot;,
+    k=10,
+    filter_fn=lambda doc: doc.metadata.get(&quot;created_date&quot;, &quot;0&quot;) &gt;= &quot;2024&quot;,
+)
+print(f&quot;\n2024+ documents: {len(recent_results)}&quot;)
+for r in recent_results:
+    print(f&quot;  [{r.metadata['created_date']}] {r.page_content[:60]}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>Metadata covers the cases where semantic similarity fails: time ranges, category constraints, source filters. Design the schema when designing the chunking pipeline — adding metadata retroactively requires reindexing every document. The next post covers incremental indexing: processing only documents that have changed rather than rebuilding the index from scratch.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/01-pdf-parsing.md">PDF parsing and text extraction</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/document-ingestion-101/en/02-chunking-strategies.md">Chunking strategies — optimizing by document type</a></li>
+<li><strong>Metadata design and filtering (current)</strong></li>
+<li>Incremental indexing — updating only changed documents (upcoming)</li>
+<li>Multi-format document pipeline (upcoming)</li>
+<li>Completing the document ingestion pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/modules/data_connection/document_loaders/">LangChain Document loaders</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/vectorstores/faiss/">FAISS metadata filtering</a></li>
+<li><a href="https://www.pinecone.io/learn/metadata-filtering/">RAG metadata filtering strategy (Pinecone)</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, Document Processing, LangChain, Python</p>
+</body>
+</html>
