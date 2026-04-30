@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Monitoring and logging for LLM apps</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Monitoring and logging for LLM apps</h1>
+<blockquote>
+<p>LLM Apps Ops 101 (1/6)</p>
+</blockquote>
+<p>The moment you push an LLM app to production, monitoring becomes non-negotiable. Unlike standard web services, LLM apps have response times measured in seconds, token consumption that maps directly to cost, and non-deterministic outputs. This post builds a practical monitoring foundation: structured logs, latency tracking, and token accounting.</p>
+<hr>
+<h2>Why LLM monitoring is different</h2>
+<p>A conventional API dashboard needs three numbers: status codes, response time, and throughput. LLM apps require more.</p>
+<ul>
+<li><strong>Token usage</strong>: input and output tokens must be recorded separately to reverse-engineer cost.</li>
+<li><strong>Model parameters</strong>: temperature and max_tokens alter outputs even with the same prompt.</li>
+<li><strong>Prompt version</strong>: prompt changes need to be correlated with quality shifts.</li>
+<li><strong>Latency distribution</strong>: P95 and P99 matter more than mean — they determine the experience for the tail.</li>
+</ul>
+<hr>
+<h2>Structured logger</h2>
+<pre><code class="language-python">import json
+import logging
+import time
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+
+class JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -&gt; str:
+        log = {
+            &quot;ts&quot;: datetime.utcnow().isoformat() + &quot;Z&quot;,
+            &quot;level&quot;: record.levelname,
+            &quot;logger&quot;: record.name,
+            &quot;msg&quot;: record.getMessage(),
+        }
+        if hasattr(record, &quot;extra&quot;):
+            log.update(record.extra)
+        if record.exc_info:
+            log[&quot;exception&quot;] = self.formatException(record.exc_info)
+        return json.dumps(log)
+
+def build_logger(name: str) -&gt; logging.Logger:
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(JsonFormatter())
+        logger.addHandler(handler)
+    return logger
+
+logger = build_logger(&quot;llm_ops&quot;)
+
+@dataclass
+class LLMCallRecord:
+    call_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
+    model: str = &quot;&quot;
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    latency_ms: float = 0.0
+    success: bool = True
+    error: str = &quot;&quot;
+    prompt_preview: str = &quot;&quot;
+    response_preview: str = &quot;&quot;
+    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat() + &quot;Z&quot;)
+
+    @property
+    def total_tokens(self) -&gt; int:
+        return self.prompt_tokens + self.completion_tokens
+
+    def log(self):
+        level = logging.INFO if self.success else logging.ERROR
+        logger.log(
+            level,
+            &quot;llm_call&quot;,
+            extra={
+                &quot;extra&quot;: {
+                    &quot;call_id&quot;: self.call_id,
+                    &quot;model&quot;: self.model,
+                    &quot;prompt_tokens&quot;: self.prompt_tokens,
+                    &quot;completion_tokens&quot;: self.completion_tokens,
+                    &quot;total_tokens&quot;: self.total_tokens,
+                    &quot;latency_ms&quot;: round(self.latency_ms, 1),
+                    &quot;success&quot;: self.success,
+                    &quot;error&quot;: self.error,
+                    &quot;prompt_preview&quot;: self.prompt_preview[:120],
+                    &quot;response_preview&quot;: self.response_preview[:120],
+                }
+            },
+        )
+</code></pre>
+<hr>
+<h2>Instrumented invoke wrapper</h2>
+<pre><code class="language-python">import os
+from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage
+
+def instrumented_invoke(llm: ChatGroq, prompt: str) -&gt; tuple[str, LLMCallRecord]:
+    record = LLMCallRecord(model=llm.model_name, prompt_preview=prompt)
+    t0 = time.perf_counter()
+    try:
+        response = llm.invoke([HumanMessage(content=prompt)])
+        record.latency_ms = (time.perf_counter() - t0) * 1000
+        record.response_preview = response.content
+
+        usage = getattr(response, &quot;usage_metadata&quot;, None)
+        if usage:
+            record.prompt_tokens = usage.get(&quot;input_tokens&quot;, 0)
+            record.completion_tokens = usage.get(&quot;output_tokens&quot;, 0)
+
+        record.success = True
+        return response.content, record
+
+    except Exception as e:
+        record.latency_ms = (time.perf_counter() - t0) * 1000
+        record.success = False
+        record.error = str(e)
+        raise
+    finally:
+        record.log()
+</code></pre>
+<hr>
+<h2>Latency histogram</h2>
+<p>Mean latency hides SLA violations. Track distributions.</p>
+<pre><code class="language-python">import math
+from collections import defaultdict
+
+class LatencyHistogram:
+    BUCKETS = [100, 250, 500, 1000, 2000, 5000, float(&quot;inf&quot;)]
+
+    def __init__(self):
+        self._counts: dict[float, int] = defaultdict(int)
+        self._total = 0.0
+        self._n = 0
+        self._min = float(&quot;inf&quot;)
+        self._max = 0.0
+
+    def record(self, ms: float):
+        self._total += ms
+        self._n += 1
+        self._min = min(self._min, ms)
+        self._max = max(self._max, ms)
+        for b in self.BUCKETS:
+            if ms &lt;= b:
+                self._counts[b] += 1
+                break
+
+    def percentile(self, p: float) -&gt; float:
+        if self._n == 0:
+            return 0.0
+        target = math.ceil(p / 100 * self._n)
+        cumulative = 0
+        prev_b = 0.0
+        for b in self.BUCKETS:
+            cumulative += self._counts[b]
+            if cumulative &gt;= target:
+                ratio = (target - (cumulative - self._counts[b])) / max(self._counts[b], 1)
+                return prev_b + ratio * (b - prev_b if b != float(&quot;inf&quot;) else prev_b)
+            prev_b = b
+        return self._max
+
+    def summary(self) -&gt; dict:
+        return {
+            &quot;n&quot;: self._n,
+            &quot;mean_ms&quot;: round(self._total / self._n, 1) if self._n else 0,
+            &quot;min_ms&quot;: round(self._min, 1) if self._n else 0,
+            &quot;max_ms&quot;: round(self._max, 1),
+            &quot;p50_ms&quot;: round(self.percentile(50), 1),
+            &quot;p95_ms&quot;: round(self.percentile(95), 1),
+            &quot;p99_ms&quot;: round(self.percentile(99), 1),
+        }
+</code></pre>
+<hr>
+<h2>Token budget tracker</h2>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class TokenBudget:
+    daily_limit: int
+    used: int = 0
+
+    @property
+    def remaining(self) -&gt; int:
+        return max(0, self.daily_limit - self.used)
+
+    @property
+    def utilization(self) -&gt; float:
+        return self.used / self.daily_limit if self.daily_limit else 0.0
+
+    def consume(self, tokens: int) -&gt; bool:
+        self.used += tokens
+        if self.used &gt; self.daily_limit:
+            logger.warning(&quot;token_budget_exceeded&quot;, extra={&quot;extra&quot;: {
+                &quot;used&quot;: self.used, &quot;limit&quot;: self.daily_limit,
+                &quot;over&quot;: self.used - self.daily_limit,
+            }})
+            return False
+        if self.utilization &gt; 0.8:
+            logger.warning(&quot;token_budget_80pct&quot;, extra={&quot;extra&quot;: {
+                &quot;used&quot;: self.used, &quot;limit&quot;: self.daily_limit,
+            }})
+        return True
+
+    def report(self) -&gt; dict:
+        return {
+            &quot;used&quot;: self.used,
+            &quot;limit&quot;: self.daily_limit,
+            &quot;remaining&quot;: self.remaining,
+            &quot;utilization_pct&quot;: round(self.utilization * 100, 1),
+        }
+</code></pre>
+<hr>
+<h2>End-to-end example</h2>
+<pre><code class="language-python">histogram = LatencyHistogram()
+budget = TokenBudget(daily_limit=50_000)
+
+def run_with_monitoring(prompt: str) -&gt; str:
+    llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+        temperature=0.0,
+    )
+    content, record = instrumented_invoke(llm, prompt)
+    budget.consume(record.total_tokens)
+    histogram.record(record.latency_ms)
+    return content
+
+if __name__ == &quot;__main__&quot;:
+    questions = [
+        &quot;What is list comprehension in Python?&quot;,
+        &quot;Explain the difference between REST and GraphQL.&quot;,
+        &quot;What is the difference between Docker and a virtual machine?&quot;,
+    ]
+    for q in questions:
+        ans = run_with_monitoring(q)
+        print(f&quot;\nQ: {q}&quot;)
+        print(f&quot;A: {ans[:200]}...&quot;)
+
+    print(&quot;\n=== latency summary ===&quot;)
+    print(json.dumps(histogram.summary(), indent=2))
+    print(&quot;\n=== token budget ===&quot;)
+    print(json.dumps(budget.report(), indent=2))
+</code></pre>
+<hr>
+<h2>Principles</h2>
+<p><strong>Instrument at design time, not as an afterthought.</strong> Wrapping call sites with <code>instrumented_invoke</code> gives 100% coverage without touching business logic.</p>
+<p>Structured logs are queryable without schema migrations. Whether you ship them to Elasticsearch, BigQuery, or Datadog, the JSON shape stays the same.</p>
+<p>P95 and P99 are user-experience metrics. If your mean LLM call is 1 s but P99 is 8 s, one in a hundred users waits 8 s every time they interact.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>Monitoring and logging for LLM apps (current)</strong></li>
+<li>LLM cost tracking and optimization (upcoming)</li>
+<li>Evaluating LLM output quality (upcoming)</li>
+<li>LLM app security (upcoming)</li>
+<li>LLM app deployment strategies (upcoming)</li>
+<li>Completing the LLM ops pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/modules/callbacks/">LangChain Callbacks</a></li>
+<li><a href="https://console.groq.com/docs/api-reference">Groq API response metadata</a></li>
+<li><a href="https://opentelemetry.io/docs/instrumentation/python/">OpenTelemetry Python</a></li>
+</ul>
+<p class="tags-line">Tags: LLMOps, Observability, Python, LLM</p>
+</body>
+</html>

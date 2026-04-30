@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evaluating LLM output quality</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Evaluating LLM output quality</h1>
+<blockquote>
+<p>LLM Apps Ops 101 (3/6)</p>
+</blockquote>
+<p>When you swap models or revise a prompt, how do you confirm things actually improved? Manual review works for a handful of examples, but it does not scale to thousands of responses. This post builds an automated evaluation pipeline: LLM-as-judge scoring, factual consistency checks, and format compliance validation.</p>
+<hr>
+<h2>Three evaluation axes</h2>
+<p>LLM output quality lives across three dimensions.</p>
+<ul>
+<li><strong>Relevance</strong>: did the model actually answer the question?</li>
+<li><strong>Faithfulness</strong>: does the answer stay within the given context, or does it hallucinate?</li>
+<li><strong>Completeness</strong>: did it cover every part of the question?</li>
+</ul>
+<p>A failure on any axis affects user experience directly.</p>
+<hr>
+<h2>LLM-as-judge</h2>
+<pre><code class="language-python">import json
+import os
+import re
+from dataclasses import dataclass
+
+from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage, SystemMessage
+
+JUDGE_SYSTEM = &quot;&quot;&quot;You are an expert AI response evaluator.
+Given a question, context, and response, score these three dimensions from 1 to 5.
+
+Criteria:
+- relevance: does the response directly answer the question? (1=unrelated, 5=fully answers)
+- faithfulness: is the response grounded only in the context? (1=severe hallucination, 5=context-only)
+- completeness: does it address every part of the question? (1=major gaps, 5=fully covered)
+
+Respond only with this JSON:
+{&quot;relevance&quot;: &lt;1-5&gt;, &quot;faithfulness&quot;: &lt;1-5&gt;, &quot;completeness&quot;: &lt;1-5&gt;, &quot;reason&quot;: &quot;&lt;one sentence&gt;&quot;}&quot;&quot;&quot;
+
+@dataclass
+class EvalResult:
+    relevance: float
+    faithfulness: float
+    completeness: float
+    reason: str
+    raw: str = &quot;&quot;
+
+    @property
+    def average(self) -&gt; float:
+        return (self.relevance + self.faithfulness + self.completeness) / 3
+
+    def passed(self, threshold: float = 3.5) -&gt; bool:
+        return self.average &gt;= threshold
+
+    def to_dict(self) -&gt; dict:
+        return {
+            &quot;relevance&quot;: self.relevance,
+            &quot;faithfulness&quot;: self.faithfulness,
+            &quot;completeness&quot;: self.completeness,
+            &quot;average&quot;: round(self.average, 2),
+            &quot;passed&quot;: self.passed(),
+            &quot;reason&quot;: self.reason,
+        }
+
+class LLMJudge:
+    def __init__(self, model: str = &quot;llama-3.1-8b-instant&quot;):
+        self.llm = ChatGroq(
+            model=model,
+            api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+            temperature=0.0,
+        )
+
+    def evaluate(self, question: str, context: str, response: str) -&gt; EvalResult:
+        user_msg = f&quot;Question: {question}\n\nContext: {context}\n\nResponse: {response}&quot;
+        raw = self.llm.invoke([
+            SystemMessage(content=JUDGE_SYSTEM),
+            HumanMessage(content=user_msg),
+        ]).content
+
+        try:
+            match = re.search(r&quot;\{[^}]+\}&quot;, raw, re.DOTALL)
+            if not match:
+                raise ValueError(&quot;no JSON found&quot;)
+            data = json.loads(match.group())
+            return EvalResult(
+                relevance=float(data.get(&quot;relevance&quot;, 3)),
+                faithfulness=float(data.get(&quot;faithfulness&quot;, 3)),
+                completeness=float(data.get(&quot;completeness&quot;, 3)),
+                reason=data.get(&quot;reason&quot;, &quot;&quot;),
+                raw=raw,
+            )
+        except Exception:
+            return EvalResult(3.0, 3.0, 3.0, &quot;parse failed&quot;, raw=raw)
+</code></pre>
+<hr>
+<h2>Format compliance checker</h2>
+<pre><code class="language-python">import re
+from dataclasses import dataclass
+
+@dataclass
+class FormatCheck:
+    name: str
+    passed: bool
+    detail: str = &quot;&quot;
+
+class FormatChecker:
+    def check_json(self, text: str) -&gt; FormatCheck:
+        try:
+            json.loads(text.strip())
+            return FormatCheck(&quot;json&quot;, True)
+        except json.JSONDecodeError as e:
+            return FormatCheck(&quot;json&quot;, False, str(e))
+
+    def check_max_length(self, text: str, max_chars: int) -&gt; FormatCheck:
+        if len(text) &lt;= max_chars:
+            return FormatCheck(&quot;max_length&quot;, True)
+        return FormatCheck(&quot;max_length&quot;, False, f&quot;{len(text)} &gt; {max_chars}&quot;)
+
+    def check_bullet_list(self, text: str, min_items: int = 2) -&gt; FormatCheck:
+        bullets = re.findall(r&quot;^[-*]\s+.+&quot;, text, re.MULTILINE)
+        if len(bullets) &gt;= min_items:
+            return FormatCheck(&quot;bullet_list&quot;, True, f&quot;{len(bullets)} items&quot;)
+        return FormatCheck(&quot;bullet_list&quot;, False, f&quot;{len(bullets)} &lt; {min_items}&quot;)
+
+    def check_no_uncertainty_markers(self, text: str) -&gt; FormatCheck:
+        patterns = [
+            r&quot;I (?:think|believe|guess|suppose)&quot;,
+            r&quot;(?:might|may|could) be&quot;,
+            r&quot;I'm not (?:sure|certain)&quot;,
+        ]
+        found = [p for p in patterns if re.search(p, text, re.IGNORECASE)]
+        if not found:
+            return FormatCheck(&quot;no_uncertainty_markers&quot;, True)
+        return FormatCheck(&quot;no_uncertainty_markers&quot;, False, f&quot;found: {found}&quot;)
+</code></pre>
+<hr>
+<h2>Batch evaluation pipeline</h2>
+<pre><code class="language-python">from dataclasses import dataclass, field
+
+@dataclass
+class TestCase:
+    question: str
+    context: str
+    expected_keywords: list[str] = field(default_factory=list)
+
+def run_eval_suite(
+    test_cases: list[TestCase],
+    responder_model: str = &quot;llama-3.1-8b-instant&quot;,
+    judge_model: str = &quot;llama-3.1-8b-instant&quot;,
+) -&gt; dict:
+    responder = ChatGroq(
+        model=responder_model, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0
+    )
+    judge = LLMJudge(judge_model)
+
+    results = []
+    for tc in test_cases:
+        prompt = f&quot;Context:\n{tc.context}\n\nQuestion: {tc.question}&quot;
+        response = responder.invoke([HumanMessage(content=prompt)]).content
+
+        eval_result = judge.evaluate(tc.question, tc.context, response)
+
+        keyword_hits = [kw for kw in tc.expected_keywords if kw.lower() in response.lower()]
+        keyword_coverage = len(keyword_hits) / len(tc.expected_keywords) if tc.expected_keywords else 1.0
+
+        results.append({
+            &quot;question&quot;: tc.question,
+            &quot;response_preview&quot;: response[:150],
+            &quot;eval&quot;: eval_result.to_dict(),
+            &quot;keyword_coverage&quot;: round(keyword_coverage, 2),
+            &quot;keyword_hits&quot;: keyword_hits,
+        })
+
+    avg_score = sum(r[&quot;eval&quot;][&quot;average&quot;] for r in results) / len(results) if results else 0
+    pass_rate = sum(1 for r in results if r[&quot;eval&quot;][&quot;passed&quot;]) / len(results) if results else 0
+
+    return {
+        &quot;total&quot;: len(results),
+        &quot;avg_score&quot;: round(avg_score, 2),
+        &quot;pass_rate&quot;: round(pass_rate, 2),
+        &quot;details&quot;: results,
+    }
+
+if __name__ == &quot;__main__&quot;:
+    test_cases = [
+        TestCase(
+            question=&quot;What is Python's GIL?&quot;,
+            context=&quot;The GIL (Global Interpreter Lock) is a mutex in CPython that allows only one thread to execute Python bytecode at a time. The GIL is released during I/O operations.&quot;,
+            expected_keywords=[&quot;mutex&quot;, &quot;thread&quot;, &quot;CPython&quot;],
+        ),
+        TestCase(
+            question=&quot;What is the difference between a list and a tuple?&quot;,
+            context=&quot;Lists are mutable data structures. Tuples are immutable — they cannot be changed after creation. Tuples can be used as dictionary keys; lists cannot.&quot;,
+            expected_keywords=[&quot;mutable&quot;, &quot;immutable&quot;, &quot;dictionary&quot;],
+        ),
+    ]
+
+    report = run_eval_suite(test_cases)
+    print(json.dumps(report, indent=2))
+</code></pre>
+<hr>
+<h2>Limits of automated evaluation</h2>
+<p>LLM-as-judge is fast and scalable, but the judge model may share biases with the responder model. For high-stakes domains — medical, legal, financial — a human review layer is non-negotiable.</p>
+<p>Keyword coverage and format checks are fully automatable. LLM-as-judge adds semantic quality scoring on top. Combining all three layers gives you a reliable quality gate without manual inspection at scale.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/02-cost-tracking.md">LLM cost tracking and optimization</a></li>
+<li><strong>Evaluating LLM output quality (current)</strong></li>
+<li>LLM app security (upcoming)</li>
+<li>LLM app deployment strategies (upcoming)</li>
+<li>Completing the LLM ops pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.ragas.io/">RAGAS evaluation framework</a></li>
+<li><a href="https://python.langchain.com/docs/guides/evaluation/">LangChain evaluation module</a></li>
+<li><a href="https://arxiv.org/abs/2303.16634">G-Eval paper</a></li>
+</ul>
+<p class="tags-line">Tags: LLMOps, Observability, Python, LLM</p>
+</body>
+</html>

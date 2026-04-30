@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LLM app deployment strategies</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>LLM app deployment strategies</h1>
+<blockquote>
+<p>LLM Apps Ops 101 (5/6)</p>
+</blockquote>
+<p>Moving an LLM app from local to production surfaces three recurring pain points: timeouts, concurrency, and retry handling. This post builds a deployable LLM server with FastAPI, exponential-backoff retries, streaming responses, and health checks.</p>
+<hr>
+<h2>Deployment architecture</h2>
+<p>LLM API calls are inherently slow. Generating a response takes seconds, and network errors or rate limits (429) can strike at any time. A production server needs three capabilities.</p>
+<ul>
+<li><strong>Async processing</strong>: handle other requests while one is waiting for the LLM.</li>
+<li><strong>Exponential backoff</strong>: recover from transient failures automatically.</li>
+<li><strong>Streaming</strong>: return the first token quickly to reduce perceived latency.</li>
+</ul>
+<hr>
+<h2>Retry decorator</h2>
+<pre><code class="language-python">import asyncio
+import functools
+import logging
+import time
+from typing import Callable
+
+logger = logging.getLogger(&quot;llm_server&quot;)
+
+def retry_with_backoff(
+    max_retries: int = 3,
+    base_delay: float = 1.0,
+    max_delay: float = 30.0,
+    exceptions: tuple = (Exception,),
+):
+    &quot;&quot;&quot;Exponential backoff retry — works for both sync and async functions.&quot;&quot;&quot;
+
+    def decorator(func: Callable) -&gt; Callable:
+        @functools.wraps(func)
+        async def async_wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(max_retries + 1):
+                try:
+                    return await func(*args, **kwargs)
+                except exceptions as e:
+                    last_exc = e
+                    if attempt == max_retries:
+                        break
+                    delay = min(base_delay * (2 ** attempt), max_delay)
+                    logger.warning(f&quot;retry {attempt + 1}/{max_retries}: {e} — waiting {delay:.1f}s&quot;)
+                    await asyncio.sleep(delay)
+            raise last_exc
+
+        @functools.wraps(func)
+        def sync_wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    last_exc = e
+                    if attempt == max_retries:
+                        break
+                    delay = min(base_delay * (2 ** attempt), max_delay)
+                    time.sleep(delay)
+            raise last_exc
+
+        return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper
+
+    return decorator
+</code></pre>
+<hr>
+<h2>FastAPI LLM server</h2>
+<pre><code class="language-python">import os
+import time
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
+from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage, SystemMessage
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=4000)
+    system_prompt: str = Field(default=&quot;You are a helpful assistant.&quot;)
+    temperature: float = Field(default=0.0, ge=0.0, le=1.0)
+    stream: bool = Field(default=False)
+
+class ChatResponse(BaseModel):
+    response: str
+    model: str
+    latency_ms: float
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+        temperature=0.0,
+    )
+    logger.info(&quot;LLM client initialized&quot;)
+    yield
+    logger.info(&quot;server shutting down&quot;)
+
+app = FastAPI(title=&quot;LLM API Server&quot;, lifespan=lifespan)
+
+@app.middleware(&quot;http&quot;)
+async def log_requests(request: Request, call_next):
+    t0 = time.perf_counter()
+    response = await call_next(request)
+    ms = (time.perf_counter() - t0) * 1000
+    logger.info(f&quot;{request.method} {request.url.path} → {response.status_code} ({ms:.0f}ms)&quot;)
+    return response
+
+@app.get(&quot;/health&quot;)
+async def health():
+    return {&quot;status&quot;: &quot;ok&quot;, &quot;model&quot;: &quot;llama-3.1-8b-instant&quot;}
+
+@retry_with_backoff(max_retries=2, base_delay=1.0)
+async def _call_llm(llm: ChatGroq, messages: list) -&gt; str:
+    loop = asyncio.get_event_loop()
+    response = await loop.run_in_executor(None, lambda: llm.invoke(messages))
+    return response.content
+
+@app.post(&quot;/chat&quot;, response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    messages = [
+        SystemMessage(content=request.system_prompt),
+        HumanMessage(content=request.message),
+    ]
+
+    if request.stream:
+        async def token_stream() -&gt; AsyncIterator[str]:
+            for chunk in app.state.llm.stream(messages):
+                if chunk.content:
+                    yield f&quot;data: {chunk.content}\n\n&quot;
+            yield &quot;data: [DONE]\n\n&quot;
+        return StreamingResponse(token_stream(), media_type=&quot;text/event-stream&quot;)
+
+    t0 = time.perf_counter()
+    try:
+        content = await _call_llm(app.state.llm, messages)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f&quot;LLM call failed: {e}&quot;)
+
+    return ChatResponse(
+        response=content,
+        model=&quot;llama-3.1-8b-instant&quot;,
+        latency_ms=round((time.perf_counter() - t0) * 1000, 1),
+    )
+</code></pre>
+<hr>
+<h2>Streaming client</h2>
+<pre><code class="language-python">import httpx
+
+async def stream_chat(message: str, base_url: str = &quot;http://localhost:8000&quot;):
+    payload = {&quot;message&quot;: message, &quot;stream&quot;: True}
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        async with client.stream(&quot;POST&quot;, f&quot;{base_url}/chat&quot;, json=payload) as response:
+            async for line in response.aiter_lines():
+                if line.startswith(&quot;data: &quot;) and not line.endswith(&quot;[DONE]&quot;):
+                    print(line[6:], end=&quot;&quot;, flush=True)
+    print()
+
+# Run server: uvicorn server:app --host 0.0.0.0 --port 8000
+# asyncio.run(stream_chat(&quot;Explain Python asyncio in one sentence.&quot;))
+</code></pre>
+<hr>
+<h2>Deployment checklist</h2>
+<p><strong>Environment variables</strong>: inject <code>GROQ_API_KEY</code> via a secrets manager or <code>.env</code> file. Never hardcode it.</p>
+<p><strong>Timeouts</strong>: client timeouts must exceed the longest expected LLM response. Groq typically responds in 2–5 s, but complex prompts can take 15–30 s.</p>
+<p><strong>Concurrency</strong>: increasing <code>--workers</code> raises throughput but also multiplies outbound LLM API requests. Tune against your API rate limits.</p>
+<p><strong>Graceful shutdown</strong>: the <code>lifespan</code> context manager ensures SIGTERM lets in-flight requests complete before the process exits.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/02-cost-tracking.md">LLM cost tracking and optimization</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/03-evaluation.md">Evaluating LLM output quality</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/04-security.md">LLM app security</a></li>
+<li><strong>LLM app deployment strategies (current)</strong></li>
+<li>Completing the LLM ops pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://fastapi.tiangolo.com/">FastAPI documentation</a></li>
+<li><a href="https://www.uvicorn.org/deployment/">Uvicorn deployment guide</a></li>
+<li><a href="https://python.langchain.com/docs/expression_language/streaming">LangChain streaming</a></li>
+</ul>
+<p class="tags-line">Tags: LLMOps, Observability, Python, LLM</p>
+</body>
+</html>

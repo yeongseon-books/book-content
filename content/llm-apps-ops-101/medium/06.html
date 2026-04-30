@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Completing the LLM ops pipeline</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Completing the LLM ops pipeline</h1>
+<blockquote>
+<p>LLM Apps Ops 101 (6/6)</p>
+</blockquote>
+<p>This post assembles monitoring, cost tracking, quality evaluation, security, and deployment into a single production server. Each layer is independently replaceable; together they form a reliable operational foundation for any LLM app.</p>
+<hr>
+<h2>Integrated production server</h2>
+<pre><code class="language-python">import asyncio
+import functools
+import json
+import logging
+import os
+import re
+import time
+import uuid
+from collections import defaultdict
+from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import AsyncIterator
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_groq import ChatGroq
+from pydantic import BaseModel, Field
+
+# ── logger ─────────────────────────────────────────────────────────────────
+class JsonFormatter(logging.Formatter):
+    def format(self, record):
+        log = {&quot;ts&quot;: datetime.utcnow().isoformat() + &quot;Z&quot;, &quot;level&quot;: record.levelname, &quot;msg&quot;: record.getMessage()}
+        if hasattr(record, &quot;extra&quot;):
+            log.update(record.extra)
+        return json.dumps(log)
+
+def build_logger(name: str) -&gt; logging.Logger:
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+    if not logger.handlers:
+        h = logging.StreamHandler()
+        h.setFormatter(JsonFormatter())
+        logger.addHandler(h)
+    return logger
+
+logger = build_logger(&quot;llm_prod&quot;)
+
+# ── retry ──────────────────────────────────────────────────────────────────
+def retry_backoff(max_retries: int = 2, base_delay: float = 1.0):
+    def decorator(func):
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(max_retries + 1):
+                try:
+                    return await func(*args, **kwargs)
+                except Exception as e:
+                    last_exc = e
+                    if attempt == max_retries:
+                        break
+                    await asyncio.sleep(base_delay * (2 ** attempt))
+            raise last_exc
+        return wrapper
+    return decorator
+
+# ── rate limiter ────────────────────────────────────────────────────────────
+class RateLimiter:
+    def __init__(self, max_calls: int = 10, window: int = 60):
+        self.max_calls = max_calls
+        self.window = window
+        self._calls: dict[str, list[float]] = defaultdict(list)
+
+    def is_allowed(self, user_id: str) -&gt; tuple[bool, str]:
+        now = time.time()
+        cutoff = now - self.window
+        self._calls[user_id] = [t for t in self._calls[user_id] if t &gt; cutoff]
+        if len(self._calls[user_id]) &gt;= self.max_calls:
+            reset_in = int(self._calls[user_id][0] + self.window - now)
+            return False, f&quot;retry in {reset_in}s&quot;
+        self._calls[user_id].append(now)
+        return True, &quot;&quot;
+
+# ── input validation ────────────────────────────────────────────────────────
+INJECTION_PATTERNS = [
+    r&quot;ignore\s+(?:all\s+)?(?:previous|prior)\s+instructions?&quot;,
+    r&quot;forget\s+everything&quot;,
+    r&quot;override\s+(?:safety|system)&quot;,
+]
+
+SENSITIVE_RE = re.compile(
+    r&quot;\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b&quot;
+    r&quot;|\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b&quot;
+    r&quot;|(?:sk|pk|api|key)[-_][A-Za-z0-9]{16,}&quot;,
+    re.IGNORECASE,
+)
+
+def validate_input(text: str) -&gt; tuple[bool, str, str]:
+    if not text.strip():
+        return False, &quot;empty input&quot;, &quot;&quot;
+    if len(text) &gt; 4000:
+        return False, f&quot;input too long: {len(text)}&quot;, &quot;&quot;
+    for pat in INJECTION_PATTERNS:
+        if re.search(pat, text, re.IGNORECASE):
+            return False, &quot;prompt injection detected&quot;, &quot;&quot;
+    return True, &quot;&quot;, SENSITIVE_RE.sub(&quot;[REDACTED]&quot;, text)
+
+# ── cost tracking ───────────────────────────────────────────────────────────
+MODEL_PRICING = {&quot;llama-3.1-8b-instant&quot;: {&quot;input&quot;: 0.00005, &quot;output&quot;: 0.00008}}
+
+@dataclass
+class CallRecord:
+    call_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
+    input_tokens: int = 0
+    output_tokens: int = 0
+    latency_ms: float = 0.0
+    model: str = &quot;llama-3.1-8b-instant&quot;
+
+    @property
+    def cost_usd(self) -&gt; float:
+        p = MODEL_PRICING.get(self.model, {&quot;input&quot;: 0, &quot;output&quot;: 0})
+        return (self.input_tokens * p[&quot;input&quot;] + self.output_tokens * p[&quot;output&quot;]) / 1000
+
+cumulative_cost = 0.0
+total_calls = 0
+
+# ── FastAPI ─────────────────────────────────────────────────────────────────
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=4000)
+    user_id: str = Field(default=&quot;anonymous&quot;)
+    system_prompt: str = Field(default=&quot;You are a helpful assistant.&quot;)
+    stream: bool = False
+
+class ChatResponse(BaseModel):
+    response: str
+    call_id: str
+    latency_ms: float
+    cost_usd: float
+
+rate_limiter = RateLimiter()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.llm = ChatGroq(
+        model=&quot;llama-3.1-8b-instant&quot;,
+        api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+        temperature=0.0,
+    )
+    logger.info(&quot;server started&quot;)
+    yield
+    logger.info(&quot;server stopped&quot;)
+
+app = FastAPI(title=&quot;LLM Production Server&quot;, lifespan=lifespan)
+
+@app.middleware(&quot;http&quot;)
+async def request_log(request: Request, call_next):
+    t0 = time.perf_counter()
+    resp = await call_next(request)
+    ms = (time.perf_counter() - t0) * 1000
+    logger.info(f&quot;{request.method} {request.url.path}&quot;, extra={&quot;status&quot;: resp.status_code, &quot;ms&quot;: round(ms, 1)})
+    return resp
+
+@app.get(&quot;/health&quot;)
+async def health():
+    return {&quot;status&quot;: &quot;ok&quot;, &quot;total_calls&quot;: total_calls, &quot;cumulative_cost_usd&quot;: round(cumulative_cost, 4)}
+
+@retry_backoff(max_retries=2)
+async def _llm_call(llm, messages) -&gt; tuple[str, dict]:
+    loop = asyncio.get_event_loop()
+    response = await loop.run_in_executor(None, lambda: llm.invoke(messages))
+    return response.content, getattr(response, &quot;usage_metadata&quot;, {}) or {}
+
+@app.post(&quot;/chat&quot;, response_model=ChatResponse)
+async def chat(req: ChatRequest):
+    global cumulative_cost, total_calls
+
+    allowed, reason = rate_limiter.is_allowed(req.user_id)
+    if not allowed:
+        raise HTTPException(status_code=429, detail=reason)
+
+    ok, reason, sanitized = validate_input(req.message)
+    if not ok:
+        raise HTTPException(status_code=400, detail=reason)
+
+    messages = [SystemMessage(content=req.system_prompt), HumanMessage(content=sanitized)]
+
+    if req.stream:
+        async def token_stream() -&gt; AsyncIterator[str]:
+            for chunk in app.state.llm.stream(messages):
+                if chunk.content:
+                    yield f&quot;data: {chunk.content}\n\n&quot;
+            yield &quot;data: [DONE]\n\n&quot;
+        return StreamingResponse(token_stream(), media_type=&quot;text/event-stream&quot;)
+
+    record = CallRecord()
+    t0 = time.perf_counter()
+    try:
+        content, usage = await _llm_call(app.state.llm, messages)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f&quot;LLM error: {e}&quot;)
+
+    record.latency_ms = (time.perf_counter() - t0) * 1000
+    record.input_tokens = usage.get(&quot;input_tokens&quot;, 0)
+    record.output_tokens = usage.get(&quot;output_tokens&quot;, 0)
+    cumulative_cost += record.cost_usd
+    total_calls += 1
+
+    logger.info(&quot;llm_call&quot;, extra={
+        &quot;call_id&quot;: record.call_id,
+        &quot;latency_ms&quot;: round(record.latency_ms, 1),
+        &quot;tokens&quot;: record.input_tokens + record.output_tokens,
+        &quot;cost_usd&quot;: round(record.cost_usd, 6),
+    })
+
+    return ChatResponse(
+        response=content,
+        call_id=record.call_id,
+        latency_ms=round(record.latency_ms, 1),
+        cost_usd=round(record.cost_usd, 6),
+    )
+</code></pre>
+<hr>
+<h2>Running the server</h2>
+<pre><code class="language-bash">pip install fastapi uvicorn langchain-groq pydantic
+
+GROQ_API_KEY=&lt;your_key&gt; uvicorn server:app --host 0.0.0.0 --port 8000
+
+curl http://localhost:8000/health
+
+curl -X POST http://localhost:8000/chat \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;message&quot;: &quot;What is Python asyncio?&quot;, &quot;user_id&quot;: &quot;user_1&quot;}'
+</code></pre>
+<hr>
+<h2>Series summary</h2>
+<p>The layers built across this series stack in order.</p>
+<p>Monitoring and logging form the foundation — you cannot improve what you cannot see. Cost tracking sits on top and prevents budget overruns. Quality evaluation acts as a safety net when you change models or prompts. Security filters contain misuse. The deployment structure holds it all together in production.</p>
+<p>Each layer is independently swappable. Replace the monitoring backend with Datadog, move the cache to Redis, or swap the retry logic for Tenacity — the rest continues working unchanged.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/02-cost-tracking.md">LLM cost tracking and optimization</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/03-evaluation.md">Evaluating LLM output quality</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/04-security.md">LLM app security</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-apps-ops-101/en/05-deployment.md">LLM app deployment strategies</a></li>
+<li><strong>Completing the LLM ops pipeline (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://fastapi.tiangolo.com/">FastAPI documentation</a></li>
+<li><a href="https://python.langchain.com/docs/guides/productionization/">LangChain productionization guide</a></li>
+<li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP LLM Top 10</a></li>
+</ul>
+<p class="tags-line">Tags: LLMOps, Observability, Python, LLM</p>
+</body>
+</html>
