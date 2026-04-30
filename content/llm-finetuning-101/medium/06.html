@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model serving</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Model serving</h1>
+<blockquote>
+<p>LLM Fine-tuning 101 (6/6)</p>
+</blockquote>
+<p>This post covers deploying a fine-tuned model into a service. Merge the LoRA adapter into the base model to produce a single artifact, expose an inference endpoint with FastAPI, and push to the Hugging Face Hub.</p>
+<hr>
+<h2>Merging the adapter</h2>
+<p>Merging the LoRA adapter into the base model lets you serve a single model at inference time, with no PEFT layer overhead. The merged model has the same parameter count as the original.</p>
+<pre><code class="language-python">from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+BASE_MODEL = &quot;microsoft/phi-2&quot;
+ADAPTER_PATH = &quot;./outputs/finetuned&quot;
+MERGED_PATH = &quot;./outputs/merged&quot;
+
+def merge_adapter(
+    base_model_name: str = BASE_MODEL,
+    adapter_path: str = ADAPTER_PATH,
+    output_path: str = MERGED_PATH,
+) -&gt; None:
+    &quot;&quot;&quot;Merge the LoRA adapter into the base model and save.&quot;&quot;&quot;
+    print(&quot;Loading base model...&quot;)
+    # Merge in fp16 without 4-bit quantization
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model_name,
+        torch_dtype=torch.float16,
+        device_map=&quot;auto&quot;,
+        trust_remote_code=True,
+    )
+    tokenizer = AutoTokenizer.from_pretrained(adapter_path)
+
+    print(&quot;Loading and merging adapter...&quot;)
+    model = PeftModel.from_pretrained(model, adapter_path)
+    model = model.merge_and_unload()
+
+    print(f&quot;Saving merged model to {output_path}&quot;)
+    model.save_pretrained(output_path, safe_serialization=True)
+    tokenizer.save_pretrained(output_path)
+    print(&quot;Merge complete&quot;)
+</code></pre>
+<hr>
+<h2>FastAPI inference server</h2>
+<pre><code class="language-python">import time
+from contextlib import asynccontextmanager
+from typing import Optional
+
+import torch
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+
+ALPACA_TEMPLATE = &quot;&quot;&quot;Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+{instruction}
+
+### Response:
+&quot;&quot;&quot;
+
+class InferenceRequest(BaseModel):
+    instruction: str
+    input: Optional[str] = &quot;&quot;
+    max_new_tokens: int = 200
+    temperature: float = 0.7
+    do_sample: bool = True
+
+class InferenceResponse(BaseModel):
+    response: str
+    latency_ms: float
+    tokens_generated: int
+
+_model = None
+_tokenizer = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global _model, _tokenizer
+    model_path = &quot;./outputs/merged&quot;
+    print(f&quot;Loading model from {model_path}&quot;)
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type=&quot;nf4&quot;,
+        bnb_4bit_compute_dtype=torch.float16,
+    )
+    _tokenizer = AutoTokenizer.from_pretrained(model_path)
+    if _tokenizer.pad_token is None:
+        _tokenizer.pad_token = _tokenizer.eos_token
+    _model = AutoModelForCausalLM.from_pretrained(
+        model_path,
+        quantization_config=bnb_config,
+        device_map=&quot;auto&quot;,
+        trust_remote_code=True,
+    )
+    _model.eval()
+    print(&quot;Model ready&quot;)
+    yield
+    _model = None
+    _tokenizer = None
+
+app = FastAPI(title=&quot;LLM Inference API&quot;, lifespan=lifespan)
+
+@app.post(&quot;/generate&quot;, response_model=InferenceResponse)
+async def generate(request: InferenceRequest):
+    if _model is None:
+        raise HTTPException(status_code=503, detail=&quot;Model not loaded&quot;)
+
+    prompt = ALPACA_TEMPLATE.format(instruction=request.instruction)
+    inputs = _tokenizer(prompt, return_tensors=&quot;pt&quot;).to(_model.device)
+
+    start = time.time()
+    with torch.no_grad():
+        outputs = _model.generate(
+            **inputs,
+            max_new_tokens=request.max_new_tokens,
+            do_sample=request.do_sample,
+            temperature=request.temperature if request.do_sample else 1.0,
+            pad_token_id=_tokenizer.eos_token_id,
+        )
+    latency_ms = (time.time() - start) * 1000
+
+    generated = outputs[0][inputs[&quot;input_ids&quot;].shape[1]:]
+    return InferenceResponse(
+        response=_tokenizer.decode(generated, skip_special_tokens=True),
+        latency_ms=round(latency_ms, 1),
+        tokens_generated=len(generated),
+    )
+
+@app.get(&quot;/health&quot;)
+async def health():
+    return {&quot;status&quot;: &quot;ok&quot;, &quot;model_loaded&quot;: _model is not None}
+</code></pre>
+<hr>
+<h2>Pushing to Hugging Face Hub</h2>
+<pre><code class="language-python">from huggingface_hub import HfApi
+
+def push_to_hub(
+    model_path: str,
+    repo_id: str,
+    private: bool = True,
+    token: str | None = None,
+) -&gt; None:
+    &quot;&quot;&quot;Push the merged model to the Hugging Face Hub.&quot;&quot;&quot;
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    import torch
+
+    print(f&quot;Pushing to {repo_id}&quot;)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_path, torch_dtype=torch.float16, trust_remote_code=True
+    )
+    tokenizer.push_to_hub(repo_id, private=private, token=token)
+    model.push_to_hub(repo_id, private=private, token=token)
+    print(f&quot;Done: https://huggingface.co/{repo_id}&quot;)
+
+def push_adapter_only(
+    adapter_path: str,
+    repo_id: str,
+    private: bool = True,
+    token: str | None = None,
+) -&gt; None:
+    &quot;&quot;&quot;Push adapter weights only (saves storage vs. full model).&quot;&quot;&quot;
+    api = HfApi(token=token)
+    api.create_repo(repo_id=repo_id, private=private, exist_ok=True)
+    api.upload_folder(folder_path=adapter_path, repo_id=repo_id, token=token)
+    print(f&quot;Adapter pushed: https://huggingface.co/{repo_id}&quot;)
+</code></pre>
+<hr>
+<h2>Series summary</h2>
+<pre><code class="language-python">pipeline_steps = [
+    &quot;1. Load base model (4-bit quantization)&quot;,
+    &quot;2. Prepare dataset (Alpaca instruction format)&quot;,
+    &quot;3. Configure LoRA adapter (r=16, alpha=32)&quot;,
+    &quot;4. Train with SFTTrainer (3 epochs, lr=2e-4)&quot;,
+    &quot;5. Evaluate (F1, comparison against base model)&quot;,
+    &quot;6. Merge adapter and serve with FastAPI&quot;,
+]
+for step in pipeline_steps:
+    print(step)
+</code></pre>
+<p>The pipeline built across this series runs on a single consumer GPU. LoRA makes it possible to fine-tune a 7B model in 8 GB of VRAM. In practice, data quality, hyperparameter search, and evaluation metric design are what determine the outcome — not the framework.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/01-intro.md">Introduction to LLM Fine-tuning</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/02-dataset.md">Dataset preparation and preprocessing</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/03-lora.md">Configuring the LoRA adapter</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/04-training.md">Training loop and hyperparameters</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/05-evaluation.md">Model evaluation</a></li>
+<li><strong>Model serving (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://huggingface.co/docs/hub/models-uploading">Hugging Face Hub upload documentation</a></li>
+<li><a href="https://fastapi.tiangolo.com/">FastAPI documentation</a></li>
+<li><a href="https://huggingface.co/docs/peft/package_reference/lora#peft.LoraModel.merge_and_unload">PEFT merge_and_unload</a></li>
+</ul>
+<p class="tags-line">Tags: Fine-tuning, LoRA, LLM, Python</p>
+</body>
+</html>

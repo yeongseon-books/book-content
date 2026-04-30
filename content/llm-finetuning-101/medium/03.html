@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Configuring the LoRA adapter</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Configuring the LoRA adapter</h1>
+<blockquote>
+<p>LLM Fine-tuning 101 (3/6)</p>
+</blockquote>
+<p>LoRA (Low-Rank Adaptation) freezes the original model weights and adds a small pair of matrices at each layer. Trainable parameters drop below 1% of the original, while performance stays close to full fine-tuning. This post covers LoRA's mechanics and adapter configuration with the PEFT library.</p>
+<hr>
+<h2>How LoRA works</h2>
+<p>Instead of updating the full weight matrix W (d×k), LoRA approximates the update with the product of two low-rank matrices A (d×r) and B (r×k), where r &lt;&lt; min(d, k).</p>
+<pre><code class="language-python">&quot;&quot;&quot;
+Original weights: W (d × k) — frozen, not trained
+LoRA update:      ΔW = B × A
+  A: (d × r), initialized: Gaussian
+  B: (r × k), initialized: zeros
+
+Forward pass: h = W₀x + (B×A)x × (alpha/r)
+  - alpha: scaling hyperparameter
+  - r: rank (typically 4–64)
+
+Trainable parameter ratio = 2 × r / (d + k)
+  - d=4096, k=4096, r=16: 0.39%
+&quot;&quot;&quot;
+
+import torch
+import torch.nn as nn
+
+class LoRALinear(nn.Module):
+    &quot;&quot;&quot;Linear layer with LoRA (for conceptual illustration).&quot;&quot;&quot;
+
+    def __init__(self, in_features: int, out_features: int, rank: int = 16, alpha: float = 32.0):
+        super().__init__()
+        self.weight = nn.Parameter(torch.randn(out_features, in_features), requires_grad=False)
+        self.lora_A = nn.Parameter(torch.randn(in_features, rank) * 0.01)
+        self.lora_B = nn.Parameter(torch.zeros(rank, out_features))
+        self.scale = alpha / rank
+
+    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:
+        base = x @ self.weight.T
+        lora = x @ self.lora_A @ self.lora_B * self.scale
+        return base + lora
+
+d, k, r = 4096, 4096, 16
+total = d * k
+lora_params = d * r + r * k
+print(f&quot;Total parameters: {total:,}&quot;)
+print(f&quot;LoRA parameters:  {lora_params:,} ({100 * lora_params / total:.2f}%)&quot;)
+</code></pre>
+<hr>
+<h2>Applying LoRA with PEFT</h2>
+<pre><code class="language-python">from peft import LoraConfig, get_peft_model, TaskType, prepare_model_for_kbit_training
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import torch
+
+def create_lora_config(
+    rank: int = 16,
+    alpha: float = 32.0,
+    dropout: float = 0.05,
+    target_modules: list[str] | None = None,
+) -&gt; LoraConfig:
+    &quot;&quot;&quot;Build a LoRA configuration.&quot;&quot;&quot;
+    if target_modules is None:
+        target_modules = [&quot;q_proj&quot;, &quot;v_proj&quot;, &quot;k_proj&quot;, &quot;dense&quot;]
+    return LoraConfig(
+        task_type=TaskType.CAUSAL_LM,
+        r=rank,
+        lora_alpha=alpha,
+        lora_dropout=dropout,
+        target_modules=target_modules,
+        bias=&quot;none&quot;,
+        inference_mode=False,
+    )
+
+def apply_lora(model, lora_config: LoraConfig):
+    &quot;&quot;&quot;Wrap the base model with LoRA adapters.&quot;&quot;&quot;
+    model = get_peft_model(model, lora_config)
+    model.print_trainable_parameters()
+    return model
+
+def load_model_for_training(model_name: str = &quot;microsoft/phi-2&quot;):
+    &quot;&quot;&quot;Load a model with QLoRA configuration.&quot;&quot;&quot;
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type=&quot;nf4&quot;,
+        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_use_double_quant=True,
+    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        quantization_config=bnb_config,
+        device_map=&quot;auto&quot;,
+        trust_remote_code=True,
+    )
+    model = prepare_model_for_kbit_training(model)
+    return model, tokenizer
+</code></pre>
+<hr>
+<h2>Choosing rank and alpha</h2>
+<pre><code class="language-python">def rank_alpha_guide() -&gt; dict:
+    return {
+        &quot;conservative&quot;: {
+            &quot;r&quot;: 8, &quot;alpha&quot;: 16,
+            &quot;use_case&quot;: &quot;Simple tasks, data &lt; 1K examples, overfitting concern&quot;,
+            &quot;trainable_ratio&quot;: &quot;~0.2%&quot;,
+        },
+        &quot;standard&quot;: {
+            &quot;r&quot;: 16, &quot;alpha&quot;: 32,
+            &quot;use_case&quot;: &quot;General instruction tuning (recommended starting point)&quot;,
+            &quot;trainable_ratio&quot;: &quot;~0.4%&quot;,
+        },
+        &quot;aggressive&quot;: {
+            &quot;r&quot;: 64, &quot;alpha&quot;: 128,
+            &quot;use_case&quot;: &quot;Complex tasks, data &gt; 10K examples, high expressiveness needed&quot;,
+            &quot;trainable_ratio&quot;: &quot;~1.6%&quot;,
+        },
+    }
+
+for name, config in rank_alpha_guide().items():
+    print(f&quot;\n{name}: r={config['r']}, alpha={config['alpha']}&quot;)
+    print(f&quot;  {config['use_case']}&quot;)
+    print(f&quot;  trainable: {config['trainable_ratio']}&quot;)
+</code></pre>
+<hr>
+<h2>Finding target modules</h2>
+<pre><code class="language-python">def find_target_modules(model) -&gt; list[str]:
+    &quot;&quot;&quot;Print the names of linear layers available as LoRA targets.&quot;&quot;&quot;
+    modules = set()
+    for name, module in model.named_modules():
+        if isinstance(module, torch.nn.Linear):
+            modules.add(name.split(&quot;.&quot;)[-1])
+    return sorted(modules)
+
+if __name__ == &quot;__main__&quot;:
+    model, tokenizer = load_model_for_training()
+    print(&quot;Linear layers:&quot;, find_target_modules(model))
+
+    lora_config = create_lora_config(rank=16, alpha=32)
+    model = apply_lora(model, lora_config)
+
+    model.save_pretrained(&quot;./outputs/lora-adapter&quot;)
+    tokenizer.save_pretrained(&quot;./outputs/lora-adapter&quot;)
+    print(&quot;LoRA adapter saved&quot;)
+</code></pre>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/01-intro.md">Introduction to LLM Fine-tuning</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/02-dataset.md">Dataset preparation and preprocessing</a></li>
+<li><strong>Configuring the LoRA adapter (current)</strong></li>
+<li>Training loop and hyperparameters (upcoming)</li>
+<li>Model evaluation (upcoming)</li>
+<li>Model serving (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://huggingface.co/docs/peft/conceptual_guides/lora">PEFT LoRA conceptual guide</a></li>
+<li><a href="https://arxiv.org/abs/2106.09685">LoRA paper</a></li>
+<li><a href="https://arxiv.org/abs/2305.14314">QLoRA paper</a></li>
+</ul>
+<p class="tags-line">Tags: Fine-tuning, LoRA, LLM, Python</p>
+</body>
+</html>

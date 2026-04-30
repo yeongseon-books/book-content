@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dataset preparation and preprocessing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Dataset preparation and preprocessing</h1>
+<blockquote>
+<p>LLM Fine-tuning 101 (2/6)</p>
+</blockquote>
+<p>Data quality determines fine-tuning quality. It has more impact on final model performance than model architecture or hyperparameters. This post covers the right data format for fine-tuning, collection strategies, and a preprocessing pipeline.</p>
+<hr>
+<h2>Data format</h2>
+<p>Fine-tuning data is typically instruction-response pairs. The model learns to produce the desired output for a given input.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class TrainingExample:
+    instruction: str  # user question or task description
+    input: str        # additional context (optional)
+    output: str       # desired response
+
+examples = [
+    TrainingExample(
+        instruction=&quot;Find and fix the bug in the following Python code.&quot;,
+        input=&quot;def add(a, b):\n    return a - b&quot;,
+        output=&quot;Bug: subtraction operator used in an addition function.\n\nFixed:\ndef add(a, b):\n    return a + b&quot;,
+    ),
+    TrainingExample(
+        instruction=&quot;Write a SQL query.&quot;,
+        input=&quot;Table: users(id, name, age). Return users aged 30 or older, sorted by age descending.&quot;,
+        output=&quot;SELECT id, name, age FROM users WHERE age &gt;= 30 ORDER BY age DESC;&quot;,
+    ),
+]
+</code></pre>
+<hr>
+<h2>Prompt templates</h2>
+<p>Each model family has a preferred prompt format. The same template must be used at training time and inference time.</p>
+<pre><code class="language-python">ALPACA_TEMPLATE = &quot;&quot;&quot;Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+
+### Instruction:
+{instruction}
+
+### Input:
+{input}
+
+### Response:
+{output}&quot;&quot;&quot;
+
+ALPACA_NO_INPUT_TEMPLATE = &quot;&quot;&quot;Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+{instruction}
+
+### Response:
+{output}&quot;&quot;&quot;
+
+def format_example(example: dict, for_inference: bool = False) -&gt; str:
+    &quot;&quot;&quot;Build a training or inference prompt.&quot;&quot;&quot;
+    has_input = bool(example.get(&quot;input&quot;, &quot;&quot;).strip())
+    if has_input:
+        prompt = ALPACA_TEMPLATE.format(
+            instruction=example[&quot;instruction&quot;],
+            input=example[&quot;input&quot;],
+            output=&quot;&quot; if for_inference else example[&quot;output&quot;],
+        )
+    else:
+        prompt = ALPACA_NO_INPUT_TEMPLATE.format(
+            instruction=example[&quot;instruction&quot;],
+            output=&quot;&quot; if for_inference else example[&quot;output&quot;],
+        )
+    return prompt
+
+sample = {&quot;instruction&quot;: &quot;Reverse a Python list.&quot;, &quot;input&quot;: &quot;&quot;, &quot;output&quot;: &quot;lst[::-1] or lst.reverse()&quot;}
+print(format_example(sample))
+</code></pre>
+<hr>
+<h2>Data collection and cleaning</h2>
+<pre><code class="language-python">import json
+import re
+import statistics
+from pathlib import Path
+from datasets import Dataset, DatasetDict
+
+def load_jsonl(file_path: str) -&gt; list[dict]:
+    &quot;&quot;&quot;Load a JSONL file.&quot;&quot;&quot;
+    data = []
+    with open(file_path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+        for line in f:
+            if line.strip():
+                data.append(json.loads(line))
+    return data
+
+def validate_example(example: dict) -&gt; tuple[bool, str]:
+    &quot;&quot;&quot;Check data quality.&quot;&quot;&quot;
+    if not example.get(&quot;instruction&quot;, &quot;&quot;).strip():
+        return False, &quot;missing instruction&quot;
+    if not example.get(&quot;output&quot;, &quot;&quot;).strip():
+        return False, &quot;missing output&quot;
+    if len(example[&quot;instruction&quot;]) &lt; 10:
+        return False, &quot;instruction too short&quot;
+    if len(example[&quot;output&quot;]) &lt; 5:
+        return False, &quot;output too short&quot;
+    if re.search(r&quot;[\x00-\x08\x0b\x0c\x0e-\x1f]&quot;, example[&quot;output&quot;]):
+        return False, &quot;control characters found&quot;
+    return True, &quot;ok&quot;
+
+def clean_example(example: dict) -&gt; dict:
+    &quot;&quot;&quot;Normalize whitespace and strip.&quot;&quot;&quot;
+    return {
+        &quot;instruction&quot;: example[&quot;instruction&quot;].strip(),
+        &quot;input&quot;: example.get(&quot;input&quot;, &quot;&quot;).strip(),
+        &quot;output&quot;: example[&quot;output&quot;].strip(),
+    }
+
+def build_dataset(raw_data: list[dict], tokenizer, max_length: int = 512) -&gt; Dataset:
+    &quot;&quot;&quot;Build a training dataset from raw examples.&quot;&quot;&quot;
+    valid, invalid = [], []
+    for ex in raw_data:
+        ok, reason = validate_example(ex)
+        if ok:
+            valid.append(clean_example(ex))
+        else:
+            invalid.append((ex, reason))
+
+    print(f&quot;Valid: {len(valid)}, Excluded: {len(invalid)}&quot;)
+    for ex, reason in invalid[:3]:
+        print(f&quot;  Excluded ({reason}): {str(ex)[:80]}&quot;)
+
+    formatted = [{&quot;text&quot;: format_example(ex)} for ex in valid]
+
+    def tokenize_and_filter(batch):
+        tokens = tokenizer(batch[&quot;text&quot;], truncation=False)
+        return {&quot;length&quot;: [len(ids) for ids in tokens[&quot;input_ids&quot;]]}
+
+    dataset = Dataset.from_list(formatted)
+    lengths = dataset.map(tokenize_and_filter, batched=True, batch_size=64)
+    dataset = dataset.filter(
+        lambda ex, idx: lengths[idx][&quot;length&quot;] &lt;= max_length, with_indices=True
+    )
+    print(f&quot;After max-length filter ({max_length} tokens): {len(dataset)} examples&quot;)
+    return dataset
+</code></pre>
+<hr>
+<h2>Train/validation split and saving</h2>
+<pre><code class="language-python">def split_and_save(dataset: Dataset, output_dir: str, val_ratio: float = 0.1) -&gt; DatasetDict:
+    &quot;&quot;&quot;Split into train/validation and save to disk.&quot;&quot;&quot;
+    split = dataset.train_test_split(test_size=val_ratio, seed=42)
+    dataset_dict = DatasetDict({&quot;train&quot;: split[&quot;train&quot;], &quot;validation&quot;: split[&quot;test&quot;]})
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    dataset_dict.save_to_disk(output_dir)
+
+    print(f&quot;Train: {len(dataset_dict['train'])}&quot;)
+    print(f&quot;Validation: {len(dataset_dict['validation'])}&quot;)
+    print(f&quot;Saved to: {output_dir}&quot;)
+    return dataset_dict
+
+def analyze_dataset(dataset: Dataset, tokenizer) -&gt; dict:
+    &quot;&quot;&quot;Compute token-length statistics.&quot;&quot;&quot;
+    lengths = [len(tokenizer.encode(t)) for t in dataset[&quot;text&quot;]]
+    return {
+        &quot;count&quot;: len(lengths),
+        &quot;token_length&quot;: {
+            &quot;min&quot;: min(lengths),
+            &quot;max&quot;: max(lengths),
+            &quot;mean&quot;: round(statistics.mean(lengths), 1),
+            &quot;median&quot;: statistics.median(lengths),
+            &quot;p95&quot;: sorted(lengths)[int(len(lengths) * 0.95)],
+        },
+    }
+
+if __name__ == &quot;__main__&quot;:
+    from transformers import AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(&quot;microsoft/phi-2&quot;, trust_remote_code=True)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    raw_data = [
+        {&quot;instruction&quot;: &quot;How do you create a dictionary in Python?&quot;, &quot;input&quot;: &quot;&quot;, &quot;output&quot;: &quot;d = {'key': 'value'} or d = dict(key='value')&quot;},
+        {&quot;instruction&quot;: &quot;Show a list comprehension example.&quot;, &quot;input&quot;: &quot;&quot;, &quot;output&quot;: &quot;[x**2 for x in range(10) if x % 2 == 0]&quot;},
+    ] * 50
+
+    dataset = build_dataset(raw_data, tokenizer, max_length=256)
+    stats = analyze_dataset(dataset, tokenizer)
+    print(stats)
+    split_and_save(dataset, &quot;./data/finetuning&quot;)
+</code></pre>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/01-intro.md">Introduction to LLM Fine-tuning</a></li>
+<li><strong>Dataset preparation and preprocessing (current)</strong></li>
+<li>Configuring the LoRA adapter (upcoming)</li>
+<li>Training loop and hyperparameters (upcoming)</li>
+<li>Model evaluation (upcoming)</li>
+<li>Model serving (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/tatsu-lab/stanford_alpaca">Stanford Alpaca dataset</a></li>
+<li><a href="https://huggingface.co/docs/datasets">Hugging Face datasets documentation</a></li>
+<li><a href="https://arxiv.org/abs/2307.09288">LIMA: Less is More for Alignment</a></li>
+</ul>
+<p class="tags-line">Tags: Fine-tuning, LoRA, LLM, Python</p>
+</body>
+</html>

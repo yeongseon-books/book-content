@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model evaluation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Model evaluation</h1>
+<blockquote>
+<p>LLM Fine-tuning 101 (5/6)</p>
+</blockquote>
+<p>A finished training run needs measurement. Loss alone is not enough. You need task-appropriate metrics, a quantitative comparison against the base model, and a look at actual outputs. This post covers how to evaluate a fine-tuned model.</p>
+<hr>
+<h2>Loading the fine-tuned model</h2>
+<pre><code class="language-python">from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import torch
+
+BASE_MODEL = &quot;microsoft/phi-2&quot;
+ADAPTER_PATH = &quot;./outputs/finetuned&quot;
+
+def load_finetuned_model(base_model: str = BASE_MODEL, adapter_path: str = ADAPTER_PATH):
+    &quot;&quot;&quot;Load the fine-tuned model with its LoRA adapter.&quot;&quot;&quot;
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type=&quot;nf4&quot;,
+        bnb_4bit_compute_dtype=torch.float16,
+    )
+    tokenizer = AutoTokenizer.from_pretrained(adapter_path)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    base = AutoModelForCausalLM.from_pretrained(
+        base_model,
+        quantization_config=bnb_config,
+        device_map=&quot;auto&quot;,
+        trust_remote_code=True,
+    )
+    model = PeftModel.from_pretrained(base, adapter_path)
+    model.eval()
+    return model, tokenizer
+
+def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 200) -&gt; str:
+    &quot;&quot;&quot;Generate a response for the given prompt.&quot;&quot;&quot;
+    inputs = tokenizer(prompt, return_tensors=&quot;pt&quot;).to(model.device)
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            temperature=1.0,
+            pad_token_id=tokenizer.eos_token_id,
+        )
+    generated = outputs[0][inputs[&quot;input_ids&quot;].shape[1]:]
+    return tokenizer.decode(generated, skip_special_tokens=True)
+</code></pre>
+<hr>
+<h2>Quantitative metrics</h2>
+<pre><code class="language-python">import re
+from collections import Counter
+
+def compute_exact_match(predictions: list[str], references: list[str]) -&gt; float:
+    matches = sum(p.strip() == r.strip() for p, r in zip(predictions, references))
+    return matches / len(references) if references else 0.0
+
+def compute_f1(prediction: str, reference: str) -&gt; float:
+    &quot;&quot;&quot;Token-level F1 score.&quot;&quot;&quot;
+    pred_tokens = prediction.lower().split()
+    ref_tokens = reference.lower().split()
+    pred_counter = Counter(pred_tokens)
+    ref_counter = Counter(ref_tokens)
+    common = sum((pred_counter &amp; ref_counter).values())
+    if common == 0:
+        return 0.0
+    precision = common / len(pred_tokens)
+    recall = common / len(ref_tokens)
+    return 2 * precision * recall / (precision + recall)
+
+def compute_code_metrics(prediction: str, reference: str) -&gt; dict:
+    &quot;&quot;&quot;Metrics for code generation tasks.&quot;&quot;&quot;
+    def extract_code(text: str) -&gt; str:
+        match = re.search(r&quot;```(?:python)?\n?(.*?)```&quot;, text, re.DOTALL)
+        return match.group(1).strip() if match else text.strip()
+
+    pred_code = extract_code(prediction)
+    ref_code = extract_code(reference)
+    return {
+        &quot;exact_match&quot;: pred_code == ref_code,
+        &quot;f1&quot;: compute_f1(pred_code, ref_code),
+        &quot;line_coverage&quot;: len(set(pred_code.split(&quot;\n&quot;)) &amp; set(ref_code.split(&quot;\n&quot;))) / max(len(ref_code.split(&quot;\n&quot;)), 1),
+    }
+</code></pre>
+<hr>
+<h2>Base model comparison</h2>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class EvalResult:
+    question: str
+    reference: str
+    base_answer: str
+    finetuned_answer: str
+    base_f1: float = 0.0
+    finetuned_f1: float = 0.0
+
+def compare_models(
+    base_model,
+    finetuned_model,
+    tokenizer,
+    test_cases: list[dict],
+    prompt_formatter,
+) -&gt; list[EvalResult]:
+    &quot;&quot;&quot;Compare base and fine-tuned model on test cases.&quot;&quot;&quot;
+    results = []
+    for tc in test_cases:
+        prompt = prompt_formatter(tc, for_inference=True)
+        base_ans = generate_response(base_model, tokenizer, prompt)
+        ft_ans = generate_response(finetuned_model, tokenizer, prompt)
+        result = EvalResult(
+            question=tc[&quot;instruction&quot;],
+            reference=tc[&quot;output&quot;],
+            base_answer=base_ans,
+            finetuned_answer=ft_ans,
+            base_f1=compute_f1(base_ans, tc[&quot;output&quot;]),
+            finetuned_f1=compute_f1(ft_ans, tc[&quot;output&quot;]),
+        )
+        results.append(result)
+        print(f&quot;Q: {tc['instruction'][:50]}...&quot;)
+        print(f&quot;  base F1: {result.base_f1:.3f}, fine-tuned F1: {result.finetuned_f1:.3f}&quot;)
+    return results
+
+def summarize_comparison(results: list[EvalResult]) -&gt; dict:
+    base_avg = sum(r.base_f1 for r in results) / len(results)
+    ft_avg = sum(r.finetuned_f1 for r in results) / len(results)
+    improved = sum(1 for r in results if r.finetuned_f1 &gt; r.base_f1)
+    return {
+        &quot;base_avg_f1&quot;: round(base_avg, 4),
+        &quot;finetuned_avg_f1&quot;: round(ft_avg, 4),
+        &quot;improvement&quot;: round(ft_avg - base_avg, 4),
+        &quot;improved_cases&quot;: f&quot;{improved}/{len(results)}&quot;,
+    }
+</code></pre>
+<hr>
+<h2>Running evaluation</h2>
+<pre><code class="language-python">if __name__ == &quot;__main__&quot;:
+    model, tokenizer = load_finetuned_model()
+
+    ALPACA_NO_INPUT_TEMPLATE = &quot;&quot;&quot;Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+{instruction}
+
+### Response:
+{output}&quot;&quot;&quot;
+
+    def format_example(example: dict, for_inference: bool = False) -&gt; str:
+        return ALPACA_NO_INPUT_TEMPLATE.format(
+            instruction=example[&quot;instruction&quot;],
+            output=&quot;&quot; if for_inference else example[&quot;output&quot;],
+        )
+
+    test_cases = [
+        {
+            &quot;instruction&quot;: &quot;How do you merge two lists in Python?&quot;,
+            &quot;input&quot;: &quot;&quot;,
+            &quot;output&quot;: &quot;list1 + list2 or list1.extend(list2)&quot;,
+        },
+        {
+            &quot;instruction&quot;: &quot;How do you check if a key exists in a dictionary?&quot;,
+            &quot;input&quot;: &quot;&quot;,
+            &quot;output&quot;: &quot;'key' in dict or dict.get('key') is not None&quot;,
+        },
+    ]
+
+    for tc in test_cases:
+        prompt = format_example(tc, for_inference=True)
+        response = generate_response(model, tokenizer, prompt)
+        f1 = compute_f1(response, tc[&quot;output&quot;])
+        print(f&quot;\nQ: {tc['instruction']}&quot;)
+        print(f&quot;A: {response[:200]}&quot;)
+        print(f&quot;F1: {f1:.3f}&quot;)
+</code></pre>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/01-intro.md">Introduction to LLM Fine-tuning</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/02-dataset.md">Dataset preparation and preprocessing</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/03-lora.md">Configuring the LoRA adapter</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-finetuning-101/en/04-training.md">Training loop and hyperparameters</a></li>
+<li><strong>Model evaluation (current)</strong></li>
+<li>Model serving (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://huggingface.co/docs/evaluate">Hugging Face evaluate library</a></li>
+<li><a href="https://huggingface.co/spaces/evaluate-metric/rouge">ROUGE metric</a></li>
+<li><a href="https://arxiv.org/abs/2307.03109">A survey on LLM evaluation</a></li>
+</ul>
+<p class="tags-line">Tags: Fine-tuning, LoRA, LLM, Python</p>
+</body>
+</html>
