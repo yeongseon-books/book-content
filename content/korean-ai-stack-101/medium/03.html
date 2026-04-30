@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BGE-M3 multilingual embedding in practice</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>BGE-M3 multilingual embedding in practice</h1>
+<blockquote>
+<p>Korean AI Stack 101 (3/6)</p>
+</blockquote>
+<p>Technical documents, research papers, and API references often mix English terms into Korean sentences — "트랜스포머(Transformer) 모델의 어텐션(Attention) 메커니즘". KoSimCSE is optimized for pure Korean, but BGE-M3 handles this code-switching text better. BGE-M3 supports over 100 languages and delivers dense, sparse, and multi-vector retrieval from a single model.</p>
+<p>Topics:</p>
+<ul>
+<li>BGE-M3's three output types: dense, sparse, ColBERT</li>
+<li>performance on Korean-English mixed documents</li>
+<li>dense + sparse hybrid retrieval</li>
+<li>LangChain integration</li>
+</ul>
+<hr>
+<h2>BGE-M3's three output types</h2>
+<p>BGE-M3 produces three different embedding forms from the same input.</p>
+<p><strong>Dense</strong>: a standard high-dimensional vector (1024 dims). Used with ANN indexes like FAISS.</p>
+<p><strong>Sparse (Lexical Weight)</strong>: a sparse vector assigning weight to each token. Similar to BM25, strong on exact keyword matching.</p>
+<p><strong>ColBERT (Multi-vector)</strong>: a separate vector per token, scored via Late Interaction. Most accurate but expensive in storage and compute.</p>
+<p>Dense + sparse hybrid is the practical sweet spot for most production systems.</p>
+<hr>
+<h2>Dense embeddings with mixed Korean/English text</h2>
+<pre><code class="language-python">import numpy as np
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer(&quot;BAAI/bge-m3&quot;)
+
+mixed_docs = [
+    &quot;트랜스포머(Transformer) 모델의 어텐션(Attention) 메커니즘은 시퀀스 내 각 위치 간 의존성을 학습합니다.&quot;,
+    &quot;FAISS는 Facebook AI Research에서 개발한 벡터 유사도 검색 라이브러리입니다.&quot;,
+    &quot;파이썬의 asyncio 모듈을 사용하면 비동기 I/O 작업을 효율적으로 처리할 수 있습니다.&quot;,
+    &quot;LangChain의 LCEL(LangChain Expression Language)은 체인을 선언적으로 구성하는 방법입니다.&quot;,
+    &quot;RAG(Retrieval-Augmented Generation)는 검색과 생성을 결합해 LLM의 지식 한계를 보완합니다.&quot;,
+    &quot;Docker 컨테이너를 Kubernetes 클러스터에 배포하는 방법을 알아봅니다.&quot;,
+]
+
+embeddings = model.encode(mixed_docs, normalize_embeddings=True)
+print(f&quot;dense embedding shape: {embeddings.shape}&quot;)  # (6, 1024)
+
+def cosine_sim(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b))
+
+# queries mixing Korean and English
+queries = [
+    &quot;Attention mechanism이 어떻게 작동하나요?&quot;,  # English keyword in Korean sentence
+    &quot;벡터 검색 라이브러리&quot;,                       # pure Korean query
+    &quot;async I/O 처리 방법&quot;,                        # mixed
+]
+
+for query in queries:
+    query_vec = model.encode([query], normalize_embeddings=True)[0]
+    sims = [(cosine_sim(query_vec, emb), doc) for emb, doc in zip(embeddings, mixed_docs)]
+    sims.sort(reverse=True)
+
+    print(f&quot;\nquery: {query}&quot;)
+    for score, doc in sims[:3]:
+        print(f&quot;  [{score:.3f}] {doc[:70]}...&quot;)
+</code></pre>
+<hr>
+<h2>Dense + sparse hybrid retrieval</h2>
+<p>Dense retrieval is strong on semantic similarity. Sparse retrieval is strong on exact keyword matching. Combining the two scores with a weighted sum captures both advantages.</p>
+<pre><code class="language-python">import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer(&quot;BAAI/bge-m3&quot;)
+
+tech_docs = [
+    &quot;Python asyncio를 사용한 비동기 HTTP 요청 처리&quot;,
+    &quot;FAISS IndexIVFFlat으로 대규모 벡터 검색 최적화&quot;,
+    &quot;Kubernetes Pod 스케줄링과 리소스 제한 설정&quot;,
+    &quot;LangChain Retriever와 FAISS 벡터스토어 통합&quot;,
+    &quot;트랜스포머 모델의 Self-Attention 구현&quot;,
+    &quot;Redis를 이용한 API 응답 캐싱 전략&quot;,
+    &quot;PostgreSQL 인덱스 최적화와 쿼리 플랜 분석&quot;,
+    &quot;Docker multi-stage build로 이미지 크기 줄이기&quot;,
+]
+
+dense_embeddings = model.encode(tech_docs, normalize_embeddings=True).astype(np.float32)
+dim = dense_embeddings.shape[1]
+dense_index = faiss.IndexFlatIP(dim)
+dense_index.add(dense_embeddings)
+
+def sparse_sim(query: str, doc: str) -&gt; float:
+    &quot;&quot;&quot;Word-overlap sparse similarity (BM25 approximation).&quot;&quot;&quot;
+    query_tokens = set(query.lower().split())
+    doc_tokens = set(doc.lower().split())
+    overlap = query_tokens &amp; doc_tokens
+    return len(overlap) / len(query_tokens) if query_tokens else 0.0
+
+def hybrid_search(query: str, alpha: float = 0.7, k: int = 3) -&gt; list[dict]:
+    &quot;&quot;&quot;
+    Hybrid search: alpha * dense_score + (1 - alpha) * sparse_score.
+    alpha=1.0 is pure dense, alpha=0.0 is pure sparse.
+    &quot;&quot;&quot;
+    query_vec = model.encode([query], normalize_embeddings=True).astype(np.float32)
+    distances, indices = dense_index.search(query_vec, len(tech_docs))
+    dense_scores = {int(idx): float(dist) for idx, dist in zip(indices[0], distances[0])}
+
+    results = []
+    for i, doc in enumerate(tech_docs):
+        d_score = dense_scores.get(i, 0.0)
+        s_score = sparse_sim(query, doc)
+        combined = alpha * d_score + (1 - alpha) * s_score
+        results.append({&quot;score&quot;: combined, &quot;dense&quot;: d_score, &quot;sparse&quot;: s_score, &quot;doc&quot;: doc})
+
+    results.sort(key=lambda x: x[&quot;score&quot;], reverse=True)
+    return results[:k]
+
+queries = [
+    &quot;FAISS 벡터 인덱스 구성 방법&quot;,
+    &quot;asyncio HTTP&quot;,
+    &quot;Kubernetes 리소스 관리&quot;,
+]
+
+for query in queries:
+    print(f&quot;\nquery: {query}&quot;)
+    results = hybrid_search(query, alpha=0.7)
+    for r in results:
+        print(f&quot;  [{r['score']:.3f}] dense={r['dense']:.3f} sparse={r['sparse']:.3f}&quot;)
+        print(f&quot;       {r['doc']}&quot;)
+</code></pre>
+<hr>
+<h2>LangChain integration</h2>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;BAAI/bge-m3&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+vectorstore = FAISS.from_texts(texts=tech_docs, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the question using the technical documents below.\n\n&quot;
+        &quot;Documents:\n{context}&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+def format_docs(docs: list) -&gt; str:
+    return &quot;\n&quot;.join(doc.page_content for doc in docs)
+
+chain = (
+    {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+answer = chain.invoke(&quot;How do I optimize vector search with FAISS?&quot;)
+print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>BGE-M3 is well suited for technical services that mix Korean and English. Dense retrieval alone handles most cases, but when exact keyword matching matters — searching code identifiers, model names, or API terms — add the sparse component. The <code>alpha</code> parameter lets you tune the trade-off without reindexing.</p>
+<p>The next post covers CLOVA OCR API: extracting text from images and PDFs to feed into the embedding pipeline.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/01-korean-embedding-models.md">Korean embedding models compared — KoSimCSE, BGE-M3, Solar</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/02-kosimcse-similarity.md">Building sentence similarity search with KoSimCSE</a></li>
+<li><strong>BGE-M3 multilingual embedding in practice (current)</strong></li>
+<li>Document text extraction with CLOVA OCR API (upcoming)</li>
+<li>Using HyperCLOVA X and Solar API (upcoming)</li>
+<li>Assembling a Korean RAG pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2309.07597">BGE-M3 paper</a></li>
+<li><a href="https://github.com/FlagOpen/FlagEmbedding">FlagEmbedding library</a></li>
+<li><a href="https://www.pinecone.io/learn/hybrid-search-intro/">Hybrid search introduction</a></li>
+</ul>
+<p class="tags-line">Tags: Korean NLP, LLM, Embeddings, OCR</p>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building sentence similarity search with KoSimCSE</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building sentence similarity search with KoSimCSE</h1>
+<blockquote>
+<p>Korean AI Stack 101 (2/6)</p>
+</blockquote>
+<p>The previous post compared three Korean embedding models. This post builds a working Korean sentence similarity search system with KoSimCSE, moving from benchmark comparison to practical implementation.</p>
+<p>Topics:</p>
+<ul>
+<li>installing and initializing KoSimCSE</li>
+<li>encoding sentences and computing similarity</li>
+<li>storing Korean documents in a FAISS index</li>
+<li>searching with Korean queries</li>
+<li>integrating into a LangChain FAQ retrieval chain</li>
+</ul>
+<hr>
+<h2>Installation</h2>
+<pre><code class="language-bash">pip install sentence-transformers faiss-cpu
+</code></pre>
+<p>The first run downloads model weights from HuggingFace — approximately 500 MB.</p>
+<hr>
+<h2>Basic similarity calculation</h2>
+<pre><code class="language-python">import numpy as np
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer(&quot;BM-K/KoSimCSE-roberta-multitask&quot;)
+
+def cosine_sim(a: np.ndarray, b: np.ndarray) -&gt; float:
+    &quot;&quot;&quot;Dot product of normalized vectors equals cosine similarity.&quot;&quot;&quot;
+    return float(np.dot(a, b))
+
+sentences = [
+    &quot;오늘 점심에 비빔밥을 먹었다.&quot;,       # I had bibimbap for lunch today.
+    &quot;오늘 낮에 비빔밥으로 식사를 했다.&quot;,   # I had a bibimbap meal at noon today.
+    &quot;주식 시장이 오늘 크게 올랐다.&quot;,       # The stock market rose sharply today.
+    &quot;한국 전통 음식 중 하나가 비빔밥이다.&quot;,# Bibimbap is one of Korea's traditional dishes.
+    &quot;파이썬으로 웹 애플리케이션을 개발했다.&quot;, # I built a web app with Python.
+]
+
+embeddings = model.encode(sentences, normalize_embeddings=True)
+print(f&quot;embedding shape: {embeddings.shape}&quot;)  # (5, 768)
+
+query = embeddings[0]
+print(f&quot;\nreference sentence: {sentences[0]}&quot;)
+print(&quot;-&quot; * 60)
+for sent, emb in zip(sentences[1:], embeddings[1:]):
+    sim = cosine_sim(query, emb)
+    print(f&quot;[{sim:.3f}] {sent}&quot;)
+</code></pre>
+<hr>
+<h2>Building a FAISS index</h2>
+<pre><code class="language-python">import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer(&quot;BM-K/KoSimCSE-roberta-multitask&quot;)
+
+faq_documents = [
+    {&quot;id&quot;: 1, &quot;question&quot;: &quot;비밀번호를 잊어버렸습니다.&quot;, &quot;answer&quot;: &quot;로그인 화면에서 '비밀번호 찾기'를 클릭하세요.&quot;},
+    {&quot;id&quot;: 2, &quot;question&quot;: &quot;회원 탈퇴는 어떻게 하나요?&quot;, &quot;answer&quot;: &quot;설정 &gt; 계정 관리 &gt; 탈퇴하기를 선택하세요.&quot;},
+    {&quot;id&quot;: 3, &quot;question&quot;: &quot;결제가 실패했습니다.&quot;, &quot;answer&quot;: &quot;카드 정보를 확인하고 다시 시도해 주세요.&quot;},
+    {&quot;id&quot;: 4, &quot;question&quot;: &quot;환불은 얼마나 걸리나요?&quot;, &quot;answer&quot;: &quot;영업일 기준 3~5일 이내에 처리됩니다.&quot;},
+    {&quot;id&quot;: 5, &quot;question&quot;: &quot;배송 추적은 어디서 하나요?&quot;, &quot;answer&quot;: &quot;마이페이지 &gt; 주문 내역에서 확인할 수 있습니다.&quot;},
+    {&quot;id&quot;: 6, &quot;question&quot;: &quot;계정 정보를 변경하고 싶습니다.&quot;, &quot;answer&quot;: &quot;설정 &gt; 프로필 편집에서 변경할 수 있습니다.&quot;},
+    {&quot;id&quot;: 7, &quot;question&quot;: &quot;앱이 자꾸 충돌합니다.&quot;, &quot;answer&quot;: &quot;앱을 최신 버전으로 업데이트하거나 캐시를 삭제해 보세요.&quot;},
+    {&quot;id&quot;: 8, &quot;question&quot;: &quot;상품을 교환하고 싶습니다.&quot;, &quot;answer&quot;: &quot;수령 후 7일 이내에 고객센터를 통해 교환 신청이 가능합니다.&quot;},
+    {&quot;id&quot;: 9, &quot;question&quot;: &quot;할인 코드 입력은 어디서 하나요?&quot;, &quot;answer&quot;: &quot;결제 화면의 '쿠폰/할인코드 입력' 칸에 입력하세요.&quot;},
+    {&quot;id&quot;: 10, &quot;question&quot;: &quot;두 기기에서 동시에 로그인할 수 있나요?&quot;, &quot;answer&quot;: &quot;최대 3대의 기기에서 동시 로그인이 가능합니다.&quot;},
+]
+
+questions = [doc[&quot;question&quot;] for doc in faq_documents]
+question_embeddings = model.encode(questions, normalize_embeddings=True)
+embeddings_f32 = question_embeddings.astype(np.float32)
+
+dim = embeddings_f32.shape[1]
+index = faiss.IndexFlatIP(dim)
+index.add(embeddings_f32)
+print(f&quot;index ready: {index.ntotal} documents&quot;)
+</code></pre>
+<hr>
+<h2>Searching with Korean queries</h2>
+<p>KoSimCSE handles paraphrase variation well — "패스워드" (English loanword for password) matches "비밀번호" (Korean word for password) with high similarity.</p>
+<pre><code class="language-python">def search_faq(query: str, k: int = 3) -&gt; list[dict]:
+    &quot;&quot;&quot;Return the k most similar FAQ entries for a Korean query.&quot;&quot;&quot;
+    query_vec = model.encode([query], normalize_embeddings=True).astype(np.float32)
+    distances, indices = index.search(query_vec, k)
+
+    results = []
+    for dist, idx in zip(distances[0], indices[0]):
+        doc = faq_documents[idx]
+        results.append({
+            &quot;score&quot;: float(dist),
+            &quot;question&quot;: doc[&quot;question&quot;],
+            &quot;answer&quot;: doc[&quot;answer&quot;],
+        })
+    return results
+
+test_queries = [
+    &quot;패스워드를 분실했어요&quot;,            # paraphrase: 비밀번호를 잊어버렸습니다
+    &quot;주문한 물건 배송 확인하고 싶어요&quot;,  # paraphrase: 배송 추적
+    &quot;결제가 안 돼요&quot;,                   # paraphrase: 결제가 실패했습니다
+    &quot;앱이 꺼집니다&quot;,                    # colloquial: 앱이 충돌합니다
+    &quot;탈퇴하고 싶어요&quot;,                  # shorter: 회원 탈퇴
+]
+
+for query in test_queries:
+    print(f&quot;\nquery: {query}&quot;)
+    results = search_faq(query, k=2)
+    for r in results:
+        print(f&quot;  [{r['score']:.3f}] Q: {r['question']}&quot;)
+        print(f&quot;          A: {r['answer']}&quot;)
+</code></pre>
+<hr>
+<h2>Integrating into a LangChain retrieval chain</h2>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;BM-K/KoSimCSE-roberta-multitask&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+texts = [doc[&quot;question&quot;] + &quot; &quot; + doc[&quot;answer&quot;] for doc in faq_documents]
+vectorstore = FAISS.from_texts(texts=texts, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the customer question using the FAQ documents below.\n&quot;
+        &quot;Be polite and clear.\n\n&quot;
+        &quot;FAQ documents:\n{context}&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+def format_docs(docs: list) -&gt; str:
+    return &quot;\n&quot;.join(doc.page_content for doc in docs)
+
+rag_chain = (
+    {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+answer = rag_chain.invoke(&quot;비밀번호를 까먹었는데 어떻게 하면 되나요?&quot;)
+print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>KoSimCSE maps paraphrase variation — "패스워드" and "비밀번호", "충돌" and "꺼짐" — to nearby vectors without any special handling. Wrapping it with LangChain's <code>HuggingFaceEmbeddings</code> and <code>FAISS</code> connects it to any existing retrieval chain in minutes.</p>
+<p>The next post covers BGE-M3's multilingual capabilities and hybrid dense+sparse retrieval.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/01-korean-embedding-models.md">Korean embedding models compared — KoSimCSE, BGE-M3, Solar</a></li>
+<li><strong>Building sentence similarity search with KoSimCSE (current)</strong></li>
+<li>BGE-M3 multilingual embedding in practice (upcoming)</li>
+<li>Document text extraction with CLOVA OCR API (upcoming)</li>
+<li>Using HyperCLOVA X and Solar API (upcoming)</li>
+<li>Assembling a Korean RAG pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://huggingface.co/BM-K/KoSimCSE-roberta-multitask">KoSimCSE on HuggingFace</a></li>
+<li><a href="https://faiss.ai/">FAISS documentation</a></li>
+<li><a href="https://www.sbert.net/docs/usage/computing_sentence_embeddings.html">SentenceTransformers encoding guide</a></li>
+</ul>
+<p class="tags-line">Tags: Korean NLP, LLM, Embeddings, OCR</p>
+</body>
+</html>

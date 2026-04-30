@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Korean embedding models compared — KoSimCSE, BGE-M3, Solar</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Korean embedding models compared — KoSimCSE, BGE-M3, Solar</h1>
+<blockquote>
+<p>Korean AI Stack 101 (1/6)</p>
+</blockquote>
+<p>Embedding models designed around English corpora do not reliably capture the meaning of Korean sentences. Understanding that "나는 밥을 먹었다" and "I had a meal" are semantically equivalent requires a model that has learned Korean morphology. This post compares three embedding models suited for Korean NLP work.</p>
+<p>Topics:</p>
+<ul>
+<li>why Korean-specific embedding models matter</li>
+<li>characteristics of KoSimCSE, BGE-M3, and Solar Embedding</li>
+<li>side-by-side similarity scores on the same sentence pairs</li>
+<li>a practical guide to choosing between them</li>
+</ul>
+<hr>
+<h2>Why Korean-specific models matter</h2>
+<p>A multilingual model like <code>sentence-transformers/all-MiniLM-L6-v2</code> can process Korean text, but its training corpus is English-dominant. It is not sensitive to Korean particles, verb endings, or the way meaning is packed into suffixes. As a result, "서울시청" and "서울 시청" — the same place, written with and without a space — can end up far apart in embedding space. Korean-specific models trained on morpheme-tokenized data reduce these errors.</p>
+<hr>
+<h2>Three models at a glance</h2>
+<p><strong>KoSimCSE-RoBERTa</strong> (<code>BM-K/KoSimCSE-roberta-multitask</code>): A Korean SimCSE model from the open-source community. Strong on Korean sentence similarity benchmarks. Outputs 768-dimensional vectors. Free on HuggingFace.</p>
+<p><strong>BGE-M3</strong> (<code>BAAI/bge-m3</code>): A multilingual model from BAAI supporting 100-plus languages, with solid Korean performance. Supports dense, sparse, and multi-vector retrieval in the same model, making it well suited for hybrid search. Outputs 1024-dimensional vectors.</p>
+<p><strong>Solar Embedding</strong> (<code>upstage/solar-embedding-1-large-query</code>): A bilingual Korean/English model from Upstage optimized for Korean RAG. Delivered as an API. Uses 4096-dimensional vectors to capture fine semantic distinctions.</p>
+<hr>
+<h2>Side-by-side comparison</h2>
+<pre><code class="language-python">import numpy as np
+from sentence_transformers import SentenceTransformer
+
+print(&quot;loading models...&quot;)
+
+kosimcse = SentenceTransformer(&quot;BM-K/KoSimCSE-roberta-multitask&quot;)
+bge_m3 = SentenceTransformer(&quot;BAAI/bge-m3&quot;)
+
+print(&quot;models loaded&quot;)
+
+# Korean sentence pairs with expected similarity label
+sentence_pairs = [
+    (&quot;나는 오늘 밥을 먹었다.&quot;, &quot;나는 오늘 식사를 했다.&quot;, &quot;similar&quot;),
+    (&quot;서울 날씨가 맑다.&quot;, &quot;부산 날씨가 흐리다.&quot;, &quot;unrelated&quot;),
+    (&quot;파이썬으로 웹 서버를 만들었다.&quot;, &quot;Python을 이용해 웹 앱을 개발했다.&quot;, &quot;similar&quot;),
+    (&quot;고양이가 쥐를 잡았다.&quot;, &quot;주식 시장이 하락했다.&quot;, &quot;unrelated&quot;),
+    (&quot;인공지능이 의료 진단을 돕는다.&quot;, &quot;AI가 병원에서 환자 진단을 지원한다.&quot;, &quot;similar&quot;),
+]
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+def compare_models(pairs: list[tuple]) -&gt; None:
+    print(f&quot;\n{'Sentence A':&lt;32} {'Sentence B':&lt;32} {'Expected':^8} {'KoSimCSE':^10} {'BGE-M3':^10}&quot;)
+    print(&quot;-&quot; * 96)
+
+    for sent_a, sent_b, expected in pairs:
+        vec_a = kosimcse.encode(sent_a, normalize_embeddings=True)
+        vec_b = kosimcse.encode(sent_b, normalize_embeddings=True)
+        ko_sim = cosine_similarity(vec_a, vec_b)
+
+        vec_a = bge_m3.encode(sent_a, normalize_embeddings=True)
+        vec_b = bge_m3.encode(sent_b, normalize_embeddings=True)
+        bge_sim = cosine_similarity(vec_a, vec_b)
+
+        a_display = sent_a[:30] + &quot;..&quot; if len(sent_a) &gt; 32 else sent_a
+        b_display = sent_b[:30] + &quot;..&quot; if len(sent_b) &gt; 32 else sent_b
+        print(f&quot;{a_display:&lt;32} {b_display:&lt;32} {expected:^8} {ko_sim:^10.3f} {bge_sim:^10.3f}&quot;)
+
+compare_models(sentence_pairs)
+</code></pre>
+<hr>
+<h2>Dimensionality and retrieval performance</h2>
+<p>Higher embedding dimensionality can encode finer semantic distinctions, but it increases storage and search time proportionally.</p>
+<pre><code class="language-python">import time
+
+import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+# KoSimCSE: 768 dims
+# BGE-M3:   1024 dims
+# Solar:    4096 dims (API only)
+
+bge_m3 = SentenceTransformer(&quot;BAAI/bge-m3&quot;)
+
+documents = [
+    &quot;Comparing Python web development frameworks&quot;,
+    &quot;Training machine learning models step by step&quot;,
+    &quot;Korean natural language processing techniques&quot;,
+    &quot;Database index optimization strategies&quot;,
+    &quot;Cloud service architecture design&quot;,
+    &quot;Deep learning image classification models&quot;,
+    &quot;API security and authentication methods&quot;,
+    &quot;Docker container deployment strategies&quot;,
+] * 100  # 800 documents
+
+print(f&quot;document count: {len(documents)}&quot;)
+
+start = time.time()
+embeddings = bge_m3.encode(documents, normalize_embeddings=True, show_progress_bar=True)
+embed_time = time.time() - start
+print(f&quot;embedding time: {embed_time:.2f}s&quot;)
+print(f&quot;embedding dims: {embeddings.shape[1]}&quot;)
+print(f&quot;storage size: {embeddings.nbytes / 1024:.1f} KB&quot;)
+
+embeddings_f32 = embeddings.astype(np.float32)
+index = faiss.IndexFlatIP(embeddings.shape[1])
+index.add(embeddings_f32)
+
+query = &quot;deep learning models for natural language processing&quot;
+query_vec = bge_m3.encode([query], normalize_embeddings=True).astype(np.float32)
+
+start = time.time()
+for _ in range(100):
+    distances, indices = index.search(query_vec, k=5)
+search_time = (time.time() - start) / 100 * 1000
+print(f&quot;\nsearch latency: {search_time:.3f}ms (100-run average)&quot;)
+print(&quot;top 5 results:&quot;)
+for i, idx in enumerate(indices[0]):
+    print(f&quot;  {i + 1}. [{distances[0][i]:.3f}] {documents[idx]}&quot;)
+</code></pre>
+<hr>
+<h2>Choosing between models</h2>
+<p><strong>Korean-only, free, lightweight</strong>: KoSimCSE. At 768 dimensions it is storage-efficient and available directly from HuggingFace. It has been validated on Korean sentence similarity benchmarks.</p>
+<p><strong>Mixed Korean/English documents</strong>: BGE-M3. Technical documentation and academic papers often mix English terms into Korean sentences. BGE-M3 handles this well and also supports hybrid dense+sparse retrieval.</p>
+<p><strong>Highest quality Korean RAG, API budget available</strong>: Solar Embedding. The 4096-dimensional vectors distinguish fine-grained semantic differences, and Upstage has specifically optimized it for Korean.</p>
+<hr>
+<h2>Conclusion</h2>
+<p>No single model is best for every scenario. For zero-cost experimentation, start with KoSimCSE or BGE-M3. The next post builds a sentence similarity search system using KoSimCSE, walking through each step from encoding to retrieval.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>Korean embedding models compared — KoSimCSE, BGE-M3, Solar (current)</strong></li>
+<li>Building sentence similarity search with KoSimCSE (upcoming)</li>
+<li>BGE-M3 multilingual embedding in practice (upcoming)</li>
+<li>Document text extraction with CLOVA OCR API (upcoming)</li>
+<li>Using HyperCLOVA X and Solar API (upcoming)</li>
+<li>Assembling a Korean RAG pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2109.12145">KoSimCSE paper (Kim et al., 2021)</a></li>
+<li><a href="https://huggingface.co/BAAI/bge-m3">BGE-M3 on HuggingFace</a></li>
+<li><a href="https://developers.upstage.ai/docs/apis/embeddings">Upstage Solar Embedding</a></li>
+<li><a href="https://www.sbert.net/">SentenceTransformers library</a></li>
+</ul>
+<p class="tags-line">Tags: Korean NLP, LLM, Embeddings, OCR</p>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Assembling a Korean RAG pipeline</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Assembling a Korean RAG pipeline</h1>
+<blockquote>
+<p>Korean AI Stack 101 (6/6)</p>
+</blockquote>
+<p>This post assembles the components covered throughout the series into one pipeline: KoSimCSE embeddings for indexing Korean documents, FAISS for retrieval, and Solar LLM for generating Korean answers. Adding CLOVA OCR preprocessing extends it to scanned images and PDFs.</p>
+<p>Topics:</p>
+<ul>
+<li>full pipeline architecture</li>
+<li>complete Korean RAG implementation</li>
+<li>document-type-aware chunking strategies</li>
+<li>debugging each pipeline stage</li>
+</ul>
+<hr>
+<h2>Pipeline architecture</h2>
+<pre><code>[document sources]
+  text files ─┐
+  images/PDFs─┼─→ [preprocessing] ─→ [chunking] ─→ [KoSimCSE embedding] ─→ [FAISS index]
+  OCR output ─┘
+
+[query time]
+  user question ─→ [KoSimCSE embedding] ─→ [FAISS search] ─→ [Solar LLM] ─→ answer
+</code></pre>
+<hr>
+<h2>Complete Korean RAG implementation</h2>
+<pre><code class="language-python">import os
+import re
+from dataclasses import dataclass
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+@dataclass
+class DocumentChunk:
+    text: str
+    source: str
+    chunk_idx: int
+
+class KoreanRAGPipeline:
+    &quot;&quot;&quot;
+    Complete RAG pipeline for Korean documents.
+    KoSimCSE embedding + FAISS + Solar LLM.
+    &quot;&quot;&quot;
+
+    SPLITTER_CONFIG = {
+        &quot;legal&quot;: {
+            &quot;chunk_size&quot;: 500,
+            &quot;chunk_overlap&quot;: 100,
+            &quot;separators&quot;: [&quot;\n\n&quot;, &quot;\n&quot;, &quot;。&quot;, &quot;. &quot;],
+        },
+        &quot;news&quot;: {
+            &quot;chunk_size&quot;: 300,
+            &quot;chunk_overlap&quot;: 50,
+            &quot;separators&quot;: [&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;],
+        },
+        &quot;technical&quot;: {
+            &quot;chunk_size&quot;: 400,
+            &quot;chunk_overlap&quot;: 80,
+            &quot;separators&quot;: [&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;],
+        },
+    }
+
+    def __init__(self, doc_type: str = &quot;technical&quot;):
+        self.embedding_model = HuggingFaceEmbeddings(
+            model_name=&quot;BM-K/KoSimCSE-roberta-multitask&quot;,
+            model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+            encode_kwargs={&quot;normalize_embeddings&quot;: True},
+        )
+
+        config = self.SPLITTER_CONFIG.get(doc_type, self.SPLITTER_CONFIG[&quot;technical&quot;])
+        self.splitter = RecursiveCharacterTextSplitter(**config)
+
+        self.llm = ChatOpenAI(
+            model=&quot;solar-1-mini-chat&quot;,
+            api_key=os.environ.get(&quot;UPSTAGE_API_KEY&quot;, &quot;dummy&quot;),
+            base_url=&quot;https://api.upstage.ai/v1/solar&quot;,
+            temperature=0.3,
+        )
+
+        self.vectorstore = None
+        self.retriever = None
+        self.chain = None
+
+    def clean_text(self, text: str) -&gt; str:
+        &quot;&quot;&quot;Basic Korean text cleaning.&quot;&quot;&quot;
+        text = re.sub(r&quot;([^\w\s가-힣])\1{2,}&quot;, &quot;&quot;, text)
+        text = re.sub(r&quot; {2,}&quot;, &quot; &quot;, text)
+        lines = [ln.strip() for ln in text.split(&quot;\n&quot;)]
+        cleaned = []
+        prev_empty = False
+        for line in lines:
+            is_empty = not line
+            if is_empty and prev_empty:
+                continue
+            cleaned.append(line)
+            prev_empty = is_empty
+        return &quot;\n&quot;.join(cleaned).strip()
+
+    def index_documents(self, documents: list[dict]) -&gt; None:
+        &quot;&quot;&quot;
+        Index a list of documents.
+        Each document: {&quot;text&quot;: str, &quot;source&quot;: str}
+        &quot;&quot;&quot;
+        all_chunks = []
+        for doc in documents:
+            cleaned = self.clean_text(doc[&quot;text&quot;])
+            chunks = self.splitter.split_text(cleaned)
+            for idx, chunk in enumerate(chunks):
+                all_chunks.append(DocumentChunk(
+                    text=chunk,
+                    source=doc[&quot;source&quot;],
+                    chunk_idx=idx,
+                ))
+
+        texts = [c.text for c in all_chunks]
+        metadatas = [{&quot;source&quot;: c.source, &quot;chunk_idx&quot;: c.chunk_idx} for c in all_chunks]
+
+        self.vectorstore = FAISS.from_texts(
+            texts=texts,
+            embedding=self.embedding_model,
+            metadatas=metadatas,
+        )
+        self.retriever = self.vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                &quot;system&quot;,
+                &quot;Answer the question using the reference documents below.\n&quot;
+                &quot;If the answer is not in the documents, say so.\n\n&quot;
+                &quot;Reference documents:\n{context}&quot;,
+            ),
+            (&quot;human&quot;, &quot;{question}&quot;),
+        ])
+
+        def format_docs(docs: list) -&gt; str:
+            parts = []
+            for doc in docs:
+                source = doc.metadata.get(&quot;source&quot;, &quot;unknown&quot;)
+                parts.append(f&quot;[source: {source}]\n{doc.page_content}&quot;)
+            return &quot;\n\n&quot;.join(parts)
+
+        self.chain = (
+            {&quot;context&quot;: self.retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+            | prompt
+            | self.llm
+            | StrOutputParser()
+        )
+
+        print(f&quot;indexed: {len(all_chunks)} chunks from {len(documents)} documents&quot;)
+
+    def query(self, question: str) -&gt; dict:
+        &quot;&quot;&quot;Answer a question and return the sources used.&quot;&quot;&quot;
+        if not self.chain:
+            raise RuntimeError(&quot;call index_documents() first&quot;)
+
+        docs = self.retriever.invoke(question)
+        sources = list({doc.metadata.get(&quot;source&quot;, &quot;unknown&quot;) for doc in docs})
+        answer = self.chain.invoke(question)
+
+        return {&quot;answer&quot;: answer, &quot;sources&quot;: sources}
+</code></pre>
+<hr>
+<h2>Usage</h2>
+<pre><code class="language-python">pipeline = KoreanRAGPipeline(doc_type=&quot;legal&quot;)
+
+documents = [
+    {
+        &quot;source&quot;: &quot;constitution.txt&quot;,
+        &quot;text&quot;: &quot;&quot;&quot;
+Article 1 of the Constitution of the Republic of Korea:
+The Republic of Korea shall be a democratic republic.
+The sovereignty of the Republic of Korea shall reside in the people, and all state authority shall emanate from the people.
+
+Article 10:
+All citizens shall be assured of human worth and dignity and shall have the right to pursue happiness.
+It shall be the duty of the state to confirm and guarantee the fundamental and inviolable human rights of individuals.
+
+Article 12:
+All citizens shall enjoy personal liberty. No person shall be arrested, detained, searched, seized or interrogated except as provided by act.
+        &quot;&quot;&quot;,
+    },
+    {
+        &quot;source&quot;: &quot;civil_code.txt&quot;,
+        &quot;text&quot;: &quot;&quot;&quot;
+Article 750 of the Civil Act (Tort):
+A person who causes injury to another through an unlawful act, intentionally or negligently, shall be bound to make compensation for damages arising therefrom.
+
+Article 751:
+A person who causes damage to another's body, liberty or reputation or inflicts mental anguish on another shall also be bound to make compensation for non-property damages.
+        &quot;&quot;&quot;,
+    },
+]
+
+pipeline.index_documents(documents)
+
+questions = [
+    &quot;How does the Korean constitution protect fundamental rights?&quot;,
+    &quot;What is the legal liability when someone causes damage through an unlawful act?&quot;,
+    &quot;Under what conditions can personal liberty be restricted?&quot;,
+]
+
+for question in questions:
+    print(f&quot;\nquestion: {question}&quot;)
+    result = pipeline.query(question)
+    print(f&quot;answer: {result['answer']}&quot;)
+    print(f&quot;sources: {result['sources']}&quot;)
+</code></pre>
+<hr>
+<h2>Debugging each stage</h2>
+<p>When retrieval results are unexpected, inspect each stage individually.</p>
+<pre><code class="language-python">def debug_pipeline(pipeline: KoreanRAGPipeline, question: str) -&gt; None:
+    &quot;&quot;&quot;Print intermediate results at each pipeline stage.&quot;&quot;&quot;
+    print(f&quot;\n=== debug: '{question}' ===&quot;)
+
+    query_embedding = pipeline.embedding_model.embed_query(question)
+    print(f&quot;query embedding dims: {len(query_embedding)}&quot;)
+    print(f&quot;first 3 values: {query_embedding[:3]}&quot;)
+
+    docs = pipeline.retriever.invoke(question)
+    print(f&quot;\nretrieved chunks: {len(docs)}&quot;)
+    for i, doc in enumerate(docs, start=1):
+        source = doc.metadata.get(&quot;source&quot;, &quot;unknown&quot;)
+        print(f&quot;  [{i}] source: {source}&quot;)
+        print(f&quot;       content: {doc.page_content[:80]}...&quot;)
+
+    result = pipeline.query(question)
+    print(f&quot;\nfinal answer:\n{result['answer']}&quot;)
+
+debug_pipeline(pipeline, &quot;Who holds sovereignty in Korea?&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>The Korean AI stack — KoSimCSE or BGE-M3 for embeddings, CLOVA OCR for image documents, and HyperCLOVA X or Solar for generation — outperforms English-centric stacks on Korean-language domains like law, medicine, and finance. The pipeline presented here is production-ready: clean the text, chunk with domain-appropriate settings, index with normalized embeddings, and use a low temperature for factual retrieval tasks.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/01-korean-embedding-models.md">Korean embedding models compared — KoSimCSE, BGE-M3, Solar</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/02-kosimcse-similarity.md">Building sentence similarity search with KoSimCSE</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/03-bge-m3-multilingual.md">BGE-M3 multilingual embedding in practice</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/04-clova-ocr.md">Document text extraction with CLOVA OCR API</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/05-hyperclova-solar-api.md">Using HyperCLOVA X and Solar API</a></li>
+<li><strong>Assembling a Korean RAG pipeline (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://huggingface.co/BM-K/KoSimCSE-roberta-multitask">KoSimCSE</a></li>
+<li><a href="https://huggingface.co/BAAI/bge-m3">BGE-M3</a></li>
+<li><a href="https://api.ncloud-docs.com/docs/ai-application-service-ocr">CLOVA OCR</a></li>
+<li><a href="https://developers.upstage.ai/docs/apis/chat">Solar API</a></li>
+<li><a href="https://faiss.ai/">FAISS</a></li>
+</ul>
+<p class="tags-line">Tags: Korean NLP, LLM, Embeddings, OCR</p>
+</body>
+</html>

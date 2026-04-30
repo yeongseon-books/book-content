@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Using HyperCLOVA X and Solar API</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Using HyperCLOVA X and Solar API</h1>
+<blockquote>
+<p>Korean AI Stack 101 (5/6)</p>
+</blockquote>
+<p>OpenAI and Anthropic models support Korean, but models trained primarily on Korean corpora produce more natural output on Korean cultural nuance and idiomatic expression. HyperCLOVA X (NAVER) and Solar (Upstage) are commercial LLMs built with Korean as a first-class language. Both expose OpenAI-compatible chat completion interfaces, so switching requires minimal code changes.</p>
+<p>Topics:</p>
+<ul>
+<li>HyperCLOVA X API basics</li>
+<li>Solar API basics</li>
+<li>integrating both into LangChain</li>
+<li>RAG with a Korean-specialized LLM</li>
+</ul>
+<hr>
+<h2>HyperCLOVA X API</h2>
+<p>Obtain an API key from NAVER Cloud Platform's CLOVA Studio.</p>
+<pre><code class="language-python">import os
+
+import requests
+
+def call_hyperclova_x(
+    messages: list[dict],
+    model: str = &quot;HCX-003&quot;,
+    max_tokens: int = 512,
+    temperature: float = 0.7,
+) -&gt; str:
+    &quot;&quot;&quot;Call HyperCLOVA X Chat Completions API (OpenAI-compatible format).&quot;&quot;&quot;
+    api_key = os.environ[&quot;CLOVA_STUDIO_API_KEY&quot;]
+
+    headers = {
+        &quot;Authorization&quot;: f&quot;Bearer {api_key}&quot;,
+        &quot;Content-Type&quot;: &quot;application/json&quot;,
+    }
+
+    payload = {
+        &quot;model&quot;: model,
+        &quot;messages&quot;: messages,
+        &quot;maxTokens&quot;: max_tokens,
+        &quot;temperature&quot;: temperature,
+    }
+
+    response = requests.post(
+        &quot;https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/HCX-003&quot;,
+        headers=headers,
+        json=payload,
+        timeout=30,
+    )
+    response.raise_for_status()
+    return response.json()[&quot;result&quot;][&quot;message&quot;][&quot;content&quot;]
+
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a helpful AI assistant specializing in Korean culture.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What are three traditional Korean foods especially popular in winter?&quot;},
+]
+
+response = call_hyperclova_x(messages)
+print(&quot;HyperCLOVA X response:&quot;)
+print(response)
+</code></pre>
+<hr>
+<h2>Solar API (Upstage)</h2>
+<p>Solar's OpenAI-compatible interface means you can use the standard <code>openai</code> Python package.</p>
+<pre><code class="language-python">import os
+
+from openai import OpenAI
+
+def call_solar(
+    messages: list[dict],
+    model: str = &quot;solar-1-mini-chat&quot;,
+    max_tokens: int = 512,
+    temperature: float = 0.7,
+) -&gt; str:
+    &quot;&quot;&quot;Call Upstage Solar API using the OpenAI SDK.&quot;&quot;&quot;
+    client = OpenAI(
+        api_key=os.environ[&quot;UPSTAGE_API_KEY&quot;],
+        base_url=&quot;https://api.upstage.ai/v1/solar&quot;,
+    )
+
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        max_tokens=max_tokens,
+        temperature=temperature,
+    )
+    return response.choices[0].message.content
+
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a helpful AI assistant specializing in Korean culture.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What are three traditional Korean foods especially popular in winter?&quot;},
+]
+
+response = call_solar(messages)
+print(&quot;Solar response:&quot;)
+print(response)
+</code></pre>
+<hr>
+<h2>LangChain integration</h2>
+<p>LangChain's <code>ChatOpenAI</code> accepts a <code>base_url</code> parameter for OpenAI-compatible APIs. Solar integrates with no custom code.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+solar_llm = ChatOpenAI(
+    model=&quot;solar-1-mini-chat&quot;,
+    api_key=os.environ[&quot;UPSTAGE_API_KEY&quot;],
+    base_url=&quot;https://api.upstage.ai/v1/solar&quot;,
+    temperature=0.7,
+    max_tokens=512,
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You are an expert on Korean language and writing.\n&quot;
+        &quot;Answer clearly and naturally.&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+chain = prompt | solar_llm | StrOutputParser()
+
+questions = [
+    &quot;What is the difference between formal and informal speech levels in Korean?&quot;,
+    &quot;When should you use honorific language in Korean business settings?&quot;,
+]
+
+for question in questions:
+    answer = chain.invoke({&quot;question&quot;: question})
+    print(f&quot;\nquestion: {question}&quot;)
+    print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<hr>
+<h2>Korean RAG with Solar</h2>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;BM-K/KoSimCSE-roberta-multitask&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+# Korean legal documents
+ko_documents = [
+    &quot;대한민국 헌법 제1조: 대한민국은 민주공화국이다.&quot;,
+    &quot;대한민국 헌법 제10조: 모든 국민은 인간으로서의 존엄과 가치를 가지며, 행복을 추구할 권리를 가진다.&quot;,
+    &quot;대한민국 헌법 제37조: 국민의 자유와 권리는 헌법에 열거되지 아니한 이유로 경시되지 아니한다.&quot;,
+    &quot;형사소송법 제244조: 피의자의 진술은 서면으로 작성하여야 하며, 피의자에게 열람하게 하거나 읽어 주어야 한다.&quot;,
+    &quot;민법 제750조: 고의 또는 과실로 인한 위법행위로 타인에게 손해를 가한 자는 그 손해를 배상할 책임이 있다.&quot;,
+]
+
+vectorstore = FAISS.from_texts(texts=ko_documents, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 2})
+
+solar_llm = ChatOpenAI(
+    model=&quot;solar-1-mini-chat&quot;,
+    api_key=os.environ[&quot;UPSTAGE_API_KEY&quot;],
+    base_url=&quot;https://api.upstage.ai/v1/solar&quot;,
+    temperature=0.3,  # low temperature for legal interpretation
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the question based on the legal provisions below.\n&quot;
+        &quot;Explain technical terms in plain language.\n\n&quot;
+        &quot;Legal provisions:\n{context}&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+def format_docs(docs: list) -&gt; str:
+    return &quot;\n&quot;.join(doc.page_content for doc in docs)
+
+rag_chain = (
+    {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+    | prompt
+    | solar_llm
+    | StrOutputParser()
+)
+
+answer = rag_chain.invoke(&quot;How does the Korean constitution protect human dignity?&quot;)
+print(f&quot;answer:\n{answer}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>Both HyperCLOVA X and Solar produce more natural Korean output than general-purpose multilingual models on culturally specific or idiomatically rich content. Solar's complete OpenAI SDK compatibility means you can swap it into any existing LangChain chain by changing two parameters. The next post assembles everything covered in this series — KoSimCSE embeddings, CLOVA OCR, and Solar — into a complete Korean RAG pipeline.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/01-korean-embedding-models.md">Korean embedding models compared — KoSimCSE, BGE-M3, Solar</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/02-kosimcse-similarity.md">Building sentence similarity search with KoSimCSE</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/03-bge-m3-multilingual.md">BGE-M3 multilingual embedding in practice</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/04-clova-ocr.md">Document text extraction with CLOVA OCR API</a></li>
+<li><strong>Using HyperCLOVA X and Solar API (current)</strong></li>
+<li>Assembling a Korean RAG pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://api.ncloud-docs.com/docs/ai-application-service-clovastudio">CLOVA Studio API documentation</a></li>
+<li><a href="https://developers.upstage.ai/docs/apis/chat">Upstage Solar API</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/chat/openai/">LangChain ChatOpenAI</a></li>
+</ul>
+<p class="tags-line">Tags: Korean NLP, LLM, Embeddings, OCR</p>
+</body>
+</html>

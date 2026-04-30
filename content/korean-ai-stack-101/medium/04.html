@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Document text extraction with CLOVA OCR API</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Document text extraction with CLOVA OCR API</h1>
+<blockquote>
+<p>Korean AI Stack 101 (4/6)</p>
+</blockquote>
+<p>RAG pipelines do not always start from text files. Scanned contracts, receipt images, and tables embedded in PDFs all lock text inside images. OCR (Optical Character Recognition) extracts that text. NAVER CLOVA OCR is a commercial Korean-specialized API that handles everything from printed business documents to handwritten Korean.</p>
+<p>Topics:</p>
+<ul>
+<li>basic CLOVA OCR API usage</li>
+<li>extracting text from images and cleaning the output</li>
+<li>bounding box and position data for structured documents</li>
+<li>connecting extracted text to a RAG pipeline</li>
+</ul>
+<hr>
+<h2>API setup</h2>
+<p>Create an OCR domain in NAVER Cloud Platform to obtain an API URL and a Secret Key. Set both as environment variables.</p>
+<pre><code class="language-bash">export CLOVA_OCR_API_URL=&quot;https://...&quot;
+export CLOVA_OCR_SECRET_KEY=&quot;...&quot;
+</code></pre>
+<hr>
+<h2>Basic OCR request</h2>
+<pre><code class="language-python">import base64
+import json
+import os
+import time
+import uuid
+from pathlib import Path
+
+import requests
+
+def ocr_image(image_path: str) -&gt; dict:
+    &quot;&quot;&quot;Send an image to the CLOVA OCR API and return the parsed response.&quot;&quot;&quot;
+    api_url = os.environ[&quot;CLOVA_OCR_API_URL&quot;]
+    secret_key = os.environ[&quot;CLOVA_OCR_SECRET_KEY&quot;]
+
+    image_path = Path(image_path)
+    suffix = image_path.suffix.lower().lstrip(&quot;.&quot;)
+    format_map = {&quot;jpg&quot;: &quot;jpeg&quot;, &quot;jpeg&quot;: &quot;jpeg&quot;, &quot;png&quot;: &quot;png&quot;, &quot;pdf&quot;: &quot;pdf&quot;}
+    image_format = format_map.get(suffix, &quot;jpeg&quot;)
+
+    with open(image_path, &quot;rb&quot;) as f:
+        image_data = base64.b64encode(f.read()).decode(&quot;utf-8&quot;)
+
+    request_body = {
+        &quot;images&quot;: [
+            {
+                &quot;format&quot;: image_format,
+                &quot;name&quot;: image_path.name,
+                &quot;data&quot;: image_data,
+            }
+        ],
+        &quot;requestId&quot;: str(uuid.uuid4()),
+        &quot;version&quot;: &quot;V2&quot;,
+        &quot;timestamp&quot;: int(time.time() * 1000),
+    }
+
+    headers = {
+        &quot;X-OCR-SECRET&quot;: secret_key,
+        &quot;Content-Type&quot;: &quot;application/json&quot;,
+    }
+
+    response = requests.post(
+        api_url,
+        headers=headers,
+        data=json.dumps(request_body),
+        timeout=30,
+    )
+    response.raise_for_status()
+    return response.json()
+
+def extract_text(ocr_result: dict) -&gt; str:
+    &quot;&quot;&quot;Extract all recognized text from an OCR response into a single string.&quot;&quot;&quot;
+    lines = []
+    for image in ocr_result.get(&quot;images&quot;, []):
+        for field in image.get(&quot;fields&quot;, []):
+            lines.append(field.get(&quot;inferText&quot;, &quot;&quot;))
+    return &quot;\n&quot;.join(lines)
+</code></pre>
+<hr>
+<h2>Bounding box and position data</h2>
+<p>CLOVA OCR returns bounding polygon coordinates for each text block. This is useful for reconstructing reading order in tables and forms.</p>
+<pre><code class="language-python">def extract_text_with_position(ocr_result: dict) -&gt; list[dict]:
+    &quot;&quot;&quot;Return text blocks with position information.&quot;&quot;&quot;
+    blocks = []
+    for image in ocr_result.get(&quot;images&quot;, []):
+        for field in image.get(&quot;fields&quot;, []):
+            vertices = field.get(&quot;boundingPoly&quot;, {}).get(&quot;vertices&quot;, [])
+            top_y = min(v.get(&quot;y&quot;, 0) for v in vertices) if vertices else 0
+            left_x = min(v.get(&quot;x&quot;, 0) for v in vertices) if vertices else 0
+
+            blocks.append({
+                &quot;text&quot;: field.get(&quot;inferText&quot;, &quot;&quot;),
+                &quot;confidence&quot;: field.get(&quot;inferConfidence&quot;, 0.0),
+                &quot;x&quot;: left_x,
+                &quot;y&quot;: top_y,
+            })
+
+    # sort top-to-bottom, left-to-right within each row
+    blocks.sort(key=lambda b: (b[&quot;y&quot;], b[&quot;x&quot;]))
+    return blocks
+
+def reconstruct_lines(blocks: list[dict], y_threshold: int = 15) -&gt; list[str]:
+    &quot;&quot;&quot;Group blocks with similar y-coordinates into text lines.&quot;&quot;&quot;
+    if not blocks:
+        return []
+
+    lines = []
+    current_line = [blocks[0]]
+
+    for block in blocks[1:]:
+        if abs(block[&quot;y&quot;] - current_line[-1][&quot;y&quot;]) &lt;= y_threshold:
+            current_line.append(block)
+        else:
+            lines.append(&quot; &quot;.join(b[&quot;text&quot;] for b in current_line))
+            current_line = [block]
+
+    if current_line:
+        lines.append(&quot; &quot;.join(b[&quot;text&quot;] for b in current_line))
+
+    return lines
+</code></pre>
+<hr>
+<h2>Cleaning OCR output</h2>
+<p>Raw OCR output contains recognition errors, stray special characters, and redundant whitespace. Cleaning before embedding improves retrieval quality.</p>
+<pre><code class="language-python">import re
+
+def clean_ocr_text(text: str) -&gt; str:
+    &quot;&quot;&quot;
+    Clean OCR text:
+    1. remove repeated special characters
+    2. normalize whitespace
+    3. collapse multiple blank lines
+    &quot;&quot;&quot;
+    # remove repeated non-word characters (e.g., &quot;...&quot;, &quot;---&quot;)
+    text = re.sub(r&quot;([^\w\s가-힣])\1{2,}&quot;, &quot;&quot;, text)
+
+    # tabs to spaces
+    text = text.replace(&quot;\t&quot;, &quot; &quot;)
+
+    # collapse multiple spaces
+    text = re.sub(r&quot; {2,}&quot;, &quot; &quot;, text)
+
+    lines = [line.strip() for line in text.split(&quot;\n&quot;)]
+
+    cleaned_lines = []
+    prev_empty = False
+    for line in lines:
+        is_empty = not line
+        if is_empty and prev_empty:
+            continue
+        cleaned_lines.append(line)
+        prev_empty = is_empty
+
+    return &quot;\n&quot;.join(cleaned_lines).strip()
+
+sample = &quot;&quot;&quot;
+  Receipt   
+
+Date: 2024-01-15    Time: 14:32
+
+Item               Qty    Price
+-------------------
+Americano           1    4,500
+Cafe Latte          2    9,000
+-----------
+Total             13,500 KRW
+
+Thank you!!!
+&quot;&quot;&quot;
+
+print(clean_ocr_text(sample))
+</code></pre>
+<hr>
+<h2>OCR to RAG pipeline</h2>
+<p>Extracted and cleaned text feeds directly into the standard chunking → embedding → indexing pipeline.</p>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;BM-K/KoSimCSE-roberta-multitask&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+def process_images_to_index(image_paths: list[str]) -&gt; FAISS:
+    &quot;&quot;&quot;OCR → clean → chunk → index a list of image files.&quot;&quot;&quot;
+    all_chunks = []
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=300,
+        chunk_overlap=30,
+        separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;.&quot;, &quot; &quot;],
+    )
+
+    for image_path in image_paths:
+        print(f&quot;processing: {image_path}&quot;)
+
+        # in production, replace this with: raw_text = extract_text(ocr_image(image_path))
+        raw_text = f&quot;&quot;&quot;
+        [Sample document: {image_path}]
+        Contract date: January 15, 2024
+        Parties: Hong Gildong (Party A), ABC Corporation (Party B)
+        Contract amount: Five million Korean won (5,000,000 KRW)
+        &quot;&quot;&quot;
+        cleaned = clean_ocr_text(raw_text)
+        chunks = splitter.split_text(cleaned)
+        all_chunks.extend({&quot;text&quot;: chunk, &quot;source&quot;: image_path} for chunk in chunks)
+
+    texts = [c[&quot;text&quot;] for c in all_chunks]
+    metadatas = [{&quot;source&quot;: c[&quot;source&quot;]} for c in all_chunks]
+    return FAISS.from_texts(texts=texts, embedding=embedding_model, metadatas=metadatas)
+
+vectorstore = process_images_to_index([&quot;contract_001.jpg&quot;, &quot;contract_002.jpg&quot;])
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the question based on the scanned document content below.\n\n&quot;
+        &quot;Document content:\n{context}&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+def format_docs(docs: list) -&gt; str:
+    parts = []
+    for doc in docs:
+        source = doc.metadata.get(&quot;source&quot;, &quot;unknown&quot;)
+        parts.append(f&quot;[source: {source}]\n{doc.page_content}&quot;)
+    return &quot;\n\n&quot;.join(parts)
+
+chain = (
+    {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+answer = chain.invoke(&quot;What is the contract amount?&quot;)
+print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>CLOVA OCR delivers high accuracy on Korean documents including handwritten text. The cleaning step — removing repeated special characters and normalizing whitespace — measurably improves downstream embedding quality. Once cleaned, the extracted text enters the same chunking and indexing pipeline as any other text source.</p>
+<p>The next post covers HyperCLOVA X and Solar API: calling Korean-specialized LLMs from Python.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/01-korean-embedding-models.md">Korean embedding models compared — KoSimCSE, BGE-M3, Solar</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/02-kosimcse-similarity.md">Building sentence similarity search with KoSimCSE</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/korean-ai-stack-101/en/03-bge-m3-multilingual.md">BGE-M3 multilingual embedding in practice</a></li>
+<li><strong>Document text extraction with CLOVA OCR API (current)</strong></li>
+<li>Using HyperCLOVA X and Solar API (upcoming)</li>
+<li>Assembling a Korean RAG pipeline (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://api.ncloud-docs.com/docs/ai-application-service-ocr">CLOVA OCR API documentation</a></li>
+<li><a href="https://www.ncloud.com/product/aiService/ocr">NAVER Cloud Platform OCR</a></li>
+<li><a href="https://python.langchain.com/docs/modules/data_connection/document_transformers/">LangChain TextSplitter</a></li>
+</ul>
+<p class="tags-line">Tags: Korean NLP, LLM, Embeddings, OCR</p>
+</body>
+</html>
