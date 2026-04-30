@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Document assistant — summarization, extraction, classification</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Document assistant — summarization, extraction, classification</h1>
+<blockquote>
+<p>AI App Patterns 101 (3/6)</p>
+</blockquote>
+<p>The document assistant pattern takes a document as input and performs a specific processing task on it. Unlike a chatbot or RAG pipeline, there is no ongoing conversation: the document is the input, and a structured or condensed result is the output. LLMs handle summarization, information extraction, and classification well because all three reduce to the same operation — read the document, apply a rule, return structured text.</p>
+<p>Topics:</p>
+<ul>
+<li>summarization with style and audience control</li>
+<li>Map-Reduce for documents that exceed the context window</li>
+<li>structured information extraction with JSON output</li>
+<li>multi-class document classification</li>
+</ul>
+<hr>
+<h2>Document summarization</h2>
+<p>For short documents, pass the full text directly and request a summary. Parameterizing style, length, and audience lets the same chain serve different consumers.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+summarize_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Summarize the following document in a {style} style.\n&quot;
+        &quot;Length: {length}\n&quot;
+        &quot;Audience: {audience}&quot;,
+    ),
+    (&quot;human&quot;, &quot;Document:\n{document}&quot;),
+])
+
+chain = summarize_prompt | llm | StrOutputParser()
+
+document = &quot;&quot;&quot;
+A 2024 Python developer survey found Python ranked as the most popular programming
+language for the fifth consecutive year. Sixty-seven percent of respondents use Python
+as their primary language; of those, 45 percent apply it to data science and machine
+learning workloads. Web development accounts for 28 percent of use cases, and
+automation scripting for 18 percent.
+
+Python 3.12 delivered a 25 percent performance improvement over the prior version
+and strengthened type hint support. Eighty-nine percent of respondents run Python 3.x;
+only 2 percent still use Python 2.x.
+
+The most-used frameworks are FastAPI (52 percent), Django (38 percent), and Flask
+(34 percent). In the data science domain, pandas (78 percent), numpy (72 percent),
+and scikit-learn (65 percent) dominate.
+&quot;&quot;&quot;
+
+exec_summary = chain.invoke({
+    &quot;document&quot;: document,
+    &quot;style&quot;: &quot;business-focused&quot;,
+    &quot;length&quot;: &quot;three sentences or fewer&quot;,
+    &quot;audience&quot;: &quot;non-technical executives&quot;,
+})
+print(&quot;=== Executive summary ===&quot;)
+print(exec_summary)
+
+dev_summary = chain.invoke({
+    &quot;document&quot;: document,
+    &quot;style&quot;: &quot;technical&quot;,
+    &quot;length&quot;: &quot;five bullet points&quot;,
+    &quot;audience&quot;: &quot;senior engineers&quot;,
+})
+print(&quot;\n=== Developer summary ===&quot;)
+print(dev_summary)
+</code></pre>
+<hr>
+<h2>Long document summarization — Map-Reduce</h2>
+<p>When a document exceeds the context window it cannot be processed in one call. Map-Reduce splits the document into chunks, summarizes each independently (Map), then merges those summaries into a single coherent result (Reduce).</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+map_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Summarize the following text segment in two to three sentences, keeping only the key points.&quot;),
+    (&quot;human&quot;, &quot;{chunk}&quot;),
+])
+
+reduce_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You have received summaries of multiple document segments.\n&quot;
+        &quot;Merge them into a single coherent summary.\n&quot;
+        &quot;Remove duplicates and preserve logical flow.&quot;,
+    ),
+    (&quot;human&quot;, &quot;Segment summaries:\n{summaries}&quot;),
+])
+
+map_chain = map_prompt | llm | StrOutputParser()
+reduce_chain = reduce_prompt | llm | StrOutputParser()
+
+def map_reduce_summarize(long_document: str) -&gt; str:
+    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    chunks = splitter.split_text(long_document)
+    print(f&quot;  chunks: {len(chunks)}&quot;)
+
+    # Map: summarize each chunk independently
+    chunk_summaries = []
+    for i, chunk in enumerate(chunks):
+        summary = map_chain.invoke({&quot;chunk&quot;: chunk})
+        chunk_summaries.append(summary)
+        print(f&quot;  chunk {i + 1}/{len(chunks)} summarized&quot;)
+
+    # Reduce: merge all summaries
+    combined = &quot;\n\n&quot;.join(
+        f&quot;[Segment {i + 1}] {s}&quot; for i, s in enumerate(chunk_summaries)
+    )
+    return reduce_chain.invoke({&quot;summaries&quot;: combined})
+
+long_doc = &quot;&quot;&quot;
+Artificial intelligence (AI) is the field of computer science dedicated to simulating
+human cognitive ability in machines. Alan Turing posed the foundational question —
+&quot;Can machines think?&quot; — in the 1950s, and the field has since gone through multiple
+cycles of enthusiasm and disillusionment.
+
+Machine learning is a subfield of AI in which computers learn rules from data rather
+than executing explicitly programmed instructions. Decision trees, random forests, and
+support vector machines are representative algorithms.
+
+Deep learning is a branch of machine learning that uses artificial neural networks
+modeled on the human brain. The field gained widespread attention after a deep learning
+model dominated the 2012 ImageNet competition by a large margin. It has since driven
+breakthroughs in image recognition, speech recognition, and natural language processing.
+
+Large language models (LLMs) are deep learning models trained on massive text corpora.
+GPT, BERT, and LLaMA are prominent examples. They handle text generation, summarization,
+translation, and code writing, among other tasks. ChatGPT's release in late 2022 brought
+LLMs into mainstream public awareness.
+
+The future of AI is promising but comes with substantial challenges. Explainability,
+bias, privacy, energy consumption, and labor displacement require coordinated social
+responses. At the same time, AI is expected to play a central role in addressing
+pressing problems in medicine, climate change, and education.
+&quot;&quot;&quot;
+
+print(&quot;Starting Map-Reduce summarization...&quot;)
+final = map_reduce_summarize(long_doc)
+print(f&quot;\n=== Final summary ===\n{final}&quot;)
+</code></pre>
+<hr>
+<h2>Information extraction</h2>
+<p>Unstructured text often contains structured data that downstream systems need. Prompt the LLM to extract specific fields and return them as JSON, then parse the output with <code>JsonOutputParser</code>.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+extract_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Extract information from the text below and return it as JSON only. &quot;
+        &quot;Do not include any other text.\n\n&quot;
+        &quot;Fields to extract:\n{schema}&quot;,
+    ),
+    (&quot;human&quot;, &quot;Text:\n{text}&quot;),
+])
+
+chain = extract_prompt | llm | JsonOutputParser()
+
+job_schema = &quot;&quot;&quot;
+{
+  &quot;company&quot;: &quot;company name&quot;,
+  &quot;position&quot;: &quot;job title&quot;,
+  &quot;location&quot;: &quot;location&quot;,
+  &quot;salary_range&quot;: &quot;salary range (null if not mentioned)&quot;,
+  &quot;required_skills&quot;: [&quot;list of required skills&quot;],
+  &quot;experience_years&quot;: &quot;years of experience as a number (null if not mentioned)&quot;,
+  &quot;employment_type&quot;: &quot;full-time / contract / freelance&quot;
+}&quot;&quot;&quot;
+
+job_postings = [
+    &quot;&quot;&quot;
+    ABCTech is hiring a senior backend engineer in Gangnam, Seoul.
+    Salary range 80M-120M KRW. Five or more years with Python/Django required.
+    AWS and Docker experience a plus. Full-time position.
+    &quot;&quot;&quot;,
+    &quot;&quot;&quot;
+    Startup XYZ is looking for a full-stack developer. Remote work available.
+    Proficiency in React, Node.js, and PostgreSQL required. Three or more years.
+    Contract role with potential conversion to full-time.
+    &quot;&quot;&quot;,
+]
+
+for i, posting in enumerate(job_postings, start=1):
+    print(f&quot;\n=== Job posting {i} ===&quot;)
+    result = chain.invoke({&quot;text&quot;: posting, &quot;schema&quot;: job_schema})
+    for key, value in result.items():
+        print(f&quot;  {key}: {value}&quot;)
+</code></pre>
+<hr>
+<h2>Document classification</h2>
+<p>Classifying documents into categories is a common preprocessing step in content pipelines, support ticket routing, and compliance workflows.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+classify_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Classify the following text. Return JSON only.\n\n&quot;
+        &quot;Available categories: {categories}\n\n&quot;
+        'Format: {{&quot;category&quot;: &quot;category name&quot;, &quot;confidence&quot;: 0 to 1, &quot;reason&quot;: &quot;brief reason&quot;}}',
+    ),
+    (&quot;human&quot;, &quot;Text:\n{text}&quot;),
+])
+
+chain = classify_prompt | llm | JsonOutputParser()
+
+categories = &quot;Technology/IT, Business/Finance, Health/Medicine, Sports, Entertainment, Other&quot;
+
+texts = [
+    &quot;Python 3.12 significantly improved generic type handling speed, reducing overhead by 25 percent.&quot;,
+    &quot;Operating profit for Q3 rose 15 percent year-over-year, driven by expansion into overseas markets.&quot;,
+    &quot;A new study reports that regular aerobic exercise reduces cardiovascular disease risk by 30 percent.&quot;,
+    &quot;Real Madrid defeated Manchester City 2-1 in the Champions League final to claim the title.&quot;,
+]
+
+for text in texts:
+    result = chain.invoke({&quot;text&quot;: text, &quot;categories&quot;: categories})
+    print(f&quot;text: {text[:60]}...&quot;)
+    print(f&quot;  category: {result.get('category')}, confidence: {result.get('confidence'):.2f}&quot;)
+    print(f&quot;  reason: {result.get('reason')}\n&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>Summarization, extraction, and classification cover the majority of document processing use cases. Keep each chain focused on one task: mixing summarization with extraction in a single prompt reliably degrades output quality. For long documents, Map-Reduce is the standard approach — chunk, map independently, reduce once.</p>
+<p>The next post covers the Agent and Tool pattern, where the LLM autonomously selects and calls tools to answer questions it cannot handle from context alone.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/02-rag-qa-pattern.md">RAG Q&amp;A pattern — document-based question answering</a></li>
+<li><strong>Document assistant — summarization, extraction, classification (current)</strong></li>
+<li>Agent and tool pattern — autonomous tool selection (upcoming)</li>
+<li>Workflow automation — designing multi-step chains (upcoming)</li>
+<li>Human-in-the-loop — designing for human intervention (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/use_cases/summarization/">LangChain summarization guide</a></li>
+<li><a href="https://python.langchain.com/docs/modules/model_io/output_parsers/json/">JsonOutputParser</a></li>
+<li><a href="https://python.langchain.com/docs/use_cases/summarization/#option-2-map-reduce">Map-Reduce pattern</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, RAG, Agent, Python</p>
+</body>
+</html>

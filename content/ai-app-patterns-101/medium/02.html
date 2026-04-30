@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RAG Q&A pattern — document-based question answering</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>RAG Q&amp;A pattern — document-based question answering</h1>
+<blockquote>
+<p>AI App Patterns 101 (2/6)</p>
+</blockquote>
+<p>RAG (Retrieval-Augmented Generation) addresses two persistent LLM limitations. First, LLMs do not know about events after their training cutoff. Second, they have no access to private or proprietary data. RAG patches both gaps by retrieving relevant documents at query time and injecting them into the prompt.</p>
+<p>This post builds a complete RAG Q&amp;A pipeline step by step.</p>
+<p>Topics:</p>
+<ul>
+<li>the two phases of RAG: indexing and retrieval</li>
+<li>a complete RAG Q&amp;A chain</li>
+<li>prompt design for better answer quality</li>
+<li>returning answers with source attribution</li>
+<li>when RAG fails and how to respond</li>
+</ul>
+<hr>
+<h2>The two phases of RAG</h2>
+<p><strong>Indexing</strong> (offline): split documents into chunks, embed them, store in a vector index.</p>
+<p><strong>Retrieval</strong> (online): embed the query, find similar chunks, inject them into the prompt.</p>
+<pre><code>indexing:  documents → chunking → embedding → FAISS
+retrieval: query → embedding → FAISS search → prompt injection → LLM → answer
+</code></pre>
+<hr>
+<h2>Complete RAG Q&amp;A implementation</h2>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;&quot;&quot;
+Python is a high-level programming language created by Guido van Rossum in 1991.
+It uses indentation to delimit code blocks, which is unusual among mainstream languages.
+Python supports dynamic typing and automatic memory management.
+It is widely used in web development, data science, and artificial intelligence.
+&quot;&quot;&quot;,
+    &quot;&quot;&quot;
+Python's primary strength is readability.
+It was designed to read like English prose.
+Python has a large standard library and a vast third-party package ecosystem.
+Hundreds of thousands of packages can be installed with the pip package manager.
+&quot;&quot;&quot;,
+    &quot;&quot;&quot;
+One of Python's main weaknesses is execution speed.
+As an interpreted language, it is slower than C or Java for CPU-bound tasks.
+The GIL (Global Interpreter Lock) limits multi-threaded performance.
+Python is rarely used for mobile application development.
+&quot;&quot;&quot;,
+    &quot;&quot;&quot;
+Python version history: Python 2 was released in 2000, Python 3 in 2008.
+Python 2 reached its official end of life in January 2020.
+Python 3.10 or later is recommended for new projects.
+A new minor version is released each October.
+&quot;&quot;&quot;,
+]
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
+chunks = []
+for doc in documents:
+    chunks.extend(splitter.split_text(doc))
+
+vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Answer the question using only the reference documents below.\n&quot;
+        &quot;If the answer is not in the documents, say 'I cannot find this in the provided documents'.\n&quot;
+        &quot;Do not speculate.\n\n&quot;
+        &quot;Reference documents:\n{context}&quot;,
+    ),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+def format_docs(docs: list) -&gt; str:
+    return &quot;\n\n&quot;.join(doc.page_content for doc in docs)
+
+rag_chain = (
+    {
+        &quot;context&quot;: retriever | format_docs,
+        &quot;question&quot;: RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+test_questions = [
+    &quot;Who created Python?&quot;,
+    &quot;What are Python's weaknesses?&quot;,
+    &quot;When did Python 2 reach end of life?&quot;,
+    &quot;Can you build iOS apps with Python?&quot;,
+    &quot;What are the features of the Rust language?&quot;,  # not in documents
+]
+
+for question in test_questions:
+    print(f&quot;\nquestion: {question}&quot;)
+    answer = rag_chain.invoke(question)
+    print(f&quot;answer: {answer}&quot;)
+</code></pre>
+<hr>
+<h2>Returning answers with source attribution</h2>
+<p>Showing which document supported the answer improves user trust.</p>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_groq import ChatGroq
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents_with_metadata = [
+    (&quot;Python is a high-level language created by Guido van Rossum in 1991.&quot;, {&quot;source&quot;: &quot;python_intro.txt&quot;, &quot;page&quot;: 1}),
+    (&quot;Python's primary strength is readability.&quot;, {&quot;source&quot;: &quot;python_features.txt&quot;, &quot;page&quot;: 1}),
+    (&quot;One of Python's main weaknesses is execution speed.&quot;, {&quot;source&quot;: &quot;python_cons.txt&quot;, &quot;page&quot;: 1}),
+]
+
+texts = [text for text, _ in documents_with_metadata]
+metadatas = [meta for _, meta in documents_with_metadata]
+
+vectorstore = FAISS.from_texts(
+    texts=texts,
+    embedding=embedding_model,
+    metadatas=metadatas,
+)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 2})
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Answer the question using only the documents below:\n{context}&quot;),
+    (&quot;human&quot;, &quot;{question}&quot;),
+])
+
+def format_docs(docs: list) -&gt; str:
+    return &quot;\n\n&quot;.join(doc.page_content for doc in docs)
+
+def get_sources(docs: list) -&gt; list[str]:
+    return [doc.metadata.get(&quot;source&quot;, &quot;unknown&quot;) for doc in docs]
+
+rag_with_sources = RunnableParallel(
+    answer=(
+        {&quot;context&quot;: retriever | format_docs, &quot;question&quot;: RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    ),
+    sources=retriever | get_sources,
+)
+
+result = rag_with_sources.invoke(&quot;Who created Python?&quot;)
+print(f&quot;answer: {result['answer']}&quot;)
+print(f&quot;sources: {result['sources']}&quot;)
+</code></pre>
+<hr>
+<h2>When RAG fails</h2>
+<p><strong>The relevant chunk was not retrieved.</strong> If the query does not match any stored chunk, the LLM falls back on its internal knowledge and may hallucinate. The prompt instruction "say you don't know if it's not in the documents" is the first line of defense.</p>
+<p><strong>Information splits across chunk boundaries.</strong> Important context that spans two chunks may not appear complete in any single retrieved result. Sufficient <code>chunk_overlap</code> reduces this risk.</p>
+<p><strong>Query and document phrasing diverge too much.</strong> A casual query like "is python slow?" may not match a chunk containing "interpreted language execution performance". Query expansion or hybrid search helps here.</p>
+<hr>
+<h2>Conclusion</h2>
+<p>RAG Q&amp;A is the most practical pattern for giving an LLM access to knowledge it was not trained on. The prompt instruction to say "I don't know" when information is absent is the simplest hallucination guard.</p>
+<p>The next post covers the document assistant pattern: summarization, information extraction, and classification applied to structured document processing tasks.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>
+<li><strong>RAG Q&amp;A pattern — document-based question answering (current)</strong></li>
+<li>Document assistant — summarization, extraction, classification (upcoming)</li>
+<li>Agent and tool pattern — autonomous tool selection (upcoming)</li>
+<li>Workflow automation — designing multi-step chains (upcoming)</li>
+<li>Human-in-the-loop — designing for human intervention (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/use_cases/question_answering/">LangChain RAG tutorial</a></li>
+<li><a href="https://arxiv.org/abs/2005.11401">RAG paper (Lewis et al., 2020)</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/vectorstores/faiss/">FAISS VectorStore</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, RAG, Agent, Python</p>
+</body>
+</html>

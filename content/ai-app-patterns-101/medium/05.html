@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Workflow automation — designing multi-step chains</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Workflow automation — designing multi-step chains</h1>
+<blockquote>
+<p>AI App Patterns 101 (5/6)</p>
+</blockquote>
+<p>Some tasks resist a single LLM call. Receiving a customer inquiry, classifying it, applying category-specific logic, then generating a response is one example. Workflow automation connects these stages into a coherent pipeline using LangChain LCEL.</p>
+<p>Topics:</p>
+<ul>
+<li>building sequential chains</li>
+<li>routing — branching based on intermediate output</li>
+<li>a practical multi-stage code review pipeline</li>
+<li>passing each stage's output cleanly to the next</li>
+</ul>
+<hr>
+<h2>Sequential chains</h2>
+<p>LCEL's <code>|</code> operator connects stages: the left stage's output becomes the right stage's input.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+translate_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Translate the following text to {target_language}. Return only the translation.&quot;),
+    (&quot;human&quot;, &quot;{text}&quot;),
+])
+
+summarize_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Summarize the following text in two sentences.&quot;),
+    (&quot;human&quot;, &quot;{text}&quot;),
+])
+
+title_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Generate a one-line title for the following text.&quot;),
+    (&quot;human&quot;, &quot;{text}&quot;),
+])
+
+str_parser = StrOutputParser()
+
+def make_pipeline(target_language: str):
+    &quot;&quot;&quot;Return translate → summarize → title functions for the given language.&quot;&quot;&quot;
+
+    def translate(inputs: dict) -&gt; dict:
+        translated = (translate_prompt | llm | str_parser).invoke({
+            &quot;text&quot;: inputs[&quot;text&quot;],
+            &quot;target_language&quot;: target_language,
+        })
+        return {&quot;text&quot;: translated}
+
+    def summarize(inputs: dict) -&gt; dict:
+        summary = (summarize_prompt | llm | str_parser).invoke(inputs)
+        return {&quot;text&quot;: summary}
+
+    def make_title(inputs: dict) -&gt; str:
+        return (title_prompt | llm | str_parser).invoke(inputs)
+
+    return translate, summarize, make_title
+
+article = &quot;&quot;&quot;
+Artificial intelligence is transforming the way businesses operate.
+Companies across industries are adopting AI tools to automate repetitive tasks,
+improve decision-making, and personalize customer experiences.
+The healthcare sector uses AI to assist in diagnosis and drug discovery.
+In finance, AI powers fraud detection and algorithmic trading.
+As AI becomes more capable, organizations must also address ethical considerations
+such as bias, transparency, and data privacy.
+&quot;&quot;&quot;
+
+translate_fn, summarize_fn, title_fn = make_pipeline(&quot;Korean&quot;)
+
+step1 = translate_fn({&quot;text&quot;: article})
+print(f&quot;translation:\n{step1['text']}\n&quot;)
+
+step2 = summarize_fn(step1)
+print(f&quot;summary:\n{step2['text']}\n&quot;)
+
+step3 = title_fn(step2)
+print(f&quot;title: {step3}&quot;)
+</code></pre>
+<hr>
+<h2>Routing — branching based on classification</h2>
+<p>Classify the input first, then route it to the appropriate chain. The classifier's output is the only dependency between the two stages.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+str_parser = StrOutputParser()
+
+classify_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Classify the following customer inquiry.\n&quot;
+        &quot;Categories: BILLING, TECHNICAL, GENERAL\n&quot;
+        &quot;Return the category name only. No other text.&quot;,
+    ),
+    (&quot;human&quot;, &quot;{inquiry}&quot;),
+])
+classify_chain = classify_prompt | llm | str_parser
+
+billing_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You are a billing specialist.\n&quot;
+        &quot;Handle refunds, invoices, and charge-related inquiries.\n&quot;
+        &quot;Be accurate and reassuring.&quot;,
+    ),
+    (&quot;human&quot;, &quot;{inquiry}&quot;),
+])
+
+technical_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You are a technical support engineer.\n&quot;
+        &quot;Handle bugs, errors, and how-to questions.\n&quot;
+        &quot;Guide users step by step.&quot;,
+    ),
+    (&quot;human&quot;, &quot;{inquiry}&quot;),
+])
+
+general_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You are a customer service representative.\n&quot;
+        &quot;Handle general inquiries politely and helpfully.&quot;,
+    ),
+    (&quot;human&quot;, &quot;{inquiry}&quot;),
+])
+
+billing_chain = billing_prompt | llm | str_parser
+technical_chain = technical_prompt | llm | str_parser
+general_chain = general_prompt | llm | str_parser
+
+def route_and_respond(inquiry: str) -&gt; dict:
+    &quot;&quot;&quot;Classify → route → generate specialist response.&quot;&quot;&quot;
+    category = classify_chain.invoke({&quot;inquiry&quot;: inquiry}).strip().upper()
+
+    chains = {
+        &quot;BILLING&quot;: billing_chain,
+        &quot;TECHNICAL&quot;: technical_chain,
+        &quot;GENERAL&quot;: general_chain,
+    }
+    chain = chains.get(category, general_chain)
+    response = chain.invoke({&quot;inquiry&quot;: inquiry})
+
+    return {&quot;category&quot;: category, &quot;response&quot;: response}
+
+test_inquiries = [
+    &quot;My bill doubled this month without any explanation. Please check.&quot;,
+    &quot;The app keeps crashing when I open it. What should I do?&quot;,
+    &quot;What are your business hours?&quot;,
+]
+
+for inquiry in test_inquiries:
+    print(f&quot;\ninquiry: {inquiry}&quot;)
+    result = route_and_respond(inquiry)
+    print(f&quot;category: {result['category']}&quot;)
+    print(f&quot;response: {result['response']}&quot;)
+</code></pre>
+<hr>
+<h2>Multi-stage data transformation pipeline</h2>
+<p>Each stage transforms the previous stage's output. The code review pipeline below shows three chained transformations: analysis → suggestions → report.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+analyze_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Analyze the following code and return JSON only.\n&quot;
+        'Format: {{&quot;language&quot;: &quot;lang&quot;, &quot;purpose&quot;: &quot;purpose&quot;, &quot;issues&quot;: [&quot;issue list&quot;], &quot;score&quot;: 1-10}}',
+    ),
+    (&quot;human&quot;, &quot;Code:\n{code}&quot;),
+])
+
+suggest_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Based on the code analysis, provide specific improvements.\n&quot;
+        &quot;Include corrected code examples for each issue.&quot;,
+    ),
+    (&quot;human&quot;, &quot;Analysis:\n{analysis}\n\nOriginal code:\n{code}&quot;),
+])
+
+report_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Summarize the code review into a concise report.\n&quot;
+        &quot;Structure: overall assessment, key improvements, recommended actions.&quot;,
+    ),
+    (&quot;human&quot;, &quot;Analysis:\n{analysis}\n\nSuggestions:\n{suggestions}&quot;),
+])
+
+analyze_chain = analyze_prompt | llm | JsonOutputParser()
+suggest_chain = suggest_prompt | llm | StrOutputParser()
+report_chain = report_prompt | llm | StrOutputParser()
+
+def code_review_pipeline(code: str) -&gt; dict:
+    &quot;&quot;&quot;Code analysis → suggestions → report.&quot;&quot;&quot;
+    analysis = analyze_chain.invoke({&quot;code&quot;: code})
+    print(f&quot;  analysis done: score {analysis.get('score')}/10, {len(analysis.get('issues', []))} issues&quot;)
+
+    suggestions = suggest_chain.invoke({
+        &quot;analysis&quot;: str(analysis),
+        &quot;code&quot;: code,
+    })
+    print(&quot;  suggestions done&quot;)
+
+    report = report_chain.invoke({
+        &quot;analysis&quot;: str(analysis),
+        &quot;suggestions&quot;: suggestions,
+    })
+    print(&quot;  report done&quot;)
+
+    return {&quot;analysis&quot;: analysis, &quot;suggestions&quot;: suggestions, &quot;report&quot;: report}
+
+sample_code = &quot;&quot;&quot;
+def get_user(id):
+    import sqlite3
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute(f&quot;SELECT * FROM users WHERE id = {id}&quot;)
+    result = cursor.fetchone()
+    conn.close()
+    return result
+&quot;&quot;&quot;
+
+print(&quot;running code review pipeline...&quot;)
+result = code_review_pipeline(sample_code)
+print(f&quot;\n=== final report ===\n{result['report']}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>Keep each stage focused on one responsibility. A stage that does too much is hard to test, hard to debug, and hard to replace. When a stage's output is ambiguous — a free-form string where structured data was expected — the next stage often fails silently. Define the output format for every stage, validate it, and only then pass it forward.</p>
+<p>The final post covers human-in-the-loop design: inserting human review and approval gates into otherwise automated pipelines.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/02-rag-qa-pattern.md">RAG Q&amp;A pattern — document-based question answering</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/03-document-assistant.md">Document assistant — summarization, extraction, classification</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/04-agent-tool-pattern.md">Agent and tool pattern — autonomous tool selection</a></li>
+<li><strong>Workflow automation — designing multi-step chains (current)</strong></li>
+<li>Human-in-the-loop — designing for human intervention (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/expression_language/">LangChain LCEL</a></li>
+<li><a href="https://python.langchain.com/docs/expression_language/how_to/routing/">LangChain routing</a></li>
+<li><a href="https://python.langchain.com/docs/expression_language/primitives/parallel/">RunnableParallel</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, RAG, Agent, Python</p>
+</body>
+</html>

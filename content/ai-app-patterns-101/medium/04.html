@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent and tool pattern — autonomous tool selection</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Agent and tool pattern — autonomous tool selection</h1>
+<blockquote>
+<p>AI App Patterns 101 (4/6)</p>
+</blockquote>
+<p>Every chain built so far has a fixed execution path: input enters, steps run in order, output exits. The agent pattern changes this. The LLM decides which tool to call, inspects the result, and then decides what to do next — including whether to call another tool or produce a final answer.</p>
+<p>Topics:</p>
+<ul>
+<li>agent vs chain — what changes and why</li>
+<li>defining and registering tools</li>
+<li>building a ReAct agent</li>
+<li>composing multiple tools</li>
+</ul>
+<hr>
+<h2>Agent vs chain</h2>
+<p><strong>Chain</strong>: input → step A → step B → output. The execution path is determined at design time.</p>
+<p><strong>Agent</strong>: input → LLM reasons → selects tool → executes tool → observes result → repeats if needed → final answer. The execution path is determined at runtime.</p>
+<p>Agents use the ReAct (Reason + Act) loop: Thought → Action → Observation, repeated until the LLM determines it has enough information to answer. The LLM writes its reasoning, names a tool, supplies its arguments, reads the tool output, and then reasons again.</p>
+<hr>
+<h2>Defining tools</h2>
+<p>In LangChain, a tool is a Python function decorated with <code>@tool</code>. The docstring becomes the description the LLM reads when deciding which tool to use. Write it precisely — a vague docstring leads to wrong tool selection.</p>
+<pre><code class="language-python">import math
+import os
+from datetime import datetime
+
+from langchain_core.tools import tool
+
+@tool
+def calculate(expression: str) -&gt; str:
+    &quot;&quot;&quot;
+    Evaluate a mathematical expression and return the result.
+    Examples: '2 + 3 * 4', 'sqrt(16)', 'pow(2, 10)'
+    Uses Python expression syntax. Only math functions are allowed.
+    &quot;&quot;&quot;
+    try:
+        allowed = {
+            &quot;sqrt&quot;: math.sqrt,
+            &quot;pow&quot;: math.pow,
+            &quot;abs&quot;: abs,
+            &quot;round&quot;: round,
+            &quot;pi&quot;: math.pi,
+            &quot;e&quot;: math.e,
+        }
+        result = eval(expression, {&quot;__builtins__&quot;: {}}, allowed)
+        return str(result)
+    except Exception as exc:
+        return f&quot;calculation error: {exc}&quot;
+
+@tool
+def get_current_time(timezone: str = &quot;Asia/Seoul&quot;) -&gt; str:
+    &quot;&quot;&quot;
+    Return the current date and time.
+    The timezone parameter accepts a timezone name (default: Asia/Seoul).
+    &quot;&quot;&quot;
+    now = datetime.now()
+    return f&quot;current time: {now.strftime('%Y-%m-%d %H:%M')} ({timezone})&quot;
+
+@tool
+def word_count(text: str) -&gt; str:
+    &quot;&quot;&quot;
+    Return the word count and character count of the given text.
+    &quot;&quot;&quot;
+    words = len(text.split())
+    chars = len(text)
+    chars_no_space = len(text.replace(&quot; &quot;, &quot;&quot;))
+    return f&quot;words: {words}, characters: {chars} (excluding spaces: {chars_no_space})&quot;
+
+@tool
+def unit_convert(value: float, from_unit: str, to_unit: str) -&gt; str:
+    &quot;&quot;&quot;
+    Convert a value between units.
+    Supported conversions: km/mile, kg/lb, celsius/fahrenheit, m/ft.
+    Example: value=100, from_unit='km', to_unit='mile'
+    &quot;&quot;&quot;
+    conversions = {
+        (&quot;km&quot;, &quot;mile&quot;): lambda x: x * 0.621371,
+        (&quot;mile&quot;, &quot;km&quot;): lambda x: x * 1.60934,
+        (&quot;kg&quot;, &quot;lb&quot;): lambda x: x * 2.20462,
+        (&quot;lb&quot;, &quot;kg&quot;): lambda x: x * 0.453592,
+        (&quot;celsius&quot;, &quot;fahrenheit&quot;): lambda x: x * 9 / 5 + 32,
+        (&quot;fahrenheit&quot;, &quot;celsius&quot;): lambda x: (x - 32) * 5 / 9,
+        (&quot;m&quot;, &quot;ft&quot;): lambda x: x * 3.28084,
+        (&quot;ft&quot;, &quot;m&quot;): lambda x: x * 0.3048,
+    }
+    key = (from_unit.lower(), to_unit.lower())
+    if key not in conversions:
+        return f&quot;unsupported conversion: {from_unit} to {to_unit}&quot;
+    result = conversions[key](https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/value)
+    return f&quot;{value} {from_unit} = {result:.4f} {to_unit}&quot;
+</code></pre>
+<hr>
+<h2>Building a ReAct agent</h2>
+<pre><code class="language-python">import os
+
+from langchain.agents import AgentExecutor, create_react_agent
+from langchain_core.prompts import PromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+tools = [calculate, get_current_time, word_count, unit_convert]
+
+# ReAct prompt — instructs the LLM to follow the Thought/Action/Observation loop
+react_prompt = PromptTemplate.from_template(&quot;&quot;&quot;
+You are an AI assistant that answers questions using the tools available to you.
+
+Available tools:
+{tools}
+
+Tool names: {tool_names}
+
+You MUST follow this exact format:
+
+Question: the question to answer
+Thought: think about how to approach the question
+Action: the name of the tool to use (must be one from the tool names list)
+Action Input: the input to pass to the tool
+Observation: the result returned by the tool
+... (repeat Thought/Action/Action Input/Observation as needed)
+Thought: I now know the final answer
+Final Answer: the final answer to the question
+
+Begin!
+
+Question: {input}
+Thought: {agent_scratchpad}
+&quot;&quot;&quot;)
+
+agent = create_react_agent(llm=llm, tools=tools, prompt=react_prompt)
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,
+    max_iterations=5,
+    handle_parsing_errors=True,
+)
+
+questions = [
+    &quot;What is 2 to the power of 10?&quot;,
+    &quot;What time is it now?&quot;,
+    &quot;How many miles is 100 kilometers?&quot;,
+    &quot;Count the words in this text, then multiply by 2: 'The quick brown fox jumps over the lazy dog'&quot;,
+]
+
+for question in questions:
+    print(f&quot;\n{'=' * 60}&quot;)
+    print(f&quot;question: {question}&quot;)
+    result = agent_executor.invoke({&quot;input&quot;: question})
+    print(f&quot;final answer: {result['output']}&quot;)
+</code></pre>
+<hr>
+<h2>Observing the agent's reasoning</h2>
+<p>With <code>verbose=True</code>, the console prints every Thought, Action, Action Input, and Observation. For a simple question, the agent usually completes in one round. For a two-step question — count words, then multiply — it completes in two rounds, using the output of the first tool as input to the next computation.</p>
+<p><code>max_iterations</code> prevents infinite loops. Five to ten iterations cover most practical tasks.</p>
+<hr>
+<h2>Handling tool errors gracefully</h2>
+<p>If a tool raises an unhandled exception, the agent stops. Catching exceptions inside the tool and returning a descriptive error string keeps the agent running. The error string becomes the Observation, and the LLM can decide to try a different approach or explain the failure.</p>
+<pre><code class="language-python">@tool
+def safe_divide(a: float, b: float) -&gt; str:
+    &quot;&quot;&quot;Divide a by b. Returns an error message if b is zero.&quot;&quot;&quot;
+    if b == 0:
+        return &quot;error: cannot divide by zero&quot;
+    return str(a / b)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>The agent pattern extends chain-based LLM apps into systems that can reason across multiple steps and tools. The docstring is the only signal the LLM has for tool selection — treat it as a contract, not a comment. Keep tools narrow and focused: one clear responsibility each, error messages instead of exceptions, and deterministic behavior for the same input.</p>
+<p>The next post covers workflow automation: designing multi-step chains where each stage transforms data and passes it to the next.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/02-rag-qa-pattern.md">RAG Q&amp;A pattern — document-based question answering</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/03-document-assistant.md">Document assistant — summarization, extraction, classification</a></li>
+<li><strong>Agent and tool pattern — autonomous tool selection (current)</strong></li>
+<li>Workflow automation — designing multi-step chains (upcoming)</li>
+<li>Human-in-the-loop — designing for human intervention (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/modules/agents/">LangChain agents overview</a></li>
+<li><a href="https://arxiv.org/abs/2210.03629">ReAct paper (Yao et al., 2022)</a></li>
+<li><a href="https://python.langchain.com/docs/modules/tools/">LangChain tool definition</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, RAG, Agent, Python</p>
+</body>
+</html>

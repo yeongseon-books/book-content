@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Human-in-the-loop — designing for human intervention</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Human-in-the-loop — designing for human intervention</h1>
+<blockquote>
+<p>AI App Patterns 101 (6/6)</p>
+</blockquote>
+<p>Full automation is not always appropriate. Handling sensitive customer data, drafting legally binding documents, or making financial decisions all require a human to review and approve the AI's output before it takes effect. Human-in-the-loop (HITL) is the pattern for inserting human judgment into an otherwise automated pipeline.</p>
+<p>Topics:</p>
+<ul>
+<li>when HITL is the right choice</li>
+<li>implementing approval gates</li>
+<li>confidence-based auto/manual branching</li>
+<li>audit logging</li>
+</ul>
+<hr>
+<h2>When HITL is the right choice</h2>
+<p>HITL adds latency and cost. Use it when the cost of an unchecked error is high.</p>
+<p><strong>High-stakes decisions</strong>: money transfers, contract generation, personal data processing — anything where a mistake is expensive or irreversible.</p>
+<p><strong>Low model confidence</strong>: route uncertain outputs to a human rather than sending a guess downstream.</p>
+<p><strong>Regulatory requirements</strong>: some industries prohibit fully autonomous AI decisions.</p>
+<p><strong>Trust-building phase</strong>: start with full human review when deploying a new system; reduce the human review rate as confidence in the model accumulates.</p>
+<hr>
+<h2>Basic approval gate</h2>
+<p>The simplest HITL pattern is a blocking prompt that waits for human input before the pipeline continues.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+draft_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;You are a customer service representative.\n&quot;
+        &quot;Write a draft response to the customer inquiry below.\n&quot;
+        &quot;Be polite and professional.&quot;,
+    ),
+    (&quot;human&quot;, &quot;Customer inquiry:\n{inquiry}&quot;),
+])
+
+draft_chain = draft_prompt | llm | StrOutputParser()
+
+refine_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Revise the draft response based on the reviewer's feedback.\n&quot;
+        &quot;Apply the feedback faithfully while maintaining a professional tone.&quot;,
+    ),
+    (&quot;human&quot;, &quot;Draft:\n{draft}\n\nFeedback:\n{feedback}&quot;),
+])
+
+refine_chain = refine_prompt | llm | StrOutputParser()
+
+def draft_with_human_review(inquiry: str) -&gt; str:
+    &quot;&quot;&quot;Generate draft → human review → optional refinement → final response.&quot;&quot;&quot;
+    draft = draft_chain.invoke({&quot;inquiry&quot;: inquiry})
+    print(f&quot;\n=== generated draft ===\n{draft}\n&quot;)
+
+    print(&quot;reviewer options:&quot;)
+    print(&quot;  [1] approve — use the draft as-is&quot;)
+    print(&quot;  [2] revise — provide feedback to improve the draft&quot;)
+    print(&quot;  [3] reject — discard this response&quot;)
+
+    choice = input(&quot;choice (1/2/3): &quot;).strip()
+
+    if choice == &quot;1&quot;:
+        return draft
+    elif choice == &quot;2&quot;:
+        feedback = input(&quot;enter feedback: &quot;).strip()
+        refined = refine_chain.invoke({&quot;draft&quot;: draft, &quot;feedback&quot;: feedback})
+        print(f&quot;\n=== revised response ===\n{refined}&quot;)
+        return refined
+    else:
+        print(&quot;response rejected&quot;)
+        return &quot;&quot;
+
+inquiry = &quot;I ordered three weeks ago and my package still hasn't arrived. What happened?&quot;
+final_response = draft_with_human_review(inquiry)
+if final_response:
+    print(f&quot;\n=== final response sent ===\n{final_response}&quot;)
+</code></pre>
+<hr>
+<h2>Confidence-based branching</h2>
+<p>Ask the LLM to return a confidence score alongside its output. Route low-confidence results to a human reviewer automatically.</p>
+<pre><code class="language-python">import os
+
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+classify_prompt = ChatPromptTemplate.from_messages([
+    (
+        &quot;system&quot;,
+        &quot;Classify the following text and rate your confidence.\n&quot;
+        &quot;Return JSON only.\n&quot;
+        'Format: {{&quot;category&quot;: &quot;category name&quot;, &quot;confidence&quot;: 0.0-1.0, &quot;reason&quot;: &quot;brief reason&quot;}}',
+    ),
+    (&quot;human&quot;, &quot;{text}&quot;),
+])
+
+chain = classify_prompt | llm | JsonOutputParser()
+
+CONFIDENCE_THRESHOLD = 0.85
+
+def classify_with_hitl(text: str) -&gt; dict:
+    &quot;&quot;&quot;Route to human review when model confidence is below threshold.&quot;&quot;&quot;
+    result = chain.invoke({&quot;text&quot;: text})
+    confidence = result.get(&quot;confidence&quot;, 0.0)
+
+    if confidence &gt;= CONFIDENCE_THRESHOLD:
+        result[&quot;reviewed_by&quot;] = &quot;auto&quot;
+        print(f&quot;auto-classified: {result['category']} (confidence {confidence:.2f})&quot;)
+    else:
+        print(f&quot;low confidence ({confidence:.2f}) — manual review required&quot;)
+        print(f&quot;AI suggested category: {result['category']}&quot;)
+        print(f&quot;reason: {result['reason']}&quot;)
+        human_category = input(&quot;enter correct category: &quot;).strip()
+        result[&quot;category&quot;] = human_category
+        result[&quot;reviewed_by&quot;] = &quot;human&quot;
+
+    return result
+
+texts = [
+    &quot;Q3 2024 revenue increased 23 percent year-over-year.&quot;,  # clear case
+    &quot;The product was kind of different from what I expected.&quot;,  # ambiguous
+]
+
+for text in texts:
+    print(f&quot;\ntext: {text}&quot;)
+    result = classify_with_hitl(text)
+    print(f&quot;result: {result}&quot;)
+</code></pre>
+<hr>
+<h2>Audit logging</h2>
+<p>HITL systems require a record of who reviewed what and when. The audit log also becomes training data for improving the model over time.</p>
+<pre><code class="language-python">import json
+import os
+from datetime import datetime
+from pathlib import Path
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+LOG_FILE = Path(&quot;audit_log.jsonl&quot;)
+
+llm = ChatGroq(
+    model=&quot;llama-3.1-8b-instant&quot;,
+    api_key=os.environ[&quot;GROQ_API_KEY&quot;],
+)
+
+generate_prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;Draft a contract clause for the following request.&quot;),
+    (&quot;human&quot;, &quot;{request}&quot;),
+])
+
+generate_chain = generate_prompt | llm | StrOutputParser()
+
+def log_event(event_type: str, data: dict) -&gt; None:
+    &quot;&quot;&quot;Append an audit event to the JSONL log file.&quot;&quot;&quot;
+    entry = {
+        &quot;timestamp&quot;: datetime.now().isoformat(),
+        &quot;event_type&quot;: event_type,
+        **data,
+    }
+    with LOG_FILE.open(&quot;a&quot;, encoding=&quot;utf-8&quot;) as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + &quot;\n&quot;)
+
+def contract_clause_with_audit(request: str, reviewer_id: str) -&gt; dict:
+    &quot;&quot;&quot;Generate clause draft → audit log → human approval.&quot;&quot;&quot;
+    draft = generate_chain.invoke({&quot;request&quot;: request})
+    log_event(&quot;draft_generated&quot;, {&quot;request&quot;: request, &quot;draft&quot;: draft})
+
+    print(f&quot;\ndraft:\n{draft}\n&quot;)
+    approved = input(&quot;approve? (y/n): &quot;).strip().lower() == &quot;y&quot;
+
+    if approved:
+        log_event(&quot;approved&quot;, {
+            &quot;reviewer_id&quot;: reviewer_id,
+            &quot;request&quot;: request,
+            &quot;draft&quot;: draft,
+        })
+        return {&quot;status&quot;: &quot;approved&quot;, &quot;content&quot;: draft}
+    else:
+        reason = input(&quot;rejection reason: &quot;).strip()
+        log_event(&quot;rejected&quot;, {
+            &quot;reviewer_id&quot;: reviewer_id,
+            &quot;request&quot;: request,
+            &quot;draft&quot;: draft,
+            &quot;reason&quot;: reason,
+        })
+        return {&quot;status&quot;: &quot;rejected&quot;, &quot;reason&quot;: reason}
+
+result = contract_clause_with_audit(
+    request=&quot;full refund within 30 days of cancellation&quot;,
+    reviewer_id=&quot;reviewer_001&quot;,
+)
+print(f&quot;\nresult: {result['status']}&quot;)
+print(f&quot;audit log: {LOG_FILE}&quot;)
+</code></pre>
+<hr>
+<h2>Conclusion</h2>
+<p>HITL does not mean abandoning automation. High-confidence outputs flow through automatically; low-confidence or high-risk outputs pause for human review. The ratio shifts toward automation as the model proves itself on real traffic. Audit logs close the loop: every human correction is evidence for the next round of fine-tuning or threshold adjustment.</p>
+<p>This series covered six core LLM application patterns — chatbot, RAG Q&amp;A, document assistant, agent with tools, workflow automation, and human-in-the-loop. Each pattern stands alone or composes with the others to form more complex systems.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/02-rag-qa-pattern.md">RAG Q&amp;A pattern — document-based question answering</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/03-document-assistant.md">Document assistant — summarization, extraction, classification</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/04-agent-tool-pattern.md">Agent and tool pattern — autonomous tool selection</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/ai-app-patterns-101/en/05-workflow-automation.md">Workflow automation — designing multi-step chains</a></li>
+<li><strong>Human-in-the-loop — designing for human intervention (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/">LangGraph HITL guide</a></li>
+<li><a href="https://arxiv.org/abs/2108.00018">Human-AI interaction design</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Calibration_(statistics)">Confidence calibration</a></li>
+</ul>
+<p class="tags-line">Tags: LLM, RAG, Agent, Python</p>
+</body>
+</html>
