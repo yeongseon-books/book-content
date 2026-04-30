@@ -89,8 +89,8 @@ if __name__ == '__main__':
 ### requirements.txt
 
 ```
-Flask==3.0.0
-gunicorn==21.2.0
+Flask==3.1.3
+gunicorn==25.3.0
 ```
 
 ---

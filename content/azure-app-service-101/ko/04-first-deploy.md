@@ -124,8 +124,8 @@ if __name__ == "__main__":
 ### `requirements.txt`
 
 ```text
-Flask==3.0.3
-gunicorn==23.0.0
+Flask==3.1.3
+gunicorn==25.3.0
 ```
 
 여기서 중요한 포인트가 두 개 있습니다.
@@ -343,39 +343,39 @@ az webapp config set \
 
 ---
 
-## Step 7. `az webapp up`으로 코드 배포하기
+## Step 7. 코드 배포하기
 
 이제 진짜 배포입니다. 프로젝트 루트에서 실행하세요.
 
+먼저 현재 디렉터리를 ZIP으로 묶습니다.
+
 ```bash
-az webapp up \
-  --name $APP_NAME \
-  --resource-group $RG \
-  --runtime $RUNTIME \
-  --logs
+zip -r app.zip . -x ".venv/*" "__pycache__/*" "*.pyc"
 ```
 
-이 명령이 하는 일은 생각보다 많습니다.
+그다음 App Service에 업로드합니다.
 
-1. 현재 디렉터리 내용을 패키징하고
-2. App Service에 업로드하고
-3. Oryx가 빌드를 수행하고
-4. 앱을 재시작하고
-5. 로그 스트림까지 바로 연결할 수 있게 도와줍니다
+```bash
+az webapp deploy \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --src-path app.zip \
+  --type zip
+```
 
-즉, 체감상 “한 줄 배포”지만, 실제로는 **업로드 → 빌드 → 기동**이 모두 이어지는 파이프라인입니다.
+이 흐름이 하는 일은 다음과 같습니다.
 
-배포 중에 아래 같은 문구가 보이면 정상 흐름에 가깝습니다.
+1. ZIP 파일을 App Service에 업로드하고
+2. Oryx가 `requirements.txt`를 보고 의존성을 설치하고
+3. startup command에 따라 앱을 재시작합니다
 
-- zip deployment 시작
-- build/oryx 관련 로그
-- URL 출력
+즉, **업로드 → 빌드 → 기동**이 순서대로 이어집니다.
 
-반대로 바로 실패하면 아래부터 의심하세요.
+배포 후 바로 실패하면 아래부터 의심하세요.
 
 - 현재 디렉터리가 프로젝트 루트가 맞는가?
 - `requirements.txt`가 루트에 있는가?
-- 앱 이름이 이미 사용 중인가?
+- `SCM_DO_BUILD_DURING_DEPLOYMENT=true`가 설정되어 있는가?
 - Azure 구독/리소스 그룹 컨텍스트가 맞는가?
 
 ---

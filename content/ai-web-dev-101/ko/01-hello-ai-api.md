@@ -67,7 +67,7 @@ API를 호출하려면 먼저 '출입증'이 필요합니다. 이를 **API Key**
 
 ```bash
 # tested on 2026-04-29
-pip install "openai>=1.0,<2.0"
+pip install "openai>=2.0"
 ```
 
 ---
