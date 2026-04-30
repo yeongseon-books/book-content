@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</h1>
+<blockquote>
+<p>Vector Search 101 (2/6)</p>
+</blockquote>
+<p>Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.</p>
+<p><code>HuggingFaceEmbeddings</code> from <code>langchain-community</code> wraps <code>sentence-transformers</code> behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.</p>
+<p>This post covers five things:</p>
+<ul>
+<li>installing and initializing <code>HuggingFaceEmbeddings</code></li>
+<li>the difference between single-query and batch embedding</li>
+<li>saving vectors to NumPy files and reloading them</li>
+<li>practical tips for speeding up encoding on CPU</li>
+<li>comparing the wrapper to the raw <code>SentenceTransformer</code> API</li>
+</ul>
+<hr>
+<h2>Installation</h2>
+<p>Three packages are needed.</p>
+<pre><code class="language-bash">pip install langchain-community sentence-transformers numpy
+</code></pre>
+<p><code>langchain-community</code> provides <code>HuggingFaceEmbeddings</code>. <code>sentence-transformers</code> handles model loading and encoding. <code>numpy</code> handles vector storage and arithmetic.</p>
+<hr>
+<h2>First embedding</h2>
+<p>Initialize the model and encode a single sentence.</p>
+<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+</code></pre>
+<p><code>model_kwargs={"device": "cpu"}</code> makes the CPU target explicit. Switch to <code>"cuda"</code> if a GPU is available.</p>
+<p><code>encode_kwargs={"normalize_embeddings": True}</code> matters. With L2 normalization applied, cosine similarity simplifies to a dot product. This keeps behavior consistent when you connect the model to FAISS or any other library that assumes unit vectors.</p>
+<pre><code class="language-python">text = &quot;Vector search is the foundation of semantic retrieval.&quot;
+vector = embedding_model.embed_query(text)
+
+print(f&quot;type: {type(vector)}&quot;)
+print(f&quot;dimension: {len(vector)}&quot;)
+print(f&quot;first 5 values: {vector[:5]}&quot;)
+</code></pre>
+<pre><code>type: &lt;class 'list'&gt;
+dimension: 384
+first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
+</code></pre>
+<p><code>embed_query()</code> handles a single input and returns a plain Python list. Convert to <code>np.array()</code> when you need NumPy operations.</p>
+<hr>
+<h2>Batch embedding</h2>
+<p>For multiple documents, a single <code>embed_documents()</code> call outperforms a loop of <code>embed_query()</code> calls. The model processes inputs in batches internally, and the overhead of repeated setup adds up fast.</p>
+<pre><code class="language-python">import time
+
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a vector search library from Facebook AI Research.&quot;,
+    &quot;Cosine similarity measures the angle between two vectors.&quot;,
+    &quot;Higher embedding dimensions can capture more information.&quot;,
+    &quot;sentence-transformers specializes in sentence-level embeddings.&quot;,
+    &quot;Chunk size affects both embedding quality and retrieval accuracy.&quot;,
+]
+
+start = time.perf_counter()
+vectors = embedding_model.embed_documents(documents)
+elapsed = time.perf_counter() - start
+
+vectors_np = np.array(vectors)
+print(f&quot;matrix shape: {vectors_np.shape}&quot;)  # (5, 384)
+print(f&quot;elapsed: {elapsed:.3f}s&quot;)
+</code></pre>
+<p>The gap between batch and loop grows with document count. For large corpora, always prefer <code>embed_documents()</code>.</p>
+<hr>
+<h2>Saving and reloading vectors</h2>
+<p>Recomputing embeddings for the same documents on every run wastes time. Save the matrix once and reload it.</p>
+<pre><code class="language-python">import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library.&quot;,
+    &quot;Saving embeddings to disk makes reuse straightforward.&quot;,
+    &quot;NumPy is optimized for array operations.&quot;,
+]
+
+vectors = np.array(embedding_model.embed_documents(documents))
+
+# save
+np.save(&quot;embeddings.npy&quot;, vectors)
+print(f&quot;saved: {vectors.shape}&quot;)
+
+# reload
+loaded = np.load(&quot;embeddings.npy&quot;)
+print(f&quot;reloaded: {loaded.shape}&quot;)
+print(f&quot;identical: {np.allclose(vectors, loaded)}&quot;)
+</code></pre>
+<pre><code>saved: (3, 384)
+reloaded: (3, 384)
+identical: True
+</code></pre>
+<p>Save the source texts alongside the vectors. Without the original text, search results are just index positions.</p>
+<pre><code class="language-python">import json
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library.&quot;,
+    &quot;Saving embeddings to disk makes reuse straightforward.&quot;,
+    &quot;NumPy is optimized for array operations.&quot;,
+]
+
+vectors = np.array(embedding_model.embed_documents(documents))
+
+np.save(&quot;embeddings.npy&quot;, vectors)
+with open(&quot;documents.json&quot;, &quot;w&quot;) as f:
+    json.dump(documents, f, indent=2)
+
+print(&quot;saved embeddings and documents&quot;)
+</code></pre>
+<p>Post 4 uses exactly this pattern to build a working FAISS search system.</p>
+<hr>
+<h2>Practical speed tips</h2>
+<p>CPU encoding is slow at scale. Several adjustments help.</p>
+<p><strong>Increase batch size.</strong> The default is 32. If memory allows, bumping to 64 or 128 reduces overhead.</p>
+<pre><code class="language-python">embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True, &quot;batch_size&quot;: 64},
+)
+</code></pre>
+<p><strong>Initialize once.</strong> Model weight loading takes a few seconds. Create the <code>HuggingFaceEmbeddings</code> object once at the module level and reuse it.</p>
+<pre><code class="language-python"># module level — initialize once
+_embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+def get_embedding_model() -&gt; HuggingFaceEmbeddings:
+    return _embedding_model
+</code></pre>
+<p><strong>Cache repeated inputs.</strong> If the same texts are encoded repeatedly, cache the results in a dictionary. For large workloads, <code>diskcache</code> or <code>joblib.Memory</code> handle persistence automatically.</p>
+<hr>
+<h2>Comparing wrapper and raw API</h2>
+<p><code>HuggingFaceEmbeddings</code> wraps <code>SentenceTransformer</code>. Their outputs are numerically identical.</p>
+<pre><code class="language-python">import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from sentence_transformers import SentenceTransformer
+
+text = &quot;Checking that both libraries produce the same output.&quot;
+
+hf_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+hf_vector = np.array(hf_model.embed_query(text))
+
+st_model = SentenceTransformer(&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
+st_vector = st_model.encode(text, normalize_embeddings=True)
+
+print(f&quot;HuggingFaceEmbeddings shape: {hf_vector.shape}&quot;)
+print(f&quot;SentenceTransformer shape:   {st_vector.shape}&quot;)
+print(f&quot;max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}&quot;)
+</code></pre>
+<pre><code>HuggingFaceEmbeddings shape: (384,)
+SentenceTransformer shape:   (384,)
+max difference: 0.000001
+</code></pre>
+<p>Floating-point rounding aside, the results are the same. Use <code>HuggingFaceEmbeddings</code> when building LangChain pipelines. Use <code>SentenceTransformer</code> directly when you do not need the abstraction.</p>
+<hr>
+<h2>Conclusion</h2>
+<p>You can now produce, save, and reload embeddings with a few lines of code. The batch encoding pattern and module-level initialization are production-ready habits worth keeping from the start.</p>
+<p>The next post moves to similarity computation. We will look at when cosine similarity, dot product, and Euclidean distance each make sense, why normalization changes the arithmetic, and how to build a brute-force nearest-neighbor search from scratch.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/vector-search-101/en/01-what-is-embedding.md">What is an embedding — converting text into vectors</a></li>
+<li><strong>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (current)</strong></li>
+<li>Cosine similarity and vector search — computing sentence distances (upcoming)</li>
+<li>FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)</li>
+<li>Chunking strategies — how to split long documents (upcoming)</li>
+<li>Vector search pipeline — from document ingestion to query (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/">langchain-community HuggingFaceEmbeddings</a></li>
+<li><a href="https://www.sbert.net/docs/package_reference/SentenceTransformer.html">sentence-transformers encode API</a></li>
+<li><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">all-MiniLM-L6-v2 model card</a></li>
+</ul>
+<p class="tags-line">Tags: Vector Search, FAISS, Embeddings, Python</p>
+</body>
+</html>

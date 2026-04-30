@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FAISS fundamentals — fast approximate nearest-neighbor search</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>FAISS fundamentals — fast approximate nearest-neighbor search</h1>
+<blockquote>
+<p>Vector Search 101 (4/6)</p>
+</blockquote>
+<p>Once documents number in the thousands or tens of thousands, NumPy brute-force search slows down. Comparing a query against 100,000 vectors of dimension 384 requires 38.4 million multiplications per query. At that scale, search latency climbs into the hundreds of milliseconds or higher, which is too slow for interactive applications.</p>
+<p>FAISS (Facebook AI Similarity Search) was built for this problem. It supports approximate nearest-neighbor (ANN) search that trades a small accuracy cost for a large speed gain. It handles billion-scale vector collections and runs fast on both CPU and GPU.</p>
+<p>This post covers five things:</p>
+<ul>
+<li>installing FAISS and choosing an index type</li>
+<li>exact search with <code>IndexFlatL2</code> and <code>IndexFlatIP</code></li>
+<li>saving an index to disk and reloading it</li>
+<li>running real queries against a small corpus</li>
+<li>how to choose between index types</li>
+</ul>
+<hr>
+<h2>Installation</h2>
+<p>CPU-only version:</p>
+<pre><code class="language-bash">pip install faiss-cpu sentence-transformers numpy
+</code></pre>
+<p>Replace <code>faiss-cpu</code> with <code>faiss-gpu</code> if a compatible GPU is available.</p>
+<hr>
+<h2>Understanding index types</h2>
+<p>FAISS supports many index types, each with different speed-accuracy tradeoffs. Two are essential at the start.</p>
+<p><strong>IndexFlatL2</strong>: exact search using Euclidean distance. Compares every vector without skipping. Accuracy is 100%, but search time scales linearly with the number of vectors.</p>
+<p><strong>IndexFlatIP</strong>: exact search using inner product. With normalized vectors, inner product equals cosine similarity. Text retrieval typically uses this index with pre-normalized vectors.</p>
+<p>Larger deployments use approximate indexes like <code>IndexIVFFlat</code> or <code>IndexHNSWFlat</code>. This post focuses on Flat indexes to establish the baseline pattern.</p>
+<hr>
+<h2>Exact search with IndexFlatIP</h2>
+<p>The standard pattern for text retrieval: normalized vectors plus inner-product index.</p>
+<pre><code class="language-python">import json
+
+import faiss
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library from Facebook AI Research.&quot;,
+    &quot;Cosine similarity measures the directional similarity between two vectors.&quot;,
+    &quot;Embedding models project text into a high-dimensional vector space.&quot;,
+    &quot;sentence-transformers specializes in sentence-level embeddings.&quot;,
+    &quot;Vector search captures semantic similarity that keyword search misses.&quot;,
+    &quot;Chunking strategies split long documents into searchable units.&quot;,
+    &quot;RAG combines retrieved documents with an LLM prompt.&quot;,
+    &quot;HNSW indexes use graph-based approximate nearest-neighbor search.&quot;,
+    &quot;Higher embedding dimensions can capture more information.&quot;,
+    &quot;With normalized vectors, inner product equals cosine similarity.&quot;,
+]
+
+doc_vectors = np.array(embedding_model.embed_documents(documents), dtype=np.float32)
+dimension = doc_vectors.shape[1]  # 384
+
+index = faiss.IndexFlatIP(dimension)
+index.add(doc_vectors)
+
+print(f&quot;total vectors in index: {index.ntotal}&quot;)
+print(f&quot;vector dimension: {dimension}&quot;)
+</code></pre>
+<pre><code>total vectors in index: 10
+vector dimension: 384
+</code></pre>
+<p>FAISS requires <code>float32</code> arrays. Without the explicit <code>dtype=np.float32</code> cast, NumPy defaults to <code>float64</code> and FAISS raises an error.</p>
+<hr>
+<h2>Running queries</h2>
+<pre><code class="language-python">def search(query: str, top_k: int = 3) -&gt; list[tuple[float, str]]:
+    query_vector = np.array(
+        [embedding_model.embed_query(query)], dtype=np.float32
+    )  # (1, 384) — FAISS expects a 2D array
+    scores, indices = index.search(query_vector, top_k)
+    results = []
+    for score, idx in zip(scores[0], indices[0]):
+        if idx != -1:  # -1 means no result found
+            results.append((float(score), documents[idx]))
+    return results
+
+queries = [
+    &quot;how vector search finds similar content&quot;,
+    &quot;what embedding models do&quot;,
+    &quot;splitting documents into pieces&quot;,
+]
+
+for query in queries:
+    print(f&quot;\nquery: '{query}'&quot;)
+    results = search(query, top_k=3)
+    for rank, (score, text) in enumerate(results, start=1):
+        print(f&quot;  [{rank}] {score:.4f} — {text[:60]}&quot;)
+</code></pre>
+<pre><code>query: 'how vector search finds similar content'
+  [1] 0.7234 — Vector search captures semantic similarity that keyword...
+  [2] 0.6891 — Embedding models project text into a high-dimensional...
+  [3] 0.6312 — Cosine similarity measures the directional similarity...
+
+query: 'what embedding models do'
+  [1] 0.8012 — Embedding models project text into a high-dimensional...
+  [2] 0.7213 — sentence-transformers specializes in sentence-level...
+  [3] 0.6534 — Higher embedding dimensions can capture more information.
+
+query: 'splitting documents into pieces'
+  [1] 0.8234 — Chunking strategies split long documents into searchable...
+  [2] 0.5123 — RAG combines retrieved documents with an LLM prompt.
+  [3] 0.4891 — Vector search captures semantic similarity that keyword...
+</code></pre>
+<hr>
+<h2>Saving and reloading the index</h2>
+<p>Persisting the index avoids re-embedding documents on every startup.</p>
+<pre><code class="language-python">import json
+
+import faiss
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library from Facebook AI Research.&quot;,
+    &quot;Cosine similarity measures the directional similarity between two vectors.&quot;,
+    &quot;Embedding models project text into a high-dimensional vector space.&quot;,
+]
+
+doc_vectors = np.array(embedding_model.embed_documents(documents), dtype=np.float32)
+dimension = doc_vectors.shape[1]
+
+index = faiss.IndexFlatIP(dimension)
+index.add(doc_vectors)
+
+# save
+faiss.write_index(index, &quot;faiss.index&quot;)
+with open(&quot;documents.json&quot;, &quot;w&quot;) as f:
+    json.dump(documents, f, indent=2)
+
+print(f&quot;saved: {index.ntotal} vectors&quot;)
+
+# reload
+loaded_index = faiss.read_index(&quot;faiss.index&quot;)
+with open(&quot;documents.json&quot;) as f:
+    loaded_documents = json.load(f)
+
+print(f&quot;reloaded: {loaded_index.ntotal} vectors&quot;)
+
+# verify with a query
+query_vector = np.array(
+    [embedding_model.embed_query(&quot;vector search speed&quot;)], dtype=np.float32
+)
+scores, indices = loaded_index.search(query_vector, 2)
+
+print(&quot;\nresults:&quot;)
+for score, idx in zip(scores[0], indices[0]):
+    print(f&quot;  {score:.4f} — {loaded_documents[idx]}&quot;)
+</code></pre>
+<pre><code>saved: 3 vectors
+reloaded: 3 vectors
+
+results:
+  0.6234 — Embedding models project text into a high-dimensional vector space.
+  0.5891 — Cosine similarity measures the directional similarity between two vectors.
+</code></pre>
+<p><code>faiss.write_index()</code> and <code>faiss.read_index()</code> use FAISS's own binary format, which loads faster than NumPy <code>.npy</code> files at scale.</p>
+<hr>
+<h2>IndexFlatL2 versus IndexFlatIP</h2>
+<pre><code class="language-python">import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer(&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
+
+sentences = [
+    &quot;Python async programming&quot;,
+    &quot;handling concurrency in Python&quot;,
+    &quot;training a machine learning model&quot;,
+    &quot;walking the dog in the park&quot;,
+]
+
+vectors_norm = model.encode(sentences, normalize_embeddings=True).astype(np.float32)
+vectors_raw = model.encode(sentences, normalize_embeddings=False).astype(np.float32)
+
+query = &quot;Python concurrency&quot;
+query_norm = model.encode(query, normalize_embeddings=True).reshape(1, -1).astype(np.float32)
+query_raw = model.encode(query, normalize_embeddings=False).reshape(1, -1).astype(np.float32)
+
+dim = vectors_norm.shape[1]
+
+idx_ip = faiss.IndexFlatIP(dim)
+idx_ip.add(vectors_norm)
+scores_ip, indices_ip = idx_ip.search(query_norm, 2)
+
+idx_l2 = faiss.IndexFlatL2(dim)
+idx_l2.add(vectors_raw)
+scores_l2, indices_l2 = idx_l2.search(query_raw, 2)
+
+print(&quot;IndexFlatIP (higher = more similar):&quot;)
+for score, idx in zip(scores_ip[0], indices_ip[0]):
+    print(f&quot;  {score:.4f} — {sentences[idx]}&quot;)
+
+print(&quot;\nIndexFlatL2 (lower = more similar):&quot;)
+for score, idx in zip(scores_l2[0], indices_l2[0]):
+    print(f&quot;  {score:.4f} — {sentences[idx]}&quot;)
+</code></pre>
+<pre><code>IndexFlatIP (higher = more similar):
+  0.8241 — handling concurrency in Python
+  0.7134 — Python async programming
+
+IndexFlatL2 (lower = more similar):
+  0.3512 — handling concurrency in Python
+  0.5123 — Python async programming
+</code></pre>
+<p>Both indexes return the correct ranking. For text retrieval, <code>IndexFlatIP</code> with normalized vectors is the standard choice.</p>
+<hr>
+<h2>Choosing an index</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Accuracy</th>
+<th>Speed</th>
+<th>Memory</th>
+<th>Typical scale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IndexFlatL2 / IP</td>
+<td>100%</td>
+<td>O(n)</td>
+<td>n × d × 4B</td>
+<td>up to ~100K</td>
+</tr>
+<tr>
+<td>IndexIVFFlat</td>
+<td>99%+</td>
+<td>O(n/nlist)</td>
+<td>n × d × 4B</td>
+<td>100K–1M</td>
+</tr>
+<tr>
+<td>IndexHNSWFlat</td>
+<td>98%+</td>
+<td>O(log n)</td>
+<td>n × d × 4B + graph</td>
+<td>any</td>
+</tr>
+</tbody>
+</table>
+<p>Start with <code>IndexFlatIP</code>. When search latency becomes a problem, move to <code>IndexIVFFlat</code> or <code>IndexHNSWFlat</code>.</p>
+<hr>
+<h2>Conclusion</h2>
+<p>You can now build a FAISS index, run queries against it, and persist it to disk. The combination of <code>IndexFlatIP</code> with normalized vectors is the baseline for text retrieval.</p>
+<p>The next post covers chunking. We will look at how chunk size, overlap, and split strategy affect retrieval quality — and why getting this wrong causes more problems than choosing the wrong embedding model.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/vector-search-101/en/01-what-is-embedding.md">What is an embedding — converting text into vectors</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/vector-search-101/en/02-huggingface-embeddings.md">HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/vector-search-101/en/03-cosine-similarity.md">Cosine similarity and vector search — computing sentence distances</a></li>
+<li><strong>FAISS fundamentals — fast approximate nearest-neighbor search (current)</strong></li>
+<li>Chunking strategies — how to split long documents (upcoming)</li>
+<li>Vector search pipeline — from document ingestion to query (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://faiss.ai/">FAISS documentation</a></li>
+<li><a href="https://github.com/facebookresearch/faiss">FAISS GitHub</a></li>
+<li><a href="https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index">FAISS index selection guide</a></li>
+<li><a href="https://pypi.org/project/faiss-cpu/">faiss-cpu on PyPI</a></li>
+</ul>
+<p class="tags-line">Tags: Vector Search, FAISS, Embeddings, Python</p>
+</body>
+</html>

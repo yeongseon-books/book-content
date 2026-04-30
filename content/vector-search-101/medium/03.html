@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cosine similarity and vector search — computing sentence distances</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cosine similarity and vector search — computing sentence distances</h1>
+<blockquote>
+<p>Vector Search 101 (3/6)</p>
+</blockquote>
+<p>Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.</p>
+<p>This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.</p>
+<ul>
+<li>implementing cosine similarity, dot product, and Euclidean distance</li>
+<li>the relationship between normalization and each metric</li>
+<li>building a brute-force nearest-neighbor search</li>
+<li>running a real query and examining the results</li>
+<li>when to use each metric</li>
+</ul>
+<hr>
+<h2>Three distance metrics</h2>
+<p><strong>Cosine similarity</strong></p>
+<p>Cosine similarity measures the angle between two vectors, ignoring their magnitudes.</p>
+<pre><code>cos(θ) = (A · B) / (|A| × |B|)
+</code></pre>
+<p>Values range from -1 to 1. In practice, text embeddings rarely produce negative values, so the range is effectively 0 to 1. Closer to 1 means more similar.</p>
+<pre><code class="language-python">import numpy as np
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+</code></pre>
+<p><strong>Dot product</strong></p>
+<p>The dot product multiplies element-wise and sums the result.</p>
+<pre><code>A · B = Σ(Aᵢ × Bᵢ)
+</code></pre>
+<p>When vectors are L2-normalized (magnitude = 1), dot product and cosine similarity are numerically identical. Because the dot product is faster to compute than the full cosine formula, FAISS and similar libraries implement cosine search by normalizing first and then computing dot products.</p>
+<pre><code class="language-python">def dot_product(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b))
+</code></pre>
+<p><strong>Euclidean distance (L2)</strong></p>
+<p>Euclidean distance is the straight-line distance between two points.</p>
+<pre><code>L2(A, B) = √Σ(Aᵢ - Bᵢ)²
+</code></pre>
+<p>Smaller values mean more similar — opposite direction from cosine similarity. With normalized vectors, L2 and cosine similarity have a monotonic relationship, so ranking order is the same.</p>
+<pre><code class="language-python">def euclidean_distance(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.linalg.norm(a - b))
+</code></pre>
+<hr>
+<h2>Comparing all three metrics</h2>
+<p>Apply all three to the same sentence pairs.</p>
+<pre><code class="language-python">import numpy as np
+from sentence_transformers import SentenceTransformer
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+def dot_product(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b))
+
+def euclidean_distance(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.linalg.norm(a - b))
+
+model = SentenceTransformer(&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
+
+pairs = [
+    (&quot;Python async programming&quot;, &quot;handling concurrency in Python&quot;),
+    (&quot;Python async programming&quot;, &quot;training a machine learning model&quot;),
+    (&quot;Python async programming&quot;, &quot;walking the dog in the park&quot;),
+]
+
+for text_a, text_b in pairs:
+    a = model.encode(text_a, normalize_embeddings=True)
+    b = model.encode(text_b, normalize_embeddings=True)
+
+    cos = cosine_similarity(a, b)
+    dot = dot_product(a, b)
+    l2 = euclidean_distance(a, b)
+
+    print(f&quot;\n'{text_a[:25]}' vs '{text_b[:25]}'&quot;)
+    print(f&quot;  cosine:     {cos:.4f}&quot;)
+    print(f&quot;  dot:        {dot:.4f}&quot;)
+    print(f&quot;  euclidean:  {l2:.4f}&quot;)
+</code></pre>
+<p>Expected output:</p>
+<pre><code>'Python async programming' vs 'handling concurrency in Py'
+  cosine:     0.8134
+  dot:        0.8134
+  euclidean:  0.6109
+
+'Python async programming' vs 'training a machine learning'
+  cosine:     0.3812
+  dot:        0.3812
+  euclidean:  1.1103
+
+'Python async programming' vs 'walking the dog in the park'
+  cosine:     0.0471
+  dot:        0.0471
+  euclidean:  1.3792
+</code></pre>
+<p>With normalized vectors, cosine and dot product match exactly. Euclidean distance goes in the opposite direction but produces the same ranking.</p>
+<hr>
+<h2>Why normalization matters</h2>
+<p>Without normalization, dot product and cosine similarity diverge.</p>
+<pre><code class="language-python">import numpy as np
+from sentence_transformers import SentenceTransformer
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+model = SentenceTransformer(&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
+
+text_a = &quot;Python async programming&quot;
+text_b = &quot;handling concurrency in Python&quot;
+
+a_raw = model.encode(text_a, normalize_embeddings=False)
+b_raw = model.encode(text_b, normalize_embeddings=False)
+a_norm = model.encode(text_a, normalize_embeddings=True)
+b_norm = model.encode(text_b, normalize_embeddings=True)
+
+print(f&quot;raw magnitudes: a={np.linalg.norm(a_raw):.4f}, b={np.linalg.norm(b_raw):.4f}&quot;)
+print(f&quot;norm magnitudes: a={np.linalg.norm(a_norm):.4f}, b={np.linalg.norm(b_norm):.4f}&quot;)
+
+print(f&quot;\nraw cosine: {cosine_similarity(a_raw, b_raw):.4f}&quot;)
+print(f&quot;raw dot:    {float(np.dot(a_raw, b_raw)):.4f}&quot;)
+
+print(f&quot;\nnorm cosine: {cosine_similarity(a_norm, b_norm):.4f}&quot;)
+print(f&quot;norm dot:    {float(np.dot(a_norm, b_norm)):.4f}&quot;)
+</code></pre>
+<pre><code>raw magnitudes: a=4.2318, b=4.1092
+norm magnitudes: a=1.0000, b=1.0000
+
+raw cosine: 0.8134
+raw dot:    14.1547
+
+norm cosine: 0.8134
+norm dot:    0.8134
+</code></pre>
+<p>Without normalization, the raw dot product (14.15) is dominated by the vector magnitude (roughly 4.2 × 4.1 × 0.81). After normalization, both metrics land at 0.8134. FAISS's <code>IndexFlatIP</code> relies on this equivalence — it computes dot products on the assumption that inputs are pre-normalized. Setting <code>normalize_embeddings=True</code> consistently at encoding time is not optional when using those indexes.</p>
+<hr>
+<h2>Brute-force nearest-neighbor search</h2>
+<p>For a few hundred documents, NumPy alone is sufficient for retrieval.</p>
+<pre><code class="language-python">import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+    encode_kwargs={&quot;normalize_embeddings&quot;: True},
+)
+
+documents = [
+    &quot;FAISS is a high-speed vector search library from Facebook AI Research.&quot;,
+    &quot;Cosine similarity measures the directional similarity between two vectors.&quot;,
+    &quot;Embedding models project text into a high-dimensional vector space.&quot;,
+    &quot;sentence-transformers specializes in sentence-level embeddings.&quot;,
+    &quot;Vector search captures semantic similarity that keyword search misses.&quot;,
+    &quot;Chunking strategies split long documents into searchable units.&quot;,
+    &quot;RAG combines retrieved documents with an LLM prompt.&quot;,
+]
+
+doc_vectors = np.array(embedding_model.embed_documents(documents))
+
+def search(query: str, top_k: int = 3) -&gt; list[tuple[float, str]]:
+    query_vector = np.array(embedding_model.embed_query(query))
+    # normalized vectors: dot product == cosine similarity
+    scores = doc_vectors @ query_vector
+    top_indices = np.argsort(scores)[::-1][:top_k]
+    return [(float(scores[i]), documents[i]) for i in top_indices]
+
+query = &quot;how vector search finds similar documents&quot;
+results = search(query, top_k=3)
+
+print(f&quot;query: '{query}'\n&quot;)
+for rank, (score, text) in enumerate(results, start=1):
+    print(f&quot;[{rank}] score: {score:.4f}&quot;)
+    print(f&quot;    {text}\n&quot;)
+</code></pre>
+<pre><code>query: 'how vector search finds similar documents'
+
+[1] score: 0.7234
+    Vector search captures semantic similarity that keyword search misses.
+
+[2] score: 0.6891
+    Embedding models project text into a high-dimensional vector space.
+
+[3] score: 0.6312
+    Cosine similarity measures the directional similarity between two vectors.
+</code></pre>
+<p><code>doc_vectors @ query_vector</code> is a matrix-vector dot product — one cosine similarity computation per document, vectorized across the entire corpus. <code>np.argsort(scores)[::-1][:top_k]</code> returns the top-k indices in descending order.</p>
+<p>This approach is called exact search or brute-force search. It is accurate but scales as O(n × d), where n is the number of documents and d is the vector dimension. For tens of thousands of documents or more, it becomes too slow. That is where FAISS enters.</p>
+<hr>
+<h2>When to use each metric</h2>
+<p><strong>Cosine similarity</strong><br>
+- Best for: Text meaning comparison, documents of different lengths<br>
+- Watch out for: Ignores magnitude</p>
+<p><strong>Dot product</strong><br>
+- Best for: Normalized vectors, FAISS IP index<br>
+- Watch out for: Magnitude distorts results without normalization</p>
+<p><strong>Euclidean L2</strong><br>
+- Best for: When absolute distance carries meaning<br>
+- Watch out for: Same ranking as cosine on normalized vectors</p>
+<p>For text search, cosine similarity is the safe default. With normalized vectors, you get the same result using dot product with less arithmetic. FAISS's <code>IndexFlatIP</code> is built on exactly that assumption.</p>
+<hr>
+<h2>Conclusion</h2>
+<p>All three distance metrics are now implemented and compared. The normalization effect is visible: dot product matches cosine similarity only when vectors have unit magnitude. The brute-force search works correctly for small corpora but does not scale.</p>
+<p>The next post introduces FAISS. We will look at index types, how to build and persist an index, and how approximate search trades a small accuracy cost for a large speed gain.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/vector-search-101/en/01-what-is-embedding.md">What is an embedding — converting text into vectors</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/vector-search-101/en/02-huggingface-embeddings.md">HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</a></li>
+<li><strong>Cosine similarity and vector search — computing sentence distances (current)</strong></li>
+<li>FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)</li>
+<li>Chunking strategies — how to split long documents (upcoming)</li>
+<li>Vector search pipeline — from document ingestion to query (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index">FAISS wiki — choosing an index</a></li>
+<li><a href="https://www.sbert.net/docs/usage/semantic_textual_similarity.html">sentence-transformers semantic similarity</a></li>
+<li><a href="https://www.pinecone.io/learn/vector-similarity/">Vector similarity — Pinecone</a></li>
+</ul>
+<p class="tags-line">Tags: Vector Search, FAISS, Embeddings, Python</p>
+</body>
+</html>
