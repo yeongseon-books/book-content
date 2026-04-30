@@ -1,0 +1,41 @@
+id: rag-deep-dive
+category: ai
+title:
+  ko: RAG Deep Dive
+  en: RAG Deep Dive
+description:
+  ko: LangChain · FAISS · RAGAS 소스로 따라가는 RAG 파이프라인 심층 분석 6부작.
+  en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+tags:
+  - RAG
+  - LangChain
+  - Vector Search
+  - LLM
+articles:
+- idx: 1
+  slug: 01-document-loading-and-chunking
+  status: draft
+- idx: 2
+  slug: 02-embeddings-and-vector-index
+  status: draft
+- idx: 3
+  slug: 03-retriever-design
+  status: draft
+- idx: 4
+  slug: 04-prompt-construction-and-context-injection
+  status: draft
+- idx: 5
+  slug: 05-rag-chain-assembly
+  status: draft
+- idx: 6
+  slug: 06-evaluation-and-quality-gates
+  status: draft

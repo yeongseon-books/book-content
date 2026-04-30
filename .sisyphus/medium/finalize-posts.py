@@ -31,6 +31,7 @@ SERIES_TAGS: dict[str, list[str]] = {
     "azure-aca-101": ["Azure", "Container Apps", "Serverless", "Containers"],
     "azure-aca-deep-dive": ["Container Apps", "KEDA", "Dapr", "Envoy"],
     "llm-from-scratch-101": ["LLM", "PyTorch", "Transformer", "Tutorial"],
+    "rag-deep-dive": ["RAG", "LangChain", "Vector Search", "LLM"],
 }
 
 REFERENCES_HEADINGS_ANY = ("## References", "## 참고 자료", "## 참고문헌", "## 참고")

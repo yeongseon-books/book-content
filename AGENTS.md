@@ -28,6 +28,10 @@ And the LLM series (3-variant like Azure):
 
 - `llm-from-scratch-101/` — 9-part series (`ko/`, `en/`, `medium/`). PyTorch 2.x, ~720 LOC tiny GPT, TinyShakespeare. Series tags: `LLM, PyTorch, Transformer, Tutorial`.
 
+And the RAG series (3-variant like Azure):
+
+- `rag-deep-dive/` — 6-part series (`ko/`, `en/`, `medium/`). LangChain, FAISS, RAGAS source-pinned. Series tags: `RAG, LangChain, Vector Search, LLM`.
+
 The single source of truth for the catalog is now [`series.yaml`](./series.yaml); [`SERIES.md`](./SERIES.md) is the human-readable summary.
 
 ## Post structure (mandatory order)

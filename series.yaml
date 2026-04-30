@@ -156,6 +156,20 @@ series:
     status: draft
     path: content/llm-from-scratch-101
 
+  # RAG
+  - id: rag-deep-dive
+    category: ai
+    title:
+      ko: RAG Deep Dive
+      en: RAG Deep Dive
+    description:
+      ko: LangChain · FAISS · RAGAS 소스로 따라가는 RAG 파이프라인 심층 분석 6부작.
+      en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
+    languages: [ko, en]
+    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    status: draft
+    path: content/rag-deep-dive
+
   # AX (planned)
   - id: ax-practical-guide
     category: ax
