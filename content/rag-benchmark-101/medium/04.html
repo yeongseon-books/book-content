@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VectorDB selection criteria</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>VectorDB selection criteria</h1>
+<blockquote>
+<p>RAG Benchmark 101 (4/6)</p>
+</blockquote>
+<p>FAISS, Chroma, Qdrant — every vector database makes different trade-offs. This post benchmarks FAISS and Chroma head-to-head on indexing speed, query latency, memory footprint, and metadata filtering support, then establishes clear selection criteria.</p>
+<hr>
+<h2>Evaluation axes</h2>
+<p>Four dimensions drive vector database selection.</p>
+<ul>
+<li><strong>Indexing speed</strong>: how fast can documents be added?</li>
+<li><strong>Query latency</strong>: time per similarity search</li>
+<li><strong>Memory efficiency</strong>: RAM footprint relative to corpus size</li>
+<li><strong>Filter support</strong>: metadata-conditioned retrieval</li>
+</ul>
+<hr>
+<h2>FAISS vs Chroma benchmark</h2>
+<pre><code class="language-python">import json
+import time
+import tempfile
+from dataclasses import dataclass
+
+from langchain.schema import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS, Chroma
+
+@dataclass
+class VectorDBBenchResult:
+    name: str
+    index_time_s: float
+    query_time_ms: float
+    precision_at_3: float
+    recall_at_3: float
+    supports_filter: bool
+    notes: str = &quot;&quot;
+
+    def summary(self) -&gt; dict:
+        return {
+            &quot;db&quot;: self.name,
+            &quot;index_time_s&quot;: round(self.index_time_s, 2),
+            &quot;query_time_ms&quot;: round(self.query_time_ms, 1),
+            &quot;precision@3&quot;: round(self.precision_at_3, 4),
+            &quot;recall@3&quot;: round(self.recall_at_3, 4),
+            &quot;supports_filter&quot;: self.supports_filter,
+            &quot;notes&quot;: self.notes,
+        }
+
+def _get_embedding():
+    return HuggingFaceEmbeddings(
+        model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+
+def _prm(retrieved_ids: list[str], relevant_ids: set[str], k: int) -&gt; tuple[float, float, float]:
+    top_k = retrieved_ids[:k]
+    hits = [d for d in top_k if d in relevant_ids]
+    precision = len(hits) / k if k &gt; 0 else 0.0
+    recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
+    mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
+    return precision, recall, mrr
+
+def benchmark_faiss(corpus: list[Document], queries: list, k: int = 3) -&gt; VectorDBBenchResult:
+    embedding = _get_embedding()
+    t0 = time.perf_counter()
+    vs = FAISS.from_documents(corpus, embedding)
+    index_time = time.perf_counter() - t0
+
+    retriever = vs.as_retriever(search_kwargs={&quot;k&quot;: k})
+    precisions, recalls, qtimes = [], [], []
+    for qt in queries:
+        t0 = time.perf_counter()
+        docs = retriever.invoke(qt.query)
+        qtimes.append((time.perf_counter() - t0) * 1000)
+        p, r, _ = _prm([d.metadata.get(&quot;id&quot;, &quot;&quot;) for d in docs], qt.relevant_ids, k)
+        precisions.append(p)
+        recalls.append(r)
+
+    avg = lambda lst: sum(lst) / len(lst) if lst else 0.0
+    return VectorDBBenchResult(&quot;FAISS&quot;, index_time, avg(qtimes), avg(precisions), avg(recalls),
+                               False, &quot;in-memory; serialization required for persistence&quot;)
+
+def benchmark_chroma(corpus: list[Document], queries: list, k: int = 3) -&gt; VectorDBBenchResult:
+    embedding = _get_embedding()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        t0 = time.perf_counter()
+        vs = Chroma.from_documents(corpus, embedding, persist_directory=tmpdir, collection_name=&quot;bench&quot;)
+        index_time = time.perf_counter() - t0
+
+        retriever = vs.as_retriever(search_kwargs={&quot;k&quot;: k})
+        precisions, recalls, qtimes = [], [], []
+        for qt in queries:
+            t0 = time.perf_counter()
+            docs = retriever.invoke(qt.query)
+            qtimes.append((time.perf_counter() - t0) * 1000)
+            p, r, _ = _prm([d.metadata.get(&quot;id&quot;, &quot;&quot;) for d in docs], qt.relevant_ids, k)
+            precisions.append(p)
+            recalls.append(r)
+
+        avg = lambda lst: sum(lst) / len(lst) if lst else 0.0
+        return VectorDBBenchResult(&quot;Chroma&quot;, index_time, avg(qtimes), avg(precisions), avg(recalls),
+                                   True, &quot;SQLite-backed persistence, native metadata filters&quot;)
+</code></pre>
+<hr>
+<h2>Metadata filter comparison</h2>
+<pre><code class="language-python">def demo_metadata_filter(corpus: list[Document]):
+    embedding = _get_embedding()
+    query = &quot;what is vector search?&quot;
+
+    # Chroma: native filter
+    with tempfile.TemporaryDirectory() as tmpdir:
+        chroma_vs = Chroma.from_documents(corpus, embedding, persist_directory=tmpdir)
+        retriever = chroma_vs.as_retriever(search_kwargs={&quot;k&quot;: 3, &quot;filter&quot;: {&quot;topic&quot;: &quot;faiss&quot;}})
+        results = retriever.invoke(query)
+        print(&quot;Chroma native filter (topic=faiss):&quot;)
+        for doc in results:
+            print(f&quot;  [{doc.metadata.get('id')}] {doc.page_content[:60]}&quot;)
+
+    # FAISS: post-hoc filter
+    faiss_vs = FAISS.from_documents(corpus, embedding)
+    all_results = faiss_vs.similarity_search(query, k=len(corpus))
+    filtered = [d for d in all_results if d.metadata.get(&quot;topic&quot;) == &quot;faiss&quot;][:3]
+    print(&quot;\nFAISS post-hoc filter (topic=faiss):&quot;)
+    for doc in filtered:
+        print(f&quot;  [{doc.metadata.get('id')}] {doc.page_content[:60]}&quot;)
+</code></pre>
+<hr>
+<h2>Selection guide</h2>
+<p><strong>Choose FAISS when:</strong><br>
+- In-memory processing is acceptable and persistence is not required<br>
+- Metadata filters are not needed<br>
+- Corpus is up to a few million vectors</p>
+<p><strong>Choose Chroma when:</strong><br>
+- Metadata-conditioned retrieval is required<br>
+- Persistence and index reload across restarts is needed<br>
+- Corpus is up to hundreds of thousands of documents</p>
+<p><strong>Consider Qdrant or Weaviate when:</strong><br>
+- Hundreds of millions of vectors or more<br>
+- Distributed deployment and horizontal scaling<br>
+- Complex payload filtering and hybrid search</p>
+<pre><code class="language-python">if __name__ == &quot;__main__&quot;:
+    from rag_benchmark_post2 import CORPUS, QUERIES
+
+    for result in [benchmark_faiss(CORPUS, QUERIES), benchmark_chroma(CORPUS, QUERIES)]:
+        print(json.dumps(result.summary(), indent=2))
+
+    demo_metadata_filter(CORPUS)
+</code></pre>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/02-retrieval-benchmarking.md">Measuring retrieval performance</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/03-embedding-comparison.md">Comparing embedding models</a></li>
+<li><strong>VectorDB selection criteria (current)</strong></li>
+<li>End-to-end RAG pipeline evaluation (upcoming)</li>
+<li>Completing the RAG benchmark (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/facebookresearch/faiss/wiki">FAISS wiki</a></li>
+<li><a href="https://docs.trychroma.com/">Chroma documentation</a></li>
+<li><a href="https://ann-benchmarks.com/">ANN benchmarks</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, VectorDB, Benchmarking, LLM</p>
+</body>
+</html>

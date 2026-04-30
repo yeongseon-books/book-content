@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding RAG evaluation metrics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding RAG evaluation metrics</h1>
+<blockquote>
+<p>RAG Benchmark 101 (1/6)</p>
+</blockquote>
+<p>A RAG pipeline has two distinct stages: retrieval and generation. Without measuring each stage separately, you cannot diagnose quality problems. Is retrieval returning the wrong documents? Is the model ignoring what it retrieved? You need to know before you can fix anything. This post covers the core RAG evaluation metrics and implements them from scratch.</p>
+<hr>
+<h2>Two evaluation layers</h2>
+<p>RAG evaluation splits across two layers.</p>
+<p><strong>Retrieval quality</strong>: does the system fetch the right documents?<br>
+- Precision@K: fraction of the top-K results that are relevant<br>
+- Recall@K: fraction of all relevant documents that appear in the top K<br>
+- MRR (Mean Reciprocal Rank): rank of the first relevant result</p>
+<p><strong>Generation quality</strong>: does the model use retrieved context correctly?<br>
+- Faithfulness: are all claims in the answer grounded in the retrieved context?<br>
+- Answer relevance: does the answer directly address the question?<br>
+- Context precision: what fraction of retrieved context was actually used?</p>
+<hr>
+<h2>Retrieval metrics</h2>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class RetrievalMetrics:
+    precision_at_k: float
+    recall_at_k: float
+    f1_at_k: float
+    mrr: float
+    k: int
+
+    def summary(self) -&gt; dict:
+        return {
+            f&quot;precision@{self.k}&quot;: round(self.precision_at_k, 4),
+            f&quot;recall@{self.k}&quot;: round(self.recall_at_k, 4),
+            f&quot;f1@{self.k}&quot;: round(self.f1_at_k, 4),
+            &quot;mrr&quot;: round(self.mrr, 4),
+        }
+
+def compute_retrieval_metrics(
+    retrieved_ids: list[str],
+    relevant_ids: set[str],
+    k: int,
+) -&gt; RetrievalMetrics:
+    top_k = retrieved_ids[:k]
+    hits = [doc_id for doc_id in top_k if doc_id in relevant_ids]
+
+    precision = len(hits) / k if k &gt; 0 else 0.0
+    recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
+    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) &gt; 0 else 0.0
+
+    mrr = 0.0
+    for rank, doc_id in enumerate(top_k, start=1):
+        if doc_id in relevant_ids:
+            mrr = 1.0 / rank
+            break
+
+    return RetrievalMetrics(precision_at_k=precision, recall_at_k=recall, f1_at_k=f1, mrr=mrr, k=k)
+
+# example
+retrieved = [&quot;doc_3&quot;, &quot;doc_1&quot;, &quot;doc_5&quot;, &quot;doc_2&quot;, &quot;doc_7&quot;]
+relevant = {&quot;doc_1&quot;, &quot;doc_3&quot;, &quot;doc_6&quot;}
+
+for k in [1, 3, 5]:
+    metrics = compute_retrieval_metrics(retrieved, relevant, k)
+    print(f&quot;K={k}: {metrics.summary()}&quot;)
+</code></pre>
+<hr>
+<h2>Generation metrics (LLM-as-judge)</h2>
+<pre><code class="language-python">import json
+import os
+import re
+from typing import Optional
+
+from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage
+
+FAITHFULNESS_PROMPT = &quot;&quot;&quot;Evaluate faithfulness for the given context and answer.
+
+Faithfulness: are all claims in the answer directly supported by the context?
+- 1: contains claims contradicted by or absent from the context
+- 3: some claims are grounded, others are not
+- 5: every claim is directly supported by the context
+
+Context: {context}
+Answer: {answer}
+
+Respond with JSON only: {{&quot;score&quot;: &lt;1-5&gt;, &quot;reason&quot;: &quot;&lt;one sentence&gt;&quot;}}&quot;&quot;&quot;
+
+RELEVANCE_PROMPT = &quot;&quot;&quot;Evaluate answer relevance for the given question and answer.
+
+Answer Relevance: does the answer directly address the question?
+- 1: unrelated to the question
+- 3: partially answers
+- 5: fully and directly answers the question
+
+Question: {question}
+Answer: {answer}
+
+Respond with JSON only: {{&quot;score&quot;: &lt;1-5&gt;, &quot;reason&quot;: &quot;&lt;one sentence&gt;&quot;}}&quot;&quot;&quot;
+
+@dataclass
+class GenerationMetrics:
+    faithfulness: float
+    answer_relevance: float
+    faithfulness_reason: str = &quot;&quot;
+    answer_relevance_reason: str = &quot;&quot;
+
+    @property
+    def average(self) -&gt; float:
+        return (self.faithfulness + self.answer_relevance) / 2
+
+    def summary(self) -&gt; dict:
+        return {
+            &quot;faithfulness&quot;: round(self.faithfulness, 2),
+            &quot;answer_relevance&quot;: round(self.answer_relevance, 2),
+            &quot;average&quot;: round(self.average, 2),
+        }
+
+def _parse_score(raw: str, default: float = 3.0) -&gt; tuple[float, str]:
+    try:
+        match = re.search(r&quot;\{[^}]+\}&quot;, raw, re.DOTALL)
+        if not match:
+            return default, &quot;&quot;
+        data = json.loads(match.group())
+        return float(data.get(&quot;score&quot;, default)), data.get(&quot;reason&quot;, &quot;&quot;)
+    except Exception:
+        return default, &quot;&quot;
+
+def evaluate_generation(
+    question: str,
+    context: str,
+    answer: str,
+    llm: Optional[ChatGroq] = None,
+) -&gt; GenerationMetrics:
+    if llm is None:
+        llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+
+    f_raw = llm.invoke([HumanMessage(content=FAITHFULNESS_PROMPT.format(context=context, answer=answer))]).content
+    f_score, f_reason = _parse_score(f_raw)
+
+    r_raw = llm.invoke([HumanMessage(content=RELEVANCE_PROMPT.format(question=question, answer=answer))]).content
+    r_score, r_reason = _parse_score(r_raw)
+
+    return GenerationMetrics(faithfulness=f_score, answer_relevance=r_score,
+                             faithfulness_reason=f_reason, answer_relevance_reason=r_reason)
+</code></pre>
+<hr>
+<h2>End-to-end evaluation demo</h2>
+<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain.schema import Document
+
+def run_rag_eval_demo():
+    docs = [
+        Document(page_content=&quot;FAISS is a high-density vector search library developed by Facebook AI.&quot;, metadata={&quot;id&quot;: &quot;doc_1&quot;}),
+        Document(page_content=&quot;FAISS can search billions of vectors in milliseconds.&quot;, metadata={&quot;id&quot;: &quot;doc_2&quot;}),
+        Document(page_content=&quot;Chroma is an open-source vector database for embedding-based document retrieval.&quot;, metadata={&quot;id&quot;: &quot;doc_3&quot;}),
+        Document(page_content=&quot;Vector indexes use ANN (approximate nearest neighbor) algorithms.&quot;, metadata={&quot;id&quot;: &quot;doc_4&quot;}),
+    ]
+
+    embedding = HuggingFaceEmbeddings(
+        model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+    vectorstore = FAISS.from_documents(docs, embedding)
+    retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
+
+    question = &quot;What is FAISS?&quot;
+    relevant_ids = {&quot;doc_1&quot;, &quot;doc_2&quot;}
+
+    retrieved_docs = retriever.invoke(question)
+    retrieved_ids = [d.metadata[&quot;id&quot;] for d in retrieved_docs]
+    context = &quot;\n&quot;.join(d.page_content for d in retrieved_docs)
+
+    retrieval = compute_retrieval_metrics(retrieved_ids, relevant_ids, k=3)
+    print(&quot;=== retrieval metrics ===&quot;)
+    print(json.dumps(retrieval.summary(), indent=2))
+
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    answer = llm.invoke([HumanMessage(content=f&quot;Context:\n{context}\n\nQuestion: {question}&quot;)]).content
+
+    generation = evaluate_generation(question, context, answer, llm)
+    print(&quot;\n=== generation metrics ===&quot;)
+    print(json.dumps(generation.summary(), indent=2))
+
+if __name__ == &quot;__main__&quot;:
+    run_rag_eval_demo()
+</code></pre>
+<hr>
+<h2>Interpreting results</h2>
+<p>Tracking retrieval and generation metrics separately surfaces bottlenecks fast. High Precision@K with low Faithfulness points to a prompting or model problem. Low Precision@K with high Faithfulness means retrieval is the bottleneck. Fixing the wrong layer wastes time.</p>
+<p>MRR captures ranking quality: a relevant document at rank 1 scores 1.0; at rank 3 it scores 0.33. When MRR is low, adding a re-ranker after initial retrieval is usually the highest-ROI intervention.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>Understanding RAG evaluation metrics (current)</strong></li>
+<li>Measuring retrieval performance (upcoming)</li>
+<li>Comparing embedding models (upcoming)</li>
+<li>VectorDB selection criteria (upcoming)</li>
+<li>End-to-end RAG pipeline evaluation (upcoming)</li>
+<li>Completing the RAG benchmark (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.ragas.io/">RAGAS evaluation framework</a></li>
+<li><a href="https://github.com/beir-cellar/beir">BEIR benchmark</a></li>
+<li><a href="https://trec.nist.gov/">TREC evaluation metrics</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, VectorDB, Benchmarking, LLM</p>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Measuring retrieval performance</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Measuring retrieval performance</h1>
+<blockquote>
+<p>RAG Benchmark 101 (2/6)</p>
+</blockquote>
+<p>A good RAG retriever surfaces relevant documents at the top. This post runs a systematic benchmark across a query set, aggregates results into a system-level retrieval report, and compares chunking strategies using the same evaluation harness.</p>
+<hr>
+<h2>Benchmark design</h2>
+<p>Measuring retrieval performance requires three things.</p>
+<ul>
+<li><strong>Query set</strong>: questions that reflect realistic usage patterns</li>
+<li><strong>Ground truth</strong>: the set of relevant document IDs for each query</li>
+<li><strong>Retriever</strong>: the system under test</li>
+</ul>
+<p>If ground truth labels do not exist yet, an LLM can generate them from your corpus.</p>
+<hr>
+<h2>Test corpus and query set</h2>
+<pre><code class="language-python">import json
+import os
+from dataclasses import dataclass, field
+
+from langchain.schema import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+CORPUS = [
+    Document(page_content=&quot;A vector database stores embedding vectors and supports similarity search.&quot;, metadata={&quot;id&quot;: &quot;d01&quot;, &quot;topic&quot;: &quot;vectordb&quot;}),
+    Document(page_content=&quot;FAISS is a vector similarity search library developed by Facebook AI Research.&quot;, metadata={&quot;id&quot;: &quot;d02&quot;, &quot;topic&quot;: &quot;faiss&quot;}),
+    Document(page_content=&quot;FAISS IndexFlatL2 provides exact L2 distance-based search.&quot;, metadata={&quot;id&quot;: &quot;d03&quot;, &quot;topic&quot;: &quot;faiss&quot;}),
+    Document(page_content=&quot;Cosine similarity measures the directional similarity between two vectors.&quot;, metadata={&quot;id&quot;: &quot;d04&quot;, &quot;topic&quot;: &quot;similarity&quot;}),
+    Document(page_content=&quot;HNSW is a fast ANN search algorithm based on hierarchical navigable graphs.&quot;, metadata={&quot;id&quot;: &quot;d05&quot;, &quot;topic&quot;: &quot;ann&quot;}),
+    Document(page_content=&quot;Embedding models transform text into high-dimensional vector representations.&quot;, metadata={&quot;id&quot;: &quot;d06&quot;, &quot;topic&quot;: &quot;embedding&quot;}),
+    Document(page_content=&quot;all-MiniLM-L6-v2 is a lightweight model producing 384-dimensional embeddings.&quot;, metadata={&quot;id&quot;: &quot;d07&quot;, &quot;topic&quot;: &quot;embedding&quot;}),
+    Document(page_content=&quot;Smaller chunk sizes improve precision but reduce available context.&quot;, metadata={&quot;id&quot;: &quot;d08&quot;, &quot;topic&quot;: &quot;chunking&quot;}),
+    Document(page_content=&quot;Hybrid search combines keyword and vector search for better coverage.&quot;, metadata={&quot;id&quot;: &quot;d09&quot;, &quot;topic&quot;: &quot;hybrid&quot;}),
+    Document(page_content=&quot;Re-ranking reorders initial retrieval results to improve precision.&quot;, metadata={&quot;id&quot;: &quot;d10&quot;, &quot;topic&quot;: &quot;reranking&quot;}),
+]
+
+@dataclass
+class QueryGroundTruth:
+    query: str
+    relevant_ids: set[str]
+    topic: str = &quot;&quot;
+
+QUERIES: list[QueryGroundTruth] = [
+    QueryGroundTruth(&quot;What is FAISS?&quot;, {&quot;d02&quot;, &quot;d03&quot;}, &quot;faiss&quot;),
+    QueryGroundTruth(&quot;How do embedding models work?&quot;, {&quot;d06&quot;, &quot;d07&quot;}, &quot;embedding&quot;),
+    QueryGroundTruth(&quot;What is the difference between cosine similarity and L2 distance?&quot;, {&quot;d03&quot;, &quot;d04&quot;}, &quot;similarity&quot;),
+    QueryGroundTruth(&quot;What is an ANN search algorithm?&quot;, {&quot;d05&quot;}, &quot;ann&quot;),
+    QueryGroundTruth(&quot;How does chunk size affect retrieval?&quot;, {&quot;d08&quot;}, &quot;chunking&quot;),
+    QueryGroundTruth(&quot;What is hybrid search?&quot;, {&quot;d09&quot;}, &quot;hybrid&quot;),
+]
+</code></pre>
+<hr>
+<h2>Retrieval benchmark runner</h2>
+<pre><code class="language-python">from collections import defaultdict
+
+def _precision_recall_mrr(retrieved_ids: list[str], relevant_ids: set[str], k: int):
+    top_k = retrieved_ids[:k]
+    hits = [d for d in top_k if d in relevant_ids]
+    precision = len(hits) / k if k &gt; 0 else 0.0
+    recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
+    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) &gt; 0 else 0.0
+    mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
+    return precision, recall, f1, mrr
+
+def run_retrieval_benchmark(
+    queries: list[QueryGroundTruth],
+    vectorstore: FAISS,
+    k_values: list[int] = [1, 3, 5],
+) -&gt; dict:
+    retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: max(k_values)})
+    all_metrics: list[dict] = []
+
+    for qt in queries:
+        retrieved_docs = retriever.invoke(qt.query)
+        retrieved_ids = [d.metadata[&quot;id&quot;] for d in retrieved_docs]
+
+        query_metrics = {&quot;query&quot;: qt.query, &quot;topic&quot;: qt.topic}
+        for k in k_values:
+            p, r, f1, mrr = _precision_recall_mrr(retrieved_ids, qt.relevant_ids, k)
+            query_metrics.update({f&quot;precision@{k}&quot;: p, f&quot;recall@{k}&quot;: r, f&quot;f1@{k}&quot;: f1})
+        query_metrics[&quot;mrr&quot;] = _precision_recall_mrr(retrieved_ids, qt.relevant_ids, k_values[0])[3]
+        all_metrics.append(query_metrics)
+
+    def avg(key: str) -&gt; float:
+        vals = [x[key] for x in all_metrics if key in x]
+        return round(sum(vals) / len(vals), 4) if vals else 0.0
+
+    keys = [f&quot;precision@{k}&quot; for k in k_values] + [f&quot;recall@{k}&quot; for k in k_values] + \
+           [f&quot;f1@{k}&quot; for k in k_values] + [&quot;mrr&quot;]
+    return {&quot;summary&quot;: {k: avg(k) for k in keys} | {&quot;total_queries&quot;: len(queries)}, &quot;details&quot;: all_metrics}
+</code></pre>
+<hr>
+<h2>Chunking strategy comparison</h2>
+<pre><code class="language-python">from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def build_vectorstore(docs: list[Document], chunk_size: int, chunk_overlap: int) -&gt; FAISS:
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;],
+    )
+    split_docs = splitter.split_documents(docs)
+    for i, doc in enumerate(split_docs):
+        if &quot;id&quot; not in doc.metadata:
+            doc.metadata[&quot;id&quot;] = f&quot;chunk_{i}&quot;
+
+    embedding = HuggingFaceEmbeddings(
+        model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+    return FAISS.from_documents(split_docs, embedding)
+
+def compare_chunking_strategies(corpus, queries, configs):
+    results = {}
+    for cfg in configs:
+        label = f&quot;chunk={cfg['chunk_size']}_overlap={cfg['chunk_overlap']}&quot;
+        vs = build_vectorstore(corpus, cfg[&quot;chunk_size&quot;], cfg[&quot;chunk_overlap&quot;])
+        results[label] = run_retrieval_benchmark(queries, vs)[&quot;summary&quot;]
+    return results
+
+if __name__ == &quot;__main__&quot;:
+    configs = [
+        {&quot;chunk_size&quot;: 200, &quot;chunk_overlap&quot;: 20},
+        {&quot;chunk_size&quot;: 400, &quot;chunk_overlap&quot;: 80},
+        {&quot;chunk_size&quot;: 800, &quot;chunk_overlap&quot;: 160},
+    ]
+    comparison = compare_chunking_strategies(CORPUS, QUERIES, configs)
+    for label, metrics in comparison.items():
+        print(f&quot;\n{label}&quot;)
+        print(json.dumps(metrics, indent=2))
+</code></pre>
+<hr>
+<h2>Interpreting results</h2>
+<p>Start with Recall@K. Low recall means relevant documents are missing from results entirely. If recall stays flat as K increases, the problem is likely embedding quality rather than K.</p>
+<p>Precision@1 is the user-facing number — it measures whether the first result is relevant. Re-ranking after initial retrieval is the most effective lever for improving Precision@1 without reindexing.</p>
+<p>When MRR is low, the retriever finds relevant documents eventually but ranks them poorly. This is a re-ranker problem, not an embedding problem.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>
+<li><strong>Measuring retrieval performance (current)</strong></li>
+<li>Comparing embedding models (upcoming)</li>
+<li>VectorDB selection criteria (upcoming)</li>
+<li>End-to-end RAG pipeline evaluation (upcoming)</li>
+<li>Completing the RAG benchmark (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/beir-cellar/beir">BEIR retrieval benchmark</a></li>
+<li><a href="https://faiss.ai/cpp_api/struct/faiss__IndexFlat.html">FAISS index guide</a></li>
+<li><a href="https://python.langchain.com/docs/modules/data_connection/retrievers/">LangChain retriever documentation</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, VectorDB, Benchmarking, LLM</p>
+</body>
+</html>

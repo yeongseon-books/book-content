@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>End-to-end RAG pipeline evaluation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>End-to-end RAG pipeline evaluation</h1>
+<blockquote>
+<p>RAG Benchmark 101 (5/6)</p>
+</blockquote>
+<p>The previous posts evaluated individual components — retriever, embedding model, vector database — in isolation. This post evaluates the full RAG pipeline as a single unit: one evaluation loop measures retrieval metrics and generation metrics simultaneously, from question to answer.</p>
+<hr>
+<h2>End-to-end evaluation design</h2>
+<p>Pipeline evaluation is about localizing failure, not just measuring accuracy.</p>
+<pre><code>question → [retriever] → context → [LLM] → answer
+                ↓                      ↓
+         retrieval metrics       generation metrics
+     (Precision, Recall, MRR)  (Faithfulness, Relevance)
+</code></pre>
+<hr>
+<h2>Combined evaluator</h2>
+<pre><code class="language-python">import json
+import os
+import re
+from dataclasses import dataclass
+from typing import Optional
+
+from langchain.schema import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.messages import HumanMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+@dataclass
+class EndToEndEvalResult:
+    question: str
+    retrieved_ids: list[str]
+    relevant_ids: set[str]
+    context: str
+    answer: str
+    precision_at_k: float
+    recall_at_k: float
+    mrr: float
+    faithfulness: float
+    answer_relevance: float
+
+    @property
+    def retrieval_score(self) -&gt; float:
+        return (self.precision_at_k + self.recall_at_k + self.mrr) / 3
+
+    @property
+    def generation_score(self) -&gt; float:
+        return (self.faithfulness + self.answer_relevance) / 2
+
+    @property
+    def pipeline_score(self) -&gt; float:
+        return (self.retrieval_score + self.generation_score) / 2
+
+    def summary(self) -&gt; dict:
+        return {
+            &quot;question&quot;: self.question[:60],
+            &quot;retrieval&quot;: {
+                &quot;precision@k&quot;: round(self.precision_at_k, 3),
+                &quot;recall@k&quot;: round(self.recall_at_k, 3),
+                &quot;mrr&quot;: round(self.mrr, 3),
+                &quot;score&quot;: round(self.retrieval_score, 3),
+            },
+            &quot;generation&quot;: {
+                &quot;faithfulness&quot;: round(self.faithfulness, 3),
+                &quot;answer_relevance&quot;: round(self.answer_relevance, 3),
+                &quot;score&quot;: round(self.generation_score, 3),
+            },
+            &quot;pipeline_score&quot;: round(self.pipeline_score, 3),
+        }
+
+def _judge_score(llm: ChatGroq, prompt: str, default: float = 3.0) -&gt; float:
+    raw = llm.invoke([HumanMessage(content=prompt)]).content
+    try:
+        match = re.search(r'&quot;score&quot;\s*:\s*(\d+(?:\.\d+)?)', raw)
+        return float(match.group(1)) if match else default
+    except Exception:
+        return default
+
+FAITHFULNESS_TMPL = &quot;&quot;&quot;Context: {context}
+Answer: {answer}
+
+Rate faithfulness 1-5: are all claims grounded in the context?
+Respond only: {{&quot;score&quot;: &lt;1-5&gt;}}&quot;&quot;&quot;
+
+RELEVANCE_TMPL = &quot;&quot;&quot;Question: {question}
+Answer: {answer}
+
+Rate answer relevance 1-5: does it directly address the question?
+Respond only: {{&quot;score&quot;: &lt;1-5&gt;}}&quot;&quot;&quot;
+
+class EndToEndEvaluator:
+    def __init__(self, vectorstore: FAISS, llm: ChatGroq, judge_llm: Optional[ChatGroq] = None, k: int = 3):
+        self.retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: k})
+        self.llm = llm
+        self.judge = judge_llm or llm
+        self.k = k
+
+        prompt = ChatPromptTemplate.from_messages([
+            (&quot;system&quot;, &quot;Answer the question using only the context below.\n\nContext: {context}&quot;),
+            (&quot;human&quot;, &quot;{question}&quot;),
+        ])
+        self.chain = (
+            {&quot;context&quot;: self.retriever | (lambda docs: &quot;\n\n&quot;.join(d.page_content for d in docs)),
+             &quot;question&quot;: RunnablePassthrough()}
+            | prompt | self.llm | StrOutputParser()
+        )
+
+    def _prm(self, retrieved_ids: list[str], relevant_ids: set[str]) -&gt; tuple[float, float, float]:
+        top_k = retrieved_ids[:self.k]
+        hits = [d for d in top_k if d in relevant_ids]
+        precision = len(hits) / self.k if self.k &gt; 0 else 0.0
+        recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
+        mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
+        return precision, recall, mrr
+
+    def evaluate_single(self, question: str, relevant_ids: set[str]) -&gt; EndToEndEvalResult:
+        retrieved_docs = self.retriever.invoke(question)
+        retrieved_ids = [d.metadata.get(&quot;id&quot;, &quot;&quot;) for d in retrieved_docs]
+        context = &quot;\n\n&quot;.join(d.page_content for d in retrieved_docs)
+        answer = self.chain.invoke(question)
+
+        precision, recall, mrr = self._prm(retrieved_ids, relevant_ids)
+        faithfulness = _judge_score(self.judge, FAITHFULNESS_TMPL.format(context=context, answer=answer))
+        relevance = _judge_score(self.judge, RELEVANCE_TMPL.format(question=question, answer=answer))
+
+        return EndToEndEvalResult(
+            question=question, retrieved_ids=retrieved_ids, relevant_ids=relevant_ids,
+            context=context, answer=answer, precision_at_k=precision, recall_at_k=recall,
+            mrr=mrr, faithfulness=faithfulness, answer_relevance=relevance,
+        )
+
+    def evaluate_suite(self, test_cases: list[dict]) -&gt; dict:
+        results = [self.evaluate_single(tc[&quot;question&quot;], tc[&quot;relevant_ids&quot;]).summary() for tc in test_cases]
+
+        def avg(key_path: list[str]) -&gt; float:
+            vals = []
+            for r in results:
+                obj = r
+                for k in key_path:
+                    obj = obj.get(k, {})
+                if isinstance(obj, (int, float)):
+                    vals.append(obj)
+            return round(sum(vals) / len(vals), 3) if vals else 0.0
+
+        return {
+            &quot;total&quot;: len(results),
+            &quot;avg_pipeline_score&quot;: avg([&quot;pipeline_score&quot;]),
+            &quot;avg_precision&quot;: avg([&quot;retrieval&quot;, &quot;precision@k&quot;]),
+            &quot;avg_recall&quot;: avg([&quot;retrieval&quot;, &quot;recall@k&quot;]),
+            &quot;avg_faithfulness&quot;: avg([&quot;generation&quot;, &quot;faithfulness&quot;]),
+            &quot;avg_relevance&quot;: avg([&quot;generation&quot;, &quot;answer_relevance&quot;]),
+            &quot;details&quot;: results,
+        }
+</code></pre>
+<hr>
+<h2>Example run</h2>
+<pre><code class="language-python">def run_e2e_eval():
+    from rag_benchmark_post2 import CORPUS
+
+    embedding = HuggingFaceEmbeddings(
+        model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+    vectorstore = FAISS.from_documents(CORPUS, embedding)
+    llm = ChatGroq(model=&quot;llama-3.1-8b-instant&quot;, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=0.0)
+    evaluator = EndToEndEvaluator(vectorstore, llm, k=3)
+
+    test_cases = [
+        {&quot;question&quot;: &quot;What is FAISS?&quot;, &quot;relevant_ids&quot;: {&quot;d02&quot;, &quot;d03&quot;}},
+        {&quot;question&quot;: &quot;How do embedding models work?&quot;, &quot;relevant_ids&quot;: {&quot;d06&quot;, &quot;d07&quot;}},
+        {&quot;question&quot;: &quot;What is hybrid search?&quot;, &quot;relevant_ids&quot;: {&quot;d09&quot;}},
+    ]
+    print(json.dumps(evaluator.evaluate_suite(test_cases), indent=2))
+
+if __name__ == &quot;__main__&quot;:
+    run_e2e_eval()
+</code></pre>
+<hr>
+<h2>Bottleneck diagnosis</h2>
+<p>Pipeline score alone does not tell you where to intervene.</p>
+<ul>
+<li><strong>Low pipeline score + low retrieval score</strong>: retrieval is the bottleneck. Try a better embedding model, increase K, or add hybrid search.</li>
+<li><strong>Low pipeline score + low generation score</strong>: generation is the bottleneck. Strengthen the system prompt, lower temperature, or switch models.</li>
+<li><strong>High retrieval score + low faithfulness</strong>: retrieval works but the model ignores context. Add an explicit instruction to stay within the provided context.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/02-retrieval-benchmarking.md">Measuring retrieval performance</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/03-embedding-comparison.md">Comparing embedding models</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/04-vectordb-selection.md">VectorDB selection criteria</a></li>
+<li><strong>End-to-end RAG pipeline evaluation (current)</strong></li>
+<li>Completing the RAG benchmark (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.ragas.io/en/latest/concepts/metrics/index.html">RAGAS comprehensive evaluation</a></li>
+<li><a href="https://python.langchain.com/docs/guides/evaluation/string/criteria_eval_chain">LangChain RAG evaluation guide</a></li>
+<li><a href="https://arxiv.org/abs/2303.16634">G-Eval paper</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, VectorDB, Benchmarking, LLM</p>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Completing the RAG benchmark</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Completing the RAG benchmark</h1>
+<blockquote>
+<p>RAG Benchmark 101 (6/6)</p>
+</blockquote>
+<p>This post assembles the evaluation metrics, retrieval benchmark, embedding comparison, VectorDB selection, and end-to-end evaluation from across the series into one complete benchmark pipeline. The result is a framework for systematically comparing RAG configurations and finding the optimal setup.</p>
+<hr>
+<h2>Complete RAG benchmark framework</h2>
+<pre><code class="language-python">import json
+import os
+import re
+import time
+from dataclasses import dataclass
+
+from langchain.schema import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.messages import HumanMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_groq import ChatGroq
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# ── config ─────────────────────────────────────────────────────────────────
+@dataclass
+class RAGConfig:
+    name: str
+    embedding_model: str = &quot;sentence-transformers/all-MiniLM-L6-v2&quot;
+    chunk_size: int = 400
+    chunk_overlap: int = 80
+    k: int = 3
+    temperature: float = 0.0
+    llm_model: str = &quot;llama-3.1-8b-instant&quot;
+
+# ── result ─────────────────────────────────────────────────────────────────
+@dataclass
+class BenchmarkResult:
+    config_name: str
+    precision_at_k: float
+    recall_at_k: float
+    mrr: float
+    faithfulness: float
+    answer_relevance: float
+    avg_latency_ms: float
+    total_queries: int
+
+    @property
+    def retrieval_score(self) -&gt; float:
+        return (self.precision_at_k + self.recall_at_k + self.mrr) / 3
+
+    @property
+    def generation_score(self) -&gt; float:
+        return (self.faithfulness + self.answer_relevance) / 2
+
+    @property
+    def overall_score(self) -&gt; float:
+        return (self.retrieval_score + self.generation_score) / 2
+
+    def summary(self) -&gt; dict:
+        return {
+            &quot;config&quot;: self.config_name,
+            &quot;overall_score&quot;: round(self.overall_score, 3),
+            &quot;retrieval_score&quot;: round(self.retrieval_score, 3),
+            &quot;generation_score&quot;: round(self.generation_score, 3),
+            &quot;precision@k&quot;: round(self.precision_at_k, 3),
+            &quot;recall@k&quot;: round(self.recall_at_k, 3),
+            &quot;mrr&quot;: round(self.mrr, 3),
+            &quot;faithfulness&quot;: round(self.faithfulness, 3),
+            &quot;answer_relevance&quot;: round(self.answer_relevance, 3),
+            &quot;avg_latency_ms&quot;: round(self.avg_latency_ms, 1),
+            &quot;total_queries&quot;: self.total_queries,
+        }
+
+# ── helpers ─────────────────────────────────────────────────────────────────
+def _prm(retrieved_ids: list[str], relevant_ids: set[str], k: int) -&gt; tuple[float, float, float]:
+    top_k = retrieved_ids[:k]
+    hits = [d for d in top_k if d in relevant_ids]
+    precision = len(hits) / k if k &gt; 0 else 0.0
+    recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
+    mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
+    return precision, recall, mrr
+
+def _judge(llm: ChatGroq, prompt: str) -&gt; float:
+    raw = llm.invoke([HumanMessage(content=prompt)]).content
+    try:
+        m = re.search(r'&quot;score&quot;\s*:\s*(\d+(?:\.\d+)?)', raw)
+        return float(m.group(1)) if m else 3.0
+    except Exception:
+        return 3.0
+
+# ── benchmark ───────────────────────────────────────────────────────────────
+class RAGBenchmark:
+    FAITHFULNESS = &quot;Context: {context}\nAnswer: {answer}\n\nRate faithfulness 1-5. JSON only: {{\&quot;score\&quot;: &lt;1-5&gt;}}&quot;
+    RELEVANCE = &quot;Question: {question}\nAnswer: {answer}\n\nRate answer relevance 1-5. JSON only: {{\&quot;score\&quot;: &lt;1-5&gt;}}&quot;
+    RAG = &quot;Answer using only the context below. If absent, say so.\n\nContext: {context}\n\nQuestion: {question}&quot;
+
+    def __init__(self, corpus: list[Document], test_cases: list[dict]):
+        self.corpus = corpus
+        self.test_cases = test_cases
+
+    def _build_vectorstore(self, config: RAGConfig) -&gt; FAISS:
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=config.chunk_size, chunk_overlap=config.chunk_overlap,
+            separators=[&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;],
+        )
+        chunks = splitter.split_documents(self.corpus)
+        for i, doc in enumerate(chunks):
+            if &quot;id&quot; not in doc.metadata:
+                doc.metadata[&quot;id&quot;] = f&quot;chunk_{i}&quot;
+        embedding = HuggingFaceEmbeddings(
+            model_name=config.embedding_model,
+            model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+            encode_kwargs={&quot;normalize_embeddings&quot;: True},
+        )
+        return FAISS.from_documents(chunks, embedding)
+
+    def run(self, config: RAGConfig) -&gt; BenchmarkResult:
+        vectorstore = self._build_vectorstore(config)
+        retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: config.k})
+        llm = ChatGroq(model=config.llm_model, api_key=os.environ[&quot;GROQ_API_KEY&quot;], temperature=config.temperature)
+
+        precisions, recalls, mrrs, faiths, rels, lats = [], [], [], [], [], []
+        for tc in self.test_cases:
+            q, rel_ids = tc[&quot;question&quot;], tc[&quot;relevant_ids&quot;]
+            t0 = time.perf_counter()
+            docs = retriever.invoke(q)
+            context = &quot;\n\n&quot;.join(d.page_content for d in docs)
+            answer = llm.invoke([HumanMessage(content=self.RAG.format(context=context, question=q))]).content
+            lats.append((time.perf_counter() - t0) * 1000)
+
+            p, r, m = _prm([d.metadata.get(&quot;id&quot;, &quot;&quot;) for d in docs], rel_ids, config.k)
+            precisions.append(p); recalls.append(r); mrrs.append(m)
+            faiths.append(_judge(llm, self.FAITHFULNESS.format(context=context, answer=answer)))
+            rels.append(_judge(llm, self.RELEVANCE.format(question=q, answer=answer)))
+
+        avg = lambda lst: sum(lst) / len(lst) if lst else 0.0
+        return BenchmarkResult(
+            config_name=config.name, precision_at_k=avg(precisions), recall_at_k=avg(recalls),
+            mrr=avg(mrrs), faithfulness=avg(faiths), answer_relevance=avg(rels),
+            avg_latency_ms=avg(lats), total_queries=len(self.test_cases),
+        )
+
+    def compare(self, configs: list[RAGConfig]) -&gt; list[dict]:
+        results = []
+        for config in configs:
+            print(f&quot;evaluating {config.name} ...&quot;)
+            results.append(self.run(config).summary())
+        return sorted(results, key=lambda x: x[&quot;overall_score&quot;], reverse=True)
+</code></pre>
+<hr>
+<h2>Example run</h2>
+<pre><code class="language-python">from rag_benchmark_post2 import CORPUS
+
+TEST_CASES = [
+    {&quot;question&quot;: &quot;What is FAISS?&quot;, &quot;relevant_ids&quot;: {&quot;d02&quot;, &quot;d03&quot;}},
+    {&quot;question&quot;: &quot;How do embedding models work?&quot;, &quot;relevant_ids&quot;: {&quot;d06&quot;, &quot;d07&quot;}},
+    {&quot;question&quot;: &quot;What is hybrid search?&quot;, &quot;relevant_ids&quot;: {&quot;d09&quot;}},
+    {&quot;question&quot;: &quot;What is cosine similarity?&quot;, &quot;relevant_ids&quot;: {&quot;d04&quot;}},
+]
+
+CONFIGS = [
+    RAGConfig(&quot;baseline&quot;, chunk_size=400, chunk_overlap=80, k=3),
+    RAGConfig(&quot;small-chunks&quot;, chunk_size=200, chunk_overlap=20, k=3),
+    RAGConfig(&quot;large-k&quot;, chunk_size=400, chunk_overlap=80, k=5),
+    RAGConfig(&quot;mpnet&quot;, embedding_model=&quot;sentence-transformers/all-mpnet-base-v2&quot;, k=3),
+]
+
+if __name__ == &quot;__main__&quot;:
+    bench = RAGBenchmark(CORPUS, TEST_CASES)
+    results = bench.compare(CONFIGS)
+    print(&quot;\n=== RAG benchmark results (ranked by overall score) ===&quot;)
+    for i, r in enumerate(results, 1):
+        print(f&quot;\n#{i}: {r['config']}&quot;)
+        print(json.dumps(r, indent=2))
+</code></pre>
+<hr>
+<h2>Series summary</h2>
+<p>The evaluation framework built across this series has three layers.</p>
+<p>The <strong>metrics layer</strong> defines what to measure: Precision, Recall, MRR for retrieval; Faithfulness and Answer Relevance for generation.</p>
+<p>The <strong>component layer</strong> benchmarks individual pieces in isolation: embedding model comparison, VectorDB selection, chunking strategy.</p>
+<p>The <strong>pipeline layer</strong> ties it together: end-to-end evaluation and multi-config comparison surface which change delivers the highest overall score improvement.</p>
+<p>With this framework, decisions about model swaps, chunking changes, and prompt revisions are driven by data, not intuition.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/02-retrieval-benchmarking.md">Measuring retrieval performance</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/03-embedding-comparison.md">Comparing embedding models</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/04-vectordb-selection.md">VectorDB selection criteria</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/05-e2e-evaluation.md">End-to-end RAG pipeline evaluation</a></li>
+<li><strong>Completing the RAG benchmark (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.ragas.io/">RAGAS framework</a></li>
+<li><a href="https://github.com/beir-cellar/beir">BEIR benchmark</a></li>
+<li><a href="https://python.langchain.com/docs/guides/evaluation/">LangChain evaluation module</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, VectorDB, Benchmarking, LLM</p>
+</body>
+</html>

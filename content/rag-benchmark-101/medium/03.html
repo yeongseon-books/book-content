@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Comparing embedding models</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Comparing embedding models</h1>
+<blockquote>
+<p>RAG Benchmark 101 (3/6)</p>
+</blockquote>
+<p>The embedding model is the foundation of a RAG pipeline. Swap it out while keeping everything else constant and retrieval quality shifts significantly. This post benchmarks three common models against the same query set to establish a model selection framework.</p>
+<hr>
+<h2>Models under comparison</h2>
+<p>Three models commonly found in production RAG systems.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Dimensions</th>
+<th>Size</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all-MiniLM-L6-v2</td>
+<td>384</td>
+<td>80 MB</td>
+<td>lightweight, fast</td>
+</tr>
+<tr>
+<td>all-mpnet-base-v2</td>
+<td>768</td>
+<td>420 MB</td>
+<td>higher quality</td>
+</tr>
+<tr>
+<td>paraphrase-multilingual-MiniLM-L12-v2</td>
+<td>384</td>
+<td>120 MB</td>
+<td>multilingual</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Embedding model benchmark</h2>
+<pre><code class="language-python">import time
+from dataclasses import dataclass
+
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain.schema import Document
+
+@dataclass
+class EmbeddingBenchResult:
+    model_name: str
+    index_time_s: float
+    query_time_ms: float
+    precision_at_3: float
+    recall_at_3: float
+    mrr: float
+
+    def summary(self) -&gt; dict:
+        return {
+            &quot;model&quot;: self.model_name.split(&quot;/&quot;)[-1],
+            &quot;index_time_s&quot;: round(self.index_time_s, 2),
+            &quot;query_time_ms&quot;: round(self.query_time_ms, 1),
+            &quot;precision@3&quot;: round(self.precision_at_3, 4),
+            &quot;recall@3&quot;: round(self.recall_at_3, 4),
+            &quot;mrr&quot;: round(self.mrr, 4),
+        }
+
+def _prm(retrieved_ids: list[str], relevant_ids: set[str], k: int) -&gt; tuple[float, float, float]:
+    top_k = retrieved_ids[:k]
+    hits = [d for d in top_k if d in relevant_ids]
+    precision = len(hits) / k if k &gt; 0 else 0.0
+    recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
+    mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
+    return precision, recall, mrr
+
+def benchmark_embedding_model(
+    model_name: str,
+    corpus: list[Document],
+    queries: list,
+    k: int = 3,
+) -&gt; EmbeddingBenchResult:
+    embedding = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+
+    t0 = time.perf_counter()
+    vectorstore = FAISS.from_documents(corpus, embedding)
+    index_time = time.perf_counter() - t0
+
+    retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: k})
+    precisions, recalls, mrrs, query_times = [], [], [], []
+
+    for qt in queries:
+        t0 = time.perf_counter()
+        retrieved_docs = retriever.invoke(qt.query)
+        query_times.append((time.perf_counter() - t0) * 1000)
+
+        retrieved_ids = [d.metadata.get(&quot;id&quot;, &quot;&quot;) for d in retrieved_docs]
+        p, r, m = _prm(retrieved_ids, qt.relevant_ids, k)
+        precisions.append(p)
+        recalls.append(r)
+        mrrs.append(m)
+
+    def avg(lst):
+        return sum(lst) / len(lst) if lst else 0.0
+
+    return EmbeddingBenchResult(
+        model_name=model_name,
+        index_time_s=index_time,
+        query_time_ms=avg(query_times),
+        precision_at_3=avg(precisions),
+        recall_at_3=avg(recalls),
+        mrr=avg(mrrs),
+    )
+</code></pre>
+<hr>
+<h2>Similarity distribution analysis</h2>
+<pre><code class="language-python">def analyze_similarity_distribution(
+    model_name: str,
+    corpus: list[Document],
+    queries: list,
+    k: int = 5,
+) -&gt; dict:
+    embedding = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs={&quot;device&quot;: &quot;cpu&quot;},
+        encode_kwargs={&quot;normalize_embeddings&quot;: True},
+    )
+    vectorstore = FAISS.from_documents(corpus, embedding)
+
+    relevant_scores, irrelevant_scores = [], []
+    for qt in queries:
+        results = vectorstore.similarity_search_with_score(qt.query, k=k)
+        for doc, score in results:
+            doc_id = doc.metadata.get(&quot;id&quot;, &quot;&quot;)
+            (relevant_scores if doc_id in qt.relevant_ids else irrelevant_scores).append(float(score))
+
+    def stats(scores: list[float]) -&gt; dict:
+        if not scores:
+            return {}
+        arr = np.array(scores)
+        return {&quot;mean&quot;: round(float(arr.mean()), 4), &quot;std&quot;: round(float(arr.std()), 4),
+                &quot;min&quot;: round(float(arr.min()), 4), &quot;max&quot;: round(float(arr.max()), 4)}
+
+    return {
+        &quot;model&quot;: model_name.split(&quot;/&quot;)[-1],
+        &quot;relevant&quot;: stats(relevant_scores),
+        &quot;irrelevant&quot;: stats(irrelevant_scores),
+        &quot;gap&quot;: round(
+            abs(np.mean(relevant_scores) - np.mean(irrelevant_scores))
+            if (relevant_scores and irrelevant_scores) else 0, 4
+        ),
+    }
+</code></pre>
+<hr>
+<h2>Running the comparison</h2>
+<pre><code class="language-python">import json
+
+MODELS = [
+    &quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
+    &quot;sentence-transformers/all-mpnet-base-v2&quot;,
+    &quot;sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2&quot;,
+]
+
+if __name__ == &quot;__main__&quot;:
+    from rag_benchmark_post2 import CORPUS, QUERIES  # reuse from post 2
+
+    print(&quot;=== embedding model comparison ===&quot;)
+    for model_name in MODELS:
+        print(f&quot;\nbenchmarking {model_name.split('/')[-1]} ...&quot;)
+        result = benchmark_embedding_model(model_name, CORPUS, QUERIES)
+        print(json.dumps(result.summary(), indent=2))
+
+    print(&quot;\n=== similarity distribution ===&quot;)
+    for model_name in MODELS:
+        dist = analyze_similarity_distribution(model_name, CORPUS, QUERIES)
+        print(json.dumps(dist, indent=2))
+</code></pre>
+<hr>
+<h2>Model selection criteria</h2>
+<p>No single metric determines the best embedding model. Match the model to the use case.</p>
+<ul>
+<li><strong>Throughput-constrained</strong>: <code>all-MiniLM-L6-v2</code> — best when query speed and memory matter more than absolute quality.</li>
+<li><strong>Quality-first</strong>: <code>all-mpnet-base-v2</code> — worth the larger footprint when retrieval precision is the primary concern.</li>
+<li><strong>Multilingual corpus</strong>: <code>paraphrase-multilingual-MiniLM-L12-v2</code> — required when documents mix languages.</li>
+</ul>
+<p>The similarity gap between relevant and irrelevant documents measures discriminability. A small gap means the model cannot reliably separate good from bad results, which makes threshold-based filtering unreliable and pollutes the context window.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-benchmark-101/en/02-retrieval-benchmarking.md">Measuring retrieval performance</a></li>
+<li><strong>Comparing embedding models (current)</strong></li>
+<li>VectorDB selection criteria (upcoming)</li>
+<li>End-to-end RAG pipeline evaluation (upcoming)</li>
+<li>Completing the RAG benchmark (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://huggingface.co/spaces/mteb/leaderboard">MTEB embedding benchmark</a></li>
+<li><a href="https://www.sbert.net/docs/pretrained_models.html">Sentence Transformers model hub</a></li>
+<li><a href="https://github.com/facebookresearch/faiss/wiki/Faiss-indexes">FAISS index type guide</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, VectorDB, Benchmarking, LLM</p>
+</body>
+</html>
