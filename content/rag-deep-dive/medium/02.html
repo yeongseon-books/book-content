@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Embeddings and the Vector Index — Inside FAISS IndexFlatL2</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Embeddings and the Vector Index — Inside FAISS IndexFlatL2</h1>
+<blockquote>
+<p>RAG Deep Dive series (2/6)</p>
+</blockquote>
+<h2>Source Version</h2>
+<p>LangChain code citations in this post are pinned to <a href="https://github.com/langchain-ai/langchain/tree/langchain==0.2.17"><code>langchain-ai/langchain @ langchain==0.2.17</code></a>, and FAISS C++ code citations are pinned to <a href="https://github.com/facebookresearch/faiss/tree/c72ef8a"><code>facebookresearch/faiss @ c72ef8a</code></a>.</p>
+<p>Episode 1 argued that chunking is the first failure point in RAG. Episode 2 picks up exactly where that left off. The vector index is not a neutral store. It takes the chunk boundaries we created earlier and turns them into geometry. If a heading and its explanation were preserved in one chunk, they become one vector neighborhood. If an exception clause was split away from the rule it qualifies, that severed boundary is now frozen into the retrieval space. The index does not heal those cuts. It operationalizes them.</p>
+<p>That is why embeddings and indexing have to be read together. A production retrieval path is not “embedding model first, then some database.” It is an embedding function, a distance metric, an index structure, and a mapping layer that turns integer search results back into LangChain <code>Document</code> objects. This post follows that full path in source. We will look at how <code>OpenAIEmbeddings</code> calls <code>embed_documents()</code> and <code>embed_query()</code>, what <code>FAISS IndexFlatL2</code> actually computes inside <code>IndexFlat::search()</code>, how <code>FAISS.from_documents()</code> wires vectors back to documents, when <code>IndexFlatIP</code> and <code>IndexIVFFlat</code> become the better fit, and why persistence in LangChain is also a trust-boundary problem.</p>
+<hr>
+<h2>1. How <code>OpenAIEmbeddings</code> works and why query/document paths are separate</h2>
+<p>In LangChain 0.2.17, the familiar <code>OpenAIEmbeddings</code> class lives in <code>langchain_community.embeddings.openai</code>. One source-level detail matters immediately: the class is already deprecated in favor of <code>langchain_openai.OpenAIEmbeddings</code>. It is still a useful baseline because a lot of existing tutorials and pipelines in this release line still follow this code path.</p>
+<p><img alt="Document and query embedding flow" src="../../../assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png"></p>
+<p>If you read the source closely, the implementation difference between <code>embed_documents()</code> and <code>embed_query()</code> is almost nonexistent. <code>embed_documents()</code> calls <code>_get_len_safe_embeddings(texts, engine=engine)</code>. <code>embed_query()</code> simply returns <code>self.embed_documents([text])[0]</code>. So in this pinned implementation, both flows converge on the same machinery.</p>
+<p>That does <strong>not</strong> mean they are conceptually interchangeable. The interface is split on purpose because retrieval models do not always treat documents and queries the same way. In asymmetric retrieval setups, document embeddings are optimized to preserve broad evidence, while query embeddings are optimized to point sharply toward the relevant region of the space. Some providers implement that by routing to different projections, by injecting different instructions, or by using different tuning objectives for query and document representations. That is why LangChain keeps <code>embed_query()</code> and <code>embed_documents()</code> distinct even when a specific provider implementation happens to delegate one to the other.</p>
+<p>This is the practical lesson: in 0.2.17 <code>OpenAIEmbeddings</code>, query and document embedding share the same code path, but you should not bake that assumption into your application architecture. If you later switch to a provider or model family with stronger query/document asymmetry, collapsing those two entry points will quietly distort retrieval quality.</p>
+<p>The more interesting source function is <code>_get_len_safe_embeddings()</code>. That method tokenizes input text, splits any overlong text into pieces under <code>embedding_ctx_length</code>, embeds those pieces in batches, and then averages the partial embeddings with token-count weights. Finally, it L2-normalizes the result with <code>average / np.linalg.norm(average)</code>. So even before FAISS sees a vector, the LangChain wrapper has already made a representational choice: a long chunk is not stored as one raw model output, but as a weighted average of sub-embeddings collapsed back into one normalized vector.</p>
+<p>At the API layer, the request shape is straightforward. <code>embed_with_retry()</code> calls <code>embeddings.client.create(**kwargs)</code>, and in the OpenAI v1 path <code>_invocation_params</code> carries only <code>model</code> plus any <code>model_kwargs</code>. Auth, timeout, and related transport settings are configured earlier on the <code>openai.OpenAI(...)</code> client object during environment validation rather than packed into this dict. In practice the call shape looks like this:</p>
+<pre><code class="language-python">import os
+
+from langchain_community.embeddings import OpenAIEmbeddings
+
+def build_embeddings() -&gt; OpenAIEmbeddings:
+    return OpenAIEmbeddings(
+        model=&quot;text-embedding-3-large&quot;,
+        openai_api_key=os.environ[&quot;OPENAI_API_KEY&quot;],
+        chunk_size=128,
+        max_retries=3,
+    )
+
+def demo() -&gt; None:
+    embeddings = build_embeddings()
+
+    doc_vectors = embeddings.embed_documents(
+        [
+            &quot;The payment worker retries a failed task three times.&quot;,
+            &quot;The dead-letter queue stores the original payload for inspection.&quot;,
+        ]
+    )
+    query_vector = embeddings.embed_query(&quot;Why did the worker dead-letter the message?&quot;)
+
+    print(len(doc_vectors), len(doc_vectors[0]))
+    print(len(query_vector))
+
+if __name__ == &quot;__main__&quot;:
+    demo()
+</code></pre>
+<p>The baseline for the rest of this post is simple. The embedding step is already shaping the geometry. Chunk boundaries matter, long inputs may be averaged, and the query/document split is semantically meaningful even when one concrete implementation collapses it.</p>
+<hr>
+<h2>2. What FAISS <code>IndexFlatL2</code> actually computes</h2>
+<p><code>IndexFlatL2</code> is often described as the simplest FAISS index. That is true, but incomplete. What makes it simple is not just that it is brute-force. It is that it computes the exact L2 comparison against every stored vector and then picks the smallest <code>k</code> results. No pruning, no quantization, no approximation.</p>
+<p><img alt="Query against full vector scan" src="../../../assets/rag-deep-dive/02/02-02-indexflat-search-internals.en.png"></p>
+<p>In <code>faiss/IndexFlat.cpp</code>, <code>IndexFlat::search()</code> is very direct. If <code>metric_type == METRIC_INNER_PRODUCT</code>, it calls <code>knn_inner_product(...)</code>. If <code>metric_type == METRIC_L2</code>, it calls <code>knn_L2sqr(...)</code>. That second call is the important part for <code>IndexFlatL2</code>: FAISS is comparing vectors by <strong>squared</strong> Euclidean distance.</p>
+<p>For a query vector <code>q</code> and a stored vector <code>x</code>, the score is:</p>
+<p><code>||q - x||^2 = Σ_i (q_i - x_i)^2</code></p>
+<p>Lower is better. Because the index examines all stored vectors, the result is exact nearest-neighbor retrieval. That exactness is valuable. It gives you a clean baseline when you are trying to separate embedding quality problems from approximate-index problems.</p>
+<p>The cost is the classic one: <code>O(n·d)</code> per query, where <code>n</code> is the number of stored vectors and <code>d</code> is the embedding dimension. If you have 100,000 chunks and 1,536-dimensional embeddings, that can still be perfectly practical, especially for offline evaluation or internal knowledge bases with moderate query volume. If you have millions of vectors and latency-sensitive online traffic, the same property becomes expensive fast because every query still touches the full corpus.</p>
+<p>This is also where metric semantics matter. Many teams say they are using cosine similarity while the actual implementation is either <code>IndexFlatIP</code> on normalized vectors or <code>IndexFlatL2</code> on normalized vectors. Those are not identical formulas, but after normalization they can induce closely related rankings. The point is not that one is universally right. The point is that the index is not “just storage.” It is the ranking rule.</p>
+<p>This small example shows the mechanical behavior.</p>
+<pre><code class="language-python">import numpy as np
+import faiss
+
+def main() -&gt; None:
+    dim = 4
+    xb = np.array(
+        [
+            [0.1, 0.0, 0.0, 0.0],
+            [0.0, 0.2, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0],
+            [0.9, 0.9, 0.9, 0.9],
+        ],
+        dtype=&quot;float32&quot;,
+    )
+    xq = np.array([[0.05, 0.0, 0.0, 0.0]], dtype=&quot;float32&quot;)
+
+    index = faiss.IndexFlatL2(dim)
+    index.add(xb)
+
+    distances, labels = index.search(xq, k=2)
+    print(&quot;distances:&quot;, distances.tolist())
+    print(&quot;labels:&quot;, labels.tolist())
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Use <code>IndexFlatL2</code> when you want exactness and a trustworthy baseline. Stop treating it as neutral infrastructure. It encodes a very specific notion of closeness and pays for it with linear scan cost.</p>
+<hr>
+<h2>3. How <code>FAISS.from_documents()</code> maps search results back to <code>Document</code> objects</h2>
+<p>At the API level, <code>FAISS.from_documents()</code> feels like one convenience call. Under the hood, the path is important. <code>VectorStore.from_documents()</code> in <code>langchain_core.vectorstores.base</code> extracts <code>page_content</code> and <code>metadata</code> from each <code>Document</code> and delegates to <code>from_texts()</code>. In <code>langchain_community.vectorstores.faiss</code>, <code>FAISS.from_texts()</code> embeds those texts with <code>embedding.embed_documents(texts)</code> and then passes everything into the internal <code>__from()</code> constructor.</p>
+<p><img alt="Document to FAISS mapping layers" src="../../../assets/rag-deep-dive/02/02-03-langchain-faiss-layers.en.png"></p>
+<p>The actual design has three separate layers.</p>
+<ol>
+<li>FAISS stores dense vectors and returns integer row ids.</li>
+<li>The LangChain <code>docstore</code> stores <code>id -&gt; Document</code>.</li>
+<li><code>index_to_docstore_id</code> stores <code>faiss_row_id -&gt; docstore_id</code>.</li>
+</ol>
+<p>That middle layer is the reason similarity search returns a real <code>Document</code> rather than a naked vector id. In <code>similarity_search_with_score_by_vector()</code>, LangChain first calls <code>self.index.search(...)</code>. Then for each returned integer <code>i</code>, it looks up <code>self.index_to_docstore_id[i]</code>, uses that to fetch the original <code>Document</code> from <code>self.docstore</code>, and only then returns the reconstructed result.</p>
+<p>This mapping explains why <code>docstore</code> matters. FAISS itself does not know what a LangChain <code>Document</code> is. It also does not know your metadata schema. The vector index is one subsystem; document reconstruction is another. If the vector store returns the right ids but <code>index_to_docstore_id</code> is stale or corrupted, retrieval can succeed numerically and still fail at the application layer.</p>
+<p>One more source-level detail is easy to miss: <code>VectorStore.from_documents()</code> does not preserve <code>Document.id</code> as the FAISS-side key. Unless you explicitly pass <code>ids=...</code>, <code>FAISS.__add()</code> generates fresh UUID strings and uses those as docstore ids.</p>
+<p>The source also reveals the default storage choices. <code>__from()</code> constructs <code>IndexFlatIP</code> if the distance strategy is max inner product, otherwise it defaults to <code>IndexFlatL2</code>. The default <code>docstore</code> is <code>InMemoryDocstore()</code>, and the default <code>index_to_docstore_id</code> is an empty dict. In <code>__add()</code>, LangChain converts embeddings into a <code>float32</code> NumPy array, optionally normalizes it, calls <code>self.index.add(vector)</code>, then inserts the paired <code>Document</code> objects into the docstore and builds a contiguous integer-to-id mapping.</p>
+<p>This is a realistic example of the full call path.</p>
+<pre><code class="language-python">from langchain_core.documents import Document
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import OpenAIEmbeddings
+
+def build_vector_store() -&gt; FAISS:
+    docs = [
+        Document(
+            page_content=&quot;The payment worker retries failed jobs three times before dead-lettering.&quot;,
+            metadata={&quot;source&quot;: &quot;runbook.md&quot;, &quot;section&quot;: &quot;worker&quot;},
+        ),
+        Document(
+            page_content=&quot;The API gateway returns HTTP 429 when the caller exceeds the per-minute quota.&quot;,
+            metadata={&quot;source&quot;: &quot;api.md&quot;, &quot;section&quot;: &quot;rate-limit&quot;},
+        ),
+    ]
+
+    embeddings = OpenAIEmbeddings(model=&quot;text-embedding-3-large&quot;)
+    return FAISS.from_documents(docs, embeddings)
+
+def main() -&gt; None:
+    vector_store = build_vector_store()
+    print(type(vector_store.docstore).__name__)
+    print(vector_store.index.ntotal)
+    print(vector_store.index_to_docstore_id)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The main operational takeaway is that retrieval bugs can happen in any of these layers. A bad score is not the same as a bad reconstruction, and a bad reconstruction is not the same as a bad metadata filter path.</p>
+<hr>
+<h2>4. When to use <code>IndexFlatIP</code>, <code>IndexFlatL2</code>, or <code>IndexIVFFlat</code></h2>
+<p>The first FAISS choice is usually the metric. <code>IndexFlatL2</code> minimizes squared Euclidean distance. <code>IndexFlatIP</code> maximizes inner product. Both are flat indexes, which means both are exact. The difference is not speed class but similarity definition.</p>
+<p><img alt="Index choices and search tradeoffs" src="../../../assets/rag-deep-dive/02/02-04-index-type-comparison.en.png"></p>
+<p>If your vectors are L2-normalized, inner product often becomes the easiest route to cosine-style retrieval. That is why many production setups use normalized embeddings plus <code>IndexFlatIP</code>. If you are working with Euclidean structure directly, <code>IndexFlatL2</code> is the more literal choice.</p>
+<p><code>IndexIVFFlat</code> is the more significant architectural shift. It is not exact search. It partitions the space into <code>nlist</code> coarse cells, assigns vectors to those inverted lists, and then searches only a subset of them at query time. The key runtime knob is <code>nprobe</code>. In <code>faiss/IndexIVF.cpp</code>, search computes <code>cur_nprobe = std::min(nlist, params ? params-&gt;nprobe : this-&gt;nprobe)</code>. That is the number of lists it will open for the current query.</p>
+<p>Small <code>nprobe</code> means less work and lower latency, but also a higher chance that the true nearest neighbor lives in a list you never looked at. Larger <code>nprobe</code> pushes recall up and latency with it. That makes <code>nprobe</code> one of the most important practical tuning knobs in approximate retrieval.</p>
+<p>My rule of thumb is simple.</p>
+<ul>
+<li>start with <code>IndexFlatL2</code> or <code>IndexFlatIP</code> when the corpus is still small enough to scan exactly or when you are establishing a clean evaluation baseline</li>
+<li>choose between <code>L2</code> and <code>IP</code> based on your metric semantics and normalization strategy, not by habit</li>
+<li>move to <code>IndexIVFFlat</code> only when exact search latency is the actual bottleneck</li>
+<li>once you move, treat <code>nprobe</code> as an operating parameter and measure recall/latency together</li>
+</ul>
+<p>This example compares exact flat search and approximate IVF search for the same retrieval task: both indexes use the same normalized vectors and the same inner-product metric, so the only moving parts are approximation and <code>nprobe</code>.</p>
+<pre><code class="language-python">import numpy as np
+import faiss
+
+def build_indexes(vectors: np.ndarray) -&gt; tuple[faiss.IndexFlatIP, faiss.IndexIVFFlat]:
+    dim = vectors.shape[1]
+    normalized = vectors.copy()
+    faiss.normalize_L2(normalized)
+
+    flat_ip = faiss.IndexFlatIP(dim)
+    flat_ip.add(normalized)
+
+    quantizer = faiss.IndexFlatIP(dim)
+    ivf = faiss.IndexIVFFlat(quantizer, dim, 16, faiss.METRIC_INNER_PRODUCT)
+    ivf.train(normalized)
+    ivf.add(normalized)
+    return flat_ip, ivf
+
+def main() -&gt; None:
+    rng = np.random.default_rng(7)
+    vectors = rng.random((2000, 64), dtype=np.float32)
+    query = rng.random((1, 64), dtype=np.float32)
+
+    flat_ip, ivf = build_indexes(vectors)
+
+    normalized_query = query.copy()
+    faiss.normalize_L2(normalized_query)
+    flat_scores, flat_ids = flat_ip.search(normalized_query, 5)
+    ivf.nprobe = 1
+    ivf_scores_low, ivf_ids_low = ivf.search(normalized_query, 5)
+    ivf.nprobe = 8
+    ivf_scores_high, ivf_ids_high = ivf.search(normalized_query, 5)
+
+    print(&quot;flat ip ids:&quot;, flat_ids[0].tolist())
+    print(&quot;flat ip scores:&quot;, flat_scores[0].tolist())
+    print(&quot;ivf nprobe=1 ids:&quot;, ivf_ids_low[0].tolist())
+    print(&quot;ivf nprobe=1 scores:&quot;, ivf_scores_low[0].tolist())
+    print(&quot;ivf nprobe=8 ids:&quot;, ivf_ids_high[0].tolist())
+    print(&quot;ivf nprobe=8 scores:&quot;, ivf_scores_high[0].tolist())
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>For many teams, exact flat search remains the right choice longer than expected. Use IVF when the scale truly demands it, not because approximate indexes sound more advanced.</p>
+<hr>
+<h2>5. Persistence: what <code>save_local()</code> and <code>load_local()</code> really store</h2>
+<p>LangChain's FAISS wrapper persists state through <code>save_local()</code> and restores it through <code>load_local()</code>. The implementation is important because it stores two different layers in two different formats. <code>save_local()</code> writes the FAISS index with <code>faiss.write_index(...)</code> into an <code>.faiss</code> file, then pickles <code>(self.docstore, self.index_to_docstore_id)</code> into a <code>.pkl</code> file.</p>
+<p><img alt="Persistence split across two files" src="../../../assets/rag-deep-dive/02/02-05-persistence-flow.en.png"></p>
+<p>The split exists for a good reason. The FAISS index is a C++ object and is not stored as a Python pickle. The LangChain-side reconstruction state is Python-native, so it is stored separately. That means:</p>
+<ul>
+<li><code>.faiss</code> contains the actual vector index data structure and stored vectors</li>
+<li><code>.pkl</code> contains the <code>docstore</code> plus <code>index_to_docstore_id</code></li>
+</ul>
+<p>The security-sensitive part is the second file. In 0.2.x, <code>load_local()</code> requires <code>allow_dangerous_deserialization=True</code> before it will unpickle that state. The source explains why in plain terms: pickle files can be modified to execute arbitrary code when deserialized. So the flag exists to force you to acknowledge that loading a saved vector store is not just reading data. It can be equivalent to executing code from an artifact.</p>
+<p>That is not an academic warning. Many teams mentally classify retrieval artifacts as harmless data blobs. In this storage scheme, part of the artifact is a Python pickle. If you load an untrusted <code>.pkl</code> in a dev box, CI runner, or production job, you have widened your attack surface.</p>
+<p>This is the normal trusted-path example.</p>
+<pre><code class="language-python">from pathlib import Path
+
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+
+def main() -&gt; None:
+    docs = [
+        Document(page_content=&quot;Rotate secrets every 90 days.&quot;, metadata={&quot;source&quot;: &quot;policy.md&quot;}),
+        Document(page_content=&quot;Retry HTTP 429 with exponential backoff.&quot;, metadata={&quot;source&quot;: &quot;api.md&quot;}),
+    ]
+    embeddings = OpenAIEmbeddings(model=&quot;text-embedding-3-large&quot;)
+    store = FAISS.from_documents(docs, embeddings)
+
+    target = Path(&quot;artifacts/faiss-demo&quot;)
+    store.save_local(str(target), index_name=&quot;knowledge&quot;)
+
+    restored = FAISS.load_local(
+        str(target),
+        embeddings,
+        index_name=&quot;knowledge&quot;,
+        # trusted artifact only
+        allow_dangerous_deserialization=True,
+    )
+    result = restored.similarity_search(&quot;How often should secrets be rotated?&quot;, k=1)
+    print(result[0].page_content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The lesson is bigger than persistence. A retrieval system is not only math and latency. It also has artifact boundaries, trust assumptions, and operational risks.</p>
+<hr>
+<h2>The baseline to carry into episode 3</h2>
+<p>This episode established the geometry layer of the pipeline. <code>OpenAIEmbeddings</code> may currently route <code>embed_query()</code> through <code>embed_documents()</code>, but LangChain still models them as distinct interfaces because retrieval systems may be asymmetric. <code>IndexFlatL2</code> is exact search over squared L2 distance, which makes it a strong baseline and an expensive one at scale. <code>FAISS.from_documents()</code> hides a three-layer reconstruction path made of FAISS row ids, a LangChain docstore, and <code>index_to_docstore_id</code>. <code>IndexIVFFlat</code> introduces approximation and turns <code>nprobe</code> into a real operating knob. And persistence is split between <code>.faiss</code> and <code>.pkl</code>, with the latter carrying explicit deserialization risk.</p>
+<p>That baseline matters because the next layer is not just “top-k retrieval.” The retriever decides how many candidates to pull, whether to diversify them, and how those vector scores are turned into context. In episode 3, we will stay on the same foundation and follow it into <code>VectorStoreRetriever</code> and MMR.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>
+<li><strong>Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (current)</strong></li>
+<li>Retriever Design — VectorStoreRetriever and MMR (upcoming)</li>
+<li>Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)</li>
+<li>Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)</li>
+<li>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/embeddings/openai.py">LangChain <code>OpenAIEmbeddings</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/vectorstores/faiss.py">LangChain FAISS vector store source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/vectorstores/base.py">LangChain <code>VectorStore.from_documents</code> base source</a></li>
+<li><a href="https://github.com/facebookresearch/faiss/blob/c72ef8a/faiss/IndexFlat.cpp">FAISS <code>IndexFlat.cpp</code></a></li>
+<li><a href="https://github.com/facebookresearch/faiss/blob/c72ef8a/faiss/IndexIVF.cpp">FAISS <code>IndexIVF.cpp</code></a></li>
+<li><a href="https://github.com/facebookresearch/faiss/blob/c72ef8a/faiss/IndexFlat.h">FAISS <code>IndexFlat.h</code></a></li>
+</ul>
+<p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
+</body>
+</html>

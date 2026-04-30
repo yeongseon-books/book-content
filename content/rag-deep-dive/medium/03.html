@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Retriever Design — VectorStoreRetriever and MMR</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Retriever Design — VectorStoreRetriever and MMR</h1>
+<blockquote>
+<p>RAG Deep Dive series (3/6)</p>
+</blockquote>
+<h2>Source Version</h2>
+<p>All code citations in this post are pinned to <a href="https://github.com/langchain-ai/langchain/tree/langchain==0.2.17"><code>langchain-ai/langchain @ langchain==0.2.17</code></a>.</p>
+<p>Episode 2 ended with vector geometry. Episode 3 is where that geometry becomes the ranked chunk list that the model will treat as evidence. That boundary matters because vector neighborhoods can be mathematically correct and still operationally misleading. A corpus full of near-duplicate clauses can produce a clean similarity ranking and a poor context set. The geometry stayed the same. The retrieval policy changed.</p>
+<p>That policy lives in several places at once. <code>BaseRetriever</code> wraps retrieval in the Runnable lifecycle. <code>VectorStoreRetriever</code> chooses among <code>similarity</code>, <code>mmr</code>, and <code>similarity_score_threshold</code>. FAISS then distinguishes raw L2 distance from normalized relevance scores. This post follows that path from the retriever interface down to backend selection logic and then back up to a custom retriever pattern that narrows the search space before vector search begins.</p>
+<hr>
+<h2>1. What <code>BaseRetriever</code> actually standardizes</h2>
+<p>In LangChain 0.2.17, the foundational retriever interface is <code>langchain_core.retrievers.BaseRetriever</code>. At first glance it looks simple: take a string query, return a list of <code>Document</code> objects. In source, though, it is already part of the Runnable system. That design choice is the reason the recommended entry points are <code>invoke()</code> and <code>ainvoke()</code> rather than the older <code>get_relevant_documents()</code> methods.</p>
+<p><img alt="Invoke path into retriever callbacks" src="../../../assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png"></p>
+<p><code>invoke()</code> is worth reading line by line. It starts with <code>ensure_config(config)</code>, then builds a <code>CallbackManager</code> through <code>CallbackManager.configure(...)</code>. At that stage LangChain merges together several sources of execution metadata: callbacks from the run config, retriever-level tags and metadata, config-level tags and metadata, and the tracing payload from <code>_get_ls_params()</code>. After that, <code>callback_manager.on_retriever_start(...)</code> creates a <code>run_manager</code>. Only then does the retriever call the implementation hook that actually performs retrieval.</p>
+<p>That implementation hook is <code>_get_relevant_documents()</code>. If the subclass supports the newer signature, <code>invoke()</code> passes in <code>run_manager</code>. Success triggers <code>run_manager.on_retriever_end(result)</code>, and failure triggers <code>run_manager.on_retriever_error(e)</code>. So retrieval is executed as a traced run, not as an unstructured helper call.</p>
+<p><code>run_manager</code> exists so custom retrievers can emit intermediate callback events or tracing text while they work. <code>BaseRetriever.__init_subclass__()</code> also uses signature inspection to detect support for <code>run_manager</code> and to patch older retrievers that implemented <code>get_relevant_documents()</code> directly. Those legacy retrievers still work in 0.2.17, but the intended implementation point is clearly <code>_get_relevant_documents()</code>.</p>
+<p>The async side follows the same pattern. <code>ainvoke()</code> builds an <code>AsyncCallbackManager</code> and calls <code>_aget_relevant_documents()</code>. If a retriever has no native async implementation, the default <code>_aget_relevant_documents()</code> falls back to <code>run_in_executor(...)</code> around the synchronous implementation. That is why the async hook exists: it allows true async retrievers to stay native while keeping a uniform async interface for everything else.</p>
+<p>The public methods <code>get_relevant_documents()</code> and <code>aget_relevant_documents()</code> are therefore compatibility shims. They have been deprecated since 0.1.46 and now delegate into <code>invoke()</code> / <code>ainvoke()</code>. In 0.2.x, deprecation means the execution center has moved to the Runnable model, not that retrieval itself is disappearing.</p>
+<p>This minimal example shows the intended custom pattern.</p>
+<pre><code class="language-python">from typing import List
+
+from langchain_core.callbacks.manager import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
+
+class KeywordWindowRetriever(BaseRetriever):
+    docs: List[Document]
+    k: int = 2
+
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -&gt; List[Document]:
+        matched = [doc for doc in self.docs if query.lower() in doc.page_content.lower()]
+        run_manager.on_text(f&quot;matched {len(matched)} documents before truncation&quot;)
+        return matched[: self.k]
+
+def main() -&gt; None:
+    retriever = KeywordWindowRetriever(
+        docs=[
+            Document(page_content=&quot;Payment worker retries failed jobs three times.&quot;),
+            Document(page_content=&quot;HTTP 429 indicates per-minute quota exhaustion.&quot;),
+            Document(page_content=&quot;Dead-letter messages keep the original payload.&quot;),
+        ],
+        k=2,
+    )
+    for doc in retriever.invoke(&quot;worker&quot;):
+        print(doc.page_content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The baseline here is straightforward: <code>BaseRetriever</code> is not merely a semantic contract about inputs and outputs. It is a Runnable contract that standardizes lifecycle hooks, tracing metadata, and async compatibility.</p>
+<hr>
+<h2>2. How <code>VectorStoreRetriever</code> dispatches search types</h2>
+<p><code>VectorStoreRetriever</code> is the default adapter that turns a vector store into a retriever. Its implementation is short, but the shortness is deceptive. The class stores two policy fields, <code>search_type</code> and <code>search_kwargs</code>, and its <code>_get_relevant_documents()</code> method dispatches to different vector-store methods based on those settings. Retrieval quality is therefore shaped at this adapter boundary before it reaches FAISS or any other backend.</p>
+<p><img alt="Search type dispatch and parameters" src="../../../assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.en.png"></p>
+<p>The allowed search types are explicitly enumerated:</p>
+<ul>
+<li><code>similarity</code></li>
+<li><code>similarity_score_threshold</code></li>
+<li><code>mmr</code></li>
+</ul>
+<p>The <code>root_validator</code> named <code>validate_search_type()</code> enforces two rules. First, the <code>search_type</code> must be one of those three. Second, if the type is <code>similarity_score_threshold</code>, then <code>search_kwargs["score_threshold"]</code> must be present and must be a float. That second rule is more important than it first appears because threshold retrieval is not just regular similarity search with an extra if-statement. It goes through a different scoring path.</p>
+<p>The dispatch logic itself is direct. For <code>similarity</code>, <code>_get_relevant_documents()</code> calls <code>self.vectorstore.similarity_search(query, **self.search_kwargs)</code>. For <code>similarity_score_threshold</code>, it calls <code>self.vectorstore.similarity_search_with_relevance_scores(query, **self.search_kwargs)</code> and strips away the scores, keeping only documents. For <code>mmr</code>, it calls <code>self.vectorstore.max_marginal_relevance_search(query, **self.search_kwargs)</code>. The async method <code>_aget_relevant_documents()</code> follows the same shape with <code>asimilarity_search</code>, <code>asimilarity_search_with_relevance_scores</code>, and <code>amax_marginal_relevance_search</code>.</p>
+<p><code>k</code> exists in all three modes, but its meaning shifts slightly. In plain similarity search it is the number of top documents returned by the backend. In threshold mode it is the maximum number returned after relevance-score conversion and filtering. In MMR mode it is the final output size after a larger candidate pool has been diversified.</p>
+<p><code>fetch_k</code> matters only for MMR and is passed straight through to the vector store. <code>score_threshold</code> matters only for threshold mode and is applied after relevance-score conversion, not on raw backend distances. That is why <code>VectorStoreRetriever</code> calls <code>similarity_search_with_relevance_scores()</code> rather than <code>similarity_search_with_score()</code>.</p>
+<p>The examples below use <code>FakeEmbeddings</code>, so any rankings or scores are illustrative rather than semantically meaningful.</p>
+<p>This small script makes the three modes visible.</p>
+<pre><code class="language-python">from langchain_core.documents import Document
+from langchain_core.embeddings import FakeEmbeddings
+from langchain_community.vectorstores import FAISS
+
+def build_store() -&gt; FAISS:
+    docs = [
+        Document(page_content=&quot;Workers retry failed jobs three times.&quot;, metadata={&quot;source&quot;: &quot;runbook&quot;}),
+        Document(page_content=&quot;Dead-letter queues preserve the original payload.&quot;, metadata={&quot;source&quot;: &quot;runbook&quot;}),
+        Document(page_content=&quot;HTTP 429 means the caller exceeded quota.&quot;, metadata={&quot;source&quot;: &quot;api&quot;}),
+    ]
+    return FAISS.from_documents(docs, FakeEmbeddings(size=8))
+
+def main() -&gt; None:
+    store = build_store()
+
+    similarity_retriever = store.as_retriever(
+        search_type=&quot;similarity&quot;,
+        search_kwargs={&quot;k&quot;: 2},
+    )
+    threshold_retriever = store.as_retriever(
+        search_type=&quot;similarity_score_threshold&quot;,
+        search_kwargs={&quot;k&quot;: 3, &quot;score_threshold&quot;: 0.2},
+    )
+    mmr_retriever = store.as_retriever(
+        search_type=&quot;mmr&quot;,
+        search_kwargs={&quot;k&quot;: 2, &quot;fetch_k&quot;: 6, &quot;lambda_mult&quot;: 0.3},
+    )
+
+    print(&quot;similarity&quot;)
+    for doc in similarity_retriever.invoke(&quot;retry policy&quot;):
+        print(doc.page_content)
+
+    print(&quot;threshold&quot;)
+    for doc in threshold_retriever.invoke(&quot;retry policy&quot;):
+        print(doc.page_content)
+
+    print(&quot;mmr&quot;)
+    for doc in mmr_retriever.invoke(&quot;retry policy&quot;):
+        print(doc.page_content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>So <code>VectorStoreRetriever</code> is simple in code size but not trivial in effect. It is the first place where “retrieval” stops meaning one thing and becomes a choice among several ranking semantics.</p>
+<hr>
+<h2>3. MMR internals: where diversity actually enters the ranking</h2>
+<p>MMR exists to counter one of the most common retrieval failure modes: a top-k list that is locally accurate and globally repetitive. If a corpus contains many near-duplicate chunks, plain similarity search happily returns them because each chunk is individually close to the query. The user then gets redundancy instead of coverage. MMR addresses that by selecting documents that are both query-relevant and mutually less redundant.</p>
+<p><img alt="MMR candidate expansion and selection" src="../../../assets/rag-deep-dive/03/03-03-mmr-selection-flow.en.png"></p>
+<p>The FAISS path is easy to trace in source. <code>max_marginal_relevance_search()</code> embeds the query and hands the vector to <code>max_marginal_relevance_search_by_vector()</code>. That method then delegates to <code>max_marginal_relevance_search_with_score_by_vector()</code>, which performs the actual backend search. The implementation first calls <code>self.index.search(...)</code> to fetch <code>fetch_k</code> candidates. If a metadata filter is present, FAISS doubles the raw fetch width to <code>fetch_k * 2</code> before filtering because some candidates may be discarded later. Then it reconstructs each candidate vector with <code>self.index.reconstruct(int(i))</code> and passes those vectors into <code>maximal_marginal_relevance(...)</code>.</p>
+<p>The MMR core that FAISS actually calls lives in <code>langchain_community.vectorstores.utils.maximal_marginal_relevance()</code>. A near-identical copy also exists under <code>langchain_core.vectorstores.utils</code>, but in 0.2.17 the FAISS path imports and uses the community version. The function computes cosine similarity between the query and the candidate set, picks the single most query-similar candidate first, and then grows the result greedily. For every remaining candidate it computes:</p>
+<p><code>equation_score = lambda_mult * query_score - (1 - lambda_mult) * redundant_score</code></p>
+<p>Here <code>query_score</code> is the candidate's cosine similarity to the query, and <code>redundant_score</code> is the maximum cosine similarity between that candidate and any already selected candidate. So the LangChain variable <code>lambda_mult</code> weights query similarity, while <code>(1 - lambda_mult)</code> weights the redundancy penalty.</p>
+<p>You will often see the same tradeoff written as <code>score = (1-λ)·similarity - λ·max_similarity_to_selected</code>. That is not a contradiction. It is only a change in what the symbol λ means. In LangChain's source, <code>lambda_mult</code> names the query-relevance weight. In other writeups, λ sometimes names the diversity weight instead. The operational meaning is the same: one term rewards closeness to the query, the other penalizes closeness to already selected results.</p>
+<p>This is why <code>fetch_k &gt;&gt; k</code> matters. MMR cannot diversify what it never sees. If <code>k=4</code> and <code>fetch_k=4</code>, you are effectively locked into the same local neighborhood that plain similarity search already chose. With <code>fetch_k=20</code> or <code>40</code>, the selector finally has room to trade a little closeness for materially less redundancy.</p>
+<p>That matters most in corpora with repeated templates or many chunks that share the same lead-in. In practice, <code>lambda_mult=0.5</code> is a reasonable starting point, values around <code>0.2</code> to <code>0.4</code> often work well when duplication is severe, and values above <code>0.7</code> behave much more like ordinary similarity search.</p>
+<p>Here is a runnable sketch.</p>
+<pre><code class="language-python">from langchain_core.documents import Document
+from langchain_core.embeddings import FakeEmbeddings
+from langchain_community.vectorstores import FAISS
+
+def main() -&gt; None:
+    docs = [
+        Document(page_content=&quot;Retry budget is three attempts before dead-lettering.&quot;),
+        Document(page_content=&quot;The worker retries failed messages three times.&quot;),
+        Document(page_content=&quot;Dead-letter queues keep the original payload for debugging.&quot;),
+        Document(page_content=&quot;HTTP 429 responses require exponential backoff.&quot;),
+        Document(page_content=&quot;Operators inspect exception chains after the final retry.&quot;),
+    ]
+
+    store = FAISS.from_documents(docs, FakeEmbeddings(size=16))
+
+    print(&quot;lambda_mult=0.8&quot;)
+    for doc in store.max_marginal_relevance_search(
+        &quot;Why did the worker stop retrying?&quot;,
+        k=3,
+        fetch_k=10,
+        lambda_mult=0.8,
+    ):
+        print(doc.page_content)
+
+    print(&quot;lambda_mult=0.2&quot;)
+    for doc in store.max_marginal_relevance_search(
+        &quot;Why did the worker stop retrying?&quot;,
+        k=3,
+        fetch_k=10,
+        lambda_mult=0.2,
+    ):
+        print(doc.page_content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>MMR is therefore best understood as a second-stage selector over an expanded candidate pool, not as a smarter version of top-k similarity alone.</p>
+<hr>
+<h2>4. What <code>similarity_score_threshold</code> means with FAISS L2 distances</h2>
+<p>Threshold retrieval sounds simple until you ask what the threshold is actually applied to. In FAISS <code>IndexFlatL2</code>, the backend returns L2 distance values, not similarity scores. Lower is better. If you apply a “score threshold” directly to those raw numbers, you are really applying a distance ceiling. LangChain adds an intermediate relevance-score layer precisely to make threshold retrieval more backend-independent.</p>
+<p><img alt="Distance values becoming relevance scores" src="../../../assets/rag-deep-dive/03/03-04-threshold-score-conversion.en.png"></p>
+<p>When <code>VectorStoreRetriever</code> uses <code>search_type="similarity_score_threshold"</code>, it calls <code>vectorstore.similarity_search_with_relevance_scores(...)</code>. That method does not expose the backend's raw score semantics directly. Instead it calls <code>_similarity_search_with_relevance_scores()</code>, which obtains raw <code>(doc, score)</code> pairs from <code>similarity_search_with_score()</code>, then transforms each raw score through <code>_select_relevance_score_fn()</code>. Only after that transformation does it apply <code>score_threshold</code>, keeping results whose normalized relevance score is greater than or equal to the threshold.</p>
+<p>FAISS defines the fallback behavior explicitly. <code>_select_relevance_score_fn()</code> first respects any override supplied to the constructor. If none is set, it chooses a default from <code>distance_strategy</code>: max inner product, Euclidean distance, or cosine. So “no relevance score function set” does not mean “no conversion happens.” It means the vector store falls back to its built-in mapping.</p>
+<p>For L2 distance, that default is <code>1.0 - distance / math.sqrt(2)</code>. The assumption behind it is normalized embeddings, where identical vectors are distance 0 and maximally different unit vectors are distance <code>sqrt(2)</code>. If that assumption is wrong for your embeddings, the converted scores can drift outside <code>[0, 1]</code>, and LangChain will warn accordingly.</p>
+<p>One more distinction matters in practice. FAISS also accepts <code>score_threshold</code> in its raw <code>similarity_search_with_score_by_vector()</code> path, but there it compares against the backend score directly: <code>&lt;=</code> for Euclidean distance and <code>&gt;=</code> for max inner product. <code>VectorStoreRetriever</code> threshold mode compares after relevance-score conversion. Same parameter name, different layer.</p>
+<p>This script shows both views.</p>
+<pre><code class="language-python">from langchain_core.documents import Document
+from langchain_core.embeddings import FakeEmbeddings
+from langchain_community.vectorstores import FAISS
+
+def main() -&gt; None:
+    docs = [
+        Document(page_content=&quot;Retry budget is three attempts.&quot;, metadata={&quot;source&quot;: &quot;ops&quot;}),
+        Document(page_content=&quot;HTTP 429 requires exponential backoff.&quot;, metadata={&quot;source&quot;: &quot;api&quot;}),
+        Document(page_content=&quot;Dead-letter queues preserve payloads.&quot;, metadata={&quot;source&quot;: &quot;ops&quot;}),
+    ]
+
+    store = FAISS.from_documents(docs, FakeEmbeddings(size=12))
+
+    print(&quot;raw scores&quot;)
+    for doc, score in store.similarity_search_with_score(&quot;retry budget&quot;, k=3):
+        print(round(score, 4), doc.page_content)
+
+    print(&quot;relevance scores&quot;)
+    for doc, score in store.similarity_search_with_relevance_scores(&quot;retry budget&quot;, k=3):
+        print(round(score, 4), doc.page_content)
+
+    retriever = store.as_retriever(
+        search_type=&quot;similarity_score_threshold&quot;,
+        search_kwargs={&quot;k&quot;: 3, &quot;score_threshold&quot;: 0.2},
+    )
+    print(&quot;threshold results&quot;)
+    for doc in retriever.invoke(&quot;retry budget&quot;):
+        print(doc.page_content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>So the lesson is not just that L2 is a distance. It is that threshold retrieval in LangChain deliberately inserts a translation layer from raw backend distance into retriever-level relevance semantics.</p>
+<hr>
+<h2>5. When a custom retriever is the right abstraction</h2>
+<p><code>VectorStoreRetriever</code> is a solid default, but it is not always the right boundary for retrieval policy. Sometimes the real requirement is to narrow the search space before vector search begins. A common example is source scoping. If the application already knows the user should only search documents from one source, tenant, or repository, then searching a global index and discarding cross-source results afterward is structurally wasteful.</p>
+<p><img alt="Source-filtered routing before vector search" src="../../../assets/rag-deep-dive/03/03-05-custom-source-retriever.en.png"></p>
+<p>This is easy to miss because FAISS does support metadata filtering in LangChain. But if you read the implementation closely, filtering is not truly pre-search in the flat-index path. Similarity search first retrieves candidates from the index and then applies the metadata filter in Python. In MMR mode it may fetch even more candidates first, using <code>fetch_k * 2</code> when a filter is present, because some results may be discarded later. That means a strong metadata constraint can still force a broad vector search before most of the candidates are thrown away.</p>
+<p>This is where a custom retriever becomes the cleaner abstraction. Instead of one global index plus post-filtering, you can maintain one vector store per source and let the retriever choose the correct sub-index up front. In that design, <code>doc.metadata["source"]</code> is not a late-stage filter. It is an early routing key.</p>
+<p>That is not always the right trade. You give up some global recall in exchange for lower noise and lower search cost inside a known boundary. But when the boundary already belongs to the application contract, it is usually the right one.</p>
+<p>Here is a concrete pattern.</p>
+<pre><code class="language-python">from collections import defaultdict
+from typing import Dict, List
+
+from langchain_core.callbacks.manager import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings, FakeEmbeddings
+from langchain_core.retrievers import BaseRetriever
+from langchain_community.vectorstores import FAISS
+
+def build_source_indexes(
+    documents: List[Document], embeddings: Embeddings
+) -&gt; Dict[str, FAISS]:
+    grouped: Dict[str, List[Document]] = defaultdict(list)
+    for doc in documents:
+        grouped[doc.metadata[&quot;source&quot;]].append(doc)
+    return {
+        source: FAISS.from_documents(source_docs, embeddings)
+        for source, source_docs in grouped.items()
+    }
+
+class SourceScopedRetriever(BaseRetriever):
+    stores_by_source: Dict[str, FAISS]
+    source: str
+    k: int = 4
+
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -&gt; List[Document]:
+        store = self.stores_by_source.get(self.source)
+        if store is None:
+            run_manager.on_text(f&quot;no index for source={self.source}&quot;)
+            return []
+        run_manager.on_text(f&quot;searching source={self.source}&quot;)
+        return store.similarity_search(query, k=self.k)
+
+def main() -&gt; None:
+    embeddings = FakeEmbeddings(size=10)
+    documents = [
+        Document(
+            page_content=&quot;Workers retry failed jobs three times before dead-lettering.&quot;,
+            metadata={&quot;source&quot;: &quot;runbook&quot;},
+        ),
+        Document(
+            page_content=&quot;Operators inspect the exception chain after the final retry.&quot;,
+            metadata={&quot;source&quot;: &quot;runbook&quot;},
+        ),
+        Document(
+            page_content=&quot;HTTP 429 means the caller exceeded the public API quota.&quot;,
+            metadata={&quot;source&quot;: &quot;api&quot;},
+        ),
+        Document(
+            page_content=&quot;Backoff is mandatory for retrying 429 responses.&quot;,
+            metadata={&quot;source&quot;: &quot;api&quot;},
+        ),
+    ]
+
+    stores_by_source = build_source_indexes(documents, embeddings)
+    retriever = SourceScopedRetriever(
+        stores_by_source=stores_by_source,
+        source=&quot;runbook&quot;,
+        k=2,
+    )
+
+    for doc in retriever.invoke(&quot;Why did the worker stop retrying?&quot;):
+        print(doc.page_content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The specific example uses source-based routing, but the same pattern works for tenant scoping, permission boundaries, document freshness tiers, or language-specific sub-indexes. The important idea is that a custom retriever is where you encode retrieval policy that should happen before generic vector ranking.</p>
+<hr>
+<h2>The baseline to carry into episode 4</h2>
+<p>This episode established the retriever layer as a policy boundary rather than a passive wrapper. <code>BaseRetriever</code> standardizes lifecycle, tracing, and async fallback under the Runnable model. <code>VectorStoreRetriever</code> then chooses among plain similarity, thresholded relevance retrieval, and MMR-based diversification. MMR only helps if the candidate pool is widened first, which is why <code>fetch_k</code> must usually be much larger than <code>k</code>. Threshold mode depends on relevance-score conversion, with FAISS falling back to a distance-strategy-specific default when no explicit <code>relevance_score_fn</code> is supplied. And custom retrievers matter when the main optimization is not a different ranking formula but a different search boundary.</p>
+<p>That baseline leads directly into episode 4. Retrieval output is still not final context. The next failure point is how those documents are packed and injected into the prompt.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/02-embeddings-and-vector-index.md">Embeddings and the Vector Index — Inside FAISS IndexFlatL2</a></li>
+<li><strong>Retriever Design — VectorStoreRetriever and MMR (current)</strong></li>
+<li>Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)</li>
+<li>Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)</li>
+<li>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/retrievers.py">LangChain <code>BaseRetriever</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/vectorstores/base.py">LangChain <code>VectorStore</code> and <code>VectorStoreRetriever</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/vectorstores/faiss.py">LangChain FAISS vector store source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/vectorstores/utils.py">LangChain community vector store utils with <code>maximal_marginal_relevance</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/vectorstores/utils.py">LangChain core vector store utils copy</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/vectorstores/utils.py">LangChain community vector store utils with <code>DistanceStrategy</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/vectorstores/base.py#L937-L1002">LangChain <code>VectorStore.as_retriever</code> API source</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
+</body>
+</html>

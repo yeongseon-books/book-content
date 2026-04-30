@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Assembling the RAG Chain — RetrievalQA vs LCEL</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Assembling the RAG Chain — RetrievalQA vs LCEL</h1>
+<blockquote>
+<p>RAG Deep Dive series (5/6)</p>
+</blockquote>
+<h2>Source Version</h2>
+<p>All code citations in this post are pinned to <a href="https://github.com/langchain-ai/langchain/tree/langchain==0.2.17"><code>langchain-ai/langchain @ langchain==0.2.17</code></a>.</p>
+<p>Episodes 1 through 4 pulled the RAG stack apart layer by layer. We looked at document loading and chunking, embeddings and vector indexes, retriever policy, and the prompt layer that turns retrieved documents into model-visible context. Now comes assembly. In a real application, one user question should trigger retrieval, context construction, model invocation, and output parsing as one execution graph.</p>
+<p>LangChain 0.2.x gives you two different ways to assemble that graph. The older path is <code>RetrievalQA</code>, a classic chain abstraction that wraps the whole pipeline behind a small interface. The newer path is LCEL, where you compose runnable objects directly with the pipe operator: <code>retriever | prompt | llm | parser</code>. Both solve the same problem, but they make very different tradeoffs around visibility, output shape, streaming, and control over intermediate results.</p>
+<p>This episode traces both paths from the source. We will first walk through <code>RetrievalQA.from_chain_type()</code> and see what <code>chain_type</code> actually chooses. Then we will switch to LCEL and inspect what <code>Runnable.__or__()</code> builds, how <code>invoke()</code>, <code>stream()</code>, and <code>batch()</code> relate to the runnable protocol, and how schema reflection comes along for free. After that, we will break down the canonical LCEL RAG pattern step by step, then use <code>RunnablePassthrough.assign()</code> to return both answers and sources from one chain invocation.</p>
+<hr>
+<h2>1. The classic <code>RetrievalQA</code> API: what <code>from_chain_type()</code> actually selects</h2>
+<p>The first file to read is <code>langchain/chains/retrieval_qa/base.py</code>. <code>BaseRetrievalQA</code> holds four pieces of state that define the public surface: <code>combine_documents_chain</code>, <code>input_key</code>, <code>output_key</code>, and <code>return_source_documents</code>. The defaults are <code>input_key="query"</code> and <code>output_key="result"</code>, so the classic call shape is <code>qa.invoke({"query": "..."})</code>, returning <code>{"result": "..."}</code>. If <code>return_source_documents=True</code>, the <code>output_keys</code> property appends <code>"source_documents"</code>, which changes the output contract to <code>{"result": "...", "source_documents": [...]}</code>.</p>
+<p><img alt="RetrievalQA chain-type dispatch path" src="../../../assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png"></p>
+<p>The popular constructor was <code>from_chain_type()</code>. Its implementation is intentionally small. It takes an LLM, a <code>chain_type</code>, optional <code>chain_type_kwargs</code>, calls <code>load_qa_chain(llm, chain_type=chain_type, **kwargs)</code>, and stores the returned combine-documents chain in <code>combine_documents_chain</code>. In other words, <code>RetrievalQA</code> does not itself implement stuffing, map-reduce, or refinement. It delegates document combination to a separate factory and acts as the glue between retriever output and that factory-produced answer chain.</p>
+<p>The real dispatch lives in <code>langchain/chains/question_answering/chain.py</code>. In 0.2.17, <code>load_qa_chain()</code> exposes a <code>loader_mapping</code> with <code>"stuff"</code>, <code>"map_reduce"</code>, <code>"refine"</code>, and <code>"map_rerank"</code>. The three options most relevant to the mental model are <code>stuff</code>, <code>map_reduce</code>, and <code>refine</code>.</p>
+<ul>
+<li><code>stuff</code> formats all retrieved documents and concatenates them into one context string for a single model call.</li>
+<li><code>map_reduce</code> runs a per-document or per-group question step first, then combines those intermediate outputs in a reduction step.</li>
+<li><code>refine</code> produces an initial answer from the first document and updates that answer incrementally as later documents are processed.</li>
+</ul>
+<p>The important point is that <code>chain_type</code> does not change retrieval. Retrieval still ends in <code>_get_docs(question)</code>. What it changes is the policy for collapsing a retrieved <code>List[Document]</code> into something the model can consume. That is the seam between Episode 3 and Episode 4: retrieval decides which evidence enters the room, while <code>chain_type</code> decides how that evidence is folded into the final prompt path.</p>
+<p><code>return_source_documents</code> also looks different once you follow <code>_call()</code>. The method reads <code>question = inputs[self.input_key]</code>, asks <code>_get_docs(question)</code> for documents, passes those documents into <code>self.combine_documents_chain.run(input_documents=docs, question=question, ...)</code>, and only then decides whether to include the original <code>docs</code> list in the returned dictionary. So the source-document option does not mean “return the exact context string that the model saw.” It means “return the raw <code>Document</code> objects that came out of retrieval.” If you later add compression, metadata filtering, or custom formatting, the returned document list and the final prompt payload are not the same artifact.</p>
+<p>The reason this API is considered legacy in 0.2.x is visible in the source itself. Both <code>BaseRetrievalQA</code> and <code>RetrievalQA</code> are decorated with <code>@deprecated</code>, and the migration message points toward <code>create_retrieval_chain</code>. The design issue is not that <code>RetrievalQA</code> is broken. It is that it hides too much. You get convenience, but you lose visibility into where documents become strings, where output structure is fixed, and where you could intercept intermediate state. That tradeoff is exactly what LCEL tries to reverse.</p>
+<p>This small script shows the classic API surface with a custom in-memory retriever and a fake LLM so the example stays runnable end to end:</p>
+<pre><code class="language-python">from typing import List
+
+from langchain.chains import RetrievalQA
+from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
+from langchain_community.llms.fake import FakeListLLM
+
+class KeywordRetriever(BaseRetriever):
+    docs: List[Document]
+
+    def _get_relevant_documents(self, query: str) -&gt; List[Document]:
+        tokens = set(query.lower().split())
+        matched = []
+        for doc in self.docs:
+            text = doc.page_content.lower()
+            if any(token in text for token in tokens):
+                matched.append(doc)
+        return matched or self.docs[:1]
+
+def main() -&gt; None:
+    retriever = KeywordRetriever(
+        docs=[
+            Document(page_content=&quot;Retry budget is three attempts.&quot;, metadata={&quot;source&quot;: &quot;runbook.md&quot;}),
+            Document(page_content=&quot;After the final retry, the job moves to the dead-letter queue.&quot;, metadata={&quot;source&quot;: &quot;ops.md&quot;}),
+        ]
+    )
+    llm = FakeListLLM(
+        responses=[&quot;The worker retries the job three times and then moves it to the dead-letter queue.&quot;]
+    )
+
+    qa = RetrievalQA.from_chain_type(
+        llm=llm,
+        retriever=retriever,
+        chain_type=&quot;stuff&quot;,
+        return_source_documents=True,
+    )
+
+    result = qa.invoke({&quot;query&quot;: &quot;When is the job dead-lettered?&quot;})
+    print(result[&quot;result&quot;])
+    print([doc.metadata[&quot;source&quot;] for doc in result[&quot;source_documents&quot;]])
+    print(&quot;input key:&quot;, qa.input_key)
+    print(&quot;output keys:&quot;, qa.output_keys)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The value of <code>RetrievalQA</code> in 2026 is mostly pedagogical. It is one of the clearest places to see the old RAG assembly model before everything became more composable.</p>
+<hr>
+<h2>2. LCEL basics: what the pipe operator actually builds</h2>
+<p>LCEL starts in <code>langchain_core.runnables.base.py</code>. The <code>Runnable</code> abstraction defines the common execution surface: <code>invoke</code>, <code>ainvoke</code>, <code>batch</code>, <code>abatch</code>, <code>stream</code>, <code>astream</code>, plus input and output schema reflection. Then <code>Runnable.__or__()</code> reveals the heart of the language in one short method: <code>self | other</code> returns <code>RunnableSequence(self, coerce_to_runnable(other))</code>. So the pipe operator is not special syntax for “call the next function.” It is a constructor for a runnable sequence whose output feeds the next step.</p>
+<p><img alt="LCEL pipe operator building a sequence" src="../../../assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.en.png"></p>
+<p>That matters because retrievers, prompts, models, and parsers can all implement the same runnable protocol. A composed LCEL chain therefore inherits the shared execution methods of the runnable stack. <code>invoke()</code> is the narrow path: one input in, one final output out. <code>stream()</code> is the incremental path: the default <code>Runnable.stream()</code> simply yields <code>invoke(...)</code>, but when steps implement streaming or transform semantics, chunks can propagate through the sequence instead of waiting for one final object.</p>
+<p><code>batch()</code> and <code>abatch()</code> follow the same philosophy. The base implementations in <code>Runnable</code> run multiple invocations concurrently rather than inventing a new batch-only API shape. The sync default uses an executor to fan out <code>invoke()</code> calls. The async default uses <code>asyncio.gather</code>-style orchestration around multiple <code>ainvoke()</code> calls. If a specific runnable knows how to do better, it can override the default. Otherwise, the composition model still gives you parallel evaluation with no extra wrapper code.</p>
+<p>Another underused but very practical feature is schema reflection. Every runnable exposes <code>input_schema</code> and <code>output_schema</code>, derived from <code>InputType</code> and <code>OutputType</code>. If the type is simple, LangChain wraps it in a root Pydantic model. If the type is dict-like or explicitly annotated, you get object-like field schemas. This is where <code>.with_types()</code> becomes useful: it does not change execution behavior, but it gives the chain an explicit contract that can be reused by API layers, validation, or tooling.</p>
+<p>This minimal example shows sequence composition, schema reflection, and batch execution in one place:</p>
+<pre><code class="language-python">from langchain_core.pydantic_v1 import BaseModel
+from langchain_core.runnables import RunnableLambda
+
+class NumberInput(BaseModel):
+    value: int
+
+class NumberOutput(BaseModel):
+    doubled: int
+
+chain = (
+    RunnableLambda(lambda payload: payload[&quot;value&quot;])
+    | RunnableLambda(lambda number: number * 2)
+    | RunnableLambda(lambda number: {&quot;doubled&quot;: number})
+).with_types(input_type=NumberInput, output_type=NumberOutput)
+
+def main() -&gt; None:
+    print(chain.invoke({&quot;value&quot;: 7}))
+    print(chain.input_schema.schema())
+    print(chain.output_schema.schema())
+    print(chain.batch([{&quot;value&quot;: 2}, {&quot;value&quot;: 5}, {&quot;value&quot;: 9}]))
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Once you see LCEL as “a type-aware runnable composition system” rather than “chain sugar,” the rest of the RAG assembly story becomes much easier to read.</p>
+<hr>
+<h2>3. Building a RAG chain in LCEL: why the dict literal becomes <code>RunnableParallel</code></h2>
+<p>The canonical LCEL RAG shape looks like this:</p>
+<pre><code class="language-python">chain = (
+    {&quot;context&quot;: retriever, &quot;question&quot;: RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+</code></pre>
+<p>The code is compact enough to hide what is really happening. Two source-level details matter. First, when a dict enters LCEL composition, <code>coerce_to_runnable(...)</code> wraps it as <code>RunnableParallel</code>. Second, <code>RunnablePassthrough()</code> is just the identity runnable. So the first line is really saying: take the same input question, send it to multiple branches at once, let one branch build <code>context</code>, let another preserve the original <code>question</code>, then merge those branch outputs back into one dictionary.</p>
+<p><img alt="Parallel split into context and question" src="../../../assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.en.png"></p>
+<p>If you trace one invocation step by step, the flow becomes concrete.</p>
+<ol>
+<li>The user provides a question string.</li>
+<li>The dict literal is already acting as a <code>RunnableParallel</code>, so the same question is fanned out to every branch.</li>
+<li>The <code>context</code> branch calls <code>retriever.invoke(question)</code> and typically receives <code>List[Document]</code>.</li>
+<li>In most real chains, another runnable then formats and joins those documents into one prompt-ready context string.</li>
+<li>The <code>question</code> branch runs <code>RunnablePassthrough.invoke(question)</code> and returns the input unchanged.</li>
+<li>The two branches merge into <code>{"context": "...", "question": "..."}</code>.</li>
+<li>The prompt runnable formats that dictionary into a prompt value.</li>
+<li>The model runnable performs generation.</li>
+<li><code>StrOutputParser()</code> turns the final model output into a plain string.</li>
+</ol>
+<p>This is the same logical pipeline as <code>RetrievalQA</code>, but it is no longer hidden behind one classic chain class. You can see exactly where retrieved documents remain structured, where they collapse into a context string, where the original user question is preserved, and where output parsing begins. That visibility is what makes LCEL much easier to customize. You can insert reranking, metadata shaping, prompt branching, or structured parsing without fighting a sealed abstraction.</p>
+<p>Here is a self-contained example that uses a fake retriever and a fake model runnable while keeping the canonical LCEL pattern intact:</p>
+<pre><code class="language-python">from typing import Any
+
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+
+DOCS = [
+    Document(
+        page_content=&quot;Retry budget is three attempts before the worker stops retrying.&quot;,
+        metadata={&quot;source&quot;: &quot;runbook.md&quot;},
+    ),
+    Document(
+        page_content=&quot;After the final retry, the original payload moves to the dead-letter queue.&quot;,
+        metadata={&quot;source&quot;: &quot;ops-guide.md&quot;},
+    ),
+]
+
+def retrieve(question: str) -&gt; list[Document]:
+    lowered = question.lower()
+    if &quot;dead-letter&quot; in lowered or &quot;retry&quot; in lowered:
+        return DOCS
+    return DOCS[:1]
+
+def format_docs(docs: list[Document]) -&gt; str:
+    return &quot;\n\n&quot;.join(
+        f&quot;[{doc.metadata['source']}]\n{doc.page_content}&quot; for doc in docs
+    )
+
+def fake_llm(prompt_value: Any) -&gt; str:
+    rendered = prompt_value.to_string() if hasattr(prompt_value, &quot;to_string&quot;) else str(prompt_value)
+    return f&quot;Synthetic answer based on:\n{rendered}&quot;
+
+retriever = RunnableLambda(retrieve) | RunnableLambda(format_docs)
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (&quot;system&quot;, &quot;Answer from the supplied context only.&quot;),
+        (&quot;human&quot;, &quot;Context:\n{context}\n\nQuestion: {question}&quot;),
+    ]
+)
+
+chain = (
+    {&quot;context&quot;: retriever, &quot;question&quot;: RunnablePassthrough()}
+    | prompt
+    | RunnableLambda(fake_llm)
+    | StrOutputParser()
+)
+
+def main() -&gt; None:
+    print(chain.invoke(&quot;Why did the worker stop and dead-letter the job?&quot;))
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The most important shift is conceptual. In LCEL, retrieval is not a hidden phase inside a QA chain. It is one runnable branch in a visible graph.</p>
+<hr>
+<h2>4. <code>RunnablePassthrough.assign()</code>: enriching outputs without losing the chain state</h2>
+<p>Sooner or later, plain string output stops being enough. Production RAG systems usually need to return the answer together with sources, IDs, scores, or diagnostic fields. The base <code>prompt | llm | parser</code> pattern discards most of that state because the chain narrows toward one final string. The tool that solves this in LCEL is <code>RunnablePassthrough.assign()</code> from <code>langchain_core.runnables.passthrough.py</code>.</p>
+<p><img alt="Assign enriching answer output with sources" src="../../../assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.en.png"></p>
+<p>At the source level, <code>RunnablePassthrough.assign(**kwargs)</code> returns <code>RunnableAssign(RunnableParallel(kwargs))</code>. That means “keep the original dict input, compute additional fields from it in parallel, and merge those fields back into the dict.” The merge is explicit in <code>RunnableAssign.invoke()</code>: it returns <code>{**input, **self.mapper.invoke(input, ...)}</code>. So assign is not post-processing glued on the side. It is a structured way to grow the dictionary that flows through the chain.</p>
+<p>That is a perfect fit for RAG. A common pattern is:</p>
+<ol>
+<li>Start by building a dict with <code>question</code> and <code>sources</code>.</li>
+<li>Use <code>assign(context=...)</code> to turn <code>sources</code> into one formatted context string.</li>
+<li>Use another <code>assign(answer=...)</code> to run the prompt, model, and parser on the current dict.</li>
+<li>Finish by projecting only the fields you want to expose, such as <code>{"answer": ..., "sources": ...}</code>.</li>
+</ol>
+<p>This avoids a subtle but important inefficiency: you do not need to rerun retrieval just to attach sources to the answer. Retrieval happens once, the documents stay in the dict, and later stages reuse them. That is much harder to express cleanly with <code>RetrievalQA</code>, where source-document return is a built-in option rather than a general state-enrichment pattern.</p>
+<p>This is also where <code>.with_types()</code> becomes genuinely useful. Once the final output is no longer a bare string but a dict with <code>answer</code> and <code>sources</code>, you can annotate that output structure directly on the chain and get a reusable schema contract.</p>
+<p>The example below returns an answer plus source labels from a single invocation:</p>
+<pre><code class="language-python">from operator import itemgetter
+
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.pydantic_v1 import BaseModel
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+
+DOCS = [
+    Document(page_content=&quot;Retry budget is three attempts.&quot;, metadata={&quot;source&quot;: &quot;runbook.md&quot;}),
+    Document(page_content=&quot;The final failure moves the job into the dead-letter queue.&quot;, metadata={&quot;source&quot;: &quot;ops-guide.md&quot;}),
+]
+
+def retrieve(question: str) -&gt; list[Document]:
+    return DOCS if &quot;retry&quot; in question.lower() or &quot;dead-letter&quot; in question.lower() else DOCS[:1]
+
+def format_docs(docs: list[Document]) -&gt; str:
+    return &quot;\n\n&quot;.join(
+        f&quot;[{doc.metadata['source']}]\n{doc.page_content}&quot; for doc in docs
+    )
+
+def fake_llm(prompt_value) -&gt; str:
+    rendered = prompt_value.to_string() if hasattr(prompt_value, &quot;to_string&quot;) else str(prompt_value)
+    return f&quot;Answer grounded in context:\n{rendered.split('Question:')[-1].strip()}&quot;
+
+class QuestionInput(BaseModel):
+    question: str
+
+class AnswerOutput(BaseModel):
+    answer: str
+    sources: list[str]
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (&quot;system&quot;, &quot;Answer only from the retrieved context and cite sources.&quot;),
+        (&quot;human&quot;, &quot;Context:\n{context}\n\nQuestion: {question}&quot;),
+    ]
+)
+
+chain = (
+    {
+        &quot;question&quot;: itemgetter(&quot;question&quot;),
+        &quot;sources&quot;: itemgetter(&quot;question&quot;) | RunnableLambda(retrieve),
+    }
+    | RunnablePassthrough.assign(context=lambda x: format_docs(x[&quot;sources&quot;]))
+    | RunnablePassthrough.assign(
+        answer=(
+            RunnableLambda(lambda x: {&quot;context&quot;: x[&quot;context&quot;], &quot;question&quot;: x[&quot;question&quot;]})
+            | prompt
+            | RunnableLambda(fake_llm)
+            | StrOutputParser()
+        )
+    )
+    | RunnableLambda(
+        lambda x: {
+            &quot;answer&quot;: x[&quot;answer&quot;],
+            &quot;sources&quot;: [doc.metadata[&quot;source&quot;] for doc in x[&quot;sources&quot;]],
+        }
+    )
+).with_types(input_type=QuestionInput, output_type=AnswerOutput)
+
+def main() -&gt; None:
+    result = chain.invoke({&quot;question&quot;: &quot;Why was the job sent to dead-letter after retries?&quot;})
+    print(result)
+    print(chain.output_schema.schema())
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p><code>assign()</code> is one of the main reasons LCEL scales better than classic chains. It lets you preserve and enrich chain state instead of collapsing too early.</p>
+<hr>
+<h2>5. Streaming and batching: where LCEL becomes the practical default</h2>
+<p>The execution-model difference becomes sharpest with streaming and batching. <code>RetrievalQA</code> is built around <code>_call()</code> and <code>_acall()</code>. It runs retrieval, runs the combine-documents chain, and returns only after the answer is fully assembled. It can optionally return source documents, but it does not expose a first-class surface for streaming intermediate answer chunks through the chain interface.</p>
+<p><img alt="Streaming chunks propagating through runnable steps" src="../../../assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.en.png"></p>
+<p>LCEL does. Because a runnable sequence shares <code>stream()</code> and <code>transform()</code> semantics, chunk-producing steps can push output through the graph incrementally. There is an important caveat: streaming begins only after the blocking stages ahead of it have finished. Retrieval is usually one such stage. Prompt formatting is usually another. But once those are done, a streaming model runnable can start yielding chunks immediately, and downstream parsers can keep transforming those chunks without waiting for the entire final string.</p>
+<p>If retrieval takes 150 ms and generation takes 4 seconds, classic chains force the user to experience the full delay as one silent wait. LCEL lets you turn that into a short retrieval pause followed by visible answer progress.</p>
+<p>Batching follows the same compositional logic. The default <code>Runnable.batch()</code> implementation fans out multiple <code>invoke()</code> calls in parallel with an executor. The default <code>abatch()</code> implementation uses <code>asyncio.gather</code>-style orchestration for multiple <code>ainvoke()</code> calls. That means the exact same LCEL graph you use for one interactive query can be reused for offline evaluation, regression suites, or synthetic question sets with almost no extra code.</p>
+<p>This example shows <code>invoke()</code>, <code>batch()</code>, and <code>stream()</code> on one simple runnable chain. <code>answer_chain</code> produces a normal string response, while <code>stream_chain</code> appends a generator runnable with the shape <code>Iterator[Any] -&gt; Iterator[str]</code> so you can see chunk propagation directly:</p>
+<pre><code class="language-python">from typing import Any, Iterator
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnableLambda
+
+def fake_llm(prompt_value: Any) -&gt; str:
+    rendered = prompt_value.to_string() if hasattr(prompt_value, &quot;to_string&quot;) else str(prompt_value)
+    return f&quot;Answer: {rendered.split('Question:')[-1].strip()}&quot;
+
+def fake_streaming_llm(prompt_values: Iterator[Any]) -&gt; Iterator[str]:
+    for prompt_value in prompt_values:
+        rendered = (
+            prompt_value.to_string()
+            if hasattr(prompt_value, &quot;to_string&quot;)
+            else str(prompt_value)
+        )
+        answer = f&quot;Answer: {rendered.split('Question:')[-1].strip()}&quot;
+        for token in answer.split():
+            yield token + &quot; &quot;
+
+prompt = PromptTemplate.from_template(&quot;Context: {context}\nQuestion: {question}&quot;)
+
+answer_chain = (
+    RunnableLambda(lambda x: {&quot;context&quot;: &quot;retry budget is 3&quot;, &quot;question&quot;: x})
+    | prompt
+    | RunnableLambda(fake_llm)
+    | StrOutputParser()
+)
+
+stream_chain = (
+    RunnableLambda(lambda x: {&quot;context&quot;: &quot;retry budget is 3&quot;, &quot;question&quot;: x})
+    | prompt
+    | fake_streaming_llm
+)
+
+def main() -&gt; None:
+    print(answer_chain.invoke(&quot;When does dead-lettering happen?&quot;))
+
+    print(&quot;batch:&quot;)
+    print(
+        answer_chain.batch(
+            [
+                &quot;When does dead-lettering happen?&quot;,
+                &quot;How many retries are allowed?&quot;,
+            ]
+        )
+    )
+
+    print(&quot;stream:&quot;)
+    for chunk in stream_chain.stream(&quot;When does dead-lettering happen?&quot;):
+        print(repr(chunk))
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>In a real system, <code>fake_streaming_llm</code> would be replaced by a streaming chat model runnable. The point here is only to show that LCEL can propagate chunks emitted by a generator-style runnable through the chain surface.</p>
+<p>That is why the practical recommendation in 0.2.x is fairly clear. <code>RetrievalQA</code> remains useful for understanding the older assembly model and for reading a compact source path. But once you care about richer outputs, schema-aware chaining, streaming UX, or large-scale evaluation, LCEL is the better default.</p>
+<p>Episodes 1 through 4 decomposed the layers and showed where information can be lost. Episode 5 puts those layers back together and shows that chain structure is not an implementation detail. The way documents are routed, preserved, flattened, streamed, and returned determines how trustworthy and operable the final RAG application will be. In Episode 6, we will move from assembly to evaluation: how to measure whether this chain is actually good, where to place quality gates, and how to catch failure before users do.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/02-embeddings-and-vector-index.md">Embeddings and the Vector Index — Inside FAISS IndexFlatL2</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/03-retriever-design.md">Retriever Design — VectorStoreRetriever and MMR</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/04-prompt-construction-and-context-injection.md">Prompt Construction and Context Injection — Inside PromptTemplate</a></li>
+<li><strong>Assembling the RAG Chain — RetrievalQA vs LCEL (current)</strong></li>
+<li>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ol>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py"><code>langchain/chains/retrieval_qa/base.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py"><code>langchain/chains/question_answering/chain.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py"><code>langchain/chains/combine_documents/stuff.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py"><code>langchain_core/runnables/base.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py"><code>langchain_core/runnables/passthrough.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/output_parsers/string.py"><code>langchain_core/output_parsers/string.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/base.py"><code>langchain/chains/base.py</code></a></li>
+</ol>
+<p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness</h1>
+<blockquote>
+<p>RAG Deep Dive series (6/6)</p>
+</blockquote>
+<h2>Source Version</h2>
+<p>All RAGAS code citations in this post refer to the installable <a href="https://pypi.org/project/ragas/0.1.22/"><code>ragas==0.1.22</code></a> package, and all LangChain citations are pinned to <a href="https://github.com/langchain-ai/langchain/tree/langchain==0.2.17"><code>langchain-ai/langchain @ langchain==0.2.17</code></a>. Accordingly, the metric source files discussed here are <code>ragas/metrics/_faithfulness.py</code>, <code>ragas/metrics/_answer_relevance.py</code>, and <code>ragas/metrics/_context_precision.py</code>.</p>
+<p>A RAG pipeline that answers questions is not the same thing as a RAG pipeline that answers them correctly. In a demo, “retrieval seems fine” can be enough. In production, it is not. If you change chunk size, retriever <code>k</code>, or ranking policy, did grounding improve or did the system merely get longer and noisier? Evaluation is what turns tuning into reproducible improvement.</p>
+<p>This final episode follows that evaluation layer from the source. We will start with the <code>datasets.Dataset</code> input shape, then trace faithfulness, answer relevancy, and context precision, and finally turn those metrics into a CI quality gate.</p>
+<hr>
+<h2>1. RAGAS overview and <code>datasets.Dataset</code>: the input columns define what can be measured</h2>
+<p>The first important thing to understand about RAGAS is that it is not a generic “grade this answer” box. Each metric requires a specific set of fields, and without those fields the metric cannot even run. That is why the real starting point is not the evaluator function but the dataset schema. In <code>ragas==0.1.22</code>, <code>evaluate()</code> takes a Hugging Face <code>datasets.Dataset</code>, and the default columns are <code>question</code>, <code>contexts</code>, <code>answer</code>, and <code>ground_truth</code>.</p>
+<p>Those four columns form the core frame for RAG evaluation. <code>question</code> is the user query. <code>contexts</code> is the ordered list of retrieved chunks. <code>answer</code> is the model output. <code>ground_truth</code> is the human reference answer. If you do not keep the original question, you cannot compute answer relevancy. If you do not keep retrieved context, you cannot check faithfulness. If you do not keep a reference answer, you lose metrics that need a target outcome.</p>
+<p><img alt="Sample fields controlling metric eligibility" src="../../../assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png"></p>
+<p>The schema is also your failure taxonomy. An answer can drift away from the question, inject unsupported claims, or retrieve useful evidence too late in the ranking. The row shape decides which of those failures you can measure.</p>
+<p>It also explains why metrics have different contracts. Faithfulness needs <code>question</code>, <code>answer</code>, and <code>contexts</code>. Answer relevancy also requires all three because <code>evaluation_mode = qac</code>. Its <code>_create_question_gen_prompt()</code> method reads both <code>row["answer"]</code> and <code>row["contexts"]</code>, so if <code>contexts</code> is missing, <code>evaluate()</code> validation fails before scoring starts. Context precision needs <code>question</code>, <code>contexts</code>, and an answer target from <code>ground_truth</code>.</p>
+<p>It is worth building rows explicitly rather than trying to reconstruct them later from partial logs. Once a production system stores <code>question</code>, <code>contexts</code>, <code>answer</code>, and <code>ground_truth</code> together, you can compare chunking or retrieval changes on the same sample set over time. If your internal column names differ, <code>evaluate(..., column_map={...})</code> can remap them by pointing each canonical RAGAS name to the existing dataset column.</p>
+<pre><code class="language-python">from datasets import Dataset
+
+dataset = Dataset.from_dict(
+    {
+        &quot;question&quot;: [&quot;After how many retries is the job moved to the dead-letter queue?&quot;],
+        &quot;contexts&quot;: [[
+            &quot;The worker retries the job up to three times before giving up.&quot;,
+            &quot;After the final retry, the payload is moved to the dead-letter queue.&quot;,
+        ]],
+        &quot;answer&quot;: [&quot;The job is retried three times before it is moved to the dead-letter queue.&quot;],
+        &quot;ground_truth&quot;: [&quot;The job is retried up to three times before it is dead-lettered.&quot;],
+    }
+)
+
+print(dataset)
+print(dataset.features)
+
+legacy_dataset = Dataset.from_dict(
+    {
+        &quot;query&quot;: [&quot;After how many retries is the job moved to the dead-letter queue?&quot;],
+        &quot;retrieved_passages&quot;: [[
+            &quot;The worker retries the job up to three times before giving up.&quot;,
+            &quot;After the final retry, the payload is moved to the dead-letter queue.&quot;,
+        ]],
+        &quot;prediction&quot;: [&quot;The job is retried three times before it is moved to the dead-letter queue.&quot;],
+        &quot;reference_answer&quot;: [&quot;The job is retried up to three times before it is dead-lettered.&quot;],
+    }
+)
+
+column_map = {
+    &quot;question&quot;: &quot;query&quot;,
+    &quot;contexts&quot;: &quot;retrieved_passages&quot;,
+    &quot;answer&quot;: &quot;prediction&quot;,
+    &quot;ground_truth&quot;: &quot;reference_answer&quot;,
+}
+
+print(column_map)
+</code></pre>
+<p>That may look simple, but it captures the core idea: a useful RAG evaluation set is not a bag of outputs. It is a set of relations between intent, evidence, answer, and target truth.</p>
+<hr>
+<h2>2. Faithfulness internals: decompose the answer, then verify every claim</h2>
+<p>If you only watch one RAG-specific metric, faithfulness is often the best first choice. The most common production failure in RAG is not “the model wrote bad prose.” It is “the model said something that was not supported by the retrieved evidence.” <code>ragas/metrics/_faithfulness.py</code> makes that failure mode explicit by reducing it to two source-visible steps.</p>
+<p>First, RAGAS does not judge the answer as one indivisible block. It uses an LLM to break the answer into simpler, atomic statements. The <code>LONG_FORM_ANSWER_PROMPT</code> instructs the model to analyze answer sentences, remove pronouns, and rewrite them as fully understandable simpler statements. A compound sentence like “The worker retries the job three times and then sends it to the dead-letter queue” can become two atomic claims: one about retry count and one about the dead-letter transition.</p>
+<p>Second, each atomic claim is checked against the retrieved context list. The <code>NLI_STATEMENTS_MESSAGE</code> prompt asks whether every statement can be directly inferred from the provided context, returning a binary <code>verdict</code> for each one. In <code>_create_nli_prompt()</code>, the metric joins <code>contexts</code> into one context string and passes the claim list in JSON form. Then <code>_compute_score()</code> reduces the result to a ratio.</p>
+<p><img alt="Claim decomposition and support verification flow" src="../../../assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.en.png"></p>
+<p>Conceptually, the formula is:</p>
+<p>[<br>
+faithfulness_score = \frac{|supported_claims|}{|total_claims|}<br>
+]</p>
+<p>That is exactly what the source does with <code>faithful_statements / num_statements</code>. If no statements are generated, the implementation returns <code>NaN</code>, because there is nothing meaningful to score.</p>
+<p>The important part is what this metric means operationally. Faithfulness is not checking style, completeness, or even general world truth. It is checking whether the answer stays inside the evidence boundary defined by <code>contexts</code>. That makes its definition of hallucination narrower and more useful for RAG. A claim can be true in the real world and still count against faithfulness if it is not supported by the retrieved chunks for this invocation.</p>
+<p>Suppose retrieval returned only the retry count and dead-letter rule, but the model adds “the default retry backoff is 30 seconds.” That may be true somewhere else in your docs. If it is not in the retrieved context for this run, faithfulness marks it unsupported. That is the right contract for RAG.</p>
+<p>This is why faithfulness is such a strong regression signal. When it drops, the problem is often upstream: chunking split evidence badly, retrieval missed it, or prompting weakened the evidence boundary.</p>
+<p>The core scoring idea is small enough to show in plain Python:</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class ClaimVerdict:
+    statement: str
+    verdict: int
+
+def faithfulness_score(verdicts: list[ClaimVerdict]) -&gt; float:
+    if not verdicts:
+        raise ValueError(&quot;At least one claim verdict is required&quot;)
+    supported_claims = sum(1 for item in verdicts if item.verdict == 1)
+    return supported_claims / len(verdicts)
+
+verdicts = [
+    ClaimVerdict(&quot;The worker retries the job three times.&quot;, 1),
+    ClaimVerdict(&quot;The payload is moved to the dead-letter queue after the final retry.&quot;, 1),
+    ClaimVerdict(&quot;The default retry backoff is 30 seconds.&quot;, 0),
+]
+
+print(faithfulness_score(verdicts))
+</code></pre>
+<p>The real RAGAS implementation uses an LLM both to produce the atomic claims and to verify them, but the score itself is just the supported-claims fraction. That simplicity is part of what makes it operationally useful.</p>
+<hr>
+<h2>3. Answer relevancy: reverse-question generation measures focus, not truth</h2>
+<p>Where faithfulness asks whether an answer stayed inside the evidence boundary, answer relevancy asks a different question: does this answer stay tightly aligned with the original user intent? <code>ragas/metrics/_answer_relevance.py</code> answers that by turning the answer around and asking what question the answer appears to be answering.</p>
+<p>The implementation uses a reverse-question generation prompt. <code>QUESTION_GEN</code> takes the <code>answer</code> together with <code>context</code>, then asks the LLM to produce a question plus a <code>noncommittal</code> flag. The default <code>strictness</code> is 3, so the metric usually generates multiple reverse questions for the same answer. <code>_calculate_score()</code> then embeds the original <code>question</code> and the generated reverse questions, computes cosine similarity, and averages the result.</p>
+<p><img alt="Reverse questions measuring answer focus" src="../../../assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.en.png"></p>
+<p>That means answer relevancy is not a factuality metric. It does not verify whether the answer is correct. It verifies whether the answer is focused enough that, when read backward, it still points to the same question. Answers that wander into unnecessary detail, boilerplate, or adjacent explanations tend to produce reverse questions that drift away from the user’s actual request.</p>
+<p>The <code>noncommittal</code> flag makes this even clearer. In <code>ragas==0.1.22</code>, a sample whose generated reverse-question set is classified as noncommittal contributes 0 for that sample. After <code>evaluate()</code> finishes, the metric is summarized as the mean across evaluated samples. So an evasive answer like “I’m not sure” or “there is not enough information” contributes a zero-valued sample to that mean.</p>
+<p>Answer relevancy should therefore be interpreted carefully. A verbose answer can still be highly faithful if every sentence is grounded in retrieved evidence, yet score worse on answer relevancy because it is not tightly focused on the question. Conversely, a short direct answer may score well on answer relevancy while still failing faithfulness if it states an unsupported fact.</p>
+<p>In practice, answer relevancy is especially useful for spotting prompt drift. If a template starts adding too much background or boilerplate, this score often drops before users can explain why the answer feels off.</p>
+<p>The similarity step is straightforward enough to express outside the library:</p>
+<pre><code class="language-python">import numpy as np
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -&gt; float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+original_question = np.array([0.9, 0.1, 0.0, 0.2])
+generated_question_1 = np.array([0.85, 0.12, 0.02, 0.18])
+generated_question_2 = np.array([0.88, 0.05, 0.01, 0.24])
+
+scores = [
+    cosine_similarity(original_question, generated_question_1),
+    cosine_similarity(original_question, generated_question_2),
+]
+
+print(sum(scores) / len(scores))
+</code></pre>
+<p>The point is what the metric is actually asking: answer focus under the original user intent, not correctness.</p>
+<hr>
+<h2>4. Context precision: earlier useful chunks are worth more</h2>
+<p>Context precision is the metric that looks most directly at retrieval ranking quality. In <code>ragas/metrics/_context_precision.py</code>, the system evaluates each retrieved chunk one by one and asks whether that chunk was useful for arriving at the target answer. Then it applies an average-precision style calculation over the ranked list. So this is not just “did retrieval include something useful?” It is “how early did retrieval surface useful evidence?”</p>
+<p>The input contract matters here too. <code>ragas==0.1.22</code> expects a <code>Dataset</code> with <code>question</code>, <code>contexts</code>, <code>answer</code>, and <code>ground_truth</code>, and <code>evaluate()</code> first normalizes aliases through <code>remap_column_names(dataset, column_map)</code>. After that normalization, context precision evaluates each context chunk against the question and the answer target carried by the dataset, which is why it is better understood as a retrieval metric than a generation metric.</p>
+<p><img alt="Rank-weighted precision at k scoring" src="../../../assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.en.png"></p>
+<p>The scoring logic lives in <code>_calculate_average_precision()</code>. Let <code>rel(i)</code> be 1 if the chunk at rank <code>i</code> is useful and 0 otherwise. Let <code>P(i)</code> be precision up to position <code>i</code>. Then the score is:</p>
+<p>[<br>
+AP@k = \frac{\sum_{i=1}^{k} P(i) \cdot rel(i)}{\sum_{i=1}^{k} rel(i)}<br>
+]</p>
+<p>This formula rewards relevant chunks appearing early. If the same two useful chunks appear at ranks 1 and 2, the score is much higher than if they appear at ranks 4 and 5. That is why ordering matters. Context precision is sensitive not just to inclusion, but to ranked usefulness.</p>
+<p>This ties directly back to Episode 3. Increasing retriever <code>k</code> can improve recall, but it does not guarantee better context precision. If extra chunks add noise near the top, average precision can fall. MMR may reduce redundancy, but if it pushes the best evidence from rank 1 to rank 3, the ranking became less useful.</p>
+<p>Here is the same average-precision calculation in compact Python:</p>
+<pre><code class="language-python">def average_precision(verdicts: list[int]) -&gt; float:
+    relevant = sum(verdicts)
+    if relevant == 0:
+        raise ValueError(&quot;At least one relevant context is required&quot;)
+
+    numerator = 0.0
+    for index, verdict in enumerate(verdicts, start=1):
+        if verdict == 1:
+            precision_at_i = sum(verdicts[:index]) / index
+            numerator += precision_at_i
+
+    return numerator / relevant
+
+ranking = [1, 0, 1, 0]
+print(average_precision(ranking))
+</code></pre>
+<p>Once you look at retrieval through this lens, “just increase k” stops sounding like a universal fix.</p>
+<hr>
+<h2>5. Building a quality gate in CI: fail fast when faithfulness regresses</h2>
+<p>Computing metrics is only half the job. The real value appears when those metrics block regressions. The practical pattern is simple: keep a representative evaluation set, run <code>ragas.evaluate()</code> in CI, and fail the pipeline when a grounding metric falls below a threshold.</p>
+<p>One versioning detail matters. In <code>ragas==0.1.22</code>, the executable dataset uses <code>question</code>, <code>contexts</code>, <code>answer</code>, and <code>ground_truth</code>. If your stored dataset uses names like <code>query</code>, <code>retrieved_passages</code>, <code>prediction</code>, or <code>reference_answer</code>, pass a <code>column_map</code> in the direction canonical name -&gt; existing dataset column. For example, <code>{"question": "query"}</code> means the RAGAS <code>question</code> slot should read from the dataset column named <code>query</code>.</p>
+<p><img alt="CI gate around faithfulness thresholds" src="../../../assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.en.png"></p>
+<p>This script shows a small but realistic quality gate. It runs faithfulness, answer relevancy, and context precision over a fixed dataset, computes mean scores, and fails immediately when average faithfulness falls below 0.8.</p>
+<pre><code class="language-python">import numpy as np
+from datasets import Dataset
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from ragas import evaluate
+from ragas.metrics import answer_relevancy, context_precision, faithfulness
+
+def build_eval_dataset() -&gt; Dataset:
+    rows = {
+        &quot;question&quot;: [
+            &quot;After how many retries is the job moved to the dead-letter queue?&quot;,
+            &quot;Why should fetch_k be larger than k in MMR retrieval?&quot;,
+        ],
+        &quot;answer&quot;: [
+            &quot;The job is retried up to three times before it is moved to the dead-letter queue.&quot;,
+            &quot;MMR needs a wider candidate pool before picking the final k results, so fetch_k must be larger than k to give reranking room to improve diversity.&quot;,
+        ],
+        &quot;contexts&quot;: [
+            [
+                &quot;The worker retries the job up to three times before giving up.&quot;,
+                &quot;After the final retry, the payload is moved to the dead-letter queue.&quot;,
+            ],
+            [
+                &quot;MMR first gathers a larger candidate pool before selecting the final k documents.&quot;,
+                &quot;If fetch_k equals k, the reranking stage has almost no room to improve diversity.&quot;,
+            ],
+        ],
+        &quot;ground_truth&quot;: [
+            &quot;The job is retried up to three times before it is dead-lettered.&quot;,
+            &quot;fetch_k should be larger than k because MMR needs a wider candidate set before selecting the final ranking.&quot;,
+        ],
+    }
+    return Dataset.from_dict(rows)
+
+def run_quality_gate() -&gt; dict[str, float]:
+    dataset = build_eval_dataset()
+    judge_llm = ChatOpenAI(model=&quot;gpt-4o-mini&quot;, temperature=0)
+    embeddings = OpenAIEmbeddings(model=&quot;text-embedding-3-small&quot;)
+
+    result = evaluate(
+        dataset=dataset,
+        metrics=[faithfulness, answer_relevancy, context_precision],
+        llm=judge_llm,
+        embeddings=embeddings,
+        in_ci=True,
+        column_map={},
+        raise_exceptions=True,
+    )
+
+    summary = {
+        &quot;faithfulness&quot;: float(np.nanmean(result[&quot;faithfulness&quot;])),
+        &quot;answer_relevancy&quot;: float(np.nanmean(result[&quot;answer_relevancy&quot;])),
+        &quot;context_precision&quot;: float(np.nanmean(result[&quot;context_precision&quot;])),
+    }
+
+    if summary[&quot;faithfulness&quot;] &lt; 0.8:
+        raise SystemExit(
+            f&quot;Fail: faithfulness {summary['faithfulness']:.3f} is below 0.800&quot;
+        )
+
+    print(summary)
+    return summary
+
+if __name__ == &quot;__main__&quot;:
+    run_quality_gate()
+</code></pre>
+<p>If you prefer pytest integration, the test can be almost trivial:</p>
+<pre><code class="language-python">from quality_gate import run_quality_gate
+
+def test_rag_quality_gate() -&gt; None:
+    summary = run_quality_gate()
+    assert summary[&quot;faithfulness&quot;] &gt;= 0.8
+    assert summary[&quot;context_precision&quot;] &gt;= 0.7
+</code></pre>
+<p>Why make faithfulness the first hard gate? Because chunking, retrieval, prompting, and chain assembly all feed into whether the final answer stays inside its evidence boundary.</p>
+<p>LangChain’s evaluation layer is helpful here as a complement, not a replacement. <code>EvaluatorType</code> and <code>load_evaluator()</code> are useful for final-answer grading, criteria checks, or exact-match style comparisons. They do not natively compute retrieval-grounded faithfulness. That is the gap RAGAS fills.</p>
+<p>That gives the series a clean ending. Episodes 1 through 5 explained how chunks are created, retrieved, injected, and assembled. Episode 6 adds the final layer: a repeatable way to prove that a change made the system better rather than merely different. A production-ready RAG stack is complete only when it can fail a build before it fails a user.</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/02-embeddings-and-vector-index.md">Embeddings and the Vector Index — Inside FAISS IndexFlatL2</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/03-retriever-design.md">Retriever Design — VectorStoreRetriever and MMR</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/04-prompt-construction-and-context-injection.md">Prompt Construction and Context Injection — Inside PromptTemplate</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/05-rag-chain-assembly.md">Assembling the RAG Chain — RetrievalQA vs LCEL</a></li>
+<li><strong>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ol>
+<li><a href="https://pypi.org/project/ragas/0.1.22/"><code>ragas==0.1.22</code> package index</a></li>
+<li><code>ragas/evaluation.py</code> from installed <code>ragas==0.1.22</code></li>
+<li><code>ragas/metrics/_faithfulness.py</code> from installed <code>ragas==0.1.22</code></li>
+<li><code>ragas/metrics/_answer_relevance.py</code> from installed <code>ragas==0.1.22</code></li>
+<li><code>ragas/metrics/_context_precision.py</code> from installed <code>ragas==0.1.22</code></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py"><code>langchain/evaluation/loading.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/schema.py"><code>langchain/evaluation/schema.py</code></a></li>
+</ol>
+<p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
+</body>
+</html>

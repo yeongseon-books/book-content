@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Document Loading and Chunking — Inside LangChain TextSplitter</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Document Loading and Chunking — Inside LangChain TextSplitter</h1>
+<blockquote>
+<p>RAG Deep Dive series (1/6)</p>
+</blockquote>
+<h2>Source Version</h2>
+<p>All code citations in this post are pinned to <a href="https://github.com/langchain-ai/langchain/tree/langchain==0.2.17"><code>langchain-ai/langchain @ v0.2.17</code></a>.</p>
+<p>When a RAG system underperforms, teams often blame the index first and the retriever second. In practice, the first failure usually happens earlier. It happens when you decide what counts as one document, where you cut it, how much context you keep on each side, and what metadata survives the ingest path. If those decisions are wrong, the vector index does not fix them. It only stores the already-broken pieces, and the retriever faithfully returns the nearest broken piece.</p>
+<p>That is why this series starts with loading and chunking rather than embeddings. In a production RAG pipeline, chunking is not a preprocessing footnote. It is where you decide whether evidence stays intact long enough to be found later. This post reads the LangChain source directly to make that claim concrete. The scope is <code>langchain_community.document_loaders</code> plus <code>langchain_text_splitters</code>, with attention on <code>TextLoader</code>, <code>PDFMinerLoader</code>, <code>UnstructuredFileLoader</code>, <code>CharacterTextSplitter</code>, <code>RecursiveCharacterTextSplitter</code>, and <code>TokenTextSplitter</code>.</p>
+<hr>
+<h2>Why chunking is the first failure point in RAG</h2>
+<p>A retriever can only search what the ingest pipeline preserved. If the answer to a user question spans a heading and the following paragraph, but those two pieces were split into separate chunks with weak overlap, retrieval may return the heading without the explanation or the explanation without the subject. The index is working. The retriever is working. The chunking strategy failed first.</p>
+<p>This shows up in several common forms. Policy documents lose the exception clause because it spilled into the next page. API references lose the rate-limit note because the endpoint heading and the limit paragraph were separated. Source code loses the guard condition because the function signature and the error branch no longer live in the same chunk. Once the original semantic unit has been severed, downstream ranking can only choose among incomplete candidates.</p>
+<p>The operating principle for this post is simple: <strong>chunking is a meaning-preservation problem before it becomes a storage problem</strong>. To see why, we need to start at the loader boundary.</p>
+<hr>
+<h2>1. Document loaders decide the first boundary</h2>
+<p>In LangChain, a loader does two things. First, it reads bytes from somewhere. Second, it emits one or more <code>Document(page_content=..., metadata=...)</code> objects. That second step matters more than it first appears to. The splitter, vector store, retriever, and often the citation layer all inherit the loader's original decision about document boundaries and metadata.</p>
+<p><img alt="Loader metadata flow into documents" src="../../../assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png"></p>
+<p>Start with the simplest case. In <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/text.py"><code>text.py</code></a>, <code>TextLoader.lazy_load()</code> opens the file, reads it into one string, and yields a single <code>Document</code> with <code>metadata = {"source": str(self.file_path)}</code>. If decoding fails and <code>autodetect_encoding=True</code>, it retries the candidate encodings returned by <code>detect_file_encodings</code>. The source-level quirk in 0.2.17 is that exhausting those candidates is not surfaced cleanly as an error in every path. The method can fall through with <code>text</code> still empty and then yield a <code>Document</code> with empty <code>page_content</code>. In other words, the default metadata surface for plain text is basically just <code>source</code>, and the default boundary is “the whole file.”</p>
+<p><code>PDFMinerLoader</code> is more interesting because the loader class itself delegates the important part to a parser. In <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/pdf.py"><code>pdf.py</code></a>, <code>PDFMinerLoader</code> wires up <code>PDFMinerParser</code>. The actual boundary logic sits in <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/parsers/pdf.py"><code>parsers/pdf.py</code></a>. <code>PDFMinerParser.lazy_parse()</code> does one of two things:</p>
+<ul>
+<li>with <code>concatenate_pages=True</code>, it extracts the full PDF into one text blob and emits one <code>Document</code> with <code>metadata={"source": blob.source}</code></li>
+<li>with <code>concatenate_pages=False</code>, it emits one <code>Document</code> per page with <code>metadata={"source": blob.source, "page": str(i)}</code></li>
+</ul>
+<p>That single configuration choice changes the starting point for every later chunk. One option preserves cross-page context better. The other preserves page identity better for citation and debugging.</p>
+<p><code>UnstructuredFileLoader</code> goes even further, with one important caveat first. In the 0.2.17 source this class is a compatibility shim marked <code>@deprecated(since="0.2.8", removal="1.0", alternative_import="langchain_unstructured.UnstructuredLoader")</code>. For new code, the recommended import is <code>langchain_unstructured.UnstructuredLoader</code>. The source is still worth reading, though, because it explains the behavior many existing pipelines still rely on. In <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/unstructured.py"><code>unstructured.py</code></a>, <code>UnstructuredBaseLoader.lazy_load()</code> branches by mode. <code>mode="single"</code> joins all elements with double newlines into one <code>Document</code>. <code>mode="elements"</code> yields one <code>Document</code> per element and can carry <code>element.metadata.to_dict()</code>, <code>category</code>, and <code>element_id</code>. <code>mode="paged"</code> regroups elements by page number, but in 0.2.17 it also emits a deprecation warning in favor of <code>chunking_strategy="by_page"</code>. The practical difference is huge. For a structured policy document, <code>elements</code> can preserve section boundaries and titles far better than raw text extraction, but it also produces many more units and more metadata noise.</p>
+<p>Here is a realistic ingest snippet that uses all three patterns in one corpus.</p>
+<pre><code class="language-python">from pathlib import Path
+
+# deprecated since langchain 0.2.8 — use langchain_unstructured.UnstructuredLoader instead
+from langchain_community.document_loaders import (
+    PDFMinerLoader,
+    TextLoader,
+    UnstructuredFileLoader,
+)
+
+def load_corpus(base_dir: Path):
+    docs = []
+
+    docs.extend(
+        TextLoader(
+            base_dir / &quot;announcements&quot; / &quot;release-note.txt&quot;,
+            encoding=&quot;utf-8&quot;,
+            autodetect_encoding=True,
+        ).load()
+    )
+
+    docs.extend(
+        PDFMinerLoader(
+            str(base_dir / &quot;manuals&quot; / &quot;oncall-runbook.pdf&quot;),
+            concatenate_pages=False,
+        ).load()
+    )
+
+    docs.extend(
+        UnstructuredFileLoader(
+            str(base_dir / &quot;policies&quot; / &quot;security-policy.docx&quot;),
+            mode=&quot;elements&quot;,
+            strategy=&quot;fast&quot;,
+        ).load()
+    )
+
+    for doc in docs[:5]:
+        print(doc.metadata)
+
+    return docs
+
+if __name__ == &quot;__main__&quot;:
+    corpus = load_corpus(Path(&quot;sample_data&quot;))
+    print(f&quot;loaded documents: {len(corpus)}&quot;)
+</code></pre>
+<p>The operational lesson is straightforward. <strong>Before tuning <code>chunk_size</code>, inspect the loader boundary.</strong> If the loader has already frozen page boundaries, stripped structure, or split titles away from body text, later chunking can only work within that damage.</p>
+<hr>
+<h2>2. How <code>TextSplitter</code> actually builds chunks</h2>
+<p>Most high-level explanations say that <code>CharacterTextSplitter</code> splits on a separator and then stops there. The source says otherwise. In <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/character.py"><code>character.py</code></a>, <code>CharacterTextSplitter.split_text()</code> first breaks the input into smaller pieces through <code>_split_text_with_regex()</code>. The final chunk boundaries are then decided by <code>TextSplitter._merge_splits()</code> in <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/base.py"><code>base.py</code></a>. That merge stage is where <code>chunk_size</code>, <code>chunk_overlap</code>, and <code>length_function</code> interact.</p>
+<p><img alt="Merge window inside CharacterTextSplitter" src="../../../assets/rag-deep-dive/01/01-02-character-splitter-merge-window.en.png"></p>
+<p>The base constructor defaults are:</p>
+<ul>
+<li><code>chunk_size=4000</code></li>
+<li><code>chunk_overlap=200</code></li>
+<li><code>length_function=len</code></li>
+<li><code>keep_separator=False</code></li>
+<li><code>add_start_index=False</code></li>
+</ul>
+<p>Two details matter a lot in practice.</p>
+<p>First, <code>chunk_overlap</code> does <strong>not</strong> mean “each chunk overlaps the previous one by exactly N characters.” <code>_merge_splits()</code> accumulates split pieces inside <code>current_doc</code> until adding the next piece would cross <code>_chunk_size</code>. At that point it finalizes the current chunk, then repeatedly pops items from the front while <code>total &gt; self._chunk_overlap</code> or while the upcoming item still would not fit. Because the algorithm works on already-split units rather than a raw character stream, the realized overlap depends on the shape of those units. If your separator yields paragraph-sized pieces, overlap can be much coarser than you expected.</p>
+<p>Second, <code>length_function</code> is not a cosmetic hook. It changes the governing metric of the merge algorithm. With the default <code>len</code>, the splitter counts characters. If you substitute a tokenizer-based function, the exact same content will merge differently because the budget is no longer character length but model token length. This matters whenever character count is a poor proxy for context cost, which is common for multilingual text, JSON-heavy content, logs, or anything dense with identifiers.</p>
+<p>There is one more method worth keeping in view: <code>create_documents()</code>. If <code>add_start_index=True</code>, it computes a search offset and stores <code>metadata["start_index"]</code> for each emitted chunk. That is useful for later citation mapping or debugging. The implementation relies on <code>text.find(chunk, max(0, offset))</code>, so if the same string repeats multiple times and overlap is involved, it is wise to verify that the recovered offset still matches what your citation layer expects.</p>
+<p>This small script makes the interaction visible.</p>
+<pre><code class="language-python">from langchain_text_splitters import CharacterTextSplitter
+
+text = &quot;&quot;&quot;Incident summary
+
+The payment worker retries a failed task three times.
+If all retries fail, the message moves to the dead-letter queue.
+Operators must inspect the original payload and the exception chain.
+&quot;&quot;&quot;
+
+splitter = CharacterTextSplitter(
+    separator=&quot;\n&quot;,
+    chunk_size=80,
+    chunk_overlap=20,
+    length_function=len,
+    add_start_index=True,
+)
+
+documents = splitter.create_documents([text], metadatas=[{&quot;source&quot;: &quot;runbook&quot;}])
+
+for index, doc in enumerate(documents, start=1):
+    print(f&quot;chunk {index}&quot;)
+    print(doc.metadata)
+    print(doc.page_content)
+    print(&quot;-&quot; * 40)
+</code></pre>
+<p>If you run it, you will notice that overlap feels irregular rather than exact. That is not a bug. It is a direct consequence of LangChain's split-then-merge design.</p>
+<hr>
+<h2>3. Why <code>RecursiveCharacterTextSplitter</code> became the default choice</h2>
+<p><code>RecursiveCharacterTextSplitter</code> is widely used not because it is magical, but because its failure mode is relatively gentle. In <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/character.py"><code>character.py</code></a>, the default separator priority is <code>[
+"\n\n", "\n", " ", ""]</code>. In plain terms: try paragraph breaks first, then line breaks, then spaces, and only then fall all the way back to character-level splitting.</p>
+<p><img alt="Separator priority in recursive splitting" src="../../../assets/rag-deep-dive/01/01-03-recursive-separator-fallback.en.png"></p>
+<p>The <code>_split_text()</code> method is the whole story:</p>
+<ol>
+<li>scan the separator list until you find one that actually exists in the current text</li>
+<li>split using that separator</li>
+<li>keep pieces smaller than <code>_chunk_size</code> in <code>_good_splits</code></li>
+<li>when a piece is still too large, flush the accumulated good pieces through <code>_merge_splits()</code></li>
+<li>recursively retry the oversized piece with the remaining separators</li>
+<li>if no separator remains, return the oversized piece as is</li>
+</ol>
+<p>This is a conservative strategy. Preserve larger semantic boundaries when possible, and only degrade into finer cuts when the content forces you to. A markdown document with healthy blank lines will mostly split at <code>"\n\n"</code>. A log file without paragraph breaks will fall to <code>"\n"</code>. OCR output with broken line handling may slide all the way down to spaces or even characters.</p>
+<p>Another important default sits in the constructor: <code>keep_separator=True</code>. That differs from <code>CharacterTextSplitter</code>, whose base default is <code>False</code>. In recursive splitting, keeping separators means line breaks and paragraph markers survive inside the emitted text. That small choice often improves retrieval quality because headings, bullets, and local formatting still signal structure to the embedding model.</p>
+<p>Here is a minimal markdown example.</p>
+<pre><code class="language-python">from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+markdown_text = &quot;&quot;&quot;# Service policy
+
+## Password reset
+Users can reset passwords from the account settings page.
+The reset link expires after 15 minutes.
+
+## API rate limit
+The public API allows 120 requests per minute per API key.
+Burst requests above the limit receive HTTP 429 responses.
+&quot;&quot;&quot;
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=120,
+    chunk_overlap=30,
+)
+
+chunks = splitter.split_text(markdown_text)
+
+for index, chunk in enumerate(chunks, start=1):
+    print(f&quot;chunk {index}\n{chunk}\n&quot;)
+</code></pre>
+<p>That is why <code>RecursiveCharacterTextSplitter</code> is such a good default for mixed prose. It does not guarantee perfect semantic chunks, but it tends to preserve the most natural boundaries available before it gives up and cuts harder. The caveat is just as important: for highly structured content such as code, HTML, legal text, or machine-generated data, the default separator list is only a starting point. Domain-aware separators or pre-normalization often outperform the stock behavior.</p>
+<hr>
+<h2>4. Why token-aware splitting matters</h2>
+<p>Character count and token count are not the same thing, and language models only care about the second one. That mismatch is one of the easiest ways to create a RAG system that looks healthy during ingest and then fails when the final prompt is assembled.</p>
+<p><img alt="Character counts diverging from token counts" src="../../../assets/rag-deep-dive/01/01-04-token-aware-splitting.en.png"></p>
+<p>LangChain's <code>TokenTextSplitter</code> addresses this directly. In <a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/base.py"><code>base.py</code></a>, <code>TokenTextSplitter.split_text()</code> builds an internal <code>_encode()</code> function, creates a <code>Tokenizer</code> dataclass with <code>tokens_per_chunk=self._chunk_size</code> and <code>chunk_overlap=self._chunk_overlap</code>, and then delegates to <code>split_text_on_tokens()</code>. That helper slides a fixed-width window over token IDs by advancing <code>start_idx += tokenizer.tokens_per_chunk - tokenizer.chunk_overlap</code> on each iteration.</p>
+<p>This is a very different overlap model from <code>CharacterTextSplitter</code>. Here, overlap is enforced directly in token space rather than emerging indirectly from already-split text fragments. The result is more predictable against model context limits, but less aligned with semantic boundaries. Token windows do not know where a paragraph ends or where a heading begins.</p>
+<p>That trade-off is the point. <code>TokenTextSplitter</code> is not inherently “better” at preserving meaning. It is better at respecting the resource the model actually consumes. In production, that makes it valuable in at least two cases: when your chunks are later repacked into larger prompt bundles, and when your corpus mixes languages or symbol-heavy content where character count is a bad cost estimate.</p>
+<p>This example compares character-based and token-based splits over the same sentence.</p>
+<pre><code class="language-python">import tiktoken
+from langchain_text_splitters import CharacterTextSplitter, TokenTextSplitter
+
+text = &quot;Customer 18423 did not fail because of HTTP 429. The real cause was an internal batch worker that retried without exponential backoff.&quot;
+
+encoding = tiktoken.get_encoding(&quot;cl100k_base&quot;)
+
+char_splitter = CharacterTextSplitter(
+    separator=&quot; &quot;,
+    chunk_size=30,
+    chunk_overlap=5,
+)
+token_splitter = TokenTextSplitter(
+    encoding_name=&quot;cl100k_base&quot;,
+    chunk_size=18,
+    chunk_overlap=4,
+)
+
+char_chunks = char_splitter.split_text(text)
+token_chunks = token_splitter.split_text(text)
+
+print(&quot;character-based&quot;)
+for chunk in char_chunks:
+    print(len(chunk), len(encoding.encode(chunk)), chunk)
+
+print(&quot;token-based&quot;)
+for chunk in token_chunks:
+    print(len(chunk), len(encoding.encode(chunk)), chunk)
+</code></pre>
+<p>On multilingual text, logs, code, and text dense with identifiers, the gap between character length and token length gets wider fast. That is why a system can appear safe at ingest time and still blow the budget when it concatenates several retrieved chunks at answer time. If you want predictable prompt budgets, token-aware measurement has to show up somewhere in the design.</p>
+<hr>
+<h2>5. Practical guidance for choosing chunk size</h2>
+<p>There is no universal best chunk size. There are only chunk sizes that are better or worse for a domain, a model budget, and a question style. The most common mistake is applying one number everywhere, such as <code>chunk_size=1000</code> and <code>chunk_overlap=200</code>, across policy documents, API docs, legal contracts, logs, and source code.</p>
+<p><img alt="Chunk quality feedback loop" src="../../../assets/rag-deep-dive/01/01-05-chunk-quality-feedback-loop.en.png"></p>
+<p>In practice, I look at three things together.</p>
+<p>First, can a chunk stand on its own as evidence? A useful chunk should contain the definition, condition, or exception that a model would need to answer a question without guessing. Second, is the chunk so large that it smears neighboring topics into one embedding? Bigger chunks preserve context, but they also dilute specificity. Third, does overlap produce meaningful continuity or only repeated noise?</p>
+<p>An easy starting metric is the configured overlap ratio:</p>
+<p><code>overlap_ratio = chunk_overlap / chunk_size</code></p>
+<p>That is not enough on its own, because actual overlap in emitted chunks may differ from configured overlap, especially with recursive or separator-based splitters. It is more useful to pair the configured ratio with observed token-length distributions and a small question set that tells you whether answer-bearing evidence usually lives inside one chunk or spills across several.</p>
+<p>My rough defaults are domain-shaped rather than model-shaped:</p>
+<ul>
+<li>policy and prose-heavy guides: recursive splitting, target roughly 500 to 900 tokens, 10 to 20 percent overlap</li>
+<li>API references and code-adjacent docs: preserve headers or function boundaries first, then aim smaller, often 200 to 400 tokens</li>
+<li>logs, OCR output, and messy text extractions: normalize structure before chunking or the splitter spends all its effort recovering from bad input</li>
+</ul>
+<p>This script is a lightweight way to inspect token lengths and configured overlap together.</p>
+<pre><code class="language-python">from statistics import mean
+
+import tiktoken
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def measure_chunks(texts):
+    chunk_size = 700
+    chunk_overlap = 120
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+    )
+    encoding = tiktoken.get_encoding(&quot;cl100k_base&quot;)
+
+    chunks = []
+    for text in texts:
+        chunks.extend(splitter.split_text(text))
+
+    token_lengths = [len(encoding.encode(chunk)) for chunk in chunks]
+    overlap_ratio = chunk_overlap / chunk_size
+
+    print(f&quot;chunks: {len(chunks)}&quot;)
+    print(f&quot;configured overlap ratio: {overlap_ratio:.2f}&quot;)
+    print(f&quot;avg tokens per chunk: {mean(token_lengths):.1f}&quot;)
+    print(f&quot;max tokens per chunk: {max(token_lengths)}&quot;)
+    print(f&quot;min tokens per chunk: {min(token_lengths)}&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    documents = [
+        &quot;Service owners must rotate secrets every 90 days. Emergency exceptions require security approval.&quot;,
+        &quot;API clients that exceed the quota receive HTTP 429 and should retry with exponential backoff.&quot;,
+    ]
+    measure_chunks(documents)
+</code></pre>
+<p>This is still not enough by itself. The final judge is retrieval behavior against representative questions. But once you understand the source-level mechanics, you can at least explain <em>why</em> a given configuration behaved the way it did, instead of tuning chunk sizes by superstition.</p>
+<hr>
+<h2>The baseline to carry into episode 2</h2>
+<p>The first part of a RAG pipeline is built from relatively small pieces of code. <code>TextLoader</code> mostly gives you one document per file plus <code>source</code> metadata, but its autodetected encoding fallback has a real 0.2.17 quirk when all candidates fail. <code>PDFMinerLoader</code> can either preserve page identity or flatten it away, depending on <code>concatenate_pages</code>. <code>UnstructuredFileLoader</code>, itself a deprecated compatibility shim in this release line, can promote document structure into element-level metadata. Above that, <code>CharacterTextSplitter</code> and <code>RecursiveCharacterTextSplitter</code> create chunks through a split-then-merge strategy, while <code>TokenTextSplitter</code> redefines the budget in model-token terms.</p>
+<p>That baseline matters because the vector index is not neutral. It geometrizes the document units produced by the loader and the splitter. In episode 2, we will follow that geometry into embeddings and <code>FAISS IndexFlatL2</code>, and look at how chunk boundaries become retrieval behavior.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>Document Loading and Chunking — Inside LangChain TextSplitter (current)</strong></li>
+<li>Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (upcoming)</li>
+<li>Retriever Design — VectorStoreRetriever and MMR (upcoming)</li>
+<li>Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)</li>
+<li>Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)</li>
+<li>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/base.py">LangChain <code>TextSplitter</code> base source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/character.py">LangChain <code>CharacterTextSplitter</code> and <code>RecursiveCharacterTextSplitter</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/text.py">LangChain <code>TextLoader</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/pdf.py">LangChain PDF loader source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/parsers/pdf.py">LangChain PDF parser source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/unstructured.py">LangChain <code>UnstructuredFileLoader</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/documents/base.py">LangChain <code>Document</code> base type</a></li>
+<li><a href="https://doi.org/10.48550/arXiv.2005.11401">Lewis et al., Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a></li>
+</ul>
+<p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
+</body>
+</html>

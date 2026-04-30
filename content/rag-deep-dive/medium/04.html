@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prompt Construction and Context Injection — Inside PromptTemplate</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Prompt Construction and Context Injection — Inside PromptTemplate</h1>
+<blockquote>
+<p>RAG Deep Dive series (4/6)</p>
+</blockquote>
+<h2>Source Version</h2>
+<p>All code citations in this post are pinned to <a href="https://github.com/langchain-ai/langchain/tree/langchain==0.2.17"><code>langchain-ai/langchain @ langchain==0.2.17</code></a>.</p>
+<p>By the end of Episode 3, the retriever has already done its part. The relevant chunks are in memory as <code>Document</code> objects. That still does not mean the model will see the right evidence. One more narrowing step remains before generation: prompt construction. This is where retrieved chunks are filtered, ordered, wrapped, and squeezed into the model's context window.</p>
+<p>That is why prompt construction is not presentation glue. In RAG, it is the last loss point before inference. <code>PromptTemplate</code> and <code>ChatPromptTemplate</code> are runnable objects with validation, partial binding, prompt-value conversion, and, in the retrieval path, direct involvement in how <code>Document.page_content</code> becomes the <code>{context}</code> variable.</p>
+<hr>
+<h2>1. <code>PromptTemplate</code> internals: where a string becomes a runnable prompt</h2>
+<p>At the source level, <code>PromptTemplate</code> lives in <code>langchain_core.prompts.prompt.PromptTemplate</code>, but most of the important behavior comes from its parent classes. <code>PromptTemplate</code> inherits from <code>StringPromptTemplate</code>, which itself inherits from <code>BasePromptTemplate</code>. That class stack explains why a prompt in LangChain is more than a formatted string. It has declared <code>input_variables</code>, optional <code>partial_variables</code>, validation logic, a runnable <code>invoke()</code> entry point, and a <code>format_prompt()</code> method that wraps the final string into a <code>StringPromptValue</code> object.</p>
+<p><img alt="String and chat prompt hierarchy" src="../../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png"></p>
+<p>The most common constructor is <code>PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)</code>. It calls <code>get_template_variables(...)</code>, subtracts any pre-filled partial variables, and stores the remainder in <code>input_variables</code>. The validators in <code>prompt.py</code> and <code>base.py</code> then enforce two guardrails: <code>stop</code> cannot be used as a variable name, and <code>input_variables</code> cannot overlap with <code>partial_variables</code>.</p>
+<p><code>format()</code> is the narrowest execution path. <code>PromptTemplate.format(**kwargs)</code> first calls <code>_merge_partial_and_user_variables(**kwargs)</code>, then applies the selected formatter. With the default <code>f-string</code> format this is ordinary placeholder substitution. The source also supports <code>mustache</code> and <code>jinja2</code>, with an explicit warning that <code>jinja2</code> should not be used with untrusted templates.</p>
+<p><code>format_prompt()</code> adds the next layer. <code>StringPromptTemplate.format_prompt(**kwargs)</code> returns <code>StringPromptValue(text=self.format(**kwargs))</code>. In LCEL, that means the prompt output remains a <code>PromptValue</code> instead of collapsing immediately to a raw string.</p>
+<p>The distinction between <code>PromptTemplate</code> and <code>ChatPromptTemplate</code> becomes clear here. <code>PromptTemplate.format()</code> returns a string. <code>PromptTemplate.format_prompt()</code> returns a <code>StringPromptValue</code>. A chat prompt, by contrast, formats into a <code>ChatPromptValue</code> made of <code>BaseMessage</code> objects. So the source-level difference is not “old style versus new style.” It is “single string payload versus structured message payload.” That difference is what decides whether the downstream model receives one concatenated prompt or a sequence of role-tagged messages.</p>
+<p>This small script shows the string side without involving any external model:</p>
+<pre><code class="language-python">from langchain_core.prompts import PromptTemplate
+
+def main() -&gt; None:
+    prompt = PromptTemplate.from_template(
+        &quot;Answer the question using only this policy excerpt:\n\n{context}\n\nQuestion: {question}&quot;,
+        partial_variables={&quot;context&quot;: &quot;Retry budget: 3 attempts before dead-lettering.&quot;},
+    )
+
+    print(&quot;input variables:&quot;, prompt.input_variables)
+    print(&quot;raw string:&quot;)
+    print(prompt.format(question=&quot;Why was the message dead-lettered?&quot;))
+
+    prompt_value = prompt.format_prompt(question=&quot;Why was the message dead-lettered?&quot;)
+    print(&quot;prompt value type:&quot;, type(prompt_value).__name__)
+    print(&quot;prompt value text:&quot;)
+    print(prompt_value.to_string())
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The practical lesson is simple: prompt shape is enforced before any model call happens.</p>
+<hr>
+<h2>2. <code>ChatPromptTemplate.from_messages()</code>: composing structured message payloads</h2>
+<p>Once you switch from string prompts to chat prompts, the center of gravity moves from one template string to a list of message templates. In <code>langchain_core.prompts.chat</code>, LangChain models that list explicitly. <code>SystemMessagePromptTemplate</code>, <code>HumanMessagePromptTemplate</code>, and <code>AIMessagePromptTemplate</code> are thin wrappers around underlying string prompt templates. Each one ultimately formats into a concrete message class such as <code>SystemMessage</code>, <code>HumanMessage</code>, or <code>AIMessage</code>.</p>
+<p><img alt="Message templates becoming chat messages" src="../../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.en.png"></p>
+<p>The entry point most people use is <code>ChatPromptTemplate.from_messages(messages, template_format="f-string")</code>. The source accepts several message-like representations and normalizes them into the internal <code>self.messages</code> list. A tuple such as <code>("system", "...")</code> becomes a <code>SystemMessagePromptTemplate</code>. A tuple such as <code>("human", "{question}")</code> becomes a <code>HumanMessagePromptTemplate</code>. If you pass a concrete <code>BaseMessage</code>, LangChain stores it directly. The result is a prompt object whose payload is heterogeneous by design: some items are static messages, some are message templates, and some can be placeholders for conversation history.</p>
+<p>Formatting is handled by <code>ChatPromptTemplate.format_messages(**kwargs)</code>. The implementation merges partial and user variables, iterates over <code>self.messages</code>, keeps existing <code>BaseMessage</code> objects as-is, and asks message prompt templates to render themselves. The return value is <code>List[BaseMessage]</code>, not a string.</p>
+<p>The concrete message classes are intentionally light. <code>HumanMessage</code>, <code>SystemMessage</code>, and <code>AIMessage</code> all inherit from <code>BaseMessage</code>, while <code>AIMessage</code> adds fields such as <code>tool_calls</code> and <code>usage_metadata</code>. The important part is that role boundaries are already explicit in the data structure.</p>
+<p>One source-level trick becomes extremely important in conversational RAG: <code>MessagesPlaceholder</code>. This class assumes one variable already contains a list of messages. In <code>format_messages(**kwargs)</code>, it fetches <code>kwargs[self.variable_name]</code>, converts the value through <code>convert_to_messages(...)</code>, and optionally truncates to the most recent <code>n_messages</code>. If <code>optional=True</code>, it can legally resolve to an empty list. That means conversation history can be injected into a chat prompt without being flattened into one ad hoc string field.</p>
+<p>This is the pattern LangChain is encouraging when you need both retrieval context and prior turns:</p>
+<pre><code class="language-python">from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+def main() -&gt; None:
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (&quot;system&quot;, &quot;Use the retrieved context to answer the user faithfully.&quot;),
+            MessagesPlaceholder(&quot;history&quot;, optional=True, n_messages=4),
+            (&quot;human&quot;, &quot;Context:\n{context}\n\nQuestion: {question}&quot;),
+        ]
+    )
+
+    prompt_value = prompt.invoke(
+        {
+            &quot;history&quot;: [
+                HumanMessage(content=&quot;What happens after the third retry?&quot;),
+                AIMessage(content=&quot;The worker moves the message to the dead-letter queue.&quot;),
+            ],
+            &quot;context&quot;: &quot;Retry budget: 3 attempts before dead-lettering.&quot;,
+            &quot;question&quot;: &quot;Why would the operator inspect the payload?&quot;,
+        }
+    )
+
+    for message in prompt_value.messages:
+        print(type(message).__name__, &quot;-&gt;&quot;, message.content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The important design choice is that retrieved context and prior conversation are treated differently. Context is usually one variable such as <code>{context}</code>. History stays as a list of messages.</p>
+<hr>
+<h2>3. Context injection in <code>RetrievalQA</code>: where <code>Document.page_content</code> becomes <code>{context}</code></h2>
+<p>The retrieval path becomes concrete in <code>langchain/chains/retrieval_qa/base.py</code>. Even though <code>RetrievalQA</code> is deprecated in favor of <code>create_retrieval_chain</code>, it is still one of the cleanest source files for understanding how LangChain assembles a classic RAG answer. The important methods are <code>_get_docs()</code> and <code>_call()</code>.</p>
+<p><img alt="RetrievalQA context assembly path" src="../../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.en.png"></p>
+<p>In <code>RetrievalQA._get_docs()</code>, the implementation is intentionally small: it calls <code>self.retriever.invoke(question, config={"callbacks": run_manager.get_child()})</code> and returns a <code>List[Document]</code>. So retrieval is already complete at that point. <code>_call()</code> then reads <code>question = inputs[self.input_key]</code>, asks <code>_get_docs()</code> for documents, and finally executes:</p>
+<pre><code class="language-python">answer = self.combine_documents_chain.run(
+    input_documents=docs,
+    question=question,
+    callbacks=_run_manager.get_child(),
+)
+</code></pre>
+<p>That line is the handoff from retrieval into prompt construction. <code>RetrievalQA</code> itself does not join chunks. The joining happens inside the selected combine-documents chain. The default path from <code>BaseRetrievalQA.from_llm()</code> builds an <code>LLMChain</code> plus a <code>StuffDocumentsChain</code>. It also constructs a default <code>document_prompt</code> with <code>template="Context:\n{page_content}"</code> and sets <code>document_variable_name="context"</code>.</p>
+<p>Inside <code>StuffDocumentsChain._get_inputs()</code>, LangChain formats each <code>Document</code> by calling <code>format_document(doc, self.document_prompt)</code>. <code>format_document()</code> pulls <code>doc.page_content</code> plus any required metadata fields and runs them through the prompt. Then <code>_get_inputs()</code> joins all formatted document strings with <code>self.document_separator</code>, whose default is <code>"\n\n"</code>. That joined string is assigned to <code>inputs[self.document_variable_name]</code>. In the default case, that means the final LLM prompt receives one big <code>{context}</code> value that looks roughly like:</p>
+<pre><code class="language-text">Context:
+&lt;chunk 1&gt;
+
+Context:
+&lt;chunk 2&gt;
+
+Context:
+&lt;chunk 3&gt;
+</code></pre>
+<p>The practical consequence is clear: the retriever returns structured documents, but the default stuff chain collapses them into one flat string before the model sees them.</p>
+<p>This is also where one of LangChain's sharpest foot-guns sits. Neither <code>RetrievalQA._call()</code> nor <code>StuffDocumentsChain.combine_docs()</code> truncates the context automatically. <code>StuffDocumentsChain.prompt_length(...)</code> can estimate size, but it is advisory only. If retrieval returns too many large chunks, LangChain will still assemble the oversized prompt.</p>
+<hr>
+<h2>4. Prompt variables, partial variables, and the difference between <code>format()</code> and <code>invoke()</code></h2>
+<p>Now that we have seen where <code>{context}</code> comes from, the next question is how variables travel through the prompt layer. <code>BasePromptTemplate</code> is the key source file here. It defines both partial binding and the runnable <code>invoke()</code> path.</p>
+<p><img alt="Partial variables meeting invoke inputs" src="../../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.en.png"></p>
+<p><code>partial()</code> is a structural operation, not a one-off string replacement. In <code>BasePromptTemplate.partial(**kwargs)</code>, LangChain copies the prompt state, removes those keys from <code>input_variables</code>, merges them into <code>partial_variables</code>, and returns a new prompt object of the same type. Because <code>partial_variables</code> may also be callables, this is a good place to bind stable policy values.</p>
+<p>At formatting time, <code>_merge_partial_and_user_variables()</code> resolves all partials first and then overlays per-call kwargs on top.</p>
+<p>The difference between <code>format()</code> and <code>invoke()</code> matters once prompts live inside LCEL chains. <code>format()</code> returns the narrow payload type. <code>invoke()</code> runs the prompt as a runnable, validates input shape, merges config metadata, and returns a <code>PromptValue</code>.</p>
+<p>That is why you often see LCEL examples prefer:</p>
+<pre><code class="language-python">prompt_value = prompt.invoke({&quot;context&quot;: ..., &quot;question&quot;: ...})
+</code></pre>
+<p>instead of:</p>
+<pre><code class="language-python">text = prompt.format(context=..., question=...)
+</code></pre>
+<p>In the classic <code>RetrievalQA.from_llm()</code> path, the variable flow is quite direct. The chain receives <code>inputs[self.input_key]</code>, whose default key is <code>query</code>. <code>_call()</code> extracts that value into the local variable <code>question</code>. <code>_get_docs(question)</code> retrieves <code>Document</code> objects. <code>StuffDocumentsChain._get_inputs()</code> turns those documents into one joined context string under the key <code>context</code>. Then <code>LLMChain</code> formats the final prompt using both <code>question</code> and <code>context</code>. So the mapping is:</p>
+<ul>
+<li>user input <code>query</code> -&gt; local variable <code>question</code></li>
+<li>retrieved <code>List[Document]</code> -&gt; formatted and joined <code>context</code></li>
+<li>prompt variables <code>{question}</code> and <code>{context}</code> -&gt; final model input</li>
+</ul>
+<p>This example keeps the runnable semantics visible without calling an external model:</p>
+<pre><code class="language-python">from langchain_core.prompts import ChatPromptTemplate
+
+def main() -&gt; None:
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (&quot;system&quot;, &quot;Answer only from the supplied context. Cite sources inline.&quot;),
+            (&quot;human&quot;, &quot;Context:\n{context}\n\nQuestion: {question}&quot;),
+        ]
+    ).partial(question=&quot;Why was the job dead-lettered?&quot;)
+
+    prompt_value = prompt.invoke(
+        {&quot;context&quot;: &quot;[runbook.md] Retry budget: 3 attempts before dead-lettering.&quot;}
+    )
+
+    print(prompt.input_variables)
+    for message in prompt_value.messages:
+        print(type(message).__name__, &quot;-&gt;&quot;, message.content)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>The key point is that <code>partial()</code> reduces the call-time surface area, while <code>invoke()</code> keeps the prompt inside the runnable graph.</p>
+<hr>
+<h2>5. Practical RAG prompt construction: explicit citations, bounded context, and when to go beyond stuffing</h2>
+<p>A good RAG prompt does not merely say “use the context.” It tells the model how to treat evidence, what to do when evidence is missing, and how to cite sources.</p>
+<p><img alt="RAG chat prompt with citation rules" src="../../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.en.png"></p>
+<p>The most practical baseline in 0.2.17 is a system-plus-human chat prompt. Keep stable answering policy in the system message, dynamic evidence in <code>{context}</code>, and the user question in its own field.</p>
+<p>Here is a self-contained example that formats documents with source labels, assembles a bounded context string, and renders the final chat messages:</p>
+<pre><code class="language-python">from langchain_core.documents import Document
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, format_document
+
+def build_context(docs: list[Document], max_chars: int = 800) -&gt; str:
+    document_prompt = PromptTemplate.from_template(
+        &quot;[{source}]\n{page_content}&quot;
+    )
+    formatted_docs = [format_document(doc, document_prompt) for doc in docs]
+
+    selected = []
+    total = 0
+    for item in formatted_docs:
+        projected = total + len(item) + (2 if selected else 0)
+        if projected &gt; max_chars:
+            break
+        selected.append(item)
+        total = projected
+
+    return &quot;\n\n&quot;.join(selected)
+
+def main() -&gt; None:
+    docs = [
+        Document(
+            page_content=&quot;The payment worker retries a failed job three times.&quot;,
+            metadata={&quot;source&quot;: &quot;runbook.md&quot;},
+        ),
+        Document(
+            page_content=&quot;After the final retry, the original payload moves to the dead-letter queue.&quot;,
+            metadata={&quot;source&quot;: &quot;runbook.md&quot;},
+        ),
+        Document(
+            page_content=&quot;Operators inspect the payload and exception chain before replaying the job.&quot;,
+            metadata={&quot;source&quot;: &quot;ops-guide.md&quot;},
+        ),
+    ]
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                &quot;system&quot;,
+                &quot;You are a careful RAG assistant. Answer only from the supplied context. &quot;
+                &quot;If the context is insufficient, say you do not know. &quot;
+                &quot;When you make a factual claim, cite the source in square brackets like [runbook.md].&quot;,
+            ),
+            (
+                &quot;human&quot;,
+                &quot;Context:\n{context}\n\nQuestion: {question}\n\n&quot;
+                &quot;Answer in 3-5 sentences and keep only the citations that support each claim.&quot;,
+            ),
+        ]
+    )
+
+    prompt_value = prompt.invoke(
+        {
+            &quot;context&quot;: build_context(docs, max_chars=500),
+            &quot;question&quot;: &quot;Why would the operator inspect the payload before replaying the job?&quot;,
+        }
+    )
+
+    for message in prompt_value.messages:
+        print(type(message).__name__)
+        print(message.content)
+        print(&quot;-&quot; * 60)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Use a stuff chain when the corpus is modest, the chunks are already clean, and one joined <code>{context}</code> string is enough. Switch to custom context assembly when you need budget-aware trimming, citation IDs, metadata-based ordering, deduplication, or section-aware packing.</p>
+<p>The broader lesson is the same one that has repeated through this series. Retrieval quality does not end at retrieval. Prompt construction is where evidence is converted from “available in memory” to “visible to the model.”</p>
+<hr>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/02-embeddings-and-vector-index.md">Embeddings and the Vector Index — Inside FAISS IndexFlatL2</a></li>
+<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/rag-deep-dive/en/03-retriever-design.md">Retriever Design — VectorStoreRetriever and MMR</a></li>
+<li><strong>Prompt Construction and Context Injection — Inside PromptTemplate (current)</strong></li>
+<li>Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)</li>
+<li>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ol>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py"><code>langchain_core/prompts/prompt.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/string.py"><code>langchain_core/prompts/string.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/base.py"><code>langchain_core/prompts/base.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py"><code>langchain_core/prompts/chat.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py"><code>langchain_core/messages/base.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/human.py"><code>langchain_core/messages/human.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/system.py"><code>langchain_core/messages/system.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/ai.py"><code>langchain_core/messages/ai.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py"><code>langchain/chains/retrieval_qa/base.py</code></a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py"><code>langchain/chains/combine_documents/stuff.py</code></a></li>
+</ol>
+<p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
+</body>
+</html>
