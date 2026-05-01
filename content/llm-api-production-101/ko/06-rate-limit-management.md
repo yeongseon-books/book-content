@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM API 프로덕션 101 시리즈 (6/6)
 
-예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/06-rate-limit-management)
+예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/ko/06-rate-limit-management)
 
 API를 오래 운영해 본 팀이라면 언젠가 같은 장면을 봅니다. 평소에는 문제없던 호출이 특정 시간대나 배치 시작 시점에 갑자기 실패하고, 로그에는 429 또는 rate limit 관련 메시지가 찍힙니다. LLM API도 예외가 아닙니다. 오히려 입력 토큰과 출력 토큰이 커서 요청 하나의 무게가 큰 만큼, 같은 순간에 트래픽이 몰리면 더 거칠게 제한에 부딪힐 수 있습니다.
 

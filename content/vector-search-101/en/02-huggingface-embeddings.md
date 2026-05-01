@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > Vector Search 101 (2/6)
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/02-huggingface-embeddings)
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
 
 Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.
 

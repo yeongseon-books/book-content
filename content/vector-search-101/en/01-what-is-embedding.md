@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > Vector Search 101 (1/6)
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/01-what-is-embedding)
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
 
 Search engines have compared keywords for decades. A user types "python async", and the engine checks how often those words appear in each document and where. This works well when the query and the document share exact terms, but it breaks down when meaning is preserved while wording changes. "Handling concurrency in Python" and "Python async programming" mean the same thing, but a keyword engine may not connect them.
 

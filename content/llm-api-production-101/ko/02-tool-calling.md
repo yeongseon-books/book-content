@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM API 프로덕션 101 시리즈 (2/6)
 
-예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/02-tool-calling)
+예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/ko/02-tool-calling)
 
 구조화 출력까지 붙이고 나면 다음 요구가 자연스럽게 따라옵니다. 모델이 답변만 하지 말고, 애플리케이션 기능을 직접 선택해서 실행하게 만들고 싶다는 요구입니다. 예를 들어 배송 상태를 물으면 `get_order_status()`를 호출하고, 환율을 묻으면 내부 가격 조회 함수를 실행하고, 일정 생성 요청이 오면 캘린더 API를 붙이고 싶어집니다. 이때 많은 입문자가 모델에게 함수 이름을 문자열로 내놓게 한 뒤 `if/elif`로 해석합니다. 작게는 동작하지만, 호출 규약이 느슨하면 곧 예외 처리가 늘어납니다.
 

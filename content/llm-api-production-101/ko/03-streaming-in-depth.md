@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM API 프로덕션 101 시리즈 (3/6)
 
-예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/03-streaming-in-depth)
+예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/ko/03-streaming-in-depth)
 
 스트리밍은 데모에서는 화려한 효과처럼 보이지만, 운영에서는 부분 응답을 다루는 프로토콜 문제입니다. 첫 글자라도 빨리 보여 주면 사용자는 앱이 살아 있다고 느끼고, 긴 답변에서도 이탈이 줄어듭니다. 하지만 구현 난도는 단순한 `stream=True` 한 줄에서 끝나지 않습니다. 청크가 비어 있을 수 있고, 연결이 중간에 끊길 수 있으며, 마지막 메타데이터가 오기 전에 타임아웃이 날 수 있습니다. 완성된 문자열 하나를 받던 시절과는 실패 모양이 달라집니다.
 

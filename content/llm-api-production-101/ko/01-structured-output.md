@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM API 프로덕션 101 시리즈 (1/6)
 
-예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/01-structured-output)
+예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/ko/01-structured-output)
 
 LLM API를 처음 붙인 뒤 가장 먼저 겪는 운영 문제는 모델 품질보다 출력 모양입니다. 데모 단계에서는 자연어 한 덩어리를 화면에 보여주면 끝이지만, 실제 서비스는 그 다음 단계가 더 중요합니다. 분류 결과를 DB에 넣어야 하고, 추출된 필드를 검증해야 하며, 후속 파이프라인이 같은 키 이름을 기대합니다. 여기서 모델이 보기 좋은 문장을 써 주는지는 두 번째 문제입니다. 더 중요한 것은 애플리케이션이 읽을 수 있는 형태로 답이 돌아오는가입니다.
 

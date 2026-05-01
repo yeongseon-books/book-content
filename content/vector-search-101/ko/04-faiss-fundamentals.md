@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > 벡터 검색 101 시리즈 (4/6)
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/04-faiss-fundamentals)
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/04-faiss-fundamentals)
 
 문서가 수천, 수만 건이 되면 NumPy 브루트 포스 검색은 느려집니다. 차원이 384인 벡터 10만 개를 쿼리 한 번에 비교하려면 3,840만 번의 곱셈이 필요합니다. 검색 지연이 수백 밀리초에서 수 초로 늘어나면 실제 서비스에 쓰기 어렵습니다.
 

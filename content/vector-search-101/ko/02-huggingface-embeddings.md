@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > 벡터 검색 101 시리즈 (2/6)
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/02-huggingface-embeddings)
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/02-huggingface-embeddings)
 
 지난 글에서 임베딩의 개념을 잡았다면, 이번 글은 실제로 벡터를 만들고 다루는 방법에 집중합니다. 이론을 코드로 옮기는 과정에서 자주 막히는 부분이 있습니다. 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장했다가 재사용하는 방법은 무엇인지 같은 실용적인 질문들입니다.
 

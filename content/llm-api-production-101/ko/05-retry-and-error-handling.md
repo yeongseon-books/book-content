@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM API 프로덕션 101 시리즈 (5/6)
 
-예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/05-retry-and-error-handling)
+예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/ko/05-retry-and-error-handling)
 
 LLM API를 운영 경로에 붙이면 실패는 예외가 아니라 일상입니다. 네트워크가 잠깐 흔들릴 수 있고, 공급자 API가 순간적으로 느려질 수 있으며, 클라이언트가 제한 시간 안에 응답을 못 받을 수도 있습니다. 문제는 실패 그 자체보다, 실패 뒤의 코드가 얼마나 예측 가능하게 동작하느냐입니다. 같은 오류를 매번 손으로 다시 던지고 로그만 찍는 수준에서는 서비스가 금방 거칠어집니다.
 

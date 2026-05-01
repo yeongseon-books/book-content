@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > Vector Search 101 (5/6)
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/05-chunking-strategies)
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/05-chunking-strategies)
 
 Embedding models have a hard token limit. `all-MiniLM-L6-v2` processes at most 256 subword tokens. A single page of a PDF often exceeds that. Feeding a long document as one input either truncates it — losing content at the boundary — or compresses too much information into one vector, which dilutes retrieval precision.
 

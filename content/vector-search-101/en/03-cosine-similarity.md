@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > Vector Search 101 (3/6)
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/03-cosine-similarity)
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
 
 Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.
 

@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > 벡터 검색 101 시리즈 (1/6)
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/01-what-is-embedding)
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/01-what-is-embedding)
 
 검색 엔진은 오랫동안 키워드를 비교했습니다. 사용자가 "파이썬 비동기"를 입력하면 엔진은 그 단어가 문서에 얼마나 많이, 어떤 위치에 등장하는지를 봤습니다. 이 방식은 단어가 정확히 일치할 때 잘 작동하지만, "파이썬으로 동시성 처리하기"처럼 의미는 같아도 표현이 다른 경우에는 약합니다.
 

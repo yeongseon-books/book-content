@@ -21,7 +21,7 @@ last_reviewed: '2026-05-01'
 
 > 벡터 검색 101 시리즈 (3/6)
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/03-cosine-similarity)
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/03-cosine-similarity)
 
 벡터를 만들었다면 다음 질문은 "어떻게 비교하는가"입니다. 벡터 간 거리를 재는 방법은 여러 가지이고, 어떤 척도를 쓰느냐에 따라 검색 결과가 달라집니다. 코사인 유사도가 가장 널리 쓰이지만, 내적(dot product)과 유클리드 거리(L2)가 더 적합한 상황도 있습니다.
 

@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM API 프로덕션 101 시리즈 (4/6)
 
-예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/04-caching-strategies)
+예제 코드: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/ko/04-caching-strategies)
 
 LLM API를 운영 환경에 붙이면 성능 문제보다 먼저 비용 문제가 눈에 들어오는 경우가 많습니다. 같은 질문이 반복되는데도 매번 모델을 다시 부르고, 같은 시스템 프롬프트와 같은 컨텍스트를 매 요청마다 토큰으로 재전송하면 응답 시간과 사용량이 같이 커집니다. 이때 많은 팀이 모델 교체나 프롬프트 축소부터 고민하지만, 실제로는 더 싼 해법이 앞에 있는 경우가 많습니다. 이미 계산한 답을 다시 쓰는 일, 즉 캐싱입니다.
 

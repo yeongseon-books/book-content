@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM API Production 101 (1/6)
 
-Example code: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/01-structured-output)
+Example code: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/01-structured-output)
 
 The first production problem in an LLM application is often not answer quality. It is output shape. A demo can render one paragraph of model text and stop there. A real service usually cannot. It needs fields that can be inserted into a database, validated against business rules, passed to another service, or used to drive control flow. At that point, pretty prose is secondary. The important question is whether the application can trust the response format.
 
