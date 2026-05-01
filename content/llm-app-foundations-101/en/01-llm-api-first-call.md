@@ -137,10 +137,10 @@ api_key = os.environ["GROQ_API_KEY"]
 print(f"API key loaded: {api_key[:6]}...")
 ```
 
-```
+~~~
 Output
 API key loaded: gsk_Z2...
-```
+~~~
 
 You would not print the full key in a real application. A short prefix is enough for local verification.
 
@@ -192,10 +192,10 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-```
+~~~
 Output
-Python list comprehensions are a concise way to create new lists by performing operations on existing lists or other iterables. They consist of brackets containing the expression, which is executed for each element, along with the for loop to specify the elements to be processed, and optionally, another for loop to handle nested data structures. The basic syntax is `[expression for element in iterable]`, where `expression` is the operation you want to perform on each element and `iterable` is the list or iterable you want to process. List comprehensions can also include conditional statements, such as `[expression for element in iterable if condition]`, which allows you to filter out elements that do not meet the specified condition. This method of list creation is often more efficient and readable than using a traditional for loop and append method to create a new list.
-```
+Python list comprehensions provide a concise way to create a new list by performing operations on existing lists or other iterable objects. They consist of brackets containing the expression, which is executed for each element, along with optional 'for' clause to specify the input iterables and 'if' clause for filtering. The general syntax of a list comprehension is `[expression for variable in iterable (if condition)]`, where 'expression' is the operation performed on each element, 'variable' is the name used to refer to each element, 'iterable' is the list or other iterable object, and 'condition' is an optional filter clause. This allows for compact and expressive iteration and creation of lists in Python.
+~~~
 
 Three lines matter most.
 
@@ -236,42 +236,42 @@ completion = client.chat.completions.create(
 print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
 ```
 
-```
+~~~
 Output
 {
-  "id": "chatcmpl-35c862c3-cd55-4a93-825e-1b9d54333814",
+  "id": "chatcmpl-abe37271-fb45-4240-a07c-c832d158e0f4",
   "choices": [
     {
       "finish_reason": "stop",
       "index": 0,
       "logprobs": null,
       "message": {
-        "content": "An HTTP API is a publicly accessible interface that uses standard protocols (such as HTTP/HTTPS) to expose services and endpoints, allowing clients to make requests and receive responses in a format like JSON or XML. On the other hand, an SDK (Software Development Kit) is a collection of tools and libraries that provides a more direct and efficient way to interact with a service or platform, typically built for specific programming languages and environments. While an HTTP API requires developers to manually write requests and handle responses, an SDK typically wraps this functionality in a more user-friendly API, enabling developers to access services with fewer lines of code.",
+        "content": "An HTTP API (Application Programming Interface) provides a web-based interface that allows applications to interact with it over the internet, typically using HTTP protocol, and is often used for building integrations with third-party services. An SDK (Software Development Kit) is a collection of developer tools, libraries, and guidelines provided by a software company to help developers build applications on top of their platform, often requiring local installation and compilation. In essence, an HTTP API is used to consume services remotely, whereas an SDK is used to build applications locally.",
         "role": "assistant"
       }
     }
   ],
-  "created": 1777641241,
+  "created": 1777642666,
   "model": "llama-3.1-8b-instant",
   "object": "chat.completion",
   "service_tier": "on_demand",
   "system_fingerprint": "fp_7ccc667439",
   "usage": {
-    "completion_tokens": 124,
+    "completion_tokens": 107,
     "prompt_tokens": 50,
-    "total_tokens": 174,
-    "completion_time": 0.235684766,
-    "prompt_time": 0.002361543,
-    "queue_time": 0.007217993,
-    "total_time": 0.238046309
+    "total_tokens": 157,
+    "completion_time": 0.196864982,
+    "prompt_time": 0.002359753,
+    "queue_time": 0.007421581,
+    "total_time": 0.199224735
   },
   "usage_breakdown": null,
   "x_groq": {
-    "id": "req_01kqhtsesvfqd9hb69jp6cemaj",
-    "seed": 1716278177
+    "id": "req_01kqhw4ykefx98ht3g38s8b3dc",
+    "seed": 853933155
   }
 }
-```
+~~~
 
 When you look through that output, pay attention to three fields first.
 
@@ -365,10 +365,10 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-```
+~~~
 Output
-Asynchronous programming is a paradigm that enables a program to execute multiple tasks simultaneously, improving responsiveness and scalability. It involves breaking down a task into smaller, independent sub-tasks (also known as "coroutines" or "tasks") that can run concurrently, without blocking the main program flow. When a task is initiated, it is executed in the background, and the program continues to execute other tasks or return control to its previous state. This approach avoids blocking waits, preventing the entire program from freezing due to a single long-running task. Instead, asynchronous programming relies on mechanisms like callbacks, events, or promise-based API calls to manage the completion of sub-tasks and handle the resulting data or exceptions, often with the aid of specialized libraries, frameworks, or languages designed to support concurrency.
-```
+Asynchronous programming is a type of programming approach that allows multiple tasks or operations to be executed concurrently, without the need for one task to wait for the completion of another. This is achieved by switching between tasks while they are in execution, rather than blocking the execution of the main thread until a task is complete. In asynchronous programming, tasks are broken down into smaller, non-blocking units called "coroutines" or "threads," which are scheduled to run by the operating system or a runtime environment. While one task is waiting for a resource or I/O operation to complete, the program can proceed to execute another task, resulting in improved responsiveness, scalability, and efficiency, especially in systems that involve network communication, database queries, or user input.
+~~~
 
 And here is the async version. This block is also executable on its own.
 
@@ -396,21 +396,61 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-```
+~~~
 Output
-Asynchronous programming with asyncio in Python is particularly useful in the following two situations:
+## **Asyncio Use Cases**
 
-### Situation 1: I/O-bound operations
+Asyncio is a module in Python's standard library that allows for efficient and asynchronous I/O operations. It's particularly useful when you have to perform tasks that are slow or blocking, such as waiting for a network call, disk I/O, or a database query to complete. Here are two situations where asyncio is particularly useful:
 
-Asynchronous programming shines when dealing with I/O-bound operations such as:
+### **1. Handling Multiple Concurrent API Calls**
 
-- Network requests: Making multiple parallel requests to an API or a web server.
-- Database queries: Executing multiple database queries concurrently.
-- File operations: Reading and writing files in parallel.
+Imagine you have a web scraper that needs to fetch data from multiple APIs concurrently. If you use a blocking approach, you would have to make each API call sequentially, which can be slow and inefficient. With asyncio, you can make all the API calls at the same time, using coroutines to handle each call. This approach can significantly improve your application's performance.
 
-Example:
+Here's an example of how you can use asyncio to make concurrent API calls:
 
 ```python
+import asyncio
+
+async def fetch_data(url):
+    # simulate a network call
+    await asyncio.sleep(2)
+    return f"Data from {url}"
+
+async def main():
+    urls = ["api1.com", "api2.com", "api3.com"]
+    tasks = [fetch_data(url) for url in urls]
+    results = await asyncio.gather(*tasks)
+    print(results)
+
+asyncio.run(main())
+```
+
+### **2. Handling Long-Running Tasks in the Background**
+
+Another situation where asyncio is useful is when you have a long-running task that you need to run in the background while your main application remains responsive. For example, imagine you have an application that needs to export data to a CSV file. Instead of blocking the UI with a "please wait" dialog, you can use asyncio to run the export task in the background, keeping the UI responsive.
+
+Here's an example of how you can use asyncio to run a long-running task in the background:
+
+```python
+import asyncio
+
+async def export_data():
+    # simulate a long-running task
+    await asyncio.sleep(10)
+    print("Export task complete")
+
+async def main():
+    # create a task to run in the background
+    task = asyncio.create_task(export_data())
+    # keep the main application running
+    while True:
+        await asyncio.sleep(1)
+
+asyncio.run(main())
+```
+
+In both examples, asyncio helps to improve performance, responsiveness, and overall user experience.
+~~~python
 import asyncio
 import aiohttp
 
@@ -492,22 +532,6 @@ async def main() -> None:
         print(f"[{index}] {answer}\n")
 
 asyncio.run(main())
-```
-
-```
-Output
-[1] **Lists vs Tuples: A Brief Explanation**
-
-In most programming languages, particularly Python, `list` and `tuple` are two fundamental data types used to store collections of values. While they share some similarities, these two data types have distinct differences.
-
-### Lists
-
-*   **Mutable**: Lists are mutable, meaning their contents can be modified after creation. You can add, remove, or modify elements in a list.
-*   **Indexed**: Lists are indexed, which means you can access specific elements by their index (position) in the list.
-*   **Implied Length**: Lists can be of any length, and their length is determined by the number of elements it contains.
-*   **Common Usage**: Lists are ideal for storing collections of data where the order matters and elements need to be added or removed frequently.
-
-**Example:**
 ```python
 my_list = [1, 2, 3, 4, 5]
 my_list[0] = 10  # Modifying an element
@@ -530,6 +554,11 @@ try:
 except TypeError as e:
     print(e)  # Output: 'tuple' object does not support item assignment
 ```
+
+~~~
+Output
+'tuple' object does not support item assignment
+~~~
 
 **In Summary**
 
@@ -608,12 +637,27 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 === answer ===
-In Python, a function is a self-contained block of code that can be executed independently, whereas a method is a function that belongs to a particular class or object and operates on attributes of that class or object. Functions don't require an object instance to be called, whereas methods do. This makes methods instance-specific and can access attributes directly, while functions are more general-purpose and have limited access to the surrounding scope. Here's a simple example: 
+In Python, a function is a standalone block of code that can be called multiple times from anywhere in the program, whereas a method is a function that is part of a class and is intended to be used with objects of that class. Methods often modify or return values related to the object they're part of. A function, on the other hand, stands alone and can be used without any object reference. 
+
+Here's an example:
 
 ```python
+class Person:
+    def say_hello(self):  # method
+        print("Hello!")
+
+say_hello()  # function (same as the method say_hello, without self)
+```
+
+=== metadata ===
+model: llama-3.1-8b-instant
+prompt_tokens: 67
+completion_tokens: 127
+total_tokens: 194
+~~~python
 class MyClass:
     def greet(self):
         print("Hello, World!")

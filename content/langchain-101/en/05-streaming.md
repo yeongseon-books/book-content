@@ -48,10 +48,10 @@ for chunk in chain.stream({"topic": "astream"}):
     print(chunk, end="", flush=True)
 ```
 
-```
+~~~
 Output
-Astream is a platform that allows users to create, share, and monetize live and on-demand video content. It was initially created to cater to the online streaming needs of gamers, but it has since expanded to support various types of content, including music, art, and talk shows. Astream offers features such as live chat, subscriptions, and tipping, making it a popular choice for content creators who want to engage with their audience and earn revenue through their online streams.
-```
+Astream is a free, open-source, and community-driven platform for hosting and monetizing live streams, podcasts, and videos. It offers features such as customizable player designs, real-time chat, and membership programs, allowing creators to engage with their audience and earn revenue. Astream also provides tools for analytics and tracking, making it easier for content creators to analyze their performance and grow their online presence.
+~~~
 
 ## What to notice in this code
 
@@ -136,30 +136,30 @@ for chunk in chain.stream({"topic": "vector search"}):
 print()
 ```
 
-```
+~~~
 Output
 === LLM direct streaming ===
 Here are five advantages of Python:
 
-1. **Easy to Learn**: Python is known for its simplicity and readability, making it a great language for beginners. Its syntax is designed to be easy to understand, and it has a relatively small number of keywords, which makes it easy to learn and remember.
+1. **Easy to Learn**: Python has a simple syntax and is relatively easy to learn, making it a great language for beginners. It's also a great language for those who want to learn programming quickly.
 
-2. **High-Level Language**: Python is a high-level language, which means it abstracts away many low-level details, allowing developers to focus on the logic of their program without worrying about the underlying mechanics of the computer. This makes it easier to write efficient and effective code.
+2. **High-Level Language**: Python is a high-level language, meaning it abstracts away many low-level details, allowing developers to focus on the logic of their program without worrying about memory management, pointers, etc.
 
-3. **Versatile**: Python can be used for a wide range of applications, including web development, data analysis, machine learning, automation, and more. It's also often used as a scripting language for many operating systems and applications.
+3. **Fast Development**: Python's syntax and nature make it ideal for rapid prototyping and development. It's often used in data science, machine learning, and web development for its ability to quickly develop and test ideas.
 
-4. **Large Community and Resources**: Python has a massive and active community, which means there are many resources available for learning and troubleshooting. This includes extensive documentation, tutorials, and libraries, making it easier to find help when you need it.
+4. **Large Community**: Python has a massive and active community, which means there are many resources available for learning and troubleshooting. This also means there are many libraries and frameworks available, making it easier to find the right tool for the job.
 
-5. **Cross-Platform**: Python can run on multiple operating systems, including Windows, macOS, and Linux. This makes it a great choice for developers who need to write code that can run on different platforms.
+5. **Cross-Platform**: Python can run on multiple operating systems, including Windows, macOS, and Linux. This makes it a great choice for projects that need to be deployed on multiple platforms.
 
-Overall, Python's ease of use, versatility, and large community make it a popular choice for many developers and applications.
+These advantages make Python a popular choice for many applications, including data science, machine learning, web development, automation, and more.
 
 === chain streaming ===
-Vector search is a technique used in various fields, including computer science, statistics, and data analysis. It involves comparing two or more vectors to determine their similarity or distance. In essence, a vector is a mathematical representation of an object or data point, with each element representing a dimension or feature. Vector search algorithms compute the similarity between two vectors by calculating their dot product, Euclidean distance, or cosine similarity, among other methods.
+Vector search is an operation used in various applications, including information retrieval, recommendation systems, and natural language processing. It involves comparing a query vector with a set of stored vectors to find the most similar ones. These vectors can represent various types of data, such as text documents, images, or user behavior. The key concept behind vector search is to use a vector space model, where each data item is represented as a set of numerical features or dimensions. This allows for efficient comparison and similarity measurement between vectors.
 
-There are several applications of vector search, including text search, image search, and recommendation systems. In text search, for example, a vector can represent a document as a collection of word frequencies. The similarity between two documents can be calculated based on their vector representations, enabling the retrieval of relevant documents. Similarly, in image search, a vector can represent an image as a set of pixel values. Vector search algorithms can be used to identify images with similar features.
+In traditional search algorithms, such as exact matching or Boolean search, the comparison is typically done using string or keyword matching. However, vector search algorithms focus on the semantic meaning of the data, using techniques like word embeddings (e.g., Word2Vec, GloVe) to map words or phrases into dense vector representations. These vector representations capture the underlying relationships and patterns in the data, enabling more accurate similarity measurements. By computing the similarity between the query vector and the stored vectors, vector search algorithms can retrieve the most relevant and similar data items.
 
-The most popular algorithm used for vector search is the Approximate Nearest Neighbor (ANN) search. ANN search uses techniques such as k-d trees, ball trees, or Locality-Sensitive Hashing (LSH) to efficiently search for similar vectors in a high-dimensional space. These algorithms trade off between search accuracy and computational efficiency, making them suitable for large-scale applications. Vector search has numerous applications in areas such as information retrieval, natural language processing, and machine learning, where it is used to improve the accuracy and efficiency of various tasks, including classification, clustering, and recommendation.
-```
+Popular algorithms used for vector search include similarity search (e.g., k-nearest neighbors), indexing techniques (e.g., inverted indexes, hierarchical tree structures), and specialized libraries like Faiss (Facebook AI Similarity Search) or Annoy (Approximate Nearest Neighbors Oh Yeah!). These algorithms and libraries provide efficient and scalable solutions for vector search, allowing applications to handle large datasets and perform complex similarity searches in real-time. By leveraging vector search, developers can build more effective recommendation systems, improve search results, and gain valuable insights from complex data.
+~~~
 
 `end=""` and `flush=True` suppress the newline and force immediate output. `StrOutputParser()` extracts the string content from each `AIMessageChunk` during streaming.
 
@@ -197,33 +197,28 @@ full_text = "".join(chunks)
 print(f"\n\ntotal characters: {len(full_text)}")
 ```
 
-```
+~~~
 Output
-streaming: FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook that provides efficient similarity search and clustering for dense vectors. It is primarily designed for large-scale applications, such as search engines, recommendation systems, and clustering algorithms.
+streaming: FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook AI Research (FAIR) for efficient similarity search and clustering of dense vectors. It's a widely used tool in the field of natural language processing, computer vision, and machine learning.
 
-FAISS supports various indexing techniques, including:
+FAISS provides a set of optimized algorithms for searching and clustering high-dimensional vectors, such as those generated by word embeddings (e.g., Word2Vec, GloVe), image embeddings (e.g., ResNet), or other deep learning models. Its primary goals are to:
 
-1. **Flat**: A simple and efficient indexing method that stores all vectors in memory.
-2. **IVF (Inverted File)**: A hierarchical indexing method that divides the vector space into multiple clusters and uses a separate index for each cluster.
-3. **HNSW (Hierarchical Navigable Small World)**: A graph-based indexing method that uses a navigable small-world graph to efficiently search for similar vectors.
-4. **OPQ (Orthogonal Projections)**: A preprocessing method that projects the vectors onto a lower-dimensional space using orthogonal projections.
+1. **Speed up similarity search**: FAISS achieves this by using techniques like quantization, product quantization, and hierarchical k-means to reduce the dimensionality of the search space.
+2. **Improve scalability**: The library is designed to handle massive datasets and can be easily parallelized to take advantage of multi-core processors and distributed computing environments.
+3. **Provide a flexible and modular architecture**: FAISS allows users to choose from various indexing algorithms, distance metrics, and clustering techniques to suit their specific use cases.
 
-FAISS provides several benefits, including:
+Some common applications of FAISS include:
 
-1. **Efficient search**: FAISS can search for similar vectors in a matter of milliseconds, even for large datasets.
-2. **Scalability**: FAISS can handle datasets with billions of vectors and scale to large clusters.
-3. **Flexibility**: FAISS supports various indexing techniques and can be used in a variety of applications.
+1. **Text search**: Efficiently searching for similar documents or sentences in a large corpus.
+2. **Image search**: Searching for similar images in a large database, such as in self-driving cars or image classification tasks.
+3. **Anomaly detection**: Identifying unusual patterns or outliers in high-dimensional data.
+4. **Recommendation systems**: Suggesting relevant items to users based on their past behavior or preferences.
+5. **Clustering**: Grouping similar data points into clusters, such as in customer segmentation or market research.
 
-Some common use cases for FAISS include:
+Overall, FAISS is a powerful tool for efficiently searching and clustering high-dimensional vectors, making it a valuable resource for many data-intensive applications.
 
-1. **Similarity search**: FAISS can be used to find similar vectors in a dataset, such as searching for similar images or text documents.
-2. **Clustering**: FAISS can be used to cluster similar vectors together, such as grouping similar customers or products.
-3. **Recommendation systems**: FAISS can be used to build recommendation systems that suggest similar items to users based on their past behavior.
-
-Overall, FAISS is a powerful library that provides efficient similarity search and clustering capabilities for dense vectors, making it a popular choice for large-scale applications.
-
-total characters: 1906
-```
+total characters: 1876
+~~~
 
 ---
 
@@ -263,70 +258,47 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-```
+~~~
 Output
 streaming: embedding vectors
-**Vector Embeddings: A Brief Overview**
+**Embedding Vectors**
 
-Vector embeddings are a fundamental concept in natural language processing (NLP) and machine learning. They enable computers to understand complex data by representing it as numerical vectors.
+Embedding vectors is a technique used in natural language processing (NLP) and machine learning to represent words, phrases, or other entities as numerical vectors in a high-dimensional space. The goal is to capture the semantic meaning of each entity in a way that allows for efficient comparison and similarity calculation.
 
-**Key Concepts:**
+**Key Properties:**
 
-1. **Tokenization**: Breaking down text into individual words or tokens.
-2. **Vector Space**: A high-dimensional space where each token is represented as a numerical vector.
-3. **Embeddings**: Learned vector representations of tokens that capture their semantic meaning.
+1. **Dimensionality Reduction**: Embedding vectors reduce the dimensionality of the input data, making it more manageable for machine learning algorithms.
+2. **Semantic Similarity**: Embedding vectors preserve the semantic relationships between entities, allowing for similarity calculations between words or phrases.
+3. **Continuous Space**: Embedding vectors are represented in a continuous numerical space, enabling efficient computation and comparison.
 
-**How Embeddings Work:**
+**Common Use Cases:**
 
-1. **Training**: A neural network model is trained on a large dataset of text, where the goal is to predict the next word in a sequence.
-2. **Learning**: The model learns to represent each token as a vector in the vector space, such that similar tokens are close together.
-3. **Embedding**: The learned vector representations of tokens are extracted and stored as embeddings.
+1. **Word Embeddings**: Represent words in a vector space to capture their semantic meanings and relationships (e.g., Word2Vec, GloVe).
+2. **Sentence Embeddings**: Represent sentences or phrases as vectors to capture their meaning and context (e.g., Sentence-BERT).
+3. **Image Embeddings**: Represent images as vectors to capture their visual features and similarities (e.g., Convolutional Neural Networks).
 
 **Example:**
 
-Suppose we have two words "king" and "queen". Their embeddings might be:
+Suppose we have two words: "dog" and "cat". A word embedding might represent them as vectors in a 200-dimensional space:
 
-* king: [0.1, 0.2, 0.3, ...]
-* queen: [0.1, 0.2, -0.2, ...]
+* "dog" → [0.23, 0.56, 0.78, ...]
+* "cat" → [0.12, 0.34, 0.92, ...]
 
-These vectors capture the semantic similarity between "king" and "queen", allowing the model to understand their relationship.
+The similarity between these vectors can be calculated using various metrics (e.g., cosine similarity), allowing us to determine that "dog" and "cat" are semantically similar.
 
-**Popular Embedding Techniques:**
-
-1. Word2Vec
-2. GloVe (Global Vectors for Word Representation)
-3. FastText
-
-**Advantages:**
-
-1. Improved performance in NLP tasks, such as sentiment analysis and language translation.
-2. Ability to capture nuanced semantic relationships between words.
-
-By representing tokens as numerical vectors, vector embeddings enable computers to understand complex data and make informed decisions.
+By representing entities as vectors, embedding vectors provide a powerful tool for NLP and machine learning tasks, enabling efficient comparison and similarity calculations.
 streaming: FAISS indexes
-**FAISS Indexes: An Overview**
+FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook AI Research (FAIR) for efficient similarity search and clustering of dense vectors. It provides a range of algorithms and data structures (indexes) for indexing and searching high-dimensional vectors efficiently.
 
-FAISS (Facebook AI Similarity Search) is a library for efficient similarity search and clustering of dense vectors. It provides various indexing techniques to speed up the search process. Here's a brief overview of FAISS indexes:
+The most commonly used indexes in FAISS are:
 
-### 1. Flat Index (IVF)
+1. **IVF (Inverted File)**: A hierarchical k-means based index, which divides the search space into a hierarchy of clusters. Each cluster is represented by a centroid, and the index is built by storing the centroids and their corresponding clusters.
+2. **IVFFLAT (Inverted File with Flat Index)**: A variant of the IVF index that uses a flat index to speed up the search process. It's particularly useful when the search space is very large.
+3. **HNSW (Hierarchical Navigable Small World)**: A graph-based index that constructs a graph where each node represents a vector, and two nodes are connected if the vectors are similar.
+4. **PQ (Product Quantization)**: A quantization-based index that divides the search space into smaller subspaces and represents each vector as a combination of indices into these subspaces.
 
-- **Description:** The most basic index type in FAISS, which stores all the vectors in memory.
-- **Advantages:** Fast lookup, suitable for small datasets.
-- **Disadvantages:** Not scalable for large datasets.
-
-### 2. Inverted File (IVF)
-
-- **Description:** A hierarchical index that divides the vector space into regions (centroids) and stores vectors in each region.
-- **Advantages:** Scalable and efficient for large datasets.
-- **Disadvantages:** Can be slow for exact matches.
-
-### 3. Product Quantization (PQ)
-
-- **Description:** A technique that divides each vector dimension into multiple bins (centroids) and stores the bin indices.
-- **Advantages:** Fast and efficient for approximate matches.
-- **Disadvantages:** Can lose some precision.
-... (truncated)
-```
+These indexes are designed to trade off between search time and memory usage, allowing users to choose the best approach for their specific use case.
+~~~
 
 ---
 

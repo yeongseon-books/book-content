@@ -133,11 +133,11 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 HEALTH: {'status': 'ok', 'model': 'llama-3.1-8b-instant'}
 CHAT: {'response': 'Python async functions, also known as coroutines, are a way to write single-threaded concurrent code using asynchronous programming. They allow a function to pause its execution at specific points, known as await expressions, and resume execution when the awaited task is complete, enabling efficient use of system resources and improving responsiveness.', 'model': 'llama-3.1-8b-instant'}
-```
+~~~
 
 ## What to notice in this code
 - `asyncio.to_thread` prevents the synchronous Groq SDK from blocking the FastAPI event loop.

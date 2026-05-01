@@ -113,7 +113,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 {
   "raw": {
@@ -124,7 +124,7 @@ if __name__ == "__main__":
       "CPython",
       "threading",
       "concurrency",
-      "multithreading"
+      "parallelism"
     ]
   },
   "evaluation": {
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     "answer_length": 138
   }
 }
-```
+~~~
 
 ## 이 코드에서 봐야 할 것
 - `response_format={"type": "json_object"}`로 모델 출력 형태를 먼저 좁혀 두면 검사기가 단순해집니다.

@@ -98,7 +98,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 {
   "price_per_million_tokens": 0.05,
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     }
   ]
 }
-```
+~~~
 
 ## 이 코드에서 봐야 할 것
 - `PRICE_PER_MILLION_TOKENS`를 상수로 두면 공급자나 플랜이 바뀌어도 계산식은 유지됩니다.

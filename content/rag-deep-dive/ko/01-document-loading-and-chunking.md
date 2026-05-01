@@ -89,7 +89,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 
 === CharacterTextSplitter (3 chunks) ===
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 [1] '# Incident runbook\n\n## Retry policy\nThe worker retries a failed message three times.\nAfter the final retry, the'
 [2] ' final retry, the payload moves to the dead-letter queue.\n\n## Operator action\nThe on-call engineer checks the exception chain'
 [3] ' checks the exception chain and the original payload.\n'
-```
+~~~
 
 ### 이 코드에서 봐야 할 것
 
@@ -263,7 +263,7 @@ for index, doc in enumerate(documents, start=1):
     print("-" * 40)
 ```
 
-```
+~~~
 출력 결과
 chunk 1
 {'source': 'runbook', 'start_index': -1}
@@ -278,7 +278,7 @@ chunk 3
 {'source': 'runbook', 'start_index': 137}
 Operators must inspect the original payload and the exception chain.
 ----------------------------------------
-```
+~~~
 
 이 예시를 직접 돌려 보면 overlap이 항상 정확히 20문자가 아니라, 줄 단위 조각을 얼마나 오래 유지했는지에 따라 바뀌는 것을 확인할 수 있습니다. 실무에서 “왜 overlap을 100으로 줬는데 체감상 거의 안 겹치지?”라는 질문이 나오는 이유가 여기 있습니다. LangChain은 문자 스트림을 잘라 붙이는 것이 아니라, **먼저 쪼갠 조각들을 다시 묶는 방식**으로 overlap을 구현합니다.
 
@@ -331,7 +331,7 @@ for index, chunk in enumerate(chunks, start=1):
     print(f"chunk {index}\n{chunk}\n")
 ```
 
-```
+~~~
 출력 결과
 chunk 1
 # Service policy
@@ -347,7 +347,7 @@ The public API allows 120 requests per minute per API key.
 
 chunk 4
 Burst requests above the limit receive HTTP 429 responses.
-```
+~~~
 
 여기서 기대해야 할 것은 “완벽한 의미 단위”가 아니라 “대부분의 자연스러운 경계가 보존되는 기본값”입니다. 그래서 `RecursiveCharacterTextSplitter`는 범용 기본 선택으로 좋지만, 문서 형식이 더 구조적이라면 그대로 멈추면 안 됩니다. 코드, HTML, JSON, 법률 문서처럼 경계가 명확한 자료는 언어별 separator 집합이나 도메인별 전처리를 추가하는 편이 낫습니다.
 
@@ -396,7 +396,7 @@ for chunk in token_chunks:
     print(len(chunk), len(encoding.encode(chunk)), chunk)
 ```
 
-```
+~~~
 출력 결과
 character-based
 27 17 고객 ID 18423의 결제 실패 원인은 HTTP
@@ -407,7 +407,7 @@ token-based
 24 18 인은 HTTP 429 응답이 아니라, 백오�
 21 18  백오프 없이 재시도한 내부 배치 작�
 12 9  배치 작업이었습니다.
-```
+~~~
 
 한국어, 숫자, 영문 식별자, 구두점이 섞인 운영 로그나 에러 리포트에서는 이 차이가 더 벌어집니다. 문자 500자면 충분할 거라고 가정했는데 토큰 900개가 나오는 식입니다. 질문당 여러 chunk를 합치는 multi-context RAG에서는 이 편차가 누적됩니다. `top_k=6`을 유지하고 싶다면 ingest 단계의 chunk 크기부터 토큰 예산과 맞춰야 합니다.
 
@@ -469,14 +469,14 @@ if __name__ == "__main__":
     measure_chunks(documents)
 ```
 
-```
+~~~
 출력 결과
 chunks: 2
 configured overlap ratio: 0.17
 avg tokens per chunk: 17.0
 max tokens per chunk: 18
 min tokens per chunk: 16
-```
+~~~
 
 이 스크립트만으로 품질을 다 알 수는 없습니다. 그래도 설정 숫자를 감으로 고르는 단계에서 한 걸음 나아갑니다. chunk 전략은 결국 retrieval 실험으로 닫혀야 합니다. 다만 실험 전에 소스 코드를 읽어 두면 왜 특정 설정이 그렇게 동작했는지 설명할 수 있게 됩니다. 그것이 운영에서 중요합니다. 튜닝은 우연히 맞출 수 있어도, 재현 가능한 개선은 내부 동작을 이해해야만 가능합니다.
 

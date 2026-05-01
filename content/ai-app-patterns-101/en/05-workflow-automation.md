@@ -117,24 +117,20 @@ step3 = title_fn(step2)
 print(f"title: {step3}")
 ```
 
-```
+~~~
 Output
 translation:
-인공 지능이 기업의 운영 방식을 혁신하고 있습니다. 
-
-산업 분야의 회사들이 반복적인 작업을 자동화하고, 의사 결정을 향상하고, 고객 경험을 개인화하기 위해 인공 지능 도구를 채택하고 있습니다.
-
-의료 분야에서는 인공 지능이 진단과 약물 발견에 도움을 주고 있습니다. 
-
-금융 분야에서는 인공 지능이 위조 탐지와 알고리즘 거래를 구동하고 있습니다. 
-
-인공 지능이 더 능력을 얻을수록, 조직은 편견, 투명성, 데이터 개인 정보와 같은 윤리적 고려를 해결해야 합니다.
+인공지능이 기업의 운영 방식을 변화시키고 있습니다.
+산업 분야의 모든 회사들이 반복적인 업무를 자동화하고, 의사 결정을 개선하고, 고객의 개인화된 경험을 제공하기 위해 인공지능 도구를 채택하고 있습니다.
+의료 분야에서는 인공지능이 진단 및 약물 개발을 도와주고 있습니다.
+금융 분야에서는 인공지능이 사기 감지를 지원하고 알고리즘 거래를 동작시킵니다.
+인공지능이 더 능동적으로 될수록, 기관들은 편향성, 투명성 및 데이터 프라이버시와 같은 эти적 고려사항에 대처해야 합니다.
 
 summary:
-인공 지능은 기업의 운영 방식을 혁신하고 있으며, 산업 분야에서 반복적인 작업을 자동화하고 고객 경험을 개인화하는 데 사용되고 있습니다. 의료, 금융 분야에서도 인공 지능이 진단과 약물 발견, 위조 탐지, 알고리즘 거래 등에 도움을 주고 있지만, 더 높은 능력으로 인해 윤리적 고려 사항이 더욱 중요한 주제로 떠오르고 있습니다.
+인공지능은 기업의 운영 방식을 변화시켜가며, 산업 분야의 모든 회사들이 업무를 자동화하고 고객의 개인화된 경험을 제공하기 위해 인공지능 도구를 채택하고 있습니다. 그러나 인공지능이 더 능동적으로 변할수록, 기관들은 편향성, 투명성 및 데이터 프라이버시와 같은 эти적 고려사항에 대한 대응이 필요해지고 있습니다.
 
-title: "인공 지능의 혁신적인 가능성과 윤리적 고려"
-```
+title: "인공지능의 성장: 기업의 새로운 도전과 도전"
+~~~
 
 ---
 
@@ -226,70 +222,70 @@ for inquiry in test_inquiries:
     print(f"response: {result['response']}")
 ```
 
-```
+~~~
 Output
 
 inquiry: My bill doubled this month without any explanation. Please check.
 category: BILLING
-response: I'm here to help you understand your bill. I'll review the details and provide a clear explanation.
+response: I'd be happy to help you with that. Can you please provide me with some details so I can look into this for you?
 
-To assist me, could you please provide the following information:
+Could you please provide your account number or the last 4 digits of your account number? This will help me to access your account information.
 
-1. Your account number or the last 4 digits of your account number.
-2. The date of the current bill you received.
-3. The original amount of your previous bill.
-4. Any additional services you've added or changes to your plan recently.
+Additionally, can you tell me what services you have with us (e.g. phone, internet, streaming, etc.)? And have you received any previous invoices or statements that show your bill normally being a certain amount?
 
-With this information, I'll investigate further and provide you with a detailed explanation for the increase in your bill. If there's an error or issue, we'll work together to correct it and get your bill back to the correct amount.
-
-Also, please note that if you've already made any payments on this bill, we'll process a refund promptly if the issue is resolved in your favor.
-
-Is there anything else you'd like to share about your account or the bill in question?
+Lastly, have you made any changes to your account recently, such as adding or removing services, or paying an outstanding balance?
 
 inquiry: The app keeps crashing when I open it. What should I do?
 category: TECHNICAL
-response: Sorry to hear that the app is crashing. Let's troubleshoot the issue step by step. Here are some possible solutions:
+response: Crashes can be frustrating. Let's troubleshoot the issue step by step. Here's a possible solution:
 
-**Step 1: Close and Reopen the App**
+**Step 1: Close the app and restart your device**
 
-1. Close the app by swiping it away from the task list (on Android devices) or by double-tapping the Home button to find the app and swipe it away (on iOS devices).
-2. Wait for a few seconds and then reopen the app.
-3. If the app still crashes, proceed to the next step.
+Try closing the app completely and then restart your device. This can sometimes resolve the issue.
 
-**Step 2: Restart Your Device**
+1. Double-tap the Home button (or swipe up from the bottom on some devices) to bring up the app switcher.
+2. Swipe left or right to find the app that's crashing.
+3. Swipe up on the app to close it.
+4. Restart your device.
 
-1. Restart your device by pressing and holding the Power button until the shutdown menu appears.
-2. Tap "Restart" or "Power off" to restart your device.
-3. Wait for your device to fully boot up and then reopen the app.
+**Step 2: Check for updates**
 
-**Step 3: Clear App Data and Cache**
+Ensure your app is updated to the latest version.
 
-1. Go to your device's Settings app.
-2. Find the app that's crashing and select it.
-3. Look for the "Storage" or "App info" option and select it.
-4. Tap "Clear cache" and "Clear data" (be cautious when clearing data, as it may remove app settings and progress).
-5. Wait for the cache to be cleared and then reopen the app.
+1. Open the App Store (on iOS) or Google Play Store (on Android).
+2. Search for the app that's crashing.
+3. Check if an update is available.
+4. If there's an update, download and install it.
 
-**Step 4: Update the App**
+**Step 3: Clear app data and cache**
 
-1. Check the Google Play Store (for Android devices) or the Apple App Store (for iOS devices) for any available updates for the app.
-2. If an update is available, download and install it.
-3. Wait for the update to complete and then reopen the app.
+Clearing the app's data and cache can resolve issues caused by corrupted data.
 
-**Step 5: Uninstall and Reinstall the App**
+1. Go to your device's Settings.
+2. Navigate to Apps (or App Manager).
+3. Find the app that's crashing.
+4. Tap on Storage (or Clear data).
+5. Select Clear cache and Clear data (if available).
+6. Restart your device.
 
-1. Go to your device's Settings app and find the app that's crashing.
-2. Select the app and choose "Uninstall" or "Delete".
-3. Wait for the app to be fully uninstalled.
-4. Open the Google Play Store (for Android devices) or the Apple App Store (for iOS devices) and reinstall the app.
-5. Wait for the app to fully install and then reopen it.
+**Step 4: Uninstall and reinstall the app**
 
-If none of these steps resolve the issue, please provide more information about the error message you're seeing or any other symptoms you're experiencing. This will help me better understand the problem and provide a more tailored solution.
+If the above steps don't work, try uninstalling and reinstalling the app.
 
-inquiry: What are your business hours?
-category: GENERAL
+1. Go to your device's Settings.
+2. Navigate to Apps (or App Manager).
+3. Find the app that's crashing.
+4. Tap on Uninstall.
+5. Wait for the app to uninstall.
+6. Open the App Store (on iOS) or Google Play Store (on Android).
+7. Search for the app.
+8. Tap the Install button.
+
+If none of these steps resolve the issue, please provide more details about the crash, such as:
+
+* The error message you see
 ... (truncated)
-```
+~~~
 
 ---
 
@@ -373,33 +369,6 @@ def get_user(id):
 print("running code review pipeline...")
 result = code_review_pipeline(sample_code)
 print(f"\n=== final report ===\n{result['report']}")
-```
-
-```
-Output
-running code review pipeline...
-  analysis done: score 4/10, 5 issues
-  suggestions done
-  report done
-
-=== final report ===
-**Overall Assessment:**
-The code review reveals several issues with the current implementation, including SQL injection vulnerability, lack of error handling for SQLite connection errors, no error handling for SELECT statement errors, no validation for user ID, and database connection not being closed in a finally block. These issues can lead to security vulnerabilities, data loss, and other problems.
-
-**Key Improvements:**
-
-1.  **Use a parameterized query to prevent SQL injection**: Use a parameterized query instead of string formatting to insert user IDs into the SQL query.
-2.  **Implement try-except blocks for error handling**: Wrap the code in try-except blocks to catch and handle SQLite connection errors, SELECT statement errors, and other exceptions.
-3.  **Validate user IDs**: Add a check to ensure that the user ID is a valid integer.
-4.  **Close the database connection in a finally block**: Close the database connection in a finally block to ensure it is always closed, even if an exception occurs.
-
-**Recommended Actions:**
-
-1.  **Implement the corrected code**: Apply the suggested improvements to the original code to address the identified issues.
-2.  **Test the corrected code**: Thoroughly test the corrected code to ensure it works as expected and handles errors correctly.
-3.  **Continuously monitor and maintain the code**: Regularly review and update the code to ensure it remains secure, efficient, and reliable.
-
-Corrected Code:
 ```python
 def get_user(id):
     try:

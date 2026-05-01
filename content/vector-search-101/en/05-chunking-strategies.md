@@ -108,7 +108,7 @@ for i, chunk in enumerate(chunks):
     print(f"\n[{i}] {len(chunk)} chars: {chunk[:60]}...")
 ```
 
-```
+~~~
 Output
 total text length: 439 chars
 number of chunks: 6
@@ -124,7 +124,7 @@ number of chunks: 6
 [4] 100 chars: s. Choosing the right chunk size improves retrieval accuracy...
 
 [5] 39 chars: educe context loss at chunk boundaries....
-```
+~~~
 
 This version is for illustration only. Splitting by raw character count often cuts sentences in the middle. For production use, the approach below works better.
 
@@ -169,7 +169,7 @@ for i, chunk in enumerate(chunks):
     print(f"  {chunk[:80]}...")
 ```
 
-```
+~~~
 Output
 number of chunks: 5
 
@@ -189,7 +189,7 @@ I...
 
 [4] 94 chars:
   IndexFlatIP is an exact inner-product index equivalent to cosine search on norma...
-```
+~~~
 
 The `separators` list is tried in order. If `\n\n` produces a piece within `chunk_size`, that split is used. Otherwise the splitter tries the next separator. The result is chunks that usually end at paragraph or sentence boundaries.
 
@@ -257,7 +257,7 @@ for query in ["how vector search works", "FAISS library features", "setting chun
         print(f"  [{rank}] {score:.4f} — {text[:60]}...")
 ```
 
-```
+~~~
 Output
 chunks: 4
 
@@ -272,7 +272,7 @@ query: 'FAISS library features'
 query: 'setting chunk size'
   [1] 0.5347 — Chunking strategies split long documents into units the embe...
   [2] 0.0345 — FAISS is a high-speed vector search library developed at Fac...
-```
+~~~
 
 ---
 

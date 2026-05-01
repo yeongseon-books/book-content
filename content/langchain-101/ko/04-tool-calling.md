@@ -47,10 +47,10 @@ response = llm.bind_tools([add_numbers]).invoke("13과 29를 더해 주세요.")
 print(response.tool_calls)
 ```
 
-```
+~~~
 출력 결과
-[{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': 'cn4zf3ce0', 'type': 'tool_call'}]
-```
+[{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': 'tmtz1f3jx', 'type': 'tool_call'}]
+~~~
 
 ## 이 코드에서 봐야 할 것
 
@@ -168,6 +168,13 @@ print(f"content: {response.content!r}")
 print(f"tool_calls: {response.tool_calls}")
 ```
 
+~~~
+출력 결과
+응답 타입: AIMessage
+content: ''
+tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': 'zjyhw2ynk', 'type': 'tool_call'}]
+~~~
+
 `tool_calls`가 비어있지 않으면 LLM이 도구 호출을 요청한 것입니다.
 
 ```
@@ -248,6 +255,23 @@ for q in questions:
     print(f"답변: {answer}")
 ```
 
+~~~
+출력 결과
+
+질문: 15 더하기 27은 얼마인가요?
+  도구 실행: add_numbers({'a': 15, 'b': 27}) = 42.0
+답변: 15와 27의 합은 42입니다.
+
+질문: 7 곱하기 8은 얼마인가요?
+  도구 실행: multiply_numbers({'a': 7, 'b': 8}) = 56.0
+답변: 7과 8의 곱은 56입니다.
+
+질문: 5 더하기 3을 먼저 구하고, 그 결과에 4를 곱하면 얼마인가요?
+  도구 실행: add_numbers({'a': 5, 'b': 3}) = 8.0
+  도구 실행: multiply_numbers({'a': 8, 'b': 4}) = 32.0
+답변: 32.0으로 결과가 나옵니다.
+~~~
+
 루프 구조는 단순합니다. LLM이 도구 호출을 요청하지 않을 때까지 반복합니다. 각 도구 결과는 `ToolMessage`로 대화 이력에 추가됩니다.
 
 ---
@@ -302,14 +326,6 @@ def run_with_tools(question: str) -> str:
 
 print(run_with_tools("지금 몇 시인가요?"))
 print(run_with_tools("체중 70kg, 키 1.75m인 사람의 BMI는?"))
-```
-
-```
-출력 결과
-  get_current_time({}) = 2026-05-01 22:06:56
-실제로 현재 시간은 2026-05-01 22:06:56 이지만, 실제 시간과 다를 수 있습니다.
-  calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
-Note: The BMI is calculated as weight (in kg) divided by the square of height (in meters). In this case, the BMI is 70 kg / (1.75 m)^2 = 22.86.
 ```
 
 ---

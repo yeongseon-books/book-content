@@ -47,12 +47,10 @@ chain = prompt | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ
 print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemplate"}))
 ```
 
-```
+~~~
 Output
-In the context of Dialogflow or similar conversational AI platforms, a PromptTemplate is a reusable template for generating custom conversation prompts. This template allows you to define a structure for your conversation prompts, enabling you to easily create and manage multiple prompts with varying parameters, such as user input or context information.
-
-By utilizing a PromptTemplate, you can decouple the conversation flow logic from the actual prompt text, making it easier to maintain and update your conversational interface while ensuring consistency across different interactions.
-```
+In the context of LLaMA (Large Language Model Application), PromptTemplate is a feature that allows you to create a template for a prompt, which is then used to generate a specific type of response from the model. This template can include placeholders for user-specific information, such as names or dates, and is designed to be reusable for a wide range of scenarios. By using PromptTemplate, you can create more flexible and efficient prompts that can be easily adapted to different use cases, reducing the need for manual prompt engineering.
+~~~
 
 ## What to notice in this code
 
@@ -137,21 +135,66 @@ response = chain.invoke({
 print(response.content)
 ```
 
-```
+~~~
 Output
-**Choosing Between List Comprehension and For Loop**
+**List Comprehensions vs For Loops**
 
-List comprehensions and for loops are both used to create lists in Python. However, there are situations where one is a better choice than the other.
+List comprehensions and for loops are both used to create lists in Python, but they have different use cases and benefits.
 
-**When to Use List Comprehension**
+**When to Use List Comprehensions:**
 
-List comprehensions are a better choice than for loops in the following scenarios:
+1.  **Concise Code:** List comprehensions are more concise and readable than for loops when the operation is simple and straightforward.
+2.  **Performance:** List comprehensions are generally faster than for loops because they avoid the overhead of function calls and variable assignments.
+3.  **Memory Efficiency:** List comprehensions create lists in a single step, which can be more memory-efficient than for loops, especially when dealing with large datasets.
 
-### 1. **Simple Transformations**
+**When to Use For Loops:**
 
-If you need to perform a simple transformation on each element of a list, list comprehensions are a good choice.
+1.  **Complex Operations:** For loops are better suited for complex operations that involve multiple steps, conditional statements, or function calls.
+2.  **Debugging:** For loops provide more visibility into the iteration process, making them easier to debug than list comprehensions.
+3.  **Mutating the Original List:** For loops are necessary when you need to mutate the original list, such as appending or removing elements.
 
-```python
+**Example Use Cases:**
+
+1.  **Simple List Creation:**
+
+    ```python
+# For loop
+numbers = []
+for i in range(10):
+    numbers.append(i)
+
+# List comprehension
+numbers = [i for i in range(10)]
+```
+
+2.  **Filtering and Transformation:**
+
+    ```python
+# For loop
+numbers = []
+for i in range(10):
+    if i % 2 == 0:
+        numbers.append(i)
+
+# List comprehension
+numbers = [i for i in range(10) if i % 2 == 0]
+```
+
+3.  **Complex Operations:**
+
+    ```python
+# For loop
+numbers = []
+for i in range(10):
+    if i % 2 == 0:
+        numbers.append(i * 2)
+
+# List comprehension
+numbers = [i * 2 for i in range(10) if i % 2 == 0]
+```
+
+In summary, use list comprehensions when you need concise, efficient, and readable code for simple operations. Use for loops when you require complex operations, debugging, or mutating the original list.
+~~~python
 numbers = [1, 2, 3, 4, 5]
 double_numbers = [x * 2 for x in numbers]
 print(double_numbers)  # [2, 4, 6, 8, 10]
@@ -167,6 +210,11 @@ even_numbers = [x for x in numbers if x % 2 == 0]
 print(even_numbers)  # [2, 4]
 ```
 
+~~~
+Output
+[2, 4]
+~~~
+
 ### 3. **Readability**
 
 List comprehensions can make your code more readable by avoiding the need for a for loop and if statement.
@@ -179,6 +227,11 @@ for x in numbers:
         even_numbers.append(x)
 print(even_numbers)  # [2, 4]
 ```
+
+~~~
+Output
+[2, 4]
+~~~
 
 ### 4. **Performance**
 
@@ -290,13 +343,13 @@ print(f"description: {result.get('description')}")
 print(f"use_case: {result.get('use_case')}")
 ```
 
-```
+~~~
 Output
 type: <class 'dict'>
 name: FAISS
-description: Facebook AI Similarity Search (FAISS) is an open-source library for efficient similarity search and clustering of dense vectors. It is developed by the Facebook AI Research (FAIR) team.
-use_case: FAISS is used in various applications including but not limited to: Similarity search and clustering of dense vectors, Product recommendations, Image and video search, Personalized advertising, and Anomaly detection.
-```
+description: Facebook AI Similarity Search (FAISS) is a library for efficient similarity search and clustering of dense vectors.
+use_case: FAISS is used in various applications such as image and speech processing, natural language processing, and recommender systems.
+~~~
 
 If JSON parsing is unreliable, `with_structured_output()` is more robust. That method is covered in the llm-api-production-101 series.
 
@@ -334,10 +387,10 @@ result = chain.invoke({
 print(result)
 ```
 
-```
+~~~
 Output
 FAISS was developed at Facebook AI Research.
-```
+~~~
 
 `RunnablePassthrough` appears most often when connecting a Retriever to a prompt. Post 3 shows that pattern in detail.
 
@@ -377,31 +430,70 @@ result = chain_with_fallback.invoke({"question": "How does Python handle excepti
 print(result)
 ```
 
-```
+~~~
 Output
 **Exception Handling in Python**
 =====================================
 
-Python provides a comprehensive exception handling mechanism that allows you to handle runtime errors and other exceptional conditions that may arise during the execution of your code. Here's an overview of how Python handles exceptions:
+Python provides a robust exception handling mechanism to handle runtime errors and exceptions. This mechanism allows you to write more robust and error-free code.
 
 **Types of Exceptions**
 ------------------------
 
-Python has two types of exceptions:
+There are two types of exceptions in Python:
 
-1. **Built-in Exceptions**: These are exceptions that are defined in the Python standard library. Examples include `ValueError`, `TypeError`, `RuntimeError`, etc.
-2. **User-defined Exceptions**: These are exceptions that you can define yourself using the `class` keyword.
+1. **Built-in Exceptions**: These are exceptions that are defined in the Python standard library. Examples include `ValueError`, `TypeError`, `ZeroDivisionError`, etc.
+2. **Custom Exceptions**: These are exceptions that you define yourself to handle specific errors in your code.
 
 **Try-Except Block**
---------------------
+---------------------
 
-The try-except block is the fundamental building block of exception handling in Python. It consists of two parts:
+The try-except block is the core of Python's exception handling mechanism. It consists of two parts:
 
-1. **Try Block**: This is the block of code that may raise an exception.
-2. **Except Block**: This is the block of code that will be executed if an exception is raised in the try block.
+1. **Try Block**: This is where you put the code that might raise an exception.
+2. **Except Block**: This is where you put the code that handles the exception.
 
 Here's an example:
 ```python
+try:
+    x = 5 / 0
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+```
+In this example, we're trying to divide `5` by `0`, which raises a `ZeroDivisionError`. The except block catches this exception and prints a custom error message.
+
+**Multiple Except Blocks**
+---------------------------
+
+You can have multiple except blocks to catch different types of exceptions:
+```python
+try:
+    x = 5 / 0
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+except TypeError:
+    print("Invalid data type!")
+```
+**Finally Block**
+------------------
+
+The finally block is optional, but it's useful for cleaning up resources:
+```python
+try:
+    x = 5 / 0
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+finally:
+    print("Cleanup resources...")
+```
+**Raising Exceptions**
+----------------------
+
+You can raise a custom exception using the `raise` keyword:
+```python
+class CustomError(Exception):
+... (truncated)
+~~~python
 try:
     # Code that may raise an exception
     x = 5 / 0
@@ -424,6 +516,11 @@ except TypeError:
     # Code that will be executed if a TypeError is raised
     print("Invalid type!")
 ```
+
+~~~
+Output
+Cannot divide by zero!
+~~~
 **Finally Block**
 -----------------
 
@@ -439,6 +536,12 @@ finally:
     # Code that will be executed regardless of whether an exception was raised
     print("This will always be printed!")
 ```
+
+~~~
+Output
+Cannot divide by zero!
+This will always be printed!
+~~~
 ... (truncated)
 ```
 

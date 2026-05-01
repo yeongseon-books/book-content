@@ -44,7 +44,7 @@ PYTHON_BLOCK_RE = re.compile(
 
 # Already-inserted output block patterns (ko or en)
 OUTPUT_BLOCK_RE = re.compile(
-    r"^```\n(출력 결과|Output|출력)\n",
+    r"^(```|~~~)\n(출력 결과|Output|출력)\n",
     re.MULTILINE,
 )
 
@@ -162,7 +162,7 @@ def inject_file(path: Path) -> int:
             continue
 
         print(f"ok ({len(out.splitlines())} lines)")
-        output_block = f"\n\n```\n{label}\n{out}\n```"
+        output_block = f"\n\n~~~\n{label}\n{out}\n~~~"
         new_parts.append(fence_open + code + fence_close + output_block)
         injected += 1
 

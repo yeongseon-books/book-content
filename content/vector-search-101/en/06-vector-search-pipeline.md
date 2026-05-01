@@ -192,7 +192,7 @@ for query in queries:
         print(f"  [{rank}] {score:.4f} — {text.strip()[:70]}...")
 ```
 
-```
+~~~
 Output
 total chunks: 4
 vector shape: (4, 384)
@@ -214,7 +214,7 @@ query: 'choosing chunk size'
 query: 'role of retrieval in RAG'
   [1] 0.5931 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
   [2] 0.1908 — Chunking strategies split long documents into units the embedding mode...
-```
+~~~
 
 Expected output:
 

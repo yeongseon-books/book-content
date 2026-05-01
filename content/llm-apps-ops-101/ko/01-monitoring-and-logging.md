@@ -132,18 +132,18 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 === monitoring summary ===
 {
   "calls": 2,
   "latency_ms": [
-    398.6,
-    362.8
+    379.6,
+    326.1
   ],
   "total_tokens": 262
 }
-```
+~~~
 
 ## 이 코드에서 봐야 할 것
 - `JsonFormatter`가 모든 로그를 같은 스키마로 맞춰서 후처리 없이 적재할 수 있습니다.

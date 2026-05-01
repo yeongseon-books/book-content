@@ -96,12 +96,12 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 {'faithfulness': 0.7500, 'answer_relevancy': 0.6183}
                                             question                                                                                                                                         contexts                                                                                                            answer                                                         ground_truth  faithfulness  answer_relevancy
 After how many retries is the message dead-lettered? [The worker retries a failed message up to three times before giving up., After the final retry, the payload is moved to the dead-letter queue.] The system retries the message three times. After the final retry, it moves the payload to the dead-letter queue. The message is retried up to three times before it is dead-lettered.          0.75          0.618348
-```
+~~~
 
 ### What to notice in this code
 
@@ -187,7 +187,7 @@ column_map = {
 print(column_map)
 ```
 
-```
+~~~
 Output
 Dataset({
     features: ['question', 'contexts', 'answer', 'ground_truth'],
@@ -195,7 +195,7 @@ Dataset({
 })
 {'question': Value('string'), 'contexts': List(Value('string')), 'answer': Value('string'), 'ground_truth': Value('string')}
 {'question': 'query', 'contexts': 'retrieved_passages', 'answer': 'prediction', 'ground_truth': 'reference_answer'}
-```
+~~~
 
 That may look simple, but it captures the core idea: a useful RAG evaluation set is not a bag of outputs. It is a set of relations between intent, evidence, answer, and target truth.
 
@@ -250,10 +250,10 @@ verdicts = [
 print(faithfulness_score(verdicts))
 ```
 
-```
+~~~
 Output
 0.6666666666666666
-```
+~~~
 
 The real RAGAS implementation uses an LLM both to produce the atomic claims and to verify them, but the score itself is just the supported-claims fraction. That simplicity is part of what makes it operationally useful.
 
@@ -295,10 +295,10 @@ scores = [
 print(sum(scores) / len(scores))
 ```
 
-```
+~~~
 Output
 0.9983311560026473
-```
+~~~
 
 The point is what the metric is actually asking: answer focus under the original user intent, not correctness.
 
@@ -342,10 +342,10 @@ ranking = [1, 0, 1, 0]
 print(average_precision(ranking))
 ```
 
-```
+~~~
 Output
 0.8333333333333333
-```
+~~~
 
 Once you look at retrieval through this lens, “just increase k” stops sounding like a universal fix.
 

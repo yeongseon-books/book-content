@@ -113,11 +113,11 @@ print(f"total vectors in index: {index.ntotal}")
 print(f"vector dimension: {dimension}")
 ```
 
-```
+~~~
 Output
 total vectors in index: 10
 vector dimension: 384
-```
+~~~
 
 ```
 total vectors in index: 10
@@ -228,7 +228,7 @@ for score, idx in zip(scores[0], indices[0]):
     print(f"  {score:.4f} — {loaded_documents[idx]}")
 ```
 
-```
+~~~
 Output
 saved: 3 vectors
 reloaded: 3 vectors
@@ -236,7 +236,7 @@ reloaded: 3 vectors
 results:
   0.5446 — FAISS is a high-speed vector search library from Facebook AI Research.
   0.4393 — Cosine similarity measures the directional similarity between two vectors.
-```
+~~~
 
 ```
 saved: 3 vectors
@@ -293,7 +293,7 @@ for score, idx in zip(scores_l2[0], indices_l2[0]):
     print(f"  {score:.4f} — {sentences[idx]}")
 ```
 
-```
+~~~
 Output
 IndexFlatIP (higher = more similar):
   0.9508 — handling concurrency in Python
@@ -302,7 +302,7 @@ IndexFlatIP (higher = more similar):
 IndexFlatL2 (lower = more similar):
   0.0984 — handling concurrency in Python
   0.7173 — Python async programming
-```
+~~~
 
 ```
 IndexFlatIP (higher = more similar):

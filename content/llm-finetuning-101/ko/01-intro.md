@@ -67,10 +67,10 @@ lora_params = shape.num_layers * lora_params_per_layer(shape.hidden_size, shape.
 print(base_linear_params, lora_params)
 ```
 
-```
+~~~
 출력 결과
 84934656 1327104
-```
+~~~
 
 ## 이 코드에서 봐야 할 것
 

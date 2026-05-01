@@ -78,7 +78,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 input variables: ['context']
 partial variables: ['history', 'question']
@@ -89,7 +89,7 @@ HumanMessage -> Context:
 Retry budget: 3 attempts before dead-lettering. Operators inspect the original payload before replay.
 
 Question: Why was the message dead-lettered?
-```
+~~~
 
 ### 이 코드에서 봐야 할 것
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 input variables: ['question']
 raw string:
@@ -182,7 +182,7 @@ prompt value text:
 재시도 예산은 3회이며, 이후 dead-letter queue로 이동합니다.
 
 질문: 왜 메시지가 dead-letter로 이동했나요?
-```
+~~~
 
 실무 기준으로 보면 이 섹션의 핵심은 하나입니다. 프롬프트 오류는 종종 모델 호출 단계에서 발견되지만, 원인은 그보다 앞선 `PromptTemplate` 계약 위반인 경우가 많습니다. 입력 이름이 안 맞거나, partial과 호출 변수가 충돌하거나, 아예 프롬프트가 runnable로 어떤 타입을 반환하는지 이해하지 못한 채 조립하면 뒤에서 이상하게 터집니다.
 
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 SystemMessage -> 검색된 문맥만 근거로 답하세요.
 HumanMessage -> 세 번째 재시도 뒤에는 무슨 일이 일어나나요?
@@ -246,7 +246,7 @@ HumanMessage -> 문맥:
 재시도 예산은 3회이며, 이후 원본 payload가 dead-letter queue로 이동합니다.
 
 질문: 운영자가 payload를 왜 다시 확인하나요?
-```
+~~~
 
 정리하면 `ChatPromptTemplate`의 핵심은 문장을 보기 좋게 나누는 데 있지 않습니다. 역할이 다른 입력을 서로 다른 메시지 타입으로 유지한 채, 최종 모델 입력까지 구조를 끌고 가는 데 있습니다. RAG에서 이는 특히 중요합니다. 시스템 지시, 검색 문맥, 과거 대화는 의미도 다르고 취급도 달라야 하기 때문입니다.
 
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 ['context']
 SystemMessage -> 주어진 문맥만 근거로 답하고, 출처를 같이 적으세요.
@@ -346,7 +346,7 @@ HumanMessage -> 문맥:
 [runbook.md] 재시도 예산은 3회이며, 이후 dead-letter queue로 이동합니다.
 
 질문: 왜 작업이 dead-letter로 이동했나요?
-```
+~~~
 
 핵심은 두 가지입니다. `partial()`은 호출 시마다 반복되는 정책 입력을 줄여 주고, `invoke()`는 프롬프트를 runnable 그래프 안에 남겨 둡니다. RAG에서는 안정적인 규칙과 매번 달라지는 증거가 공존하므로, 이 둘을 분리하는 습관이 특히 유용합니다.
 
@@ -431,7 +431,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 출력 결과
 SystemMessage
 당신은 근거 중심 RAG 어시스턴트입니다. 주어진 문맥 밖의 사실은 추정하지 마세요. 문맥이 부족하면 모른다고 말하세요. 사실 주장마다 [runbook.md] 같은 대괄호 출처를 붙이세요.
@@ -451,7 +451,7 @@ HumanMessage
 
 답변은 3~5문장으로 쓰고, 각 문장을 뒷받침하는 출처만 남기세요.
 ------------------------------------------------------------
-```
+~~~
 
 이 예시는 동시에 `StuffDocumentsChain`를 언제 쓰고 언제 넘어설지에 대한 기준도 보여 줍니다. 기본 stuff 체인이 적합한 경우는 코퍼스가 크지 않고, chunk가 이미 깔끔하며, 문서별 포맷이 단순하고, 하나의 `{context}` 문자열로 충분할 때입니다. 내부 문서 검색, 운영 가이드 보조 도구, 초기 프로토타입은 대개 여기서 출발해도 괜찮습니다.
 

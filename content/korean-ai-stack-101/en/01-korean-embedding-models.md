@@ -80,11 +80,11 @@ for label, name in MODEL_NAMES.items():
     print(label, scores)
 ```
 
-```
+~~~
 Output
 all-MiniLM-L6-v2 [('similar', 0.7876580953598022), ('similar', 0.9715070128440857), ('unrelated', 0.27471810579299927)]
 ko-sbert-nli [('similar', 0.9112296104431152), ('similar', 0.8726195096969604), ('unrelated', 0.0983656570315361)]
-```
+~~~
 
 ---
 

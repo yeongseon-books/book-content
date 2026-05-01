@@ -47,10 +47,12 @@ chain = prompt | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ
 print(chain.invoke({"audience": "주니어 백엔드 개발자", "topic": "PromptTemplate"}))
 ```
 
-```
+~~~
 출력 결과
-PromptTemplate는 프롬프트에 대한 템플릿을 정의하는 도구입니다. 프롬프트 템플릿을 사용하면 특정한 형식의 프롬프트를 생성할 수 있습니다. 예를 들어, 특정한 질문 형식의 프롬프트를 생성하기 위해 프롬프트 템플릿을 사용할 수 있습니다.
-```
+PromptTemplate은 미리 정의된 템플릿을 사용하여 사용자의 입력을 보다 유연하고 보다 쉽게 처리할 수 있도록 도와주는 도구입니다. 사용자가 입력 형식을 미리 지정하기만 하면, PromptTemplate은 해당 템플릿에 따라 입력을 처리하여 개발자의 코드를 간소화하고 가독성을 향상시킵니다.
+
+PromptTemplate은 유사한 입력을 처리하는 코드를 여러 번 작성할 필요가 없도록 해주며, 또한 일관된 입력 형식을 유지하기 위해 도와줍니다. 이를 통해 개발자는 더 많은 시간과 노력을 투자하여 제품의 기능을 개선할 수 있습니다.
+~~~
 
 ## 이 코드에서 봐야 할 것
 
@@ -135,15 +137,33 @@ response = chain.invoke({
 print(response.content)
 ```
 
-```
+~~~
 출력 결과
-리스트 컴프리헨션(List Comprehension)은 파이썬의 강력한 기능 중 하나입니다. 목록을 생성하는 데 사용할 수 있습니다. 일반적으로 컴프리헨션을 사용하는 것이 좋습니다.
+리스트 컴프리헨션은 리스트를 생성하는 데 사용하는 파이썬의 고급 문법입니다. 리스트 컴프리헨션은 다음 상황에서 유용합니다.
 
-### 언제 사용하는가?
+1. **리스트를 생성할 때**: 리스트 컴프리헨션은 리스트를 생성하는 데 유용합니다. 예를 들어, 1부터 10까지의 숫자를 리스트에 추가하는 코드를 작성할 때 다음과 같이 사용할 수 있습니다.
 
-1. **리스트를 생성할 때**: 컴프리헨션은 목록을 생성하는 데 사용할 수 있습니다. 예를 들어, 1부터 10까지의 리스트를 생성하는 코드를 작성할 때 컴프리헨션을 사용할 수 있습니다.
+    ```python
+numbers = [i for i in range(1, 11)]
+print(numbers)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
 
-```python
+2. **리스트 내의 특정 요소 필터링할 때**: 리스트 내의 특정 요소를 필터링할 때 리스트 컴프리헨션을 사용할 수 있습니다. 예를 들어, 1부터 10까지의 숫자 중 짝수만을 리스트에 추가하는 코드를 작성할 때 다음과 같이 사용할 수 있습니다.
+
+    ```python
+numbers = [i for i in range(1, 11) if i % 2 == 0]
+print(numbers)  # [2, 4, 6, 8, 10]
+```
+
+3. **리스트 내의 요소를 변환할 때**: 리스트 내의 요소를 변환할 때 리스트 컴프리헨션을 사용할 수 있습니다. 예를 들어, 1부터 10까지의 숫자를 제곱해서 리스트에 추가하는 코드를 작성할 때 다음과 같이 사용할 수 있습니다.
+
+    ```python
+numbers = [i ** 2 for i in range(1, 11)]
+print(numbers)  # [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+```
+
+리스트 컴프리헨션은 리스트를 생성하거나 필터링하거나 변환할 때 유용한 파이썬의 고급 문법입니다. 리스트 컴프리헨션은 코드를 더 짧고 간결하게 작성할 수 있게 해줍니다.
+~~~python
 numbers = [i for i in range(1, 11)]
 print(numbers)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
@@ -156,6 +176,11 @@ even_numbers = [num for num in numbers if num % 2 == 0]
 print(even_numbers)  # [2, 4, 6, 8, 10]
 ```
 
+~~~
+출력 결과
+[2, 4, 6, 8, 10]
+~~~
+
 3. **리스트에서 변환할 때**: 컴프리헨션은 목록에서 항목을 변환하는 데 사용할 수 있습니다. 예를 들어, 문자열 목록에서 대문자를 소문자로 변환하는 코드를 작성할 때 컴프리헨션을 사용할 수 있습니다.
 
 ```python
@@ -163,6 +188,11 @@ strings = ['Hello', 'World', 'Python']
 lower_strings = [s.lower() for s in strings]
 print(lower_strings)  # ['hello', 'world', 'python']
 ```
+
+~~~
+출력 결과
+['hello', 'world', 'python']
+~~~
 
 ### 언제 사용하지 않는가?
 
@@ -265,16 +295,13 @@ print(f"description: {result.get('description')}")
 print(f"use_case: {result.get('use_case')}")
 ```
 
-```
+~~~
 출력 결과
 타입: <class 'dict'>
 name: FAISS
-description: FAISS는 Facebook에서 개발한 빠른 similarity search 라이브러리로, 벡터 검색을 위한 오픈 소스 소프트웨어입니다. FAISS는 GPU-accelerated similarity search를 제공하며, 효율적인 index 관리와 빠른 검색 속도를 제공합니다.
-use_case: FAISS는 다음과 같은 용도로 사용할 수 있습니다.
- - 이미지 검색: 이미지 벡터를 indexing하고 빠르게 검색하는 용도로 사용할 수 있습니다.
- - 자연어 처리: 텍스트 벡터를 indexing하고 빠르게 검색하는 용도로 사용할 수 있습니다.
- - 추천 시스템: 사용자 행위를 분석하여 추천할 상품을 빠르게 검색하는 용도로 사용할 수 있습니다.
-```
+description: Faiss는 Facebook에서 개발한 효율적인 벡터 집합 검색 알고리즘입니다. 벡터 집합 검색은 대규모 데이터에서 특정 벡터와 유사한 벡터를 검색하는 프로세스입니다.
+use_case: FAISS는 클라우드 컴퓨팅, 이미지 검색, 추천 알고리즘, 자연어 처리 등 다양한 분야에서 활용될 수 있습니다.
+~~~
 
 JSON 파싱이 불안정하다면 LangChain의 `with_structured_output()`을 쓰는 편이 더 안정적입니다. 이 방법은 llm-api-production-101 시리즈에서 다룹니다.
 
@@ -321,10 +348,10 @@ result = chain2.invoke({
 print(result)
 ```
 
-```
+~~~
 출력 결과
 FAISS는 Facebook AI Research에서 만든 벡터 검색 라이브러리입니다.
-```
+~~~
 
 `RunnablePassthrough`는 나중에 Retriever와 체인을 연결할 때 자주 씁니다. 4편(Retriever)에서 실제 패턴을 볼 수 있습니다.
 
@@ -364,15 +391,70 @@ result = chain_with_fallback.invoke({"question": "파이썬 예외 처리 방법
 print(result)
 ```
 
-```
+~~~
 출력 결과
-파이썬에서는 try-except 문을 사용하여 예외 처리를 합니다. 
+파이썬에서 예외 처리 방법은 다음과 같습니다.
 
-**1. try-except 문**
+### 1. try-except 블록
 
-try-except 문은 다음과 같이 구성됩니다.
+`try-except` 블록은 예외를 처리하는 기본적인 방법입니다. `try` 블록 내에서 예외가 발생할 수 있는 코드를 작성하고, `except` 블록 내에서 예외를 처리하는 코드를 작성합니다.
 
 ```python
+try:
+    # 예외가 발생할 수 있는 코드
+    x = 5 / 0
+except ZeroDivisionError:
+    # 예외를 처리하는 코드
+    print("ZeroDivisionError")
+```
+
+### 2. try-except-else 블록
+
+`try-except-else` 블록은 `try-except` 블록에 추가된 `else` 블록을 의미합니다. `try` 블록 내에서 예외가 발생하지 않은 경우 `else` 블록이 실행됩니다.
+
+```python
+try:
+    # 예외가 발생할 수 있는 코드
+    x = 5 / 1
+except ZeroDivisionError:
+    # 예외를 처리하는 코드
+    print("ZeroDivisionError")
+else:
+    # 예외가 발생하지 않은 경우 실행되는 코드
+    print("정상 실행")
+```
+
+### 3. try-except-finally 블록
+
+`try-except-finally` 블록은 `try-except` 블록에 추가된 `finally` 블록을 의미합니다. `finally` 블록은 예외가 발생하거나 발생하지 않은 경우 모두 실행됩니다.
+
+```python
+try:
+    # 예외가 발생할 수 있는 코드
+    x = 5 / 0
+except ZeroDivisionError:
+    # 예외를 처리하는 코드
+    print("ZeroDivisionError")
+finally:
+    # 예외가 발생하거나 발생하지 않은 경우 모두 실행되는 코드
+    print("finally 블록")
+```
+
+### 4. 예외를 직접 발생시키기
+
+`raise` 키워드를 사용하여 직접 예외를 발생시킬 수 있습니다.
+
+```python
+def divide(a, b):
+    if b == 0:
+        raise ZeroDivisionError("ZeroDivisionError")
+    return a / b
+
+try:
+    result = divide(5, 0)
+except ZeroDivisionError as e:
+... (truncated)
+~~~python
 try:
     # 코드를 실행합니다.
 except 예외 타입:
@@ -388,6 +470,11 @@ except ZeroDivisionError:
     print("0으로 나눌 수 없습니다.")
 ```
 
+~~~
+출력 결과
+0으로 나눌 수 없습니다.
+~~~
+
 이 코드는 0으로 나누는 것을 시도합니다. 0으로 나누는 것이 가능하지 않기 때문에 ZeroDivisionError가 발생하고, 예외 처리 코드인 `print("0으로 나눌 수 없습니다.")`가 실행됩니다.
 
 **2. 여러 예외 처리**
@@ -401,6 +488,11 @@ except (ZeroDivisionError, TypeError):
     print("예외가 발생했습니다.")
 ```
 
+~~~
+출력 결과
+예외가 발생했습니다.
+~~~
+
 이 코드는 ZeroDivisionError와 TypeError를 함께 처리합니다.
 
 **3. 예외의 상세 정보**
@@ -413,6 +505,11 @@ try:
 except ZeroDivisionError as e:
     print(f"예외가 발생했습니다: {e}")
 ```
+
+~~~
+출력 결과
+예외가 발생했습니다: division by zero
+~~~
 
 이 코드는 예외가 발생했을 때의 상세 정보를 출력합니다.
 

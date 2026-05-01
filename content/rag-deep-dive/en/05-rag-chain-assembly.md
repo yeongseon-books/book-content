@@ -131,7 +131,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 === RetrievalQA ===
 The system stopped retrying the message after the final retry because it moved the original payload to the dead-letter queue.
@@ -139,7 +139,7 @@ sources: ['ops-guide.md', 'ops-guide.md']
 
 === LCEL ===
 The context doesn't explicitly state why the system stopped retrying the message. It only mentions that after the final retry, the original payload moves to the dead-letter queue. It implies that the system has exhausted its retry attempts, but it doesn't provide the reason for stopping the retries.
-```
+~~~
 
 ### What to notice in this code
 
@@ -241,13 +241,13 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 The job is dead-lettered after the final retry.
 ['runbook.md', 'ops.md']
 input key: query
 output keys: ['result', 'source_documents']
-```
+~~~
 
 The value of `RetrievalQA` in 2026 is mostly pedagogical. It is one of the clearest places to see the old RAG assembly model before everything became more composable.
 
@@ -293,13 +293,13 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 {'doubled': 14}
 {'title': 'NumberInput', 'type': 'object', 'properties': {'value': {'title': 'Value', 'type': 'integer'}}, 'required': ['value']}
 {'title': 'NumberOutput', 'type': 'object', 'properties': {'doubled': {'title': 'Doubled', 'type': 'integer'}}, 'required': ['doubled']}
 [{'doubled': 4}, {'doubled': 10}, {'doubled': 18}]
-```
+~~~
 
 Once you see LCEL as “a type-aware runnable composition system” rather than “chain sugar,” the rest of the RAG assembly story becomes much easier to read.
 
@@ -394,7 +394,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 Synthetic answer based on:
 System: Answer from the supplied context only.
@@ -406,7 +406,7 @@ Retry budget is three attempts before the worker stops retrying.
 After the final retry, the original payload moves to the dead-letter queue.
 
 Question: Why did the worker stop and dead-letter the job?
-```
+~~~
 
 The most important shift is conceptual. In LCEL, retrieval is not a hidden phase inside a QA chain. It is one runnable branch in a visible graph.
 
@@ -504,11 +504,11 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 {'answer': 'Answer grounded in context:\nWhy was the job sent to dead-letter after retries?', 'sources': ['runbook.md', 'ops-guide.md']}
 {'title': 'AnswerOutput', 'type': 'object', 'properties': {'answer': {'title': 'Answer', 'type': 'string'}, 'sources': {'title': 'Sources', 'type': 'array', 'items': {'type': 'string'}}}, 'required': ['answer', 'sources']}
-```
+~~~
 
 `assign()` is one of the main reasons LCEL scales better than classic chains. It lets you preserve and enrich chain state instead of collapsing too early.
 
@@ -586,7 +586,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 Answer: When does dead-lettering happen?
 batch:
@@ -597,7 +597,7 @@ stream:
 'does '
 'dead-lettering '
 'happen? '
-```
+~~~
 
 In a real system, `fake_streaming_llm` would be replaced by a streaming chat model runnable. The point here is only to show that LCEL can propagate chunks emitted by a generator-style runnable through the chain surface.
 

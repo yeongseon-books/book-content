@@ -76,15 +76,15 @@ print(chat("What are two advantages of Python?"))
 print(chat("What is my name?"))  # must recall earlier turn
 ```
 
-```
+~~~
 Output
-Nice to meet you, Alice. How can I assist you today?
+Hello Alice, nice to meet you. How can I assist you today?
 Two advantages of Python are:
 
-1. **Easy to Learn**: Python has a simple syntax, making it a great language for beginners.
-2. **Versatile**: Python can be used for various applications, including web development, data analysis, machine learning, and more.
+1. Easy to learn: Python has a simple syntax and is beginner-friendly.
+2. Versatile: Python can be used for web development, data analysis, machine learning, and more.
 Your name is Alice.
-```
+~~~
 
 As history accumulates, the context window fills up. `llama-3.1-8b-instant` has an 8,192 token limit. Long conversations hit the ceiling.
 
@@ -141,37 +141,6 @@ for turn in turns:
     answer = bot.chat(turn)
     print(f"[bot] {answer[:150]}...")
     print(f"history length: {bot.history_length} messages")
-```
-
-```
-Output
-
-[user] What is the difference between a list and a tuple in Python?
-[bot] **Lists vs Tuples in Python**
-
-In Python, `lists` and `tuples` are both data structures used to store multiple values. However, they have some key dif...
-history length: 2 messages
-
-[user] When is a dictionary the right choice?
-[bot] **Choosing Dictionaries in Python**
-
-A dictionary is a powerful data structure in Python that stores key-value pairs. Here are some scenarios where a ...
-history length: 4 messages
-
-[user] What are the main uses of a set?
-[bot] **Sets in Python**
-
-A set is a data structure in Python that stores unique elements. Here are the main uses of a set:
-
-### 1. **Unique Element Storage...
-history length: 6 messages
-
-[user] Summarize the three data structures you just explained in one line each.
-[bot] Here are one-line summaries for each data structure:
-
-### List
-A list is a **mutable** collection of elements that can be ordered, indexed, and modifi...
-history length: 8 messages
 ```
 
 `deque(maxlen=window_size)` discards the oldest entry automatically when capacity is exceeded.
@@ -319,18 +288,18 @@ print(f"session B: {session_b}")
 print(f"session A history length: {len(sessions[session_a])}")
 ```
 
-```
+~~~
 Output
-[Alice] Nice to meet you, Alice. I'm here to help with any questions or topics you'd like to discuss. How's ...
+[Alice] Hello Alice, it's nice to meet you. Is there something I can help you with or would you like to chat...
 
-[Bob] Hello Bob, it's nice to meet you. Is there anything I can help you with today, or would you like to ...
+[Bob] Hi Bob, it's nice to meet you. I'm here to help with any questions or topics you'd like to discuss. ...
 
-[Alice continued] Your name is Alice....
+[Alice continued] Your name is Alice. How are you doing today?...
 
-session A: 19ea2c13-9adf-4c74-ac92-8197a9562930
-session B: c513618b-16d3-4f6e-8f12-2e4e40db09d2
+session A: bfae30a3-40b8-41bd-855b-57ed87fb8f42
+session B: 3a0c134f-ee40-4c0b-8f5a-01982d5885d6
 session A history length: 4
-```
+~~~
 
 ---
 

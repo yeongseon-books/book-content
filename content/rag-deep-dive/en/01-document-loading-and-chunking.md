@@ -89,7 +89,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 
 === CharacterTextSplitter (3 chunks) ===
@@ -108,7 +108,7 @@ Output
 [1] '# Incident runbook\n\n## Retry policy\nThe worker retries a failed message three times.\nAfter the final retry, the'
 [2] ' final retry, the payload moves to the dead-letter queue.\n\n## Operator action\nThe on-call engineer checks the exception chain'
 [3] ' checks the exception chain and the original payload.\n'
-```
+~~~
 
 ### What to notice in this code
 
@@ -270,7 +270,7 @@ for index, doc in enumerate(documents, start=1):
     print("-" * 40)
 ```
 
-```
+~~~
 Output
 chunk 1
 {'source': 'runbook', 'start_index': -1}
@@ -285,7 +285,7 @@ chunk 3
 {'source': 'runbook', 'start_index': 137}
 Operators must inspect the original payload and the exception chain.
 ----------------------------------------
-```
+~~~
 
 If you run it, you will notice that overlap feels irregular rather than exact. That is not a bug. It is a direct consequence of LangChain's split-then-merge design.
 
@@ -338,7 +338,7 @@ for index, chunk in enumerate(chunks, start=1):
     print(f"chunk {index}\n{chunk}\n")
 ```
 
-```
+~~~
 Output
 chunk 1
 # Service policy
@@ -354,7 +354,7 @@ The public API allows 120 requests per minute per API key.
 
 chunk 4
 Burst requests above the limit receive HTTP 429 responses.
-```
+~~~
 
 That is why `RecursiveCharacterTextSplitter` is such a good default for mixed prose. It does not guarantee perfect semantic chunks, but it tends to preserve the most natural boundaries available before it gives up and cuts harder. The caveat is just as important: for highly structured content such as code, HTML, legal text, or machine-generated data, the default separator list is only a starting point. Domain-aware separators or pre-normalization often outperform the stock behavior.
 
@@ -405,7 +405,7 @@ for chunk in token_chunks:
     print(len(chunk), len(encoding.encode(chunk)), chunk)
 ```
 
-```
+~~~
 Output
 character-based
 27 7 Customer 18423 did not fail
@@ -416,7 +416,7 @@ character-based
 token-based
 70 18 Customer 18423 did not fail because of HTTP 429. The real cause was an
 82 15  real cause was an internal batch worker that retried without exponential backoff.
-```
+~~~
 
 On multilingual text, logs, code, and text dense with identifiers, the gap between character length and token length gets wider fast. That is why a system can appear safe at ingest time and still blow the budget when it concatenates several retrieved chunks at answer time. If you want predictable prompt budgets, token-aware measurement has to show up somewhere in the design.
 
@@ -482,14 +482,14 @@ if __name__ == "__main__":
     measure_chunks(documents)
 ```
 
-```
+~~~
 Output
 chunks: 2
 configured overlap ratio: 0.17
 avg tokens per chunk: 17.0
 max tokens per chunk: 18
 min tokens per chunk: 16
-```
+~~~
 
 This is still not enough by itself. The final judge is retrieval behavior against representative questions. But once you understand the source-level mechanics, you can at least explain *why* a given configuration behaved the way it did, instead of tuning chunk sizes by superstition.
 

@@ -98,7 +98,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 {
   "price_per_million_tokens": 0.05,
@@ -129,7 +129,7 @@ Output
     }
   ]
 }
-```
+~~~
 
 ## What to notice in this code
 - A single `PRICE_PER_MILLION_TOKENS` constant keeps the math obvious and easy to replace later.

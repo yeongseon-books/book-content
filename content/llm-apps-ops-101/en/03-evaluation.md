@@ -113,7 +113,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 {
   "raw": {
@@ -136,7 +136,7 @@ Output
     "answer_length": 138
   }
 }
-```
+~~~
 
 ## What to notice in this code
 - Forcing JSON output narrows the shape of the problem before evaluation starts.

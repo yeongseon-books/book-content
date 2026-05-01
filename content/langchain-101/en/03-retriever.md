@@ -45,10 +45,10 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
 print(retriever.invoke("What does a Retriever do?")[0].page_content)
 ```
 
-```
+~~~
 Output
 A Retriever finds documents relevant to a question.
-```
+~~~
 
 ## What to notice in this code
 
@@ -135,10 +135,10 @@ vectorstore = FAISS.from_texts(
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
 
-```
+~~~
 Output
 index vector count: 7
-```
+~~~
 
 ---
 
@@ -247,18 +247,18 @@ for question in questions:
     print(f"answer: {answer}")
 ```
 
-```
+~~~
 Output
 
 question: What is FAISS?
-answer: FAISS is a high-speed vector search library.
+answer: FAISS is a high-speed vector search library developed at Facebook AI Research.
 
 question: How does the RAG pattern work?
-answer: The RAG pattern combines retrieved documents with an LLM prompt.
+answer: The RAG pattern works by combining retrieved documents with a Large Language Model (LLM) prompt.
 
 question: What do embedding models do?
 answer: Embedding models project text into a high-dimensional vector space.
-```
+~~~
 
 The key is the chain input dict:
 
@@ -309,13 +309,13 @@ results = loaded_store.similarity_search("vector search", k=1)
 print(f"\nresult: {results[0].page_content}")
 ```
 
-```
+~~~
 Output
 saved
 reloaded: 2 vectors
 
 result: FAISS is a high-speed vector search library developed at Facebook AI Research.
-```
+~~~
 
 ---
 

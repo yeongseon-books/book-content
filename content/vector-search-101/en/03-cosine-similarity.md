@@ -137,7 +137,7 @@ for text_a, text_b in pairs:
     print(f"  euclidean:  {l2:.4f}")
 ```
 
-```
+~~~
 Output
 
 'Python async programming' vs 'handling concurrency in P'
@@ -154,7 +154,7 @@ Output
   cosine:     -0.0400
   dot:        -0.0400
   euclidean:  1.4423
-```
+~~~
 
 Expected output:
 
@@ -210,7 +210,7 @@ print(f"\nnorm cosine: {cosine_similarity(a_norm, b_norm):.4f}")
 print(f"norm dot:    {float(np.dot(a_norm, b_norm)):.4f}")
 ```
 
-```
+~~~
 Output
 raw magnitudes: a=1.0000, b=1.0000
 norm magnitudes: a=1.0000, b=1.0000
@@ -220,7 +220,7 @@ raw dot:    0.6201
 
 norm cosine: 0.6201
 norm dot:    0.6201
-```
+~~~
 
 ```
 raw magnitudes: a=4.2318, b=4.1092
@@ -279,7 +279,7 @@ for rank, (score, text) in enumerate(results, start=1):
     print(f"    {text}\n")
 ```
 
-```
+~~~
 Output
 query: 'how vector search finds similar documents'
 
@@ -291,7 +291,7 @@ query: 'how vector search finds similar documents'
 
 [3] score: 0.4517
     FAISS is a high-speed vector search library from Facebook AI Research.
-```
+~~~
 
 ```
 query: 'how vector search finds similar documents'

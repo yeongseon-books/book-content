@@ -106,37 +106,70 @@ print("\n---")
 print(final_text)
 ```
 
-```
+~~~
 Output
 **FastAPI Dependency Injection for Beginners**
 =====================================================
 
-Dependency injection is a design pattern that allows you to decouple components of your application, making it more modular, testable, and maintainable. In the context of FastAPI, dependency injection is used to inject dependencies into your routes and endpoints.
+Dependency injection is a design pattern that allows you to decouple components of your application, making it more modular, testable, and maintainable. In FastAPI, dependency injection is achieved through the use of dependency injection frameworks like `inject` or `pydantic`.
 
 **Why Use Dependency Injection?**
 --------------------------------
 
-Dependency injection helps you:
+Dependency injection helps you to:
 
-*   **Decouple** components of your application, making it easier to change or replace individual components without affecting the rest of the application.
-*   **Test** your application more easily by injecting mock dependencies.
-*   **Improve** code organization and readability by separating concerns.
+*   **Decouple components**: By injecting dependencies instead of hardcoding them, you can easily swap out one dependency for another.
+*   **Improve testability**: Dependency injection makes it easier to write unit tests for your application.
+*   **Enhance maintainability**: With dependency injection, you can update dependencies without affecting other parts of your application.
 
-**Basic Concepts**
------------------
+**Basic Dependency Injection Example**
+--------------------------------------
 
-Before diving into the implementation, let's cover some basic concepts:
-
-*   **Dependency**: A dependency is an object or service that your application needs to function.
-*   **Injector**: The injector is responsible for providing dependencies to your application.
-*   **Provider**: A provider is an object that provides a dependency.
-
-**FastAPI Dependency Injection**
--------------------------------
-
-FastAPI provides a built-in dependency injection system using the `Depends` function. Here's an example:
+Let's consider a simple example of a user service that depends on a database connection. Without dependency injection, the user service might look like this:
 
 ```python
+from fastapi import FastAPI
+from sqlalchemy import create_engine
+
+app = FastAPI()
+
+# Create a database connection
+engine = create_engine("sqlite:///users.db")
+
+# Define the user service
+class UserService:
+    def __init__(self):
+        self.engine = engine
+
+    def get_user(self, user_id):
+        # Query the database for the user
+        return self.engine.execute("SELECT * FROM users WHERE id = ?", user_id).fetchone()
+
+# Create an instance of the user service
+user_service = UserService()
+
+# Define a route that uses the user service
+@app.get("/users/{user_id}")
+async def get_user(user_id: int):
+    return user_service.get_user(user_id)
+```
+
+In this example, the user service is tightly coupled to the database connection. If you want to switch to a different database, you'll have to modify the user service.
+
+**Dependency Injection Example with `inject`**
+---------------------------------------------
+
+To decouple the user service from the database connection, you can use the `inject` library to inject the database connection as a dependency:
+
+```python
+from fastapi import FastAPI
+from sqlalchemy import create_engine
+from inject import inject
+
+app = FastAPI()
+
+... (truncated)
+~~~python
 from fastapi import Depends, FastAPI
 
 app = FastAPI()
@@ -246,27 +279,53 @@ async def consume_stream(prompt: str) -> dict:
 asyncio.run(consume_stream("Explain why Python context managers are useful."))
 ```
 
-```
+~~~
 Output
-**What are Python Context Managers?**
+Python Context Managers are a crucial part of the language, providing a way to manage resources such as files, network connections, database connections, and locks. They ensure that these resources are acquired and released in a controlled and predictable manner, preventing resource leaks and making code more concise and readable.
 
-Python context managers are a design pattern that helps you manage resources (such as files, locks, or network connections) by automatically acquiring and releasing these resources when needed.
+**Why Context Managers are Useful**
 
-**Why are Context Managers Useful?**
+1. **Ensure Resource Release**: When working with external resources, such as files or database connections, it's essential to ensure they are properly released when no longer needed. Context managers guarantee that resources are released, even if exceptions occur.
+2. **Prevent Resource Leaks**: Without context managers, it's easy to accidentally leave open connections or locks, leading to resource leaks. Context managers prevent this by ensuring resources are closed or released when no longer needed.
+3. **Simplify Code**: Context managers often simplify code by encapsulating setup and teardown logic in a single, concise block of code.
+4. **Improve Code Readability**: Context managers make code more readable by clearly conveying the resource management flow.
+5. **Promote Best Practices**: By using context managers, developers are forced to think about resource management and best practices, such as exception handling and cleanup.
 
-Context managers are useful for several reasons:
+**Example Use Case**
 
-1. **Resource Management**: Context managers ensure that resources are properly cleaned up and released after use, preventing memory leaks, file descriptor leaks, and other potential issues.
-2. **Improved Code Readability**: Context managers make your code more readable by clearly indicating the lifetime of a resource and when it's released.
-3. **Reusability**: You can write a context manager once and reuse it throughout your code, eliminating duplication and making it easier to maintain.
-4. **Exception Handling**: Context managers can propagate exceptions to the caller, making it easier to handle errors that occur within the resource acquisition or usage.
-5. **Atomicity**: Context managers ensure that a specific block of code runs as a single, indivisible unit, making it easier to ensure atomicity and thread safety.
-
-**Example Use Case: Working with Files**
-
-Here's an example of using a context manager to work with a file:
-
+Let's consider a simple example of using a context manager to handle a file:
 ```python
+with open('example.txt', 'w') as file:
+    file.write('Hello, World!')
+```
+In this example, the `open` function returns a file object, which is the context manager. The `with` statement ensures that the file is properly closed when the block is executed.
+
+If an exception occurs within the block, the file will still be closed, and the exception will propagate.
+
+**Implementing a Context Manager**
+
+To create a custom context manager, you can use the `contextmanager` decorator from the `contextlib` module:
+```python
+import contextlib
+
+@contextlib.contextmanager
+def my_context_manager():
+    try:
+        # Setup logic
+        yield
+    finally:
+        # Teardown logic
+        pass
+```
+This decorator allows you to define a generator that yields control to the outer code, and then returns to the generator when the block is executed.
+
+You can then use your custom context manager like this:
+```python
+with my_context_manager():
+    # Code executed within the context manager
+```
+In summary, Python context managers are a powerful tool for managing resources and ensuring that they are properly released when no longer needed. They simplify code, improve readability, and promote best practices. By using context managers, developers can write more robust, maintainable, and efficient code.
+~~~python
 with open("example.txt", "r") as file:
     contents = file.read()
     print(contents)
@@ -300,6 +359,12 @@ with LockContextManager(lock) as ctx:
     print("Released lock")
 ```
 
+~~~
+Output
+Acquired lock
+Released lock
+~~~
+
 In this example, the `LockContextManager` class implements a context manager that acquires and releases a lock when entering and exiting the `with` block. This ensures that the lock is safely acquired and released, even in the presence of exceptions.
 ```
 
@@ -329,22 +394,70 @@ for chunk in stream:
         print(delta, end="", flush=True)
 ```
 
-```
+~~~
 Output
 **Python Generators**
 ======================
-Python generators are a powerful tool that allows you to create iterators, which can be used to generate a sequence of values on-the-fly, rather than storing them all in memory at once. This makes them particularly useful for handling large datasets.
 
-**What are Generators?**
+Python generators are a powerful tool for producing a sequence of results, one at a time, on demand. They allow you to create an iterator object that uses memory more efficiently and can handle large datasets.
+
+**What is a Generator?**
 ------------------------
 
-A generator is a special type of function that can be used to generate a sequence of results, rather than computing them all at once and returning them in a list, for example. Generators use the `yield` statement to produce a value, and then suspend their execution until the next value is requested.
+A generator is a function that uses the `yield` keyword to produce a series of values, rather than computing them all at once and returning them in a list, for example. The `yield` keyword is similar to `return`, except that it doesn't terminate the function. Instead, it pauses the function and saves its state, so that execution can resume where it left off when the next value is requested.
 
-**Basic Example**
------------------
+**How Generators Work**
+-----------------------
 
-Here's a simple example of a generator that generates the numbers from 0 to n:
+Here's a step-by-step breakdown of how generators work:
+
+1. A generator is called as a function, just like any other function.
+2. When a generator is called, it starts executing like a normal function until it hits a `yield` statement.
+3. When a `yield` statement is encountered, the generator returns the specified value and pauses its execution.
+4. The generator object becomes an iterator, which means it remembers its state, including the current position in the iteration.
+5. When `next()` is called on the generator object, the generator resumes execution from where it left off.
+6. If the generator reaches the end of the function, it returns `StopIteration`, indicating that there are no more values to produce.
+
+**Example of a Simple Generator**
+---------------------------------
+
 ```python
+def square_numbers(n):
+    for i in range(n):
+        yield i ** 2
+
+# Create a generator
+squares = square_numbers(5)
+
+# Print the first 5 square numbers
+while True:
+    try:
+        print(next(squares))
+    except StopIteration:
+        break
+```
+
+**Advantages of Generators**
+---------------------------
+
+Generators have several advantages:
+
+*   **Memory efficiency**: Generators only store the current value in memory, making them more memory-efficient than storing the entire sequence in a list.
+*   **Flexibility**: Generators can be used for both finite and infinite sequences, and can be paused and resumed as needed.
+*   **Lazy evaluation**: Generators only produce values when asked for them, which means that expensive operations can be avoided when not needed.
+
+**Real-World Use Case: Reading Large Files**
+-------------------------------------------
+
+Generators are particularly useful when working with large files, where loading the entire file into memory at once may not be feasible. Here's an example of using a generator to read large files:
+
+```python
+def read_large_file(filename):
+    with open(filename, 'r') as file:
+        for line in file:
+            yield line.strip()
+... (truncated)
+~~~python
 def generate_numbers(n):
     for i in range(n+1):
         yield i

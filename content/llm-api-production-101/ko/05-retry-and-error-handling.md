@@ -162,6 +162,13 @@ except RetryableLLMError as exc:
     logger.error("재시도 후에도 실패한 요청입니다: %s", exc)
 ```
 
+~~~
+출력 결과
+Python의 context manager는 자원 관리를 위한 디자인 패턴입니다. 
+이 패턴은 try-finally 블록을 사용하여 자원을 열고 닫는 것을 자동화합니다. 
+context manager는 with 문을 사용하여 사용할 수 있으며, try-finally 블록의 복잡성을 줄여줍니다.
+~~~
+
 핵심은 세 가지입니다. 첫째, `retry_if_exception_type(RetryableLLMError)`로 재시도 대상을 명시합니다. 둘째, `wait_exponential_jitter`로 대기 간격을 점진적으로 늘리면서 동시에 지터를 섞습니다. 셋째, `reraise=True`로 최종 실패를 숨기지 않습니다.
 
 ---

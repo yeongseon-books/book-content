@@ -119,10 +119,10 @@ request_payload = {
 print(build_cache_key(request_payload))
 ```
 
-```
+~~~
 출력 결과
 d825e2316b05debea2c4ff2bdaa3cfdcab11ad95069ff965050c3d362dfe17d1
-```
+~~~
 
 이 함수가 하는 일은 단순합니다. 같은 의미의 payload가 같은 문자열이 되도록 JSON을 정규화하고, 그 결과를 고정 길이 해시로 바꿉니다. `sort_keys=True`를 빼면 딕셔너리 키 순서 차이 때문에 같은 요청이 다른 키를 가질 수 있습니다. `separators`를 고정하는 이유는 공백 차이까지 제거하기 위해서입니다.
 
@@ -257,9 +257,11 @@ print(cached_completion(payload))
 print(cached_completion(payload))
 ```
 
-```
+~~~
 출력 결과
 {'source': 'model', 'content': 'Python의 dataclass는 클래스를 정의할 때 자동으로 __init__ 메서드, __repr__ 메서드, __eq__ 메서드, __lt__ 메서드, __le__ 메서드, __gt__ 메서드, __ge__ 메서드, __hash__ 메서드를 생성해 주는 데코레이터입니다. \n\ndataclass를 사용하면 클래스를 정의할 때 이러한 메서드를 하나하나 구현할 필요가 없고, 자동으로 생성되기 때문에 클래스를 정의하는 시간을 단축할 수 있습니다.\n\ndataclass는 또한 클래스의 속성을 자동으로 생성해 주기 때문에, 속성을 정의할 때 __init__ 메서드를 구현할 필요가 없습니다. \n\n예를 들어, 다음 코드는 Person 클래스를 정의합니다.\n\n```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass Person:\n    name: str\n    age: int\n```\n\n이 클래스는 자동으로 __init__ 메서드, __repr__ 메서드, __eq__ 메서드, __lt__ 메서드, __le__ 메서드, __gt__ 메서드, __ge__ 메서드, __hash__ 메서드를 생성합니다. \n\n또한, name과 age 속성을 자동으로 생성합니다. \n\n이러한 속성을 사용할 때는 Person(name="John", age=30)과 같이 생성자를 호출하여 객체를 생성할 수 있습니다.'}
+{'source': 'cache', 'content': 'Python의 dataclass는 클래스를 정의할 때 자동으로 __init__ 메서드, __repr__ 메서드, __eq__ 메서드, __lt__ 메서드, __le__ 메서드, __gt__ 메서드, __ge__ 메서드, __hash__ 메서드를 생성해 주는 데코레이터입니다. \n\ndataclass를 사용하면 클래스를 정의할 때 이러한 메서드를 하나하나 구현할 필요가 없고, 자동으로 생성되기 때문에 클래스를 정의하는 시간을 단축할 수 있습니다.\n\ndataclass는 또한 클래스의 속성을 자동으로 생성해 주기 때문에, 속성을 정의할 때 __init__ 메서드를 구현할 필요가 없습니다. \n\n예를 들어, 다음 코드는 Person 클래스를 정의합니다.\n\n```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass Person:\n    name: str\n    age: int\n```\n\n이 클래스는 자동으로 __init__ 메서드, __repr__ 메서드, __eq__ 메서드, __lt__ 메서드, __le__ 메서드, __gt__ 메서드, __ge__ 메서드, __hash__ 메서드를 생성합니다. \n\n또한, name과 age 속성을 자동으로 생성합니다. \n\n이러한 속성을 사용할 때는 Person(name="John", age=30)과 같이 생성자를 호출하여 객체를 생성할 수 있습니다.'}
+~~~python\nfrom dataclasses import dataclass\n\n@dataclass\nclass Person:\n    name: str\n    age: int\n```\n\n이 클래스는 자동으로 __init__ 메서드, __repr__ 메서드, __eq__ 메서드, __lt__ 메서드, __le__ 메서드, __gt__ 메서드, __ge__ 메서드, __hash__ 메서드를 생성합니다. \n\n또한, name과 age 속성을 자동으로 생성합니다. \n\n이러한 속성을 사용할 때는 Person(name="John", age=30)과 같이 생성자를 호출하여 객체를 생성할 수 있습니다.'}
 {'source': 'cache', 'content': 'Python의 dataclass는 클래스를 정의할 때 자동으로 __init__ 메서드, __repr__ 메서드, __eq__ 메서드, __lt__ 메서드, __le__ 메서드, __gt__ 메서드, __ge__ 메서드, __hash__ 메서드를 생성해 주는 데코레이터입니다. \n\ndataclass를 사용하면 클래스를 정의할 때 이러한 메서드를 하나하나 구현할 필요가 없고, 자동으로 생성되기 때문에 클래스를 정의하는 시간을 단축할 수 있습니다.\n\ndataclass는 또한 클래스의 속성을 자동으로 생성해 주기 때문에, 속성을 정의할 때 __init__ 메서드를 구현할 필요가 없습니다. \n\n예를 들어, 다음 코드는 Person 클래스를 정의합니다.\n\n```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass Person:\n    name: str\n    age: int\n```\n\n이 클래스는 자동으로 __init__ 메서드, __repr__ 메서드, __eq__ 메서드, __lt__ 메서드, __le__ 메서드, __gt__ 메서드, __ge__ 메서드, __hash__ 메서드를 생성합니다. \n\n또한, name과 age 속성을 자동으로 생성합니다. \n\n이러한 속성을 사용할 때는 Person(name="John", age=30)과 같이 생성자를 호출하여 객체를 생성할 수 있습니다.'}
 ```
 

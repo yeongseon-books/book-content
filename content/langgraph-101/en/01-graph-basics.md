@@ -99,7 +99,7 @@ if __name__ == "__main__":
     print(result["answer"])
 ```
 
-```
+~~~
 Output
 Request: Explain how a LangGraph StateGraph works.
 Chosen topic: graph basics
@@ -107,7 +107,7 @@ Teaching outline:
 - Define graph basics
 - Show the nodes in the graph
 - Explain how invoke() runs the graph
-```
+~~~
 
 Runnable file: `/root/Github/langgraph-101/en/01-graph-basics/main.py`
 

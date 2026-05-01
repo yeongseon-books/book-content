@@ -108,12 +108,12 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-```
+~~~
 Output
 category: technical
 priority: high
-reason: The error prevents the user from completing a critical task, which may impact their productivity.
-```
+reason: The issue is directly related to the functionality of the service, causing a critical error.
+~~~
 
 Three things matter here. First, few-shot is just message-array design. Second, the example has to show the desired answer shape, not merely a related question. Third, every example consumes tokens, so compact representative examples are usually better than long ones.
 
@@ -185,18 +185,18 @@ print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
 
-```
+~~~
 Output
 [zero-shot]
 category: billing
 priority: high
-reason: Unexpected invoice amount discrepancy is causing concern about potential overcharging.
+reason: The discrepancy in the invoice suggests an unexpected change in pricing or billing calculation.
 
 [few-shot]
 category: billing
 priority: high
-reason: Unexpected charges can cause financial disruption and require urgent resolution.
-```
+reason: Unexpected billing discrepancies can cause financial disruptions for the customer.
+~~~
 
 In many runs, zero-shot will still produce a reasonable answer. Few-shot usually improves a different dimension: repeatability. It tends to stabilize the label vocabulary, the line order, the explanation length, and the way ambiguous cases are interpreted.
 
@@ -296,18 +296,18 @@ print("[good examples]")
 print(good_run.choices[0].message.content)
 ```
 
-```
+~~~
 Output
 [bad examples]
 category: technical
 priority: high
-reason: The customer is unable to access their account due to a failed password reset email.
+reason: The customer is unable to access their account due to a failed password reset process.
 
 [good examples]
 category: technical
 priority: high
-reason: The inability to reset the password prevents the customer from accessing their account.
-```
+reason: The inability to reset the password prevents the user from accessing their account.
+~~~
 
 The stronger examples do more than show correct answers. They demonstrate a stable schema, a clear priority policy, and the expected sentence length. That is why example quality matters more than raw example count. Two clean examples often outperform six messy ones.
 
@@ -361,7 +361,7 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-```
+~~~
 Output
 To find the final payment amount, we'll follow the steps you mentioned.
 
@@ -386,7 +386,7 @@ Final price = Discounted price + VAT amount
 = 118,800 won
 
 final_answer: 118800 won.
-```
+~~~
 
 This tends to reduce mistakes in ordering and intermediate arithmetic. It is especially handy when the task has words like “first,” “then,” “except,” or “only if,” because those are exactly the cases where skipping an intermediate check causes the answer to drift.
 
@@ -443,13 +443,13 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-```
+~~~
 Output
 1) 25% of 80000 won is 20000 won.
 2) After the discount, the subtotal is 60000 won.
 3) Add the 5000 won shipping fee to get 65000 won.
 final_answer: 65000 won
-```
+~~~
 
 The difference is easy to summarize:
 
@@ -532,14 +532,14 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-```
+~~~
 Output
 policy_check:
 1) The request is more than 7 days after purchase.
 2) Watch progress is under 20%.
 decision: denied
 reason: The request exceeds the allowed time window for a refund, regardless of the watch progress.
-```
+~~~
 
 This pattern is useful because it improves more than answer quality. It improves debuggability. If the output is wrong, you can inspect which policy check went wrong rather than treating the whole response as a black box.
 

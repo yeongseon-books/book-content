@@ -48,10 +48,14 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("What is LCEL?"))
 ```
 
-```
+~~~
 Output
-LCEL stands for Long-Running Concurrency for Elm.
-```
+LCEL (Lightweight Concurrent Execution Library) is likely a library that enables concurrent execution of tasks, specifically runnables, in a pipelined fashion. The name suggests that it's designed to be lightweight and efficient, allowing concurrent execution of runnables while maintaining a connection between them through a pipe. 
+
+This kind of library is often used in systems programming, data processing, or other scenarios where tasks need to be processed in a sequential or pipelined manner while still leveraging concurrency for performance improvements. 
+
+However, without more context or information, I couldn't pinpoint the exact definition or usage of LCEL in a specific programming language or framework. If you have more details or context, I can try to provide a more precise answer.
+~~~
 
 ## What to notice in this code
 
@@ -151,10 +155,10 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
 
-```
+~~~
 Output
 index vector count: 4
-```
+~~~
 
 ---
 

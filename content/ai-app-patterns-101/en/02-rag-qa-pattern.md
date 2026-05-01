@@ -156,14 +156,17 @@ for question in test_questions:
     print(f"answer: {answer}")
 ```
 
-```
+~~~
 Output
 
 question: Who created Python?
-answer: Guido van Rossum created Python.
+answer: Python was created by Guido van Rossum in 1991.
 
 question: What are Python's weaknesses?
-answer: One of Python's main weaknesses is execution speed.
+answer: Python's main weaknesses are:
+
+1. Execution speed, as it is slower than C or Java for CPU-bound tasks.
+2. The GIL (Global Interpreter Lock), which limits multi-threaded performance.
 
 question: When did Python 2 reach end of life?
 answer: Python 2 reached its official end of life in January 2020.
@@ -173,7 +176,7 @@ answer: I cannot find this in the provided documents.
 
 question: What are the features of the Rust language?
 answer: I cannot find this in the provided documents.
-```
+~~~
 
 ---
 
@@ -244,11 +247,11 @@ print(f"answer: {result['answer']}")
 print(f"sources: {result['sources']}")
 ```
 
-```
+~~~
 Output
-answer: Guido van Rossum created Python.
+answer: Python was created by Guido van Rossum in 1991.
 sources: ['python_intro.txt', 'python_features.txt']
-```
+~~~
 
 ---
 

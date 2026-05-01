@@ -92,7 +92,7 @@ if __name__ == "__main__":
     print(f"Saved turn count: {snapshot.values['turn_count']}")
 ```
 
-```
+~~~
 Output
 First reply:
 Turn 1. Latest user message: My project is about LangGraph.. No earlier user turns saved yet.
@@ -102,7 +102,7 @@ Turn 2. Latest user message: What did I say my project was about?. Earlier user 
 
 Saved message count: 4
 Saved turn count: 2
-```
+~~~
 
 Runnable file: `/root/Github/langgraph-101/en/02-state-and-checkpoints/main.py`
 

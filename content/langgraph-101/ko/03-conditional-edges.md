@@ -98,7 +98,7 @@ if __name__ == "__main__":
         print(f"Answer: {result['answer']}\n")
 ```
 
-```
+~~~
 출력 결과
 Question: Write Python code for quicksort.
 Route: code
@@ -111,7 +111,7 @@ Answer: Route: concept. Next node should explain the idea clearly.
 Question: I got a traceback while running my graph.
 Route: debug
 Answer: Route: debug. Next node should inspect failure details first.
-```
+~~~
 
 실행 파일: `/root/Github/langgraph-101/ko/03-conditional-edges/main.py`
 

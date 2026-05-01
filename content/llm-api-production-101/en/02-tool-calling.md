@@ -157,10 +157,10 @@ message = completion.choices[0].message
 print(message.tool_calls)
 ```
 
-```
+~~~
 Output
-[ChatCompletionMessageToolCall(id='6sh1260hk', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
-```
+[ChatCompletionMessageToolCall(id='09d0pn0j5', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
+~~~
 
 `tool_choice="auto"` lets the model decide whether a tool is needed. In practice, the interesting case is when the assistant message contains one or more `tool_calls`. That means your application has more work to do before a final user-facing answer exists.
 
@@ -236,10 +236,10 @@ for tool_call in message.tool_calls or []:
     print(function_name, arguments, result)
 ```
 
-```
+~~~
 Output
 get_order_status {'order_id': 'ORD-1001'} {'status': 'in_transit', 'eta_days': 2}
-```
+~~~
 
 At this stage, the model has not fully answered the user yet. It has only requested a tool. The application has executed that request. The final conversational answer comes after the tool result is fed back to the model.
 

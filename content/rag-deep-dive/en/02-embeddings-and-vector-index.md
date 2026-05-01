@@ -78,7 +78,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 rank=1 distance=0.8672
 Operators inspect the exception chain before replaying the message.
@@ -89,7 +89,7 @@ The worker retries a failed message three times before dead-lettering.
 rank=3 distance=1.2581
 The dead-letter queue keeps the original payload for later inspection.
 ------------------------------------------------------------
-```
+~~~
 
 ### What to notice in this code
 
@@ -161,11 +161,11 @@ if __name__ == "__main__":
     demo()
 ```
 
-```
+~~~
 Output
 2 384
 384
-```
+~~~
 
 The baseline for the rest of this post is simple. The embedding step is already shaping the geometry. Chunk boundaries matter, long inputs may be averaged, and the query/document split is semantically meaningful even when one concrete implementation collapses it.
 
@@ -219,11 +219,11 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 distances: [[0.002500000176951289, 0.042500004172325134]]
 labels: [[0, 1]]
-```
+~~~
 
 Use `IndexFlatL2` when you want exactness and a trustworthy baseline. Stop treating it as neutral infrastructure. It encodes a very specific notion of closeness and pays for it with linear scan cost.
 
@@ -281,12 +281,12 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 InMemoryDocstore
 2
-{0: '26cf0323-df66-4ba9-bf90-c8f6d440ac08', 1: 'cbc0b4d6-c194-4b92-b126-3a5f3be4a310'}
-```
+{0: 'b2edbe39-2ff8-4d74-98b4-8745e43e2e2a', 1: '52b2a2a8-82ec-4544-bbc8-bdc6bef5fe88'}
+~~~
 
 The main operational takeaway is that retrieval bugs can happen in any of these layers. A bad score is not the same as a bad reconstruction, and a bad reconstruction is not the same as a bad metadata filter path.
 
@@ -357,7 +357,7 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 flat ip ids: [1218, 1405, 770, 1745, 727]
 flat ip scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8482962846755981, 0.8418495655059814]
@@ -365,7 +365,7 @@ ivf nprobe=1 ids: [1218, 1405, 770, 1361, 756]
 ivf nprobe=1 scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8389736413955688, 0.8291006088256836]
 ivf nprobe=8 ids: [1218, 1405, 770, 727, 1377]
 ivf nprobe=8 scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8418495655059814, 0.8412026166915894]
-```
+~~~
 
 For many teams, exact flat search remains the right choice longer than expected. Use IVF when the scale truly demands it, not because approximate indexes sound more advanced.
 
@@ -420,10 +420,10 @@ if __name__ == "__main__":
     main()
 ```
 
-```
+~~~
 Output
 Rotate secrets every 90 days.
-```
+~~~
 
 The lesson is bigger than persistence. A retrieval system is not only math and latency. It also has artifact boundaries, trust assumptions, and operational risks.
 

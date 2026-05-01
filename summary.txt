@@ -1,12 +1,11 @@
-Here's a beginner-friendly summary of Redis:
-
-1. Redis is a powerful, open-source in-memory data store.
-2. It's often used as a database, but it's more than just a traditional database.
-3. Redis stores data in RAM (Random Access Memory), which makes it very fast.
-4. It's known for its high performance and scalability.
-5. Redis supports a range of data structures, including strings, hashes, lists, sets, and more.
-6. It offers a publish-subscribe messaging pattern (pub/sub) for real-time communication.
-7. Redis can also behave like a messaging broker, providing queuing and workflow management.
-8. Its atomic operations and transactions ensure data consistency and integrity.
-9. Redis can be used in a variety of applications, such as caching, session management, and leaderboard storage.
-10. With its simple API and extensive client libraries, Redis makes it easy to develop high-performance applications.
+Redis는 오픈 소스 키-밸류 저장소입니다. 
+1. **키-밸류 저장소** : Redis는 문자열, 해시, 리스트, 집합, 셋 등의 자료형을 사용해 데이터를 저장합니다. 
+2. **인메모리** : Redis의 자료형은 RAM에 저장되므로 빠른 조회, 삽입, 삭제가 가능합니다. 
+3. **데이터 구조** : Redis는 기본 자료형(문자열, 해시, 리스트, 집합, 셋)과 데이터셋(TSDB, GIS)을 지원합니다.
+4. **트랜잭션** : Redis는 트랜잭션 지원을 해서 원자성을 보장하거나 데이터 불일치를 방지할 수 있습니다.
+5. **분산** : Redis는 여러 서버를 클러스터로 구성하여 부하 분산 가능합니다.
+6. **스케일링** : Redis의 대용량 캐시 기능으로 대규모 애플리케이션을 확장할 수 있습니다.
+7. **오픈 소스** : Redis는 GPL-2.0 조건하에 오픈 소스입니다.
+8. **개발 환경** : Redis는 다양한 개발 언어(Java, Python, C++, Node.js, Go, Ruby)에서 사용할 수 있습니다.
+9. **데이터베이스** : Redis는 데이터베이스의 일부와 함께 작업하는 데이터를 비롯하여 다양한 데이터 타입을 저장하고 처리할 수 있습니다. 
+10. Redis는 다양한 기능(스레드 처리, 클러스터링, 분산 잠금 등)을 제공하여 대규모 애플리케이션에 적합합니다.

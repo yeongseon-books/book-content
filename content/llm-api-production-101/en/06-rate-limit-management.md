@@ -214,7 +214,7 @@ def limited_completion(prompt: str) -> str:
 print(limited_completion("Explain the difference between a list and a tuple in Python."))
 ```
 
-```
+~~~
 Output
 **Lists vs Tuples in Python**
 =====================================
@@ -251,6 +251,49 @@ try:
 except TypeError:
     print("Tuples are immutable")
 ```
+**Key differences:**
+
+1. **Mutability**: Lists are mutable, while tuples are immutable.
+2. **Syntax**: Lists use square brackets `[]`, while tuples use parentheses `()`.
+3. **Performance**: Tuples are generally faster than lists because they are immutable and can be stored in a single block of memory.
+4. **Use cases**: Lists are suitable for dynamic data structures, while tuples are suitable for static data structures.
+
+**When to use each:**
+
+* Use lists when you need to modify the data structure frequently.
+* Use tuples when you need to store a fixed set of values and don't need to modify them.
+
+In summary, while both lists and tuples can store multiple values, lists are mutable and suitable for dynamic data structures, while tuples are immutable and suitable for static data structures.
+~~~python
+my_list = [1, 2, 3, 4, 5]
+print(my_list)  # Output: [1, 2, 3, 4, 5]
+
+# Modifying the list
+my_list[0] = 10
+print(my_list)  # Output: [10, 2, 3, 4, 5]
+```
+**Tuples**
+---------
+
+A `tuple` is an immutable data structure that cannot be modified after creation. It is defined using parentheses `()` and elements are separated by commas.
+
+**Example:**
+```python
+my_tuple = (1, 2, 3, 4, 5)
+print(my_tuple)  # Output: (1, 2, 3, 4, 5)
+
+# Attempting to modify the tuple will raise an error
+try:
+    my_tuple[0] = 10
+except TypeError:
+    print("Tuples are immutable")
+```
+
+~~~
+Output
+(1, 2, 3, 4, 5)
+Tuples are immutable
+~~~
 **Key differences:**
 
 1. **Mutability**: Lists are mutable, while tuples are immutable.
