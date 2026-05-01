@@ -34,6 +34,33 @@ pip install "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mk
 pandoc, xelatex, Nanum 폰트, playwright, poppler-utils, epubcheck 가 추가로 필요하며
 `mkdocs-ebook doctor` 로 확인할 수 있다.
 
+### 1.3 Always use the latest `mkdocs-ebook`
+
+`tech-writing`의 eBook 빌드는 항상 private `mkdocs-ebook` repository의 최신 버전을 기준으로 수행한다.
+
+원칙:
+
+- `mkdocs-ebook`은 `tech-writing`의 고정 의존성이 아니다.
+- `requirements.txt`에는 절대 포함하지 않는다.
+- eBook 빌드 직전 private builder 환경에서 최신 `mkdocs-ebook`을 설치하거나 업데이트한다.
+- 기존 설치본이 있더라도 빌드 전 `--upgrade --force-reinstall`로 최신 main 상태를 반영한다.
+- `mkdocs-ebook doctor`로 PDF/EPUB 빌드 환경을 확인한 뒤 빌드한다.
+- 재현 가능한 릴리스가 필요한 경우에만 별도 release branch 또는 tag를 지정한다. 일반 개발·검증 빌드는 latest 기준으로 수행한다.
+
+권장 설치/갱신 명령:
+
+```bash
+# SSH
+pip install --upgrade --force-reinstall \
+  git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+
+# HTTPS + gh token
+pip install --upgrade --force-reinstall \
+  "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mkdocs-ebook.git"
+```
+
+---
+
 ### 1.2 PDF/EPUB 빌드용 시스템 의존성 (Ubuntu/Debian 기준)
 
 ```bash
@@ -116,6 +143,8 @@ mkdocs-ebook (private)
 
 ## 4. 명령
 
+source bundle 생성:
+
 ```bash
 python3 scripts/export_ebook_source.py <series-id> --lang <ko|en>
 ```
@@ -133,10 +162,28 @@ docs/
 
 `mkdocs build --strict` 가 번들 안에서 그대로 통과해야 한다. 19/19 시리즈가 현재 통과한다.
 
-private builder 에서:
+private builder 에서 (항상 최신 mkdocs-ebook 기준으로 수행):
 
 ```bash
+# 1. 최신 mkdocs-ebook 설치/갱신
+pip install --upgrade --force-reinstall \
+  git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+
+# 2. source bundle 생성
+python3 scripts/export_ebook_source.py <series-id> --lang <ko|en>
+
+# 3. 빌드 환경 점검
+mkdocs-ebook doctor
+
+# 4. PDF/EPUB 빌드
 mkdocs-ebook build exports/ebook-source/<series-id>-<lang>
+```
+
+또는 Makefile 사용:
+
+```bash
+make ebook-upgrade                                        # 1. 최신 builder 갱신
+make ebook-build SERIES=azure-functions-101 LANG=ko      # 2+3+4 한 번에
 ```
 
 ### 4.1 번들 contract

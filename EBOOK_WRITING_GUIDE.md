@@ -213,7 +213,9 @@ episode: 1
 language: ko
 targets:
   tistory: true
+  blogger: true
   medium: true
+  mkdocs: true
   ebook: true
 ebook_part: 1
 ebook_chapter: 1

@@ -52,6 +52,7 @@ content/azure-functions-101/en/01-what-is-azure-functions.md
 
 ```text
 exports/tistory/<series>/<NN>-<slug>.md
+exports/blogger/<series>/<NN>-<slug>.html   ← planned (export_blogger.py 미구현)
 exports/medium/<series>/<NN>.html
 exports/ebook-source/<series>-<lang>/...
 ```
@@ -231,17 +232,17 @@ python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
 
 ## 7. 변형(variant)별 비교
 
-| 항목 | Tistory (ko) | Medium (en) | MkDocs (ko/en) | eBook source |
-| --- | --- | --- | --- | --- |
-| 산출물 형식 | .md | **.html** | .md | .md |
-| `blog-only` 블록 | 유지 | 유지 | 제거 | 제거 |
-| `ebook-only` 블록 | 제거 | 제거 | 옵션 | 유지 |
-| Visible 하단 `Tags:` 라인 | 유지 | **유지** (Medium 태그칸에 수동 복사) | 제거 | 제거 |
-| TOC `<!-- toc:* -->` 마커 | 유지 | 제거 (마커만; TOC 본문은 유지) | 제거 (전체) | 제거 (전체) |
-| 이미지 경로 | 상대 / 호스팅 | **base64 data URI (인라인)** | 상대 (`docs/` 기준) | 번들 내부 상대 |
-| Mermaid | PNG | PNG | mermaid 또는 PNG | PNG |
-| H3+ demote | 그대로 | demote | 그대로 | 그대로 |
-| `finalize-posts.py` 적용 | 적용 | **스킵** (`to-medium.py` 단독 책임) | N/A | N/A |
+| 항목 | Tistory (ko) | Blogger (en) | Medium (en adapted) | MkDocs (ko/en) | eBook source |
+| --- | --- | --- | --- | --- | --- |
+| 산출물 형식 | .md | .html | **.html** | .md | .md |
+| `blog-only` 블록 | 유지 | 유지 | 유지 | 제거 | 제거 |
+| `ebook-only` 블록 | 제거 | 제거 | 제거 | 옵션 | 유지 |
+| Visible 하단 `Tags:` 라인 | 유지 | 유지 | **유지** (Medium 태그칸에 수동 복사) | 제거 | 제거 |
+| TOC `<!-- toc:* -->` 마커 | 유지 | 유지 | 제거 (마커만; TOC 본문은 유지) | 제거 (전체) | 제거 (전체) |
+| 이미지 경로 | 상대 / Tistory 업로드 | 상대 / Blogger 업로드 | **base64 data URI (인라인)** | 상대 (`docs/` 기준) | 번들 내부 상대 |
+| Mermaid | PNG | PNG | PNG | mermaid 또는 PNG | PNG |
+| H3+ demote | 그대로 | 그대로 | demote | 그대로 | 그대로 |
+| `finalize-posts.py` 적용 | 적용 | 적용 | **스킵** (`to-medium.py` 단독 책임) | N/A | N/A |
 
 ---
 

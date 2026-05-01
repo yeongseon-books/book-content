@@ -6,20 +6,33 @@
 # `mkdocs-ebook` lives in a private repository (yeongseon/mkdocs-ebook).
 # Do NOT enable this by default — CI environments without access will fail.
 #
-# Install (pick one):
+# Policy:
+#   Always use the latest mkdocs-ebook when building eBook artifacts.
+#   Do not pin mkdocs-ebook in this repository unless creating a reproducible
+#   release build. Refresh before every build with --upgrade --force-reinstall.
+#
+# Install / refresh before building (pick one):
 #
 #   # A) SSH — preferred for local dev with a registered key:
-#   pip install git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+#   pip install --upgrade --force-reinstall \
+#     git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
 #
 #   # B) HTTPS + gh token — for CI or environments without SSH access:
-#   pip install "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mkdocs-ebook.git"
+#   pip install --upgrade --force-reinstall \
+#     "git+https://x-access-token:$(gh auth token)@github.com/yeongseon/mkdocs-ebook.git"
 #
 # `gh auth token` returns the token from `gh auth login` (needs `repo` scope).
 # `mkdocs-ebook lint` works with just the Python install. Full PDF/EPUB build
 # additionally needs pandoc, xelatex, Nanum fonts, playwright, poppler-utils,
 # and epubcheck — run `mkdocs-ebook doctor` to see what's missing.
 #
-# Once installed, the build flow is documented in EBOOK.md.
+# Once installed, the full build flow is:
+#   1. pip install --upgrade --force-reinstall <url above>
+#   2. python3 scripts/export_ebook_source.py <series-id> --lang <ko|en>
+#   3. mkdocs-ebook doctor
+#   4. mkdocs-ebook build exports/ebook-source/<series-id>-<lang>
+#
+# Full workflow documented in EBOOK.md.
 # ---------------------------------------------------------------------------
 # git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
 
