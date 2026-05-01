@@ -111,25 +111,6 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 print(f"prompt_tokens={usage.prompt_tokens}")
 print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
-```def my_decorator(func):
-    def wrapper():
-        print("Something is happening before the function is called.")
-        func()
-        print("Something is happening after the function is called.")
-    return wrapper
-
-@my_decorator
-def say_hello():
-    print("Hello!")
-
-say_hello()
-```
-In this example, the `my_decorator` function takes the `say_hello` function as an argument and returns a new function, `wrapper`, which wraps the original `say_hello` function. The `@my_decorator` notation is simply a shorthand for `say_hello = my_decorator(say_hello)`. When `say_hello` is called, it actually executes the `wrapper` function, which includes the original function's code. This allows us to add new functionality to the original function without altering its original code.
-
-finish_reason=stop
-prompt_tokens=46
-completion_tokens=283
-total_tokens=329
 ```
 
 Each field tells you something different.
@@ -183,6 +164,7 @@ print(f"token_count={len(tokens)}")
     token_count=12
 
 <!-- injected-output:end -->
+
 There is one important caveat here. `cl100k_base` is a well-known encoding from the OpenAI ecosystem. It does not automatically mean that Groq's `llama-3.1-8b-instant` uses the exact same tokenizer internally. Because of that, treat this number as a **practical estimate**, not as the provider's billing source of truth. For billing and final accounting, the provider's `usage` field is authoritative.
 
 That does not make the estimate useless. In most applications, the first question is not “what is the exact invoice number for this one request?” The first question is “is this prompt short, large, or dangerously large?” An approximate count is often enough to trigger the right control flow.
@@ -220,6 +202,7 @@ print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
     estimated_prompt_tokens=41
 
 <!-- injected-output:end -->
+
 This is not a provider-exact calculation. It is a useful operational estimate. For a chatbot, you can run this just before the API call and start trimming or summarizing once the estimate crosses a threshold.
 
 ---
@@ -277,6 +260,7 @@ print()
 print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
+
 `max_tokens` affects more than length alone.
 
 - a smaller value often produces shorter, faster, cheaper answers
@@ -337,6 +321,7 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("Warning: the response stopped because it hit a length limit.")
 ```
+
 Three things matter here.
 
 First, the script estimates prompt size before the call. That estimate is useful for preflight control.

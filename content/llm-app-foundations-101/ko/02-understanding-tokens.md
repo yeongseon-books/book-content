@@ -109,30 +109,6 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 print(f"prompt_tokens={usage.prompt_tokens}")
 print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
-```import logging
-import functools
-
-def log_decorator(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        logging.debug(f"{func.__name__} 함수가 호출되었습니다.")
-        result = func(*args, **kwargs)
-        logging.debug(f"{func.__name__} 함수가 종료되었습니다.")
-        return result
-    return wrapper
-
-@log_decorator
-def add(a, b):
-    return a + b
-
-result = add(3, 5)
-print(result)
-```
-
-finish_reason=stop
-prompt_tokens=53
-completion_tokens=275
-total_tokens=328
 ```
 
 세 필드는 각자 역할이 분명합니다.
@@ -186,6 +162,7 @@ print(f"token_count={len(tokens)}")
     token_count=39
 
 <!-- injected-output:end -->
+
 여기서 한 가지는 분명히 구분해야 합니다. `cl100k_base`는 OpenAI 계열에서 널리 알려진 인코딩입니다. Groq의 `llama-3.1-8b-instant`가 내부적으로 완전히 같은 토크나이저를 쓴다고 단정할 수는 없습니다. 따라서 이 숫자는 **청구 기준의 절대값**이라기보다 **사전 점검용 근사치**로 보는 편이 안전합니다. 실제 청구와 한계 판정은 공급자가 반환한 `usage`가 기준입니다.
 
 그렇더라도 이 근사치가 쓸모없는 것은 아닙니다. 운영에서 필요한 판단은 대개 “지금 프롬프트가 짧은가, 긴가, 너무 긴가”입니다. 수천 토큰 규모에서 대략적인 길이를 미리 아는 것만으로도 입력 잘라내기, 문서 청크 크기 조절, 대화 이력 축약 같은 결정을 훨씬 빨리 내릴 수 있습니다.
@@ -223,6 +200,7 @@ print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
     estimated_prompt_tokens=71
 
 <!-- injected-output:end -->
+
 이 계산은 공급자 내부 포맷과 1:1로 같지 않습니다. 하지만 길이 감시용으로는 충분히 실용적입니다. 대화 이력이 누적되는 챗봇이라면 요청 직전에 이 값을 재고, 임계치를 넘으면 오래된 메시지를 줄이거나 요약하는 흐름을 넣으면 됩니다.
 
 ---
@@ -280,6 +258,7 @@ print()
 print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
+
 `max_tokens`는 길이 비용과 응답 스타일을 함께 바꿉니다.
 
 - 값을 작게 주면 짧고 빠른 답이 나올 가능성이 큽니다.
@@ -340,6 +319,7 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.")
 ```
+
 이 코드에서 볼 포인트는 세 가지입니다.
 
 첫째, 요청 전에 `estimated_prompt_tokens`를 계산합니다. 사전 점검용 근사치입니다.

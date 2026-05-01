@@ -107,6 +107,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 Three things matter here. First, few-shot is just message-array design. Second, the example has to show the desired answer shape, not merely a related question. Third, every example consumes tokens, so compact representative examples are usually better than long ones.
 
 ---
@@ -176,6 +177,7 @@ print()
 print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
+
 In many runs, zero-shot will still produce a reasonable answer. Few-shot usually improves a different dimension: repeatability. It tends to stabilize the label vocabulary, the line order, the explanation length, and the way ambiguous cases are interpreted.
 
 That difference matters because applications care less about one impressive answer than about hundreds of answers arriving in a shape the rest of the system can rely on.
@@ -273,6 +275,7 @@ print()
 print("[good examples]")
 print(good_run.choices[0].message.content)
 ```
+
 The stronger examples do more than show correct answers. They demonstrate a stable schema, a clear priority policy, and the expected sentence length. That is why example quality matters more than raw example count. Two clean examples often outperform six messy ones.
 
 In practice, good few-shot examples are usually:
@@ -324,6 +327,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 This tends to reduce mistakes in ordering and intermediate arithmetic. It is especially handy when the task has words like “first,” “then,” “except,” or “only if,” because those are exactly the cases where skipping an intermediate check causes the answer to drift.
 
 ---
@@ -378,6 +382,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 The difference is easy to summarize:
 
 - zero-shot CoT: ask for step-by-step reasoning
@@ -458,6 +463,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 This pattern is useful because it improves more than answer quality. It improves debuggability. If the output is wrong, you can inspect which policy check went wrong rather than treating the whole response as a black box.
 
 ---

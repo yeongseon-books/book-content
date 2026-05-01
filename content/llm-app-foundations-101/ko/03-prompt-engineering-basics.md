@@ -125,46 +125,6 @@ print(without_system.choices[0].message.content)
 print()
 print("[with system]")
 print(with_system.choices[0].message.content)
-```python
-# 리스트 예시
-fruits = ['apple', 'banana', 'apple']
-print(fruits)  # ['apple', 'banana', 'apple']
-
-# 딕셔너리 예시
-person = {'name': 'John', 'age': 30}
-print(person)  # {'name': 'John', 'age': 30}
-```
-
-### 사용하는 경우
-
-- **리스트**: 리스트는 데이터의 순서가 중요한 경우에 사용합니다. 예를 들어, 학생의 이름과 학번을 저장할 때, 이름과 학번의 순서가 중요하므로 리스트를 사용합니다.
-- **딕셔너리**: 딕셔너리는 데이터의 키-값 쌍이 중요한 경우에 사용합니다. 예를 들어, 학생의 이름과 학번을 저장할 때, 이름이 키이고 학번이 값인 딕셔너리를 사용합니다.
-
-### 결론
-
-리스트와 딕셔너리는 모두 데이터를 저장하고 관리하는 데 사용되는 자료형입니다. 리스트는 순서가 있는 데이터의 집합이며, 딕셔너리는 키-값 쌍의 집합입니다. 리스트는 데이터의 순서가 중요한 경우에 사용하고, 딕셔너리는 데이터의 키-값 쌍이 중요한 경우에 사용합니다.
-
-[with system]
-**딕셔너리와 리스트의 차이**
-
-Python의 딕셔너리와 리스트는 모두 데이터를 저장할 수 있는 자료형입니다. 하지만 그 사용 방법과 특징이 다릅니다. 딕셔너리는 키-값 쌍으로 데이터를 저장하는 자료형으로, 리스트는 순서가 있는 데이터의 목록입니다.
-
-딕셔너리는 키(key)와 값(value)으로 구성됩니다. 키는 고유한 값으로, 값은 키와 관련된 데이터입니다. 예를 들어, 학생의 이름과 학점을 딕셔너리 형태로 저장할 수 있습니다.
-
-```python
-학생 = {'이름': '홍길동', '학점': 90}
-```
-
-리스트는 순서가 있는 데이터의 목록입니다. 리스트는 인덱스(index)로 데이터를 참조할 수 있습니다. 예를 들어, 학생의 이름과 학점을 리스트 형태로 저장할 수 있습니다.
-
-```python
-학생 = ['홍길동', 90]
-```
-
-**핵심 차이**
-
-* **키-값 쌍 vs 순서가 있는 목록**: 딕셔너리는 키-값 쌍으로 데이터를 저장하며, 키를 사용하여 데이터를 참조할 수 있습니다. 리스트는 순서가 있는 데이터의 목록이며, 인덱스를 사용하여 데이터를 참조할 수 있습니다.
-... (truncated)
 ```
 
 실행해 보면 두 응답이 같은 사실을 설명하더라도 구조와 톤이 달라지는 경우가 많습니다. system이 없으면 모델은 일반적인 설명을 자유롭게 구성합니다. system이 있으면 아래 요소가 더 안정적으로 고정됩니다.
@@ -230,20 +190,6 @@ second = client.chat.completions.create(
 
 print("[assistant turn 2]")
 print(second.choices[0].message.content)
-```# 리스트 선언
-my_list = [1, 2, 3]
-print(my_list)  # [1, 2, 3]
-my_list.append(4)
-print(my_list)  # [1, 2, 3, 4]
-
-# 튜플 선언
-my_tuple = (1, 2, 3)
-print(my_tuple)  # (1, 2, 3)
-try:
-    my_tuple.append(4)
-except AttributeError:
-    print("튜플은 변경할 수 없습니다.")
-```
 ```
 
 핵심은 `assistant_text`를 다시 배열에 넣는 부분입니다. 이렇게 해야 두 번째 요청이 “방금 설명”이 무엇이었는지 압니다. 이 패턴이 곧 챗봇의 기본 메모리입니다.
@@ -299,6 +245,7 @@ for temperature in (0.0, 0.9):
     print(completion.choices[0].message.content)
     print()
 ```
+
 ### `top_p`
 
 `top_p`는 확률이 높은 후보 집합을 얼마나 넓게 열어둘지 정합니다. 개념적으로는 “상위 누적 확률 질량 안에서만 뽑기”에 가깝습니다. 낮추면 더 보수적이고, 높이면 더 다양한 후보를 허용합니다.
@@ -356,20 +303,6 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
-```from dataclasses import dataclass
-
-@dataclass
-class Person:
-    name: str
-    age: int
-
-p = Person("John", 30)
-print(p)  # Person(name='John', age=30)
-```
-
-** 언제 쓰면 좋은지?**
-
-데이터 클래스는 데이터를 다루는 클래스를 정의할 때 유용합니다. 예를 들어, 데이터베이스에서 데이터를 읽어와서 처리할 때, 또는 데이터를 쉽게 표현하고 비교할 때 사용할 수 있습니다.
 ```
 
 이 구조가 좋은 이유는 세 가지입니다. 지시가 분명해지고, 배경 정보가 묻히지 않으며, 출력 검증 기준이 생깁니다. 나중에 응답 품질이 흔들릴 때도 “지시가 약한가”, “컨텍스트가 부족한가”, “형식 조건이 모호한가”를 분리해서 볼 수 있습니다.
@@ -415,6 +348,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 이 방식은 강력하지만 공짜는 아닙니다. 예시가 늘수록 토큰도 늘어납니다. 따라서 무작정 많이 넣기보다, 원하는 패턴을 가장 잘 보여주는 짧고 대표적인 예시를 고르는 편이 낫습니다.
 
 ---

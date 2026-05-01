@@ -117,6 +117,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 여기서 핵심은 마지막 질문 하나가 아니라 그 앞에 붙어 있는 이력입니다. 모델은 `그럼`과 `둘 중`이 무엇을 가리키는지 스스로 추론하는 것이 아니라, 앞선 메시지에서 그 대상을 읽습니다. 같은 질문을 이력 없이 보내면 훨씬 덜 안정적인 답이 나옵니다.
 
 이 패턴을 구현할 때 애플리케이션은 보통 다음 순서를 반복합니다.
@@ -164,6 +165,7 @@ def ask(user_text: str) -> str:
 print(ask("내 서비스는 월 구독형 SaaS야. 기억해 줘."))
 print(ask("그럼 환불 정책 문구를 한 줄로 써 줘."))
 ```
+
 이 방식의 장점은 분명합니다.
 
 - 구현이 가장 쉽습니다.

@@ -107,6 +107,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 이 예시는 긴 설명보다 세 가지를 분명하게 보여 줍니다. 첫째, few-shot은 결국 메시지 배열 설계입니다. 둘째, 예시는 질문만이 아니라 원하는 답변 형식까지 포함해야 합니다. 셋째, 예시 수가 늘수록 토큰도 늘어나므로 대표성 있는 짧은 예시를 고르는 편이 낫습니다.
 
 ---
@@ -176,6 +177,7 @@ print()
 print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
+
 실행해 보면 zero-shot도 꽤 그럴듯하게 맞추는 경우가 많습니다. 그런데 few-shot 쪽이 보통 더 안정적으로 아래 요소를 맞춥니다.
 
 - 라벨 이름
@@ -278,6 +280,7 @@ print()
 print("[good examples]")
 print(good_run.choices[0].message.content)
 ```
+
 코드만 보면 차이가 작아 보일 수 있지만, 결과는 꽤 크게 갈립니다. 나쁜 예시는 모델에게 형식을 가르치지 못하고 애매함만 전달합니다. 좋은 예시는 라벨, 우선순위 판단 기준, 문장 길이를 함께 고정합니다. few-shot의 핵심은 예시 개수가 아니라 예시의 선명도입니다.
 
 실무에서는 아래 기준으로 예시를 고르는 편이 안전합니다.
@@ -331,6 +334,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 이 방식은 중간 추론 단계를 더 분명하게 끌어내는 경향이 있습니다. 그 결과 산술 순서나 조건 적용 순서를 덜 놓칩니다. 특히 “먼저 할인, 그다음 세금”처럼 순서가 중요한 문제에서 효과를 체감하기 쉽습니다.
 
 ---
@@ -385,6 +389,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 둘의 차이는 이런 식으로 보면 됩니다.
 
 - zero-shot CoT: 추론하라고만 지시
@@ -465,6 +470,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 이 패턴의 장점은 둘입니다. 먼저 예시가 답변 껍데기를 고정합니다. 이어서 `policy_check` 단계가 판단 순서를 고정합니다. 단순히 `approved`나 `denied`만 받는 것보다 디버깅도 쉬워집니다. 잘못 분류되면 어느 단계에서 판단이 틀어졌는지 확인할 수 있기 때문입니다.
 
 ---

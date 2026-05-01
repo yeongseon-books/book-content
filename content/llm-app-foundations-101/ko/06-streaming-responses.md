@@ -115,6 +115,7 @@ stream = client.chat.completions.create(
 for chunk in stream:
     print(chunk)
 ```
+
 여기서 반환되는 `stream`은 완성된 응답 객체가 아니라 청크 이터레이터에 가깝습니다. 각 청크에는 그 시점에 새로 생성된 조각과 메타데이터가 들어 있습니다. 입문 단계에서 가장 중요한 변화는 사고방식입니다. 이제 응답은 문자열 한 덩어리가 아니라 순차적으로 도착하는 이벤트 묶음입니다.
 
 이벤트 스트림을 다룰 때는 보통 세 가지를 구분합니다.
@@ -163,36 +164,6 @@ for chunk in stream:
 final_text = "".join(parts)
 print("\n---")
 print(final_text)
-```from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
-```
-
-Flask 예시:
-
-```python
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route("/")
-def read_root():
-    return {"message": "Hello World"}
-```
-
-위 예시는 FastAPI와 Flask의 기본적인 예시입니다. FastAPI는 더 간단하고 직관적입니다.
----
-FastAPI와 Flask는 두 가지 인기 있는 파이썬 웹 프레임워크입니다. 둘 다 웹 애플리케이션을 개발하기 위해 사용할 수 있지만, 차이점이 있습니다.
-
-### 1. 성능
-
-FastAPI는 Flask보다 훨씬 빠른 성능을 제공합니다. FastAPI는 ASGI(Asynchronous Server Gateway Interface) 표준을 사용하여 비동기 처리를 지원하기 때문에, 요청을 처리하는 속도가 훨씬 빠릅니다. 반면 Flask는 WSGI(Web Server Gateway Interface) 표준을 사용하여 동기 처리를 지원하기 때문에, 요청을 처리하는 속도가 느립니다.
-
-... (truncated)
 ```
 
 패턴은 간단합니다.
@@ -253,49 +224,6 @@ async def main() -> None:
     print(final_text)
 
 asyncio.run(main())
-```import asyncio
-
-async def handle_request(reader, writer):
-    data = await reader.read(100)
-    writer.write(b"Hello, world!")
-    await writer.drain()
-    writer.close()
-
-async def main():
-    server = await asyncio.start_server(handle_request, '127.0.0.1', 8080)
-    async with server:
-        await server.serve_forever()
-
-asyncio.run(main())
-```
-
-이 예에서는 asyncio를 사용하여 웹 서버를 생성하고, 동시에 여러 요청을 처리합니다. `handle_request` 함수는 요청을 처리하고, `main` 함수는 서버를 시작합니다.
-
-asyncio를 사용하는 웹 서버의 장점은 다음과 같습니다.
-
-* 성능 향상
-* 비동기 처리
-* 이벤트 루프
-* 태스크 관리
-* 병렬 처리
-* 비동기 입출력
-
-asyncio를 사용하는 웹 서버의 단점은 다음과 같습니다.
-
-* 복잡한 코드
-* 오류 처리가 어려움
-* 성능이 향상되지 않는 경우
-
-asyncio를 사용하는 웹 서버의 경우, 성능이 향상되고, 비동기 처리가 가능합니다. 하지만 복잡한 코드와 오류 처리가 어려울 수 있습니다. 따라서, asyncio를 사용하는 웹 서버를 개발할 때, 성능 향상과 오류 처리를 고려해야 합니다.
----
-asyncio는 Python에서 제공하는 비동기 입출력 라이브러리입니다. 웹 서버에서 asyncio를 사용하는 이유는 다음과 같습니다.
-
-1. **비동기 처리**: 웹 서버는 동시에 여러 요청을 처리해야 하므로, asyncio는 비동기 처리를 지원하여 서버의 성능을 향상시킵니다. asyncio는 이벤트 루프를 사용하여 동시에 여러 태스크를 처리할 수 있습니다.
-2. **성능 향상**: asyncio는 동기 처리보다 성능이 향상됩니다. 동기 처리에서는 하나의 태스크가 완료될 때까지 다른 태스크를 처리할 수 없지만, asyncio에서는 동시에 여러 태스크를 처리할 수 있습니다.
-3. **이벤트 루프**: asyncio는 이벤트 루프를 사용하여 태스크를 처리합니다. 이벤트 루프는 태스크를 순서대로 처리하고, 태스크가 완료되면 다음 태스크를 처리합니다.
-4. **태스크 관리**: asyncio는 태스크를 관리하기 위한 다양한 함수를 제공합니다. 예를 들어, `asyncio.create_task()` 함수는 태스크를 생성하고, `asyncio.wait()` 함수는 태스크를 기다립니다.
-5. **병렬 처리**: asyncio는 병렬 처리를 지원하여 서버의 성능을 향상시킵니다
-... (truncated)
 ```
 
 구조는 동기 버전과 비슷하지만, 적용 위치는 다릅니다.
@@ -350,56 +278,6 @@ if usage is not None:
     print("total_tokens:", usage.total_tokens)
 else:
     print("usage metadata was not present in the final chunk")
-```def 데코레이터_이름(기능_기능):
-    def wrapper(원 함수):
-        # 원 함수에 추가 기능을 구현
-        결과 = 기능_기능(원 함수)
-        return 결과
-    return wrapper
-
-# 데코레이터를 사용하는 함수
-@데코레이터_이름
-def 원_함수():
-    # 원 함수의 로직
-    return "원 함수가 실행되었습니다."
-
-# 데코레이터를 적용하면 원 함수가 wrapper 함수를 사용하므로 데코레이터의 기능이 적용됩니다.
-```
-
-데코레이터는 함수에게 기능을 추가하는 기법입니다. 데코레이터는 원래 함수 대신 wrapper 함수를 반환하므로, 원래 함수의 이름과 위치가 변할 수 있지만, 실행 순서는 원래 함수가 먼저 실행되고, 그 다음 데코레이터의 기능이 진행됩니다.
-
-데코레이터와 wrapper 함수 사이의 통신은 데코레이터가 wrapper 함수에 전달한 매개 변수를 사용합니다.
-
-데코레이터를 이용할 때, 기존 함수를 수정하지 않고도 새로운 기능을 추가하여 유용하게 사용할 수 있습니다.
-
-예를 들어, 함수의 실행 시간을 측정하는 데코레이터를 만들 수 있습니다.
-
-```python
-import time
-
-def 시간 측정_데코레이터(기능_기능):
-    def wrapper(원 함수):
-        시작 시간 = time.time()
-        결과 = 기능_기능(원 함수)
-        종료 시간 = time.time()
-        print(f"실행 시간: {종료 시간 - 시작 시간}초")
-        return 결과
-    return(wrapper)
-
-@시간_측정_데코레이터
-def 원_함수():
-    time.sleep(2)
-    print("원 함수가 실행되었습니다.")
-
-원_함수()
-```
-
-위의 예제에서는 `시간_측정_데코레이터`를 사용하여 `원_함수`의 실행 시간을 측정할 수 있습니다.
-
-데코레이터는 함수에 다양한 추가 기능을 구현할 수 있으며, 코드 재사용성과 가독성을 향상하는 데 유용한 도구입니다.
-prompt_tokens: 50
-completion_tokens: 546
-total_tokens: 596
 ```
 
 운영 코드에서는 한 단계 더 보수적으로 접근하는 편이 좋습니다. 이유는 두 가지입니다.
@@ -446,6 +324,7 @@ with open("summary.txt", "w", encoding="utf-8") as file:
             file.flush()
             print(delta, end="", flush=True)
 ```
+
 이 코드는 생성되는 즉시 파일과 표준 출력에 동시에 기록합니다. 생성이 길어지더라도 중간 결과가 디스크에 남기 때문에, 운영 중간에 프로세스가 끊겼을 때도 일부 결과를 복구하기 쉽습니다.
 
 조금 더 흥미로운 패턴은 다음 단계로 파이프하는 방식입니다. 예를 들어 모델 응답을 한 문장씩 받아 금칙어 검사나 요약기, 번역기, TTS 엔진에 순차적으로 넘길 수 있습니다. 이때는 “토큰마다 바로 후처리”보다 “작은 버퍼를 모았다가 의미 있는 경계에서 넘기기”가 실용적입니다.
