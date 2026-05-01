@@ -51,7 +51,7 @@ export GROQ_API_KEY="여기에-발급받은-키"
 
 ## 왜 함수 이름 문자열만으로는 부족한가
 
-![문자열 분기와 툴 계약의 차이 비교](../../assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.ko.png)
+![문자열 분기와 툴 계약의 차이 비교](../../../assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.ko.png)
 초기 구현은 보통 아래처럼 시작합니다.
 
 ```python
@@ -75,7 +75,7 @@ elif "환불" in user_question:
 
 ## `tools` 파라미터는 무엇을 담는가
 
-![툴 정의를 이루는 구성 요소 구조](../../assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.ko.png)
+![툴 정의를 이루는 구성 요소 구조](../../../assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.ko.png)
 Groq 채팅 API에서 툴은 보통 `type: function` 항목으로 정의합니다. 각 툴에는 이름, 설명, 파라미터 스키마가 들어갑니다. 예제로 주문 상태 조회 함수를 열어 보겠습니다.
 
 ```python
@@ -107,7 +107,7 @@ tools = [
 
 ## 첫 번째 툴 호출 요청 만들기
 
-![첫 툴 호출 요청에서 모델이 고르는 흐름](../../assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.ko.png)
+![첫 툴 호출 요청에서 모델이 고르는 흐름](../../../assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.ko.png)
 이제 실제 호출을 보겠습니다. 아래 코드는 모델에게 주문 상태 질문을 주고, 툴 사용이 필요하면 `tool_calls`를 반환하게 합니다.
 
 ```python
@@ -250,7 +250,7 @@ for tool_call in message.tool_calls or []:
 
 ## 함수 실행 루프를 끝까지 만들기
 
-![툴 호출 왕복 실행 루프 흐름](../../assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.ko.png)
+![툴 호출 왕복 실행 루프 흐름](../../../assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.ko.png)
 툴 호출은 한 번의 API 호출로 끝나지 않는 경우가 많습니다. 일반적인 패턴은 다음과 같습니다.
 
 1. 사용자 메시지와 `tools` 목록을 보냅니다.
@@ -361,7 +361,7 @@ print(final.choices[0].message.content)
 
 ## 운영에서 특히 조심할 점
 
-![툴 실행 전에 거치는 운영 방어 단계](../../assets/llm-api-production-101/02/02-05-what-to-guard-in-production.ko.png)
+![툴 실행 전에 거치는 운영 방어 단계](../../../assets/llm-api-production-101/02/02-05-what-to-guard-in-production.ko.png)
 툴 호출을 붙이면 모델이 더 똑똑해진 것처럼 보이지만, 운영 관점에서는 실패 지점이 늘어납니다. 특히 아래 항목을 초기에 잡아 두는 편이 좋습니다.
 
 첫째, **허용 목록 밖 함수는 절대 실행하지 않습니다.** 모델 응답에 나온 함수 이름을 바로 `globals()`에서 찾는 패턴은 위험합니다.

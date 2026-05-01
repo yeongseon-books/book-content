@@ -60,7 +60,7 @@ Once you think in those layers, prompt design becomes easier to maintain.
 
 ## Understanding the three roles
 
-![Roles merged into one messages array](../../assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.en.png)
+![Roles merged into one messages array](../../../assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.en.png)
 Each role has a different purpose.
 
 ### `system`
@@ -83,7 +83,7 @@ That means multi-turn conversation is not a hidden built-in memory feature. It i
 
 ## How a system message changes the answer
 
-![Same question with and without system](../../assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.en.png)
+![Same question with and without system](../../../assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.en.png)
 It is easier to understand `system` by comparing outputs directly. The script below sends the same user question twice. The first request has no system message. The second adds a system instruction that constrains language, audience, and output structure. The contrast is usually obvious.
 
 ```python
@@ -198,7 +198,7 @@ A system message is not a perfect hard lock. It is the strongest steering input,
 
 ## Building multi-turn history with assistant messages
 
-![Assistant reply replay in the next turn](../../assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.en.png)
+![Assistant reply replay in the next turn](../../../assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.en.png)
 In many application flows, the provider does not remember the full conversation for you. If the next request only includes the latest user message, the model only sees that latest message.
 
 To preserve context, the application has to replay the conversation, including the model's earlier answer as an `assistant` message.
@@ -287,7 +287,7 @@ Post 05 will cover conversation state in more depth. For now, the key takeaway i
 
 ## Temperature and top_p: consistency versus variety
 
-![Low and high sampling control comparison](../../assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.en.png)
+![Low and high sampling control comparison](../../../assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.en.png)
 Prompt wording is only part of output control. Sampling parameters matter too. The first two to learn are `temperature` and `top_p`.
 
 ### `temperature`
@@ -478,7 +478,7 @@ This can be very effective, but every example consumes tokens. Short, representa
 
 ## Common prompt design mistakes
 
-![Prompt mistakes that destabilize output](../../assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.en.png)
+![Prompt mistakes that destabilize output](../../../assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.en.png)
 These mistakes show up repeatedly in first-generation LLM apps.
 
 ### Putting shared policy only in the user message

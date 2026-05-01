@@ -46,7 +46,7 @@ The operating idea is simple: better prompts are often less about clever wording
 
 ## Few-shot prompting teaches by example inside the messages array
 
-![Example pairs steering the final answer](../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png)
+![Example pairs steering the final answer](../../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png)
 Few-shot prompting is the practice of placing one or more worked examples before the real question. In chat APIs, those examples are not stored in a separate training field. They live in the same `messages` array as everything else, usually as paired `user` and `assistant` turns.
 
 The basic pattern looks like this:
@@ -124,7 +124,7 @@ Three things matter here. First, few-shot is just message-array design. Second, 
 
 ## Zero-shot versus few-shot on the same request
 
-![Zero-shot and few-shot stability comparison](../../assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.en.png)
+![Zero-shot and few-shot stability comparison](../../../assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.en.png)
 Zero-shot means you ask for the task directly with no examples. You rely on the model's general training and instruction-following ability. That often works surprisingly well, especially for simple classification or summarization tasks. The weakness is consistency. The model may understand the task but still vary the label wording, the answer structure, or the level of explanation.
 
 The script below sends the same support ticket twice: once as zero-shot and once with few-shot examples.
@@ -212,7 +212,7 @@ That difference matters because applications care less about one impressive answ
 
 ## Example quality can help or hurt
 
-![Weak and strong example comparison](../../assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.en.png)
+![Weak and strong example comparison](../../../assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.en.png)
 Few-shot prompting is only as good as the examples you provide. That sounds obvious, but it is one of the most common failure modes in early LLM applications. Developers add examples expecting an automatic boost, and the outputs become less consistent instead of more consistent.
 
 Bad examples usually fail in one of four ways:
@@ -331,7 +331,7 @@ In practice, good few-shot examples are usually:
 
 ## Chain-of-thought helps the model decompose the task
 
-![Stepwise reasoning path to final_answer](../../assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.en.png)
+![Stepwise reasoning path to final_answer](../../../assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.en.png)
 If few-shot is about answer patterns, chain-of-thought is about solution process. The familiar version is a phrase such as “Let's think step by step.” The reason this often works is not mystical. Multi-step tasks become easier when the model is nudged to compute or check intermediate states instead of leaping directly to the conclusion.
 
 That is useful for arithmetic, rule application, ordered constraints, and cases where the final answer depends on several earlier checks. The model is not gaining new facts. It is being guided to use its existing knowledge more methodically.
@@ -563,7 +563,7 @@ This pattern is useful because it improves more than answer quality. It improves
 
 ## Where these techniques stop helping
 
-![When prompting should yield to other tools](../../assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.en.png)
+![When prompting should yield to other tools](../../../assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.en.png)
 Few-shot and CoT are powerful, but they are not universal fixes.
 
 ### When the model lacks the required knowledge

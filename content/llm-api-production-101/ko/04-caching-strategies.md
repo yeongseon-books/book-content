@@ -49,7 +49,7 @@ export GROQ_API_KEY="여기에-발급받은-키"
 
 ## 왜 LLM 호출 앞에 캐시가 필요한가
 
-![반복 요청에서 비용이 다시 쌓이는 흐름](../../assets/llm-api-production-101/04/04-01-why-an-llm-path-needs-caching.ko.png)
+![반복 요청에서 비용이 다시 쌓이는 흐름](../../../assets/llm-api-production-101/04/04-01-why-an-llm-path-needs-caching.ko.png)
 운영 로그를 보면 LLM 요청은 생각보다 반복적입니다. 특히 아래 패턴에서 그렇습니다.
 
 - 자주 묻는 질문 챗봇
@@ -65,7 +65,7 @@ export GROQ_API_KEY="여기에-발급받은-키"
 
 ## 무엇을 캐시 키에 넣어야 하는가
 
-![캐시 키를 이루는 요청 구성 요소 구조](../../assets/llm-api-production-101/04/04-02-what-belongs-in-the-cache-key.ko.png)
+![캐시 키를 이루는 요청 구성 요소 구조](../../../assets/llm-api-production-101/04/04-02-what-belongs-in-the-cache-key.ko.png)
 가장 흔한 실수는 사용자 질문 문자열만 키로 쓰는 것입니다.
 
 ```python
@@ -134,7 +134,7 @@ print(build_cache_key(request_payload))
 
 ## TTL이 필요한 이유
 
-![캐시 항목의 생성 만료 갱신 단계](../../assets/llm-api-production-101/04/04-03-why-ttl-matters.ko.png)
+![캐시 항목의 생성 만료 갱신 단계](../../../assets/llm-api-production-101/04/04-03-why-ttl-matters.ko.png)
 해시 키만 있으면 캐시는 만들 수 있지만, TTL이 없으면 곧 다른 문제가 생깁니다. 오래된 응답이 영원히 남고, 모델 버전이나 프롬프트 정책이 바뀌어도 예전 답을 계속 재사용할 수 있기 때문입니다. 메모리도 계속 불어납니다.
 
 TTL은 캐시가 진실의 원본이 아니라 **일정 시간 동안만 재사용 가능한 복사본**이라는 사실을 코드로 표현합니다. LLM 경로에서는 특히 아래 기준으로 TTL을 생각하면 좋습니다.
@@ -193,7 +193,7 @@ class TTLCache:
 
 ## Groq 호출 앞에 캐시를 붙이기
 
-![캐시 적중과 미스가 갈리는 실행 경로](../../assets/llm-api-production-101/04/04-04-putting-the-cache-in-front-of-groq-calls.ko.png)
+![캐시 적중과 미스가 갈리는 실행 경로](../../../assets/llm-api-production-101/04/04-04-putting-the-cache-in-front-of-groq-calls.ko.png)
 이제 실제 LLM 호출 경로에 캐시를 넣어 보겠습니다.
 
 ```python
@@ -277,7 +277,7 @@ print(cached_completion(payload))
 
 ## 어떤 응답은 캐시하지 말아야 한다
 
-![캐시 가능 경로와 우회 경로의 판단 비교](../../assets/llm-api-production-101/04/04-05-when-not-to-cache.ko.png)
+![캐시 가능 경로와 우회 경로의 판단 비교](../../../assets/llm-api-production-101/04/04-05-when-not-to-cache.ko.png)
 캐시는 유용하지만 모든 경로에 자동으로 붙이면 위험합니다. 특히 아래 경우는 주의해야 합니다.
 
 - 실시간 외부 데이터에 의존하는 응답

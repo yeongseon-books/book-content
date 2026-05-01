@@ -108,7 +108,7 @@ LangChain에서 스트리밍은 `stream()` 메서드 하나로 시작합니다. 
 
 ## 기본 스트리밍
 
-![모델 직접 스트리밍과 체인 스트리밍 비교](../../assets/langchain-101/05/05-01-basic-streaming.ko.png)
+![모델 직접 스트리밍과 체인 스트리밍 비교](../../../assets/langchain-101/05/05-01-basic-streaming.ko.png)
 `stream()`은 제너레이터를 반환합니다. `for` 루프로 청크를 받아 처리합니다.
 
 ```python
@@ -172,7 +172,7 @@ print()
 
 ## 스트리밍 출력 수집
 
-![청크 수집 후 전체 문자열 복원 흐름](../../assets/langchain-101/05/05-02-collecting-streamed-output.ko.png)
+![청크 수집 후 전체 문자열 복원 흐름](../../../assets/langchain-101/05/05-02-collecting-streamed-output.ko.png)
 스트리밍 출력을 처리한 뒤 전체 텍스트도 필요할 때 청크를 리스트에 모읍니다.
 
 ```python
@@ -274,7 +274,7 @@ print(f"\n\n전체 글자 수: {len(full_text)}자")
 
 ## astream() — 비동기 스트리밍
 
-![async for 기반 비동기 스트리밍 흐름](../../assets/langchain-101/05/05-03-astream-async-streaming.ko.png)
+![async for 기반 비동기 스트리밍 흐름](../../../assets/langchain-101/05/05-03-astream-async-streaming.ko.png)
 FastAPI 같은 비동기 프레임워크에서는 `astream()`을 씁니다. `async for`로 청크를 받습니다.
 
 ```python
@@ -361,7 +361,7 @@ curl "http://localhost:8000/stream?question=RAG%EB%9E%80+%EB%AC%B4%EC%97%87%EC%9
 
 ## astream_events()로 이벤트 수준 제어
 
-![체인 이벤트를 골라 처리하는 흐름](../../assets/langchain-101/05/05-04-astream-events-for-fine-grained-control.ko.png)
+![체인 이벤트를 골라 처리하는 흐름](../../../assets/langchain-101/05/05-04-astream-events-for-fine-grained-control.ko.png)
 `astream_events()`는 체인 내부에서 발생하는 이벤트를 세밀하게 제어할 때 씁니다.
 
 ```python

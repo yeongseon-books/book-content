@@ -99,7 +99,7 @@ Topics:
 
 ## Basic streaming
 
-![Direct model and chain streaming comparison](../../assets/langchain-101/05/05-01-basic-streaming.en.png)
+![Direct model and chain streaming comparison](../../../assets/langchain-101/05/05-01-basic-streaming.en.png)
 `stream()` returns a generator. Iterate over it with a `for` loop.
 
 ```python
@@ -138,7 +138,7 @@ print()
 
 ## Collecting streamed output
 
-![Reassembling chunks into final text](../../assets/langchain-101/05/05-02-collecting-streamed-output.en.png)
+![Reassembling chunks into final text](../../../assets/langchain-101/05/05-02-collecting-streamed-output.en.png)
 When you need the full text after streaming, accumulate chunks in a list.
 
 ```python
@@ -208,7 +208,7 @@ print(f"\n\ntotal characters: {len(full_text)}")
 
 ## astream() — async streaming
 
-![Async for streaming execution path](../../assets/langchain-101/05/05-03-astream-async-streaming.en.png)
+![Async for streaming execution path](../../../assets/langchain-101/05/05-03-astream-async-streaming.en.png)
 In async frameworks like FastAPI, use `astream()` with `async for`.
 
 ```python
@@ -297,7 +297,7 @@ curl "http://localhost:8000/stream?question=What+is+RAG"
 
 ## astream_events() for fine-grained control
 
-![Selecting specific chain events](../../assets/langchain-101/05/05-04-astream-events-for-fine-grained-control.en.png)
+![Selecting specific chain events](../../../assets/langchain-101/05/05-04-astream-events-for-fine-grained-control.en.png)
 `astream_events()` exposes individual events from each component in the chain.
 
 ```python

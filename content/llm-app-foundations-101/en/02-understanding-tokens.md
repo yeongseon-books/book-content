@@ -46,7 +46,7 @@ The central idea is simple: **LLM applications run on token budgets, not on raw 
 
 ## What a token actually is
 
-![Text split into model token pieces](../../assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.en.png)
+![Text split into model token pieces](../../../assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.en.png)
 A token is a chunk of text from the model's point of view. That chunk is not guaranteed to be a word. Sometimes a short common word becomes one token. Sometimes a longer word is split into several pieces. Korean text can split across stems, particles, and endings. Numbers, whitespace, newlines, punctuation, and code symbols all count too.
 
 These three inputs may feel similar to a human reader:
@@ -65,7 +65,7 @@ For application work, you do not need to master tokenizer theory. You do need on
 
 ## Why tokens matter so much
 
-![Similar inputs with uneven token cost](../../assets/llm-app-foundations-101/02/02-02-why-tokens-matter-so-much.en.png)
+![Similar inputs with uneven token cost](../../../assets/llm-app-foundations-101/02/02-02-why-tokens-matter-so-much.en.png)
 Tokens are not just an internal implementation detail. They drive the three things that shape application behavior most often: cost, speed, and limits.
 
 Start with cost. Most LLM APIs charge based on input tokens and output tokens. The exact pricing table varies by provider and model, but the structure stays familiar. A longer prompt costs more on the input side. A longer answer costs more on the output side. Adding a system prompt, a large conversation history, or multiple retrieved passages increases total token usage, even if the user only asked a short question.
@@ -86,7 +86,7 @@ Once you start looking at logs through that lens, many “mysterious” LLM beha
 
 ## Revisiting `usage.prompt_tokens`, `completion_tokens`, and `total_tokens`
 
-![Usage fields for input output and total](../../assets/llm-app-foundations-101/02/02-03-revisiting-usage-prompt-tokens-completio.en.png)
+![Usage fields for input output and total](../../../assets/llm-app-foundations-101/02/02-03-revisiting-usage-prompt-tokens-completio.en.png)
 Post 01 introduced the `usage` field. Now we need to read it like an operator, not like a curious beginner. Every code example in this post is written so you can copy and run it directly. The example below makes a real call with the Groq Python SDK and prints the usage numbers.
 
 ```python
@@ -172,7 +172,7 @@ In production-style logging, it is worth storing `model`, `prompt_tokens`, `comp
 
 ## Estimating token count with `tiktoken`
 
-![Token estimate path before API send](../../assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.en.png)
+![Token estimate path before API send](../../../assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.en.png)
 Reading usage after the call is necessary, but it is not enough. You also want a preflight estimate before sending the request. That helps you decide whether to trim input, summarize older messages, or split one large job into multiple calls.
 
 Install `tiktoken` like this:
@@ -331,7 +331,7 @@ It is also important to remember what `max_tokens` is not. It is not a promise t
 
 ## Detecting long-prompt problems with `finish_reason`
 
-![Context overflow and length cutoff branches](../../assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.en.png)
+![Context overflow and length cutoff branches](../../../assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.en.png)
 Once prompts get longer, two failure modes show up often. The request itself may approach the context limit, or the answer may hit a generation cap and stop midstream. In both cases, you want explicit detection instead of guessing from the final text.
 
 The script below creates a long repeated input, estimates its token size with `tiktoken`, sends the request with a small `max_tokens`, and checks `finish_reason`.

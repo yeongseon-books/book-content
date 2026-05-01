@@ -159,6 +159,27 @@ for query in queries:
         print(f"  [{rank}] {score:.4f} — {text[:60]}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+
+    query: 'how vector search finds similar content'
+      [1] 0.6746 — Vector search captures semantic similarity that keyword sear
+      [2] 0.4981 — Cosine similarity measures the directional similarity betwee
+      [3] 0.4782 — FAISS is a high-speed vector search library from Facebook AI
+
+    query: 'what embedding models do'
+      [1] 0.6641 — Higher embedding dimensions can capture more information.
+      [2] 0.6437 — Embedding models project text into a high-dimensional vector
+      [3] 0.4751 — sentence-transformers specializes in sentence-level embeddin
+
+    query: 'splitting documents into pieces'
+      [1] 0.7226 — Chunking strategies split long documents into searchable uni
+      [2] 0.3137 — RAG combines retrieved documents with an LLM prompt.
+      [3] 0.2652 — Embedding models project text into a high-dimensional vector
+
+<!-- injected-output:end -->
+
 ```
 query: 'how vector search finds similar content'
   [1] 0.7234 — Vector search captures semantic similarity that keyword...

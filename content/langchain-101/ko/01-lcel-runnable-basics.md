@@ -105,7 +105,7 @@ LangChain을 처음 접하면 코드보다 용어가 더 먼저 막힙니다. LC
 
 ## LangChain이 해결하려는 문제
 
-![반복 연결 코드와 LCEL 추상화 구조](../../assets/langchain-101/01/01-01-langchain.ko.png)
+![반복 연결 코드와 LCEL 추상화 구조](../../../assets/langchain-101/01/01-01-langchain.ko.png)
 LLM 앱을 만들면 반복되는 작업이 나타납니다. 프롬프트를 조립하고, LLM에 보내고, 응답을 파싱해서, 다음 단계로 넘기는 패턴입니다. 이 과정에서 연결 코드가 점점 늘어납니다.
 
 ```python
@@ -124,7 +124,7 @@ LangChain은 이 연결 코드를 컴포넌트로 추상화합니다. 핵심 아
 
 ## Runnable 인터페이스
 
-![invoke batch stream 실행 방식 비교](../../assets/langchain-101/01/01-02-runnable.ko.png)
+![invoke batch stream 실행 방식 비교](../../../assets/langchain-101/01/01-02-runnable.ko.png)
 LangChain의 거의 모든 컴포넌트는 `Runnable` 인터페이스를 구현합니다. 세 가지 핵심 메서드가 있습니다.
 
 - `invoke(input)` — 입력을 받아 출력을 반환합니다. 동기 단일 호출입니다.
@@ -161,7 +161,7 @@ print(response.content)
 
 ## LCEL과 파이프 연산자
 
-![프롬프트 모델 파서 타입 연결 흐름](../../assets/langchain-101/01/01-03-lcel.ko.png)
+![프롬프트 모델 파서 타입 연결 흐름](../../../assets/langchain-101/01/01-03-lcel.ko.png)
 LCEL은 `|` 연산자로 Runnable 컴포넌트를 연결하는 문법입니다. 왼쪽 컴포넌트의 출력이 오른쪽 컴포넌트의 입력이 됩니다.
 
 ```python
@@ -326,7 +326,7 @@ print(result)
 
 ## batch()로 여러 입력 처리
 
-![batch 호출의 입력 분배와 결과 수집 흐름](../../assets/langchain-101/01/01-04-batch.ko.png)
+![batch 호출의 입력 분배와 결과 수집 흐름](../../../assets/langchain-101/01/01-04-batch.ko.png)
 `batch()`는 입력 목록을 받아 각각 처리한 뒤 결과 목록을 반환합니다.
 
 ```python

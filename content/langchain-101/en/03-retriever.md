@@ -103,7 +103,7 @@ Topics:
 
 ## Creating a FAISS VectorStore
 
-![Documents turning into a vector index](../../assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png)
+![Documents turning into a vector index](../../../assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png)
 LangChain's `FAISS` class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.
 
 ```bash
@@ -149,7 +149,7 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ## Creating a Retriever
 
-![Similarity mmr threshold search paths](../../assets/langchain-101/03/03-02-creating-a-retriever.en.png)
+![Similarity mmr threshold search paths](../../../assets/langchain-101/03/03-02-creating-a-retriever.en.png)
 `as_retriever()` wraps the VectorStore in the Retriever interface.
 
 ```python
@@ -182,7 +182,7 @@ retriever_mmr = vectorstore.as_retriever(
 
 ## Connecting a Retriever to a chain
 
-![Retrieved documents becoming prompt context](../../assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.en.png)
+![Retrieved documents becoming prompt context](../../../assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.en.png)
 The standard RAG pattern: retrieve relevant documents, inject them as context, pass to the LLM.
 
 ```python
@@ -284,7 +284,7 @@ The key is the chain input dict:
 
 ## Saving and reloading a VectorStore
 
-![Saving and reloading index lifecycle](../../assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png)
+![Saving and reloading index lifecycle](../../../assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png)
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS

@@ -49,7 +49,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why an LLM path needs caching
 
-![Cost flow of repeated uncached requests](../../assets/llm-api-production-101/04/04-01-why-an-llm-path-needs-caching.en.png)
+![Cost flow of repeated uncached requests](../../../assets/llm-api-production-101/04/04-01-why-an-llm-path-needs-caching.en.png)
 Production logs usually show more repetition than people expect. It appears in at least four places:
 
 - FAQ-style chatbots
@@ -65,7 +65,7 @@ The important part is defining “the same task” correctly. A human may think 
 
 ## What belongs in the cache key
 
-![Structure of a normalized cache key](../../assets/llm-api-production-101/04/04-02-what-belongs-in-the-cache-key.en.png)
+![Structure of a normalized cache key](../../../assets/llm-api-production-101/04/04-02-what-belongs-in-the-cache-key.en.png)
 The most common mistake is caching only by the visible user prompt.
 
 ```python
@@ -134,7 +134,7 @@ This matters because equivalent requests should serialize to the same string bef
 
 ## Why TTL matters
 
-![Lifecycle stages of a cached entry](../../assets/llm-api-production-101/04/04-03-why-ttl-matters.en.png)
+![Lifecycle stages of a cached entry](../../../assets/llm-api-production-101/04/04-03-why-ttl-matters.en.png)
 A hash key is not enough. Without TTL, stale responses can live forever. A model may change, a prompt policy may change, or the underlying business meaning may shift while the cache keeps serving old output. Memory usage also grows without any bound.
 
 TTL makes the cache honest about what it is: a temporary copy, not the source of truth.
@@ -195,7 +195,7 @@ This uses lazy eviction: expired entries are removed when they are read. That ke
 
 ## Putting the cache in front of Groq calls
 
-![Execution path for cache hit and miss](../../assets/llm-api-production-101/04/04-04-putting-the-cache-in-front-of-groq-calls.en.png)
+![Execution path for cache hit and miss](../../../assets/llm-api-production-101/04/04-04-putting-the-cache-in-front-of-groq-calls.en.png)
 Now we can place the cache directly in front of a completion request.
 
 ```python
@@ -281,7 +281,7 @@ It also helps to record the response source explicitly. A field such as `source:
 
 ## When not to cache
 
-![Comparison between cacheable and unsafe paths](../../assets/llm-api-production-101/04/04-05-when-not-to-cache.en.png)
+![Comparison between cacheable and unsafe paths](../../../assets/llm-api-production-101/04/04-05-when-not-to-cache.en.png)
 Caches are useful, but applying them blindly creates new risks. A few cases deserve extra caution:
 
 - answers that depend on rapidly changing external data

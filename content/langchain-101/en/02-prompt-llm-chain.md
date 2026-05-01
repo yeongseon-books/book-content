@@ -103,7 +103,7 @@ Topics:
 
 ## ChatPromptTemplate structure
 
-![System human ai message roles](../../assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png)
+![System human ai message roles](../../../assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png)
 `ChatPromptTemplate` constructs conversation-style prompts and renders them into the message format the LLM expects.
 
 Three message roles are available:
@@ -194,7 +194,7 @@ Placeholder names like `{language}` and `{question}` must match the keys in the 
 
 ## Prompts with multiple variables
 
-![Multiple variables into one prompt](../../assets/langchain-101/02/02-02-prompts-with-multiple-variables.en.png)
+![Multiple variables into one prompt](../../../assets/langchain-101/02/02-02-prompts-with-multiple-variables.en.png)
 More complex tasks need more template variables. Pass them all in the same dict.
 
 ```python
@@ -237,7 +237,7 @@ print(result)
 
 ## StrOutputParser vs JsonOutputParser
 
-![String parser and JSON parser outputs](../../assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.en.png)
+![String parser and JSON parser outputs](../../../assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.en.png)
 Output parsers convert the LLM response into the format you need.
 
 **StrOutputParser**: extracts `AIMessage.content` as a plain string. This covers most use cases.
@@ -337,7 +337,7 @@ print(result)
 
 ## Adding a fallback to a chain
 
-![Primary failure and fallback switch](../../assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.en.png)
+![Primary failure and fallback switch](../../../assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.en.png)
 `.with_fallbacks()` runs an alternative chain when the primary call fails.
 
 ```python

@@ -88,6 +88,15 @@ print(f"dimension: {len(vector)}")
 print(f"first 5 values: {vector[:5]}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    type: <class 'list'>
+    dimension: 384
+    first 5 values: [0.04267469793558121, 0.00979855377227068, -0.031552139669656754, -0.033105991780757904, 0.04774016514420509]
+
+<!-- injected-output:end -->
+
 ```
 type: <class 'list'>
 dimension: 384

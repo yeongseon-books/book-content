@@ -116,7 +116,7 @@ LangChain 101 시리즈 (6/6)
 
 ## 문서 인덱싱 파이프라인
 
-![문서 청킹부터 인덱스 생성까지 흐름](../../assets/langchain-101/06/06-01-document-indexing-pipeline.ko.png)
+![문서 청킹부터 인덱스 생성까지 흐름](../../../assets/langchain-101/06/06-01-document-indexing-pipeline.ko.png)
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -178,7 +178,7 @@ print(f"인덱스 벡터 수: {vectorstore.index.ntotal}")
 
 ## RAG 체인 조립
 
-![retriever prompt llm parser 조립 구조](../../assets/langchain-101/06/06-02-assembling-the-rag-chain.ko.png)
+![retriever prompt llm parser 조립 구조](../../../assets/langchain-101/06/06-02-assembling-the-rag-chain.ko.png)
 ```python
 import os
 
@@ -219,7 +219,7 @@ rag_chain = (
 
 ## 스트리밍으로 실행
 
-![통합 RAG 체인의 스트리밍 실행 경로](../../assets/langchain-101/06/06-03-running-with-streaming.ko.png)
+![통합 RAG 체인의 스트리밍 실행 경로](../../../assets/langchain-101/06/06-03-running-with-streaming.ko.png)
 ```python
 questions = [
     "벡터 검색은 키워드 검색과 어떻게 다른가요?",
@@ -240,7 +240,7 @@ for question in questions:
 
 ## 대화 이력을 반영한 멀티턴 RAG
 
-![대화 이력이 반영되는 멀티턴 RAG 흐름](../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.ko.png)
+![대화 이력이 반영되는 멀티턴 RAG 흐름](../../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.ko.png)
 단순 RAG 체인은 각 질문을 독립적으로 처리합니다. 이전 대화를 참고해서 답하려면 대화 이력을 체인에 넘겨야 합니다.
 
 ```python

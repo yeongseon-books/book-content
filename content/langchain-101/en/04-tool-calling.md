@@ -105,7 +105,7 @@ Topics:
 
 ## Defining tools
 
-![Function definition into tool metadata](../../assets/langchain-101/04/04-01-defining-tools.en.png)
+![Function definition into tool metadata](../../../assets/langchain-101/04/04-01-defining-tools.en.png)
 The `@tool` decorator turns a Python function into a LangChain tool. The docstring tells the LLM what the tool does and when to use it. Type hints define the input schema.
 
 ```python
@@ -135,7 +135,7 @@ print(f"schema: {add_numbers.args_schema.model_json_schema()}")
 
 ## Connecting tools with bind_tools()
 
-![Binding tool metadata to the model](../../assets/langchain-101/04/04-02-connecting-tools-with-bind-tools.en.png)
+![Binding tool metadata to the model](../../../assets/langchain-101/04/04-02-connecting-tools-with-bind-tools.en.png)
 `bind_tools()` informs the LLM which tools are available.
 
 ```python
@@ -188,7 +188,7 @@ tool_calls: [{'name': 'add_numbers', 'args': {'a': 15.0, 'b': 27.0}, 'id': 'call
 
 ## A minimal tool-call loop
 
-![Tool call execution and reinjection loop](../../assets/langchain-101/04/04-03-a-minimal-tool-call-loop.en.png)
+![Tool call execution and reinjection loop](../../../assets/langchain-101/04/04-03-a-minimal-tool-call-loop.en.png)
 After the LLM requests a tool call, the application must execute the function and return the result as a `ToolMessage`.
 
 ```python
@@ -345,7 +345,7 @@ print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
 
 ## What to watch out for
 
-![Guardrails for invalid tool requests](../../assets/langchain-101/04/04-04-what-to-watch-out-for.en.png)
+![Guardrails for invalid tool requests](../../../assets/langchain-101/04/04-04-what-to-watch-out-for.en.png)
 **Docstrings drive tool selection.** The LLM reads docstrings to decide which tool to use and when. Vague or overlapping descriptions cause wrong tool selection.
 
 **Validate inputs inside the tool.** Type hints define the schema but do not prevent the LLM from passing invalid values at runtime. For tools with side effects, validate inputs before executing.

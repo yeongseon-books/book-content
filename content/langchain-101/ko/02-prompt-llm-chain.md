@@ -107,7 +107,7 @@ LangChain 101 시리즈 (2/6)
 
 ## ChatPromptTemplate 구조
 
-![system human ai 메시지 역할 구조](../../assets/langchain-101/02/02-01-chatprompttemplate-structure.ko.png)
+![system human ai 메시지 역할 구조](../../../assets/langchain-101/02/02-01-chatprompttemplate-structure.ko.png)
 `ChatPromptTemplate`은 대화 형식의 프롬프트를 만드는 클래스입니다. 메시지 목록을 받아 LLM에 전달할 형식으로 렌더링합니다.
 
 세 가지 메시지 역할이 있습니다.
@@ -180,7 +180,7 @@ print(response.content)
 
 ## 여러 변수를 가진 프롬프트
 
-![여러 입력 변수가 프롬프트로 합쳐지는 흐름](../../assets/langchain-101/02/02-02-prompts-with-multiple-variables.ko.png)
+![여러 입력 변수가 프롬프트로 합쳐지는 흐름](../../../assets/langchain-101/02/02-02-prompts-with-multiple-variables.ko.png)
 복잡한 태스크일수록 프롬프트에 여러 변수가 필요합니다. 모두 딕셔너리로 넘깁니다.
 
 ```python
@@ -223,7 +223,7 @@ print(result)
 
 ## StrOutputParser vs JsonOutputParser
 
-![문자열 파서와 JSON 파서 출력 비교](../../assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.ko.png)
+![문자열 파서와 JSON 파서 출력 비교](../../../assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.ko.png)
 출력 파서는 LLM 응답을 원하는 형태로 변환합니다. 두 가지가 자주 쓰입니다.
 
 **StrOutputParser**: `AIMessage.content`를 문자열로 꺼냅니다. 대부분의 경우 이걸로 충분합니다.
@@ -336,7 +336,7 @@ print(result)
 
 ## 체인에 fallback 추가하기
 
-![주 체인 실패 시 대체 체인 전환 흐름](../../assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.ko.png)
+![주 체인 실패 시 대체 체인 전환 흐름](../../../assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.ko.png)
 모델 호출이 실패할 때 대체 체인을 실행하도록 `.with_fallbacks()`를 씁니다.
 
 ```python

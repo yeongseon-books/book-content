@@ -110,17 +110,37 @@ def _make_output_block(out: str, lang: str) -> str:
     )
 
 
-def run_block(code: str) -> str | None:
+def run_block(code: str, context: str = "") -> str | None:
+    """Run a single code block, optionally prepending accumulated context.
+
+    The context portion has its stdout suppressed (redirected to /dev/null)
+    so only the current block's output is captured.
+    """
     if "input(" in code:
         return None
     if _SKIP_PATTERNS.search(code):
         return None
 
+    # Build the full script: suppress context output, then run current block
+    if context.strip():
+        full_code = (
+            "import sys as _sys, os as _os\n"
+            "_devnull = open(_os.devnull, 'w')\n"
+            "_real_stdout = _sys.stdout\n"
+            "_sys.stdout = _devnull\n"
+            "try:\n"
+            + "\n".join("    " + line for line in context.splitlines())
+            + "\nexcept Exception:\n    pass\nfinally:\n    _sys.stdout = _real_stdout\n    _devnull.close()\n"
+            + code
+        )
+    else:
+        full_code = code
+
     env = {**os.environ, "GROQ_API_KEY": os.environ.get("GROQ_API_KEY", "")}
 
     try:
         result = subprocess.run(
-            [sys.executable, "-c", code],
+            [sys.executable, "-c", full_code],
             capture_output=True,
             text=True,
             timeout=TIMEOUT_SECS,
@@ -166,6 +186,7 @@ def inject_file(path: Path) -> int:
     injected = 0
     offset = 0
     new_parts: list[str] = []
+    accumulated_context: list[str] = []
 
     for m in PYTHON_BLOCK_RE.finditer(text):
         new_parts.append(text[offset: m.start()])
@@ -176,11 +197,15 @@ def inject_file(path: Path) -> int:
         fence_close = m.group(3)
 
         if already_has_output(text, m.end()):
+            accumulated_context.append(code)
             new_parts.append(fence_open + code + fence_close)
             continue
 
         print(f"  executing block ({len(code.splitlines())} lines)…", end=" ", flush=True)
-        out = run_block(code)
+        context = "\n".join(accumulated_context)
+        out = run_block(code, context=context)
+
+        accumulated_context.append(code)
 
         if out is None:
             print("skipped")

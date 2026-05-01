@@ -48,7 +48,7 @@ The main idea is simple: **an LLM app begins with request and response structure
 
 ## What an LLM API is
 
-![JSON request and response flow](../../assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.en.png)
+![JSON request and response flow](../../../assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.en.png)
 An LLM API is still an API. The transport is HTTP. The payload is usually JSON. Your code sends input to a remote service, and that service sends structured output back.
 
 From the application's point of view, a typical request answers three questions:
@@ -173,7 +173,7 @@ At this point, you have everything you need for a first request.
 
 ## Sending your first request
 
-![Client setup and first call chain](../../assets/llm-app-foundations-101/01/01-02-sending-your-first-request.en.png)
+![Client setup and first call chain](../../../assets/llm-app-foundations-101/01/01-02-sending-your-first-request.en.png)
 Start with the smallest successful program. The code below sends one request in synchronous style and prints only the generated text. This block is self-contained.
 
 ```python
@@ -217,7 +217,7 @@ Do not focus on the exact wording of the answer. The important result is structu
 
 ## Inspecting the response object
 
-![Completion object fields and branches](../../assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.en.png)
+![Completion object fields and branches](../../../assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.en.png)
 Many beginners stop after printing the answer text. That is fine for a smoke test, but it is not enough for a working application. You also need token usage, model identity, and the overall response shape.
 
 The Groq Python SDK returns Pydantic models, so you can convert the response into a dictionary with `to_dict()`. This block is also self-contained.
@@ -331,7 +331,7 @@ print(completion.choices[0].finish_reason)        # "stop", "length", or "tool_c
 
 ## Why the HTTP mental model still matters
 
-![Authentication rate limit and retry branches](../../assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.en.png)
+![Authentication rate limit and retry branches](../../../assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.en.png)
 The SDK handles authentication headers, JSON serialization, response parsing, and typed errors. It does not remove the network boundary.
 
 That boundary explains a lot of beginner problems:
@@ -347,7 +347,7 @@ This is the real value of seeing the first call clearly. You stop treating the m
 
 ## Synchronous and asynchronous patterns
 
-![Sync waits and async gather comparison](../../assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.en.png)
+![Sync waits and async gather comparison](../../../assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.en.png)
 Python gives you two common ways to call an LLM API: synchronous code and asynchronous code.
 
 Synchronous code is usually the better teaching tool. It works well for scripts, notebooks, and small command-line programs.
