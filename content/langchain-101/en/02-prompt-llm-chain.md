@@ -3,7 +3,7 @@ title: 'Prompt and LLM chain — assembling your first chain'
 series: langchain-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,82 @@ last_reviewed: '2026-05-01'
 
 # Prompt and LLM chain — assembling your first chain
 
-> LangChain 101 (2/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/02-prompt-llm-chain)
+- How do `system` and `human` messages divide responsibility in `ChatPromptTemplate`
+- How should you model prompts that need multiple input variables
+- When is `StrOutputParser` enough, and when do you need structured parsing
+- How do you forward part of the input unchanged through a chain
+
+> A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.
+
+```mermaid
+flowchart LR
+    A[topic and audience] --> B[ChatPromptTemplate]
+    B --> C[ChatGroq]
+    C --> D[StrOutputParser]
+    D --> E[explanation text]
+```
+
+## Minimal runnable example
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a tutor explaining concepts to {audience}."),
+    ("human", "Explain {topic} in three sentences."),
+])
+chain = prompt | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"]) | StrOutputParser()
+
+print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemplate"}))
+```
+
+## What to notice in this code
+
+- Variables are managed at the template layer instead of through manual string assembly.
+- The `system` message sets behavior while the `human` message carries the request.
+- Adding a parser makes downstream steps deal with a plain string instead of an `AIMessage`.
+- You can adjust prompt structure without rewriting the rest of the chain.
+
+## Where engineers get confused
+
+- `ChatPromptTemplate` is both a formatter and a message builder.
+- Without an output parser, many examples return `AIMessage`, not text.
+- `RunnablePassthrough` forwards the current input; it does not magically merge unrelated state.
+
+## Checklist
+
+- [ ] I can explain the roles of `system`, `human`, and `ai` messages
+- [ ] I can build a prompt template with multiple variables
+- [ ] I understand how the parser changes the chain's output type
+
+LangChain 101 (2/6)
+
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/02-prompt-llm-chain)
+
+## Questions this post answers
+
+- How is `ChatPromptTemplate` different from plain string formatting?
+- Why separate prompt, LLM, and output parser into distinct steps?
+- What input shape should you keep when a chain has multiple variables?
+- Where should fallbacks sit in a prompt-to-model pipeline?
+
+> A prompt chain is the smallest useful LCEL pipeline: turn structured input into messages, call the model, then parse the result into an application-friendly output.
+
+## The flow at a glance
+
+```mermaid
+flowchart LR
+    Input[Input variables] --> Prompt[ChatPromptTemplate]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Parser[OutputParser]
+    Parser --> App[Application output]
+```
 
 Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.
 
@@ -247,6 +320,25 @@ print(result)
 This pattern switches automatically to the fallback model when the primary model is unavailable or rate-limited.
 
 ---
+
+## What to notice in this code
+
+- Prompt chains usually take dictionaries as input, and the keys must line up with the variables used in the template.
+- Choosing between `StrOutputParser` and `JsonOutputParser` is mostly about what downstream code expects to receive.
+- `RunnablePassthrough` matters because it makes data flow explicit even when a value should remain unchanged.
+- A fallback is not just defensive code. It is a second chain that preserves the same input and output contract when the primary path fails.
+
+## Where engineers get confused
+
+- If you treat a prompt template as plain string interpolation, you miss the value of role-separated chat messages.
+- JSON parsing is only reliable when the prompt strongly constrains the schema the model should emit.
+- Fallback chains become hard to debug if they return a different shape from the primary chain.
+
+## Checklist
+
+- [ ] I can build a dictionary input for a `ChatPromptTemplate` with multiple variables
+- [ ] I know when `StrOutputParser` is enough and when structured parsing is worth the extra constraint
+- [ ] I understand why fallback chains must preserve the same output shape
 
 ## Conclusion
 

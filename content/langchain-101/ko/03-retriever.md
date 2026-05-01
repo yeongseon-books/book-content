@@ -3,7 +3,7 @@ title: 'Retriever — 문서 검색과 컨텍스트 주입'
 series: langchain-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,84 @@ last_reviewed: '2026-05-01'
 
 # Retriever — 문서 검색과 컨텍스트 주입
 
-> LangChain 101 시리즈 (3/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/03-retriever)
+- Retriever는 VectorStore와 무엇이 다르고 왜 분리되어 있는가
+- `as_retriever()`로 만들면 체인 안에서 어떤 입력과 출력을 주고받는가
+- 검색된 여러 문서를 프롬프트 컨텍스트로 넣을 때 어떤 포맷이 안정적인가
+- RAG의 정확도 문제를 Retriever 단계에서 어디까지 줄일 수 있는가
+
+> Retriever는 문서를 저장하는 컴포넌트가 아니라 질문을 검색 가능한 컨텍스트로 바꾸는 진입점입니다.
+
+```mermaid
+flowchart LR
+    A[질문] --> B[Retriever]
+    B --> C[관련 문서 리스트]
+    C --> D[문서 포매터]
+    D --> E[ChatPromptTemplate]
+    E --> F[ChatGroq]
+```
+
+## 최소 실행 예제
+
+```python
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+vectorstore = FAISS.from_texts([
+    "FAISS는 고속 벡터 검색 라이브러리입니다.",
+    "Retriever는 질문과 관련된 문서를 찾습니다.",
+], embedding)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
+
+print(retriever.invoke("Retriever가 무엇을 하나요?")[0].page_content)
+```
+
+## 이 코드에서 봐야 할 것
+
+- 임베딩 모델은 텍스트를 벡터로 바꾸고, Retriever는 그 벡터 인덱스를 검색 인터페이스로 감춥니다.
+- 체인 입장에서는 `query -> documents`라는 일관된 계약만 알면 됩니다.
+- 검색 결과는 문자열이 아니라 `Document` 객체 목록이므로 후처리 단계가 필요합니다.
+- RAG 품질의 첫 관문은 프롬프트보다 검색 결과 품질입니다.
+
+## 실무에서 헷갈리는 지점
+
+- VectorStore를 만들었다고 바로 RAG가 되는 것은 아닙니다. 문서 포맷팅 단계가 꼭 필요합니다.
+- `k`를 크게 늘리면 항상 좋아지는 것이 아니라 노이즈가 늘 수 있습니다.
+- Retriever는 답을 생성하지 않고, 답에 넣을 문맥만 고릅니다.
+
+## 체크리스트
+
+- [ ] VectorStore와 Retriever의 역할 차이를 설명할 수 있다
+- [ ] 검색된 `Document` 리스트를 문자열 컨텍스트로 바꿀 수 있다
+- [ ] 간단한 Retriever를 LCEL 체인에 연결할 수 있다
+
+LangChain 101 시리즈 (3/6)
+
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/03-retriever)
+
+## 이 글에서 답할 질문
+
+- Retriever는 VectorStore와 어떤 관계를 가질까
+- `as_retriever()` 뒤에 어떤 검색 파라미터를 조절할 수 있을까
+- 검색 결과를 프롬프트 컨텍스트 문자열로 바꿀 때 무엇을 주의해야 할까
+- RAG 체인에서 retriever는 정확히 어느 위치에 들어갈까
+
+> Retriever는 질문을 받아 관련 문서를 고르고, 그 결과를 프롬프트에 넣을 수 있는 컨텍스트로 바꾸는 LangChain의 검색 경계입니다.
+
+## 핵심 흐름 한눈에 보기
+
+```mermaid
+flowchart LR
+    Docs[원본 문서] --> Embed[임베딩]
+    Embed --> Store[FAISS VectorStore]
+    Store --> Retriever[Retriever]
+    Question[사용자 질문] --> Retriever
+    Retriever --> Context[컨텍스트 문자열]
+    Context --> Prompt[Prompt]
+    Prompt --> LLM[ChatGroq]
+```
 
 Retriever는 쿼리를 받아 관련 문서 목록을 반환하는 컴포넌트입니다. LangChain의 Retriever 인터페이스는 `get_relevant_documents(query)` 메서드 하나로 정의됩니다. 뒤에 어떤 검색 시스템이 있든 — FAISS, Chroma, Elasticsearch — 체인에서는 같은 방식으로 사용합니다.
 
@@ -243,6 +318,25 @@ print(f"\n검색 결과: {results[0].page_content}")
 ```
 
 ---
+
+## 이 코드에서 봐야 할 것
+
+- VectorStore는 문서를 저장하는 계층이고, Retriever는 그 저장소를 질의 가능한 인터페이스로 감싼 계층입니다.
+- `retriever | format_docs` 패턴은 검색 결과를 바로 프롬프트 입력으로 넘기기 위한 가장 흔한 LCEL 연결입니다.
+- `RunnablePassthrough()`는 질문 원문을 별도 키로 유지해 컨텍스트와 질문을 함께 프롬프트에 넣게 합니다.
+- 저장과 재로딩 예제는 Retriever가 일회성 데모가 아니라 재사용 가능한 인덱스 위에서 동작한다는 점을 보여줍니다.
+
+## 실무에서 헷갈리는 지점
+
+- Retriever가 답을 만드는 것으로 오해하기 쉽지만, 실제 답변 생성은 여전히 LLM 단계의 역할입니다.
+- 검색 품질 문제를 프롬프트 문제로 착각하는 경우가 많습니다. 관련 문서가 안 뽑히면 먼저 임베딩·청킹·`k` 값을 봐야 합니다.
+- 문서를 단순 연결할 때 길이 제한을 넘기기 쉽습니다. `format_docs`는 내용뿐 아니라 길이 제어 지점이기도 합니다.
+
+## 체크리스트
+
+- [ ] VectorStore와 Retriever의 역할 차이를 설명할 수 있다
+- [ ] `as_retriever(search_kwargs={...})`에서 조절할 값을 알고 있다
+- [ ] 검색 결과를 컨텍스트 문자열로 합치는 이유와 주의점을 이해했다
 
 ## 마무리
 

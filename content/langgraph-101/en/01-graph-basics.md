@@ -3,7 +3,7 @@ title: 'LangGraph introduction and graph basics'
 series: langgraph-101
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,146 +19,116 @@ last_reviewed: '2026-05-01'
 
 # LangGraph introduction and graph basics
 
-> LangGraph 101 (1/6)
+## Questions this post answers
+
+- What exactly does `StateGraph` define in LangGraph?
+- How should you connect nodes and edges so the workflow stays readable?
+- What happens to state when you call `invoke()`?
+
+> StateGraph is a blueprint that turns node functions plus transition rules into an executable workflow over shared state.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/01-graph-basics)
 
-LangChain handles linear chains well. Real agents are different — they use a tool, look at the result, decide what to do next, and use another tool. This loop is what LangGraph is built to express. This post introduces the core concepts: StateGraph, nodes, and edges, and builds the first graph.
+The most useful first mental shift is this: LangGraph is not “a few chains glued together.” It is a graph where state moves through named steps. This post builds the smallest possible graph so you can see node registration, edge wiring, and `invoke()` in one place.
 
----
-
-<!-- ebook-only:start -->
-
-**The key idea**: LangGraph represents agent flow as a graph. Nodes (functions) and edges (transition conditions) define loops and branches explicitly.
-
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **State management and checkpoints**.
-<!-- ebook-only:end -->
-
-## Core concepts
-
-LangGraph represents LLM workflows as **directed graphs**.
-
-- **Node**: a unit of work. Any processing step — LLM call, tool execution, data transformation.
-- **Edge**: flow between nodes. Unconditional (always go there) or conditional (branch based on state).
-- **State**: data that flows through the entire graph. Each node receives state, optionally modifies it, and returns the update.
-- **Checkpoint**: a state snapshot. The foundation for pause/resume and memory.
-
----
-
-## First graph: echo bot
-
-Start with the simplest possible graph — receive user input, process with LLM, return.
-
-```python
-import os
-from typing import TypedDict, Annotated
-
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langchain_core.messages import BaseMessage, HumanMessage
-from langchain_groq import ChatGroq
-
-class BasicState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-
-def call_llm(state: BasicState) -> BasicState:
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
-    )
-    response = llm.invoke(state["messages"])
-    return {"messages": [response]}
-
-def build_basic_graph():
-    graph = StateGraph(BasicState)
-    graph.add_node("llm", call_llm)
-    graph.set_entry_point("llm")
-    graph.add_edge("llm", END)
-    return graph.compile()
-
-if __name__ == "__main__":
-    app = build_basic_graph()
-    result = app.invoke({"messages": [HumanMessage(content="Explain Python list comprehensions.")]})
-    print(result["messages"][-1].content)
+```mermaid
+flowchart LR
+    A[User request] --> B[choose_topic]
+    B --> C[build_outline]
+    C --> D[write_answer]
+    D --> E[Final state]
 ```
 
----
-
-## Multi-node pipeline
-
-Add nodes and define order to build a pipeline.
+## Minimal runnable example
 
 ```python
-from langchain_core.messages import SystemMessage
+from typing import TypedDict
 
-class PipelineState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
+from langgraph.graph import END, START, StateGraph
+
+class ArticleState(TypedDict):
+    user_request: str
     topic: str
-    summary: str
+    outline: list[str]
+    answer: str
 
-def extract_topic(state: PipelineState) -> PipelineState:
-    last_msg = state["messages"][-1].content
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="Extract the core topic of the user message as a single word. Return only the word."),
-        HumanMessage(content=last_msg),
-    ])
-    return {"topic": response.content.strip()}
+def choose_topic(state: ArticleState) -> ArticleState:
+    request = state["user_request"].lower()
+    if "checkpoint" in request:
+        topic = "checkpoints"
+    elif "tool" in request:
+        topic = "tool calling"
+    else:
+        topic = "graph basics"
+    return {"topic": topic}
 
-def generate_answer(state: PipelineState) -> PipelineState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content=f"You are an expert in {state['topic']}. Explain clearly and practically."),
-        *state["messages"],
-    ])
-    return {"messages": [response]}
+def build_outline(state: ArticleState) -> ArticleState:
+    outline = [
+        f"Define {state['topic']}",
+        "Show the nodes in the graph",
+        "Explain how invoke() runs the graph",
+    ]
+    return {"outline": outline}
 
-def summarize_answer(state: PipelineState) -> PipelineState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    last_answer = state["messages"][-1].content
-    response = llm.invoke([
-        SystemMessage(content="Summarize the following in exactly one sentence."),
-        HumanMessage(content=last_answer),
-    ])
-    return {"summary": response.content}
+def write_answer(state: ArticleState) -> ArticleState:
+    bullet_lines = "\n".join(f"- {item}" for item in state["outline"])
+    answer = (
+        f"Request: {state['user_request']}\n"
+        f"Chosen topic: {state['topic']}\n"
+        "Teaching outline:\n"
+        f"{bullet_lines}"
+    )
+    return {"answer": answer}
 
-def build_pipeline_graph():
-    graph = StateGraph(PipelineState)
-    graph.add_node("extract_topic", extract_topic)
-    graph.add_node("generate_answer", generate_answer)
-    graph.add_node("summarize", summarize_answer)
+def build_graph():
+    graph = StateGraph(ArticleState)
+    graph.add_node("choose_topic", choose_topic)
+    graph.add_node("build_outline", build_outline)
+    graph.add_node("write_answer", write_answer)
 
-    graph.set_entry_point("extract_topic")
-    graph.add_edge("extract_topic", "generate_answer")
-    graph.add_edge("generate_answer", "summarize")
-    graph.add_edge("summarize", END)
+    graph.add_edge(START, "choose_topic")
+    graph.add_edge("choose_topic", "build_outline")
+    graph.add_edge("build_outline", "write_answer")
+    graph.add_edge("write_answer", END)
+
     return graph.compile()
 
 if __name__ == "__main__":
-    pipeline = build_pipeline_graph()
-    result = pipeline.invoke({
-        "messages": [HumanMessage(content="Explain the difference between generators and iterators.")],
-        "topic": "",
-        "summary": "",
-    })
-    print(f"topic: {result['topic']}")
-    print(f"summary: {result['summary']}")
-    print(f"\nfull answer:\n{result['messages'][-1].content}")
+    app = build_graph()
+    result = app.invoke(
+        {
+            "user_request": "Explain how a LangGraph StateGraph works.",
+            "topic": "",
+            "outline": [],
+            "answer": "",
+        }
+    )
+    print(result["answer"])
 ```
 
----
+Runnable file: `/root/Github/langgraph-101/en/01-graph-basics/main.py`
 
-## State design principles
+## What to notice in this code
 
-State is the shared memory flowing through the graph. Two decisions matter at design time.
+- `StateGraph(ArticleState)` declares the shared schema for the whole workflow.
+- Each node receives full state and returns only the fields it wants to update.
+- `START -> choose_topic -> build_outline -> write_answer -> END` makes execution order explicit in code.
 
-**Field type**: `Annotated[list, add_messages]` appends rather than overwrites. Use it for cumulative data like message history. Plain typed fields are overwritten by each update.
+## Where engineers get confused
 
-**Field scope**: only put data in state that another node needs. Keep intermediate results as local variables; write to state only what the next node must see.
+- A node does not need to reconstruct the entire state object. Returning changed fields is enough.
+- `StateGraph` is not limited to DAG-style pipelines. Later posts add loops and branches on the same abstraction.
+- `invoke()` returns the final state, not just the output of the last node.
+
+## Checklist
+
+- [ ] Does state contain only fields that another node actually needs
+- [ ] Are node names descriptive enough to read the flow quickly
+- [ ] Is the path from `START` to `END` free of unnecessary steps
+
+## Summary
+
+At this stage, the important skill is not “building a graph” but learning to see workflow as visible state transitions. In the next post, we keep that state alive across calls with checkpoints and `thread_id`.
 
 <!-- blog-only:start -->
 Next: [State management and checkpoints](./02-state-and-checkpoints.md)
@@ -180,8 +150,8 @@ Next: [State management and checkpoints](./02-state-and-checkpoints.md)
 
 ## References
 
-- [LangGraph documentation](https://langchain-ai.github.io/langgraph/)
-- [LangGraph concepts guide](https://langchain-ai.github.io/langgraph/concepts/)
+- [LangGraph concepts: low level](https://langchain-ai.github.io/langgraph/concepts/low_level/)
 - [StateGraph API reference](https://langchain-ai.github.io/langgraph/reference/graphs/)
+- [LangGraph introduction tutorial](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
 
 Tags: LangGraph, Agent, Python, LLM

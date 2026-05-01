@@ -3,7 +3,7 @@ title: '조건부 엣지와 분기 흐름'
 series: langgraph-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,199 +19,118 @@ last_reviewed: '2026-05-01'
 
 # 조건부 엣지와 분기 흐름
 
-> LangGraph 101 (3/6)
+## 이 글에서 답할 질문
+
+- `add_conditional_edges()`는 언제 써야 할까요?
+- 상태를 보고 다음 노드를 고르는 함수는 어떤 역할만 맡아야 할까요?
+- 분기 그래프를 만들 때 무한 루프를 어떻게 피할까요?
+
+> 조건부 엣지는 상태를 계산한 뒤 다음 노드 이름을 반환해 그래프의 흐름을 런타임에 결정합니다.
 
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/03-conditional-edges)
 
-선형 파이프라인은 항상 같은 경로로 흐릅니다. 에이전트는 상황에 따라 다른 경로를 선택해야 합니다. LangGraph의 조건부 엣지는 상태를 검사해 다음 노드를 동적으로 결정합니다. 이 포스트에서는 라우팅 패턴, 루프, 탈출 조건을 구현합니다.
+LLM 워크플로가 실제 서비스로 가면 모든 요청이 같은 경로를 타지 않습니다. 어떤 질문은 코드 생성으로, 어떤 질문은 개념 설명으로, 어떤 질문은 디버깅 흐름으로 보내야 합니다. LangGraph에서는 이 결정을 조건부 엣지 하나로 드러낼 수 있습니다.
 
----
+```mermaid
+flowchart LR
+    A[질문] --> B[classify]
+    B -->|code| C[answer_code]
+    B -->|concept| D[answer_concept]
+    B -->|debug| E[answer_debug]
+    C --> F[END]
+    D --> F
+    E --> F
+```
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **조건부 엣지는 State를 보고 다음 노드를 결정한다.** 함수가 문자열을 반환하면 그래프가 그 키에 해당하는 노드로 이동한다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 3번째 장입니다.
-앞 장에서는 **상태 관리와 체크포인트**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **도구 호출 에이전트**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 조건부 엣지 기본
-
-`add_conditional_edges`는 상태를 인자로 받아 다음 노드 이름을 반환하는 함수와 함께 씁니다.
+## 최소 실행 예제
 
 ```python
-import os
-from typing import TypedDict, Annotated, Literal
+from typing import Literal, TypedDict
 
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+from langgraph.graph import END, START, StateGraph
 
 class RouterState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-    category: str
-    response: str
+    question: str
+    route: str
+    answer: str
 
-# ── 라우터 노드 ───────────────────────────────────────────────────────────
 def classify_question(state: RouterState) -> RouterState:
-    """질문을 카테고리로 분류합니다."""
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    last_msg = state["messages"][-1].content
-    response = llm.invoke([
-        SystemMessage(content="""질문을 다음 중 하나로 분류하세요:
-- code: 코드 작성, 디버깅, 프로그래밍 관련
-- concept: 개념 설명, 이론, 원리 관련  
-- other: 그 외
+    text = state["question"].lower()
+    if any(word in text for word in ("bug", "error", "traceback")):
+        route = "debug"
+    elif any(word in text for word in ("code", "implement", "write")):
+        route = "code"
+    else:
+        route = "concept"
+    return {"route": route}
 
-반드시 code, concept, other 중 하나만 반환하세요."""),
-        HumanMessage(content=last_msg),
-    ])
-    category = response.content.strip().lower()
-    if category not in ("code", "concept", "other"):
-        category = "other"
-    return {"category": category}
+def route_question(state: RouterState) -> Literal["code", "concept", "debug"]:
+    return state["route"]
 
-# ── 전문 노드들 ───────────────────────────────────────────────────────────
-def handle_code_question(state: RouterState) -> RouterState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="코드 예시와 함께 명확하게 답변하세요. 코드 블록을 반드시 포함하세요."),
-        *state["messages"],
-    ])
-    return {"messages": [response], "response": response.content}
+def answer_code(_: RouterState) -> RouterState:
+    return {"answer": "Route: code. Next node should generate or review code."}
 
-def handle_concept_question(state: RouterState) -> RouterState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="개념을 단계별로 명확하게 설명하세요. 비유나 예시를 활용하세요."),
-        *state["messages"],
-    ])
-    return {"messages": [response], "response": response.content}
+def answer_concept(_: RouterState) -> RouterState:
+    return {"answer": "Route: concept. Next node should explain the idea clearly."}
 
-def handle_other_question(state: RouterState) -> RouterState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="도움이 되는 방향으로 답변하세요."),
-        *state["messages"],
-    ])
-    return {"messages": [response], "response": response.content}
+def answer_debug(_: RouterState) -> RouterState:
+    return {"answer": "Route: debug. Next node should inspect failure details first."}
 
-# ── 라우팅 함수 ───────────────────────────────────────────────────────────
-def route_by_category(state: RouterState) -> Literal["code", "concept", "other"]:
-    return state["category"]
-
-def build_router_graph():
+def build_graph():
     graph = StateGraph(RouterState)
-
     graph.add_node("classify", classify_question)
-    graph.add_node("code", handle_code_question)
-    graph.add_node("concept", handle_concept_question)
-    graph.add_node("other", handle_other_question)
+    graph.add_node("code", answer_code)
+    graph.add_node("concept", answer_concept)
+    graph.add_node("debug", answer_debug)
 
-    graph.set_entry_point("classify")
+    graph.add_edge(START, "classify")
     graph.add_conditional_edges(
         "classify",
-        route_by_category,
-        {"code": "code", "concept": "concept", "other": "other"},
+        route_question,
+        {"code": "code", "concept": "concept", "debug": "debug"},
     )
     graph.add_edge("code", END)
     graph.add_edge("concept", END)
-    graph.add_edge("other", END)
+    graph.add_edge("debug", END)
 
     return graph.compile()
 
 if __name__ == "__main__":
-    app = build_router_graph()
-    questions = [
-        "파이썬에서 리스트를 정렬하는 코드를 작성해 주세요.",
-        "재귀 함수가 무엇인지 설명해 주세요.",
-        "파이썬은 왜 인기가 있나요?",
-    ]
-    for q in questions:
-        result = app.invoke({"messages": [HumanMessage(content=q)], "category": "", "response": ""})
-        print(f"\n질문: {q}")
-        print(f"카테고리: {result['category']}")
-        print(f"답변: {result['response'][:150]}...")
+    app = build_graph()
+    for question in [
+        "Write Python code for quicksort.",
+        "What is a checkpoint in LangGraph?",
+        "I got a traceback while running my graph.",
+    ]:
+        result = app.invoke({"question": question, "route": "", "answer": ""})
+        print(f"Question: {question}")
+        print(f"Route: {result['route']}")
+        print(f"Answer: {result['answer']}\n")
 ```
 
----
+실행 파일: `/root/Github/langgraph-101/ko/03-conditional-edges/main.py`
 
-## 루프와 탈출 조건
+## 이 코드에서 봐야 할 것
 
-에이전트 루프는 작업 완료 전까지 반복합니다. 무한 루프를 막기 위해 반드시 탈출 조건이 필요합니다.
+- `classify_question()`은 분기 판단에 필요한 값을 상태에 씁니다.
+- `route_question()`은 부작용 없이 다음 노드 이름만 반환합니다.
+- `path_map` 딕셔너리 덕분에 문자열 라벨과 실제 노드 이름 매핑이 명시적으로 남습니다.
 
-```python
-from typing import TypedDict, Annotated
+## 실무에서 헷갈리는 지점
 
-class ReflectionState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-    draft: str
-    critique: str
-    iteration: int
-    max_iterations: int
-    final: str
+- 라우팅 함수 안에서 LLM 호출까지 같이 넣으면 디버깅이 어려워집니다. 분류와 라우팅은 분리하는 편이 낫습니다.
+- 조건부 엣지는 if/else 한 번으로 끝나지 않습니다. 루프를 만들 수도 있으므로 종료 조건을 항상 같이 설계해야 합니다.
+- 라우트 문자열이 오타 나면 런타임에 바로 깨집니다. `Literal[...]` 힌트를 두는 이유가 여기 있습니다.
 
-def generate_draft(state: ReflectionState) -> ReflectionState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.7)
-    prompt = state["messages"][-1].content if not state["draft"] else \
-        f"이전 답변: {state['draft']}\n\n비판: {state['critique']}\n\n위 비판을 반영해 개선하세요."
-    response = llm.invoke([HumanMessage(content=prompt)])
-    return {"draft": response.content, "iteration": state["iteration"] + 1}
+## 체크리스트
 
-def critique_draft(state: ReflectionState) -> ReflectionState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="""다음 답변을 비판하세요.
-답변이 충분히 좋으면 'APPROVED'를 반환하세요.
-개선이 필요하면 구체적인 개선점을 한 문장으로 제시하세요."""),
-        HumanMessage(content=state["draft"]),
-    ])
-    return {"critique": response.content}
+- [ ] 분기 기준이 상태 필드로 분리되어 있는가
+- [ ] 라우팅 함수가 외부 부작용 없이 순수하게 동작하는가
+- [ ] 모든 분기 경로가 `END` 또는 다음 안정된 노드로 닫히는가
 
-def should_continue(state: ReflectionState) -> Literal["generate", "finish"]:
-    if state["iteration"] >= state["max_iterations"]:
-        return "finish"
-    if "APPROVED" in state["critique"]:
-        return "finish"
-    return "generate"
+## 정리
 
-def finish(state: ReflectionState) -> ReflectionState:
-    return {"final": state["draft"]}
-
-def build_reflection_graph():
-    graph = StateGraph(ReflectionState)
-    graph.add_node("generate", generate_draft)
-    graph.add_node("critique", critique_draft)
-    graph.add_node("finish", finish)
-
-    graph.set_entry_point("generate")
-    graph.add_edge("generate", "critique")
-    graph.add_conditional_edges("critique", should_continue, {"generate": "generate", "finish": "finish"})
-    graph.add_edge("finish", END)
-
-    return graph.compile()
-
-if __name__ == "__main__":
-    reflection_app = build_reflection_graph()
-    result = reflection_app.invoke({
-        "messages": [HumanMessage(content="파이썬 async/await를 설명해 주세요.")],
-        "draft": "", "critique": "", "iteration": 0, "max_iterations": 3, "final": "",
-    })
-    print(f"반복 횟수: {result['iteration']}")
-    print(f"최종 답변:\n{result['final']}")
-```
-
----
-
-## 라우팅 함수 설계 원칙
-
-라우팅 함수는 상태만 받아 노드 이름을 반환합니다. 부작용이 없어야 합니다. LLM 호출이나 외부 API 호출은 라우팅 함수가 아닌 노드에서 수행합니다.
-
-루프의 탈출 조건은 두 가지를 동시에 씁니다. 품질 기반 조건("APPROVED")과 횟수 기반 조건(`max_iterations`)을 모두 설정하면 품질이 충족될 때 빠르게 종료하고, 품질이 달성되지 않아도 무한 루프를 막을 수 있습니다.
+조건부 엣지는 LangGraph가 "그래프답게" 느껴지는 첫 지점입니다. 다음 글에서는 이 분기 흐름 위에 실제 도구 호출 루프를 얹어 에이전트 형태로 발전시켜 보겠습니다.
 
 <!-- blog-only:start -->
 다음 글: [도구 호출 에이전트](./04-tool-calling-agent.md)
@@ -233,8 +152,8 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [LangGraph 조건부 엣지 문서](https://langchain-ai.github.io/langgraph/how-tos/branching/)
-- [LangGraph 루프 패턴](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
-- [LangGraph 사이클 가이드](https://langchain-ai.github.io/langgraph/concepts/low_level/#cycles)
+- [LangGraph branching 가이드](https://langchain-ai.github.io/langgraph/how-tos/branching/)
+- [LangGraph low-level concepts: edges](https://langchain-ai.github.io/langgraph/concepts/low_level/)
+- [LangGraph recursion limit 가이드](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
 
 Tags: LangGraph, Agent, Python, LLM

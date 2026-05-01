@@ -3,7 +3,7 @@ title: '종단 간 RAG 파이프라인 평가'
 series: rag-benchmark-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,260 +19,67 @@ last_reviewed: '2026-05-01'
 
 # 종단 간 RAG 파이프라인 평가
 
-> RAG 벤치마크 101 (5/6)
+## 이 글에서 답할 질문
+- ragas 0.1.22에서 faithfulness와 answer_relevancy를 실제로 어떻게 계산할까요?
+- LangChain LLM과 임베딩 모델을 RAGAS wrapper에 어떻게 연결할까요?
+- 검색이 아니라 최종 답변의 품질을 볼 때 어떤 데이터셋 모양이 필요할까요?
 
-지금까지 개별 구성 요소(검색기, 임베딩, VectorDB)를 각각 평가했습니다. 이 포스트에서는 전체 RAG 파이프라인을 하나의 단위로 평가하는 방법을 다룹니다. 입력(질문)부터 출력(답변)까지 한 번의 평가 루프로 검색 지표와 생성 지표를 동시에 측정합니다.
+> 종단 간 평가는 “답이 맞아 보이는가”가 아니라, 답이 컨텍스트에 근거했고 질문에 직접 답했는가를 구조화된 점수로 보는 일입니다.
 
-예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/05-e2e-evaluation`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/05-e2e-evaluation)에서 확인할 수 있습니다.
+다섯 번째 글에서는 RAGAS를 붙여 생성 품질을 측정합니다. 여기서 중요한 것은 ragas 버전에 맞는 실제 API를 쓰는 것입니다. 예제는 `Faithfulness()`와 `AnswerRelevancy(strictness=1)`를 사용하고, `LangchainLLMWrapper`와 `LangchainEmbeddingsWrapper`로 Groq LLM과 sentence-transformers 임베딩을 연결합니다.
 
----
-
-<!-- ebook-only:start -->
-
-이 장의 핵심: **End-to-End 평가는 질문 → 검색 → 생성 전 과정을 하나의 점수로 본다.** 병목이 어느 단계인지 찾아야 개선 방향이 보인다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 5번째 장입니다.
-앞 장에서는 **VectorDB 선택 기준**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **RAG 벤치마크 완성**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 종단 간 평가 설계
-
-RAG 파이프라인 평가는 단순히 정확도를 측정하는 것이 아닙니다. 어느 단계에서 손실이 발생하는지 파악해야 합니다.
-
-```
-질문 → [검색기] → 컨텍스트 → [LLM] → 답변
-         ↓                          ↓
-    검색 지표                   생성 지표
-(Precision, Recall, MRR)  (Faithfulness, Relevance)
+```mermaid
+flowchart LR
+    A[질문 · 답변 · contexts] --> D[Dataset.from_dict]
+    D --> E[ragas.evaluate]
+    L[LangchainLLMWrapper] --> E
+    EM[LangchainEmbeddingsWrapper] --> E
+    E --> F[faithfulness]
+    E --> R[answer_relevancy]
 ```
 
----
+## 최소 실행 예제
 
-## 종합 평가 클래스
+실행 코드는 `rag-benchmark-101/ko/05-e2e-evaluation/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
+
+```bash
+cd /root/Github/rag-benchmark-101/ko/05-e2e-evaluation
+export GROQ_API_KEY=... && python3 main.py
+```
 
 ```python
-import json
-import os
-from dataclasses import dataclass, field
-from typing import Optional
-
-from langchain.schema import Document
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_groq import ChatGroq
-
-@dataclass
-class EndToEndEvalResult:
-    question: str
-    retrieved_ids: list[str]
-    relevant_ids: set[str]
-    context: str
-    answer: str
-    precision_at_k: float
-    recall_at_k: float
-    mrr: float
-    faithfulness: float
-    answer_relevance: float
-
-    @property
-    def retrieval_score(self) -> float:
-        return (self.precision_at_k + self.recall_at_k + self.mrr) / 3
-
-    @property
-    def generation_score(self) -> float:
-        return (self.faithfulness + self.answer_relevance) / 2
-
-    @property
-    def pipeline_score(self) -> float:
-        return (self.retrieval_score + self.generation_score) / 2
-
-    def summary(self) -> dict:
-        return {
-            "question": self.question[:60],
-            "retrieval": {
-                "precision@k": round(self.precision_at_k, 3),
-                "recall@k": round(self.recall_at_k, 3),
-                "mrr": round(self.mrr, 3),
-                "score": round(self.retrieval_score, 3),
-            },
-            "generation": {
-                "faithfulness": round(self.faithfulness, 3),
-                "answer_relevance": round(self.answer_relevance, 3),
-                "score": round(self.generation_score, 3),
-            },
-            "pipeline_score": round(self.pipeline_score, 3),
-        }
-
-import re
-
-def _judge_score(llm: ChatGroq, prompt: str, default: float = 3.0) -> float:
-    raw = llm.invoke([HumanMessage(content=prompt)]).content
-    try:
-        match = re.search(r'"score"\s*:\s*(\d+(?:\.\d+)?)', raw)
-        return float(match.group(1)) if match else default
-    except Exception:
-        return default
-
-FAITHFULNESS_TMPL = """Context: {context}
-Answer: {answer}
-
-Rate faithfulness 1-5: all claims grounded in context?
-Respond only: {{"score": <1-5>}}"""
-
-RELEVANCE_TMPL = """Question: {question}
-Answer: {answer}
-
-Rate answer relevance 1-5: directly addresses the question?
-Respond only: {{"score": <1-5>}}"""
-
-class EndToEndEvaluator:
-    def __init__(
-        self,
-        vectorstore: FAISS,
-        llm: ChatGroq,
-        judge_llm: Optional[ChatGroq] = None,
-        k: int = 3,
-    ):
-        self.retriever = vectorstore.as_retriever(search_kwargs={"k": k})
-        self.llm = llm
-        self.judge = judge_llm or llm
-        self.k = k
-        self._build_chain()
-
-    def _build_chain(self):
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "Answer the question using only the context below. If the answer is not in the context, say so.\n\nContext: {context}"),
-            ("human", "{question}"),
-        ])
-
-        def format_docs(docs):
-            return "\n\n".join(d.page_content for d in docs)
-
-        self.chain = (
-            {"context": self.retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | self.llm
-            | StrOutputParser()
-        )
-
-    def _retrieval_metrics(self, retrieved_ids: list[str], relevant_ids: set[str]) -> tuple[float, float, float]:
-        top_k = retrieved_ids[:self.k]
-        hits = [d for d in top_k if d in relevant_ids]
-        precision = len(hits) / self.k if self.k > 0 else 0.0
-        recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
-        mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
-        return precision, recall, mrr
-
-    def evaluate_single(self, question: str, relevant_ids: set[str]) -> EndToEndEvalResult:
-        # 검색
-        retrieved_docs = self.retriever.invoke(question)
-        retrieved_ids = [d.metadata.get("id", "") for d in retrieved_docs]
-        context = "\n\n".join(d.page_content for d in retrieved_docs)
-
-        # 생성
-        answer = self.chain.invoke(question)
-
-        # 검색 지표
-        precision, recall, mrr = self._retrieval_metrics(retrieved_ids, relevant_ids)
-
-        # 생성 지표
-        faithfulness = _judge_score(
-            self.judge, FAITHFULNESS_TMPL.format(context=context, answer=answer)
-        )
-        relevance = _judge_score(
-            self.judge, RELEVANCE_TMPL.format(question=question, answer=answer)
-        )
-
-        return EndToEndEvalResult(
-            question=question,
-            retrieved_ids=retrieved_ids,
-            relevant_ids=relevant_ids,
-            context=context,
-            answer=answer,
-            precision_at_k=precision,
-            recall_at_k=recall,
-            mrr=mrr,
-            faithfulness=faithfulness,
-            answer_relevance=relevance,
-        )
-
-    def evaluate_suite(self, test_cases: list[dict]) -> dict:
-        results = []
-        for tc in test_cases:
-            result = self.evaluate_single(tc["question"], tc["relevant_ids"])
-            results.append(result.summary())
-
-        def avg(key_path: list[str]) -> float:
-            vals = []
-            for r in results:
-                obj = r
-                for k in key_path:
-                    obj = obj.get(k, {})
-                if isinstance(obj, (int, float)):
-                    vals.append(obj)
-            return round(sum(vals) / len(vals), 3) if vals else 0.0
-
-        return {
-            "total": len(results),
-            "avg_pipeline_score": avg(["pipeline_score"]),
-            "avg_precision": avg(["retrieval", "precision@k"]),
-            "avg_recall": avg(["retrieval", "recall@k"]),
-            "avg_faithfulness": avg(["generation", "faithfulness"]),
-            "avg_relevance": avg(["generation", "answer_relevance"]),
-            "details": results,
-        }
+result = evaluate(
+    dataset=dataset,
+    metrics=[Faithfulness(), AnswerRelevancy(strictness=1)],
+    llm=LangchainLLMWrapper(llm),
+    embeddings=LangchainEmbeddingsWrapper(embedding),
+    run_config=RunConfig(timeout=300, max_workers=1),
+)
 ```
 
----
+## 이 코드에서 봐야 할 것
+- `contexts` 컬럼은 문자열 리스트여야 합니다. 단일 문자열로 넘기면 ragas 기대 형태와 어긋납니다.
+- `AnswerRelevancy(strictness=1)`로 두면 예제 실행 시간을 줄이면서도 실제 API 흐름을 그대로 볼 수 있습니다.
+- `RunConfig(timeout=300, max_workers=1)`는 네트워크 LLM 평가에서 타임아웃과 동시성 문제를 줄여 줍니다.
 
-## 실행 예시
+## 실무에서 헷갈리는 지점
+- faithfulness는 ground truth 없이도 계산되지만, answer_relevancy는 답변이 질문을 직접 겨냥하는지 보므로 “그럴듯한 우회 답변”을 낮게 줄 수 있습니다.
+- RAGAS 점수는 검색 품질이 이미 반영된 최종 결과입니다. 따라서 검색 실패와 생성 실패를 따로 보고 싶다면 retrieval benchmark도 병행해야 합니다.
+- 버전이 다르면 import 경로와 metric 생성 방식이 달라질 수 있습니다. 이 글은 ragas 0.1.22 기준입니다.
 
-```python
-def run_e2e_eval():
-    from rag_benchmark_post2 import CORPUS
-
-    embedding = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-    vectorstore = FAISS.from_documents(CORPUS, embedding)
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-
-    evaluator = EndToEndEvaluator(vectorstore, llm, k=3)
-
-    test_cases = [
-        {"question": "What is FAISS?", "relevant_ids": {"d02", "d03"}},
-        {"question": "How do embedding models work?", "relevant_ids": {"d06", "d07"}},
-        {"question": "What is hybrid search?", "relevant_ids": {"d09"}},
-    ]
-
-    report = evaluator.evaluate_suite(test_cases)
-    print(json.dumps(report, indent=2))
-
-if __name__ == "__main__":
-    run_e2e_eval()
-```
-
----
-
-## 병목 진단 가이드
-
-종단 간 평가 결과로 다음 진단을 할 수 있습니다.
-
-- **pipeline_score 낮음 + retrieval.score 낮음**: 검색이 병목. 임베딩 모델 교체, K 증가, 하이브리드 검색 도입을 검토합니다.
-- **pipeline_score 낮음 + generation.score 낮음**: 생성이 병목. 시스템 프롬프트 강화, temperature 조정, LLM 교체를 검토합니다.
-- **retrieval.score 높음 + generation.faithfulness 낮음**: 검색은 잘 되지만 모델이 컨텍스트를 무시함. 프롬프트에 컨텍스트 의존성 명시가 필요합니다.
+## 체크리스트
+- [ ] ragas 0.1.22 API로 metric 객체를 생성했다.
+- [ ] LLM과 임베딩을 wrapper로 감쌌다.
+- [ ] 질문·답변·contexts 형태의 Dataset을 만들었다.
 
 <!-- blog-only:start -->
+
+## 정리
+
+이제 생성 품질도 숫자로 볼 수 있습니다. 마지막 글에서는 retrieval과 generation 평가를 한 파이프라인에 묶어 전체 RAG 벤치마크를 완성합니다.
+
 다음 글: [RAG 벤치마크 완성](./06-benchmark-complete.md)
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -291,8 +98,8 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [RAGAS 종합 평가](https://docs.ragas.io/en/latest/concepts/metrics/index.html)
-- [LangChain RAG 평가 가이드](https://python.langchain.com/docs/guides/evaluation/string/criteria_eval_chain)
-- [G-Eval 논문](https://arxiv.org/abs/2303.16634)
+- [RAGAS documentation](https://docs.ragas.io/)
+- [RAGAS GitHub repository](https://github.com/explodinggradients/ragas)
+- [Groq Python integration in LangChain](https://python.langchain.com/docs/integrations/chat/groq/)
 
 Tags: RAG, VectorDB, Benchmarking, LLM

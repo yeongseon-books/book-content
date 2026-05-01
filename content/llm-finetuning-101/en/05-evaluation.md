@@ -3,7 +3,7 @@ title: 'Model evaluation'
 series: llm-finetuning-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,208 +19,75 @@ last_reviewed: '2026-05-01'
 
 # Model evaluation
 
-> LLM Fine-tuning 101 (5/6)
+## Questions this post answers
+
+- How do you compute perplexity right after fine-tuning?
+- Why is perplexity useful but still incomplete as a quality signal?
+- Why should evaluation live outside the training loop even in a tiny demo?
+
+> Perplexity measures how unsurprised the model is by the next token. It does not directly guarantee that the answer is useful to a human reader.
 
 Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/05-evaluation)
 
-A finished training run needs measurement. Loss alone is not enough. You need task-appropriate metrics, a quantitative comparison against the base model, and a look at actual outputs. This post covers how to evaluate a fine-tuned model.
+After training, it is tempting to jump straight to generated examples. In practice, it is worth checking a quantitative baseline first. Perplexity is one of the simplest ways to do that: it tells you how comfortably the model predicts the evaluation tokens.
 
----
+The example in this post trains a tiny LoRA-wrapped GPT-2 model for one step and computes perplexity before and after training on a tiny evaluation dataset. Running `python main.py` prints both numbers, which is enough to validate that the evaluation path is separate from the training path.
 
-<!-- ebook-only:start -->
+## The right way to read perplexity
 
-**The key idea**: task-specific metrics matter more than perplexity or BLEU. The real test is whether the model answers in the expected format.
+Lower perplexity is usually better, but the absolute value can be noisy on tiny models, tiny datasets, and short contexts. That is why perplexity is most useful as a regression guardrail. It is excellent for asking whether a change made things worse or better relative to a baseline.
 
-## Where this chapter fits
+```mermaid
+flowchart LR
+    A[Evaluation texts] --> B[Prepare input_ids and labels]
+    B --> C[Run model loss]
+    C --> D[Average losses]
+    D --> E[Convert with exp loss to perplexity]
+```
 
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Training loop and hyperparameters**.
-After this chapter, the next one moves on to **Model serving**.
-<!-- ebook-only:end -->
-
-## Loading the fine-tuned model
+## Minimal runnable example
 
 ```python
-from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import math
 import torch
 
-BASE_MODEL = "microsoft/phi-2"
-ADAPTER_PATH = "./outputs/finetuned"
-
-def load_finetuned_model(base_model: str = BASE_MODEL, adapter_path: str = ADAPTER_PATH):
-    """Load the fine-tuned model with its LoRA adapter."""
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-    )
-    tokenizer = AutoTokenizer.from_pretrained(adapter_path)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-
-    base = AutoModelForCausalLM.from_pretrained(
-        base_model,
-        quantization_config=bnb_config,
-        device_map="auto",
-        trust_remote_code=True,
-    )
-    model = PeftModel.from_pretrained(base, adapter_path)
+def perplexity(model, dataset) -> float:
+    losses = []
     model.eval()
-    return model, tokenizer
+    for row in dataset:
+        batch = {key: torch.tensor([value]) for key, value in row.items()}
+        with torch.no_grad():
+            loss = model(**batch).loss
+        losses.append(loss.item())
+    return math.exp(sum(losses) / len(losses))
 
-def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 200) -> str:
-    """Generate a response for the given prompt."""
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            do_sample=False,
-            temperature=1.0,
-            pad_token_id=tokenizer.eos_token_id,
-        )
-    generated = outputs[0][inputs["input_ids"].shape[1]:]
-    return tokenizer.decode(generated, skip_special_tokens=True)
+before = perplexity(peft_model, eval_dataset)
+trainer.train()
+after = perplexity(peft_model, eval_dataset)
 ```
 
----
+## What to notice in this code
 
-## Quantitative metrics
+- The evaluation function stays separate from training so you do not accidentally update parameters while measuring them.
+- `model.eval()` and `torch.no_grad()` keep dropout and memory usage stable during evaluation.
+- In real work, perplexity should sit beside task metrics and human review, not replace them.
 
-```python
-import re
-from collections import Counter
+## Where engineers get confused
 
-def compute_exact_match(predictions: list[str], references: list[str]) -> float:
-    matches = sum(p.strip() == r.strip() for p, r in zip(predictions, references))
-    return matches / len(references) if references else 0.0
+- Better perplexity does not automatically mean better answer formatting or factuality.
+- Using identical train and eval text can make metrics look optimistic. This demo accepts that trade-off to keep the example small.
+- Small numeric changes are normal in a one-step tiny-model example. The point is validating the evaluation pipeline.
 
-def compute_f1(prediction: str, reference: str) -> float:
-    """Token-level F1 score."""
-    pred_tokens = prediction.lower().split()
-    ref_tokens = reference.lower().split()
-    pred_counter = Counter(pred_tokens)
-    ref_counter = Counter(ref_tokens)
-    common = sum((pred_counter & ref_counter).values())
-    if common == 0:
-        return 0.0
-    precision = common / len(pred_tokens)
-    recall = common / len(ref_tokens)
-    return 2 * precision * recall / (precision + recall)
+## Checklist
 
-def compute_code_metrics(prediction: str, reference: str) -> dict:
-    """Metrics for code generation tasks."""
-    def extract_code(text: str) -> str:
-        match = re.search(r"```(?:python)?\n?(.*?)```", text, re.DOTALL)
-        return match.group(1).strip() if match else text.strip()
+- [ ] I understand that perplexity is `exp(mean_loss)`.
+- [ ] I can explain why evaluation uses `eval()` and `no_grad()`.
+- [ ] I ran `python main.py` and saw both pre-training and post-training perplexity outputs.
+- [ ] I would not ship a model without at least one quantitative baseline anymore.
 
-    pred_code = extract_code(prediction)
-    ref_code = extract_code(reference)
-    return {
-        "exact_match": pred_code == ref_code,
-        "f1": compute_f1(pred_code, ref_code),
-        "line_coverage": len(set(pred_code.split("\n")) & set(ref_code.split("\n"))) / max(len(ref_code.split("\n")), 1),
-    }
-```
+## Summary
 
----
-
-## Base model comparison
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class EvalResult:
-    question: str
-    reference: str
-    base_answer: str
-    finetuned_answer: str
-    base_f1: float = 0.0
-    finetuned_f1: float = 0.0
-
-def compare_models(
-    base_model,
-    finetuned_model,
-    tokenizer,
-    test_cases: list[dict],
-    prompt_formatter,
-) -> list[EvalResult]:
-    """Compare base and fine-tuned model on test cases."""
-    results = []
-    for tc in test_cases:
-        prompt = prompt_formatter(tc, for_inference=True)
-        base_ans = generate_response(base_model, tokenizer, prompt)
-        ft_ans = generate_response(finetuned_model, tokenizer, prompt)
-        result = EvalResult(
-            question=tc["instruction"],
-            reference=tc["output"],
-            base_answer=base_ans,
-            finetuned_answer=ft_ans,
-            base_f1=compute_f1(base_ans, tc["output"]),
-            finetuned_f1=compute_f1(ft_ans, tc["output"]),
-        )
-        results.append(result)
-        print(f"Q: {tc['instruction'][:50]}...")
-        print(f"  base F1: {result.base_f1:.3f}, fine-tuned F1: {result.finetuned_f1:.3f}")
-    return results
-
-def summarize_comparison(results: list[EvalResult]) -> dict:
-    base_avg = sum(r.base_f1 for r in results) / len(results)
-    ft_avg = sum(r.finetuned_f1 for r in results) / len(results)
-    improved = sum(1 for r in results if r.finetuned_f1 > r.base_f1)
-    return {
-        "base_avg_f1": round(base_avg, 4),
-        "finetuned_avg_f1": round(ft_avg, 4),
-        "improvement": round(ft_avg - base_avg, 4),
-        "improved_cases": f"{improved}/{len(results)}",
-    }
-```
-
----
-
-## Running evaluation
-
-```python
-if __name__ == "__main__":
-    model, tokenizer = load_finetuned_model()
-
-    ALPACA_NO_INPUT_TEMPLATE = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Response:
-{output}"""
-
-    def format_example(example: dict, for_inference: bool = False) -> str:
-        return ALPACA_NO_INPUT_TEMPLATE.format(
-            instruction=example["instruction"],
-            output="" if for_inference else example["output"],
-        )
-
-    test_cases = [
-        {
-            "instruction": "How do you merge two lists in Python?",
-            "input": "",
-            "output": "list1 + list2 or list1.extend(list2)",
-        },
-        {
-            "instruction": "How do you check if a key exists in a dictionary?",
-            "input": "",
-            "output": "'key' in dict or dict.get('key') is not None",
-        },
-    ]
-
-    for tc in test_cases:
-        prompt = format_example(tc, for_inference=True)
-        response = generate_response(model, tokenizer, prompt)
-        f1 = compute_f1(response, tc["output"])
-        print(f"\nQ: {tc['instruction']}")
-        print(f"A: {response[:200]}")
-        print(f"F1: {f1:.3f}")
-```
+Evaluation is not glamorous, but it is what makes the rest of the pipeline trustworthy. Once you have a baseline, future experiments become far less subjective.
 
 <!-- blog-only:start -->
 Next: [Model serving](./06-serving.md)
@@ -242,8 +109,7 @@ Next: [Model serving](./06-serving.md)
 
 ## References
 
-- [Hugging Face evaluate library](https://huggingface.co/docs/evaluate)
-- [ROUGE metric](https://huggingface.co/spaces/evaluate-metric/rouge)
-- [A survey on LLM evaluation](https://arxiv.org/abs/2307.03109)
+- [Perplexity of fixed-length models](https://huggingface.co/docs/transformers/perplexity)
+- [Evaluation best practices for language models](https://huggingface.co/docs/evaluate/index)
 
 Tags: Fine-tuning, LoRA, LLM, Python

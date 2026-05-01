@@ -3,7 +3,7 @@ title: 'Tool-calling agents'
 series: langgraph-101
 episode: 4
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,171 +19,169 @@ last_reviewed: '2026-05-01'
 
 # Tool-calling agents
 
-> LangGraph 101 (4/6)
+## Questions this post answers
+
+- What responsibility does `ToolNode` take in a LangGraph agent?
+- How do `ChatGroq.bind_tools()` and conditional edges work together?
+- How does the graph know when the tool loop should stop?
+
+> A tool-calling agent is a loop: the model decides whether it needs a tool, ToolNode executes the call, and the model reads the result before answering.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/04-tool-calling-agent)
 
-The defining capability of an agent is choosing tools, observing results, and deciding what to do next. This post builds a tool-calling agent with LangGraph: tool definitions, a tool execution node, and the agent loop that ties them together.
+The key question is not whether the LLM can look clever. It is whether the tool path is explicit, inspectable, and easy to extend. In LangGraph 0.4.5, `ToolNode` plus `tools_condition` is the cleanest low-level pattern for that loop.
 
----
+```mermaid
+flowchart LR
+    A[User question] --> B[agent]
+    B -->|tool call| C[ToolNode]
+    C --> B
+    B -->|final answer| D[END]
+```
 
-<!-- ebook-only:start -->
-
-**The key idea**: a Tool Calling Agent loops through Thought → Action → Observation. In LangGraph that loop is visible as nodes and edges.
-
-## Where this chapter fits
-
-This is chapter 4 of 6 in the series.
-The previous chapter covered **Conditional edges and branching**.
-After this chapter, the next one moves on to **Multi-agent systems**.
-<!-- ebook-only:end -->
-
-## Tool definitions
-
-LangChain's `@tool` decorator turns functions into tools. The docstring becomes the tool description passed to the LLM.
+## Minimal runnable example
 
 ```python
+import ast
 import json
 import math
-import os
-from typing import TypedDict, Annotated
+import operator
+from typing import Any, Callable
 
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
-from langchain_core.messages import BaseMessage, HumanMessage, ToolMessage
 from langchain_groq import ChatGroq
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
+from langgraph.graph import END, START, MessagesState, StateGraph
+from langgraph.prebuilt import ToolNode, tools_condition
+
+ALLOWED_BINARY_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+ALLOWED_UNARY_OPERATORS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+}
+ALLOWED_FUNCTIONS: dict[str, Callable[..., Any]] = {
+    name: value
+    for name, value in math.__dict__.items()
+    if not name.startswith("_") and callable(value)
+}
+ALLOWED_CONSTANTS = {"pi": math.pi, "e": math.e, "tau": math.tau}
+
+def evaluate_math_expression(expression: str) -> float:
+    def _evaluate(node: ast.AST) -> float:
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.BinOp):
+            left = _evaluate(node.left)
+            right = _evaluate(node.right)
+            operation = ALLOWED_BINARY_OPERATORS.get(type(node.op))
+            if operation is None:
+                raise ValueError("unsupported operator")
+            return float(operation(left, right))
+        if isinstance(node, ast.UnaryOp):
+            operand = _evaluate(node.operand)
+            operation = ALLOWED_UNARY_OPERATORS.get(type(node.op))
+            if operation is None:
+                raise ValueError("unsupported unary operator")
+            return float(operation(operand))
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            function = ALLOWED_FUNCTIONS.get(node.func.id)
+            if function is None or node.keywords:
+                raise ValueError("unsupported function")
+            arguments = [_evaluate(argument) for argument in node.args]
+            return float(function(*arguments))
+        if isinstance(node, ast.Name):
+            value = ALLOWED_CONSTANTS.get(node.id)
+            if value is not None:
+                return float(value)
+            raise ValueError("unsupported constant")
+        raise ValueError("unsupported expression")
+
+    parsed = ast.parse(expression, mode="eval")
+    return _evaluate(parsed.body)
 
 @tool
 def calculator(expression: str) -> str:
-    """Evaluate a mathematical expression.
-    
-    Args:
-        expression: math expression to evaluate (e.g., '2 + 3 * 4', 'sqrt(16)')
-    
-    Returns:
-        result as a string
-    """
+    """Evaluate an arithmetic expression with safe math functions like sqrt(16) or pi * 2."""
+
     try:
-        allowed = {k: v for k, v in math.__dict__.items() if not k.startswith("_")}
-        result = eval(expression, {"__builtins__": {}}, allowed)
-        return str(result)
-    except Exception as e:
-        return f"calculation error: {e}"
+        result = evaluate_math_expression(expression)
+    except Exception as exc:
+        return f"calculation error: {exc}"
+    return str(result)
 
 @tool
-def word_counter(text: str) -> str:
-    """Count words, characters, and sentences in text.
-    
-    Args:
-        text: text to analyze
-    
-    Returns:
-        JSON with word, char, and sentence counts
-    """
-    return json.dumps({
-        "words": len(text.split()),
-        "chars": len(text),
-        "sentences": text.count(".") + text.count("!") + text.count("?"),
-    })
+def word_stats(text: str) -> str:
+    """Return word and character counts for a piece of text."""
 
-@tool
-def unit_converter(value: float, from_unit: str, to_unit: str) -> str:
-    """Convert between units. Supported: km/mile, kg/lb, celsius/fahrenheit.
-    
-    Args:
-        value: numeric value to convert
-        from_unit: source unit
-        to_unit: target unit
-    
-    Returns:
-        converted value with units
-    """
-    conversions = {
-        ("km", "mile"): lambda x: x * 0.621371,
-        ("mile", "km"): lambda x: x * 1.60934,
-        ("kg", "lb"): lambda x: x * 2.20462,
-        ("lb", "kg"): lambda x: x / 2.20462,
-        ("celsius", "fahrenheit"): lambda x: x * 9/5 + 32,
-        ("fahrenheit", "celsius"): lambda x: (x - 32) * 5/9,
-    }
-    key = (from_unit.lower(), to_unit.lower())
-    fn = conversions.get(key)
-    if not fn:
-        return f"unsupported conversion: {from_unit} -> {to_unit}"
-    return f"{value} {from_unit} = {fn(value):.4f} {to_unit}"
-```
+    return json.dumps({"words": len(text.split()), "characters": len(text)})
 
----
+TOOLS = [calculator, word_stats]
 
-## Tool-calling agent graph
-
-```python
-TOOLS = [calculator, word_counter, unit_converter]
-TOOL_MAP = {t.name: t for t in TOOLS}
-
-class AgentState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-
-def agent_node(state: AgentState) -> AgentState:
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
-    ).bind_tools(TOOLS)
-    response = llm.invoke(state["messages"])
+def call_model(state: MessagesState):
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.0, stop_sequences=None).bind_tools(TOOLS)
+    system = SystemMessage(
+        content="You are a precise assistant. Use tools for calculations or counting tasks."
+    )
+    response = llm.invoke([system, *state["messages"]])
     return {"messages": [response]}
 
-def tool_node(state: AgentState) -> AgentState:
-    last_message = state["messages"][-1]
-    results = []
-    for call in last_message.tool_calls:
-        tool = TOOL_MAP.get(call["name"])
-        result = tool.invoke(call["args"]) if tool else f"unknown tool: {call['name']}"
-        results.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
-    return {"messages": results}
-
-def should_use_tool(state: AgentState) -> str:
-    last = state["messages"][-1]
-    if hasattr(last, "tool_calls") and last.tool_calls:
-        return "tools"
-    return "end"
-
-def build_tool_agent():
-    graph = StateGraph(AgentState)
-    graph.add_node("agent", agent_node)
-    graph.add_node("tools", tool_node)
-
-    graph.set_entry_point("agent")
-    graph.add_conditional_edges("agent", should_use_tool, {"tools": "tools", "end": END})
+def build_graph():
+    graph = StateGraph(MessagesState)
+    graph.add_node("agent", call_model)
+    graph.add_node("tools", ToolNode(TOOLS))
+    graph.add_edge(START, "agent")
+    graph.add_conditional_edges("agent", tools_condition, {"tools": "tools", "__end__": END})
     graph.add_edge("tools", "agent")
-
     return graph.compile()
 
 if __name__ == "__main__":
-    app = build_tool_agent()
-    questions = [
-        "What is sqrt(144) + 5^2?",
-        "How many miles is 100 km?",
-        "Count the words in: An agent is a system where an LLM chooses and executes tools.",
-    ]
-    for q in questions:
-        print(f"\nQ: {q}")
-        result = app.invoke({"messages": [HumanMessage(content=q)]})
-        print(f"A: {result['messages'][-1].content}")
+    app = build_graph()
+    for question in [
+        "What is sqrt(144) + 25? Use a tool.",
+        "Count the words in this sentence: LangGraph makes tool loops explicit.",
+    ]:
+        result = app.invoke({"messages": [HumanMessage(content=question)]})
+        print(f"Question: {question}")
+        print(f"Answer: {result['messages'][-1].content}\n")
 ```
 
----
+Runnable file: `/root/Github/langgraph-101/en/04-tool-calling-agent/main.py`
 
-## Tool design principles
+Run it with:
 
-**Single responsibility**: one tool does one thing. Don't bundle calculation and search into the same tool.
+```bash
+export GROQ_API_KEY=... && python main.py
+```
 
-**Clear docstrings**: the LLM selects tools based on docstrings alone. Specify input format, return format, and supported range explicitly.
+## What to notice in this code
 
-**Fail gracefully**: if a tool raises an exception, the agent loop halts. Catch exceptions internally and return an error string instead.
+- Tool docstrings are the instructions the model actually sees.
+- `ToolNode(TOOLS)` owns execution and the resulting `ToolMessage` objects.
+- `tools_condition` routes to `tools` only when the last AI message includes tool calls; otherwise it ends the graph.
 
-**Determinism**: tools should return the same output for the same input. Random or time-dependent tools make agent debugging unnecessarily hard.
+## Where engineers get confused
+
+- If you inline tool execution inside the model loop, retries, logging, and testing become harder than they need to be.
+- `bind_tools()` only teaches the model how to request tools. It does not execute anything by itself.
+- Deterministic tools are easier to debug. Keep the calculator tool on a strict arithmetic parser instead of raw `eval()`.
+
+## Checklist
+
+- [ ] Do tool descriptions clearly define inputs and outputs
+- [ ] Is the `agent -> tools -> agent` loop explicit in the graph
+- [ ] Do non-tool answers exit directly to `END`
+
+## Summary
+
+At this point LangGraph starts to feel like an agent runtime rather than a workflow helper. In the next post, we extend the same pattern into a supervisor-worker design where multiple agents cooperate over shared state.
 
 <!-- blog-only:start -->
 Next: [Multi-agent systems](./05-multi-agent.md)
@@ -205,8 +203,8 @@ Next: [Multi-agent systems](./05-multi-agent.md)
 
 ## References
 
-- [LangGraph tool node documentation](https://langchain-ai.github.io/langgraph/how-tos/tool-calling/)
-- [LangChain tool definitions](https://python.langchain.com/docs/modules/tools/)
-- [LangGraph agent patterns](https://langchain-ai.github.io/langgraph/concepts/agentic_concepts/)
+- [LangGraph tool-calling how-to](https://langchain-ai.github.io/langgraph/how-tos/tool-calling/)
+- [ToolNode API reference](https://langchain-ai.github.io/langgraph/reference/prebuilt/#toolnode)
+- [LangChain tool concepts](https://python.langchain.com/docs/concepts/tools/)
 
 Tags: LangGraph, Agent, Python, LLM

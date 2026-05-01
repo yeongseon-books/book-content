@@ -3,7 +3,7 @@ title: '학습 루프와 하이퍼파라미터'
 series: llm-finetuning-101
 episode: 4
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,218 +19,84 @@ last_reviewed: '2026-05-01'
 
 # 학습 루프와 하이퍼파라미터
 
-> LLM 파인튜닝 101 (4/6)
+## 이 글에서 답할 질문
+
+- `TrainingArguments`에서 최소한 무엇을 지정해야 1 step 학습이 돌까?
+- 왜 작은 실습에서도 `labels`와 data collator가 필요한가?
+- 학습 루프를 디버깅할 때 먼저 봐야 할 출력은 무엇일까?
+
+> 학습 루프는 거대한 블랙박스가 아니라, 토큰화된 배치를 모델에 넣고 loss를 한 번 줄이는 반복입니다.
 
 예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/04-training)
 
-LoRA 어댑터와 데이터셋이 준비되면 실제 학습을 시작합니다. Hugging Face TRL 라이브러리의 `SFTTrainer`를 사용하면 학습 루프, 그래디언트 체크포인팅, 로깅을 간결하게 처리할 수 있습니다. 이 포스트에서는 학습 설정과 주요 하이퍼파라미터를 다룹니다.
+4편은 파인튜닝 시리즈에서 처음으로 실제 업데이트를 발생시키는 글입니다. 하지만 여전히 목표는 큰 성능이 아니라 **학습 루프가 살아 있는지 확인하는 것**입니다. GPU 없는 환경에서 이 검증을 하려면 모델, 데이터셋, step 수를 극단적으로 줄여야 합니다.
 
----
+예제 코드는 tiny GPT-2에 LoRA 어댑터를 붙이고, 질문-답변 두 줄짜리 데이터셋으로 `Trainer`를 1 step만 돌립니다. 실행 결과로 `global_step=1`과 `training_loss`가 출력되면, 옵티마이저와 backward 경로가 정상이라는 뜻입니다.
 
-<!-- ebook-only:start -->
+## 학습 루프에서 줄여도 되는 것과 줄이면 안 되는 것
 
-이 장의 핵심: **학습 루프는 손실이 수렴할 때까지 배치를 반복한다.** Learning Rate와 배치 크기가 수렴 속도와 안정성을 결정한다.
+샘플 수와 step 수는 줄여도 됩니다. 하지만 **토큰화된 입력, labels, optimizer step, loss 계산**은 줄이면 학습 검증이 아니라 단순 추론 테스트가 됩니다. 그래서 이 글의 예제는 가장 작은 데이터셋을 쓰더라도 학습 구성요소는 그대로 유지합니다.
 
-## 이 장의 위치
+```mermaid
+flowchart LR
+    A[질문 답변 텍스트] --> B[토크나이즈와 labels 생성]
+    B --> C[LoRA 모델 준비]
+    C --> D[TrainingArguments 설정]
+    D --> E[Trainer 1 step 실행]
+```
 
-이 글은 시리즈 6편 중 4번째 장입니다.
-앞 장에서는 **LoRA 어댑터 구성**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **모델 평가**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## SFTTrainer 설정
+## 최소 실행 예제
 
 ```python
-import os
-from pathlib import Path
+from datasets import Dataset
+from transformers import Trainer, TrainingArguments
 
-import torch
-from datasets import load_from_disk
-from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    BitsAndBytesConfig,
-    TrainingArguments,
+texts = [
+    "질문: 파이썬 리스트를 정렬하는 방법은? 답변: sorted(lst) 또는 lst.sort()를 사용합니다.",
+    "질문: HTTP 404는 무엇을 뜻하나요? 답변: 요청한 리소스를 찾지 못했다는 뜻입니다.",
+]
+
+rows = []
+for text in texts:
+    encoded = tokenizer(text, truncation=True, padding="max_length", max_length=64)
+    encoded["labels"] = encoded["input_ids"].copy()
+    rows.append(encoded)
+
+dataset = Dataset.from_list(rows)
+args = TrainingArguments(
+    output_dir="artifacts",
+    per_device_train_batch_size=2,
+    max_steps=1,
+    learning_rate=5e-4,
+    save_strategy="no",
+    report_to=[],
 )
-from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
-
-MODEL_NAME = "microsoft/phi-2"
-OUTPUT_DIR = "./outputs/finetuned"
-
-def load_model_and_tokenizer():
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-        bnb_4bit_use_double_quant=True,
-    )
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side = "right"
-
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME, quantization_config=bnb_config, device_map="auto", trust_remote_code=True
-    )
-    model = prepare_model_for_kbit_training(model)
-
-    lora_config = LoraConfig(
-        task_type=TaskType.CAUSAL_LM,
-        r=16,
-        lora_alpha=32,
-        lora_dropout=0.05,
-        target_modules=["q_proj", "v_proj", "k_proj", "dense"],
-        bias="none",
-    )
-    model = get_peft_model(model, lora_config)
-    model.print_trainable_parameters()
-    return model, tokenizer
+trainer = Trainer(model=peft_model, args=args, train_dataset=dataset)
+trainer.train()
 ```
 
----
+## 이 코드에서 봐야 할 것
 
-## 학습 인수
+- `labels = input_ids.copy()`는 causal LM에서 다음 토큰 예측 손실을 계산하기 위한 최소 설정입니다.
+- `max_steps=1`로 줄여도 backward와 optimizer step은 실제로 일어납니다.
+- 이 예제는 `training_loss`와 `global_step`만 확인하면 충분합니다. 숫자 자체보다 루프가 끝까지 도는지가 더 중요합니다.
 
-```python
-def get_training_args(output_dir: str = OUTPUT_DIR) -> TrainingArguments:
-    """학습 설정을 반환합니다."""
-    return TrainingArguments(
-        output_dir=output_dir,
-        # 에폭과 배치
-        num_train_epochs=3,
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
-        gradient_accumulation_steps=4,   # 유효 배치 크기 = 4 × 4 = 16
-        # 옵티마이저
-        learning_rate=2e-4,
-        lr_scheduler_type="cosine",
-        warmup_ratio=0.05,
-        weight_decay=0.01,
-        optim="paged_adamw_8bit",        # 메모리 효율적 옵티마이저
-        # 체크포인트와 로깅
-        save_strategy="epoch",
-        evaluation_strategy="epoch",
-        logging_steps=10,
-        load_best_model_at_end=True,
-        metric_for_best_model="eval_loss",
-        # 메모리 최적화
-        fp16=True,
-        gradient_checkpointing=True,
-        dataloader_num_workers=0,
-        # 재현성
-        seed=42,
-        data_seed=42,
-    )
-```
+## 실무에서 헷갈리는 지점
 
----
+- 샘플이 적다고 collator가 불필요한 것은 아닙니다. 배치 차원 정리가 필요하면 작은 실습에서도 collator가 도와줍니다.
+- loss가 높게 나와도 실패가 아닙니다. tiny 모델에 한 step만 돌리는 예제라서 손실 절대값보다 실행 가능성이 중요합니다.
+- Trainer가 편해 보여도 입력 컬럼 이름이 틀리면 바로 깨집니다. 그래서 2편에서 전처리 구조를 먼저 맞춘 것입니다.
 
-## 학습 실행
+## 체크리스트
 
-```python
-def train(dataset_path: str = "./data/finetuning"):
-    """파인튜닝을 실행합니다."""
-    model, tokenizer = load_model_and_tokenizer()
-    dataset_dict = load_from_disk(dataset_path)
-    train_dataset = dataset_dict["train"]
-    eval_dataset = dataset_dict["validation"]
+- [ ] `TrainingArguments`의 필수 필드를 직접 읽고 수정할 수 있다.
+- [ ] `labels`가 왜 필요한지 이해했다.
+- [ ] `python main.py` 실행 후 1 step 학습과 loss 출력을 확인했다.
+- [ ] 다음 글에서 동일한 모델을 평가할 준비가 되었다.
 
-    training_args = get_training_args()
+## 정리
 
-    # 응답 부분만 손실 계산 (instruction 부분 제외)
-    response_template = "### Response:\n"
-    collator = DataCollatorForCompletionOnlyLM(
-        response_template=response_template,
-        tokenizer=tokenizer,
-    )
-
-    trainer = SFTTrainer(
-        model=model,
-        tokenizer=tokenizer,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        dataset_text_field="text",
-        max_seq_length=512,
-        data_collator=collator,
-        args=training_args,
-    )
-
-    print("학습 시작...")
-    trainer.train()
-
-    # 어댑터만 저장 (베이스 모델 제외)
-    model.save_pretrained(OUTPUT_DIR)
-    tokenizer.save_pretrained(OUTPUT_DIR)
-    print(f"모델 저장 완료: {OUTPUT_DIR}")
-    return trainer
-```
-
----
-
-## 주요 하이퍼파라미터 가이드
-
-```python
-def hyperparameter_guide() -> list[dict]:
-    return [
-        {
-            "param": "learning_rate",
-            "recommended": "1e-4 ~ 3e-4",
-            "note": "LoRA에서 전통적인 파인튜닝보다 높은 LR 사용 가능. 너무 높으면 발산.",
-        },
-        {
-            "param": "num_train_epochs",
-            "recommended": "1 ~ 5",
-            "note": "데이터 < 1K이면 1~2 에폭. 많을수록 과적합 주의.",
-        },
-        {
-            "param": "gradient_accumulation_steps",
-            "recommended": "4 ~ 16",
-            "note": "GPU 메모리 부족 시 배치 크기 대신 사용. 유효 배치 = batch × steps.",
-        },
-        {
-            "param": "warmup_ratio",
-            "recommended": "0.03 ~ 0.1",
-            "note": "전체 스텝의 3~10%를 워밍업에 사용. 초기 손실 폭발 방지.",
-        },
-        {
-            "param": "lora_rank (r)",
-            "recommended": "8 ~ 64",
-            "note": "높을수록 표현력 증가, 메모리 증가. 16이 좋은 시작점.",
-        },
-    ]
-
-for hp in hyperparameter_guide():
-    print(f"\n{hp['param']}: {hp['recommended']}")
-    print(f"  {hp['note']}")
-```
-
----
-
-## 학습 모니터링
-
-```python
-def monitor_training(trainer) -> None:
-    """학습 로그에서 손실 추이를 출력합니다."""
-    if not trainer.state.log_history:
-        print("로그 없음")
-        return
-
-    train_losses = [(e["epoch"], e["loss"]) for e in trainer.state.log_history if "loss" in e]
-    eval_losses = [(e["epoch"], e["eval_loss"]) for e in trainer.state.log_history if "eval_loss" in e]
-
-    print("학습 손실:")
-    for epoch, loss in train_losses[-5:]:
-        print(f"  epoch {epoch:.1f}: {loss:.4f}")
-
-    print("검증 손실:")
-    for epoch, loss in eval_losses:
-        print(f"  epoch {epoch:.0f}: {loss:.4f}")
-
-    if len(eval_losses) >= 2:
-        improvement = eval_losses[0][1] - eval_losses[-1][1]
-        print(f"검증 손실 개선: {improvement:.4f}")
-```
+학습 루프는 생각보다 작은 단위로도 검증할 수 있습니다. 1 step이 성공하면 이후에 늘려야 할 것은 데이터와 시간이지, 기본 구조가 아닙니다.
 
 <!-- blog-only:start -->
 다음 글: [모델 평가](./05-evaluation.md)
@@ -252,8 +118,7 @@ def monitor_training(trainer) -> None:
 
 ## 참고 자료
 
-- [TRL SFTTrainer 문서](https://huggingface.co/docs/trl/sft_trainer)
-- [Hugging Face TrainingArguments](https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments)
-- [그래디언트 체크포인팅 가이드](https://huggingface.co/docs/transformers/perf_train_gpu_one#gradient-checkpointing)
+- [Transformers Trainer documentation](https://huggingface.co/docs/transformers/main_classes/trainer)
+- [TrainingArguments reference](https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments)
 
 Tags: Fine-tuning, LoRA, LLM, Python

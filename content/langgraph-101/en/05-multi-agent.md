@@ -3,7 +3,7 @@ title: 'Multi-agent systems'
 series: langgraph-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,161 +19,141 @@ last_reviewed: '2026-05-01'
 
 # Multi-agent systems
 
-> LangGraph 101 (5/6)
+## Questions this post answers
+
+- How do you express the supervisor-worker pattern in LangGraph?
+- What should a supervisor node decide before handing work to a worker?
+- How much shared state should multiple agents actually share?
+
+> A multi-agent graph is not just “more LLM calls.” It is a delegation structure where roles, handoffs, and state boundaries stay explicit.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/05-multi-agent)
 
-Complex tasks benefit from multiple specialized agents working together. One agent orchestrates the work; the others focus on their specific roles. This post implements the supervisor-worker pattern as a multi-agent system in LangGraph.
+If you push every task into one giant agent, prompts grow, roles blur, and behavior becomes harder to debug. A supervisor-worker graph fixes that by separating routing, execution, and final assembly into named nodes.
 
----
-
-<!-- ebook-only:start -->
-
-**The key idea**: Multi-Agent is multiple graphs exchanging messages. A Supervisor distributes tasks and Sub-Agents handle each one.
-
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Tool-calling agents**.
-After this chapter, the next one moves on to **Completing LangGraph**.
-<!-- ebook-only:end -->
-
-## Supervisor-worker pattern
-
-The supervisor analyzes the request, delegates to the appropriate worker agent, and integrates the results into a final answer.
-
-```
-user → [supervisor] → [research agent] → result
-                    → [code agent]     → result
-                    → [summary agent]  → final answer
+```mermaid
+flowchart LR
+    A[User request] --> B[supervisor]
+    B -->|research| C[research_worker]
+    B -->|code| D[code_worker]
+    C --> E[finalize]
+    D --> E
+    E --> F[END]
 ```
 
----
-
-## Agent implementation
+## Minimal runnable example
 
 ```python
 import os
-from typing import TypedDict, Annotated, Literal
+from typing import Literal, TypedDict
 
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
+from langgraph.graph import END, START, StateGraph
 
-class MultiAgentState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-    task_type: str
-    research_result: str
-    code_result: str
+class SupervisorState(TypedDict):
+    request: str
+    route: str
+    worker_result: str
     final_answer: str
 
-def _llm(temperature: float = 0.0) -> ChatGroq:
-    return ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=temperature,
+def llm() -> ChatGroq:
+    return ChatGroq(model="llama-3.1-8b-instant", temperature=0.0, api_key=os.environ["GROQ_API_KEY"])
+
+def supervisor(state: SupervisorState) -> SupervisorState:
+    request_lower = state["request"].lower()
+    if any(keyword in request_lower for keyword in ("code", "python", "function", "implement", "write")):
+        return {"route": "code"}
+    if any(keyword in request_lower for keyword in ("what", "why", "explain", "concept")):
+        return {"route": "research"}
+
+    response = llm().invoke(
+        [
+            SystemMessage(content="Classify the request as research or code. Return only one label: research or code."),
+            HumanMessage(content=state["request"]),
+        ]
     )
+    route = response.content.strip().lower()
+    if route not in {"research", "code"}:
+        route = "research"
+    return {"route": route}
 
-def supervisor_node(state: MultiAgentState) -> MultiAgentState:
-    last_msg = state["messages"][-1].content
-    response = _llm().invoke([
-        SystemMessage(content="""Analyze the user request and determine the task type.
+def route_to_worker(state: SupervisorState) -> Literal["research_worker", "code_worker"]:
+    return "code_worker" if state["route"] == "code" else "research_worker"
 
-- research: information gathering, concept explanation, fact checking
-- code: code writing, debugging, code explanation
-- summary: summarizing or organizing information
+def research_worker(state: SupervisorState) -> SupervisorState:
+    response = llm().invoke(
+        [
+            SystemMessage(content="You are a research worker for the LangGraph framework in the LangChain ecosystem. Explain concepts with crisp bullet points and practical engineering language."),
+            HumanMessage(content=state["request"]),
+        ]
+    )
+    return {"worker_result": response.content}
 
-Return only one of: research, code, summary."""),
-        HumanMessage(content=last_msg),
-    ])
-    task_type = response.content.strip().lower()
-    return {"task_type": task_type if task_type in ("research", "code", "summary") else "research"}
+def code_worker(state: SupervisorState) -> SupervisorState:
+    response = llm().invoke(
+        [
+            SystemMessage(content="You are a coding worker for LangGraph tutorials. Produce short Python-focused answers with one small example."),
+            HumanMessage(content=state["request"]),
+        ]
+    )
+    return {"worker_result": response.content}
 
-def research_agent_node(state: MultiAgentState) -> MultiAgentState:
-    last_msg = state["messages"][-1].content
-    response = _llm().invoke([
-        SystemMessage(content="You are a research expert. Provide accurate and detailed information with clear key points."),
-        HumanMessage(content=last_msg),
-    ])
-    return {
-        "research_result": response.content,
-        "messages": [AIMessage(content=f"[research agent] {response.content}")],
-    }
+def finalize(state: SupervisorState) -> SupervisorState:
+    final_answer = (
+        f"Supervisor route: {state['route']}\n"
+        f"Worker output:\n{state['worker_result']}"
+    )
+    return {"final_answer": final_answer}
 
-def code_agent_node(state: MultiAgentState) -> MultiAgentState:
-    last_msg = state["messages"][-1].content
-    response = _llm().invoke([
-        SystemMessage(content="You are a senior Python developer. Write clear, practical code with type hints, docstrings, and explanations."),
-        HumanMessage(content=last_msg),
-    ])
-    return {
-        "code_result": response.content,
-        "messages": [AIMessage(content=f"[code agent] {response.content}")],
-    }
+def build_graph():
+    graph = StateGraph(SupervisorState)
+    graph.add_node("supervisor", supervisor)
+    graph.add_node("research_worker", research_worker)
+    graph.add_node("code_worker", code_worker)
+    graph.add_node("finalize", finalize)
 
-def summary_agent_node(state: MultiAgentState) -> MultiAgentState:
-    parts = []
-    if state.get("research_result"):
-        parts.append(f"Research:\n{state['research_result']}")
-    if state.get("code_result"):
-        parts.append(f"Code:\n{state['code_result']}")
-    context = "\n\n".join(parts) if parts else state["messages"][-1].content
-
-    response = _llm().invoke([
-        SystemMessage(content="Synthesize the following information into a clear, structured final answer."),
-        HumanMessage(content=f"Original question: {state['messages'][0].content}\n\n{context}"),
-    ])
-    return {
-        "final_answer": response.content,
-        "messages": [AIMessage(content=response.content)],
-    }
-
-def route_by_task_type(state: MultiAgentState) -> Literal["research", "code", "summary"]:
-    return state["task_type"]
-
-def build_multi_agent_graph():
-    graph = StateGraph(MultiAgentState)
-    graph.add_node("supervisor", supervisor_node)
-    graph.add_node("research", research_agent_node)
-    graph.add_node("code", code_agent_node)
-    graph.add_node("summary", summary_agent_node)
-
-    graph.set_entry_point("supervisor")
+    graph.add_edge(START, "supervisor")
     graph.add_conditional_edges(
         "supervisor",
-        route_by_task_type,
-        {"research": "research", "code": "code", "summary": "summary"},
+        route_to_worker,
+        {"research_worker": "research_worker", "code_worker": "code_worker"},
     )
-    graph.add_edge("research", "summary")
-    graph.add_edge("code", "summary")
-    graph.add_edge("summary", END)
+    graph.add_edge("research_worker", "finalize")
+    graph.add_edge("code_worker", "finalize")
+    graph.add_edge("finalize", END)
     return graph.compile()
-
-if __name__ == "__main__":
-    app = build_multi_agent_graph()
-    initial: MultiAgentState = {
-        "messages": [], "task_type": "",
-        "research_result": "", "code_result": "", "final_answer": "",
-    }
-    questions = [
-        "What is Python asynchronous programming?",
-        "Implement a Fibonacci sequence generator in Python.",
-    ]
-    for q in questions:
-        result = app.invoke({**initial, "messages": [HumanMessage(content=q)]})
-        print(f"\nQ: {q}")
-        print(f"task type: {result['task_type']}")
-        print(f"answer:\n{result['final_answer'][:300]}...")
 ```
 
----
+Runnable file: `/root/Github/langgraph-101/en/05-multi-agent/main.py`
 
-## Inter-agent communication
+Run it with:
 
-Agents communicate through shared state. Each agent writes its result to a dedicated state field; the next agent reads from it.
+```bash
+export GROQ_API_KEY=... && python main.py
+```
 
-This keeps coupling low. The summary agent does not need to know how the code agent is implemented — it only reads `code_result`. Adding a new agent type requires no changes to existing agents, only a new node and routing entry.
+## What to notice in this code
+
+- The supervisor decides the route but does not try to answer the request itself.
+- Workers write to dedicated shared fields like `worker_result`.
+- `finalize` keeps answer assembly in one place, which makes future expansion easier.
+
+## Where engineers get confused
+
+- “Multi-agent” does not automatically mean “better.” Weak role boundaries often produce worse results than one well-designed agent.
+- If the supervisor also does the substantive work, you are drifting back toward a monolith.
+- Oversharing state increases coupling. Most workers need a small, explicit contract instead.
+
+## Checklist
+
+- [ ] Can you explain the supervisor and worker responsibilities in one sentence each
+- [ ] Are worker outputs stored in clearly named fields
+- [ ] Is there a dedicated final assembly node for debugging and extension
+
+## Summary
+
+The heart of multi-agent design is delegation, not model count. In the final post, we combine checkpoints, routing, and tool loops into one complete LangGraph agent skeleton.
 
 <!-- blog-only:start -->
 Next: [Completing LangGraph](./06-langgraph-complete.md)
@@ -195,8 +175,8 @@ Next: [Completing LangGraph](./06-langgraph-complete.md)
 
 ## References
 
-- [LangGraph multi-agent documentation](https://langchain-ai.github.io/langgraph/how-tos/multi-agent-network/)
-- [LangGraph supervisor pattern](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/)
-- [LangGraph agent network concepts](https://langchain-ai.github.io/langgraph/concepts/multi_agent/)
+- [LangGraph multi-agent concepts](https://langchain-ai.github.io/langgraph/concepts/multi_agent/)
+- [LangGraph supervisor tutorial](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/)
+- [LangGraph multi-agent network guide](https://langchain-ai.github.io/langgraph/how-tos/multi-agent-network/)
 
 Tags: LangGraph, Agent, Python, LLM

@@ -3,7 +3,7 @@ title: 'LLM 앱 운영 완성'
 series: llm-apps-ops-101
 episode: 6
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,296 +19,234 @@ last_reviewed: '2026-05-01'
 
 # LLM 앱 운영 완성
 
-> LLM 앱 운영 101 (6/6)
+## 이 글에서 답할 질문
+- 로깅, 비용, 품질 평가를 한 엔드포인트에 어떻게 합칠까요?
+- 헬스체크에서 누적 호출 수와 비용을 함께 보여 주는 이유는 무엇일까요?
+- 통합 파이프라인에서 가장 먼저 실패시켜야 하는 지점은 어디일까요?
 
-이 시리즈에서 다룬 모니터링, 비용 추적, 품질 평가, 보안, 배포 전략을 하나의 프로덕션 서버로 통합합니다. 각 레이어는 독립적으로 교체 가능하고, 전체가 함께 동작할 때 신뢰할 수 있는 LLM 앱 운영 기반이 됩니다.
+> 운영 완성의 핵심은 기능을 많이 넣는 것이 아니라, 한 요청이 남기는 로그·비용·품질 신호가 서로 연결되도록 만드는 것입니다.
 
-<!-- ebook-only:start -->
+## 큰 그림
+```mermaid
+flowchart LR
+    Request[채팅 요청] --> Validate[입력 검증]
+    Validate --> Groq[Groq API]
+    Groq --> Eval[품질 평가]
+    Eval --> Cost[토큰·비용 계산]
+    Cost --> Log[JSON 운영 로그]
+    Log --> Response[최종 응답]
+```
 
-이 장의 핵심: **LLMOps는 개발·배포·모니터링·재학습 루프를 자동화한다.** 피드백을 수집하고 지표가 떨어지면 트리거가 울려야 한다.
+## 왜 이 레이어가 필요한가
+통합 파이프라인은 개별 기능 소개가 아니라, 한 요청이 남기는 운영 신호를 연결하는 단계입니다.
 
-## 이 장의 위치
+운영 레이어를 따로따로 두면 데모는 쉬워도 실제 문제를 설명하기 어렵습니다. 한 번의 실패가 보안 문제인지, 비용 이상인지, 품질 저하인지 연결해서 봐야 운영이 됩니다.
 
-이 글은 시리즈 6편 중 6번째 장입니다.
-앞 장에서는 **LLM 앱 배포 전략**을 다뤘습니다.
-<!-- ebook-only:end -->
+예제 파일: `/root/Github/llm-apps-ops-101/ko/06-ops-complete/main.py`
 
-## 예제 코드
-예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
-
----
-
-## 통합 운영 서버
-
+## 최소 실행 예제
 ```python
 import asyncio
-import functools
 import json
 import logging
 import os
 import re
+import threading
 import time
-import uuid
-from collections import defaultdict
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from datetime import datetime
-from pathlib import Path
-from typing import AsyncIterator, Optional
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+import httpx
+import uvicorn
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from groq import Groq
 
-# ── 로거 ──────────────────────────────────────────────────────────────────
+MODEL = "llama-3.1-8b-instant"
+PRICE_PER_MILLION_TOKENS = 0.05
+INJECTION_PATTERNS = [r"ignore\s+all\s+previous\s+instructions", r"reveal\s+your\s+system\s+prompt"]
+
 class JsonFormatter(logging.Formatter):
-    def format(self, record):
-        log = {
-            "ts": datetime.utcnow().isoformat() + "Z",
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "level": record.levelname,
-            "msg": record.getMessage(),
+            "event": record.getMessage(),
         }
-        if hasattr(record, "extra"):
-            log.update(record.extra)
-        return json.dumps(log, ensure_ascii=False)
+        extra = getattr(record, "payload", None)
+        if extra:
+            payload.update(extra)
+        return json.dumps(payload, ensure_ascii=False)
 
-def build_logger(name: str) -> logging.Logger:
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+def build_logger() -> logging.Logger:
+    logger = logging.getLogger("llm_ops_pipeline")
+    logger.setLevel(logging.INFO)
     if not logger.handlers:
-        h = logging.StreamHandler()
-        h.setFormatter(JsonFormatter())
-        logger.addHandler(h)
+        handler = logging.StreamHandler()
+        handler.setFormatter(JsonFormatter())
+        logger.addHandler(handler)
+    logger.propagate = False
     return logger
 
-logger = build_logger("llm_prod")
-
-# ── 재시도 ─────────────────────────────────────────────────────────────────
-def retry_backoff(max_retries: int = 2, base_delay: float = 1.0):
-    def decorator(func):
-        @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
-            last_exc = None
-            for attempt in range(max_retries + 1):
-                try:
-                    return await func(*args, **kwargs)
-                except Exception as e:
-                    last_exc = e
-                    if attempt == max_retries:
-                        break
-                    await asyncio.sleep(base_delay * (2 ** attempt))
-            raise last_exc
-        return wrapper
-    return decorator
-
-# ── 속도 제한 ──────────────────────────────────────────────────────────────
-class RateLimiter:
-    def __init__(self, max_calls: int = 10, window: int = 60):
-        self.max_calls = max_calls
-        self.window = window
-        self._calls: dict[str, list[float]] = defaultdict(list)
-
-    def is_allowed(self, user_id: str) -> tuple[bool, str]:
-        now = time.time()
-        cutoff = now - self.window
-        self._calls[user_id] = [t for t in self._calls[user_id] if t > cutoff]
-        if len(self._calls[user_id]) >= self.max_calls:
-            reset_in = int(self._calls[user_id][0] + self.window - now)
-            return False, f"{reset_in}초 후 재시도"
-        self._calls[user_id].append(now)
-        return True, ""
-
-# ── 입력 검증 ──────────────────────────────────────────────────────────────
-INJECTION_PATTERNS = [
-    r"ignore\s+(?:all\s+)?(?:previous|prior)\s+instructions?",
-    r"forget\s+everything",
-    r"override\s+(?:safety|system)",
-]
-
-SENSITIVE_RE = re.compile(
-    r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-    r"|\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b"
-    r"|(?:sk|pk|api|key)[-_][A-Za-z0-9]{16,}",
-    re.IGNORECASE,
-)
-
-def validate_input(text: str) -> tuple[bool, str, str]:
-    """(passed, reason, sanitized) 반환."""
-    if not text.strip():
-        return False, "빈 입력", ""
-    if len(text) > 4000:
-        return False, f"입력 초과: {len(text)}자", ""
-    for pat in INJECTION_PATTERNS:
-        if re.search(pat, text, re.IGNORECASE):
-            return False, "프롬프트 인젝션 탐지", ""
-    sanitized = SENSITIVE_RE.sub("[REDACTED]", text)
-    return True, "", sanitized
-
-# ── 비용 추적 ──────────────────────────────────────────────────────────────
-MODEL_PRICING = {"llama-3.1-8b-instant": {"input": 0.00005, "output": 0.00008}}
+LOGGER = build_logger()
 
 @dataclass
-class CallRecord:
-    call_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
-    input_tokens: int = 0
-    output_tokens: int = 0
-    latency_ms: float = 0.0
-    model: str = "llama-3.1-8b-instant"
+class QualityReport:
+    length_ok: bool
+    keywords_ok: bool
+    answer_length: int
+    missing_keywords: list[str]
 
-    @property
-    def cost_usd(self) -> float:
-        p = MODEL_PRICING.get(self.model, {"input": 0, "output": 0})
-        return (self.input_tokens * p["input"] + self.output_tokens * p["output"]) / 1000
-
-cumulative_cost = 0.0
-total_calls = 0
-
-# ── FastAPI 앱 ──────────────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=4000)
-    user_id: str = Field(default="anonymous")
-    system_prompt: str = Field(default="당신은 유용한 어시스턴트입니다.")
-    stream: bool = False
+    message: str = Field(min_length=1, max_length=4000)
+    expected_keywords: list[str] = Field(default_factory=list)
 
 class ChatResponse(BaseModel):
     response: str
-    call_id: str
-    latency_ms: float
+    total_tokens: int
     cost_usd: float
+    quality: dict
 
-rate_limiter = RateLimiter()
+def estimate_cost(total_tokens: int) -> float:
+    return round((total_tokens / 1_000_000) * PRICE_PER_MILLION_TOKENS, 8)
+
+def validate_input(text: str) -> None:
+    for pattern in INJECTION_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            raise HTTPException(status_code=400, detail="prompt injection detected")
+
+def evaluate_output(answer: str, expected_keywords: list[str]) -> QualityReport:
+    missing = [keyword for keyword in expected_keywords if keyword.lower() not in answer.lower()]
+    return QualityReport(
+        length_ok=60 <= len(answer) <= 400,
+        keywords_ok=not missing,
+        answer_length=len(answer),
+        missing_keywords=missing,
+    )
+
+def call_model(client: Groq, message: str) -> tuple[str, int]:
+    response = client.chat.completions.create(
+        model=MODEL,
+        temperature=0,
+        messages=[
+            {"role": "system", "content": "You are a concise Python assistant."},
+            {"role": "user", "content": message},
+        ],
+    )
+    usage = response.usage
+    if usage is None:
+        raise RuntimeError("usage metadata missing from Groq response")
+    answer = response.choices[0].message.content or ""
+    return answer, usage.total_tokens
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
-    )
-    logger.info("서버 시작", extra={"extra": {"model": "llama-3.1-8b-instant"}})
+    app.state.client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    app.state.total_calls = 0
+    app.state.total_cost_usd = 0.0
     yield
-    logger.info("서버 종료")
 
-app = FastAPI(title="LLM Production Server", lifespan=lifespan)
+app = FastAPI(title="llm-ops-pipeline", lifespan=lifespan)
 
-@app.middleware("http")
-async def request_log(request: Request, call_next):
-    t0 = time.perf_counter()
-    resp = await call_next(request)
-    ms = (time.perf_counter() - t0) * 1000
-    logger.info(
-        f"{request.method} {request.url.path}",
-        extra={"extra": {"status": resp.status_code, "ms": round(ms, 1)}},
-    )
-    return resp
+class ThreadSafeServer(uvicorn.Server):
+    def install_signal_handlers(self) -> None:
+        return None
 
 @app.get("/health")
-async def health():
+async def health() -> dict:
     return {
         "status": "ok",
-        "total_calls": total_calls,
-        "cumulative_cost_usd": round(cumulative_cost, 4),
+        "total_calls": app.state.total_calls,
+        "total_cost_usd": round(app.state.total_cost_usd, 8),
     }
 
-@retry_backoff(max_retries=2)
-async def _llm_call(llm, messages) -> tuple[str, dict]:
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(None, lambda: llm.invoke(messages))
-    usage = getattr(response, "usage_metadata", {}) or {}
-    return response.content, usage
-
 @app.post("/chat", response_model=ChatResponse)
-async def chat(req: ChatRequest):
-    global cumulative_cost, total_calls
-
-    # 속도 제한
-    allowed, reason = rate_limiter.is_allowed(req.user_id)
-    if not allowed:
-        raise HTTPException(status_code=429, detail=reason)
-
-    # 입력 검증
-    ok, reason, sanitized = validate_input(req.message)
-    if not ok:
-        raise HTTPException(status_code=400, detail=reason)
-
-    if req.stream:
-        messages = [SystemMessage(content=req.system_prompt), HumanMessage(content=sanitized)]
-        async def token_stream() -> AsyncIterator[str]:
-            for chunk in app.state.llm.stream(messages):
-                if chunk.content:
-                    yield f"data: {chunk.content}\n\n"
-            yield "data: [DONE]\n\n"
-        return StreamingResponse(token_stream(), media_type="text/event-stream")
-
-    record = CallRecord()
-    messages = [SystemMessage(content=req.system_prompt), HumanMessage(content=sanitized)]
-    t0 = time.perf_counter()
-
-    try:
-        content, usage = await _llm_call(app.state.llm, messages)
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"LLM 오류: {e}")
-
-    record.latency_ms = (time.perf_counter() - t0) * 1000
-    record.input_tokens = usage.get("input_tokens", 0)
-    record.output_tokens = usage.get("output_tokens", 0)
-
-    cumulative_cost += record.cost_usd
-    total_calls += 1
-
-    logger.info(
+async def chat(request: ChatRequest) -> ChatResponse:
+    validate_input(request.message)
+    started = time.perf_counter()
+    answer, total_tokens = await asyncio.to_thread(call_model, app.state.client, request.message)
+    quality = evaluate_output(answer, request.expected_keywords)
+    cost_usd = estimate_cost(total_tokens)
+    app.state.total_calls += 1
+    app.state.total_cost_usd += cost_usd
+    LOGGER.info(
         "llm_call",
-        extra={"extra": {
-            "call_id": record.call_id,
-            "latency_ms": round(record.latency_ms, 1),
-            "tokens": record.input_tokens + record.output_tokens,
-            "cost_usd": round(record.cost_usd, 6),
-        }},
+        extra={
+            "payload": {
+                "latency_ms": round((time.perf_counter() - started) * 1000, 1),
+                "total_tokens": total_tokens,
+                "cost_usd": cost_usd,
+                "quality": asdict(quality),
+            }
+        },
     )
-
     return ChatResponse(
-        response=content,
-        call_id=record.call_id,
-        latency_ms=round(record.latency_ms, 1),
-        cost_usd=round(record.cost_usd, 6),
+        response=answer,
+        total_tokens=total_tokens,
+        cost_usd=cost_usd,
+        quality=asdict(quality),
     )
+
+def run_server(server: uvicorn.Server) -> None:
+    server.run()
+
+def main() -> None:
+    config = uvicorn.Config(app, host="127.0.0.1", port=8016, log_level="warning")
+    server = ThreadSafeServer(config)
+    thread = threading.Thread(target=run_server, args=(server,), daemon=True)
+    thread.start()
+
+    for _ in range(40):
+        try:
+            health = httpx.get("http://127.0.0.1:8016/health", timeout=2.0)
+            if health.status_code == 200:
+                break
+        except Exception:
+            time.sleep(0.25)
+    else:
+        raise RuntimeError("server did not start")
+
+    print("HEALTH:", health.json())
+    response = httpx.post(
+        "http://127.0.0.1:8016/chat",
+        json={
+            "message": "Explain Python's GIL in two sentences.",
+                    "expected_keywords": ["GIL", "thread", "lock"],
+        },
+        timeout=30.0,
+    )
+    print("CHAT:", response.json())
+    final_health = httpx.get("http://127.0.0.1:8016/health", timeout=2.0)
+    print("FINAL_HEALTH:", final_health.json())
+
+    server.should_exit = True
+    thread.join(timeout=10)
+    if thread.is_alive():
+        raise RuntimeError("server did not stop cleanly")
+
+if __name__ == "__main__":
+    main()
 ```
 
----
+## 이 코드에서 봐야 할 것
+- `/chat` 응답에 quality, total_tokens, cost_usd를 함께 실어 두면 클라이언트도 운영 신호를 바로 볼 수 있습니다.
+- 헬스체크에 누적 호출 수와 비용을 추가하면 데모 단계에서도 상태 변화를 쉽게 확인할 수 있습니다.
+- 구조화 로그의 `quality` 필드는 나중에 배치 평가 결과와도 같은 모양으로 확장하기 좋습니다.
 
-## 실행 방법
+## 실무에서 헷갈리는 지점
+- 통합 파이프라인이 모든 문제를 해결해 주는 것은 아닙니다. 여전히 알림, 저장소, 대시보드가 별도로 필요합니다.
+- 품질 평가를 응답 직후에 수행하면 지연 시간이 늘 수 있습니다. 운영에서는 동기/비동기 분리를 다시 설계해야 합니다.
+- 비용 계산식이 단순해도 실제 과금 모델이 달라지면 상수와 집계 단위를 다시 검토해야 합니다.
 
-```bash
-# 의존성 설치
-pip install fastapi uvicorn langchain-groq pydantic
+## 체크리스트
+- [ ] 입력 검증을 가장 먼저 수행한다
+- [ ] 응답마다 total_tokens와 cost_usd를 계산한다
+- [ ] quality 결과를 구조화 로그와 응답에 함께 남긴다
+- [ ] health check에서 누적 상태를 확인한다
 
-# 서버 시작
-GROQ_API_KEY=<your_key> uvicorn server:app --host 0.0.0.0 --port 8000
-
-# 헬스체크
-curl http://localhost:8000/health
-
-# 채팅 요청
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "파이썬 asyncio란 무엇인가요?", "user_id": "user_1"}'
-```
-
----
-
-## 시리즈 마무리
-
-이 시리즈에서 구축한 레이어는 순서대로 쌓이는 구조입니다.
-
-- 모니터링과 로깅이 기반이 됩니다.
-- 비용 추적이 그 위에 올라가서 예산 초과를 막습니다.
-- 품질 평가가 모델 교체나 프롬프트 변경 시 안전망이 됩니다.
-- 보안 레이어가 악의적 사용을 억제합니다.
-- 배포 구조가 전체를 프로덕션에서 신뢰할 수 있게 만듭니다.
-
-각 레이어는 독립적으로 교체할 수 있습니다. 모니터링 백엔드를 Datadog으로 바꾸거나, 캐시를 Redis로 올리거나, 재시도 로직을 Tenacity 라이브러리로 교체해도 나머지는 그대로 작동합니다.
+## 정리
+이제 한 요청이 남기는 운영 신호를 한 자리에서 볼 수 있습니다. 여기서부터는 알림, 저장, 대시보드로 확장하면 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -326,8 +264,8 @@ curl -X POST http://localhost:8000/chat \
 
 ## 참고 자료
 
-- [FastAPI 공식 문서](https://fastapi.tiangolo.com/)
-- [LangChain 운영 가이드](https://python.langchain.com/docs/guides/productionization/)
-- [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Groq API Reference](https://console.groq.com/docs/api-reference)
+- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 
 Tags: LLMOps, Observability, Python, LLM

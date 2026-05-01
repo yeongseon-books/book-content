@@ -3,7 +3,7 @@ title: 'State management and checkpoints'
 series: langgraph-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,163 +19,110 @@ last_reviewed: '2026-05-01'
 
 # State management and checkpoints
 
-> LangGraph 101 (2/6)
+## Questions this post answers
+
+- What does a LangGraph checkpointer actually store?
+- How do `MemorySaver` and `thread_id` let a graph resume later?
+- How do you inspect the restored state after another turn?
+
+> A checkpointer snapshots graph state so the next invocation can continue from the same conversation timeline instead of starting from zero.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/02-state-and-checkpoints)
 
-Conversational agents need to remember previous turns. LangGraph's checkpointer saves state after each step and automatically maintains conversation history. This post implements conversation persistence using both an in-memory checkpointer for development and a SQLite checkpointer for production.
+As soon as an agent becomes conversational, single-shot execution stops being enough. You need to save state between turns, reload it with the same session key, and verify what the graph actually kept. In LangGraph, that job belongs to the checkpointer.
 
----
-
-<!-- ebook-only:start -->
-
-**The key idea**: State is a dictionary shared across the entire graph. Each node reads and updates it; Checkpoints persist it.
-
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **LangGraph introduction and graph basics**.
-After this chapter, the next one moves on to **Conditional edges and branching**.
-<!-- ebook-only:end -->
-
-## How checkpoints work
-
-Without a checkpointer, every graph invocation is independent. With a checkpointer, a `thread_id` identifies a conversation session — invoking with the same `thread_id` resumes from where the last invocation left off.
-
-```
-invoke 1: [Q1] → run nodes → save state (thread_id="session_1")
-invoke 2: restore state (thread_id="session_1") → [Q1, A1, Q2] → run nodes → save state
+```mermaid
+flowchart LR
+    A[First invoke] --> B[assistant]
+    B --> C[MemorySaver stores state]
+    C --> D[Invoke again with same thread_id]
+    D --> E[Restore prior state]
+    E --> F[assistant runs again]
 ```
 
----
-
-## Memory checkpointer (development)
+## Minimal runnable example
 
 ```python
-import os
-from typing import TypedDict, Annotated
+from typing import Annotated
 
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+from langgraph.graph import END, START, StateGraph
+from langgraph.graph.message import add_messages
+from typing_extensions import TypedDict
 
-class ConversationState(TypedDict):
+class ChatState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
+    turn_count: int
 
-SYSTEM_PROMPT = "You are a Python tutor. Remember the conversation history and respond in context."
-
-def chat_node(state: ConversationState) -> ConversationState:
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
+def assistant(state: ChatState) -> ChatState:
+    human_messages = [msg.content for msg in state["messages"] if isinstance(msg, HumanMessage)]
+    latest = human_messages[-1]
+    remembered = human_messages[:-1]
+    memory_line = "No earlier user turns saved yet."
+    if remembered:
+        memory_line = f"Earlier user turns: {', '.join(remembered)}"
+    reply = AIMessage(
+        content=(
+            f"Turn {state.get('turn_count', 0) + 1}. "
+            f"Latest user message: {latest}. {memory_line}"
+        )
     )
-    response = llm.invoke([SystemMessage(content=SYSTEM_PROMPT)] + state["messages"])
-    return {"messages": [response]}
+    return {"messages": [reply], "turn_count": state.get("turn_count", 0) + 1}
 
-def build_chat_graph(checkpointer=None):
-    graph = StateGraph(ConversationState)
-    graph.add_node("chat", chat_node)
-    graph.set_entry_point("chat")
-    graph.add_edge("chat", END)
-    return graph.compile(checkpointer=checkpointer)
-
-def demo_memory_checkpointer():
-    checkpointer = MemorySaver()
-    app = build_chat_graph(checkpointer)
-    config = {"configurable": {"thread_id": "session_1"}}
-
-    turns = [
-        "What is a Python decorator?",
-        "Show me an example of the concept you just explained.",
-        "Why is functools.wraps used in that example?",
-    ]
-    for msg in turns:
-        print(f"\nuser: {msg}")
-        result = app.invoke({"messages": [HumanMessage(content=msg)]}, config=config)
-        print(f"AI: {result['messages'][-1].content[:200]}...")
+def build_graph():
+    graph = StateGraph(ChatState)
+    graph.add_node("assistant", assistant)
+    graph.add_edge(START, "assistant")
+    graph.add_edge("assistant", END)
+    return graph.compile(checkpointer=MemorySaver())
 
 if __name__ == "__main__":
-    demo_memory_checkpointer()
-```
+    app = build_graph()
+    config = {"configurable": {"thread_id": "memory-demo"}}
 
----
-
-## SQLite checkpointer (production)
-
-The memory checkpointer is lost when the process restarts. SQLite persists conversations to disk.
-
-```python
-import sqlite3
-from langgraph.checkpoint.sqlite import SqliteSaver
-
-def build_persistent_chat_app(db_path: str = "conversations.db"):
-    conn = sqlite3.connect(db_path, check_same_thread=False)
-    checkpointer = SqliteSaver(conn)
-    return build_chat_graph(checkpointer)
-
-def demo_sqlite_checkpointer():
-    app = build_persistent_chat_app()
-    config = {"configurable": {"thread_id": "persistent_session_1"}}
-
-    result = app.invoke(
-        {"messages": [HumanMessage(content="What is Python's GIL?")]},
+    first = app.invoke(
+        {"messages": [HumanMessage(content="My project is about LangGraph.")], "turn_count": 0},
         config=config,
     )
-    print(f"turn 1: {result['messages'][-1].content[:200]}...")
+    print("First reply:")
+    print(first["messages"][-1].content)
 
-    result = app.invoke(
-        {"messages": [HumanMessage(content="How does the GIL affect multithreading?")]},
+    second = app.invoke(
+        {"messages": [HumanMessage(content="What did I say my project was about?")]},
         config=config,
     )
-    print(f"\nturn 2 (with prior context): {result['messages'][-1].content[:200]}...")
+    print("\nSecond reply after resume:")
+    print(second["messages"][-1].content)
 
-    state = app.get_state(config)
-    print(f"\nsaved message count: {len(state.values['messages'])}")
+    snapshot = app.get_state(config)
+    print(f"\nSaved message count: {len(snapshot.values['messages'])}")
+    print(f"Saved turn count: {snapshot.values['turn_count']}")
 ```
 
----
+Runnable file: `/root/Github/langgraph-101/en/02-state-and-checkpoints/main.py`
 
-## State inspection
+## What to notice in this code
 
-```python
-def inspect_state():
-    checkpointer = MemorySaver()
-    app = build_chat_graph(checkpointer)
-    config = {"configurable": {"thread_id": "debug"}}
+- `add_messages` appends new messages instead of overwriting history.
+- `graph.compile(checkpointer=MemorySaver())` attaches persistence in one place.
+- The second `invoke()` sends only the new message, but the same `thread_id` restores prior state automatically.
 
-    app.invoke({"messages": [HumanMessage(content="Hello!")]}, config=config)
+## Where engineers get confused
 
-    state = app.get_state(config)
-    print("message count:", len(state.values["messages"]))
-    for msg in state.values["messages"]:
-        role = "user" if isinstance(msg, HumanMessage) else "AI"
-        print(f"  [{role}]: {msg.content[:80]}...")
+- A checkpointer is not “memory magic.” It is a state store that makes memory-like behavior possible.
+- A weak `thread_id` strategy can mix sessions from different users.
+- Persistence does not mean every field merges the way you want. Accumulating fields must be modeled explicitly.
 
-    print("\nstate history:")
-    for snap in app.get_state_history(config):
-        cid = snap.config["configurable"].get("checkpoint_id", "N/A")[:8]
-        print(f"  step {cid}: {len(snap.values.get('messages', []))} messages")
-```
+## Checklist
 
----
+- [ ] Do you have a clear `thread_id` rule for session identity
+- [ ] Did you separate append-only fields from overwrite fields
+- [ ] Did you verify saved values with `get_state()` after another turn
 
-## Thread ID design
+## Summary
 
-`thread_id` identifies a conversation session. In production, combine user ID and session ID for uniqueness.
-
-```python
-import uuid
-
-def make_thread_id(user_id: str, session_id: str) -> str:
-    return f"{user_id}:{session_id}"
-
-new_session = make_thread_id("user_123", str(uuid.uuid4()))
-```
-
-Use the memory checkpointer only in development and tests. In production, use SQLite (single server) or Redis/PostgreSQL (distributed). Swapping the checkpointer requires no changes to the graph code.
+Once you add a checkpointer, a graph stops being a one-off function call and becomes a resumable conversation system. In the next post, we use saved state to decide which node should run next with conditional edges.
 
 <!-- blog-only:start -->
 Next: [Conditional edges and branching](./03-conditional-edges.md)
@@ -197,8 +144,8 @@ Next: [Conditional edges and branching](./03-conditional-edges.md)
 
 ## References
 
-- [LangGraph checkpoints documentation](https://langchain-ai.github.io/langgraph/reference/checkpoints/)
 - [LangGraph persistence guide](https://langchain-ai.github.io/langgraph/how-tos/persistence/)
-- [SqliteSaver API](https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.sqlite.SqliteSaver)
+- [MemorySaver reference](https://langchain-ai.github.io/langgraph/reference/checkpoints/)
+- [Working with messages in graph state](https://langchain-ai.github.io/langgraph/concepts/low_level/#working-with-messages-in-graph-state)
 
 Tags: LangGraph, Agent, Python, LLM

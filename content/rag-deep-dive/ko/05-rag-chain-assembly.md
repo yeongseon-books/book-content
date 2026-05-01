@@ -3,7 +3,7 @@ title: RAG Chain 조립 — RetrievalQA vs LCEL
 series: rag-deep-dive
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,32 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # RAG Chain 조립 — RetrievalQA vs LCEL
+
+<!-- a-grade-intro:begin -->
+## 이 글에서 답할 질문
+
+- `RetrievalQA`는 어떤 단계를 내부에 숨기고 있을까요?
+- LCEL의 `|` 연산자는 RAG 그래프를 어떻게 드러낼까요?
+- `RunnablePassthrough()`는 왜 질문 원문 보존에 자주 쓰일까요?
+- 답변과 source documents를 함께 돌려주려면 어느 계층을 만져야 할까요?
+
+> RAG 체인은 질문에서 답변까지 이어지는 그래프이며, LCEL은 그 그래프의 각 경계를 바깥으로 끌어내는 조립 언어입니다.
+
+```mermaid
+flowchart LR
+    A[Question] --> B[Retriever]
+    B --> C[Context docs]
+    A --> D[Question passthrough]
+    C --> E[Prompt assembly]
+    D --> E
+    E --> F[ChatGroq]
+    F --> G[Answer]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (5/6)
 
@@ -31,6 +53,123 @@ last_reviewed: '2026-04-30'
 앞 장에서는 **프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부**을 다뤘습니다.
 이 장을 마치면 다음 장에서 **평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness**으로 이어집니다.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## 최소 실행 예제
+
+예제 파일: `/root/Github/rag-deep-dive/ko/05-rag-chain-assembly/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+import os
+
+from langchain.chains import RetrievalQA
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_groq import ChatGroq
+
+DOCS = [
+    Document(
+        page_content="Retry budget is three attempts before the worker stops retrying.",
+        metadata={"source": "runbook.md"},
+    ),
+    Document(
+        page_content="After the final retry, the original payload moves to the dead-letter queue.",
+        metadata={"source": "ops-guide.md"},
+    ),
+    Document(
+        page_content="Operators inspect the exception chain before replaying the payload.",
+        metadata={"source": "ops-guide.md"},
+    ),
+]
+QUESTION = "Why did the system stop retrying the message?"
+
+def build_retriever():
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    store = FAISS.from_documents(DOCS, embeddings)
+    return store.as_retriever(search_kwargs={"k": 2})
+
+def format_docs(docs: list[Document]) -> str:
+    return "\n\n".join(
+        f"[{doc.metadata['source']}] {doc.page_content}" for doc in docs
+    )
+
+def main() -> None:
+    if not os.environ.get("GROQ_API_KEY"):
+        raise RuntimeError("GROQ_API_KEY is required")
+
+    retriever = build_retriever()
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0, max_tokens=120)
+
+    classic_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        retriever=retriever,
+        chain_type="stuff",
+        return_source_documents=True,
+    )
+    classic_result = classic_chain.invoke({"query": QUESTION})
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "Answer only from the supplied context. If the context is insufficient, say so.",
+            ),
+            ("human", "Context:\n{context}\n\nQuestion: {question}"),
+        ]
+    )
+    lcel_chain = (
+        {
+            "context": retriever | RunnableLambda(format_docs),
+            "question": RunnablePassthrough(),
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+    lcel_result = lcel_chain.invoke(QUESTION)
+
+    print("=== RetrievalQA ===")
+    print(classic_result["result"])
+    print(
+        "sources:",
+        [doc.metadata["source"] for doc in classic_result["source_documents"]],
+    )
+    print("\n=== LCEL ===")
+    print(lcel_result)
+
+if __name__ == "__main__":
+    main()
+```
+
+### 이 코드에서 봐야 할 것
+
+- 같은 retriever와 같은 LLM을 두고도 classic chain과 LCEL chain의 조립 표면이 다릅니다.
+- LCEL에서는 문서 포맷팅 단계가 `RunnableLambda(format_docs)`로 명시적으로 드러납니다.
+- `RetrievalQA`는 source documents 반환을 내장 옵션으로 다루지만, LCEL은 필요한 출력 모양을 직접 설계할 수 있습니다.
+
+### 실무에서 헷갈리는 지점
+
+- `RetrievalQA`가 반환하는 source documents는 최종 prompt 문자열과 동일한 artifact가 아닙니다.
+- LCEL의 dict literal은 평범한 dict가 아니라 내부적으로 병렬 runnable로 동작합니다.
+- 스트리밍과 중간 단계 관측이 필요해지는 순간 classic chain의 편의성이 빠르게 한계에 닿습니다.
+
+## 체크리스트
+
+- [ ] classic `RetrievalQA`와 LCEL 체인을 같은 질의로 비교했다.
+- [ ] 문서 리스트가 문자열 컨텍스트로 접히는 지점을 코드에서 확인했다.
+- [ ] source 반환 요구사항이 classic 옵션인지, LCEL 출력 설계 문제인지 구분했다.
+- [ ] 스트리밍이나 배치가 필요하면 LCEL이 기본 선택지라는 점을 이해했다.
+<!-- a-grade-example:end -->
 
 ## 소스 버전
 

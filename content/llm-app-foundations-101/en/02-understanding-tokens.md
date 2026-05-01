@@ -3,7 +3,7 @@ title: Understanding tokens — cost, limits, and context windows
 series: llm-app-foundations-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Understanding tokens — cost, limits, and context windows

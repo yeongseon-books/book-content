@@ -3,7 +3,7 @@ title: 'Prompt와 LLM Chain — 체인 첫 번째 구성'
 series: langchain-101
 episode: 2
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,82 @@ last_reviewed: '2026-05-01'
 
 # Prompt와 LLM Chain — 체인 첫 번째 구성
 
-> LangChain 101 시리즈 (2/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/02-prompt-llm-chain)
+- `ChatPromptTemplate`에서 `system`과 `human` 메시지는 어떻게 역할이 갈리는가
+- 여러 입력 변수를 프롬프트에 안전하게 넣으려면 어떻게 구성해야 하는가
+- `StrOutputParser`와 구조화된 파서의 선택 기준은 무엇인가
+- 입력값 일부를 그대로 다음 단계로 넘기려면 어떤 Runnable이 필요한가
+
+> Prompt chain은 문자열을 만드는 코드가 아니라 입력 구조를 메시지 구조로 바꾸는 작은 변환 파이프입니다.
+
+```mermaid
+flowchart LR
+    A[topic and audience] --> B[ChatPromptTemplate]
+    B --> C[ChatGroq]
+    C --> D[StrOutputParser]
+    D --> E[설명 문자열]
+```
+
+## 최소 실행 예제
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "당신은 {audience}에게 설명하는 튜터입니다."),
+    ("human", "{topic}을 세 문장으로 설명해 주세요."),
+])
+chain = prompt | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"]) | StrOutputParser()
+
+print(chain.invoke({"audience": "주니어 백엔드 개발자", "topic": "PromptTemplate"}))
+```
+
+## 이 코드에서 봐야 할 것
+
+- 프롬프트 변수는 문자열 이어붙이기 대신 템플릿 단계에서 관리됩니다.
+- `system` 메시지는 말투와 제약을 잡고 `human` 메시지는 실제 질문을 담습니다.
+- 파서를 마지막에 붙이면 이후 단계가 항상 문자열을 받는다고 가정할 수 있습니다.
+- 프롬프트 수정과 모델 교체가 체인 바깥 코드에 거의 영향을 주지 않습니다.
+
+## 실무에서 헷갈리는 지점
+
+- PromptTemplate은 문자열 포매터이면서 동시에 메시지 구조 생성기입니다.
+- 출력 파서를 붙이지 않으면 결과가 `AIMessage`라서 후속 단계 타입이 달라집니다.
+- `RunnablePassthrough`는 값을 복사하는 도구가 아니라 현재 입력을 그대로 전달하는 연결점입니다.
+
+## 체크리스트
+
+- [ ] `system`, `human`, `ai` 메시지 역할 차이를 설명할 수 있다
+- [ ] 여러 변수로 PromptTemplate을 만들고 실행할 수 있다
+- [ ] 파서를 붙였을 때와 붙이지 않았을 때 출력 타입 차이를 이해한다
+
+LangChain 101 시리즈 (2/6)
+
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/02-prompt-llm-chain)
+
+## 이 글에서 답할 질문
+
+- `ChatPromptTemplate`은 문자열 포맷팅과 무엇이 다를까
+- Prompt, LLM, OutputParser를 왜 세 단계로 나누는 걸까
+- 여러 입력 변수를 체인에 넣을 때 어떤 형태를 유지해야 할까
+- fallback을 붙일 때 체인 경계는 어디로 잡아야 할까
+
+> Prompt chain은 입력 딕셔너리를 프롬프트로 렌더링하고, 모델 호출 결과를 파싱해 애플리케이션이 쓰기 좋은 출력으로 바꾸는 가장 기본적인 LCEL 조립입니다.
+
+## 핵심 흐름 한눈에 보기
+
+```mermaid
+flowchart LR
+    Input[입력 변수] --> Prompt[ChatPromptTemplate]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Parser[OutputParser]
+    Parser --> App[애플리케이션 출력]
+```
 
 지난 글에서 LCEL의 기본 구조를 잡았다면, 이번 글에서는 실제로 자주 쓰는 패턴을 하나씩 만들어 봅니다. `ChatPromptTemplate`을 깊이 이해하고, 출력 파서를 선택하고, 체인에 변수를 넣는 방법을 다룹니다.
 
@@ -256,6 +329,25 @@ print(result)
 이 패턴은 주 모델이 다운되거나 속도 제한에 걸렸을 때 자동으로 대체 모델로 전환합니다.
 
 ---
+
+## 이 코드에서 봐야 할 것
+
+- Prompt chain의 입력은 대부분 딕셔너리입니다. 키 이름이 프롬프트 변수와 맞아야 체인이 자연스럽게 이어집니다.
+- `StrOutputParser`와 `JsonOutputParser`의 선택은 모델 품질보다 애플리케이션이 어떤 후속 처리를 기대하는지에 더 가깝습니다.
+- `RunnablePassthrough`는 값을 바꾸지 않지만, 체인 안에서 어떤 입력을 그대로 흘려보낼지 명시해 준다는 점이 중요합니다.
+- fallback은 예외 처리용 장식이 아니라, 실패해도 같은 출력 계약을 유지하도록 체인을 한 번 더 준비하는 패턴입니다.
+
+## 실무에서 헷갈리는 지점
+
+- 프롬프트 템플릿을 문자열 템플릿으로만 보면 메시지 역할 분리의 장점을 놓치기 쉽습니다.
+- JSON 파싱은 파서만 붙이면 끝난다고 생각하기 쉽지만, 모델에게 원하는 스키마를 충분히 강하게 지시해야 안정적입니다.
+- fallback 체인은 성공 경로와 동일한 입력·출력 형태를 맞추지 않으면 오히려 디버깅이 더 어려워집니다.
+
+## 체크리스트
+
+- [ ] `ChatPromptTemplate`에 여러 변수를 넣는 입력 딕셔너리를 직접 만들 수 있다
+- [ ] 문자열 파서와 JSON 파서를 언제 구분해서 써야 하는지 설명할 수 있다
+- [ ] fallback 체인을 붙일 때 출력 형태를 맞춰야 하는 이유를 이해했다
 
 ## 마무리
 

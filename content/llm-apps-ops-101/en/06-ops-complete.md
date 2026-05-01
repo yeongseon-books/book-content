@@ -3,7 +3,7 @@ title: 'Completing the LLM ops pipeline'
 series: llm-apps-ops-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,266 +19,234 @@ last_reviewed: '2026-05-01'
 
 # Completing the LLM ops pipeline
 
-> LLM Apps Ops 101 (6/6)
+## Questions this post answers
+- How do you combine logging, cost tracking, and quality checks in one endpoint?
+- Why should health checks surface cumulative calls and cumulative cost?
+- Which failure should happen first in an integrated ops pipeline?
 
-This post assembles monitoring, cost tracking, quality evaluation, security, and deployment into a single production server. Each layer is independently replaceable; together they form a reliable operational foundation for any LLM app.
+> Operational maturity is not about stacking features. It is about making one request produce connected signals for validation, cost, quality, and logs.
 
-<!-- ebook-only:start -->
+## Big picture
+```mermaid
+flowchart LR
+    Request[Chat request] --> Validate[Input validation]
+    Validate --> Groq[Groq API]
+    Groq --> Eval[Quality evaluation]
+    Eval --> Cost[Token and cost calculation]
+    Cost --> Log[Structured ops log]
+    Log --> Response[Final response]
+```
 
-**The key idea**: LLMOps automates the develop → deploy → monitor → retrain loop. Collect feedback and trigger alerts when metrics degrade.
+## Why this layer matters
+An integrated pipeline matters because one request should leave connected traces for validation, cost, quality, and logging.
 
-## Where this chapter fits
+When each operational layer lives alone, demos look clean but incidents stay hard to explain. In production, you need one place to tell whether a bad outcome came from unsafe input, rising cost, or degrading output quality.
 
-This is chapter 6 of 6 in the series.
-The previous chapter covered **LLM app deployment strategies**.
-<!-- ebook-only:end -->
+Example file: `/root/Github/llm-apps-ops-101/en/06-ops-complete/main.py`
 
-## Example code
-Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
-
----
-
-## Integrated production server
-
+## Minimal runnable example
 ```python
 import asyncio
-import functools
 import json
 import logging
 import os
 import re
+import threading
 import time
-import uuid
-from collections import defaultdict
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import AsyncIterator
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+import httpx
+import uvicorn
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from groq import Groq
 
-# ── logger ─────────────────────────────────────────────────────────────────
+MODEL = "llama-3.1-8b-instant"
+PRICE_PER_MILLION_TOKENS = 0.05
+INJECTION_PATTERNS = [r"ignore\s+all\s+previous\s+instructions", r"reveal\s+your\s+system\s+prompt"]
+
 class JsonFormatter(logging.Formatter):
-    def format(self, record):
-        log = {"ts": datetime.utcnow().isoformat() + "Z", "level": record.levelname, "msg": record.getMessage()}
-        if hasattr(record, "extra"):
-            log.update(record.extra)
-        return json.dumps(log)
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "level": record.levelname,
+            "event": record.getMessage(),
+        }
+        extra = getattr(record, "payload", None)
+        if extra:
+            payload.update(extra)
+        return json.dumps(payload, ensure_ascii=False)
 
-def build_logger(name: str) -> logging.Logger:
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+def build_logger() -> logging.Logger:
+    logger = logging.getLogger("llm_ops_pipeline")
+    logger.setLevel(logging.INFO)
     if not logger.handlers:
-        h = logging.StreamHandler()
-        h.setFormatter(JsonFormatter())
-        logger.addHandler(h)
+        handler = logging.StreamHandler()
+        handler.setFormatter(JsonFormatter())
+        logger.addHandler(handler)
+    logger.propagate = False
     return logger
 
-logger = build_logger("llm_prod")
-
-# ── retry ──────────────────────────────────────────────────────────────────
-def retry_backoff(max_retries: int = 2, base_delay: float = 1.0):
-    def decorator(func):
-        @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
-            last_exc = None
-            for attempt in range(max_retries + 1):
-                try:
-                    return await func(*args, **kwargs)
-                except Exception as e:
-                    last_exc = e
-                    if attempt == max_retries:
-                        break
-                    await asyncio.sleep(base_delay * (2 ** attempt))
-            raise last_exc
-        return wrapper
-    return decorator
-
-# ── rate limiter ────────────────────────────────────────────────────────────
-class RateLimiter:
-    def __init__(self, max_calls: int = 10, window: int = 60):
-        self.max_calls = max_calls
-        self.window = window
-        self._calls: dict[str, list[float]] = defaultdict(list)
-
-    def is_allowed(self, user_id: str) -> tuple[bool, str]:
-        now = time.time()
-        cutoff = now - self.window
-        self._calls[user_id] = [t for t in self._calls[user_id] if t > cutoff]
-        if len(self._calls[user_id]) >= self.max_calls:
-            reset_in = int(self._calls[user_id][0] + self.window - now)
-            return False, f"retry in {reset_in}s"
-        self._calls[user_id].append(now)
-        return True, ""
-
-# ── input validation ────────────────────────────────────────────────────────
-INJECTION_PATTERNS = [
-    r"ignore\s+(?:all\s+)?(?:previous|prior)\s+instructions?",
-    r"forget\s+everything",
-    r"override\s+(?:safety|system)",
-]
-
-SENSITIVE_RE = re.compile(
-    r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-    r"|\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b"
-    r"|(?:sk|pk|api|key)[-_][A-Za-z0-9]{16,}",
-    re.IGNORECASE,
-)
-
-def validate_input(text: str) -> tuple[bool, str, str]:
-    if not text.strip():
-        return False, "empty input", ""
-    if len(text) > 4000:
-        return False, f"input too long: {len(text)}", ""
-    for pat in INJECTION_PATTERNS:
-        if re.search(pat, text, re.IGNORECASE):
-            return False, "prompt injection detected", ""
-    return True, "", SENSITIVE_RE.sub("[REDACTED]", text)
-
-# ── cost tracking ───────────────────────────────────────────────────────────
-MODEL_PRICING = {"llama-3.1-8b-instant": {"input": 0.00005, "output": 0.00008}}
+LOGGER = build_logger()
 
 @dataclass
-class CallRecord:
-    call_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
-    input_tokens: int = 0
-    output_tokens: int = 0
-    latency_ms: float = 0.0
-    model: str = "llama-3.1-8b-instant"
+class QualityReport:
+    length_ok: bool
+    keywords_ok: bool
+    answer_length: int
+    missing_keywords: list[str]
 
-    @property
-    def cost_usd(self) -> float:
-        p = MODEL_PRICING.get(self.model, {"input": 0, "output": 0})
-        return (self.input_tokens * p["input"] + self.output_tokens * p["output"]) / 1000
-
-cumulative_cost = 0.0
-total_calls = 0
-
-# ── FastAPI ─────────────────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=4000)
-    user_id: str = Field(default="anonymous")
-    system_prompt: str = Field(default="You are a helpful assistant.")
-    stream: bool = False
+    message: str = Field(min_length=1, max_length=4000)
+    expected_keywords: list[str] = Field(default_factory=list)
 
 class ChatResponse(BaseModel):
     response: str
-    call_id: str
-    latency_ms: float
+    total_tokens: int
     cost_usd: float
+    quality: dict
 
-rate_limiter = RateLimiter()
+def estimate_cost(total_tokens: int) -> float:
+    return round((total_tokens / 1_000_000) * PRICE_PER_MILLION_TOKENS, 8)
+
+def validate_input(text: str) -> None:
+    for pattern in INJECTION_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            raise HTTPException(status_code=400, detail="prompt injection detected")
+
+def evaluate_output(answer: str, expected_keywords: list[str]) -> QualityReport:
+    missing = [keyword for keyword in expected_keywords if keyword.lower() not in answer.lower()]
+    return QualityReport(
+        length_ok=60 <= len(answer) <= 400,
+        keywords_ok=not missing,
+        answer_length=len(answer),
+        missing_keywords=missing,
+    )
+
+def call_model(client: Groq, message: str) -> tuple[str, int]:
+    response = client.chat.completions.create(
+        model=MODEL,
+        temperature=0,
+        messages=[
+            {"role": "system", "content": "You are a concise Python assistant."},
+            {"role": "user", "content": message},
+        ],
+    )
+    usage = response.usage
+    if usage is None:
+        raise RuntimeError("usage metadata missing from Groq response")
+    answer = response.choices[0].message.content or ""
+    return answer, usage.total_tokens
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
-    )
-    logger.info("server started")
+    app.state.client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    app.state.total_calls = 0
+    app.state.total_cost_usd = 0.0
     yield
-    logger.info("server stopped")
 
-app = FastAPI(title="LLM Production Server", lifespan=lifespan)
+app = FastAPI(title="llm-ops-pipeline", lifespan=lifespan)
 
-@app.middleware("http")
-async def request_log(request: Request, call_next):
-    t0 = time.perf_counter()
-    resp = await call_next(request)
-    ms = (time.perf_counter() - t0) * 1000
-    logger.info(f"{request.method} {request.url.path}", extra={"status": resp.status_code, "ms": round(ms, 1)})
-    return resp
+class ThreadSafeServer(uvicorn.Server):
+    def install_signal_handlers(self) -> None:
+        return None
 
 @app.get("/health")
-async def health():
-    return {"status": "ok", "total_calls": total_calls, "cumulative_cost_usd": round(cumulative_cost, 4)}
-
-@retry_backoff(max_retries=2)
-async def _llm_call(llm, messages) -> tuple[str, dict]:
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(None, lambda: llm.invoke(messages))
-    return response.content, getattr(response, "usage_metadata", {}) or {}
+async def health() -> dict:
+    return {
+        "status": "ok",
+        "total_calls": app.state.total_calls,
+        "total_cost_usd": round(app.state.total_cost_usd, 8),
+    }
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat(req: ChatRequest):
-    global cumulative_cost, total_calls
-
-    allowed, reason = rate_limiter.is_allowed(req.user_id)
-    if not allowed:
-        raise HTTPException(status_code=429, detail=reason)
-
-    ok, reason, sanitized = validate_input(req.message)
-    if not ok:
-        raise HTTPException(status_code=400, detail=reason)
-
-    messages = [SystemMessage(content=req.system_prompt), HumanMessage(content=sanitized)]
-
-    if req.stream:
-        async def token_stream() -> AsyncIterator[str]:
-            for chunk in app.state.llm.stream(messages):
-                if chunk.content:
-                    yield f"data: {chunk.content}\n\n"
-            yield "data: [DONE]\n\n"
-        return StreamingResponse(token_stream(), media_type="text/event-stream")
-
-    record = CallRecord()
-    t0 = time.perf_counter()
-    try:
-        content, usage = await _llm_call(app.state.llm, messages)
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"LLM error: {e}")
-
-    record.latency_ms = (time.perf_counter() - t0) * 1000
-    record.input_tokens = usage.get("input_tokens", 0)
-    record.output_tokens = usage.get("output_tokens", 0)
-    cumulative_cost += record.cost_usd
-    total_calls += 1
-
-    logger.info("llm_call", extra={
-        "call_id": record.call_id,
-        "latency_ms": round(record.latency_ms, 1),
-        "tokens": record.input_tokens + record.output_tokens,
-        "cost_usd": round(record.cost_usd, 6),
-    })
-
-    return ChatResponse(
-        response=content,
-        call_id=record.call_id,
-        latency_ms=round(record.latency_ms, 1),
-        cost_usd=round(record.cost_usd, 6),
+async def chat(request: ChatRequest) -> ChatResponse:
+    validate_input(request.message)
+    started = time.perf_counter()
+    answer, total_tokens = await asyncio.to_thread(call_model, app.state.client, request.message)
+    quality = evaluate_output(answer, request.expected_keywords)
+    cost_usd = estimate_cost(total_tokens)
+    app.state.total_calls += 1
+    app.state.total_cost_usd += cost_usd
+    LOGGER.info(
+        "llm_call",
+        extra={
+            "payload": {
+                "latency_ms": round((time.perf_counter() - started) * 1000, 1),
+                "total_tokens": total_tokens,
+                "cost_usd": cost_usd,
+                "quality": asdict(quality),
+            }
+        },
     )
+    return ChatResponse(
+        response=answer,
+        total_tokens=total_tokens,
+        cost_usd=cost_usd,
+        quality=asdict(quality),
+    )
+
+def run_server(server: uvicorn.Server) -> None:
+    server.run()
+
+def main() -> None:
+    config = uvicorn.Config(app, host="127.0.0.1", port=8016, log_level="warning")
+    server = ThreadSafeServer(config)
+    thread = threading.Thread(target=run_server, args=(server,), daemon=True)
+    thread.start()
+
+    for _ in range(40):
+        try:
+            health = httpx.get("http://127.0.0.1:8016/health", timeout=2.0)
+            if health.status_code == 200:
+                break
+        except Exception:
+            time.sleep(0.25)
+    else:
+        raise RuntimeError("server did not start")
+
+    print("HEALTH:", health.json())
+    response = httpx.post(
+        "http://127.0.0.1:8016/chat",
+        json={
+            "message": "Explain Python's GIL in two sentences.",
+                    "expected_keywords": ["GIL", "thread", "lock"],
+        },
+        timeout=30.0,
+    )
+    print("CHAT:", response.json())
+    final_health = httpx.get("http://127.0.0.1:8016/health", timeout=2.0)
+    print("FINAL_HEALTH:", final_health.json())
+
+    server.should_exit = True
+    thread.join(timeout=10)
+    if thread.is_alive():
+        raise RuntimeError("server did not stop cleanly")
+
+if __name__ == "__main__":
+    main()
 ```
 
----
+## What to notice in this code
+- Returning `quality`, `total_tokens`, and `cost_usd` in one response gives both server and client immediate operating context.
+- Adding cumulative call count and cost to `/health` makes state changes visible even in a tiny demo.
+- The structured `quality` payload can later be aligned with batch evaluation jobs and dashboards.
 
-## Running the server
+## Where engineers get confused
+- An integrated pipeline does not remove the need for storage, alerts, and dashboards. It just gives them better signals.
+- Inline evaluation improves visibility but can add latency. Production systems often split synchronous and asynchronous checks.
+- A simple cost formula is fine for the demo, but real billing models may require input/output separation and model-specific tables.
 
-```bash
-pip install fastapi uvicorn langchain-groq pydantic
+## Checklist
+- [ ] Validate input before the model call
+- [ ] Compute total_tokens and cost_usd for every response
+- [ ] Log the quality report in structured form
+- [ ] Expose cumulative state in /health
 
-GROQ_API_KEY=<your_key> uvicorn server:app --host 0.0.0.0 --port 8000
-
-curl http://localhost:8000/health
-
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "What is Python asyncio?", "user_id": "user_1"}'
-```
-
----
-
-## Series summary
-
-The layers built across this series stack in order.
-
-Monitoring and logging form the foundation — you cannot improve what you cannot see. Cost tracking sits on top and prevents budget overruns. Quality evaluation acts as a safety net when you change models or prompts. Security filters contain misuse. The deployment structure holds it all together in production.
-
-Each layer is independently swappable. Replace the monitoring backend with Datadog, move the cache to Redis, or swap the retry logic for Tenacity — the rest continues working unchanged.
+## Summary
+At this point one request leaves a full operational trail. From here, the next step is persistence, alerting, and dashboards rather than new endpoint logic.
 
 <!-- toc:begin -->
 ## In this series
@@ -296,8 +264,8 @@ Each layer is independently swappable. Replace the monitoring backend with Datad
 
 ## References
 
-- [FastAPI documentation](https://fastapi.tiangolo.com/)
-- [LangChain productionization guide](https://python.langchain.com/docs/guides/productionization/)
-- [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Groq API Reference](https://console.groq.com/docs/api-reference)
+- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 
 Tags: LLMOps, Observability, Python, LLM

@@ -3,7 +3,7 @@ title: '실전 체인 조립 — 컴포넌트를 하나로 연결하기'
 series: langchain-101
 episode: 6
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,95 @@ last_reviewed: '2026-05-01'
 
 # 실전 체인 조립 — 컴포넌트를 하나로 연결하기
 
-> LangChain 101 시리즈 (6/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/06-putting-it-together)
+- 지금까지 본 Runnable들을 하나의 실행 가능한 RAG 체인으로 어떻게 묶는가
+- 문서 분할, 임베딩, 검색, 프롬프트, 생성 단계는 어떤 경계로 나뉘는가
+- 스트리밍 출력까지 붙였을 때 전체 데이터 흐름은 어떻게 읽어야 하는가
+- 통합 예제에서 가장 먼저 교체해야 할 컴포넌트는 무엇인가
+
+> 통합 체인은 새로운 마법이 아니라 앞에서 본 Runnable들을 입력 타입 순서대로 이어 붙인 결과입니다.
+
+```mermaid
+flowchart LR
+    A[documents] --> B[text splitter]
+    B --> C[embeddings]
+    C --> D[FAISS]
+    E[question] --> F[Retriever]
+    D --> F
+    F --> G[context formatter]
+    G --> H[ChatPromptTemplate]
+    E --> H
+    H --> I[ChatGroq]
+    I --> J[StrOutputParser]
+    J --> K[streamed answer]
+```
+
+## 최소 실행 예제
+
+```python
+import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+vectorstore = FAISS.from_texts(["LCEL은 Runnable을 파이프로 연결합니다."], HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2"))
+retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
+chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question": RunnablePassthrough()} | ChatPromptTemplate.from_template("문맥: {context}\n질문: {question}") | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"]) | StrOutputParser())
+
+print(chain.invoke("LCEL이 무엇인가요?"))
+```
+
+## 이 코드에서 봐야 할 것
+
+- 인덱싱 단계와 질의 단계는 시간축이 다르므로 코드에서도 분리하는 편이 좋습니다.
+- Retriever 출력은 바로 프롬프트에 넣지 말고 문자열 포맷터를 거쳐야 합니다.
+- `RunnablePassthrough()`가 사용자 질문을 보존해서 프롬프트 딕셔너리의 다른 키와 합칩니다.
+- 통합 체인 디버깅은 항상 검색 결과 확인부터 시작하는 편이 빠릅니다.
+
+## 실무에서 헷갈리는 지점
+
+- RAG가 안 맞을 때 프롬프트만 손보는 경우가 많은데, 실제 원인은 검색 품질인 경우가 많습니다.
+- 통합 예제라고 해서 모든 단계를 한 함수에 넣을 필요는 없습니다.
+- 대화 이력을 넣는 순간 입력 스키마가 바뀌므로 Runnable 조합도 함께 바뀝니다.
+
+## 체크리스트
+
+- [ ] Retriever, prompt, llm, parser를 하나의 체인으로 연결할 수 있다
+- [ ] 문서 인덱싱 단계와 질문 실행 단계를 구분해서 설명할 수 있다
+- [ ] 통합 체인에서 어디부터 디버깅해야 하는지 감을 잡았다
+
+LangChain 101 시리즈 (6/6)
+
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/06-putting-it-together)
+
+## 이 글에서 답할 질문
+
+- 앞선 다섯 편의 컴포넌트를 하나의 체인으로 묶을 때 최소 구조는 무엇일까
+- 인덱싱, 검색, 프롬프트, 생성 단계를 어디에서 분리해 두는 게 좋을까
+- 멀티턴 대화 이력은 프롬프트에 어떤 방식으로 끼워 넣을까
+- 통합 예제를 하나의 파일로 유지하면서도 읽기 쉽게 나누려면 어떻게 해야 할까
+
+> 통합 LangChain 파이프라인은 인덱싱 단계와 질의 단계가 분리되고, 질의 단계 내부는 retriever → prompt → llm → parser 순서로 흘러가는 조합입니다.
+
+## 핵심 흐름 한눈에 보기
+
+```mermaid
+flowchart LR
+    Docs[문서 집합] --> Split[청킹]
+    Split --> Embed[임베딩]
+    Embed --> Store[FAISS]
+    Question[사용자 질문] --> Retriever[Retriever]
+    Store --> Retriever
+    Retriever --> Prompt[Prompt]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Parser[StrOutputParser]
+    Parser --> Output[최종 답변 또는 스트림]
+```
 
 지금까지 LCEL, 프롬프트, Retriever, Tool Calling, Streaming을 각각 다뤘습니다. 마지막 글에서는 이 컴포넌트들을 하나의 실행 가능한 앱으로 조립합니다. 문서를 인덱싱하고, 쿼리로 검색하고, LLM이 답변을 생성하고, 결과를 스트리밍으로 출력하는 전체 흐름입니다.
 
@@ -326,6 +412,25 @@ if __name__ == "__main__":
 ```
 
 ---
+
+## 이 코드에서 봐야 할 것
+
+- 인덱싱 파이프라인과 질의 파이프라인을 나눠 두면, 문서 준비 비용과 질의 처리 비용을 분리해서 이해할 수 있습니다.
+- 통합 체인의 핵심도 여전히 `retriever | format_docs`, `prompt | llm | parser` 같은 작은 조합의 반복입니다.
+- `MessagesPlaceholder`는 멀티턴 이력을 프롬프트 구조 안에 안전하게 끼워 넣는 지점입니다.
+- 마지막 전체 예제는 긴 파일이지만, 실제로는 작은 Runnable 조합을 함수로 쪼개어 관리하는 패턴을 보여줍니다.
+
+## 실무에서 헷갈리는 지점
+
+- RAG 앱을 한 번에 구현하려고 하면 복잡해 보이지만, 런타임 경계는 인덱싱과 질의 두 부분으로 먼저 나누면 훨씬 단순해집니다.
+- 검색, 프롬프트, 대화 이력 문제가 한꺼번에 섞여 디버깅되기 쉽습니다. 각 단계를 개별 실행해 보는 습관이 중요합니다.
+- 통합 예제에서 스트리밍을 추가해도 체인 정의 자체는 크게 바뀌지 않습니다. 소비 방식만 바뀝니다.
+
+## 체크리스트
+
+- [ ] 인덱싱 단계와 질의 단계를 분리해서 설명할 수 있다
+- [ ] 통합 체인 안에서 retriever, prompt, llm, parser의 역할을 각각 말할 수 있다
+- [ ] 멀티턴 대화 이력을 프롬프트에 넣는 위치를 이해했다
 
 ## 마무리
 

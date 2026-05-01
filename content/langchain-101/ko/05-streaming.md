@@ -3,7 +3,7 @@ title: 'Streaming — 실시간 출력 처리'
 series: langchain-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,84 @@ last_reviewed: '2026-05-01'
 
 # Streaming — 실시간 출력 처리
 
-> LangChain 101 시리즈 (5/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/05-streaming)
+- `invoke()` 대신 `stream()`을 쓰면 호출 결과 타입이 어떻게 달라지는가
+- 체인 스트리밍과 모델 직접 스트리밍은 어디서 차이가 생기는가
+- `astream()`과 `astream_events()`는 언제 필요한가
+- 스트리밍 응답을 UI나 API 응답으로 넘길 때 어떤 형태로 모아야 하는가
+
+> Streaming은 응답이 끝난 뒤 받는 방식이 아니라 생성 중간 상태를 그대로 소비하는 실행 모드입니다.
+
+```mermaid
+flowchart LR
+    A[질문] --> B[Prompt or chain]
+    B --> C[ChatGroq]
+    C --> D[token chunks]
+    D --> E[CLI or API response]
+```
+
+## 최소 실행 예제
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+chain = (
+    ChatPromptTemplate.from_template("{topic}을 세 문장으로 설명해 주세요.")
+    | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+    | StrOutputParser()
+)
+
+for chunk in chain.stream({"topic": "astream"}):
+    print(chunk, end="", flush=True)
+```
+
+## 이 코드에서 봐야 할 것
+
+- 체인 정의는 `invoke()` 때와 같고 소비 방식만 반복자로 바뀝니다.
+- 파서를 붙인 스트리밍은 문자열 청크가 오고, 파서가 없으면 메시지 청크가 옵니다.
+- 출력 청크를 바로 화면에 흘려보낼 수도 있고, 버퍼에 모아 최종 문자열로 만들 수도 있습니다.
+- 스트리밍은 응답 속도를 줄이는 것이 아니라 첫 토큰 체감 시간을 줄입니다.
+
+## 실무에서 헷갈리는 지점
+
+- 스트리밍이 전체 실행 시간을 항상 줄여 주는 것은 아닙니다.
+- 비동기 환경에서는 `stream()` 대신 `astream()`을 써야 이벤트 루프와 자연스럽게 붙습니다.
+- 이벤트 단위 관찰이 필요할 때는 텍스트 청크보다 `astream_events()`가 더 유용합니다.
+
+## 체크리스트
+
+- [ ] `stream()` 결과를 반복자로 소비할 수 있다
+- [ ] 문자열 청크와 메시지 청크 차이를 이해한다
+- [ ] 비동기 환경에서 `astream()`을 언제 써야 하는지 설명할 수 있다
+
+LangChain 101 시리즈 (5/6)
+
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/05-streaming)
+
+## 이 글에서 답할 질문
+
+- `invoke()` 대신 `stream()`으로 바꾸면 코드 구조가 얼마나 달라질까
+- `astream()`과 `astream_events()`는 언제 구분해서 써야 할까
+- 스트리밍 청크를 문자열로 다시 모을 때 어떤 패턴을 쓰면 될까
+- FastAPI에서 스트리밍 결과를 HTTP 응답으로 보내려면 무엇이 필요할까
+
+> Streaming은 체인을 다시 설계하는 기능이 아니라, 같은 체인의 출력을 한 번에 받지 않고 청크 단위로 소비하는 실행 방식입니다.
+
+## 핵심 흐름 한눈에 보기
+
+```mermaid
+flowchart LR
+    Prompt[Prompt 또는 Chain] --> Stream[stream / astream]
+    Stream --> Chunk[토큰 청크]
+    Chunk --> UI[콘솔 또는 UI]
+    Stream --> Events[astream_events]
+    Events --> Monitor[이벤트 관찰]
+```
 
 LLM이 긴 응답을 생성할 때, 전체 텍스트가 완성될 때까지 기다리면 사용자 경험이 나빠집니다. 스트리밍은 토큰이 생성되는 즉시 화면에 출력하는 방식입니다. ChatGPT나 Claude에서 응답이 문자 단위로 흘러나오는 것이 바로 이 방식입니다.
 
@@ -244,6 +319,25 @@ asyncio.run(main())
 `astream_events()`는 여러 체인 컴포넌트에서 각각 발생하는 이벤트를 구분해서 처리할 때 유용합니다. 단순 출력이면 `astream()`이 더 간단합니다.
 
 ---
+
+## 이 코드에서 봐야 할 것
+
+- 체인 정의는 `invoke()` 때와 거의 같습니다. 달라지는 부분은 호출 API와 청크를 소비하는 루프입니다.
+- `stream()`은 동기 반복, `astream()`은 비동기 반복이라는 점만 이해해도 대부분의 서버 코드를 읽을 수 있습니다.
+- 청크를 리스트에 모았다가 마지막에 `"".join(...)` 하는 패턴은 로그 저장이나 후처리에 자주 쓰입니다.
+- `astream_events()`는 모델 출력만이 아니라 체인 전체 이벤트를 볼 수 있어 디버깅과 계측에 유리합니다.
+
+## 실무에서 헷갈리는 지점
+
+- 스트리밍을 쓰면 응답 형식 자체가 바뀐다고 생각하기 쉽지만, 최종 문자열은 그대로이고 전달 타이밍만 달라집니다.
+- 비동기 스트리밍을 도입하면 상위 프레임워크도 async 흐름을 받아야 합니다.
+- 이벤트 스트림은 디버깅에 좋지만, 단순 UI 출력만 필요하면 과한 선택일 수 있습니다.
+
+## 체크리스트
+
+- [ ] 같은 체인을 `invoke()`와 `stream()`으로 각각 실행해 볼 수 있다
+- [ ] `astream()`과 `astream_events()`의 목적 차이를 설명할 수 있다
+- [ ] FastAPI `StreamingResponse`로 스트리밍 청크를 넘기는 흐름을 이해했다
 
 ## 마무리
 

@@ -3,7 +3,7 @@ title: 'Putting it together — a complete chain in one file'
 series: langchain-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,95 @@ last_reviewed: '2026-05-01'
 
 # Putting it together — a complete chain in one file
 
-> LangChain 101 (6/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/06-putting-it-together)
+- How do the Runnables from the previous posts combine into one executable RAG chain
+- Where is the boundary between indexing, retrieval, prompting, and generation
+- What does the full data flow look like once streaming is added
+- Which component should you replace first when adapting the example to a real project
+
+> The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.
+
+```mermaid
+flowchart LR
+    A[documents] --> B[text splitter]
+    B --> C[embeddings]
+    C --> D[FAISS]
+    E[question] --> F[Retriever]
+    D --> F
+    F --> G[context formatter]
+    G --> H[ChatPromptTemplate]
+    E --> H
+    H --> I[ChatGroq]
+    I --> J[StrOutputParser]
+    J --> K[streamed answer]
+```
+
+## Minimal runnable example
+
+```python
+import os
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
+
+vectorstore = FAISS.from_texts(["LCEL connects Runnables with a pipe."], HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2"))
+retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
+chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question": RunnablePassthrough()} | ChatPromptTemplate.from_template("Context: {context}\nQuestion: {question}") | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"]) | StrOutputParser())
+
+print(chain.invoke("What is LCEL?"))
+```
+
+## What to notice in this code
+
+- Indexing and query execution happen on different timelines, so the code should keep them separate.
+- Retriever output should be formatted before it enters the prompt.
+- `RunnablePassthrough()` preserves the user's question while other keys in the prompt dictionary are assembled.
+- When an integrated chain fails, inspecting retrieval output is usually faster than tweaking the prompt first.
+
+## Where engineers get confused
+
+- When RAG answers are weak, the retrieval stage is often the real issue rather than the prompt.
+- A complete example does not mean every stage belongs in one giant function.
+- Once conversation history is added, the chain's input schema changes and the Runnable composition changes with it.
+
+## Checklist
+
+- [ ] I can connect retriever, prompt, llm, and parser into one chain
+- [ ] I can explain the difference between indexing time and question-answering time
+- [ ] I know where to start debugging an integrated RAG chain
+
+LangChain 101 (6/6)
+
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/06-putting-it-together)
+
+## Questions this post answers
+
+- What is the minimum structure for combining the first five posts into one chain?
+- Where should you separate indexing, retrieval, prompting, and generation concerns?
+- How should multi-turn history enter the prompt?
+- How do you keep a one-file integrated example readable?
+
+> An integrated LangChain pipeline separates indexing from query-time execution, and the query path itself is still a simple retriever → prompt → llm → parser composition.
+
+## The flow at a glance
+
+```mermaid
+flowchart LR
+    Docs[Document set] --> Split[Chunking]
+    Split --> Embed[Embeddings]
+    Embed --> Store[FAISS]
+    Question[User question] --> Retriever[Retriever]
+    Store --> Retriever
+    Retriever --> Prompt[Prompt]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Parser[StrOutputParser]
+    Parser --> Output[Final answer or stream]
+```
 
 The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.
 
@@ -319,6 +405,25 @@ if __name__ == "__main__":
 ```
 
 ---
+
+## What to notice in this code
+
+- Separating the indexing pipeline from the query pipeline makes document preparation costs and request-time costs easier to reason about.
+- Even the integrated chain is still built from small LCEL pieces such as `retriever | format_docs` and `prompt | llm | parser`.
+- `MessagesPlaceholder` is the insertion point that lets multi-turn history enter the prompt without collapsing the structure.
+- The full application is long, but the maintainable pattern is still to split small Runnable assemblies into focused helper functions.
+
+## Where engineers get confused
+
+- A RAG application feels complex when viewed all at once, but it becomes much simpler once you split indexing from query-time work.
+- Retrieval, prompting, and history management often get debugged together even though each can be validated independently.
+- Adding streaming to the integrated example changes output consumption far more than it changes the chain definition itself.
+
+## Checklist
+
+- [ ] I can explain the difference between indexing time and query time in this application
+- [ ] I can name the role of retriever, prompt, llm, and parser inside the final chain
+- [ ] I understand where conversation history enters the prompt structure
 
 ## Conclusion
 

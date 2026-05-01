@@ -16,7 +16,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -97,7 +97,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -170,7 +170,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -251,7 +251,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -324,7 +324,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -405,7 +405,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -478,7 +478,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -559,7 +559,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -631,7 +631,7 @@ series:
   - ko
   targets:
     tistory: true
-    blogger: false
+    hashnode: false
     medium: false
     mkdocs: true
     ebook: true
@@ -684,7 +684,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -783,7 +783,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -796,53 +796,53 @@ series:
       - idx: 1
         slug: 01-document-loading-and-chunking
         title: 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-embeddings-and-vector-index
         title: 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-retriever-design
         title: Retriever 설계 — VectorStoreRetriever와 MMR
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-prompt-construction-and-context-injection
         title: 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-rag-chain-assembly
         title: RAG Chain 조립 — RetrievalQA vs LCEL
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-evaluation-and-quality-gates
         title: 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-document-loading-and-chunking
         title: Document Loading and Chunking — Inside LangChain TextSplitter
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-embeddings-and-vector-index
         title: Embeddings and the Vector Index — Inside FAISS IndexFlatL2
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-retriever-design
         title: Retriever Design — VectorStoreRetriever and MMR
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-prompt-construction-and-context-injection
         title: Prompt Construction and Context Injection — Inside PromptTemplate
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-rag-chain-assembly
         title: Assembling the RAG Chain — RetrievalQA vs LCEL
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-evaluation-and-quality-gates
         title: Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
-        status: draft
+        status: publish-ready
   track: authority
   stage: internals
 - id: llm-app-foundations-101
@@ -858,7 +858,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -871,53 +871,53 @@ series:
       - idx: 1
         slug: 01-llm-api-first-call
         title: LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-understanding-tokens
         title: 토큰 이해하기 — 비용, 한계, 컨텍스트 창
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-prompt-engineering-basics
         title: 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-few-shot-and-cot
         title: Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-conversation-state
         title: 대화 상태 관리 — 멀티턴 챗봇 만들기
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-streaming-responses
         title: 스트리밍 응답 처리 — 실시간으로 출력 받기
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-llm-api-first-call
         title: LLM API first call — sending your first request
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-understanding-tokens
         title: Understanding tokens — cost, limits, and context windows
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-prompt-engineering-basics
         title: Prompt engineering basics — system, user, and assistant roles
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-few-shot-and-cot
         title: Few-shot and chain-of-thought — steering better answers
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-conversation-state
         title: Managing conversation state — building a multi-turn chatbot
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-streaming-responses
         title: Handling streaming responses — real-time output
-        status: draft
+        status: publish-ready
   track: traffic
   stage: foundation
 - id: llm-api-production-101
@@ -933,7 +933,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -946,53 +946,53 @@ series:
       - idx: 1
         slug: 01-structured-output
         title: 구조화 출력 — JSON 모드와 응답 스키마
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-tool-calling
         title: 툴 호출 — 함수를 모델에 연결하기
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-streaming-in-depth
         title: 스트리밍 심화 — 청크 처리와 오류 복구
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-caching-strategies
         title: 캐싱 전략 — 비용과 지연 시간 줄이기
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-retry-and-error-handling
         title: 재시도와 오류 처리 — 안정적인 API 호출 만들기
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-rate-limit-management
         title: 속도 제한 관리 — Rate Limit 대응 패턴
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-structured-output
         title: Structured output — JSON mode and response schemas
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-tool-calling
         title: Tool calling — connecting functions to the model
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-streaming-in-depth
         title: Streaming in depth — chunk handling and error recovery
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-caching-strategies
         title: Caching strategies — reducing cost and latency
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-retry-and-error-handling
         title: Retry and error handling — making API calls reliable
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-rate-limit-management
         title: Rate limit management — patterns for staying within limits
-        status: draft
+        status: publish-ready
   track: traffic
   stage: production
 - id: vector-search-101
@@ -1008,7 +1008,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1021,53 +1021,53 @@ series:
       - idx: 1
         slug: 01-what-is-embedding
         title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-huggingface-embeddings
         title: HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-cosine-similarity
         title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-faiss-fundamentals
         title: FAISS 입문 — 고속 근사 최근접 이웃 검색
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-chunking-strategies
         title: 청크 전략 — 긴 문서를 어떻게 나눌 것인가
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-vector-search-pipeline
         title: 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-what-is-embedding
         title: What is an embedding — converting text into vectors
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-huggingface-embeddings
         title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-cosine-similarity
         title: Cosine similarity and vector search — computing sentence distances
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-faiss-fundamentals
         title: FAISS fundamentals — fast approximate nearest-neighbor search
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-chunking-strategies
         title: Chunking strategies — how to split long documents
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-vector-search-pipeline
         title: Vector search pipeline — from document ingestion to query
-        status: draft
+        status: publish-ready
   track: traffic
   stage: search
 - id: langchain-101
@@ -1083,7 +1083,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1096,53 +1096,53 @@ series:
       - idx: 1
         slug: 01-lcel-runnable-basics
         title: LangChain 소개 — LCEL과 Runnable 기본
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-prompt-llm-chain
         title: Prompt와 LLM Chain — 체인 첫 번째 구성
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-retriever
         title: Retriever — 문서 검색과 컨텍스트 주입
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-tool-calling
         title: Tool Calling — 외부 도구 연결하기
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-streaming
         title: Streaming — 실시간 출력 처리
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-putting-it-together
         title: 실전 체인 조립 — 컴포넌트를 하나로 연결하기
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-lcel-runnable-basics
         title: LangChain introduction — LCEL and the Runnable interface
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-prompt-llm-chain
         title: Prompt and LLM chain — assembling your first chain
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-retriever
         title: Retriever — document search and context injection
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-tool-calling
         title: Tool calling — connecting external tools
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-streaming
         title: Streaming — handling real-time output
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-putting-it-together
         title: Putting it together — a complete chain in one file
-        status: draft
+        status: publish-ready
   track: authority
   stage: foundation
 - id: ai-app-patterns-101
@@ -1158,7 +1158,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1171,53 +1171,53 @@ series:
       - idx: 1
         slug: 01-chatbot-pattern
         title: 챗봇 패턴 — 대화 이력 관리와 상태
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-rag-qa-pattern
         title: RAG Q&A 패턴 — 문서 기반 질의응답
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-document-assistant
         title: 문서 어시스턴트 — 요약, 추출, 분류
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-agent-tool-pattern
         title: Agent + Tool 패턴 — 자율 도구 선택
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-workflow-automation
         title: 워크플로 자동화 — 다단계 체인 설계
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-human-in-the-loop
         title: Human-in-the-loop — 사람 개입 설계 패턴
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-chatbot-pattern
         title: Chatbot pattern — managing conversation history and state
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-rag-qa-pattern
         title: RAG Q&A pattern — document-based question answering
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-document-assistant
         title: Document assistant — summarization, extraction, classification
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-agent-tool-pattern
         title: Agent and tool pattern — autonomous tool selection
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-workflow-automation
         title: Workflow automation — designing multi-step chains
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-human-in-the-loop
         title: Human-in-the-loop — designing for human intervention
-        status: draft
+        status: publish-ready
   track: ebook
   stage: patterns
 - id: korean-ai-stack-101
@@ -1233,7 +1233,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1246,53 +1246,53 @@ series:
       - idx: 1
         slug: 01-korean-embedding-models
         title: 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-kosimcse-similarity
         title: KoSimCSE로 문장 유사도 구현하기
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-bge-m3-multilingual
         title: BGE-M3 다국어 임베딩 실전
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-clova-ocr
         title: CLOVA OCR API로 문서 텍스트 추출
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-hyperclova-solar-api
         title: HyperCLOVA X와 Solar API 사용하기
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-korean-rag-pipeline
         title: 한국어 RAG 파이프라인 조합하기
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-korean-embedding-models
         title: Korean embedding models compared — KoSimCSE, BGE-M3, Solar
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-kosimcse-similarity
         title: Building sentence similarity search with KoSimCSE
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-bge-m3-multilingual
         title: BGE-M3 multilingual embedding in practice
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-clova-ocr
         title: Document text extraction with CLOVA OCR API
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-hyperclova-solar-api
         title: Using HyperCLOVA X and Solar API
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-korean-rag-pipeline
         title: Assembling a Korean RAG pipeline
-        status: draft
+        status: publish-ready
   track: traffic
   stage: korean
 - id: document-ingestion-101
@@ -1308,7 +1308,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1321,53 +1321,53 @@ series:
       - idx: 1
         slug: 01-pdf-parsing
         title: PDF 파싱과 텍스트 추출
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-chunking-strategies
         title: 청킹 전략 — 문서 유형별 최적화
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-metadata-filtering
         title: 메타데이터 설계와 필터링
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-incremental-indexing
         title: 증분 인덱싱 — 변경된 문서만 업데이트
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-multi-format-pipeline
         title: 다중 포맷 문서 파이프라인
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-pipeline-completion
         title: 문서 수집 파이프라인 완성
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-pdf-parsing
         title: PDF parsing and text extraction
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-chunking-strategies
         title: Chunking strategies — optimizing by document type
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-metadata-filtering
         title: Metadata design and filtering
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-incremental-indexing
         title: Incremental indexing — updating only changed documents
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-multi-format-pipeline
         title: Multi-format document pipeline
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-pipeline-completion
         title: Completing the document ingestion pipeline
-        status: draft
+        status: publish-ready
   track: ebook
   stage: rag
 - id: llm-apps-ops-101
@@ -1383,7 +1383,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1396,53 +1396,53 @@ series:
       - idx: 1
         slug: 01-monitoring-and-logging
         title: LLM 앱 모니터링과 로깅
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-cost-tracking
         title: LLM 비용 추적과 최적화
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-evaluation
         title: LLM 출력 품질 평가
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-security
         title: LLM 앱 보안
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-deployment
         title: LLM 앱 배포 전략
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-ops-complete
         title: LLM 앱 운영 완성
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-monitoring-and-logging
         title: Monitoring and logging for LLM apps
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-cost-tracking
         title: LLM cost tracking and optimization
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-evaluation
         title: Evaluating LLM output quality
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-security
         title: LLM app security
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-deployment
         title: LLM app deployment strategies
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-ops-complete
         title: Completing the LLM ops pipeline
-        status: draft
+        status: publish-ready
   track: authority
   stage: ops
 - id: rag-benchmark-101
@@ -1458,7 +1458,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1471,53 +1471,53 @@ series:
       - idx: 1
         slug: 01-evaluation-metrics
         title: RAG 평가 지표 이해
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-retrieval-benchmarking
         title: 검색 성능 측정
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-embedding-comparison
         title: 임베딩 모델 비교
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-vectordb-selection
         title: VectorDB 선택 기준
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-e2e-evaluation
         title: 종단 간 RAG 파이프라인 평가
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-benchmark-complete
         title: RAG 벤치마크 완성
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-evaluation-metrics
         title: Understanding RAG evaluation metrics
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-retrieval-benchmarking
         title: Measuring retrieval performance
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-embedding-comparison
         title: Comparing embedding models
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-vectordb-selection
         title: VectorDB selection criteria
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-e2e-evaluation
         title: End-to-end RAG pipeline evaluation
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-benchmark-complete
         title: Completing the RAG benchmark
-        status: draft
+        status: publish-ready
   track: traffic
   stage: rag
 - id: langgraph-101
@@ -1533,7 +1533,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1546,53 +1546,53 @@ series:
       - idx: 1
         slug: 01-graph-basics
         title: LangGraph 소개와 그래프 기초
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-state-and-checkpoints
         title: 상태 관리와 체크포인트
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-conditional-edges
         title: 조건부 엣지와 분기 흐름
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-tool-calling-agent
         title: 도구 호출 에이전트
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-multi-agent
         title: 멀티 에이전트 시스템
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-langgraph-complete
         title: LangGraph 완성
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-graph-basics
         title: LangGraph introduction and graph basics
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-state-and-checkpoints
         title: State management and checkpoints
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-conditional-edges
         title: Conditional edges and branching
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-tool-calling-agent
         title: Tool-calling agents
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-multi-agent
         title: Multi-agent systems
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-langgraph-complete
         title: Completing LangGraph
-        status: draft
+        status: publish-ready
   track: authority
   stage: patterns
 - id: llm-finetuning-101
@@ -1608,7 +1608,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1621,53 +1621,53 @@ series:
       - idx: 1
         slug: 01-intro
         title: LLM 파인튜닝 입문
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-dataset
         title: 데이터셋 준비와 전처리
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-lora
         title: LoRA 어댑터 구성
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-training
         title: 학습 루프와 하이퍼파라미터
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-evaluation
         title: 모델 평가
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-serving
         title: 모델 서빙
-        status: draft
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-intro
         title: Introduction to LLM Fine-tuning
-        status: draft
+        status: publish-ready
       - idx: 2
         slug: 02-dataset
         title: Dataset preparation and preprocessing
-        status: draft
+        status: publish-ready
       - idx: 3
         slug: 03-lora
         title: Configuring the LoRA adapter
-        status: draft
+        status: publish-ready
       - idx: 4
         slug: 04-training
         title: Training loop and hyperparameters
-        status: draft
+        status: publish-ready
       - idx: 5
         slug: 05-evaluation
         title: Model evaluation
-        status: draft
+        status: publish-ready
       - idx: 6
         slug: 06-serving
         title: Model serving
-        status: draft
+        status: publish-ready
   track: authority
   stage: education
 - id: ax-practical-guide
@@ -1683,7 +1683,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true
@@ -1703,7 +1703,7 @@ series:
   - en
   targets:
     tistory: true
-    blogger: true
+    hashnode: true
     medium: true
     mkdocs: true
     ebook: true

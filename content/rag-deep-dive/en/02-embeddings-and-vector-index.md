@@ -3,7 +3,7 @@ title: Embeddings and the Vector Index — Inside FAISS IndexFlatL2
 series: rag-deep-dive
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,31 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Embeddings and the Vector Index — Inside FAISS IndexFlatL2
+
+<!-- a-grade-intro:begin -->
+## Questions this post answers
+
+- Why should `embed_documents()` and `embed_query()` stay conceptually separate?
+- What distance does `IndexFlatL2` actually compute?
+- Where does the system map vector ids back to source documents?
+- When is exact flat search still the right baseline?
+
+> Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.
+
+```mermaid
+flowchart LR
+    A[Chunk text] --> B[HuggingFaceEmbeddings]
+    B --> C[Dense vectors]
+    C --> D[IndexFlatL2]
+    E[User query] --> F[Query embedding]
+    F --> D
+    D --> G[Top k nearest chunks]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (2/6)
 
@@ -31,6 +52,70 @@ This is chapter 2 of 6 in the series.
 The previous chapter covered **Document Loading and Chunking — Inside LangChain TextSplitter**.
 After this chapter, the next one moves on to **Retriever Design — VectorStoreRetriever and MMR**.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## Minimal runnable example
+
+Example file: `/root/Github/rag-deep-dive/en/02-embeddings-and-vector-index/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+import faiss
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+DOCS = [
+    "The worker retries a failed message three times before dead-lettering.",
+    "The dead-letter queue keeps the original payload for later inspection.",
+    "HTTP 429 means the caller exceeded the per-minute quota.",
+    "Operators inspect the exception chain before replaying the message.",
+]
+QUERY = "Why did the system stop retrying the message?"
+
+def main() -> None:
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    doc_vectors = np.array(embeddings.embed_documents(DOCS), dtype="float32")
+    query_vector = np.array([embeddings.embed_query(QUERY)], dtype="float32")
+
+    index = faiss.IndexFlatL2(doc_vectors.shape[1])
+    index.add(doc_vectors)
+
+    distances, indices = index.search(query_vector, k=3)
+    for rank, (doc_index, distance) in enumerate(
+        zip(indices[0], distances[0]), start=1
+    ):
+        print(f"rank={rank} distance={float(distance):.4f}")
+        print(DOCS[int(doc_index)])
+        print("-" * 60)
+
+if __name__ == "__main__":
+    main()
+```
+
+### What to notice in this code
+
+- The script embeds text with HuggingFace, converts it to `float32`, and feeds it directly into `IndexFlatL2`.
+- FAISS knows vectors and integer row ids, not your original documents.
+- Returned results are ranked by smaller L2 distance.
+
+### Where engineers get confused
+
+- Teams often say “cosine” while the implementation is actually L2 or inner product.
+- Distance values are easy to misread if normalization assumptions are unstated.
+- The index is a ranking rule, not neutral storage.
+
+## Checklist
+
+- [ ] I kept document and query embedding paths conceptually separate.
+- [ ] I verified whether the backend returns distance or similarity.
+- [ ] I understood how vector ids map back to source content.
+- [ ] I established an exact-search baseline before tuning approximate search.
+<!-- a-grade-example:end -->
 
 ## Source Version
 

@@ -3,7 +3,7 @@ title: 'Assembling a Korean RAG pipeline'
 series: korean-ai-stack-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,273 +19,100 @@ last_reviewed: '2026-05-01'
 
 # Assembling a Korean RAG pipeline
 
+## Questions this post answers
+
+- What stages are non-negotiable in a minimal Korean RAG pipeline?
+- Which stage most often becomes the quality bottleneck: chunking, embedding, retrieval, or generation?
+- How should retrieved context be formatted before it reaches the LLM?
+- How do the earlier pieces connect into one working pipeline?
+
+> RAG quality is not produced by one magical call. It emerges from the combined behavior of chunk boundaries, retrieval candidates, and how context is handed to the model.
+
 > Korean AI Stack 101 (6/6)
 
 Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/06-korean-rag-pipeline)
 
-This post assembles the components covered throughout the series into one pipeline: KoSimCSE embeddings for indexing Korean documents, FAISS for retrieval, and Solar LLM for generating Korean answers. Adding CLOVA OCR preprocessing extends it to scanned images and PDFs.
-
-Topics:
-
-- full pipeline architecture
-- complete Korean RAG implementation
-- document-type-aware chunking strategies
-- debugging each pipeline stage
+The final post connects the earlier pieces. Korean documents are split into small chunks, embedded with KoSimCSE, searched with FAISS, and then passed to a Groq model only after retrieval has selected the top context.
 
 ---
 
-<!-- ebook-only:start -->
+## Core flow
 
-**The key idea**: a Korean RAG pipeline swaps each stage for a Korean-friendly component. Different combinations produce different performance profiles.
-
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Using HyperCLOVA X and Solar API**.
-<!-- ebook-only:end -->
-
-## Pipeline architecture
-
-```
-[document sources]
-  text files ─┐
-  images/PDFs─┼─→ [preprocessing] ─→ [chunking] ─→ [KoSimCSE embedding] ─→ [FAISS index]
-  OCR output ─┘
-
-[query time]
-  user question ─→ [KoSimCSE embedding] ─→ [FAISS search] ─→ [Solar LLM] ─→ answer
+```mermaid
+flowchart LR
+    A[Korean documents] --> B[Chunk into smaller units]
+    B --> C[KoSimCSE embeddings]
+    C --> D[FAISS retrieval]
+    E[User question] --> F[Question embedding]
+    F --> D
+    D --> G[Assemble top context]
+    G --> H[Groq answer generation]
 ```
 
 ---
 
-## Complete Korean RAG implementation
+## Why a simpler pipeline teaches more
+
+A simpler implementation makes failure visible sooner. When the question is about a successful payment with no order record, you should inspect the retrieved context before judging the answer.
+
+---
+
+## Minimal runnable example
 
 ```python
-import os
-import re
-from dataclasses import dataclass
+import faiss
+from sentence_transformers import SentenceTransformer
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-@dataclass
-class DocumentChunk:
-    text: str
-    source: str
-    chunk_idx: int
-
-class KoreanRAGPipeline:
-    """
-    Complete RAG pipeline for Korean documents.
-    KoSimCSE embedding + FAISS + Solar LLM.
-    """
-
-    SPLITTER_CONFIG = {
-        "legal": {
-            "chunk_size": 500,
-            "chunk_overlap": 100,
-            "separators": ["\n\n", "\n", "。", ". "],
-        },
-        "news": {
-            "chunk_size": 300,
-            "chunk_overlap": 50,
-            "separators": ["\n\n", "\n", ". "],
-        },
-        "technical": {
-            "chunk_size": 400,
-            "chunk_overlap": 80,
-            "separators": ["\n\n", "\n", ". ", " "],
-        },
-    }
-
-    def __init__(self, doc_type: str = "technical"):
-        self.embedding_model = HuggingFaceEmbeddings(
-            model_name="BM-K/KoSimCSE-roberta-multitask",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-
-        config = self.SPLITTER_CONFIG.get(doc_type, self.SPLITTER_CONFIG["technical"])
-        self.splitter = RecursiveCharacterTextSplitter(**config)
-
-        self.llm = ChatOpenAI(
-            model="solar-1-mini-chat",
-            api_key=os.environ.get("UPSTAGE_API_KEY", "dummy"),
-            base_url="https://api.upstage.ai/v1/solar",
-            temperature=0.3,
-        )
-
-        self.vectorstore = None
-        self.retriever = None
-        self.chain = None
-
-    def clean_text(self, text: str) -> str:
-        """Basic Korean text cleaning."""
-        text = re.sub(r"([^\w\s가-힣])\1{2,}", "", text)
-        text = re.sub(r" {2,}", " ", text)
-        lines = [ln.strip() for ln in text.split("\n")]
-        cleaned = []
-        prev_empty = False
-        for line in lines:
-            is_empty = not line
-            if is_empty and prev_empty:
-                continue
-            cleaned.append(line)
-            prev_empty = is_empty
-        return "\n".join(cleaned).strip()
-
-    def index_documents(self, documents: list[dict]) -> None:
-        """
-        Index a list of documents.
-        Each document: {"text": str, "source": str}
-        """
-        all_chunks = []
-        for doc in documents:
-            cleaned = self.clean_text(doc["text"])
-            chunks = self.splitter.split_text(cleaned)
-            for idx, chunk in enumerate(chunks):
-                all_chunks.append(DocumentChunk(
-                    text=chunk,
-                    source=doc["source"],
-                    chunk_idx=idx,
-                ))
-
-        texts = [c.text for c in all_chunks]
-        metadatas = [{"source": c.source, "chunk_idx": c.chunk_idx} for c in all_chunks]
-
-        self.vectorstore = FAISS.from_texts(
-            texts=texts,
-            embedding=self.embedding_model,
-            metadatas=metadatas,
-        )
-        self.retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
-
-        prompt = ChatPromptTemplate.from_messages([
-            (
-                "system",
-                "Answer the question using the reference documents below.\n"
-                "If the answer is not in the documents, say so.\n\n"
-                "Reference documents:\n{context}",
-            ),
-            ("human", "{question}"),
-        ])
-
-        def format_docs(docs: list) -> str:
-            parts = []
-            for doc in docs:
-                source = doc.metadata.get("source", "unknown")
-                parts.append(f"[source: {source}]\n{doc.page_content}")
-            return "\n\n".join(parts)
-
-        self.chain = (
-            {"context": self.retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | self.llm
-            | StrOutputParser()
-        )
-
-        print(f"indexed: {len(all_chunks)} chunks from {len(documents)} documents")
-
-    def query(self, question: str) -> dict:
-        """Answer a question and return the sources used."""
-        if not self.chain:
-            raise RuntimeError("call index_documents() first")
-
-        docs = self.retriever.invoke(question)
-        sources = list({doc.metadata.get("source", "unknown") for doc in docs})
-        answer = self.chain.invoke(question)
-
-        return {"answer": answer, "sources": sources}
-```
-
----
-
-## Usage
-
-```python
-pipeline = KoreanRAGPipeline(doc_type="legal")
-
-documents = [
-    {
-        "source": "constitution.txt",
-        "text": """
-Article 1 of the Constitution of the Republic of Korea:
-The Republic of Korea shall be a democratic republic.
-The sovereignty of the Republic of Korea shall reside in the people, and all state authority shall emanate from the people.
-
-Article 10:
-All citizens shall be assured of human worth and dignity and shall have the right to pursue happiness.
-It shall be the duty of the state to confirm and guarantee the fundamental and inviolable human rights of individuals.
-
-Article 12:
-All citizens shall enjoy personal liberty. No person shall be arrested, detained, searched, seized or interrogated except as provided by act.
-        """,
-    },
-    {
-        "source": "civil_code.txt",
-        "text": """
-Article 750 of the Civil Act (Tort):
-A person who causes injury to another through an unlawful act, intentionally or negligently, shall be bound to make compensation for damages arising therefrom.
-
-Article 751:
-A person who causes damage to another's body, liberty or reputation or inflicts mental anguish on another shall also be bound to make compensation for non-property damages.
-        """,
-    },
+model = SentenceTransformer('BM-K/KoSimCSE-roberta-multitask')
+chunks = [
+    '결제는 성공했지만 주문이 생성되지 않은 경우에는 주문 동기화 지연 여부를 먼저 확인합니다.',
+    '결제 실패 문의는 카드 승인 실패와 주문 저장 실패를 분리해서 대응해야 합니다.',
 ]
+vectors = model.encode(chunks, normalize_embeddings=True).astype('float32')
+index = faiss.IndexFlatIP(vectors.shape[1])
+index.add(vectors)
 
-pipeline.index_documents(documents)
-
-questions = [
-    "How does the Korean constitution protect fundamental rights?",
-    "What is the legal liability when someone causes damage through an unlawful act?",
-    "Under what conditions can personal liberty be restricted?",
-]
-
-for question in questions:
-    print(f"\nquestion: {question}")
-    result = pipeline.query(question)
-    print(f"answer: {result['answer']}")
-    print(f"sources: {result['sources']}")
+question = '결제는 됐는데 주문 내역이 없을 때 어떤 순서로 점검해야 하나요?'
+query_vec = model.encode([question], normalize_embeddings=True).astype('float32')
+distances, indices = index.search(query_vec, 2)
+print(distances, indices)
 ```
 
 ---
 
-## Debugging each stage
+## What to notice in this code
 
-When retrieval results are unexpected, inspect each stage individually.
-
-```python
-def debug_pipeline(pipeline: KoreanRAGPipeline, question: str) -> None:
-    """Print intermediate results at each pipeline stage."""
-    print(f"\n=== debug: '{question}' ===")
-
-    query_embedding = pipeline.embedding_model.embed_query(question)
-    print(f"query embedding dims: {len(query_embedding)}")
-    print(f"first 3 values: {query_embedding[:3]}")
-
-    docs = pipeline.retriever.invoke(question)
-    print(f"\nretrieved chunks: {len(docs)}")
-    for i, doc in enumerate(docs, start=1):
-        source = doc.metadata.get("source", "unknown")
-        print(f"  [{i}] source: {source}")
-        print(f"       content: {doc.page_content[:80]}...")
-
-    result = pipeline.query(question)
-    print(f"\nfinal answer:\n{result['answer']}")
-
-debug_pipeline(pipeline, "Who holds sovereignty in Korea?")
-```
+- The documents are broken into **chunks** before indexing.
+- Retrieved chunks are printed with scores.
+- The full script forbids unsupported speculation in the system prompt.
+- The full `main.py` shows both the evidence and the generated answer.
 
 ---
 
-## Conclusion
+## Where engineers get confused
 
-The Korean AI stack — KoSimCSE or BGE-M3 for embeddings, CLOVA OCR for image documents, and HyperCLOVA X or Solar for generation — outperforms English-centric stacks on Korean-language domains like law, medicine, and finance. The pipeline presented here is production-ready: clean the text, chunk with domain-appropriate settings, index with normalized embeddings, and use a low temperature for factual retrieval tasks.
+- A better LLM does not rescue weak retrieval.
+- Chunking strategy matters almost as much as model choice.
+- Sensitive documents may need masking before context is sent to an external API.
+
+---
+
+## Checklist
+
+- [ ] Choose chunk boundaries before tuning the prompt.
+- [ ] Log retrieval scores and selected sources together.
+- [ ] Tell the LLM not to guess beyond the provided context.
+- [ ] Add masking rules before external generation when the corpus is sensitive.
+
+---
+
+## Summary
+
+The deeper lesson of the series is not a specific tool choice but the habit of separating each Korean document-processing stage clearly. Once you can inspect those stages independently, the pipeline becomes much easier to improve safely.
+
+<!-- blog-only:start -->
+This is the final post in the series. Return to episode 1, rebuild the comparison on your own corpus, and then swap that model into this pipeline.
+<!-- blog-only:end -->
 
 <!-- toc:begin -->
 ## In this series
@@ -303,10 +130,8 @@ The Korean AI stack — KoSimCSE or BGE-M3 for embeddings, CLOVA OCR for image d
 
 ## References
 
-- [KoSimCSE](https://huggingface.co/BM-K/KoSimCSE-roberta-multitask)
-- [BGE-M3](https://huggingface.co/BAAI/bge-m3)
-- [CLOVA OCR](https://api.ncloud-docs.com/docs/ai-application-service-ocr)
-- [Solar API](https://developers.upstage.ai/docs/apis/chat)
-- [FAISS](https://faiss.ai/)
+- [FAISS getting started](https://github.com/facebookresearch/faiss/wiki/Getting-started)
+- [BM-K/KoSimCSE-roberta-multitask](https://huggingface.co/BM-K/KoSimCSE-roberta-multitask)
+- [Groq API reference](https://console.groq.com/docs/api-reference)
 
 Tags: Korean NLP, LLM, Embeddings, OCR

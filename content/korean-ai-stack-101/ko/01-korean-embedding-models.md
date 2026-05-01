@@ -3,7 +3,7 @@ title: '한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar'
 series: korean-ai-stack-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,173 +19,106 @@ last_reviewed: '2026-05-01'
 
 # 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar
 
+## 이 글에서 답할 질문
+
+- 한국어 문장을 많이 다루는 팀이 영어 중심 임베딩만 쓰면 어디서 자주 틀어질까요?
+- 모델 비교에서 코사인 유사도 한두 개보다 separation gap을 먼저 봐야 하는 이유는 무엇일까요?
+- 한국어 문장과 영어 기술 용어가 섞인 데이터에서는 어떤 비교 축을 먼저 잡아야 할까요?
+- 바로 돌려 볼 수 있는 기준선 모델과 한국어 특화 모델을 함께 놓고 보면 어떤 판단이 쉬워질까요?
+
+> 임베딩 모델 비교는 절대 점수 자랑이 아니라, 비슷한 문장과 무관한 문장을 얼마나 안정적으로 벌려 놓는지 보는 작업입니다.
+
 > 한국어 AI 스택 101 시리즈 (1/6)
 
 예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/01-korean-embedding-models)
 
-영어 중심으로 설계된 임베딩 모델은 한국어 문장의 의미를 잘 잡아내지 못합니다. "나는 밥을 먹었다"와 "I had a meal"이 의미상 같다는 것을 알아채려면 한국어 문장 구조를 이해하는 모델이 필요합니다. 이번 글에서는 한국어에 특화된 세 가지 임베딩 모델을 비교합니다.
+이번 글의 목표는 화려한 벤치마크 표를 다시 옮기는 데 있지 않습니다. 같은 문장 쌍을 두 모델에 통과시키고, 한국어 문장·영어 혼용 문장·무관한 문장이 어떤 간격으로 분리되는지 직접 보는 데 있습니다. 글 제목에는 KoSimCSE, BGE-M3, Solar가 함께 나오지만, 실행 예제는 재현성을 우선해 `all-MiniLM-L6-v2`와 `jhgan/ko-sbert-nli`를 비교합니다. 독자가 바로 `python main.py`로 돌릴 수 있어야 비교 기준이 손에 잡히기 때문입니다.
 
-다룰 내용은 다음과 같습니다.
-
-- 한국어 임베딩 모델을 따로 써야 하는 이유
-- KoSimCSE, BGE-M3, Solar Embedding의 특징 비교
-- 같은 문장 쌍으로 세 모델 유사도 비교
-- 어느 상황에 어떤 모델을 선택할지 기준
+실무에서는 "어떤 모델이 제일 좋으냐"보다 "우리 데이터에서 어떤 실패를 덜 내느냐"가 더 중요합니다. 고객센터 FAQ처럼 짧은 한국어 문장이 많은지, 한국어 설명문 안에 영어 제품명이 자주 섞이는지, 코사인 점수를 임계값으로 잘라야 하는지에 따라 선택 기준이 달라집니다. 그래서 첫 글은 모델 소개보다 비교 프레임을 먼저 세웁니다.
 
 ---
 
-<!-- ebook-only:start -->
+## 핵심 흐름
 
-이 장의 핵심: **한국어 임베딩 모델은 한국어 문장의 의미를 벡터로 압축한다.** KoSimCSE·BGE-M3·Solar는 각각 다른 접근 방식을 가진다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **KoSimCSE로 문장 유사도 구현하기**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 한국어 임베딩 모델을 따로 써야 하는 이유
-
-`sentence-transformers/all-MiniLM-L6-v2` 같은 다국어 모델도 한국어를 처리할 수 있습니다. 하지만 훈련 데이터의 대부분이 영어이기 때문에 한국어 표현, 조사, 어미 변화에 민감하지 않습니다.
-
-예를 들어, "서울시청"과 "서울 시청"은 같은 의미지만 범용 모델은 두 표현을 멀리 배치할 수 있습니다. 한국어 전용 모델은 형태소 단위로 언어를 이해하도록 훈련되어 이런 문제를 줄입니다.
+```mermaid
+flowchart LR
+    A[문장 쌍 준비] --> B[all-MiniLM 임베딩]
+    A --> C[ko-sbert-nli 임베딩]
+    B --> D[코사인 유사도 계산]
+    C --> D
+    D --> E[similar 평균과 unrelated 평균 비교]
+```
 
 ---
 
-## 세 모델 개요
+## 왜 재현 가능한 비교부터 시작할까
 
-**KoSimCSE-RoBERTa** (`BM-K/KoSimCSE-roberta-multitask`): 카카오브레인과 HuggingFace 커뮤니티가 공개한 한국어 SimCSE 모델입니다. 한국어 문장 유사도 벤치마크에서 강한 성능을 보입니다. 768차원 벡터를 출력합니다. HuggingFace에서 무료로 사용할 수 있습니다.
+모델 비교 글이 실전에서 도움이 되려면 독자가 같은 코드를 돌려서 비슷한 경향을 확인할 수 있어야 합니다. API 전용 모델이나 사내 전용 평가셋만으로 비교하면 읽을 때는 그럴듯하지만, 다음 날 바로 다시 확인하기 어렵습니다.
 
-**BGE-M3** (`BAAI/bge-m3`): 베이징 AI 연구소(BAAI)가 만든 다국어 모델입니다. 100개 이상의 언어를 지원하며 한국어 성능도 우수합니다. Dense, Sparse, Multi-vector 세 가지 검색 방식을 모두 지원해 하이브리드 검색에 강점이 있습니다. 1024차원 벡터를 출력합니다.
-
-**Solar Embedding** (`upstage/solar-embedding-1-large-query`): 업스테이지가 만든 한국어/영어 이중 언어 모델입니다. 한국어 RAG에 최적화되어 있으며 API 형태로 제공됩니다. 4096차원 고차원 벡터를 사용해 미세한 의미 차이를 잘 구분합니다.
+이번 예제는 두 가지 관찰 포인트를 남깁니다. 첫째, 한국어 전용에 가까운 `ko-sbert-nli`는 유사 문장과 무관 문장을 더 크게 벌려 놓는 경향을 보입니다. 둘째, 범용 `all-MiniLM-L6-v2`는 영어 표현이 섞일 때 기준선으로는 유용하지만, 한국어만 놓고 보면 separation gap이 더 좁게 나올 수 있습니다. 이 차이를 알아두면 다음 글에서 KoSimCSE를 볼 때도 "한국어 문장끼리 더 잘 모이는가"를 같은 방식으로 확인할 수 있습니다.
 
 ---
 
-## 세 모델 비교 실험
+## 최소 실행 예제
+
+아래 코드는 두 모델을 같은 문장 쌍에 적용하고, `similar` 평균과 `unrelated` 평균을 비교합니다. 전체 실행 파일은 `main.py`에 있습니다.
 
 ```python
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-# ── 모델 로드 ──────────────────────────────────────────────────────────────
-print("모델 로딩 중...")
+MODEL_NAMES = {
+    'all-MiniLM-L6-v2': 'sentence-transformers/all-MiniLM-L6-v2',
+    'ko-sbert-nli': 'jhgan/ko-sbert-nli',
+}
 
-kosimcse = SentenceTransformer("BM-K/KoSimCSE-roberta-multitask")
-bge_m3 = SentenceTransformer("BAAI/bge-m3")
-
-print("모델 로딩 완료")
-
-# ── 테스트 문장 쌍 ─────────────────────────────────────────────────────────
-sentence_pairs = [
-    # (문장A, 문장B, 예상 관계)
-    ("나는 오늘 밥을 먹었다.", "나는 오늘 식사를 했다.", "유사"),
-    ("서울 날씨가 맑다.", "부산 날씨가 흐리다.", "무관"),
-    ("파이썬으로 웹 서버를 만들었다.", "Python을 이용해 웹 애플리케이션을 개발했다.", "유사"),
-    ("고양이가 쥐를 잡았다.", "주식 시장이 하락했다.", "무관"),
-    ("인공지능이 의료 진단을 돕는다.", "AI가 병원에서 환자 진단을 지원한다.", "유사"),
+SENTENCE_PAIRS = [
+    ('나는 오늘 점심으로 비빔밥을 먹었다.', '오늘 점심은 비빔밥이었다.', 'similar'),
+    ('서울시청 앞에서 회의를 했다.', '회의는 서울 시청 앞에서 열렸다.', 'similar'),
+    ('비가 와서 우산을 챙겼다.', 'GPU 메모리가 부족해 학습이 중단됐다.', 'unrelated'),
 ]
 
-def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
-    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
-
-def compare_models(pairs: list[tuple]) -> None:
-    print(f"\n{'문장A':<30} {'문장B':<30} {'예상':^6} {'KoSimCSE':^10} {'BGE-M3':^10}")
-    print("-" * 90)
-
-    for sent_a, sent_b, expected in pairs:
-        # KoSimCSE
-        vec_a = kosimcse.encode(sent_a, normalize_embeddings=True)
-        vec_b = kosimcse.encode(sent_b, normalize_embeddings=True)
-        ko_sim = cosine_similarity(vec_a, vec_b)
-
-        # BGE-M3
-        vec_a = bge_m3.encode(sent_a, normalize_embeddings=True)
-        vec_b = bge_m3.encode(sent_b, normalize_embeddings=True)
-        bge_sim = cosine_similarity(vec_a, vec_b)
-
-        a_display = sent_a[:28] + ".." if len(sent_a) > 30 else sent_a
-        b_display = sent_b[:28] + ".." if len(sent_b) > 30 else sent_b
-        print(f"{a_display:<30} {b_display:<30} {expected:^6} {ko_sim:^10.3f} {bge_sim:^10.3f}")
-
-compare_models(sentence_pairs)
+for label, name in MODEL_NAMES.items():
+    model = SentenceTransformer(name)
+    scores = []
+    for sent_a, sent_b, expected in SENTENCE_PAIRS:
+        emb = model.encode([sent_a, sent_b], normalize_embeddings=True)
+        score = float(np.dot(emb[0], emb[1]))
+        scores.append((expected, score))
+    print(label, scores)
 ```
 
 ---
 
-## 차원과 검색 성능의 관계
+## 이 코드에서 봐야 할 것
 
-임베딩 차원이 높을수록 더 미세한 의미 차이를 담을 수 있지만, 저장 공간과 검색 시간도 늘어납니다.
-
-```python
-import numpy as np
-import time
-import faiss
-from sentence_transformers import SentenceTransformer
-
-# 모델별 차원
-# KoSimCSE: 768차원
-# BGE-M3: 1024차원
-# Solar (API): 4096차원
-
-# BGE-M3로 차원 vs 검색 속도 실험
-bge_m3 = SentenceTransformer("BAAI/bge-m3")
-
-documents = [
-    "파이썬 웹 개발 프레임워크 비교",
-    "머신러닝 모델 훈련 방법",
-    "한국어 자연어 처리 기술",
-    "데이터베이스 인덱스 최적화",
-    "클라우드 서비스 아키텍처 설계",
-    "딥러닝 이미지 분류 모델",
-    "API 보안과 인증 방법",
-    "도커 컨테이너 배포 전략",
-] * 100  # 800개 문서
-
-print(f"문서 수: {len(documents)}")
-
-# 임베딩 생성
-start = time.time()
-embeddings = bge_m3.encode(documents, normalize_embeddings=True, show_progress_bar=True)
-embed_time = time.time() - start
-print(f"임베딩 시간: {embed_time:.2f}초")
-print(f"임베딩 차원: {embeddings.shape[1]}")
-print(f"저장 공간: {embeddings.nbytes / 1024:.1f} KB")
-
-# FAISS 인덱스 구성
-embeddings_f32 = embeddings.astype(np.float32)
-index = faiss.IndexFlatIP(embeddings.shape[1])
-index.add(embeddings_f32)
-
-# 검색 속도 측정
-query = "자연어 처리를 위한 딥러닝 모델"
-query_vec = bge_m3.encode([query], normalize_embeddings=True).astype(np.float32)
-
-start = time.time()
-for _ in range(100):
-    distances, indices = index.search(query_vec, k=5)
-search_time = (time.time() - start) / 100 * 1000
-print(f"\n검색 속도: {search_time:.3f}ms (100회 평균)")
-print(f"상위 5개 결과:")
-for i, idx in enumerate(indices[0]):
-    print(f"  {i+1}. [{distances[0][i]:.3f}] {documents[idx]}")
-```
+- 두 모델에 **같은 문장 쌍**을 넣습니다. 그래야 점수 차이가 데이터셋 차이가 아니라 모델 차이에서 왔는지 읽을 수 있습니다.
+- `normalize_embeddings=True`를 켜 두면 내적이 곧 코사인 유사도가 됩니다. 실험 코드가 짧아지고, FAISS `IndexFlatIP`와도 연결하기 쉬워집니다.
+- 개별 점수보다 `similar 평균 - unrelated 평균`을 같이 봐야 합니다. 운영에서는 이 간격이 넓을수록 임계값을 잡기가 편합니다.
+- 한국어/영어 혼용 쌍을 하나 넣어 둔 이유는, 실제 문서가 완전한 단일 언어가 아닌 경우가 많기 때문입니다.
 
 ---
 
-## 모델 선택 기준
+## 실무에서 헷갈리는 지점
 
-**한국어 전용, 무료, 가벼운 모델이 필요할 때**: KoSimCSE를 선택합니다. 768차원으로 저장 부담이 적고, HuggingFace에서 바로 사용할 수 있습니다. 한국어 문장 유사도 태스크에서 검증된 성능을 보입니다.
+- 한국어 특화 모델이 항상 모든 다국어 작업에서 우세한 것은 아닙니다. 영어가 많이 섞인 문서 검색이면 다국어 모델이 더 안정적일 수 있습니다.
+- 코사인 점수 0.8이 "좋다"는 절대 기준은 아닙니다. 모델마다 분포가 다르므로, 상대적 간격과 실제 검색 결과를 함께 봐야 합니다.
+- 벤치마크 리더보드 순위와 운영 체감 품질은 다를 수 있습니다. 짧은 질의, 오탈자, 띄어쓰기 흔들림 같은 한국어 실전 조건이 더 중요할 때가 많습니다.
 
-**한국어/영어 혼용 문서를 다룰 때**: BGE-M3를 선택합니다. 기술 문서, 학술 자료처럼 영어가 섞인 한국어 텍스트에 강합니다. Dense + Sparse 하이브리드 검색도 지원합니다.
+---
 
-**최고 품질의 한국어 RAG가 필요하고 API 비용을 감당할 수 있을 때**: Solar Embedding을 선택합니다. 4096차원 고차원 벡터로 미세한 의미 차이를 잘 잡아내며, 업스테이지가 한국어에 특화해서 훈련했습니다.
+## 체크리스트
+
+- [ ] 우리 데이터가 한국어 단일 문장 중심인지, 한국어/영어 혼용인지 먼저 적어 본다.
+- [ ] 유사 문장과 무관 문장을 함께 넣어 separation gap을 본다.
+- [ ] 모델별 점수 분포를 확인한 뒤 임계값 후보를 정한다.
+- [ ] 바로 다음 단계에서 FAISS나 벡터 DB로 이어질 수 있는지 확인한다.
 
 ---
 
 ## 마무리
 
-한국어 임베딩 모델 선택은 요구사항에 따라 달라집니다. 비용 없이 시작하려면 KoSimCSE나 BGE-M3로 충분합니다. 다음 글에서는 KoSimCSE를 실제로 사용해서 문장 유사도 검색 시스템을 만듭니다.
+첫 글에서 가져가야 할 핵심은 "모델 이름"이 아니라 "비교 방법"입니다. 같은 문장 쌍으로 간격을 보고, 그 간격이 실제 검색 품질로 이어지는지 확인해야 다음 선택이 쉬워집니다. 다음 글에서는 한국어 문장 유사도 검색을 더 직접적으로 보여 주는 KoSimCSE 예제로 넘어갑니다.
 
 <!-- blog-only:start -->
 다음 글: [KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
@@ -207,9 +140,8 @@ for i, idx in enumerate(indices[0]):
 
 ## 참고 자료
 
-- [KoSimCSE 논문 (Kim et al., 2021)](https://arxiv.org/abs/2109.12145)
-- [BGE-M3 HuggingFace 페이지](https://huggingface.co/BAAI/bge-m3)
-- [Upstage Solar Embedding](https://developers.upstage.ai/docs/apis/embeddings)
-- [SentenceTransformers 라이브러리](https://www.sbert.net/)
+- [SentenceTransformers documentation](https://www.sbert.net/)
+- [jhgan/ko-sbert-nli](https://huggingface.co/jhgan/ko-sbert-nli)
+- [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 
 Tags: Korean NLP, LLM, Embeddings, OCR

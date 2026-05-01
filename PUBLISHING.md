@@ -1,6 +1,6 @@
 # Publishing Guide
 
-이 문서는 `content/` 아래의 원본 Markdown을 Tistory, Blogger, Medium, eBook source로 변환하는 규칙을 정의한다.
+이 문서는 `content/` 아래의 원본 Markdown을 Tistory, Hashnode, Medium, eBook source로 변환하는 규칙을 정의한다.
 
 > **현재 상태**: 모든 시리즈가 `content/<series>/` 아래로 이동 완료되었다 (Phase 6 완료). 이행 전 경로(`<series>/{ko,en,medium}/`)는 더 이상 사용하지 않는다.
 
@@ -12,7 +12,7 @@
 
 원고를 어떻게 써야 하는가는 아래 문서를 따른다.
 
-- [`BLOG_WRITING_GUIDE.md`](./BLOG_WRITING_GUIDE.md) — Tistory/Blogger/Medium 블로그 글 작성 규칙 (SEO 제목, 글 구조, blog-only 블록, 발행 체크리스트)
+- [`BLOG_WRITING_GUIDE.md`](./BLOG_WRITING_GUIDE.md) — Tistory/Hashnode/Medium 블로그 글 작성 규칙 (SEO 제목, 글 구조, blog-only 블록, 발행 체크리스트)
 - [`EBOOK_WRITING_GUIDE.md`](./EBOOK_WRITING_GUIDE.md) — 시리즈를 eBook으로 묶을 때의 원고 구성 규칙 (장 구조, ebook-only 블록, Part 구성, 반복 제거)
 - [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) — 문체, 이미지, 코드, 태그, 참고자료 공통 규칙
 
@@ -25,7 +25,7 @@
 | Pipeline | Platform | Source | Output | Purpose |
 | --- | --- | --- | --- | --- |
 | Korean Blog | Tistory | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
-| English Blog | Blogger | `content/<series>/en/*.md` | `exports/blogger/<series>/*.html` | 한국어 원문의 충실한 영어 대응본 |
+| English Blog | Hashnode | `content/<series>/en/*.md` | (Hashnode에 직접 Markdown 붙여넣기) | 한국어 원문의 충실한 영어 대응본 |
 | Medium | Medium | `content/<series>/en/*.md` + adaptation | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
 | eBook | private `mkdocs-ebook` | `content/<series>/{ko,en}/*.md` + ebook-only blocks | `exports/ebook-source/<series>-<lang>/` | 책 단위 학습형 원고 |
 
@@ -52,7 +52,7 @@ content/azure-functions-101/en/01-what-is-azure-functions.md
 
 ```text
 exports/tistory/<series>/<NN>-<slug>.md
-exports/blogger/<series>/<NN>-<slug>.html   ← planned (export_blogger.py 미구현)
+exports/hashnode/<series>/<NN>-<slug>.md    ← planned (Hashnode는 Markdown 직접 사용)
 exports/medium/<series>/<NN>.html
 exports/ebook-source/<series>-<lang>/...
 ```
@@ -92,9 +92,9 @@ python3 scripts/export_tistory.py azure-functions-101 --episode 1
 
 ---
 
-## 3. Blogger Publishing (English Blog)
+## 3. Hashnode Publishing (English Blog)
 
-> **현재 상태**: `export_blogger.py` 스크립트 미구현 (planned). 현재는 `en/*.md`를 Blogger 에디터에 수동으로 붙여넣어 발행한다.
+> **현재 상태**: Hashnode는 Markdown을 직접 지원한다. `en/*.md`를 Hashnode 에디터에 붙여넣거나 GitHub 연동으로 발행한다.
 
 ### 대상
 
@@ -102,20 +102,23 @@ python3 scripts/export_tistory.py azure-functions-101 --episode 1
 content/<series>/en/*.md
 ```
 
-### 변환 결과 (planned)
+### 변환 결과
 
 ```text
-exports/blogger/<series>/<NN>-<slug>.html
+exports/hashnode/<series>/<NN>-<slug>.md   ← planned
 ```
+
+Hashnode는 Markdown 네이티브 에디터를 제공하므로 HTML 변환 없이 `.md` 원본을 그대로 사용한다.
 
 ### 규칙
 
-- 목적: `ko/` 원문의 충실한 영어 대응본. 구조, 기술적 주장, 코드, 그림, 참고자료를 최대한 일치시킨다.
+- 목적: `ko/` 원문의 충실한 영어 대응본. 개발자 브랜딩 및 eBook 유입 채널.
+- 구조, 기술적 주장, 코드, 그림, 참고자료를 `ko/` 원문과 최대한 일치시킨다.
 - Medium처럼 hook 중심으로 재작성하지 않는다.
 - `ebook-only` 블록은 제거한다.
 - `blog-only` 블록은 유지한다.
-- 하단 `Tags:` 라인은 Blogger labels에 활용한다.
-- 이미지 경로는 Blogger 업로드 방식에 맞게 정리한다.
+- 하단 `Tags:` 라인은 Hashnode tags에 활용한다.
+- 이미지는 Hashnode 에디터에 PNG를 직접 업로드한다.
 
 ---
 
@@ -232,14 +235,14 @@ python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
 
 ## 7. 변형(variant)별 비교
 
-| 항목 | Tistory (ko) | Blogger (en) | Medium (en adapted) | MkDocs (ko/en) | eBook source |
+| 항목 | Tistory (ko) | Hashnode (en) | Medium (en adapted) | MkDocs (ko/en) | eBook source |
 | --- | --- | --- | --- | --- | --- |
-| 산출물 형식 | .md | .html | **.html** | .md | .md |
+| 산출물 형식 | .md | .md | **.html** | .md | .md |
 | `blog-only` 블록 | 유지 | 유지 | 유지 | 제거 | 제거 |
 | `ebook-only` 블록 | 제거 | 제거 | 제거 | 옵션 | 유지 |
 | Visible 하단 `Tags:` 라인 | 유지 | 유지 | **유지** (Medium 태그칸에 수동 복사) | 제거 | 제거 |
 | TOC `<!-- toc:* -->` 마커 | 유지 | 유지 | 제거 (마커만; TOC 본문은 유지) | 제거 (전체) | 제거 (전체) |
-| 이미지 경로 | 상대 / Tistory 업로드 | 상대 / Blogger 업로드 | **base64 data URI (인라인)** | 상대 (`docs/` 기준) | 번들 내부 상대 |
+| 이미지 경로 | 상대 / Tistory 업로드 | 상대 / Hashnode 업로드 | **base64 data URI (인라인)** | 상대 (`docs/` 기준) | 번들 내부 상대 |
 | Mermaid | PNG | PNG | PNG | mermaid 또는 PNG | PNG |
 | H3+ demote | 그대로 | 그대로 | demote | 그대로 | 그대로 |
 | `finalize-posts.py` 적용 | 적용 | 적용 | **스킵** (`to-medium.py` 단독 책임) | N/A | N/A |

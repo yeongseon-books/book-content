@@ -3,7 +3,7 @@ title: 'Document assistant — summarization, extraction, classification'
 series: ai-app-patterns-101
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,23 @@ last_reviewed: '2026-05-01'
 ---
 
 # Document assistant — summarization, extraction, classification
+
+## Questions this post answers
+
+- What chain structure keeps summarization stable when a document is too long for one prompt?
+- How should chunk-level processing and final synthesis be separated in a summarization pipeline?
+- Why does the document assistant pattern fit batch processing better than a chatbot?
+
+> A document assistant is not a conversational system; it is a transformer that turns long input into short, task-shaped output.
+
+```mermaid
+flowchart LR
+    Doc[Long document] --> Split[Chunk split]
+    Split --> Map[Per-chunk summary]
+    Map --> Merge[Summary bundle]
+    Merge --> Reduce[Final synthesis]
+    Reduce --> Output[Usable result]
+```
 
 > AI App Patterns 101 (3/6)
 
@@ -300,6 +317,31 @@ for text in texts:
     print(f"  category: {result.get('category')}, confidence: {result.get('confidence'):.2f}")
     print(f"  reason: {result.get('reason')}\n")
 ```
+
+---
+
+## What to notice in this code
+
+- `main.py` separates the map and reduce phases explicitly so a long document can be processed across multiple model calls.
+- Printing each intermediate chunk summary makes it easier to debug where information was lost.
+- The same pattern generalizes from summarization to extraction or classification batches.
+
+---
+
+## Where engineers get confused
+
+- Teams often reach for a larger model first, but chunk size and overlap usually matter more to summary quality.
+- Map-Reduce parallelizes well, but it weakens cross-chunk global context, which makes the reduce prompt critical.
+- Document summarization and document Q&A may look similar at the input layer, but they optimize for different production metrics.
+
+---
+
+## Checklist
+
+- [ ] The long document is split into multiple chunks
+- [ ] Each chunk is summarized independently
+- [ ] Those partial summaries are merged into one final summary
+- [ ] The final synthesis prompt is responsible for deduplication and coherence
 
 ---
 

@@ -3,7 +3,7 @@ title: 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
 series: rag-deep-dive
 episode: 6
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,33 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
+
+<!-- a-grade-intro:begin -->
+## 이 글에서 답할 질문
+
+- RAGAS는 왜 답변 문자열 하나만으로는 평가를 시작할 수 없을까요?
+- faithfulness는 답변을 어떤 단위로 쪼개서 검증할까요?
+- answer relevancy는 정확도가 아니라 무엇을 재려는 메트릭일까요?
+- 이 점수들을 CI 품질 게이트로 연결하려면 무엇을 고정해야 할까요?
+
+> 평가 단계는 RAG 답변을 다시 질문, 근거, 답변, 기준 답의 관계로 펼친 뒤, 그 관계를 점수로 바꾸는 단계입니다.
+
+```mermaid
+flowchart LR
+    A[Question] --> E[Evaluation row]
+    B[Contexts] --> E
+    C[Answer] --> E
+    D[Ground truth] --> E
+    E --> F[Faithfulness]
+    E --> G[Answer relevancy]
+    F --> H[Quality gate]
+    G --> H
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (6/6)
 
@@ -30,6 +53,88 @@ last_reviewed: '2026-04-30'
 이 글은 시리즈 6편 중 6번째 장입니다.
 앞 장에서는 **RAG Chain 조립 — RetrievalQA vs LCEL**을 다뤘습니다.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## 최소 실행 예제
+
+예제 파일: `/root/Github/rag-deep-dive/ko/06-evaluation-and-quality-gates/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+import os
+
+from datasets import Dataset
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_groq import ChatGroq
+from ragas import evaluate
+from ragas.embeddings import LangchainEmbeddingsWrapper
+from ragas.llms import LangchainLLMWrapper
+from ragas.metrics import answer_relevancy, faithfulness
+
+def main() -> None:
+    if not os.environ.get("GROQ_API_KEY"):
+        raise RuntimeError("GROQ_API_KEY is required")
+
+    dataset = Dataset.from_dict(
+        {
+            "question": ["After how many retries is the message dead-lettered?"],
+            "contexts": [[
+                "The worker retries a failed message up to three times before giving up.",
+                "After the final retry, the payload is moved to the dead-letter queue.",
+            ]],
+            "answer": [
+                "The system retries the message three times. After the final retry, it moves the payload to the dead-letter queue."
+            ],
+            "ground_truth": [
+                "The message is retried up to three times before it is dead-lettered."
+            ],
+        }
+    )
+
+    llm = LangchainLLMWrapper(
+        ChatGroq(model="llama-3.1-8b-instant", temperature=0, max_tokens=256)
+    )
+    embeddings = LangchainEmbeddingsWrapper(
+        HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    )
+
+    result = evaluate(
+        dataset=dataset,
+        metrics=[faithfulness, answer_relevancy],
+        llm=llm,
+        embeddings=embeddings,
+        raise_exceptions=True,
+    )
+
+    print(result)
+    print(result.to_pandas().to_string(index=False))
+
+if __name__ == "__main__":
+    main()
+```
+
+### 이 코드에서 봐야 할 것
+
+- 평가 입력은 `question`, `contexts`, `answer`, `ground_truth`의 관계로 묶입니다.
+- RAGAS는 faithfulness용 LLM과 answer relevancy용 임베딩을 각각 사용합니다.
+- 결과는 샘플별 점수와 요약 수치로 바로 확인할 수 있습니다.
+
+### 실무에서 헷갈리는 지점
+
+- faithfulness가 높다고 answer relevancy도 반드시 높은 것은 아닙니다.
+- answer relevancy는 사실 검증이 아니라 질문 초점도를 재는 축입니다.
+- 평가셋 스키마를 고정하지 않으면 지표 비교가 재현되지 않습니다.
+
+## 체크리스트
+
+- [ ] 평가셋에 질문, 근거, 답변, 기준 답을 모두 남겼다.
+- [ ] faithfulness와 answer relevancy를 서로 다른 실패 축으로 해석한다.
+- [ ] 점수 비교 전에 같은 샘플셋과 같은 모델 버전을 고정했다.
+- [ ] CI 게이트에 넣을 임계값을 로그와 함께 관리할 계획이 있다.
+<!-- a-grade-example:end -->
 
 ## 소스 버전
 

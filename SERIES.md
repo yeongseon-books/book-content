@@ -26,7 +26,7 @@
 Azure App Service 입문 7부작 — 호스팅, 설정, 로그, 스케일링.
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-app-service-101/`](./content/azure-app-service-101/)
 
 | # | Title | KO | EN | Medium | Status |
@@ -44,7 +44,7 @@ Azure App Service 입문 7부작 — 호스팅, 설정, 로그, 스케일링.
 App Service 내부 — Front-End, Worker, Sandbox, Kudu, Scaling.
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-app-service-deep-dive/`](./content/azure-app-service-deep-dive/)
 
 | # | Title | KO | EN | Medium | Status |
@@ -61,7 +61,7 @@ App Service 내부 — Front-End, Worker, Sandbox, Kudu, Scaling.
 Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-functions-101/`](./content/azure-functions-101/)
 
 | # | Title | KO | EN | Medium | Status |
@@ -79,7 +79,7 @@ Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
 Azure Functions Host 소스 분석 시리즈 (commit-pinned).
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-functions-deep-dive/`](./content/azure-functions-deep-dive/)
 
 | # | Title | KO | EN | Medium | Status |
@@ -96,7 +96,7 @@ Azure Functions Host 소스 분석 시리즈 (commit-pinned).
 AKS 입문 시리즈.
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-aks-101/`](./content/azure-aks-101/)
 
 | # | Title | KO | EN | Medium | Status |
@@ -114,7 +114,7 @@ AKS 입문 시리즈.
 AKS control plane / data plane 내부 동작.
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-aks-deep-dive/`](./content/azure-aks-deep-dive/)
 
 | # | Title | KO | EN | Medium | Status |
@@ -131,7 +131,7 @@ AKS control plane / data plane 내부 동작.
 Container Apps 입문 시리즈.
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-aca-101/`](./content/azure-aca-101/)
 
 | # | Title | KO | EN | Medium | Status |
@@ -149,7 +149,7 @@ Container Apps 입문 시리즈.
 ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
 
 - 언어: ko, en
-- 발행 대상: tistory, blogger, medium, mkdocs, ebook
+- 발행 대상: tistory, hashnode, medium, mkdocs, ebook
 - 경로: [`content/azure-aca-deep-dive/`](./content/azure-aca-deep-dive/)
 
 | # | Title | KO | EN | Medium | Status |

@@ -3,7 +3,7 @@ title: 'Completing LangGraph'
 series: langgraph-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,187 +19,226 @@ last_reviewed: '2026-05-01'
 
 # Completing LangGraph
 
-> LangGraph 101 (6/6)
+## Questions this post answers
+
+- How do you combine checkpoints, routing, and tool calling in one graph?
+- How do you separate direct answers from tool-heavy requests without losing conversation state?
+- What should you verify before calling a combined example production-ready?
+
+> A complete LangGraph agent is not one giant prompt. It is a state machine where supervisor logic, tool execution, and checkpointing cooperate through explicit transitions.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
 
-This post assembles graph basics, checkpoints, conditional edges, tool calling, and multi-agent coordination from across the series into one complete production agent: conversation memory, tool use, quality validation, and multi-turn dialogue.
+This final example pulls the series together. It classifies the incoming question, answers simple conceptual prompts directly, routes calculation-heavy prompts into a tool loop, and stores the whole conversation with `MemorySaver`. That is already enough structure for a serious prototype.
 
----
+```mermaid
+flowchart LR
+    A[User message] --> B[supervisor]
+    B -->|direct_answer| C[direct_answer]
+    B -->|tool_agent| D[tool_agent]
+    D -->|tool call| E[ToolNode]
+    E --> D
+    C --> F[END]
+    D -->|final answer| F
+    F --> G[MemorySaver checkpoint]
+```
 
-<!-- ebook-only:start -->
-
-**The key idea**: the heart of a LangGraph app is State design. Decide what to share and what to isolate; everything else follows.
-
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Multi-agent systems**.
-<!-- ebook-only:end -->
-
-## Complete production agent
+## Minimal runnable example
 
 ```python
+import ast
 import json
 import math
-import os
-import sqlite3
-from typing import TypedDict, Annotated, Literal
+import operator
+from typing import Any, Callable, Literal, cast
 
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
+from langgraph.graph import END, START, MessagesState, StateGraph
+from langgraph.prebuilt import ToolNode, tools_condition
+
+ALLOWED_BINARY_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+ALLOWED_UNARY_OPERATORS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+}
+ALLOWED_FUNCTIONS: dict[str, Callable[..., Any]] = {
+    name: value
+    for name, value in math.__dict__.items()
+    if not name.startswith("_") and callable(value)
+}
+ALLOWED_CONSTANTS = {"pi": math.pi, "e": math.e, "tau": math.tau}
+
+def evaluate_math_expression(expression: str) -> float:
+    def _evaluate(node: ast.AST) -> float:
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.BinOp):
+            left = _evaluate(node.left)
+            right = _evaluate(node.right)
+            operation = ALLOWED_BINARY_OPERATORS.get(type(node.op))
+            if operation is None:
+                raise ValueError("unsupported operator")
+            return float(operation(left, right))
+        if isinstance(node, ast.UnaryOp):
+            operand = _evaluate(node.operand)
+            operation = ALLOWED_UNARY_OPERATORS.get(type(node.op))
+            if operation is None:
+                raise ValueError("unsupported unary operator")
+            return float(operation(operand))
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            function = ALLOWED_FUNCTIONS.get(node.func.id)
+            if function is None or node.keywords:
+                raise ValueError("unsupported function")
+            arguments = [_evaluate(argument) for argument in node.args]
+            return float(function(*arguments))
+        if isinstance(node, ast.Name):
+            value = ALLOWED_CONSTANTS.get(node.id)
+            if value is not None:
+                return float(value)
+            raise ValueError("unsupported constant")
+        raise ValueError("unsupported expression")
+
+    parsed = ast.parse(expression, mode="eval")
+    return _evaluate(parsed.body)
 
 @tool
 def calculator(expression: str) -> str:
-    """Evaluate a math expression. E.g.: '2 + 3 * 4', 'sqrt(16)', 'pi * 5**2'"""
+    """Evaluate an arithmetic expression with safe math functions like sqrt(16) or pi * 2."""
+
     try:
-        allowed = {k: v for k, v in math.__dict__.items() if not k.startswith("_")}
-        return str(eval(expression, {"__builtins__": {}}, allowed))
-    except Exception as e:
-        return f"error: {e}"
+        result = evaluate_math_expression(expression)
+    except Exception as exc:
+        return f"calculation error: {exc}"
+    return str(result)
 
 @tool
 def word_stats(text: str) -> str:
-    """Return word count and character count for text."""
-    return json.dumps({"words": len(text.split()), "chars": len(text)})
+    """Return word and character counts for a piece of text."""
+
+    return json.dumps({"words": len(text.split()), "characters": len(text)})
 
 TOOLS = [calculator, word_stats]
-TOOL_MAP = {t.name: t for t in TOOLS}
 
-SYSTEM_PROMPT = """You are a helpful Python tutor agent.
-Use tools to perform accurate calculations and analysis.
-Remember the conversation history and respond in context.
-Be honest when you don't know something."""
+class CompleteState(MessagesState):
+    route: str
 
-class AgentState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-    iterations: int
+def base_llm() -> ChatGroq:
+    return ChatGroq(model="llama-3.3-70b-versatile", temperature=0.0, stop_sequences=None)
 
-MAX_ITERATIONS = 10
-
-def agent_node(state: AgentState) -> AgentState:
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
-    ).bind_tools(TOOLS)
-    messages = [SystemMessage(content=SYSTEM_PROMPT)] + state["messages"]
-    response = llm.invoke(messages)
-    return {"messages": [response], "iterations": state["iterations"] + 1}
-
-def tool_node(state: AgentState) -> AgentState:
-    last = state["messages"][-1]
-    results = []
-    for call in last.tool_calls:
-        t = TOOL_MAP.get(call["name"])
-        result = t.invoke(call["args"]) if t else f"unknown tool: {call['name']}"
-        results.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
-    return {"messages": results}
-
-def route_agent(state: AgentState) -> Literal["tools", "end"]:
-    if state["iterations"] >= MAX_ITERATIONS:
-        return "end"
-    last = state["messages"][-1]
-    if hasattr(last, "tool_calls") and last.tool_calls:
-        return "tools"
-    return "end"
-
-def build_production_agent(persist: bool = False):
-    graph = StateGraph(AgentState)
-    graph.add_node("agent", agent_node)
-    graph.add_node("tools", tool_node)
-
-    graph.set_entry_point("agent")
-    graph.add_conditional_edges("agent", route_agent, {"tools": "tools", "end": END})
-    graph.add_edge("tools", "agent")
-
-    if persist:
-        conn = sqlite3.connect("agent.db", check_same_thread=False)
-        from langgraph.checkpoint.sqlite import SqliteSaver
-        checkpointer = SqliteSaver(conn)
+def supervisor(state: CompleteState) -> dict[str, str]:
+    latest_question = str(state["messages"][-1].content).lower()
+    if any(keyword in latest_question for keyword in ("count", "calculate", "math", "sqrt")):
+        route = "tool_agent"
     else:
-        checkpointer = MemorySaver()
+        route = "direct_answer"
+    return {"route": route}
 
-    return graph.compile(checkpointer=checkpointer)
-```
+def route_after_supervisor(state: CompleteState) -> Literal["direct_answer", "tool_agent"]:
+    return cast(Literal["direct_answer", "tool_agent"], state["route"])
 
----
-
-## Batch evaluation
-
-Production agents need quality validation before deployment.
-
-```python
-def evaluate_agent(app, test_cases: list[dict]) -> dict:
-    results = []
-    for tc in test_cases:
-        config = {"configurable": {"thread_id": f"eval_{tc['id']}"}}
-        result = app.invoke(
-            {"messages": [HumanMessage(content=tc["question"])], "iterations": 0},
-            config=config,
+def direct_answer(state: CompleteState) -> dict[str, object]:
+    system = SystemMessage(
+        content=(
+            "You are explaining LangGraph from the LangChain ecosystem. "
+            "Answer clearly using the full conversation history when it matters."
         )
-        answer = result["messages"][-1].content
-        kw_hits = [kw for kw in tc["expected_keywords"] if kw.lower() in answer.lower()]
-        results.append({
-            "id": tc["id"],
-            "passed": len(kw_hits) == len(tc["expected_keywords"]),
-            "keyword_coverage": len(kw_hits) / len(tc["expected_keywords"]) if tc["expected_keywords"] else 1.0,
-        })
+    )
+    response = base_llm().invoke([system, *state["messages"]])
+    return {"messages": [response]}
 
-    pass_rate = sum(1 for r in results if r["passed"]) / len(results) if results else 0.0
-    return {"total": len(results), "pass_rate": round(pass_rate, 2), "details": results}
+def tool_agent(state: CompleteState) -> dict[str, object]:
+    system = SystemMessage(
+        content=(
+            "You are a precise assistant. Use tools for calculations or counting tasks, "
+            "then answer in one concise paragraph."
+        )
+    )
+    response = base_llm().bind_tools(TOOLS).invoke([system, *state["messages"]])
+    return {"messages": [response]}
+
+def build_graph():
+    graph = StateGraph(CompleteState)
+    graph.add_node("supervisor", supervisor)
+    graph.add_node("direct_answer", direct_answer)
+    graph.add_node("tool_agent", tool_agent)
+    graph.add_node("tools", ToolNode(TOOLS))
+
+    graph.add_edge(START, "supervisor")
+    graph.add_conditional_edges(
+        "supervisor",
+        route_after_supervisor,
+        {"direct_answer": "direct_answer", "tool_agent": "tool_agent"},
+    )
+    graph.add_edge("direct_answer", END)
+    graph.add_conditional_edges("tool_agent", tools_condition, {"tools": "tools", "__end__": END})
+    graph.add_edge("tools", "tool_agent")
+
+    return graph.compile(checkpointer=MemorySaver())
 
 if __name__ == "__main__":
-    app = build_production_agent()
-    test_cases = [
-        {"id": 1, "question": "What is sqrt(256)?", "expected_keywords": ["16"]},
-        {"id": 2, "question": "What is a Python list comprehension?",
-         "expected_keywords": ["list", "expression"]},
-    ]
-    print(json.dumps(evaluate_agent(app, test_cases), indent=2))
+    app = build_graph()
+    config: RunnableConfig = {"configurable": {"thread_id": "complete-demo"}}
+
+    first = app.invoke(
+        {"messages": [HumanMessage(content="Explain what explicit state means in LangGraph.")], "route": ""},
+        config=config,
+    )
+    print("First turn:")
+    print(first["messages"][-1].content)
+
+    second = app.invoke(
+        {"messages": [HumanMessage(content="Now calculate sqrt(81) + 5 and use a tool.")]},
+        config=config,
+    )
+    print("\nSecond turn:")
+    print(second["messages"][-1].content)
+
+    snapshot = app.get_state(config)
+    print(f"\nCheckpoint message count: {len(snapshot.values['messages'])}")
 ```
 
----
+Runnable file: `/root/Github/langgraph-101/en/06-langgraph-complete/main.py`
 
-## Multi-turn conversation
+Run it with:
 
-```python
-def run_conversation(thread_id: str = "demo"):
-    app = build_production_agent()
-    config = {"configurable": {"thread_id": thread_id}}
-    print("Python tutor agent (type 'quit' to exit)")
-    print("-" * 40)
-    while True:
-        user_input = input("\nuser: ").strip()
-        if user_input.lower() in ("quit", "q", "exit"):
-            break
-        if not user_input:
-            continue
-        result = app.invoke(
-            {"messages": [HumanMessage(content=user_input)], "iterations": 0},
-            config=config,
-        )
-        print(f"\nagent: {result['messages'][-1].content}")
+```bash
+export GROQ_API_KEY=... && python main.py
 ```
 
----
+## What to notice in this code
 
-## Series summary
+- The supervisor keeps graph complexity under control by splitting direct answers from tool-driven requests.
+- The `tool_agent -> ToolNode -> tool_agent` loop is isolated to the cases that need tools.
+- `compile(checkpointer=MemorySaver())` makes the entire conversation resumable across turns.
 
-The agent built across this series has six layers.
+## Where engineers get confused
 
-1. **Graph basics**: StateGraph, nodes, and edges define the workflow explicitly
-2. **Checkpointer**: conversation memory and session management
-3. **Conditional edges**: dynamic flow control based on state
-4. **Tool calling**: the agent loop that lets the LLM use external functions
-5. **Multi-agent**: specialized agents coordinating through shared state
-6. **Production integration**: all layers combined with quality validation
+- Sending every request through the tool loop usually makes the agent slower and more expensive than necessary.
+- Even with checkpointing, routing should stay simple enough to reason about from the latest message.
+- Tool execution is not evaluation. You still need explicit regression cases, and the calculator tool should stay on a strict arithmetic parser rather than raw `eval()`.
 
-LangGraph's key insight is that complex workflows should be expressed as explicit graphs. When flow is visible in the graph definition rather than hidden in code, debugging, testing, and extension become straightforward.
+## Checklist
+
+- [ ] Are direct-answer and tool paths separated clearly
+- [ ] Does the same `thread_id` resume the conversation as expected
+- [ ] Do tool questions and non-tool questions route to the intended path
+- [ ] Is loop termination explicit before the final answer
+
+## Summary
+
+The real goal of this series was never memorizing LangGraph APIs. It was learning how to design state, edges, checkpoints, and tool loops as one coherent system. Once that mental model is in place, building a usable agent skeleton becomes much more straightforward.
 
 <!-- toc:begin -->
 ## In this series
@@ -217,8 +256,8 @@ LangGraph's key insight is that complex workflows should be expressed as explici
 
 ## References
 
-- [LangGraph documentation](https://langchain-ai.github.io/langgraph/)
 - [LangGraph tutorials](https://langchain-ai.github.io/langgraph/tutorials/)
-- [LangGraph examples repository](https://github.com/langchain-ai/langgraph/tree/main/examples)
+- [LangGraph persistence guide](https://langchain-ai.github.io/langgraph/how-tos/persistence/)
+- [LangGraph prebuilt components](https://langchain-ai.github.io/langgraph/reference/prebuilt/)
 
 Tags: LangGraph, Agent, Python, LLM

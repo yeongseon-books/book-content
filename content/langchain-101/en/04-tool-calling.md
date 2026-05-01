@@ -3,7 +3,7 @@ title: 'Tool calling — connecting external tools'
 series: langchain-101
 episode: 4
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,85 @@ last_reviewed: '2026-05-01'
 
 # Tool calling — connecting external tools
 
-> LangChain 101 (4/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/04-tool-calling)
+- How is tool calling different from a normal prompt-only chain
+- What execution contract do `@tool` and type hints expose to the model
+- After `bind_tools()`, what loop is still the application's responsibility
+- How do you make tool usage more reliable instead of leaving it to chance
+
+> Tool calling works when the model stops pretending to do the work itself and starts choosing which real function should do it.
+
+```mermaid
+flowchart LR
+    A[user question] --> B[LLM with tools]
+    B --> C[tool call]
+    C --> D[Python function execution]
+    D --> E[ToolMessage]
+    E --> F[final answer]
+```
+
+## Minimal runnable example
+
+```python
+import os
+
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+
+@tool
+def add_numbers(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b
+
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+response = llm.bind_tools([add_numbers]).invoke("Add 13 and 29.")
+print(response.tool_calls)
+```
+
+## What to notice in this code
+
+- The tool name, description, and input schema come from the function signature and docstring.
+- `bind_tools()` exposes tools to the model but does not execute them for you.
+- When `tool_calls` appears in the model response, your application loop takes over.
+- Conceptually, tool calling is still message passing, just with an extra function-execution round trip.
+
+## Where engineers get confused
+
+- Binding a tool does not mean the function runs automatically.
+- Weak docstrings and vague type hints make tool selection worse.
+- For simple math, the model may answer directly unless you explicitly instruct it to use tools.
+
+## Checklist
+
+- [ ] I understand what schema a `@tool` function exposes
+- [ ] I can describe the application loop after `bind_tools()`
+- [ ] I can read `tool_calls` and execute the matching Python function
+
+LangChain 101 (4/6)
+
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/04-tool-calling)
+
+## Questions this post answers
+
+- What information does LangChain expose to the model when you define a tool?
+- What changes when you call `bind_tools()`?
+- Why must tool results go back into the conversation as `ToolMessage`?
+- Where should a minimal tool loop stop to stay safe?
+
+> Tool calling is not the model executing Python directly. It is the model emitting a structured function request that your application executes and feeds back.
+
+## The flow at a glance
+
+```mermaid
+flowchart LR
+    Question[User question] --> LLM[ChatGroq with bind_tools]
+    LLM --> Decision{tool_calls?}
+    Decision -->|yes| Tool[Python function execution]
+    Tool --> ToolMessage[ToolMessage]
+    ToolMessage --> LLM
+    Decision -->|no| Answer[Final answer]
+```
 
 LLMs generate text. Calculation, weather lookup, database queries — those require external tools. Tool calling is the pattern where the LLM produces a structured request ("call this function with these arguments"), the application executes the actual function, and the result goes back to the LLM.
 
@@ -272,6 +348,25 @@ def run_with_tools_safe(question: str) -> str:
 ```
 
 ---
+
+## What to notice in this code
+
+- The `@tool` docstring and type hints become the model-facing description and argument schema.
+- `bind_tools()` does not create an agent by itself. It attaches tool metadata to the model so tool-call requests become possible.
+- When `tool_calls` appears in the response, the application must execute the function and return the result as `ToolMessage` for the reasoning loop to continue.
+- The multi-tool example is valuable because it makes the request → execute → reinject loop explicit.
+
+## Where engineers get confused
+
+- Tool calling is often mistaken for model-side execution, but the application always owns the real function call.
+- Vague tool descriptions lead to wrong tool selection or malformed arguments.
+- Iteration limits are not optional. A bad tool loop can keep regenerating invalid calls forever.
+
+## Checklist
+
+- [ ] I can explain the role of `@tool`, `bind_tools()`, and `ToolMessage`
+- [ ] I can describe the exact sequence after the model asks for a tool
+- [ ] I understand why a tool loop needs an explicit stop condition
 
 ## Conclusion
 

@@ -3,7 +3,7 @@ title: '다중 포맷 문서 파이프라인'
 series: document-ingestion-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,249 +19,136 @@ last_reviewed: '2026-05-01'
 
 # 다중 포맷 문서 파이프라인
 
-> 문서 수집과 인덱싱 101 시리즈 (5/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/05-multi-format-pipeline)
+- PDF, TXT, MD를 하나의 파이프라인으로 어떻게 묶을 수 있을까요?
+- 파일 형식마다 로더가 달라도 왜 공통 `Document` 구조가 중요할까요?
+- 포맷별 분기와 메타데이터 표준화는 어디서 처리하는 편이 좋을까요?
 
-실제 서비스에서는 PDF 하나만 처리하지 않습니다. Word 문서, HTML 페이지, Markdown 파일, 텍스트 파일이 한 번에 들어옵니다. 각 포맷마다 적절한 파서를 선택하고 공통 포맷으로 변환하는 파이프라인이 필요합니다.
+> 다중 포맷 파이프라인의 본질은 다양한 입력을 하나의 `Document` 계약으로 수렴시키는 일입니다.
 
-다룰 내용은 다음과 같습니다.
+예제 코드: `/root/Github/document-ingestion-101/ko/05-multi-format-pipeline/main.py`
 
-- 포맷별 LangChain DocumentLoader
-- 포맷 자동 감지
-- 통합 문서 처리 파이프라인
-- HTML에서 불필요한 태그 제거
-
----
-
-<!-- ebook-only:start -->
-
-이 장의 핵심: **다중 포맷 파이프라인은 포맷별 로더를 통일된 인터페이스로 추상화한다.** Document 객체 하나로 모든 포맷을 동일하게 처리한다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 5번째 장입니다.
-앞 장에서는 **증분 인덱싱 — 변경된 문서만 업데이트**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **문서 수집 파이프라인 완성**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## LangChain DocumentLoader 목록
-
-LangChain은 다양한 포맷을 위한 DocumentLoader를 제공합니다.
-
-```python
-# 주요 DocumentLoader
-from langchain_community.document_loaders import (
-    PyMuPDFLoader,           # PDF — 가장 정확
-    Docx2txtLoader,          # Word (.docx)
-    UnstructuredHTMLLoader,  # HTML (unstructured 패키지 필요)
-    BSHTMLLoader,            # HTML (BeautifulSoup4)
-    TextLoader,              # 텍스트 파일
-    UnstructuredMarkdownLoader,  # Markdown
-    CSVLoader,               # CSV
-    JSONLoader,              # JSON
-)
+```mermaid
+flowchart LR
+    A[PDF TXT MD 입력] --> B[확장자별 로더 선택]
+    B --> C[공통 Document 생성]
+    C --> D[source format 메타데이터 표준화]
 ```
 
----
+실제 문서 수집은 PDF만 다루지 않습니다. 운영 노트는 TXT로, 팀 런북은 Markdown으로, 외부 자료는 PDF로 들어오는 경우가 흔합니다.
 
-## 포맷별 로더 구현
+이번 예제는 세 포맷을 각각 읽되 최종 출력은 모두 같은 `Document` 구조로 맞춥니다. 그래야 이후 청킹과 인덱싱 단계가 포맷 차이를 의식하지 않아도 됩니다.
+
+## 실행 예제
 
 ```python
-import os
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
+from __future__ import annotations
+
 from pathlib import Path
 
-from langchain.schema import Document
-from langchain_community.document_loaders import (
-    BSHTMLLoader,
-    Docx2txtLoader,
-    PyMuPDFLoader,
-    TextLoader,
-)
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
+from pypdf import PdfReader
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
-def load_pdf(file_path: str) -> list[Document]:
-    """PDF 파일을 로드합니다."""
-    loader = PyMuPDFLoader(file_path)
-    docs = loader.load()
-    # source 메타데이터 표준화
-    for doc in docs:
-        doc.metadata["format"] = "pdf"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / 'data'
+DATA_DIR.mkdir(exist_ok=True)
 
-def load_word(file_path: str) -> list[Document]:
-    """Word (.docx) 파일을 로드합니다."""
-    loader = Docx2txtLoader(file_path)
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "docx"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+def create_pdf(path: Path) -> None:
+    c = canvas.Canvas(str(path), pagesize=A4)
+    c.setFont('Helvetica', 12)
+    c.drawString(72, 780, 'PDF source: incident review and remediation steps.')
+    c.drawString(72, 760, 'Store the source format in metadata so later stages stay uniform.')
+    c.save()
 
-def load_html(file_path: str) -> list[Document]:
-    """HTML 파일에서 텍스트를 추출합니다. 스크립트와 스타일 태그를 제거합니다."""
-    loader = BSHTMLLoader(file_path, bs_kwargs={"features": "html.parser"})
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "html"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+def seed_files() -> list[Path]:
+    pdf_path = DATA_DIR / 'incident.pdf'
+    txt_path = DATA_DIR / 'notes.txt'
+    md_path = DATA_DIR / 'runbook.md'
+    create_pdf(pdf_path)
+    txt_path.write_text('TXT source: queue backlog grew overnight. Scale-out reduced latency.
+', encoding='utf-8')
+    md_path.write_text('# Runbook
 
-def load_text(file_path: str, encoding: str = "utf-8") -> list[Document]:
-    """텍스트 파일을 로드합니다."""
-    loader = TextLoader(file_path, encoding=encoding)
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "txt"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+MD source: restart the worker only after checking the dead-letter queue.
+', encoding='utf-8')
+    return [pdf_path, txt_path, md_path]
 
-def load_markdown(file_path: str) -> list[Document]:
-    """Markdown 파일을 로드합니다."""
-    # Markdown은 TextLoader로 충분
-    loader = TextLoader(file_path, encoding="utf-8")
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "md"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+def load_pdf(path: Path) -> list[Document]:
+    reader = PdfReader(str(path))
+    text = '
+'.join((page.extract_text() or '').strip() for page in reader.pages)
+    return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
+
+def load_text_like(path: Path, fmt: str) -> list[Document]:
+    return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': fmt})]
+
+def load_document(path: Path) -> list[Document]:
+    suffix = path.suffix.lower()
+    if suffix == '.pdf':
+        return load_pdf(path)
+    if suffix == '.txt':
+        return load_text_like(path, 'txt')
+    if suffix in {'.md', '.markdown'}:
+        return load_text_like(path, 'md')
+    raise ValueError(f'unsupported format: {suffix}')
+
+def main() -> None:
+    for path in seed_files():
+        docs = load_document(path)
+        for doc in docs:
+            preview = doc.page_content.replace('
+', ' ')[:90]
+            print(f"source={doc.metadata['source']} format={doc.metadata['format']} preview={preview}")
+
+if __name__ == '__main__':
+    main()
 ```
 
----
+## 실행 방법
 
-## 포맷 자동 감지 라우터
-
-```python
-LOADER_MAP = {
-    ".pdf": load_pdf,
-    ".docx": load_word,
-    ".doc": load_word,
-    ".html": load_html,
-    ".htm": load_html,
-    ".txt": load_text,
-    ".md": load_markdown,
-    ".markdown": load_markdown,
-}
-
-def load_document(file_path: str) -> list[Document]:
-    """
-    파일 확장자를 보고 적절한 로더를 선택해서 문서를 로드합니다.
-    """
-    suffix = Path(file_path).suffix.lower()
-    loader_fn = LOADER_MAP.get(suffix)
-
-    if loader_fn is None:
-        raise ValueError(f"지원하지 않는 파일 포맷: {suffix}\n지원 포맷: {list(LOADER_MAP.keys())}")
-
-    docs = loader_fn(file_path)
-    print(f"  [{suffix[1:].upper()}] {Path(file_path).name}: {len(docs)}개 페이지/섹션 로드")
-    return docs
+```bash
+python main.py
 ```
 
----
+## 검증된 실행 결과
 
-## 통합 파이프라인
-
-```python
-import os
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-
-def process_directory(
-    directory: str,
-    patterns: list[str] = None,
-    chunk_size: int = 400,
-    chunk_overlap: int = 80,
-) -> FAISS:
-    """
-    디렉터리의 모든 지원 문서를 로드, 청킹, 인덱싱합니다.
-    """
-    if patterns is None:
-        patterns = ["*.pdf", "*.docx", "*.html", "*.txt", "*.md"]
-
-    directory = Path(directory)
-    all_files = []
-    for pattern in patterns:
-        all_files.extend(directory.glob(pattern))
-
-    print(f"발견된 파일: {len(all_files)}개")
-
-    all_docs = []
-    for file_path in all_files:
-        try:
-            docs = load_document(str(file_path))
-            all_docs.extend(docs)
-        except Exception as e:
-            print(f"  [오류] {file_path.name}: {e}")
-
-    if not all_docs:
-        raise ValueError("처리할 문서가 없습니다.")
-
-    # 청킹
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". ", " "],
-    )
-    chunks = splitter.split_documents(all_docs)
-    print(f"총 청크 수: {len(chunks)}")
-
-    # 포맷별 통계
-    format_counts = {}
-    for chunk in chunks:
-        fmt = chunk.metadata.get("format", "unknown")
-        format_counts[fmt] = format_counts.get(fmt, 0) + 1
-    print(f"포맷별 청크 분포: {format_counts}")
-
-    # 인덱싱
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-    vectorstore = FAISS.from_documents(chunks, embedding_model)
-    print(f"인덱스 완료: {vectorstore.index.ntotal}개 벡터")
-    return vectorstore
-
-# 테스트: 임시 파일들 생성
-import tempfile
-
-with tempfile.TemporaryDirectory() as tmpdir:
-    tmpdir = Path(tmpdir)
-
-    (tmpdir / "guide.txt").write_text(
-        "파이썬 설치 가이드\n\n파이썬 3.10 이상을 python.org에서 다운로드하세요.\npip install 명령으로 패키지를 설치합니다.",
-        encoding="utf-8",
-    )
-    (tmpdir / "readme.md").write_text(
-        "# 프로젝트 소개\n\n이 프로젝트는 RAG 파이프라인을 구현합니다.\n\n## 기능\n\n- 문서 인덱싱\n- 질의응답",
-        encoding="utf-8",
-    )
-    (tmpdir / "index.html").write_text(
-        "<html><body><h1>제품 소개</h1><p>이 제품은 AI 기반 문서 검색 시스템입니다.</p></body></html>",
-        encoding="utf-8",
-    )
-
-    vectorstore = process_directory(str(tmpdir))
-
-    # 검색 테스트
-    results = vectorstore.similarity_search("파이썬 설치", k=2)
-    print("\n검색 결과:")
-    for r in results:
-        print(f"  [{r.metadata.get('format')}] {r.page_content[:80]}")
+```text
+source=incident.pdf format=pdf preview=PDF source: incident review and remediation steps. ...
+source=notes.txt format=txt preview=TXT source: queue backlog grew overnight. ...
+source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 ```
 
----
+## 이 코드에서 봐야 할 것
 
-## 마무리
+- `load_document()`가 확장자 분기를 한곳에 모아서 라우팅 책임을 명확히 합니다.
+- 각 로더가 `source`와 `format` 메타데이터를 공통 키로 맞추기 때문에 후속 단계 코드가 단순해집니다.
+- PDF는 `pypdf`, TXT/MD는 파일 읽기로 처리해도 출력 계약은 동일합니다.
 
-다양한 포맷의 문서를 하나의 파이프라인으로 처리하는 핵심은 공통 인터페이스(`list[Document]`)로 변환하는 것입니다. 포맷별 파서를 라우터로 연결하면 새 포맷을 추가할 때 파서 함수 하나와 LOADER_MAP 한 줄만 추가하면 됩니다.
+## 실무에서 헷갈리는 지점
 
-다음 글에서는 지금까지 다룬 모든 요소를 하나의 프로덕션 파이프라인으로 조합합니다.
+- 다중 포맷 지원은 로더 개수를 늘리는 문제가 아니라 메타데이터 키를 통일하는 문제입니다.
+- Markdown도 결국 텍스트처럼 읽을 수 있지만 헤더 보존이 필요하면 이후 청킹 설정을 별도로 가져가야 합니다.
+- PDF 로더와 텍스트 로더의 반환 단위가 다를 수 있으니 페이지 기준인지 파일 기준인지 계약을 먼저 정해야 합니다.
+
+## 체크리스트
+
+- [ ] PDF, TXT, MD 입력을 모두 한 번에 처리했다.
+- [ ] 모든 출력에 source와 format 메타데이터가 있다.
+- [ ] 확장자 라우팅 로직이 한 함수에 모여 있다.
+- [ ] 후속 단계가 포맷별 조건문 없이 동작할 수 있는지 확인했다.
 
 <!-- blog-only:start -->
-다음 글: [문서 수집 파이프라인 완성](./06-pipeline-completion.md)
+
+## 정리
+
+포맷별 파싱은 달라도 `Document` 계약이 하나면 나머지 파이프라인은 훨씬 단순해집니다.
+
+다음 글에서는 이 모든 단계를 합쳐 FAISS 저장과 재로딩까지 이어지는 완성형 파이프라인을 만듭니다.
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -276,12 +163,8 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangChain DocumentLoaders](https://python.langchain.com/docs/integrations/document_loaders/)
-- [Unstructured.io 라이브러리](https://unstructured.io/)
-- [python-docx](https://python-docx.readthedocs.io/)
+- https://python.langchain.com/docs/concepts/document_loaders/
 
 Tags: RAG, Document Processing, LangChain, Python

@@ -3,7 +3,7 @@ title: Prompt Construction and Context Injection — Inside PromptTemplate
 series: rag-deep-dive
 episode: 4
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,31 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Prompt Construction and Context Injection — Inside PromptTemplate
+
+<!-- a-grade-intro:begin -->
+## Questions this post answers
+
+- What does `PromptTemplate` validate beyond string interpolation?
+- How does `ChatPromptTemplate.from_messages()` keep inputs structured?
+- When do retrieved `Document` objects collapse into a `{context}` string?
+- What changes once you bind variables with `partial()`?
+
+> The prompt layer is where structured retrieval output becomes the exact contract the model will read.
+
+```mermaid
+flowchart LR
+    A[Retrieved documents] --> B[Context formatting]
+    C[Question] --> D[Variable binding]
+    E[History] --> D
+    B --> D
+    D --> F[ChatPromptTemplate]
+    F --> G[Role tagged messages]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (4/6)
 
@@ -31,6 +52,70 @@ This is chapter 4 of 6 in the series.
 The previous chapter covered **Retriever Design — VectorStoreRetriever and MMR**.
 After this chapter, the next one moves on to **Assembling the RAG Chain — RetrievalQA vs LCEL**.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## Minimal runnable example
+
+Example file: `/root/Github/rag-deep-dive/en/04-prompt-construction-and-context-injection/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+def main() -> None:
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", "Answer only from the supplied context."),
+            MessagesPlaceholder("history", optional=True, n_messages=4),
+            ("human", "Context:\n{context}\n\nQuestion: {question}"),
+        ]
+    ).partial(question="Why was the message dead-lettered?")
+
+    prompt_value = prompt.invoke(
+        {
+            "history": [
+                HumanMessage(content="What happens after the third retry?"),
+                AIMessage(content="The payload moves to the dead-letter queue."),
+            ],
+            "context": (
+                "Retry budget: 3 attempts before dead-lettering. "
+                "Operators inspect the original payload before replay."
+            ),
+        }
+    )
+
+    print("input variables:", prompt.input_variables)
+    print("partial variables:", sorted(prompt.partial_variables.keys()))
+    for message in prompt_value.messages:
+        print(type(message).__name__, "->", message.content)
+
+if __name__ == "__main__":
+    main()
+```
+
+### What to notice in this code
+
+- After `partial(question=...)`, the remaining input variable set becomes smaller.
+- `MessagesPlaceholder` preserves chat history as message objects rather than flattening it.
+- `invoke()` returns a prompt value path, not just one interpolated string.
+
+### Where engineers get confused
+
+- `{context}` becomes a string in the document-combination layer, not in retrieval itself.
+- `format()` and `invoke()` look similar but return different types and fit LCEL differently.
+- Flattening system instructions, history, and context into one string throws away chat structure.
+
+## Checklist
+
+- [ ] I separated partial variables from per-call variables.
+- [ ] I kept history as messages and context as formatted text.
+- [ ] I verified whether my prompt step returns a string or a prompt value.
+- [ ] I planned a separate context-length check before model invocation.
+<!-- a-grade-example:end -->
 
 ## Source Version
 

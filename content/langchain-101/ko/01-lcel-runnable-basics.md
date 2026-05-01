@@ -3,7 +3,7 @@ title: 'LangChain 소개 — LCEL과 Runnable 기본'
 series: langchain-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,80 @@ last_reviewed: '2026-05-01'
 
 # LangChain 소개 — LCEL과 Runnable 기본
 
-> LangChain 101 시리즈 (1/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/01-lcel-runnable-basics)
+- LCEL은 왜 생겼고, 어떤 연결 코드를 줄여 주는가
+- Runnable 인터페이스는 어떤 공통 호출 방식을 강제하는가
+- `invoke()`, `batch()`, `stream()`은 언제 각각 쓰는가
+- `|` 연산자로 연결한 체인은 내부에서 어떤 순서로 흘러가는가
+
+> LangChain에서는 입력과 출력 타입만 맞으면 거의 모든 컴포넌트를 같은 파이프 규칙으로 연결할 수 있습니다.
+
+```mermaid
+flowchart LR
+    A[입력 딕셔너리] --> B[ChatPromptTemplate]
+    B --> C[ChatGroq]
+    C --> D[StrOutputParser]
+    D --> E[문자열 출력]
+```
+
+## 최소 실행 예제
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_template("{topic}을 한 문단으로 설명해 주세요.")
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+chain = prompt | llm | StrOutputParser()
+
+print(chain.invoke({"topic": "LCEL"}))
+```
+
+## 이 코드에서 봐야 할 것
+
+- `ChatPromptTemplate`은 딕셔너리 입력을 받아 메시지로 바꿉니다.
+- `ChatGroq`는 메시지를 받아 `AIMessage`를 반환합니다.
+- `StrOutputParser`가 마지막에 붙으면서 체인 출력 타입이 문자열로 고정됩니다.
+- 이 세 단계가 모두 Runnable이라서 `|` 하나로 조립됩니다.
+
+## 실무에서 헷갈리는 지점
+
+- LCEL은 새 모델이 아니라 컴포넌트 연결 문법입니다.
+- `invoke()`와 `stream()`은 체인 정의가 아니라 호출 방식만 다릅니다.
+- `RunnableLambda`는 복잡한 비즈니스 로직용 프레임워크가 아니라 가벼운 변환용 연결점에 가깝습니다.
+
+## 체크리스트
+
+- [ ] 어떤 값이 프롬프트로 들어가고 어떤 값이 문자열로 나오는지 설명할 수 있다
+- [ ] `invoke()`, `batch()`, `stream()`의 용도 차이를 구분할 수 있다
+- [ ] `prompt | llm | parser` 구조를 직접 실행해 볼 수 있다
+
+LangChain 101 시리즈 (1/6)
+
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/01-lcel-runnable-basics)
+
+## 이 글에서 답할 질문
+
+- LCEL은 왜 `|` 연산자로 컴포넌트를 연결할까
+- Runnable 인터페이스는 어떤 메서드를 공통으로 제공할까
+- Prompt, LLM, Parser가 체인 안에서 어떤 타입으로 이어질까
+- `invoke()`와 `batch()`는 언제 구분해서 써야 할까
+
+> LCEL은 프롬프트, 모델, 파서를 같은 Runnable 규약으로 묶어 한 번의 데이터 흐름으로 실행하는 방법입니다.
+
+## 핵심 흐름 한눈에 보기
+
+```mermaid
+flowchart LR
+    Input[입력 딕셔너리] --> Prompt[ChatPromptTemplate]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Parser[StrOutputParser]
+    Parser --> Output[최종 문자열]
+```
 
 LangChain을 처음 접하면 코드보다 용어가 더 먼저 막힙니다. LCEL, Runnable, Chain, Pipe — 개념은 많은데 어떤 게 핵심인지 잘 보이지 않습니다. 이번 글은 LangChain의 설계 중심인 LCEL(LangChain Expression Language)과 Runnable 인터페이스가 무엇인지, 그리고 왜 이런 구조를 썼는지부터 잡습니다.
 
@@ -267,6 +338,25 @@ results = chain.batch(topics, config={"max_concurrency": 2})
 ```
 
 ---
+
+## 이 코드에서 봐야 할 것
+
+- `prompt | llm | parser`는 문자열 결합이 아니라 Runnable 간 입출력 계약을 연결하는 파이프라인입니다.
+- `ChatPromptTemplate`의 출력은 최종 문자열이 아니라 메시지 객체이며, 그 다음 단계인 `ChatGroq`가 그 객체를 그대로 입력으로 받습니다.
+- `StrOutputParser`를 끝에 두면 `AIMessage`를 후속 코드가 다루기 쉬운 일반 문자열로 정리할 수 있습니다.
+- `batch()`는 체인 구조를 바꾸지 않고 입력만 여러 개 넣는 방식이라, 단건 `invoke()`를 이해한 뒤 확장하기 좋습니다.
+
+## 실무에서 헷갈리는 지점
+
+- LCEL을 새 문법으로 보기 쉽지만, 실제 핵심은 컴포넌트마다 같은 `Runnable` 인터페이스를 가진다는 점입니다.
+- `invoke()` 결과 타입이 단계마다 달라집니다. 프롬프트 단계는 메시지 묶음, 모델 단계는 `AIMessage`, 파서 뒤는 문자열입니다.
+- `RunnableLambda`는 편리하지만 비즈니스 로직이 길어지면 체인 가독성을 해칠 수 있습니다. 후처리는 얇게 유지하는 편이 좋습니다.
+
+## 체크리스트
+
+- [ ] `ChatPromptTemplate`, `ChatGroq`, `StrOutputParser`가 어떤 입력과 출력을 주고받는지 설명할 수 있다
+- [ ] `invoke()`와 `batch()`를 같은 체인에서 각각 호출해 볼 수 있다
+- [ ] plain Python 함수를 `RunnableLambda`로 체인에 넣는 이유를 이해했다
 
 ## 마무리
 

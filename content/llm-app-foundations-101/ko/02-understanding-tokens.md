@@ -3,7 +3,7 @@ title: 토큰 이해하기 — 비용, 한계, 컨텍스트 창
 series: llm-app-foundations-101
 episode: 2
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # 토큰 이해하기 — 비용, 한계, 컨텍스트 창

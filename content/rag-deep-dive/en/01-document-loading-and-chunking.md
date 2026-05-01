@@ -3,7 +3,7 @@ title: Document Loading and Chunking — Inside LangChain TextSplitter
 series: rag-deep-dive
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,33 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Document Loading and Chunking — Inside LangChain TextSplitter
+
+<!-- a-grade-intro:begin -->
+## Questions this post answers
+
+- Why does loader boundary design matter before similarity search starts?
+- How do Character, Recursive, and Token splitters cut the same text differently?
+- Why does `chunk_overlap` often feel less exact than the configured number?
+- When is token-aware splitting safer than character counting?
+
+> Chunking is not just slicing text smaller. It is freezing the semantic boundary you hope retrieval can recover later.
+
+```mermaid
+flowchart LR
+    A[Source document] --> B[Loader]
+    B --> C[Character splitter]
+    B --> D[Recursive splitter]
+    B --> E[Token splitter]
+    C --> F[Chunk candidates]
+    D --> F
+    E --> F
+    F --> G[Retrievable context]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (1/6)
 
@@ -30,6 +53,81 @@ last_reviewed: '2026-04-30'
 This is chapter 1 of 6 in the series.
 After this chapter, the next one moves on to **Embeddings and the Vector Index — Inside FAISS IndexFlatL2**.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## Minimal runnable example
+
+Example file: `/root/Github/rag-deep-dive/en/01-document-loading-and-chunking/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+from langchain_text_splitters import (
+    CharacterTextSplitter,
+    RecursiveCharacterTextSplitter,
+    TokenTextSplitter,
+)
+
+TEXT = """# Incident runbook
+
+## Retry policy
+The worker retries a failed message three times.
+After the final retry, the payload moves to the dead-letter queue.
+
+## Operator action
+The on-call engineer checks the exception chain and the original payload.
+"""
+
+def print_chunks(name: str, chunks: list[str]) -> None:
+    print(f"\n=== {name} ({len(chunks)} chunks) ===")
+    for index, chunk in enumerate(chunks, start=1):
+        print(f"[{index}] {chunk!r}")
+
+def main() -> None:
+    character = CharacterTextSplitter(
+        separator="\n\n",
+        chunk_size=90,
+        chunk_overlap=10,
+    )
+    recursive = RecursiveCharacterTextSplitter(
+        chunk_size=90,
+        chunk_overlap=10,
+    )
+    token = TokenTextSplitter(
+        encoding_name="cl100k_base",
+        chunk_size=24,
+        chunk_overlap=4,
+    )
+
+    print_chunks("CharacterTextSplitter", character.split_text(TEXT))
+    print_chunks("RecursiveCharacterTextSplitter", recursive.split_text(TEXT))
+    print_chunks("TokenTextSplitter", token.split_text(TEXT))
+
+if __name__ == "__main__":
+    main()
+```
+
+### What to notice in this code
+
+- The same source text produces different chunk boundaries across the three splitters.
+- `RecursiveCharacterTextSplitter` preserves paragraph and line boundaries before degrading further.
+- `TokenTextSplitter` gives a more predictable context budget in model terms.
+
+### Where engineers get confused
+
+- `chunk_overlap=10` does not guarantee an exact 10-character overlap in merge-based splitting.
+- Recursive splitting preserves structure better, but it is not magically domain-aware.
+- Character budgets can look safe while token budgets still overflow later.
+
+## Checklist
+
+- [ ] I inspected the loader boundary before tuning split sizes.
+- [ ] I compared character-based and token-based chunk outputs on the same text.
+- [ ] I verified realized overlap from actual output rather than config alone.
+- [ ] I separated ingest-time chunking from prompt-time token budgeting.
+<!-- a-grade-example:end -->
 
 ## Source Version
 

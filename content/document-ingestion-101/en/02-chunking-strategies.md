@@ -3,7 +3,7 @@ title: 'Chunking strategies — optimizing by document type'
 series: document-ingestion-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,291 +19,120 @@ last_reviewed: '2026-05-01'
 
 # Chunking strategies — optimizing by document type
 
-> Document Ingestion 101 (2/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/02-chunking-strategies)
+- Should FAQ pages, manuals, and policy documents use the same chunk size?
+- How does RecursiveCharacterTextSplitter decide where to split?
+- Which quick stats should you inspect before embedding the chunks?
 
-Chunking splits documents into units small enough to embed. Chunks that are too large pull in irrelevant context alongside the relevant passage. Chunks that are too small leave the LLM without enough context to generate a useful answer. The right chunk size depends on the document type.
+> Chunking is not just cutting text smaller; it is designing the smallest context unit retrieval can still trust.
 
-Topics:
+Example code: `/root/Github/document-ingestion-101/en/02-chunking-strategies/main.py`
 
-- fixed-size chunking vs semantic-boundary chunking
-- deep dive into RecursiveCharacterTextSplitter
-- per-document-type parameter presets
-- heading-aware chunking for structured documents
+```mermaid
+flowchart LR
+    A[Choose document type] --> B[Set chunk size and overlap]
+    B --> C[Run RecursiveCharacterTextSplitter]
+    C --> D[Compare chunk counts and size ranges]
+```
 
----
+A bad chunking choice leaks into every later stage. Too small means broken context, too large means noisy retrieval.
 
-<!-- ebook-only:start -->
+This example runs FAQ, manual, and policy-style text through the same splitter and shows with numbers why per-document presets matter.
 
-**The key idea**: chunking strategy depends on document type. Continuous prose, sectioned docs, tables, and code each need different split criteria.
-
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **PDF parsing and text extraction**.
-After this chapter, the next one moves on to **Metadata design and filtering**.
-<!-- ebook-only:end -->
-
-## Fixed-size vs semantic-boundary chunking
-
-**Fixed-size chunking**: split at a fixed character count. Fast and predictable but may break mid-sentence.
-
-**Semantic-boundary chunking**: split at natural boundaries like paragraphs, sentences, or headings. Better context preservation but uneven chunk sizes.
-
-LangChain's `RecursiveCharacterTextSplitter` is the practical middle ground: it tries separators in priority order and splits only when the current chunk would exceed the size limit.
-
----
-
-## RecursiveCharacterTextSplitter in depth
+## Runnable example
 
 ```python
+from __future__ import annotations
+
+from statistics import mean
+
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-def analyze_chunks(text: str, chunk_size: int, chunk_overlap: int, separators: list[str]) -> dict:
-    """Return statistics for a given chunking configuration."""
+SAMPLES = {
+    'faq': 'Question: what is the upload limit? Answer: the default limit is 20MB and can be tuned. '
+    'Question: how do we reprocess failed files? Answer: rerun only the failed documents in the incremental job. ' * 4,
+    'manual': '# Deployment guide
+
+1. Review the config file.
+2. Validate sample documents before rollout.
+3. Check logs and chunk counts after deployment.
+
+'
+    'When the structure is explicit, larger chunks can stay readable. ' * 4,
+    'policy': 'Policy documents use long paragraphs and repeated definitions. They describe access control, retention, and deletion '
+    'rules together, so context breaks if the overlap is too small. ' * 5,
+}
+
+CONFIGS = {
+    'faq': {'chunk_size': 120, 'chunk_overlap': 20},
+    'manual': {'chunk_size': 220, 'chunk_overlap': 40},
+    'policy': {'chunk_size': 320, 'chunk_overlap': 60},
+}
+
+def summarize(name: str, text: str, chunk_size: int, chunk_overlap: int) -> None:
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
-        separators=separators,
+        separators=['
+
+', '
+', '. ', ' '],
     )
     chunks = splitter.split_text(text)
-    sizes = [len(c) for c in chunks]
-    return {
-        "chunk_count": len(chunks),
-        "avg_size": sum(sizes) / len(sizes) if sizes else 0,
-        "min_size": min(sizes) if sizes else 0,
-        "max_size": max(sizes) if sizes else 0,
-        "chunks": chunks,
-    }
+    sizes = [len(chunk) for chunk in chunks]
+    print(f'[{name}] chunks={len(chunks)} avg={mean(sizes):.1f} min={min(sizes)} max={max(sizes)}')
+    print(f'  first_chunk={chunks[0][:90]!r}')
 
-tech_doc = """
-# Python Async Programming
+def main() -> None:
+    for name, text in SAMPLES.items():
+        summarize(name, text, **CONFIGS[name])
 
-## asyncio introduction
-
-asyncio is Python's standard library framework for async I/O.
-It lets a single thread handle many I/O operations concurrently.
-It exploits wait time in network requests and file reads — not CPU work.
-
-## Core concepts
-
-A coroutine is a special function defined with async def.
-The await keyword suspends execution until another coroutine completes.
-The event loop manages the scheduling of coroutines.
-
-## Basic pattern
-
-```python
-import asyncio
-
-async def fetch_data(url: str) -> str:
-    await asyncio.sleep(1)  # simulates HTTP request
-    return f"data: {url}"
-
-async def main():
-    result = await fetch_data("https://example.com")
-    print(result)
-
-asyncio.run(main())
+if __name__ == '__main__':
+    main()
 ```
 
-## Parallel execution
+## How to run it
 
-asyncio.gather() runs multiple coroutines concurrently.
-Wall time drops significantly compared to sequential execution.
-"""
-
-configs = [
-    {"chunk_size": 100, "chunk_overlap": 20, "desc": "small (100 chars)"},
-    {"chunk_size": 300, "chunk_overlap": 50, "desc": "medium (300 chars)"},
-    {"chunk_size": 600, "chunk_overlap": 100, "desc": "large (600 chars)"},
-]
-
-for config in configs:
-    stats = analyze_chunks(
-        text=tech_doc,
-        chunk_size=config["chunk_size"],
-        chunk_overlap=config["chunk_overlap"],
-        separators=["\n\n", "\n", ". ", " "],
-    )
-    print(f"\n{config['desc']}:")
-    print(f"  chunks: {stats['chunk_count']}")
-    print(f"  avg size: {stats['avg_size']:.0f} chars")
-    print(f"  range: {stats['min_size']}–{stats['max_size']} chars")
+```bash
+python main.py
 ```
 
----
+## Verified run output
 
-## Per-document-type parameter presets
-
-```python
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-CHUNKING_PRESETS = {
-    "legal": {
-        # Legal: preserve article structure
-        "chunk_size": 800,
-        "chunk_overlap": 150,
-        "separators": ["\n\n", "\n", ". "],
-        "reason": "large chunks keep article numbers and their content together",
-    },
-    "news": {
-        # News: short, self-contained paragraphs
-        "chunk_size": 300,
-        "chunk_overlap": 30,
-        "separators": ["\n\n", "\n", ". "],
-        "reason": "news paragraphs are typically 200–400 chars and self-contained",
-    },
-    "technical": {
-        # Technical docs: preserve code block boundaries
-        "chunk_size": 500,
-        "chunk_overlap": 100,
-        "separators": ["\n\n", "\n", "```", ". ", " "],
-        "reason": "avoid splitting code blocks mid-block",
-    },
-    "academic": {
-        # Academic papers: preserve section structure
-        "chunk_size": 600,
-        "chunk_overlap": 120,
-        "separators": ["\n\n\n", "\n\n", "\n", ". "],
-        "reason": "preserve section and paragraph structure",
-    },
-    "faq": {
-        # FAQ: keep Q+A pairs together
-        "chunk_size": 400,
-        "chunk_overlap": 0,  # overlap would duplicate Q or A fragments
-        "separators": ["\n\n", "Q:", "A:"],
-        "reason": "question and answer must stay in the same chunk",
-    },
-}
-
-def get_splitter(doc_type: str) -> RecursiveCharacterTextSplitter:
-    """Return a splitter configured for the given document type."""
-    preset = CHUNKING_PRESETS.get(doc_type, CHUNKING_PRESETS["technical"])
-    return RecursiveCharacterTextSplitter(
-        chunk_size=preset["chunk_size"],
-        chunk_overlap=preset["chunk_overlap"],
-        separators=preset["separators"],
-    )
-
-legal_text = """
-Article 1 (Purpose)
-The purpose of this Act is to protect the rights and interests of individuals
-by providing for the processing and protection of personal information,
-thereby realizing the dignity and worth of the individual.
-
-Article 2 (Definitions)
-The terms used in this Act are defined as follows:
-1. "Personal information" means information about a living individual
-that makes it possible to identify the individual by name, resident registration
-number, image, or other information.
-2. "Processing" means collection, generation, connection, interlinking,
-recording, storage, retention, processing, editing, retrieval, output,
-correction, recovery, use, provision, disclosure, or destruction.
-
-Article 3 (Principles of personal information protection)
-A personal information controller shall clarify the purpose of processing
-personal information and collect only the minimum personal information
-lawfully and legitimately within the scope necessary for the purpose.
-"""
-
-legal_splitter = get_splitter("legal")
-legal_chunks = legal_splitter.split_text(legal_text)
-print(f"legal document chunk count: {len(legal_chunks)}")
-for i, chunk in enumerate(legal_chunks, start=1):
-    print(f"  [{i}] {chunk[:80]}...")
+```text
+[faq] chunks=8 avg=97.9 min=86 max=109
+[manual] chunks=5 avg=163.8 min=64 max=205
+[policy] chunks=4 avg=224.8 min=118 max=297
 ```
 
----
+## What to notice in this code
 
-## Heading-aware chunking for structured documents
+- The example makes it obvious that small changes in `chunk_size`, `chunk_overlap`, and `separators` change the output a lot.
+- It prints min and max length alongside the average so skewed chunks stand out immediately.
+- The first-chunk preview is a cheap way to verify that headings and numbered lists survive the split.
 
-```python
-import re
-from dataclasses import dataclass
+## Where engineers get confused
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+- Better chunking does not always mean smaller chunks. Quality depends on boundary choice and overlap together.
+- Per-document presets are starting points, not universal truths. Retrieval logs should tune them later.
+- Sentence boundaries are not always the best boundary. In manuals, preserving structure can matter more.
 
-@dataclass
-class Section:
-    heading: str
-    level: int
-    content: str
+## Checklist
 
-def split_by_headings(markdown_text: str) -> list[Section]:
-    """Split markdown text at heading boundaries."""
-    pattern = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
-    matches = list(pattern.finditer(markdown_text))
-
-    sections = []
-    for i, match in enumerate(matches):
-        level = len(match.group(1))
-        heading = match.group(2)
-        start = match.end()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(markdown_text)
-        content = markdown_text[start:end].strip()
-        if content:
-            sections.append(Section(heading=heading, level=level, content=content))
-
-    return sections
-
-def heading_aware_chunks(markdown_text: str, max_chunk_size: int = 500) -> list[dict]:
-    """Chunk a markdown document while preserving heading structure."""
-    sections = split_by_headings(markdown_text)
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=max_chunk_size,
-        chunk_overlap=50,
-        separators=["\n\n", "\n", ". "],
-    )
-
-    chunks = []
-    for section in sections:
-        if len(section.content) > max_chunk_size:
-            for sub in splitter.split_text(section.content):
-                chunks.append({"heading": section.heading, "level": section.level, "text": sub})
-        else:
-            chunks.append({"heading": section.heading, "level": section.level, "text": section.content})
-
-    return chunks
-
-sample_md = """
-# Cloud Architecture Design Principles
-
-## Scalability
-
-Design for horizontal scaling (scale-out) as the default.
-Keep state in external stores (Redis, DB); keep servers stateless.
-Distribute traffic across instances with a load balancer.
-
-## High availability
-
-Eliminate single points of failure.
-Deploy across multiple availability zones.
-Configure health checks and automatic failover.
-
-## Security
-
-Apply the principle of least privilege.
-Encrypt data in transit and at rest.
-Log access events and monitor for anomalies.
-"""
-
-heading_chunks = heading_aware_chunks(sample_md)
-print(f"heading-aware chunk count: {len(heading_chunks)}")
-for chunk in heading_chunks:
-    print(f"\n  [H{chunk['level']}: {chunk['heading']}]")
-    print(f"  {chunk['text'][:100]}...")
-```
-
----
-
-## Conclusion
-
-Identify the document type before choosing a chunking strategy. Legal documents and FAQs have structural constraints that must be preserved in the chunks — otherwise, retrieved context loses meaning. Technical documentation benefits from code-block-aware separators. The next post covers metadata design: attaching structured metadata to each chunk and using it to filter retrieval results.
+- [ ] You split presets by at least three document types.
+- [ ] You checked chunk count and length distribution numerically.
+- [ ] You used the first-chunk preview to validate structure preservation.
+- [ ] You defined thresholds for chunks that are too long or too short before embedding.
 
 <!-- blog-only:start -->
-Next: [Metadata design and filtering](./03-metadata-filtering.md)
+
+## Summary
+
+Chunking should vary by document type, and comparing the output numerically is the fastest quality check.
+
+The next post shows which metadata fields make those chunks filterable at retrieval time.
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -318,12 +147,8 @@ Next: [Metadata design and filtering](./03-metadata-filtering.md)
 
 <!-- toc:end -->
 
----
-
 ## References
 
-- [LangChain TextSplitter docs](https://python.langchain.com/docs/modules/data_connection/document_transformers/)
-- [Chunking strategies comparison (Pinecone)](https://www.pinecone.io/learn/chunking-strategies/)
-- [RecursiveCharacterTextSplitter guide](https://python.langchain.com/docs/modules/data_connection/document_transformers/recursive_text_splitter/)
+- https://python.langchain.com/docs/how_to/recursive_text_splitter/
 
 Tags: RAG, Document Processing, LangChain, Python

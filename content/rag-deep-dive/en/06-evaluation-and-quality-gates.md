@@ -3,7 +3,7 @@ title: Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
 series: rag-deep-dive
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,33 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
+
+<!-- a-grade-intro:begin -->
+## Questions this post answers
+
+- Why can’t RAGAS start from an answer string alone?
+- How does faithfulness decompose and verify an answer?
+- What does answer relevancy measure if not truth?
+- What needs to stay fixed before these scores become a CI gate?
+
+> Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.
+
+```mermaid
+flowchart LR
+    A[Question] --> E[Evaluation row]
+    B[Contexts] --> E
+    C[Answer] --> E
+    D[Ground truth] --> E
+    E --> F[Faithfulness]
+    E --> G[Answer relevancy]
+    F --> H[Quality gate]
+    G --> H
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (6/6)
 
@@ -30,6 +53,88 @@ last_reviewed: '2026-04-30'
 This is chapter 6 of 6 in the series.
 The previous chapter covered **Assembling the RAG Chain — RetrievalQA vs LCEL**.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## Minimal runnable example
+
+Example file: `/root/Github/rag-deep-dive/en/06-evaluation-and-quality-gates/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+import os
+
+from datasets import Dataset
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_groq import ChatGroq
+from ragas import evaluate
+from ragas.embeddings import LangchainEmbeddingsWrapper
+from ragas.llms import LangchainLLMWrapper
+from ragas.metrics import answer_relevancy, faithfulness
+
+def main() -> None:
+    if not os.environ.get("GROQ_API_KEY"):
+        raise RuntimeError("GROQ_API_KEY is required")
+
+    dataset = Dataset.from_dict(
+        {
+            "question": ["After how many retries is the message dead-lettered?"],
+            "contexts": [[
+                "The worker retries a failed message up to three times before giving up.",
+                "After the final retry, the payload is moved to the dead-letter queue.",
+            ]],
+            "answer": [
+                "The system retries the message three times. After the final retry, it moves the payload to the dead-letter queue."
+            ],
+            "ground_truth": [
+                "The message is retried up to three times before it is dead-lettered."
+            ],
+        }
+    )
+
+    llm = LangchainLLMWrapper(
+        ChatGroq(model="llama-3.1-8b-instant", temperature=0, max_tokens=256)
+    )
+    embeddings = LangchainEmbeddingsWrapper(
+        HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    )
+
+    result = evaluate(
+        dataset=dataset,
+        metrics=[faithfulness, answer_relevancy],
+        llm=llm,
+        embeddings=embeddings,
+        raise_exceptions=True,
+    )
+
+    print(result)
+    print(result.to_pandas().to_string(index=False))
+
+if __name__ == "__main__":
+    main()
+```
+
+### What to notice in this code
+
+- The evaluation row preserves question, contexts, answer, and ground truth together.
+- RAGAS uses an LLM for faithfulness and embeddings for answer relevancy.
+- The result object exposes both summary scores and tabular sample output.
+
+### Where engineers get confused
+
+- High faithfulness does not guarantee high answer relevancy.
+- Answer relevancy measures focus under the original question, not factual truth.
+- Without a stable dataset schema, score comparisons stop being reproducible.
+
+## Checklist
+
+- [ ] I preserved question, evidence, answer, and target truth in the dataset.
+- [ ] I interpret faithfulness and answer relevancy as different failure axes.
+- [ ] I keep the sample set and model versions fixed before comparing scores.
+- [ ] I plan to store thresholds and raw outputs together for CI gates.
+<!-- a-grade-example:end -->
 
 ## Source Version
 

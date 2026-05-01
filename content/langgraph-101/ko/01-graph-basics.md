@@ -3,7 +3,7 @@ title: 'LangGraph 소개와 그래프 기초'
 series: langgraph-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,157 +19,116 @@ last_reviewed: '2026-05-01'
 
 # LangGraph 소개와 그래프 기초
 
-> LangGraph 101 (1/6)
+## 이 글에서 답할 질문
+
+- LangGraph에서 `StateGraph`는 정확히 무엇을 정의할까요?
+- 노드와 엣지를 어떻게 연결해야 흐름이 읽히는 그래프가 될까요?
+- `invoke()`를 호출하면 상태가 어떤 순서로 흘러갈까요?
+
+> StateGraph는 노드 함수들을 상태 전이 규칙으로 엮어 실행 가능한 워크플로로 바꾸는 설계도입니다.
 
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/01-graph-basics)
 
-LangChain은 선형 체인을 잘 다룹니다. 그러나 실제 에이전트는 루프를 돕니다. 도구를 쓰고, 결과를 보고, 다음 단계를 결정하고, 또 도구를 씁니다. 이 반복 흐름을 표현하는 것이 LangGraph의 핵심입니다. 이 포스트에서는 LangGraph의 기본 개념인 StateGraph, 노드, 엣지를 소개하고 첫 번째 그래프를 만듭니다.
+LangGraph를 처음 볼 때 가장 중요한 감각은 "체인 여러 개"가 아니라 "상태가 흐르는 그래프"라는 점입니다. 이 글에서는 가장 작은 그래프를 직접 만들면서 노드 추가, 엣지 연결, `invoke()` 실행까지 한 번에 정리합니다.
 
----
-
-<!-- ebook-only:start -->
-
-이 장의 핵심: **LangGraph는 에이전트 흐름을 그래프로 표현한다.** 노드(함수)와 엣지(전환 조건)로 복잡한 루프와 분기를 명시적으로 정의한다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **상태 관리와 체크포인트**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## LangGraph의 핵심 개념
-
-LangGraph는 LLM 워크플로를 **방향성 그래프(directed graph)**로 표현합니다.
-
-- **노드(Node)**: 작업 단위. LLM 호출, 도구 실행, 데이터 변환 등 모든 처리 단계입니다.
-- **엣지(Edge)**: 노드 간 흐름. 조건 없이 항상 이동하거나, 조건에 따라 다른 노드로 분기합니다.
-- **상태(State)**: 그래프 전체를 흐르는 데이터. 각 노드는 상태를 받아 수정하고 반환합니다.
-- **체크포인트**: 상태 스냅샷. 중단과 재개, 메모리 구현의 기반입니다.
-
----
-
-## 첫 번째 그래프: 에코 봇
-
-가장 단순한 그래프부터 시작합니다. 사용자 입력을 받아 LLM으로 처리하고 반환합니다.
-
-```python
-import os
-from typing import TypedDict, Annotated
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langchain_core.messages import BaseMessage, HumanMessage
-from langchain_groq import ChatGroq
-
-# ── 상태 스키마 ───────────────────────────────────────────────────────────
-class BasicState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-
-# ── 노드 ──────────────────────────────────────────────────────────────────
-def call_llm(state: BasicState) -> BasicState:
-    """LLM을 호출하고 응답을 상태에 추가합니다."""
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
-    )
-    response = llm.invoke(state["messages"])
-    return {"messages": [response]}
-
-# ── 그래프 구성 ───────────────────────────────────────────────────────────
-def build_basic_graph() -> StateGraph:
-    graph = StateGraph(BasicState)
-    graph.add_node("llm", call_llm)
-
-    graph.set_entry_point("llm")
-    graph.add_edge("llm", END)
-
-    return graph.compile()
-
-# ── 실행 ──────────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    app = build_basic_graph()
-
-    result = app.invoke({"messages": [HumanMessage(content="파이썬 리스트 컴프리헨션을 설명해 주세요.")]})
-    print(result["messages"][-1].content)
+```mermaid
+flowchart LR
+    A[사용자 요청] --> B[choose_topic]
+    B --> C[build_outline]
+    C --> D[write_answer]
+    D --> E[최종 상태]
 ```
 
----
-
-## 다중 노드 그래프
-
-노드를 추가하고 순서를 정의하면 파이프라인을 만들 수 있습니다.
+## 최소 실행 예제
 
 ```python
-from langchain_core.messages import SystemMessage
+from typing import TypedDict
 
-class PipelineState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
+from langgraph.graph import END, START, StateGraph
+
+class ArticleState(TypedDict):
+    user_request: str
     topic: str
-    summary: str
+    outline: list[str]
+    answer: str
 
-def extract_topic(state: PipelineState) -> PipelineState:
-    """사용자 메시지에서 주제를 추출합니다."""
-    last_msg = state["messages"][-1].content
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="사용자 메시지의 핵심 주제를 한 단어로 추출하세요. 단어만 반환하세요."),
-        HumanMessage(content=last_msg),
-    ])
-    return {"topic": response.content.strip()}
+def choose_topic(state: ArticleState) -> ArticleState:
+    request = state["user_request"].lower()
+    if "checkpoint" in request:
+        topic = "checkpoints"
+    elif "tool" in request:
+        topic = "tool calling"
+    else:
+        topic = "graph basics"
+    return {"topic": topic}
 
-def generate_answer(state: PipelineState) -> PipelineState:
-    """주제를 바탕으로 상세한 답변을 생성합니다."""
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content=f"당신은 {state['topic']} 전문가입니다. 명확하고 실용적으로 설명하세요."),
-        *state["messages"],
-    ])
-    return {"messages": [response]}
+def build_outline(state: ArticleState) -> ArticleState:
+    outline = [
+        f"Define {state['topic']}",
+        "Show the nodes in the graph",
+        "Explain how invoke() runs the graph",
+    ]
+    return {"outline": outline}
 
-def summarize_answer(state: PipelineState) -> PipelineState:
-    """답변을 한 문장으로 요약합니다."""
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    last_answer = state["messages"][-1].content
-    response = llm.invoke([
-        SystemMessage(content="주어진 내용을 한 문장으로 요약하세요."),
-        HumanMessage(content=last_answer),
-    ])
-    return {"summary": response.content}
+def write_answer(state: ArticleState) -> ArticleState:
+    bullet_lines = "\n".join(f"- {item}" for item in state["outline"])
+    answer = (
+        f"Request: {state['user_request']}\n"
+        f"Chosen topic: {state['topic']}\n"
+        "Teaching outline:\n"
+        f"{bullet_lines}"
+    )
+    return {"answer": answer}
 
-def build_pipeline_graph():
-    graph = StateGraph(PipelineState)
-    graph.add_node("extract_topic", extract_topic)
-    graph.add_node("generate_answer", generate_answer)
-    graph.add_node("summarize", summarize_answer)
+def build_graph():
+    graph = StateGraph(ArticleState)
+    graph.add_node("choose_topic", choose_topic)
+    graph.add_node("build_outline", build_outline)
+    graph.add_node("write_answer", write_answer)
 
-    graph.set_entry_point("extract_topic")
-    graph.add_edge("extract_topic", "generate_answer")
-    graph.add_edge("generate_answer", "summarize")
-    graph.add_edge("summarize", END)
+    graph.add_edge(START, "choose_topic")
+    graph.add_edge("choose_topic", "build_outline")
+    graph.add_edge("build_outline", "write_answer")
+    graph.add_edge("write_answer", END)
 
     return graph.compile()
 
 if __name__ == "__main__":
-    pipeline = build_pipeline_graph()
-    result = pipeline.invoke({
-        "messages": [HumanMessage(content="제너레이터와 이터레이터의 차이를 설명해 주세요.")],
-        "topic": "",
-        "summary": "",
-    })
-    print(f"주제: {result['topic']}")
-    print(f"요약: {result['summary']}")
-    print(f"\n전체 답변:\n{result['messages'][-1].content}")
+    app = build_graph()
+    result = app.invoke(
+        {
+            "user_request": "Explain how a LangGraph StateGraph works.",
+            "topic": "",
+            "outline": [],
+            "answer": "",
+        }
+    )
+    print(result["answer"])
 ```
 
----
+실행 파일: `/root/Github/langgraph-101/ko/01-graph-basics/main.py`
 
-## 상태 설계 원칙
+## 이 코드에서 봐야 할 것
 
-상태는 그래프를 흐르는 공유 메모리입니다. 설계 시 두 가지를 결정해야 합니다.
+- `StateGraph(ArticleState)`가 그래프 전체에서 공유할 상태 스키마를 정합니다.
+- 각 노드는 상태 전체를 받아 필요한 필드만 업데이트해서 반환합니다.
+- `START → choose_topic → build_outline → write_answer → END` 순서가 코드에 그대로 드러납니다.
 
-**필드 타입**: `Annotated[list, add_messages]`는 리스트를 덮어쓰지 않고 추가합니다. 메시지 히스토리처럼 누적이 필요한 필드에 씁니다. 나머지 필드는 일반 타입으로 선언하면 덮어씁니다.
+## 실무에서 헷갈리는 지점
 
-**필드 범위**: 노드가 필요한 정보만 상태에 담습니다. 임시 계산 결과는 노드 로컬 변수로 유지하고, 다음 노드에 전달할 데이터만 상태에 씁니다.
+- 노드가 상태 전체를 다시 만들어야 하는 것은 아닙니다. 바뀐 필드만 반환해도 됩니다.
+- `StateGraph`는 DAG만 만드는 도구가 아닙니다. 뒤 글에서 보겠지만 루프와 조건 분기도 자연스럽게 표현합니다.
+- `invoke()`의 반환값은 마지막 노드 출력이 아니라 최종 상태 전체입니다.
+
+## 체크리스트
+
+- [ ] 상태 필드가 다음 노드에 정말 필요한 값만 담고 있는가
+- [ ] 노드 이름만 봐도 흐름이 읽히는가
+- [ ] `START`와 `END` 사이 경로가 불필요하게 우회하지 않는가
+
+## 정리
+
+이 단계에서는 "그래프를 만든다"보다 "상태가 어떤 순서로 변하는지 드러낸다"는 감각을 잡는 것이 중요합니다. 다음 글에서는 이 상태를 메모리에 저장하고 같은 `thread_id`로 다시 이어 붙이는 방법을 봅니다.
 
 <!-- blog-only:start -->
 다음 글: [상태 관리와 체크포인트](./02-state-and-checkpoints.md)
@@ -191,8 +150,8 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [LangGraph 공식 문서](https://langchain-ai.github.io/langgraph/)
-- [LangGraph 개념 가이드](https://langchain-ai.github.io/langgraph/concepts/)
-- [StateGraph API](https://langchain-ai.github.io/langgraph/reference/graphs/)
+- [LangGraph 개념 문서](https://langchain-ai.github.io/langgraph/concepts/low_level/)
+- [StateGraph API 레퍼런스](https://langchain-ai.github.io/langgraph/reference/graphs/)
+- [LangGraph 시작 가이드](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
 
 Tags: LangGraph, Agent, Python, LLM

@@ -3,7 +3,7 @@ title: 'Streaming — handling real-time output'
 series: langchain-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,84 @@ last_reviewed: '2026-05-01'
 
 # Streaming — handling real-time output
 
-> LangChain 101 (5/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/05-streaming)
+- How does the return shape change when you switch from `invoke()` to `stream()`
+- What is the practical difference between chain streaming and model-only streaming
+- When do you need `astream()` or `astream_events()` instead of plain `stream()`
+- How should streamed output be forwarded to a UI or API response
+
+> Streaming is not a different chain design; it is a different way of consuming the chain while the model is still generating.
+
+```mermaid
+flowchart LR
+    A[question] --> B[prompt or chain]
+    B --> C[ChatGroq]
+    C --> D[token chunks]
+    D --> E[CLI or API response]
+```
+
+## Minimal runnable example
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+chain = (
+    ChatPromptTemplate.from_template("Explain {topic} in three sentences.")
+    | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+    | StrOutputParser()
+)
+
+for chunk in chain.stream({"topic": "astream"}):
+    print(chunk, end="", flush=True)
+```
+
+## What to notice in this code
+
+- The chain definition is identical to `invoke()`; only the consumption pattern changes.
+- With a parser attached, streaming yields text chunks. Without one, it yields message chunks.
+- You can forward chunks immediately to the client or buffer them into a final string.
+- Streaming improves perceived latency more than total wall-clock time.
+
+## Where engineers get confused
+
+- Streaming does not guarantee the full response finishes sooner.
+- In async applications, `astream()` fits the event loop better than `stream()`.
+- When you need lifecycle visibility, `astream_events()` is more useful than raw text chunks.
+
+## Checklist
+
+- [ ] I can consume the output of `stream()` incrementally
+- [ ] I understand the difference between text chunks and message chunks
+- [ ] I know when to switch to `astream()` in async code
+
+LangChain 101 (5/6)
+
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/05-streaming)
+
+## Questions this post answers
+
+- How much code changes when you replace `invoke()` with `stream()`?
+- When should you choose `astream()` versus `astream_events()`?
+- What pattern works for reassembling streamed chunks into one string?
+- What do you need to send streaming output through FastAPI?
+
+> Streaming is not a different chain design. It is the same chain executed in a way that yields partial output instead of waiting for the final string.
+
+## The flow at a glance
+
+```mermaid
+flowchart LR
+    Prompt[Prompt or chain] --> Stream[stream or astream]
+    Stream --> Chunk[Token chunks]
+    Chunk --> UI[Console or UI]
+    Stream --> Events[astream_events]
+    Events --> Monitor[Event inspection]
+```
 
 When an LLM generates a long response, waiting for the full text before displaying anything makes the experience feel slow. Streaming sends tokens to the output as they are generated. That is what you see in ChatGPT or Claude when text appears character by character.
 
@@ -246,6 +321,25 @@ asyncio.run(main())
 `astream_events()` is useful when a chain has multiple components and you need to distinguish which one is producing output. For simple streaming, `astream()` is easier.
 
 ---
+
+## What to notice in this code
+
+- The chain definition barely changes from the `invoke()` version. The real change is how you consume output.
+- `stream()` means synchronous iteration, while `astream()` means asynchronous iteration over the same logical response.
+- Collecting chunks into a list and joining them later is a common pattern for logging, caching, or post-processing.
+- `astream_events()` exposes chain-level events, which is useful for debugging and instrumentation beyond simple token display.
+
+## Where engineers get confused
+
+- Streaming does not change the final answer format. It changes when the application receives each piece.
+- Async streaming affects the caller too, so your framework and endpoint style must support async flow.
+- Event streams are powerful, but they are unnecessary overhead if all you need is progressive text rendering.
+
+## Checklist
+
+- [ ] I can run the same chain with both `invoke()` and `stream()`
+- [ ] I can explain the difference between `astream()` and `astream_events()`
+- [ ] I understand how `StreamingResponse` fits around streamed chunks in FastAPI
 
 ## Conclusion
 

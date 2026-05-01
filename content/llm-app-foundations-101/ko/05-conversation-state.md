@@ -3,7 +3,7 @@ title: 대화 상태 관리 — 멀티턴 챗봇 만들기
 series: llm-app-foundations-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # 대화 상태 관리 — 멀티턴 챗봇 만들기

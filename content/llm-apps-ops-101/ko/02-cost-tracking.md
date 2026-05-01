@@ -3,7 +3,7 @@ title: 'LLM 비용 추적과 최적화'
 series: llm-apps-ops-101
 episode: 2
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,260 +19,110 @@ last_reviewed: '2026-05-01'
 
 # LLM 비용 추적과 최적화
 
-> LLM 앱 운영 101 (2/6)
+## 이 글에서 답할 질문
+- 토큰 사용량을 호출별로 어떻게 누적해야 할까요?
+- 단가가 단순할 때 비용 계산 코드는 어디까지 추상화하면 충분할까요?
+- 같은 프롬프트를 여러 번 호출했을 때 어떤 숫자를 먼저 봐야 절감 포인트가 보일까요?
 
-LLM API 비용은 토큰 단위로 청구됩니다. 개발 단계에서는 미미하지만, 트래픽이 늘면 급격히 올라갑니다. 이 포스트에서는 호출별 비용을 정확히 계산하고, 캐싱과 프롬프트 압축으로 비용을 줄이는 방법을 다룹니다.
+> 비용 추적은 회계가 아니라 피드백 루프입니다. 호출 한 건이 얼마였는지 알아야 캐시, 프롬프트 압축, 모델 라우팅이 의미를 가집니다.
 
-<!-- ebook-only:start -->
+## 큰 그림
+```mermaid
+flowchart LR
+    Prompt[프롬프트] --> Groq[Groq API]
+    Groq --> Usage[usage.total_tokens]
+    Usage --> Cost[단가 계산기]
+    Cost --> Report[누적 비용 리포트]
+```
 
-이 장의 핵심: **LLM 비용은 토큰 수 × 단가다.** 모델별 단가·입출력 비율·캐시 히트율을 추적해야 예산을 제어할 수 있다.
+## 왜 이 레이어가 필요한가
+비용은 LLM 기능이 성공할수록 더 중요해지는 운영 지표입니다. 그래서 초기에 계산식을 코드로 박아 두는 편이 낫습니다.
 
-## 이 장의 위치
+LLM 비용은 대부분 작게 시작해서 갑자기 커집니다. 개발 단계에서는 몇 원 수준이라 무시되지만, 배치 작업이나 반복 질문이 붙는 순간 토큰 누적량이 먼저 폭발합니다.
 
-이 글은 시리즈 6편 중 2번째 장입니다.
-앞 장에서는 **LLM 앱 모니터링과 로깅**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **LLM 출력 품질 평가**으로 이어집니다.
-<!-- ebook-only:end -->
+예제 파일: `/root/Github/llm-apps-ops-101/ko/02-cost-tracking/main.py`
 
-## 예제 코드
-예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
-
----
-
-## 토큰 비용 계산
-
-Groq는 현재 무료 티어를 제공하지만, OpenAI나 Anthropic은 토큰당 요금을 부과합니다. 비용 모델을 코드에 내재화해야 나중에 API를 교체해도 추적 로직을 다시 짜지 않아도 됩니다.
-
+## 최소 실행 예제
 ```python
-from dataclasses import dataclass, field
-from datetime import datetime
+import json
+import os
+from dataclasses import asdict, dataclass
 
-# ── 모델 가격표 (1000 토큰당 USD) ──────────────────────────────────────────
-MODEL_PRICING: dict[str, dict[str, float]] = {
-    "llama-3.1-8b-instant": {"input": 0.00005, "output": 0.00008},
-    "llama-3.1-70b-versatile": {"input": 0.00059, "output": 0.00079},
-    "gpt-4o-mini": {"input": 0.00015, "output": 0.00060},
-    "gpt-4o": {"input": 0.00250, "output": 0.01000},
-    "claude-3-haiku-20240307": {"input": 0.00025, "output": 0.00125},
-}
+from groq import Groq
 
-def estimate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
-    """USD 단위 비용을 추정합니다."""
-    pricing = MODEL_PRICING.get(model)
-    if not pricing:
-        return 0.0
-    return (input_tokens * pricing["input"] + output_tokens * pricing["output"]) / 1000
+MODEL = "llama-3.1-8b-instant"
+PRICE_PER_MILLION_TOKENS = 0.05
 
-# ── 호출별 비용 레코드 ────────────────────────────────────────────────────
 @dataclass
 class CostRecord:
-    model: str
-    input_tokens: int
-    output_tokens: int
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
+    prompt: str
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    cost_usd: float
 
-    @property
-    def cost_usd(self) -> float:
-        return estimate_cost(self.model, self.input_tokens, self.output_tokens)
+def estimate_cost(total_tokens: int) -> float:
+    return round((total_tokens / 1_000_000) * PRICE_PER_MILLION_TOKENS, 8)
 
-    @property
-    def total_tokens(self) -> int:
-        return self.input_tokens + self.output_tokens
-```
+def run_prompt(client: Groq, prompt: str) -> CostRecord:
+    response = client.chat.completions.create(
+        model=MODEL,
+        temperature=0,
+        messages=[
+            {"role": "system", "content": "You are a concise Python assistant."},
+            {"role": "user", "content": prompt},
+        ],
+    )
+    usage = response.usage
+    if usage is None:
+        raise RuntimeError("usage metadata missing from Groq response")
+    return CostRecord(
+        prompt=prompt,
+        prompt_tokens=usage.prompt_tokens,
+        completion_tokens=usage.completion_tokens,
+        total_tokens=usage.total_tokens,
+        cost_usd=estimate_cost(usage.total_tokens),
+    )
 
----
-
-## 누적 비용 추적기
-
-```python
-from collections import defaultdict
-from typing import Optional
-
-class CostTracker:
-    def __init__(self):
-        self._records: list[CostRecord] = []
-        self._by_model: dict[str, list[CostRecord]] = defaultdict(list)
-
-    def record(self, model: str, input_tokens: int, output_tokens: int) -> CostRecord:
-        rec = CostRecord(model=model, input_tokens=input_tokens, output_tokens=output_tokens)
-        self._records.append(rec)
-        self._by_model[model].append(rec)
-        return rec
-
-    def total_cost(self) -> float:
-        return sum(r.cost_usd for r in self._records)
-
-    def total_tokens(self) -> int:
-        return sum(r.total_tokens for r in self._records)
-
-    def by_model(self) -> dict[str, dict]:
-        result = {}
-        for model, records in self._by_model.items():
-            result[model] = {
-                "calls": len(records),
-                "input_tokens": sum(r.input_tokens for r in records),
-                "output_tokens": sum(r.output_tokens for r in records),
-                "cost_usd": round(sum(r.cost_usd for r in records), 6),
-            }
-        return result
-
-    def report(self) -> dict:
-        return {
-            "total_calls": len(self._records),
-            "total_tokens": self.total_tokens(),
-            "total_cost_usd": round(self.total_cost(), 6),
-            "by_model": self.by_model(),
-        }
-```
-
----
-
-## 응답 캐싱으로 비용 절감
-
-동일한 프롬프트에 대해 LLM을 반복 호출하는 것은 낭비입니다. 의미적으로 동일한 요청을 캐시에서 반환하면 비용과 지연 시간을 동시에 줄입니다.
-
-```python
-import hashlib
-import json
-import time
-from pathlib import Path
-
-class ResponseCache:
-    """파일 기반 LLM 응답 캐시."""
-
-    def __init__(self, cache_dir: str, ttl_seconds: int = 3600):
-        self.cache_dir = Path(cache_dir)
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.ttl = ttl_seconds
-        self._hits = 0
-        self._misses = 0
-
-    def _key(self, model: str, prompt: str, temperature: float) -> str:
-        raw = f"{model}|{temperature}|{prompt}"
-        return hashlib.sha256(raw.encode()).hexdigest()[:16]
-
-    def get(self, model: str, prompt: str, temperature: float) -> Optional[str]:
-        key = self._key(model, prompt, temperature)
-        path = self.cache_dir / f"{key}.json"
-        if not path.exists():
-            self._misses += 1
-            return None
-        data = json.loads(path.read_text())
-        if time.time() - data["ts"] > self.ttl:
-            path.unlink(missing_ok=True)
-            self._misses += 1
-            return None
-        self._hits += 1
-        return data["response"]
-
-    def set(self, model: str, prompt: str, temperature: float, response: str):
-        key = self._key(model, prompt, temperature)
-        path = self.cache_dir / f"{key}.json"
-        path.write_text(json.dumps({
-            "ts": time.time(),
-            "model": model,
-            "response": response,
-        }, ensure_ascii=False))
-
-    @property
-    def hit_rate(self) -> float:
-        total = self._hits + self._misses
-        return self._hits / total if total else 0.0
-
-    def stats(self) -> dict:
-        return {"hits": self._hits, "misses": self._misses, "hit_rate": round(self.hit_rate, 3)}
-```
-
----
-
-## 프롬프트 압축
-
-시스템 프롬프트가 길면 입력 토큰이 늘어납니다. 불필요한 공백, 반복 지시, 과도한 예시를 제거하는 것만으로도 토큰을 줄일 수 있습니다.
-
-```python
-import re
-
-def compress_prompt(text: str) -> str:
-    """기본 프롬프트 압축: 공백 정규화, 중복 줄 제거."""
-    # 연속 공백 → 단일 공백
-    text = re.sub(r" {2,}", " ", text)
-    # 연속 빈 줄 → 단일 빈 줄
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    # 줄 앞뒤 공백 제거
-    lines = [line.strip() for line in text.splitlines()]
-    # 중복된 연속 줄 제거
-    deduped = []
-    for line in lines:
-        if not deduped or line != deduped[-1]:
-            deduped.append(line)
-    return "\n".join(deduped).strip()
-
-def token_estimate(text: str) -> int:
-    """토큰 수 근사치 (영어 기준 4자/토큰, 한국어 기준 2자/토큰)."""
-    korean_chars = sum(1 for c in text if "\uAC00" <= c <= "\uD7A3")
-    other_chars = len(text) - korean_chars
-    return korean_chars // 2 + other_chars // 4
-```
-
----
-
-## 통합 비용 최적화 파이프라인
-
-```python
-import os
-from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage
-
-tracker = CostTracker()
-cache = ResponseCache(".cache/llm", ttl_seconds=3600)
-
-def cost_optimized_call(prompt: str, model: str = "llama-3.1-8b-instant", temperature: float = 0.0) -> str:
-    compressed = compress_prompt(prompt)
-
-    # 캐시 조회
-    cached = cache.get(model, compressed, temperature)
-    if cached:
-        print(f"  [캐시 히트] 토큰 절감: ~{token_estimate(cached)}토큰")
-        return cached
-
-    llm = ChatGroq(model=model, api_key=os.environ["GROQ_API_KEY"], temperature=temperature)
-    response = llm.invoke([HumanMessage(content=compressed)])
-    content = response.content
-
-    usage = getattr(response, "usage_metadata", None)
-    if usage:
-        rec = tracker.record(model, usage.get("input_tokens", 0), usage.get("output_tokens", 0))
-        print(f"  [비용] ${rec.cost_usd:.6f} | {rec.total_tokens} 토큰")
-
-    cache.set(model, compressed, temperature, content)
-    return content
+def main() -> None:
+    client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    prompts = [
+        "Summarize Python decorators in one sentence.",
+        "Summarize Python decorators in one sentence.",
+        "Summarize asyncio.gather in one sentence.",
+    ]
+    records = [run_prompt(client, prompt) for prompt in prompts]
+    report = {
+        "price_per_million_tokens": PRICE_PER_MILLION_TOKENS,
+        "total_calls": len(records),
+        "total_tokens": sum(record.total_tokens for record in records),
+        "total_cost_usd": round(sum(record.cost_usd for record in records), 8),
+        "records": [asdict(record) for record in records],
+    }
+    print(json.dumps(report, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
-    prompts = [
-        "파이썬 데코레이터를 한 문장으로 설명해 주세요.",
-        "파이썬 데코레이터를 한 문장으로 설명해 주세요.",  # 캐시 히트
-        "제너레이터와 이터레이터의 차이는 무엇인가요?",
-    ]
-    for p in prompts:
-        ans = cost_optimized_call(p)
-        print(f"  답변: {ans[:100]}...")
-
-    print("\n=== 비용 리포트 ===")
-    import json
-    print(json.dumps(tracker.report(), indent=2, ensure_ascii=False))
-    print("\n=== 캐시 통계 ===")
-    print(json.dumps(cache.stats(), indent=2, ensure_ascii=False))
+    main()
 ```
 
----
+## 이 코드에서 봐야 할 것
+- `PRICE_PER_MILLION_TOKENS`를 상수로 두면 공급자나 플랜이 바뀌어도 계산식은 유지됩니다.
+- 호출별 `CostRecord`를 남겨 두면 어떤 프롬프트가 비싼지 다시 계산하지 않아도 됩니다.
+- 동일 프롬프트 두 번 호출을 일부러 넣어 두면 캐시 전후 비교 실험의 기준점이 생깁니다.
 
-## 비용 최적화 원칙
+## 실무에서 헷갈리는 지점
+- 입력 토큰과 출력 토큰 단가가 다른 모델도 많습니다. 예제가 단순하더라도 분리 가능한 구조를 염두에 두는 편이 좋습니다.
+- 누적 비용만 보면 이상 징후를 놓칩니다. 호출 수, 평균 토큰, 최댓값을 같이 봐야 합니다.
+- 비용 최적화는 품질 저하와 함께 오기 쉽기 때문에 다음 장의 평가 레이어와 붙여서 봐야 합니다.
 
-**측정 없이 최적화는 없습니다.** `CostTracker`로 호출별 비용을 먼저 파악하고, 가장 비싼 호출부터 공략해야 합니다.
+## 체크리스트
+- [ ] 호출별 total_tokens를 저장한다
+- [ ] 단가 상수를 코드 한 곳에서 관리한다
+- [ ] 누적 비용과 호출별 비용을 함께 출력한다
+- [ ] 반복 프롬프트를 분리해서 캐시 후보를 찾는다
 
-캐싱은 가장 확실한 비용 절감 수단입니다. FAQ 응답처럼 동일 입력이 반복되는 경우 hit rate 80% 이상도 가능합니다. 단, 창의적 응답이 필요하거나 실시간 데이터를 다룰 때는 캐싱을 적용하지 않습니다.
-
-소형 모델로 먼저 처리하고, 복잡한 요청만 대형 모델로 에스컬레이션하는 라우팅 전략도 효과적입니다. `llama-3.1-8b-instant`의 비용은 `llama-3.1-70b-versatile`의 약 10분의 1입니다.
+## 정리
+비용을 줄이려면 먼저 비용이 어디서 생기는지 보여야 합니다. 그 출발점이 호출별 토큰 기록입니다.
 
 <!-- blog-only:start -->
 다음 글: [LLM 출력 품질 평가](./03-evaluation.md)
@@ -294,8 +144,8 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [Groq 가격 정책](https://groq.com/pricing/)
-- [LangChain 응답 메타데이터](https://python.langchain.com/docs/modules/model_io/llms/token_usage_tracking/)
-- [OpenAI 토큰 카운팅](https://platform.openai.com/tokenizer)
+- [Groq pricing](https://groq.com/pricing/)
+- [OpenAI pricing patterns](https://openai.com/api/pricing/)
+- [Anthropic API pricing](https://www.anthropic.com/pricing#api)
 
 Tags: LLMOps, Observability, Python, LLM

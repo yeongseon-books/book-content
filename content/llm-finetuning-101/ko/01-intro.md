@@ -3,7 +3,7 @@ title: 'LLM 파인튜닝 입문'
 series: llm-finetuning-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,185 +19,83 @@ last_reviewed: '2026-05-01'
 
 # LLM 파인튜닝 입문
 
-> LLM 파인튜닝 101 (1/6)
+## 이 글에서 답할 질문
+
+- LoRA가 왜 풀 파인튜닝보다 훨씬 가벼운지 어떻게 계산할까?
+- 파인튜닝이 필요한 문제와 프롬프트 엔지니어링으로 충분한 문제는 어떻게 구분할까?
+- GPU 없이도 1편에서 무엇을 검증할 수 있을까?
+
+> 풀 파인튜닝이 건물 전체를 다시 짓는 일이라면, LoRA는 하중이 걸리는 기둥 몇 개에만 보강재를 덧대는 일입니다.
 
 예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/01-intro)
 
-사전 학습된 LLM은 범용적으로 동작하지만, 특정 도메인이나 태스크에서는 한계가 뚜렷합니다. 고객 지원 봇이 자사 제품 용어를 정확히 사용해야 하거나, 의료 문서 요약 모델이 특정 형식을 따라야 할 때, 파인튜닝이 필요합니다. 이 시리즈는 LoRA를 활용한 효율적인 파인튜닝 전 과정을 다룹니다.
+파인튜닝 시리즈의 첫 글에서는 모델을 크게 돌리기보다 먼저 계산 감각을 맞춥니다. LLM 파인튜닝이 무조건 GPU 실습부터 시작해야 하는 주제는 아닙니다. LoRA가 왜 싸고 빠른지, 어느 정도 파라미터만 학습하는지, 언제 이 선택이 합리적인지를 숫자로 먼저 이해해야 이후 데이터셋, 학습, 평가, 서빙 단계가 흔들리지 않습니다.
 
----
+이 글의 예제 코드는 실제 모델을 로드하지 않습니다. 대신 GPT-2 small에 가까운 구조를 가정해 선형 레이어 파라미터 수와 LoRA 어댑터 파라미터 수를 수식으로 계산합니다. `python main.py` 실행만으로 1.5% 안팎의 학습 비율을 확인할 수 있으므로, GPU가 없는 환경에서도 출발점을 검증할 수 있습니다.
 
-<!-- ebook-only:start -->
+## 먼저 감을 잡아야 하는 것
 
-이 장의 핵심: **Fine-tuning은 사전학습 모델의 가중치를 특정 태스크로 조정하는 것이다.** 전체 학습보다 훨씬 적은 데이터와 연산으로 도메인 특화 성능을 얻는다.
+파인튜닝에서 가장 먼저 놓치기 쉬운 지점은 **어디를 학습 대상으로 잡느냐**입니다. 풀 파인튜닝은 기존 가중치 전체를 업데이트하므로 메모리와 옵티마이저 상태가 함께 불어납니다. 반면 LoRA는 기존 가중치를 고정한 채 저랭크 행렬 두 개만 추가합니다. 그래서 비용 이야기를 할 때는 모델 전체 파라미터보다 **학습 가능한 파라미터 수**를 따로 봐야 합니다.
 
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **데이터셋 준비와 전처리**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 파인튜닝이란
-
-파인튜닝은 사전 학습된 모델의 가중치를 특정 태스크에 맞게 추가 학습하는 과정입니다. 전체 가중치를 업데이트하는 풀 파인튜닝과, 일부 파라미터만 학습하는 파라미터 효율적 파인튜닝(PEFT)으로 나뉩니다.
-
-풀 파인튜닝은 GPU 메모리가 매우 많이 필요합니다. 7B 파라미터 모델은 fp32 기준 약 28GB를 차지합니다. 반면 LoRA 같은 PEFT 기법은 원본 가중치를 고정하고 작은 어댑터 레이어만 학습해서 메모리 요구량을 90% 이상 줄입니다.
-
----
-
-## 언제 파인튜닝이 필요한가
-
-프롬프트 엔지니어링과 RAG로 해결되지 않을 때 파인튜닝을 고려합니다.
-
-```python
-"""
-파인튜닝이 적합한 상황:
-- 도메인 특화 어휘나 형식이 필요할 때
-- 프롬프트에 담기 어려운 수백 개 예시가 필요할 때
-- 추론 시 컨텍스트 길이를 줄이고 싶을 때 (비용 절감)
-- 일관된 출력 형식을 강제해야 할 때
-
-파인튜닝이 불필요한 상황:
-- 범용 질문 답변 (GPT-4나 Claude가 이미 충분)
-- 최신 정보 필요 (RAG가 더 적합)
-- 데이터가 100개 미만 (과적합 위험)
-"""
-
-# 의사 결정 흐름
-def should_finetune(task: dict) -> str:
-    if task["examples"] < 100:
-        return "데이터 부족 — 프롬프트 엔지니어링 먼저"
-    if task["needs_latest_info"]:
-        return "RAG 사용"
-    if task["domain_specific"] and task["format_strict"]:
-        return "파인튜닝 적합"
-    return "프롬프트 엔지니어링으로 충분한지 먼저 확인"
+```mermaid
+flowchart LR
+    A[사전 학습 모델 구조] --> B[선형 레이어 크기 계산]
+    B --> C[LoRA rank 선택]
+    C --> D[학습 파라미터 수 계산]
+    D --> E[풀 파인튜닝과 비용 비교]
 ```
 
----
-
-## 파인튜닝 방법 비교
+## 최소 실행 예제
 
 ```python
 from dataclasses import dataclass
 
 @dataclass
-class FinetuningMethod:
-    name: str
-    trainable_params: str
-    memory_requirement: str
-    use_case: str
+class TransformerShape:
+    hidden_size: int
+    intermediate_size: int
+    num_layers: int
 
-methods = [
-    FinetuningMethod(
-        name="풀 파인튜닝",
-        trainable_params="100%",
-        memory_requirement="매우 높음 (>80GB for 7B)",
-        use_case="도메인 전체 재학습, 충분한 GPU 자원",
-    ),
-    FinetuningMethod(
-        name="LoRA",
-        trainable_params="0.1~1%",
-        memory_requirement="낮음 (~8GB for 7B with 4-bit)",
-        use_case="태스크 특화, 단일 GPU 환경",
-    ),
-    FinetuningMethod(
-        name="QLoRA",
-        trainable_params="0.1~1%",
-        memory_requirement="매우 낮음 (~4GB for 7B)",
-        use_case="소비자 GPU, 메모리 극도로 제한된 환경",
-    ),
-    FinetuningMethod(
-        name="프롬프트 튜닝",
-        trainable_params="<0.01%",
-        memory_requirement="최소",
-        use_case="단순 태스크 전환, 추론 시 오버헤드 없음",
-    ),
-]
-
-for m in methods:
-    print(f"{m.name}: 학습 파라미터 {m.trainable_params}, 메모리 {m.memory_requirement}")
-```
-
----
-
-## 환경 구성
-
-이 시리즈에서는 Hugging Face `transformers`, `peft`, `datasets` 라이브러리를 사용합니다. 실습은 Google Colab(무료 T4 GPU)에서 가능합니다.
-
-```python
-# pip install transformers peft datasets accelerate bitsandbytes trl
-
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-from peft import LoraConfig, get_peft_model, TaskType
-
-print(f"PyTorch: {torch.__version__}")
-print(f"CUDA 사용 가능: {torch.cuda.is_available()}")
-if torch.cuda.is_available():
-    print(f"GPU: {torch.cuda.get_device_name(0)}")
-    print(f"VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f}GB")
-```
-
----
-
-## 기본 모델 로드
-
-```python
-import os
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-import torch
-
-MODEL_NAME = "microsoft/phi-2"  # 2.7B 파라미터, 소비자 GPU 적합
-
-def load_base_model(model_name: str = MODEL_NAME) -> tuple:
-    """4비트 양자화로 베이스 모델을 로드합니다."""
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-        bnb_4bit_use_double_quant=True,
+def total_linear_params(shape: TransformerShape) -> int:
+    return shape.num_layers * (
+        4 * shape.hidden_size * shape.hidden_size
+        + 2 * shape.hidden_size * shape.intermediate_size
     )
-    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        quantization_config=bnb_config,
-        device_map="auto",
-        trust_remote_code=True,
-    )
-    return model, tokenizer
+def lora_params_per_layer(hidden_size: int, intermediate_size: int, rank: int) -> int:
+    attention = 4 * rank * (hidden_size + hidden_size)
+    mlp = rank * (hidden_size + intermediate_size) + rank * (intermediate_size + hidden_size)
+    return attention + mlp
 
-def count_parameters(model) -> dict:
-    """학습 가능한 파라미터 수를 반환합니다."""
-    total = sum(p.numel() for p in model.parameters())
-    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    return {
-        "total": f"{total:,}",
-        "trainable": f"{trainable:,}",
-        "ratio": f"{100 * trainable / total:.2f}%",
-    }
-
-if __name__ == "__main__":
-    model, tokenizer = load_base_model()
-    stats = count_parameters(model)
-    print(f"전체 파라미터: {stats['total']}")
-    print(f"학습 가능 파라미터: {stats['trainable']} ({stats['ratio']})")
-
-    # 베이스 모델 추론 테스트
-    inputs = tokenizer("파이썬에서 리스트를 정렬하는 방법은?", return_tensors="pt")
-    with torch.no_grad():
-        outputs = model.generate(**inputs, max_new_tokens=100, do_sample=False)
-    print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+shape = TransformerShape(hidden_size=768, intermediate_size=3072, num_layers=12)
+rank = 8
+base_linear_params = total_linear_params(shape)
+lora_params = shape.num_layers * lora_params_per_layer(shape.hidden_size, shape.intermediate_size, rank)
+print(base_linear_params, lora_params)
 ```
 
----
+## 이 코드에서 봐야 할 것
 
-## 시리즈 전체 흐름
+- `hidden_size=768`, `intermediate_size=3072`, `num_layers=12`는 GPT-2 small 급 구조를 흉내 낸 값입니다.
+- 이 스크립트는 전체 모델 파라미터가 아니라 attention/MLP 선형 레이어를 기준으로 LoRA가 개입하는 면적을 계산합니다.
+- 실행 결과로 나온 비율은 이후 3편에서 `LoraConfig(r=8)`를 고를 때 감각 기준이 됩니다.
 
-1편(현재)에서 파인튜닝 개념과 환경을 갖췄습니다. 2편에서는 학습 데이터를 준비하고, 3편에서 LoRA 어댑터를 구성합니다. 4편이 실제 학습 루프, 5편이 평가, 6편이 서빙으로 마무리됩니다.
+## 실무에서 헷갈리는 지점
+
+- LoRA가 전체 모델 크기를 줄여주는 것은 아닙니다. **학습 가능한 파라미터 수**와 **저장해야 할 추가 가중치**를 줄여줄 뿐입니다.
+- 풀 파인튜닝보다 싸다고 해서 아무 데이터셋에나 잘 맞는 것은 아닙니다. 데이터가 나쁘면 작은 어댑터도 그대로 나쁜 방향으로 학습합니다.
+- 1편의 숫자는 근사치입니다. 실제 모델마다 target module과 tied weight 구조가 달라 정확한 비율은 조금씩 달라집니다.
+
+## 체크리스트
+
+- [ ] LoRA가 줄이는 대상이 모델 크기인지 학습 파라미터 수인지 구분했다.
+- [ ] rank가 커질수록 학습 파라미터가 선형으로 늘어난다는 점을 이해했다.
+- [ ] `python main.py`로 파라미터 계산이 실제로 실행되는지 확인했다.
+- [ ] 다음 글에서 다룰 데이터셋 형식이 왜 중요한지 연결 지었다.
+
+## 정리
+
+1편의 목적은 파인튜닝을 신비한 GPU 작업으로 보지 않는 데 있습니다. 파라미터 계산만 정확히 이해해도 LoRA가 왜 실무 기본값이 되었는지 설명할 수 있습니다.
 
 <!-- blog-only:start -->
 다음 글: [데이터셋 준비와 전처리](./02-dataset.md)
@@ -219,8 +117,7 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [Hugging Face PEFT 문서](https://huggingface.co/docs/peft)
-- [LoRA 논문: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685)
-- [QLoRA 논문](https://arxiv.org/abs/2305.14314)
+- [LoRA paper](https://arxiv.org/abs/2106.09685)
+- [Hugging Face PEFT documentation](https://huggingface.co/docs/peft)
 
 Tags: Fine-tuning, LoRA, LLM, Python

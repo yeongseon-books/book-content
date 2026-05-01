@@ -3,7 +3,7 @@ title: 'PDF parsing and text extraction'
 series: document-ingestion-101
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,247 +19,153 @@ last_reviewed: '2026-05-01'
 
 # PDF parsing and text extraction
 
-> Document Ingestion 101 (1/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/01-pdf-parsing)
+- How do you make a PDF extraction demo reproducible when no sample file exists?
+- How do you inspect page-level text and character counts with pypdf?
+- Which metadata is worth keeping at the very first ingestion step?
 
-The first step in a RAG pipeline is pulling text out of documents. Plain text files are trivial to read, but most real-world documents arrive as PDFs. PDF is a complex format where text, images, tables, and layout information are interleaved — a naive read rarely gives you the right content in the right order. This post covers PDF text extraction step by step.
+> The first goal of PDF parsing is to turn a visual document into a verifiable list of strings.
 
-Topics:
+Example code: `/root/Github/document-ingestion-101/en/01-pdf-parsing/main.py`
 
-- extracting text with PyMuPDF
-- comparing with pypdf
-- preserving per-page metadata
-- handling tables and multi-column layouts
+```mermaid
+flowchart LR
+    A[Script creates sample PDF] --> B[pypdf extracts page text]
+    B --> C[Count pages and characters]
+    C --> D[Verify extracted output]
+```
 
----
+The first practical problem in a PDF parsing tutorial is usually the sample file. If readers cannot reproduce the example from scratch, the pipeline story starts with friction.
 
-<!-- ebook-only:start -->
+This example generates its own PDF with `reportlab`, then reads it back with `pypdf` and prints page-level text summaries. That is exactly the shape you want for the first ingestion step.
 
-**The key idea**: PDF parsing is two problems — extracting the text layer and reconstructing layout. Different libraries produce different results.
+## Runnable example
 
-## Where this chapter fits
+```python
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
+from __future__ import annotations
 
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **Chunking strategies — optimizing by document type**.
-<!-- ebook-only:end -->
+from pathlib import Path
+from typing import TypedDict
 
-## Choosing a PDF parsing library
+from pypdf import PdfReader
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
-Python has three main PDF libraries.
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / 'data'
+DATA_DIR.mkdir(exist_ok=True)
+PDF_PATH = DATA_DIR / 'sample.pdf'
 
-**pymupdf** (`fitz`): fastest and most accurate. Extracts text block positions, font sizes, and image data. Preserves reading order reliably in complex layouts.
+def create_sample_pdf(pdf_path: Path) -> None:
+    c = canvas.Canvas(str(pdf_path), pagesize=A4)
+    _, height = A4
+    pages = [
+        [
+            'Document ingestion notes',
+            '',
+            '1. PDF text extraction is the first pipeline step.',
+            '2. pypdf is reliable when the layout is simple.',
+            '3. Keeping page numbers in metadata makes debugging easier.',
+        ],
+        [
+            'Operational checks',
+            '',
+            '1. The script creates its own sample PDF.',
+            '2. Re-reading the file should stay reproducible.',
+            '3. Verify both page count and extracted character count.',
+        ],
+    ]
+    for page_index, lines in enumerate(pages, start=1):
+        y = height - 72
+        c.setFont('Helvetica-Bold', 16)
+        c.drawString(72, y, f'Page {page_index}')
+        y -= 36
+        c.setFont('Helvetica', 12)
+        for line in lines:
+            c.drawString(72, y, line)
+            y -= 20
+        c.showPage()
+    c.save()
 
-**pypdf**: pure Python with minimal dependencies. Sufficient for simple PDFs but reading order breaks on complex layouts.
+class PageSummary(TypedDict):
+    page: int
+    chars: int
+    preview: str
 
-**pdfplumber**: strong table extraction. Slower than pymupdf but the right choice for heavily tabular documents.
+def extract_pages(pdf_path: Path) -> list[PageSummary]:
+    reader = PdfReader(str(pdf_path))
+    pages: list[PageSummary] = []
+    for index, page in enumerate(reader.pages, start=1):
+        text = (page.extract_text() or '').strip()
+        pages.append(
+            {
+                'page': index,
+                'chars': len(text),
+                'preview': text.replace('
+', ' ')[:100],
+            }
+        )
+    return pages
 
-For a general RAG pipeline, use pymupdf by default and add pdfplumber for table-heavy documents.
+def main() -> None:
+    create_sample_pdf(PDF_PATH)
+    pages = extract_pages(PDF_PATH)
+    print(f'created: {PDF_PATH.name}')
+    print(f'page_count: {len(pages)}')
+    total_chars = sum(int(page['chars']) for page in pages)
+    print(f'total_chars: {total_chars}')
+    for page in pages:
+        print(f"page={page['page']} chars={page['chars']} preview={page['preview']}")
 
----
+if __name__ == '__main__':
+    main()
+```
 
-## Basic pymupdf usage
+## How to run it
 
 ```bash
-pip install pymupdf pypdf pdfplumber langchain-community
+python main.py
 ```
 
-```python
-from pathlib import Path
+## Verified run output
 
-import fitz  # pymupdf
-
-def extract_text_pymupdf(pdf_path: str) -> list[dict]:
-    """
-    Extract text page by page from a PDF.
-    Returns: [{"page_num": int, "text": str, "char_count": int}]
-    """
-    doc = fitz.open(pdf_path)
-    pages = []
-
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        text = page.get_text("text")
-        pages.append({
-            "page_num": page_num + 1,
-            "text": text.strip(),
-            "char_count": len(text.strip()),
-        })
-
-    doc.close()
-    return pages
-
-def extract_blocks_pymupdf(pdf_path: str) -> list[dict]:
-    """
-    Extract text at the block level.
-    block_type: 0=text, 1=image
-    """
-    doc = fitz.open(pdf_path)
-    all_blocks = []
-
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        blocks = page.get_text("blocks")
-
-        for block_idx, block in enumerate(blocks):
-            x0, y0, x1, y1, text, block_no, block_type = block
-            if block_type == 0 and text.strip():
-                all_blocks.append({
-                    "page_num": page_num + 1,
-                    "block_num": block_idx,
-                    "text": text.strip(),
-                    "bbox": (x0, y0, x1, y1),
-                    "block_type": block_type,
-                })
-
-    doc.close()
-    return all_blocks
-
-def create_sample_pdf(output_path: str) -> None:
-    """Create a sample PDF for testing."""
-    doc = fitz.open()
-
-    page = doc.new_page()
-    page.insert_text(
-        (50, 50),
-        "Python Programming Guide\n\n"
-        "Chapter 1: Introduction\n"
-        "Python is a programming language created by Guido van Rossum in 1991.\n"
-        "It was designed for readability and uses indentation to delimit code blocks.\n\n"
-        "Chapter 2: Features\n"
-        "Dynamic typing, automatic memory management, and a rich library ecosystem are its hallmarks.\n"
-        "It is widely used in web development, data science, and AI.",
-        fontsize=12,
-        fontname="helv",
-    )
-
-    page2 = doc.new_page()
-    page2.insert_text(
-        (50, 50),
-        "Chapter 3: Installation\n"
-        "Download the latest version from python.org.\n"
-        "Python 3.10 or later is recommended for new projects.\n\n"
-        "Chapter 4: Package management\n"
-        "Install packages with: pip install <package-name>\n"
-        "Use virtual environments (venv) to isolate per-project dependencies.",
-        fontsize=12,
-        fontname="helv",
-    )
-
-    doc.save(output_path)
-    doc.close()
-    print(f"sample PDF created: {output_path}")
-
-create_sample_pdf("/tmp/sample_en.pdf")
-pages = extract_text_pymupdf("/tmp/sample_en.pdf")
-for page in pages:
-    print(f"\n=== page {page['page_num']} ({page['char_count']} chars) ===")
-    print(page["text"][:200])
+```text
+created: sample.pdf
+page_count: 2
+total_chars: 363
+page=1 chars=190 preview=Page 1 Document ingestion notes ...
+page=2 chars=173 preview=Page 2 Operational checks ...
 ```
 
----
+## What to notice in this code
 
-## Comparing with pypdf
+- `create_sample_pdf()` creates the input data, so the example has no hidden file dependency.
+- `extract_pages()` returns page number, character count, and preview together, which maps cleanly to later metadata work.
+- The output stays human-readable, so layout failures are easy to catch by inspection.
 
-```python
-from pypdf import PdfReader
+## Where engineers get confused
 
-def extract_text_pypdf(pdf_path: str) -> list[dict]:
-    """Extract text page by page using pypdf."""
-    reader = PdfReader(pdf_path)
-    pages = []
+- PDF parsing is not the same as OCR. If the PDF already has a text layer, verify plain extraction first.
+- A high character count does not automatically mean high quality. Reading order and repeated headers still matter.
+- Complex layouts do require library comparison, but the first tutorial should start with a reproducible simple sample.
 
-    for page_num, page in enumerate(reader.pages):
-        text = page.extract_text() or ""
-        pages.append({
-            "page_num": page_num + 1,
-            "text": text.strip(),
-            "char_count": len(text.strip()),
-        })
+## Checklist
 
-    return pages
-
-pymupdf_pages = extract_text_pymupdf("/tmp/sample_en.pdf")
-pypdf_pages = extract_text_pypdf("/tmp/sample_en.pdf")
-
-print("pymupdf total chars:", sum(p["char_count"] for p in pymupdf_pages))
-print("pypdf total chars:", sum(p["char_count"] for p in pypdf_pages))
-```
-
----
-
-## Extracting PDF metadata
-
-```python
-def extract_metadata(pdf_path: str) -> dict:
-    """Extract file-level metadata from a PDF."""
-    doc = fitz.open(pdf_path)
-
-    metadata = {
-        "file_path": str(pdf_path),
-        "file_name": Path(pdf_path).name,
-        "page_count": len(doc),
-        "title": doc.metadata.get("title", ""),
-        "author": doc.metadata.get("author", ""),
-        "subject": doc.metadata.get("subject", ""),
-        "creator": doc.metadata.get("creator", ""),
-        "creation_date": doc.metadata.get("creationDate", ""),
-        "modification_date": doc.metadata.get("modDate", ""),
-        "file_size_kb": Path(pdf_path).stat().st_size // 1024,
-    }
-
-    doc.close()
-    return metadata
-
-meta = extract_metadata("/tmp/sample_en.pdf")
-for key, value in meta.items():
-    if value:
-        print(f"  {key}: {value}")
-```
-
----
-
-## LangChain DocumentLoader integration
-
-```python
-from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-loader = PyMuPDFLoader("/tmp/sample_en.pdf")
-documents = loader.load()
-
-print(f"pages loaded: {len(documents)}")
-for doc in documents:
-    print(f"\npage {doc.metadata.get('page', 0) + 1}:")
-    print(f"  metadata: {doc.metadata}")
-    print(f"  first 100 chars: {doc.page_content[:100]}")
-
-splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=50)
-chunks = splitter.split_documents(documents)
-print(f"\nchunk count: {len(chunks)}")
-
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-vectorstore = FAISS.from_documents(chunks, embedding_model)
-print(f"index ready: {vectorstore.index.ntotal} vectors")
-```
-
----
-
-## Conclusion
-
-For most RAG pipelines, pymupdf is the right choice: it is fast, preserves reading order in complex layouts, and exposes page-level metadata that chunking strategies and retrieval filters depend on. LangChain's `PyMuPDFLoader` wraps it with automatic metadata attachment so documents flow directly into splitters and vector stores.
-
-The next post covers chunking strategies: finding the optimal chunk size and overlap for different document types.
+- [ ] The script creates its own PDF.
+- [ ] It prints both page count and character count.
+- [ ] The page preview is enough to verify extraction order by eye.
+- [ ] You identified which metadata should flow into the next stage.
 
 <!-- blog-only:start -->
-Next: [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+
+## Summary
+
+When one file covers sample generation and extraction verification, the first ingestion step becomes easy to explain and easy to rerun.
+
+The next post compares how chunk size should change across document types.
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -274,13 +180,9 @@ Next: [Chunking strategies — optimizing by document type](./02-chunking-strate
 
 <!-- toc:end -->
 
----
-
 ## References
 
-- [pymupdf documentation](https://pymupdf.readthedocs.io/)
-- [pypdf documentation](https://pypdf.readthedocs.io/)
-- [LangChain PyMuPDFLoader](https://python.langchain.com/docs/integrations/document_loaders/pymupdf/)
-- [pdfplumber](https://github.com/jsvine/pdfplumber)
+- https://pypdf.readthedocs.io/
+- https://docs.reportlab.com/reportlab/userguide/ch1_intro/
 
 Tags: RAG, Document Processing, LangChain, Python

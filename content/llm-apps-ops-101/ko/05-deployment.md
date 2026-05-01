@@ -3,7 +3,7 @@ title: 'LLM 앱 배포 전략'
 series: llm-apps-ops-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,220 +19,138 @@ last_reviewed: '2026-05-01'
 
 # LLM 앱 배포 전략
 
-> LLM 앱 운영 101 (5/6)
+## 이 글에서 답할 질문
+- FastAPI 기반 LLM 엔드포인트에서 health check는 어디까지 확인하면 충분할까요?
+- 동기 Groq 클라이언트를 async 엔드포인트에서 안전하게 호출하려면 어떻게 감싸야 할까요?
+- 로컬 self-test로 서버 기동 여부를 자동 확인하려면 어떤 흐름이 가장 단순할까요?
 
-LLM 앱을 로컬에서 프로덕션으로 올릴 때 가장 자주 마주치는 문제는 타임아웃, 동시성, 재시도 처리입니다. 이 포스트에서는 FastAPI 기반 서버, 연결 풀링, 재시도 로직, 헬스체크를 갖춘 배포 가능한 LLM 서버를 구축합니다.
+> 배포 가능한 예제의 기준은 코드가 예쁘게 보이는지가 아니라, 서버를 띄우고 헬스체크와 실제 채팅 요청을 같은 스크립트에서 검증할 수 있느냐입니다.
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **배포는 모델 버전·프롬프트 버전·코드 버전을 함께 관리하는 것이다.** 세 버전이 어긋나면 재현 불가능한 버그가 생긴다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 5번째 장입니다.
-앞 장에서는 **LLM 앱 보안**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **LLM 앱 운영 완성**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 예제 코드
-예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
-
----
-
-## 배포 구조 개요
-
-LLM API 호출은 기본적으로 느립니다. 응답 생성에 수 초가 걸리고, 네트워크 오류나 속도 제한(429)이 언제든 발생할 수 있습니다. 프로덕션 서버는 다음 세 가지를 갖춰야 합니다.
-
-- **비동기 처리**: 한 요청이 LLM 응답을 기다리는 동안 다른 요청을 처리할 수 있어야 합니다.
-- **지수 백오프 재시도**: 일시적 오류를 자동으로 복구합니다.
-- **스트리밍 응답**: 첫 토큰을 빠르게 반환해 체감 지연을 줄입니다.
-
----
-
-## 재시도 데코레이터
-
-```python
-import asyncio
-import functools
-import logging
-import time
-from typing import Callable, TypeVar
-
-logger = logging.getLogger("llm_server")
-T = TypeVar("T")
-
-def retry_with_backoff(
-    max_retries: int = 3,
-    base_delay: float = 1.0,
-    max_delay: float = 30.0,
-    exceptions: tuple = (Exception,),
-):
-    """지수 백오프 재시도 데코레이터 (동기 + 비동기 모두 지원)."""
-
-    def decorator(func: Callable) -> Callable:
-        @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
-            last_exc = None
-            for attempt in range(max_retries + 1):
-                try:
-                    return await func(*args, **kwargs)
-                except exceptions as e:
-                    last_exc = e
-                    if attempt == max_retries:
-                        break
-                    delay = min(base_delay * (2 ** attempt), max_delay)
-                    logger.warning(f"재시도 {attempt + 1}/{max_retries}: {e} — {delay:.1f}초 대기")
-                    await asyncio.sleep(delay)
-            raise last_exc
-
-        @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
-            last_exc = None
-            for attempt in range(max_retries + 1):
-                try:
-                    return func(*args, **kwargs)
-                except exceptions as e:
-                    last_exc = e
-                    if attempt == max_retries:
-                        break
-                    delay = min(base_delay * (2 ** attempt), max_delay)
-                    time.sleep(delay)
-            raise last_exc
-
-        if asyncio.iscoroutinefunction(func):
-            return async_wrapper
-        return sync_wrapper
-
-    return decorator
+## 큰 그림
+```mermaid
+flowchart LR
+    SelfTest[self-test] --> Health[/health]
+    SelfTest --> Chat[/chat]
+    Health --> App[FastAPI 앱]
+    Chat --> App
+    App --> Groq[Groq API]
 ```
 
----
+## 왜 이 레이어가 필요한가
+서버가 실제로 뜨고 응답하는지 스스로 증명하는 self-test가 있어야 배포 예제가 완성됩니다.
 
-## FastAPI LLM 서버
+배포 글에서 가장 흔한 실수는 서버 코드만 보여 주고 실제로 떠 있는지 확인하지 않는 것입니다. 운영 준비가 된 예제라면 최소한 health check와 대표 요청 한 건은 자동으로 검증해야 합니다.
 
+예제 파일: `/root/Github/llm-apps-ops-101/ko/05-deployment/main.py`
+
+## 최소 실행 예제
 ```python
+import asyncio
 import os
+import threading
 import time
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse
+import httpx
+import uvicorn
+from fastapi import FastAPI
 from pydantic import BaseModel, Field
-from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage, SystemMessage
+from groq import Groq
 
-# ── 요청/응답 스키마 ─────────────────────────────────────────────────────────
+MODEL = "llama-3.1-8b-instant"
+
 class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=4000)
-    system_prompt: str = Field(default="당신은 유용한 어시스턴트입니다.")
-    temperature: float = Field(default=0.0, ge=0.0, le=1.0)
-    stream: bool = Field(default=False)
+    message: str = Field(min_length=1, max_length=4000)
 
 class ChatResponse(BaseModel):
     response: str
     model: str
-    latency_ms: float
 
-# ── 앱 초기화 ─────────────────────────────────────────────────────────────
+def call_model(client: Groq, message: str) -> str:
+    response = client.chat.completions.create(
+        model=MODEL,
+        temperature=0,
+        messages=[
+            {"role": "system", "content": "You are a concise Python assistant."},
+            {"role": "user", "content": message},
+        ],
+    )
+    return response.choices[0].message.content or ""
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 앱 시작 시 LLM 클라이언트 초기화
-    app.state.llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=0.0,
-    )
-    logger.info("LLM 클라이언트 초기화 완료")
+    app.state.client = Groq(api_key=os.environ["GROQ_API_KEY"])
     yield
-    logger.info("서버 종료")
 
-app = FastAPI(title="LLM API Server", lifespan=lifespan)
+app = FastAPI(title="llm-deployment-demo", lifespan=lifespan)
 
-# ── 미들웨어: 요청 로깅 ──────────────────────────────────────────────────────
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    t0 = time.perf_counter()
-    response = await call_next(request)
-    latency = (time.perf_counter() - t0) * 1000
-    logger.info(f"{request.method} {request.url.path} → {response.status_code} ({latency:.0f}ms)")
-    return response
+class ThreadSafeServer(uvicorn.Server):
+    def install_signal_handlers(self) -> None:
+        return None
 
-# ── 헬스체크 ─────────────────────────────────────────────────────────────
 @app.get("/health")
-async def health():
-    return {"status": "ok", "model": "llama-3.1-8b-instant"}
-
-# ── 채팅 엔드포인트 ───────────────────────────────────────────────────────
-@retry_with_backoff(max_retries=2, base_delay=1.0)
-async def _call_llm(llm: ChatGroq, messages: list) -> str:
-    response = await asyncio.get_event_loop().run_in_executor(
-        None, lambda: llm.invoke(messages)
-    )
-    return response.content
+async def health() -> dict:
+    return {"status": "ok", "model": MODEL}
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
-    messages = [
-        SystemMessage(content=request.system_prompt),
-        HumanMessage(content=request.message),
-    ]
+async def chat(request: ChatRequest) -> ChatResponse:
+    answer = await asyncio.to_thread(call_model, app.state.client, request.message)
+    return ChatResponse(response=answer, model=MODEL)
 
-    if request.stream:
-        async def stream_response() -> AsyncIterator[str]:
-            llm = request.app.state.llm
-            for chunk in llm.stream(messages):
-                if chunk.content:
-                    yield f"data: {chunk.content}\n\n"
-            yield "data: [DONE]\n\n"
-        return StreamingResponse(stream_response(), media_type="text/event-stream")
+def run_server(server: uvicorn.Server) -> None:
+    server.run()
 
-    t0 = time.perf_counter()
-    try:
-        llm = app.state.llm
-        content = await _call_llm(llm, messages)
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"LLM 호출 실패: {str(e)}")
+def main() -> None:
+    config = uvicorn.Config(app, host="127.0.0.1", port=8015, log_level="warning")
+    server = ThreadSafeServer(config)
+    thread = threading.Thread(target=run_server, args=(server,), daemon=True)
+    thread.start()
 
-    return ChatResponse(
-        response=content,
-        model="llama-3.1-8b-instant",
-        latency_ms=round((time.perf_counter() - t0) * 1000, 1),
+    for _ in range(40):
+        try:
+            health = httpx.get("http://127.0.0.1:8015/health", timeout=2.0)
+            if health.status_code == 200:
+                break
+        except Exception:
+            time.sleep(0.25)
+    else:
+        raise RuntimeError("server did not start")
+
+    print("HEALTH:", health.json())
+    response = httpx.post(
+        "http://127.0.0.1:8015/chat",
+        json={"message": "Explain Python async functions in two sentences."},
+        timeout=30.0,
     )
+    print("CHAT:", response.json())
+
+    server.should_exit = True
+    thread.join(timeout=10)
+    if thread.is_alive():
+        raise RuntimeError("server did not stop cleanly")
+
+if __name__ == "__main__":
+    main()
 ```
 
----
+## 이 코드에서 봐야 할 것
+- `asyncio.to_thread`로 동기 Groq 호출을 분리해 FastAPI 이벤트 루프를 막지 않습니다.
+- `uvicorn.Server`를 코드에서 직접 띄우면 문서의 실행 예제와 검증 코드가 하나로 합쳐집니다.
+- self-test가 `/health`와 `/chat`를 모두 치면 단순 기동 확인을 넘어 실제 의존성 경로까지 점검할 수 있습니다.
 
-## 스트리밍 클라이언트 예시
+## 실무에서 헷갈리는 지점
+- 헬스체크는 모델 품질을 보장하지 않습니다. 이 엔드포인트는 프로세스와 기본 의존성 상태만 확인합니다.
+- 비동기 프레임워크를 쓴다고 외부 SDK 호출까지 자동으로 비동기가 되는 것은 아닙니다.
+- 로컬 self-test가 통과해도 배포 환경에서는 네트워크 제한, 시크릿 주입, 타임아웃 값을 다시 확인해야 합니다.
 
-```python
-import httpx
+## 체크리스트
+- [ ] 서버 시작 후 /health를 자동 호출한다
+- [ ] 실제 /chat 요청 한 건을 보내 응답을 확인한다
+- [ ] 이벤트 루프를 막는 동기 호출을 to_thread로 분리한다
+- [ ] 종료 시 서버 스레드가 정상 종료되는지 확인한다
 
-async def stream_chat(message: str, base_url: str = "http://localhost:8000"):
-    payload = {"message": message, "stream": True}
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        async with client.stream("POST", f"{base_url}/chat", json=payload) as response:
-            async for line in response.aiter_lines():
-                if line.startswith("data: ") and not line.endswith("[DONE]"):
-                    token = line[6:]
-                    print(token, end="", flush=True)
-    print()
-
-# 서버 시작: uvicorn server:app --host 0.0.0.0 --port 8000
-# asyncio.run(stream_chat("파이썬 asyncio를 한 문장으로 설명해 주세요."))
-```
-
----
-
-## 배포 체크리스트
-
-**환경 변수**: `GROQ_API_KEY`는 `.env` 파일이나 비밀 관리 서비스에서 주입합니다. 코드에 직접 넣지 않습니다.
-
-**타임아웃 설정**: 클라이언트 타임아웃은 LLM 응답 시간보다 충분히 크게 잡아야 합니다. Groq는 보통 2–5초이지만, 복잡한 요청은 15–30초까지 걸릴 수 있습니다.
-
-**동시성 제한**: `--workers` 수를 늘리면 처리량이 올라가지만, 동시에 나가는 LLM API 요청 수도 늘어납니다. API 속도 제한에 맞게 조정해야 합니다.
-
-**그레이스풀 셧다운**: `lifespan` 컨텍스트 매니저를 사용하면 SIGTERM 수신 시 진행 중인 요청을 완료하고 종료합니다.
+## 정리
+배포 예제는 서버 코드보다 self-test가 더 중요합니다. 스스로 기동과 요청을 증명하지 못하면 운영 문서로 쓰기 어렵습니다.
 
 <!-- blog-only:start -->
 다음 글: [LLM 앱 운영 완성](./06-ops-complete.md)
@@ -254,8 +172,8 @@ async def stream_chat(message: str, base_url: str = "http://localhost:8000"):
 
 ## 참고 자료
 
-- [FastAPI 공식 문서](https://fastapi.tiangolo.com/)
-- [Uvicorn 배포 가이드](https://www.uvicorn.org/deployment/)
-- [LangChain 스트리밍](https://python.langchain.com/docs/expression_language/streaming)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Uvicorn settings](https://www.uvicorn.org/settings/)
+- [HTTPX quickstart](https://www.python-httpx.org/quickstart/)
 
 Tags: LLMOps, Observability, Python, LLM

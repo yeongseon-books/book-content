@@ -17,7 +17,7 @@ Eight Azure series (52 posts × 3 variants = 156 markdown files):
 Each Azure series has three variants: `ko/`, `en/`, `medium/`.
 
 - `ko/<NN>-<slug>.md` — Tistory original (Korean)
-- `en/<NN>-<slug>.md` — Blogger English Blog (한국어 원문의 충실한 영어 대응본). Published to `https://yeongseon-choe.blogspot.com/`.
+- `en/<NN>-<slug>.md` — Hashnode English Blog (한국어 원문의 충실한 영어 대응본). Published to `https://hashnode.com/@yeongseon`.
 - `medium/<NN>.html` — Medium publication adaptation. Generated from `en/<NN>-<slug>.md` by `.sisyphus/medium/to-medium.py` (which delegates HTML rendering to `to-medium-html.py`). During markdown processing image refs are kept as relative local paths; during HTML rendering PNGs are inlined as base64 `data:` URIs. Open in Chrome, select-all, copy, paste into a fresh empty Medium draft; the first H1 maps to Medium's title slot, the trailing visible `Tags: ...` line is copied manually into Medium's tag input field.
 
 Plus the single-variant Korean series:
@@ -289,7 +289,7 @@ When a post is close to publication, add channel-specific titles to front matter
 ```yaml
 title: Azure Functions란? — 이벤트가 함수를 호출하는 세상    # canonical (H1 must match)
 seo_title: Azure Functions란? Trigger, Binding, Host 구조 한 번에 이해하기
-blogger_title: What Is Azure Functions? — A World Where Events Call Your Code
+hashnode_title: What Is Azure Functions? — A World Where Events Call Your Code
 medium_title: Azure Functions Is Not Just "Serverless"
 ebook_title: The Azure Functions Mental Model
 ```

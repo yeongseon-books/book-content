@@ -1,20 +1,20 @@
 ---
-title: '청크 전략 — 긴 문서를 어떻게 나눌 것인가'
-series: vector-search-101
 episode: 5
 language: ko
-status: draft
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
+last_reviewed: '2026-05-01'
+series: vector-search-101
+status: publish-ready
 tags:
 - Vector Search
 - FAISS
 - Embeddings
 - Python
-last_reviewed: '2026-05-01'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 청크 전략 — 긴 문서를 어떻게 나눌 것인가
 ---
 
 # 청크 전략 — 긴 문서를 어떻게 나눌 것인가

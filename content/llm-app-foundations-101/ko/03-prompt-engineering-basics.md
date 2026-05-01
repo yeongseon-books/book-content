@@ -3,7 +3,7 @@ title: 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
 series: llm-app-foundations-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # 프롬프트 엔지니어링 기초 — System·User·Assistant 역할

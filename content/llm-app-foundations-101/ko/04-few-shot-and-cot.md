@@ -3,7 +3,7 @@ title: Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
 series: llm-app-foundations-101
 episode: 4
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기

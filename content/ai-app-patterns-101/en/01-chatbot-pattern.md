@@ -3,7 +3,7 @@ title: 'Chatbot pattern — managing conversation history and state'
 series: ai-app-patterns-101
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,24 @@ last_reviewed: '2026-05-01'
 ---
 
 # Chatbot pattern — managing conversation history and state
+
+## Questions this post answers
+
+- Why does a chatbot application need to carry conversation history itself?
+- What is the smallest working pattern for a multi-turn chatbot with accumulated messages?
+- When should session history stay in memory, and when should it move to external storage?
+
+> A chatbot is not a model with memory; it is an application loop that keeps replaying the accumulated messages list.
+
+```mermaid
+flowchart LR
+    User[User input] --> Session[Session messages list]
+    Session --> Prompt[System plus history plus new question]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Reply[Generated reply]
+    Reply --> Session
+    Reply --> User
+```
 
 > AI App Patterns 101 (1/6)
 
@@ -278,6 +296,31 @@ print(f"\nsession A: {session_a}")
 print(f"session B: {session_b}")
 print(f"session A history length: {len(sessions[session_a])}")
 ```
+
+---
+
+## What to notice in this code
+
+- `main.py` implements multi-turn behavior with nothing more than `SystemMessage` plus accumulated `HumanMessage` and `AIMessage` objects per session.
+- The demo runs one continuing session and one separate session to show that “memory” lives in application state, not inside the model.
+- In production, this in-memory `dict[str, list]` becomes Redis or a database-backed session store.
+
+---
+
+## Where engineers get confused
+
+- Persisting chat history does not give the model durable memory; it only replays prior turns on every request.
+- Session identity and user identity are related but not identical. One user can have multiple concurrent sessions.
+- As history grows, cost and latency often break first, long before the chatbot stops working.
+
+---
+
+## Checklist
+
+- [ ] Conversation history is isolated per session ID
+- [ ] The system prompt is included on every model call
+- [ ] The AI reply is appended back into history after each response
+- [ ] The storage layer can later move to Redis or a database without changing the calling pattern
 
 ---
 

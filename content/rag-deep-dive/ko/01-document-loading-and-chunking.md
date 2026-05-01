@@ -3,7 +3,7 @@ title: 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
 series: rag-deep-dive
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,33 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
+
+<!-- a-grade-intro:begin -->
+## 이 글에서 답할 질문
+
+- 로더가 만든 문서 경계가 왜 검색 품질보다 먼저 중요할까요?
+- Character, Recursive, Token splitter는 같은 텍스트를 어떻게 다르게 자를까요?
+- `chunk_overlap`은 왜 설정한 숫자와 체감이 다를까요?
+- 토큰 기준 분할은 언제 문자 기준 분할보다 안전할까요?
+
+> 청킹은 문서를 잘게 자르는 작업이 아니라, 나중에 다시 찾을 의미 경계를 먼저 고정하는 작업입니다.
+
+```mermaid
+flowchart LR
+    A[원본 문서] --> B[Loader]
+    B --> C[Character splitter]
+    B --> D[Recursive splitter]
+    B --> E[Token splitter]
+    C --> F[청크 후보]
+    D --> F
+    E --> F
+    F --> G[검색 가능한 문맥]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (1/6)
 
@@ -30,6 +53,81 @@ last_reviewed: '2026-04-30'
 이 글은 시리즈 6편 중 1번째 장입니다.
 이 장을 마치면 다음 장에서 **임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리**으로 이어집니다.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## 최소 실행 예제
+
+예제 파일: `/root/Github/rag-deep-dive/ko/01-document-loading-and-chunking/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+from langchain_text_splitters import (
+    CharacterTextSplitter,
+    RecursiveCharacterTextSplitter,
+    TokenTextSplitter,
+)
+
+TEXT = """# Incident runbook
+
+## Retry policy
+The worker retries a failed message three times.
+After the final retry, the payload moves to the dead-letter queue.
+
+## Operator action
+The on-call engineer checks the exception chain and the original payload.
+"""
+
+def print_chunks(name: str, chunks: list[str]) -> None:
+    print(f"\n=== {name} ({len(chunks)} chunks) ===")
+    for index, chunk in enumerate(chunks, start=1):
+        print(f"[{index}] {chunk!r}")
+
+def main() -> None:
+    character = CharacterTextSplitter(
+        separator="\n\n",
+        chunk_size=90,
+        chunk_overlap=10,
+    )
+    recursive = RecursiveCharacterTextSplitter(
+        chunk_size=90,
+        chunk_overlap=10,
+    )
+    token = TokenTextSplitter(
+        encoding_name="cl100k_base",
+        chunk_size=24,
+        chunk_overlap=4,
+    )
+
+    print_chunks("CharacterTextSplitter", character.split_text(TEXT))
+    print_chunks("RecursiveCharacterTextSplitter", recursive.split_text(TEXT))
+    print_chunks("TokenTextSplitter", token.split_text(TEXT))
+
+if __name__ == "__main__":
+    main()
+```
+
+### 이 코드에서 봐야 할 것
+
+- 같은 원문을 세 splitter에 넣어도 청크 수와 경계가 달라집니다.
+- `RecursiveCharacterTextSplitter`는 문단과 줄바꿈을 최대한 살린 뒤 더 거친 분할로 내려갑니다.
+- `TokenTextSplitter`는 모델 예산 기준으로 더 예측 가능한 창을 만듭니다.
+
+### 실무에서 헷갈리는 지점
+
+- `chunk_overlap=10`이 항상 정확히 10문자 겹침을 뜻하지는 않습니다.
+- 재귀 분할은 구조 보존에 강하지만, 도메인별 경계를 자동으로 이해하는 것은 아닙니다.
+- 문자 기준으로 안전해 보여도 토큰 기준 컨텍스트 한도는 초과할 수 있습니다.
+
+## 체크리스트
+
+- [ ] 로더가 만든 기본 `Document` 경계를 먼저 확인했다.
+- [ ] 문자 기준과 토큰 기준 분할 결과를 둘 다 비교했다.
+- [ ] overlap이 조각 단위로 실현된다는 점을 로그로 검증했다.
+- [ ] 프롬프트 직전 토큰 예산 점검이 따로 필요하다는 점을 이해했다.
+<!-- a-grade-example:end -->
 
 ## 소스 버전
 

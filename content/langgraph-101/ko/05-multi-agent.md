@@ -3,7 +3,7 @@ title: '멀티 에이전트 시스템'
 series: langgraph-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,199 +19,141 @@ last_reviewed: '2026-05-01'
 
 # 멀티 에이전트 시스템
 
-> LangGraph 101 (5/6)
+## 이 글에서 답할 질문
+
+- 감독자와 작업자 패턴을 LangGraph에서는 어떻게 표현할까요?
+- supervisor 노드는 어떤 기준으로 worker를 선택해야 할까요?
+- 여러 에이전트가 협력할 때 공유 상태는 어디까지 가져가야 할까요?
+
+> 멀티 에이전트 그래프는 여러 LLM을 늘어놓는 구조가 아니라 누가 어떤 작업을 맡는지 상태와 엣지로 명시하는 구조입니다.
 
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/05-multi-agent)
 
-복잡한 작업은 여러 전문 에이전트가 협력해 처리합니다. 한 에이전트가 전체를 조율하고, 나머지는 각자의 역할에 집중합니다. 이 포스트에서는 감독자-작업자 패턴으로 멀티 에이전트 시스템을 구현합니다.
+복잡한 요청을 하나의 에이전트에 모두 밀어 넣으면 프롬프트가 비대해지고 역할이 흐려집니다. 반대로 supervisor가 요청 성격을 판단하고 적절한 worker에게 넘기면 책임이 분리되고 그래프도 읽기 쉬워집니다.
 
----
-
-<!-- ebook-only:start -->
-
-이 장의 핵심: **Multi-Agent는 여러 그래프가 메시지를 주고받는 것이다.** Supervisor가 Task를 분배하고 Sub-Agent가 각자 처리한다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 5번째 장입니다.
-앞 장에서는 **도구 호출 에이전트**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **LangGraph 완성**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 감독자-작업자 패턴
-
-감독자(Supervisor)가 작업을 분석해 적절한 작업자(Worker) 에이전트에 위임하고, 결과를 통합해 최종 답변을 생성합니다.
-
-```
-사용자 → [감독자] → [연구 에이전트] → 결과
-                  → [코드 에이전트] → 결과
-                  → [요약 에이전트] → 최종 답변
+```mermaid
+flowchart LR
+    A[사용자 요청] --> B[supervisor]
+    B -->|research| C[research_worker]
+    B -->|code| D[code_worker]
+    C --> E[finalize]
+    D --> E
+    E --> F[END]
 ```
 
----
-
-## 에이전트 구현
+## 최소 실행 예제
 
 ```python
 import os
-from typing import TypedDict, Annotated, Literal
+from typing import Literal, TypedDict
 
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
-from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
+from langgraph.graph import END, START, StateGraph
 
-# ── 공유 상태 ──────────────────────────────────────────────────────────────
-class MultiAgentState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-    task_type: str          # 작업 유형: research, code, summary
-    research_result: str    # 연구 에이전트 결과
-    code_result: str        # 코드 에이전트 결과
-    final_answer: str       # 최종 답변
+class SupervisorState(TypedDict):
+    request: str
+    route: str
+    worker_result: str
+    final_answer: str
 
-def _llm(temperature: float = 0.0) -> ChatGroq:
-    return ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-        temperature=temperature,
+def llm() -> ChatGroq:
+    return ChatGroq(model="llama-3.1-8b-instant", temperature=0.0, api_key=os.environ["GROQ_API_KEY"])
+
+def supervisor(state: SupervisorState) -> SupervisorState:
+    request_lower = state["request"].lower()
+    if any(keyword in request_lower for keyword in ("code", "python", "function", "implement", "write")):
+        return {"route": "code"}
+    if any(keyword in request_lower for keyword in ("what", "why", "explain", "concept")):
+        return {"route": "research"}
+
+    response = llm().invoke(
+        [
+            SystemMessage(content="Classify the request as research or code. Return only one label: research or code."),
+            HumanMessage(content=state["request"]),
+        ]
     )
+    route = response.content.strip().lower()
+    if route not in {"research", "code"}:
+        route = "research"
+    return {"route": route}
 
-# ── 감독자 에이전트 ────────────────────────────────────────────────────────
-def supervisor_node(state: MultiAgentState) -> MultiAgentState:
-    """사용자 요청을 분석해 작업 유형을 결정합니다."""
-    last_msg = state["messages"][-1].content
-    response = _llm().invoke([
-        SystemMessage(content="""사용자 요청을 분석해 작업 유형을 결정하세요.
+def route_to_worker(state: SupervisorState) -> Literal["research_worker", "code_worker"]:
+    return "code_worker" if state["route"] == "code" else "research_worker"
 
-- research: 정보 수집, 개념 설명, 사실 확인이 필요한 경우
-- code: 코드 작성, 디버깅, 코드 설명이 필요한 경우  
-- summary: 정보를 요약하거나 정리가 필요한 경우
+def research_worker(state: SupervisorState) -> SupervisorState:
+    response = llm().invoke(
+        [
+            SystemMessage(content="You are a research worker for the LangGraph framework in the LangChain ecosystem. Explain concepts with crisp bullet points and practical engineering language."),
+            HumanMessage(content=state["request"]),
+        ]
+    )
+    return {"worker_result": response.content}
 
-반드시 research, code, summary 중 하나만 반환하세요."""),
-        HumanMessage(content=last_msg),
-    ])
-    task_type = response.content.strip().lower()
-    if task_type not in ("research", "code", "summary"):
-        task_type = "research"
-    return {"task_type": task_type}
+def code_worker(state: SupervisorState) -> SupervisorState:
+    response = llm().invoke(
+        [
+            SystemMessage(content="You are a coding worker for LangGraph tutorials. Produce short Python-focused answers with one small example."),
+            HumanMessage(content=state["request"]),
+        ]
+    )
+    return {"worker_result": response.content}
 
-# ── 연구 에이전트 ──────────────────────────────────────────────────────────
-def research_agent_node(state: MultiAgentState) -> MultiAgentState:
-    """개념 설명과 정보 수집을 담당합니다."""
-    last_msg = state["messages"][-1].content
-    response = _llm().invoke([
-        SystemMessage(content="""당신은 연구 전문가입니다.
-다음 질문에 대해 정확하고 상세한 정보를 제공하세요.
-출처와 핵심 포인트를 명확히 하세요."""),
-        HumanMessage(content=last_msg),
-    ])
-    return {
-        "research_result": response.content,
-        "messages": [AIMessage(content=f"[연구 에이전트] {response.content}")],
-    }
+def finalize(state: SupervisorState) -> SupervisorState:
+    final_answer = (
+        f"Supervisor route: {state['route']}\n"
+        f"Worker output:\n{state['worker_result']}"
+    )
+    return {"final_answer": final_answer}
 
-# ── 코드 에이전트 ──────────────────────────────────────────────────────────
-def code_agent_node(state: MultiAgentState) -> MultiAgentState:
-    """코드 작성과 설명을 담당합니다."""
-    last_msg = state["messages"][-1].content
-    response = _llm(temperature=0.0).invoke([
-        SystemMessage(content="""당신은 시니어 파이썬 개발자입니다.
-명확하고 실용적인 코드를 작성하세요.
-코드 블록과 함께 설명을 제공하세요.
-타입 힌트와 docstring을 포함하세요."""),
-        HumanMessage(content=last_msg),
-    ])
-    return {
-        "code_result": response.content,
-        "messages": [AIMessage(content=f"[코드 에이전트] {response.content}")],
-    }
+def build_graph():
+    graph = StateGraph(SupervisorState)
+    graph.add_node("supervisor", supervisor)
+    graph.add_node("research_worker", research_worker)
+    graph.add_node("code_worker", code_worker)
+    graph.add_node("finalize", finalize)
 
-# ── 요약 에이전트 ──────────────────────────────────────────────────────────
-def summary_agent_node(state: MultiAgentState) -> MultiAgentState:
-    """정보를 통합하고 최종 답변을 생성합니다."""
-    context_parts = []
-    if state.get("research_result"):
-        context_parts.append(f"연구 결과:\n{state['research_result']}")
-    if state.get("code_result"):
-        context_parts.append(f"코드 결과:\n{state['code_result']}")
-
-    context = "\n\n".join(context_parts) if context_parts else state["messages"][-1].content
-
-    response = _llm().invoke([
-        SystemMessage(content="""다음 정보를 바탕으로 사용자에게 최종 답변을 작성하세요.
-명확하고 구조적으로 정리하세요."""),
-        HumanMessage(content=f"원래 질문: {state['messages'][0].content}\n\n{context}"),
-    ])
-    return {
-        "final_answer": response.content,
-        "messages": [AIMessage(content=response.content)],
-    }
-
-# ── 라우팅 ────────────────────────────────────────────────────────────────
-def route_by_task_type(state: MultiAgentState) -> Literal["research", "code", "summary"]:
-    return state["task_type"]
-
-def after_agent(state: MultiAgentState) -> Literal["summary", "end"]:
-    """연구 또는 코드 에이전트 후 요약 에이전트로 이동."""
-    return "summary"
-
-# ── 그래프 조립 ───────────────────────────────────────────────────────────
-def build_multi_agent_graph():
-    graph = StateGraph(MultiAgentState)
-
-    graph.add_node("supervisor", supervisor_node)
-    graph.add_node("research", research_agent_node)
-    graph.add_node("code", code_agent_node)
-    graph.add_node("summary", summary_agent_node)
-
-    graph.set_entry_point("supervisor")
+    graph.add_edge(START, "supervisor")
     graph.add_conditional_edges(
         "supervisor",
-        route_by_task_type,
-        {
-            "research": "research",
-            "code": "code",
-            "summary": "summary",
-        },
+        route_to_worker,
+        {"research_worker": "research_worker", "code_worker": "code_worker"},
     )
-    graph.add_edge("research", "summary")
-    graph.add_edge("code", "summary")
-    graph.add_edge("summary", END)
-
+    graph.add_edge("research_worker", "finalize")
+    graph.add_edge("code_worker", "finalize")
+    graph.add_edge("finalize", END)
     return graph.compile()
-
-if __name__ == "__main__":
-    app = build_multi_agent_graph()
-
-    initial_state: MultiAgentState = {
-        "messages": [],
-        "task_type": "",
-        "research_result": "",
-        "code_result": "",
-        "final_answer": "",
-    }
-
-    questions = [
-        "파이썬 비동기 프로그래밍이란 무엇인가요?",
-        "파이썬으로 피보나치 수열을 구현해 주세요.",
-    ]
-
-    for q in questions:
-        state = {**initial_state, "messages": [HumanMessage(content=q)]}
-        result = app.invoke(state)
-        print(f"\n질문: {q}")
-        print(f"작업 유형: {result['task_type']}")
-        print(f"최종 답변:\n{result['final_answer'][:300]}...")
 ```
 
----
+실행 파일: `/root/Github/langgraph-101/ko/05-multi-agent/main.py`
 
-## 에이전트 간 통신 패턴
+실행:
 
-멀티 에이전트 시스템에서 에이전트 간 통신은 공유 상태를 통해 이루어집니다. 각 에이전트가 상태에 결과를 쓰고, 다음 에이전트가 그 결과를 읽습니다.
+```bash
+export GROQ_API_KEY=... && python main.py
+```
 
-이 패턴의 장점은 에이전트 간 결합도가 낮다는 것입니다. 코드 에이전트가 어떻게 구현됐는지 요약 에이전트는 알 필요가 없습니다. 공유 상태의 `code_result` 필드만 읽으면 됩니다. 에이전트 교체가 쉽고, 새 에이전트를 추가할 때 기존 에이전트를 수정할 필요가 없습니다.
+## 이 코드에서 봐야 할 것
+
+- supervisor는 직접 답을 만들지 않고 `route`만 결정합니다.
+- worker는 각자 `worker_result` 같은 공유 필드에 결과를 씁니다.
+- `finalize`가 마지막 조립만 맡기 때문에 worker 수가 늘어나도 정리 지점이 흔들리지 않습니다.
+
+## 실무에서 헷갈리는 지점
+
+- 멀티 에이전트라고 해서 그래프가 자동으로 똑똑해지지는 않습니다. 역할 경계가 애매하면 단일 에이전트보다 더 나빠질 수 있습니다.
+- supervisor가 분류도 하고 답변도 하게 만들면 결국 거대한 단일 에이전트로 되돌아갑니다.
+- 공유 상태를 과하게 넓히면 worker 간 결합도가 높아집니다. 필요한 결과 필드만 남기는 편이 좋습니다.
+
+## 체크리스트
+
+- [ ] supervisor와 worker 책임이 문장으로 분리 설명되는가
+- [ ] worker 출력 필드가 명시적으로 구분돼 있는가
+- [ ] 최종 조립 노드가 있어 디버깅 지점이 분명한가
+
+## 정리
+
+멀티 에이전트의 핵심은 LLM 개수가 아니라 작업 위임 구조입니다. 마지막 글에서는 지금까지 만든 체크포인트, 조건 분기, 도구 호출을 한 그래프로 합쳐 전체 LangGraph 에이전트를 완성하겠습니다.
 
 <!-- blog-only:start -->
 다음 글: [LangGraph 완성](./06-langgraph-complete.md)
@@ -233,8 +175,8 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [LangGraph 멀티 에이전트 문서](https://langchain-ai.github.io/langgraph/how-tos/multi-agent-network/)
-- [LangGraph 감독자 패턴](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/)
-- [LangGraph 에이전트 네트워크](https://langchain-ai.github.io/langgraph/concepts/multi_agent/)
+- [LangGraph multi-agent concepts](https://langchain-ai.github.io/langgraph/concepts/multi_agent/)
+- [LangGraph supervisor tutorial](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/)
+- [LangGraph multi-agent network guide](https://langchain-ai.github.io/langgraph/how-tos/multi-agent-network/)
 
 Tags: LangGraph, Agent, Python, LLM

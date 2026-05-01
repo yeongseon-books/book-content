@@ -3,7 +3,7 @@ title: 'Agent + Tool 패턴 — 자율 도구 선택'
 series: ai-app-patterns-101
 episode: 4
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,24 @@ last_reviewed: '2026-05-01'
 ---
 
 # Agent + Tool 패턴 — 자율 도구 선택
+
+## 이 글에서 답할 질문
+
+- 고정 체인 대신 AgentExecutor를 써야 하는 순간은 언제일까요?
+- LLM이 계산기와 검색 도구 중 무엇을 고를지 결정하게 하려면 도구 설명을 어떻게 써야 할까요?
+- 도구 선택형 에이전트를 디버깅할 때 어떤 실행 흔적을 확인해야 할까요?
+
+> 에이전트는 단계를 직접 하드코딩하는 대신, 모델이 도구 호출 경로를 런타임에 고르게 만드는 제어기입니다.
+
+```mermaid
+flowchart LR
+    Question[사용자 질문] --> Agent[AgentExecutor]
+    Agent --> Decide[도구 선택]
+    Decide --> Calc[calculate 도구]
+    Decide --> Search[search_docs 도구]
+    Calc --> Result[도구 결과]
+    Search --> Result
+```
 
 > AI 앱 패턴 101 시리즈 (4/6)
 
@@ -221,6 +239,31 @@ def safe_divide(a: float, b: float) -> str:
         return "오류: 0으로 나눌 수 없습니다."
     return str(a / b)
 ```
+
+---
+
+## 이 코드에서 봐야 할 것
+
+- `main.py`는 `AgentExecutor`를 계산용 실행기와 검색용 실행기로 나눠 가장 단순한 도구 선택 패턴을 보여 줍니다.
+- 각 도구는 `@tool(return_direct=True)`를 사용해 선택 결과를 바로 반환합니다.
+- 질문과 도구 설명을 짧게 유지해야 함수 호출 실패를 줄일 수 있습니다.
+
+---
+
+## 실무에서 헷갈리는 지점
+
+- 에이전트를 쓰면 무조건 더 똑똑해지는 것이 아닙니다. 경로 자유도가 늘어나는 대신 예측 가능성은 줄어듭니다.
+- 도구 품질이 낮으면 에이전트 품질도 같이 낮아집니다. LLM이 아니라 도구 인터페이스가 병목일 수 있습니다.
+- 검색 도구와 RAG는 비슷해 보여도 다릅니다. 전자는 도구 호출, 후자는 프롬프트 컨텍스트 주입이 중심입니다.
+
+---
+
+## 체크리스트
+
+- [ ] 도구마다 명확한 설명과 입력 형태가 있다
+- [ ] AgentExecutor가 계산 도구를 한 번 호출한다
+- [ ] AgentExecutor가 검색 도구를 한 번 호출한다
+- [ ] 도구 결과가 최종 출력으로 바로 전달된다
 
 ---
 

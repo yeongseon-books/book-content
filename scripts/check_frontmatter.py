@@ -29,12 +29,12 @@ CONTENT_DIR = REPO_ROOT / "content"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 REQUIRED_FIELDS = {"title", "series", "episode", "language", "status", "targets", "tags", "last_reviewed"}
-OPTIONAL_FIELDS = {"seo_title", "blogger_title", "medium_title", "ebook_title", "published"}
+OPTIONAL_FIELDS = {"seo_title", "hashnode_title", "medium_title", "ebook_title", "published"}
 VALID_STATUS = {"draft", "content-ready", "code-checked", "publish-ready", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 TARGET_KEYS = {"tistory", "medium", "mkdocs", "ebook"}
-OPTIONAL_TARGET_KEYS = {"blogger"}
-PUBLISHED_KEYS = {"tistory_url", "blogger_url", "medium_url", "mkdocs_url"}
+OPTIONAL_TARGET_KEYS = {"hashnode"}
+PUBLISHED_KEYS = {"tistory_url", "hashnode_url", "medium_url", "mkdocs_url"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PREFIX_RE = re.compile(r"^(\d+)")
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)

@@ -14,7 +14,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: publish-ready
 tags:
   - RAG
   - LangChain
@@ -23,19 +23,19 @@ tags:
 articles:
 - idx: 1
   slug: 01-document-loading-and-chunking
-  status: draft
+  status: publish-ready
 - idx: 2
   slug: 02-embeddings-and-vector-index
-  status: draft
+  status: publish-ready
 - idx: 3
   slug: 03-retriever-design
-  status: draft
+  status: publish-ready
 - idx: 4
   slug: 04-prompt-construction-and-context-injection
-  status: draft
+  status: publish-ready
 - idx: 5
   slug: 05-rag-chain-assembly
-  status: draft
+  status: publish-ready
 - idx: 6
   slug: 06-evaluation-and-quality-gates
-  status: draft
+  status: publish-ready

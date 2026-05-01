@@ -3,7 +3,7 @@ title: '메타데이터 설계와 필터링'
 series: document-ingestion-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,268 +19,163 @@ last_reviewed: '2026-05-01'
 
 # 메타데이터 설계와 필터링
 
-> 문서 수집과 인덱싱 101 시리즈 (3/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/03-metadata-filtering)
+- 임베딩 검색만으로 해결되지 않는 조건은 어떤 것들일까요?
+- LangChain Document 메타데이터를 어떻게 설계해야 나중에 필터가 쉬울까요?
+- FAISS 검색에서 `filter` 파라미터를 어떤 식으로 붙일 수 있을까요?
 
-"2024년 4분기 보고서에서 마케팅 관련 내용을 찾아줘"라는 쿼리를 생각해 보세요. 임베딩만으로는 날짜와 카테고리를 동시에 필터링하기 어렵습니다. 메타데이터 필터링은 이런 경우를 위한 것입니다. 각 청크에 구조화된 메타데이터를 붙이고, 검색 시 메타데이터 조건과 의미 유사도를 함께 적용합니다.
+> 메타데이터는 본문을 설명하는 부가 정보라기보다 검색 후보군을 줄이는 첫 번째 인덱스입니다.
 
-다룰 내용은 다음과 같습니다.
+예제 코드: `/root/Github/document-ingestion-101/ko/03-metadata-filtering/main.py`
 
-- 메타데이터 스키마 설계
-- 청크에 메타데이터 붙이기
-- FAISS와 메타데이터 필터링
-- 날짜, 카테고리, 출처 기반 필터링
+```mermaid
+flowchart LR
+    A[원본 문서] --> B[청크 생성]
+    B --> C[category quarter source 메타데이터 부착]
+    C --> D[FAISS 저장]
+    D --> E[similarity_search + filter]
+```
 
----
+RAG 검색이 생각보다 엉뚱한 결과를 내는 가장 흔한 이유는 “비슷한 내용”과 “찾고 싶은 범위”를 분리하지 않았기 때문입니다. 분기, 문서 종류, 출처 같은 조건은 임베딩만으로 깔끔하게 처리되지 않습니다.
 
-<!-- ebook-only:start -->
+이번 예제는 작은 문서 세 개를 FAISS에 넣고, `filter` 파라미터로 category와 quarter를 바꾸면서 검색 결과가 어떻게 달라지는지 확인합니다.
 
-이 장의 핵심: **메타데이터는 검색 필터의 원천이다.** 출처·날짜·섹션 정보를 청크에 붙여야 정밀한 필터 검색이 가능하다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 3번째 장입니다.
-앞 장에서는 **청킹 전략 — 문서 유형별 최적화**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **증분 인덱싱 — 변경된 문서만 업데이트**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 메타데이터 스키마 설계
-
-좋은 메타데이터 스키마는 검색 시 자주 쓰이는 필터 조건을 미리 정의합니다.
+## 실행 예제
 
 ```python
-from dataclasses import dataclass, field
-from datetime import date
-from typing import Optional
+from __future__ import annotations
+
+import hashlib
+from dataclasses import dataclass
+
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
+
+class SimpleHashEmbeddings(Embeddings):
+    def __init__(self, size: int = 32):
+        self.size = size
+
+    def _embed(self, text: str) -> list[float]:
+        vector = [0.0] * self.size
+        for token in text.lower().split():
+            digest = hashlib.sha256(token.encode('utf-8')).digest()
+            for index in range(self.size):
+                vector[index] += digest[index] / 255.0
+        return vector
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return [self._embed(text) for text in texts]
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._embed(text)
 
 @dataclass
-class DocumentMetadata:
-    # 식별자
-    doc_id: str
-    chunk_id: str
+class ChunkSpec:
+    title: str
+    text: str
+    category: str
+    quarter: str
+    source: str
 
-    # 출처
-    source_file: str
-    source_type: str          # pdf, txt, html, docx
+    def to_document(self) -> Document:
+        metadata = {
+            'title': self.title,
+            'category': self.category,
+            'quarter': self.quarter,
+            'source': self.source,
+        }
+        return Document(page_content=self.text, metadata=metadata)
 
-    # 내용 분류
-    category: str             # legal, news, technical, faq
-    subcategory: Optional[str] = None
+def build_vectorstore() -> FAISS:
+    docs = [
+        ChunkSpec(
+            title='Q4 marketing budget',
+            text='The 2024 Q4 marketing budget focuses on campaign spend and partner events.',
+            category='marketing',
+            quarter='2024Q4',
+            source='q4-report.pdf',
+        ).to_document(),
+        ChunkSpec(
+            title='Q4 infrastructure cost',
+            text='The 2024 Q4 infrastructure budget focuses on storage migration and backup cost.',
+            category='engineering',
+            quarter='2024Q4',
+            source='q4-report.pdf',
+        ).to_document(),
+        ChunkSpec(
+            title='Q3 marketing review',
+            text='The 2024 Q3 marketing review summarizes webinar leads and conversion rate.',
+            category='marketing',
+            quarter='2024Q3',
+            source='q3-review.md',
+        ).to_document(),
+    ]
+    return FAISS.from_documents(docs, SimpleHashEmbeddings())
 
-    # 날짜
-    created_date: Optional[str] = None   # ISO 8601: "2024-01-15"
-    modified_date: Optional[str] = None
+def main() -> None:
+    vectorstore = build_vectorstore()
+    query = 'marketing budget'
 
-    # 위치 정보
-    page_num: Optional[int] = None
-    chunk_idx: int = 0
+    print('[filter=category:marketing]')
+    for doc in vectorstore.similarity_search(query, k=3, filter={'category': 'marketing'}):
+        print(doc.metadata['title'], doc.metadata['quarter'], '-', doc.page_content)
 
-    # 품질 지표
-    char_count: int = 0
-    language: str = "ko"
+    print('
+[filter=quarter:2024Q4]')
+    for doc in vectorstore.similarity_search(query, k=3, filter={'quarter': '2024Q4'}):
+        print(doc.metadata['title'], doc.metadata['category'], '-', doc.page_content)
 
-    def to_dict(self) -> dict:
-        return {k: v for k, v in self.__dict__.items() if v is not None}
-
-# 메타데이터 생성 예시
-meta = DocumentMetadata(
-    doc_id="doc_001",
-    chunk_id="doc_001_chunk_003",
-    source_file="2024q4_report.pdf",
-    source_type="pdf",
-    category="business",
-    subcategory="marketing",
-    created_date="2024-10-01",
-    page_num=5,
-    chunk_idx=3,
-    char_count=320,
-    language="ko",
-)
-print(meta.to_dict())
+if __name__ == '__main__':
+    main()
 ```
 
----
+## 실행 방법
 
-## 청크에 메타데이터 붙이기
-
-```python
-import hashlib
-import os
-from datetime import datetime
-from pathlib import Path
-
-import fitz
-from langchain.schema import Document
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-def load_pdf_with_metadata(
-    pdf_path: str,
-    category: str,
-    chunk_size: int = 400,
-    chunk_overlap: int = 80,
-) -> list[Document]:
-    """
-    PDF를 로드하고 각 청크에 메타데이터를 붙여 LangChain Document 목록으로 반환합니다.
-    """
-    pdf_path = Path(pdf_path)
-    doc = fitz.open(str(pdf_path))
-
-    # PDF 수준 메타데이터
-    file_stat = pdf_path.stat()
-    pdf_meta = {
-        "source_file": pdf_path.name,
-        "source_type": "pdf",
-        "category": category,
-        "page_count": len(doc),
-        "file_size_kb": file_stat.st_size // 1024,
-        "modified_date": datetime.fromtimestamp(file_stat.st_mtime).strftime("%Y-%m-%d"),
-    }
-
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". "],
-    )
-
-    langchain_docs = []
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        text = page.get_text("text").strip()
-        if not text:
-            continue
-
-        chunks = splitter.split_text(text)
-        for chunk_idx, chunk in enumerate(chunks):
-            # 청크별 고유 ID 생성
-            chunk_hash = hashlib.md5(chunk.encode()).hexdigest()[:8]
-            chunk_id = f"{pdf_path.stem}_p{page_num+1}_c{chunk_idx}_{chunk_hash}"
-
-            metadata = {
-                **pdf_meta,
-                "page_num": page_num + 1,
-                "chunk_idx": chunk_idx,
-                "chunk_id": chunk_id,
-                "char_count": len(chunk),
-            }
-
-            langchain_docs.append(Document(page_content=chunk, metadata=metadata))
-
-    doc.close()
-    return langchain_docs
-
-# 샘플 PDF 생성 및 로드 (앞 글에서 만든 /tmp/sample.pdf 활용)
-docs = load_pdf_with_metadata("/tmp/sample.pdf", category="technical")
-print(f"생성된 Document 수: {len(docs)}")
-for doc in docs[:2]:
-    print(f"\n청크 ID: {doc.metadata['chunk_id']}")
-    print(f"메타데이터: {doc.metadata}")
-    print(f"내용: {doc.page_content[:100]}...")
+```bash
+python main.py
 ```
 
----
+## 검증된 실행 결과
 
-## FAISS 메타데이터 필터링
+```text
+[filter=category:marketing]
+Q3 marketing review 2024Q3 - ...
+Q4 marketing budget 2024Q4 - ...
 
-FAISS는 자체 메타데이터 필터링 기능이 제한적입니다. LangChain의 FAISS 통합은 메타데이터를 저장하지만 필터링은 검색 후 후처리로 수행합니다.
-
-```python
-def build_index_with_metadata(documents: list[Document]) -> FAISS:
-    """메타데이터가 포함된 FAISS 인덱스를 구성합니다."""
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-
-    vectorstore = FAISS.from_documents(documents, embedding_model)
-    print(f"인덱스 구성 완료: {vectorstore.index.ntotal}개 벡터")
-    return vectorstore
-
-def filtered_search(
-    vectorstore: FAISS,
-    query: str,
-    k: int = 10,  # 더 많이 가져온 후 필터링
-    filter_fn=None,
-) -> list[Document]:
-    """
-    의미 유사도 검색 후 메타데이터 필터를 적용합니다.
-    filter_fn: Document → bool
-    """
-    # 충분히 많은 결과를 가져옴
-    results = vectorstore.similarity_search(query, k=k)
-
-    if filter_fn:
-        results = [doc for doc in results if filter_fn(doc)]
-
-    return results
-
-# 인덱스 구성 (여러 카테고리 문서 시뮬레이션)
-all_docs = []
-
-# 기술 문서
-tech_docs_raw = [
-    Document(
-        page_content="파이썬 asyncio로 비동기 HTTP 클라이언트를 구현합니다.",
-        metadata={"category": "technical", "source_file": "python_async.pdf", "page_num": 1, "created_date": "2024-01-15"},
-    ),
-    Document(
-        page_content="FAISS 인덱스의 IVF 방식은 대규모 벡터 검색을 빠르게 합니다.",
-        metadata={"category": "technical", "source_file": "faiss_guide.pdf", "page_num": 3, "created_date": "2024-03-10"},
-    ),
-]
-
-# 법령 문서
-legal_docs_raw = [
-    Document(
-        page_content="개인정보는 살아 있는 개인에 관한 정보로서 개인을 식별할 수 있는 정보입니다.",
-        metadata={"category": "legal", "source_file": "privacy_law.pdf", "page_num": 1, "created_date": "2023-09-01"},
-    ),
-    Document(
-        page_content="개인정보 처리자는 정보 주체의 동의 없이 개인정보를 제3자에게 제공할 수 없습니다.",
-        metadata={"category": "legal", "source_file": "privacy_law.pdf", "page_num": 5, "created_date": "2023-09-01"},
-    ),
-]
-
-all_docs = tech_docs_raw + legal_docs_raw
-vectorstore = build_index_with_metadata(all_docs)
-
-# 필터링 검색 예시
-# 1. 기술 문서만 검색
-tech_results = filtered_search(
-    vectorstore,
-    query="벡터 검색 방법",
-    k=10,
-    filter_fn=lambda doc: doc.metadata.get("category") == "technical",
-)
-print(f"\n기술 문서 필터 결과: {len(tech_results)}개")
-for r in tech_results:
-    print(f"  [{r.metadata['category']}] {r.page_content[:60]}")
-
-# 2. 2024년 이후 문서만 검색
-recent_results = filtered_search(
-    vectorstore,
-    query="비동기 처리",
-    k=10,
-    filter_fn=lambda doc: doc.metadata.get("created_date", "0") >= "2024",
-)
-print(f"\n2024년 이후 문서 결과: {len(recent_results)}개")
-for r in recent_results:
-    print(f"  [{r.metadata['created_date']}] {r.page_content[:60]}")
+[filter=quarter:2024Q4]
+Q4 marketing budget marketing - ...
+Q4 infrastructure cost engineering - ...
 ```
 
----
+## 이 코드에서 봐야 할 것
 
-## 마무리
+- `ChunkSpec`이 본문과 메타데이터를 함께 정의하므로 검색 스키마를 코드에서 한눈에 볼 수 있습니다.
+- `SimpleHashEmbeddings`를 써서 네트워크 없이도 `filter` 동작 자체를 재현할 수 있습니다.
+- 같은 질의라도 필터 조건을 바꾸면 결과 집합이 달라진다는 점이 핵심입니다.
 
-메타데이터는 의미 검색이 닿지 않는 범위를 커버합니다. "2024년 4분기" 같은 시간 필터, "법령" 같은 카테고리 필터는 임베딩 유사도만으로는 처리할 수 없습니다. 청크를 만들 때 메타데이터를 함께 설계하면 나중에 검색 품질을 크게 높일 수 있습니다.
+## 실무에서 헷갈리는 지점
 
-다음 글에서는 증분 인덱싱을 다룹니다. 문서가 추가되거나 변경될 때 전체를 다시 인덱싱하지 않고 변경분만 처리하는 방법입니다.
+- 메타데이터는 많이 붙일수록 좋은 것이 아닙니다. 실제 필터에 쓰는 필드만 남겨야 유지비가 낮습니다.
+- 벡터 검색 결과가 부정확해 보여도 필터 문제일 수 있습니다. 먼저 후보군이 올바르게 제한됐는지 봐야 합니다.
+- FAISS 자체는 관계형 DB가 아니므로 복잡한 다중 조건은 애플리케이션 레이어 설계가 함께 필요합니다.
+
+## 체크리스트
+
+- [ ] chunk 메타데이터에 최소한 category, quarter, source를 넣었다.
+- [ ] 같은 질의에 대해 서로 다른 filter 결과를 비교했다.
+- [ ] 필터 필드 이름이 문서 생성 코드와 검색 코드에서 일관된다.
+- [ ] 운영에서 필요한 필드만 남기도록 스키마를 정리했다.
 
 <!-- blog-only:start -->
-다음 글: [증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
+
+## 정리
+
+메타데이터 스키마가 잡혀야 임베딩 검색이 실무용 검색으로 바뀝니다.
+
+다음 글에서는 이 메타데이터와 청크를 매번 다시 만들지 않도록 증분 인덱싱으로 이어갑니다.
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -295,12 +190,8 @@ for r in recent_results:
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangChain Document](https://python.langchain.com/docs/modules/data_connection/document_loaders/)
-- [FAISS 메타데이터 필터링](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
-- [RAG 메타데이터 설계 전략](https://www.pinecone.io/learn/metadata-filtering/)
+- https://python.langchain.com/docs/integrations/vectorstores/faiss/
 
 Tags: RAG, Document Processing, LangChain, Python

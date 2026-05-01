@@ -3,7 +3,7 @@ title: 'LLM 출력 품질 평가'
 series: llm-apps-ops-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,249 +19,125 @@ last_reviewed: '2026-05-01'
 
 # LLM 출력 품질 평가
 
-> LLM 앱 운영 101 (3/6)
+## 이 글에서 답할 질문
+- 모델 응답이 길이 제한을 지켰는지 자동으로 어떻게 확인할까요?
+- 핵심 키워드 포함 여부를 품질 게이트로 쓰려면 어떤 구조가 단순할까요?
+- 형식 검사를 JSON 파싱 수준에서 끝낼지, 스키마 검증까지 갈지 어떻게 판단할까요?
 
-모델을 교체하거나 프롬프트를 수정할 때 "더 좋아졌는가"를 어떻게 판단하나요? 사람이 직접 읽어보는 것도 방법이지만, 수천 건의 응답을 수작업으로 검토할 수는 없습니다. 이 포스트에서는 LLM-as-judge 패턴, 사실 일관성 검사, 형식 준수 검사로 자동 평가 파이프라인을 구축합니다.
+> 평가 자동화의 첫 단계는 의미를 완벽히 이해하는 심판을 만드는 것이 아니라, 명확하게 실패한 응답을 빠르게 걸러내는 체를 만드는 것입니다.
 
-<!-- ebook-only:start -->
+## 큰 그림
+```mermaid
+flowchart LR
+    Prompt[평가용 질문] --> Groq[Groq API]
+    Groq --> Json[JSON 응답]
+    Json --> Rules[길이·키워드·형식 검사]
+    Rules --> Gate[Pass 또는 Fail]
+```
 
-이 장의 핵심: **LLM 평가는 정답이 없는 출력을 점수로 만드는 것이다.** 참조 기반·LLM-as-judge·사람 평가를 목적에 맞게 조합한다.
+## 왜 이 레이어가 필요한가
+자동 평가는 모델을 심판으로 쓰기 전에, 기계적으로 실패를 걸러내는 규칙층부터 만드는 편이 실용적입니다.
 
-## 이 장의 위치
+실무에서는 모든 응답을 사람이 읽을 수 없습니다. 그래서 처음부터 완벽한 semantic judge를 만들기보다, 길이 초과·키워드 누락·형식 오류 같은 기계적으로 잡히는 실패를 먼저 막는 편이 훨씬 효율적입니다.
 
-이 글은 시리즈 6편 중 3번째 장입니다.
-앞 장에서는 **LLM 비용 추적과 최적화**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **LLM 앱 보안**으로 이어집니다.
-<!-- ebook-only:end -->
+예제 파일: `/root/Github/llm-apps-ops-101/ko/03-evaluation/main.py`
 
-## 예제 코드
-예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
-
----
-
-## 평가의 세 축
-
-LLM 출력 품질은 세 가지 차원에서 측정합니다.
-
-- **관련성**: 질문에 제대로 답했는가
-- **사실 일관성**: 주어진 컨텍스트와 모순되지 않는가
-- **형식 준수**: 요청한 구조(JSON, 불릿, 길이 제한)를 지켰는가
-
-셋 중 하나라도 실패하면 사용자 경험에 직접적인 영향을 줍니다.
-
----
-
-## LLM-as-judge 평가기
-
+## 최소 실행 예제
 ```python
 import json
 import os
-import re
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import asdict, dataclass
 
-from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage, SystemMessage
+from groq import Groq
 
-JUDGE_SYSTEM = """당신은 AI 응답 품질 평가 전문가입니다.
-주어진 질문, 컨텍스트, 응답을 보고 다음 세 가지를 1–5점으로 평가하세요.
-
-평가 기준:
-- relevance: 질문에 직접 답하는가 (1=전혀 무관, 5=완전히 답변)
-- faithfulness: 컨텍스트 내용에만 근거하는가 (1=환각 심각, 5=컨텍스트만 사용)
-- completeness: 질문의 모든 부분을 다루는가 (1=핵심 누락, 5=완전히 포괄)
-
-반드시 아래 JSON 형식으로만 응답하세요:
-{"relevance": <1-5>, "faithfulness": <1-5>, "completeness": <1-5>, "reason": "<한 문장 근거>"}"""
+MODEL = "llama-3.1-8b-instant"
 
 @dataclass
 class EvalResult:
-    relevance: float
-    faithfulness: float
-    completeness: float
-    reason: str
-    raw: str = ""
-
-    @property
-    def average(self) -> float:
-        return (self.relevance + self.faithfulness + self.completeness) / 3
-
-    def passed(self, threshold: float = 3.5) -> bool:
-        return self.average >= threshold
-
-    def to_dict(self) -> dict:
-        return {
-            "relevance": self.relevance,
-            "faithfulness": self.faithfulness,
-            "completeness": self.completeness,
-            "average": round(self.average, 2),
-            "passed": self.passed(),
-            "reason": self.reason,
-        }
-
-class LLMJudge:
-    def __init__(self, judge_model: str = "llama-3.1-8b-instant"):
-        self.llm = ChatGroq(
-            model=judge_model,
-            api_key=os.environ["GROQ_API_KEY"],
-            temperature=0.0,
-        )
-
-    def evaluate(self, question: str, context: str, response: str) -> EvalResult:
-        user_msg = f"질문: {question}\n\n컨텍스트: {context}\n\n응답: {response}"
-        messages = [
-            SystemMessage(content=JUDGE_SYSTEM),
-            HumanMessage(content=user_msg),
-        ]
-        raw = self.llm.invoke(messages).content
-
-        try:
-            # JSON 블록 추출
-            match = re.search(r"\{[^}]+\}", raw, re.DOTALL)
-            if not match:
-                raise ValueError("JSON 없음")
-            data = json.loads(match.group())
-            return EvalResult(
-                relevance=float(data.get("relevance", 3)),
-                faithfulness=float(data.get("faithfulness", 3)),
-                completeness=float(data.get("completeness", 3)),
-                reason=data.get("reason", ""),
-                raw=raw,
-            )
-        except Exception:
-            return EvalResult(relevance=3.0, faithfulness=3.0, completeness=3.0, reason="파싱 실패", raw=raw)
-```
-
----
-
-## 형식 준수 검사기
-
-```python
-import re
-from typing import Callable
-
-@dataclass
-class FormatCheck:
-    name: str
     passed: bool
-    detail: str = ""
+    length_ok: bool
+    keywords_ok: bool
+    format_ok: bool
+    missing_keywords: list[str]
+    answer_length: int
 
-class FormatChecker:
-    """응답이 요청된 형식을 지켰는지 검사합니다."""
-
-    def check_json(self, text: str) -> FormatCheck:
-        try:
-            json.loads(text.strip())
-            return FormatCheck("json", True)
-        except json.JSONDecodeError as e:
-            return FormatCheck("json", False, str(e))
-
-    def check_max_length(self, text: str, max_chars: int) -> FormatCheck:
-        if len(text) <= max_chars:
-            return FormatCheck("max_length", True)
-        return FormatCheck("max_length", False, f"{len(text)} > {max_chars}자")
-
-    def check_bullet_list(self, text: str, min_items: int = 2) -> FormatCheck:
-        bullets = re.findall(r"^[-*•]\s+.+", text, re.MULTILINE)
-        if len(bullets) >= min_items:
-            return FormatCheck("bullet_list", True, f"{len(bullets)}개")
-        return FormatCheck("bullet_list", False, f"{len(bullets)} < {min_items}개")
-
-    def check_no_hallucination_markers(self, text: str) -> FormatCheck:
-        """모델이 불확실성을 표현하는 패턴을 탐지합니다."""
-        patterns = [
-            r"I (?:think|believe|guess|suppose)",
-            r"(?:might|may|could) be",
-            r"I'm not (?:sure|certain)",
-            r"(?:approximately|roughly|about) \d",
-        ]
-        found = [p for p in patterns if re.search(p, text, re.IGNORECASE)]
-        if not found:
-            return FormatCheck("no_hallucination_markers", True)
-        return FormatCheck("no_hallucination_markers", False, f"발견된 패턴: {found}")
-```
-
----
-
-## 배치 평가 파이프라인
-
-```python
-from dataclasses import dataclass, field
-
-@dataclass
-class TestCase:
-    question: str
-    context: str
-    expected_keywords: list[str] = field(default_factory=list)
-
-def run_eval_suite(
-    test_cases: list[TestCase],
-    responder_model: str = "llama-3.1-8b-instant",
-    judge_model: str = "llama-3.1-8b-instant",
-) -> dict:
-    """테스트 케이스 배치 평가를 실행합니다."""
-    responder = ChatGroq(
-        model=responder_model, api_key=os.environ["GROQ_API_KEY"], temperature=0.0
+def ask_for_json(client: Groq, topic: str) -> str:
+    response = client.chat.completions.create(
+        model=MODEL,
+        temperature=0,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Return JSON only with keys 'answer' and 'keywords'. "
+                    "The answer must be concise and technical."
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"Explain {topic} in JSON. Include one short answer and a keyword list.",
+            },
+        ],
+        response_format={"type": "json_object"},
     )
-    judge = LLMJudge(judge_model)
-    checker = FormatChecker()
+    return response.choices[0].message.content or "{}"
 
-    results = []
-    for tc in test_cases:
-        # 응답 생성
-        prompt = f"컨텍스트:\n{tc.context}\n\n질문: {tc.question}"
-        response = responder.invoke([HumanMessage(content=prompt)]).content
+def evaluate(text: str, expected_keywords: list[str]) -> EvalResult:
+    try:
+        payload = json.loads(text)
+        answer = payload["answer"]
+        keywords = payload["keywords"]
+        format_ok = isinstance(answer, str) and isinstance(keywords, list)
+    except Exception:
+        return EvalResult(False, False, False, False, expected_keywords, 0)
 
-        # 품질 평가
-        eval_result = judge.evaluate(tc.question, tc.context, response)
+    normalized_answer = answer.lower()
+    normalized_keywords = {str(item).lower() for item in keywords}
+    missing = [
+        keyword
+        for keyword in expected_keywords
+        if keyword.lower() not in normalized_answer and keyword.lower() not in normalized_keywords
+    ]
+    length_ok = 60 <= len(answer) <= 280
+    keywords_ok = not missing
+    format_ok = format_ok
+    return EvalResult(
+        passed=length_ok and keywords_ok and format_ok,
+        length_ok=length_ok,
+        keywords_ok=keywords_ok,
+        format_ok=format_ok,
+        missing_keywords=missing,
+        answer_length=len(answer),
+    )
 
-        # 키워드 포함 여부 검사
-        keyword_hits = [kw for kw in tc.expected_keywords if kw.lower() in response.lower()]
-        keyword_coverage = len(keyword_hits) / len(tc.expected_keywords) if tc.expected_keywords else 1.0
-
-        results.append({
-            "question": tc.question,
-            "response_preview": response[:150],
-            "eval": eval_result.to_dict(),
-            "keyword_coverage": round(keyword_coverage, 2),
-            "keyword_hits": keyword_hits,
-        })
-
-    avg_score = sum(r["eval"]["average"] for r in results) / len(results) if results else 0
-    pass_rate = sum(1 for r in results if r["eval"]["passed"]) / len(results) if results else 0
-
-    return {
-        "total": len(results),
-        "avg_score": round(avg_score, 2),
-        "pass_rate": round(pass_rate, 2),
-        "details": results,
-    }
+def main() -> None:
+    client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    raw = ask_for_json(client, "Python's GIL")
+    result = evaluate(raw, ["CPython", "thread", "lock"])
+    print(json.dumps({"raw": json.loads(raw), "evaluation": asdict(result)}, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
-    test_cases = [
-        TestCase(
-            question="파이썬 GIL이란 무엇인가요?",
-            context="GIL(Global Interpreter Lock)은 CPython 인터프리터에서 한 번에 하나의 스레드만 Python 바이트코드를 실행하도록 제한하는 뮤텍스입니다. I/O 바운드 작업에서는 GIL이 해제됩니다.",
-            expected_keywords=["뮤텍스", "스레드", "CPython"],
-        ),
-        TestCase(
-            question="리스트와 튜플의 차이는?",
-            context="리스트는 가변(mutable) 자료구조입니다. 튜플은 불변(immutable) 자료구조로, 생성 후 변경할 수 없습니다. 튜플은 딕셔너리 키로 사용할 수 있습니다.",
-            expected_keywords=["가변", "불변", "딕셔너리"],
-        ),
-    ]
-
-    report = run_eval_suite(test_cases)
-    print(json.dumps(report, indent=2, ensure_ascii=False))
+    main()
 ```
 
----
+## 이 코드에서 봐야 할 것
+- `response_format={"type": "json_object"}`로 모델 출력 형태를 먼저 좁혀 두면 검사기가 단순해집니다.
+- 평가 함수가 `missing_keywords`를 반환하면 fail 이유를 바로 대시보드에 올릴 수 있습니다.
+- 길이 기준을 너무 빡빡하게 잡으면 좋은 응답도 버려집니다. 제품 문맥에 맞는 범위를 직접 정해야 합니다.
 
-## 평가 자동화의 한계
+## 실무에서 헷갈리는 지점
+- 형식 검사가 통과했다고 품질이 좋은 것은 아닙니다. 반대로 형식 실패는 거의 항상 운영 실패입니다.
+- 키워드 기반 평가는 도메인 용어가 분명할 때만 강력합니다. 창의적 글쓰기에는 맞지 않습니다.
+- LLM-as-judge를 나중에 붙이더라도, 규칙 기반 평가층은 여전히 값싼 1차 방어선으로 남습니다.
 
-LLM-as-judge는 빠르고 확장 가능하지만, 평가 모델이 응답 모델과 같은 편향을 공유할 수 있습니다. 고위험 영역(의료, 법률, 금융)에서는 인간 검토 레이어를 반드시 유지해야 합니다.
+## 체크리스트
+- [ ] 모델에게 JSON only를 강제한다
+- [ ] 길이 기준을 숫자로 명시한다
+- [ ] expected_keywords를 테스트 케이스마다 정의한다
+- [ ] 실패 시 missing_keywords를 함께 기록한다
 
-키워드 커버리지와 형식 검사는 자동화가 완전히 가능합니다. LLM-as-judge는 이 두 가지가 통과한 응답의 의미적 품질을 추가로 검증하는 데 씁니다. 세 레이어를 조합하면 수작업 없이도 신뢰할 수 있는 품질 게이트를 만들 수 있습니다.
+## 정리
+품질 평가는 거창한 점수 체계보다도, 명확한 실패를 얼마나 빨리 발견하느냐에서 운영 가치가 생깁니다.
 
 <!-- blog-only:start -->
 다음 글: [LLM 앱 보안](./04-security.md)
@@ -283,8 +159,8 @@ LLM-as-judge는 빠르고 확장 가능하지만, 평가 모델이 응답 모델
 
 ## 참고 자료
 
-- [RAGAS 평가 프레임워크](https://docs.ragas.io/)
-- [LangChain 평가 모듈](https://python.langchain.com/docs/guides/evaluation/)
-- [G-Eval 논문](https://arxiv.org/abs/2303.16634)
+- [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs)
+- [JSON Schema](https://json-schema.org/)
+- [G-Eval paper](https://arxiv.org/abs/2303.16634)
 
 Tags: LLMOps, Observability, Python, LLM

@@ -3,7 +3,7 @@ title: 'Multi-format document pipeline'
 series: document-ingestion-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,232 +19,136 @@ last_reviewed: '2026-05-01'
 
 # Multi-format document pipeline
 
-> Document Ingestion 101 (5/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/05-multi-format-pipeline)
+- How do you combine PDF, TXT, and MD into one pipeline?
+- Why is a shared `Document` shape important even when loaders differ by format?
+- Where should format branching and metadata normalization happen?
 
-Real services do not process only PDFs. Word documents, HTML pages, Markdown files, and plain text files arrive together. The pipeline needs to select the right parser for each format and convert every source into a common representation.
+> The essence of a multi-format pipeline is forcing varied inputs into one shared `Document` contract.
 
-Topics:
+Example code: `/root/Github/document-ingestion-101/en/05-multi-format-pipeline/main.py`
 
-- LangChain DocumentLoaders by format
-- automatic format detection
-- unified document processing pipeline
-- stripping noise from HTML
-
----
-
-<!-- ebook-only:start -->
-
-**The key idea**: a multi-format pipeline abstracts format-specific loaders behind a unified interface. One Document object handles every format the same way.
-
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Incremental indexing — updating only changed documents**.
-After this chapter, the next one moves on to **Completing the document ingestion pipeline**.
-<!-- ebook-only:end -->
-
-## LangChain DocumentLoader catalog
-
-```python
-from langchain_community.document_loaders import (
-    PyMuPDFLoader,               # PDF — most accurate
-    Docx2txtLoader,              # Word (.docx)
-    UnstructuredHTMLLoader,      # HTML (requires unstructured package)
-    BSHTMLLoader,                # HTML (BeautifulSoup4)
-    TextLoader,                  # plain text
-    UnstructuredMarkdownLoader,  # Markdown
-    CSVLoader,                   # CSV
-    JSONLoader,                  # JSON
-)
+```mermaid
+flowchart LR
+    A[PDF TXT MD inputs] --> B[Pick loader by extension]
+    B --> C[Create shared Document objects]
+    C --> D[Normalize source and format metadata]
 ```
 
----
+Real ingestion systems rarely deal with PDFs alone. Operational notes may be TXT, team runbooks may be Markdown, and external reports may be PDF.
 
-## Per-format loader functions
+This example reads three formats separately but emits the same `Document` structure for all of them. That keeps later chunking and indexing stages format-agnostic.
+
+## Runnable example
 
 ```python
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
+from __future__ import annotations
+
 from pathlib import Path
 
-from langchain.schema import Document
-from langchain_community.document_loaders import (
-    BSHTMLLoader,
-    Docx2txtLoader,
-    PyMuPDFLoader,
-    TextLoader,
-)
+from langchain_core.documents import Document
+from pypdf import PdfReader
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
-def load_pdf(file_path: str) -> list[Document]:
-    loader = PyMuPDFLoader(file_path)
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "pdf"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / 'data'
+DATA_DIR.mkdir(exist_ok=True)
 
-def load_word(file_path: str) -> list[Document]:
-    loader = Docx2txtLoader(file_path)
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "docx"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+def create_pdf(path: Path) -> None:
+    c = canvas.Canvas(str(path), pagesize=A4)
+    c.setFont('Helvetica', 12)
+    c.drawString(72, 780, 'PDF source: incident review and remediation steps.')
+    c.drawString(72, 760, 'Store the source format in metadata so later stages stay uniform.')
+    c.save()
 
-def load_html(file_path: str) -> list[Document]:
-    loader = BSHTMLLoader(file_path, bs_kwargs={"features": "html.parser"})
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "html"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+def seed_files() -> list[Path]:
+    pdf_path = DATA_DIR / 'incident.pdf'
+    txt_path = DATA_DIR / 'notes.txt'
+    md_path = DATA_DIR / 'runbook.md'
+    create_pdf(pdf_path)
+    txt_path.write_text('TXT source: queue backlog grew overnight. Scale-out reduced latency.
+', encoding='utf-8')
+    md_path.write_text('# Runbook
 
-def load_text(file_path: str, encoding: str = "utf-8") -> list[Document]:
-    loader = TextLoader(file_path, encoding=encoding)
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "txt"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+MD source: restart the worker only after checking the dead-letter queue.
+', encoding='utf-8')
+    return [pdf_path, txt_path, md_path]
 
-def load_markdown(file_path: str) -> list[Document]:
-    loader = TextLoader(file_path, encoding="utf-8")
-    docs = loader.load()
-    for doc in docs:
-        doc.metadata["format"] = "md"
-        doc.metadata["source"] = Path(file_path).name
-    return docs
+def load_pdf(path: Path) -> list[Document]:
+    reader = PdfReader(str(path))
+    text = '
+'.join((page.extract_text() or '').strip() for page in reader.pages)
+    return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
+
+def load_text_like(path: Path, fmt: str) -> list[Document]:
+    return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': fmt})]
+
+def load_document(path: Path) -> list[Document]:
+    suffix = path.suffix.lower()
+    if suffix == '.pdf':
+        return load_pdf(path)
+    if suffix == '.txt':
+        return load_text_like(path, 'txt')
+    if suffix in {'.md', '.markdown'}:
+        return load_text_like(path, 'md')
+    raise ValueError(f'unsupported format: {suffix}')
+
+def main() -> None:
+    for path in seed_files():
+        docs = load_document(path)
+        for doc in docs:
+            preview = doc.page_content.replace('
+', ' ')[:90]
+            print(f"source={doc.metadata['source']} format={doc.metadata['format']} preview={preview}")
+
+if __name__ == '__main__':
+    main()
 ```
 
----
+## How to run it
 
-## Format-detection router
-
-```python
-LOADER_MAP = {
-    ".pdf": load_pdf,
-    ".docx": load_word,
-    ".doc": load_word,
-    ".html": load_html,
-    ".htm": load_html,
-    ".txt": load_text,
-    ".md": load_markdown,
-    ".markdown": load_markdown,
-}
-
-def load_document(file_path: str) -> list[Document]:
-    """Select the appropriate loader based on file extension."""
-    suffix = Path(file_path).suffix.lower()
-    loader_fn = LOADER_MAP.get(suffix)
-
-    if loader_fn is None:
-        raise ValueError(
-            f"unsupported format: {suffix}\nsupported: {list(LOADER_MAP.keys())}"
-        )
-
-    docs = loader_fn(file_path)
-    print(f"  [{suffix[1:].upper()}] {Path(file_path).name}: {len(docs)} page(s)/section(s)")
-    return docs
+```bash
+python main.py
 ```
 
----
+## Verified run output
 
-## Unified pipeline
-
-```python
-import tempfile
-from pathlib import Path
-
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-def process_directory(
-    directory: str,
-    patterns: list[str] = None,
-    chunk_size: int = 400,
-    chunk_overlap: int = 80,
-) -> FAISS:
-    """Load, chunk, and index all supported documents in a directory."""
-    if patterns is None:
-        patterns = ["*.pdf", "*.docx", "*.html", "*.txt", "*.md"]
-
-    directory = Path(directory)
-    all_files = []
-    for pattern in patterns:
-        all_files.extend(directory.glob(pattern))
-
-    print(f"files found: {len(all_files)}")
-
-    all_docs = []
-    for file_path in all_files:
-        try:
-            docs = load_document(str(file_path))
-            all_docs.extend(docs)
-        except Exception as e:
-            print(f"  [error] {file_path.name}: {e}")
-
-    if not all_docs:
-        raise ValueError("no documents to process")
-
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". ", " "],
-    )
-    chunks = splitter.split_documents(all_docs)
-    print(f"total chunks: {len(chunks)}")
-
-    format_counts: dict[str, int] = {}
-    for chunk in chunks:
-        fmt = chunk.metadata.get("format", "unknown")
-        format_counts[fmt] = format_counts.get(fmt, 0) + 1
-    print(f"chunks by format: {format_counts}")
-
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-    vectorstore = FAISS.from_documents(chunks, embedding_model)
-    print(f"index ready: {vectorstore.index.ntotal} vectors")
-    return vectorstore
-
-# Test with temporary files
-with tempfile.TemporaryDirectory() as tmpdir:
-    tmpdir = Path(tmpdir)
-
-    (tmpdir / "guide.txt").write_text(
-        "Python Installation Guide\n\nDownload Python 3.10 or later from python.org.\nInstall packages with: pip install <name>.",
-        encoding="utf-8",
-    )
-    (tmpdir / "readme.md").write_text(
-        "# Project overview\n\nThis project implements a RAG pipeline.\n\n## Features\n\n- Document indexing\n- Question answering",
-        encoding="utf-8",
-    )
-    (tmpdir / "index.html").write_text(
-        "<html><body><h1>Product introduction</h1><p>AI-powered document search system.</p></body></html>",
-        encoding="utf-8",
-    )
-
-    vectorstore = process_directory(str(tmpdir))
-
-    results = vectorstore.similarity_search("Python installation", k=2)
-    print("\nsearch results:")
-    for r in results:
-        print(f"  [{r.metadata.get('format')}] {r.page_content[:80]}")
+```text
+source=incident.pdf format=pdf preview=PDF source: incident review and remediation steps. ...
+source=notes.txt format=txt preview=TXT source: queue backlog grew overnight. ...
+source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 ```
 
----
+## What to notice in this code
 
-## Conclusion
+- `load_document()` centralizes extension routing in one place.
+- Every loader normalizes `source` and `format`, so later code does not branch again.
+- PDF uses `pypdf` while TXT and MD use plain file reads, but the output contract is identical.
 
-The key to multi-format pipelines is the common interface: every format converter returns `list[Document]`. The router maps file extensions to converter functions. Adding a new format means writing one loader function and one LOADER_MAP entry — the chunking and indexing stages remain unchanged.
+## Where engineers get confused
 
-The final post assembles all components into a complete production document ingestion pipeline.
+- Supporting many formats is less about adding loaders and more about standardizing metadata keys.
+- Markdown can be read like plain text, but heading-aware chunking may still need a separate policy later.
+- PDF loaders and text loaders may return different granularities, so decide early whether your contract is per-page or per-file.
+
+## Checklist
+
+- [ ] You processed PDF, TXT, and MD in one run.
+- [ ] Every output document includes source and format metadata.
+- [ ] Extension routing lives in one function.
+- [ ] You confirmed later stages can run without format-specific branching.
 
 <!-- blog-only:start -->
-Next: [Completing the document ingestion pipeline](./06-pipeline-completion.md)
+
+## Summary
+
+Once every loader converges on one `Document` contract, the rest of the pipeline gets dramatically simpler.
+
+The next post combines all of those steps into a full pipeline that saves to and reloads from FAISS.
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -259,12 +163,8 @@ Next: [Completing the document ingestion pipeline](./06-pipeline-completion.md)
 
 <!-- toc:end -->
 
----
-
 ## References
 
-- [LangChain DocumentLoaders](https://python.langchain.com/docs/integrations/document_loaders/)
-- [Unstructured.io library](https://unstructured.io/)
-- [python-docx](https://python-docx.readthedocs.io/)
+- https://python.langchain.com/docs/concepts/document_loaders/
 
 Tags: RAG, Document Processing, LangChain, Python

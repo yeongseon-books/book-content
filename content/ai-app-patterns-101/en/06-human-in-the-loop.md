@@ -3,7 +3,7 @@ title: 'Human-in-the-loop — designing for human intervention'
 series: ai-app-patterns-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,24 @@ last_reviewed: '2026-05-01'
 ---
 
 # Human-in-the-loop — designing for human intervention
+
+## Questions this post answers
+
+- What criteria should trigger a human approval step before an AI draft is sent?
+- How can you implement a branch that escalates only low-confidence outputs to a human?
+- How do you keep a HITL demo script verifiable in automation while still modeling human review?
+
+> Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.
+
+```mermaid
+flowchart LR
+    Request[Customer request] --> Draft[LLM draft]
+    Draft --> Score[Confidence check]
+    Score -->|High| Auto[Auto approval]
+    Score -->|Low| Human[Human review]
+    Human --> Final[Final response]
+    Auto --> Final
+```
 
 > AI App Patterns 101 (6/6)
 
@@ -259,6 +277,31 @@ result = contract_clause_with_audit(
 print(f"\nresult: {result['status']}")
 print(f"audit log: {LOG_FILE}")
 ```
+
+---
+
+## What to notice in this code
+
+- `main.py` scores the generated draft, then routes low-confidence cases into an `input()`-style review step.
+- For automated verification, the script can simulate reviewer choices from the `HITL_DECISIONS` environment variable.
+- In a real application, that same boundary becomes an approval queue and an operator console.
+
+---
+
+## Where engineers get confused
+
+- HITL does not always sit at the very end; human review can appear before classification, before sending, or before money moves.
+- A confidence score is only a routing hint, not an objective truth signal. Review thresholds still require policy decisions.
+- Adding human review improves control but reduces throughput, so staffing and SLA impact must be designed alongside quality.
+
+---
+
+## Checklist
+
+- [ ] Low-risk requests can finish through auto-approval
+- [ ] High-risk or low-confidence requests are routed to human review
+- [ ] The reviewer decision changes the final output
+- [ ] Automated runs can still reproduce reviewer choices through environment variables
 
 ---
 

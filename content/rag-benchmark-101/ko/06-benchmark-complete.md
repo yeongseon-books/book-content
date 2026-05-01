@@ -3,7 +3,7 @@ title: 'RAG 벤치마크 완성'
 series: rag-benchmark-101
 episode: 6
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,235 +19,69 @@ last_reviewed: '2026-05-01'
 
 # RAG 벤치마크 완성
 
-> RAG 벤치마크 101 (6/6)
+## 이 글에서 답할 질문
+- 데이터셋 → 검색 → 생성 → 평가를 하나의 실행 파일로 어떻게 묶을까요?
+- retrieval 지표와 RAGAS 점수를 한 리포트로 합칠 때 어떤 구분이 필요할까요?
+- 최종 파이프라인 벤치마크에서 가장 먼저 고정해야 할 실험 조건은 무엇일까요?
 
-이 시리즈에서 다룬 평가 지표, 검색 벤치마크, 임베딩 비교, VectorDB 선택, 종단 간 평가를 하나의 완전한 벤치마크 파이프라인으로 통합합니다. 서로 다른 RAG 구성을 체계적으로 비교하고 최적 설정을 찾는 프레임워크를 만듭니다.
+> 완성된 RAG 벤치마크는 하나의 점수가 아니라, retrieval과 generation을 나눠서 같은 실험 조건 아래 반복 실행하는 재현 가능한 파이프라인입니다.
 
-예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/06-benchmark-complete`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/06-benchmark-complete)에서 확인할 수 있습니다.
+마지막 글에서는 지금까지의 조각을 하나로 연결합니다. 먼저 FAISS retriever로 관련 문서를 찾고, 그 컨텍스트를 Groq LLM에 넣어 답변을 만들고, 마지막으로 retrieval 지표와 RAGAS 점수를 함께 집계합니다. 이렇게 해야 “검색이 문제인지, 답변 생성이 문제인지”를 같은 실행 로그 안에서 볼 수 있습니다.
 
----
-
-<!-- ebook-only:start -->
-
-이 장의 핵심: **벤치마크는 재현 가능해야 한다.** 데이터셋·모델 버전·파라미터를 고정하고 실험을 자동화해야 비교가 의미 있다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 6번째 장입니다.
-앞 장에서는 **종단 간 RAG 파이프라인 평가**을 다뤘습니다.
-<!-- ebook-only:end -->
-
-## 완전한 RAG 벤치마크 프레임워크
-
-```python
-import json
-import os
-import re
-import time
-from dataclasses import dataclass, field
-from typing import Optional
-
-from langchain.schema import Document
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.messages import HumanMessage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_groq import ChatGroq
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# ── 설정 ──────────────────────────────────────────────────────────────────
-@dataclass
-class RAGConfig:
-    name: str
-    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
-    chunk_size: int = 400
-    chunk_overlap: int = 80
-    k: int = 3
-    temperature: float = 0.0
-    llm_model: str = "llama-3.1-8b-instant"
-
-# ── 지표 ──────────────────────────────────────────────────────────────────
-@dataclass
-class BenchmarkResult:
-    config_name: str
-    precision_at_k: float
-    recall_at_k: float
-    mrr: float
-    faithfulness: float
-    answer_relevance: float
-    avg_latency_ms: float
-    total_queries: int
-
-    @property
-    def retrieval_score(self) -> float:
-        return (self.precision_at_k + self.recall_at_k + self.mrr) / 3
-
-    @property
-    def generation_score(self) -> float:
-        return (self.faithfulness + self.answer_relevance) / 2
-
-    @property
-    def overall_score(self) -> float:
-        return (self.retrieval_score + self.generation_score) / 2
-
-    def summary(self) -> dict:
-        return {
-            "config": self.config_name,
-            "overall_score": round(self.overall_score, 3),
-            "retrieval_score": round(self.retrieval_score, 3),
-            "generation_score": round(self.generation_score, 3),
-            "precision@k": round(self.precision_at_k, 3),
-            "recall@k": round(self.recall_at_k, 3),
-            "mrr": round(self.mrr, 3),
-            "faithfulness": round(self.faithfulness, 3),
-            "answer_relevance": round(self.answer_relevance, 3),
-            "avg_latency_ms": round(self.avg_latency_ms, 1),
-            "total_queries": self.total_queries,
-        }
-
-# ── 유틸 ──────────────────────────────────────────────────────────────────
-def _prm(retrieved_ids: list[str], relevant_ids: set[str], k: int) -> tuple[float, float, float]:
-    top_k = retrieved_ids[:k]
-    hits = [d for d in top_k if d in relevant_ids]
-    precision = len(hits) / k if k > 0 else 0.0
-    recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
-    mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
-    return precision, recall, mrr
-
-def _judge(llm: ChatGroq, prompt: str) -> float:
-    raw = llm.invoke([HumanMessage(content=prompt)]).content
-    try:
-        m = re.search(r'"score"\s*:\s*(\d+(?:\.\d+)?)', raw)
-        return float(m.group(1)) if m else 3.0
-    except Exception:
-        return 3.0
-
-# ── 메인 벤치마크 ──────────────────────────────────────────────────────────
-class RAGBenchmark:
-    FAITHFULNESS_TMPL = "Context: {context}\nAnswer: {answer}\n\nRate faithfulness 1-5 (grounded in context?)\nJSON only: {{\"score\": <1-5>}}"
-    RELEVANCE_TMPL = "Question: {question}\nAnswer: {answer}\n\nRate answer relevance 1-5 (directly answers?)\nJSON only: {{\"score\": <1-5>}}"
-    RAG_TMPL = "Answer using only the context below. If absent, say so.\n\nContext: {context}\n\nQuestion: {question}"
-
-    def __init__(self, corpus: list[Document], test_cases: list[dict]):
-        self.corpus = corpus
-        self.test_cases = test_cases
-
-    def _build_vectorstore(self, config: RAGConfig) -> FAISS:
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=config.chunk_size,
-            chunk_overlap=config.chunk_overlap,
-            separators=["\n\n", "\n", ". ", " "],
-        )
-        chunks = splitter.split_documents(self.corpus)
-        for i, doc in enumerate(chunks):
-            if "id" not in doc.metadata:
-                doc.metadata["id"] = f"chunk_{i}"
-
-        embedding = HuggingFaceEmbeddings(
-            model_name=config.embedding_model,
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-        return FAISS.from_documents(chunks, embedding)
-
-    def run(self, config: RAGConfig) -> BenchmarkResult:
-        vectorstore = self._build_vectorstore(config)
-        retriever = vectorstore.as_retriever(search_kwargs={"k": config.k})
-        llm = ChatGroq(
-            model=config.llm_model,
-            api_key=os.environ["GROQ_API_KEY"],
-            temperature=config.temperature,
-        )
-
-        precisions, recalls, mrrs = [], [], []
-        faithfulness_scores, relevance_scores = [], []
-        latencies = []
-
-        for tc in self.test_cases:
-            question = tc["question"]
-            relevant_ids = tc["relevant_ids"]
-
-            t0 = time.perf_counter()
-            retrieved_docs = retriever.invoke(question)
-            retrieved_ids = [d.metadata.get("id", "") for d in retrieved_docs]
-            context = "\n\n".join(d.page_content for d in retrieved_docs)
-            answer = llm.invoke([HumanMessage(content=self.RAG_TMPL.format(context=context, question=question))]).content
-            latencies.append((time.perf_counter() - t0) * 1000)
-
-            p, r, m = _prm(retrieved_ids, relevant_ids, config.k)
-            precisions.append(p)
-            recalls.append(r)
-            mrrs.append(m)
-
-            faithfulness_scores.append(_judge(llm, self.FAITHFULNESS_TMPL.format(context=context, answer=answer)))
-            relevance_scores.append(_judge(llm, self.RELEVANCE_TMPL.format(question=question, answer=answer)))
-
-        def avg(lst): return sum(lst) / len(lst) if lst else 0.0
-
-        return BenchmarkResult(
-            config_name=config.name,
-            precision_at_k=avg(precisions),
-            recall_at_k=avg(recalls),
-            mrr=avg(mrrs),
-            faithfulness=avg(faithfulness_scores),
-            answer_relevance=avg(relevance_scores),
-            avg_latency_ms=avg(latencies),
-            total_queries=len(self.test_cases),
-        )
-
-    def compare(self, configs: list[RAGConfig]) -> list[dict]:
-        results = []
-        for config in configs:
-            print(f"평가 중: {config.name} ...")
-            result = self.run(config)
-            results.append(result.summary())
-        return sorted(results, key=lambda x: x["overall_score"], reverse=True)
+```mermaid
+flowchart LR
+    C[평가 코퍼스] --> E[임베딩 · FAISS]
+    Q[벤치마크 질문] --> R[retriever]
+    E --> R
+    R --> G[Groq 답변 생성]
+    R --> RM[hit rate · MRR]
+    G --> DS[question · answer · contexts]
+    DS --> RG[ragas.evaluate]
+    RG --> GM[faithfulness · answer_relevancy]
 ```
 
----
+## 최소 실행 예제
 
-## 실행 예시
+실행 코드는 `rag-benchmark-101/ko/06-benchmark-complete/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
-```python
-from rag_benchmark_post2 import CORPUS, QUERIES
-
-TEST_CASES = [
-    {"question": "What is FAISS?", "relevant_ids": {"d02", "d03"}},
-    {"question": "How do embedding models work?", "relevant_ids": {"d06", "d07"}},
-    {"question": "What is hybrid search?", "relevant_ids": {"d09"}},
-    {"question": "What is cosine similarity?", "relevant_ids": {"d04"}},
-]
-
-CONFIGS = [
-    RAGConfig("baseline", chunk_size=400, chunk_overlap=80, k=3),
-    RAGConfig("small-chunks", chunk_size=200, chunk_overlap=20, k=3),
-    RAGConfig("large-k", chunk_size=400, chunk_overlap=80, k=5),
-    RAGConfig("mpnet", embedding_model="sentence-transformers/all-mpnet-base-v2", chunk_size=400, k=3),
-]
-
-if __name__ == "__main__":
-    bench = RAGBenchmark(CORPUS, TEST_CASES)
-    results = bench.compare(CONFIGS)
-
-    print("\n=== RAG 벤치마크 결과 (overall_score 기준 내림차순) ===")
-    for i, r in enumerate(results, 1):
-        print(f"\n{i}위: {r['config']}")
-        print(json.dumps(r, indent=2, ensure_ascii=False))
+```bash
+cd /root/Github/rag-benchmark-101/ko/06-benchmark-complete
+export GROQ_API_KEY=... && python3 main.py
 ```
 
----
+```python
+for case in TEST_CASES:
+    docs = retriever.invoke(case['question'])
+    answer = chain.invoke({'question': case['question'], 'context': context})
+    rows.append({'question': case['question'], 'answer': answer, 'contexts': [doc.page_content for doc in docs]})
 
-## 시리즈 마무리
+ragas_result = evaluate(dataset=Dataset.from_list(rows), ...)
+```
 
-이 시리즈에서 구축한 평가 체계는 세 레이어로 구성됩니다.
+## 이 코드에서 봐야 할 것
+- retrieval 리포트와 generation 리포트를 별도 key로 나눠서 출력해야 병목 분석이 쉬워집니다.
+- 질문별로 retrieved ids와 최종 answer를 함께 로그에 남기면 숫자 뒤의 실패 사례를 빠르게 추적할 수 있습니다.
+- 전체 파이프라인 벤치마크에서는 코퍼스, 임베딩 모델, top-k, LLM 모델을 고정해야 비교가 의미 있습니다.
 
-- **지표 레이어**: Precision, Recall, MRR, Faithfulness, Answer Relevance
-- **구성 요소 레이어**: 임베딩 모델 비교, VectorDB 선택, 청킹 전략
-- **파이프라인 레이어**: 종단 간 평가와 설정 비교
+## 실무에서 헷갈리는 지점
+- 최종 faithfulness가 낮다고 해서 항상 LLM만 문제인 것은 아닙니다. 검색기가 잘못된 문서를 가져오면 생성기는 그 문서에 충실하게 틀릴 수 있습니다.
+- 반대로 retrieval 지표가 좋아도 answer_relevancy가 낮으면 프롬프트나 생성 단계가 질문을 제대로 반영하지 못한 것입니다.
+- 전체 점수 하나로만 정렬하면 어떤 레이어를 개선해야 하는지 감이 사라집니다. 최소한 retrieval과 generation을 분리해 유지하세요.
 
-이 프레임워크를 쓰면 모델 교체, 청킹 변경, 프롬프트 수정 중 어느 것이 가장 효과적인지 데이터로 결정할 수 있습니다. RAG 품질 개선은 직관이 아니라 측정에서 시작합니다.
+## 체크리스트
+- [ ] 검색, 생성, 평가를 한 실행 파일에 묶었다.
+- [ ] retrieval 지표와 generation 지표를 분리해 출력했다.
+- [ ] 질문별 로그와 최종 요약 리포트를 함께 남겼다.
+
+<!-- blog-only:start -->
+
+## 정리
+
+이제 시리즈의 벤치마크 뼈대가 완성됐습니다. 다음 실험부터는 임베딩, chunking, 프롬프트, 인덱스 설정을 한 축씩 바꾸면서 같은 파이프라인으로 비교하면 됩니다.
+
+이 시리즈는 여기서 마무리됩니다.
+
+<!-- blog-only:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -265,8 +99,8 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [RAGAS 프레임워크](https://docs.ragas.io/)
-- [BEIR 벤치마크](https://github.com/beir-cellar/beir)
-- [LangChain 평가 모듈](https://python.langchain.com/docs/guides/evaluation/)
+- [RAGAS documentation](https://docs.ragas.io/)
+- [LangChain retrieval overview](https://python.langchain.com/docs/concepts/retrieval/)
+- [FAISS documentation](https://faiss.ai/)
 
 Tags: RAG, VectorDB, Benchmarking, LLM

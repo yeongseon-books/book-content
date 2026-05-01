@@ -3,7 +3,7 @@ title: 'Evaluating LLM output quality'
 series: llm-apps-ops-101
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,237 +19,125 @@ last_reviewed: '2026-05-01'
 
 # Evaluating LLM output quality
 
-> LLM Apps Ops 101 (3/6)
+## Questions this post answers
+- How do you automate max-length checks for model output?
+- When does keyword coverage become a useful quality gate?
+- How far should format validation go before you add schema validation?
 
-When you swap models or revise a prompt, how do you confirm things actually improved? Manual review works for a handful of examples, but it does not scale to thousands of responses. This post builds an automated evaluation pipeline: LLM-as-judge scoring, factual consistency checks, and format compliance validation.
+> The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.
 
-<!-- ebook-only:start -->
+## Big picture
+```mermaid
+flowchart LR
+    Prompt[Evaluation prompt] --> Groq[Groq API]
+    Groq --> Json[JSON output]
+    Json --> Rules[Length, keyword, format checks]
+    Rules --> Gate[Pass or fail]
+```
 
-**The key idea**: LLM evaluation turns open-ended output into scores. Combine reference-based, LLM-as-judge, and human evaluation based on the goal.
+## Why this layer matters
+Before adding complex judges, build a rule layer that catches obviously bad output cheaply and consistently.
 
-## Where this chapter fits
+At scale, nobody reads every answer. A practical pipeline starts by blocking machine-detectable failures: malformed JSON, missing keywords, and answers that are far too short or too long.
 
-This is chapter 3 of 6 in the series.
-The previous chapter covered **LLM cost tracking and optimization**.
-After this chapter, the next one moves on to **LLM app security**.
-<!-- ebook-only:end -->
+Example file: `/root/Github/llm-apps-ops-101/en/03-evaluation/main.py`
 
-## Example code
-Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
-
----
-
-## Three evaluation axes
-
-LLM output quality lives across three dimensions.
-
-- **Relevance**: did the model actually answer the question?
-- **Faithfulness**: does the answer stay within the given context, or does it hallucinate?
-- **Completeness**: did it cover every part of the question?
-
-A failure on any axis affects user experience directly.
-
----
-
-## LLM-as-judge
-
+## Minimal runnable example
 ```python
 import json
 import os
-import re
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
-from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage, SystemMessage
+from groq import Groq
 
-JUDGE_SYSTEM = """You are an expert AI response evaluator.
-Given a question, context, and response, score these three dimensions from 1 to 5.
-
-Criteria:
-- relevance: does the response directly answer the question? (1=unrelated, 5=fully answers)
-- faithfulness: is the response grounded only in the context? (1=severe hallucination, 5=context-only)
-- completeness: does it address every part of the question? (1=major gaps, 5=fully covered)
-
-Respond only with this JSON:
-{"relevance": <1-5>, "faithfulness": <1-5>, "completeness": <1-5>, "reason": "<one sentence>"}"""
+MODEL = "llama-3.1-8b-instant"
 
 @dataclass
 class EvalResult:
-    relevance: float
-    faithfulness: float
-    completeness: float
-    reason: str
-    raw: str = ""
-
-    @property
-    def average(self) -> float:
-        return (self.relevance + self.faithfulness + self.completeness) / 3
-
-    def passed(self, threshold: float = 3.5) -> bool:
-        return self.average >= threshold
-
-    def to_dict(self) -> dict:
-        return {
-            "relevance": self.relevance,
-            "faithfulness": self.faithfulness,
-            "completeness": self.completeness,
-            "average": round(self.average, 2),
-            "passed": self.passed(),
-            "reason": self.reason,
-        }
-
-class LLMJudge:
-    def __init__(self, model: str = "llama-3.1-8b-instant"):
-        self.llm = ChatGroq(
-            model=model,
-            api_key=os.environ["GROQ_API_KEY"],
-            temperature=0.0,
-        )
-
-    def evaluate(self, question: str, context: str, response: str) -> EvalResult:
-        user_msg = f"Question: {question}\n\nContext: {context}\n\nResponse: {response}"
-        raw = self.llm.invoke([
-            SystemMessage(content=JUDGE_SYSTEM),
-            HumanMessage(content=user_msg),
-        ]).content
-
-        try:
-            match = re.search(r"\{[^}]+\}", raw, re.DOTALL)
-            if not match:
-                raise ValueError("no JSON found")
-            data = json.loads(match.group())
-            return EvalResult(
-                relevance=float(data.get("relevance", 3)),
-                faithfulness=float(data.get("faithfulness", 3)),
-                completeness=float(data.get("completeness", 3)),
-                reason=data.get("reason", ""),
-                raw=raw,
-            )
-        except Exception:
-            return EvalResult(3.0, 3.0, 3.0, "parse failed", raw=raw)
-```
-
----
-
-## Format compliance checker
-
-```python
-import re
-from dataclasses import dataclass
-
-@dataclass
-class FormatCheck:
-    name: str
     passed: bool
-    detail: str = ""
+    length_ok: bool
+    keywords_ok: bool
+    format_ok: bool
+    missing_keywords: list[str]
+    answer_length: int
 
-class FormatChecker:
-    def check_json(self, text: str) -> FormatCheck:
-        try:
-            json.loads(text.strip())
-            return FormatCheck("json", True)
-        except json.JSONDecodeError as e:
-            return FormatCheck("json", False, str(e))
-
-    def check_max_length(self, text: str, max_chars: int) -> FormatCheck:
-        if len(text) <= max_chars:
-            return FormatCheck("max_length", True)
-        return FormatCheck("max_length", False, f"{len(text)} > {max_chars}")
-
-    def check_bullet_list(self, text: str, min_items: int = 2) -> FormatCheck:
-        bullets = re.findall(r"^[-*]\s+.+", text, re.MULTILINE)
-        if len(bullets) >= min_items:
-            return FormatCheck("bullet_list", True, f"{len(bullets)} items")
-        return FormatCheck("bullet_list", False, f"{len(bullets)} < {min_items}")
-
-    def check_no_uncertainty_markers(self, text: str) -> FormatCheck:
-        patterns = [
-            r"I (?:think|believe|guess|suppose)",
-            r"(?:might|may|could) be",
-            r"I'm not (?:sure|certain)",
-        ]
-        found = [p for p in patterns if re.search(p, text, re.IGNORECASE)]
-        if not found:
-            return FormatCheck("no_uncertainty_markers", True)
-        return FormatCheck("no_uncertainty_markers", False, f"found: {found}")
-```
-
----
-
-## Batch evaluation pipeline
-
-```python
-from dataclasses import dataclass, field
-
-@dataclass
-class TestCase:
-    question: str
-    context: str
-    expected_keywords: list[str] = field(default_factory=list)
-
-def run_eval_suite(
-    test_cases: list[TestCase],
-    responder_model: str = "llama-3.1-8b-instant",
-    judge_model: str = "llama-3.1-8b-instant",
-) -> dict:
-    responder = ChatGroq(
-        model=responder_model, api_key=os.environ["GROQ_API_KEY"], temperature=0.0
+def ask_for_json(client: Groq, topic: str) -> str:
+    response = client.chat.completions.create(
+        model=MODEL,
+        temperature=0,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Return JSON only with keys 'answer' and 'keywords'. "
+                    "The answer must be concise and technical."
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"Explain {topic} in JSON. Include one short answer and a keyword list.",
+            },
+        ],
+        response_format={"type": "json_object"},
     )
-    judge = LLMJudge(judge_model)
+    return response.choices[0].message.content or "{}"
 
-    results = []
-    for tc in test_cases:
-        prompt = f"Context:\n{tc.context}\n\nQuestion: {tc.question}"
-        response = responder.invoke([HumanMessage(content=prompt)]).content
+def evaluate(text: str, expected_keywords: list[str]) -> EvalResult:
+    try:
+        payload = json.loads(text)
+        answer = payload["answer"]
+        keywords = payload["keywords"]
+        format_ok = isinstance(answer, str) and isinstance(keywords, list)
+    except Exception:
+        return EvalResult(False, False, False, False, expected_keywords, 0)
 
-        eval_result = judge.evaluate(tc.question, tc.context, response)
+    normalized_answer = answer.lower()
+    normalized_keywords = {str(item).lower() for item in keywords}
+    missing = [
+        keyword
+        for keyword in expected_keywords
+        if keyword.lower() not in normalized_answer and keyword.lower() not in normalized_keywords
+    ]
+    length_ok = 60 <= len(answer) <= 280
+    keywords_ok = not missing
+    format_ok = format_ok
+    return EvalResult(
+        passed=length_ok and keywords_ok and format_ok,
+        length_ok=length_ok,
+        keywords_ok=keywords_ok,
+        format_ok=format_ok,
+        missing_keywords=missing,
+        answer_length=len(answer),
+    )
 
-        keyword_hits = [kw for kw in tc.expected_keywords if kw.lower() in response.lower()]
-        keyword_coverage = len(keyword_hits) / len(tc.expected_keywords) if tc.expected_keywords else 1.0
-
-        results.append({
-            "question": tc.question,
-            "response_preview": response[:150],
-            "eval": eval_result.to_dict(),
-            "keyword_coverage": round(keyword_coverage, 2),
-            "keyword_hits": keyword_hits,
-        })
-
-    avg_score = sum(r["eval"]["average"] for r in results) / len(results) if results else 0
-    pass_rate = sum(1 for r in results if r["eval"]["passed"]) / len(results) if results else 0
-
-    return {
-        "total": len(results),
-        "avg_score": round(avg_score, 2),
-        "pass_rate": round(pass_rate, 2),
-        "details": results,
-    }
+def main() -> None:
+    client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    raw = ask_for_json(client, "Python's GIL")
+    result = evaluate(raw, ["CPython", "thread", "lock"])
+    print(json.dumps({"raw": json.loads(raw), "evaluation": asdict(result)}, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
-    test_cases = [
-        TestCase(
-            question="What is Python's GIL?",
-            context="The GIL (Global Interpreter Lock) is a mutex in CPython that allows only one thread to execute Python bytecode at a time. The GIL is released during I/O operations.",
-            expected_keywords=["mutex", "thread", "CPython"],
-        ),
-        TestCase(
-            question="What is the difference between a list and a tuple?",
-            context="Lists are mutable data structures. Tuples are immutable — they cannot be changed after creation. Tuples can be used as dictionary keys; lists cannot.",
-            expected_keywords=["mutable", "immutable", "dictionary"],
-        ),
-    ]
-
-    report = run_eval_suite(test_cases)
-    print(json.dumps(report, indent=2))
+    main()
 ```
 
----
+## What to notice in this code
+- Forcing JSON output narrows the shape of the problem before evaluation starts.
+- Returning `missing_keywords` makes failures actionable instead of mysterious.
+- Length thresholds should reflect the product, not an abstract best practice.
 
-## Limits of automated evaluation
+## Where engineers get confused
+- Passing format checks does not mean the answer is good. Failing format checks usually means the answer is unusable.
+- Keyword checks work best in domains with explicit terminology, not creative tasks.
+- Even if you later add LLM-as-judge, rule-based checks remain a cheap first-pass guardrail.
 
-LLM-as-judge is fast and scalable, but the judge model may share biases with the responder model. For high-stakes domains — medical, legal, financial — a human review layer is non-negotiable.
+## Checklist
+- [ ] Force JSON-only output
+- [ ] Define numeric length thresholds
+- [ ] Set expected_keywords per test case
+- [ ] Log missing keywords on failure
 
-Keyword coverage and format checks are fully automatable. LLM-as-judge adds semantic quality scoring on top. Combining all three layers gives you a reliable quality gate without manual inspection at scale.
+## Summary
+Evaluation becomes operationally useful when it fails fast on obvious mistakes before humans ever need to look.
 
 <!-- blog-only:start -->
 Next: [LLM app security](./04-security.md)
@@ -271,8 +159,8 @@ Next: [LLM app security](./04-security.md)
 
 ## References
 
-- [RAGAS evaluation framework](https://docs.ragas.io/)
-- [LangChain evaluation module](https://python.langchain.com/docs/guides/evaluation/)
+- [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs)
+- [JSON Schema](https://json-schema.org/)
 - [G-Eval paper](https://arxiv.org/abs/2303.16634)
 
 Tags: LLMOps, Observability, Python, LLM

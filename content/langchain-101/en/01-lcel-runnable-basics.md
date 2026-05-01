@@ -3,7 +3,7 @@ title: 'LangChain introduction — LCEL and the Runnable interface'
 series: langchain-101
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,80 @@ last_reviewed: '2026-05-01'
 
 # LangChain introduction — LCEL and the Runnable interface
 
-> LangChain 101 (1/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/01-lcel-runnable-basics)
+- Why does LCEL exist, and what glue code does it remove
+- What contract does the Runnable interface give every component
+- When should you use `invoke()`, `batch()`, and `stream()`
+- What actually flows through a chain connected with `|`
+
+> In LangChain, most components become interchangeable once their input and output shapes line up.
+
+```mermaid
+flowchart LR
+    A[input dict] --> B[ChatPromptTemplate]
+    B --> C[ChatGroq]
+    C --> D[StrOutputParser]
+    D --> E[string output]
+```
+
+## Minimal runnable example
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_template("Explain {topic} in one paragraph.")
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+chain = prompt | llm | StrOutputParser()
+
+print(chain.invoke({"topic": "LCEL"}))
+```
+
+## What to notice in this code
+
+- `ChatPromptTemplate` turns a dict into chat messages.
+- `ChatGroq` turns those messages into an `AIMessage`.
+- `StrOutputParser` normalizes the final output to a string.
+- The pipe works because all three objects implement Runnable.
+
+## Where engineers get confused
+
+- LCEL is not a model feature; it is a composition syntax.
+- `invoke()` and `stream()` do not change the chain definition, only the execution mode.
+- `RunnableLambda` is best treated as a lightweight transform step, not a replacement for application structure.
+
+## Checklist
+
+- [ ] I can explain what enters and exits each stage of `prompt | llm | parser`
+- [ ] I know when to prefer `invoke()`, `batch()`, and `stream()`
+- [ ] I can run a minimal LCEL chain with Groq end to end
+
+LangChain 101 (1/6)
+
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/01-lcel-runnable-basics)
+
+## Questions this post answers
+
+- Why does LCEL connect components with the `|` operator?
+- Which methods make up the shared Runnable interface?
+- How do prompt, model, and parser outputs line up inside one chain?
+- When should you use `invoke()` versus `batch()`?
+
+> LCEL is the way LangChain turns prompt, model, and parser steps into one executable data flow by making them all speak the Runnable interface.
+
+## The flow at a glance
+
+```mermaid
+flowchart LR
+    Input[Input dictionary] --> Prompt[ChatPromptTemplate]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Parser[StrOutputParser]
+    Parser --> Output[Final string]
+```
 
 LangChain throws a lot of terminology at you before the code makes sense: LCEL, Runnable, Chain, Pipe. This post cuts through that by focusing on what LCEL (LangChain Expression Language) and the Runnable interface actually are and why the library is structured around them.
 
@@ -265,6 +336,25 @@ results = chain.batch(topics, config={"max_concurrency": 2})
 ```
 
 ---
+
+## What to notice in this code
+
+- `prompt | llm | parser` is not string piping. It is composition based on compatible Runnable input and output types.
+- `ChatPromptTemplate` returns message objects, and `ChatGroq` consumes those objects directly without extra glue code.
+- `StrOutputParser` is what turns an `AIMessage` into a plain string that the rest of your application can use easily.
+- `batch()` does not require a different chain design. It reuses the same pipeline with multiple inputs.
+
+## Where engineers get confused
+
+- LCEL looks like the main abstraction, but the real foundation is the Runnable contract underneath it.
+- The output type changes at each stage: prompt output is messages, model output is `AIMessage`, parser output is text.
+- `RunnableLambda` is useful, but long business logic inside the chain can make the pipeline harder to reason about.
+
+## Checklist
+
+- [ ] I can explain the input and output type of `ChatPromptTemplate`, `ChatGroq`, and `StrOutputParser`
+- [ ] I can run the same chain with both `invoke()` and `batch()`
+- [ ] I understand when a plain Python function should be wrapped with `RunnableLambda`
 
 ## Conclusion
 

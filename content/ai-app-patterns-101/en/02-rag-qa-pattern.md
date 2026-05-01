@@ -3,7 +3,7 @@ title: 'RAG Q&A pattern — document-based question answering'
 series: ai-app-patterns-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,27 @@ last_reviewed: '2026-05-01'
 ---
 
 # RAG Q&A pattern — document-based question answering
+
+## Questions this post answers
+
+- How should a minimal RAG pipeline connect chunking, embedding, retrieval, and answer generation?
+- Can a small FAISS-based example return answer text together with evidence snippets?
+- Where do you design against hallucination when the answer is not in the documents?
+
+> RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.
+
+```mermaid
+flowchart LR
+    Docs[Source documents] --> Split[Chunking]
+    Split --> Embed[Embeddings]
+    Embed --> Index[FAISS index]
+    Question[User question] --> QueryEmbed[Query embedding]
+    QueryEmbed --> Index
+    Index --> Retrieved[Relevant chunks]
+    Retrieved --> Prompt[Question plus context]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Answer[Answer plus sources]
+```
 
 > AI App Patterns 101 (2/6)
 
@@ -236,6 +257,31 @@ print(f"sources: {result['sources']}")
 **Information splits across chunk boundaries.** Important context that spans two chunks may not appear complete in any single retrieved result. Sufficient `chunk_overlap` reduces this risk.
 
 **Query and document phrasing diverge too much.** A casual query like "is python slow?" may not match a chunk containing "interpreted language execution performance". Query expansion or hybrid search helps here.
+
+---
+
+## What to notice in this code
+
+- `main.py` uses `RecursiveCharacterTextSplitter` for chunking and `FAISS.from_documents()` for immediate indexing.
+- The script keeps the retrieved `Document` objects around so it can print both the answer and the supporting sources.
+- The prompt explicitly says to answer only from context and admit when the documents do not contain the answer.
+
+---
+
+## Where engineers get confused
+
+- Many teams blame the generator first, but chunking strategy and retriever settings are often the real source of poor RAG quality.
+- The embedding model and the answer-generation model solve different problems; they do not need to match.
+- Increasing top-k is not automatically better because extra noisy chunks can dilute the useful context.
+
+---
+
+## Checklist
+
+- [ ] Documents are split into chunks before indexing
+- [ ] The retriever runs before answer generation
+- [ ] The final output includes source file names
+- [ ] The prompt constrains the model to admit when the documents do not contain the answer
 
 ---
 

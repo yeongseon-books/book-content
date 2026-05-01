@@ -40,7 +40,7 @@ eBook은 블로그 글 모음이 아니라 **학습 경로**다.
 | 코드 | 독립 실행 가능해야 함 | 점진적으로 누적 가능 |
 | 요약 | 빠른 정리 + 다음 글 링크 | 장 요약 + 다음 장으로 자연 연결 |
 | 링크 | 외부/관련 글 링크 적극 활용 | 참고자료 중심, 내부 흐름 우선 |
-| 산출물 | Tistory / Blogger / Medium | PDF / EPUB / MkDocs book |
+| 산출물 | Tistory / Hashnode / Medium | PDF / EPUB / MkDocs book |
 
 ---
 

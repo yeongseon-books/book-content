@@ -3,7 +3,7 @@ title: 'LLM cost tracking and optimization'
 series: llm-apps-ops-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,245 +19,110 @@ last_reviewed: '2026-05-01'
 
 # LLM cost tracking and optimization
 
-> LLM Apps Ops 101 (2/6)
+## Questions this post answers
+- How should token usage accumulate across repeated calls?
+- How much abstraction is enough for a simple price-per-million model?
+- Which numbers reveal the highest-value cost-saving opportunities first?
 
-LLM API costs are billed per token. At development scale the numbers are negligible; at production scale they compound fast. This post covers per-call cost accounting, response caching, and prompt compression — three levers that consistently reduce spend without degrading quality.
+> Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.
 
-<!-- ebook-only:start -->
+## Big picture
+```mermaid
+flowchart LR
+    Prompt[Prompt] --> Groq[Groq API]
+    Groq --> Usage[usage.total_tokens]
+    Usage --> Cost[Cost calculator]
+    Cost --> Report[Cumulative report]
+```
 
-**The key idea**: LLM cost is token count × price per token. Track per-model pricing, input/output ratio, and cache hit rate to control the budget.
+## Why this layer matters
+Cost becomes more important as the feature succeeds, which is exactly why the math should exist in code early.
 
-## Where this chapter fits
+LLM costs usually start small enough to ignore, then jump when repeated prompts, background jobs, or traffic growth hit at once. If you do not record usage per call, optimization becomes guesswork.
 
-This is chapter 2 of 6 in the series.
-The previous chapter covered **Monitoring and logging for LLM apps**.
-After this chapter, the next one moves on to **Evaluating LLM output quality**.
-<!-- ebook-only:end -->
+Example file: `/root/Github/llm-apps-ops-101/en/02-cost-tracking/main.py`
 
-## Example code
-Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
-
----
-
-## Token cost model
-
-Groq offers a generous free tier, but OpenAI and Anthropic charge per token. Internalizing the cost model lets you swap APIs later without rewriting tracking logic.
-
+## Minimal runnable example
 ```python
-from dataclasses import dataclass, field
-from datetime import datetime
+import json
+import os
+from dataclasses import asdict, dataclass
 
-MODEL_PRICING: dict[str, dict[str, float]] = {
-    "llama-3.1-8b-instant":    {"input": 0.00005,  "output": 0.00008},
-    "llama-3.1-70b-versatile": {"input": 0.00059,  "output": 0.00079},
-    "gpt-4o-mini":             {"input": 0.00015,  "output": 0.00060},
-    "gpt-4o":                  {"input": 0.00250,  "output": 0.01000},
-    "claude-3-haiku-20240307": {"input": 0.00025,  "output": 0.00125},
-}
+from groq import Groq
 
-def estimate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
-    pricing = MODEL_PRICING.get(model)
-    if not pricing:
-        return 0.0
-    return (input_tokens * pricing["input"] + output_tokens * pricing["output"]) / 1000
+MODEL = "llama-3.1-8b-instant"
+PRICE_PER_MILLION_TOKENS = 0.05
 
 @dataclass
 class CostRecord:
-    model: str
-    input_tokens: int
-    output_tokens: int
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
+    prompt: str
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    cost_usd: float
 
-    @property
-    def cost_usd(self) -> float:
-        return estimate_cost(self.model, self.input_tokens, self.output_tokens)
+def estimate_cost(total_tokens: int) -> float:
+    return round((total_tokens / 1_000_000) * PRICE_PER_MILLION_TOKENS, 8)
 
-    @property
-    def total_tokens(self) -> int:
-        return self.input_tokens + self.output_tokens
-```
+def run_prompt(client: Groq, prompt: str) -> CostRecord:
+    response = client.chat.completions.create(
+        model=MODEL,
+        temperature=0,
+        messages=[
+            {"role": "system", "content": "You are a concise Python assistant."},
+            {"role": "user", "content": prompt},
+        ],
+    )
+    usage = response.usage
+    if usage is None:
+        raise RuntimeError("usage metadata missing from Groq response")
+    return CostRecord(
+        prompt=prompt,
+        prompt_tokens=usage.prompt_tokens,
+        completion_tokens=usage.completion_tokens,
+        total_tokens=usage.total_tokens,
+        cost_usd=estimate_cost(usage.total_tokens),
+    )
 
----
-
-## Cumulative cost tracker
-
-```python
-from collections import defaultdict
-
-class CostTracker:
-    def __init__(self):
-        self._records: list[CostRecord] = []
-        self._by_model: dict[str, list[CostRecord]] = defaultdict(list)
-
-    def record(self, model: str, input_tokens: int, output_tokens: int) -> CostRecord:
-        rec = CostRecord(model=model, input_tokens=input_tokens, output_tokens=output_tokens)
-        self._records.append(rec)
-        self._by_model[model].append(rec)
-        return rec
-
-    def total_cost(self) -> float:
-        return sum(r.cost_usd for r in self._records)
-
-    def by_model(self) -> dict[str, dict]:
-        result = {}
-        for model, records in self._by_model.items():
-            result[model] = {
-                "calls": len(records),
-                "input_tokens": sum(r.input_tokens for r in records),
-                "output_tokens": sum(r.output_tokens for r in records),
-                "cost_usd": round(sum(r.cost_usd for r in records), 6),
-            }
-        return result
-
-    def report(self) -> dict:
-        return {
-            "total_calls": len(self._records),
-            "total_tokens": sum(r.total_tokens for r in self._records),
-            "total_cost_usd": round(self.total_cost(), 6),
-            "by_model": self.by_model(),
-        }
-```
-
----
-
-## Response caching
-
-Calling the LLM twice for the same prompt is waste. A cache that keyed on model, prompt, and temperature returns the stored response instantly.
-
-```python
-import hashlib
-import json
-import time
-from pathlib import Path
-from typing import Optional
-
-class ResponseCache:
-    def __init__(self, cache_dir: str, ttl_seconds: int = 3600):
-        self.cache_dir = Path(cache_dir)
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.ttl = ttl_seconds
-        self._hits = 0
-        self._misses = 0
-
-    def _key(self, model: str, prompt: str, temperature: float) -> str:
-        raw = f"{model}|{temperature}|{prompt}"
-        return hashlib.sha256(raw.encode()).hexdigest()[:16]
-
-    def get(self, model: str, prompt: str, temperature: float) -> Optional[str]:
-        key = self._key(model, prompt, temperature)
-        path = self.cache_dir / f"{key}.json"
-        if not path.exists():
-            self._misses += 1
-            return None
-        data = json.loads(path.read_text())
-        if time.time() - data["ts"] > self.ttl:
-            path.unlink(missing_ok=True)
-            self._misses += 1
-            return None
-        self._hits += 1
-        return data["response"]
-
-    def set(self, model: str, prompt: str, temperature: float, response: str):
-        key = self._key(model, prompt, temperature)
-        (self.cache_dir / f"{key}.json").write_text(json.dumps({
-            "ts": time.time(), "model": model, "response": response,
-        }))
-
-    def stats(self) -> dict:
-        total = self._hits + self._misses
-        return {
-            "hits": self._hits,
-            "misses": self._misses,
-            "hit_rate": round(self._hits / total, 3) if total else 0.0,
-        }
-```
-
----
-
-## Prompt compression
-
-Long system prompts inflate input token counts. Stripping redundant whitespace, duplicate lines, and over-specified examples consistently saves 10–30% without affecting output quality.
-
-```python
-import re
-
-def compress_prompt(text: str) -> str:
-    text = re.sub(r" {2,}", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    lines = [line.strip() for line in text.splitlines()]
-    deduped = []
-    for line in lines:
-        if not deduped or line != deduped[-1]:
-            deduped.append(line)
-    return "\n".join(deduped).strip()
-
-def token_estimate(text: str) -> int:
-    """Rough estimate: 4 chars per token for English."""
-    return len(text) // 4
-```
-
----
-
-## Integrated cost-optimized pipeline
-
-```python
-import os
-from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage
-
-tracker = CostTracker()
-cache = ResponseCache(".cache/llm", ttl_seconds=3600)
-
-def cost_optimized_call(
-    prompt: str,
-    model: str = "llama-3.1-8b-instant",
-    temperature: float = 0.0,
-) -> str:
-    compressed = compress_prompt(prompt)
-
-    cached = cache.get(model, compressed, temperature)
-    if cached:
-        print(f"  [cache hit] saved ~{token_estimate(cached)} tokens")
-        return cached
-
-    llm = ChatGroq(model=model, api_key=os.environ["GROQ_API_KEY"], temperature=temperature)
-    response = llm.invoke([HumanMessage(content=compressed)])
-    content = response.content
-
-    usage = getattr(response, "usage_metadata", None)
-    if usage:
-        rec = tracker.record(model, usage.get("input_tokens", 0), usage.get("output_tokens", 0))
-        print(f"  [cost] ${rec.cost_usd:.6f} | {rec.total_tokens} tokens")
-
-    cache.set(model, compressed, temperature, content)
-    return content
+def main() -> None:
+    client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    prompts = [
+        "Summarize Python decorators in one sentence.",
+        "Summarize Python decorators in one sentence.",
+        "Summarize asyncio.gather in one sentence.",
+    ]
+    records = [run_prompt(client, prompt) for prompt in prompts]
+    report = {
+        "price_per_million_tokens": PRICE_PER_MILLION_TOKENS,
+        "total_calls": len(records),
+        "total_tokens": sum(record.total_tokens for record in records),
+        "total_cost_usd": round(sum(record.cost_usd for record in records), 8),
+        "records": [asdict(record) for record in records],
+    }
+    print(json.dumps(report, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
-    prompts = [
-        "Explain Python decorators in one sentence.",
-        "Explain Python decorators in one sentence.",  # cache hit
-        "What is the difference between a generator and an iterator?",
-    ]
-    for p in prompts:
-        ans = cost_optimized_call(p)
-        print(f"  answer: {ans[:100]}...")
-
-    import json
-    print("\n=== cost report ===")
-    print(json.dumps(tracker.report(), indent=2))
-    print("\n=== cache stats ===")
-    print(json.dumps(cache.stats(), indent=2))
+    main()
 ```
 
----
+## What to notice in this code
+- A single `PRICE_PER_MILLION_TOKENS` constant keeps the math obvious and easy to replace later.
+- Persisting one `CostRecord` per call lets you analyze outliers without recomputing reports.
+- Repeating one prompt on purpose gives you a baseline for later cache experiments.
 
-## Cost optimization principles
+## Where engineers get confused
+- Many vendors price input and output tokens differently. Even if the example is simple, design for that split mentally.
+- A total-cost number alone hides spikes. You also need call count and token distribution.
+- Cost optimization without quality checks often means quietly making the product worse.
 
-**Measure before optimizing.** Use `CostTracker` to identify the most expensive calls, then target those first.
+## Checklist
+- [ ] Store total_tokens per call
+- [ ] Keep pricing constants in one place
+- [ ] Report both cumulative and per-call cost
+- [ ] Mark repeated prompts as cache candidates
 
-Caching is the highest-leverage lever. FAQ-style workloads where the same inputs repeat can hit 80%+ cache rates. Skip caching for creative generation and real-time data queries.
-
-Small-model routing works well for mixed workloads: route simple requests to `llama-3.1-8b-instant` and escalate complex ones to a larger model. The cost difference between 8B and 70B is roughly 10x.
+## Summary
+You cannot reduce spend responsibly until you can point to the exact calls that create it.
 
 <!-- blog-only:start -->
 Next: [Evaluating LLM output quality](./03-evaluation.md)
@@ -280,7 +145,7 @@ Next: [Evaluating LLM output quality](./03-evaluation.md)
 ## References
 
 - [Groq pricing](https://groq.com/pricing/)
-- [LangChain token usage tracking](https://python.langchain.com/docs/modules/model_io/llms/token_usage_tracking/)
-- [OpenAI tokenizer](https://platform.openai.com/tokenizer)
+- [OpenAI pricing](https://openai.com/api/pricing/)
+- [Anthropic API pricing](https://www.anthropic.com/pricing#api)
 
 Tags: LLMOps, Observability, Python, LLM

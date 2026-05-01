@@ -3,7 +3,7 @@ title: 'Dataset preparation and preprocessing'
 series: llm-finetuning-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,218 +19,77 @@ last_reviewed: '2026-05-01'
 
 # Dataset preparation and preprocessing
 
-> LLM Fine-tuning 101 (2/6)
+## Questions this post answers
+
+- How should instruction, input, and output fields be structured?
+- How do you load a tiny JSONL dataset with Hugging Face datasets?
+- Which preprocessing checks matter before you ever start training?
+
+> A good fine-tuning dataset is not a pile of sentences. It is a contract that teaches the model which request shape should produce which answer shape.
 
 Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/02-dataset)
 
-Data quality determines fine-tuning quality. It has more impact on final model performance than model architecture or hyperparameters. This post covers the right data format for fine-tuning, collection strategies, and a preprocessing pipeline.
+At this stage, consistency matters more than volume. If the model cannot tell where the instruction ends and where the answer begins, the training loop can run successfully while teaching the wrong pattern. That is why Post 02 focuses on structuring a tiny dataset clearly before scaling it.
 
----
+The example script writes a `toy.jsonl` file, reads it with `datasets.load_dataset()`, applies an instruction template, and tokenizes the result with a tiny GPT-2 tokenizer. Running `python main.py` prints the row count, output columns, and token lengths so you can verify the pipeline end to end.
 
-<!-- ebook-only:start -->
+## The three layers of dataset preparation
 
-**The key idea**: dataset quality determines fine-tuning results. Consistent format and accurate labels matter more than volume.
+It helps to separate fine-tuning data into three layers: the **raw samples**, the **formatted prompts**, and the **tokenized tensors**. When these layers are explicit, you can debug filtering issues and token-length issues independently instead of mixing them together.
 
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **Introduction to LLM Fine-tuning**.
-After this chapter, the next one moves on to **Configuring the LoRA adapter**.
-<!-- ebook-only:end -->
-
-## Data format
-
-Fine-tuning data is typically instruction-response pairs. The model learns to produce the desired output for a given input.
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class TrainingExample:
-    instruction: str  # user question or task description
-    input: str        # additional context (optional)
-    output: str       # desired response
-
-examples = [
-    TrainingExample(
-        instruction="Find and fix the bug in the following Python code.",
-        input="def add(a, b):\n    return a - b",
-        output="Bug: subtraction operator used in an addition function.\n\nFixed:\ndef add(a, b):\n    return a + b",
-    ),
-    TrainingExample(
-        instruction="Write a SQL query.",
-        input="Table: users(id, name, age). Return users aged 30 or older, sorted by age descending.",
-        output="SELECT id, name, age FROM users WHERE age >= 30 ORDER BY age DESC;",
-    ),
-]
+```mermaid
+flowchart LR
+    A[Raw JSONL samples] --> B[Validation and filtering]
+    B --> C[Instruction template formatting]
+    C --> D[Tokenizer preprocessing]
+    D --> E[Training columns inspection]
 ```
 
----
-
-## Prompt templates
-
-Each model family has a preferred prompt format. The same template must be used at training time and inference time.
-
-```python
-ALPACA_TEMPLATE = """Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Input:
-{input}
-
-### Response:
-{output}"""
-
-ALPACA_NO_INPUT_TEMPLATE = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Response:
-{output}"""
-
-def format_example(example: dict, for_inference: bool = False) -> str:
-    """Build a training or inference prompt."""
-    has_input = bool(example.get("input", "").strip())
-    if has_input:
-        prompt = ALPACA_TEMPLATE.format(
-            instruction=example["instruction"],
-            input=example["input"],
-            output="" if for_inference else example["output"],
-        )
-    else:
-        prompt = ALPACA_NO_INPUT_TEMPLATE.format(
-            instruction=example["instruction"],
-            output="" if for_inference else example["output"],
-        )
-    return prompt
-
-sample = {"instruction": "Reverse a Python list.", "input": "", "output": "lst[::-1] or lst.reverse()"}
-print(format_example(sample))
-```
-
----
-
-## Data collection and cleaning
+## Minimal runnable example
 
 ```python
 import json
-import re
-import statistics
 from pathlib import Path
-from datasets import Dataset, DatasetDict
 
-def load_jsonl(file_path: str) -> list[dict]:
-    """Load a JSONL file."""
-    data = []
-    with open(file_path, "r", encoding="utf-8") as f:
-        for line in f:
-            if line.strip():
-                data.append(json.loads(line))
-    return data
+from datasets import load_dataset
+from transformers import AutoTokenizer
 
-def validate_example(example: dict) -> tuple[bool, str]:
-    """Check data quality."""
-    if not example.get("instruction", "").strip():
-        return False, "missing instruction"
-    if not example.get("output", "").strip():
-        return False, "missing output"
-    if len(example["instruction"]) < 10:
-        return False, "instruction too short"
-    if len(example["output"]) < 5:
-        return False, "output too short"
-    if re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", example["output"]):
-        return False, "control characters found"
-    return True, "ok"
+ROOT = Path(__file__).resolve().parent
+DATA_PATH = ROOT / "toy.jsonl"
 
-def clean_example(example: dict) -> dict:
-    """Normalize whitespace and strip."""
-    return {
-        "instruction": example["instruction"].strip(),
-        "input": example.get("input", "").strip(),
-        "output": example["output"].strip(),
-    }
+with DATA_PATH.open("w", encoding="utf-8") as file:
+    file.write(json.dumps({
+        "instruction": "Explain two ways to reverse a Python list.",
+        "input": "Include a one-line code example.",
+        "output": "You can use lst[::-1] or lst.reverse().",
+    }) + "\n")
 
-def build_dataset(raw_data: list[dict], tokenizer, max_length: int = 512) -> Dataset:
-    """Build a training dataset from raw examples."""
-    valid, invalid = [], []
-    for ex in raw_data:
-        ok, reason = validate_example(ex)
-        if ok:
-            valid.append(clean_example(ex))
-        else:
-            invalid.append((ex, reason))
-
-    print(f"Valid: {len(valid)}, Excluded: {len(invalid)}")
-    for ex, reason in invalid[:3]:
-        print(f"  Excluded ({reason}): {str(ex)[:80]}")
-
-    formatted = [{"text": format_example(ex)} for ex in valid]
-
-    def tokenize_and_filter(batch):
-        tokens = tokenizer(batch["text"], truncation=False)
-        return {"length": [len(ids) for ids in tokens["input_ids"]]}
-
-    dataset = Dataset.from_list(formatted)
-    lengths = dataset.map(tokenize_and_filter, batched=True, batch_size=64)
-    dataset = dataset.filter(
-        lambda ex, idx: lengths[idx]["length"] <= max_length, with_indices=True
-    )
-    print(f"After max-length filter ({max_length} tokens): {len(dataset)} examples")
-    return dataset
+dataset = load_dataset("json", data_files=str(DATA_PATH), split="train")
+tokenizer = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
 ```
 
----
+## What to notice in this code
 
-## Train/validation split and saving
+- Using `datasets.load_dataset()` keeps the example close to real JSONL-based workflows.
+- Formatting prompts before tokenization makes it much easier to swap in a model-specific chat template later.
+- The example fixes `max_length=64` so even a CPU-only run can expose token-length behavior immediately.
 
-```python
-def split_and_save(dataset: Dataset, output_dir: str, val_ratio: float = 0.1) -> DatasetDict:
-    """Split into train/validation and save to disk."""
-    split = dataset.train_test_split(test_size=val_ratio, seed=42)
-    dataset_dict = DatasetDict({"train": split["train"], "validation": split["test"]})
+## Where engineers get confused
 
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
-    dataset_dict.save_to_disk(output_dir)
+- More rows do not automatically mean better training. Duplicates and inconsistent answer style can hurt a small model very quickly.
+- It is normal that this post stops at tokenization. The `labels` field appears in Post 04, where the training loop is introduced.
+- The simple length filters here are just a starting point. Production pipelines need checks for duplicates, PII, policy violations, and class balance.
 
-    print(f"Train: {len(dataset_dict['train'])}")
-    print(f"Validation: {len(dataset_dict['validation'])}")
-    print(f"Saved to: {output_dir}")
-    return dataset_dict
+## Checklist
 
-def analyze_dataset(dataset: Dataset, tokenizer) -> dict:
-    """Compute token-length statistics."""
-    lengths = [len(tokenizer.encode(t)) for t in dataset["text"]]
-    return {
-        "count": len(lengths),
-        "token_length": {
-            "min": min(lengths),
-            "max": max(lengths),
-            "mean": round(statistics.mean(lengths), 1),
-            "median": statistics.median(lengths),
-            "p95": sorted(lengths)[int(len(lengths) * 0.95)],
-        },
-    }
+- [ ] I can describe the raw sample schema as instruction, input, and output.
+- [ ] I loaded a real JSONL file with `datasets.load_dataset()`.
+- [ ] I verified the tokenized columns and prompt lengths after preprocessing.
+- [ ] I understand why consistent formatting matters before adapter tuning begins.
 
-if __name__ == "__main__":
-    from transformers import AutoTokenizer
+## Summary
 
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-2", trust_remote_code=True)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-
-    raw_data = [
-        {"instruction": "How do you create a dictionary in Python?", "input": "", "output": "d = {'key': 'value'} or d = dict(key='value')"},
-        {"instruction": "Show a list comprehension example.", "input": "", "output": "[x**2 for x in range(10) if x % 2 == 0]"},
-    ] * 50
-
-    dataset = build_dataset(raw_data, tokenizer, max_length=256)
-    stats = analyze_dataset(dataset, tokenizer)
-    print(stats)
-    split_and_save(dataset, "./data/finetuning")
-```
+The key job of dataset preparation is making the input-output boundary unambiguous. Once that boundary is clean, training-loop debugging gets dramatically easier.
 
 <!-- blog-only:start -->
 Next: [Configuring the LoRA adapter](./03-lora.md)
@@ -252,8 +111,7 @@ Next: [Configuring the LoRA adapter](./03-lora.md)
 
 ## References
 
-- [Stanford Alpaca dataset](https://github.com/tatsu-lab/stanford_alpaca)
-- [Hugging Face datasets documentation](https://huggingface.co/docs/datasets)
-- [LIMA: Less is More for Alignment](https://arxiv.org/abs/2307.09288)
+- [Hugging Face Datasets documentation](https://huggingface.co/docs/datasets)
+- [Instruction tuning overview](https://arxiv.org/abs/2203.02155)
 
 Tags: Fine-tuning, LoRA, LLM, Python

@@ -3,7 +3,7 @@ title: 'Conditional edges and branching'
 series: langgraph-101
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,181 +19,118 @@ last_reviewed: '2026-05-01'
 
 # Conditional edges and branching
 
-> LangGraph 101 (3/6)
+## Questions this post answers
+
+- When should you use `add_conditional_edges()`?
+- What job should the routing function do, and what should it avoid?
+- How do you keep branch-heavy graphs from turning into unbounded loops?
+
+> A conditional edge inspects state and returns the name of the next node, so routing becomes an explicit runtime decision instead of hidden control flow.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/03-conditional-edges)
 
-Linear pipelines always take the same path. Agents need to choose different paths depending on what they encounter. LangGraph's conditional edges inspect state and dynamically select the next node. This post implements routing patterns, loops, and escape conditions.
+Real agent workflows do not follow one path forever. Some requests should go to code generation, some to conceptual explanation, and others to debugging. LangGraph makes that branch visible with one routing node and one conditional edge definition.
 
----
+```mermaid
+flowchart LR
+    A[Question] --> B[classify]
+    B -->|code| C[answer_code]
+    B -->|concept| D[answer_concept]
+    B -->|debug| E[answer_debug]
+    C --> F[END]
+    D --> F
+    E --> F
+```
 
-<!-- ebook-only:start -->
-
-**The key idea**: a conditional edge inspects State and decides the next node. The function returns a string key; the graph routes to the matching node.
-
-## Where this chapter fits
-
-This is chapter 3 of 6 in the series.
-The previous chapter covered **State management and checkpoints**.
-After this chapter, the next one moves on to **Tool-calling agents**.
-<!-- ebook-only:end -->
-
-## Conditional edge basics
-
-`add_conditional_edges` takes a routing function that receives state and returns the next node name.
+## Minimal runnable example
 
 ```python
-import os
-from typing import TypedDict, Annotated, Literal
+from typing import Literal, TypedDict
 
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
+from langgraph.graph import END, START, StateGraph
 
 class RouterState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-    category: str
-    response: str
+    question: str
+    route: str
+    answer: str
 
 def classify_question(state: RouterState) -> RouterState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    last_msg = state["messages"][-1].content
-    response = llm.invoke([
-        SystemMessage(content="""Classify the question as one of:
-- code: code writing, debugging, programming
-- concept: explanations, theory, principles
-- other: everything else
+    text = state["question"].lower()
+    if any(word in text for word in ("bug", "error", "traceback")):
+        route = "debug"
+    elif any(word in text for word in ("code", "implement", "write")):
+        route = "code"
+    else:
+        route = "concept"
+    return {"route": route}
 
-Return only the label: code, concept, or other."""),
-        HumanMessage(content=last_msg),
-    ])
-    category = response.content.strip().lower()
-    return {"category": category if category in ("code", "concept", "other") else "other"}
+def route_question(state: RouterState) -> Literal["code", "concept", "debug"]:
+    return state["route"]
 
-def handle_code_question(state: RouterState) -> RouterState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="Answer with code examples. Always include a code block."),
-        *state["messages"],
-    ])
-    return {"messages": [response], "response": response.content}
+def answer_code(_: RouterState) -> RouterState:
+    return {"answer": "Route: code. Next node should generate or review code."}
 
-def handle_concept_question(state: RouterState) -> RouterState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="Explain step by step with analogies and examples."),
-        *state["messages"],
-    ])
-    return {"messages": [response], "response": response.content}
+def answer_concept(_: RouterState) -> RouterState:
+    return {"answer": "Route: concept. Next node should explain the idea clearly."}
 
-def handle_other_question(state: RouterState) -> RouterState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([SystemMessage(content="Be helpful."), *state["messages"]])
-    return {"messages": [response], "response": response.content}
+def answer_debug(_: RouterState) -> RouterState:
+    return {"answer": "Route: debug. Next node should inspect failure details first."}
 
-def route_by_category(state: RouterState) -> Literal["code", "concept", "other"]:
-    return state["category"]
-
-def build_router_graph():
+def build_graph():
     graph = StateGraph(RouterState)
     graph.add_node("classify", classify_question)
-    graph.add_node("code", handle_code_question)
-    graph.add_node("concept", handle_concept_question)
-    graph.add_node("other", handle_other_question)
+    graph.add_node("code", answer_code)
+    graph.add_node("concept", answer_concept)
+    graph.add_node("debug", answer_debug)
 
-    graph.set_entry_point("classify")
+    graph.add_edge(START, "classify")
     graph.add_conditional_edges(
         "classify",
-        route_by_category,
-        {"code": "code", "concept": "concept", "other": "other"},
+        route_question,
+        {"code": "code", "concept": "concept", "debug": "debug"},
     )
-    for node in ("code", "concept", "other"):
-        graph.add_edge(node, END)
+    graph.add_edge("code", END)
+    graph.add_edge("concept", END)
+    graph.add_edge("debug", END)
 
     return graph.compile()
 
 if __name__ == "__main__":
-    app = build_router_graph()
-    questions = [
-        "Write code to sort a list in Python.",
-        "What is recursion?",
-        "Why is Python popular?",
-    ]
-    for q in questions:
-        result = app.invoke({"messages": [HumanMessage(content=q)], "category": "", "response": ""})
-        print(f"\nQ: {q}\ncategory: {result['category']}\nanswer: {result['response'][:150]}...")
+    app = build_graph()
+    for question in [
+        "Write Python code for quicksort.",
+        "What is a checkpoint in LangGraph?",
+        "I got a traceback while running my graph.",
+    ]:
+        result = app.invoke({"question": question, "route": "", "answer": ""})
+        print(f"Question: {question}")
+        print(f"Route: {result['route']}")
+        print(f"Answer: {result['answer']}\n")
 ```
 
----
+Runnable file: `/root/Github/langgraph-101/en/03-conditional-edges/main.py`
 
-## Loops and escape conditions
+## What to notice in this code
 
-Agent loops repeat until a task is done. Always include an escape condition to prevent infinite loops.
+- `classify_question()` writes the routing signal into state.
+- `route_question()` has one job: return the next node name with no side effects.
+- The path map keeps the branch labels and target nodes explicit and easy to audit.
 
-```python
-class ReflectionState(TypedDict):
-    messages: Annotated[list[BaseMessage], add_messages]
-    draft: str
-    critique: str
-    iteration: int
-    max_iterations: int
-    final: str
+## Where engineers get confused
 
-def generate_draft(state: ReflectionState) -> ReflectionState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.7)
-    prompt = state["messages"][-1].content if not state["draft"] else \
-        f"Previous answer: {state['draft']}\n\nCritique: {state['critique']}\n\nRevise based on the critique."
-    response = llm.invoke([HumanMessage(content=prompt)])
-    return {"draft": response.content, "iteration": state["iteration"] + 1}
+- Mixing classification logic and side-effectful work in one routing function makes debugging painful.
+- Conditional edges are not only for one-time if/else branches. They also control loops, which means termination must be designed explicitly.
+- Route strings are runtime contracts. Typos become graph failures, which is why `Literal[...]` helps.
 
-def critique_draft(state: ReflectionState) -> ReflectionState:
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"], temperature=0.0)
-    response = llm.invoke([
-        SystemMessage(content="""Critique the following answer.
-If it is good enough, return 'APPROVED'.
-Otherwise, give one specific improvement in a single sentence."""),
-        HumanMessage(content=state["draft"]),
-    ])
-    return {"critique": response.content}
+## Checklist
 
-def should_continue(state: ReflectionState) -> Literal["generate", "finish"]:
-    if state["iteration"] >= state["max_iterations"] or "APPROVED" in state["critique"]:
-        return "finish"
-    return "generate"
+- [ ] Is the branch decision written into a dedicated state field
+- [ ] Is the routing function pure and side-effect free
+- [ ] Does every branch terminate cleanly or move into a stable next step
 
-def finish(state: ReflectionState) -> ReflectionState:
-    return {"final": state["draft"]}
+## Summary
 
-def build_reflection_graph():
-    graph = StateGraph(ReflectionState)
-    graph.add_node("generate", generate_draft)
-    graph.add_node("critique", critique_draft)
-    graph.add_node("finish", finish)
-
-    graph.set_entry_point("generate")
-    graph.add_edge("generate", "critique")
-    graph.add_conditional_edges("critique", should_continue, {"generate": "generate", "finish": "finish"})
-    graph.add_edge("finish", END)
-    return graph.compile()
-
-if __name__ == "__main__":
-    app = build_reflection_graph()
-    result = app.invoke({
-        "messages": [HumanMessage(content="Explain Python async/await.")],
-        "draft": "", "critique": "", "iteration": 0, "max_iterations": 3, "final": "",
-    })
-    print(f"iterations: {result['iteration']}")
-    print(f"final answer:\n{result['final']}")
-```
-
----
-
-## Routing function design
-
-Routing functions must be pure: they receive state and return a node name, with no side effects. LLM calls and API requests belong in nodes, not routing functions.
-
-Always combine a quality-based escape (`"APPROVED"`) with an iteration cap (`max_iterations`). The quality check exits early when the result is good; the cap guarantees termination when it is not.
+Conditional edges are where LangGraph starts to feel meaningfully graph-shaped. In the next post, we put that branching machinery under a real tool-calling loop and move from workflow to agent behavior.
 
 <!-- blog-only:start -->
 Next: [Tool-calling agents](./04-tool-calling-agent.md)
@@ -215,8 +152,8 @@ Next: [Tool-calling agents](./04-tool-calling-agent.md)
 
 ## References
 
-- [LangGraph conditional edges](https://langchain-ai.github.io/langgraph/how-tos/branching/)
-- [LangGraph recursion limit](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
-- [LangGraph cycles guide](https://langchain-ai.github.io/langgraph/concepts/low_level/#cycles)
+- [LangGraph branching guide](https://langchain-ai.github.io/langgraph/how-tos/branching/)
+- [LangGraph low-level concepts: edges](https://langchain-ai.github.io/langgraph/concepts/low_level/)
+- [LangGraph recursion limit guide](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
 
 Tags: LangGraph, Agent, Python, LLM

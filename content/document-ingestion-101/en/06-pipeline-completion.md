@@ -3,7 +3,7 @@ title: 'Completing the document ingestion pipeline'
 series: document-ingestion-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,270 +19,188 @@ last_reviewed: '2026-05-01'
 
 # Completing the document ingestion pipeline
 
-> Document Ingestion 101 (6/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/06-pipeline-completion)
+- How do you connect loading, chunking, embedding, and FAISS save-reload in one flow?
+- Which outputs are the minimum proof that the whole pipeline actually worked?
+- How do you keep the retrieval flow reproducible offline?
 
-This post assembles all components from the series into one complete pipeline: PDF/Word/HTML/Markdown parsing, format-aware chunking, metadata attachment, incremental indexing, FAISS retrieval, and a LangChain RAG chain.
+> A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.
 
----
+Example code: `/root/Github/document-ingestion-101/en/06-pipeline-completion/main.py`
 
-<!-- ebook-only:start -->
+```mermaid
+flowchart LR
+    A[Load PDF TXT MD] --> B[Create chunks]
+    B --> C[Generate embeddings]
+    C --> D[Save FAISS index]
+    D --> E[Reload FAISS index]
+    E --> F[Verify similarity search]
+```
 
-**The key idea**: a complete pipeline runs ingest → parse → chunk → embed → index automatically. Independent modules make each stage replaceable and testable.
+The final post assembles the earlier isolated examples into one real flow. At this point the important question is whether the stage boundaries still line up.
 
-## Where this chapter fits
+This example loads three formats, chunks them, stores embeddings in FAISS, reloads the saved index, and runs a search against it. That is enough to prove an ingestion MVP works end to end.
 
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Multi-format document pipeline**.
-<!-- ebook-only:end -->
-
-## Complete document ingestion pipeline
+## Runnable example
 
 ```python
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
+from __future__ import annotations
+
 import hashlib
-import json
-import os
-from datetime import datetime
+import shutil
 from pathlib import Path
 
-from langchain.schema import Document
-from langchain_community.document_loaders import (
-    BSHTMLLoader,
-    Docx2txtLoader,
-    PyMuPDFLoader,
-    TextLoader,
-)
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_groq import ChatGroq
+from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from pypdf import PdfReader
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
-# ── chunking config ─────────────────────────────────────────────────────────
-CHUNKING_CONFIG = {
-    "pdf":  {"chunk_size": 500, "chunk_overlap": 100},
-    "docx": {"chunk_size": 500, "chunk_overlap": 100},
-    "html": {"chunk_size": 300, "chunk_overlap": 50},
-    "txt":  {"chunk_size": 400, "chunk_overlap": 80},
-    "md":   {"chunk_size": 400, "chunk_overlap": 80},
-}
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / 'data'
+INDEX_DIR = BASE_DIR / 'faiss_store'
+DATA_DIR.mkdir(exist_ok=True)
 
-SEPARATORS = ["\n\n", "\n", ". ", " "]
+class SimpleHashEmbeddings(Embeddings):
+    def __init__(self, size: int = 32):
+        self.size = size
 
-# ── format loaders ──────────────────────────────────────────────────────────
-def _add_base_metadata(docs: list[Document], file_path: str, fmt: str) -> list[Document]:
-    path = Path(file_path)
-    stat = path.stat()
-    for doc in docs:
-        doc.metadata.update({
-            "format": fmt,
-            "source": path.name,
-            "source_path": str(path),
-            "modified_date": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d"),
-            "file_size_kb": stat.st_size // 1024,
-        })
-    return docs
+    def _embed(self, text: str) -> list[float]:
+        vector = [0.0] * self.size
+        for token in text.lower().split():
+            digest = hashlib.sha256(token.encode('utf-8')).digest()
+            for index in range(self.size):
+                vector[index] += digest[index] / 255.0
+        return vector
 
-LOADERS = {
-    ".pdf":      lambda p: _add_base_metadata(PyMuPDFLoader(p).load(), p, "pdf"),
-    ".docx":     lambda p: _add_base_metadata(Docx2txtLoader(p).load(), p, "docx"),
-    ".doc":      lambda p: _add_base_metadata(Docx2txtLoader(p).load(), p, "docx"),
-    ".html":     lambda p: _add_base_metadata(BSHTMLLoader(p, bs_kwargs={"features": "html.parser"}).load(), p, "html"),
-    ".htm":      lambda p: _add_base_metadata(BSHTMLLoader(p, bs_kwargs={"features": "html.parser"}).load(), p, "html"),
-    ".txt":      lambda p: _add_base_metadata(TextLoader(p, encoding="utf-8").load(), p, "txt"),
-    ".md":       lambda p: _add_base_metadata(TextLoader(p, encoding="utf-8").load(), p, "md"),
-    ".markdown": lambda p: _add_base_metadata(TextLoader(p, encoding="utf-8").load(), p, "md"),
-}
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return [self._embed(text) for text in texts]
 
-def load_file(file_path: str) -> list[Document]:
-    suffix = Path(file_path).suffix.lower()
-    loader = LOADERS.get(suffix)
-    if not loader:
-        raise ValueError(f"unsupported format: {suffix}")
-    return loader(file_path)
+    def embed_query(self, text: str) -> list[float]:
+        return self._embed(text)
 
-# ── state store ─────────────────────────────────────────────────────────────
-class StateStore:
-    def __init__(self, path: str):
-        self.path = Path(path)
-        self.data = json.loads(self.path.read_text()) if self.path.exists() else {}
+def create_pdf(path: Path) -> None:
+    c = canvas.Canvas(str(path), pagesize=A4)
+    c.setFont('Helvetica', 12)
+    c.drawString(72, 780, 'PDF source: access policy and retention rules.')
+    c.drawString(72, 760, 'Chunk metadata should preserve the original file name and format.')
+    c.save()
 
-    def save(self):
-        self.path.write_text(json.dumps(self.data, ensure_ascii=False, indent=2))
+def seed_files() -> list[Path]:
+    pdf_path = DATA_DIR / 'policy.pdf'
+    txt_path = DATA_DIR / 'ops.txt'
+    md_path = DATA_DIR / 'faq.md'
+    create_pdf(pdf_path)
+    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.
+', encoding='utf-8')
+    md_path.write_text('# FAQ
 
-    def hash_file(self, fp: str) -> str:
-        h = hashlib.md5()
-        with open(fp, "rb") as f:
-            for chunk in iter(lambda: f.read(8192), b""):
-                h.update(chunk)
-        return h.hexdigest()
+MD source: metadata filters reduce the candidate set before answer generation.
+', encoding='utf-8')
+    return [pdf_path, txt_path, md_path]
 
-    def needs_update(self, fp: str) -> bool:
-        stored = self.data.get(fp, {})
-        mtime = Path(fp).stat().st_mtime
-        if stored.get("mtime") == mtime:
-            return False
-        return stored.get("hash") != self.hash_file(fp)
+def load_file(path: Path) -> list[Document]:
+    suffix = path.suffix.lower()
+    if suffix == '.pdf':
+        reader = PdfReader(str(path))
+        text = '
+'.join((page.extract_text() or '').strip() for page in reader.pages)
+        return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
+    if suffix == '.txt':
+        return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': 'txt'})]
+    if suffix in {'.md', '.markdown'}:
+        return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': 'md'})]
+    raise ValueError(f'unsupported format: {suffix}')
 
-    def mark(self, fp: str, chunk_ids: list[str]):
-        self.data[fp] = {
-            "hash": self.hash_file(fp),
-            "mtime": Path(fp).stat().st_mtime,
-            "indexed_at": datetime.now().isoformat(),
-            "chunk_ids": chunk_ids,
-        }
+def chunk_documents(documents: list[Document]) -> list[Document]:
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=90,
+        chunk_overlap=20,
+        separators=['
 
-# ── chunking ────────────────────────────────────────────────────────────────
-def chunk_documents(docs: list[Document]) -> list[Document]:
-    all_chunks = []
-    for doc in docs:
-        fmt = doc.metadata.get("format", "txt")
-        cfg = CHUNKING_CONFIG.get(fmt, CHUNKING_CONFIG["txt"])
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=cfg["chunk_size"],
-            chunk_overlap=cfg["chunk_overlap"],
-            separators=SEPARATORS,
-        )
-        chunks = splitter.split_documents([doc])
-        for idx, chunk in enumerate(chunks):
-            cid = hashlib.md5(chunk.page_content.encode()).hexdigest()[:8]
-            chunk.metadata["chunk_id"] = f"{Path(doc.metadata['source']).stem}_c{idx}_{cid}"
-            chunk.metadata["chunk_idx"] = idx
-        all_chunks.extend(chunks)
-    return all_chunks
+', '
+', '. ', ' '],
+    )
+    chunks = splitter.split_documents(documents)
+    for index, chunk in enumerate(chunks):
+        chunk.metadata['chunk_id'] = f'chunk-{index:02d}'
+    return chunks
 
-# ── main pipeline ───────────────────────────────────────────────────────────
-class DocumentIngestionPipeline:
-    def __init__(self, index_dir: str):
-        self.index_dir = Path(index_dir)
-        self.index_dir.mkdir(parents=True, exist_ok=True)
-        self.state = StateStore(str(self.index_dir / "state.json"))
-        self.embedding = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-        faiss_path = self.index_dir / "faiss"
-        if faiss_path.exists():
-            self.vectorstore = FAISS.load_local(
-                str(faiss_path), self.embedding, allow_dangerous_deserialization=True
-            )
-        else:
-            dummy = Document(page_content="__init__", metadata={"_dummy": True})
-            self.vectorstore = FAISS.from_documents([dummy], self.embedding)
+def main() -> None:
+    files = seed_files()
+    loaded = [doc for path in files for doc in load_file(path)]
+    chunks = chunk_documents(loaded)
+    if INDEX_DIR.exists():
+        shutil.rmtree(INDEX_DIR)
+    vectorstore = FAISS.from_documents(chunks, SimpleHashEmbeddings())
+    vectorstore.save_local(str(INDEX_DIR))
+    reloaded = FAISS.load_local(
+        str(INDEX_DIR),
+        SimpleHashEmbeddings(),
+        allow_dangerous_deserialization=True,
+    )
+    results = reloaded.similarity_search('metadata filters and retention', k=2)
 
-    def ingest(self, file_paths: list[str]) -> dict:
-        stats = {"added": 0, "updated": 0, "skipped": 0, "errors": 0}
+    print(f'loaded_documents: {len(loaded)}')
+    print(f'chunks: {len(chunks)}')
+    print(f'faiss_saved: {INDEX_DIR}')
+    for doc in results:
+        preview = doc.page_content.replace('
+', ' ')[:90]
+        print(f"result={doc.metadata['source']} chunk_id={doc.metadata['chunk_id']} preview={preview}")
 
-        for fp in file_paths:
-            try:
-                if not self.state.needs_update(fp) and fp in self.state.data:
-                    stats["skipped"] += 1
-                    continue
-
-                is_update = fp in self.state.data
-                docs = load_file(fp)
-                chunks = chunk_documents(docs)
-
-                if chunks:
-                    self.vectorstore.add_documents(chunks)
-                    self.state.mark(fp, [c.metadata["chunk_id"] for c in chunks])
-                    stats["updated" if is_update else "added"] += 1
-                    label = "updated" if is_update else "added"
-                    print(f"  [{label}] {Path(fp).name}: {len(chunks)} chunks")
-
-            except Exception as e:
-                stats["errors"] += 1
-                print(f"  [error] {fp}: {e}")
-
-        self.state.save()
-        self.vectorstore.save_local(str(self.index_dir / "faiss"))
-        return stats
-
-    def build_rag_chain(self, llm):
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
-        prompt = ChatPromptTemplate.from_messages([
-            (
-                "system",
-                "Answer the question using the documents below.\n"
-                "If the answer is not in the documents, say so.\n\n"
-                "Documents:\n{context}",
-            ),
-            ("human", "{question}"),
-        ])
-
-        def format_docs(docs: list) -> str:
-            parts = []
-            for doc in docs:
-                src = doc.metadata.get("source", "unknown")
-                parts.append(f"[source: {src}]\n{doc.page_content}")
-            return "\n\n".join(parts)
-
-        return (
-            {"context": retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | llm
-            | StrOutputParser()
-        )
+if __name__ == '__main__':
+    main()
 ```
 
----
+## How to run it
 
-## Usage
-
-```python
-import tempfile
-
-with tempfile.TemporaryDirectory() as tmpdir:
-    tmpdir = Path(tmpdir)
-
-    (tmpdir / "python_guide.txt").write_text(
-        "Python Basics Guide\n\n"
-        "Python is a high-level programming language created in 1991.\n"
-        "It prioritizes readability above all else.\n\n"
-        "Installation:\nDownload the latest version from python.org.\n"
-        "Install packages with: pip install <name>.",
-        encoding="utf-8",
-    )
-    (tmpdir / "faq.md").write_text(
-        "# Frequently asked questions\n\n"
-        "## What is the difference between Python and Java?\n\n"
-        "Python is interpreted, Java is compiled.\n"
-        "Python code is shorter and more readable.\n\n"
-        "## Can I build web apps with Python?\n\n"
-        "Yes. Django and FastAPI are the leading web frameworks.",
-        encoding="utf-8",
-    )
-
-    pipeline = DocumentIngestionPipeline(str(tmpdir / ".index"))
-    files = [str(tmpdir / "python_guide.txt"), str(tmpdir / "faq.md")]
-    stats = pipeline.ingest(files)
-    print(f"ingestion result: {stats}")
-
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-    )
-    chain = pipeline.build_rag_chain(llm)
-
-    questions = [
-        "When was Python created?",
-        "Can Python be used for web development?",
-    ]
-    for question in questions:
-        answer = chain.invoke(question)
-        print(f"\nquestion: {question}")
-        print(f"answer: {answer}")
+```bash
+python main.py
 ```
 
----
+## Verified run output
 
-## Conclusion
+```text
+loaded_documents: 3
+chunks: 4
+faiss_saved: /root/Github/document-ingestion-101/en/06-pipeline-completion/faiss_store
+result=policy.pdf chunk_id=chunk-00 preview=PDF source: access policy and retention rules.
+result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the original file name and format.
+```
 
-This series covered the full document ingestion lifecycle: parsing, chunking, metadata, incremental indexing, multi-format support, and RAG chain assembly. Each stage is independently replaceable — swap the parser to support a new format, tune the chunking config to improve retrieval quality, replace the JSON state store with SQLite or Redis to scale further.
+## What to notice in this code
+
+- `load_file()` absorbs format differences, and `chunk_documents()` creates the shared chunk contract.
+- `SimpleHashEmbeddings` lets the example verify FAISS save-reload behavior without depending on a network model download.
+- The log keeps four tight checkpoints: `loaded_documents`, `chunks`, `faiss_saved`, and `result`.
+
+## Where engineers get confused
+
+- An end-to-end demo does not need an LLM call on day one. Verifying index save and reload is more important first.
+- Embedding quality and pipeline correctness are different concerns. Reproducibility wins at the demo stage.
+- If you skip the reload step, deployment-time path and serialization issues stay hidden until later.
+
+## Checklist
+
+- [ ] You loaded all three formats.
+- [ ] You checked that the chunk count was plausible.
+- [ ] You saved the FAISS index and loaded it back.
+- [ ] You verified retrieval against the reloaded index.
+
+<!-- blog-only:start -->
+
+## Summary
+
+At this point the core ingestion loop—load, chunk, embed, save, reload—works as one continuous path.
+
+The next series can now build on this index with full retrieval, answering, and operational metrics.
+
+<!-- blog-only:end -->
 
 <!-- toc:begin -->
 ## In this series
@@ -296,12 +214,9 @@ This series covered the full document ingestion lifecycle: parsing, chunking, me
 
 <!-- toc:end -->
 
----
-
 ## References
 
-- [LangChain indexing API](https://python.langchain.com/docs/modules/data_connection/indexing/)
-- [FAISS documentation](https://faiss.ai/)
-- [pymupdf documentation](https://pymupdf.readthedocs.io/)
+- https://python.langchain.com/docs/integrations/vectorstores/faiss/
+- https://github.com/facebookresearch/faiss
 
 Tags: RAG, Document Processing, LangChain, Python

@@ -3,7 +3,7 @@ title: '모델 평가'
 series: llm-finetuning-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,202 +19,76 @@ last_reviewed: '2026-05-01'
 
 # 모델 평가
 
-> LLM 파인튜닝 101 (5/6)
+## 이 글에서 답할 질문
+
+- 파인튜닝 직후 가장 먼저 볼 정량 지표로 perplexity를 어떻게 계산할까?
+- 학습 전후 perplexity 비교가 왜 완벽한 품질 평가가 아닌가?
+- tiny 모델 데모에서도 평가 루프를 따로 두는 이유는 무엇일까?
+
+> perplexity는 모델이 다음 토큰을 얼마나 덜 놀라며 예측하는지 보는 지표이지, 사람이 읽기 좋은 답변을 직접 보장하는 지표는 아닙니다.
 
 예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/05-evaluation)
 
-학습이 끝난 모델은 실제로 얼마나 나아졌는지 측정해야 합니다. 손실 값만으로는 부족합니다. 태스크에 맞는 지표를 선택하고, 베이스 모델과 정량 비교하고, 실제 출력을 살펴봐야 합니다. 이 포스트에서는 파인튜닝된 모델 평가 방법을 다룹니다.
+학습이 끝나면 곧바로 생성 결과만 보고 싶어집니다. 하지만 실무에서는 생성 예시보다 먼저 정량 지표를 봐야 합니다. 그중 가장 기본이 perplexity입니다. 이 값은 모델이 평가 데이터의 토큰을 얼마나 자연스럽게 예측하는지 보여줍니다.
 
----
+예제 코드는 tiny GPT-2 + LoRA 모델을 1 step 학습한 뒤, 같은 형식의 평가 데이터셋에 대해 평균 loss를 구하고 `exp(loss)`로 perplexity를 계산합니다. 실행하면 학습 전과 후의 perplexity가 모두 출력되므로, 평가 루프가 분리되어 있는지 확인할 수 있습니다.
 
-<!-- ebook-only:start -->
+## perplexity를 해석하는 기본 태도
 
-이 장의 핵심: **평가는 Perplexity·BLEU보다 태스크 특화 지표가 중요하다.** 모델이 원하는 형식으로 답하는지가 핵심이다.
+perplexity는 낮을수록 좋지만, 절대값만으로 품질을 단정하면 안 됩니다. 작은 데모 모델, 작은 데이터셋, 짧은 문맥에서는 값이 크게 튈 수 있습니다. 그래서 실무에서는 perplexity를 **회귀 방지용 기준선**으로 주로 씁니다. 학습 전보다 나빠졌는지, 설정을 바꿨을 때 추세가 개선되는지를 보는 데 강합니다.
 
-## 이 장의 위치
+```mermaid
+flowchart LR
+    A[평가용 텍스트] --> B[input_ids와 labels 준비]
+    B --> C[모델 forward loss 계산]
+    C --> D[평균 loss 집계]
+    D --> E[exp loss로 perplexity 변환]
+```
 
-이 글은 시리즈 6편 중 5번째 장입니다.
-앞 장에서는 **학습 루프와 하이퍼파라미터**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **모델 서빙**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 파인튜닝 모델 로드
+## 최소 실행 예제
 
 ```python
-from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+import math
 import torch
 
-BASE_MODEL = "microsoft/phi-2"
-ADAPTER_PATH = "./outputs/finetuned"
-
-def load_finetuned_model(base_model: str = BASE_MODEL, adapter_path: str = ADAPTER_PATH):
-    """파인튜닝된 모델을 로드합니다."""
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-    )
-    tokenizer = AutoTokenizer.from_pretrained(adapter_path)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-
-    base = AutoModelForCausalLM.from_pretrained(
-        base_model,
-        quantization_config=bnb_config,
-        device_map="auto",
-        trust_remote_code=True,
-    )
-    model = PeftModel.from_pretrained(base, adapter_path)
+def perplexity(model, dataset) -> float:
+    losses = []
     model.eval()
-    return model, tokenizer
+    for row in dataset:
+        batch = {key: torch.tensor([value]) for key, value in row.items()}
+        with torch.no_grad():
+            loss = model(**batch).loss
+        losses.append(loss.item())
+    return math.exp(sum(losses) / len(losses))
 
-def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 200) -> str:
-    """프롬프트에 대한 응답을 생성합니다."""
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-    with torch.no_grad():
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            do_sample=False,
-            temperature=1.0,
-            pad_token_id=tokenizer.eos_token_id,
-        )
-    generated = outputs[0][inputs["input_ids"].shape[1]:]
-    return tokenizer.decode(generated, skip_special_tokens=True)
+before = perplexity(peft_model, eval_dataset)
+trainer.train()
+after = perplexity(peft_model, eval_dataset)
+print(before, after)
 ```
 
----
+## 이 코드에서 봐야 할 것
 
-## 정량 평가 지표
+- 평가 함수는 학습 루프와 분리되어 있어야 합니다. 그렇지 않으면 loss를 보는 순간에도 파라미터가 바뀌는 실수를 하게 됩니다.
+- `torch.no_grad()`와 `model.eval()`은 메모리 사용과 드롭아웃 동작을 안정화하는 기본 장치입니다.
+- 이 글의 예제는 추세 확인용입니다. 실제 프로젝트에서는 hold-out set, task metric, human review가 함께 필요합니다.
 
-```python
-import re
-from collections import Counter
+## 실무에서 헷갈리는 지점
 
-def compute_exact_match(predictions: list[str], references: list[str]) -> float:
-    """정확 일치율을 계산합니다."""
-    matches = sum(p.strip() == r.strip() for p, r in zip(predictions, references))
-    return matches / len(references) if references else 0.0
+- perplexity가 좋아졌다고 서비스 품질이 무조건 좋아지는 것은 아닙니다. 포맷 준수나 사실성은 별도 평가가 필요합니다.
+- 평가 데이터와 학습 데이터를 완전히 같게 쓰면 수치가 낙관적으로 보일 수 있습니다. 데모에서는 구조 이해를 위해 같게 썼습니다.
+- tiny 모델에서 수치 차이가 작아 보여도 정상입니다. 1 step 데모의 목적은 평가 파이프라인 검증입니다.
 
-def compute_f1(prediction: str, reference: str) -> float:
-    """토큰 수준 F1 점수를 계산합니다."""
-    pred_tokens = prediction.lower().split()
-    ref_tokens = reference.lower().split()
-    pred_counter = Counter(pred_tokens)
-    ref_counter = Counter(ref_tokens)
-    common = sum((pred_counter & ref_counter).values())
-    if common == 0:
-        return 0.0
-    precision = common / len(pred_tokens)
-    recall = common / len(ref_tokens)
-    return 2 * precision * recall / (precision + recall)
+## 체크리스트
 
-def compute_code_metrics(prediction: str, reference: str) -> dict:
-    """코드 태스크용 지표를 계산합니다."""
-    # 코드 블록 추출
-    def extract_code(text: str) -> str:
-        match = re.search(r"```(?:python)?\n?(.*?)```", text, re.DOTALL)
-        return match.group(1).strip() if match else text.strip()
+- [ ] perplexity가 평균 loss의 지수값이라는 점을 이해했다.
+- [ ] 평가 루프에서 `no_grad`와 `eval`을 사용하는 이유를 설명할 수 있다.
+- [ ] `python main.py`로 학습 전후 perplexity 출력이 실제로 나오는지 확인했다.
+- [ ] 서빙 전에 최소 정량 평가를 거치는 습관을 잡았다.
 
-    pred_code = extract_code(prediction)
-    ref_code = extract_code(reference)
-    return {
-        "exact_match": pred_code == ref_code,
-        "f1": compute_f1(pred_code, ref_code),
-        "line_coverage": len(set(pred_code.split("\n")) & set(ref_code.split("\n"))) / max(len(ref_code.split("\n")), 1),
-    }
-```
+## 정리
 
----
-
-## 베이스 모델 대비 비교
-
-```python
-from dataclasses import dataclass, field
-
-@dataclass
-class EvalResult:
-    question: str
-    reference: str
-    base_answer: str
-    finetuned_answer: str
-    base_f1: float = 0.0
-    finetuned_f1: float = 0.0
-
-def compare_models(
-    base_model,
-    finetuned_model,
-    tokenizer,
-    test_cases: list[dict],
-    prompt_formatter,
-) -> list[EvalResult]:
-    """베이스 모델과 파인튜닝 모델을 비교 평가합니다."""
-    results = []
-    for tc in test_cases:
-        prompt = prompt_formatter(tc, for_inference=True)
-        base_ans = generate_response(base_model, tokenizer, prompt)
-        ft_ans = generate_response(finetuned_model, tokenizer, prompt)
-        result = EvalResult(
-            question=tc["instruction"],
-            reference=tc["output"],
-            base_answer=base_ans,
-            finetuned_answer=ft_ans,
-            base_f1=compute_f1(base_ans, tc["output"]),
-            finetuned_f1=compute_f1(ft_ans, tc["output"]),
-        )
-        results.append(result)
-        print(f"Q: {tc['instruction'][:50]}...")
-        print(f"  베이스 F1: {result.base_f1:.3f}, 파인튜닝 F1: {result.finetuned_f1:.3f}")
-    return results
-
-def summarize_comparison(results: list[EvalResult]) -> dict:
-    """비교 결과를 요약합니다."""
-    base_avg = sum(r.base_f1 for r in results) / len(results)
-    ft_avg = sum(r.finetuned_f1 for r in results) / len(results)
-    improved = sum(1 for r in results if r.finetuned_f1 > r.base_f1)
-    return {
-        "base_avg_f1": round(base_avg, 4),
-        "finetuned_avg_f1": round(ft_avg, 4),
-        "improvement": round(ft_avg - base_avg, 4),
-        "improved_cases": f"{improved}/{len(results)}",
-    }
-```
-
----
-
-## 평가 실행
-
-```python
-if __name__ == "__main__":
-    from transformers import AutoTokenizer
-
-    # 파인튜닝 모델 로드
-    model, tokenizer = load_finetuned_model()
-
-    # 평가 케이스
-    test_cases = [
-        {
-            "instruction": "파이썬에서 두 리스트를 합치는 방법은?",
-            "input": "",
-            "output": "list1 + list2 또는 list1.extend(list2)",
-        },
-        {
-            "instruction": "딕셔너리에서 키가 존재하는지 확인하는 방법은?",
-            "input": "",
-            "output": "'key' in dict 또는 dict.get('key') is not None",
-        },
-    ]
-
-    for tc in test_cases:
-        from 03_lora import format_example  # 실제 프로젝트에서는 공통 모듈로 분리
-        prompt = format_example(tc, for_inference=True)
-        response = generate_response(model, tokenizer, prompt)
-        f1 = compute_f1(response, tc["output"])
-        print(f"\nQ: {tc['instruction']}")
-        print(f"A: {response[:200]}")
-        print(f"F1: {f1:.3f}")
-```
+평가는 화려하지 않지만 파인튜닝 파이프라인의 신뢰를 만드는 단계입니다. 생성 예시를 보기 전에 기준선을 만들면, 이후 실험이 훨씬 덜 감에 의존하게 됩니다.
 
 <!-- blog-only:start -->
 다음 글: [모델 서빙](./06-serving.md)
@@ -236,8 +110,7 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [Hugging Face evaluate 라이브러리](https://huggingface.co/docs/evaluate)
-- [ROUGE 지표](https://huggingface.co/spaces/evaluate-metric/rouge)
-- [LLM 평가 설문 논문](https://arxiv.org/abs/2307.03109)
+- [Perplexity of fixed-length models](https://huggingface.co/docs/transformers/perplexity)
+- [Evaluation best practices for language models](https://huggingface.co/docs/evaluate/index)
 
 Tags: Fine-tuning, LoRA, LLM, Python

@@ -3,7 +3,7 @@ title: '한국어 RAG 파이프라인 조합하기'
 series: korean-ai-stack-101
 episode: 6
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,281 +19,100 @@ last_reviewed: '2026-05-01'
 
 # 한국어 RAG 파이프라인 조합하기
 
+## 이 글에서 답할 질문
+
+- 한국어 RAG 파이프라인을 최소 구성으로 묶으려면 어떤 단계가 꼭 필요할까요?
+- 문서 청킹, 임베딩, 검색, 생성 중 어느 단계가 가장 자주 품질 병목이 되나요?
+- 검색된 문맥을 LLM에 넘길 때 어떤 형태로 정리해야 추측을 줄일 수 있을까요?
+- 시리즈 앞선 글의 요소들이 실제로 어떻게 이어질까요?
+
+> RAG의 품질은 한 번의 마법 같은 호출에서 나오지 않고, 청크 경계·검색 후보·문맥 전달 방식이 맞물려 쌓이는 합성 결과입니다.
+
 > 한국어 AI 스택 101 시리즈 (6/6)
 
 예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/06-korean-rag-pipeline)
 
-이 시리즈에서 다룬 구성 요소를 하나의 파이프라인으로 조합합니다. KoSimCSE 임베딩으로 한국어 문서를 인덱싱하고, FAISS로 검색하고, Solar LLM으로 한국어 답변을 생성합니다. 여기에 OCR 전처리까지 추가하면 이미지나 스캔 문서도 처리할 수 있습니다.
-
-이번 글에서는 다음을 다룹니다.
-
-- 전체 파이프라인 아키텍처
-- 완전한 한국어 RAG 구현
-- 문서 유형별 청킹 전략 선택
-- 파이프라인 디버깅과 모니터링
+마지막 글에서는 앞선 요소를 한 줄로 연결합니다. 한국어 문서를 청크로 나누고, KoSimCSE 임베딩으로 벡터화하고, FAISS로 상위 청크를 찾고, 마지막으로 Groq LLM에 검색된 문맥만 넘겨 답을 생성합니다.
 
 ---
 
-<!-- ebook-only:start -->
+## 핵심 흐름
 
-이 장의 핵심: **한국어 RAG는 임베딩·검색·생성 각 단계를 한국어 친화적 컴포넌트로 교체한다.** 조합이 달라지면 성능 프로파일이 달라진다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 6번째 장입니다.
-앞 장에서는 **HyperCLOVA X와 Solar API 사용하기**을 다뤘습니다.
-<!-- ebook-only:end -->
-
-## 전체 파이프라인 아키텍처
-
-```
-[문서 소스]
-  텍스트 파일 ─┐
-  이미지/PDF  ─┼─→ [전처리] ─→ [청킹] ─→ [KoSimCSE 임베딩] ─→ [FAISS 인덱스]
-  OCR 결과   ─┘
-
-[쿼리 시간]
-  사용자 질문 ─→ [KoSimCSE 임베딩] ─→ [FAISS 검색] ─→ [Solar LLM] ─→ 답변
+```mermaid
+flowchart LR
+    A[한국어 문서] --> B[문단/문장 청킹]
+    B --> C[KoSimCSE 임베딩]
+    C --> D[FAISS 검색]
+    E[사용자 질문] --> F[질문 임베딩]
+    F --> D
+    D --> G[상위 문맥 묶기]
+    G --> H[Groq LLM 답변 생성]
 ```
 
 ---
 
-## 완전한 한국어 RAG 파이프라인
+## 왜 단순한 파이프라인이 더 많이 알려 주는가
+
+청킹 함수, 임베딩, 검색, 생성이 드러나는 코드는 품질 문제를 훨씬 빨리 좁혀 줍니다. 질문이 "결제는 됐는데 주문 내역이 없다"일 때 어떤 청크가 선택되는지 먼저 보고 답변을 읽어야 합니다.
+
+---
+
+## 최소 실행 예제
 
 ```python
-import os
-import re
-from dataclasses import dataclass
-from pathlib import Path
+import faiss
+from sentence_transformers import SentenceTransformer
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-@dataclass
-class DocumentChunk:
-    text: str
-    source: str
-    chunk_idx: int
-
-class KoreanRAGPipeline:
-    """
-    한국어 문서를 위한 완전한 RAG 파이프라인.
-    KoSimCSE 임베딩 + FAISS + Solar LLM.
-    """
-
-    SPLITTER_CONFIG = {
-        "legal": {
-            "chunk_size": 500,
-            "chunk_overlap": 100,
-            "separators": ["\n\n", "\n", "。", ". "],
-        },
-        "news": {
-            "chunk_size": 300,
-            "chunk_overlap": 50,
-            "separators": ["\n\n", "\n", ". "],
-        },
-        "technical": {
-            "chunk_size": 400,
-            "chunk_overlap": 80,
-            "separators": ["\n\n", "\n", ". ", " "],
-        },
-    }
-
-    def __init__(self, doc_type: str = "technical"):
-        self.embedding_model = HuggingFaceEmbeddings(
-            model_name="BM-K/KoSimCSE-roberta-multitask",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-
-        config = self.SPLITTER_CONFIG.get(doc_type, self.SPLITTER_CONFIG["technical"])
-        self.splitter = RecursiveCharacterTextSplitter(**config)
-
-        self.llm = ChatOpenAI(
-            model="solar-1-mini-chat",
-            api_key=os.environ.get("UPSTAGE_API_KEY", "dummy"),
-            base_url="https://api.upstage.ai/v1/solar",
-            temperature=0.3,
-        )
-
-        self.vectorstore = None
-        self.retriever = None
-        self.chain = None
-
-    def clean_text(self, text: str) -> str:
-        """한국어 텍스트 기본 정제."""
-        text = re.sub(r"([^\w\s가-힣])\1{2,}", "", text)
-        text = re.sub(r" {2,}", " ", text)
-        lines = [l.strip() for l in text.split("\n")]
-        cleaned = []
-        prev_empty = False
-        for line in lines:
-            is_empty = not line
-            if is_empty and prev_empty:
-                continue
-            cleaned.append(line)
-            prev_empty = is_empty
-        return "\n".join(cleaned).strip()
-
-    def index_documents(self, documents: list[dict]) -> None:
-        """
-        문서 목록을 인덱싱합니다.
-        각 문서: {"text": str, "source": str}
-        """
-        all_chunks = []
-        for doc in documents:
-            cleaned = self.clean_text(doc["text"])
-            chunks = self.splitter.split_text(cleaned)
-            for idx, chunk in enumerate(chunks):
-                all_chunks.append(DocumentChunk(
-                    text=chunk,
-                    source=doc["source"],
-                    chunk_idx=idx,
-                ))
-
-        texts = [c.text for c in all_chunks]
-        metadatas = [{"source": c.source, "chunk_idx": c.chunk_idx} for c in all_chunks]
-
-        self.vectorstore = FAISS.from_texts(
-            texts=texts,
-            embedding=self.embedding_model,
-            metadatas=metadatas,
-        )
-        self.retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
-
-        prompt = ChatPromptTemplate.from_messages([
-            (
-                "system",
-                "다음 참고 문서를 바탕으로 질문에 답하세요.\n"
-                "문서에 없는 내용은 '제공된 문서에서 찾을 수 없습니다'라고 하세요.\n\n"
-                "참고 문서:\n{context}",
-            ),
-            ("human", "{question}"),
-        ])
-
-        def format_docs(docs: list) -> str:
-            parts = []
-            for doc in docs:
-                source = doc.metadata.get("source", "알 수 없음")
-                parts.append(f"[출처: {source}]\n{doc.page_content}")
-            return "\n\n".join(parts)
-
-        self.chain = (
-            {"context": self.retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | self.llm
-            | StrOutputParser()
-        )
-
-        print(f"인덱싱 완료: {len(all_chunks)}개 청크 ({len(documents)}개 문서)")
-
-    def query(self, question: str) -> dict:
-        """질문에 답하고 사용된 출처를 함께 반환합니다."""
-        if not self.chain:
-            raise RuntimeError("먼저 index_documents()를 호출하세요.")
-
-        docs = self.retriever.invoke(question)
-        sources = list({doc.metadata.get("source", "알 수 없음") for doc in docs})
-        answer = self.chain.invoke(question)
-
-        return {"answer": answer, "sources": sources}
-```
-
----
-
-## 사용 예시
-
-```python
-# 파이프라인 초기화 (법령 문서용 청킹 설정)
-pipeline = KoreanRAGPipeline(doc_type="legal")
-
-# 문서 인덱싱
-documents = [
-    {
-        "source": "헌법.txt",
-        "text": """
-대한민국 헌법 제1조
-대한민국은 민주공화국이다.
-대한민국의 주권은 국민에게 있고, 모든 권력은 국민으로부터 나온다.
-
-대한민국 헌법 제10조
-모든 국민은 인간으로서의 존엄과 가치를 가지며, 행복을 추구할 권리를 가진다.
-국가는 개인이 가지는 불가침의 기본적 인권을 확인하고 이를 보장할 의무를 진다.
-
-대한민국 헌법 제12조
-모든 국민은 신체의 자유를 가진다. 누구든지 법률에 의하지 아니하고는 체포·구속·압수·수색 또는 심문을 받지 아니하며, 법률과 적법한 절차에 의하지 아니하고는 처벌·보안처분 또는 강제노역을 받지 아니한다.
-        """,
-    },
-    {
-        "source": "민법.txt",
-        "text": """
-민법 제750조 (불법행위의 내용)
-고의 또는 과실로 인한 위법행위로 타인에게 손해를 가한 자는 그 손해를 배상할 책임이 있다.
-
-민법 제751조 (재산 이외의 손해의 배상)
-타인의 신체, 자유 또는 명예를 해하거나 기타 정신상고통을 가한 자는 재산 이외의 손해에 대하여도 배상할 책임이 있다.
-        """,
-    },
+model = SentenceTransformer('BM-K/KoSimCSE-roberta-multitask')
+chunks = [
+    '결제는 성공했지만 주문이 생성되지 않은 경우에는 주문 동기화 지연 여부를 먼저 확인합니다.',
+    '결제 실패 문의는 카드 승인 실패와 주문 저장 실패를 분리해서 대응해야 합니다.',
 ]
+vectors = model.encode(chunks, normalize_embeddings=True).astype('float32')
+index = faiss.IndexFlatIP(vectors.shape[1])
+index.add(vectors)
 
-pipeline.index_documents(documents)
-
-# 질문
-questions = [
-    "헌법에서 국민의 기본권은 어떻게 보장되나요?",
-    "불법행위로 손해를 입혔을 때 법적 책임은 어떻게 되나요?",
-    "신체의 자유는 어떤 경우에 제한될 수 있나요?",
-]
-
-for question in questions:
-    print(f"\n질문: {question}")
-    result = pipeline.query(question)
-    print(f"답변: {result['answer']}")
-    print(f"출처: {result['sources']}")
+question = '결제는 됐는데 주문 내역이 없을 때 어떤 순서로 점검해야 하나요?'
+query_vec = model.encode([question], normalize_embeddings=True).astype('float32')
+distances, indices = index.search(query_vec, 2)
+print(distances, indices)
 ```
 
 ---
 
-## 파이프라인 디버깅
+## 이 코드에서 봐야 할 것
 
-검색 결과가 예상과 다를 때 각 단계를 개별적으로 확인합니다.
+- 문서를 **청크 목록**으로 분리합니다.
+- 검색된 청크를 점수와 함께 출력합니다.
+- 시스템 메시지에서 문맥에 없는 내용은 추측하지 말라고 못 박습니다.
+- 전체 `main.py`는 검색된 문맥과 생성된 답변을 모두 보여 줍니다.
 
-```python
-def debug_pipeline(pipeline: KoreanRAGPipeline, question: str) -> None:
-    """파이프라인 각 단계의 중간 결과를 출력합니다."""
-    print(f"\n=== 디버그: '{question}' ===")
+---
 
-    # 1. 쿼리 임베딩 확인
-    query_embedding = pipeline.embedding_model.embed_query(question)
-    print(f"쿼리 임베딩 차원: {len(query_embedding)}")
-    print(f"쿼리 임베딩 처음 3값: {query_embedding[:3]}")
+## 실무에서 헷갈리는 지점
 
-    # 2. 검색 결과 확인
-    docs = pipeline.retriever.invoke(question)
-    print(f"\n검색된 청크 수: {len(docs)}")
-    for i, doc in enumerate(docs, start=1):
-        source = doc.metadata.get("source", "알 수 없음")
-        print(f"  [{i}] 출처: {source}")
-        print(f"      내용: {doc.page_content[:80]}...")
+- 좋은 LLM을 붙였다고 RAG가 좋아지는 것은 아닙니다.
+- 임베딩 모델 선택만큼 청킹 전략도 중요합니다.
+- 민감 정보는 외부 API로 보내기 전에 마스킹이 필요할 수 있습니다.
 
-    # 3. 최종 답변
-    result = pipeline.query(question)
-    print(f"\n최종 답변:\n{result['answer']}")
+---
 
-# 디버그 실행
-debug_pipeline(pipeline, "주권이 누구에게 있나요?")
-```
+## 체크리스트
+
+- [ ] 청크 단위를 먼저 정하고 검색 결과를 직접 읽어 본다.
+- [ ] 검색 점수와 선택된 출처를 항상 함께 기록한다.
+- [ ] LLM 프롬프트에 추측 금지 규칙을 명시한다.
+- [ ] 민감 정보 마스킹 규칙을 생성 단계 앞에 둔다.
 
 ---
 
 ## 마무리
 
-이번 시리즈에서는 한국어 AI 스택의 핵심 구성 요소를 다뤘습니다. KoSimCSE와 BGE-M3로 한국어 의미를 벡터로 표현하고, CLOVA OCR로 이미지 문서에서 텍스트를 추출하고, HyperCLOVA X와 Solar로 자연스러운 한국어 답변을 생성했습니다. 이 파이프라인은 법률, 의료, 금융 등 한국어 문서가 많은 도메인에서 영어 중심 스택보다 더 나은 결과를 냅니다.
+이 시리즈의 핵심은 특정 도구 이름이 아니라, 한국어 문서 처리 단계를 분해해서 보는 습관입니다. 임베딩 비교, 문장 검색, 다국어 검색, OCR, 생성 API를 차례로 쌓아 올리면 한국어 RAG 파이프라인을 더 차분하게 설계할 수 있습니다.
+
+<!-- blog-only:start -->
+시리즈 마지막 글입니다. 1편의 비교 기준으로 돌아가 자신의 문서셋에 맞게 이 파이프라인을 변형해 보세요.
+<!-- blog-only:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -311,10 +130,8 @@ debug_pipeline(pipeline, "주권이 누구에게 있나요?")
 
 ## 참고 자료
 
-- [KoSimCSE](https://huggingface.co/BM-K/KoSimCSE-roberta-multitask)
-- [BGE-M3](https://huggingface.co/BAAI/bge-m3)
-- [CLOVA OCR](https://api.ncloud-docs.com/docs/ai-application-service-ocr)
-- [Solar API](https://developers.upstage.ai/docs/apis/chat)
-- [FAISS](https://faiss.ai/)
+- [FAISS getting started](https://github.com/facebookresearch/faiss/wiki/Getting-started)
+- [BM-K/KoSimCSE-roberta-multitask](https://huggingface.co/BM-K/KoSimCSE-roberta-multitask)
+- [Groq API reference](https://console.groq.com/docs/api-reference)
 
 Tags: Korean NLP, LLM, Embeddings, OCR

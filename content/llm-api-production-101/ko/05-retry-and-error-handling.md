@@ -1,20 +1,20 @@
 ---
-title: 재시도와 오류 처리 — 안정적인 API 호출 만들기
-series: llm-api-production-101
 episode: 5
 language: ko
-status: draft
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
+last_reviewed: '2026-05-01'
+series: llm-api-production-101
+status: publish-ready
 tags:
 - LLM
 - OpenAI
 - Streaming
 - Python
-last_reviewed: '2026-04-30'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 재시도와 오류 처리 — 안정적인 API 호출 만들기
 ---
 
 # 재시도와 오류 처리 — 안정적인 API 호출 만들기

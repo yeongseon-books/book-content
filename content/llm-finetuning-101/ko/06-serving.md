@@ -3,7 +3,7 @@ title: '모델 서빙'
 series: llm-finetuning-101
 episode: 6
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,222 +19,82 @@ last_reviewed: '2026-05-01'
 
 # 모델 서빙
 
-> LLM 파인튜닝 101 (6/6)
+## 이 글에서 답할 질문
+
+- 파인튜닝된 소형 모델을 FastAPI 엔드포인트로 감싸는 최소 구조는 무엇일까?
+- 서빙 코드에서 학습과 추론 경계를 어디서 끊어야 할까?
+- 브라우저를 열지 않고도 엔드포인트를 어떻게 실행 검증할 수 있을까?
+
+> 서빙은 모델을 더 똑똑하게 만드는 단계가 아니라, 이미 준비된 모델을 예측 가능한 HTTP 계약 뒤에 놓는 단계입니다.
 
 예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/06-serving)
 
-파인튜닝된 모델을 서비스에 배포하는 방법을 다룹니다. LoRA 어댑터를 베이스 모델에 병합해 단일 모델로 만들고, FastAPI로 추론 엔드포인트를 구성하고, Hugging Face Hub에 배포하는 전체 흐름을 구현합니다.
+시리즈 마지막 글에서는 학습된 어댑터를 API 뒤에 놓습니다. 운영 환경에서는 학습과 서빙을 분리하는 것이 원칙이지만, 데모 단계에서는 작은 한 걸음 파인튜닝을 한 뒤 곧바로 엔드포인트로 감싸는 편이 전체 흐름을 이해하기 좋습니다.
 
----
+예제 코드는 tiny GPT-2 + LoRA 모델에 한 번의 toy update를 적용한 뒤 FastAPI 앱을 만들고, `TestClient`로 `/health`와 `/generate`를 호출합니다. 그래서 `python main.py`만 실행해도 서버 프로세스를 따로 띄우지 않고 서빙 경로를 검증할 수 있습니다.
 
-<!-- ebook-only:start -->
+## 데모 서빙에서 꼭 분리해서 볼 것
 
-이 장의 핵심: **Serving은 모델 가중치와 LoRA 어댑터를 함께 로드하는 것이다.** vLLM·Ollama가 추론 서버 역할을 한다.
+실전에서는 모델 로딩, 요청 검증, 생성 옵션, 응답 직렬화, 관측성 로그가 서로 다른 책임입니다. 이 글의 예제는 이 중 **모델 준비**와 **HTTP 계약**만 최소 단위로 보여 줍니다. 작은 데모라도 health check와 generate endpoint를 분리해 두면 운영 코드로 확장하기 쉬워집니다.
 
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 6번째 장입니다.
-앞 장에서는 **모델 평가**을 다뤘습니다.
-<!-- ebook-only:end -->
-
-## 어댑터 병합
-
-LoRA 어댑터를 베이스 모델과 병합하면 추론 시 별도의 PEFT 레이어 없이 단일 모델로 서빙할 수 있습니다. 병합 후에는 원본과 동일한 파라미터 수를 가집니다.
-
-```python
-from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
-
-BASE_MODEL = "microsoft/phi-2"
-ADAPTER_PATH = "./outputs/finetuned"
-MERGED_PATH = "./outputs/merged"
-
-def merge_adapter(
-    base_model_name: str = BASE_MODEL,
-    adapter_path: str = ADAPTER_PATH,
-    output_path: str = MERGED_PATH,
-) -> None:
-    """LoRA 어댑터를 베이스 모델에 병합하고 저장합니다."""
-    print("베이스 모델 로드 중...")
-    # 병합은 fp16으로 수행 (4비트 양자화 없이)
-    model = AutoModelForCausalLM.from_pretrained(
-        base_model_name,
-        torch_dtype=torch.float16,
-        device_map="auto",
-        trust_remote_code=True,
-    )
-    tokenizer = AutoTokenizer.from_pretrained(adapter_path)
-
-    print("어댑터 로드 및 병합 중...")
-    model = PeftModel.from_pretrained(model, adapter_path)
-    model = model.merge_and_unload()  # 어댑터 가중치를 베이스에 흡수
-
-    print(f"병합된 모델 저장: {output_path}")
-    model.save_pretrained(output_path, safe_serialization=True)
-    tokenizer.save_pretrained(output_path)
-    print("병합 완료")
+```mermaid
+flowchart LR
+    A[LoRA 어댑터 한 step 업데이트] --> B[FastAPI 앱 생성]
+    B --> C[health 엔드포인트]
+    B --> D[generate 엔드포인트]
+    C --> E[TestClient 검증]
+    D --> E
 ```
 
----
-
-## FastAPI 추론 서버
+## 최소 실행 예제
 
 ```python
-import time
-from contextlib import asynccontextmanager
-from typing import Optional
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
-import torch
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-
-ALPACA_TEMPLATE = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Response:
-"""
-
-class InferenceRequest(BaseModel):
-    instruction: str
-    input: Optional[str] = ""
-    max_new_tokens: int = 200
-    temperature: float = 0.7
-    do_sample: bool = True
-
-class InferenceResponse(BaseModel):
-    response: str
-    latency_ms: float
-    tokens_generated: int
-
-# 전역 모델 상태
-_model = None
-_tokenizer = None
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    global _model, _tokenizer
-    model_path = "./outputs/merged"
-    print(f"모델 로드 중: {model_path}")
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-    )
-    _tokenizer = AutoTokenizer.from_pretrained(model_path)
-    if _tokenizer.pad_token is None:
-        _tokenizer.pad_token = _tokenizer.eos_token
-    _model = AutoModelForCausalLM.from_pretrained(
-        model_path,
-        quantization_config=bnb_config,
-        device_map="auto",
-        trust_remote_code=True,
-    )
-    _model.eval()
-    print("모델 로드 완료")
-    yield
-    _model = None
-    _tokenizer = None
-
-app = FastAPI(title="LLM Inference API", lifespan=lifespan)
-
-@app.post("/generate", response_model=InferenceResponse)
-async def generate(request: InferenceRequest):
-    if _model is None:
-        raise HTTPException(status_code=503, detail="모델이 준비되지 않았습니다.")
-
-    prompt = ALPACA_TEMPLATE.format(instruction=request.instruction)
-    inputs = _tokenizer(prompt, return_tensors="pt").to(_model.device)
-
-    start = time.time()
-    with torch.no_grad():
-        outputs = _model.generate(
-            **inputs,
-            max_new_tokens=request.max_new_tokens,
-            do_sample=request.do_sample,
-            temperature=request.temperature if request.do_sample else 1.0,
-            pad_token_id=_tokenizer.eos_token_id,
-        )
-    latency_ms = (time.time() - start) * 1000
-
-    generated = outputs[0][inputs["input_ids"].shape[1]:]
-    response_text = _tokenizer.decode(generated, skip_special_tokens=True)
-    return InferenceResponse(
-        response=response_text,
-        latency_ms=round(latency_ms, 1),
-        tokens_generated=len(generated),
-    )
+app = FastAPI()
 
 @app.get("/health")
-async def health():
-    return {"status": "ok", "model_loaded": _model is not None}
+def health() -> dict:
+    return {"status": "ok"}
+
+@app.post("/generate")
+def generate(payload: dict) -> dict:
+    prompt = payload["prompt"]
+    outputs = model.generate(**tokenizer(prompt, return_tensors="pt"), max_new_tokens=20)
+    return {"completion": tokenizer.decode(outputs[0], skip_special_tokens=True)}
+
+client = TestClient(app)
+print(client.get("/health").json())
+print(client.post("/generate", json={"prompt": "파이썬 함수 예시"}).json())
 ```
 
----
+## 이 코드에서 봐야 할 것
 
-## Hugging Face Hub 배포
+- 예제는 실제로 toy training loss를 한 번 계산한 뒤 앱 상태에 저장합니다. 즉, 완전히 순수한 베이스 모델 서빙이 아닙니다.
+- `TestClient`를 쓰면 uvicorn을 띄우지 않아도 엔드포인트 계약을 검증할 수 있어 CI 친화적입니다.
+- `/health`와 `/generate`를 분리해 두면 모델 상태 확인과 추론 실패 원인 분리가 쉬워집니다.
 
-```python
-from huggingface_hub import HfApi
+## 실무에서 헷갈리는 지점
 
-def push_to_hub(
-    model_path: str,
-    repo_id: str,
-    private: bool = True,
-    token: str | None = None,
-) -> None:
-    """병합된 모델을 Hugging Face Hub에 배포합니다."""
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    import torch
+- 서빙 코드 안에서 학습을 계속 돌리는 것은 실전 기본값이 아닙니다. 이 글은 전체 흐름을 한 파일에서 재현하기 위한 데모입니다.
+- 생성 결과 문장이 자연스럽지 않은 것은 tiny 모델 한계 때문입니다. 서빙 구조 검증과 생성 품질 평가는 별개 문제입니다.
+- FastAPI 엔드포인트가 성공했다고 운영 준비가 끝난 것은 아닙니다. 배치, 타임아웃, 인증, 로깅은 별도 설계가 필요합니다.
 
-    print(f"Hub 배포 시작: {repo_id}")
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_path, torch_dtype=torch.float16, trust_remote_code=True
-    )
-    tokenizer.push_to_hub(repo_id, private=private, token=token)
-    model.push_to_hub(repo_id, private=private, token=token)
-    print(f"배포 완료: https://huggingface.co/{repo_id}")
+## 체크리스트
 
-def push_adapter_only(
-    adapter_path: str,
-    repo_id: str,
-    private: bool = True,
-    token: str | None = None,
-) -> None:
-    """어댑터만 배포합니다 (베이스 모델 제외, 용량 절약)."""
-    api = HfApi(token=token)
-    api.create_repo(repo_id=repo_id, private=private, exist_ok=True)
-    api.upload_folder(
-        folder_path=adapter_path,
-        repo_id=repo_id,
-        token=token,
-    )
-    print(f"어댑터 배포 완료: https://huggingface.co/{repo_id}")
-```
+- [ ] 모델 준비와 HTTP 엔드포인트 책임을 구분해서 설명할 수 있다.
+- [ ] `TestClient`로 `/health`와 `/generate`를 검증했다.
+- [ ] tiny 모델 데모와 실제 운영 서빙의 차이를 이해했다.
+- [ ] 시리즈 1편부터 6편까지의 흐름을 한 번에 연결할 수 있다.
 
----
+## 정리
 
-## 시리즈 완성
+이제 파인튜닝 시리즈의 최소 전체 경로가 완성되었습니다. 수식으로 감을 잡고, 데이터를 정리하고, LoRA를 붙이고, 한 step 학습하고, 평가한 뒤, 마지막에 HTTP 엔드포인트까지 연결했습니다.
 
-```python
-# 전체 파인튜닝 파이프라인 요약
-pipeline_steps = [
-    "1. 베이스 모델 로드 (4비트 양자화)",
-    "2. 데이터셋 준비 및 전처리 (Alpaca 형식)",
-    "3. LoRA 어댑터 구성 (r=16, alpha=32)",
-    "4. SFTTrainer로 학습 (3 에폭, lr=2e-4)",
-    "5. 평가 (F1, 베이스 모델 대비 비교)",
-    "6. 어댑터 병합 및 FastAPI 서빙",
-]
-for step in pipeline_steps:
-    print(step)
-```
-
-이 시리즈에서 구축한 파인튜닝 파이프라인은 소비자 GPU 한 장에서 실행 가능합니다. LoRA 덕분에 7B 모델도 8GB VRAM에서 학습할 수 있습니다. 데이터 품질, 하이퍼파라미터 탐색, 평가 지표 설계가 실제 프로덕션 파인튜닝의 핵심입니다.
+<!-- blog-only:start -->
+시리즈 첫 글로 돌아가기: [LLM 파인튜닝 입문](./01-intro.md)
+<!-- blog-only:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -252,8 +112,7 @@ for step in pipeline_steps:
 
 ## 참고 자료
 
-- [Hugging Face Hub 배포 문서](https://huggingface.co/docs/hub/models-uploading)
-- [FastAPI 공식 문서](https://fastapi.tiangolo.com/)
-- [PEFT merge_and_unload](https://huggingface.co/docs/peft/package_reference/lora#peft.LoraModel.merge_and_unload)
+- [FastAPI documentation](https://fastapi.tiangolo.com/)
+- [Starlette TestClient reference](https://www.starlette.io/testclient/)
 
 Tags: Fine-tuning, LoRA, LLM, Python

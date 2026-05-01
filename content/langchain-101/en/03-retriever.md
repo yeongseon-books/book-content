@@ -3,7 +3,7 @@ title: 'Retriever — document search and context injection'
 series: langchain-101
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,9 +19,84 @@ last_reviewed: '2026-05-01'
 
 # Retriever — document search and context injection
 
-> LangChain 101 (3/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/03-retriever)
+- Why does LangChain separate a Retriever from the underlying VectorStore
+- What input and output contract does `as_retriever()` expose inside a chain
+- How should retrieved documents be formatted before they enter the prompt
+- How much of RAG quality is determined before the LLM is even called
+
+> A Retriever does not store knowledge by itself; it turns a question into the subset of documents worth showing the model.
+
+```mermaid
+flowchart LR
+    A[question] --> B[Retriever]
+    B --> C[relevant documents]
+    C --> D[document formatter]
+    D --> E[ChatPromptTemplate]
+    E --> F[ChatGroq]
+```
+
+## Minimal runnable example
+
+```python
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+vectorstore = FAISS.from_texts([
+    "FAISS is a high-speed vector search library.",
+    "A Retriever finds documents relevant to a question.",
+], embedding)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
+
+print(retriever.invoke("What does a Retriever do?")[0].page_content)
+```
+
+## What to notice in this code
+
+- The embedding model turns text into vectors, while the Retriever exposes a query-to-documents interface.
+- The rest of the chain only needs to know `question -> list[Document]`.
+- Retrieved output is not yet prompt-ready; you still need a formatting step.
+- In RAG systems, retrieval quality often matters more than prompt wording at the start.
+
+## Where engineers get confused
+
+- Building a VectorStore does not automatically give you a usable RAG chain.
+- Raising `k` is not always better; it often adds noise as well as recall.
+- A Retriever does not answer the question. It selects context for the model.
+
+## Checklist
+
+- [ ] I can explain the difference between a VectorStore and a Retriever
+- [ ] I can turn `list[Document]` into a context string for a prompt
+- [ ] I can connect a Retriever to an LCEL chain
+
+LangChain 101 (3/6)
+
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/03-retriever)
+
+## Questions this post answers
+
+- How does a Retriever relate to a VectorStore?
+- Which search parameters matter after calling `as_retriever()`?
+- What should you watch when turning retrieved documents into prompt context?
+- Where does the retriever sit inside a basic RAG chain?
+
+> A Retriever is LangChain's search boundary: it selects relevant documents for a question and hands the next chain step the context needed to answer.
+
+## The flow at a glance
+
+```mermaid
+flowchart LR
+    Docs[Source documents] --> Embed[Embeddings]
+    Embed --> Store[FAISS VectorStore]
+    Store --> Retriever[Retriever]
+    Question[User question] --> Retriever
+    Retriever --> Context[Context string]
+    Context --> Prompt[Prompt]
+    Prompt --> LLM[ChatGroq]
+```
 
 A Retriever accepts a query and returns a list of relevant documents. LangChain defines the Retriever interface around a single method: `get_relevant_documents(query)`. Whatever search system sits behind it — FAISS, Chroma, Elasticsearch — the chain uses it the same way.
 
@@ -241,6 +316,25 @@ print(f"\nresult: {results[0].page_content}")
 ```
 
 ---
+
+## What to notice in this code
+
+- The VectorStore is the storage layer, while the Retriever is the query interface layered on top of it.
+- `retriever | format_docs` is the standard LCEL bridge from search results into prompt-ready context.
+- `RunnablePassthrough()` preserves the original user question as a separate key so the prompt can see both context and question.
+- The save and reload example matters because retrievers usually sit on top of reusable indexes, not one-off in-memory demos.
+
+## Where engineers get confused
+
+- The retriever does not generate the answer. It only selects documents; the LLM still synthesizes the response.
+- Poor retrieval quality is often misdiagnosed as a prompt problem. Check chunking, embeddings, and `k` before rewriting the prompt.
+- Simple document concatenation can overflow the context window, so `format_docs` is also a control point for length.
+
+## Checklist
+
+- [ ] I can explain the difference between a VectorStore and a Retriever
+- [ ] I know which `search_kwargs` values I am likely to tune first
+- [ ] I understand why retrieved documents must be formatted before prompt injection
 
 ## Conclusion
 

@@ -3,7 +3,7 @@ title: 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
 series: rag-deep-dive
 episode: 4
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,31 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
+
+<!-- a-grade-intro:begin -->
+## 이 글에서 답할 질문
+
+- `PromptTemplate`는 단순 문자열 치환기보다 무엇을 더 검증할까요?
+- `ChatPromptTemplate.from_messages()`는 여러 입력을 어떻게 구조화할까요?
+- 검색 결과 `Document`는 언제 `{context}` 문자열로 접힐까요?
+- `partial()`과 `invoke()`는 변수 바인딩에 어떤 차이를 만들까요?
+
+> 프롬프트 계층은 문서를 예쁘게 붙이는 단계가 아니라, 구조화된 데이터를 모델이 실제로 읽는 계약으로 바꾸는 단계입니다.
+
+```mermaid
+flowchart LR
+    A[Retrieved documents] --> B[Context formatting]
+    C[Question] --> D[Variable binding]
+    E[History] --> D
+    B --> D
+    D --> F[ChatPromptTemplate]
+    F --> G[Role tagged messages]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (4/6)
 
@@ -31,6 +52,70 @@ last_reviewed: '2026-04-30'
 앞 장에서는 **Retriever 설계 — VectorStoreRetriever와 MMR**을 다뤘습니다.
 이 장을 마치면 다음 장에서 **RAG Chain 조립 — RetrievalQA vs LCEL**으로 이어집니다.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## 최소 실행 예제
+
+예제 파일: `/root/Github/rag-deep-dive/ko/04-prompt-construction-and-context-injection/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+def main() -> None:
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", "Answer only from the supplied context."),
+            MessagesPlaceholder("history", optional=True, n_messages=4),
+            ("human", "Context:\n{context}\n\nQuestion: {question}"),
+        ]
+    ).partial(question="Why was the message dead-lettered?")
+
+    prompt_value = prompt.invoke(
+        {
+            "history": [
+                HumanMessage(content="What happens after the third retry?"),
+                AIMessage(content="The payload moves to the dead-letter queue."),
+            ],
+            "context": (
+                "Retry budget: 3 attempts before dead-lettering. "
+                "Operators inspect the original payload before replay."
+            ),
+        }
+    )
+
+    print("input variables:", prompt.input_variables)
+    print("partial variables:", sorted(prompt.partial_variables.keys()))
+    for message in prompt_value.messages:
+        print(type(message).__name__, "->", message.content)
+
+if __name__ == "__main__":
+    main()
+```
+
+### 이 코드에서 봐야 할 것
+
+- `partial(question=...)` 뒤에는 실제 입력 변수 집합이 줄어듭니다.
+- `MessagesPlaceholder`는 대화 이력을 문자열이 아니라 메시지 리스트로 유지합니다.
+- `invoke()` 결과는 raw string이 아니라 `ChatPromptValue`에 가까운 구조를 보여 줍니다.
+
+### 실무에서 헷갈리는 지점
+
+- `{context}`는 retrieval 단계가 아니라 combine-documents 단계에서 문자열이 됩니다.
+- `format()`과 `invoke()`는 비슷해 보여도 반환 타입과 LCEL 연결성이 다릅니다.
+- system 지시, history, context를 한 문자열로 평탄화하면 채팅 프롬프트의 구조 이점을 잃습니다.
+
+## 체크리스트
+
+- [ ] partial 변수와 호출 변수의 경계를 구분했다.
+- [ ] history는 메시지 리스트로, context는 문자열로 다루고 있다.
+- [ ] 프롬프트가 반환하는 타입이 string인지 prompt value인지 확인했다.
+- [ ] 최종 모델 입력 직전 컨텍스트 길이를 따로 점검할 계획이 있다.
+<!-- a-grade-example:end -->
 
 ## 소스 버전
 

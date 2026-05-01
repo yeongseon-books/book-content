@@ -1,20 +1,20 @@
 ---
-title: 속도 제한 관리 — Rate Limit 대응 패턴
-series: llm-api-production-101
 episode: 6
 language: ko
-status: draft
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
+last_reviewed: '2026-05-01'
+series: llm-api-production-101
+status: publish-ready
 tags:
 - LLM
 - OpenAI
 - Streaming
 - Python
-last_reviewed: '2026-04-30'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 속도 제한 관리 — Rate Limit 대응 패턴
 ---
 
 # 속도 제한 관리 — Rate Limit 대응 패턴

@@ -3,7 +3,7 @@ title: 'RAG Q&A 패턴 — 문서 기반 질의응답'
 series: ai-app-patterns-101
 episode: 2
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,27 @@ last_reviewed: '2026-05-01'
 ---
 
 # RAG Q&A 패턴 — 문서 기반 질의응답
+
+## 이 글에서 답할 질문
+
+- RAG 파이프라인은 청킹, 임베딩, 검색, 답변 생성을 어떤 순서로 묶어야 할까요?
+- FAISS 기반 최소 구현에서도 출처와 근거 문맥을 함께 돌려줄 수 있을까요?
+- 문서에 없는 질문이 들어왔을 때 hallucination을 줄이려면 어디를 설계해야 할까요?
+
+> RAG는 모델이 답을 외우는 구조가 아니라, 검색된 문서를 프롬프트에 주입해 답하게 만드는 조립식 파이프라인입니다.
+
+```mermaid
+flowchart LR
+    Docs[원본 문서] --> Split[문서 청킹]
+    Split --> Embed[임베딩 생성]
+    Embed --> Index[FAISS 인덱스]
+    Question[사용자 질문] --> QueryEmbed[질문 임베딩]
+    QueryEmbed --> Index
+    Index --> Retrieved[관련 청크 검색]
+    Retrieved --> Prompt[질문 + 컨텍스트]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Answer[답변 + 출처]
+```
 
 > AI 앱 패턴 101 시리즈 (2/6)
 
@@ -243,6 +264,31 @@ print(f"출처: {result['sources']}")
 **청크 경계에서 정보가 잘릴 때.** 중요한 정보가 두 청크에 걸쳐 있으면 하나의 청크에서 전체 맥락을 얻지 못합니다. `chunk_overlap`을 충분히 설정하면 도움이 됩니다.
 
 **쿼리와 문서의 표현 방식이 너무 다를 때.** "파이썬 느려?"라는 구어체 쿼리가 "인터프리터 언어 실행 속도"를 검색하지 못할 수 있습니다. 쿼리 확장(query expansion)이나 하이브리드 검색이 도움이 됩니다.
+
+---
+
+## 이 코드에서 봐야 할 것
+
+- `main.py`는 `RecursiveCharacterTextSplitter`로 문서를 자르고 `FAISS.from_documents()`로 바로 인덱싱합니다.
+- 검색된 `Document` 객체를 그대로 받아 답변과 `sources`를 함께 출력해 디버깅 포인트를 남깁니다.
+- 프롬프트에 "문서에 없으면 없다고 답하라"는 규칙을 넣어 검색 실패 시 모델 추측을 줄입니다.
+
+---
+
+## 실무에서 헷갈리는 지점
+
+- RAG 품질 문제를 모두 LLM 탓으로 돌리기 쉽지만, 실제로는 청킹과 retriever 설정이 더 자주 원인입니다.
+- 임베딩 모델과 생성 모델은 역할이 다릅니다. 같은 모델 계열을 쓸 필요는 없습니다.
+- 상위 k를 늘리면 무조건 좋아지지 않습니다. 잡음 청크가 늘어 답변 품질이 오히려 떨어질 수 있습니다.
+
+---
+
+## 체크리스트
+
+- [ ] 문서가 청크 단위로 분할되어 인덱스에 저장된다
+- [ ] 질문 시 retriever가 관련 청크를 먼저 찾는다
+- [ ] 최종 답변과 함께 출처 파일명이 출력된다
+- [ ] 문서에 없는 질문에는 모른다고 답하도록 프롬프트가 제한된다
 
 ---
 

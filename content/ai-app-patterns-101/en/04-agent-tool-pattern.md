@@ -3,7 +3,7 @@ title: 'Agent and tool pattern — autonomous tool selection'
 series: ai-app-patterns-101
 episode: 4
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,24 @@ last_reviewed: '2026-05-01'
 ---
 
 # Agent and tool pattern — autonomous tool selection
+
+## Questions this post answers
+
+- When does it make sense to use `AgentExecutor` instead of a fixed chain?
+- How should tool descriptions be written so the LLM can choose correctly between a calculator and a search tool?
+- What execution traces matter when debugging a tool-selecting agent?
+
+> An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.
+
+```mermaid
+flowchart LR
+    Question[User question] --> Agent[AgentExecutor]
+    Agent --> Decide[Tool choice]
+    Decide --> Calc[calculate tool]
+    Decide --> Search[search_docs tool]
+    Calc --> Result[Tool result]
+    Search --> Result
+```
 
 > AI App Patterns 101 (4/6)
 
@@ -219,6 +237,31 @@ def safe_divide(a: float, b: float) -> str:
         return "error: cannot divide by zero"
     return str(a / b)
 ```
+
+---
+
+## What to notice in this code
+
+- `main.py` splits the `AgentExecutor` demo into a calculator executor and a search executor to show the smallest reliable tool-selection pattern.
+- Each tool uses `@tool(return_direct=True)` so the selected tool result comes back directly.
+- Short prompts and narrow tool descriptions reduce function-calling failure modes.
+
+---
+
+## Where engineers get confused
+
+- Agents are not automatically smarter; they trade predictability for runtime flexibility.
+- If the tools are weak, the agent is weak. The bottleneck is often the tool interface, not the LLM.
+- A search tool and RAG can look similar from far away, but one is tool invocation and the other is prompt-context injection.
+
+---
+
+## Checklist
+
+- [ ] Each tool has a clear description and input shape
+- [ ] The AgentExecutor invokes the calculator tool once
+- [ ] The AgentExecutor invokes the search tool once
+- [ ] The selected tool result is returned directly to the caller
 
 ---
 

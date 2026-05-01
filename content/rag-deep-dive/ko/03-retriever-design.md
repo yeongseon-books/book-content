@@ -3,7 +3,7 @@ title: Retriever 설계 — VectorStoreRetriever와 MMR
 series: rag-deep-dive
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,31 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Retriever 설계 — VectorStoreRetriever와 MMR
+
+<!-- a-grade-intro:begin -->
+## 이 글에서 답할 질문
+
+- `BaseRetriever`는 단순 helper가 아니라 어떤 호출 규약을 강제할까요?
+- `VectorStoreRetriever`는 어디에서 `similarity`, `mmr`, `threshold`로 갈라질까요?
+- `fetch_k`가 `k`보다 넓어야 하는 이유는 무엇일까요?
+- `lambda_mult`를 조절하면 결과 다양성은 어떻게 달라질까요?
+
+> retriever는 가장 가까운 벡터를 기계적으로 꺼내는 부품이 아니라, 후보 집합을 어떤 정책으로 줄일지 결정하는 선택기입니다.
+
+```mermaid
+flowchart LR
+    A[Query] --> B[VectorStoreRetriever]
+    B --> C[Similarity top k]
+    B --> D[MMR fetch_k 후보]
+    D --> E[다양성 재선택]
+    C --> F[최종 문맥]
+    E --> F
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (3/6)
 
@@ -31,6 +52,82 @@ last_reviewed: '2026-04-30'
 앞 장에서는 **임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리**을 다뤘습니다.
 이 장을 마치면 다음 장에서 **프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부**으로 이어집니다.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## 최소 실행 예제
+
+예제 파일: `/root/Github/rag-deep-dive/ko/03-retriever-design/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+from langchain_core.documents import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+DOCS = [
+    Document(page_content="Retry budget is three attempts before dead-lettering."),
+    Document(page_content="The worker retries failed messages three times before it stops."),
+    Document(page_content="After the final retry, the payload moves to the dead-letter queue."),
+    Document(page_content="Operators inspect the exception chain before replaying a job."),
+    Document(page_content="HTTP 429 requires exponential backoff on the client side."),
+    Document(page_content="The dead-letter queue preserves the original payload for debugging."),
+]
+QUERY = "Why did the worker stop retrying the message?"
+
+def show_results(label: str, docs: list[Document]) -> None:
+    print(f"\n=== {label} ===")
+    for index, doc in enumerate(docs, start=1):
+        print(f"{index}. {doc.page_content}")
+
+def main() -> None:
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    store = FAISS.from_documents(DOCS, embeddings)
+
+    similarity = store.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 2},
+    )
+    mmr_small = store.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": 2, "fetch_k": 4, "lambda_mult": 0.3},
+    )
+    mmr_wide = store.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": 2, "fetch_k": 6, "lambda_mult": 0.3},
+    )
+
+    show_results("similarity k=2", similarity.invoke(QUERY))
+    show_results("mmr k=2 fetch_k=4", mmr_small.invoke(QUERY))
+    show_results("mmr k=2 fetch_k=6", mmr_wide.invoke(QUERY))
+
+if __name__ == "__main__":
+    main()
+```
+
+### 이 코드에서 봐야 할 것
+
+- 같은 vector store라도 `search_type`에 따라 반환 문서 집합이 달라집니다.
+- `fetch_k`를 넓히면 MMR이 중복이 아닌 다른 근거를 고를 공간이 생깁니다.
+- `lambda_mult`가 낮을수록 다양성 쪽 가중치가 커집니다.
+
+### 실무에서 헷갈리는 지점
+
+- `k`만 늘리면 다양성이 좋아질 것이라고 생각하기 쉽습니다.
+- `fetch_k == k` 상태에서는 MMR이 사실상 similarity search와 비슷해질 수 있습니다.
+- retriever threshold와 vector store raw score threshold는 같은 계층이 아닙니다.
+
+## 체크리스트
+
+- [ ] similarity와 MMR을 같은 질의로 비교해 봤다.
+- [ ] `fetch_k`를 `k`보다 충분히 크게 잡아 봤다.
+- [ ] `lambda_mult`를 조절하며 중복과 커버리지 trade-off를 확인했다.
+- [ ] 검색 품질 문제를 임베딩 문제와 retriever 정책 문제로 분리해서 봤다.
+<!-- a-grade-example:end -->
 
 ## 소스 버전
 

@@ -3,7 +3,7 @@ title: 'PDF 파싱과 텍스트 추출'
 series: document-ingestion-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,254 +19,153 @@ last_reviewed: '2026-05-01'
 
 # PDF 파싱과 텍스트 추출
 
-> 문서 수집과 인덱싱 101 시리즈 (1/6)
+## 이 글에서 답할 질문
 
-예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/01-pdf-parsing)
+- 샘플 PDF가 없어도 텍스트 추출 예제를 어떻게 재현할 수 있을까요?
+- pypdf로 페이지별 텍스트와 문자 수를 어떻게 확인할까요?
+- 문서 수집 첫 단계에서 꼭 남겨야 할 메타데이터는 무엇일까요?
 
-RAG 파이프라인의 첫 단계는 문서에서 텍스트를 꺼내는 것입니다. 텍스트 파일은 바로 읽으면 되지만, 실무에서 마주치는 문서의 대부분은 PDF입니다. PDF는 텍스트, 이미지, 표, 레이아웃 정보가 뒤섞인 복잡한 포맷이어서 단순 읽기로는 충분하지 않습니다. 이번 글에서는 PDF에서 텍스트를 추출하는 방법을 단계별로 다룹니다.
+> PDF 파싱의 첫 목표는 “보이는 문서”를 “검증 가능한 문자열 목록”으로 바꾸는 것입니다.
 
-다룰 내용은 다음과 같습니다.
+예제 코드: `/root/Github/document-ingestion-101/ko/01-pdf-parsing/main.py`
 
-- pymupdf로 PDF 텍스트 추출
-- pypdf 대안 비교
-- 페이지별 메타데이터 보존
-- 표와 멀티컬럼 레이아웃 처리
+```mermaid
+flowchart LR
+    A[스크립트가 샘플 PDF 생성] --> B[pypdf가 페이지별 텍스트 추출]
+    B --> C[페이지 번호와 문자 수 계산]
+    C --> D[추출 결과 검증]
+```
 
----
+실무에서 PDF 파싱 예제를 설명할 때 가장 먼저 막히는 부분은 샘플 파일입니다. 저장소에 PDF를 커밋하지 않아도 글만 보고 바로 실행할 수 있어야 재현성이 생깁니다.
 
-<!-- ebook-only:start -->
+이번 예제는 `reportlab`으로 PDF를 스크립트 안에서 만들고, `pypdf`로 다시 읽어서 페이지별 텍스트와 문자 수를 출력합니다. 문서 수집 파이프라인의 출발점으로 딱 맞는 구조입니다.
 
-이 장의 핵심: **PDF 파싱은 텍스트 레이어 추출과 레이아웃 복원 두 문제다.** 라이브러리마다 처리 방식이 달라 결과가 다르다.
+## 실행 예제
 
-## 이 장의 위치
+```python
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
+from __future__ import annotations
 
-이 글은 시리즈 6편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **청킹 전략 — 문서 유형별 최적화**으로 이어집니다.
-<!-- ebook-only:end -->
+from pathlib import Path
+from typing import TypedDict
 
-## PDF 파싱 라이브러리 선택
+from pypdf import PdfReader
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
-Python의 주요 PDF 파싱 라이브러리는 세 가지입니다.
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / 'data'
+DATA_DIR.mkdir(exist_ok=True)
+PDF_PATH = DATA_DIR / 'sample.pdf'
 
-**pymupdf** (`fitz`): 가장 빠르고 정확합니다. 텍스트 블록 위치, 폰트 크기, 이미지 정보까지 추출할 수 있습니다. 복잡한 레이아웃에서도 텍스트 순서를 잘 보존합니다.
+def create_sample_pdf(pdf_path: Path) -> None:
+    c = canvas.Canvas(str(pdf_path), pagesize=A4)
+    _, height = A4
+    pages = [
+        [
+            'Document ingestion notes',
+            '',
+            '1. PDF text extraction is the first pipeline step.',
+            '2. pypdf is reliable when the layout is simple.',
+            '3. Keeping page numbers in metadata makes debugging easier.',
+        ],
+        [
+            'Operational checks',
+            '',
+            '1. The script creates its own sample PDF.',
+            '2. Re-reading the file should stay reproducible.',
+            '3. Verify both page count and extracted character count.',
+        ],
+    ]
+    for page_index, lines in enumerate(pages, start=1):
+        y = height - 72
+        c.setFont('Helvetica-Bold', 16)
+        c.drawString(72, y, f'Page {page_index}')
+        y -= 36
+        c.setFont('Helvetica', 12)
+        for line in lines:
+            c.drawString(72, y, line)
+            y -= 20
+        c.showPage()
+    c.save()
 
-**pypdf**: 순수 Python 구현으로 의존성이 가볍습니다. 단순한 PDF에는 충분하지만 복잡한 레이아웃에서 텍스트 순서가 깨질 수 있습니다.
+class PageSummary(TypedDict):
+    page: int
+    chars: int
+    preview: str
 
-**pdfplumber**: 표 추출에 강점이 있습니다. pymupdf보다 느리지만 표가 많은 문서에 적합합니다.
+def extract_pages(pdf_path: Path) -> list[PageSummary]:
+    reader = PdfReader(str(pdf_path))
+    pages: list[PageSummary] = []
+    for index, page in enumerate(reader.pages, start=1):
+        text = (page.extract_text() or '').strip()
+        pages.append(
+            {
+                'page': index,
+                'chars': len(text),
+                'preview': text.replace('
+', ' ')[:100],
+            }
+        )
+    return pages
 
-일반적인 RAG 파이프라인에는 pymupdf를 기본으로 사용하고, 표가 많은 문서에는 pdfplumber를 추가합니다.
+def main() -> None:
+    create_sample_pdf(PDF_PATH)
+    pages = extract_pages(PDF_PATH)
+    print(f'created: {PDF_PATH.name}')
+    print(f'page_count: {len(pages)}')
+    total_chars = sum(int(page['chars']) for page in pages)
+    print(f'total_chars: {total_chars}')
+    for page in pages:
+        print(f"page={page['page']} chars={page['chars']} preview={page['preview']}")
 
----
+if __name__ == '__main__':
+    main()
+```
 
-## pymupdf 기본 사용
+## 실행 방법
 
 ```bash
-pip install pymupdf pypdf pdfplumber langchain-community
+python main.py
 ```
 
-```python
-from pathlib import Path
+## 검증된 실행 결과
 
-import fitz  # pymupdf
-
-def extract_text_pymupdf(pdf_path: str) -> list[dict]:
-    """
-    PDF에서 페이지별 텍스트를 추출합니다.
-    각 페이지: {"page_num": int, "text": str, "char_count": int}
-    """
-    doc = fitz.open(pdf_path)
-    pages = []
-
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        text = page.get_text("text")  # 기본 텍스트 추출
-        pages.append({
-            "page_num": page_num + 1,
-            "text": text.strip(),
-            "char_count": len(text.strip()),
-        })
-
-    doc.close()
-    return pages
-
-def extract_blocks_pymupdf(pdf_path: str) -> list[dict]:
-    """
-    텍스트 블록 단위로 추출합니다.
-    블록: {"page_num", "block_num", "text", "bbox", "block_type"}
-    block_type: 0=텍스트, 1=이미지
-    """
-    doc = fitz.open(pdf_path)
-    all_blocks = []
-
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        blocks = page.get_text("blocks")
-
-        for block_idx, block in enumerate(blocks):
-            x0, y0, x1, y1, text, block_no, block_type = block
-            if block_type == 0 and text.strip():  # 텍스트 블록만
-                all_blocks.append({
-                    "page_num": page_num + 1,
-                    "block_num": block_idx,
-                    "text": text.strip(),
-                    "bbox": (x0, y0, x1, y1),
-                    "block_type": block_type,
-                })
-
-    doc.close()
-    return all_blocks
-
-# 샘플 PDF 생성 (테스트용)
-def create_sample_pdf(output_path: str) -> None:
-    """테스트용 샘플 PDF를 생성합니다."""
-    doc = fitz.open()
-
-    page = doc.new_page()
-    page.insert_text(
-        (50, 50),
-        "파이썬 프로그래밍 가이드\n\n"
-        "1장: 소개\n"
-        "파이썬은 1991년 귀도 반 로섬이 만든 프로그래밍 언어입니다.\n"
-        "가독성을 최우선으로 설계되었으며, 들여쓰기로 코드 블록을 구분합니다.\n\n"
-        "2장: 특징\n"
-        "동적 타이핑, 자동 메모리 관리, 풍부한 라이브러리가 특징입니다.\n"
-        "웹 개발, 데이터 과학, AI 분야에서 널리 사용됩니다.",
-        fontsize=12,
-        fontname="helv",
-    )
-
-    page2 = doc.new_page()
-    page2.insert_text(
-        (50, 50),
-        "3장: 설치\n"
-        "python.org에서 최신 버전을 다운로드할 수 있습니다.\n"
-        "현재 권장 버전은 Python 3.10 이상입니다.\n\n"
-        "4장: 패키지 관리\n"
-        "pip install <패키지명> 명령으로 패키지를 설치합니다.\n"
-        "가상환경(venv)으로 프로젝트별 의존성을 격리합니다.",
-        fontsize=12,
-        fontname="helv",
-    )
-
-    doc.save(output_path)
-    doc.close()
-    print(f"샘플 PDF 생성: {output_path}")
-
-create_sample_pdf("/tmp/sample.pdf")
-pages = extract_text_pymupdf("/tmp/sample.pdf")
-for page in pages:
-    print(f"\n=== 페이지 {page['page_num']} ({page['char_count']}자) ===")
-    print(page["text"][:200])
+```text
+created: sample.pdf
+page_count: 2
+total_chars: 363
+page=1 chars=190 preview=Page 1 Document ingestion notes ...
+page=2 chars=173 preview=Page 2 Operational checks ...
 ```
 
----
+## 이 코드에서 봐야 할 것
 
-## pypdf 비교
+- `create_sample_pdf()`가 입력 데이터를 직접 만들기 때문에 외부 의존 파일이 없습니다.
+- `extract_pages()`가 페이지 번호, 문자 수, 미리보기를 함께 반환해서 이후 메타데이터 설계로 자연스럽게 이어집니다.
+- 출력은 사람이 바로 읽을 수 있는 형태라서 파싱이 깨졌을 때 눈으로 검증하기 쉽습니다.
 
-```python
-from pypdf import PdfReader
+## 실무에서 헷갈리는 지점
 
-def extract_text_pypdf(pdf_path: str) -> list[dict]:
-    """pypdf로 페이지별 텍스트 추출."""
-    reader = PdfReader(pdf_path)
-    pages = []
+- PDF 파싱은 OCR과 다릅니다. 텍스트 레이어가 이미 있는 PDF라면 먼저 텍스트 추출부터 확인해야 합니다.
+- 문자 수가 많이 나온다고 품질이 좋은 것은 아닙니다. 줄바꿈, 순서, 머리글 반복도 같이 봐야 합니다.
+- 복잡한 레이아웃 문서는 라이브러리 비교가 필요하지만, 입문 단계에서는 재현 가능한 단순 샘플부터 검증하는 편이 낫습니다.
 
-    for page_num, page in enumerate(reader.pages):
-        text = page.extract_text() or ""
-        pages.append({
-            "page_num": page_num + 1,
-            "text": text.strip(),
-            "char_count": len(text.strip()),
-        })
+## 체크리스트
 
-    return pages
-
-# 같은 PDF로 비교
-pymupdf_pages = extract_text_pymupdf("/tmp/sample.pdf")
-pypdf_pages = extract_text_pypdf("/tmp/sample.pdf")
-
-print("pymupdf 추출 문자 수:", sum(p["char_count"] for p in pymupdf_pages))
-print("pypdf 추출 문자 수:", sum(p["char_count"] for p in pypdf_pages))
-```
-
----
-
-## PDF 메타데이터 추출
-
-```python
-def extract_metadata(pdf_path: str) -> dict:
-    """PDF 파일 메타데이터를 추출합니다."""
-    doc = fitz.open(pdf_path)
-
-    metadata = {
-        "file_path": str(pdf_path),
-        "file_name": Path(pdf_path).name,
-        "page_count": len(doc),
-        "title": doc.metadata.get("title", ""),
-        "author": doc.metadata.get("author", ""),
-        "subject": doc.metadata.get("subject", ""),
-        "creator": doc.metadata.get("creator", ""),
-        "creation_date": doc.metadata.get("creationDate", ""),
-        "modification_date": doc.metadata.get("modDate", ""),
-        "file_size_kb": Path(pdf_path).stat().st_size // 1024,
-    }
-
-    doc.close()
-    return metadata
-
-meta = extract_metadata("/tmp/sample.pdf")
-for key, value in meta.items():
-    if value:
-        print(f"  {key}: {value}")
-```
-
----
-
-## LangChain DocumentLoader 통합
-
-```python
-import os
-
-from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# LangChain의 PyMuPDFLoader 사용
-loader = PyMuPDFLoader("/tmp/sample.pdf")
-documents = loader.load()
-
-print(f"로드된 페이지 수: {len(documents)}")
-for doc in documents:
-    print(f"\n페이지 {doc.metadata.get('page', '?')+1}:")
-    print(f"  메타데이터: {doc.metadata}")
-    print(f"  텍스트 앞 100자: {doc.page_content[:100]}")
-
-# 청킹 + 임베딩 + 인덱싱
-splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=50)
-chunks = splitter.split_documents(documents)
-print(f"\n청크 수: {len(chunks)}")
-
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-vectorstore = FAISS.from_documents(chunks, embedding_model)
-print(f"인덱스 완료: {vectorstore.index.ntotal}개 벡터")
-```
-
----
-
-## 마무리
-
-PDF 파싱에서 가장 중요한 선택은 라이브러리입니다. 대부분의 경우 pymupdf가 속도와 정확도에서 최선입니다. LangChain의 `PyMuPDFLoader`를 사용하면 메타데이터 보존과 청킹을 간편하게 처리할 수 있습니다.
-
-다음 글에서는 청킹 전략을 집중적으로 다룹니다. 문서 유형별로 최적의 청크 크기와 겹침(overlap) 설정을 찾는 방법입니다.
+- [ ] 스크립트가 PDF를 직접 생성한다.
+- [ ] 페이지 수와 문자 수를 함께 출력한다.
+- [ ] 페이지 미리보기로 추출 순서를 눈으로 확인했다.
+- [ ] 다음 단계에서 쓸 메타데이터 후보를 정리했다.
 
 <!-- blog-only:start -->
-다음 글: [청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
+
+## 정리
+
+샘플 PDF 생성부터 추출 검증까지 한 파일에서 끝내면 문서 수집 파이프라인의 첫 단계를 안정적으로 설명할 수 있습니다.
+
+다음 글에서는 문서 유형별로 청크 크기를 어떻게 달리 가져가야 하는지 비교합니다.
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -281,13 +180,9 @@ PDF 파싱에서 가장 중요한 선택은 라이브러리입니다. 대부분�
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [pymupdf 공식 문서](https://pymupdf.readthedocs.io/)
-- [pypdf 공식 문서](https://pypdf.readthedocs.io/)
-- [LangChain PyMuPDFLoader](https://python.langchain.com/docs/integrations/document_loaders/pymupdf/)
-- [pdfplumber](https://github.com/jsvine/pdfplumber)
+- https://pypdf.readthedocs.io/
+- https://docs.reportlab.com/reportlab/userguide/ch1_intro/
 
 Tags: RAG, Document Processing, LangChain, Python

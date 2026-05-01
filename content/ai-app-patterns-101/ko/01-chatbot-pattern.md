@@ -3,7 +3,7 @@ title: '챗봇 패턴 — 대화 이력 관리와 상태'
 series: ai-app-patterns-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,24 @@ last_reviewed: '2026-05-01'
 ---
 
 # 챗봇 패턴 — 대화 이력 관리와 상태
+
+## 이 글에서 답할 질문
+
+- 왜 LLM 챗봇은 대화 이력을 앱이 직접 들고 있어야 할까요?
+- 메시지 리스트를 누적하는 가장 단순한 멀티턴 패턴은 어떻게 구현할까요?
+- 세션별 이력을 분리할 때 어디까지 메모리에 두고 언제 외부 저장소로 빼야 할까요?
+
+> 챗봇은 모델이 기억하는 시스템이 아니라, 앱이 messages 리스트를 계속 다시 보내는 재생 루프입니다.
+
+```mermaid
+flowchart LR
+    User[사용자 입력] --> Session[세션별 messages 리스트]
+    Session --> Prompt[System + history + 새 질문]
+    Prompt --> LLM[ChatGroq]
+    LLM --> Reply[응답 생성]
+    Reply --> Session
+    Reply --> User
+```
 
 > AI 앱 패턴 101 시리즈 (1/6)
 
@@ -279,6 +297,31 @@ print(f"\n세션 A: {session_a}")
 print(f"세션 B: {session_b}")
 print(f"세션 A 이력 길이: {len(sessions[session_a])}")
 ```
+
+---
+
+## 이 코드에서 봐야 할 것
+
+- `main.py`는 `SystemMessage` + 세션별 `HumanMessage`/`AIMessage` 누적 구조만으로 멀티턴을 구현합니다.
+- 실행 예제는 같은 세션과 다른 세션을 함께 돌려서 "기억"이 모델이 아니라 앱 상태에 있다는 점을 보여줍니다.
+- 운영 단계에서는 이 `dict[str, list]` 저장소를 Redis나 DB로 바꾸면 됩니다.
+
+---
+
+## 실무에서 헷갈리는 지점
+
+- 대화 이력을 저장한다고 해서 모델이 장기 기억을 갖는 것은 아닙니다. 매 요청마다 다시 보내는 것뿐입니다.
+- 세션 분리와 사용자 인증은 다른 문제입니다. 같은 사용자라도 여러 세션을 가질 수 있습니다.
+- 이력이 길어질수록 품질보다 먼저 비용과 지연 시간이 문제 되므로 요약이나 윈도잉 전략이 필요합니다.
+
+---
+
+## 체크리스트
+
+- [ ] 세션 ID별로 messages 리스트가 분리되어 있다
+- [ ] system prompt가 매 호출마다 항상 포함된다
+- [ ] 응답 후 AIMessage도 다시 이력에 append된다
+- [ ] 장기 저장소로 바꿔도 인터페이스가 유지된다
 
 ---
 

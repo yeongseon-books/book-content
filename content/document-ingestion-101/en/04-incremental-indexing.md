@@ -3,7 +3,7 @@ title: 'Incremental indexing — updating only changed documents'
 series: document-ingestion-101
 episode: 4
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,244 +19,163 @@ last_reviewed: '2026-05-01'
 
 # Incremental indexing — updating only changed documents
 
-> Document Ingestion 101 (4/6)
+## Questions this post answers
 
-Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/04-incremental-indexing)
+- What do you need to process only changed documents instead of rebuilding everything?
+- What is the simplest shape for a hash-based state store?
+- How do you distinguish unchanged, updated, and new files in the run log?
 
-With 1,000 documents, the initial indexing run happens once. But if new documents arrive daily and existing ones get revised, rebuilding the full index every time is expensive. Incremental indexing identifies which documents changed and processes only those, leaving unchanged documents untouched.
+> Incremental indexing is less a vector-store trick and more an operational memory problem.
 
-Topics:
+Example code: `/root/Github/document-ingestion-101/en/04-incremental-indexing/main.py`
 
-- detecting file changes (hash or modification time)
-- designing an index state store
-- handling additions, modifications, and deletions
-- applying incremental updates to a FAISS index
+```mermaid
+flowchart LR
+    A[Scan files] --> B[Read state store]
+    B --> C{Existing hash?}
+    C -->|no| D[added]
+    C -->|same| E[unchanged]
+    C -->|different| F[updated]
+```
 
----
+A full rebuild is acceptable for dozens of files, but it becomes wasteful once the corpus grows into the thousands.
 
-<!-- ebook-only:start -->
+This example uses only file hashes and a JSON state file to classify `added`, `unchanged`, and `updated`. That simple classifier is the foundation for every later vector-store update step.
 
-**The key idea**: incremental indexing reprocesses only changed documents. Hash or modification time detects changes; only the affected chunks are updated.
-
-## Where this chapter fits
-
-This is chapter 4 of 6 in the series.
-The previous chapter covered **Metadata design and filtering**.
-After this chapter, the next one moves on to **Multi-format document pipeline**.
-<!-- ebook-only:end -->
-
-## Change detection strategies
-
-Two approaches for detecting file changes:
-
-**Modification time comparison**: store the filesystem `mtime` and compare. Fast but may reprocess files whose content did not actually change (e.g., touch without editing).
-
-**Content hash comparison**: store an MD5/SHA-256 hash of the file content and compare. Accurate but requires reading the full file every run.
-
-In practice, combine both: check `mtime` first (fast path), and only compute the hash when `mtime` changed.
-
----
-
-## Index state store
+## Runnable example
 
 ```python
+from __future__ import annotations
+
 import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
+WORK_DIR = BASE_DIR / 'workspace'
+WORK_DIR.mkdir(exist_ok=True)
+STATE_FILE = BASE_DIR / 'index_state.json'
+
 class IndexStateStore:
-    """
-    Manages per-document indexing state in a JSON file.
-    Schema: {file_path: {"hash": str, "mtime": float, "indexed_at": str, "chunk_ids": [str]}}
-    """
-
-    def __init__(self, state_file: str = ".index_state.json"):
-        self.state_file = Path(state_file)
-        self.state = self._load()
-
-    def _load(self) -> dict:
-        if self.state_file.exists():
-            with open(self.state_file, encoding="utf-8") as f:
-                return json.load(f)
-        return {}
+    def __init__(self, state_file: Path):
+        self.state_file = state_file
+        self.state = json.loads(state_file.read_text(encoding='utf-8')) if state_file.exists() else {}
 
     def save(self) -> None:
-        with open(self.state_file, "w", encoding="utf-8") as f:
-            json.dump(self.state, f, ensure_ascii=False, indent=2)
+        self.state_file.write_text(json.dumps(self.state, ensure_ascii=False, indent=2), encoding='utf-8')
 
-    def get_file_hash(self, file_path: str) -> str:
-        hasher = hashlib.md5()
-        with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(8192), b""):
-                hasher.update(chunk)
-        return hasher.hexdigest()
+    def file_hash(self, file_path: Path) -> str:
+        return hashlib.md5(file_path.read_bytes()).hexdigest()
 
-    def is_changed(self, file_path: str) -> bool:
-        """Return True if the file changed since it was last indexed."""
-        path = Path(file_path)
-        if not path.exists():
-            return False
+    def classify(self, file_path: Path) -> str:
+        record = self.state.get(str(file_path))
+        if record is None:
+            return 'added'
+        current_hash = self.file_hash(file_path)
+        if record['hash'] != current_hash:
+            return 'updated'
+        return 'unchanged'
 
-        current_mtime = path.stat().st_mtime
-        stored = self.state.get(str(file_path), {})
-
-        if stored.get("mtime") == current_mtime:
-            return False  # fast path: mtime unchanged
-
-        return stored.get("hash") != self.get_file_hash(file_path)
-
-    def is_deleted(self, file_path: str) -> bool:
-        """Return True if the file was previously indexed but no longer exists."""
-        return str(file_path) in self.state and not Path(file_path).exists()
-
-    def mark_indexed(self, file_path: str, chunk_ids: list[str]) -> None:
-        path = Path(file_path)
+    def mark_indexed(self, file_path: Path) -> None:
         self.state[str(file_path)] = {
-            "hash": self.get_file_hash(file_path),
-            "mtime": path.stat().st_mtime,
-            "indexed_at": datetime.now().isoformat(),
-            "chunk_ids": chunk_ids,
+            'hash': self.file_hash(file_path),
+            'mtime': file_path.stat().st_mtime,
+            'indexed_at': datetime.now().isoformat(timespec='seconds'),
         }
 
-    def get_chunk_ids(self, file_path: str) -> list[str]:
-        return self.state.get(str(file_path), {}).get("chunk_ids", [])
+def reset_demo_state() -> None:
+    if STATE_FILE.exists():
+        STATE_FILE.unlink()
+    for file_path in WORK_DIR.glob('*'):
+        if file_path.is_file():
+            file_path.unlink()
 
-    def remove(self, file_path: str) -> None:
-        self.state.pop(str(file_path), None)
+def seed_files() -> list[Path]:
+    files = {
+        'alpha.txt': 'This is the first document. It acts as the baseline for incremental indexing.
+',
+        'beta.txt': 'This is the second document. We will revise it later.
+',
+    }
+    paths = []
+    for name, content in files.items():
+        path = WORK_DIR / name
+        if not path.exists():
+            path.write_text(content, encoding='utf-8')
+        paths.append(path)
+    return paths
 
-store = IndexStateStore("/tmp/test_index_state.json")
-print("state store initialized")
+def scan(store: IndexStateStore, files: list[Path], label: str) -> None:
+    print(f'[{label}]')
+    for file_path in files:
+        state = store.classify(file_path)
+        print(f'  {file_path.name}: {state}')
+        if state in {'added', 'updated'}:
+            store.mark_indexed(file_path)
+    store.save()
+
+def main() -> None:
+    reset_demo_state()
+    files = seed_files()
+    store = IndexStateStore(STATE_FILE)
+    scan(store, files, 'first run')
+    scan(store, files, 'second run without changes')
+    files[1].write_text('This is the second document. Its contents changed, so it must be reprocessed.
+', encoding='utf-8')
+    scan(store, files, 'third run after beta update')
+
+if __name__ == '__main__':
+    main()
 ```
 
----
+## How to run it
 
-## Incremental indexer
-
-```python
-import hashlib
-from pathlib import Path
-
-from langchain.schema import Document
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-class IncrementalIndexer:
-    """Indexes only documents that changed since the last run."""
-
-    def __init__(self, index_path: str, state_file: str = ".index_state.json"):
-        self.index_path = Path(index_path)
-        self.state_store = IndexStateStore(state_file)
-        self.embedding_model = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-        self.splitter = RecursiveCharacterTextSplitter(
-            chunk_size=400,
-            chunk_overlap=80,
-            separators=["\n\n", "\n", ". "],
-        )
-        self.vectorstore = self._load_or_create_index()
-
-    def _load_or_create_index(self) -> FAISS:
-        if self.index_path.exists():
-            print(f"loading existing index: {self.index_path}")
-            return FAISS.load_local(
-                str(self.index_path),
-                self.embedding_model,
-                allow_dangerous_deserialization=True,
-            )
-        print("creating new index")
-        dummy = Document(page_content="init", metadata={"_dummy": True})
-        return FAISS.from_documents([dummy], self.embedding_model)
-
-    def _text_to_chunks(self, text: str, file_path: str) -> list[Document]:
-        chunks = self.splitter.split_text(text)
-        docs = []
-        for idx, chunk in enumerate(chunks):
-            chunk_id = f"{Path(file_path).stem}_c{idx}_{hashlib.md5(chunk.encode()).hexdigest()[:6]}"
-            docs.append(Document(
-                page_content=chunk,
-                metadata={
-                    "source_file": Path(file_path).name,
-                    "chunk_id": chunk_id,
-                    "chunk_idx": idx,
-                },
-            ))
-        return docs
-
-    def process_file(self, file_path: str, text: str) -> str:
-        """Process one file. Returns: 'added' | 'updated' | 'skipped'."""
-        if not self.state_store.is_changed(file_path) and str(file_path) in self.state_store.state:
-            return "skipped"
-
-        old_chunk_ids = self.state_store.get_chunk_ids(file_path)
-        if old_chunk_ids:
-            print(f"  removing {len(old_chunk_ids)} previous chunks")
-
-        docs = self._text_to_chunks(text, file_path)
-        if docs:
-            self.vectorstore.add_documents(docs)
-            self.state_store.mark_indexed(file_path, [d.metadata["chunk_id"] for d in docs])
-            return "updated" if old_chunk_ids else "added"
-
-        return "skipped"
-
-    def sync_directory(self, directory: str, pattern: str = "*.txt") -> dict:
-        """Sync all matching files in a directory."""
-        directory = Path(directory)
-        files = list(directory.glob(pattern))
-        stats = {"added": 0, "updated": 0, "skipped": 0, "deleted": 0}
-
-        for file_path in files:
-            text = file_path.read_text(encoding="utf-8")
-            status = self.process_file(str(file_path), text)
-            stats[status] += 1
-            print(f"  [{status}] {file_path.name}")
-
-        for stored_path in list(self.state_store.state.keys()):
-            if self.state_store.is_deleted(stored_path):
-                self.state_store.remove(stored_path)
-                stats["deleted"] += 1
-                print(f"  [deleted] {stored_path}")
-
-        self.state_store.save()
-        self.vectorstore.save_local(str(self.index_path))
-        return stats
-
-# Test with a temporary directory
-import tempfile
-
-with tempfile.TemporaryDirectory() as tmpdir:
-    tmpdir = Path(tmpdir)
-
-    (tmpdir / "doc1.txt").write_text("Python async programming basics. Uses asyncio.", encoding="utf-8")
-    (tmpdir / "doc2.txt").write_text("Machine learning model training and evaluation.", encoding="utf-8")
-
-    indexer = IncrementalIndexer(str(tmpdir / ".faiss_index"))
-    stats = indexer.sync_directory(str(tmpdir))
-    print(f"\nfirst sync: {stats}")
-
-    # modify doc1, add doc3
-    (tmpdir / "doc1.txt").write_text("Build async HTTP clients with Python asyncio and aiohttp.", encoding="utf-8")
-    (tmpdir / "doc3.txt").write_text("Deep learning model deployment and serving strategies.", encoding="utf-8")
-
-    stats = indexer.sync_directory(str(tmpdir))
-    print(f"second sync: {stats}")
+```bash
+python main.py
 ```
 
----
+## Verified run output
 
-## Conclusion
+```text
+[first run]
+  alpha.txt: added
+  beta.txt: added
+[second run without changes]
+  alpha.txt: unchanged
+  beta.txt: unchanged
+[third run after beta update]
+  alpha.txt: unchanged
+  beta.txt: updated
+```
 
-Incremental indexing is necessary for any service where documents change regularly. A JSON state file is a simple starting point; swap it for Redis or SQLite as the document corpus grows. The pattern is always the same: detect changes via mtime + hash, remove stale chunks, add new chunks, persist the updated state.
+## What to notice in this code
 
-The next post covers multi-format document pipelines: handling Word documents, HTML pages, and Markdown alongside PDFs.
+- `IndexStateStore` keeps hash, mtime, and indexed_at together, which makes debugging easier.
+- The script intentionally runs three passes to replay the added → unchanged → updated lifecycle.
+- Using JSON first keeps the logic transparent before moving the same pattern into a database.
+
+## Where engineers get confused
+
+- mtime-only checks are fast but can over-report changes. That is why content hashes still matter.
+- Incremental indexing has two separate concerns: detecting change and applying the change.
+- Deletion handling needs an extra pass that compares the current file list with stored state.
+
+## Checklist
+
+- [ ] The state store records both hash and timestamp.
+- [ ] A second run without edits resolves to unchanged.
+- [ ] A later file edit resolves to updated.
+- [ ] You identified where deletion handling would plug in.
 
 <!-- blog-only:start -->
-Next: [Multi-format document pipeline](./05-multi-format-pipeline.md)
+
+## Summary
+
+The core of incremental indexing is not scale for its own sake but a state store that remembers exactly what changed.
+
+The next post extends that change-detection mindset into a pipeline that handles multiple file formats.
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -271,12 +190,8 @@ Next: [Multi-format document pipeline](./05-multi-format-pipeline.md)
 
 <!-- toc:end -->
 
----
-
 ## References
 
-- [LangChain RecordManager (incremental indexing)](https://python.langchain.com/docs/modules/data_connection/indexing/)
-- [FAISS save/load](https://python.langchain.com/docs/integrations/vectorstores/faiss/#saving-and-loading)
-- [File hash change detection patterns](https://realpython.com/python-hashlib/)
+- https://docs.python.org/3/library/hashlib.html
 
 Tags: RAG, Document Processing, LangChain, Python

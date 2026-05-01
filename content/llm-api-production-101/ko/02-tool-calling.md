@@ -1,20 +1,20 @@
 ---
-title: 툴 호출 — 함수를 모델에 연결하기
-series: llm-api-production-101
 episode: 2
 language: ko
-status: draft
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
+last_reviewed: '2026-05-01'
+series: llm-api-production-101
+status: publish-ready
 tags:
 - LLM
 - OpenAI
 - Streaming
 - Python
-last_reviewed: '2026-04-30'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 툴 호출 — 함수를 모델에 연결하기
 ---
 
 # 툴 호출 — 함수를 모델에 연결하기

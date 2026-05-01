@@ -3,7 +3,7 @@ title: Managing conversation state — building a multi-turn chatbot
 series: llm-app-foundations-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Managing conversation state — building a multi-turn chatbot

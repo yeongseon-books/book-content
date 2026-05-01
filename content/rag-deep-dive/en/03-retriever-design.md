@@ -3,7 +3,7 @@ title: Retriever Design — VectorStoreRetriever and MMR
 series: rag-deep-dive
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,31 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Retriever Design — VectorStoreRetriever and MMR
+
+<!-- a-grade-intro:begin -->
+## Questions this post answers
+
+- What contract does `BaseRetriever` enforce beyond returning documents?
+- Where does `VectorStoreRetriever` branch into `similarity`, `mmr`, and threshold mode?
+- Why does `fetch_k` need to be wider than `k` for MMR to matter?
+- How does `lambda_mult` change redundancy versus coverage?
+
+> A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.
+
+```mermaid
+flowchart LR
+    A[Query] --> B[VectorStoreRetriever]
+    B --> C[Similarity top k]
+    B --> D[MMR fetch_k candidates]
+    D --> E[Diversity re-selection]
+    C --> F[Final context]
+    E --> F
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (3/6)
 
@@ -31,6 +52,82 @@ This is chapter 3 of 6 in the series.
 The previous chapter covered **Embeddings and the Vector Index — Inside FAISS IndexFlatL2**.
 After this chapter, the next one moves on to **Prompt Construction and Context Injection — Inside PromptTemplate**.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## Minimal runnable example
+
+Example file: `/root/Github/rag-deep-dive/en/03-retriever-design/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+from langchain_core.documents import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+DOCS = [
+    Document(page_content="Retry budget is three attempts before dead-lettering."),
+    Document(page_content="The worker retries failed messages three times before it stops."),
+    Document(page_content="After the final retry, the payload moves to the dead-letter queue."),
+    Document(page_content="Operators inspect the exception chain before replaying a job."),
+    Document(page_content="HTTP 429 requires exponential backoff on the client side."),
+    Document(page_content="The dead-letter queue preserves the original payload for debugging."),
+]
+QUERY = "Why did the worker stop retrying the message?"
+
+def show_results(label: str, docs: list[Document]) -> None:
+    print(f"\n=== {label} ===")
+    for index, doc in enumerate(docs, start=1):
+        print(f"{index}. {doc.page_content}")
+
+def main() -> None:
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    store = FAISS.from_documents(DOCS, embeddings)
+
+    similarity = store.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 2},
+    )
+    mmr_small = store.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": 2, "fetch_k": 4, "lambda_mult": 0.3},
+    )
+    mmr_wide = store.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": 2, "fetch_k": 6, "lambda_mult": 0.3},
+    )
+
+    show_results("similarity k=2", similarity.invoke(QUERY))
+    show_results("mmr k=2 fetch_k=4", mmr_small.invoke(QUERY))
+    show_results("mmr k=2 fetch_k=6", mmr_wide.invoke(QUERY))
+
+if __name__ == "__main__":
+    main()
+```
+
+### What to notice in this code
+
+- The same vector store returns different evidence sets once `search_type` changes.
+- Wider `fetch_k` gives MMR real room to diversify results.
+- Lower `lambda_mult` increases the diversity penalty.
+
+### Where engineers get confused
+
+- Increasing only `k` does not automatically improve coverage.
+- When `fetch_k == k`, MMR can collapse toward plain similarity search.
+- Retriever-level thresholding is not the same as raw backend score filtering.
+
+## Checklist
+
+- [ ] I compared similarity and MMR on the same query.
+- [ ] I tested `fetch_k` at a meaningfully larger width than `k`.
+- [ ] I observed the redundancy-versus-coverage tradeoff through `lambda_mult`.
+- [ ] I separated embedding quality issues from retriever policy issues.
+<!-- a-grade-example:end -->
 
 ## Source Version
 

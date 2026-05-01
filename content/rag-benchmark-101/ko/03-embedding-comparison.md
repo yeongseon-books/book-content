@@ -3,7 +3,7 @@ title: '임베딩 모델 비교'
 series: rag-benchmark-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -19,219 +19,65 @@ last_reviewed: '2026-05-01'
 
 # 임베딩 모델 비교
 
-> RAG 벤치마크 101 (3/6)
+## 이 글에서 답할 질문
+- all-MiniLM-L6-v2와 paraphrase-MiniLM-L3-v2를 같은 질의셋으로 비교하면 무엇이 보일까요?
+- 임베딩 모델 비교에서 hit rate만 보면 왜 부족할까요?
+- 속도와 정확도 중 어느 쪽이 병목인지 어떻게 읽어야 할까요?
 
-임베딩 모델은 RAG 파이프라인의 핵심입니다. 같은 검색기와 LLM을 써도 임베딩 모델이 바뀌면 검색 품질이 크게 달라집니다. 이 포스트에서는 여러 임베딩 모델을 동일한 쿼리 집합으로 벤치마킹해 모델 선택 기준을 정립합니다.
+> 임베딩 모델 비교는 “어떤 모델이 더 똑똑한가”보다, 같은 검색 파이프라인에서 어느 모델이 더 빨리 관련 문서를 앞쪽에 올려주는가를 보는 일입니다.
 
-예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/03-embedding-comparison`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/03-embedding-comparison)에서 확인할 수 있습니다.
+세 번째 글에서는 retriever 구조를 그대로 두고 임베딩 모델만 바꿉니다. 이렇게 해야 품질 차이를 모델 쪽으로 귀속할 수 있습니다. 예제는 두 sentence-transformers 모델을 같은 corpus, 같은 query set, 같은 k 값으로 평가합니다.
 
----
-
-<!-- ebook-only:start -->
-
-이 장의 핵심: **임베딩 비교는 동일한 코퍼스에서 같은 쿼리로 순위를 측정한다.** 모델마다 강한 도메인이 다르다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 3번째 장입니다.
-앞 장에서는 **검색 성능 측정**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **VectorDB 선택 기준**으로 이어집니다.
-<!-- ebook-only:end -->
-
-## 비교할 임베딩 모델
-
-실제 프로덕션에서 자주 쓰이는 모델 세 가지를 비교합니다.
-
-| 모델 | 차원 | 크기 | 특징 |
-|------|-----|-----|------|
-| all-MiniLM-L6-v2 | 384 | 80MB | 경량, 빠름 |
-| all-mpnet-base-v2 | 768 | 420MB | 높은 품질 |
-| paraphrase-multilingual-MiniLM-L12-v2 | 384 | 120MB | 다국어 지원 |
-
----
-
-## 임베딩 모델 벤치마크
-
-```python
-import json
-import time
-from dataclasses import dataclass, field
-
-import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain.schema import Document
-
-@dataclass
-class EmbeddingBenchResult:
-    model_name: str
-    index_time_s: float
-    query_time_ms: float
-    precision_at_3: float
-    recall_at_3: float
-    mrr: float
-
-    def summary(self) -> dict:
-        return {
-            "model": self.model_name.split("/")[-1],
-            "index_time_s": round(self.index_time_s, 2),
-            "query_time_ms": round(self.query_time_ms, 1),
-            "precision@3": round(self.precision_at_3, 4),
-            "recall@3": round(self.recall_at_3, 4),
-            "mrr": round(self.mrr, 4),
-        }
-
-def _metrics(retrieved_ids: list[str], relevant_ids: set[str], k: int) -> tuple[float, float, float]:
-    top_k = retrieved_ids[:k]
-    hits = [d for d in top_k if d in relevant_ids]
-    precision = len(hits) / k if k > 0 else 0.0
-    recall = len(hits) / len(relevant_ids) if relevant_ids else 0.0
-    mrr = next((1.0 / (i + 1) for i, d in enumerate(top_k) if d in relevant_ids), 0.0)
-    return precision, recall, mrr
-
-def benchmark_embedding_model(
-    model_name: str,
-    corpus: list[Document],
-    queries: list,  # list[QueryGroundTruth]
-    k: int = 3,
-) -> EmbeddingBenchResult:
-    embedding = HuggingFaceEmbeddings(
-        model_name=model_name,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-
-    # 인덱싱 시간 측정
-    t0 = time.perf_counter()
-    vectorstore = FAISS.from_documents(corpus, embedding)
-    index_time = time.perf_counter() - t0
-
-    retriever = vectorstore.as_retriever(search_kwargs={"k": k})
-
-    # 쿼리 시간 + 검색 품질 측정
-    precisions, recalls, mrrs = [], [], []
-    query_times = []
-
-    for qt in queries:
-        t0 = time.perf_counter()
-        retrieved_docs = retriever.invoke(qt.query)
-        query_times.append((time.perf_counter() - t0) * 1000)
-
-        retrieved_ids = [d.metadata.get("id", "") for d in retrieved_docs]
-        p, r, m = _metrics(retrieved_ids, qt.relevant_ids, k)
-        precisions.append(p)
-        recalls.append(r)
-        mrrs.append(m)
-
-    return EmbeddingBenchResult(
-        model_name=model_name,
-        index_time_s=index_time,
-        query_time_ms=sum(query_times) / len(query_times) if query_times else 0,
-        precision_at_3=sum(precisions) / len(precisions) if precisions else 0,
-        recall_at_3=sum(recalls) / len(recalls) if recalls else 0,
-        mrr=sum(mrrs) / len(mrrs) if mrrs else 0,
-    )
+```mermaid
+flowchart LR
+    Q[공통 질문 집합] --> B[동일한 벤치마크 루프]
+    C[공통 코퍼스] --> B
+    M1[all-MiniLM-L6-v2] --> B
+    M2[paraphrase-MiniLM-L3-v2] --> B
+    B --> O[hit rate · MRR · latency 비교]
 ```
 
----
+## 최소 실행 예제
 
-## 코사인 유사도 분포 분석
+실행 코드는 `rag-benchmark-101/ko/03-embedding-comparison/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
-```python
-def analyze_similarity_distribution(
-    model_name: str,
-    corpus: list[Document],
-    queries: list,
-    k: int = 5,
-) -> dict:
-    """관련/비관련 문서 간 유사도 분포를 분석합니다."""
-    embedding = HuggingFaceEmbeddings(
-        model_name=model_name,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-    vectorstore = FAISS.from_documents(corpus, embedding)
-
-    relevant_scores, irrelevant_scores = [], []
-    for qt in queries:
-        results = vectorstore.similarity_search_with_score(qt.query, k=k)
-        for doc, score in results:
-            doc_id = doc.metadata.get("id", "")
-            if doc_id in qt.relevant_ids:
-                relevant_scores.append(float(score))
-            else:
-                irrelevant_scores.append(float(score))
-
-    def stats(scores: list[float]) -> dict:
-        if not scores:
-            return {}
-        arr = np.array(scores)
-        return {
-            "mean": round(float(arr.mean()), 4),
-            "std": round(float(arr.std()), 4),
-            "min": round(float(arr.min()), 4),
-            "max": round(float(arr.max()), 4),
-        }
-
-    return {
-        "model": model_name.split("/")[-1],
-        "relevant": stats(relevant_scores),
-        "irrelevant": stats(irrelevant_scores),
-        "gap": round(
-            abs(np.mean(relevant_scores) - np.mean(irrelevant_scores)) if (relevant_scores and irrelevant_scores) else 0,
-            4,
-        ),
-    }
+```bash
+cd /root/Github/rag-benchmark-101/ko/03-embedding-comparison
+python3 main.py
 ```
 
----
-
-## 비교 실행
-
 ```python
-# 이전 포스트에서 정의한 CORPUS, QUERIES 재사용
 MODELS = [
-    "sentence-transformers/all-MiniLM-L6-v2",
-    "sentence-transformers/all-mpnet-base-v2",
-    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    'sentence-transformers/all-MiniLM-L6-v2',
+    'sentence-transformers/paraphrase-MiniLM-L3-v2',
 ]
-
-def run_embedding_comparison(corpus, queries, models):
-    results = []
-    for model_name in models:
-        print(f"벤치마킹: {model_name.split('/')[-1]} ...")
-        result = benchmark_embedding_model(model_name, corpus, queries)
-        results.append(result.summary())
-    return results
-
-if __name__ == "__main__":
-    from rag_benchmark_101_02 import CORPUS, QUERIES  # 이전 포스트 임포트
-
-    comparison = run_embedding_comparison(CORPUS, QUERIES, MODELS)
-    print("\n=== 임베딩 모델 비교 ===")
-    for result in comparison:
-        print(json.dumps(result, indent=2, ensure_ascii=False))
-
-    print("\n=== 유사도 분포 분석 ===")
-    for model in MODELS:
-        dist = analyze_similarity_distribution(model, CORPUS, QUERIES)
-        print(json.dumps(dist, indent=2, ensure_ascii=False))
+results = [benchmark_model(model_name) for model_name in MODELS]
+print(json.dumps(results, indent=2))
 ```
 
----
+## 이 코드에서 봐야 할 것
+- Corpus와 query set을 고정해야 모델 간 비교가 공정해집니다.
+- MRR을 함께 보면 두 모델이 관련 문서를 “찾는지”뿐 아니라 “얼마나 앞에 두는지”까지 볼 수 있습니다.
+- 평균 latency를 같이 저장하면 더 좋은 점수가 실제 운영 비용과 맞는지도 판단할 수 있습니다.
 
-## 모델 선택 기준
+## 실무에서 헷갈리는 지점
+- 임베딩 차이와 chunking 차이를 동시에 바꾸면 원인 분리가 되지 않습니다. 한 번에 한 축만 바꿔야 합니다.
+- 같은 hit rate라도 MRR 차이가 크면 실제 응답 품질은 달라질 수 있습니다. LLM은 상위 문서 몇 개의 순서에 민감합니다.
+- 작은 데이터셋에서 한 모델이 이겼다고 끝내면 안 됩니다. 도메인 질문으로 다시 검증해야 합니다.
 
-임베딩 모델을 고를 때 단일 지표에 의존하면 안 됩니다. 상황에 맞게 다음을 고려해야 합니다.
-
-- **쿼리 속도가 중요한 경우**: `all-MiniLM-L6-v2`. 품질보다 처리량이 우선인 실시간 시스템에 적합합니다.
-- **품질이 중요한 경우**: `all-mpnet-base-v2`. 모델 크기와 인덱싱 시간을 감수할 수 있다면 최선입니다.
-- **다국어 지원이 필요한 경우**: `paraphrase-multilingual-MiniLM-L12-v2`. 한국어와 영어가 혼재하는 코퍼스에서 유리합니다.
-
-유사도 분포 분석에서 관련/비관련 문서 간 점수 차이(gap)가 클수록 모델의 변별력이 높습니다. gap이 작으면 임계값 기반 필터링이 어렵고 노이즈가 많은 검색 결과가 나옵니다.
+## 체크리스트
+- [ ] 동일한 corpus, 동일한 query set으로 두 모델을 평가했다.
+- [ ] hit rate와 MRR을 함께 비교했다.
+- [ ] latency까지 포함해 운영 관점의 비용을 함께 봤다.
 
 <!-- blog-only:start -->
+
+## 정리
+
+이제 임베딩 모델이라는 한 축을 따로 비교할 수 있습니다. 다음 글에서는 검색 백엔드 자체를 바꿔 flat 검색과 근사 검색의 트레이드오프를 확인합니다.
+
 다음 글: [VectorDB 선택 기준](./04-vectordb-selection.md)
+
 <!-- blog-only:end -->
 
 <!-- toc:begin -->
@@ -250,8 +96,7 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-- [MTEB 임베딩 벤치마크](https://huggingface.co/spaces/mteb/leaderboard)
-- [Sentence Transformers 모델 허브](https://www.sbert.net/docs/pretrained_models.html)
-- [FAISS 인덱스 타입 가이드](https://github.com/facebookresearch/faiss/wiki/Faiss-indexes)
+- [Sentence Transformers model catalog](https://www.sbert.net/docs/pretrained_models.html)
+- [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
 
 Tags: RAG, VectorDB, Benchmarking, LLM

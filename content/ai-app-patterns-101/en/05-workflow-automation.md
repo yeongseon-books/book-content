@@ -3,7 +3,7 @@ title: 'Workflow automation — designing multi-step chains'
 series: ai-app-patterns-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -18,6 +18,22 @@ last_reviewed: '2026-05-01'
 ---
 
 # Workflow automation — designing multi-step chains
+
+## Questions this post answers
+
+- How should intermediate outputs be structured when several LLM stages are chained together?
+- Where should a summary → classification → tagging workflow detect and surface failure?
+- In what situations is a fixed workflow better than an agent?
+
+> Workflow automation removes model choice and replaces it with a pipeline that follows human-defined stages and data contracts.
+
+```mermaid
+flowchart LR
+    Raw[Raw ticket] --> Sum[Summarize step]
+    Sum --> Classify[Classification step]
+    Classify --> Tag[Tagging step]
+    Tag --> Result[Structured result]
+```
 
 > AI App Patterns 101 (5/6)
 
@@ -292,6 +308,31 @@ print("running code review pipeline...")
 result = code_review_pipeline(sample_code)
 print(f"\n=== final report ===\n{result['report']}")
 ```
+
+---
+
+## What to notice in this code
+
+- `main.py` breaks the same support ticket into three sequential stages: summarization, category classification, and tag suggestion.
+- Every stage returns a `dict`, which makes intermediate outputs easy to log, inspect, or persist.
+- This structure is friendly to operational controls such as approval, routing, and retry policies.
+
+---
+
+## Where engineers get confused
+
+- More stages are not automatically better; every extra call adds cost, latency, and another failure surface.
+- Passing only raw strings between stages makes later validation and branching harder than passing structured dictionaries.
+- The real line between a workflow and an agent is not tool usage but whether the execution path changes at runtime.
+
+---
+
+## Checklist
+
+- [ ] The summary output feeds the next stage
+- [ ] The classifier returns one value from a limited category set
+- [ ] The tagging step uses earlier stage results, not only the raw text
+- [ ] The final output is a structured object that still contains intermediate artifacts
 
 ---
 

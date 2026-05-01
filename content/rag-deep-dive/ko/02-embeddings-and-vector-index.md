@@ -3,7 +3,7 @@ title: 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
 series: rag-deep-dive
 episode: 2
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,31 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
+
+<!-- a-grade-intro:begin -->
+## 이 글에서 답할 질문
+
+- `embed_documents()`와 `embed_query()`를 왜 같은 함수처럼 다루면 안 될까요?
+- `IndexFlatL2`는 실제로 어떤 거리값을 계산할까요?
+- 벡터 검색 결과를 원문 문서로 다시 매핑하는 계층은 어디일까요?
+- exact flat search와 approximate IVF search는 언제 갈라질까요?
+
+> 임베딩 단계는 청크를 좌표로 바꾸고, 인덱스 단계는 그 좌표들 사이의 가까움을 순위로 바꿉니다.
+
+```mermaid
+flowchart LR
+    A[청크 텍스트] --> B[HuggingFaceEmbeddings]
+    B --> C[Dense vectors]
+    C --> D[IndexFlatL2]
+    E[질문] --> F[Query embedding]
+    F --> D
+    D --> G[Top k 거리 결과]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (2/6)
 
@@ -31,6 +52,70 @@ last_reviewed: '2026-04-30'
 앞 장에서는 **문서 로딩과 청크 전략 — LangChain TextSplitter 내부**을 다뤘습니다.
 이 장을 마치면 다음 장에서 **Retriever 설계 — VectorStoreRetriever와 MMR**으로 이어집니다.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## 최소 실행 예제
+
+예제 파일: `/root/Github/rag-deep-dive/ko/02-embeddings-and-vector-index/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+import faiss
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+DOCS = [
+    "The worker retries a failed message three times before dead-lettering.",
+    "The dead-letter queue keeps the original payload for later inspection.",
+    "HTTP 429 means the caller exceeded the per-minute quota.",
+    "Operators inspect the exception chain before replaying the message.",
+]
+QUERY = "Why did the system stop retrying the message?"
+
+def main() -> None:
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    doc_vectors = np.array(embeddings.embed_documents(DOCS), dtype="float32")
+    query_vector = np.array([embeddings.embed_query(QUERY)], dtype="float32")
+
+    index = faiss.IndexFlatL2(doc_vectors.shape[1])
+    index.add(doc_vectors)
+
+    distances, indices = index.search(query_vector, k=3)
+    for rank, (doc_index, distance) in enumerate(
+        zip(indices[0], distances[0]), start=1
+    ):
+        print(f"rank={rank} distance={float(distance):.4f}")
+        print(DOCS[int(doc_index)])
+        print("-" * 60)
+
+if __name__ == "__main__":
+    main()
+```
+
+### 이 코드에서 봐야 할 것
+
+- HuggingFace 임베딩 결과를 `float32` 행렬로 만든 뒤 직접 `IndexFlatL2`에 넣습니다.
+- FAISS는 문서를 모르고 벡터와 정수 row id만 압니다.
+- 검색 결과는 거리값이 낮은 순서로 반환됩니다.
+
+### 실무에서 헷갈리는 지점
+
+- cosine을 쓰고 있다고 말하면서 실제로는 L2 또는 inner product를 쓰는 경우가 많습니다.
+- 정규화 여부를 모른 채 거리값만 비교하면 순위 의미를 잘못 해석하게 됩니다.
+- 인덱스는 저장소가 아니라 ranking rule이라는 점을 놓치기 쉽습니다.
+
+## 체크리스트
+
+- [ ] 문서 임베딩과 질의 임베딩 호출 경로를 구분했다.
+- [ ] FAISS가 반환하는 값이 거리인지 유사도인지 확인했다.
+- [ ] 벡터 row id를 원문과 다시 연결하는 매핑 계층을 이해했다.
+- [ ] exact baseline 없이 approximate index만 먼저 튜닝하지 않았다.
+<!-- a-grade-example:end -->
 
 ## 소스 버전
 

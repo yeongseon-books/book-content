@@ -3,7 +3,7 @@ title: Assembling the RAG Chain — RetrievalQA vs LCEL
 series: rag-deep-dive
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,10 +14,32 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-04-30'
+last_reviewed: '2026-05-01'
 ---
 
 # Assembling the RAG Chain — RetrievalQA vs LCEL
+
+<!-- a-grade-intro:begin -->
+## Questions this post answers
+
+- Which steps does `RetrievalQA` hide behind its classic interface?
+- How does LCEL expose the RAG graph more directly?
+- Why is `RunnablePassthrough()` useful for preserving the original question?
+- Where do you attach source-return logic in each approach?
+
+> A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
+
+```mermaid
+flowchart LR
+    A[Question] --> B[Retriever]
+    B --> C[Context docs]
+    A --> D[Question passthrough]
+    C --> E[Prompt assembly]
+    D --> E
+    E --> F[ChatGroq]
+    F --> G[Answer]
+```
+<!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (5/6)
 
@@ -28,6 +50,123 @@ This is chapter 5 of 6 in the series.
 The previous chapter covered **Prompt Construction and Context Injection — Inside PromptTemplate**.
 After this chapter, the next one moves on to **Evaluation and Quality Gates — RAGAS Metrics and Faithfulness**.
 <!-- ebook-only:end -->
+
+<!-- a-grade-example:begin -->
+## Minimal runnable example
+
+Example file: `/root/Github/rag-deep-dive/en/05-rag-chain-assembly/main.py`
+
+```bash
+export GROQ_API_KEY=... && python main.py
+```
+
+```python
+import os
+
+from langchain.chains import RetrievalQA
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_groq import ChatGroq
+
+DOCS = [
+    Document(
+        page_content="Retry budget is three attempts before the worker stops retrying.",
+        metadata={"source": "runbook.md"},
+    ),
+    Document(
+        page_content="After the final retry, the original payload moves to the dead-letter queue.",
+        metadata={"source": "ops-guide.md"},
+    ),
+    Document(
+        page_content="Operators inspect the exception chain before replaying the payload.",
+        metadata={"source": "ops-guide.md"},
+    ),
+]
+QUESTION = "Why did the system stop retrying the message?"
+
+def build_retriever():
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    store = FAISS.from_documents(DOCS, embeddings)
+    return store.as_retriever(search_kwargs={"k": 2})
+
+def format_docs(docs: list[Document]) -> str:
+    return "\n\n".join(
+        f"[{doc.metadata['source']}] {doc.page_content}" for doc in docs
+    )
+
+def main() -> None:
+    if not os.environ.get("GROQ_API_KEY"):
+        raise RuntimeError("GROQ_API_KEY is required")
+
+    retriever = build_retriever()
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0, max_tokens=120)
+
+    classic_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        retriever=retriever,
+        chain_type="stuff",
+        return_source_documents=True,
+    )
+    classic_result = classic_chain.invoke({"query": QUESTION})
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "Answer only from the supplied context. If the context is insufficient, say so.",
+            ),
+            ("human", "Context:\n{context}\n\nQuestion: {question}"),
+        ]
+    )
+    lcel_chain = (
+        {
+            "context": retriever | RunnableLambda(format_docs),
+            "question": RunnablePassthrough(),
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+    lcel_result = lcel_chain.invoke(QUESTION)
+
+    print("=== RetrievalQA ===")
+    print(classic_result["result"])
+    print(
+        "sources:",
+        [doc.metadata["source"] for doc in classic_result["source_documents"]],
+    )
+    print("\n=== LCEL ===")
+    print(lcel_result)
+
+if __name__ == "__main__":
+    main()
+```
+
+### What to notice in this code
+
+- The classic and LCEL paths use the same retriever and LLM but expose different assembly surfaces.
+- In LCEL, document formatting is explicit through `RunnableLambda(format_docs)`.
+- `RetrievalQA` has a built-in source return option, while LCEL lets you design the output contract directly.
+
+### Where engineers get confused
+
+- `source_documents` from `RetrievalQA` are not the same artifact as the final prompt string.
+- The LCEL dict literal is not an ordinary dict at runtime. It becomes a parallel runnable step.
+- Once you need streaming or intermediate observability, the classic chain abstraction becomes limiting quickly.
+
+## Checklist
+
+- [ ] I compared classic `RetrievalQA` and LCEL on the same question.
+- [ ] I identified where documents collapse into prompt-ready context.
+- [ ] I separated source-return concerns from prompt-construction concerns.
+- [ ] I know why LCEL is the better default when streaming or batching matters.
+<!-- a-grade-example:end -->
 
 ## Source Version
 
