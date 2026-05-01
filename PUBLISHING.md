@@ -1,6 +1,6 @@
 # Publishing Guide
 
-이 문서는 `content/` 아래의 원본 Markdown을 Tistory, Medium, MkDocs, eBook source로 변환하는 규칙을 정의한다.
+이 문서는 `content/` 아래의 원본 Markdown을 Tistory, Blogger, Medium, eBook source로 변환하는 규칙을 정의한다.
 
 > **현재 상태**: 모든 시리즈가 `content/<series>/` 아래로 이동 완료되었다 (Phase 6 완료). 이행 전 경로(`<series>/{ko,en,medium}/`)는 더 이상 사용하지 않는다.
 
@@ -12,7 +12,7 @@
 
 원고를 어떻게 써야 하는가는 아래 문서를 따른다.
 
-- [`BLOG_WRITING_GUIDE.md`](./BLOG_WRITING_GUIDE.md) — Tistory/Medium 블로그 글 작성 규칙 (SEO 제목, 글 구조, blog-only 블록, 발행 체크리스트)
+- [`BLOG_WRITING_GUIDE.md`](./BLOG_WRITING_GUIDE.md) — Tistory/Blogger/Medium 블로그 글 작성 규칙 (SEO 제목, 글 구조, blog-only 블록, 발행 체크리스트)
 - [`EBOOK_WRITING_GUIDE.md`](./EBOOK_WRITING_GUIDE.md) — 시리즈를 eBook으로 묶을 때의 원고 구성 규칙 (장 구조, ebook-only 블록, Part 구성, 반복 제거)
 - [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) — 문체, 이미지, 코드, 태그, 참고자료 공통 규칙
 
@@ -22,12 +22,12 @@
 
 `tech-writing`은 하나의 canonical content base를 네 가지 발행 파이프라인으로 변환한다.
 
-| Pipeline | Source | Output | Purpose |
-| --- | --- | --- | --- |
-| Tistory | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
-| English Blog | `content/<series>/en/*.md` | `docs/en/<series>/*.md` | 한국어 원문의 충실한 영어 대응본 |
-| Medium | `content/<series>/en/*.md` + adaptation rules | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
-| eBook | `content/<series>/{ko,en}/*.md` + ebook-only blocks | `exports/ebook-source/<series>-<lang>/` | 책 단위 학습형 원고 |
+| Pipeline | Platform | Source | Output | Purpose |
+| --- | --- | --- | --- | --- |
+| Korean Blog | Tistory | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
+| English Blog | Blogger | `content/<series>/en/*.md` | `exports/blogger/<series>/*.html` | 한국어 원문의 충실한 영어 대응본 |
+| Medium | Medium | `content/<series>/en/*.md` + adaptation | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
+| eBook | private `mkdocs-ebook` | `content/<series>/{ko,en}/*.md` + ebook-only blocks | `exports/ebook-source/<series>-<lang>/` | 책 단위 학습형 원고 |
 
 `ko/`와 `en/`은 canonical source다. `medium/`은 `to-medium.py`가 생성하는 발행 변형 산출물이며 canonical source가 아니다.
 
@@ -91,7 +91,32 @@ python3 scripts/export_tistory.py azure-functions-101 --episode 1
 
 ---
 
-## 3. Medium Publishing (English)
+## 3. Blogger Publishing (English Blog)
+
+### 대상
+
+```text
+content/<series>/en/*.md
+```
+
+### 변환 결과
+
+```text
+exports/blogger/<series>/<NN>-<slug>.html
+```
+
+### 규칙
+
+- 목적: `ko/` 원문의 충실한 영어 대응본. 구조, 기술적 주장, 코드, 그림, 참고자료를 최대한 일치시킨다.
+- Medium처럼 hook 중심으로 재작성하지 않는다.
+- `ebook-only` 블록은 제거한다.
+- `blog-only` 블록은 유지한다.
+- 하단 `Tags:` 라인은 Blogger labels에 활용한다.
+- 이미지 경로는 Blogger 업로드 방식에 맞게 정리한다.
+
+---
+
+## 4. Medium Publishing (English)
 
 > Medium 산출물은 `en/`의 strict translation output이 아니다.
 > `en/`의 기술적 내용, 코드, 그림, 참고자료를 유지하되, Medium 독자에게 맞게 제목, opening, transition, ending을 조정할 수 있는 publication adaptation이다.
@@ -141,7 +166,7 @@ python3 scripts/export_medium.py <series-id> --all
 
 ---
 
-## 4. MkDocs Publishing
+## 5. MkDocs Publishing
 
 ### 대상
 
@@ -169,7 +194,7 @@ mkdocs serve
 
 ---
 
-## 5. eBook Source Export
+## 6. eBook Source Export
 
 `mkdocs-ebook`은 private repository이므로 본 저장소에서는 eBook PDF/EPUB를 직접 만들지 않는다. 대신 private builder가 입력으로 사용할 수 있는 source bundle만 생성한다.
 
@@ -202,7 +227,7 @@ python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
 
 ---
 
-## 6. 변형(variant)별 비교
+## 7. 변형(variant)별 비교
 
 | 항목 | Tistory (ko) | Medium (en) | MkDocs (ko/en) | eBook source |
 | --- | --- | --- | --- | --- |
@@ -218,7 +243,7 @@ python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
 
 ---
 
-## 7. Quality Gates
+## 8. Quality Gates
 
 ```bash
 # 1. visible Tags + TOC + ko refs heading 정합성 (idempotent)
