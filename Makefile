@@ -1,4 +1,4 @@
-.PHONY: check finalize medium docs ebook ebook-build ebook-doctor ebook-upgrade
+.PHONY: check finalize medium docs series sync ebook ebook-build ebook-doctor ebook-upgrade
 
 check:
 	python3 .sisyphus/medium/finalize-posts.py --check
@@ -11,6 +11,12 @@ check:
 
 finalize:
 	python3 .sisyphus/medium/finalize-posts.py
+
+sync:
+	python3 scripts/sync_series_per.py
+	python3 scripts/gen_series_md.py
+
+series: sync
 
 medium:
 ifndef SERIES

@@ -136,3 +136,62 @@ python3 .sisyphus/medium/finalize-posts.py
 - **R2**: front matter 도입 시 `finalize-posts.py` 의 visible Tags 라인 처리 로직과 충돌 가능 → finalizer 가 front matter `tags:` 를 우선 읽고 visible 라인을 동기화하도록 확장 필요 (Phase 3 후속 작업).
 - **R3**: `mkdocs-ebook` 이 private 이라 CI 에서 eBook 빌드 검증 불가 → 본 저장소는 source bundle 검증(`python3 -c "import yaml; yaml.safe_load(open('.../mkdocs.yml'))"`)까지만 수행.
 - **R4**: 한 번에 156+ 파일 이동 시 충돌/리뷰 부담 → 시리즈별 원자 커밋 강제 (Phase 6).
+
+## Phase 10 — AI/LLM Content Strategy
+
+리뷰 기반 AI/LLM 시리즈 출판 전략.
+
+### 시리즈 트랙 분류
+
+**Track A — Traffic / Search** (검색 유입 우선)
+1. `llm-app-foundations-101` — AI/LLM 입구 시리즈
+2. `llm-api-production-101` — Structured Output / Tool Calling / Streaming
+3. `vector-search-101` — Embedding / FAISS / Chunking
+4. `rag-benchmark-101` — RAGAS / Evaluation
+5. `korean-ai-stack-101` — 한국어 특화
+
+**Track B — eBook / Learning Path** (책으로 묶기 좋은 학습 경로)
+1. `llm-app-foundations-101`
+2. `llm-api-production-101`
+3. `vector-search-101`
+4. `document-ingestion-101`
+5. `ai-app-patterns-101`
+
+**Track C — Authority / Deep Tech** (전문성/브랜딩)
+1. `rag-deep-dive` (301)
+2. `langchain-101`
+3. `langgraph-101`
+4. `llm-from-scratch-101`
+5. `llm-finetuning-101`
+
+### ai-web-dev-101 처리
+
+- [ ] `status: needs-update` 유지 — 신규 글 추가 금지
+- [ ] 기존 7편 내용을 새 시리즈로 흡수:
+  - 1~2화 → `llm-app-foundations-101`
+  - 3화(챗봇) → `ai-app-patterns-101`
+  - 4화(RAG) → `vector-search-101` / `document-ingestion-101` 이후 시리즈 연계
+  - 5화(Agent) → `ai-app-patterns-101` / `langgraph-101`
+  - 6화(배포) → `llm-apps-ops-101`
+  - 7화(평가) → `rag-benchmark-101` / `llm-apps-ops-101`
+
+### 출판 우선순위 (추천 순서)
+
+1. `llm-app-foundations-101` — AI/LLM 전체 입구
+2. `llm-api-production-101` — 트래픽 + 전문성 모두 잡음
+3. `vector-search-101` — RAG 기반 기초
+4. `document-ingestion-101` — RAG 기반 기초 (연계)
+5. `rag-benchmark-101` — 차별화 높음
+6. `ai-app-patterns-101` — eBook/브랜딩용
+7. `rag-deep-dive` — Draft 유지, version-pinned deep dive
+8. `langchain-101` — version-pinned, LCEL/Runnable 중심
+9. `langgraph-101` — 브랜딩
+10. `korean-ai-stack-101` — 한국어 트래픽 특화
+11. `llm-finetuning-101`
+12. `llm-from-scratch-101` polish/eBook화
+
+### 진행 상황
+
+- [ ] `llm-app-foundations-101` 목차 확정 및 1화 집필
+- [ ] `llm-api-production-101` 목차 확정 및 1화 집필
+- [ ] `ai-web-dev-101` → 흡수 계획 문서화

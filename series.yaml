@@ -637,6 +637,8 @@ series:
     ebook: true
   level: 101
   status: needs-update
+  note: Superseded by llm-app-foundations-101 and ai-app-patterns-101. Do not add new posts. Existing content will be absorbed
+    into the new series.
   path: content/ai-web-dev-101
   per:
     ko:
@@ -766,6 +768,8 @@ series:
         slug: 09-chatbot-wrapper
         title: Turning Your LLM into a Chatbot — FastAPI + Streaming
         status: ready
+  track: ebook
+  stage: education
 - id: rag-deep-dive
   category: ai
   title:
@@ -839,6 +843,8 @@ series:
         slug: 06-evaluation-and-quality-gates
         title: Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
         status: draft
+  track: authority
+  stage: internals
 - id: llm-app-foundations-101
   category: ai
   title:
@@ -912,6 +918,8 @@ series:
         slug: 06-streaming-responses
         title: Handling streaming responses — real-time output
         status: draft
+  track: traffic
+  stage: foundation
 - id: llm-api-production-101
   category: ai
   title:
@@ -929,7 +937,7 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  level: 101
+  level: 201
   status: planned
   path: content/llm-api-production-101
   per:
@@ -985,6 +993,8 @@ series:
         slug: 06-rate-limit-management
         title: Rate limit management — patterns for staying within limits
         status: draft
+  track: traffic
+  stage: production
 - id: vector-search-101
   category: ai
   title:
@@ -1058,6 +1068,8 @@ series:
         slug: 06-vector-search-pipeline
         title: Vector search pipeline — from document ingestion to query
         status: draft
+  track: traffic
+  stage: search
 - id: langchain-101
   category: ai
   title:
@@ -1131,6 +1143,8 @@ series:
         slug: 06-putting-it-together
         title: Putting it together — a complete chain in one file
         status: draft
+  track: authority
+  stage: foundation
 - id: ai-app-patterns-101
   category: ai
   title:
@@ -1204,6 +1218,8 @@ series:
         slug: 06-human-in-the-loop
         title: Human-in-the-loop — designing for human intervention
         status: draft
+  track: ebook
+  stage: patterns
 - id: korean-ai-stack-101
   category: ai
   title:
@@ -1277,6 +1293,8 @@ series:
         slug: 06-korean-rag-pipeline
         title: Assembling a Korean RAG pipeline
         status: draft
+  track: traffic
+  stage: korean
 - id: document-ingestion-101
   category: ai
   title:
@@ -1350,6 +1368,8 @@ series:
         slug: 06-pipeline-completion
         title: Completing the document ingestion pipeline
         status: draft
+  track: ebook
+  stage: rag
 - id: llm-apps-ops-101
   category: ai
   title:
@@ -1367,7 +1387,7 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  level: 101
+  level: 201
   status: planned
   path: content/llm-apps-ops-101
   per:
@@ -1423,14 +1443,16 @@ series:
         slug: 06-ops-complete
         title: Completing the LLM ops pipeline
         status: draft
+  track: authority
+  stage: ops
 - id: rag-benchmark-101
   category: ai
   title:
-    ko: RAG 벤치마크 101
-    en: RAG Benchmark 101
+    ko: RAG 평가와 벤치마크 101
+    en: RAG Evaluation and Benchmarking 101
   description:
-    ko: VectorDB, Embedding, Retriever, RAG 평가 비교 — 6부작.
-    en: VectorDB, embedding model, retriever, and RAG pipeline evaluation in 6 parts.
+    ko: RAG 품질 평가 6부작 — 평가 데이터셋, 임베딩/리트리버 비교, RAGAS, 의사결정 연결.
+    en: 6-part RAG evaluation guide — datasets, embedding/retriever comparison, RAGAS, product decisions.
   languages:
   - ko
   - en
@@ -1496,6 +1518,8 @@ series:
         slug: 06-benchmark-complete
         title: Completing the RAG benchmark
         status: draft
+  track: traffic
+  stage: rag
 - id: langgraph-101
   category: ai
   title:
@@ -1569,6 +1593,8 @@ series:
         slug: 06-langgraph-complete
         title: Completing LangGraph
         status: draft
+  track: authority
+  stage: patterns
 - id: llm-finetuning-101
   category: ai
   title:
@@ -1642,6 +1668,8 @@ series:
         slug: 06-serving
         title: Model serving
         status: draft
+  track: authority
+  stage: education
 - id: ax-practical-guide
   category: ax
   title:

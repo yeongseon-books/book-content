@@ -1,5 +1,8 @@
 ---
 title: Azure Functions란? — 이벤트가 함수를 호출하는 세상
+seo_title: Azure Functions란? Trigger, Binding, Host, Function App 구조 한 번에 이해하기
+medium_title: Azure Functions Is Not Just "Serverless" — It's an Event-Driven Mental Model
+ebook_title: 이벤트가 함수를 호출하는 세상
 series: azure-functions-101
 episode: 1
 language: ko
@@ -31,6 +34,13 @@ last_reviewed: '2026-04-29'
 이 글은 시리즈 7편 중 1번째 장입니다.
 이 장을 마치면 다음 장에서 **트리거와 바인딩 — 함수 입출력의 모든 것**으로 이어집니다.
 <!-- ebook-only:end -->
+
+## 이 글에서 답할 질문
+
+- Azure Functions는 기존 웹 앱(App Service)과 무엇이 다른가?
+- Trigger, Binding, Host, Function App은 각각 어떤 역할을 하는가?
+- 어떤 워크로드에서 Functions가 잘 맞고, 어떤 경우에는 피해야 하는가?
+- 콜드 스타트는 왜 생기고, 어디에 영향을 주는가?
 
 ## 한 문장 정의 — “이벤트가 들어오면 내 함수가 실행되고, 끝나면 사라진다”
 
