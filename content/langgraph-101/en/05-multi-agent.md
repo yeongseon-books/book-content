@@ -27,6 +27,17 @@ Complex tasks benefit from multiple specialized agents working together. One age
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: Multi-Agent is multiple graphs exchanging messages. A Supervisor distributes tasks and Sub-Agents handle each one.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Tool-calling agents**.
+After this chapter, the next one moves on to **Completing LangGraph**.
+<!-- ebook-only:end -->
+
 ## Supervisor-worker pattern
 
 The supervisor analyzes the request, delegates to the appropriate worker agent, and integrates the results into a final answer.

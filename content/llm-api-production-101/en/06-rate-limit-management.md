@@ -33,6 +33,16 @@ The main idea is simple: **rate-limit handling is not apologizing after a 429, i
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: rate limits hit on two axes — tokens per minute and requests per minute. Track both and use a queue to smooth the load.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Retry and error handling — making API calls reliable**.
+<!-- ebook-only:end -->
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later and the official `groq` SDK.

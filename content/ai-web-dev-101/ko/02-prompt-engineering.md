@@ -142,6 +142,15 @@ function login(user, pass) {
 다음 글: [AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현](./03-ai-chatbot.md)
 <!-- blog-only:end -->
 <!-- toc:begin -->
+
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 2번째 장입니다.
+앞 장에서는 **AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 시리즈 목차
 
 - [AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)

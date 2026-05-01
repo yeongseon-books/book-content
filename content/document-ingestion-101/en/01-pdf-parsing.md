@@ -34,6 +34,16 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: PDF parsing is two problems — extracting the text layer and reconstructing layout. Different libraries produce different results.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Chunking strategies — optimizing by document type**.
+<!-- ebook-only:end -->
+
 ## Choosing a PDF parsing library
 
 Python has three main PDF libraries.

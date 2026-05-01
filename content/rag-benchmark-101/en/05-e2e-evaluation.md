@@ -27,6 +27,17 @@ The companion code lives in [`yeongseon-books/rag-benchmark-101/en/05-e2e-evalua
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: end-to-end evaluation scores the full pipeline from question to generated answer. You need to pinpoint which stage is the bottleneck.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **VectorDB selection criteria**.
+After this chapter, the next one moves on to **Completing the RAG benchmark**.
+<!-- ebook-only:end -->
+
 ## End-to-end evaluation design
 
 Pipeline evaluation is about localizing failure, not just measuring accuracy.

@@ -35,6 +35,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: Prompt + LLM is the simplest possible chain. ChatPromptTemplate structures the input and the LLM returns a response.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **LangChain introduction — LCEL and the Runnable interface**.
+After this chapter, the next one moves on to **Retriever — document search and context injection**.
+<!-- ebook-only:end -->
+
 ## ChatPromptTemplate structure
 
 `ChatPromptTemplate` constructs conversation-style prompts and renders them into the message format the LLM expects.

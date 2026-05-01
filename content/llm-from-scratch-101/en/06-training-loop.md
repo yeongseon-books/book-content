@@ -31,6 +31,14 @@ Today's mental model is this: **Training is about repeatedly showing the model q
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 6 of 9 in the series.
+The previous chapter covered **Assembly: Completing the GPT Model Class**.
+After this chapter, the next one moves on to **Sampling — Generating Text from a Trained Model**.
+<!-- ebook-only:end -->
+
 ## The 5-line Core of the Training Loop
 
 The heart of the training loop consists of just five lines: `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, and `step()`. Everything else is operational code—handling evaluation intervals, logging, and learning rate scheduling.

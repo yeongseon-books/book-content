@@ -27,6 +27,16 @@ Pre-trained LLMs perform well on general tasks, but show clear limits in special
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: fine-tuning adjusts a pretrained model's weights for a specific task. Far less data and compute than pretraining; domain-specific performance is the payoff.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Dataset preparation and preprocessing**.
+<!-- ebook-only:end -->
+
 ## What fine-tuning is
 
 Fine-tuning continues training a pre-trained model's weights for a specific task. Two broad approaches exist: full fine-tuning, which updates all weights, and parameter-efficient fine-tuning (PEFT), which freezes most weights and trains only a small adapter.

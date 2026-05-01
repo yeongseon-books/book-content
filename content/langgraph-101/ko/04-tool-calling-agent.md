@@ -27,6 +27,17 @@ LLM이 스스로 도구를 선택하고 결과를 보고 다음 행동을 결정
 
 ---
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **Tool Calling Agent는 Thought → Action → Observation 루프다.** LangGraph에서는 이 루프가 노드와 엣지로 명시적으로 보인다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 4번째 장입니다.
+앞 장에서는 **조건부 엣지와 분기 흐름**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **멀티 에이전트 시스템**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 도구 정의
 
 LangChain의 `@tool` 데코레이터로 도구를 정의합니다. docstring이 LLM에 전달되는 도구 설명이 됩니다.

@@ -26,6 +26,14 @@ Part 2 turns the three core nouns into operating units.
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 2 of 7 in the series.
+The previous chapter covered **What is Azure Container Apps? — running containers without Kubernetes**.
+After this chapter, the next one moves on to **Your first deploy — Python/FastAPI**.
+<!-- ebook-only:end -->
+
 ## Start with the hierarchy
 
 Environment is the boundary.

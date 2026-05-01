@@ -27,6 +27,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 3번째 장입니다.
+앞 장에서는 **클러스터 아키텍처 — Control Plane과 Node Pool**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 오늘 할 일의 순서
 
 ![클러스터 생성부터 배포까지의 흐름](../../../assets/azure-aks-101/03/03-01-today-s-flow.ko.png)

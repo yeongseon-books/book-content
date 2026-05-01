@@ -27,6 +27,14 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 왜
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 5번째 장입니다.
+앞 장에서는 **Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **스케일링 — HPA, Cluster Autoscaler, KEDA**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 요청 경로부터 먼저 보자
 
 ![Ingress 앞단의 외부 요청 흐름](../../../assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)

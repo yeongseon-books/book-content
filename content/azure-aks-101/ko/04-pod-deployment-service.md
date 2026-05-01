@@ -27,6 +27,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 4번째 장입니다.
+앞 장에서는 **첫 클러스터 만들고 앱 배포하기 — Python/FastAPI**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 세 객체를 한 장으로 보면
 
 ![Pod와 Deployment와 Service의 관계](../../../assets/azure-aks-101/04/04-01-one-picture-first.ko.png)

@@ -35,6 +35,16 @@ The main idea is simple: **structured output in production is a contract design 
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: Structured Output constrains the model to a JSON schema. A Pydantic model locks the output shape and eliminates parsing errors.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Tool calling — connecting functions to the model**.
+<!-- ebook-only:end -->
+
 ## Runtime setup
 
 To run the examples as written, start with Python 3.10 or later and install the two packages used in this article.

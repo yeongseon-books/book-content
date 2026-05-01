@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a multi-format pipeline abstracts format-specific loaders behind a unified interface. One Document object handles every format the same way.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Incremental indexing — updating only changed documents**.
+After this chapter, the next one moves on to **Completing the document ingestion pipeline**.
+<!-- ebook-only:end -->
+
 ## LangChain DocumentLoader catalog
 
 ```python

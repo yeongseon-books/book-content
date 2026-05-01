@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: chunking strategy depends on document type. Continuous prose, sectioned docs, tables, and code each need different split criteria.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **PDF parsing and text extraction**.
+After this chapter, the next one moves on to **Metadata design and filtering**.
+<!-- ebook-only:end -->
+
 ## Fixed-size vs semantic-boundary chunking
 
 **Fixed-size chunking**: split at a fixed character count. Fast and predictable but may break mid-sentence.

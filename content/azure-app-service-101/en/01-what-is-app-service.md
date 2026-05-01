@@ -25,6 +25,13 @@ In this post, we'll explore how the platform works, focusing on the **3-Plane Ar
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 1 of 7 in the series.
+After this chapter, the next one moves on to **Request Lifecycle: How Requests Reach Your App**.
+<!-- ebook-only:end -->
+
 ## What is App Service?
 
 Azure App Service is a **fully managed platform** for hosting web apps, REST APIs, and mobile backends.

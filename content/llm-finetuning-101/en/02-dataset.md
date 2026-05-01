@@ -27,6 +27,17 @@ Data quality determines fine-tuning quality. It has more impact on final model p
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: dataset quality determines fine-tuning results. Consistent format and accurate labels matter more than volume.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **Introduction to LLM Fine-tuning**.
+After this chapter, the next one moves on to **Configuring the LoRA adapter**.
+<!-- ebook-only:end -->
+
 ## Data format
 
 Fine-tuning data is typically instruction-response pairs. The model learns to produce the desired output for a given input.

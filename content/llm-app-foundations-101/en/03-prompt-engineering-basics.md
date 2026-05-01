@@ -41,6 +41,14 @@ The main idea is simple: **good prompts start as structured message roles, not a
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Understanding tokens — cost, limits, and context windows**.
+After this chapter, the next one moves on to **Few-shot and chain-of-thought — steering better answers**.
+<!-- ebook-only:end -->
+
 ## Why prompt engineering is more than wording
 
 In Post 01, one `user` message was enough to make the first API call. Real applications move beyond that quickly. They need stable behavior across users, consistent output shape, and memory of earlier turns. Once those requirements appear, one free-form user string stops being enough.

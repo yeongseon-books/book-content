@@ -27,6 +27,16 @@ The companion code lives in [`yeongseon-books/rag-benchmark-101/en/06-benchmark-
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: benchmarks must be reproducible. Fix the dataset, model versions, and parameters, and automate the experiment so comparisons are meaningful.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **End-to-end RAG pipeline evaluation**.
+<!-- ebook-only:end -->
+
 ## Complete RAG benchmark framework
 
 ```python

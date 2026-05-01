@@ -41,6 +41,14 @@ The main idea is simple: **conversation memory lives in your application layer, 
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Few-shot and chain-of-thought — steering better answers**.
+After this chapter, the next one moves on to **Handling streaming responses — real-time output**.
+<!-- ebook-only:end -->
+
 ## Why LLM calls are stateless
 
 At the API boundary, each chat completion request is independent. The model sees only the payload you send. If you do not include earlier turns, those turns do not exist from the model's point of view.

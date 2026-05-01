@@ -37,6 +37,17 @@ This post covers five things:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: HuggingFace embeddings run locally for free. `sentence-transformers` downloads the model and returns vectors.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **What is an embedding — converting text into vectors**.
+After this chapter, the next one moves on to **Cosine similarity and vector search — computing sentence distances**.
+<!-- ebook-only:end -->
+
 ## Installation
 
 Three packages are needed.

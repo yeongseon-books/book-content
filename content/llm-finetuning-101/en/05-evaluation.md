@@ -27,6 +27,17 @@ A finished training run needs measurement. Loss alone is not enough. You need ta
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: task-specific metrics matter more than perplexity or BLEU. The real test is whether the model answers in the expected format.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Training loop and hyperparameters**.
+After this chapter, the next one moves on to **Model serving**.
+<!-- ebook-only:end -->
+
 ## Loading the fine-tuned model
 
 ```python

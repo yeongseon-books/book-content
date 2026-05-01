@@ -27,6 +27,16 @@ This post assembles all components from the series into one complete pipeline: P
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a complete pipeline runs ingest → parse → chunk → embed → index automatically. Independent modules make each stage replaceable and testable.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Multi-format document pipeline**.
+<!-- ebook-only:end -->
+
 ## Complete document ingestion pipeline
 
 ```python

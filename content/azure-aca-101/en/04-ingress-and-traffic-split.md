@@ -25,6 +25,14 @@ This post connects ingress with revision-based rollout control. The goal is not 
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 4 of 7 in the series.
+The previous chapter covered **Your first deploy — Python/FastAPI**.
+After this chapter, the next one moves on to **Scaling — KEDA scalers and zero-to-N**.
+<!-- ebook-only:end -->
+
 ## The request path
 
 ACA's managed ingress layer acts as the public entry point and routes traffic to active revisions.

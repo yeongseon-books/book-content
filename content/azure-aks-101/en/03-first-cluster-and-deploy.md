@@ -27,6 +27,14 @@ This post creates a small AKS cluster, adds a user node pool, and deploys a mini
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 3 of 7 in the series.
+The previous chapter covered **Cluster architecture — control plane and node pools**.
+After this chapter, the next one moves on to **Pod, Deployment, Service — the three ways you express a workload**.
+<!-- ebook-only:end -->
+
 ## Today's flow
 
 ![Cluster creation and deployment flow](../../../assets/azure-aks-101/03/03-01-today-s-flow.en.png)

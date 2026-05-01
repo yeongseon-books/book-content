@@ -31,6 +31,14 @@ SFT의 첫 효과는 지식보다 형식 변화입니다.
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 9편 중 8번째 장입니다.
+앞 장에서는 **샘플링 — 학습된 모델에서 글 뽑아내기**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## Pre-training vs Fine-tuning vs RLHF — 1분 정리
 
 pre-training은 다음 토큰 예측, SFT는 instruction-response 형식 적응, RLHF는 사람 선호 반영 단계입니다.

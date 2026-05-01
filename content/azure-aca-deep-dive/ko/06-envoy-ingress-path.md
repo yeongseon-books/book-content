@@ -19,6 +19,13 @@ last_reviewed: '2026-04-29'
 
 # Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 6번째 장입니다.
+앞 장에서는 **Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스**을 다뤘습니다.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다:

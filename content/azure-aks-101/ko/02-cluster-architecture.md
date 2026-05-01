@@ -27,6 +27,14 @@ AKS를 이해할 때 가장 먼저 분리해야 하는 것은 “클러스터의
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 2번째 장입니다.
+앞 장에서는 **Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **첫 클러스터 만들고 앱 배포하기 — Python/FastAPI**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 클러스터를 반으로 자르면 보이는 것
 
 ![Control Plane과 Node Pool의 책임 경계](../../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.ko.png)

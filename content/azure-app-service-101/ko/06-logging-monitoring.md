@@ -32,6 +32,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 6번째 장입니다.
+앞 장에서는 **Configuration 마스터하기: App Settings & 환경변수**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **Scaling 101: 언제 Scale Up vs Scale Out?**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 먼저 큰 그림: App Service에서 로그는 어디로 가는가?
 
 문제를 풀기 전에 로그의 목적지를 먼저 이해해야 합니다. 같은 `logger.info()`라도 **어디에 남느냐에 따라 쓸모가 완전히 달라지기 때문**입니다.

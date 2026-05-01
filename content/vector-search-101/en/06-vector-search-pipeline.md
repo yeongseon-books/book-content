@@ -37,6 +37,16 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a vector search pipeline is four steps — embed, index, query, retrieve. Each step should be independently replaceable.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Chunking strategies — how to split long documents**.
+<!-- ebook-only:end -->
+
 ## Pipeline structure
 
 A vector search pipeline has two phases.

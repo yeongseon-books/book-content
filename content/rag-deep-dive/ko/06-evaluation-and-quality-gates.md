@@ -21,6 +21,16 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive 시리즈 (6/6)
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **평가 지표 없이는 개선 방향이 없다.** RAGAS의 faithfulness·relevancy·precision이 RAG 품질을 숫자로 만든다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 6번째 장입니다.
+앞 장에서는 **RAG Chain 조립 — RetrievalQA vs LCEL**을 다뤘습니다.
+<!-- ebook-only:end -->
+
 ## 소스 버전
 
 이 글의 RAGAS 코드는 설치 가능한 [`ragas==0.1.22`](https://pypi.org/project/ragas/0.1.22/) 기준이고, LangChain 코드는 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다. 따라서 메트릭 구현 경로도 `ragas/metrics/_faithfulness.py`, `ragas/metrics/_answer_relevance.py`, `ragas/metrics/_context_precision.py`처럼 underscore-prefixed 파일명을 그대로 따릅니다.

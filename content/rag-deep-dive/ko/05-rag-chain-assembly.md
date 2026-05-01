@@ -21,6 +21,17 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive 시리즈 (5/6)
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **LCEL 파이프는 컴포넌트를 순서대로 연결한다.** `retriever | prompt | llm | parser` 한 줄이 완전한 RAG 체인이다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 5번째 장입니다.
+앞 장에서는 **프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 소스 버전
 
 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.

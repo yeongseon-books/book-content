@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: metadata is the source of search filters. Attaching source, date, and section info to each chunk enables precise filtered retrieval.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Chunking strategies — optimizing by document type**.
+After this chapter, the next one moves on to **Incremental indexing — updating only changed documents**.
+<!-- ebook-only:end -->
+
 ## Designing a metadata schema
 
 A good schema predefines the filter conditions you will use at query time.

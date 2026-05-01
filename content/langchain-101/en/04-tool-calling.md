@@ -37,6 +37,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: Tool Calling lets the model choose which function to call. The code executes it and returns the result back to the model.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Retriever — document search and context injection**.
+After this chapter, the next one moves on to **Streaming — handling real-time output**.
+<!-- ebook-only:end -->
+
 ## Defining tools
 
 The `@tool` decorator turns a Python function into a LangChain tool. The docstring tells the LLM what the tool does and when to use it. Type hints define the input schema.

@@ -29,6 +29,14 @@ Today's mental model is this: **Fine-tuning isn't about discarding the base mode
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 8 of 9 in the series.
+The previous chapter covered **Sampling — Generating Text from a Trained Model**.
+After this chapter, the next one moves on to **Turning Your LLM into a Chatbot — FastAPI + Streaming**.
+<!-- ebook-only:end -->
+
 ## Pre-training vs Fine-tuning vs RLHF — A Quick Summary
 
 Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.

@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a workflow is an agent with fixed steps. Explicit branches and loops make behavior predictable.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Agent and tool pattern — autonomous tool selection**.
+After this chapter, the next one moves on to **Human-in-the-loop — designing for human intervention**.
+<!-- ebook-only:end -->
+
 ## Sequential chains
 
 LCEL's `|` operator connects stages: the left stage's output becomes the right stage's input.

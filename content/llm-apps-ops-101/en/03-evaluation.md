@@ -23,6 +23,17 @@ last_reviewed: '2026-05-01'
 
 When you swap models or revise a prompt, how do you confirm things actually improved? Manual review works for a handful of examples, but it does not scale to thousands of responses. This post builds an automated evaluation pipeline: LLM-as-judge scoring, factual consistency checks, and format compliance validation.
 
+<!-- ebook-only:start -->
+
+**The key idea**: LLM evaluation turns open-ended output into scores. Combine reference-based, LLM-as-judge, and human evaluation based on the goal.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **LLM cost tracking and optimization**.
+After this chapter, the next one moves on to **LLM app security**.
+<!-- ebook-only:end -->
+
 ## Example code
 Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
 

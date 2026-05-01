@@ -19,6 +19,13 @@ last_reviewed: '2026-04-29'
 
 # App Service platform architecture — Front-End, Worker, File Server
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Front-End and ARR — how a request reaches a worker**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 This post grounds its claims in the following public sources.

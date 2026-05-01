@@ -23,6 +23,16 @@ last_reviewed: '2026-05-01'
 
 이 시리즈에서 다룬 모니터링, 비용 추적, 품질 평가, 보안, 배포 전략을 하나의 프로덕션 서버로 통합합니다. 각 레이어는 독립적으로 교체 가능하고, 전체가 함께 동작할 때 신뢰할 수 있는 LLM 앱 운영 기반이 됩니다.
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **LLMOps는 개발·배포·모니터링·재학습 루프를 자동화한다.** 피드백을 수집하고 지표가 떨어지면 트리거가 울려야 한다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 6번째 장입니다.
+앞 장에서는 **LLM 앱 배포 전략**을 다뤘습니다.
+<!-- ebook-only:end -->
+
 ## 예제 코드
 예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
 

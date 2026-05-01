@@ -37,6 +37,16 @@ This post focuses on the concept and intuition behind embeddings. Code is minima
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: an embedding compresses text into a high-dimensional vector. Sentences with similar meaning land close together in that space.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **HuggingFace embeddings in practice — creating your first vectors with sentence-transformers**.
+<!-- ebook-only:end -->
+
 ## The ceiling of keyword search
 
 Traditional search ranks results by term frequency and position. TF-IDF and BM25 are the canonical examples. These methods are fast, interpretable, and accurate when the query shares vocabulary with the document.

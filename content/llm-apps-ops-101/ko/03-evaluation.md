@@ -23,6 +23,17 @@ last_reviewed: '2026-05-01'
 
 모델을 교체하거나 프롬프트를 수정할 때 "더 좋아졌는가"를 어떻게 판단하나요? 사람이 직접 읽어보는 것도 방법이지만, 수천 건의 응답을 수작업으로 검토할 수는 없습니다. 이 포스트에서는 LLM-as-judge 패턴, 사실 일관성 검사, 형식 준수 검사로 자동 평가 파이프라인을 구축합니다.
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **LLM 평가는 정답이 없는 출력을 점수로 만드는 것이다.** 참조 기반·LLM-as-judge·사람 평가를 목적에 맞게 조합한다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 3번째 장입니다.
+앞 장에서는 **LLM 비용 추적과 최적화**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **LLM 앱 보안**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 예제 코드
 예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
 

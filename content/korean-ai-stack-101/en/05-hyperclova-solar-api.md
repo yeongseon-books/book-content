@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: HyperCLOVA X and Solar are LLM APIs specialized for Korean. They are advantageous in domains where Korean nuance matters.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Document text extraction with CLOVA OCR API**.
+After this chapter, the next one moves on to **Assembling a Korean RAG pipeline**.
+<!-- ebook-only:end -->
+
 ## HyperCLOVA X API
 
 Obtain an API key from NAVER Cloud Platform's CLOVA Studio.

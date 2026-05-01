@@ -34,6 +34,16 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a Korean RAG pipeline swaps each stage for a Korean-friendly component. Different combinations produce different performance profiles.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Using HyperCLOVA X and Solar API**.
+<!-- ebook-only:end -->
+
 ## Pipeline architecture
 
 ```

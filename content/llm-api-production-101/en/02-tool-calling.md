@@ -35,6 +35,14 @@ The main idea is straightforward: **tool calling is not model autonomy, it is an
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **Structured output — JSON mode and response schemas**.
+After this chapter, the next one moves on to **Streaming in depth — chunk handling and error recovery**.
+<!-- ebook-only:end -->
+
 ## Runtime setup
 
 If you want to run the examples end to end, start with Python 3.10 or later and install the required packages first.

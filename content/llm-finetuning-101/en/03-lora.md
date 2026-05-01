@@ -27,6 +27,17 @@ LoRA (Low-Rank Adaptation) freezes the original model weights and adds a small p
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: LoRA freezes the original weights and trains only low-rank matrices. Under 1% of parameters are updated; performance holds.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Dataset preparation and preprocessing**.
+After this chapter, the next one moves on to **Training loop and hyperparameters**.
+<!-- ebook-only:end -->
+
 ## How LoRA works
 
 Instead of updating the full weight matrix W (d×k), LoRA approximates the update with the product of two low-rank matrices A (d×r) and B (r×k), where r << min(d, k).

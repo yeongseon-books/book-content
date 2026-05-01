@@ -35,6 +35,17 @@ This post implements all three metrics from scratch, shows why normalization mat
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: cosine similarity measures the alignment of two vector directions. It ignores magnitude, so sentence length differences do not matter.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **HuggingFace embeddings in practice — creating your first vectors with sentence-transformers**.
+After this chapter, the next one moves on to **FAISS fundamentals — fast approximate nearest-neighbor search**.
+<!-- ebook-only:end -->
+
 ## Three distance metrics
 
 ### Cosine similarity

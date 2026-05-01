@@ -37,6 +37,17 @@ This post covers five things:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: chunk size and overlap control retrieval quality. Too large adds noise; too small loses context.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **FAISS fundamentals — fast approximate nearest-neighbor search**.
+After this chapter, the next one moves on to **Vector search pipeline — from document ingestion to query**.
+<!-- ebook-only:end -->
+
 ## Chunk size and overlap
 
 Two parameters control chunking: `chunk_size` and `chunk_overlap`.

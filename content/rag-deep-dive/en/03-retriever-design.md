@@ -21,6 +21,17 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive series (3/6)
 
+<!-- ebook-only:start -->
+
+**The key idea**: a retriever encapsulates a search strategy. The same VectorStore returns different results depending on which `search_type` you attach.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Embeddings and the Vector Index — Inside FAISS IndexFlatL2**.
+After this chapter, the next one moves on to **Prompt Construction and Context Injection — Inside PromptTemplate**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 All code citations in this post are pinned to [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17).

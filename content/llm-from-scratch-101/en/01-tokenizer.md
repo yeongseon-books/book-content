@@ -31,6 +31,13 @@ Today's mental model is simple: **The model doesn't read text. It reads integer 
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 1 of 9 in the series.
+After this chapter, the next one moves on to **From Integers to Vectors and Positions**.
+<!-- ebook-only:end -->
+
 ## Why Can't We Just Input Text?
 
 Neural networks process tensors. You can't perform addition or matrix multiplication on a string. To process a line like "To be, or not to be," we first have to convert it into numbers. These numbers are called Token IDs.

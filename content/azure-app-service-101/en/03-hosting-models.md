@@ -27,6 +27,14 @@ In this post, we'll cover the **key criteria for choosing your Hosting Model**.
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 3 of 7 in the series.
+The previous chapter covered **Request Lifecycle: How Requests Reach Your App**.
+After this chapter, the next one moves on to **First Deployment: From Local to Azure (Python/Flask)**.
+<!-- ebook-only:end -->
+
 ## Decision Flowchart
 
 The flow for deciding your App Service hosting strategy:

@@ -21,6 +21,16 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive series (1/6)
 
+<!-- ebook-only:start -->
+
+**The key idea**: chunk quality determines RAG performance. What the loader reads and the TextSplitter splits is the first variable in retrieval accuracy.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Embeddings and the Vector Index — Inside FAISS IndexFlatL2**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 All code citations in this post are pinned to [`langchain-ai/langchain @ v0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17).

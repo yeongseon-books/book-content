@@ -27,6 +27,16 @@ LangChain handles linear chains well. Real agents are different — they use a t
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: LangGraph represents agent flow as a graph. Nodes (functions) and edges (transition conditions) define loops and branches explicitly.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **State management and checkpoints**.
+<!-- ebook-only:end -->
+
 ## Core concepts
 
 LangGraph represents LLM workflows as **directed graphs**.

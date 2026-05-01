@@ -34,6 +34,16 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a production chain is a composition of retriever, prompt, LLM, and parser. Each component can be swapped independently.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Streaming — handling real-time output**.
+<!-- ebook-only:end -->
+
 ## Document indexing pipeline
 
 ```python

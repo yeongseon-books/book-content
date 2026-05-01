@@ -19,6 +19,14 @@ last_reviewed: '2026-04-29'
 
 # kubelet and containerd — how a container actually starts on a node
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **Control plane anatomy — what AKS hides from you**.
+After this chapter, the next one moves on to **CNI and Azure CNI Overlay — where Pod IPs come from**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

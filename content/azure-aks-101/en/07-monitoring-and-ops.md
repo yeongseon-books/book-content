@@ -27,6 +27,13 @@ This final post is a 101-level operations map for AKS: what Container Insights g
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 7 of 7 in the series.
+The previous chapter covered **Scaling — HPA, Cluster Autoscaler, KEDA**.
+<!-- ebook-only:end -->
+
 ## The operations view in one diagram
 
 ![Operations observability across logs and metrics](../../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)

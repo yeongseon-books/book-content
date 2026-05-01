@@ -31,6 +31,14 @@ The mental model for today is simple: **Attention mixes information across token
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 4 of 9 in the series.
+The previous chapter covered **Deciding Which Tokens to Focus On**.
+After this chapter, the next one moves on to **Assembly: Completing the GPT Model Class**.
+<!-- ebook-only:end -->
+
 ## FeedForward is Just a 2-layer MLP
 
 Stacking only attention layers allows tokens to reference each other extensively, but the representational power doesn't grow as expected. Each position lacks sufficient non-linear transformation. To fix this, we add an MLP with the structure `Linear(C, 4C) -> GELU -> Linear(4C, C)` to every block.

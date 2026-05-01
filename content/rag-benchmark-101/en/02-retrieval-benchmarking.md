@@ -27,6 +27,17 @@ The companion code lives in [`yeongseon-books/rag-benchmark-101/en/02-retrieval-
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a retrieval benchmark swaps retrievers on the same question set. Precision@k, MRR, and NDCG are the core metrics.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **Understanding RAG evaluation metrics**.
+After this chapter, the next one moves on to **Comparing embedding models**.
+<!-- ebook-only:end -->
+
 ## Benchmark design
 
 Measuring retrieval performance requires three things.

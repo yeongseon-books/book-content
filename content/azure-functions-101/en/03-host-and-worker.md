@@ -31,6 +31,14 @@ Let’s unpack that line with diagrams.
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 3 of 7 in the series.
+The previous chapter covered **Triggers and Bindings — Everything About Function I/O**.
+After this chapter, the next one moves on to **Deploy a Function App — From Localhost to Azure**.
+<!-- ebook-only:end -->
+
 ## The big picture — two processes
 
 A traditional web framework usually does everything inside a single process. Loading code, handling HTTP, calling the database, building the response — all in one chunk.

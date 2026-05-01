@@ -25,6 +25,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 3번째 장입니다.
+앞 장에서는 **Environment·Container App·Revision — 세 단어로 보는 ACA**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **Ingress와 트래픽 분할 — Revision 기반 배포 전략**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 배포 경로 전체 보기
 
 경로를 먼저 보면 배포가 훨씬 단순하게 느껴집니다.

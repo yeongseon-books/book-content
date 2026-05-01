@@ -27,6 +27,17 @@ Conversational agents need to remember previous turns. LangGraph's checkpointer 
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: State is a dictionary shared across the entire graph. Each node reads and updates it; Checkpoints persist it.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **LangGraph introduction and graph basics**.
+After this chapter, the next one moves on to **Conditional edges and branching**.
+<!-- ebook-only:end -->
+
 ## How checkpoints work
 
 Without a checkpointer, every graph invocation is independent. With a checkpointer, a `thread_id` identifies a conversation session — invoking with the same `thread_id` resumes from where the last invocation left off.

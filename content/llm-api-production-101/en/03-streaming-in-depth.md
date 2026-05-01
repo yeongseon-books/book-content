@@ -33,6 +33,17 @@ The goal is not a clever UI effect. The goal is a streaming consumer that can ex
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: streaming eliminates time-to-first-token (TTFT). The longer the response, the greater the perceived speed improvement.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Tool calling — connecting functions to the model**.
+After this chapter, the next one moves on to **Caching strategies — reducing cost and latency**.
+<!-- ebook-only:end -->
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later and the official `groq` SDK.

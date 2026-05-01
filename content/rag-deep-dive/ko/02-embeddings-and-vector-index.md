@@ -21,6 +21,17 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive 시리즈 (2/6)
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **임베딩은 텍스트를 거리로 바꾼다.** 의미가 비슷할수록 벡터 공간에서 가깝고, FAISS는 그 거리를 빠르게 찾는다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 2번째 장입니다.
+앞 장에서는 **문서 로딩과 청크 전략 — LangChain TextSplitter 내부**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **Retriever 설계 — VectorStoreRetriever와 MMR**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 소스 버전
 
 이 글의 LangChain 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17), FAISS C++ 코드 인용은 [`facebookresearch/faiss @ c72ef8a`](https://github.com/facebookresearch/faiss/tree/c72ef8a) 기준입니다.

@@ -33,6 +33,17 @@ The main idea is simple: **a retry is not a friendly loop, it is a bounded recov
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: retry with exponential backoff absorbs transient errors. Controlling retry count and interval handles most 429 and 503 responses.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Caching strategies — reducing cost and latency**.
+After this chapter, the next one moves on to **Rate limit management — patterns for staying within limits**.
+<!-- ebook-only:end -->
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later with `groq` and `tenacity` installed.

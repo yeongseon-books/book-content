@@ -27,6 +27,17 @@ Linear pipelines always take the same path. Agents need to choose different path
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a conditional edge inspects State and decides the next node. The function returns a string key; the graph routes to the matching node.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **State management and checkpoints**.
+After this chapter, the next one moves on to **Tool-calling agents**.
+<!-- ebook-only:end -->
+
 ## Conditional edge basics
 
 `add_conditional_edges` takes a routing function that receives state and returns the next node name.

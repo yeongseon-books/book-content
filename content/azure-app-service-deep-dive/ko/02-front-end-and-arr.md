@@ -19,6 +19,14 @@ last_reviewed: '2026-04-29'
 
 # Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 2번째 장입니다.
+앞 장에서는 **App Service 플랫폼 아키텍처 — Front-End·Worker·File Server**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.

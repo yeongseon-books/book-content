@@ -25,6 +25,13 @@ last_reviewed: '2026-04-29'
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 7번째 장입니다.
+앞 장에서는 **스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간**을 다뤘습니다.
+<!-- ebook-only:end -->
+
 ## 시작점은 Application Insights입니다
 
 Azure Functions 운영 데이터의 대부분은 Application Insights로 모입니다. 요청, 예외, 의존성 호출, 로그, 사용자 정의 메트릭을 한 자리에서 볼 수 있으니, Function App 생성 시점에 App Insights 연결을 빠뜨리지 않는 것이 가장 중요합니다.

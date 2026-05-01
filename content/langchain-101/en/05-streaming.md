@@ -37,6 +37,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: Streaming sends tokens as they are generated. `stream()` returns a generator and the client receives output in real time.
+
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Tool calling — connecting external tools**.
+After this chapter, the next one moves on to **Putting it together — a complete chain in one file**.
+<!-- ebook-only:end -->
+
 ## Basic streaming
 
 `stream()` returns a generator. Iterate over it with a `for` loop.

@@ -23,6 +23,16 @@ last_reviewed: '2026-05-01'
 
 This post assembles monitoring, cost tracking, quality evaluation, security, and deployment into a single production server. Each layer is independently replaceable; together they form a reliable operational foundation for any LLM app.
 
+<!-- ebook-only:start -->
+
+**The key idea**: LLMOps automates the develop → deploy → monitor → retrain loop. Collect feedback and trigger alerts when metrics degrade.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **LLM app deployment strategies**.
+<!-- ebook-only:end -->
+
 ## Example code
 Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
 

@@ -29,6 +29,13 @@ Today's mental model is this: **A chatbot isn't just a model. It's a small syste
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 9 of 9 in the series.
+The previous chapter covered **Adapting the Base Model to Specific Tasks**.
+<!-- ebook-only:end -->
+
 ## Chatbot = Model + History + Streaming + UI
 
 To build a functional chatbot, we need four components working together: the model itself, a way to track the conversation, a streaming protocol, and a browser-based frontend.

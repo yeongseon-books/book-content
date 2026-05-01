@@ -25,6 +25,13 @@ The scope is practical: the baseline observability view, a small KQL toolkit for
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 7 of 7 in the series.
+The previous chapter covered **Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t**.
+<!-- ebook-only:end -->
+
 ## Application Insights Is the Starting Point
 
 Most of the operational data you need for Azure Functions ends up in Application Insights. Requests, exceptions, dependency calls, logs, and custom metrics converge there, which makes App Insights integration one of the most important choices you make when standing up a Function App.

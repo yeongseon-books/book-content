@@ -19,6 +19,13 @@ last_reviewed: '2026-04-29'
 
 # KEDA 내부 — ScaledObject가 HPA를 만드는 방식
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 6번째 장입니다.
+앞 장에서는 **HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프**을 다뤘습니다.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

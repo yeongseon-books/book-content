@@ -43,6 +43,13 @@ The main idea is simple: **an LLM app begins with request and response structure
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Understanding tokens — cost, limits, and context windows**.
+<!-- ebook-only:end -->
+
 ## What an LLM API is
 
 An LLM API is still an API. The transport is HTTP. The payload is usually JSON. Your code sends input to a remote service, and that service sends structured output back.

@@ -34,6 +34,16 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: Korean embedding models compress Korean sentence meaning into vectors. KoSimCSE, BGE-M3, and Solar each take a different approach.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Building sentence similarity search with KoSimCSE**.
+<!-- ebook-only:end -->
+
 ## Why Korean-specific models matter
 
 A multilingual model like `sentence-transformers/all-MiniLM-L6-v2` can process Korean text, but its training corpus is English-dominant. It is not sensitive to Korean particles, verb endings, or the way meaning is packed into suffixes. As a result, "서울시청" and "서울 시청" — the same place, written with and without a space — can end up far apart in embedding space. Korean-specific models trained on morpheme-tokenized data reduce these errors.

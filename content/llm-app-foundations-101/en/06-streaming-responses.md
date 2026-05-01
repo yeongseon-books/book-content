@@ -43,6 +43,13 @@ The main idea is simple: **streaming does not make the model smarter or faster, 
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Managing conversation state — building a multi-turn chatbot**.
+<!-- ebook-only:end -->
+
 ## Why streaming matters
 
 From a backend point of view, blocking calls are attractive. The implementation is easy to explain. Send the request, wait for completion, read the final text, return the result. That is perfectly fine for small scripts and offline jobs.

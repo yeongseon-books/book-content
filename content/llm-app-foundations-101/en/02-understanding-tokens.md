@@ -41,6 +41,14 @@ The central idea is simple: **LLM applications run on token budgets, not on raw 
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **LLM API first call — sending your first request**.
+After this chapter, the next one moves on to **Prompt engineering basics — system, user, and assistant roles**.
+<!-- ebook-only:end -->
+
 ## What a token actually is
 
 A token is a chunk of text from the model's point of view. That chunk is not guaranteed to be a word. Sometimes a short common word becomes one token. Sometimes a longer word is split into several pieces. Korean text can split across stems, particles, and endings. Numbers, whitespace, newlines, punctuation, and code symbols all count too.

@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a document assistant turns long text into short structure. Summarization, extraction, and classification are all variations on the same Prompt-LLM pipe.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **RAG Q&A pattern — document-based question answering**.
+After this chapter, the next one moves on to **Agent and tool pattern — autonomous tool selection**.
+<!-- ebook-only:end -->
+
 ## Document summarization
 
 For short documents, pass the full text directly and request a summary. Parameterizing style, length, and audience lets the same chain serve different consumers.

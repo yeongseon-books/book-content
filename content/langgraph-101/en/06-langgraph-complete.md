@@ -27,6 +27,16 @@ This post assembles graph basics, checkpoints, conditional edges, tool calling, 
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: the heart of a LangGraph app is State design. Decide what to share and what to isolate; everything else follows.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Multi-agent systems**.
+<!-- ebook-only:end -->
+
 ## Complete production agent
 
 ```python

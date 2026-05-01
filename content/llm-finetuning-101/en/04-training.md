@@ -27,6 +27,17 @@ With a LoRA adapter and dataset ready, it's time to train. Hugging Face TRL's `S
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: the training loop repeats batches until loss converges. Learning rate and batch size control convergence speed and stability.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Configuring the LoRA adapter**.
+After this chapter, the next one moves on to **Model evaluation**.
+<!-- ebook-only:end -->
+
 ## SFTTrainer setup
 
 ```python

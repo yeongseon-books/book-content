@@ -27,6 +27,17 @@ The companion code lives in [`yeongseon-books/rag-benchmark-101/en/03-embedding-
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: embedding comparison runs the same queries on the same corpus with different models. Each model has domain strengths.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Measuring retrieval performance**.
+After this chapter, the next one moves on to **VectorDB selection criteria**.
+<!-- ebook-only:end -->
+
 ## Models under comparison
 
 Three models commonly found in production RAG systems.

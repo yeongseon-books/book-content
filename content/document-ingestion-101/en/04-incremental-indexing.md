@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: incremental indexing reprocesses only changed documents. Hash or modification time detects changes; only the affected chunks are updated.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Metadata design and filtering**.
+After this chapter, the next one moves on to **Multi-format document pipeline**.
+<!-- ebook-only:end -->
+
 ## Change detection strategies
 
 Two approaches for detecting file changes:

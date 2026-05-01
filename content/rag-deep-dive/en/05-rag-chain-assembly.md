@@ -21,6 +21,14 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive series (5/6)
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 5 of 6 in the series.
+The previous chapter covered **Prompt Construction and Context Injection — Inside PromptTemplate**.
+After this chapter, the next one moves on to **Evaluation and Quality Gates — RAGAS Metrics and Faithfulness**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 All code citations in this post are pinned to [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17).

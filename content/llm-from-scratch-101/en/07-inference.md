@@ -29,6 +29,14 @@ Today's mental model is simple. **Generation is an autoregressive loop where you
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 7 of 9 in the series.
+The previous chapter covered **Learning via Gradients**.
+After this chapter, the next one moves on to **Adapting the Base Model to Specific Tasks**.
+<!-- ebook-only:end -->
+
 ## Autoregressive Generation — One Token at a Time
 
 We input the current context `idx`, extract only the last step's logits, and then append the sampled token to the sequence.

@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: CLOVA OCR extracts text from images. It turns scanned documents, receipts, and business cards into structured text for RAG pipelines.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **BGE-M3 multilingual embedding in practice**.
+After this chapter, the next one moves on to **Using HyperCLOVA X and Solar API**.
+<!-- ebook-only:end -->
+
 ## API setup
 
 Create an OCR domain in NAVER Cloud Platform to obtain an API URL and a Secret Key. Set both as environment variables.

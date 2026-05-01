@@ -35,6 +35,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: KoSimCSE uses contrastive learning to capture Korean similarity. Same-meaning sentence pairs are pushed together; different ones are pushed apart.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **Korean embedding models compared — KoSimCSE, BGE-M3, Solar**.
+After this chapter, the next one moves on to **BGE-M3 multilingual embedding in practice**.
+<!-- ebook-only:end -->
+
 ## Installation
 
 ```bash

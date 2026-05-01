@@ -27,6 +27,13 @@ AKS는 배포가 끝났다고 운영이 끝나지 않습니다. 오히려 그때
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 7번째 장입니다.
+앞 장에서는 **스케일링 — HPA, Cluster Autoscaler, KEDA**을 다뤘습니다.
+<!-- ebook-only:end -->
+
 ## 운영 시야를 한 장으로 보면
 
 ![로그와 메트릭 기반 운영 관측 구조](../../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)

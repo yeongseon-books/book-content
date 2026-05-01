@@ -27,6 +27,17 @@ The companion code lives in [`yeongseon-books/rag-benchmark-101/en/04-vectordb-s
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: VectorDB selection is a tradeoff among scale, latency, and accuracy. FAISS, Chroma, Qdrant, and Pinecone have different operational profiles.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Comparing embedding models**.
+After this chapter, the next one moves on to **End-to-end RAG pipeline evaluation**.
+<!-- ebook-only:end -->
+
 ## Evaluation axes
 
 Four dimensions drive vector database selection.

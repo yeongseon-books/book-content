@@ -27,6 +27,16 @@ This post covers deploying a fine-tuned model into a service. Merge the LoRA ada
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: serving means loading the base model weights together with the LoRA adapter. vLLM and Ollama act as inference servers.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Model evaluation**.
+<!-- ebook-only:end -->
+
 ## Merging the adapter
 
 Merging the LoRA adapter into the base model lets you serve a single model at inference time, with no PEFT layer overhead. The merged model has the same parameter count as the original.

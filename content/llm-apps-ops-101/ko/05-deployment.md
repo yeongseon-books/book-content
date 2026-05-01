@@ -23,6 +23,17 @@ last_reviewed: '2026-05-01'
 
 LLM 앱을 로컬에서 프로덕션으로 올릴 때 가장 자주 마주치는 문제는 타임아웃, 동시성, 재시도 처리입니다. 이 포스트에서는 FastAPI 기반 서버, 연결 풀링, 재시도 로직, 헬스체크를 갖춘 배포 가능한 LLM 서버를 구축합니다.
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **배포는 모델 버전·프롬프트 버전·코드 버전을 함께 관리하는 것이다.** 세 버전이 어긋나면 재현 불가능한 버그가 생긴다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 5번째 장입니다.
+앞 장에서는 **LLM 앱 보안**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **LLM 앱 운영 완성**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 예제 코드
 예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
 

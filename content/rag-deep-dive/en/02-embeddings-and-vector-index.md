@@ -21,6 +21,17 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive series (2/6)
 
+<!-- ebook-only:start -->
+
+**The key idea**: embeddings turn text into distances. Similar meanings end up close in vector space, and FAISS finds those distances fast.
+
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **Document Loading and Chunking — Inside LangChain TextSplitter**.
+After this chapter, the next one moves on to **Retriever Design — VectorStoreRetriever and MMR**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 LangChain code citations in this post are pinned to [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17), and FAISS C++ code citations are pinned to [`facebookresearch/faiss @ c72ef8a`](https://github.com/facebookresearch/faiss/tree/c72ef8a).

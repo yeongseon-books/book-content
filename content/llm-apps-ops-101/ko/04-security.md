@@ -23,6 +23,17 @@ last_reviewed: '2026-05-01'
 
 LLM 앱은 사용자 입력을 그대로 모델에 전달하는 구조이기 때문에 프롬프트 인젝션, 민감 정보 유출, 응답 오용 등 새로운 보안 위협에 노출됩니다. 이 포스트에서는 입력 검증, 민감 정보 마스킹, 출력 안전 필터를 중심으로 LLM 보안 레이어를 구축합니다.
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **LLM 앱의 보안 위협은 Prompt Injection이 가장 흔하다.** 입력 검증·출력 필터·권한 분리가 기본 방어선이다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 4번째 장입니다.
+앞 장에서는 **LLM 출력 품질 평가**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **LLM 앱 배포 전략**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 예제 코드
 예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
 

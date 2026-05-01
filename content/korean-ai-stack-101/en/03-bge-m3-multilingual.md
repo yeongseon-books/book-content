@@ -34,6 +34,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: BGE-M3 handles multiple languages in a single model. Korean and English share the same vector space, enabling cross-lingual retrieval.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Building sentence similarity search with KoSimCSE**.
+After this chapter, the next one moves on to **Document text extraction with CLOVA OCR API**.
+<!-- ebook-only:end -->
+
 ## BGE-M3's three output types
 
 BGE-M3 produces three different embedding forms from the same input.

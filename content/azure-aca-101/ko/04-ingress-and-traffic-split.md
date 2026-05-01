@@ -25,6 +25,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 7편 중 4번째 장입니다.
+앞 장에서는 **첫 앱 배포하기 — Python/FastAPI**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **스케일링 — KEDA scaler와 0-to-N**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 요청 경로
 
 ACA의 관리형 Ingress 계층이 앞문 역할을 맡고 활성 Revision으로 트래픽을 보냅니다.

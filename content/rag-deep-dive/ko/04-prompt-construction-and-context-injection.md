@@ -21,6 +21,17 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive 시리즈 (4/6)
 
+<!-- ebook-only:start -->
+
+이 장의 핵심: **프롬프트는 컨텍스트와 질문을 붙이는 접착제다.** PromptTemplate이 두 입력을 하나의 LLM 호출로 만든다.
+
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 4번째 장입니다.
+앞 장에서는 **Retriever 설계 — VectorStoreRetriever와 MMR**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **RAG Chain 조립 — RetrievalQA vs LCEL**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## 소스 버전
 
 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.

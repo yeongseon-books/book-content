@@ -19,6 +19,14 @@ last_reviewed: '2026-04-29'
 
 # Environment internals — the network, observability, and Dapr scope boundary
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 2 of 6 in the series.
+The previous chapter covered **ACA architecture — what Microsoft layered on a hidden Kubernetes**.
+After this chapter, the next one moves on to **Revisions and traffic splitting — where Envoy weights come from**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:

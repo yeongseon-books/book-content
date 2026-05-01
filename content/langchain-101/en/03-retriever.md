@@ -37,6 +37,17 @@ Topics:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a Retriever takes a question and returns relevant documents. It abstracts a VectorStore into a search interface.
+
+## Where this chapter fits
+
+This is chapter 3 of 6 in the series.
+The previous chapter covered **Prompt and LLM chain — assembling your first chain**.
+After this chapter, the next one moves on to **Tool calling — connecting external tools**.
+<!-- ebook-only:end -->
+
 ## Creating a FAISS VectorStore
 
 LangChain's `FAISS` class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.

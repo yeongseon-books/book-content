@@ -33,6 +33,17 @@ The main idea is simple: **an LLM cache is not a box for prompt outputs, it is a
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: caching means never sending the same input twice. Semantic cache extends this to similar — not just identical — questions.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Streaming in depth — chunk handling and error recovery**.
+After this chapter, the next one moves on to **Retry and error handling — making API calls reliable**.
+<!-- ebook-only:end -->
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later and the official `groq` SDK.

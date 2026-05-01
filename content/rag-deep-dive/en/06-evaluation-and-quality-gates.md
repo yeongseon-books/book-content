@@ -21,6 +21,16 @@ last_reviewed: '2026-04-30'
 
 > RAG Deep Dive series (6/6)
 
+<!-- ebook-only:start -->
+
+**The key idea**: without evaluation metrics there is no improvement direction. RAGAS faithfulness, relevancy, and precision turn RAG quality into numbers.
+
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **Assembling the RAG Chain — RetrievalQA vs LCEL**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 All RAGAS code citations in this post refer to the installable [`ragas==0.1.22`](https://pypi.org/project/ragas/0.1.22/) package, and all LangChain citations are pinned to [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17). Accordingly, the metric source files discussed here are `ragas/metrics/_faithfulness.py`, `ragas/metrics/_answer_relevance.py`, and `ragas/metrics/_context_precision.py`.

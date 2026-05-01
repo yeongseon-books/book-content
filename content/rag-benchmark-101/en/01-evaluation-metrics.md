@@ -27,6 +27,16 @@ The companion code lives in [`yeongseon-books/rag-benchmark-101/en/01-evaluation
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: RAG evaluation separates retrieval quality from generation quality. Recall@k measures retrieval; Faithfulness and Answer Relevancy measure generation.
+
+## Where this chapter fits
+
+This is chapter 1 of 6 in the series.
+After this chapter, the next one moves on to **Measuring retrieval performance**.
+<!-- ebook-only:end -->
+
 ## Two evaluation layers
 
 RAG evaluation splits across two layers.

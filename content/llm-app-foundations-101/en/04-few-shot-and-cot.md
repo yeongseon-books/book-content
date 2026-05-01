@@ -41,6 +41,17 @@ The operating idea is simple: better prompts are often less about clever wording
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: few-shot examples show the model a pattern. Chain-of-Thought exposes intermediate reasoning steps so the model can solve harder problems.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Prompt engineering basics — system, user, and assistant roles**.
+After this chapter, the next one moves on to **Managing conversation state — building a multi-turn chatbot**.
+<!-- ebook-only:end -->
+
 ## Few-shot prompting teaches by example inside the messages array
 
 Few-shot prompting is the practice of placing one or more worked examples before the real question. In chat APIs, those examples are not stored in a separate training field. They live in the same `messages` array as everything else, usually as paired `user` and `assistant` turns.

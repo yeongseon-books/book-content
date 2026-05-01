@@ -19,6 +19,13 @@ last_reviewed: '2026-04-29'
 
 # KEDA internals — how a ScaledObject builds an HPA
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 6 of 6 in the series.
+The previous chapter covered **HPA and Cluster Autoscaler internals — two control loops**.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

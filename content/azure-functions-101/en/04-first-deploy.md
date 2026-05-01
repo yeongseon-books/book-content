@@ -34,6 +34,14 @@ One framing note before we start: this walkthrough uses **Flex Consumption as th
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 4 of 7 in the series.
+The previous chapter covered **Host and Worker — Who Actually Runs Your Functions?**.
+After this chapter, the next one moves on to **Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated**.
+<!-- ebook-only:end -->
+
 ## Tooling — three pieces
 
 You need three tools.

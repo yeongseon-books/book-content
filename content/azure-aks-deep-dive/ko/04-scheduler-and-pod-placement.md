@@ -19,6 +19,14 @@ last_reviewed: '2026-04-29'
 
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 4번째 장입니다.
+앞 장에서는 **CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

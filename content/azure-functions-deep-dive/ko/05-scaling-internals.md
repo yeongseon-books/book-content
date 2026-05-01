@@ -21,6 +21,14 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive 시리즈 (5/6)
 
+<!-- ebook-only:start -->
+## 이 장의 위치
+
+이 글은 시리즈 6편 중 5번째 장입니다.
+앞 장에서는 **Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지**을 다뤘습니다.
+이 장을 마치면 다음 장에서 **콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때**으로 이어집니다.
+<!-- ebook-only:end -->
+
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

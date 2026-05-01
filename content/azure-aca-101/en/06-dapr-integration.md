@@ -25,6 +25,14 @@ This post shows where the Dapr sidecar sits and what it simplifies. Service invo
 
 ---
 
+<!-- ebook-only:start -->
+## Where this chapter fits
+
+This is chapter 6 of 7 in the series.
+The previous chapter covered **Scaling — KEDA scalers and zero-to-N**.
+After this chapter, the next one moves on to **Monitoring and ops — Log Analytics and Application Insights**.
+<!-- ebook-only:end -->
+
 ## Where Dapr sits
 
 The sidecar sits next to the app.

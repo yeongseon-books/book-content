@@ -27,6 +27,17 @@ The defining capability of an agent is choosing tools, observing results, and de
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: a Tool Calling Agent loops through Thought → Action → Observation. In LangGraph that loop is visible as nodes and edges.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Conditional edges and branching**.
+After this chapter, the next one moves on to **Multi-agent systems**.
+<!-- ebook-only:end -->
+
 ## Tool definitions
 
 LangChain's `@tool` decorator turns functions into tools. The docstring becomes the tool description passed to the LLM.

@@ -37,6 +37,17 @@ This post covers five things:
 
 ---
 
+<!-- ebook-only:start -->
+
+**The key idea**: FAISS finds vectors fast. IndexFlatL2 is the simplest option; switch to IVF or HNSW when the dataset grows.
+
+## Where this chapter fits
+
+This is chapter 4 of 6 in the series.
+The previous chapter covered **Cosine similarity and vector search — computing sentence distances**.
+After this chapter, the next one moves on to **Chunking strategies — how to split long documents**.
+<!-- ebook-only:end -->
+
 ## Installation
 
 CPU-only version:
