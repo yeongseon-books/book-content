@@ -1,0 +1,6 @@
+[
+  "Vector search converts text into numeric vectors for meaning-based retrieval.\nUnlike keyword search, it matches content even when phrasing differs.\nEmbedding models place semantically similar text close together in vector space.",
+  "FAISS is a high-speed vector search library developed at Facebook AI Research.\nIt supports both exact and approximate search and can handle billions of vectors.\nIndexFlatIP is an exact inner-product index equivalent to cosine search on normalized vectors.",
+  "Chunking strategies split long documents into units the embedding model can process.\nchunk_size and chunk_overlap must be tuned to achieve good retrieval quality.\nRecursiveCharacterTextSplitter tries paragraph, sentence, and word boundaries in order.",
+  "RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt.\nThe system retrieves relevant chunks for the user's question and provides them as context.\nVector search is the retrieval component in most RAG pipelines."
+]

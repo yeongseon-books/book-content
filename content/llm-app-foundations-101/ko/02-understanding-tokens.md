@@ -111,6 +111,48 @@ print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
 ```
 
+```
+출력 결과
+Python 데코레이터는 기존 함수에 특정 기능을 추가하거나 수정할 수 있도록 해주는 기능입니다.
+
+데코레이터는 기존 함수에 wrapper 함수를包싸서 함수의 실행 전, 실행 후에 원하는 명령을 실행할 수 있습니다. 데코레이터를 사용하면 코드의 재사용성이 높아지며, 코드의 가독성이 향상됩니다.
+
+데코레이터를 사용할 때는 @符号를 사용하여 데코레이터를 정의하고 호출합니다. 데코레이터를 사용한 예로는 로깅, 권한 체크, 메트릭스 측정 등이 있습니다.
+
+ 예를 들어, 로깅 데코레이터를 정의한 코드는 다음과 같습니다.
+
+```python
+import logging
+import functools
+
+def log_decorator(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        logging.debug(f"{func.__name__} 함수가 호출되었습니다.")
+        result = func(*args, **kwargs)
+        logging.debug(f"{func.__name__} 함수가 종료되었습니다.")
+        return result
+    return wrapper
+
+@log_decorator
+def add(a, b):
+    return a + b
+
+result = add(3, 5)
+print(result)
+```
+
+```
+출력 결과
+8
+```
+
+finish_reason=stop
+prompt_tokens=53
+completion_tokens=275
+total_tokens=328
+```
+
 세 필드는 각자 역할이 분명합니다.
 
 ### `prompt_tokens`
@@ -155,6 +197,12 @@ print(tokens)
 print(f"token_count={len(tokens)}")
 ```
 
+```
+출력 결과
+[169, 228, 58260, 223, 108, 41871, 116, 13094, 18918, 5251, 107, 116, 29102, 16633, 105, 33390, 41871, 112, 85355, 15291, 105, 169, 63644, 29726, 18918, 5251, 235, 242, 96270, 66965, 16582, 58901, 50467, 53987, 108, 29833, 36439, 39331, 13]
+token_count=39
+```
+
 여기서 한 가지는 분명히 구분해야 합니다. `cl100k_base`는 OpenAI 계열에서 널리 알려진 인코딩입니다. Groq의 `llama-3.1-8b-instant`가 내부적으로 완전히 같은 토크나이저를 쓴다고 단정할 수는 없습니다. 따라서 이 숫자는 **청구 기준의 절대값**이라기보다 **사전 점검용 근사치**로 보는 편이 안전합니다. 실제 청구와 한계 판정은 공급자가 반환한 `usage`가 기준입니다.
 
 그렇더라도 이 근사치가 쓸모없는 것은 아닙니다. 운영에서 필요한 판단은 대개 “지금 프롬프트가 짧은가, 긴가, 너무 긴가”입니다. 수천 토큰 규모에서 대략적인 길이를 미리 아는 것만으로도 입력 잘라내기, 문서 청크 크기 조절, 대화 이력 축약 같은 결정을 훨씬 빨리 내릴 수 있습니다.
@@ -179,6 +227,16 @@ estimated_prompt_tokens = len(encoding.encode(serialized))
 print(serialized)
 print()
 print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
+```
+
+```
+출력 결과
+system: You are a concise Python tutor.
+user: 리스트와 튜플의 차이를 설명해 주세요.
+assistant: 리스트는 변경 가능하고, 튜플은 변경 불가능합니다.
+user: 예제 코드도 짧게 덧붙여 주세요.
+
+estimated_prompt_tokens=71
 ```
 
 이 계산은 공급자 내부 포맷과 1:1로 같지 않습니다. 하지만 길이 감시용으로는 충분히 실용적입니다. 대화 이력이 누적되는 챗봇이라면 요청 직전에 이 값을 재고, 임계치를 넘으면 오래된 메시지를 줄이거나 요약하는 흐름을 넣으면 됩니다.
@@ -237,6 +295,18 @@ print(completion.choices[0].message.content)
 print()
 print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
+```
+
+```
+출력 결과
+파이썬 제너레이터와 리스트는 모두 컬렉션 데이터 타입으로 데이터를 집합적으로 다루는 용도로 사용할 수 있지만 다소 다른 성격을 가지고 있습니다.
+
+## 리스트
+
+리스트는 데이터를 저장하는 데에 사용되며, 인덱스와 슬라이스를 통해 데이터에 접근할 수 있습니다. 리스트
+
+completion_tokens=80
+finish_reason=length
 ```
 
 `max_tokens`는 길이 비용과 응답 스타일을 함께 바꿉니다.
@@ -298,6 +368,20 @@ print(f"finish_reason={choice.finish_reason}")
 
 if choice.finish_reason == "length":
     print("경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.")
+```
+
+```
+출력 결과
+estimated_prompt_tokens=8827
+Python 웹 애플리케이션에서 요청 로그와 예외 로그를 함께 남기는 이유는 다음과 같습니다.
+
+- **유지보수의 용이성** : 요청 로그와 예외 로그를 함께 남기면, 개발자들은 특정 이벤트와 관련
+
+prompt_tokens=5856
+completion_tokens=60
+total_tokens=5916
+finish_reason=length
+경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.
 ```
 
 이 코드에서 볼 포인트는 세 가지입니다.

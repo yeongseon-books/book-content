@@ -92,6 +92,18 @@ if __name__ == "__main__":
     print(f"Saved turn count: {snapshot.values['turn_count']}")
 ```
 
+```
+출력 결과
+First reply:
+Turn 1. Latest user message: My project is about LangGraph.. No earlier user turns saved yet.
+
+Second reply after resume:
+Turn 2. Latest user message: What did I say my project was about?. Earlier user turns: My project is about LangGraph.
+
+Saved message count: 4
+Saved turn count: 2
+```
+
 실행 파일: `/root/Github/langgraph-101/ko/02-state-and-checkpoints/main.py`
 
 ## 이 코드에서 봐야 할 것

@@ -67,6 +67,11 @@ lora_params = shape.num_layers * lora_params_per_layer(shape.hidden_size, shape.
 print(base_linear_params, lora_params)
 ```
 
+```
+출력 결과
+84934656 1327104
+```
+
 ## 이 코드에서 봐야 할 것
 
 - `hidden_size=768`, `intermediate_size=3072`, `num_layers=12`는 GPT-2 small 급 구조를 흉내 낸 값입니다.

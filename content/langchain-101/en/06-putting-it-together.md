@@ -48,6 +48,11 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("What is LCEL?"))
 ```
 
+```
+Output
+LCEL stands for Long-Running Concurrency for Elm.
+```
+
 ## What to notice in this code
 
 - Indexing and query execution happen on different timelines, so the code should keep them separate.
@@ -144,6 +149,11 @@ vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
 print(f"index vector count: {vectorstore.index.ntotal}")
+```
+
+```
+Output
+index vector count: 4
 ```
 
 ---

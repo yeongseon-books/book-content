@@ -216,6 +216,71 @@ def limited_completion(prompt: str) -> str:
 print(limited_completion("Python의 list와 tuple 차이를 설명해 주세요."))
 ```
 
+```
+출력 결과
+Python의 list와 tuple은 모두 순서가 있는 데이터 구조입니다. 하지만 두 데이터 구조는 다음과 같은 차이가 있습니다.
+
+### 1. Mutable vs Immutable
+
+- **List**: Mutable, 즉 변경이 가능합니다. List의 요소를 추가, 삭제, 수정할 수 있습니다.
+- **Tuple**: Immutable, 즉 변경이 불가능합니다. Tuple의 요소를 추가, 삭제, 수정할 수 없습니다.
+
+### 2. Syntax
+
+- **List**: 대괄호 `[]`를 사용합니다.
+- **Tuple**: 소괄호 `()`를 사용합니다.
+
+### 3. Performance
+
+- **List**: List는 동적 할당을 사용하므로, 요소가 추가되면 메모리가 자동으로 할당됩니다. 하지만 이로 인해 성능이 떨어질 수 있습니다.
+- **Tuple**: Tuple은 정적 할당을 사용하므로, 요소가 추가되면 메모리가 미리 할당됩니다. 따라서 Tuple은 List보다 성능이 좋습니다.
+
+### 4. 사용 예시
+
+```python
+# List
+my_list = [1, 2, 3]
+print(my_list)  # [1, 2, 3]
+
+# 요소 추가
+my_list.append(4)
+print(my_list)  # [1, 2, 3, 4]
+
+# 요소 삭제
+my_list.remove(2)
+print(my_list)  # [1, 3, 4]
+
+# 요소 수정
+my_list[0] = 10
+print(my_list)  # [10, 3, 4]
+
+# Tuple
+my_tuple = (1, 2, 3)
+print(my_tuple)  # (1, 2, 3)
+
+# 요소 추가 (불가능)
+try:
+    my_tuple.append(4)
+except AttributeError:
+    print("요소 추가는 불가능합니다.")
+
+# 요소 삭제 (불가능)
+try:
+    my_tuple.remove(2)
+except AttributeError:
+    print("요소 삭제는 불가능합니다.")
+
+# 요소 수정 (불가능)
+try:
+    my_tuple[0] = 10
+except TypeError:
+    print("요소 수정은 불가능합니다.")
+```
+
+### 결론
+... (truncated)
+```
+
 이 코드는 공급자에게 보내기 전에 먼저 내부 버킷에서 토큰을 확보합니다. 허용량이 없으면 잠깐 기다립니다. 핵심은 외부 API가 막기 전에 내부 제어가 먼저 동작한다는 점입니다.
 
 ---

@@ -153,6 +153,11 @@ message = completion.choices[0].message
 print(message.tool_calls)
 ```
 
+```
+출력 결과
+[ChatCompletionMessageToolCall(id='r95zd8a1d', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
+```
+
 `tool_choice="auto"`는 모델이 필요할 때 도구를 고르게 합니다. 응답 텍스트가 곧바로 오지 않고 `tool_calls`가 채워지는 경우가 핵심입니다. 이때 애플리케이션은 그 구조를 읽고 실제 함수를 실행해야 합니다.
 
 ---
@@ -225,6 +230,11 @@ for tool_call in message.tool_calls or []:
     validated_args = OrderStatusArgs.model_validate(arguments)
     result = available_tools[function_name](**validated_args.model_dump())
     print(function_name, arguments, result)
+```
+
+```
+출력 결과
+get_order_status {'order_id': 'ORD-1001'} {'status': 'in_transit', 'eta_days': 2}
 ```
 
 이 단계에서는 아직 최종 사용자 답변이 완성되지 않았습니다. 모델은 툴 사용 계획을 제안했고, 애플리케이션은 그 계획을 실행했습니다. 다음 단계에서 이 실행 결과를 대화에 다시 넣어야 자연어 응답이 완성됩니다.

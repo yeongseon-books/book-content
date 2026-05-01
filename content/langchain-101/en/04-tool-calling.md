@@ -47,6 +47,11 @@ response = llm.bind_tools([add_numbers]).invoke("Add 13 and 29.")
 print(response.tool_calls)
 ```
 
+```
+Output
+[{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '3yvvn18h1', 'type': 'tool_call'}]
+```
+
 ## What to notice in this code
 
 - The tool name, description, and input schema come from the function signature and docstring.
@@ -160,6 +165,12 @@ print(f"content: {response.content!r}")
 print(f"tool_calls: {response.tool_calls}")
 ```
 
+```
+Output
+content: ''
+tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': 'x2ab9qz9r', 'type': 'tool_call'}]
+```
+
 When `tool_calls` is non-empty, the LLM is requesting a tool execution.
 
 ```
@@ -235,6 +246,22 @@ for q in questions:
     print(f"\nquestion: {q}")
     answer = run_with_tools(q)
     print(f"answer: {answer}")
+```
+
+```
+Output
+
+question: What is 15 plus 27?
+  executed: add_numbers({'a': 15, 'b': 27}) = 42.0
+answer: The result of 15 plus 27 is 42.
+
+question: What is 7 times 8?
+answer: <multiply_numbers>{"a": 7, "b": 8}</multiply_numbers>
+
+question: Add 5 and 3, then multiply the result by 4. What do you get?
+  executed: add_numbers({'a': 5, 'b': 3}) = 8.0
+  executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
+answer: The result of adding 5 and 3 is 8. Multiplying 8 by 4 gives 32.
 ```
 
 The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a `ToolMessage` and appended to the conversation history.

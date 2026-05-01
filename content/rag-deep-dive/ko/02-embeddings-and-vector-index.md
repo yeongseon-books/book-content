@@ -78,6 +78,19 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+출력 결과
+rank=1 distance=0.8672
+Operators inspect the exception chain before replaying the message.
+------------------------------------------------------------
+rank=2 distance=0.8806
+The worker retries a failed message three times before dead-lettering.
+------------------------------------------------------------
+rank=3 distance=1.2581
+The dead-letter queue keeps the original payload for later inspection.
+------------------------------------------------------------
+```
+
 ### 이 코드에서 봐야 할 것
 
 - HuggingFace 임베딩 결과를 `float32` 행렬로 만든 뒤 직접 `IndexFlatL2`에 넣습니다.
@@ -146,6 +159,12 @@ if __name__ == "__main__":
     demo()
 ```
 
+```
+출력 결과
+2 384
+384
+```
+
 운영 관점에서 이 섹션의 핵심은 세 가지입니다. 첫째, LangChain 인터페이스는 query와 document embedding을 분리해 두므로, 호출도 그 의도를 따라가야 합니다. 둘째, 0.2.17의 `OpenAIEmbeddings`는 긴 텍스트를 내부적으로 토큰 조각으로 나누고 평균낸 뒤 정규화합니다. 셋째, 따라서 벡터는 원문 청크의 순수 복사본이 아니라 이미 한 번 요약된 기하학적 표현입니다.
 
 ---
@@ -192,6 +211,12 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+```
+출력 결과
+distances: [[0.002500000176951289, 0.042500004172325134]]
+labels: [[0, 1]]
 ```
 
 여기서 더 중요한 실무 포인트는 정규화와 거리 함수의 관계입니다. LangChain의 `OpenAIEmbeddings` 구현은 긴 입력 평균 후 L2 정규화를 수행합니다. 만약 저장 벡터와 질의 벡터가 모두 단위 길이라면 L2 거리와 cosine similarity는 순위 관점에서 가까운 관계를 가집니다. 그래서 많은 팀이 cosine을 쓰고 있다고 말하면서 실제로는 정규화 후 `IndexFlatIP` 또는 `IndexFlatL2`를 사용합니다. 핵심은 “이 인덱스가 무슨 거리 함수를 계산하는가”를 명시적으로 아는 것입니다. 인덱스는 저장소가 아니라 ranking rule입니다.
@@ -242,6 +267,13 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+```
+출력 결과
+InMemoryDocstore
+2
+{0: 'db3af25c-905b-4dad-87c5-7ed527e946c5', 1: '22cf30f6-98cc-4b2a-abfa-3cdbaff5e7f8'}
 ```
 
 정리하면 `FAISS.from_documents()`의 편리함은 세 계층을 감춥니다. 그러나 디버깅할 때는 꼭 그 셋을 분리해서 봐야 합니다. 검색 품질 문제인지, docstore 복원 문제인지, 메타데이터 필터링 비용 문제인지가 여기서 갈립니다.
@@ -304,6 +336,16 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+출력 결과
+flat ip ids: [1218, 1405, 770, 1745, 727]
+flat ip scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8482962846755981, 0.8418495655059814]
+ivf nprobe=1 ids: [1218, 1405, 770, 1361, 756]
+ivf nprobe=1 scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8389736413955688, 0.8291006088256836]
+ivf nprobe=8 ids: [1218, 1405, 770, 727, 1377]
+ivf nprobe=8 scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8418495655059814, 0.8412026166915894]
+```
+
 운영에서는 보통 이렇게 출발합니다. 10만 청크 안팎이면 exact flat으로 기준선을 잡고, 100만 청크를 넘어가며 p95 latency가 부담되면 IVF를 검토합니다. 그리고 `nprobe`는 보통 작게 시작해 recall@k와 latency를 같이 재며 올립니다. 정확도보다 감으로 설정하면, 인덱스가 빨라진 대신 중요한 근거를 놓치는 상황이 생깁니다.
 
 ---
@@ -350,6 +392,11 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+```
+출력 결과
+Rotate secrets every 90 days.
 ```
 
 결국 persistence의 핵심은 파일 저장 자체가 아닙니다. `.faiss`는 검색 구조를, `.pkl`은 LangChain 문맥 복원을 맡습니다. 그리고 둘을 다시 합칠 때는 신뢰 경계 판단이 필요합니다. 성능 최적화 문서에서 자주 놓치지만, 운영에서 더 큰 사고를 부르는 것은 latency보다 이런 경계 누수입니다.

@@ -47,6 +47,11 @@ response = llm.bind_tools([add_numbers]).invoke("13과 29를 더해 주세요.")
 print(response.tool_calls)
 ```
 
+```
+출력 결과
+[{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': 'cn4zf3ce0', 'type': 'tool_call'}]
+```
+
 ## 이 코드에서 봐야 할 것
 
 - 도구 이름, 설명, 입력 스키마는 함수 시그니처와 독스트링에서 나옵니다.
@@ -297,6 +302,14 @@ def run_with_tools(question: str) -> str:
 
 print(run_with_tools("지금 몇 시인가요?"))
 print(run_with_tools("체중 70kg, 키 1.75m인 사람의 BMI는?"))
+```
+
+```
+출력 결과
+  get_current_time({}) = 2026-05-01 22:06:56
+실제로 현재 시간은 2026-05-01 22:06:56 이지만, 실제 시간과 다를 수 있습니다.
+  calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
+Note: The BMI is calculated as weight (in kg) divided by the square of height (in meters). In this case, the BMI is 70 kg / (1.75 m)^2 = 22.86.
 ```
 
 ---

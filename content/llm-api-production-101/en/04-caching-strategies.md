@@ -119,6 +119,11 @@ request_payload = {
 print(build_cache_key(request_payload))
 ```
 
+```
+Output
+6b8029d33b678c483174d55c429edd51a4ab075fab3943a4069fbc89476a6d8f
+```
+
 This matters because equivalent requests should serialize to the same string before hashing. `sort_keys=True` protects you from dictionary key-order differences. Fixed separators remove whitespace variation. The result is a compact key that still represents the full request contract.
 
 ---
@@ -252,6 +257,12 @@ payload = {
 
 print(cached_completion(payload))
 print(cached_completion(payload))
+```
+
+```
+Output
+{'source': 'model', 'content': 'Python dataclasses are a feature introduced in Python 3.7 that allows you to create classes with minimal boilerplate code, making it easier to define simple data structures. They automatically generate special methods like `__init__`, `__repr__`, and `__eq__` for you, reducing the amount of code you need to write. Dataclasses can be used to create immutable or mutable data structures, and they support features like type hints and fields with default values.'}
+{'source': 'cache', 'content': 'Python dataclasses are a feature introduced in Python 3.7 that allows you to create classes with minimal boilerplate code, making it easier to define simple data structures. They automatically generate special methods like `__init__`, `__repr__`, and `__eq__` for you, reducing the amount of code you need to write. Dataclasses can be used to create immutable or mutable data structures, and they support features like type hints and fields with default values.'}
 ```
 
 The first call goes to the model. The second one hits the cache because the payload is the same. The example stores only the answer text, but you could also store usage data, model name, or metadata if those are useful to downstream consumers.

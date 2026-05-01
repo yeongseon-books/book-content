@@ -137,6 +137,11 @@ api_key = os.environ["GROQ_API_KEY"]
 print(f"API key loaded: {api_key[:6]}...")
 ```
 
+```
+Output
+API key loaded: gsk_Z2...
+```
+
 You would not print the full key in a real application. A short prefix is enough for local verification.
 
 ---
@@ -187,6 +192,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+```
+Output
+Python list comprehensions are a concise way to create new lists by performing operations on existing lists or other iterables. They consist of brackets containing the expression, which is executed for each element, along with the for loop to specify the elements to be processed, and optionally, another for loop to handle nested data structures. The basic syntax is `[expression for element in iterable]`, where `expression` is the operation you want to perform on each element and `iterable` is the list or iterable you want to process. List comprehensions can also include conditional statements, such as `[expression for element in iterable if condition]`, which allows you to filter out elements that do not meet the specified condition. This method of list creation is often more efficient and readable than using a traditional for loop and append method to create a new list.
+```
+
 Three lines matter most.
 
 `Groq(...)` creates the client object that will talk to the API.
@@ -224,6 +234,43 @@ completion = client.chat.completions.create(
 )
 
 print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
+```
+
+```
+Output
+{
+  "id": "chatcmpl-35c862c3-cd55-4a93-825e-1b9d54333814",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "An HTTP API is a publicly accessible interface that uses standard protocols (such as HTTP/HTTPS) to expose services and endpoints, allowing clients to make requests and receive responses in a format like JSON or XML. On the other hand, an SDK (Software Development Kit) is a collection of tools and libraries that provides a more direct and efficient way to interact with a service or platform, typically built for specific programming languages and environments. While an HTTP API requires developers to manually write requests and handle responses, an SDK typically wraps this functionality in a more user-friendly API, enabling developers to access services with fewer lines of code.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1777641241,
+  "model": "llama-3.1-8b-instant",
+  "object": "chat.completion",
+  "service_tier": "on_demand",
+  "system_fingerprint": "fp_7ccc667439",
+  "usage": {
+    "completion_tokens": 124,
+    "prompt_tokens": 50,
+    "total_tokens": 174,
+    "completion_time": 0.235684766,
+    "prompt_time": 0.002361543,
+    "queue_time": 0.007217993,
+    "total_time": 0.238046309
+  },
+  "usage_breakdown": null,
+  "x_groq": {
+    "id": "req_01kqhtsesvfqd9hb69jp6cemaj",
+    "seed": 1716278177
+  }
+}
 ```
 
 When you look through that output, pay attention to three fields first.
@@ -318,6 +365,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+```
+Output
+Asynchronous programming is a paradigm that enables a program to execute multiple tasks simultaneously, improving responsiveness and scalability. It involves breaking down a task into smaller, independent sub-tasks (also known as "coroutines" or "tasks") that can run concurrently, without blocking the main program flow. When a task is initiated, it is executed in the background, and the program continues to execute other tasks or return control to its previous state. This approach avoids blocking waits, preventing the entire program from freezing due to a single long-running task. Instead, asynchronous programming relies on mechanisms like callbacks, events, or promise-based API calls to manage the completion of sub-tasks and handle the resulting data or exceptions, often with the aid of specialized libraries, frameworks, or languages designed to support concurrency.
+```
+
 And here is the async version. This block is also executable on its own.
 
 ```python
@@ -342,6 +394,71 @@ async def main() -> None:
     print(completion.choices[0].message.content)
 
 asyncio.run(main())
+```
+
+```
+Output
+Asynchronous programming with asyncio in Python is particularly useful in the following two situations:
+
+### Situation 1: I/O-bound operations
+
+Asynchronous programming shines when dealing with I/O-bound operations such as:
+
+- Network requests: Making multiple parallel requests to an API or a web server.
+- Database queries: Executing multiple database queries concurrently.
+- File operations: Reading and writing files in parallel.
+
+Example:
+
+```python
+import asyncio
+import aiohttp
+
+async def fetch_page(session, url):
+    async with session.get(url) as response:
+        return await response.text()
+
+async def main():
+    urls = ["http://example.com/page1", "http://example.com/page2", "http://example.com/page3"]
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_page(session, url) for url in urls]
+        pages = await asyncio.gather(*tasks)
+        for page in pages:
+            print(page)
+
+asyncio.run(main())
+```
+
+In this example, asyncio is used to make multiple network requests concurrently, improving the overall response time.
+
+### Situation 2: Real-time event-driven systems
+
+Real-time event-driven systems, such as live updates, gaming, or interactive chat applications, rely heavily on asyncio for efficient and non-blocking handling of events.
+
+Example (a simple interactive game):
+
+```python
+import asyncio
+import random
+
+class Game:
+    def __init__(self):
+        self.score = 0
+        self.is_game_over = False
+
+    async def play(self):
+        while not self.is_game_over:
+            choice = input("Enter a number (1/2) or 'exit' to quit: ")
+            if choice.lower() == "exit":
+                self.is_game_over = True
+            else:
+                try:
+                    choice = int(choice)
+                    if random.random() < 0.8:
+                        self.score += choice
+                        print(f"You gained {choice} points!")
+                    else:
+... (truncated)
 ```
 
 The structure barely changes. Replace `Groq` with `AsyncGroq`, add `await`, and run the top-level coroutine with `asyncio.run()`.
@@ -375,6 +492,71 @@ async def main() -> None:
         print(f"[{index}] {answer}\n")
 
 asyncio.run(main())
+```
+
+```
+Output
+[1] **Lists vs Tuples: A Brief Explanation**
+
+In most programming languages, particularly Python, `list` and `tuple` are two fundamental data types used to store collections of values. While they share some similarities, these two data types have distinct differences.
+
+### Lists
+
+*   **Mutable**: Lists are mutable, meaning their contents can be modified after creation. You can add, remove, or modify elements in a list.
+*   **Indexed**: Lists are indexed, which means you can access specific elements by their index (position) in the list.
+*   **Implied Length**: Lists can be of any length, and their length is determined by the number of elements it contains.
+*   **Common Usage**: Lists are ideal for storing collections of data where the order matters and elements need to be added or removed frequently.
+
+**Example:**
+```python
+my_list = [1, 2, 3, 4, 5]
+my_list[0] = 10  # Modifying an element
+my_list.append(6)  # Adding an element
+print(my_list)  # Output: [10, 2, 3, 4, 5, 6]
+```
+
+### Tuples
+
+*   **Immutable**: Tuples are immutable, meaning their contents cannot be modified after creation. Attempting to modify a tuple will result in a `TypeError`.
+*   **Indexed**: Like lists, tuples are also indexed, allowing you to access specific elements by their index.
+*   **Fixed Length**: Tuples have a fixed length, which is determined when the tuple is created.
+*   **Common Usage**: Tuples are ideal for storing collections of data where the order matters and elements will not change.
+
+**Example:**
+```python
+my_tuple = (1, 2, 3, 4, 5)
+try:
+    my_tuple[0] = 10  # Attempting to modify a tuple
+except TypeError as e:
+    print(e)  # Output: 'tuple' object does not support item assignment
+```
+
+**In Summary**
+
+Lists are mutable, indexed, and can be of any length, making them ideal for scenarios where data needs to be modified or added frequently. Tuples, on the other hand, are immutable, indexed, and have a fixed length, making them suitable for storing collections of data where the order matters, but elements will not change.
+
+**Choosing between Lists and Tuples**
+
+When deciding between a list and a tuple, consider the following:
+
+1.  If the data needs to be modified or added frequently, use a `list`.
+2.  If the data will remain constant, use a `tuple`.
+3.  If you need to return a value and cannot modify it, consider using a tuple.
+
+Remember that in Python, `list` is generally preferred over `tuple` when dynamic data structures are required, but `tuple` is recommended when static data structures are sufficient.
+
+[2] **Key Property of a Python Dictionary**
+======================================
+
+In Python, a dictionary is a mutable data type that stores a collection of key-value pairs. The key property of a Python dictionary is that it uses **keys**, which are immutable objects such as strings, integers, tuples, or frozensets, to store and retrieve values.
+
+**Characteristics of Key Property**
+
+1. **Immutability**: Dictionary keys must be immutable, i.e., they cannot be changed after creation. This ensures that keys are unique and can be used for efficient lookup.
+2. **Uniqueness**: Each key must be unique within a dictionary. If you try to use a duplicate key, the old key-value pair will be overwritten.
+3. **Hashability**: Dictionary keys must be hashable, meaning that they must have a hash value that can be used to compute the index of the key in a dictionary.
+
+... (truncated)
 ```
 
 This is where async becomes a design choice. Once several requests are in flight, you also need to think about rate limits, retries, backoff, and timeouts.
@@ -424,6 +606,26 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+```
+Output
+=== answer ===
+In Python, a function is a self-contained block of code that can be executed independently, whereas a method is a function that belongs to a particular class or object and operates on attributes of that class or object. Functions don't require an object instance to be called, whereas methods do. This makes methods instance-specific and can access attributes directly, while functions are more general-purpose and have limited access to the surrounding scope. Here's a simple example: 
+
+```python
+class MyClass:
+    def greet(self):
+        print("Hello, World!")
+```
+
+In this example, `greet` is a method of the `MyClass` class.
+
+=== metadata ===
+model: llama-3.1-8b-instant
+prompt_tokens: 67
+completion_tokens: 130
+total_tokens: 197
 ```
 
 If you save it as `first_call.py`, run it with:

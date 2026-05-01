@@ -45,6 +45,11 @@ chain = prompt | llm | StrOutputParser()
 print(chain.invoke({"topic": "LCEL"}))
 ```
 
+```
+Output
+Low-Carbon Economy Linkages (LCEL) is an initiative that aims to promote the integration of low-carbon development and climate change mitigation with broader economic development objectives. LCEL seeks to identify the linkages between low-carbon activities and economic growth, poverty reduction, and other development outcomes. This involves analyzing the economic benefits and costs of transitioning to a low-carbon economy, as well as the opportunities and challenges associated with this transition. By understanding these linkages, policymakers and businesses can make informed decisions about how to support low-carbon development and promote sustainable economic growth, while also addressing climate change and improving living standards.
+```
+
 ## What to notice in this code
 
 - `ChatPromptTemplate` turns a dict into chat messages.
@@ -136,6 +141,11 @@ response = llm.invoke("Explain the advantages of Python in two sentences.")
 print(response.content)
 ```
 
+```
+Output
+Python offers several advantages, including its ease of use, flexibility, and extensive libraries, which make it an ideal language for rapid prototyping, data analysis, machine learning, and web development. Additionally, Python's simplicity, readability, and large community support make it a popular choice among developers, both beginners and experienced professionals, for a wide range of applications.
+```
+
 `ChatGroq` implements Runnable, so `invoke()` is available directly.
 
 ---
@@ -178,6 +188,11 @@ chain = prompt | llm | parser
 
 result = chain.invoke({"topic": "embedding vectors"})
 print(result)
+```
+
+```
+Output
+Embedding vectors is a technique used in machine learning and natural language processing where high-dimensional data is reduced to lower-dimensional representations, called embeddings, that capture semantic meaning and relationships between data points. These embeddings are often learned through neural networks, such as word2vec or sentence encoders, and can be used for tasks like dimensionality reduction, clustering, and similarity calculation.
 ```
 
 What each component does:
@@ -233,6 +248,20 @@ print(f"\n=== step 3: string ===")
 print(f"  {text}")
 ```
 
+```
+Output
+=== step 1: messages ===
+  [system] You are an expert at concise explanations.
+  [human] Explain embedding vectors in two sentences.
+
+=== step 2: AIMessage ===
+  type: AIMessage
+  content: Embedding vectors is a technique in machine learning that represents words, phra...
+
+=== step 3: string ===
+  Embedding vectors is a technique in machine learning that represents words, phrases, or other objects as numerical vectors in a high-dimensional space, allowing the model to capture semantic relationships and nuances between them. These vectors can be learned through algorithms like Word2Vec or GloVe, and are often used in natural language processing tasks such as text classification, sentiment analysis, and language translation.
+```
+
 ---
 
 ## RunnableLambda — wrapping a plain function
@@ -265,6 +294,13 @@ result = chain.invoke({
     "text": "Vector search converts text into numeric vectors for meaning-based retrieval."
 })
 print(result)
+```
+
+```
+Output
+Vector search techniques convert text into numerical vectors that capture semantic meaning, enabling more accurate and efficient meaning-based retrieval of similar text documents.
+
+(character count: 179)
 ```
 
 `RunnableLambda` lets any plain Python function participate in a pipe chain. It is useful for output post-processing, logging, and lightweight transforms.
@@ -303,6 +339,15 @@ results = chain.batch(topics)
 
 for topic_dict, result in zip(topics, results):
     print(f"[{topic_dict['topic']}] {result}\n")
+```
+
+```
+Output
+[embeddings] Embeddings are a technique in machine learning that represents high-dimensional data, such as text or images, as dense vectors in a lower-dimensional space, allowing for efficient and effective similarity comparisons.
+
+[FAISS] FAISS (Facebook AI Similarity Search) is an open-source library for efficient similarity search and clustering of dense vectors, particularly useful in large-scale machine learning applications such as image and text search.
+
+[RAG] RAG stands for Red, Amber, and Green, which is a traffic light-style color-coding system used to indicate the status of a project, task, or process based on its progress and risk level.
 ```
 
 `batch()` attempts parallel processing internally. Use `max_concurrency` to cap simultaneous requests when working within API rate limits.

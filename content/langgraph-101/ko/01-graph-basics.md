@@ -99,6 +99,16 @@ if __name__ == "__main__":
     print(result["answer"])
 ```
 
+```
+출력 결과
+Request: Explain how a LangGraph StateGraph works.
+Chosen topic: graph basics
+Teaching outline:
+- Define graph basics
+- Show the nodes in the graph
+- Explain how invoke() runs the graph
+```
+
 실행 파일: `/root/Github/langgraph-101/ko/01-graph-basics/main.py`
 
 ## 이 코드에서 봐야 할 것

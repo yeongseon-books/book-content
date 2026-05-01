@@ -135,6 +135,11 @@ api_key = os.environ["GROQ_API_KEY"]
 print(f"API key loaded: {api_key[:6]}...")
 ```
 
+```
+출력 결과
+API key loaded: gsk_Z2...
+```
+
 이 코드는 환경변수 연결만 확인하는 최소 예제입니다. 실제 앱에서는 키 전체를 출력하지 않는 편이 안전합니다. 개발 초반에는 앞 몇 글자만 확인해도 충분합니다.
 
 ---
@@ -185,6 +190,56 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+```
+출력 결과
+**리스트 컴프리헨션(Iterable Comprehension)**
+
+리스트 컴프리헨션은 리스트를 생성하는 방식 중 하나입니다. 이 방식을 사용하면, 반복적으로 수행되는 코드를 간단하게 표현할 수 있습니다. 컴프리헨션은 다음과 같은 형식으로 사용됩니다.
+
+```python
+[식 for 변수 in 열거 가능한 객체]
+```
+
+이 식은 다음과 같이 작동합니다:
+
+1. `열거 가능한 객체` 내의 각 요소를 하나씩 꺼내어 반복합니다.
+2. 해당 요소를 `변수`에 할당하고 `식`을 평가합니다.
+3. 새로운 요소를 생성하고 결과 값을 `리스트`에 추가합니다.
+
+**예시**
+
+```python
+# 기본적인 리스트 컴프리헨션 예시
+num_list = [1, 2, 3, 4, 5]
+even_nums = [x for x in num_list if x % 2 == 0]
+print(even_nums)  # [2, 4]
+```
+
+이 예시에서, 리스트 `num_list`의 각 요소를 `x`에 할당하여 `x % 2 == 0` 인지 확인합니다. 만약 `x`가 짝수이면, 그 요소를 `even_nums` 리스트에 추가합니다.
+
+**다중 반복**
+
+리스트 컴프리헨션은 다중 반복도 지원합니다. 이러한 경우, 반복과 동시에 할당할 수 있습니다.
+
+```python
+# 두 항목 리스트의 교집합 찾기
+list1 = [1, 2, 3, 4]
+list2 = [2, 3, 4, 5]
+intersection = [(value1, value2) for value1 in list1 for value2 in list2 if value1 == value2]
+print(intersection)  # [(2, 2), (3, 3), (4, 4)]
+```
+
+이 예시에서, 두 항목 리스트 `list1`과 `list2`를 각각 반복하여 두 항목이 동일하면, 그 항목을 교집합 리스트에 추가합니다.
+
+**리스트 컴프리헨션의 장점**
+
+리스트 컴프리헨션을 사용하면, 코드의 길이를 줄일 수 있으며, 더 이해하기 쉬운 코드를 작성할 수 있습니다. 또한, 컴퓨팅 파워의 낭비를 줄일 수 있습니다.
+
+**참조**
+
+* [Python.org - List Comprehensions](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions)
+```
+
 여기서 눈여겨볼 줄은 세 군데입니다.
 
 첫째, `Groq(...)`는 API 서버와 통신할 클라이언트 객체를 만듭니다. 보통 애플리케이션 시작 시 한 번 만들고 재사용합니다.
@@ -222,6 +277,43 @@ completion = client.chat.completions.create(
 )
 
 print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
+```
+
+```
+출력 결과
+{
+  "id": "chatcmpl-8199ee22-d51d-4ff2-9805-935eb02b4253",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "HTTP API는 클라이언트가 HTTP 요청을 통해 서버에 요청을 보내고, 서버가 요청에 대한 응답을 반환하는 형태의 인터페이스입니다. 이는 API를 직접 호출하여 서비스를 사용할 수 있지만, 사용자가 직접 HTTP 요청 및 응답의 구현 및 관리를 해야 함을 나타냅니다.\n\nSDK는 소프트웨어 개발 키트를 말합니다. 이는 서비스의 API를 사용하기 위한 개발 툴을 제공하며, API를 사용하고 싶을 때 더 쉽게 개발을 할 수 있도록 도움을 줍니다. SDK는 API의 사용을 캡슐화하고, 서비스의 로직을 추상화하여 개발자가 편리하게 사용할 수 있도록 해줍니다.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1777640411,
+  "model": "llama-3.1-8b-instant",
+  "object": "chat.completion",
+  "service_tier": "on_demand",
+  "system_fingerprint": "fp_7ccc667439",
+  "usage": {
+    "completion_tokens": 161,
+    "prompt_tokens": 51,
+    "total_tokens": 212,
+    "completion_time": 0.333107361,
+    "prompt_time": 0.00259675,
+    "queue_time": 0.169985786,
+    "total_time": 0.335704111
+  },
+  "usage_breakdown": null,
+  "x_groq": {
+    "id": "req_01kqht048zf1293k929n8dq0ne",
+    "seed": 1735069462
+  }
+}
 ```
 
 출력을 보면 필드가 여럿 보이겠지만, 처음에는 세 가지를 우선 읽으면 됩니다.
@@ -316,6 +408,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+```
+출력 결과
+비동기 프로그래밍은 프로그램의 진행을 다른 시간점에서 계속 진행하는 프로그래밍 기법입니다. 프로그램이 다른 작업이나 메서드와 독립적으로 실행되며, 결과를 반환받을 때까지 프로그램의 진행을 멈추지 않습니다. 이 기법은 네트워크 호출, 데이터베이스 접근, 파일 읽기/쓰기 등 시간이 오래 걸리는 작업에 적합하며, 프로그램의 성능과 효율성을 향상시킵니다. 비동기 프로그래밍을 사용하면 프로그램이 이전 작업에 대한 결과 없이 다음 작업으로 넘어가게되서, 사용자의 경험을 향상시키고, 프로그램의 처리 능력도 향상되게 됩니다.
+```
+
 다음은 비동기 버전입니다. 이 코드 블록도 독립 실행 가능합니다.
 
 ```python
@@ -340,6 +437,11 @@ async def main() -> None:
     print(completion.choices[0].message.content)
 
 asyncio.run(main())
+```
+
+```
+출력 결과
+Asyncio는 비동기 프로그래밍을 위한 라이브러리로, 동시성 프로세스에서 비동기 함수를 작성할 수 있게 해준다. 다음과 같은 상황에서 asyncio를 사용할 수 있
 ```
 
 차이는 두 가지뿐입니다. `Groq` 대신 `AsyncGroq`를 쓰고, API 호출 앞에 `await`를 붙입니다. 구조는 거의 같습니다. 그래서 입문 시점에는 “동기 코드로 개념을 익히고, 웹 앱으로 가져갈 때 비동기로 옮긴다”는 순서가 무난합니다.
@@ -373,6 +475,71 @@ async def main() -> None:
         print(f"[{index}] {answer}\n")
 
 asyncio.run(main())
+```
+
+```
+출력 결과
+[1] 리스트(LIST)와 튜플(TUPLE)은 모두 파이썬에서 지원하는 자료형 중 하나입니다. 그러나 두 자료형 간의 가장 큰 차이는 **immutable** 여부입니다.
+
+### 1. 리스트 (LIST)
+
+리스트는 순서가 유지되며, 요소의 중복을 허용하는 자료형입니다. 리스트는 괄호를 사용하여 표기를하고, 요소 사이에 쉼표를 사용하여 구분합니다. 리스트의 요소는 변경이 가능합니다. 예를 들어,
+
+```python
+my_list = [1, 2, 3, "hello"]
+print(my_list[0])  # 출력: 1
+my_list[0] = 10
+print(my_list)     # 출력: [10, 2, 3, "hello"]
+```
+
+리스트의 요소를 추가하거나 제거하는 방법은 다음과 같습니다.
+
+```python
+my_list.append("world")   # 리스트의 끝에 추가
+my_list.insert(0, 5)      # 특정 인덱스에 추가
+del my_list[0]            # 인덱스 0의 요소 삭제
+my_list.pop(0)            # 인덱스 0의 요소 삭제
+```
+
+### 2. 튜플 (TUPLE)
+
+튜플은 순서가 유지되며, 요소의 중복을 허용하는 자료형입니다. 튜플은 괄호를 사용하여 표기를하고, 요소 사이에 쉼표를 사용하여 구분합니다. 튜플의 요소는 변경이 불가능합니다. 예를 들어,
+
+```python
+my_tuple = (1, 2, 3, "hello")
+print(my_tuple[0])  # 출력: 1
+# my_tuple[0] = 10  # 에러: 튜플의 요소를 변경할 수 없음
+```
+
+튜플의 요소를 추가하거나 제거할 수는 없습니다. 즉, 다음과 같은 방법으로 요소를 추가하거나 제거할 수 없습니다.
+
+```python
+# my_tuple.append("world")   # 에러: 튜플의 요소를 추가할 수 없음
+# my_tuple.insert(0, 5)      # 에러: 튜플의 요소를 추가할 수 없음
+# del my_tuple[0]            # 에러: 튜플의 요소를 삭제할 수 없음
+# my_tuple.pop(0)            # 에러: 튜플의 요소를 삭제할 수 없음
+```
+
+### 결论
+
+리스트와 튜플의 차이점은 다음과 같습니다.
+
+*   리스트는 요소의 중복을 허용하며, 요소를 변경할 수 있습니다. 튜플은 요소의 중복을 허용하며, 요소를 변경할 수 없습니다.
+*   리스트는 괄호를 사용하여 표기를하고, 요소 사이에 쉼표를 사용하여 구분합니다. 튜플도 괄호를 사용하여 표기를하고, 요소 사이에 쉼표를 사용하여 구분합니다.
+
+요약하여, 리스트는 변경이 가능한 자료형이고, 튜플은 변경이 불가능한 자료형입니다.
+
+[2] **파이썬 딕셔너리의 핵심 특징**
+
+파이썬 딕셔너리는 키-값 쌍의 컬렉션으로, 데이터의 빠른 접근 및 관리를 위해 사용됩니다. 다음은 파이썬 딕셔너리의 핵심 특징입니다.
+
+### 1. 키-값 쌍
+
+딕셔너리는 키(key)와 값(value)의 쌍으로 구성됩니다. 키는 고유해야 하며, 값은 키에 대응할 수 있는 어떠한 자료형도 사용할 수 있습니다.
+
+### 2. 키별 접근
+
+... (truncated)
 ```
 
 물론 동시에 많이 보낸다고 해서 항상 더 좋은 것은 아닙니다. API 제한, 재시도, 백오프, 타임아웃 같은 운영 문제는 곧바로 따라옵니다. 그 주제는 후속 시리즈에서 다루겠습니다. 지금은 비동기 패턴이 “문법 장난”이 아니라 동시성 제어 수단이라는 점만 잡고 가면 됩니다.
@@ -422,6 +589,38 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+```
+출력 결과
+=== answer ===
+다음은 함수와 메서드의 차이입니다:
+
+1. 함수는 독립적인 코드 블록으로, 객체나 클래스에 연관되지 않는 함수를 의미합니다.
+2. 메서드 또한 함수지만, 특정 클래스나 객체의 속성이나 행동을 나타냅니다.
+3. 함수는 standalone로 사용할 수 있지만, 메서드는 객체의 특정 함수를 의미하므로, 객체가 없이는 실행할 수 없습니다.
+4. 객체는 여러 메서드를 가지는 것을 지원하고, 클래스에서는 메서드를 정의하는 방법을 통해 객체의 동작을 정의합니다.
+5. 함수는 클래스나 객체 밖에서 호출할 수 있지만, 메서드는 클래스나 객체의 context에서만 호출할 수 있습니다.
+
+```python
+# 함수 예시
+def say_hello(name):
+    return f"Hello, {name}!"
+
+# 메서드 예시
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+    def say_hello(self):
+        return f"Hello, {self.name}!"
+```
+
+=== metadata ===
+model: llama-3.1-8b-instant
+prompt_tokens: 81
+completion_tokens: 229
+total_tokens: 310
 ```
 
 저장 파일명을 `first_call.py`라고 가정하면 실행은 아래처럼 합니다.

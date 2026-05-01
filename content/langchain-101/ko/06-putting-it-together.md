@@ -48,6 +48,11 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("LCEL이 무엇인가요?"))
 ```
 
+```
+출력 결과
+LCEL은 Light-Weight Co-located Embedded Loop의 약자입니다.
+```
+
 ## 이 코드에서 봐야 할 것
 
 - 인덱싱 단계와 질의 단계는 시간축이 다르므로 코드에서도 분리하는 편이 좋습니다.
@@ -144,6 +149,11 @@ vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
 print(f"인덱스 벡터 수: {vectorstore.index.ntotal}")
+```
+
+```
+출력 결과
+인덱스 벡터 수: 4
 ```
 
 ---

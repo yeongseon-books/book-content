@@ -133,6 +133,12 @@ print(f"벡터 행렬 크기: {vectors_np.shape}")  # (5, 384)
 print(f"소요 시간: {elapsed:.3f}초")
 ```
 
+```
+출력 결과
+벡터 행렬 크기: (5, 384)
+소요 시간: 0.204초
+```
+
 `embed_documents()`는 배치 단위로 모델을 호출하기 때문에, 같은 수의 문장을 루프로 `embed_query()` 5번 부르는 것보다 빠릅니다. 문서 수가 많을수록 차이가 커집니다.
 
 ---
@@ -170,6 +176,13 @@ print(f"동일 여부: {np.allclose(vectors, loaded)}")
 ```
 
 ```
+출력 결과
+저장 완료: (3, 384)
+불러오기 완료: (3, 384)
+동일 여부: True
+```
+
+```
 저장 완료: (3, 384)
 불러오기 완료: (3, 384)
 동일 여부: True
@@ -201,6 +214,11 @@ with open("documents.json", "w", encoding="utf-8") as f:
     json.dump(documents, f, ensure_ascii=False, indent=2)
 
 print("저장 완료")
+```
+
+```
+출력 결과
+저장 완료
 ```
 
 나중에 검색할 때는 두 파일을 같이 불러와서 인덱스를 연결합니다. 이 패턴은 4편(FAISS)에서 실제 검색 시스템을 만들 때 그대로 사용합니다.
@@ -265,6 +283,13 @@ st_vector = st_model.encode(text, normalize_embeddings=True)
 print(f"HuggingFaceEmbeddings 차원: {hf_vector.shape}")
 print(f"SentenceTransformer 차원: {st_vector.shape}")
 print(f"최대 오차: {np.max(np.abs(hf_vector - st_vector)):.6f}")
+```
+
+```
+출력 결과
+HuggingFaceEmbeddings 차원: (384,)
+SentenceTransformer 차원: (384,)
+최대 오차: 0.000000
 ```
 
 ```

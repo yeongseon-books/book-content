@@ -111,6 +111,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+```
+Output
+In Python, dictionary keys should be immutable. Therefore, a tuple is a better choice than a list as a dictionary key because tuples are immutable, while lists are not.
+```
+
 The important part is not just the last question. It is the replayed context before it. Terms like “which one” and “then” become meaningful only because the earlier turns are present in the same request. In application code, the loop is simple: append the new user message, send the current history, append the assistant reply, and repeat.
 
 ---
@@ -148,6 +153,12 @@ def ask(user_text: str) -> str:
 
 print(ask("My product is a monthly SaaS service. Please remember that."))
 print(ask("Now write a one-line refund policy statement."))
+```
+
+```
+Output
+I'll keep in mind that your product is a monthly SaaS (Software as a Service) service. What issue or question do you need help with?
+"We offer a 30-day money-back guarantee for all monthly subscriptions, with refunds processed on the next billing cycle."
 ```
 
 The appeal is obvious: implementation is trivial, context retention is strong, and debugging stays easy because nothing is hidden or compressed. The weakness is just as obvious. Prompt size, latency, and cost grow with every turn until the request hits the model's context window.

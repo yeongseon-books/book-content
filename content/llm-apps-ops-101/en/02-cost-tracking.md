@@ -98,6 +98,39 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+Output
+{
+  "price_per_million_tokens": 0.05,
+  "total_calls": 3,
+  "total_tokens": 262,
+  "total_cost_usd": 1.31e-05,
+  "records": [
+    {
+      "prompt": "Summarize Python decorators in one sentence.",
+      "prompt_tokens": 51,
+      "completion_tokens": 40,
+      "total_tokens": 91,
+      "cost_usd": 4.55e-06
+    },
+    {
+      "prompt": "Summarize Python decorators in one sentence.",
+      "prompt_tokens": 51,
+      "completion_tokens": 40,
+      "total_tokens": 91,
+      "cost_usd": 4.55e-06
+    },
+    {
+      "prompt": "Summarize asyncio.gather in one sentence.",
+      "prompt_tokens": 52,
+      "completion_tokens": 28,
+      "total_tokens": 80,
+      "cost_usd": 4e-06
+    }
+  ]
+}
+```
+
 ## What to notice in this code
 - A single `PRICE_PER_MILLION_TOKENS` constant keeps the math obvious and easy to replace later.
 - Persisting one `CostRecord` per call lets you analyze outliers without recomputing reports.

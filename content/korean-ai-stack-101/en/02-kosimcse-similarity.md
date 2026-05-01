@@ -71,6 +71,11 @@ distances, indices = index.search(query_vec, 2)
 print(distances, indices)
 ```
 
+```
+Output
+[[0.92722106 0.27328622]] [[0 1]]
+```
+
 ---
 
 ## What to notice in this code

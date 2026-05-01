@@ -108,6 +108,13 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+```
+출력 결과
+category: technical
+priority: high
+reason: 서버 오류는 시스템 문제로 인한 것으로 보인다.
+```
+
 이 예시는 긴 설명보다 세 가지를 분명하게 보여 줍니다. 첫째, few-shot은 결국 메시지 배열 설계입니다. 둘째, 예시는 질문만이 아니라 원하는 답변 형식까지 포함해야 합니다. 셋째, 예시 수가 늘수록 토큰도 늘어나므로 대표성 있는 짧은 예시를 고르는 편이 낫습니다.
 
 ---
@@ -176,6 +183,19 @@ print(zero_shot.choices[0].message.content)
 print()
 print("[few-shot]")
 print(few_shot.choices[0].message.content)
+```
+
+```
+출력 결과
+[zero-shot]
+category: billing
+priority: high
+reason: 팀 요금제의 청구 금액이 예상보다 두 배 가까이 높아 고객이 불편을 겪고 있습니다.
+
+[few-shot]
+category: billing
+priority: high
+reason: 비정상적인 청구 금액은 사용자의 예산 계획에 영향을 미칠 수 있다.
 ```
 
 실행해 보면 zero-shot도 꽤 그럴듯하게 맞추는 경우가 많습니다. 그런데 few-shot 쪽이 보통 더 안정적으로 아래 요소를 맞춥니다.
@@ -281,6 +301,19 @@ print("[good examples]")
 print(good_run.choices[0].message.content)
 ```
 
+```
+출력 결과
+[bad examples]
+category: technical
+priority: high
+reason: 비밀번호 재설정 메일이 오지 않아 로그인하지 못하는 고객의 경우 빠른 해결이 필요합니다.
+
+[good examples]
+category: account
+priority: high
+reason: 계정 잠금으로 인해 서비스 이용이 불가능하여 즉시 대응이 필요하다.
+```
+
 코드만 보면 차이가 작아 보일 수 있지만, 결과는 꽤 크게 갈립니다. 나쁜 예시는 모델에게 형식을 가르치지 못하고 애매함만 전달합니다. 좋은 예시는 라벨, 우선순위 판단 기준, 문장 길이를 함께 고정합니다. few-shot의 핵심은 예시 개수가 아니라 예시의 선명도입니다.
 
 실무에서는 아래 기준으로 예시를 고르는 편이 안전합니다.
@@ -333,6 +366,20 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
+```
+
+```
+출력 결과
+온라인 강의의 가격은 120,000원입니다. 쿠폰 10%를 적용해 보겠습니다.
+
+1. 쿠폰 10%를 적용하기 전 가격은 120,000원입니다.
+2. 쿠폰 10%를 적용하면, 10%의 가격은 120,000 x 0.1 = 12,000원입니다.
+3. 쿠폰 10%를 적용한 가격은 원래 가격에서 쿠폰 가격을 뺀 가격입니다. 따라서, 120,000 - 12,000 = 108,000원입니다.
+4. 부가세 10%를 붙이기 전 가격은 108,000원입니다.
+5. 부가세 10%를 붙이면, 10%의 가격은 108,000 x 0.1 = 10,800원입니다.
+6. 부가세 10%를 붙인 가격은 원래 가격에서 부가세 가격을 더한 가격입니다. 따라서, 108,000 + 10,800 = 118,800원입니다.
+
+final_answer: 118800원
 ```
 
 이 방식은 중간 추론 단계를 더 분명하게 끌어내는 경향이 있습니다. 그 결과 산술 순서나 조건 적용 순서를 덜 놓칩니다. 특히 “먼저 할인, 그다음 세금”처럼 순서가 중요한 문제에서 효과를 체감하기 쉽습니다.
@@ -388,6 +435,14 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
+```
+
+```
+출력 결과
+1) 80000원의 25%는 20000원입니다.
+2) 할인 적용 후 금액은 60000원입니다.
+3) 배송비 5000원을 더하면 65000원입니다.
+final_answer: 65000원
 ```
 
 둘의 차이는 이런 식으로 보면 됩니다.
@@ -469,6 +524,14 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
+```
+
+```
+출력 결과
+policy_check:
+1) 결제 후 7일 초과입니다.
+decision: denied
+reason: 기간 조건을 넘어 환불할 수 없습니다. 시청률은 무관합니다.
 ```
 
 이 패턴의 장점은 둘입니다. 먼저 예시가 답변 껍데기를 고정합니다. 이어서 `policy_check` 단계가 판단 순서를 고정합니다. 단순히 `approved`나 `denied`만 받는 것보다 디버깅도 쉬워집니다. 잘못 분류되면 어느 단계에서 판단이 틀어졌는지 확인할 수 있기 때문입니다.

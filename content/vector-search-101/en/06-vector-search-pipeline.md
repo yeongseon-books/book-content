@@ -192,6 +192,30 @@ for query in queries:
         print(f"  [{rank}] {score:.4f} — {text.strip()[:70]}...")
 ```
 
+```
+Output
+total chunks: 4
+vector shape: (4, 384)
+saved: faiss.index, chunks.json
+loaded: 4 vectors
+
+query: 'how vector search differs from keyword search'
+  [1] 0.7285 — Vector search converts text into numeric vectors for meaning-based ret...
+  [2] 0.4562 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
+
+query: 'FAISS index types'
+  [1] 0.5547 — FAISS is a high-speed vector search library developed at Facebook AI R...
+  [2] 0.1110 — Vector search converts text into numeric vectors for meaning-based ret...
+
+query: 'choosing chunk size'
+  [1] 0.4771 — Chunking strategies split long documents into units the embedding mode...
+  [2] 0.1839 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
+
+query: 'role of retrieval in RAG'
+  [1] 0.5931 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
+  [2] 0.1908 — Chunking strategies split long documents into units the embedding mode...
+```
+
 Expected output:
 
 ```

@@ -96,6 +96,13 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+출력 결과
+{'faithfulness': 0.7500, 'answer_relevancy': 0.6183}
+                                            question                                                                                                                                         contexts                                                                                                            answer                                                         ground_truth  faithfulness  answer_relevancy
+After how many retries is the message dead-lettered? [The worker retries a failed message up to three times before giving up., After the final retry, the payload is moved to the dead-letter queue.] The system retries the message three times. After the final retry, it moves the payload to the dead-letter queue. The message is retried up to three times before it is dead-lettered.          0.75          0.618348
+```
+
 ### 이 코드에서 봐야 할 것
 
 - 평가 입력은 `question`, `contexts`, `answer`, `ground_truth`의 관계로 묶입니다.
@@ -180,6 +187,16 @@ column_map = {
 print(column_map)
 ```
 
+```
+출력 결과
+Dataset({
+    features: ['question', 'contexts', 'answer', 'ground_truth'],
+    num_rows: 1
+})
+{'question': Value('string'), 'contexts': List(Value('string')), 'answer': Value('string'), 'ground_truth': Value('string')}
+{'question': 'query', 'contexts': 'retrieved_passages', 'answer': 'prediction', 'ground_truth': 'reference_answer'}
+```
+
 이 코드는 평가 설계의 핵심을 드러냅니다. **좋은 평가셋은 모델 출력 모음이 아니라, 질문·근거·답변·기준 답의 관계를 다시 구성할 수 있는 샘플 모음**입니다.
 
 ---
@@ -231,6 +248,11 @@ verdicts = [
 print(faithfulness_score(verdicts))
 ```
 
+```
+출력 결과
+0.6666666666666666
+```
+
 결국 faithfulness는 생성 모델의 수사력을 보지 않고, retrieval과 prompting이 만든 경계 안에 답변이 머무는지를 봅니다. 그래서 이 점수가 갑자기 떨어졌다면 보통은 세 군데를 의심해야 합니다. 3화에서 다룬 retriever가 충분한 근거를 못 가져왔거나, 4화에서 본 prompt가 근거 경계를 약하게 만들었거나, 5화의 chain 조립 과정에서 문맥이 잘리거나 순서가 어긋났을 가능성입니다.
 
 ---
@@ -269,6 +291,11 @@ scores = [
 ]
 
 print(sum(scores) / len(scores))
+```
+
+```
+출력 결과
+0.9983311560026473
 ```
 
 요약하면 answer relevancy는 “질문에 대한 답처럼 읽히는가”를 재는 메트릭입니다. 사실 검증까지 맡기면 안 되고, 특히 retrieval failure를 직접 잡아내는 도구로 오해하면 안 됩니다. 대신 prompt가 너무 수다스러워졌는지, answer template이 불필요한 boilerplate를 붙이고 있는지, chain 조립 뒤에 질문 원문이 희미해졌는지를 잡는 데는 꽤 민감합니다.
@@ -311,6 +338,11 @@ def average_precision(verdicts: list[int]) -> float:
 
 ranking = [1, 0, 1, 0]
 print(average_precision(ranking))
+```
+
+```
+출력 결과
+0.8333333333333333
 ```
 
 이 메트릭을 보면 왜 “retriever의 `k`를 일단 크게”가 항상 정답이 아닌지 이해가 됩니다. context precision이 낮다면 단순히 더 많이 가져오기보다, 더 관련 있고 더 앞선 순서로 가져오도록 retriever 정책을 손봐야 합니다.

@@ -113,6 +113,35 @@ print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
 ```
 
+```
+Output
+**What is a Python Decorator?**
+
+A Python decorator is a special type of function that can modify or extend the behavior of another function without permanently changing the original function. Decorators are typically used to add a new functionality to an existing function without affecting its original code. They are defined using the `@` symbol followed by the decorator function name. The decorator function takes the original function as an argument and returns a new function that "wraps" the original function. This new function is then assigned to the original function's name.
+
+Here's a simple example to illustrate this:
+```python
+def my_decorator(func):
+    def wrapper():
+        print("Something is happening before the function is called.")
+        func()
+        print("Something is happening after the function is called.")
+    return wrapper
+
+@my_decorator
+def say_hello():
+    print("Hello!")
+
+say_hello()
+```
+In this example, the `my_decorator` function takes the `say_hello` function as an argument and returns a new function, `wrapper`, which wraps the original `say_hello` function. The `@my_decorator` notation is simply a shorthand for `say_hello = my_decorator(say_hello)`. When `say_hello` is called, it actually executes the `wrapper` function, which includes the original function's code. This allows us to add new functionality to the original function without altering its original code.
+
+finish_reason=stop
+prompt_tokens=46
+completion_tokens=283
+total_tokens=329
+```
+
 Each field tells you something different.
 
 ### `prompt_tokens`
@@ -157,6 +186,12 @@ print(tokens)
 print(f"token_count={len(tokens)}")
 ```
 
+```
+Output
+[7979, 69774, 4037, 3160, 1603, 264, 1715, 3727, 10137, 11850, 30549, 13]
+token_count=12
+```
+
 There is one important caveat here. `cl100k_base` is a well-known encoding from the OpenAI ecosystem. It does not automatically mean that Groq's `llama-3.1-8b-instant` uses the exact same tokenizer internally. Because of that, treat this number as a **practical estimate**, not as the provider's billing source of truth. For billing and final accounting, the provider's `usage` field is authoritative.
 
 That does not make the estimate useless. In most applications, the first question is not “what is the exact invoice number for this one request?” The first question is “is this prompt short, large, or dangerously large?” An approximate count is often enough to trigger the right control flow.
@@ -181,6 +216,16 @@ estimated_prompt_tokens = len(encoding.encode(serialized))
 print(serialized)
 print()
 print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
+```
+
+```
+Output
+system: You are a concise Python tutor.
+user: Explain the difference between a list and a tuple.
+assistant: Lists are mutable, while tuples are immutable.
+user: Add one short code example too.
+
+estimated_prompt_tokens=41
 ```
 
 This is not a provider-exact calculation. It is a useful operational estimate. For a chatbot, you can run this just before the API call and start trimming or summarizing once the estimate crosses a threshold.
@@ -239,6 +284,22 @@ print(completion.choices[0].message.content)
 print()
 print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
+```
+
+```
+Output
+**Generators vs Lists in Python**
+=====================================
+
+In Python, generators and lists are two types of data structures that can be used to store sequences of values. However, they differ in their implementation, usage, and performance characteristics.
+
+**Lists**
+---------
+
+A list is a built-in data structure in Python that stores a collection of items in a specific order. It's defined by square brackets `[]
+
+completion_tokens=80
+finish_reason=length
 ```
 
 `max_tokens` affects more than length alone.
@@ -300,6 +361,20 @@ print(f"finish_reason={choice.finish_reason}")
 
 if choice.finish_reason == "length":
     print("Warning: the response stopped because it hit a length limit.")
+```
+
+```
+Output
+estimated_prompt_tokens=3015
+However, it appears that there is no actual text provided. The provided input is a series of identical sentences suggesting that a Python web application should keep both request logs and exception logs.
+
+Since there is no actual text to summarize, I'll provide a generic summary of why a Python web application should keep both
+
+prompt_tokens=3050
+completion_tokens=60
+total_tokens=3110
+finish_reason=length
+Warning: the response stopped because it hit a length limit.
 ```
 
 Three things matter here.

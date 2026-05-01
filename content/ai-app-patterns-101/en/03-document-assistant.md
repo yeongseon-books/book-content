@@ -106,6 +106,29 @@ print("\n=== Developer summary ===")
 print(dev_summary)
 ```
 
+```
+Output
+=== Executive summary ===
+Here's a summarized version of the document in a business-focused style:
+
+Our organization can leverage Python's continued dominance as the top programming language, with 67% of developers using it as their primary language, to drive growth in key areas such as data science and machine learning. The latest version of Python, 3.12, has improved performance by 25%, aligning with our goals for efficiency and productivity. By utilizing popular frameworks like FastAPI, Django, and Flask, and libraries like pandas, numpy, and scikit-learn, we can tap into the collective expertise of the developer community and accelerate our technology initiatives.
+
+=== Developer summary ===
+**Summary of 2024 Python Developer Survey Findings**
+
+The following highlights key trends and statistics from the survey:
+
+• **Language Popularity**: Python has retained its position as the most popular programming language for the fifth consecutive year, with 67% of respondents utilizing it as their primary language.
+
+• **Use Case Distribution**: The primary use cases for Python include data science and machine learning (45%), web development (28%), and automation scripting (18%), indicating a diverse range of applications.
+
+• **Python Version Adoption**: The majority of respondents (89%) utilize Python 3.x, while only 2% still run Python 2.x, reflecting a strong migration towards the more recent and improved version.
+
+• **Performance Enhancement**: Python 3.12 has delivered a notable 25% performance improvement over its predecessor, as well as strengthened type hint support, further solidifying its position as a top choice for developers.
+
+• **Framework and Library Adoption**: FastAPI (52%), Django (38%), and Flask (34%) are the most widely used frameworks, while pandas (78%), numpy (72%), and scikit-learn (65%) dominate in the data science domain, underscoring the importance of these libraries in Python development.
+```
+
 ---
 
 ## Long document summarization — Map-Reduce
@@ -192,6 +215,26 @@ final = map_reduce_summarize(long_doc)
 print(f"\n=== Final summary ===\n{final}")
 ```
 
+```
+Output
+Starting Map-Reduce summarization...
+  chunks: 5
+  chunk 1/5 summarized
+  chunk 2/5 summarized
+  chunk 3/5 summarized
+  chunk 4/5 summarized
+  chunk 5/5 summarized
+
+=== Final summary ===
+Here's a merged summary of the provided document segments:
+
+Artificial intelligence (AI) is a field of computer science that aims to simulate human cognitive abilities in machines. The question of whether machines can think was first posed by Alan Turing in the 1950s, and the field has experienced multiple cycles of enthusiasm and disillusionment since then. A key subfield of AI is machine learning, which involves learning rules from data rather than following explicitly programmed instructions. Machine learning encompasses various algorithms, including decision trees, random forests, and support vector machines.
+
+Deep learning is a branch of machine learning that uses artificial neural networks to achieve significant breakthroughs in image recognition, speech recognition, and natural language processing. This field gained widespread attention after a deep learning model won the 2012 ImageNet competition. Large language models (LLMs), which are a type of deep learning model, have also gained attention in recent years. LLMs are trained on vast text datasets and can perform various tasks, such as text generation, summarization, translation, and code writing.
+
+Some notable examples of LLMs include GPT, BERT, LLaMA, and ChatGPT, which have brought attention to this technology in the mainstream public. However, the future of AI holds both promise and challenges, including the need for more explainable and unbiased AI systems, as well as concerns about labor displacement. Despite these challenges, AI is expected to play a crucial role in addressing pressing issues such as climate change, medicine, and education.
+```
+
 ---
 
 ## Information extraction
@@ -253,6 +296,28 @@ for i, posting in enumerate(job_postings, start=1):
         print(f"  {key}: {value}")
 ```
 
+```
+Output
+
+=== Job posting 1 ===
+  company: ABCTech
+  position: senior backend engineer
+  location: Gangnam, Seoul
+  salary_range: 80M-120M KRW
+  required_skills: ['Python', 'Django', 'AWS', 'Docker']
+  experience_years: 5
+  employment_type: full-time
+
+=== Job posting 2 ===
+  company: Startup XYZ
+  position: full-stack developer
+  location: remote
+  salary_range: None
+  required_skills: ['React', 'Node.js', 'PostgreSQL']
+  experience_years: 3
+  employment_type: contract
+```
+
 ---
 
 ## Document classification
@@ -297,6 +362,25 @@ for text in texts:
     print(f"text: {text[:60]}...")
     print(f"  category: {result.get('category')}, confidence: {result.get('confidence'):.2f}")
     print(f"  reason: {result.get('reason')}\n")
+```
+
+```
+Output
+text: Python 3.12 significantly improved generic type handling spe...
+  category: Technology/IT, confidence: 1.00
+  reason: Reference to programming language and version
+
+text: Operating profit for Q3 rose 15 percent year-over-year, driv...
+  category: Business/Finance, confidence: 1.00
+  reason: financial and business terminology used
+
+text: A new study reports that regular aerobic exercise reduces ca...
+  category: Health/Medicine, confidence: 1.00
+  reason: Specific reference to cardiovascular disease and aerobic exercise, indicating a medical or health-related topic.
+
+text: Real Madrid defeated Manchester City 2-1 in the Champions Le...
+  category: Sports, confidence: 1.00
+  reason: mention of football teams and Champions League final
 ```
 
 ---

@@ -141,6 +141,11 @@ payload = json.loads(content)
 print(payload)
 ```
 
+```
+Output
+{'category': 'billing', 'priority': 3, 'summary': 'Order missing from order history after successful payment'}
+```
+
 Three details matter here.
 
 First, the system prompt still says "exactly one JSON object." JSON mode is a provider-side constraint, but it is still helpful to make the contract legible in the prompt itself.
@@ -214,6 +219,11 @@ except ValidationError as exc:
     raise
 
 print(ticket.model_dump())
+```
+
+```
+Output
+{'category': <Category.bug: 'bug'>, 'priority': 5, 'summary': 'Password reset emails not arriving, urgent access restoration needed', 'customer_needs_followup': True}
 ```
 
 This gives you a much stronger application boundary. If the model returns an unknown category, an out-of-range priority, a missing field, or the wrong type, validation fails immediately. That is a good thing. In production, explicit failure is safer than silently storing bad data and discovering the damage later.

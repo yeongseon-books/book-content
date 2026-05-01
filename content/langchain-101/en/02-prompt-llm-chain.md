@@ -47,6 +47,13 @@ chain = prompt | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ
 print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemplate"}))
 ```
 
+```
+Output
+In the context of Dialogflow or similar conversational AI platforms, a PromptTemplate is a reusable template for generating custom conversation prompts. This template allows you to define a structure for your conversation prompts, enabling you to easily create and manage multiple prompts with varying parameters, such as user input or context information.
+
+By utilizing a PromptTemplate, you can decouple the conversation flow logic from the actual prompt text, making it easier to maintain and update your conversational interface while ensuring consistency across different interactions.
+```
+
 ## What to notice in this code
 
 - Variables are managed at the template layer instead of through manual string assembly.
@@ -128,6 +135,71 @@ response = chain.invoke({
 })
 
 print(response.content)
+```
+
+```
+Output
+**Choosing Between List Comprehension and For Loop**
+
+List comprehensions and for loops are both used to create lists in Python. However, there are situations where one is a better choice than the other.
+
+**When to Use List Comprehension**
+
+List comprehensions are a better choice than for loops in the following scenarios:
+
+### 1. **Simple Transformations**
+
+If you need to perform a simple transformation on each element of a list, list comprehensions are a good choice.
+
+```python
+numbers = [1, 2, 3, 4, 5]
+double_numbers = [x * 2 for x in numbers]
+print(double_numbers)  # [2, 4, 6, 8, 10]
+```
+
+### 2. **Filtering**
+
+List comprehensions can be used to filter elements from a list.
+
+```python
+numbers = [1, 2, 3, 4, 5]
+even_numbers = [x for x in numbers if x % 2 == 0]
+print(even_numbers)  # [2, 4]
+```
+
+### 3. **Readability**
+
+List comprehensions can make your code more readable by avoiding the need for a for loop and if statement.
+
+```python
+numbers = [1, 2, 3, 4, 5]
+even_numbers = []
+for x in numbers:
+    if x % 2 == 0:
+        even_numbers.append(x)
+print(even_numbers)  # [2, 4]
+```
+
+### 4. **Performance**
+
+List comprehensions are generally faster than for loops because they avoid the overhead of a function call.
+
+**When to Use a For Loop**
+
+For loops are a better choice than list comprehensions in the following scenarios:
+
+### 1. **Complex Logic**
+
+If you need to perform complex logic or multiple operations on each element of a list, a for loop is a better choice.
+
+```python
+numbers = [1, 2, 3, 4, 5]
+result = []
+for x in numbers:
+    if x % 2 == 0:
+        result.append(x * 2)
+    else:
+... (truncated)
 ```
 
 Placeholder names like `{language}` and `{question}` must match the keys in the dict passed to `invoke()`.
@@ -218,6 +290,14 @@ print(f"description: {result.get('description')}")
 print(f"use_case: {result.get('use_case')}")
 ```
 
+```
+Output
+type: <class 'dict'>
+name: FAISS
+description: Facebook AI Similarity Search (FAISS) is an open-source library for efficient similarity search and clustering of dense vectors. It is developed by the Facebook AI Research (FAIR) team.
+use_case: FAISS is used in various applications including but not limited to: Similarity search and clustering of dense vectors, Product recommendations, Image and video search, Personalized advertising, and Anomaly detection.
+```
+
 If JSON parsing is unreliable, `with_structured_output()` is more robust. That method is covered in the llm-api-production-101 series.
 
 ---
@@ -252,6 +332,11 @@ result = chain.invoke({
 })
 
 print(result)
+```
+
+```
+Output
+FAISS was developed at Facebook AI Research.
 ```
 
 `RunnablePassthrough` appears most often when connecting a Retriever to a prompt. Post 3 shows that pattern in detail.
@@ -290,6 +375,71 @@ chain_with_fallback = primary_chain.with_fallbacks([fallback_chain])
 
 result = chain_with_fallback.invoke({"question": "How does Python handle exceptions?"})
 print(result)
+```
+
+```
+Output
+**Exception Handling in Python**
+=====================================
+
+Python provides a comprehensive exception handling mechanism that allows you to handle runtime errors and other exceptional conditions that may arise during the execution of your code. Here's an overview of how Python handles exceptions:
+
+**Types of Exceptions**
+------------------------
+
+Python has two types of exceptions:
+
+1. **Built-in Exceptions**: These are exceptions that are defined in the Python standard library. Examples include `ValueError`, `TypeError`, `RuntimeError`, etc.
+2. **User-defined Exceptions**: These are exceptions that you can define yourself using the `class` keyword.
+
+**Try-Except Block**
+--------------------
+
+The try-except block is the fundamental building block of exception handling in Python. It consists of two parts:
+
+1. **Try Block**: This is the block of code that may raise an exception.
+2. **Except Block**: This is the block of code that will be executed if an exception is raised in the try block.
+
+Here's an example:
+```python
+try:
+    # Code that may raise an exception
+    x = 5 / 0
+except ZeroDivisionError:
+    # Code that will be executed if a ZeroDivisionError is raised
+    print("Cannot divide by zero!")
+```
+**Multiple Except Blocks**
+---------------------------
+
+You can have multiple except blocks to handle different types of exceptions:
+```python
+try:
+    # Code that may raise an exception
+    x = 5 / 0
+except ZeroDivisionError:
+    # Code that will be executed if a ZeroDivisionError is raised
+    print("Cannot divide by zero!")
+except TypeError:
+    # Code that will be executed if a TypeError is raised
+    print("Invalid type!")
+```
+**Finally Block**
+-----------------
+
+The finally block is optional and is executed regardless of whether an exception was raised or not:
+```python
+try:
+    # Code that may raise an exception
+    x = 5 / 0
+except ZeroDivisionError:
+    # Code that will be executed if a ZeroDivisionError is raised
+    print("Cannot divide by zero!")
+finally:
+    # Code that will be executed regardless of whether an exception was raised
+    print("This will always be printed!")
+```
+... (truncated)
 ```
 
 This pattern switches automatically to the fallback model when the primary model is unavailable or rate-limited.

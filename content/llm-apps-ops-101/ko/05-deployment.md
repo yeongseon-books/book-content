@@ -133,6 +133,12 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+출력 결과
+HEALTH: {'status': 'ok', 'model': 'llama-3.1-8b-instant'}
+CHAT: {'response': 'Python async functions, also known as coroutines, are a way to write single-threaded concurrent code using asynchronous programming. They allow a function to pause its execution at specific points, known as await expressions, and resume execution when the awaited task is complete, enabling efficient use of system resources and improving responsiveness.', 'model': 'llama-3.1-8b-instant'}
+```
+
 ## 이 코드에서 봐야 할 것
 - `asyncio.to_thread`로 동기 Groq 호출을 분리해 FastAPI 이벤트 루프를 막지 않습니다.
 - `uvicorn.Server`를 코드에서 직접 띄우면 문서의 실행 예제와 검증 코드가 하나로 합쳐집니다.

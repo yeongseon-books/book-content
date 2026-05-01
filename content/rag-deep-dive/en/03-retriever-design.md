@@ -90,6 +90,22 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+Output
+
+=== similarity k=2 ===
+1. The worker retries failed messages three times before it stops.
+2. After the final retry, the payload moves to the dead-letter queue.
+
+=== mmr k=2 fetch_k=4 ===
+1. The worker retries failed messages three times before it stops.
+2. The dead-letter queue preserves the original payload for debugging.
+
+=== mmr k=2 fetch_k=6 ===
+1. The worker retries failed messages three times before it stops.
+2. HTTP 429 requires exponential backoff on the client side.
+```
+
 ### What to notice in this code
 
 - The same vector store returns different evidence sets once `search_type` changes.
@@ -172,6 +188,11 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+Output
+Payment worker retries failed jobs three times.
+```
+
 The baseline here is straightforward: `BaseRetriever` is not merely a semantic contract about inputs and outputs. It is a Runnable contract that standardizes lifecycle hooks, tracing metadata, and async compatibility.
 
 ---
@@ -243,6 +264,18 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+Output
+similarity
+Workers retry failed jobs three times.
+Dead-letter queues preserve the original payload.
+threshold
+Workers retry failed jobs three times.
+mmr
+Workers retry failed jobs three times.
+Dead-letter queues preserve the original payload.
+```
+
 So `VectorStoreRetriever` is simple in code size but not trivial in effect. It is the first place where “retrieval” stops meaning one thing and becomes a choice among several ranking semantics.
 
 ---
@@ -308,6 +341,18 @@ if __name__ == "__main__":
     main()
 ```
 
+```
+Output
+lambda_mult=0.8
+The worker retries failed messages three times.
+Operators inspect exception chains after the final retry.
+HTTP 429 responses require exponential backoff.
+lambda_mult=0.2
+The worker retries failed messages three times.
+HTTP 429 responses require exponential backoff.
+Dead-letter queues keep the original payload for debugging.
+```
+
 MMR is therefore best understood as a second-stage selector over an expanded candidate pool, not as a smarter version of top-k similarity alone.
 
 ---
@@ -361,6 +406,20 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+```
+Output
+raw scores
+0.3598 Retry budget is three attempts.
+1.6513 HTTP 429 requires exponential backoff.
+1.7776 Dead-letter queues preserve payloads.
+relevance scores
+0.7456 Retry budget is three attempts.
+-0.1676 HTTP 429 requires exponential backoff.
+-0.257 Dead-letter queues preserve payloads.
+threshold results
+Retry budget is three attempts.
 ```
 
 So the lesson is not just that L2 is a distance. It is that threshold retrieval in LangChain deliberately inserts a translation layer from raw backend distance into retriever-level relevance semantics.
@@ -451,6 +510,12 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+```
+Output
+Operators inspect the exception chain after the final retry.
+Workers retry failed jobs three times before dead-lettering.
 ```
 
 The specific example uses source-based routing, but the same pattern works for tenant scoping, permission boundaries, document freshness tiers, or language-specific sub-indexes. The important idea is that a custom retriever is where you encode retrieval policy that should happen before generic vector ranking.

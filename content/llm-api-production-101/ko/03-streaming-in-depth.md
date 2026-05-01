@@ -100,6 +100,71 @@ print("\n---")
 print(final_text)
 ```
 
+```
+출력 결과
+FastAPI는 Python으로 작성된 웹 프레임워크 중 하나입니다. 의존성 주입(Dependency Injection, DI)은 FastAPI에서 매우 중요하게 사용되는 개념입니다. 의존성 주입이란, 객체가 다른 객체에 의존하는 것을 줄이고, 의존하는 객체를 외부에서 주입하는 것을 의미합니다.
+
+### 의존성 주입의 필요성
+
+의존성 주입의 필요성은 다음과 같습니다.
+
+- **테스트하기 쉬움**: 의존성 주입을 사용하면, 객체를 테스트할 때 의존하는 객체를 mock 객체로 대체할 수 있습니다.
+- **유연성**: 의존성 주입을 사용하면, 객체의 의존하는 객체를 자유롭게 변경할 수 있습니다.
+- **재사용성**: 의존성 주입을 사용하면, 객체를 재사용할 수 있습니다.
+
+### 의존성 주입의 방법
+
+FastAPI에서 의존성 주입을 사용하는 방법은 다음과 같습니다.
+
+#### 1. FastAPI의 의존성 주입 기능 사용
+
+FastAPI는 의존성 주입을 위한 기능을 제공합니다. `@inject` 데코레이터를 사용하여 의존성을 주입할 수 있습니다.
+
+```python
+from fastapi import FastAPI
+from fastapi import Depends
+
+app = FastAPI()
+
+def get_db():
+    # DB 연결을 반환하는 함수
+    return "DB 연결"
+
+@app.get("/")
+async def read_root(db: str = Depends(get_db)):
+    return {"message": f"DB 연결: {db}"}
+```
+
+#### 2. Pydantic 모델 사용
+
+Pydantic 모델을 사용하여 의존성을 주입할 수 있습니다.
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+class DBConfig(BaseModel):
+    db: str
+
+app = FastAPI()
+
+@app.get("/")
+async def read_root(db_config: DBConfig):
+    return {"message": f"DB 연결: {db_config.db}"}
+```
+
+#### 3. 의존성 주입 라이브러리 사용
+
+FastAPI에서 의존성 주입 라이브러리를 사용할 수 있습니다. 예를 들어, `inject` 라이브러리를 사용할 수 있습니다.
+
+```python
+from fastapi import FastAPI
+from inject import inject
+
+app = FastAPI()
+... (truncated)
+```
+
 이 루프가 중요한 이유는 두 경로를 동시에 만족하기 때문입니다. 사용자에게는 부분 응답을 즉시 보여 주고, 애플리케이션에는 사후 저장·검증·캐시를 위한 완성 문자열을 남깁니다. 다만 운영에서는 이 코드가 아직 부족합니다. 청크가 없는 이벤트 처리, 장시간 정지 감지, 예외 처리, 종료 상태 기록이 비어 있기 때문입니다.
 
 ---
@@ -175,6 +240,71 @@ async def consume_stream(prompt: str) -> dict:
 asyncio.run(consume_stream("Python에서 context manager가 필요한 이유를 설명해 주세요."))
 ```
 
+```
+출력 결과
+**Context Manager의 필요성**
+
+Python에서 Context Manager는 리소스를 사용하고 해제 하는 프로세스를 간소화 해주고, 리소스가 소멸 되기 전에 해제하는 것을 보장해 주는 기능입니다. 
+
+일반적으로 파일, 네트워크 연결, DB 커넥션, 잠금 등과 같은 리소스를 사용할 때 Context Manager를 사용하면 다음의 이점이 있습니다.
+
+- 자원 손상 방지  
+  리소스 사용 전에 `try` 블록을 사용하지 않으면 어떤 문제가 발생하면 리소스가 소장되지 않게 되어 이후 다른 프로그램의 문제를 발생케 할 수 있습니다.
+
+- 코드를 간소화 해주는 것
+  리소스를 사용하고 그 후에 자원 해제를 해주는 코드는 자원에 종속되게 되어 코드를 관리하기 어렵습니다. Context Manager를 사용하면 리소스 해제는 try/finally 블록과는 별개로 동작하도록 되어 쉽게 관리할 수 있습니다.
+
+- 예외 발생시 리소스를 해제  
+  try/except/finally 블록으로 리소스를 해제 하는 것을 보장한다. 리소스 사용 후, 리소스 해제를 안 하는 경우 어떤 이유로든 프로그램을 종료한다면 리소스가 해제를 안하는 경우가 발생하지만 Context Manager를 사용하면 예외로 상관없이 리소스 해제를 보장함.
+
+### 예시
+
+```python
+class ResourceContext:
+    def __init__(self, name):
+        self.name = name
+        print(f"Opened {name}")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print(f"Closed {self.name}")
+
+
+# 사용 예시 1 : context manager를 직접 구현
+with ResourceContext("file"):
+    # file에 액세스합니다.
+    pass
+
+# 사용 예시 2 : 리소스 해제를 자동으로 함.
+from contextlib import contextmanager
+
+@contextmanager
+def resource_context_resource(name):
+    try:
+        # 리소스를 사용합니다.
+        print(f"Opened {name}")
+        yield
+    finally:
+        # 리소스를 해제합니다.
+        print(f"Closed {name}")
+
+with resource_context_resource("resource"):
+    # resource에 액세스합니다.
+    pass
+
+# 사용 예시 3 : with문 없이 Context Manager를 사용
+with open("/etc/passwd", 'rb') as fp:
+    # file이 열려 있음
+    print(fp)
+```
+
+- **__enter__()**: 리소스를 사용하기 전에 호출되며, 리소스가 사용하기 위해서는 반드시 호출되는데 이 때 리소스를 사용하기 위한 설정이나 초기화 과정을 수행해야 한다.
+- **__exit__()**: 리소스를 사용하고 난 후에 호출되며, 이 때 예외가 발생하지 않았다면 리소스가 사용되었다는 것을 인식하고 리소스를 반납(해제)한다. 리소스가 여러 개인 경우 여러 개의 리소스를 반납한다. 
+... (truncated)
+```
+
 핵심은 총 요청 시간보다 "진행이 있는가"를 별도 신호로 보되, 그 제한은 루프 본문이 아니라 스트림 읽기 자체에 걸어야 한다는 점입니다.
 
 동기 코드 경로를 유지하고 싶다면 클라이언트 생성 시 transport timeout을 함께 거는 편이 낫습니다. 다만 아래 `timeout=8.0`은 거친 클라이언트 제한일 뿐, 청크마다 읽기 간격을 정밀하게 감시하는 장치는 아닙니다. 그런 정밀 제어가 필요하면 앞의 비동기 래퍼처럼 read 자체를 감싸야 합니다.
@@ -199,6 +329,71 @@ for chunk in stream:
     delta = chunk.choices[0].delta.content
     if delta:
         print(delta, end="", flush=True)
+```
+
+```
+출력 결과
+파이썬의 제너레이터(generator)란?
+
+파이썬의 제너레이터는 생성자와 유사한 객체입니다. 생성자는 하나의 값이 있지만, 제너레이터는 여러 값이 있습니다. 이 값들은 실행 될 때마다 생성됩니다.
+
+제너레이터는 함수를 사용하여 생성할 수 있습니다. 이 함수를 "제너레이터 함수"라고합니다. 
+
+### 제너레이터 함수
+
+```python
+def 제너레이터_함수(인수):
+    for 반복문:
+        값 = 계산식
+        yield 리턴값
+```
+
+제너레이터 함수에서는 `yield` 키워드를 사용하여 값을 반환합니다.
+
+### 작동 방식
+
+```python
+def 제너레이터_함수():
+    값1 = 값
+    값2 = 값
+    yield 값1
+    yield 값2
+```
+
+제너레이터 함수를 호출할 때, 값1이 반환된다. 이후에, 제너레이터 함수는 해당 지점에서 멈추고, 해당하는 부분부터 다음 호출때부터 다시 계산한다.
+
+### 예시
+
+```python
+def 제너레이터_함수():
+    for i in range(5):
+        yield i
+
+for i in 제너레이터_함수():
+    print(i)
+```
+
+이 프로그램은 0부터 4까지의 값을 출력합니다.
+
+### 제너레이터의 장점
+
+- 제너레이터는 메모리 사용량을 줄일 수 있습니다. 일반적으로 함수는 전체 데이터를 메모리에 넣고 사용하는 반면, 제너레이터는 하나의 데이터를 사용하는 것에만 집중합니다.
+- 제너레이터는 효율적인 계산을 수행할 수 있습니다. 일반적으로 함수는 전체 데이터를 계산하는 반면, 제너레이터는 데이터가 생성되면 즉시 값을 반환하고, 그 다음 값을 사용합니다.
+
+### 제너레이터의 제한점
+
+- 제너레이터는 반드시 함수로 생성되어야 합니다.
+- 제너레이터는 값을 직접 반환할 수 없습니다. 대신에, `yield` 키워드를 사용하여 값을 반환해야 합니다.
+
+### 제너레이터 사용하기
+
+- `next()` : 제너레이터의 다음 값을 반환합니다.
+- `iter()`  : 제너레이터의 반복자(iterable)로 사용할 수 있습니다.
+- `list()` : 제너레이터의 전부를 리스트에 저장합니다.
+- `tuple()` : 제너레이터의 전부를 튜플에 저장합니다.
+- `dict()` : 제너레이터의 전부를 사전에 저장합니다.
+
+... (truncated)
 ```
 
 ---
