@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM 파인튜닝 101 (6/6)
 
+예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/06-serving)
+
 파인튜닝된 모델을 서비스에 배포하는 방법을 다룹니다. LoRA 어댑터를 베이스 모델에 병합해 단일 모델로 만들고, FastAPI로 추론 엔드포인트를 구성하고, Hugging Face Hub에 배포하는 전체 흐름을 구현합니다.
 
 ---

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (1/6)
 
+예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/01-graph-basics)
+
 LangChain은 선형 체인을 잘 다룹니다. 그러나 실제 에이전트는 루프를 돕니다. 도구를 쓰고, 결과를 보고, 다음 단계를 결정하고, 또 도구를 씁니다. 이 반복 흐름을 표현하는 것이 LangGraph의 핵심입니다. 이 포스트에서는 LangGraph의 기본 개념인 StateGraph, 노드, 엣지를 소개하고 첫 번째 그래프를 만듭니다.
 
 ---

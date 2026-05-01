@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 한국어 AI 스택 101 시리즈 (3/6)
 
+예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/03-bge-m3-multilingual)
+
 기술 문서, 논문, API 레퍼런스는 한국어 본문에 영어 용어가 섞인 경우가 많습니다. "트랜스포머(Transformer) 아키텍처의 어텐션(Attention) 메커니즘"처럼요. KoSimCSE는 한국어에 최적화되어 있지만, 이런 코드스위칭 텍스트에서는 BGE-M3가 더 강합니다. BGE-M3는 100개 이상의 언어를 지원하며, Dense + Sparse 두 가지 검색 방식을 하나의 모델에서 모두 제공합니다.
 
 다룰 내용은 다음과 같습니다.

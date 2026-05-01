@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Korean AI Stack 101 (1/6)
 
+Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/01-korean-embedding-models)
+
 Embedding models designed around English corpora do not reliably capture the meaning of Korean sentences. Understanding that "나는 밥을 먹었다" and "I had a meal" are semantically equivalent requires a model that has learned Korean morphology. This post compares three embedding models suited for Korean NLP work.
 
 Topics:

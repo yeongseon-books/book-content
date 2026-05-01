@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM Fine-tuning 101 (2/6)
 
+Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/02-dataset)
+
 Data quality determines fine-tuning quality. It has more impact on final model performance than model architecture or hyperparameters. This post covers the right data format for fine-tuning, collection strategies, and a preprocessing pipeline.
 
 ---

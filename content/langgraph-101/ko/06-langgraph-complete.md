@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (6/6)
 
+예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/06-langgraph-complete)
+
 이 시리즈에서 다룬 그래프 기초, 체크포인트, 조건부 엣지, 도구 호출, 멀티 에이전트를 하나의 완전한 프로덕션 에이전트로 통합합니다. 대화 기억, 도구 사용, 품질 검증, 멀티턴 대화를 지원하는 에이전트를 만듭니다.
 
 ---

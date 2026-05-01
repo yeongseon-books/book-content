@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (3/6)
 
+예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/03-conditional-edges)
+
 선형 파이프라인은 항상 같은 경로로 흐릅니다. 에이전트는 상황에 따라 다른 경로를 선택해야 합니다. LangGraph의 조건부 엣지는 상태를 검사해 다음 노드를 동적으로 결정합니다. 이 포스트에서는 라우팅 패턴, 루프, 탈출 조건을 구현합니다.
 
 ---

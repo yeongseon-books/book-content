@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (2/6)
 
+Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/02-state-and-checkpoints)
+
 Conversational agents need to remember previous turns. LangGraph's checkpointer saves state after each step and automatically maintains conversation history. This post implements conversation persistence using both an in-memory checkpointer for development and a SQLite checkpointer for production.
 
 ---

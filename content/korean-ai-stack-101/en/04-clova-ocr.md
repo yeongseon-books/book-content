@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Korean AI Stack 101 (4/6)
 
+Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/04-clova-ocr)
+
 RAG pipelines do not always start from text files. Scanned contracts, receipt images, and tables embedded in PDFs all lock text inside images. OCR (Optical Character Recognition) extracts that text. NAVER CLOVA OCR is a commercial Korean-specialized API that handles everything from printed business documents to handwritten Korean.
 
 Topics:

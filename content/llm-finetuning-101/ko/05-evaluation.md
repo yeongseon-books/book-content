@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM 파인튜닝 101 (5/6)
 
+예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/05-evaluation)
+
 학습이 끝난 모델은 실제로 얼마나 나아졌는지 측정해야 합니다. 손실 값만으로는 부족합니다. 태스크에 맞는 지표를 선택하고, 베이스 모델과 정량 비교하고, 실제 출력을 살펴봐야 합니다. 이 포스트에서는 파인튜닝된 모델 평가 방법을 다룹니다.
 
 ---

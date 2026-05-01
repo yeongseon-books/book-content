@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (2/6)
 
+예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/02-state-and-checkpoints)
+
 대화형 에이전트는 이전 대화를 기억해야 합니다. LangGraph의 체크포인터는 각 스텝 후 상태를 저장해 대화 기록을 자동으로 관리합니다. 이 포스트에서는 메모리 체크포인터와 SQLite 체크포인터를 사용해 대화 지속성을 구현합니다.
 
 ---

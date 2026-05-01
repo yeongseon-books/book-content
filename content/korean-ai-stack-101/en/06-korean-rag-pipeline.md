@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Korean AI Stack 101 (6/6)
 
+Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/06-korean-rag-pipeline)
+
 This post assembles the components covered throughout the series into one pipeline: KoSimCSE embeddings for indexing Korean documents, FAISS for retrieval, and Solar LLM for generating Korean answers. Adding CLOVA OCR preprocessing extends it to scanned images and PDFs.
 
 Topics:

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM 파인튜닝 101 (4/6)
 
+예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/04-training)
+
 LoRA 어댑터와 데이터셋이 준비되면 실제 학습을 시작합니다. Hugging Face TRL 라이브러리의 `SFTTrainer`를 사용하면 학습 루프, 그래디언트 체크포인팅, 로깅을 간결하게 처리할 수 있습니다. 이 포스트에서는 학습 설정과 주요 하이퍼파라미터를 다룹니다.
 
 ---

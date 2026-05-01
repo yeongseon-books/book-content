@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM Fine-tuning 101 (1/6)
 
+Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/01-intro)
+
 Pre-trained LLMs perform well on general tasks, but show clear limits in specialized domains. A customer support bot needs to use your product's exact terminology. A medical summarization model must follow a specific output format. When prompt engineering and RAG fall short, fine-tuning is the answer. This series walks through the complete process of efficient fine-tuning with LoRA.
 
 ---

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Korean AI Stack 101 (3/6)
 
+Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/03-bge-m3-multilingual)
+
 Technical documents, research papers, and API references often mix English terms into Korean sentences — "트랜스포머(Transformer) 모델의 어텐션(Attention) 메커니즘". KoSimCSE is optimized for pure Korean, but BGE-M3 handles this code-switching text better. BGE-M3 supports over 100 languages and delivers dense, sparse, and multi-vector retrieval from a single model.
 
 Topics:

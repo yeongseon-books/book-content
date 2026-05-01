@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM Fine-tuning 101 (6/6)
 
+Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/06-serving)
+
 This post covers deploying a fine-tuned model into a service. Merge the LoRA adapter into the base model to produce a single artifact, expose an inference endpoint with FastAPI, and push to the Hugging Face Hub.
 
 ---

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM Fine-tuning 101 (4/6)
 
+Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/04-training)
+
 With a LoRA adapter and dataset ready, it's time to train. Hugging Face TRL's `SFTTrainer` handles the training loop, gradient checkpointing, and logging cleanly. This post covers the training configuration and the key hyperparameters worth understanding.
 
 ---

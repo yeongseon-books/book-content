@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM 파인튜닝 101 (2/6)
 
+예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/02-dataset)
+
 파인튜닝의 품질은 데이터셋이 결정합니다. 모델 구조나 하이퍼파라미터보다 데이터 품질이 최종 성능에 더 큰 영향을 미칩니다. 이 포스트에서는 파인튜닝에 적합한 데이터 형식, 수집 전략, 전처리 파이프라인을 다룹니다.
 
 ---

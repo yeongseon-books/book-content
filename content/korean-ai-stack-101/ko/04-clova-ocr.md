@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 한국어 AI 스택 101 시리즈 (4/6)
 
+예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/04-clova-ocr)
+
 RAG 파이프라인에서 문서 소스는 텍스트 파일만이 아닙니다. 스캔한 계약서, 영수증 이미지, PDF 내 표처럼 텍스트가 이미지로 묶여 있는 경우가 많습니다. OCR(Optical Character Recognition)은 이미지에서 텍스트를 추출하는 기술입니다. 네이버 CLOVA OCR은 한국어 인식에 특화된 상용 API로, 한글 손글씨부터 인쇄된 문서까지 폭넓게 지원합니다.
 
 다룰 내용은 다음과 같습니다.

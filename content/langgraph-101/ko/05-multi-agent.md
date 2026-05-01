@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (5/6)
 
+예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/05-multi-agent)
+
 복잡한 작업은 여러 전문 에이전트가 협력해 처리합니다. 한 에이전트가 전체를 조율하고, 나머지는 각자의 역할에 집중합니다. 이 포스트에서는 감독자-작업자 패턴으로 멀티 에이전트 시스템을 구현합니다.
 
 ---

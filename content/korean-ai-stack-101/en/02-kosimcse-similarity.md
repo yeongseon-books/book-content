@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Korean AI Stack 101 (2/6)
 
+Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/02-kosimcse-similarity)
+
 The previous post compared three Korean embedding models. This post builds a working Korean sentence similarity search system with KoSimCSE, moving from benchmark comparison to practical implementation.
 
 Topics:

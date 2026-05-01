@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (5/6)
 
+Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/05-multi-agent)
+
 Complex tasks benefit from multiple specialized agents working together. One agent orchestrates the work; the others focus on their specific roles. This post implements the supervisor-worker pattern as a multi-agent system in LangGraph.
 
 ---

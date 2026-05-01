@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM 파인튜닝 101 (3/6)
 
+예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/03-lora)
+
 LoRA(Low-Rank Adaptation)는 원본 모델 가중치를 고정하고 각 레이어에 소형 행렬 쌍을 추가하는 방식입니다. 학습 가능한 파라미터 수를 1% 미만으로 줄이면서도 풀 파인튜닝에 근접한 성능을 냅니다. 이 포스트에서는 LoRA 원리와 PEFT 라이브러리를 사용한 어댑터 구성을 다룹니다.
 
 ---

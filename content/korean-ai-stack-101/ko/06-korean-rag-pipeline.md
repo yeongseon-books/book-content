@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 한국어 AI 스택 101 시리즈 (6/6)
 
+예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/06-korean-rag-pipeline)
+
 이 시리즈에서 다룬 구성 요소를 하나의 파이프라인으로 조합합니다. KoSimCSE 임베딩으로 한국어 문서를 인덱싱하고, FAISS로 검색하고, Solar LLM으로 한국어 답변을 생성합니다. 여기에 OCR 전처리까지 추가하면 이미지나 스캔 문서도 처리할 수 있습니다.
 
 이번 글에서는 다음을 다룹니다.

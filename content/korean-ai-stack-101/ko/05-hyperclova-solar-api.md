@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 한국어 AI 스택 101 시리즈 (5/6)
 
+예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/05-hyperclova-solar-api)
+
 OpenAI나 Anthropic의 모델이 한국어를 지원하지만, 한국어 뉘앙스와 문화적 맥락에서는 한국어 전용으로 훈련된 모델이 더 자연스러운 결과를 냅니다. HyperCLOVA X(네이버)와 Solar(업스테이지)는 한국어에 특화된 상용 LLM입니다. 두 모델 모두 OpenAI API 호환 인터페이스를 제공해서 기존 코드를 크게 수정하지 않고도 사용할 수 있습니다.
 
 다룰 내용은 다음과 같습니다.

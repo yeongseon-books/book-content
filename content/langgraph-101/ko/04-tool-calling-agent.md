@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (4/6)
 
+예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/04-tool-calling-agent)
+
 LLM이 스스로 도구를 선택하고 결과를 보고 다음 행동을 결정하는 것이 에이전트의 핵심입니다. 이 포스트에서는 LangGraph로 도구 호출 에이전트를 만듭니다. 도구 정의, 도구 실행 노드, 에이전트 루프를 구현하고 계산기와 검색 도구를 붙입니다.
 
 ---

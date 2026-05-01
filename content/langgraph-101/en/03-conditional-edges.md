@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (3/6)
 
+Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/03-conditional-edges)
+
 Linear pipelines always take the same path. Agents need to choose different paths depending on what they encounter. LangGraph's conditional edges inspect state and dynamically select the next node. This post implements routing patterns, loops, and escape conditions.
 
 ---

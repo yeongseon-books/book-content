@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Korean AI Stack 101 (5/6)
 
+Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/05-hyperclova-solar-api)
+
 OpenAI and Anthropic models support Korean, but models trained primarily on Korean corpora produce more natural output on Korean cultural nuance and idiomatic expression. HyperCLOVA X (NAVER) and Solar (Upstage) are commercial LLMs built with Korean as a first-class language. Both expose OpenAI-compatible chat completion interfaces, so switching requires minimal code changes.
 
 Topics:

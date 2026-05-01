@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM Fine-tuning 101 (5/6)
 
+Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/05-evaluation)
+
 A finished training run needs measurement. Loss alone is not enough. You need task-appropriate metrics, a quantitative comparison against the base model, and a look at actual outputs. This post covers how to evaluate a fine-tuned model.
 
 ---

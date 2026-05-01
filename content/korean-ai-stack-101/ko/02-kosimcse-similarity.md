@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 한국어 AI 스택 101 시리즈 (2/6)
 
+예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/02-kosimcse-similarity)
+
 앞 글에서 세 가지 한국어 임베딩 모델을 비교했습니다. 이번 글에서는 KoSimCSE를 사용해서 실제로 동작하는 한국어 문장 유사도 검색 시스템을 만듭니다. 이론 비교에서 실용 구현으로 넘어가는 단계입니다.
 
 다룰 내용은 다음과 같습니다.

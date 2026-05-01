@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (1/6)
 
+Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/01-graph-basics)
+
 LangChain handles linear chains well. Real agents are different — they use a tool, look at the result, decide what to do next, and use another tool. This loop is what LangGraph is built to express. This post introduces the core concepts: StateGraph, nodes, and edges, and builds the first graph.
 
 ---

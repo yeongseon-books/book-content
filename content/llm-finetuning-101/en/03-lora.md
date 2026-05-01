@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM Fine-tuning 101 (3/6)
 
+Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/03-lora)
+
 LoRA (Low-Rank Adaptation) freezes the original model weights and adds a small pair of matrices at each layer. Trainable parameters drop below 1% of the original, while performance stays close to full fine-tuning. This post covers LoRA's mechanics and adapter configuration with the PEFT library.
 
 ---

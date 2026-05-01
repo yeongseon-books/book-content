@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 한국어 AI 스택 101 시리즈 (1/6)
 
+예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/01-korean-embedding-models)
+
 영어 중심으로 설계된 임베딩 모델은 한국어 문장의 의미를 잘 잡아내지 못합니다. "나는 밥을 먹었다"와 "I had a meal"이 의미상 같다는 것을 알아채려면 한국어 문장 구조를 이해하는 모델이 필요합니다. 이번 글에서는 한국어에 특화된 세 가지 임베딩 모델을 비교합니다.
 
 다룰 내용은 다음과 같습니다.

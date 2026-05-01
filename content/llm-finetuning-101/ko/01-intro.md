@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LLM 파인튜닝 101 (1/6)
 
+예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/01-intro)
+
 사전 학습된 LLM은 범용적으로 동작하지만, 특정 도메인이나 태스크에서는 한계가 뚜렷합니다. 고객 지원 봇이 자사 제품 용어를 정확히 사용해야 하거나, 의료 문서 요약 모델이 특정 형식을 따라야 할 때, 파인튜닝이 필요합니다. 이 시리즈는 LoRA를 활용한 효율적인 파인튜닝 전 과정을 다룹니다.
 
 ---

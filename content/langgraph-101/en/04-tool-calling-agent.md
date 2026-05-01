@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangGraph 101 (4/6)
 
+Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/04-tool-calling-agent)
+
 The defining capability of an agent is choosing tools, observing results, and deciding what to do next. This post builds a tool-calling agent with LangGraph: tool definitions, a tool execution node, and the agent loop that ties them together.
 
 ---
