@@ -137,10 +137,12 @@ api_key = os.environ["GROQ_API_KEY"]
 print(f"API key loaded: {api_key[:6]}...")
 ```
 
-~~~
-Output
-API key loaded: gsk_Z2...
-~~~
+<!-- injected-output:start -->
+**Output**
+
+    API key loaded: gsk_Z2...
+
+<!-- injected-output:end -->
 
 You would not print the full key in a real application. A short prefix is enough for local verification.
 

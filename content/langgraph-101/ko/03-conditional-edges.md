@@ -98,21 +98,6 @@ if __name__ == "__main__":
         print(f"Answer: {result['answer']}\n")
 ```
 
-~~~
-출력 결과
-Question: Write Python code for quicksort.
-Route: code
-Answer: Route: code. Next node should generate or review code.
-
-Question: What is a checkpoint in LangGraph?
-Route: concept
-Answer: Route: concept. Next node should explain the idea clearly.
-
-Question: I got a traceback while running my graph.
-Route: debug
-Answer: Route: debug. Next node should inspect failure details first.
-~~~
-
 실행 파일: `/root/Github/langgraph-101/ko/03-conditional-edges/main.py`
 
 ## 이 코드에서 봐야 할 것

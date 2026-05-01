@@ -78,19 +78,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-Output
-rank=1 distance=0.8672
-Operators inspect the exception chain before replaying the message.
-------------------------------------------------------------
-rank=2 distance=0.8806
-The worker retries a failed message three times before dead-lettering.
-------------------------------------------------------------
-rank=3 distance=1.2581
-The dead-letter queue keeps the original payload for later inspection.
-------------------------------------------------------------
-~~~
-
 ### What to notice in this code
 
 - The script embeds text with HuggingFace, converts it to `float32`, and feeds it directly into `IndexFlatL2`.
@@ -161,12 +148,6 @@ if __name__ == "__main__":
     demo()
 ```
 
-~~~
-Output
-2 384
-384
-~~~
-
 The baseline for the rest of this post is simple. The embedding step is already shaping the geometry. Chunk boundaries matter, long inputs may be averaged, and the query/document split is semantically meaningful even when one concrete implementation collapses it.
 
 ---
@@ -218,12 +199,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-Output
-distances: [[0.002500000176951289, 0.042500004172325134]]
-labels: [[0, 1]]
-~~~
 
 Use `IndexFlatL2` when you want exactness and a trustworthy baseline. Stop treating it as neutral infrastructure. It encodes a very specific notion of closeness and pays for it with linear scan cost.
 
@@ -280,13 +255,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-Output
-InMemoryDocstore
-2
-{0: 'b5524666-2cbc-46ac-8970-d7e06301503f', 1: '5fb6fc61-a779-4d09-a563-f27d89e22594'}
-~~~
 
 The main operational takeaway is that retrieval bugs can happen in any of these layers. A bad score is not the same as a bad reconstruction, and a bad reconstruction is not the same as a bad metadata filter path.
 
@@ -357,16 +325,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-Output
-flat ip ids: [1218, 1405, 770, 1745, 727]
-flat ip scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8482962846755981, 0.8418495655059814]
-ivf nprobe=1 ids: [1218, 1405, 770, 1361, 756]
-ivf nprobe=1 scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8389736413955688, 0.8291006088256836]
-ivf nprobe=8 ids: [1218, 1405, 770, 727, 1377]
-ivf nprobe=8 scores: [0.8739232420921326, 0.8601306676864624, 0.8484551906585693, 0.8418495655059814, 0.8412026166915894]
-~~~
-
 For many teams, exact flat search remains the right choice longer than expected. Use IVF when the scale truly demands it, not because approximate indexes sound more advanced.
 
 ---
@@ -419,11 +377,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-Output
-Rotate secrets every 90 days.
-~~~
 
 The lesson is bigger than persistence. A retrieval system is not only math and latency. It also has artifact boundaries, trust assumptions, and operational risks.
 

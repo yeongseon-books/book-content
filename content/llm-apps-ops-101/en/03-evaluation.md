@@ -113,31 +113,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-Output
-{
-  "raw": {
-    "answer": "The Global Interpreter Lock (GIL) is a mechanism in CPython that prevents multiple native threads from executing Python bytecodes at once.",
-    "keywords": [
-      "Global Interpreter Lock",
-      "GIL",
-      "CPython",
-      "threading",
-      "concurrency",
-      "parallelism"
-    ]
-  },
-  "evaluation": {
-    "passed": true,
-    "length_ok": true,
-    "keywords_ok": true,
-    "format_ok": true,
-    "missing_keywords": [],
-    "answer_length": 138
-  }
-}
-~~~
-
 ## What to notice in this code
 - Forcing JSON output narrows the shape of the problem before evaluation starts.
 - Returning `missing_keywords` makes failures actionable instead of mysterious.

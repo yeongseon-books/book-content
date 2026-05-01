@@ -119,11 +119,6 @@ request_payload = {
 print(build_cache_key(request_payload))
 ```
 
-~~~
-출력 결과
-d825e2316b05debea2c4ff2bdaa3cfdcab11ad95069ff965050c3d362dfe17d1
-~~~
-
 이 함수가 하는 일은 단순합니다. 같은 의미의 payload가 같은 문자열이 되도록 JSON을 정규화하고, 그 결과를 고정 길이 해시로 바꿉니다. `sort_keys=True`를 빼면 딕셔너리 키 순서 차이 때문에 같은 요청이 다른 키를 가질 수 있습니다. `separators`를 고정하는 이유는 공백 차이까지 제거하기 위해서입니다.
 
 ---

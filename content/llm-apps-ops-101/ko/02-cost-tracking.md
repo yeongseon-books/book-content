@@ -98,39 +98,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-{
-  "price_per_million_tokens": 0.05,
-  "total_calls": 3,
-  "total_tokens": 262,
-  "total_cost_usd": 1.31e-05,
-  "records": [
-    {
-      "prompt": "Summarize Python decorators in one sentence.",
-      "prompt_tokens": 51,
-      "completion_tokens": 40,
-      "total_tokens": 91,
-      "cost_usd": 4.55e-06
-    },
-    {
-      "prompt": "Summarize Python decorators in one sentence.",
-      "prompt_tokens": 51,
-      "completion_tokens": 40,
-      "total_tokens": 91,
-      "cost_usd": 4.55e-06
-    },
-    {
-      "prompt": "Summarize asyncio.gather in one sentence.",
-      "prompt_tokens": 52,
-      "completion_tokens": 28,
-      "total_tokens": 80,
-      "cost_usd": 4e-06
-    }
-  ]
-}
-~~~
-
 ## 이 코드에서 봐야 할 것
 - `PRICE_PER_MILLION_TOKENS`를 상수로 두면 공급자나 플랜이 바뀌어도 계산식은 유지됩니다.
 - 호출별 `CostRecord`를 남겨 두면 어떤 프롬프트가 비싼지 다시 계산하지 않아도 됩니다.

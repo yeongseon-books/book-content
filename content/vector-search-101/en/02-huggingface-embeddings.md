@@ -131,12 +131,6 @@ print(f"matrix shape: {vectors_np.shape}")  # (5, 384)
 print(f"elapsed: {elapsed:.3f}s")
 ```
 
-~~~
-Output
-matrix shape: (5, 384)
-elapsed: 0.097s
-~~~
-
 The gap between batch and loop grows with document count. For large corpora, always prefer `embed_documents()`.
 
 ---
@@ -173,13 +167,6 @@ print(f"reloaded: {loaded.shape}")
 print(f"identical: {np.allclose(vectors, loaded)}")
 ```
 
-~~~
-Output
-saved: (3, 384)
-reloaded: (3, 384)
-identical: True
-~~~
-
 ```
 saved: (3, 384)
 reloaded: (3, 384)
@@ -213,11 +200,6 @@ with open("documents.json", "w") as f:
 
 print("saved embeddings and documents")
 ```
-
-~~~
-Output
-saved embeddings and documents
-~~~
 
 Post 4 uses exactly this pattern to build a working FAISS search system.
 
@@ -280,13 +262,6 @@ print(f"HuggingFaceEmbeddings shape: {hf_vector.shape}")
 print(f"SentenceTransformer shape:   {st_vector.shape}")
 print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 ```
-
-~~~
-Output
-HuggingFaceEmbeddings shape: (384,)
-SentenceTransformer shape:   (384,)
-max difference: 0.000000
-~~~
 
 ```
 HuggingFaceEmbeddings shape: (384,)

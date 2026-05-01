@@ -146,15 +146,6 @@ if __name__ == "__main__":
         print(f"Answer: {result['messages'][-1].content}\n")
 ```
 
-~~~
-출력 결과
-Question: What is sqrt(144) + 25? Use a tool.
-Answer: The result of sqrt(144) + 25 is 37.0.
-
-Question: Count the words in this sentence: LangGraph makes tool loops explicit.
-Answer: The sentence "LangGraph makes tool loops explicit." contains 5 words.
-~~~
-
 실행 파일: `/root/Github/langgraph-101/ko/04-tool-calling-agent/main.py`
 
 실행:

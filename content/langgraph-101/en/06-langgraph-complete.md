@@ -198,29 +198,6 @@ if __name__ == "__main__":
     print(f"\nCheckpoint message count: {len(snapshot.values['messages'])}")
 ```
 
-~~~
-Output
-First turn:
-In the context of LangGraph, a component of the LangChain ecosystem, "explicit state" refers to the idea of making the state of a conversation or interaction explicit and manageable.
-
-In traditional conversational AI systems, the state of the conversation is often implicit, meaning it's buried within the model's internal workings or scattered across various context variables. This can make it difficult to understand, manage, and manipulate the conversation flow.
-
-LangGraph, on the other hand, introduces the concept of explicit state, where the state of the conversation is represented as a graph data structure. This graph contains nodes and edges that represent the various elements of the conversation, such as entities, intents, and relationships between them.
-
-By making the state explicit, LangGraph enables developers to:
-
-1. **Visualize** the conversation flow and understand how the different elements interact with each other.
-2. **Manipulate** the state of the conversation, allowing for more fine-grained control over the interaction.
-3. **Reason** about the conversation, enabling more informed decision-making and improved response generation.
-
-In essence, explicit state in LangGraph means that the conversation's state is represented in a transparent, manageable, and queryable way, making it easier to build more sophisticated and effective conversational AI systems.
-
-Second turn:
-The result of the calculation sqrt(81) + 5 is 14.0.
-
-Checkpoint message count: 6
-~~~
-
 Runnable file: `/root/Github/langgraph-101/en/06-langgraph-complete/main.py`
 
 Run it with:

@@ -131,16 +131,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-=== RetrievalQA ===
-The system stopped retrying the message after the final retry because it moved the original payload to the dead-letter queue.
-sources: ['ops-guide.md', 'ops-guide.md']
-
-=== LCEL ===
-The context doesn't explicitly state why the system stopped retrying the message. It only mentions that after the final retry, the original payload moves to the dead-letter queue. It implies that the system has exhausted its retry attempts, but it doesn't provide the reason for stopping the retries.
-~~~
-
 ### 이 코드에서 봐야 할 것
 
 - 같은 retriever와 같은 LLM을 두고도 classic chain과 LCEL chain의 조립 표면이 다릅니다.
@@ -241,14 +231,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-The job is dead-lettered after the final retry.
-['runbook.md', 'ops.md']
-input key: query
-output keys: ['result', 'source_documents']
-~~~
-
 이 예제의 핵심은 답변 품질이 아니라 인터페이스입니다. `RetrievalQA`는 여전히 쓸 수 있지만, 체인 내부를 수정하고 관찰하려는 순간 바로 벽이 생깁니다. 이제부터 볼 LCEL은 그 벽을 낮추기 위해 나온 조립 언어에 가깝습니다.
 
 ---
@@ -294,14 +276,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-출력 결과
-{'doubled': 14}
-{'title': 'NumberInput', 'type': 'object', 'properties': {'value': {'title': 'Value', 'type': 'integer'}}, 'required': ['value']}
-{'title': 'NumberOutput', 'type': 'object', 'properties': {'doubled': {'title': 'Doubled', 'type': 'integer'}}, 'required': ['doubled']}
-[{'doubled': 4}, {'doubled': 10}, {'doubled': 18}]
-~~~
 
 여기서 `.with_types()`가 하는 일은 실행 로직을 바꾸는 것이 아니라, LCEL 그래프에 더 정확한 입출력 타입 정보를 덧씌우는 것입니다. 뒤에서 `RunnablePassthrough.assign()`으로 답변과 출처를 같이 반환할 때 이 패턴이 특히 유용해집니다.
 
@@ -395,20 +369,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-출력 결과
-Synthetic answer based on:
-System: 주어진 문맥만 근거로 2문장 이내로 답하세요.
-Human: 문맥:
-[runbook.md]
-Retry budget is three attempts before the worker stops retrying.
-
-[ops-guide.md]
-After the final retry, the original payload moves to the dead-letter queue.
-
-질문: 왜 dead-letter queue로 이동했나요?
-~~~
 
 이 패턴의 장점은 단순히 예쁘다는 데 있지 않습니다. 첫 dict 단계에서 이미 “질문 원문”, “검색 결과”, “추가 계산 필드”를 병렬로 만들 수 있기 때문에, 복잡한 RAG일수록 오히려 구조가 덜 숨겨집니다. 답변 전처리나 후처리도 같은 runnable 언어 안에서 해결할 수 있습니다.
 
@@ -506,12 +466,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-{'answer': 'Answer grounded in context:\nWhy was the job sent to dead-letter after retries?', 'sources': ['runbook.md', 'ops-guide.md']}
-{'title': 'AnswerOutput', 'type': 'object', 'properties': {'answer': {'title': 'Answer', 'type': 'string'}, 'sources': {'title': 'Sources', 'type': 'array', 'items': {'type': 'string'}}}, 'required': ['answer', 'sources']}
-~~~
-
 이 예제에서 중요한 것은 `assign()`이 문법 설탕 이상이라는 점입니다. 앞단에서 만든 `sources`를 유지한 채 `context`와 `answer`를 순차적으로 덧붙이기 때문에, retrieval 결과를 잃지 않고 chain output을 점점 풍부하게 만들 수 있습니다. RAG를 API나 UI에 연결할 때 이 차이는 큽니다. 사용자에게는 답변을 보여 주면서, 개발자에게는 source list와 schema를 동시에 제공할 수 있기 때문입니다.
 
 ---
@@ -585,19 +539,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-출력 결과
-Answer: When does dead-lettering happen?
-batch:
-['Answer: When does dead-lettering happen?', 'Answer: How many retries are allowed?']
-stream:
-'Answer: '
-'When '
-'does '
-'dead-lettering '
-'happen? '
-~~~
 
 실전에서는 `fake_streaming_llm` 자리에 실제 streaming chat model runnable이 들어갑니다. 여기서는 LCEL이 generator 기반 runnable에서 나온 청크를 다음 단계로 흘려보낼 수 있다는 점만 작게 보여 준 것입니다.
 

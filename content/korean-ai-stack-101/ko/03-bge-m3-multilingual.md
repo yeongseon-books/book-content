@@ -71,11 +71,6 @@ distances, indices = index.search(query_vec, 3)
 print(distances, indices)
 ```
 
-~~~
-출력 결과
-[[0.73403144 0.4136765  0.33451673]] [[1 2 0]]
-~~~
-
 ---
 
 ## 이 코드에서 봐야 할 것

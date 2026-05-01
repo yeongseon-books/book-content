@@ -132,19 +132,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-=== monitoring summary ===
-{
-  "calls": 2,
-  "latency_ms": [
-    402.7,
-    898.4
-  ],
-  "total_tokens": 262
-}
-~~~
-
 ## 이 코드에서 봐야 할 것
 - `JsonFormatter`가 모든 로그를 같은 스키마로 맞춰서 후처리 없이 적재할 수 있습니다.
 - `request_id`와 `usage.total_tokens`를 같은 레코드에 넣어 두면 장애 분석과 비용 분석이 분리되지 않습니다.

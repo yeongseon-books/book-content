@@ -78,19 +78,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-Output
-input variables: ['context']
-partial variables: ['history', 'question']
-SystemMessage -> Answer only from the supplied context.
-HumanMessage -> What happens after the third retry?
-AIMessage -> The payload moves to the dead-letter queue.
-HumanMessage -> Context:
-Retry budget: 3 attempts before dead-lettering. Operators inspect the original payload before replay.
-
-Question: Why was the message dead-lettered?
-~~~
-
 ### What to notice in this code
 
 - After `partial(question=...)`, the remaining input variable set becomes smaller.
@@ -159,24 +146,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-Output
-input variables: ['question']
-raw string:
-Answer the question using only this policy excerpt:
-
-Retry budget: 3 attempts before dead-lettering.
-
-Question: Why was the message dead-lettered?
-prompt value type: StringPromptValue
-prompt value text:
-Answer the question using only this policy excerpt:
-
-Retry budget: 3 attempts before dead-lettering.
-
-Question: Why was the message dead-lettered?
-~~~
-
 The practical lesson is simple: prompt shape is enforced before any model call happens.
 
 ---
@@ -227,17 +196,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-Output
-SystemMessage -> Use the retrieved context to answer the user faithfully.
-HumanMessage -> What happens after the third retry?
-AIMessage -> The worker moves the message to the dead-letter queue.
-HumanMessage -> Context:
-Retry budget: 3 attempts before dead-lettering.
-
-Question: Why would the operator inspect the payload?
-~~~
 
 The important design choice is that retrieved context and prior conversation are treated differently. Context is usually one variable such as `{context}`. History stays as a list of messages.
 
@@ -335,16 +293,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-Output
-['context']
-SystemMessage -> Answer only from the supplied context. Cite sources inline.
-HumanMessage -> Context:
-[runbook.md] Retry budget: 3 attempts before dead-lettering.
-
-Question: Why was the job dead-lettered?
-~~~
-
 The key point is that `partial()` reduces the call-time surface area, while `invoke()` keeps the prompt inside the runnable graph.
 
 ---
@@ -427,28 +375,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-Output
-SystemMessage
-You are a careful RAG assistant. Answer only from the supplied context. If the context is insufficient, say you do not know. When you make a factual claim, cite the source in square brackets like [runbook.md].
-------------------------------------------------------------
-HumanMessage
-Context:
-[runbook.md]
-The payment worker retries a failed job three times.
-
-[runbook.md]
-After the final retry, the original payload moves to the dead-letter queue.
-
-[ops-guide.md]
-Operators inspect the payload and exception chain before replaying the job.
-
-Question: Why would the operator inspect the payload before replaying the job?
-
-Answer in 3-5 sentences and keep only the citations that support each claim.
-------------------------------------------------------------
-~~~
 
 Use a stuff chain when the corpus is modest, the chunks are already clean, and one joined `{context}` string is enough. Switch to custom context assembly when you need budget-aware trimming, citation IDs, metadata-based ordering, deduplication, or section-aware packing.
 

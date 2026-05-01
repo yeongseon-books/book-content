@@ -48,11 +48,6 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("LCEL이 무엇인가요?"))
 ```
 
-~~~
-출력 결과
-LCEL은 Linux Container Execution Layer의 약자입니다. LCEL은 Linux에서 컨테이너를 실행하기 위한 하드웨어 가속 플랫폼입니다. LCEL은 Runnable을 파이프로 연결하는 것을 말하는 것으로, 컨테이너를 실행하기 위한 가속 플랫폼으로 동작하는 것 같네요.
-~~~
-
 ## 이 코드에서 봐야 할 것
 
 - 인덱싱 단계와 질의 단계는 시간축이 다르므로 코드에서도 분리하는 편이 좋습니다.
@@ -150,11 +145,6 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
 print(f"인덱스 벡터 수: {vectorstore.index.ntotal}")
 ```
-
-~~~
-출력 결과
-인덱스 벡터 수: 4
-~~~
 
 ---
 

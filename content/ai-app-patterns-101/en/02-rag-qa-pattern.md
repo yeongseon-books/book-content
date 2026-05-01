@@ -156,25 +156,6 @@ for question in test_questions:
     print(f"answer: {answer}")
 ```
 
-~~~
-Output
-
-question: Who created Python?
-answer: Python was created by Guido van Rossum in 1991.
-
-question: What are Python's weaknesses?
-answer: One of Python's main weaknesses is execution speed. It is also slower than C or Java for CPU-bound tasks due to its nature as an interpreted language.
-
-question: When did Python 2 reach end of life?
-answer: Python 2 reached its official end of life in January 2020.
-
-question: Can you build iOS apps with Python?
-answer: I cannot find this in the provided documents.
-
-question: What are the features of the Rust language?
-answer: I cannot find this in the provided documents.
-~~~
-
 ---
 
 ## Returning answers with source attribution
@@ -243,12 +224,6 @@ result = rag_with_sources.invoke("Who created Python?")
 print(f"answer: {result['answer']}")
 print(f"sources: {result['sources']}")
 ```
-
-~~~
-Output
-answer: Python was created by Guido van Rossum.
-sources: ['python_intro.txt', 'python_features.txt']
-~~~
 
 ---
 

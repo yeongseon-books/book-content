@@ -76,16 +76,6 @@ print(chat("What are two advantages of Python?"))
 print(chat("What is my name?"))  # must recall earlier turn
 ```
 
-~~~
-Output
-Hello Alice, it's nice to meet you. How can I assist you today?
-Two advantages of Python are:
-
-1. **Easy to learn**: Python has a simple syntax and is relatively easy to read and write.
-2. **Versatile**: Python can be used for various applications, such as web development, data analysis, machine learning, and automation.
-Your name is Alice.
-~~~
-
 As history accumulates, the context window fills up. `llama-3.1-8b-instant` has an 8,192 token limit. Long conversations hit the ceiling.
 
 ---
@@ -287,19 +277,6 @@ print(f"\nsession A: {session_a}")
 print(f"session B: {session_b}")
 print(f"session A history length: {len(sessions[session_a])}")
 ```
-
-~~~
-Output
-[Alice] Hello Alice, it's nice to meet you. How can I assist you today? Do you have a specific question, top...
-
-[Bob] Nice to meet you, Bob. I'm here to help with any questions or topics you'd like to discuss. How's yo...
-
-[Alice continued] Your name is Alice....
-
-session A: 3857a52f-bd06-4d45-9ce7-3f51a7955048
-session B: 6dd02009-8940-43df-bdbf-bf6ad536b019
-session A history length: 4
-~~~
 
 ---
 

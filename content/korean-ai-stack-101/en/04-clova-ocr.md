@@ -72,12 +72,6 @@ for image in MOCK_RESPONSE['images']:
             current = []
 ```
 
-~~~
-Output
-공급가액 45,000원
-부가세 4,500원
-~~~
-
 ---
 
 ## What to notice in this code

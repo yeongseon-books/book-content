@@ -139,11 +139,6 @@ payload = json.loads(content)
 print(payload)
 ```
 
-~~~
-출력 결과
-{'category': 'billing', 'priority': 3, 'summary': '결제 완료 후 주문 내역 미보이기'}
-~~~
-
 여기서 운영적으로 중요한 지점은 세 군데입니다.
 
 첫째, 시스템 메시지에서 "JSON 객체 하나만 반환"을 명시합니다. JSON 모드를 걸더라도 프롬프트 계약을 같이 적어 두는 편이 좋습니다. 모델이 해야 할 일을 사람도 읽을 수 있게 남겨 두는 효과가 있기 때문입니다.
@@ -218,11 +213,6 @@ except ValidationError as exc:
 
 print(ticket.model_dump())
 ```
-
-~~~
-출력 결과
-{'category': <Category.bug: 'bug'>, 'priority': 5, 'summary': '비밀번호 재설정 메일이 오지 않습니다. 업무를 시작해야 해서 오늘 안에 해결이 필요합니다.', 'customer_needs_followup': True}
-~~~
 
 이 코드가 하는 일은 단순하지만 효과는 큽니다. 모델이 `priority`를 문자열로 내거나, 허용되지 않은 `category`를 반환하거나, `summary`를 비워 두면 예외가 발생합니다. 그 순간 애플리케이션은 실패를 숨기지 않고 드러낼 수 있습니다. 운영에서는 이 동작이 중요합니다. 잘못된 데이터를 조용히 저장하는 것보다, 명시적으로 실패하고 재시도나 폴백 경로로 넘기는 편이 훨씬 안전하기 때문입니다.
 

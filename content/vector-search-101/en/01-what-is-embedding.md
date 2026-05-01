@@ -127,13 +127,6 @@ print(f"vector dimension: {embeddings[0].shape[0]}")
 print(f"first vector (first 5 values): {embeddings[0][:5]}")
 ```
 
-~~~
-Output
-number of vectors: 3
-vector dimension: 384
-first vector (first 5 values): [-0.09979379  0.00370044 -0.10362536  0.14163396 -0.04871269]
-~~~
-
 Running this gives output similar to:
 
 ```
@@ -164,12 +157,6 @@ embeddings = model.encode(sentences)
 print(f"[0] vs [1] (similar meaning): {cosine_similarity(embeddings[0], embeddings[1]):.4f}")
 print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddings[2]):.4f}")
 ```
-
-~~~
-Output
-[0] vs [1] (similar meaning): 0.6201
-[0] vs [2] (unrelated):       0.0056
-~~~
 
 Expected output:
 

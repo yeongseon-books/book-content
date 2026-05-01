@@ -48,17 +48,6 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("What is LCEL?"))
 ```
 
-~~~
-Output
-I couldn't find any specific information about "LCEL." It's possible that LCEL is an abbreviation or acronym for a specific concept, technology, or system.
-
-However, considering the context you provided, which mentions LCEL connecting Runnables with a pipe, I'm going to take a guess that LCEL might be related to "LCEL" (Little Core Executor Loop) from the context of a programming language, specifically Rust or perhaps a similar system.
-
-In this context, LCEL is likely an executor system in a programming language that enables Runnables (tasks or functions) to be executed in a coordinated and concurrent manner. 
-
-However, without more context or information, it's difficult to provide a definitive answer. If you have more details or clarification about LCEL, I'd be happy to try and help further.
-~~~
-
 ## What to notice in this code
 
 - Indexing and query execution happen on different timelines, so the code should keep them separate.
@@ -156,11 +145,6 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
-
-~~~
-Output
-index vector count: 4
-~~~
 
 ---
 

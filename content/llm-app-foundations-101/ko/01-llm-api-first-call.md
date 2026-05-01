@@ -135,10 +135,12 @@ api_key = os.environ["GROQ_API_KEY"]
 print(f"API key loaded: {api_key[:6]}...")
 ```
 
-~~~
-출력 결과
-API key loaded: gsk_Z2...
-~~~
+<!-- injected-output:start -->
+**출력 결과**
+
+    API key loaded: gsk_Z2...
+
+<!-- injected-output:end -->
 이 코드는 환경변수 연결만 확인하는 최소 예제입니다. 실제 앱에서는 키 전체를 출력하지 않는 편이 안전합니다. 개발 초반에는 앞 몇 글자만 확인해도 충분합니다.
 
 ---
@@ -205,10 +207,12 @@ even_nums = [x for x in num_list if x % 2 == 0]
 print(even_nums)  # [2, 4]
 ```
 
-~~~
-출력 결과
-[2, 4]
-~~~
+<!-- injected-output:start -->
+**출력 결과**
+
+    [2, 4]
+
+<!-- injected-output:end -->
 이 예시에서, 리스트 `num_list`의 각 요소를 `x`에 할당하여 `x % 2 == 0` 인지 확인합니다. 만약 `x`가 짝수이면, 그 요소를 `even_nums` 리스트에 추가합니다.
 
 **다중 반복**
@@ -223,10 +227,12 @@ intersection = [(value1, value2) for value1 in list1 for value2 in list2 if valu
 print(intersection)  # [(2, 2), (3, 3), (4, 4)]
 ```
 
-~~~
-출력 결과
-[(2, 2), (3, 3), (4, 4)]
-~~~
+<!-- injected-output:start -->
+**출력 결과**
+
+    [(2, 2), (3, 3), (4, 4)]
+
+<!-- injected-output:end -->
 이 예시에서, 두 항목 리스트 `list1`과 `list2`를 각각 반복하여 두 항목이 동일하면, 그 항목을 교집합 리스트에 추가합니다.
 
 **리스트 컴프리헨션의 장점**
@@ -448,10 +454,12 @@ print(my_tuple[0])  # 출력: 1
 # my_tuple[0] = 10  # 에러: 튜플의 요소를 변경할 수 없음
 ```
 
-~~~
-출력 결과
-1
-~~~
+<!-- injected-output:start -->
+**출력 결과**
+
+    1
+
+<!-- injected-output:end -->
 튜플의 요소를 추가하거나 제거할 수는 없습니다. 즉, 다음과 같은 방법으로 요소를 추가하거나 제거할 수 없습니다.
 
 ```python

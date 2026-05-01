@@ -45,11 +45,6 @@ chain = prompt | llm | StrOutputParser()
 print(chain.invoke({"topic": "LCEL"}))
 ```
 
-~~~
-Output
-Light Communication Equipment (LCEL) refers to a category of wireless communication devices that use light as a medium to transmit data. These devices can transmit data at high speeds, often in the range of gigabits per second, while also providing low latency and high reliability. LCEL technology typically operates in the visible light spectrum, using LEDs or lasers to transmit information. It is often used in applications such as indoor wireless communication systems, where it can provide faster and more reliable connectivity than traditional radio frequency (RF) wireless systems, while also being less susceptible to interference and more energy-efficient.
-~~~
-
 ## What to notice in this code
 
 - `ChatPromptTemplate` turns a dict into chat messages.
@@ -141,11 +136,6 @@ response = llm.invoke("Explain the advantages of Python in two sentences.")
 print(response.content)
 ```
 
-~~~
-Output
-Python is a versatile and widely-used programming language that offers several advantages, including its simplicity and ease of use, making it an ideal choice for beginners and experienced developers alike, as well as its vast number of libraries and frameworks that enable rapid development and deployment of complex applications. Additionally, Python's cross-platform compatibility, flexibility, and extensive community support make it an attractive choice for a wide range of applications, from web development to data analysis and artificial intelligence.
-~~~
-
 `ChatGroq` implements Runnable, so `invoke()` is available directly.
 
 ---
@@ -189,11 +179,6 @@ chain = prompt | llm | parser
 result = chain.invoke({"topic": "embedding vectors"})
 print(result)
 ```
-
-~~~
-Output
-Embedding vectors is a technique in natural language processing (NLP) and machine learning where words, phrases, or objects are represented as dense numerical vectors in a high-dimensional space, allowing machines to better understand semantic relationships and similarities between them. These vectors are typically learned through algorithms such as Word2Vec or GloVe, which analyze large datasets to identify patterns and associations between words or objects.
-~~~
 
 What each component does:
 
@@ -248,20 +233,6 @@ print(f"\n=== step 3: string ===")
 print(f"  {text}")
 ```
 
-~~~
-Output
-=== step 1: messages ===
-  [system] You are an expert at concise explanations.
-  [human] Explain embedding vectors in two sentences.
-
-=== step 2: AIMessage ===
-  type: AIMessage
-  content: Embedding vectors is a technique used in natural language processing and machine...
-
-=== step 3: string ===
-  Embedding vectors is a technique used in natural language processing and machine learning where words or phrases are represented as numerical vectors in a high-dimensional space, allowing computers to understand and analyze their semantic meaning. These vectors can be learned through various algorithms, such as word2vec or GloVe, to capture the relationships and analogies between words, enabling more accurate and meaningful representations of language.
-~~~
-
 ---
 
 ## RunnableLambda — wrapping a plain function
@@ -295,13 +266,6 @@ result = chain.invoke({
 })
 print(result)
 ```
-
-~~~
-Output
-Vector search, also known as semantic search, converts text into numerical vectors that represent the meaning of words and phrases, enabling more accurate and relevant retrieval in search applications.
-
-(character count: 201)
-~~~
 
 `RunnableLambda` lets any plain Python function participate in a pipe chain. It is useful for output post-processing, logging, and lightweight transforms.
 
@@ -340,15 +304,6 @@ results = chain.batch(topics)
 for topic_dict, result in zip(topics, results):
     print(f"[{topic_dict['topic']}] {result}\n")
 ```
-
-~~~
-Output
-[embeddings] In machine learning, embeddings are a way to represent complex data, such as text or images, as dense vectors of numbers in a high-dimensional space, allowing for efficient similarity calculations and model learning.
-
-[FAISS] FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook AI, optimized for efficient similarity search and clustering of dense vectors, widely used in applications such as image and audio search, recommendation systems, and natural language processing.
-
-[RAG] RAG is an acronym that stands for Red, Amber, and Green, a color-coding system used to categorize and track the status of tasks, projects, or goals by indicating whether they are in a critical (Red), cautionary (Amber), or satisfactory (Green) condition.
-~~~
 
 `batch()` attempts parallel processing internally. Use `max_concurrency` to cap simultaneous requests when working within API rate limits.
 

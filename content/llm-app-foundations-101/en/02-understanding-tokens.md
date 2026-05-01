@@ -176,11 +176,13 @@ print(tokens)
 print(f"token_count={len(tokens)}")
 ```
 
-~~~
-Output
-[7979, 69774, 4037, 3160, 1603, 264, 1715, 3727, 10137, 11850, 30549, 13]
-token_count=12
-~~~
+<!-- injected-output:start -->
+**Output**
+
+    [7979, 69774, 4037, 3160, 1603, 264, 1715, 3727, 10137, 11850, 30549, 13]
+    token_count=12
+
+<!-- injected-output:end -->
 There is one important caveat here. `cl100k_base` is a well-known encoding from the OpenAI ecosystem. It does not automatically mean that Groq's `llama-3.1-8b-instant` uses the exact same tokenizer internally. Because of that, treat this number as a **practical estimate**, not as the provider's billing source of truth. For billing and final accounting, the provider's `usage` field is authoritative.
 
 That does not make the estimate useless. In most applications, the first question is not “what is the exact invoice number for this one request?” The first question is “is this prompt short, large, or dangerously large?” An approximate count is often enough to trigger the right control flow.
@@ -207,15 +209,17 @@ print()
 print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
 ```
 
-~~~
-Output
-system: You are a concise Python tutor.
-user: Explain the difference between a list and a tuple.
-assistant: Lists are mutable, while tuples are immutable.
-user: Add one short code example too.
+<!-- injected-output:start -->
+**Output**
 
-estimated_prompt_tokens=41
-~~~
+    system: You are a concise Python tutor.
+    user: Explain the difference between a list and a tuple.
+    assistant: Lists are mutable, while tuples are immutable.
+    user: Add one short code example too.
+
+    estimated_prompt_tokens=41
+
+<!-- injected-output:end -->
 This is not a provider-exact calculation. It is a useful operational estimate. For a chatbot, you can run this just before the API call and start trimming or summarizing once the estimate crosses a threshold.
 
 ---

@@ -132,19 +132,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-Output
-=== monitoring summary ===
-{
-  "calls": 2,
-  "latency_ms": [
-    685.7,
-    323.7
-  ],
-  "total_tokens": 262
-}
-~~~
-
 ## What to notice in this code
 - `JsonFormatter` keeps every event in one schema, so downstream ingestion stays simple.
 - Putting `request_id` and `total_tokens` in the same record keeps debugging and cost analysis connected.

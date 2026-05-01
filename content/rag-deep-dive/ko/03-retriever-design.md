@@ -90,22 +90,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-
-=== similarity k=2 ===
-1. The worker retries failed messages three times before it stops.
-2. After the final retry, the payload moves to the dead-letter queue.
-
-=== mmr k=2 fetch_k=4 ===
-1. The worker retries failed messages three times before it stops.
-2. The dead-letter queue preserves the original payload for debugging.
-
-=== mmr k=2 fetch_k=6 ===
-1. The worker retries failed messages three times before it stops.
-2. HTTP 429 requires exponential backoff on the client side.
-~~~
-
 ### 이 코드에서 봐야 할 것
 
 - 같은 vector store라도 `search_type`에 따라 반환 문서 집합이 달라집니다.
@@ -189,11 +173,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-Payment worker retries failed jobs three times.
-~~~
-
 이 섹션의 기준선은 간단합니다. `BaseRetriever`는 검색 함수를 하나 감싼 추상 클래스가 아니라, callback 수명주기와 sync/async 호환 규약을 강제하는 runnable 인터페이스입니다. 그래서 이후에 볼 `VectorStoreRetriever`도 단순 top-k 래퍼로 읽으면 구조를 절반만 본 셈입니다.
 
 ---
@@ -268,18 +247,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-similarity
-Workers retry failed jobs three times.
-Dead-letter queues preserve the original payload.
-threshold
-Workers retry failed jobs three times.
-mmr
-Workers retry failed jobs three times.
-Dead-letter queues preserve the original payload.
-~~~
-
 정리하면 `VectorStoreRetriever`의 핵심은 얇은 래퍼라는 사실이 아니라, **어떤 검색 의미론을 선택할지 결정하는 첫 분기점**이라는 사실입니다. 실제 검색 품질은 vector space 자체와 함께 이 분기를 어떻게 택했는지에 의해 크게 달라집니다.
 
 ---
@@ -343,18 +310,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-lambda_mult=0.8
-The worker retries failed messages three times.
-Operators inspect exception chains after the final retry.
-HTTP 429 responses require exponential backoff.
-lambda_mult=0.2
-The worker retries failed messages three times.
-HTTP 429 responses require exponential backoff.
-Dead-letter queues keep the original payload for debugging.
-~~~
-
 결국 MMR은 “더 똑똑한 similarity”가 아니라, **후보를 넓게 가져온 뒤 중복을 줄이는 재선택 단계**입니다. 그래서 실패를 줄이려면 `k`만 조절할 것이 아니라 `fetch_k`와 `lambda_mult`를 함께 봐야 합니다.
 
 ---
@@ -409,20 +364,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-출력 결과
-raw scores
-0.3598 Retry budget is three attempts.
-1.6513 HTTP 429 requires exponential backoff.
-1.7776 Dead-letter queues preserve payloads.
-relevance scores
-0.7456 Retry budget is three attempts.
--0.1676 HTTP 429 requires exponential backoff.
--0.257 Dead-letter queues preserve payloads.
-threshold results
-Retry budget is three attempts.
-~~~
 
 이 섹션의 결론은 명확합니다. `similarity_score_threshold`는 점수형 필터지만, FAISS L2에서는 그 점수가 raw distance 그대로가 아닙니다. LangChain은 relevance score 변환층을 두고, 기본 `relevance_score_fn`이 없을 때도 `distance_strategy`를 보고 fallback 함수를 고릅니다. 그래서 threshold 튜닝은 인덱스의 raw 수치가 아니라 **변환된 relevance 의미론**을 기준으로 해야 합니다.
 
@@ -511,12 +452,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-출력 결과
-Operators inspect the exception chain after the final retry.
-Workers retry failed jobs three times before dead-lettering.
-~~~
 
 이 예시는 source 값을 생성 시점에 고정했지만, 실제 서비스에서는 세션 컨텍스트나 권한 정보에 따라 source를 선택하게 만들 수도 있습니다. 중요한 것은 구현 디테일보다 경계 위치입니다. vector search 전에 범위를 줄이면 recall을 의도적으로 제한하는 대신 latency와 잡음을 함께 줄일 수 있습니다. 반대로 post-filter에만 의존하면 전역 코퍼스가 커질수록 비용이 늘고, `fetch_k`를 키워도 원하는 source 안에서 후보 다양성을 확보하지 못할 수 있습니다.
 

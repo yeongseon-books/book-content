@@ -113,31 +113,6 @@ if __name__ == "__main__":
     main()
 ```
 
-~~~
-출력 결과
-{
-  "raw": {
-    "answer": "The Global Interpreter Lock (GIL) is a mechanism in CPython that prevents multiple native threads from executing Python bytecodes at once.",
-    "keywords": [
-      "Global Interpreter Lock",
-      "GIL",
-      "CPython",
-      "threading",
-      "concurrency",
-      "parallelism"
-    ]
-  },
-  "evaluation": {
-    "passed": true,
-    "length_ok": true,
-    "keywords_ok": true,
-    "format_ok": true,
-    "missing_keywords": [],
-    "answer_length": 138
-  }
-}
-~~~
-
 ## 이 코드에서 봐야 할 것
 - `response_format={"type": "json_object"}`로 모델 출력 형태를 먼저 좁혀 두면 검사기가 단순해집니다.
 - 평가 함수가 `missing_keywords`를 반환하면 fail 이유를 바로 대시보드에 올릴 수 있습니다.
