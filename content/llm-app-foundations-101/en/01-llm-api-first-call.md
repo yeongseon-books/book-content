@@ -448,10 +448,6 @@ The program we wrote today is short, but it already contains the core loop of an
 
 In the next post, we will stay close to the same API call and zoom in on token accounting. Once prompts get longer, token count becomes the thing that shapes cost, limits, and response behavior. That is the next foundation to put in place.
 
-<!-- blog-only:start -->
-Next: [Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

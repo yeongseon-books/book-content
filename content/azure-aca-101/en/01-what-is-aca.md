@@ -96,10 +96,6 @@ A single HTTP request is enough to make the boundary responsibilities visible.
 
 ---
 
-<!-- blog-only:start -->
-Next: [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

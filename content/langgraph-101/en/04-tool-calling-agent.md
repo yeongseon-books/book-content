@@ -176,10 +176,6 @@ export GROQ_API_KEY=... && python main.py
 
 At this point LangGraph starts to feel like an agent runtime rather than a workflow helper. In the next post, we extend the same pattern into a supervisor-worker design where multiple agents cooperate over shared state.
 
-<!-- blog-only:start -->
-Next: [Multi-agent systems](./05-multi-agent.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

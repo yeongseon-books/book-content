@@ -79,10 +79,6 @@ peft_model.print_trainable_parameters()
 
 The main job of adapter configuration is connection validation. Once you know where the adapter lives and how many parameters it exposes, the training loop becomes much less mysterious.
 
-<!-- blog-only:start -->
-Next: [Training loop and hyperparameters](./04-training.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

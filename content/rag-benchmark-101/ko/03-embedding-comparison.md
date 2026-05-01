@@ -62,16 +62,6 @@ print(json.dumps(results, indent=2))
 - [ ] hit rate와 MRR을 함께 비교했다.
 - [ ] latency까지 포함해 운영 관점의 비용을 함께 봤다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-이제 임베딩 모델이라는 한 축을 따로 비교할 수 있습니다. 다음 글에서는 검색 백엔드 자체를 바꿔 flat 검색과 근사 검색의 트레이드오프를 확인합니다.
-
-다음 글: [VectorDB 선택 기준](./04-vectordb-selection.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

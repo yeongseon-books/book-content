@@ -84,10 +84,6 @@ tokenizer = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
 
 The key job of dataset preparation is making the input-output boundary unambiguous. Once that boundary is clean, training-loop debugging gets dramatically easier.
 
-<!-- blog-only:start -->
-Next: [Configuring the LoRA adapter](./03-lora.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

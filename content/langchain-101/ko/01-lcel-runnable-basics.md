@@ -340,10 +340,6 @@ LCEL과 Runnable 인터페이스가 왜 편리한지 이해했습니다. 모든 
 
 다음 글에서는 `ChatPromptTemplate`을 더 깊이 다루고, `ChatGroq`와 연결해서 실용적인 체인을 만들어 봅니다.
 
-<!-- blog-only:start -->
-다음 글: [Prompt와 LLM Chain — 체인 첫 번째 구성](./02-prompt-llm-chain.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

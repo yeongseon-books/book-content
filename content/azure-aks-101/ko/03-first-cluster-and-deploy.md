@@ -366,10 +366,6 @@ kubectl describe service fastapi-hello
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

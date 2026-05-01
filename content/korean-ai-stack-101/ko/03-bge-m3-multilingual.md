@@ -103,10 +103,6 @@ print(distances, indices)
 
 BGE-M3 실습의 목적은 기능을 많이 쓰는 것이 아니라, 다국어 검색의 기준선을 분명히 만드는 데 있습니다. 이 기준선이 있어야 OCR 텍스트나 생성 단계와 연결할 때 어디가 약한지 바로 보입니다.
 
-<!-- blog-only:start -->
-다음 글: [CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

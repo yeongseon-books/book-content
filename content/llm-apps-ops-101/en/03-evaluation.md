@@ -132,10 +132,6 @@ if __name__ == "__main__":
 ## Summary
 Evaluation becomes operationally useful when it fails fast on obvious mistakes before humans ever need to look.
 
-<!-- blog-only:start -->
-Next: [LLM app security](./04-security.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -63,16 +63,6 @@ result = evaluate(
 - [ ] Wrap both the LLM and embeddings for RAGAS.
 - [ ] Build a Dataset with question, answer, and contexts columns.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Now generation quality is measurable too. The final post combines retrieval and generation into one full RAG benchmark pipeline.
-
-Next: [Completing the RAG benchmark](./06-benchmark-complete.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

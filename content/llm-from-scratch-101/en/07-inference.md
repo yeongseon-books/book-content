@@ -126,10 +126,6 @@ The meaning might be garbled, but the rhythm of the training data remains.
 
 In the next post, we'll perform Supervised Fine-Tuning (SFT) by layering a small instruction dataset on top of this base model. We'll see how a simple Q&A format can drastically change the model's output habits.
 
-<!-- blog-only:start -->
-Next: [Adapting the Base Model to Specific Tasks](./08-finetuning.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

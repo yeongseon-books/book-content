@@ -268,10 +268,6 @@ RAG Q&A is the most practical pattern for giving an LLM access to knowledge it w
 
 The next post covers the document assistant pattern: summarization, information extraction, and classification applied to structured document processing tasks.
 
-<!-- blog-only:start -->
-Next: [Document assistant — summarization, extraction, classification](./03-document-assistant.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

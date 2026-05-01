@@ -472,10 +472,6 @@ logger.info("Configuration loaded", extra={
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기](./06-logging-monitoring.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

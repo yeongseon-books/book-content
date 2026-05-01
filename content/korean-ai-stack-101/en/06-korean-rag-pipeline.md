@@ -100,10 +100,6 @@ print(distances, indices)
 
 The deeper lesson of the series is not a specific tool choice but the habit of separating each Korean document-processing stage clearly. Once you can inspect those stages independently, the pipeline becomes much easier to improve safely.
 
-<!-- blog-only:start -->
-This is the final post in the series. Return to episode 1, rebuild the comparison on your own corpus, and then swap that model into this pipeline.
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

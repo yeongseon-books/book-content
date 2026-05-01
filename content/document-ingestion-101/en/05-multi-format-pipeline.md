@@ -135,16 +135,6 @@ source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 - [ ] Extension routing lives in one function.
 - [ ] You confirmed later stages can run without format-specific branching.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Once every loader converges on one `Document` contract, the rest of the pipeline gets dramatically simpler.
-
-The next post combines all of those steps into a full pipeline that saves to and reloads from FAISS.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

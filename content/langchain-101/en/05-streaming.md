@@ -321,10 +321,6 @@ Streaming in LangChain requires one change: replace `invoke()` with `stream()` o
 
 The final post assembles all the components covered in this series into one complete chain.
 
-<!-- blog-only:start -->
-Next: [Putting it together — a complete chain in one file](./06-putting-it-together.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

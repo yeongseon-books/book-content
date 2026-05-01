@@ -84,10 +84,6 @@ print(client.post("/generate", json={"prompt": "파이썬 함수 예시"}).json(
 
 이제 파인튜닝 시리즈의 최소 전체 경로가 완성되었습니다. 수식으로 감을 잡고, 데이터를 정리하고, LoRA를 붙이고, 한 step 학습하고, 평가한 뒤, 마지막에 HTTP 엔드포인트까지 연결했습니다.
 
-<!-- blog-only:start -->
-시리즈 첫 글로 돌아가기: [LLM 파인튜닝 입문](./01-intro.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

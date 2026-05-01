@@ -330,10 +330,6 @@ print(result)
 
 다음 글에서는 Retriever를 체인에 연결해서 문서 검색 결과를 컨텍스트로 주입하는 방법을 다룹니다.
 
-<!-- blog-only:start -->
-다음 글: [Retriever — 문서 검색과 컨텍스트 주입](./03-retriever.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -28,8 +28,6 @@ last_reviewed: '2026-04-29'
 
 ---
 
-
-
 ## 왜 Next.js + Vercel AI SDK인가?
 
 AI 기능을 웹에 구현할 때 가장 큰 고민은 '응답 속도'와 '상태 관리'입니다. AI의 답변이 길어질수록 사용자는 빈 화면을 보며 기다려야 하죠. 
@@ -297,10 +295,6 @@ export default function Chat() {
 
 ---
 
-
-<!-- blog-only:start -->
-다음 글: [RAG 입문 — 내 데이터로 답하는 AI 만들기](./04-rag-intro.md)
-<!-- blog-only:end -->
 <!-- toc:begin -->
 ## 시리즈 목차
 

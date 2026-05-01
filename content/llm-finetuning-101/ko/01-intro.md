@@ -90,10 +90,6 @@ print(base_linear_params, lora_params)
 
 1편의 목적은 파인튜닝을 신비한 GPU 작업으로 보지 않는 데 있습니다. 파라미터 계산만 정확히 이해해도 LoRA가 왜 실무 기본값이 되었는지 설명할 수 있습니다.
 
-<!-- blog-only:start -->
-다음 글: [데이터셋 준비와 전처리](./02-dataset.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

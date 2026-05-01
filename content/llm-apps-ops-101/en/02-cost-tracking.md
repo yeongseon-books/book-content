@@ -117,10 +117,6 @@ if __name__ == "__main__":
 ## Summary
 You cannot reduce spend responsibly until you can point to the exact calls that create it.
 
-<!-- blog-only:start -->
-Next: [Evaluating LLM output quality](./03-evaluation.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

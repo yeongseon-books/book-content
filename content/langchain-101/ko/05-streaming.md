@@ -319,10 +319,6 @@ asyncio.run(main())
 
 다음 글에서는 지금까지 배운 컴포넌트를 하나의 완전한 체인으로 조립합니다.
 
-<!-- blog-only:start -->
-다음 글: [실전 체인 조립 — 컴포넌트를 하나로 연결하기](./06-putting-it-together.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

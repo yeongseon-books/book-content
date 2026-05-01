@@ -437,10 +437,6 @@ When you design memory for a chatbot, three questions matter more than anything 
 
 If you can answer those clearly, conversation memory stops being magic and becomes an ordinary engineering component.
 
-<!-- blog-only:start -->
-Next: [Handling streaming responses — real-time output](./06-streaming-responses.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -123,10 +123,6 @@ Runnable file: `/root/Github/langgraph-101/en/01-graph-basics/main.py`
 
 At this stage, the important skill is not “building a graph” but learning to see workflow as visible state transitions. In the next post, we keep that state alive across calls with checkpoints and `thread_id`.
 
-<!-- blog-only:start -->
-Next: [State management and checkpoints](./02-state-and-checkpoints.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

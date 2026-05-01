@@ -279,10 +279,6 @@ You can now produce, save, and reload embeddings with a few lines of code. The b
 
 The next post moves to similarity computation. We will look at when cosine similarity, dot product, and Euclidean distance each make sense, why normalization changes the arithmetic, and how to build a brute-force nearest-neighbor search from scratch.
 
-<!-- blog-only:start -->
-Next: [Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

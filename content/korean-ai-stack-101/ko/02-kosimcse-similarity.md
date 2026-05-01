@@ -103,10 +103,6 @@ print(distances, indices)
 
 KoSimCSE 예제의 핵심은 검색 루프를 투명하게 유지하는 데 있습니다. 이 기준점이 있어야 다음 단계에서 다국어 모델이나 하이브리드 검색으로 확장해도 비교가 쉽습니다.
 
-<!-- blog-only:start -->
-다음 글: [BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -269,10 +269,6 @@ The earlier chapters covered triggers and bindings, then the Host and Worker spl
 
 ---
 
-<!-- blog-only:start -->
-Next: [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

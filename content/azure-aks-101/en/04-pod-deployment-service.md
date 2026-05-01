@@ -250,10 +250,6 @@ This is part 4 of the Azure Kubernetes Service 101 series. Part 3 used Pod, Depl
 
 ---
 
-<!-- blog-only:start -->
-Next: [Networking and Ingress — the path in and out of the cluster](./05-networking-and-ingress.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -205,10 +205,6 @@ Embeddings convert text into numeric vectors where semantic similarity becomes s
 
 The next post moves from concept to practice. We will use `HuggingFaceEmbeddings` to produce, save, and reload embeddings, and speed up the encoding step with batch processing.
 
-<!-- blog-only:start -->
-Next: [HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

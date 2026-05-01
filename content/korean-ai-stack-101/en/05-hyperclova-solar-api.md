@@ -98,10 +98,6 @@ print(response.choices[0].message.content)
 
 The main lesson here is how to operate a Korean generation API, not which provider logo appears in the call. Once the input and output contracts are stable, the final RAG pipeline becomes much easier to ground safely.
 
-<!-- blog-only:start -->
-Next: [Assembling a Korean RAG pipeline](./06-korean-rag-pipeline.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

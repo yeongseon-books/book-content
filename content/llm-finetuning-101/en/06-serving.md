@@ -84,10 +84,6 @@ print(client.post("/generate", json={"prompt": "Example Python function"}).json(
 
 The minimal end-to-end path is now complete: estimate LoRA cost, prepare data, attach adapters, run a training step, evaluate the result, and expose it through HTTP.
 
-<!-- blog-only:start -->
-Back to the first post: [Introduction to LLM Fine-tuning](./01-intro.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

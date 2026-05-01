@@ -131,10 +131,6 @@ Part 1 fixed the managed control-plane boundary; this part follows the exact opp
 - `containerd-shim` → `runc`
 - `runc` → container process
 
-<!-- blog-only:start -->
-Next: [CNI and Azure CNI Overlay — where Pod IPs come from](./03-cni-and-azure-cni-overlay.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

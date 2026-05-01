@@ -184,10 +184,6 @@ This is part 1 of the Azure Kubernetes Service 101 series. This post set the res
 
 ---
 
-<!-- blog-only:start -->
-Next: [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

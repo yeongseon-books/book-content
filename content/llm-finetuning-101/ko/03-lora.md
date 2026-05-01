@@ -79,10 +79,6 @@ peft_model.print_trainable_parameters()
 
 LoRA 구성 단계의 핵심은 성능 튜닝이 아니라 연결 검증입니다. 어댑터가 어디에 붙는지, 몇 개의 파라미터가 학습 대상이 되는지만 정확히 봐도 절반은 끝난 셈입니다.
 
-<!-- blog-only:start -->
-다음 글: [학습 루프와 하이퍼파라미터](./04-training.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -163,10 +163,6 @@ containerd가 OCI runtime 계층으로 내려가면서 `runc`를 사용합니다
 - `containerd-shim` → `runc`
 - `runc` → container process
 
-<!-- blog-only:start -->
-다음 글: [CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가](./03-cni-and-azure-cni-overlay.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

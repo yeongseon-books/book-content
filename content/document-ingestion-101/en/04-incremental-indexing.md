@@ -160,16 +160,6 @@ python main.py
 - [ ] A later file edit resolves to updated.
 - [ ] You identified where deletion handling would plug in.
 
-<!-- blog-only:start -->
-
-## Summary
-
-The core of incremental indexing is not scale for its own sake but a state store that remembers exactly what changed.
-
-The next post extends that change-detection mindset into a pipeline that handles multiple file formats.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

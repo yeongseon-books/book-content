@@ -404,10 +404,6 @@ What you learned in this tutorial:
 
 ---
 
-<!-- blog-only:start -->
-Next: [Mastering Configuration: App Settings & Environment Variables](./05-configuration.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

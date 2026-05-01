@@ -347,10 +347,6 @@ Understanding each stage of the Request Lifecycle helps you:
 
 ---
 
-<!-- blog-only:start -->
-Next: [Hosting Models: Which Plan Should You Choose?](./03-hosting-models.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

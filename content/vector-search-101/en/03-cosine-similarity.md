@@ -285,10 +285,6 @@ All three distance metrics are now implemented and compared. The normalization e
 
 The next post introduces FAISS. We will look at index types, how to build and persist an index, and how approximate search trades a small accuracy cost for a large speed gain.
 
-<!-- blog-only:start -->
-Next: [FAISS fundamentals — fast approximate nearest-neighbor search](./04-faiss-fundamentals.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

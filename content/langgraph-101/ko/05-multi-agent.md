@@ -146,10 +146,6 @@ export GROQ_API_KEY=... && python main.py
 
 멀티 에이전트의 핵심은 LLM 개수가 아니라 작업 위임 구조입니다. 마지막 글에서는 지금까지 만든 체크포인트, 조건 분기, 도구 호출을 한 그래프로 합쳐 전체 LangGraph 에이전트를 완성하겠습니다.
 
-<!-- blog-only:start -->
-다음 글: [LangGraph 완성](./06-langgraph-complete.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -112,10 +112,6 @@ for label, name in MODEL_NAMES.items():
 
 첫 글에서 가져가야 할 핵심은 "모델 이름"이 아니라 "비교 방법"입니다. 같은 문장 쌍으로 간격을 보고, 그 간격이 실제 검색 품질로 이어지는지 확인해야 다음 선택이 쉬워집니다. 다음 글에서는 한국어 문장 유사도 검색을 더 직접적으로 보여 주는 KoSimCSE 예제로 넘어갑니다.
 
-<!-- blog-only:start -->
-다음 글: [KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

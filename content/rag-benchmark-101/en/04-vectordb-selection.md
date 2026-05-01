@@ -63,16 +63,6 @@ ivf_index.nprobe = 1
 - [ ] Measure search latency separately from embedding time.
 - [ ] Choose the index with both speed and accuracy in view.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Now the search backend itself is benchmarkable. The next post moves to the generation stage and evaluates answer quality with RAGAS.
-
-Next: [End-to-end RAG pipeline evaluation](./05-e2e-evaluation.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

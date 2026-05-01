@@ -161,16 +161,6 @@ Q4 infrastructure cost engineering - ...
 - [ ] Field names stay consistent between document creation and retrieval.
 - [ ] You trimmed the schema to fields that are operationally useful.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Once the metadata schema is explicit, embedding search starts to behave like operational search.
-
-The next post turns those chunks into an incremental indexing flow so you do not rebuild everything every run.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

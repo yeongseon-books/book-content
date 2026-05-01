@@ -103,10 +103,6 @@ print(distances, indices)
 
 The practical value of this BGE-M3 exercise is the baseline it creates. Once cross-lingual retrieval behaves sensibly, you can connect OCR output and generation layers with a much clearer sense of where failure will surface.
 
-<!-- blog-only:start -->
-Next: [Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

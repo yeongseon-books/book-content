@@ -194,10 +194,6 @@ Dedicated(App Service Plan)는 이름보다 본질을 보는 편이 쉽습니다
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간](./06-scaling-and-cold-start.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

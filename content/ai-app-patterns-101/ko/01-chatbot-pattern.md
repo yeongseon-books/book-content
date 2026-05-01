@@ -312,10 +312,6 @@ print(f"세션 A 이력 길이: {len(sessions[session_a])}")
 
 다음 글에서는 RAG Q&A 패턴을 다룹니다. 외부 문서를 검색해서 LLM의 답변 정확도를 높이는 방법입니다.
 
-<!-- blog-only:start -->
-다음 글: [RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

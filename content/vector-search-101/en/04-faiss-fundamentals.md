@@ -309,10 +309,6 @@ You can now build a FAISS index, run queries against it, and persist it to disk.
 
 The next post covers chunking. We will look at how chunk size, overlap, and split strategy affect retrieval quality — and why getting this wrong causes more problems than choosing the wrong embedding model.
 
-<!-- blog-only:start -->
-Next: [Chunking strategies — how to split long documents](./05-chunking-strategies.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

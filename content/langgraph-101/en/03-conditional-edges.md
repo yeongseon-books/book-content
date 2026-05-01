@@ -122,10 +122,6 @@ Runnable file: `/root/Github/langgraph-101/en/03-conditional-edges/main.py`
 
 Conditional edges are where LangGraph starts to feel meaningfully graph-shaped. In the next post, we put that branching machinery under a real tool-calling loop and move from workflow to agent behavior.
 
-<!-- blog-only:start -->
-Next: [Tool-calling agents](./04-tool-calling-agent.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -125,10 +125,6 @@ if __name__ == "__main__":
 ## Summary
 The core security posture is simple: do not trust the input, and do not trust the raw output either.
 
-<!-- blog-only:start -->
-Next: [LLM app deployment strategies](./05-deployment.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -176,10 +176,6 @@ export GROQ_API_KEY=... && python main.py
 
 여기까지 오면 LangGraph가 단순 오케스트레이션 도구가 아니라 에이전트 런타임처럼 느껴지기 시작합니다. 다음 글에서는 이 패턴을 확장해 감독자와 작업자가 협력하는 멀티 에이전트 그래프로 넘어갑니다.
 
-<!-- blog-only:start -->
-다음 글: [멀티 에이전트 시스템](./05-multi-agent.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

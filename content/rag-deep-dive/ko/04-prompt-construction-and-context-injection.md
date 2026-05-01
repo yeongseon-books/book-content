@@ -387,10 +387,6 @@ if __name__ == "__main__":
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [RAG Chain 조립 — RetrievalQA vs LCEL](./05-rag-chain-assembly.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -114,10 +114,6 @@ for block in self.blocks:
 
 이제 블록이라는 벽돌은 준비됐습니다. 다음 글에서는 임베딩, `N`개 블록, 마지막 LayerNorm, LM head를 한 클래스에 묶어 `GPT(nn.Module)`를 완성하겠습니다. forward 한 번에 logits와 loss까지 나오도록 마무리할 차례입니다.
 
-<!-- blog-only:start -->
-다음 글: [조립: GPT 모델 클래스 완성](./05-gpt-model.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

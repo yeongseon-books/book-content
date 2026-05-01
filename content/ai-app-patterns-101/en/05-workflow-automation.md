@@ -324,10 +324,6 @@ Keep each stage focused on one responsibility. A stage that does too much is har
 
 The final post covers human-in-the-loop design: inserting human review and approval gates into otherwise automated pipelines.
 
-<!-- blog-only:start -->
-Next: [Human-in-the-loop — designing for human intervention](./06-human-in-the-loop.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

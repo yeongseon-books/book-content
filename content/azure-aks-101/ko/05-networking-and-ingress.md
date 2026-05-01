@@ -251,10 +251,6 @@ IPAM 방식은 나중에 바꾸기 싫은 축입니다. 클러스터 수, 노드
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

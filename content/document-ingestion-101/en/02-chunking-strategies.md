@@ -119,16 +119,6 @@ python main.py
 - [ ] You used the first-chunk preview to validate structure preservation.
 - [ ] You defined thresholds for chunks that are too long or too short before embedding.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Chunking should vary by document type, and comparing the output numerically is the fastest quality check.
-
-The next post shows which metadata fields make those chunks filterable at retrieval time.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

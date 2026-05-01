@@ -382,10 +382,6 @@ The broader lesson is the same one that has repeated through this series. Retrie
 
 ---
 
-<!-- blog-only:start -->
-Next: [Assembling the RAG Chain — RetrievalQA vs LCEL](./05-rag-chain-assembly.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

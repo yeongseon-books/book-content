@@ -76,16 +76,6 @@ for case in cases:
 - [ ] Use the same k in both the code and the report.
 - [ ] Review per-query outputs alongside the benchmark average.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Now the retrieval metrics are grounded in actual numbers. The next post attaches the same metrics to a real FAISS retriever and measures hit rate and MRR.
-
-Next: [Measuring retrieval performance](./02-retrieval-benchmarking.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

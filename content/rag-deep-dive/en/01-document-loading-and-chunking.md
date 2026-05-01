@@ -423,10 +423,6 @@ The first part of a RAG pipeline is built from relatively small pieces of code. 
 
 That baseline matters because the vector index is not neutral. It geometrizes the document units produced by the loader and the splitter. In episode 2, we will follow that geometry into embeddings and `FAISS IndexFlatL2`, and look at how chunk boundaries become retrieval behavior.
 
-<!-- blog-only:start -->
-Next: [Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -26,8 +26,6 @@ last_reviewed: '2026-04-29'
 
 ---
 
-
-
 ## 1. 배포란 무엇인가?
 
 '배포(Deployment)'는 내 컴퓨터(Local)에서만 돌아가던 코드를 서버라는 큰 컴퓨터에 올려서, 인터넷 주소(URL)만 있으면 전 세계 누구나 접속할 수 있게 만드는 과정입니다.
@@ -243,10 +241,6 @@ Azure를 쓴다면 'Cost Management' 메뉴에서 예산 알람(Budget Alert)을
 
 ---
 
-
-<!-- blog-only:start -->
-다음 글: [AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법](./07-eval-improve.md)
-<!-- blog-only:end -->
 <!-- toc:begin -->
 ## 시리즈 목차
 

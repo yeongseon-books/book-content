@@ -63,16 +63,6 @@ result = evaluate(
 - [ ] LLM과 임베딩을 wrapper로 감쌌다.
 - [ ] 질문·답변·contexts 형태의 Dataset을 만들었다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-이제 생성 품질도 숫자로 볼 수 있습니다. 마지막 글에서는 retrieval과 generation 평가를 한 파이프라인에 묶어 전체 RAG 벤치마크를 완성합니다.
-
-다음 글: [RAG 벤치마크 완성](./06-benchmark-complete.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

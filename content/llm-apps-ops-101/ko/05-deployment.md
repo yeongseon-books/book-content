@@ -152,10 +152,6 @@ if __name__ == "__main__":
 ## 정리
 배포 예제는 서버 코드보다 self-test가 더 중요합니다. 스스로 기동과 요청을 증명하지 못하면 운영 문서로 쓰기 어렵습니다.
 
-<!-- blog-only:start -->
-다음 글: [LLM 앱 운영 완성](./06-ops-complete.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

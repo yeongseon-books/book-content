@@ -63,16 +63,6 @@ ivf_index.nprobe = 1
 - [ ] 검색 latency를 별도로 측정했다.
 - [ ] 속도와 정확도를 함께 보고 인덱스를 선택했다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-이제 검색 백엔드 선택도 계량화할 수 있습니다. 다음 글에서는 retrieval 이후 단계로 넘어가 RAGAS로 답변 품질을 직접 평가합니다.
-
-다음 글: [종단 간 RAG 파이프라인 평가](./05-e2e-evaluation.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

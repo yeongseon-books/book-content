@@ -205,10 +205,6 @@ print(f"[0] vs [2] (의미 무관): {cosine_similarity(embeddings[0], embeddings
 
 다음 글에서는 `HuggingFaceEmbeddings`를 사용해 실제 임베딩을 만들고 저장하는 방법을 다룹니다. 벡터를 파일로 저장했다가 다시 불러오고, 배치 인코딩으로 속도를 높이는 방법까지 살펴보겠습니다.
 
-<!-- blog-only:start -->
-다음 글: [HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기](./02-huggingface-embeddings.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

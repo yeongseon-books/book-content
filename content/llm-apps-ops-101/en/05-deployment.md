@@ -152,10 +152,6 @@ if __name__ == "__main__":
 ## Summary
 In deployment examples, the self-test is often more valuable than the endpoint code because it proves the instructions are real.
 
-<!-- blog-only:start -->
-Next: [Completing the LLM ops pipeline](./06-ops-complete.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

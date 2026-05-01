@@ -116,10 +116,6 @@ Runnable file: `/root/Github/langgraph-101/en/02-state-and-checkpoints/main.py`
 
 Once you add a checkpointer, a graph stops being a one-off function call and becomes a resumable conversation system. In the next post, we use saved state to decide which node should run next with conditional edges.
 
-<!-- blog-only:start -->
-Next: [Conditional edges and branching](./03-conditional-edges.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

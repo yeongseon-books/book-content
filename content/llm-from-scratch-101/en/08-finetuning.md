@@ -123,10 +123,6 @@ While it's far from a polished chatbot, the shift in format is unmistakable.
 
 In the final post, we'll wrap this model in a FastAPI server so you can talk to it directly through a browser. We'll implement multi-turn prompts and SSE streaming to complete the series.
 
-<!-- blog-only:start -->
-Next: [Turning Your LLM into a Chatbot — FastAPI + Streaming](./09-chatbot-wrapper.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

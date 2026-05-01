@@ -62,16 +62,6 @@ print(json.dumps(results, indent=2))
 - [ ] Compare hit rate and MRR together.
 - [ ] Include latency so the runtime cost stays visible.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Now the embedding layer can be compared in isolation. The next post changes the search backend itself and checks the flat-versus-approximate trade-off.
-
-Next: [VectorDB selection criteria](./04-vectordb-selection.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

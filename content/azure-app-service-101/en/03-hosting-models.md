@@ -306,10 +306,6 @@ Key points for Hosting Model selection:
 
 ---
 
-<!-- blog-only:start -->
-Next: [First Deployment: From Local to Azure (Python/Flask)](./04-first-deploy.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

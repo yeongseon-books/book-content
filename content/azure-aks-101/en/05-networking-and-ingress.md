@@ -243,10 +243,6 @@ This is part 5 of the Azure Kubernetes Service 101 series. The previous post foc
 
 ---
 
-<!-- blog-only:start -->
-Next: [Scaling — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -310,10 +310,6 @@ In this post, we built the smallest practical LLM cache: a request-hash key, an 
 
 The earlier posts focused on response shape and execution flow. Caching adds a new layer: repeated work should not be paid for twice. The next topic handles the opposite problem. When a request does fail, how do you retry it without turning temporary problems into noisy instability?
 
-<!-- blog-only:start -->
-Next: [Retry and error handling — making API calls reliable](./05-retry-and-error-handling.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

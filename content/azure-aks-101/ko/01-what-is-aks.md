@@ -184,10 +184,6 @@ AKS는 이 셋 중에서 가장 Kubernetes에 가깝습니다. 대신 그만큼 
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -348,10 +348,6 @@ This post covered the reason tokens sit at the center of LLM application work. T
 
 In the next post, we will stay with the same chat API and focus on message roles. Once `system`, `user`, and `assistant` are clearly separated, it becomes much easier to produce stable behavior from the same model.
 
-<!-- blog-only:start -->
-Next: [Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

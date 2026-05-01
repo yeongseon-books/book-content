@@ -84,10 +84,6 @@ def lora_params_per_layer(hidden_size: int, intermediate_size: int, rank: int) -
 
 Post 01 removes the mystery. Once the parameter story is concrete, LoRA stops looking like magic and starts looking like an engineering trade-off you can defend.
 
-<!-- blog-only:start -->
-Next: [Dataset preparation and preprocessing](./02-dataset.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

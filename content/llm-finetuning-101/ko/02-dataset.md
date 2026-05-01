@@ -84,10 +84,6 @@ tokenizer = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
 
 데이터셋 준비의 핵심은 모델이 배워야 할 입출력 경계를 분명히 만드는 것입니다. 작은 샘플로 먼저 구조를 맞춰 두면 이후 학습 루프를 디버깅할 때 훨씬 덜 흔들립니다.
 
-<!-- blog-only:start -->
-다음 글: [LoRA 어댑터 구성](./03-lora.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

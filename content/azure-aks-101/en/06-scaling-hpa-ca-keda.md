@@ -285,10 +285,6 @@ This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the
 
 ---
 
-<!-- blog-only:start -->
-Next: [Monitoring and ops — Container Insights, logs, alerts](./07-monitoring-and-ops.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

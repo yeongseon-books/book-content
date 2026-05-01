@@ -76,16 +76,6 @@ for case in cases:
 - [ ] 평가할 k 값을 코드와 리포트에서 동일하게 사용했다.
 - [ ] 평균 점수와 쿼리별 점수를 함께 확인했다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-이제 검색 지표의 뜻을 숫자로 확인할 준비가 됐습니다. 다음 글에서는 같은 지표를 실제 FAISS retriever에 붙여 hit rate와 MRR을 측정합니다.
-
-다음 글: [검색 성능 측정](./02-retrieval-benchmarking.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

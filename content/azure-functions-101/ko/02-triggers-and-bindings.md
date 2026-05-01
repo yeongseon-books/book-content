@@ -171,10 +171,6 @@ DB 연결, 인증, 재시도 같은 운영 코드는 **Functions Host가 대신 
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [Host와 Worker — 함수는 누가 실행하는가](./03-host-and-worker.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

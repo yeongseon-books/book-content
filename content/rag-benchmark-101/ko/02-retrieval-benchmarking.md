@@ -62,16 +62,6 @@ for question, relevant_ids in QUERIES:
 - [ ] 검색 품질과 지연 시간을 같은 루프에서 함께 측정했다.
 - [ ] 출력에 평균값뿐 아니라 질문별 ranked ids도 남겼다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-이제 retriever 자체를 숫자로 비교할 수 있습니다. 다음 글에서는 같은 벤치마크 루프를 두 개의 임베딩 모델에 그대로 붙여 결과 차이를 봅니다.
-
-다음 글: [임베딩 모델 비교](./03-embedding-comparison.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

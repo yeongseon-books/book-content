@@ -288,10 +288,6 @@ This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at proces
 
 ---
 
-<!-- blog-only:start -->
-Next: [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

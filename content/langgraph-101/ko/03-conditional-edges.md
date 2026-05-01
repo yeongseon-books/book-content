@@ -122,10 +122,6 @@ if __name__ == "__main__":
 
 조건부 엣지는 LangGraph가 "그래프답게" 느껴지는 첫 지점입니다. 다음 글에서는 이 분기 흐름 위에 실제 도구 호출 루프를 얹어 에이전트 형태로 발전시켜 보겠습니다.
 
-<!-- blog-only:start -->
-다음 글: [도구 호출 에이전트](./04-tool-calling-agent.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

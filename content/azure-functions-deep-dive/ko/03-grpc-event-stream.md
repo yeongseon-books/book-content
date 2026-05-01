@@ -288,10 +288,6 @@ message FunctionLoadRequest {
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지](./04-dispatcher-and-invocation.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

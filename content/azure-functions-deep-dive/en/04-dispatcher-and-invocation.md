@@ -275,10 +275,6 @@ This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established th
 
 ---
 
-<!-- blog-only:start -->
-Next: [Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans](./05-scaling-internals.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

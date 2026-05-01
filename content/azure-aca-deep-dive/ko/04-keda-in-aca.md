@@ -338,10 +338,6 @@ Scale 블레이드 뒤에 숨어 있는 기계가 바로 이것입니다.
 - ACA가 각 scale rule마다 실제로 어떤 hidden Kubernetes object나 private controller를 만드는지는 공개되지 않았습니다.
 - ACA HTTP scaling을 upstream KEDA HTTP add-on의 1:1 배포라고 단정하면 안 됩니다.
 
-<!-- blog-only:start -->
-다음 글: [Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스](./05-dapr-sidecar-internals.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

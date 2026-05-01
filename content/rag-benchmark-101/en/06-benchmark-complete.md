@@ -62,16 +62,6 @@ ragas_result = evaluate(dataset=Dataset.from_list(rows), ...)
 - [ ] Report retrieval metrics separately from generation metrics.
 - [ ] Keep both per-question logs and a final summary report.
 
-<!-- blog-only:start -->
-
-## Summary
-
-The benchmark skeleton for the series is now complete. From here on, you can change one axis at a time—embeddings, chunking, prompts, or index settings—and compare everything through the same pipeline.
-
-This series ends here.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

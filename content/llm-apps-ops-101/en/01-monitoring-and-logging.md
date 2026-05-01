@@ -151,10 +151,6 @@ if __name__ == "__main__":
 ## Summary
 The goal is not pretty logs. The goal is one record shape that can answer later questions about incidents, cost spikes, and model behavior.
 
-<!-- blog-only:start -->
-Next: [LLM cost tracking and optimization](./02-cost-tracking.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

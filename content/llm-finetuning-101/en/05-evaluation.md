@@ -82,10 +82,6 @@ after = perplexity(peft_model, eval_dataset)
 
 Evaluation is not glamorous, but it is what makes the rest of the pipeline trustworthy. Once you have a baseline, future experiments become far less subjective.
 
-<!-- blog-only:start -->
-Next: [Model serving](./06-serving.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

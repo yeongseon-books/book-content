@@ -97,10 +97,6 @@ Microsoft가 관리하는 Kubernetes 기반 위에 KEDA 기반 스케일링, 선
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [Environment·Container App·Revision — 세 단어로 보는 ACA](./02-environment-app-revision.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

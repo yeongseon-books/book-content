@@ -125,10 +125,6 @@ A: My lord, I serve thee with a faithful heart.
 
 다음 글에서는 FastAPI를 씌워 브라우저에서 바로 말을 걸 수 있게 만들겠습니다. 멀티턴 프롬프트와 SSE 스트리밍까지 붙여 시리즈를 마무리하겠습니다.
 
-<!-- blog-only:start -->
-다음 글: [직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍](./09-chatbot-wrapper.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

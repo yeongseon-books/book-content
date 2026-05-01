@@ -91,10 +91,6 @@ trainer.train()
 
 학습 루프는 생각보다 작은 단위로도 검증할 수 있습니다. 1 step이 성공하면 이후에 늘려야 할 것은 데이터와 시간이지, 기본 구조가 아닙니다.
 
-<!-- blog-only:start -->
-다음 글: [모델 평가](./05-evaluation.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

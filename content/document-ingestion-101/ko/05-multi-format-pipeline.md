@@ -135,16 +135,6 @@ source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 - [ ] 확장자 라우팅 로직이 한 함수에 모여 있다.
 - [ ] 후속 단계가 포맷별 조건문 없이 동작할 수 있는지 확인했다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-포맷별 파싱은 달라도 `Document` 계약이 하나면 나머지 파이프라인은 훨씬 단순해집니다.
-
-다음 글에서는 이 모든 단계를 합쳐 FAISS 저장과 재로딩까지 이어지는 완성형 파이프라인을 만듭니다.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

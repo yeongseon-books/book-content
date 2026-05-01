@@ -332,10 +332,6 @@ Summarization, extraction, and classification cover the majority of document pro
 
 The next post covers the Agent and Tool pattern, where the LLM autonomously selects and calls tools to answer questions it cannot handle from context alone.
 
-<!-- blog-only:start -->
-Next: [Agent and tool pattern — autonomous tool selection](./04-agent-tool-pattern.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

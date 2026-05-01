@@ -112,10 +112,6 @@ for label, name in MODEL_NAMES.items():
 
 The first post is really about comparison discipline, not model fandom. Once you can measure separation on your own data, the later design choices become easier. The next post moves from comparison into an actual sentence similarity search flow with KoSimCSE.
 
-<!-- blog-only:start -->
-Next: [Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

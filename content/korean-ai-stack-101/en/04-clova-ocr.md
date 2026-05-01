@@ -104,10 +104,6 @@ for image in MOCK_RESPONSE['images']:
 
 OCR is not a side feature. It defines the quality of the text entering the rest of the pipeline. Once that structure is clear, it becomes much easier to reason about the generation step in the next post.
 
-<!-- blog-only:start -->
-Next: [Using HyperCLOVA X and Solar API](./05-hyperclova-solar-api.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

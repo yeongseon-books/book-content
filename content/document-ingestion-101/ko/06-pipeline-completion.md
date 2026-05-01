@@ -184,16 +184,6 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 - [ ] FAISS 인덱스를 저장한 뒤 다시 로드했다.
 - [ ] 재로딩된 인덱스에서 검색 결과를 확인했다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-이제 문서 수집 시리즈의 핵심 흐름인 로딩 → 청킹 → 임베딩 → 저장 → 재로딩이 한 번에 이어집니다.
-
-다음 시리즈에서는 이 인덱스를 실제 질의 응답 파이프라인과 운영 지표로 연결하게 됩니다.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

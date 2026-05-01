@@ -463,10 +463,6 @@ if __name__ == "__main__":
 
 이 기준선을 잡아 두면 다음 화가 자연스럽게 이어집니다. retriever가 뽑아 온 문서들은 아직 답변이 아닙니다. 그 문서들을 어떤 순서로 붙이고, 얼마나 압축하고, 어떤 프롬프트 슬롯에 주입하느냐가 다음 실패 지점입니다. 4화에서는 retrieval 이후 단계인 prompt construction과 context injection을 소스와 실제 체인 형태에 맞춰 이어서 보겠습니다.
 
-<!-- blog-only:start -->
-다음 글: [프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

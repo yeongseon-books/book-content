@@ -114,10 +114,6 @@ With our setting of `C=128`, one block uses about 66k parameters for attention a
 
 The building blocks are ready. In the next post, we will wrap embeddings, `N` blocks, the final LayerNorm, and the LM head into a single `GPT(nn.Module)` class. We'll finish the model so it can produce both logits and loss in a single forward pass.
 
-<!-- blog-only:start -->
-Next: [Assembly: Completing the GPT Model Class](./05-gpt-model.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -502,10 +502,6 @@ The practical lesson is still conservative. More examples do not automatically m
 
 The next post moves from static prompt design to dynamic conversation state. Few-shot examples are fixed context. Multi-turn chat memory is changing context, and that is where chatbot architecture starts to feel like application engineering instead of prompt tinkering.
 
-<!-- blog-only:start -->
-Next: [Managing conversation state — building a multi-turn chatbot](./05-conversation-state.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

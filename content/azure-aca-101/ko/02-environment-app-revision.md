@@ -88,10 +88,6 @@ Multiple은 Canary와 Blue-Green을 가능하게 합니다.
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [첫 앱 배포하기 — Python/FastAPI](./03-first-deploy.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

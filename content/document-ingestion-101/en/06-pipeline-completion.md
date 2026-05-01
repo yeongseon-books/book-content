@@ -184,16 +184,6 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 - [ ] You saved the FAISS index and loaded it back.
 - [ ] You verified retrieval against the reloaded index.
 
-<!-- blog-only:start -->
-
-## Summary
-
-At this point the core ingestion loop—load, chunk, embed, save, reload—works as one continuous path.
-
-The next series can now build on this index with full retrieval, answering, and operational metrics.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

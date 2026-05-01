@@ -98,10 +98,6 @@ print(response.choices[0].message.content)
 
 이 글에서 가져갈 핵심은 한국어 생성 API를 다루는 호출 감각입니다. 어떤 모델을 쓰든 입력 계약과 출력 계약을 먼저 고정해야 다음 글의 RAG 파이프라인에서 검색 문맥을 안전하게 얹을 수 있습니다.
 
-<!-- blog-only:start -->
-다음 글: [한국어 RAG 파이프라인 조합하기](./06-korean-rag-pipeline.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

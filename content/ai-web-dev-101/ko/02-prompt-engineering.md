@@ -137,12 +137,7 @@ function login(user, pass) {
 
 ---
 
-
-<!-- blog-only:start -->
-다음 글: [AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현](./03-ai-chatbot.md)
-<!-- blog-only:end -->
 <!-- toc:begin -->
-
 
 ## 시리즈 목차
 

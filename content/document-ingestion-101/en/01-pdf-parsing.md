@@ -152,16 +152,6 @@ page=2 chars=173 preview=Page 2 Operational checks ...
 - [ ] The page preview is enough to verify extraction order by eye.
 - [ ] You identified which metadata should flow into the next stage.
 
-<!-- blog-only:start -->
-
-## Summary
-
-When one file covers sample generation and extraction verification, the first ingestion step becomes easy to explain and easy to rerun.
-
-The next post compares how chunk size should change across document types.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

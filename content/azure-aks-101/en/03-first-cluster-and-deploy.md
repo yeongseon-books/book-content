@@ -363,10 +363,6 @@ This is part 3 of the Azure Kubernetes Service 101 series. The first two posts s
 
 ---
 
-<!-- blog-only:start -->
-Next: [Pod, Deployment, Service — the three ways you express a workload](./04-pod-deployment-service.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

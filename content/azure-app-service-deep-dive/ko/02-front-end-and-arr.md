@@ -258,10 +258,6 @@ Client → App Service Front-End → host/slot resolution → ARR worker selecti
 
 Slot swap path: apply target-slot settings to the source slot → warm every source-slot instance → switch Front-End routing rules
 
-<!-- blog-only:start -->
-다음 글: [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

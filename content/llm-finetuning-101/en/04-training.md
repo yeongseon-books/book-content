@@ -84,10 +84,6 @@ trainer.train()
 
 A fine-tuning loop can be verified with surprisingly little data. Once a single step works, the next scaling problems are about time and data—not about the shape of the loop.
 
-<!-- blog-only:start -->
-Next: [Model evaluation](./05-evaluation.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -241,10 +241,6 @@ Chunking is often the biggest lever for retrieval quality in a vector search sys
 
 The final post assembles everything — document loading, chunking, embedding, indexing, and querying — into one end-to-end pipeline.
 
-<!-- blog-only:start -->
-Next: [Vector search pipeline — from document ingestion to query](./06-vector-search-pipeline.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -179,10 +179,6 @@ If you want the implementation details behind those behaviors, pair this chapter
 
 ---
 
-<!-- blog-only:start -->
-Next: [Monitoring and Operations Fundamentals](./07-monitoring-and-ops.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

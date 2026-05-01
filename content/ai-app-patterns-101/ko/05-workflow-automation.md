@@ -342,10 +342,6 @@ print(f"\n=== 최종 리포트 ===\n{result['report']}")
 
 다음 글에서는 Human-in-the-loop 패턴을 다룹니다. 자동화 파이프라인 중간에 사람의 판단과 승인을 넣는 방법입니다.
 
-<!-- blog-only:start -->
-다음 글: [Human-in-the-loop — 사람 개입 설계 패턴](./06-human-in-the-loop.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

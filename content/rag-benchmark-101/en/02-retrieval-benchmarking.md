@@ -62,16 +62,6 @@ for question, relevant_ids in QUERIES:
 - [ ] Measure retrieval quality and latency in the same loop.
 - [ ] Keep the ranked IDs in the output, not just the average.
 
-<!-- blog-only:start -->
-
-## Summary
-
-Now the retriever can be compared numerically. The next post reuses the same loop across two embedding models and looks at the gap.
-
-Next: [Comparing embedding models](./03-embedding-comparison.md)
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

@@ -62,16 +62,6 @@ ragas_result = evaluate(dataset=Dataset.from_list(rows), ...)
 - [ ] retrieval 지표와 generation 지표를 분리해 출력했다.
 - [ ] 질문별 로그와 최종 요약 리포트를 함께 남겼다.
 
-<!-- blog-only:start -->
-
-## 정리
-
-이제 시리즈의 벤치마크 뼈대가 완성됐습니다. 다음 실험부터는 임베딩, chunking, 프롬프트, 인덱스 설정을 한 축씩 바꾸면서 같은 파이프라인으로 비교하면 됩니다.
-
-이 시리즈는 여기서 마무리됩니다.
-
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

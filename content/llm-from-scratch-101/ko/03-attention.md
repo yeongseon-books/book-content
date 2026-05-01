@@ -171,10 +171,6 @@ print(attn.last_attn.shape)
 
 이제 토큰끼리 서로를 보는 눈은 생겼습니다. 다음 글에서는 여기에 FeedForward, Residual, LayerNorm을 더해 트랜스포머 블록 하나를 완성하겠습니다. 깊이를 쌓는 최소 단위가 등장합니다.
 
-<!-- blog-only:start -->
-다음 글: [블록 하나, 깊이의 단위](./04-transformer-block.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

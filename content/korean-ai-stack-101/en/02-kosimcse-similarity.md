@@ -103,10 +103,6 @@ print(distances, indices)
 
 The KoSimCSE example is valuable because it keeps the retrieval loop visible. That visibility becomes your reference point when you later add multilingual embeddings or generation on top.
 
-<!-- blog-only:start -->
-Next: [BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

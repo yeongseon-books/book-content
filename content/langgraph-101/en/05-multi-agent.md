@@ -146,10 +146,6 @@ export GROQ_API_KEY=... && python main.py
 
 The heart of multi-agent design is delegation, not model count. In the final post, we combine checkpoints, routing, and tool loops into one complete LangGraph agent skeleton.
 
-<!-- blog-only:start -->
-Next: [Completing LangGraph](./06-langgraph-complete.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

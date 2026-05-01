@@ -164,10 +164,6 @@ This is part 1 of the Azure Functions Deep Dive series. It isolates the host-boo
 
 ---
 
-<!-- blog-only:start -->
-Next: [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## In this series
 

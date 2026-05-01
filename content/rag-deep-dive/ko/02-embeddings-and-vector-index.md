@@ -362,10 +362,6 @@ if __name__ == "__main__":
 
 이 기준선을 잡아 두면 다음 화의 retriever 이야기가 훨씬 선명해집니다. retriever는 단순히 top-k를 가져오는 얇은 래퍼가 아닙니다. 어떤 거리 결과를 몇 개나 가져오고, diversity를 넣을지, metadata filter를 언제 적용할지를 결정하는 조정기이기 때문입니다. 3화에서는 `VectorStoreRetriever`와 MMR이 바로 이 벡터 공간 위에서 어떤 선택을 하는지 이어서 보겠습니다.
 
-<!-- blog-only:start -->
-다음 글: [Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

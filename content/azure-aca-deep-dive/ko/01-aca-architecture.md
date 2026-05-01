@@ -332,10 +332,6 @@ ACA가 모호하다는 뜻은 아닙니다.
 - 정확한 Kubernetes substrate, 클러스터 토폴로지, 내부 오브젝트 이름은 공개되지 않았습니다.
 - ACA 리소스를 Envoy·KEDA·Dapr 설정으로 바꾸는 private adapter 코드는 공개되지 않았습니다.
 
-<!-- blog-only:start -->
-다음 글: [Environment 내부 — 네트워크·관측·Dapr 스코프의 경계](./02-environment-internals.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

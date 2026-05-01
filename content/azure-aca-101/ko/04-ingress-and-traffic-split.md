@@ -73,10 +73,6 @@ az containerapp ingress traffic set   --name $APP_NAME   --resource-group $RG   
 
 ---
 
-<!-- blog-only:start -->
-다음 글: [스케일링 — KEDA scaler와 0-to-N](./05-scaling-with-keda.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 

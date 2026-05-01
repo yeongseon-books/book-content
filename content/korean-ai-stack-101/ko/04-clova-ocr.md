@@ -104,10 +104,6 @@ for image in MOCK_RESPONSE['images']:
 
 OCR은 부가 기능이 아니라 문서 파이프라인의 입력 정합성을 결정하는 단계입니다. 응답 구조를 먼저 이해해 두면, 다음 글에서 생성 API를 붙일 때도 어떤 문맥이 넘어가는지 훨씬 분명해집니다.
 
-<!-- blog-only:start -->
-다음 글: [HyperCLOVA X와 Solar API 사용하기](./05-hyperclova-solar-api.md)
-<!-- blog-only:end -->
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
