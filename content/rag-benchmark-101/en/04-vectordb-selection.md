@@ -184,6 +184,10 @@ if __name__ == "__main__":
     demo_metadata_filter(CORPUS)
 ```
 
+<!-- blog-only:start -->
+Next: [End-to-end RAG pipeline evaluation](./05-e2e-evaluation.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

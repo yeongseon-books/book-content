@@ -248,6 +248,10 @@ Caching is the highest-leverage lever. FAQ-style workloads where the same inputs
 
 Small-model routing works well for mixed workloads: route simple requests to `llama-3.1-8b-instant` and escalate complex ones to a larger model. The cost difference between 8B and 70B is roughly 10x.
 
+<!-- blog-only:start -->
+Next: [Evaluating LLM output quality](./03-evaluation.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

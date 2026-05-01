@@ -290,6 +290,10 @@ This post translates the intro-series scaling guidance into the internal App Ser
 - Scale-out can trigger when any scale-out rule matches, while scale-in requires all scale-in rules to match.
 - `AutoscaleEvaluationsLog`, `AutoscaleScaleActionsLog`, and the activity log expose the actual decision trail.
 
+<!-- blog-only:start -->
+Next: [Cold start and warmup — why the first request is expensive](./06-cold-start-and-warmup.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

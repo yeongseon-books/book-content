@@ -295,6 +295,10 @@ Front-End와 ARR이 어떻게 요청을 워커에 보내는지,
 - Linux custom container는 `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`일 때 `/home` 공유 영속 스토리지 마운트를 사용하지 않을 수 있습니다.
 - Kudu는 앱 옆의 SCM buddy site로서 배포와 진단 경로를 담당합니다.
 
+<!-- blog-only:start -->
+다음 글: [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

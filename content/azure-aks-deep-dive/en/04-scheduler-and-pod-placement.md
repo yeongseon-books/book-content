@@ -88,6 +88,10 @@ Parts 2 and 3 covered node execution and networking; this part explains the earl
 - scheduler writes Binding through the API server
 - kubelet on the chosen node starts the node-local execution path
 
+<!-- blog-only:start -->
+Next: [HPA and Cluster Autoscaler internals — two control loops](./05-hpa-and-cluster-autoscaler-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

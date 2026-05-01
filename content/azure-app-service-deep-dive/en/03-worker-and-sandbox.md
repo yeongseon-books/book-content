@@ -268,6 +268,10 @@ Episode 2 delivered requests to the worker, and this post explained the executio
 
 App Service Front-End (ARR) → worker instance → IIS `w3wp.exe` on Windows or container entrypoint on Linux → App Service sandbox or container boundary → user code
 
+<!-- blog-only:start -->
+Next: [Deployment and Kudu — build, sync, release from the inside](./04-deployment-and-kudu.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

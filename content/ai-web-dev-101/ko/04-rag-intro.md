@@ -200,6 +200,10 @@ RAG는 이제 AI 웹 서비스의 표준이 되었습니다. 거창한 데이터
 
 ---
 
+
+<!-- blog-only:start -->
+다음 글: [AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기](./05-ai-agent.md)
+<!-- blog-only:end -->
 <!-- toc:begin -->
 ## 시리즈 목차
 

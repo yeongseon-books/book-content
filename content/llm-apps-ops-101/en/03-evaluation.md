@@ -240,6 +240,10 @@ LLM-as-judge is fast and scalable, but the judge model may share biases with the
 
 Keyword coverage and format checks are fully automatable. LLM-as-judge adds semantic quality scoring on top. Combining all three layers gives you a reliable quality gate without manual inspection at scale.
 
+<!-- blog-only:start -->
+Next: [LLM app security](./04-security.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

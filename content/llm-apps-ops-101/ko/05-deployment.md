@@ -223,6 +223,10 @@ async def stream_chat(message: str, base_url: str = "http://localhost:8000"):
 
 **그레이스풀 셧다운**: `lifespan` 컨텍스트 매니저를 사용하면 SIGTERM 수신 시 진행 중인 요청을 완료하고 종료합니다.
 
+<!-- blog-only:start -->
+다음 글: [LLM 앱 운영 완성](./06-ops-complete.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

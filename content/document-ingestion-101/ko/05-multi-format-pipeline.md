@@ -249,6 +249,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
 다음 글에서는 지금까지 다룬 모든 요소를 하나의 프로덕션 파이프라인으로 조합합니다.
 
+<!-- blog-only:start -->
+다음 글: [문서 수집 파이프라인 완성](./06-pipeline-completion.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

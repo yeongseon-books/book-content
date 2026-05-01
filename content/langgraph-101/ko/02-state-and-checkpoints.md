@@ -186,6 +186,10 @@ new_session = make_thread_id("user_123", str(uuid.uuid4()))
 
 메모리 체크포인터는 개발과 테스트에만 씁니다. 프로덕션에서는 SQLite(단일 서버)나 Redis/PostgreSQL(분산 환경) 체크포인터를 사용합니다. 체크포인터를 바꿔도 그래프 코드는 전혀 수정할 필요가 없습니다.
 
+<!-- blog-only:start -->
+다음 글: [조건부 엣지와 분기 흐름](./03-conditional-edges.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

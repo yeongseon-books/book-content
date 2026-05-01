@@ -128,6 +128,10 @@ Thee no more of men.
 
 다음 글에서는 여기에 작은 instruction 데이터셋을 얹어 SFT를 해보겠습니다. 질문과 답변 형식이 출력 습관을 얼마나 바꾸는지 보겠습니다.
 
+<!-- blog-only:start -->
+다음 글: [베이스 모델을 우리 작업에 맞추기](./08-finetuning.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

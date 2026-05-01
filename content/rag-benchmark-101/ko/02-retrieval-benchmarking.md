@@ -214,6 +214,10 @@ if __name__ == "__main__":
 
 Precision@1이 낮다면 첫 번째 결과가 신뢰할 수 없다는 의미입니다. 사용자가 첫 번째 결과를 가장 많이 보기 때문에 이 지표가 UX에 직접적인 영향을 줍니다. 리랭킹 레이어를 추가하면 Precision@1을 가장 효과적으로 높일 수 있습니다.
 
+<!-- blog-only:start -->
+다음 글: [임베딩 모델 비교](./03-embedding-comparison.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -519,6 +519,10 @@ Azure App Service의 Request Lifecycle을 이해하면, 장애가 났을 때 질
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [Hosting Models: 어떤 플랜을 선택해야 할까?](./03-hosting-models.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

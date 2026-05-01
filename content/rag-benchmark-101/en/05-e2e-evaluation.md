@@ -223,6 +223,10 @@ Pipeline score alone does not tell you where to intervene.
 - **Low pipeline score + low generation score**: generation is the bottleneck. Strengthen the system prompt, lower temperature, or switch models.
 - **High retrieval score + low faithfulness**: retrieval works but the model ignores context. Add an explicit instruction to stay within the provided context.
 
+<!-- blog-only:start -->
+Next: [Completing the RAG benchmark](./06-benchmark-complete.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

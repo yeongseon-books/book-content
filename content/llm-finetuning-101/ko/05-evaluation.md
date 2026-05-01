@@ -205,6 +205,10 @@ if __name__ == "__main__":
         print(f"F1: {f1:.3f}")
 ```
 
+<!-- blog-only:start -->
+다음 글: [모델 서빙](./06-serving.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

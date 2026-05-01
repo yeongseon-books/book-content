@@ -148,6 +148,10 @@ curl https://<YOUR_FQDN>/
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [Ingress와 트래픽 분할 — Revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

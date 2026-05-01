@@ -315,6 +315,10 @@ In this first production-focused post, we turned model output into an applicatio
 
 If the earlier series taught the basic request and response loop, this is the point where that loop becomes safe to automate. The next step is to put function execution on top of the same contract and let the model choose tools without letting the surrounding system become ambiguous.
 
+<!-- blog-only:start -->
+Next: [Tool calling — connecting functions to the model](./02-tool-calling.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

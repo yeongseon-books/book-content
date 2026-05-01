@@ -272,6 +272,10 @@ def run_with_tools_safe(question: str) -> str:
 
 Tool Calling의 핵심 루프를 이해했습니다. `@tool`로 정의, `bind_tools()`로 연결, `ToolMessage`로 결과 전달, 루프 반복입니다. 다음 글에서는 스트리밍으로 LLM 응답을 실시간으로 받는 방법을 다룹니다.
 
+<!-- blog-only:start -->
+다음 글: [Streaming — 실시간 출력 처리](./05-streaming.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

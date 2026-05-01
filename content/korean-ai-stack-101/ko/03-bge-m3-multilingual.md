@@ -253,6 +253,10 @@ print(f"답변: {answer}")
 
 BGE-M3는 한국어-영어 혼용 문서를 다루는 기술 서비스에 적합합니다. Dense만 써도 충분한 경우가 많지만, 정확한 키워드 매칭이 중요하다면 Sparse와 하이브리드 검색을 고려하세요. 다음 글에서는 CLOVA OCR API로 이미지나 PDF에서 텍스트를 추출하는 방법을 다룹니다.
 
+<!-- blog-only:start -->
+다음 글: [CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

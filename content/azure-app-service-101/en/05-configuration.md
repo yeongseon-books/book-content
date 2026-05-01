@@ -402,6 +402,10 @@ Configuration management essentials:
 
 ---
 
+<!-- blog-only:start -->
+Next: [Logging and Monitoring Basics](./06-logging-monitoring.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

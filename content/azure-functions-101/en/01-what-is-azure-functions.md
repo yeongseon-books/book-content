@@ -146,6 +146,10 @@ The next concepts to internalize are **triggers and bindings**: what kinds of ev
 
 ---
 
+<!-- blog-only:start -->
+Next: [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

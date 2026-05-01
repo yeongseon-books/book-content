@@ -268,6 +268,10 @@ for r in recent_results:
 
 다음 글에서는 증분 인덱싱을 다룹니다. 문서가 추가되거나 변경될 때 전체를 다시 인덱싱하지 않고 변경분만 처리하는 방법입니다.
 
+<!-- blog-only:start -->
+다음 글: [증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

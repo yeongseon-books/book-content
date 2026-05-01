@@ -92,6 +92,10 @@ Part 4 explained scheduling decisions; this part explains the two control loops 
 - Cluster Autoscaler detects them and asks AKS to add a node
 - new node becomes Ready and scheduler binds the Pending Pods
 
+<!-- blog-only:start -->
+Next: [KEDA internals — how a ScaledObject builds an HPA](./06-keda-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

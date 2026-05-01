@@ -88,6 +88,10 @@ Treat this as a schematic, not as a ready-to-apply manifest. A runnable ACA Dapr
 
 ---
 
+<!-- blog-only:start -->
+Next: [Monitoring and ops — Log Analytics and Application Insights](./07-monitoring-and-ops.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

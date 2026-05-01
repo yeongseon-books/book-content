@@ -274,6 +274,10 @@ for rank, (score, text) in enumerate(results, start=1):
 
 다음 글에서는 FAISS를 써서 대규모 벡터 집합을 고속으로 검색하는 방법을 다룹니다. 인덱스 유형 선택, 저장과 불러오기, 실제 검색 성능까지 살펴보겠습니다.
 
+<!-- blog-only:start -->
+다음 글: [FAISS 입문 — 고속 근사 최근접 이웃 검색](./04-faiss-fundamentals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

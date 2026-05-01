@@ -249,6 +249,10 @@ for r in recent_results:
 
 Metadata covers the cases where semantic similarity fails: time ranges, category constraints, source filters. Design the schema when designing the chunking pipeline — adding metadata retroactively requires reindexing every document. The next post covers incremental indexing: processing only documents that have changed rather than rebuilding the index from scratch.
 
+<!-- blog-only:start -->
+Next: [Incremental indexing — updating only changed documents](./04-incremental-indexing.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

@@ -236,6 +236,10 @@ def analyze_dataset(dataset: Dataset, tokenizer) -> dict:
     }
 ```
 
+<!-- blog-only:start -->
+다음 글: [LoRA 어댑터 구성](./03-lora.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

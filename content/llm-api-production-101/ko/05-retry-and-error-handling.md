@@ -248,6 +248,10 @@ except Exception as exc:
 
 앞선 글에서 캐시로 반복 비용을 줄였다면, 재시도는 실패 경로를 덜 거칠게 만드는 기술입니다. 마지막 주제에서는 이 두 층보다 더 바깥의 제약을 다룹니다. 공급자 API가 허용한 호출 속도 안에서 안정적으로 요청을 흘려보내기 위해 rate limit을 어떻게 관리할지 살펴보겠습니다.
 
+<!-- blog-only:start -->
+다음 글: [속도 제한 관리 — Rate Limit 대응 패턴](./06-rate-limit-management.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

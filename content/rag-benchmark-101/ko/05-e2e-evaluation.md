@@ -260,6 +260,10 @@ if __name__ == "__main__":
 - **pipeline_score 낮음 + generation.score 낮음**: 생성이 병목. 시스템 프롬프트 강화, temperature 조정, LLM 교체를 검토합니다.
 - **retrieval.score 높음 + generation.faithfulness 낮음**: 검색은 잘 되지만 모델이 컨텍스트를 무시함. 프롬프트에 컨텍스트 의존성 명시가 필요합니다.
 
+<!-- blog-only:start -->
+다음 글: [RAG 벤치마크 완성](./06-benchmark-complete.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

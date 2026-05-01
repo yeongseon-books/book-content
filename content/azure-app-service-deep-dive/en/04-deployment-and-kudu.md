@@ -242,6 +242,10 @@ The previous posts explained request routing and worker execution boundaries. Th
 
 Push (zip, git, publish profile, container image reference) → Kudu SCM endpoint → optional build automation (`SCM_DO_BUILD_DURING_DEPLOYMENT`, Oryx on Linux code apps) → content placement in `wwwroot` or mounted package path → app restart / worker process recycle → worker serves the new artifact
 
+<!-- blog-only:start -->
+Next: [Scaling internals — how Scale Out decisions become new workers](./05-scaling-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

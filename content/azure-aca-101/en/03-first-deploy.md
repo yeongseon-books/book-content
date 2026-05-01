@@ -148,6 +148,10 @@ curl https://<YOUR_FQDN>/
 
 ---
 
+<!-- blog-only:start -->
+Next: [Ingress and traffic splitting — revision-based deployment strategies](./04-ingress-and-traffic-split.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

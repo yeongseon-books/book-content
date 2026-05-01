@@ -283,6 +283,10 @@ Understanding App Service's 3-Plane model helps you:
 
 ---
 
+<!-- blog-only:start -->
+Next: [Request Lifecycle: How Requests Reach Your App](./02-request-lifecycle.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

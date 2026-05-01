@@ -390,6 +390,10 @@ API 호출이 상태를 자동 보존한다고 가정하면 후속 질문 품질
 
 다음 글에서는 few-shot과 chain-of-thought를 조금 더 체계적으로 다룹니다. 이번 글에서 본 역할 분리 위에 예시 설계까지 얹으면, “질문을 던진다” 수준을 넘어 “원하는 답변 패턴을 유도한다”는 감각이 생기기 시작합니다.
 
+<!-- blog-only:start -->
+다음 글: [Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기](./04-few-shot-and-cot.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

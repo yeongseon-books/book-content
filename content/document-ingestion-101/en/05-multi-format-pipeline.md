@@ -232,6 +232,10 @@ The key to multi-format pipelines is the common interface: every format converte
 
 The final post assembles all components into a complete production document ingestion pipeline.
 
+<!-- blog-only:start -->
+Next: [Completing the document ingestion pipeline](./06-pipeline-completion.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

@@ -295,6 +295,10 @@ export default function Chat() {
 
 ---
 
+
+<!-- blog-only:start -->
+다음 글: [RAG 입문 — 내 데이터로 답하는 AI 만들기](./04-rag-intro.md)
+<!-- blog-only:end -->
 <!-- toc:begin -->
 ## 시리즈 목차
 

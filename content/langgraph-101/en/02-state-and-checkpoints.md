@@ -166,6 +166,10 @@ new_session = make_thread_id("user_123", str(uuid.uuid4()))
 
 Use the memory checkpointer only in development and tests. In production, use SQLite (single server) or Redis/PostgreSQL (distributed). Swapping the checkpointer requires no changes to the graph code.
 
+<!-- blog-only:start -->
+Next: [Conditional edges and branching](./03-conditional-edges.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

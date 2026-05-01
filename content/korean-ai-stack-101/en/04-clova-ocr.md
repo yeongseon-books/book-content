@@ -303,6 +303,10 @@ CLOVA OCR delivers high accuracy on Korean documents including handwritten text.
 
 The next post covers HyperCLOVA X and Solar API: calling Korean-specialized LLMs from Python.
 
+<!-- blog-only:start -->
+Next: [Using HyperCLOVA X and Solar API](./05-hyperclova-solar-api.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

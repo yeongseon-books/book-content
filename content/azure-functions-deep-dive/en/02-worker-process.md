@@ -158,6 +158,10 @@ This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host boot
 
 ---
 
+<!-- blog-only:start -->
+Next: [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

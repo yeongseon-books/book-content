@@ -220,6 +220,10 @@ if __name__ == "__main__":
 - 분산 배포와 수평 확장이 필요한 경우
 - 복잡한 페이로드 필터와 하이브리드 검색이 필요한 경우
 
+<!-- blog-only:start -->
+다음 글: [종단 간 RAG 파이프라인 평가](./05-e2e-evaluation.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

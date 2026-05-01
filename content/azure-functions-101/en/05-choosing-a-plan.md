@@ -194,6 +194,10 @@ The deployment chapter showed the path end to end; this chapter decides what hos
 
 ---
 
+<!-- blog-only:start -->
+Next: [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

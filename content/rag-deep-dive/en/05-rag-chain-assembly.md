@@ -418,6 +418,10 @@ Episodes 1 through 4 decomposed the layers and showed where information can be l
 
 ---
 
+<!-- blog-only:start -->
+Next: [Evaluation and Quality Gates — RAGAS Metrics and Faithfulness](./06-evaluation-and-quality-gates.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

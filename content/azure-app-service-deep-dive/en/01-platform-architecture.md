@@ -294,6 +294,10 @@ Episode 2 covers Front-End and ARR, episode 3 covers workers and the sandbox, ep
 - Linux custom containers can opt out of shared persistent `/home` storage with `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`.
 - Kudu is the SCM buddy site that handles deployment and diagnostics alongside the main app.
 
+<!-- blog-only:start -->
+Next: [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

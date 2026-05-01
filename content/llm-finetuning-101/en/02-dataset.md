@@ -221,6 +221,10 @@ if __name__ == "__main__":
     split_and_save(dataset, "./data/finetuning")
 ```
 
+<!-- blog-only:start -->
+Next: [Configuring the LoRA adapter](./03-lora.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

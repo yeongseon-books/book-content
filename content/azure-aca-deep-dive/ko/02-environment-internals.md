@@ -329,6 +329,10 @@ Ingress는 이 경계 안의 app endpoint로 들어갑니다.
 **Speculation (ACA-internal, not exposed):**
 - Environment 내부의 숨은 Kubernetes object, mesh wiring, control-plane 구현 세부사항은 공개되지 않았습니다.
 
+<!-- blog-only:start -->
+다음 글: [Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가](./03-revision-and-traffic-split.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -318,6 +318,10 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때](./06-cold-start-placeholder.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

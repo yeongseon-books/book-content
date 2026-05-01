@@ -382,6 +382,10 @@ This chapter separates ACA's public Dapr surface from upstream Dapr-on-Kubernete
 **Speculation (ACA-internal, not exposed):**
 - ACA does not publish the exact admission pipeline, certificate flow, or control-plane addresses used for Dapr inside the managed platform.
 
+<!-- blog-only:start -->
+Next: [The Envoy ingress path — how the first request reaches your container](./06-envoy-ingress-path.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

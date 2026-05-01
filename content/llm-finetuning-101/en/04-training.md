@@ -214,6 +214,10 @@ def monitor_training(trainer) -> None:
         print(f"Validation loss improvement: {improvement:.4f}")
 ```
 
+<!-- blog-only:start -->
+Next: [Model evaluation](./05-evaluation.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

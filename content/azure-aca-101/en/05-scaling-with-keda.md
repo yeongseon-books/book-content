@@ -75,6 +75,10 @@ az containerapp create   --name queue-worker   --resource-group $RG   --environm
 
 ---
 
+<!-- blog-only:start -->
+Next: [Dapr integration — what you get from a sidecar](./06-dapr-integration.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

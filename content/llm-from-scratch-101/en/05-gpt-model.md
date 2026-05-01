@@ -152,6 +152,10 @@ The default settings for this series are conservative. `n_layer=6`, `n_head=4`, 
 
 The model core is finished. In the next post, we'll implement the training loop—pulling mini-batches and running the `forward -> loss -> backward -> optimizer.step()` cycle. You'll see the TinyShakespeare loss drop from 4.17 down to the 1.0 range.
 
+<!-- blog-only:start -->
+Next: [Learning via Gradients](./06-training-loop.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

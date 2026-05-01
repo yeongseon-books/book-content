@@ -282,6 +282,10 @@ spec:
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [모니터링과 운영 — Container Insights, 로그, 알람](./07-monitoring-and-ops.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

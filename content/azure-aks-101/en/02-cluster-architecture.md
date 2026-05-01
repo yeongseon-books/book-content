@@ -220,6 +220,10 @@ This is part 2 of the Azure Kubernetes Service 101 series. Part 1 defined the ma
 
 ---
 
+<!-- blog-only:start -->
+Next: [Your first cluster, your first deploy — Python/FastAPI](./03-first-cluster-and-deploy.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

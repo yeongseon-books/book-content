@@ -164,6 +164,10 @@ Agents communicate through shared state. Each agent writes its result to a dedic
 
 This keeps coupling low. The summary agent does not need to know how the code agent is implemented — it only reads `code_result`. Adding a new agent type requires no changes to existing agents, only a new node and routing entry.
 
+<!-- blog-only:start -->
+Next: [Completing LangGraph](./06-langgraph-complete.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

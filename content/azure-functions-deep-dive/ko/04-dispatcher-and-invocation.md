@@ -275,6 +275,10 @@ gRPC stream
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이](./05-scaling-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

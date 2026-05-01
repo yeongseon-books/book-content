@@ -189,6 +189,10 @@ The line `torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'c
 
 The weights are now trained. In the next post, we'll load `ckpt.pt` and implement the autoregressive generation loop. We'll use a prompt like `ROMEO:` to see how our TinyShakespeare model predicts the next characters.
 
+<!-- blog-only:start -->
+Next: [Sampling — Generating Text from a Trained Model](./07-inference.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

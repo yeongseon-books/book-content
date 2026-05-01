@@ -338,6 +338,10 @@ This chapter leans on Microsoft's KEDA-powered scaling contract and uses upstrea
 - ACA does not publish the exact hidden Kubernetes objects or private controllers it creates for each scale rule.
 - ACA HTTP scaling should not be claimed to be a one-to-one deployment of the upstream KEDA HTTP add-on.
 
+<!-- blog-only:start -->
+Next: [Dapr sidecar internals — the Go process that lives next to your container](./05-dapr-sidecar-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

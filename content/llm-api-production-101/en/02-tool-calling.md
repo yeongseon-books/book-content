@@ -365,6 +365,10 @@ In this post, we used the `tools` parameter to expose a controlled function inte
 
 Structured output gave us a contract for data. Tool calling extends that contract to function requests. The next topic applies the same production mindset to streamed responses, where the result arrives in pieces and error handling must account for partial output instead of one final string.
 
+<!-- blog-only:start -->
+Next: [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

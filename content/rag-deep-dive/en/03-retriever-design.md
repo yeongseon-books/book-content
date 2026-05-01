@@ -374,6 +374,10 @@ This episode established the retriever layer as a policy boundary rather than a 
 
 That baseline leads directly into episode 4. Retrieval output is still not final context. The next failure point is how those documents are packed and injected into the prompt.
 
+<!-- blog-only:start -->
+Next: [Prompt Construction and Context Injection — Inside PromptTemplate](./04-prompt-construction-and-context-injection.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

@@ -75,6 +75,10 @@ az containerapp create   --name queue-worker   --resource-group $RG   --environm
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

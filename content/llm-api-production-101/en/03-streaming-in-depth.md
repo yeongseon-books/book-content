@@ -316,6 +316,10 @@ In this post, we treated streaming as a protocol with partial state rather than 
 
 Structured output and tool calling made the response boundary more explicit. Streaming stretches that same boundary across time. The next topic stays on the operational side and asks a different question: when similar requests keep arriving, how do you avoid paying the full latency and token cost every time?
 
+<!-- blog-only:start -->
+Next: [Caching strategies — reducing cost and latency](./04-caching-strategies.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

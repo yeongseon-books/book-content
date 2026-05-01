@@ -211,6 +211,10 @@ if __name__ == "__main__":
         print(f"F1: {f1:.3f}")
 ```
 
+<!-- blog-only:start -->
+Next: [Model serving](./06-serving.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

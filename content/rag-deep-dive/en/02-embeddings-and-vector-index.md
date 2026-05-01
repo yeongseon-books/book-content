@@ -311,6 +311,10 @@ This episode established the geometry layer of the pipeline. `OpenAIEmbeddings` 
 
 That baseline matters because the next layer is not just “top-k retrieval.” The retriever decides how many candidates to pull, whether to diversify them, and how those vector scores are turned into context. In episode 3, we will stay on the same foundation and follow it into `VectorStoreRetriever` and MMR.
 
+<!-- blog-only:start -->
+Next: [Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

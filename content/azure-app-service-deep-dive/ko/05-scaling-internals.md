@@ -288,6 +288,10 @@ autoscale 진단 문서는 다음 두 로그 범주를 명시합니다.
 - scale-out은 하나 이상의 확장 규칙이 충족되면 실행될 수 있지만, scale-in은 모든 축소 규칙이 충족되어야 합니다.
 - `AutoscaleEvaluationsLog`, `AutoscaleScaleActionsLog`, Activity Log를 통해 실제 평가와 실행 결과를 추적할 수 있습니다.
 
+<!-- blog-only:start -->
+다음 글: [콜드 스타트와 Warmup — 첫 요청이 비싼 이유](./06-cold-start-and-warmup.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

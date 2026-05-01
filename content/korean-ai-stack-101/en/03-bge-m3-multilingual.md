@@ -216,6 +216,10 @@ BGE-M3 is well suited for technical services that mix Korean and English. Dense 
 
 The next post covers CLOVA OCR API: extracting text from images and PDFs to feed into the embedding pipeline.
 
+<!-- blog-only:start -->
+Next: [Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

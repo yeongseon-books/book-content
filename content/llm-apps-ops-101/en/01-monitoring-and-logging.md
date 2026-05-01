@@ -292,6 +292,10 @@ Structured logs are queryable without schema migrations. Whether you ship them t
 
 P95 and P99 are user-experience metrics. If your mean LLM call is 1 s but P99 is 8 s, one in a hundred users waits 8 s every time they interact.
 
+<!-- blog-only:start -->
+Next: [LLM cost tracking and optimization](./02-cost-tracking.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

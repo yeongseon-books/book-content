@@ -193,6 +193,10 @@ if __name__ == "__main__":
     print("LoRA 어댑터 저장 완료")
 ```
 
+<!-- blog-only:start -->
+다음 글: [학습 루프와 하이퍼파라미터](./04-training.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -203,6 +203,10 @@ No single metric determines the best embedding model. Match the model to the use
 
 The similarity gap between relevant and irrelevant documents measures discriminability. A small gap means the model cannot reliably separate good from bad results, which makes threshold-based filtering unreliable and pollutes the context window.
 
+<!-- blog-only:start -->
+Next: [VectorDB selection criteria](./04-vectordb-selection.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

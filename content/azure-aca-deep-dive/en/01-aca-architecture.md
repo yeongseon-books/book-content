@@ -328,6 +328,10 @@ This chapter mixes Microsoft-documented product behavior with carefully bounded 
 - The exact Kubernetes substrate, cluster topology, and internal object naming inside ACA are not public.
 - The precise private adapter code that translates ACA resources into Envoy, KEDA, or Dapr configuration is not public.
 
+<!-- blog-only:start -->
+Next: [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

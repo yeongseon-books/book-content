@@ -232,6 +232,10 @@ Tracking retrieval and generation metrics separately surfaces bottlenecks fast. 
 
 MRR captures ranking quality: a relevant document at rank 1 scores 1.0; at rank 3 it scores 0.33. When MRR is low, adding a re-ranker after initial retrieval is usually the highest-ROI intervention.
 
+<!-- blog-only:start -->
+Next: [Measuring retrieval performance](./02-retrieval-benchmarking.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

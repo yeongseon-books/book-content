@@ -167,6 +167,10 @@ for i, idx in enumerate(indices[0]):
 
 No single model is best for every scenario. For zero-cost experimentation, start with KoSimCSE or BGE-M3. The next post builds a sentence similarity search system using KoSimCSE, walking through each step from encoding to retrieval.
 
+<!-- blog-only:start -->
+Next: [Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

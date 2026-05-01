@@ -323,6 +323,10 @@ This chapter is mostly about Microsoft-documented product boundaries, with a sma
 **Speculation (ACA-internal, not exposed):**
 - The exact hidden Kubernetes objects, mesh wiring, and control-plane implementation inside an environment are not public.
 
+<!-- blog-only:start -->
+Next: [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

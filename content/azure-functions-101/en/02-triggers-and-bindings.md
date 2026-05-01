@@ -171,6 +171,10 @@ The mental model from the opening chapter becomes much more concrete once you se
 
 ---
 
+<!-- blog-only:start -->
+Next: [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

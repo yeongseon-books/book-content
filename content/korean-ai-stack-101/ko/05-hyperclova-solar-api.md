@@ -245,6 +245,10 @@ print(f"답변:\n{answer}")
 
 HyperCLOVA X와 Solar는 한국어 문화·언어적 맥락에서 더 자연스러운 응답을 생성합니다. Solar는 OpenAI SDK와 완벽히 호환되어 LangChain 코드를 거의 바꾸지 않고 교체할 수 있습니다. 다음 글에서는 지금까지 다룬 KoSimCSE 임베딩, CLOVA OCR, Solar LLM을 모두 조합해 완전한 한국어 RAG 파이프라인을 완성합니다.
 
+<!-- blog-only:start -->
+다음 글: [한국어 RAG 파이프라인 조합하기](./06-korean-rag-pipeline.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

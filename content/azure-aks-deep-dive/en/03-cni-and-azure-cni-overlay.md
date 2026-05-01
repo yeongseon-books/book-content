@@ -94,6 +94,10 @@ Part 2 followed the node-local execution path; this part explains how CNI attach
 - Pod sandbox becomes network-ready with Pod IP attached
 - Pod traffic exits either through VNet-routable pod subnets or through overlay-to-node SNAT depending on the mode
 
+<!-- blog-only:start -->
+Next: [Scheduler and Pod placement — who decides which node](./04-scheduler-and-pod-placement.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

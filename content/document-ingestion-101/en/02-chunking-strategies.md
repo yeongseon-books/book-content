@@ -291,6 +291,10 @@ for chunk in heading_chunks:
 
 Identify the document type before choosing a chunking strategy. Legal documents and FAQs have structural constraints that must be preserved in the chunks — otherwise, retrieved context loses meaning. Technical documentation benefits from code-block-aware separators. The next post covers metadata design: attaching structured metadata to each chunk and using it to filter retrieval results.
 
+<!-- blog-only:start -->
+Next: [Metadata design and filtering](./03-metadata-filtering.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

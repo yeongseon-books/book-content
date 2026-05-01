@@ -88,6 +88,10 @@ Multiple enables canary and blue-green strategies.
 
 ---
 
+<!-- blog-only:start -->
+Next: [Your first deploy — Python/FastAPI](./03-first-deploy.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

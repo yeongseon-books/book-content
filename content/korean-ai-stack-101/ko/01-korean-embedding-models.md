@@ -177,6 +177,10 @@ for i, idx in enumerate(indices[0]):
 
 한국어 임베딩 모델 선택은 요구사항에 따라 달라집니다. 비용 없이 시작하려면 KoSimCSE나 BGE-M3로 충분합니다. 다음 글에서는 KoSimCSE를 실제로 사용해서 문장 유사도 검색 시스템을 만듭니다.
 
+<!-- blog-only:start -->
+다음 글: [KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

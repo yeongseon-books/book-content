@@ -241,6 +241,10 @@ Azure를 쓴다면 'Cost Management' 메뉴에서 예산 알람(Budget Alert)을
 
 ---
 
+
+<!-- blog-only:start -->
+다음 글: [AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법](./07-eval-improve.md)
+<!-- blog-only:end -->
 <!-- toc:begin -->
 ## 시리즈 목차
 

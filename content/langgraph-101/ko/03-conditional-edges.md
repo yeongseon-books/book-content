@@ -202,6 +202,10 @@ if __name__ == "__main__":
 
 루프의 탈출 조건은 두 가지를 동시에 씁니다. 품질 기반 조건("APPROVED")과 횟수 기반 조건(`max_iterations`)을 모두 설정하면 품질이 충족될 때 빠르게 종료하고, 품질이 달성되지 않아도 무한 루프를 막을 수 있습니다.
 
+<!-- blog-only:start -->
+다음 글: [도구 호출 에이전트](./04-tool-calling-agent.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -339,6 +339,10 @@ AKS 101이 control plane과 node pool의 역할 분담을 입문자 관점에서
 - `kube-scheduler`가 `Pod → Node` binding 기록
 - 선택된 노드에서 kubelet과 runtime이 실제 실행 수행
 
+<!-- blog-only:start -->
+다음 글: [kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지](./02-kubelet-and-containerd.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

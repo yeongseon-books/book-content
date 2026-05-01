@@ -251,6 +251,10 @@ startup contract 문제를 훨씬 정확하게 분리할 수 있습니다.
 
 App Service Front-End (ARR) → worker instance → IIS `w3wp.exe` on Windows or container entrypoint on Linux → App Service sandbox or container boundary → user code
 
+<!-- blog-only:start -->
+다음 글: [배포와 Kudu — 빌드·동기화·릴리스의 안쪽](./04-deployment-and-kudu.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

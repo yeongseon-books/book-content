@@ -273,6 +273,10 @@ if __name__ == "__main__":
 
 검색 지표와 생성 지표를 따로 추적하면 병목을 빠르게 찾을 수 있습니다. Precision@K가 낮은데 Faithfulness가 높다면 검색 문제입니다. 반대라면 프롬프트나 모델 문제입니다.
 
+<!-- blog-only:start -->
+다음 글: [검색 성능 측정](./02-retrieval-benchmarking.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

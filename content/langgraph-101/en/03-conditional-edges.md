@@ -184,6 +184,10 @@ Routing functions must be pure: they receive state and return a node name, with 
 
 Always combine a quality-based escape (`"APPROVED"`) with an iteration cap (`max_iterations`). The quality check exits early when the result is good; the cap guarantees termination when it is not.
 
+<!-- blog-only:start -->
+Next: [Tool-calling agents](./04-tool-calling-agent.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

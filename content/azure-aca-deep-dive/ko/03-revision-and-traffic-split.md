@@ -382,6 +382,10 @@ App 설정을 Envoy 설정으로 번역하는 ACA 내부 control-plane 코드는
 **Speculation (ACA-internal, not exposed):**
 - Private translation pipeline, 내부 오브젝트 이름, 실제 Envoy 구성 레이아웃은 공개되지 않았습니다.
 
+<!-- blog-only:start -->
+다음 글: [ACA 안의 KEDA — Scale Rule이 만드는 것](./04-keda-in-aca.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

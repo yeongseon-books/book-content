@@ -221,6 +221,10 @@ def monitor_training(trainer) -> None:
         print(f"검증 손실 개선: {improvement:.4f}")
 ```
 
+<!-- blog-only:start -->
+다음 글: [모델 평가](./05-evaluation.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

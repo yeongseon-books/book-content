@@ -178,6 +178,10 @@ Precision@1 is the user-facing number — it measures whether the first result i
 
 When MRR is low, the retriever finds relevant documents eventually but ranks them poorly. This is a re-ranker problem, not an embedding problem.
 
+<!-- blog-only:start -->
+Next: [Comparing embedding models](./03-embedding-comparison.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

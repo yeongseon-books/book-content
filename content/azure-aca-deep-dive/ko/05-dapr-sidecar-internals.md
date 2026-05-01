@@ -382,6 +382,10 @@ Timeout 분석에서는 이 마지막 구분이 특히 중요합니다.
 **Speculation (ACA-internal, not exposed):**
 - ACA 내부에서 실제로 어떤 admission pipeline, certificate flow, control-plane address가 쓰이는지는 공개되지 않았습니다.
 
+<!-- blog-only:start -->
+다음 글: [Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지](./06-envoy-ingress-path.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

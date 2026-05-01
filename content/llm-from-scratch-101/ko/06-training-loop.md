@@ -189,6 +189,10 @@ torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
 
 이제 가중치는 학습됐습니다. 다음 글에서는 `ckpt.pt`를 불러와 자기회귀 생성 루프를 붙이겠습니다. `ROMEO:` 같은 프롬프트 하나로 TinyShakespeare 모델이 다음 문자를 어떻게 뽑는지 직접 보게 됩니다.
 
+<!-- blog-only:start -->
+다음 글: [샘플링 — 학습된 모델에서 글 뽑아내기](./07-inference.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

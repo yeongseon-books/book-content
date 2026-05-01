@@ -319,6 +319,10 @@ The model in this post stops at the boundary where an external component has alr
 
 ---
 
+<!-- blog-only:start -->
+Next: [Cold Start and Placeholder Mode — What Happens When a New Instance Is Born](./06-cold-start-placeholder.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

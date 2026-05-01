@@ -160,6 +160,10 @@ For those new to this, it's worth noting why we need both `x` and `y`. `x` is th
 
 In the next post, we'll move on to Attention. We'll enable each token to score and decide how much it should focus on other tokens in the sequence. This is where `Q`, `K`, and `V` finally make their appearance.
 
+<!-- blog-only:start -->
+Next: [Deciding Which Tokens to Focus On](./03-attention.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

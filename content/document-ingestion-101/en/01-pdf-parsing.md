@@ -248,6 +248,10 @@ For most RAG pipelines, pymupdf is the right choice: it is fast, preserves readi
 
 The next post covers chunking strategies: finding the optimal chunk size and overlap for different document types.
 
+<!-- blog-only:start -->
+Next: [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

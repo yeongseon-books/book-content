@@ -125,6 +125,10 @@ The earlier chapters established the mental model, triggers, and bindings; this 
 
 ---
 
+<!-- blog-only:start -->
+Next: [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

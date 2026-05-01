@@ -262,6 +262,10 @@ LCEL and the Runnable interface reduce LLM application plumbing to a sequence of
 
 The next post goes deeper into `ChatPromptTemplate` and builds a more realistic chain with system messages, conditional formatting, and output parsing variants.
 
+<!-- blog-only:start -->
+Next: [Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

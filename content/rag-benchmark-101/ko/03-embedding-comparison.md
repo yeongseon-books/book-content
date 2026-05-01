@@ -219,6 +219,10 @@ if __name__ == "__main__":
 
 유사도 분포 분석에서 관련/비관련 문서 간 점수 차이(gap)가 클수록 모델의 변별력이 높습니다. gap이 작으면 임계값 기반 필터링이 어렵고 노이즈가 많은 검색 결과가 나옵니다.
 
+<!-- blog-only:start -->
+다음 글: [VectorDB 선택 기준](./04-vectordb-selection.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

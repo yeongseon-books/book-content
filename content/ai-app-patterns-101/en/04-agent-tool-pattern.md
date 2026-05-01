@@ -217,6 +217,10 @@ The agent pattern extends chain-based LLM apps into systems that can reason acro
 
 The next post covers workflow automation: designing multi-step chains where each stage transforms data and passes it to the next.
 
+<!-- blog-only:start -->
+Next: [Workflow automation — designing multi-step chains](./05-workflow-automation.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

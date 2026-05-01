@@ -162,6 +162,10 @@ If AKS 101 explained the split between the control plane and node pools for firs
 - `kube-scheduler` writes a `Pod → Node` binding
 - kubelet and node-side runtime execute the work on the chosen node
 
+<!-- blog-only:start -->
+Next: [kubelet and containerd — how a container actually starts on a node](./02-kubelet-and-containerd.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

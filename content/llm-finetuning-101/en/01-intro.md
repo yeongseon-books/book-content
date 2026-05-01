@@ -186,6 +186,10 @@ if __name__ == "__main__":
 
 Post 1 (this post) establishes the concepts and environment. Post 2 prepares training data. Post 3 configures the LoRA adapter. Post 4 is the training loop. Post 5 covers evaluation. Post 6 covers serving.
 
+<!-- blog-only:start -->
+Next: [Dataset preparation and preprocessing](./02-dataset.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

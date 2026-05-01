@@ -174,6 +174,10 @@ if __name__ == "__main__":
 
 **Determinism**: tools should return the same output for the same input. Random or time-dependent tools make agent debugging unnecessarily hard.
 
+<!-- blog-only:start -->
+Next: [Multi-agent systems](./05-multi-agent.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

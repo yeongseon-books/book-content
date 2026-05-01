@@ -182,6 +182,10 @@ if __name__ == "__main__":
     print("LoRA adapter saved")
 ```
 
+<!-- blog-only:start -->
+Next: [Training loop and hyperparameters](./04-training.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

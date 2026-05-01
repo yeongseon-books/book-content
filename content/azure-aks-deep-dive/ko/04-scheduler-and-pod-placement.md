@@ -87,6 +87,10 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 - scheduler가 API server에 Binding 기록
 - 선택된 노드의 kubelet이 후속 실행 경로 시작
 
+<!-- blog-only:start -->
+다음 글: [HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프](./05-hpa-and-cluster-autoscaler-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

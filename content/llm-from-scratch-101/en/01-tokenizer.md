@@ -158,6 +158,10 @@ Once you run this script, you'll be able to pull batches from the integer sequen
 
 We have our integer sequences ready. In the next post, we'll assign vector meanings to these cold ID arrays. By combining token embeddings and positional embeddings, we'll create the first input tensor the model will actually read.
 
+<!-- blog-only:start -->
+Next: [From Integers to Vectors and Positions](./02-embedding.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

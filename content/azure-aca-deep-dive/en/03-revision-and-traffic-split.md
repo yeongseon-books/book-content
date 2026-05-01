@@ -381,6 +381,10 @@ This chapter intentionally separates ACA product facts from the hidden routing i
 **Speculation (ACA-internal, not exposed):**
 - The exact private translation pipeline, internal object names, and internal Envoy configuration layout inside ACA are not public.
 
+<!-- blog-only:start -->
+Next: [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

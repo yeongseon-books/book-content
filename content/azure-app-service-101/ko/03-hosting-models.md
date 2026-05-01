@@ -465,6 +465,10 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)](./04-first-deploy.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

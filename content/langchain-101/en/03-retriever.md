@@ -237,6 +237,10 @@ The Retriever interface abstracts whatever search system sits behind it. The `co
 
 The next post covers Tool Calling — how an LLM can call external functions and incorporate their results into its response.
 
+<!-- blog-only:start -->
+Next: [Tool calling — connecting external tools](./04-tool-calling.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

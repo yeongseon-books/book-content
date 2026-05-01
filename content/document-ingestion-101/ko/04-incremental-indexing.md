@@ -271,6 +271,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
 다음 글에서는 PDF 외에 Word, HTML, Markdown 등 다양한 포맷을 처리하는 다중 포맷 파이프라인을 다룹니다.
 
+<!-- blog-only:start -->
+다음 글: [다중 포맷 문서 파이프라인](./05-multi-format-pipeline.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

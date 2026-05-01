@@ -164,6 +164,10 @@ last_reviewed: '2026-04-29'
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법](./02-worker-process.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

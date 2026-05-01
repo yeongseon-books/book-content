@@ -311,6 +311,10 @@ if __name__ == "__main__":
 
 P95/P99는 사용자 경험의 척도입니다. LLM 호출이 평균 1초라도 P99가 8초라면, 100명 중 1명은 매번 8초를 기다립니다.
 
+<!-- blog-only:start -->
+다음 글: [LLM 비용 추적과 최적화](./02-cost-tracking.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

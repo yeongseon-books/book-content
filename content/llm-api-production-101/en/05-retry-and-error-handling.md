@@ -258,6 +258,10 @@ In this post, we used `tenacity`, exponential backoff, and a small error hierarc
 
 Caching reduced repeated work. Retries smooth over temporary failure. The final post steps even further out and looks at the outer constraint around all of this: how to keep request flow inside the provider’s rate limits without turning traffic spikes into outages.
 
+<!-- blog-only:start -->
+Next: [Rate limit management — patterns for staying within limits](./06-rate-limit-management.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

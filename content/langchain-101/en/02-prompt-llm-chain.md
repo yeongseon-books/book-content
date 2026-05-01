@@ -243,6 +243,10 @@ You can now build prompt templates with multiple variables, select the right out
 
 The next post connects a Retriever to a chain and uses retrieved document chunks as context for the LLM.
 
+<!-- blog-only:start -->
+Next: [Retriever — document search and context injection](./03-retriever.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

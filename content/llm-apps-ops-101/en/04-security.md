@@ -214,6 +214,10 @@ Prompt injection cannot be fully prevented with pattern matching alone. Raising 
 
 Apply PII masking to logs as well as prompts. If raw prompts land in your monitoring stack unmasked, your observability system becomes a data exfiltration path.
 
+<!-- blog-only:start -->
+Next: [LLM app deployment strategies](./05-deployment.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

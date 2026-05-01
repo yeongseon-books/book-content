@@ -277,6 +277,10 @@ The chatbot pattern is fundamentally a question of history management. Simple ac
 
 The next post covers the RAG Q&A pattern: retrieving external documents to improve LLM answer accuracy.
 
+<!-- blog-only:start -->
+Next: [RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

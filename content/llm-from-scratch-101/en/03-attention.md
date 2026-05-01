@@ -171,6 +171,10 @@ When training behaves unexpectedly, the cause is often a minor tensor manipulati
 
 Now that our tokens can "see" each other, we'll move on to the next post. We'll add FeedForward, Residual connections, and LayerNorm to complete a full Transformer block—the fundamental unit of depth in our model.
 
+<!-- blog-only:start -->
+Next: [The Transformer Block: A Unit of Depth](./04-transformer-block.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

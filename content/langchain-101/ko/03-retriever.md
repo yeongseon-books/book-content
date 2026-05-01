@@ -239,6 +239,10 @@ Retriever를 만들고 RAG 체인에 연결하는 방법을 익혔습니다. `co
 
 다음 글에서는 Tool Calling을 다룹니다. LLM이 외부 함수를 호출하고 그 결과를 응답에 반영하는 방법입니다.
 
+<!-- blog-only:start -->
+다음 글: [Tool Calling — 외부 도구 연결하기](./04-tool-calling.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

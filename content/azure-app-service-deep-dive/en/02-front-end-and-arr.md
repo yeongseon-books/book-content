@@ -263,6 +263,10 @@ Client → App Service Front-End → host/slot resolution → ARR worker selecti
 
 Slot-swap path: apply target-slot settings to the source slot → warm every source-slot instance → switch Front-End routing rules
 
+<!-- blog-only:start -->
+Next: [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

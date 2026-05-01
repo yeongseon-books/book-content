@@ -386,6 +386,10 @@ The starting point of prompt engineering is not elegant phrasing. It is role-awa
 
 The next post goes deeper into few-shot prompting and chain-of-thought.
 
+<!-- blog-only:start -->
+Next: [Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

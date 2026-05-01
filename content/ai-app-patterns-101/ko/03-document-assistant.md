@@ -280,6 +280,10 @@ for text in texts:
 
 다음 글에서는 Agent + Tool 패턴을 다룹니다. LLM이 자율적으로 도구를 선택하고 실행하는 방법입니다.
 
+<!-- blog-only:start -->
+다음 글: [Agent + Tool 패턴 — 자율 도구 선택](./04-agent-tool-pattern.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

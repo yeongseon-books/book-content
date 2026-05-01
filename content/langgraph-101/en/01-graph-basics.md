@@ -150,6 +150,10 @@ State is the shared memory flowing through the graph. Two decisions matter at de
 
 **Field scope**: only put data in state that another node needs. Keep intermediate results as local variables; write to state only what the next node must see.
 
+<!-- blog-only:start -->
+Next: [State management and checkpoints](./02-state-and-checkpoints.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

@@ -210,6 +210,10 @@ async def stream_chat(message: str, base_url: str = "http://localhost:8000"):
 
 **Graceful shutdown**: the `lifespan` context manager ensures SIGTERM lets in-flight requests complete before the process exits.
 
+<!-- blog-only:start -->
+Next: [Completing the LLM ops pipeline](./06-ops-complete.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

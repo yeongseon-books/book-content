@@ -244,6 +244,10 @@ Incremental indexing is necessary for any service where documents change regular
 
 The next post covers multi-format document pipelines: handling Word documents, HTML pages, and Markdown alongside PDFs.
 
+<!-- blog-only:start -->
+Next: [Multi-format document pipeline](./05-multi-format-pipeline.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

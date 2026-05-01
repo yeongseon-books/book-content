@@ -268,6 +268,10 @@ The tool-calling loop has three moving parts: define tools with `@tool`, connect
 
 The next post covers streaming — receiving LLM output token by token as it is generated.
 
+<!-- blog-only:start -->
+Next: [Streaming — handling real-time output](./05-streaming.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

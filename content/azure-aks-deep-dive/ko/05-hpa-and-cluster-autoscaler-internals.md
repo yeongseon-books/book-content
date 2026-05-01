@@ -91,6 +91,10 @@ AKS 기본값도 같이 기억해 두면 좋습니다. `scan-interval` 기본값
 - Cluster Autoscaler가 이를 감지하고 AKS에 node 추가 요청
 - 새 node가 Ready 되면 scheduler가 Pending Pod binding
 
+<!-- blog-only:start -->
+다음 글: [KEDA 내부 — ScaledObject가 HPA를 만드는 방식](./06-keda-internals.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

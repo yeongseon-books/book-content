@@ -158,6 +158,10 @@ OS 프로세스가 떠 있다고 해서 Worker가 “준비 완료”인 건 아
 
 ---
 
+<!-- blog-only:start -->
+다음 글: [gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가](./03-grpc-event-stream.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

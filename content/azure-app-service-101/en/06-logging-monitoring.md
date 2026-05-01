@@ -468,6 +468,10 @@ Logging and monitoring essentials:
 
 ---
 
+<!-- blog-only:start -->
+Next: [Scaling 101: When to Scale Up vs Scale Out?](./07-scaling-101.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 

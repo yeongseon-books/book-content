@@ -263,6 +263,10 @@ if __name__ == "__main__":
 
 소형 모델로 먼저 처리하고, 복잡한 요청만 대형 모델로 에스컬레이션하는 라우팅 전략도 효과적입니다. `llama-3.1-8b-instant`의 비용은 `llama-3.1-70b-versatile`의 약 10분의 1입니다.
 
+<!-- blog-only:start -->
+다음 글: [LLM 출력 품질 평가](./03-evaluation.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

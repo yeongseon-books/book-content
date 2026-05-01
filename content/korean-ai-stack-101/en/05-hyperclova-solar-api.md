@@ -236,6 +236,10 @@ print(f"answer:\n{answer}")
 
 Both HyperCLOVA X and Solar produce more natural Korean output than general-purpose multilingual models on culturally specific or idiomatically rich content. Solar's complete OpenAI SDK compatibility means you can swap it into any existing LangChain chain by changing two parameters. The next post assembles everything covered in this series — KoSimCSE embeddings, CLOVA OCR, and Solar — into a complete Korean RAG pipeline.
 
+<!-- blog-only:start -->
+Next: [Assembling a Korean RAG pipeline](./06-korean-rag-pipeline.md)
+<!-- blog-only:end -->
+
 <!-- toc:begin -->
 ## In this series
 
