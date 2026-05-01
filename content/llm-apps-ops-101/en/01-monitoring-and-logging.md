@@ -24,7 +24,7 @@ last_reviewed: '2026-05-01'
 The moment you push an LLM app to production, monitoring becomes non-negotiable. Unlike standard web services, LLM apps have response times measured in seconds, token consumption that maps directly to cost, and non-deterministic outputs. This post builds a practical monitoring foundation: structured logs, latency tracking, and token accounting.
 
 ## Example code
-- [GitHub: en/ep01_monitoring_and_logging.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/en/ep01_monitoring_and_logging.py)
+Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
 
 ---
 

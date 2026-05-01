@@ -24,7 +24,7 @@ last_reviewed: '2026-05-01'
 LLM apps pass user input directly to the model, which exposes them to a new class of threats: prompt injection, sensitive data leakage, and output misuse. This post builds a security layer covering input validation, PII masking, output safety filtering, and rate limiting.
 
 ## Example code
-- [GitHub: en/ep04_security.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/en/ep04_security.py)
+Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
 
 ---
 

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-01'
 LLM 앱은 사용자 입력을 그대로 모델에 전달하는 구조이기 때문에 프롬프트 인젝션, 민감 정보 유출, 응답 오용 등 새로운 보안 위협에 노출됩니다. 이 포스트에서는 입력 검증, 민감 정보 마스킹, 출력 안전 필터를 중심으로 LLM 보안 레이어를 구축합니다.
 
 ## 예제 코드
-- [GitHub: ko/ep04_security.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/ko/ep04_security.py)
+예제 코드: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/ko)
 
 ---
 

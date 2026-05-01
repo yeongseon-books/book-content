@@ -24,7 +24,7 @@ last_reviewed: '2026-05-01'
 This post assembles monitoring, cost tracking, quality evaluation, security, and deployment into a single production server. Each layer is independently replaceable; together they form a reliable operational foundation for any LLM app.
 
 ## Example code
-- [GitHub: en/ep06_ops_complete.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/en/ep06_ops_complete.py)
+Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
 
 ---
 

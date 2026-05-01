@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM 앱 기초 시리즈 (6/6)
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/06-streaming-responses)
+예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/06-streaming-responses)
 
 LLM 앱을 처음 붙이면 많은 입문자가 같은 실수를 합니다. 모델 호출을 일반적인 CRUD API처럼 다루는 것입니다. 요청을 보내고, 몇 초 기다린 뒤, 응답 본문 전체를 한 번에 받아 화면에 넣습니다. 기능만 보면 문제없어 보입니다. 실제로 데모도 돌아갑니다. 하지만 사용자가 체감하는 품질은 여기서 크게 갈립니다. 같은 5초라도 아무 변화 없이 멈춰 있는 5초와, 첫 글자가 300ms 안에 나타나고 그 뒤로 답이 계속 이어지는 5초는 완전히 다르게 느껴집니다.
 

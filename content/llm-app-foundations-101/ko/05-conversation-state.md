@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM 앱 기초 시리즈 (5/6)
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/05-conversation-state)
+예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/05-conversation-state)
 
 챗봇 UI를 처음 붙이면 많은 입문자가 같은 장면을 봅니다. 첫 질문에는 잘 답했는데, 두 번째 질문에서 방금 한 말을 잊어버립니다. 사용자는 대화를 이어 간다고 느끼는데 모델은 문맥이 끊긴 듯 반응합니다. 여기서 중요한 사실 하나를 먼저 분명히 해야 합니다. LLM은 기본적으로 상태를 들고 있지 않습니다. 우리가 매번 “대화처럼” 보이게 만들어 주기 때문에 대화가 되는 것입니다.
 

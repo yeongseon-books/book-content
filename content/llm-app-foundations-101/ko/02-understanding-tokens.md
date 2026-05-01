@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM 앱 기초 시리즈 (2/6)
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/02-understanding-tokens)
+예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/02-understanding-tokens)
 
 LLM API를 처음 붙이면 응답 품질에 먼저 눈이 갑니다. 하지만 애플리케이션을 실제로 운영할 때 더 빨리 문제를 일으키는 쪽은 품질보다 예산과 한계입니다. 프롬프트가 조금만 길어져도 응답 속도가 늘어지고, 사용량 로그를 보면 호출마다 비용이 달라지며, 어느 시점부터는 입력이 잘리거나 출력이 중간에서 멈춥니다. 이 세 가지 뒤에는 거의 늘 같은 단위가 있습니다. 토큰입니다.
 

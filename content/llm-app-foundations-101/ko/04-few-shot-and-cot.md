@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM 앱 기초 시리즈 (4/6)
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/04-few-shot-and-cot)
+예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/04-few-shot-and-cot)
 
 이전 글에서는 `system`, `user`, `assistant` 역할을 분리해 프롬프트를 설계하는 기본 구조를 잡았습니다. 그다음 단계에서 바로 부딪히는 질문은 이것입니다. 같은 모델인데도 어떤 요청은 기대한 형식을 잘 따르고, 어떤 요청은 어딘가 비슷하지만 애매하게 빗나갑니다. 이 차이는 모델 자체보다도 모델을 어떻게 유도했는지에서 자주 갈립니다.
 

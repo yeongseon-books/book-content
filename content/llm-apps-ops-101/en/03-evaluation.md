@@ -24,7 +24,7 @@ last_reviewed: '2026-05-01'
 When you swap models or revise a prompt, how do you confirm things actually improved? Manual review works for a handful of examples, but it does not scale to thousands of responses. This post builds an automated evaluation pipeline: LLM-as-judge scoring, factual consistency checks, and format compliance validation.
 
 ## Example code
-- [GitHub: en/ep03_evaluation.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/en/ep03_evaluation.py)
+Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
 
 ---
 

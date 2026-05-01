@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM 앱 기초 시리즈 (1/6)
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/01-llm-api-first-call)
+예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/01-llm-api-first-call)
 
 처음 LLM 앱을 붙일 때 가장 낯선 지점은 모델이 아니라 경계입니다. 브라우저에서 대화창을 열면 마치 똑똑한 프로그램 하나와 바로 연결된 듯 보이지만, 실제로 애플리케이션이 하는 일은 훨씬 단순합니다. HTTP 요청 하나를 보내고 JSON 응답 하나를 받습니다. 그 왕복이 전부입니다. 채팅 UI, 프롬프트 템플릿, 스트리밍, 메모리, RAG는 모두 그 위에 올라가는 두 번째 문제입니다.
 

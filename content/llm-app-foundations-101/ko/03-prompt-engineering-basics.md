@@ -21,7 +21,7 @@ last_reviewed: '2026-04-30'
 
 > LLM 앱 기초 시리즈 (3/6)
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/03-prompt-engineering-basics)
+예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/03-prompt-engineering-basics)
 
 프롬프트 엔지니어링을 처음 접하면 문장을 그럴듯하게 쓰는 기술처럼 보이기 쉽습니다. 실전에서는 조금 다릅니다. 핵심은 말을 예쁘게 다듬는 재주보다 **입력 구조를 분리하고, 모델이 따라야 할 우선순위를 설계하는 일**입니다. 같은 질문이라도 `system`에 무엇을 두는지, `user`에 어떤 맥락을 담는지, 이전 `assistant` 답변을 어떻게 이력으로 넘기는지에 따라 결과가 크게 달라집니다.
 

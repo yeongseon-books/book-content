@@ -24,7 +24,7 @@ last_reviewed: '2026-05-01'
 Moving an LLM app from local to production surfaces three recurring pain points: timeouts, concurrency, and retry handling. This post builds a deployable LLM server with FastAPI, exponential-backoff retries, streaming responses, and health checks.
 
 ## Example code
-- [GitHub: en/ep05_deployment.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/en/ep05_deployment.py)
+Example code: [github.com/yeongseon-books/llm-apps-ops-101](https://github.com/yeongseon-books/llm-apps-ops-101/tree/main/en)
 
 ---
 
