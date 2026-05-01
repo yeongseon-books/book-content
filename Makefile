@@ -14,10 +14,10 @@ finalize:
 
 medium:
 ifndef SERIES
-	$(error SERIES is required: make medium SERIES=langgraph-101)
+	$(error SERIES is required: make medium SERIES=azure-functions-101)
 endif
-	python3 .sisyphus/medium/to-medium.py content/$(SERIES)/en
 	python3 .sisyphus/medium/finalize-posts.py
+	python3 .sisyphus/medium/to-medium.py content/$(SERIES)/en
 
 docs:
 	python3 scripts/build_docs.py
@@ -28,8 +28,13 @@ docs:
 # See EBOOK.md §1.3 for the "always latest" policy.
 
 ebook-upgrade:
+ifdef GH_TOKEN
+	pip install --upgrade --force-reinstall \
+	  "git+https://x-access-token:$(GH_TOKEN)@github.com/yeongseon/mkdocs-ebook.git"
+else
 	pip install --upgrade --force-reinstall \
 	  git+ssh://git@github.com/yeongseon/mkdocs-ebook.git
+endif
 
 ebook-doctor:
 	mkdocs-ebook doctor

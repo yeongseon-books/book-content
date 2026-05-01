@@ -58,7 +58,7 @@ if "repo" not in _meta or "published_ref" not in _meta:
         "into ebook canonical/cross-series URLs.)"
     )
 REPO = _meta["repo"]
-TAG = _meta["published_ref"]
+PUBLISHED_REF = _meta["published_ref"]
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _transform import rewrite_outside_fences, transform_for_ebook
@@ -82,7 +82,7 @@ def rewrite_assets(text: str) -> str:
 
 
 def rewrite_cross_series_links(text: str) -> str:
-    replacement = rf"\1https://github.com/{REPO}/tree/{TAG}/content/\2)"
+    replacement = rf"\1https://github.com/{REPO}/tree/{PUBLISHED_REF}/content/\2)"
     return rewrite_outside_fences(
         text,
         lambda line: CROSS_SERIES_REWRITE_RE.sub(replacement, line),
@@ -212,8 +212,7 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         idx = art["idx"]
         src = series_path / lang / f"{slug}.md"
         if not src.is_file():
-            print(f"  skip ch{idx}: missing {src.relative_to(REPO_ROOT)}")
-            continue
+            raise SystemExit(f"missing chapter source: {src.relative_to(REPO_ROOT)}")
         raw = src.read_text(encoding="utf-8")
         title = article_title(src)
         text = transform_for_ebook(raw)
@@ -223,7 +222,7 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         text = rewrite_cross_series_links(text)
         dst = docs / f"{slug}.md"
         dst.write_text(text, encoding="utf-8")
-        chapters.append({"idx": idx, "title": title, "filename": dst.name})
+        chapters.append({"idx": idx, "title": title, "filename": dst.name, "slug": slug})
 
     asset_src = ASSETS_DIR / series_id
     asset_dst = docs / "assets" / series_id
@@ -233,8 +232,8 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
     title_field = s.get("title", {}).get(lang, series_id)
     desc_field = s.get("description", {}).get(lang, "")
     canonical_links = "\n  ".join(
-        f"- [{c['title']}](https://github.com/{REPO}/blob/{TAG}/{s['path']}/{lang}/{per['articles'][i]['slug']}.md)"
-        for i, c in enumerate(chapters) if i < len(per.get("articles", []))
+        f"- [{c['title']}](https://github.com/{REPO}/blob/{PUBLISHED_REF}/{s['path']}/{lang}/{c['slug']}.md)"
+        for c in chapters
     )
     series_overview = "\n".join(
         f"- {chapter_label(c['idx'], lang)}: {c['title']}" for c in chapters
