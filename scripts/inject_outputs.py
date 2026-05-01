@@ -121,15 +121,19 @@ def run_block(code: str, lang: str) -> str | None:
 
 
 def _sanitize_output(text: str) -> str:
+    """Convert ALL fence markers (``` or ~~~) to 4-space-indented lines.
+
+    This is intentionally unconditional — we don't track open/close state
+    because LLM responses may contain an odd number of fences, which would
+    corrupt stateful toggling.  The output block is wrapped in ~~~ by the
+    caller, so any inner ``` or ~~~ must be indented to avoid breaking the
+    outer fence.
+    """
     lines = text.splitlines()
     result = []
-    in_fence = False
     for line in lines:
         stripped = line.lstrip()
         if stripped.startswith("```") or stripped.startswith("~~~"):
-            in_fence = not in_fence
-            result.append("    " + line)
-        elif in_fence:
             result.append("    " + line)
         else:
             result.append(line)

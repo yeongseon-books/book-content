@@ -141,6 +141,7 @@ print(f"API key loaded: {api_key[:6]}...")
 Output
 API key loaded: gsk_Z2...
 ~~~
+
 You would not print the full key in a real application. A short prefix is enough for local verification.
 
 ---
@@ -193,8 +194,9 @@ print(completion.choices[0].message.content)
 
 ~~~
 Output
-Python list comprehensions are a concise way to create lists from existing lists or other iterables by applying a transformation or filtering function to each element. They consist of brackets containing the expression, which is executed for each element in the input iterable, and can also include conditional statements to filter the output. The basic syntax is: `[expression for element in iterable (if condition)]`, where `expression` is the operation performed on each element, `element` is the variable representing each element in the iterable, `iterable` is the input list or other iterable, and `condition` is an optional condition to apply to each element. For example, `numbers = [x for x in range(10) if x % 2 == 0]` creates a list of even numbers from 0 to 9.
+Python list comprehensions are a powerful feature that allows you to create new lists in a concise and readable manner. They consist of brackets containing the expression, which is executed for each element, along with the 'for' loop to specify the input iterable and the 'if' clause to filter the elements. The general syntax is: `[expression for element in iterable if condition]`, where 'expression' is the operation performed on each 'element' from the 'iterable', and 'condition' is an optional filter applied to the result. For example, `[x**2 for x in range(10) if x % 2 == 0]` creates a new list containing the squares of even numbers from 0 to 9. List comprehensions provide a compact way to manipulate data and are often used for tasks such as filtering, sorting, and transforming data.
 ~~~
+
 Three lines matter most.
 
 `Groq(...)` creates the client object that will talk to the API.
@@ -237,39 +239,40 @@ print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
 ~~~
 Output
 {
-  "id": "chatcmpl-5850ff58-edee-4ee0-a1f8-6830d809d528",
+  "id": "chatcmpl-315171e7-e2ec-4bb3-8e24-d9eb6ef54e57",
   "choices": [
     {
       "finish_reason": "stop",
       "index": 0,
       "logprobs": null,
       "message": {
-        "content": "An HTTP API is a web-based interface that allows different systems to communicate with each other using standardized HTTP requests and responses, whereas an SDK (Software Development Kit) is a set of pre-written code libraries or tools that enable developers to integrate a specific service or product into their own applications. HTTP APIs typically provide access to data or functionality through a standardized interface, whereas SDKs provide a more comprehensive set of features, including error handling, caching, and other utilities. In general, HTTP APIs are intended for programmatic access, while SDKs are designed for developers to build native integrations.",
+        "content": "An HTTP API is a remote service that exposes endpoints for sending and receiving data over the web using HTTP protocols. It typically requires clients to manually construct and send HTTP requests, parse responses, and handle errors, making it a more low-level interface. \n\nOn the other hand, an SDK (Software Development Kit) is a pre-built library or framework that provides a higher-level abstraction for interacting with a service or API, allowing developers to write more code in their chosen programming language, with less manual HTTP request management.",
         "role": "assistant"
       }
     }
   ],
-  "created": 1777646404,
+  "created": 1777647296,
   "model": "llama-3.1-8b-instant",
   "object": "chat.completion",
   "service_tier": "on_demand",
   "system_fingerprint": "fp_7ccc667439",
   "usage": {
-    "completion_tokens": 118,
+    "completion_tokens": 103,
     "prompt_tokens": 50,
-    "total_tokens": 168,
-    "completion_time": 0.186925794,
-    "prompt_time": 0.002393872,
-    "queue_time": 0.006974312,
-    "total_time": 0.189319666
+    "total_tokens": 153,
+    "completion_time": 0.199277411,
+    "prompt_time": 0.002788606,
+    "queue_time": 0.007095763,
+    "total_time": 0.202066017
   },
   "usage_breakdown": null,
   "x_groq": {
-    "id": "req_01kqhzq0g9ergv3qy2spemmd0n",
-    "seed": 855522485
+    "id": "req_01kqj0j86rf7rr6s9538vfmav7",
+    "seed": 512895673
   }
 }
 ~~~
+
 When you look through that output, pay attention to three fields first.
 
 ### `choices[0].message.content`
@@ -364,8 +367,9 @@ print(completion.choices[0].message.content)
 
 ~~~
 Output
-Asynchronous programming is a paradigm that allows multiple tasks to run concurrently without blocking each other. Instead of executing tasks sequentially, where one task finishes before the next begins, asynchronous programming enables tasks to run in parallel, improving overall system performance and responsiveness. This is achieved through the use of non-blocking calls, callbacks, or promises, which notify the program when a task is completed. As a result, the program can continue to execute other tasks while waiting for the result of a particular task, making it ideal for handling time-consuming operations, such as I/O operations, network requests, or long-running computations, without freezing the application. By leveraging asynchronous programming, developers can write more efficient, scalable, and responsive code for modern applications that require real-time performance.
+Asynchronous programming is a technique used in software development where certain operations are executed in the background without blocking the main thread of execution. This allows the program to continue running without waiting for the completion of a specific task, improving overall responsiveness and efficiency. Asynchronous code is typically written using callback functions, promises, or async/await syntax, which enables the program to proceed with other tasks while waiting for the completion of a time-consuming operation, such as I/O operations (e.g., reading from a file or database), network requests, or computations that may take a long time to complete. By utilizing concurrency and non-blocking I/O, asynchronous programming enables the development of scalable, high-performance applications that can handle multiple tasks simultaneously.
 ~~~
+
 And here is the async version. This block is also executable on its own.
 
 ```python
@@ -394,111 +398,68 @@ asyncio.run(main())
 
 ~~~
 Output
-**Using asyncio for Concurrent Networking**
-=====================================================
+**Asynchronous Programming with asyncio**
 
-Situation 1: Simultaneous Networking Request
+Asynchronous programming allows for non-blocking I/O operations, leading to efficient use of system resources and improved responsiveness in applications. `asyncio` in Python is a built-in module that simplifies asynchronous programming and makes it easier to write concurrent code.
 
-asyncio is useful when you need to send multiple requests concurrently over the network. For example:
+### Situation 1: Making API Calls
 
-### Example Code
+Imagine you're building a web scraper that needs to fetch data from multiple APIs concurrently. You can use `asyncio` to make simultaneous requests to each API endpoint and then wait for all responses.
+
     ```python
-    import asyncio
-    import aiohttp
-    
-    async def fetch_page(session, url):
-        async with session.get(url) as response:
-            return await response.text()
-    
-    async def main():
-        urls = ['https://www.example.com/page1', 'https://www.example.com/page2', 'https://www.example.com/page3']
-        async with aiohttp.ClientSession() as session:
-            tasks = [fetch_page(session, url) for url in urls]
-            pages = await asyncio.gather(*tasks)
-            for page in pages:
-                print(page)
-    
-    asyncio.run(main())
-    ```
+import asyncio
 
-In this example, we use `aiohttp` to send multiple requests concurrently, and then wait for all responses using `asyncio.gather`.
-
-**Using asyncio for CPU-bound Tasks**
-=====================================
-
-Situation 2: Concurrent Data Processing
-
-asyncio is also useful when you have many CPU-bound tasks that you need to process concurrently. For example, let's say you need to process a large dataset of numbers by squaring each number.
-
-### Example Code
-    ```python
-    import asyncio
-    import concurrent.futures
-    
-    def square(x):
-        return x ** 2
-    
-    async def process_data(data):
-        loop = asyncio.get_running_loop()
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            tasks = [loop.run_in_executor(executor, square, x) for x in data]
-            results = await asyncio.gather(*tasks)
-            print(results)
-    
-    data = list(range(1000000))
-    asyncio.run(process_data(data))
-    ```
-
-In this example, we use `concurrent.futures` to run the CPU-bound task `square` on multiple threads concurrently. Note that the actual benefit of using asyncio for CPU-bound tasks is limited because asyncio is best suited for I/O-bound operations. However, it can still be useful in situations where you need to process data in parallel.
-~~~import asyncio
-import aiohttp
-
-async def fetch_page(session, url):
-    async with session.get(url) as response:
-        return await response.text()
+async def fetch_data(url):
+    # Simulate a network delay using async.sleep()
+    await asyncio.sleep(2)
+    return f"Fetched data from {url}"
 
 async def main():
-    urls = ["http://example.com/page1", "http://example.com/page2", "http://example.com/page3"]
-    async with aiohttp.ClientSession() as session:
-        tasks = [fetch_page(session, url) for url in urls]
-        pages = await asyncio.gather(*tasks)
-        for page in pages:
-            print(page)
+    # Create a list of URLs to fetch data from
+    urls = ["https://api1.com", "https://api2.com", "https://api3.com"]
+
+    # Use asyncio.gather() to run fetch_data() concurrently for each URL
+    tasks = [fetch_data(url) for url in urls]
+    results = await asyncio.gather(*tasks)
+
+    # Print the results
+    for result in results:
+        print(result)
 
 asyncio.run(main())
-```
+    ```
 
-In this example, asyncio is used to make multiple network requests concurrently, improving the overall response time.
+### Situation 2: Handling Multiple Database Queries
 
-### Situation 2: Real-time event-driven systems
+Suppose you're building a database-driven application that needs to execute multiple queries on different tables concurrently. You can use `asyncio` to create a task for each query and wait for all tasks to complete.
 
-Real-time event-driven systems, such as live updates, gaming, or interactive chat applications, rely heavily on asyncio for efficient and non-blocking handling of events.
-
-Example (a simple interactive game):
-
-```python
+    ```python
 import asyncio
-import random
+import sqlite3
 
-class Game:
-    def __init__(self):
-        self.score = 0
-        self.is_game_over = False
+async def execute_query(db, query):
+    # Simulate a database query using async.sleep()
+    await asyncio.sleep(2)
+    return f"Query executed on {db}"
 
-    async def play(self):
-        while not self.is_game_over:
-            choice = input("Enter a number (1/2) or 'exit' to quit: ")
-            if choice.lower() == "exit":
-                self.is_game_over = True
-            else:
-                try:
-                    choice = int(choice)
-                    if random.random() < 0.8:
-                        self.score += choice
-                        print(f"You gained {choice} points!")
-                    else:
+async def main():
+    # Connect to the database
+    conn = sqlite3.connect(":memory:")
+    db = conn.cursor()
+
+    # Create a list of queries to execute
+    queries = ["SELECT * FROM table1", "SELECT * FROM table2", "SELECT * FROM table3"]
+
+    # Use asyncio.gather() to run execute_query() concurrently for each query
+    tasks = [execute_query(db, query) for query in queries]
+    results = await asyncio.gather(*tasks)
+
+    # Print the results
+    for result in results:
+        print(result)
+
 ... (truncated)
-```
+~~~
 
 The structure barely changes. Replace `Groq` with `AsyncGroq`, add `await`, and run the top-level coroutine with `asyncio.run()`.
 
@@ -531,60 +492,72 @@ async def main() -> None:
         print(f"[{index}] {answer}\n")
 
 asyncio.run(main())
-```python
-my_list = [1, 2, 3, 4, 5]
-my_list[0] = 10  # Modifying an element
-my_list.append(6)  # Adding an element
-print(my_list)  # Output: [10, 2, 3, 4, 5, 6]
-```
-
-### Tuples
-
-*   **Immutable**: Tuples are immutable, meaning their contents cannot be modified after creation. Attempting to modify a tuple will result in a `TypeError`.
-*   **Indexed**: Like lists, tuples are also indexed, allowing you to access specific elements by their index.
-*   **Fixed Length**: Tuples have a fixed length, which is determined when the tuple is created.
-*   **Common Usage**: Tuples are ideal for storing collections of data where the order matters and elements will not change.
-
-**Example:**
-```python
-my_tuple = (1, 2, 3, 4, 5)
-try:
-    my_tuple[0] = 10  # Attempting to modify a tuple
-except TypeError as e:
-    print(e)  # Output: 'tuple' object does not support item assignment
 ```
 
 ~~~
 Output
-'tuple' object does not support item assignment
-~~~
-**In Summary**
+[1] In Python, both lists and tuples are used to store a collection of items, but they are implemented differently and provide different functionality.
 
-Lists are mutable, indexed, and can be of any length, making them ideal for scenarios where data needs to be modified or added frequently. Tuples, on the other hand, are immutable, indexed, and have a fixed length, making them suitable for storing collections of data where the order matters, but elements will not change.
+**Lists:**
 
-**Choosing between Lists and Tuples**
+Lists are ordered collections of items, which can be of any data type, including strings, integers, floats, and other lists. Lists are denoted by square brackets `[]` and are mutable, meaning their contents can be modified after creation.
 
-When deciding between a list and a tuple, consider the following:
+Here are some key characteristics of lists:
 
-1.  If the data needs to be modified or added frequently, use a `list`.
-2.  If the data will remain constant, use a `tuple`.
-3.  If you need to return a value and cannot modify it, consider using a tuple.
+*   Ordered: The elements in a list have a specific order and can be accessed by their index position.
+*   Mutable: Lists can be modified after creation by adding, removing, or modifying their elements.
+*   Dynamic: The size of a list can be increased or decreased dynamically.
 
-Remember that in Python, `list` is generally preferred over `tuple` when dynamic data structures are required, but `tuple` is recommended when static data structures are sufficient.
+**Tuples:**
 
-[2] **Key Property of a Python Dictionary**
-======================================
+Tuples are also ordered collections of items, but unlike lists, they are immutable, meaning their contents cannot be modified after creation. Tuples are denoted by parentheses `()`.
 
-In Python, a dictionary is a mutable data type that stores a collection of key-value pairs. The key property of a Python dictionary is that it uses **keys**, which are immutable objects such as strings, integers, tuples, or frozensets, to store and retrieve values.
+Here are some key characteristics of tuples:
 
-**Characteristics of Key Property**
+*   Ordered: The elements in a tuple have a specific order and can be accessed by their index position.
+*   Immutable: Tuples cannot be modified after creation by adding, removing, or modifying their elements.
+*   Dynamic: The size of a tuple can be determined at creation time and cannot be changed.
 
-1. **Immutability**: Dictionary keys must be immutable, i.e., they cannot be changed after creation. This ensures that keys are unique and can be used for efficient lookup.
-2. **Uniqueness**: Each key must be unique within a dictionary. If you try to use a duplicate key, the old key-value pair will be overwritten.
-3. **Hashability**: Dictionary keys must be hashable, meaning that they must have a hash value that can be used to compute the index of the key in a dictionary.
+**Key differences:**
 
+1.  **Immutability**: The most significant difference between lists and tuples is that lists are mutable, while tuples are immutable.
+2.  **Performance**: Tuples are generally faster and more memory-efficient than lists because they cannot be modified.
+3.  **Function call arguments**: Tuples can be used as function call arguments, but lists cannot.
+4.  **Return values**: Tuples can be returned from functions, and they provide an easy way to group multiple return values.
+
+**Example:**
+
+    ```python
+# Create a list
+my_list = [1, 2, 3, 4, 5]
+print(my_list)  # Output: [1, 2, 3, 4, 5]
+
+# Modify the list
+my_list.append(6)
+print(my_list)  # Output: [1, 2, 3, 4, 5, 6]
+
+# Create a tuple
+my_tuple = (1, 2, 3, 4, 5)
+print(my_tuple)  # Output: (1, 2, 3, 4, 5)
+
+# Try to modify the tuple (this will result in an error)
+try:
+    my_tuple[0] = 10
+except TypeError:
+    print("Error: Tuples are immutable.")
+
+    ```
+
+In summary, while both lists and tuples can be used to store collections of items in Python, lists are mutable, while tuples are immutable. The choice between a list and a tuple depends on whether you need to modify the contents of the collection after its creation.
+
+[2] **Key Properties of Python Dictionaries**
+
+In Python, a dictionary is an unordered collection of key-value pairs. The key properties of a Python dictionary are:
+
+1. **Uniqueness**: Each key in a dictionary must be unique. If you try to assign a key that already exists in the dictionary, its associated value will be overwritten.
+2. **Hashable**: Keys of a dictionary must be hashable, which means they must be immutable and have a unique hash value. This allows the dictionary to efficiently store and retrieve key-value pairs.
 ... (truncated)
-```
+~~~
 
 This is where async becomes a design choice. Once several requests are in flight, you also need to think about rate limits, retries, backoff, and timeouts.
 
@@ -638,28 +611,26 @@ if __name__ == "__main__":
 ~~~
 Output
 === answer ===
-In Python, a function is a self-contained block of code that can be executed independently, while a method is a function that belongs to a class and is used to perform an operation on a specific object. Functions do not require a specific class or object to be used, whereas methods always operate on an instance of a class. This fundamental difference between functions and methods affects their usage and behavior. 
+In Python, a function is a standalone block of code that can be called multiple times from various parts of a program. A method, on the other hand, is a function that belongs to a class or object. 
+Methods operate on the state of the object they belong to, whereas functions do not. 
+Here's an example of the difference: 
 
-For instance: `str.upper()` is a method, whereas `sum([1, 2, 3])` is a function.
+    ```python
+# Function: can be called standalone
+def greet(name): return "Hello, " + name
 
-=== metadata ===
-model: llama-3.1-8b-instant
-prompt_tokens: 67
-completion_tokens: 108
-total_tokens: 175
-~~~class MyClass:
-    def greet(self):
-        print("Hello, World!")
-```
-
-In this example, `greet` is a method of the `MyClass` class.
+# Method: part of a class
+class Person: 
+    def __init__(self, name): self.name = name
+    def greet(self): return "Hello, " + self.name
+    ```
 
 === metadata ===
 model: llama-3.1-8b-instant
 prompt_tokens: 67
-completion_tokens: 130
-total_tokens: 197
-```
+completion_tokens: 136
+total_tokens: 203
+~~~
 
 If you save it as `first_call.py`, run it with:
 
