@@ -19,7 +19,7 @@ last_reviewed: '2026-04-29'
 
 # Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
 
-The deployment chapter created the app on Flex Consumption because that is the current default candidate for new serverless work. Classic Consumption still matters historically and operationally, but in current Microsoft Learn guidance **it is a legacy plan**, while **Flex Consumption is the default serverless recommendation for new apps**.
+The deployment chapter created the app on Flex Consumption because that is the current default candidate for new serverless work. Classic Consumption still matters historically and operationally, but current Microsoft Learn guidance recommends **evaluating Flex Consumption first for new serverless apps**.
 
 That does not make Consumption irrelevant. You still need to understand all four hosting models to make a sound decision. This chapter covers **Consumption / Flex Consumption / Premium / Dedicated (App Service Plan)** side by side, with the current caveats left intact.
 
@@ -31,7 +31,7 @@ The goal is simple: **understand what each plan gives you, what it constrains, a
 
 | Plan | One-line definition |
 |---|---|
-| **Consumption** | The simplest pay-per-use serverless plan. Today it is a legacy option and should be treated as Windows-first. |
+| **Consumption** | The simplest pay-per-use serverless plan. An older path, and Windows-first in practice. |
 | **Flex Consumption** | Microsoft's recommended Linux-based pay-per-use plan for new serverless apps, with VNet support, selectable memory, and per-function scaling. |
 | **Premium** | A higher-end plan that reduces or avoids cold starts through Always Ready and prewarmed capacity, with VNet support and larger SKUs. |
 | **Dedicated (App Service Plan)** | Functions running on regular App Service infrastructure, where scaling is managed through App Service rules instead of event-driven platform scaling. |
@@ -51,11 +51,11 @@ Now put the differences on one table.
 
 | Feature | Consumption | Flex Consumption | Premium | Dedicated |
 |---|---|---|---|---|
-| **Current status** | Legacy | Default serverless recommendation | Advanced serverless | App Service family |
+| **Current status** | Older path | Default serverless recommendation | Advanced serverless | App Service family |
 | **Billing model** | Execution-based pay-per-use | Execution-based pay-per-use, plus Always Ready capacity if enabled | Instance time and provisioned capacity | App Service Plan SKU |
 | **Cost at zero traffic** | 0 | 0 if Always Ready stays at 0 | Minimum instance cost remains | Always billed |
 | **Cold starts** | Present | Reduced when needed via Always Ready | Usually avoidable | Effectively absent when always running |
-| **OS** | Windows legacy; Linux Consumption retired/retiring | Linux only | Windows / Linux | Windows / Linux |
+| **OS** | Windows-first; Linux Consumption availability varies by region | Linux only | Windows / Linux | Windows / Linux |
 | **VNet integration** | No | Yes | Yes | Yes |
 | **Max instances** | Roughly 200; lower in some OS and platform cases | Up to 1000, subject to regional 250-core default quota | Roughly 20-100+, depending on OS, region, and restrictions | Defined by App Service Plan SKU and autoscale rules |
 | **Event-driven autoscale** | Yes (event-driven) | Yes (per-function, target-based) | Yes (target-based optional) | Manual via App Service autoscale rules |
@@ -70,7 +70,7 @@ When you read the table, the three columns that eliminate options fastest are us
 
 ---
 
-## Consumption — still the simplest, now clearly legacy
+## Consumption — still the simplest, but no longer the default starting point
 
 Consumption is still easy to explain. No traffic means no bill, and the setup path is simple. The problem is that it is no longer the default answer for a new serverless app.
 
@@ -86,10 +86,10 @@ Consumption is still easy to explain. No traffic means no bill, and the setup pa
 - Cold starts
 - No VNet integration
 - Fixed 1.5 GB memory
-- Long-term risk from being a legacy plan
-- Linux Consumption is already retired or retiring, so it is not a stable target for new architecture decisions
+- Long-term migration risk if Microsoft guidance continues shifting away from this plan
+- Linux Consumption availability varies by region, making it a less stable target for new architecture decisions
 
-That is why the deployment chapter treated Consumption only as a legacy path note. For a fresh production design, the case for starting here is much weaker than it used to be.
+That is why the deployment chapter included Consumption only as a reference path for those with specific constraints. For a new production design, start with Flex unless a concrete requirement points elsewhere.
 
 ---
 

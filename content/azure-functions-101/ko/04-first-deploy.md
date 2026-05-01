@@ -101,7 +101,8 @@ def hello(req: func.HttpRequest) -> func.HttpResponse:
     name = req.params.get("name")
 
     if not name:
-        name = req.get_body().decode("utf-8") if req.get_body() else "world"
+        body = req.get_body()
+        name = body.decode("utf-8") if body else "world"
 
     return func.HttpResponse(f"Hello, {name}!")
 ```
@@ -180,6 +181,8 @@ az functionapp create \
 마지막 명령이 끝나면 Azure 포털에서 Function App이 보입니다. 아직 코드만 배포하지 않았을 뿐, 새 서버리스 앱의 기본 후보에 맞는 실행 자리는 준비된 상태입니다.
 
 `az functionapp create` 옵션은 플랜별로 다릅니다. Flex에서는 `--flexconsumption-location`이 핵심이고, 여기에 런타임·Functions 버전·스토리지 계정·선택적인 용량 상한을 함께 넘깁니다. `--instance-memory 2048`은 Python에서 import 비용과 일반적인 SDK 사용을 감안할 때 무난한 시작점입니다.
+
+> 이 예제는 Azure CLI 최신 버전을 전제로 합니다. `az functionapp create -h`에서 `--flexconsumption-location`, `--instance-memory`, `--maximum-instance-count` 옵션이 보이지 않으면 `az upgrade`로 Azure CLI를 업데이트하세요.
 
 이렇게 만들면 새 서버리스 앱이 가장 먼저 검토해야 할 형태로 Azure 쪽 골격이 만들어집니다.
 

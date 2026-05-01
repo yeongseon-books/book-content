@@ -438,9 +438,7 @@ curl "$APP_URL/"
 az webapp log config \
   --resource-group $RG \
   --name $APP_NAME \
-  --application-logging filesystem \
-  --docker-container-logging filesystem \
-  --level information
+  --docker-container-logging filesystem
 ```
 
 그다음 실시간 로그를 봅니다.

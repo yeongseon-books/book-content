@@ -309,8 +309,7 @@ curl $APP_URL/
 az webapp log config \
  --resource-group $RG \
  --name $APP_NAME \
- --application-logging filesystem \
- --level information
+ --docker-container-logging filesystem
 ```
 
 ### Real-time Log Stream

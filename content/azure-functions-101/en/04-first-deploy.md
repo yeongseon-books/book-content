@@ -101,7 +101,8 @@ def hello(req: func.HttpRequest) -> func.HttpResponse:
     name = req.params.get("name")
 
     if not name:
-        name = req.get_body().decode("utf-8") if req.get_body() else "world"
+        body = req.get_body()
+        name = body.decode("utf-8") if body else "world"
 
     return func.HttpResponse(f"Hello, {name}!")
 ```
@@ -180,6 +181,8 @@ az functionapp create \
 When the last command finishes, the Function App exists in Azure. The compute target is ready; the code just is not deployed yet.
 
 The `az functionapp create` shape changes by hosting plan. For Flex, the key switch is `--flexconsumption-location`; from there you add the same runtime, Functions version, storage account, and optional sizing limits you want the app to start with. `--instance-memory 2048` is a practical default for Python because it leaves room for imports and common SDKs without immediately jumping to the largest size.
+
+> This example assumes the latest Azure CLI version. If `--flexconsumption-location`, `--instance-memory`, or `--maximum-instance-count` do not appear in `az functionapp create -h`, run `az upgrade` to update the CLI.
 
 When that command finishes, the Azure-side skeleton is ready in the shape most new serverless apps should start from.
 
