@@ -41,7 +41,12 @@ last_reviewed: '2026-04-30'
 
 가장 흔한 생성 경로는 `PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)`입니다. 구현은 생각보다 짧습니다. 먼저 `get_template_variables(template, template_format)`로 템플릿 안의 변수 이름을 뽑아 냅니다. 그다음 `partial_variables`에 이미 들어 있는 이름을 제외한 뒤 `PromptTemplate(...)`를 생성합니다. 그런데 여기서 끝이 아닙니다. `prompt.py`와 `base.py`의 validator가 두 가지를 더 강제합니다. 첫째, `stop`이라는 이름은 입력 변수나 partial 변수로 쓸 수 없습니다. 내부 예약 이름이기 때문입니다. 둘째, `input_variables`와 `partial_variables`가 겹치면 예외를 냅니다. LangChain은 변수 바인딩을 느슨한 문자열 치환이 아니라, 충돌을 미리 막아야 하는 계약으로 취급하는 셈입니다.
 
-실제 포맷팅 경로도 소스에 선명하게 드러납니다. `PromptTemplate.format(**kwargs)`는 먼저 `_merge_partial_and_user_variables(**kwargs)`를 호출합니다. 이 단계에서 미리 바인딩된 partial 값과 호출 시점의 입력이 합쳐지고, callable partial이 있다면 여기서 평가됩니다. 그다음에야 `DEFAULT_FORMATTER_MAPPING[self.template_format](self.template, **kwargs)`가 실행됩니다. 기본 `f-string`이면 우리가 익숙한 변수 치환이고, 0.2.17은 `mustache`와 `jinja2`도 지원합니다. 다만 소스 주석이 분명히 경고하듯, `jinja2`는 sandbox가 best effort 수준일 뿐이라 신뢰할 수 없는 템플릿을 받아서는 안 됩니다.
+실제 포맷팅 경로도 소스에 선명하게 드러납니다. `PromptTemplate.format(**kwargs)`는 먼저 `_merge_partial_and_user_variables(**kwargs)`를 호출합니다. 이 단계에서 미리 바인딩된 partial 값과 호출 시점의 입력이 합쳐지고, callable partial이 있다면 여기서 평가됩니다. 그다음에야 아래 호출이 실행됩니다.
+
+```python
+DEFAULT_FORMATTER_MAPPING[self.template_format](self.template, **kwargs)
+```
+ 기본 `f-string`이면 우리가 익숙한 변수 치환이고, 0.2.17은 `mustache`와 `jinja2`도 지원합니다. 다만 소스 주석이 분명히 경고하듯, `jinja2`는 sandbox가 best effort 수준일 뿐이라 신뢰할 수 없는 템플릿을 받아서는 안 됩니다.
 
 `format_prompt()`는 한 단계를 더 올립니다. `StringPromptTemplate.format_prompt(**kwargs)`는 결국 `StringPromptValue(text=self.format(**kwargs))`를 반환합니다. 얼핏 사소해 보여도, LCEL 맥락에서는 이 차이가 중요합니다. 결과가 단순 문자열이 아니라 `PromptValue`이기 때문에, 다음 단계가 completion 모델인지 chat 모델인지에 따라 적절한 입력 형태로 다시 해석될 수 있기 때문입니다.
 

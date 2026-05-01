@@ -212,6 +212,29 @@ python3 .sisyphus/medium/finalize-posts.py    # re-apply tags+TOC to new medium/
 
 All finalizers are idempotent. Re-run any time the series catalog changes.
 
+## Korean naturalization agent rule
+
+When drafting or editing any `ko/*.md` post, run all Korean text through a naturalization pass before committing. The goal is to strip AI-generated phrasing and restore a natural senior-engineer voice.
+
+Prompt to apply (ChatGPT Project / Claude Project / Gemini Gem — set this as the system instruction):
+
+```
+아래 글을 자연스러운 한국어로 다듬어줘.
+
+조건:
+- AI가 쓴 것 같은 표현을 줄일 것
+- 번역투를 제거할 것
+- 문장은 너무 딱딱하지 않게 할 것
+- 의미는 바꾸지 말 것
+- 기술 용어는 유지할 것
+- 과장된 표현은 줄일 것
+- 블로그 독자가 읽기 쉽게 바꿀 것
+```
+
+Recommended setup: create a dedicated "한국어 글 자연화" agent in your preferred LLM platform (ChatGPT Project, Claude Project, or Gemini Gem) with the prompt above pinned as the system instruction. Paste draft sections in, copy the output back.
+
+This pass is in addition to the existing `check-ko.sh` gate (which catches grep-detectable S1 patterns automatically). The naturalization agent handles subtler stylistic issues that static checks cannot flag.
+
 ## When adding a new post
 
 1. Write `ko/<NN>-<slug>.md` and `en/<NN>-<slug>.md` (full body, references included)
