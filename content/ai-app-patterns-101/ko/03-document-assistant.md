@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > AI 앱 패턴 101 시리즈 (3/6)
 
+예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/03-document-assistant)
+
 문서 어시스턴트는 입력 문서를 받아 특정 작업을 수행하는 패턴입니다. 긴 문서를 요약하거나, 구조화된 정보를 추출하거나, 문서를 분류하는 작업에서 LLM은 큰 힘을 발휘합니다. 이 패턴은 챗봇이나 RAG와 달리 대화가 없고, 문서 자체가 입력입니다.
 
 이번 글에서는 세 가지 문서 처리 패턴을 다룹니다.

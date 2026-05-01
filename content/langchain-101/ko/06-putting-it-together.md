@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 시리즈 (6/6)
 
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/06-putting-it-together)
+
 지금까지 LCEL, 프롬프트, Retriever, Tool Calling, Streaming을 각각 다뤘습니다. 마지막 글에서는 이 컴포넌트들을 하나의 실행 가능한 앱으로 조립합니다. 문서를 인덱싱하고, 쿼리로 검색하고, LLM이 답변을 생성하고, 결과를 스트리밍으로 출력하는 전체 흐름입니다.
 
 다룰 내용은 다음과 같습니다.

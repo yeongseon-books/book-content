@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 (1/6)
 
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/01-lcel-runnable-basics)
+
 LangChain throws a lot of terminology at you before the code makes sense: LCEL, Runnable, Chain, Pipe. This post cuts through that by focusing on what LCEL (LangChain Expression Language) and the Runnable interface actually are and why the library is structured around them.
 
 This series covers LangChain as an API — how to use its components. Application-level patterns such as chatbots, RAG, and agents are in a separate series (ai-app-patterns-101).

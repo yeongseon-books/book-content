@@ -23,6 +23,9 @@ last_reviewed: '2026-05-01'
 
 LLM 앱을 로컬에서 프로덕션으로 올릴 때 가장 자주 마주치는 문제는 타임아웃, 동시성, 재시도 처리입니다. 이 포스트에서는 FastAPI 기반 서버, 연결 풀링, 재시도 로직, 헬스체크를 갖춘 배포 가능한 LLM 서버를 구축합니다.
 
+## 예제 코드
+- [GitHub: ko/ep05_deployment.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/ko/ep05_deployment.py)
+
 ---
 
 ## 배포 구조 개요

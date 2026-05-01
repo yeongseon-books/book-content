@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > AI 앱 패턴 101 시리즈 (1/6)
 
+예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/01-chatbot-pattern)
+
 LLM API는 무상태(stateless)입니다. 요청마다 독립적으로 처리하므로, 이전 대화를 기억하려면 앱이 직접 이력을 관리해야 합니다. 챗봇 패턴의 핵심은 대화 이력을 어떻게 관리하고, 얼마나 보존하고, 언제 요약할 것인가입니다.
 
 이번 글에서는 가장 기본적인 챗봇부터 메모리 윈도우, 대화 요약, 세션 관리까지 단계적으로 만들어 봅니다.

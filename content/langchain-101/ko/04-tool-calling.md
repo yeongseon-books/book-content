@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 시리즈 (4/6)
 
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/04-tool-calling)
+
 LLM은 텍스트만 생성합니다. 계산, 날씨 조회, 데이터베이스 검색 같은 작업은 외부 도구가 필요합니다. Tool Calling은 LLM이 "이 도구를 이렇게 불러달라"는 지시를 텍스트로 내리면, 앱이 실제 함수를 실행해서 결과를 다시 LLM에 넘기는 패턴입니다.
 
 이번 글에서는 LangChain의 도구 정의, `bind_tools()`로 LLM에 도구를 연결하는 방법, 그리고 도구 결과를 처리하는 흐름을 다룹니다.

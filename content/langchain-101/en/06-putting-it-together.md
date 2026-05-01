@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 (6/6)
 
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/06-putting-it-together)
+
 The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.
 
 Topics:

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 시리즈 (2/6)
 
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/02-prompt-llm-chain)
+
 지난 글에서 LCEL의 기본 구조를 잡았다면, 이번 글에서는 실제로 자주 쓰는 패턴을 하나씩 만들어 봅니다. `ChatPromptTemplate`을 깊이 이해하고, 출력 파서를 선택하고, 체인에 변수를 넣는 방법을 다룹니다.
 
 이번 글에서 다룰 내용은 다음과 같습니다.

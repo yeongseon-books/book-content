@@ -23,6 +23,9 @@ last_reviewed: '2026-05-01'
 
 LLM API 비용은 토큰 단위로 청구됩니다. 개발 단계에서는 미미하지만, 트래픽이 늘면 급격히 올라갑니다. 이 포스트에서는 호출별 비용을 정확히 계산하고, 캐싱과 프롬프트 압축으로 비용을 줄이는 방법을 다룹니다.
 
+## 예제 코드
+- [GitHub: ko/ep02_cost_tracking.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/ko/ep02_cost_tracking.py)
+
 ---
 
 ## 토큰 비용 계산

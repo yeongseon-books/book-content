@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 (4/6)
 
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/04-tool-calling)
+
 LLMs generate text. Calculation, weather lookup, database queries — those require external tools. Tool calling is the pattern where the LLM produces a structured request ("call this function with these arguments"), the application executes the actual function, and the result goes back to the LLM.
 
 This post covers defining tools with the `@tool` decorator, connecting them to an LLM with `bind_tools()`, and handling tool results in a simple loop.

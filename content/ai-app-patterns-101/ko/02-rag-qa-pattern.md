@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > AI 앱 패턴 101 시리즈 (2/6)
 
+예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/02-rag-qa-pattern)
+
 RAG(Retrieval-Augmented Generation)는 LLM의 고질적인 문제 두 가지를 해결합니다. 첫째, LLM의 훈련 데이터 컷오프 이후 생성된 정보는 모릅니다. 둘째, 사내 문서, 개인 데이터 같은 비공개 정보는 처음부터 없습니다. RAG는 외부 문서를 검색해서 LLM 프롬프트에 주입함으로써 이 두 가지를 보완합니다.
 
 이번 글에서는 RAG Q&A 파이프라인의 완전한 구현을 단계별로 만들어 봅니다.

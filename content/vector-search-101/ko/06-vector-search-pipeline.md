@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 벡터 검색 101 시리즈 (6/6)
 
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/06-vector-search-pipeline)
+
 지금까지 임베딩, 유사도 계산, FAISS, 청킹을 각각 따로 다뤘습니다. 이번 글에서는 이 부품들을 하나의 실행 가능한 파이프라인으로 조립합니다. 문서 파일을 불러오고, 청크로 나누고, 임베딩하고, FAISS 인덱스에 저장하고, 자연어 쿼리로 검색하는 전체 흐름입니다.
 
 마지막에는 키워드 검색과 벡터 검색을 결합한 하이브리드 검색의 기본 개념도 살펴봅니다.

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 (2/6)
 
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/02-prompt-llm-chain)
+
 Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.
 
 Topics:

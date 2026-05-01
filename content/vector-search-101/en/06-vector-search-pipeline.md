@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Vector Search 101 (6/6)
 
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/06-vector-search-pipeline)
+
 The previous five posts each covered one component in isolation: embeddings, similarity metrics, FAISS, and chunking. This post assembles them into one executable pipeline that loads documents, splits them into chunks, embeds those chunks, stores them in a FAISS index, and retrieves results for natural-language queries.
 
 The post closes with the basics of hybrid search, which combines vector retrieval with keyword search.

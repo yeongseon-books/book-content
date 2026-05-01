@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 (5/6)
 
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/05-streaming)
+
 When an LLM generates a long response, waiting for the full text before displaying anything makes the experience feel slow. Streaming sends tokens to the output as they are generated. That is what you see in ChatGPT or Claude when text appears character by character.
 
 In LangChain, streaming starts with `stream()`. Chain construction is identical to `invoke()` — only the call method changes.

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > AI 앱 패턴 101 시리즈 (4/6)
 
+예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/04-agent-tool-pattern)
+
 지금까지는 LLM이 고정된 체인 안에서만 동작했습니다. 입력이 들어오면 정해진 순서로 처리하고 결과를 반환했습니다. Agent 패턴은 다릅니다. LLM이 스스로 판단해서 어떤 도구를 쓸지, 도구 결과를 보고 다음에 무엇을 할지 결정합니다.
 
 이번 글에서는 Agent 패턴의 핵심 개념과 완전한 구현을 다룹니다.

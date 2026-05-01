@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 시리즈 (3/6)
 
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/03-retriever)
+
 Retriever는 쿼리를 받아 관련 문서 목록을 반환하는 컴포넌트입니다. LangChain의 Retriever 인터페이스는 `get_relevant_documents(query)` 메서드 하나로 정의됩니다. 뒤에 어떤 검색 시스템이 있든 — FAISS, Chroma, Elasticsearch — 체인에서는 같은 방식으로 사용합니다.
 
 이번 글에서는 FAISS 기반 Retriever를 만들고, 그 결과를 프롬프트에 주입하는 RAG 패턴의 기본 형태를 구현합니다.

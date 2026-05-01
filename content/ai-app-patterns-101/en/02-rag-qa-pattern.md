@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > AI App Patterns 101 (2/6)
 
+Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/02-rag-qa-pattern)
+
 RAG (Retrieval-Augmented Generation) addresses two persistent LLM limitations. First, LLMs do not know about events after their training cutoff. Second, they have no access to private or proprietary data. RAG patches both gaps by retrieving relevant documents at query time and injecting them into the prompt.
 
 This post builds a complete RAG Q&A pipeline step by step.

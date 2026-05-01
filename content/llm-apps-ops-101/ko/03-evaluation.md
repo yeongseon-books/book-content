@@ -23,6 +23,9 @@ last_reviewed: '2026-05-01'
 
 모델을 교체하거나 프롬프트를 수정할 때 "더 좋아졌는가"를 어떻게 판단하나요? 사람이 직접 읽어보는 것도 방법이지만, 수천 건의 응답을 수작업으로 검토할 수는 없습니다. 이 포스트에서는 LLM-as-judge 패턴, 사실 일관성 검사, 형식 준수 검사로 자동 평가 파이프라인을 구축합니다.
 
+## 예제 코드
+- [GitHub: ko/ep03_evaluation.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/ko/ep03_evaluation.py)
+
 ---
 
 ## 평가의 세 축

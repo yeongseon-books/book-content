@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 시리즈 (1/6)
 
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/01-lcel-runnable-basics)
+
 LangChain을 처음 접하면 코드보다 용어가 더 먼저 막힙니다. LCEL, Runnable, Chain, Pipe — 개념은 많은데 어떤 게 핵심인지 잘 보이지 않습니다. 이번 글은 LangChain의 설계 중심인 LCEL(LangChain Expression Language)과 Runnable 인터페이스가 무엇인지, 그리고 왜 이런 구조를 썼는지부터 잡습니다.
 
 이 시리즈는 LangChain을 API로 사용하는 방법에 집중합니다. 챗봇, RAG, 에이전트 같은 애플리케이션 패턴은 별도 시리즈(ai-app-patterns-101)에서 다룹니다.

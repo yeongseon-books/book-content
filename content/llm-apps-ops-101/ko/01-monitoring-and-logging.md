@@ -23,6 +23,9 @@ last_reviewed: '2026-05-01'
 
 LLM 앱을 프로덕션에 올리는 순간부터 모니터링이 필수입니다. 일반 웹 서비스와 달리 LLM 앱은 응답 시간이 수 초에 달하고, 토큰 소비가 비용으로 직결되며, 모델 출력이 비결정적입니다. 이 포스트에서는 구조화된 로그, 지연 시간 추적, 토큰 카운팅을 중심으로 실용적인 모니터링 기반을 구축합니다.
 
+## 예제 코드
+- [GitHub: ko/ep01_monitoring_and_logging.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/ko/ep01_monitoring_and_logging.py)
+
 ---
 
 ## 왜 LLM 모니터링이 다른가

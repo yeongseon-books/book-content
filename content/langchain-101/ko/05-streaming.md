@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 시리즈 (5/6)
 
+예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/ko/05-streaming)
+
 LLM이 긴 응답을 생성할 때, 전체 텍스트가 완성될 때까지 기다리면 사용자 경험이 나빠집니다. 스트리밍은 토큰이 생성되는 즉시 화면에 출력하는 방식입니다. ChatGPT나 Claude에서 응답이 문자 단위로 흘러나오는 것이 바로 이 방식입니다.
 
 LangChain에서 스트리밍은 `stream()` 메서드 하나로 시작합니다. 체인을 구성하는 방식은 `invoke()`와 동일하고, 호출 방법만 바뀝니다.

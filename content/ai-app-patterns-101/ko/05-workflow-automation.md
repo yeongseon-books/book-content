@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > AI 앱 패턴 101 시리즈 (5/6)
 
+예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/05-workflow-automation)
+
 단일 LLM 호출로 해결하기 어려운 작업이 있습니다. 고객 문의를 받아 분류하고, 분류 결과에 따라 다른 처리를 하고, 최종적으로 답변을 생성하는 경우가 대표적입니다. 워크플로 자동화는 이런 여러 단계를 LangChain LCEL로 연결하는 패턴입니다.
 
 이번 글에서는 다음을 다룹니다.

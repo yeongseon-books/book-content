@@ -23,6 +23,9 @@ last_reviewed: '2026-05-01'
 
 LLM API costs are billed per token. At development scale the numbers are negligible; at production scale they compound fast. This post covers per-call cost accounting, response caching, and prompt compression — three levers that consistently reduce spend without degrading quality.
 
+## Example code
+- [GitHub: en/ep02_cost_tracking.py](https://github.com/yeongseon-books/llm-apps-ops-101/blob/main/en/ep02_cost_tracking.py)
+
 ---
 
 ## Token cost model

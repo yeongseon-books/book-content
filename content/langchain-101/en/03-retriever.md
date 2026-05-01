@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > LangChain 101 (3/6)
 
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/en/03-retriever)
+
 A Retriever accepts a query and returns a list of relevant documents. LangChain defines the Retriever interface around a single method: `get_relevant_documents(query)`. Whatever search system sits behind it — FAISS, Chroma, Elasticsearch — the chain uses it the same way.
 
 This post builds a FAISS-based Retriever, connects it to a prompt, and assembles the basic form of a RAG pattern.

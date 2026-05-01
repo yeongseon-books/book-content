@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > AI 앱 패턴 101 시리즈 (6/6)
 
+예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/06-human-in-the-loop)
+
 완전 자동화 파이프라인이 항상 옳지는 않습니다. 민감한 고객 데이터를 다루거나, 법적 효력이 있는 문서를 작성하거나, 금전적 결정을 내리는 경우에는 AI 출력 결과를 사람이 검토하고 승인해야 합니다. Human-in-the-loop(HITL)는 이런 경우를 위해 파이프라인 중간에 사람의 판단 지점을 만드는 패턴입니다.
 
 이번 글에서는 다음을 다룹니다.

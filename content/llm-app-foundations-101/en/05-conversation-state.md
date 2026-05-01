@@ -21,6 +21,8 @@ last_reviewed: '2026-04-30'
 
 > LLM App Foundations 101 (5/6)
 
+Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/05-conversation-state)
+
 One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.
 
 An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.
