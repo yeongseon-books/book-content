@@ -6,6 +6,21 @@ eBook export·build 정책은 [`EBOOK.md`](./EBOOK.md), 변환 규칙은 [`PUBLI
 
 ---
 
+## Blog Series to eBook Workflow
+
+`tech-writing`의 기본 출판 흐름은 다음과 같다.
+
+```text
+1. 블로그 시리즈로 먼저 발행한다.
+2. 독자 반응과 원고 품질을 확인한다.
+3. 같은 canonical source를 기반으로 eBook source bundle을 만든다.
+4. eBook 단계에서 Preface, Prerequisites, Book Map, Part intro, Appendix를 추가한다.
+```
+
+따라서 eBook은 블로그를 단순히 합친 결과물이 아니다. 블로그에서 검증된 글을 책의 흐름에 맞게 재구성한 두 번째 산출물이다.
+
+---
+
 ## 1. eBook의 목적
 
 eBook은 블로그 글 모음이 아니라 **학습 경로**다.

@@ -18,6 +18,24 @@
 
 ---
 
+## Publication Pipelines
+
+`tech-writing`은 하나의 canonical content base를 네 가지 발행 파이프라인으로 변환한다.
+
+| Pipeline | Source | Output | Purpose |
+| --- | --- | --- | --- |
+| Tistory | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
+| English Blog | `content/<series>/en/*.md` | `docs/en/<series>/*.md` | 한국어 원문의 충실한 영어 대응본 |
+| Medium | `content/<series>/en/*.md` + adaptation rules | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
+| eBook | `content/<series>/{ko,en}/*.md` + ebook-only blocks | `exports/ebook-source/<series>-<lang>/` | 책 단위 학습형 원고 |
+
+`ko/`와 `en/`은 canonical source다. `medium/`은 `to-medium.py`가 생성하는 발행 변형 산출물이며 canonical source가 아니다.
+
+> `content/<series>/medium/`은 generated Medium draft 디렉터리다.
+> canonical source는 `ko/`와 `en/`이며, `medium/`은 발행 편의를 위한 변형 산출물이다.
+
+---
+
 ## 1. Source Principle
 
 모든 글은 `content/` 아래에서 작성한다.
@@ -74,6 +92,9 @@ python3 scripts/export_tistory.py azure-functions-101 --episode 1
 ---
 
 ## 3. Medium Publishing (English)
+
+> Medium 산출물은 `en/`의 strict translation output이 아니다.
+> `en/`의 기술적 내용, 코드, 그림, 참고자료를 유지하되, Medium 독자에게 맞게 제목, opening, transition, ending을 조정할 수 있는 publication adaptation이다.
 
 ### 대상
 

@@ -2,6 +2,17 @@
 
 이 문서는 기술 글의 문체, 구조, 이미지, 태그, 참고자료 규칙을 정의한다. ko 글의 추가 규칙은 [`.sisyphus/skills/humanize-korean/quick-rules.md`](./.sisyphus/skills/humanize-korean/quick-rules.md) (S1 패턴) 을 함께 따른다.
 
+## Scope
+
+이 문서는 모든 산출물(Tistory / English Blog / Medium / eBook)에 공통으로 적용되는 문체, 코드, 이미지, 참고자료 규칙을 정의한다.
+
+채널별 작성 규칙은 다음 문서를 따른다.
+
+- [`BLOG_WRITING_GUIDE.md`](./BLOG_WRITING_GUIDE.md) — Tistory / English Blog / Medium 블로그 글 작성 규칙
+- [`EBOOK_WRITING_GUIDE.md`](./EBOOK_WRITING_GUIDE.md) — eBook 원고 구성 규칙
+
+변환·빌드 규칙은 [`PUBLISHING.md`](./PUBLISHING.md)와 [`EBOOK.md`](./EBOOK.md)를 따른다.
+
 ---
 
 ## 1. 글 구조 (mandatory order)

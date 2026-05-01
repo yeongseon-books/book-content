@@ -35,6 +35,7 @@ series:
       en: A 7-part beginner guide to Azure App Service.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: draft
     path: content/azure-app-service-101
 
@@ -48,6 +49,7 @@ series:
       en: Inside App Service — Front-End, Worker, Sandbox, Kudu, Scaling.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 301
     status: draft
     path: content/azure-app-service-deep-dive
 
@@ -61,6 +63,7 @@ series:
       en: A 7-part beginner guide to Azure Functions.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: draft
     path: content/azure-functions-101
 
@@ -74,6 +77,7 @@ series:
       en: Source-level dive into Azure Functions Host (commit-pinned).
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 301
     status: draft
     path: content/azure-functions-deep-dive
 
@@ -87,6 +91,7 @@ series:
       en: AKS beginner guide.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: draft
     path: content/azure-aks-101
 
@@ -100,6 +105,7 @@ series:
       en: AKS control plane / data plane internals.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 301
     status: draft
     path: content/azure-aks-deep-dive
 
@@ -113,6 +119,7 @@ series:
       en: Container Apps beginner guide.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: draft
     path: content/azure-aca-101
 
@@ -126,6 +133,7 @@ series:
       en: Inside ACA — KEDA, Dapr, Envoy.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 301
     status: draft
     path: content/azure-aca-deep-dive
 
@@ -140,6 +148,7 @@ series:
       en: 7-part guide for junior developers — from AI API basics to deployment.
     languages: [ko]
     targets: { tistory: true, medium: false, mkdocs: true, ebook: true }
+    level: 101
     status: needs-update
     path: content/ai-web-dev-101
 
@@ -153,6 +162,7 @@ series:
       en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: draft
     path: content/llm-from-scratch-101
 
@@ -167,6 +177,7 @@ series:
       en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 301
     status: draft
     path: content/rag-deep-dive
 
@@ -181,6 +192,7 @@ series:
       en: LLM API basics, tokens, and prompt engineering in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/llm-app-foundations-101
 
@@ -194,6 +206,7 @@ series:
       en: Structured Output, Tool Calling, Streaming, Caching, Retry, and Rate Limit in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/llm-api-production-101
 
@@ -207,6 +220,7 @@ series:
       en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/vector-search-101
 
@@ -220,6 +234,7 @@ series:
       en: LCEL, Runnable, Retriever, Tool Calling, and Streaming — LangChain API in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/langchain-101
 
@@ -233,6 +248,7 @@ series:
       en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/ai-app-patterns-101
 
@@ -246,6 +262,7 @@ series:
       en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/korean-ai-stack-101
 
@@ -259,6 +276,7 @@ series:
       en: PDF parsing, metadata, and incremental indexing in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/document-ingestion-101
 
@@ -272,6 +290,7 @@ series:
       en: Observability, evaluation, cost, security, and deployment in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/llm-apps-ops-101
 
@@ -285,6 +304,7 @@ series:
       en: VectorDB, embedding model, retriever, and RAG pipeline evaluation in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/rag-benchmark-101
 
@@ -298,6 +318,7 @@ series:
       en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/langgraph-101
 
@@ -311,6 +332,7 @@ series:
       en: LoRA, datasets, and serving in 6 parts (optional).
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/llm-finetuning-101
 
@@ -325,6 +347,7 @@ series:
       en: Practical strategies for AI Transformation in real organizations.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/ax-practical-guide
 
@@ -339,5 +362,6 @@ series:
       en: Designing a series and shipping a single article.
     languages: [ko, en]
     targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    level: 101
     status: planned
     path: content/technical-writing

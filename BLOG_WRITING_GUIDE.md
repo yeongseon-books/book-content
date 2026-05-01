@@ -1,6 +1,6 @@
 # Blog Writing Guide
 
-이 문서는 Tistory(한국어)와 Medium(영어) 블로그 발행을 위한 원고 작성 규칙을 정의한다.
+이 문서는 Tistory(한국어), English Blog(영어 번역형 블로그), Medium(영어권 발행 변형) 블로그 발행을 위한 원고 작성 규칙을 정의한다.
 
 문체·이미지·코드·태그 공통 규칙은 [`STYLE_GUIDE.md`](./STYLE_GUIDE.md), 변환·산출물 규칙은 [`PUBLISHING.md`](./PUBLISHING.md)를 따른다.
 
@@ -59,13 +59,21 @@
   - `Azure App Service Kudu란? SCM 사이트와 앱 런타임의 차이`
   - `Azure Functions Flex Consumption 플랜 선택 기준 정리`
 
-### en (Medium)
+### en (English Blog)
 
-- Hook과 첫 문단이 독자를 붙잡는다. 제목은 실무 문제 중심으로.
+- `ko/` 원문의 구조와 제목 의미를 보존한다. 기술적 정확성과 bilingual archive 역할을 우선한다.
 - 예:
-  - `How to fix cold start in Azure Functions Premium plan`
-  - `Azure App Service vs Azure Functions: when to use which`
-- "An overview of", "Introduction to" 같은 generic prefix는 피한다.
+  - `What Is Azure Functions? — A World Where Events Call Your Code`
+  - `Request Lifecycle: Where Should You Start When a 502 Happens at 3 AM?`
+  - `LangChain introduction — LCEL and the Runnable interface`
+
+### medium
+
+- strict translation이 아니라 publication adaptation이다. 영어권 독자의 문제의식과 hook을 우선한다.
+- 예:
+  - `Azure Functions Is Not Just "Serverless"`
+  - `Most Azure App Service 502s Make More Sense Once You Understand the Request Path`
+  - `Kudu Is Not Your App: Understanding the SCM Plane in Azure App Service`
 
 ---
 
@@ -80,7 +88,25 @@
 
 ---
 
-## 5. Medium 발행 규칙
+## 5. English Blog vs Medium
+
+`en/`과 `medium/`은 모두 영어 콘텐츠이지만 목적이 다르다.
+
+| 항목 | English Blog (`en/`) | Medium (`medium/`) |
+| --- | --- | --- |
+| 역할 | 한국어 원문의 충실한 영어 대응본 | 영어권 독자용 발행 변형 |
+| 구조 | `ko/` 원문 구조를 최대한 유지 | 제목, 도입부, 전환, 결론 재작성 가능 |
+| 목적 | bilingual archive, 검색, 레퍼런스 | reach, branding, 공유 |
+| 제목 | 원문 제목의 자연스러운 영어화 | hook 중심 제목 |
+| 도입부 | 원문 흐름 유지 | 문제 제기와 reader pain point 강화 |
+| 코드/기술 주장 | 원문과 동일하게 유지 | 원문과 동일하게 유지 |
+| 참고자료 | 충실히 유지 | 핵심 링크 중심으로 압축 가능 |
+
+Medium은 strict translation이 아니다. `en/`을 기반으로 하되, 영어권 독자에게 더 잘 읽히도록 제목, opening, transition, ending을 조정한 publication adaptation이다.
+
+---
+
+## 6. Medium 발행 규칙
 
 - 발행 대상: `content/<series>/en/*.md`
 - 산출물: `content/<series>/medium/<NN>.html` (브라우저 붙여넣기용)
@@ -92,7 +118,7 @@
 
 ---
 
-## 6. 원고 작성 체크리스트
+## 7. 원고 작성 체크리스트
 
 발행 전 아래를 확인한다.
 
