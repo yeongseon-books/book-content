@@ -93,13 +93,15 @@ python3 scripts/export_tistory.py azure-functions-101 --episode 1
 
 ## 3. Blogger Publishing (English Blog)
 
+> **현재 상태**: `export_blogger.py` 스크립트 미구현 (planned). 현재는 `en/*.md`를 Blogger 에디터에 수동으로 붙여넣어 발행한다.
+
 ### 대상
 
 ```text
 content/<series>/en/*.md
 ```
 
-### 변환 결과
+### 변환 결과 (planned)
 
 ```text
 exports/blogger/<series>/<NN>-<slug>.html

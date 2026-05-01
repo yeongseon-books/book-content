@@ -10,7 +10,7 @@
 | --- | --- | --- | --- | --- | --- |
 | Korean Blog | Tistory | `https://yeongseonchoe.tistory.com/` | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
 | English Blog | Blogger | `https://yeongseon-choe.blogspot.com/` | `content/<series>/en/*.md` | `exports/blogger/<series>/*.html` | 한국어 원문의 충실한 영어 대응본 |
-| Medium | Medium | `https://medium.com/@yeongseonchoe` | `content/<series>/medium/*.html` | `.html` | 영어권 독자용 발행 변형 |
+| Medium | Medium | `https://medium.com/@yeongseonchoe` | `content/<series>/en/*.md` (adaptation) | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
 | eBook | private `mkdocs-ebook` | — | `content/<series>/{ko,en}/*.md` | `exports/ebook-source/<series>-<lang>/` | 시리즈를 책처럼 묶은 학습형 원고 |
 
 `ko/`와 `en/`이 canonical source다. `medium/`은 `to-medium.py`가 생성하는 발행 변형 산출물이며 canonical source가 아니다.

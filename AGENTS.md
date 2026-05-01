@@ -17,8 +17,8 @@ Eight Azure series (52 posts × 3 variants = 156 markdown files):
 Each Azure series has three variants: `ko/`, `en/`, `medium/`.
 
 - `ko/<NN>-<slug>.md` — Tistory original (Korean)
-- `en/<NN>-<slug>.md` — Medium-bound English translation
-- `medium/<NN>.html` — Medium browser-paste-ready HTML. Generated from `en/<NN>-<slug>.md` by `.sisyphus/medium/to-medium.py` (which delegates HTML rendering to `to-medium-html.py`). Self-contained: PNGs are inlined as base64 `data:` URIs. Open in Chrome, select-all, copy, paste into a fresh empty Medium draft; the first H1 maps to Medium's title slot, the trailing visible `Tags: ...` line is copied manually into Medium's tag input field.
+- `en/<NN>-<slug>.md` — Blogger English Blog (한국어 원문의 충실한 영어 대응본). Published to `https://yeongseon-choe.blogspot.com/`.
+- `medium/<NN>.html` — Medium publication adaptation. Generated from `en/<NN>-<slug>.md` by `.sisyphus/medium/to-medium.py` (which delegates HTML rendering to `to-medium-html.py`). During markdown processing image refs are kept as relative local paths; during HTML rendering PNGs are inlined as base64 `data:` URIs. Open in Chrome, select-all, copy, paste into a fresh empty Medium draft; the first H1 maps to Medium's title slot, the trailing visible `Tags: ...` line is copied manually into Medium's tag input field.
 
 Plus the single-variant Korean series:
 
@@ -71,7 +71,7 @@ The TOC block sits immediately above the references section, separated by a sing
 - Tag surface: visible `Tags: A, B, C, D` plain-text line as the very last line (matches ko/en source convention; no leading HTML comment). On publish, copy the comma list manually into Medium's separate tag input field; the visible line then gets removed in Medium UI or simply ignored — Tistory readers tolerate it, Medium readers see the body end at References.
 - First line: H1 (`# Title`). Medium's web editor maps the first H1 in a fresh empty draft to the title slot, so the artifact MUST start with H1 — no preface comments, no front matter, no kicker line.
 - TOC: the `<!-- toc:begin -->` / `<!-- toc:end -->` markers are stripped, but the TOC body lines are kept (Medium has no native series nav).
-- Image refs: kept as relative local paths (`../../../assets/...`), NOT rewritten to raw URLs. The publishing repo is private, so `raw.githubusercontent.com` URLs return 404. PNGs are uploaded manually via Medium's UI (drag-and-drop) when publishing; the local path tells the author which file to attach where.
+- Image refs: during markdown processing, image refs are kept as relative local paths (`../../../assets/...`). During HTML rendering (`to-medium-html.py`), PNGs are inlined as base64 `data:` URIs so the `.html` artifact is self-contained for browser-paste publishing. The publishing repo is private, so `raw.githubusercontent.com` URLs are not used.
 - Headings: H3+ are demoted (Medium import compatibility).
 - Tables: 2-col → `- **key**: value` bullets; 3-col → `**label**` header + nested `- key: value` bullets; 4+ col → kept as raw GFM table with `<!-- TODO: render this table as PNG -->` marker (Medium has no native table renderer; wide tables need manual PNG conversion on publish).
 
@@ -113,7 +113,7 @@ TOC entry titles are pulled from each post's H1 (single source of truth). Never 
 - Path pattern: `assets/<series>/<NN>/<NN>-<idx>-<slug>.{ko|en}.png`
 - ko slug = en counterpart heading slug (preserves ko/en file-name symmetry)
 - All diagrams source: Mermaid → PNG via `.sisyphus/medium/mermaid-to-png.py`
-- ko/en/medium bodies all reference local relative paths (`../../../assets/...`); Medium PNGs are uploaded manually via Medium's UI on publish
+- ko/en/medium bodies all reference local relative paths (`../../../assets/...`); during HTML rendering PNGs are inlined as base64 `data:` URIs in the `.html` artifact
 
 ## Image caption (alt text) policy
 

@@ -34,7 +34,7 @@ series:
       ko: Azure App Service 입문 7부작 — 호스팅, 설정, 로그, 스케일링.
       en: A 7-part beginner guide to Azure App Service.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: draft
     path: content/azure-app-service-101
@@ -48,7 +48,7 @@ series:
       ko: App Service 내부 — Front-End, Worker, Sandbox, Kudu, Scaling.
       en: Inside App Service — Front-End, Worker, Sandbox, Kudu, Scaling.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 301
     status: draft
     path: content/azure-app-service-deep-dive
@@ -62,7 +62,7 @@ series:
       ko: Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
       en: A 7-part beginner guide to Azure Functions.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: draft
     path: content/azure-functions-101
@@ -76,7 +76,7 @@ series:
       ko: Azure Functions Host 소스 분석 시리즈 (commit-pinned).
       en: Source-level dive into Azure Functions Host (commit-pinned).
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 301
     status: draft
     path: content/azure-functions-deep-dive
@@ -90,7 +90,7 @@ series:
       ko: AKS 입문 시리즈.
       en: AKS beginner guide.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: draft
     path: content/azure-aks-101
@@ -104,7 +104,7 @@ series:
       ko: AKS control plane / data plane 내부 동작.
       en: AKS control plane / data plane internals.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 301
     status: draft
     path: content/azure-aks-deep-dive
@@ -118,7 +118,7 @@ series:
       ko: Container Apps 입문 시리즈.
       en: Container Apps beginner guide.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: draft
     path: content/azure-aca-101
@@ -132,7 +132,7 @@ series:
       ko: ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
       en: Inside ACA — KEDA, Dapr, Envoy.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 301
     status: draft
     path: content/azure-aca-deep-dive
@@ -147,7 +147,7 @@ series:
       ko: AI API 부터 배포까지, 초급 개발자를 위한 7부작.
       en: 7-part guide for junior developers — from AI API basics to deployment.
     languages: [ko]
-    targets: { tistory: true, medium: false, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: false, medium: false, mkdocs: true, ebook: true }
     level: 101
     status: needs-update
     path: content/ai-web-dev-101
@@ -161,7 +161,7 @@ series:
       ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
       en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: draft
     path: content/llm-from-scratch-101
@@ -176,7 +176,7 @@ series:
       ko: LangChain · FAISS · RAGAS 소스로 따라가는 RAG 파이프라인 심층 분석 6부작.
       en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 301
     status: draft
     path: content/rag-deep-dive
@@ -191,7 +191,7 @@ series:
       ko: LLM API 기초, 토큰, 프롬프트 엔지니어링 — 6부작.
       en: LLM API basics, tokens, and prompt engineering in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/llm-app-foundations-101
@@ -205,7 +205,7 @@ series:
       ko: Structured Output, Tool Calling, Streaming, Caching, Retry, Rate Limit — 6부작.
       en: Structured Output, Tool Calling, Streaming, Caching, Retry, and Rate Limit in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/llm-api-production-101
@@ -219,7 +219,7 @@ series:
       ko: 임베딩, FAISS, 유사도, 청크 전략 — 6부작.
       en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/vector-search-101
@@ -233,7 +233,7 @@ series:
       ko: LCEL, Runnable, Retriever, Tool Calling 기본, Streaming — LangChain API 사용법 6부작.
       en: LCEL, Runnable, Retriever, Tool Calling, and Streaming — LangChain API in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/langchain-101
@@ -247,7 +247,7 @@ series:
       ko: 챗봇, RAG Q&A, 문서비서, Agent, Workflow, Human-in-the-loop — LLM 앱 설계 패턴 6부작.
       en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/ai-app-patterns-101
@@ -261,7 +261,7 @@ series:
       ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
       en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/korean-ai-stack-101
@@ -275,7 +275,7 @@ series:
       ko: PDF 파싱, 메타데이터, 증분 인덱싱 — 6부작.
       en: PDF parsing, metadata, and incremental indexing in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/document-ingestion-101
@@ -289,7 +289,7 @@ series:
       ko: 관측, 평가, 비용, 보안, 배포 — 6부작.
       en: Observability, evaluation, cost, security, and deployment in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/llm-apps-ops-101
@@ -303,7 +303,7 @@ series:
       ko: VectorDB, Embedding, Retriever, RAG 평가 비교 — 6부작.
       en: VectorDB, embedding model, retriever, and RAG pipeline evaluation in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/rag-benchmark-101
@@ -317,7 +317,7 @@ series:
       ko: 그래프 에이전트, 체크포인트, 멀티에이전트 — 6부작.
       en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/langgraph-101
@@ -331,7 +331,7 @@ series:
       ko: LoRA, 데이터셋, 서빙 — 6부작 (선택).
       en: LoRA, datasets, and serving in 6 parts (optional).
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/llm-finetuning-101
@@ -346,7 +346,7 @@ series:
       ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
       en: Practical strategies for AI Transformation in real organizations.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/ax-practical-guide
@@ -361,7 +361,7 @@ series:
       ko: 시리즈를 설계하고, 한 편을 다듬는 법.
       en: Designing a series and shipping a single article.
     languages: [ko, en]
-    targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
+    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
     level: 101
     status: planned
     path: content/technical-writing
