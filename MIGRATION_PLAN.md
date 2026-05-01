@@ -1,11 +1,11 @@
 # tech-blog → tech-writing 개편 계획
 
-> 이 문서는 본 저장소(`yeongseon/tech-writing`, 구 `yeongseon/tech-blog`)를 다채널 기술 콘텐츠 파이프라인 저장소로 단계적으로 개편하기 위한 마스터 플랜이다.
+> 이 문서는 본 저장소(`yeongseon-books/tech-writing`, 구 `yeongseon-books/tech-writing`)를 다채널 기술 콘텐츠 파이프라인 저장소로 단계적으로 개편하기 위한 마스터 플랜이다.
 > 실제 진행 상황은 [`ROADMAP.md`](./ROADMAP.md)에서 추적한다. **Phase 9 리포지토리 rename 은 완료되었다 (`cb179c5`).**
 
 ## 1. 개편 목적
 
-`yeongseon/tech-writing`(구 `yeongseon/tech-blog`)은 기술 블로그 원고를 저장하는 저장소로 시작했지만, 단순 블로그 저장소를 넘어 다음 목적을 모두 지원한다.
+`yeongseon-books/tech-writing`(구 `yeongseon-books/tech-writing`)은 기술 블로그 원고를 저장하는 저장소로 시작했지만, 단순 블로그 저장소를 넘어 다음 목적을 모두 지원한다.
 
 - Tistory 한국어 글 발행
 - Medium 영어 글 발행
@@ -26,8 +26,8 @@ tech-writing = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파
 
 ## 2. 리포지토리 이름 변경
 
-- 구: `yeongseon/tech-blog`
-- 현재: `yeongseon/tech-writing` (rename 완료, `cb179c5`)
+- 구: `yeongseon-books/tech-writing`
+- 현재: `yeongseon-books/tech-writing` (rename 완료, `cb179c5`)
 
 `tech-blog`는 블로그 전용 저장소처럼 보인다. 이 저장소는 Tistory, Medium, MkDocs, eBook을 모두 대상으로 하므로 더 포괄적인 이름이 필요하다. `cloud-*`, `azure-*` 계열은 부적절하다(AI, AX, 기술 글쓰기 등을 모두 다룸).
 
@@ -217,8 +217,8 @@ tech-writing/
 ### 9.1 Phase 9 수동 절차 (rename 후 실행)
 
 1. `gh repo rename tech-writing` (또는 GitHub UI).
-2. 로컬: `git remote set-url origin git@github.com:yeongseon/tech-writing.git`.
-3. `series.yaml` `meta.repo` 를 `yeongseon/tech-writing` 으로 변경하고 (선택) `meta.tag` 도 새 commit SHA 로 갱신.
+2. 로컬: `git remote set-url origin git@github.com:yeongseon-books/tech-writing.git`.
+3. `series.yaml` `meta.repo` 를 `yeongseon-books/tech-writing` 으로 변경하고 (선택) `meta.tag` 도 새 commit SHA 로 갱신.
 4. Medium 변형 재생성 (URL 이 변경되므로 두 단계 모두 필요):
    - `python3 .sisyphus/medium/to-medium.py` — `content/<series>/medium/*.md` 의 raw 이미지 URL 갱신
    - `python3 scripts/export_medium.py <series> --all` — 발행용 사본 (`exports/medium/`) 갱신; 발행 직전이라면 이 단계 생략 가능 (`exports/` 는 disposable)

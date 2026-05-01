@@ -225,7 +225,7 @@ for tool_call in message.tool_calls or []:
         raise ValueError(f&quot;unknown tool: {function_name}&quot;)
 
     validated_args = OrderStatusArgs.model_validate(arguments)
-    result = available_tools[function_name](https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/**validated_args.model_dump())
+    result = available_tools[function_name](https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/llm-api-production-101/en/**validated_args.model_dump())
     print(function_name, arguments, result)
 </code></pre>
 <p>At this stage, the model has not fully answered the user yet. It has only requested a tool. The application has executed that request. The final conversational answer comes after the tool result is fed back to the model.</p>
@@ -313,7 +313,7 @@ for tool_call in assistant_message.tool_calls or []:
     except json.JSONDecodeError as exc:
         raise ValueError(&quot;tool arguments were not valid JSON&quot;) from exc
 
-    tool_result = available_tools[function_name](https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/**validated_args.model_dump())
+    tool_result = available_tools[function_name](https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/llm-api-production-101/en/**validated_args.model_dump())
 
     messages.append(
         {
@@ -347,7 +347,7 @@ print(final.choices[0].message.content)
 <p>Structured output gave us a contract for data. Tool calling extends that contract to function requests. The next topic applies the same production mindset to streamed responses, where the result arrives in pieces and error handling must account for partial output instead of one final string.</p>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon/tech-writing/blob/f24a126/content/llm-api-production-101/en/01-structured-output.md">Structured output — JSON mode and response schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/llm-api-production-101/en/01-structured-output.md">Structured output — JSON mode and response schemas</a></li>
 <li><strong>Tool calling — connecting functions to the model (current)</strong></li>
 <li>Streaming in depth — chunk handling and error recovery (upcoming)</li>
 <li>Caching strategies — reducing cost and latency (upcoming)</li>

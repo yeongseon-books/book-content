@@ -120,7 +120,7 @@ python3 .sisyphus/medium/finalize-posts.py
 ## Phase 9 — Repository rename & cutover
 
 - [x] `gh repo rename tech-writing` (`cb179c5`)
-- [x] `series.yaml` `meta.repo` 를 `yeongseon/tech-writing` 으로 갱신; `meta.published_ref` 를 `cb179c5` 로 bump
+- [x] `series.yaml` `meta.repo` 를 `yeongseon-books/tech-writing` 으로 갱신; `meta.published_ref` 를 `cb179c5` 로 bump
 - [x] `python3 .sisyphus/medium/to-medium.py` — medium 변형 raw URL 일괄 재생성 (61 파일, `tech-writing/cb179c5` 핀)
 - [x] `python3 scripts/export_ebook_source.py <series> --lang <lang>` — 19개 ebook 번들 재생성 + mkdocs strict 통과
 - [x] MIGRATION_PLAN 업데이트 (rename 완료 표기)
