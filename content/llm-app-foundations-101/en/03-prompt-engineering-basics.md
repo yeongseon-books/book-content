@@ -123,48 +123,6 @@ print(without_system.choices[0].message.content)
 print()
 print("[with system]")
 print(with_system.choices[0].message.content)
-```my_list = [1, 2, 3, "hello", 4.5]
-print(my_list[0])  # Output: 1
-```
-### **Dictionaries**
-
-A dictionary in Python is an unordered collection of key-value pairs. Dictionaries are denoted by curly brackets `{}` and are indexed by keys, which can be any immutable data type (e.g., strings, integers, tuples).
-
-**Example:**
-```python
-my_dict = {"name": "John", "age": 30, "city": "New York"}
-print(my_dict["name"])  # Output: John
-```
-
-~~~
-Output
-John
-~~~**Key differences:**
-
-1. **Order**: Lists are ordered, while dictionaries are unordered.
-2. **Indexing**: Lists are indexed by their position, while dictionaries are indexed by keys.
-3. **Data type**: Lists can store any data type, while dictionaries store key-value pairs.
-4. **Lookup**: Lists require indexing to access elements, while dictionaries allow direct lookup by key.
-5. **Insertion**: Lists can insert elements at any position, while dictionaries can insert new key-value pairs.
-
-**When to use each:**
-
-* Use lists when:
-	+ You need to store a collection of items in a specific order.
-	+ You need to perform operations like indexing, slicing, or sorting.
-* Use dictionaries when:
-	+ You need to store key-value pairs where the key is unique.
-	+ You need to perform lookups by key.
-
-In summary, while both lists and dictionaries can store multiple values, they differ in their structure, usage, and application. Choose the right data structure based on your specific needs and requirements.
-
-[with system]
-In Python, a dictionary and a list are two different data structures that help store and organize data. A list is like a collection of items that are stored in a specific order, and you can access them by their index (position). On the other hand, a dictionary is like a collection of key-value pairs, where each key is unique and is used to look up the corresponding value.
-
-Here are some key differences between a Python dictionary and a list:
-* **Accessing data**: In a list, you access data by its index (position), while in a dictionary, you access data by its key.
-* **Data type**: A list can store any type of data, including strings, integers, floats, and other lists, while a dictionary can only store key-value pairs, where the key is a unique string or other immutable data type.
-* **Order**: A list maintains the order in which items were added, while a dictionary does not have a specific order for its key-value pairs.
 ```
 
 The facts may overlap, but the style usually does not. A good system message makes these parts more stable:
@@ -230,16 +188,6 @@ second = client.chat.completions.create(
 
 print("[assistant turn 2]")
 print(second.choices[0].message.content)
-```# Creating a list and a tuple
-my_list = [1, 2, 3]
-my_tuple = (1, 2, 3)
-
-# Trying to modify the tuple will raise an error
-try:
-    my_tuple[0] = 4
-except TypeError as e:
-    print(e)  # Output: 'tuple' object does not support item assignment
-```
 ```
 
 That append step is the core of chatbot memory.
@@ -295,6 +243,7 @@ for temperature in (0.0, 0.9):
     print(completion.choices[0].message.content)
     print()
 ```
+
 ### `top_p`
 
 `top_p` constrains token selection by cumulative probability mass. Lower values keep the model inside a narrower band of likely continuations. Higher values admit a wider range.
@@ -350,17 +299,6 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
-```from dataclasses import dataclass
-
-@dataclass
-class Person:
-    name: str
-    age: int
-
-p = Person("John", 30)
-print(p)  # Output: Person(name='John', age=30)
-```
-**Use case:** Dataclasses are commonly used in APIs to represent response data, such as a user's profile or a list of products.
 ```
 
 This works well because the task is explicit, the background stays visible, and the output shape becomes testable.
@@ -406,6 +344,7 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
 This can be very effective, but every example consumes tokens. Short, representative examples usually work better than long ones.
 
 ---

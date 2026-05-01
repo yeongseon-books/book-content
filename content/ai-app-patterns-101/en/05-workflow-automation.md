@@ -117,22 +117,6 @@ step3 = title_fn(step2)
 print(f"title: {step3}")
 ```
 
-~~~
-Output
-translation:
-인공지능은 기업들이 운영 방식에 변화를 불러오고 있다.
-가장 다양한 산업에 걸쳐 있는 기업들이 반복적인 임무를 자동화하고, 
-결정을 개선하고, 고객 경험을 개인화하기 위해 인공지능 도구를 채택하고 있다.
-건강 관리 분야에서는 인공지능이 진단에 도움을 주고, 의약품 개발에 협력한다.
-금융 분야에서는 인공지능이 사기 탐지와 알고리즘 거래를 가능하게 한다.
-인공지능이 더 강해질수록, 기관들은 편견, 투명성, 데이터 사생활과 같은 윤리적 고려를 해결해야 한다.
-
-summary:
-기업들이 인공지능 도구를 채택하여 반복적인 임무를 자동화하고, 고객 경험을 개선하는 등 운영 방식에 변화를 가져오고 있다. 그러나 인공지능이 더 강해질수록, 기관들은 윤리적 고려를 해결해야 하는 데에 도전을 받게 되며, 편견, 투명성, 데이터 사생활과 같은 문제를 해결해야 한다.
-
-title: "인공지능의 성장과 함께 부정향한 문제들: 편견, 투명성, 데이터 사생활을 비롯한 윤리적 고려"
-~~~
-
 ---
 
 ## Routing — branching based on classification
@@ -223,64 +207,6 @@ for inquiry in test_inquiries:
     print(f"response: {result['response']}")
 ```
 
-~~~
-Output
-
-inquiry: My bill doubled this month without any explanation. Please check.
-category: BILLING
-response: I'd be happy to assist you with reviewing your bill. Can you please provide me with some information so I can look into this further? 
-
-1. Your account number or customer ID (if you have it)
-2. The date and amount of the original invoice
-3. The new invoice date and amount that you received
-4. Any additional services or features you've added or changed recently
-
-I'll review your account details and check for any possible explanations for the increase. If there's an issue, I'll work with you to resolve it promptly.
-
-Also, just to let you know, if there was an error or discrepancy in your account, we'll take corrective action to ensure you're only charged for the correct services. Your satisfaction is our top priority, and we appreciate your patience and understanding as we investigate this matter.
-
-inquiry: The app keeps crashing when I open it. What should I do?
-category: TECHNICAL
-response: Sorry to hear that the app is crashing. Let's go through some troubleshooting steps to resolve the issue.
-
-**Step 1: Close and Restart the App**
-
-1. Try closing the app by swiping up and holding on your device (for iOS) or by long-pressing on the app icon and dragging it to the "Close all apps" button (for Android).
-2. Wait for a few seconds, then restart the app.
-3. Check if the app is still crashing.
-
-**Step 2: Check for Updates**
-
-1. Make sure your device is connected to the internet.
-2. Open the App Store (for iOS) or Google Play Store (for Android).
-3. Check for updates to the app. If an update is available, download and install it.
-4. Restart the app and check if the issue is resolved.
-
-**Step 3: Clear Cache and Data**
-
-1. Go to your device's settings.
-2. Find the app in the "Apps" or "Applications" section.
-3. Select the app and look for the "Storage" or "Clear Cache" option.
-4. Clear the cache and data associated with the app.
-5. Restart the app and check if the issue is resolved.
-
-**Step 4: Reinstall the App**
-
-1. Delete the app from your device by holding on the app icon and dragging it to the "Uninstall" button (for iOS) or by long-pressing on the app icon and selecting "Uninstall" (for Android).
-2. Go to the App Store (for iOS) or Google Play Store (for Android) and reinstall the app.
-3. Launch the app and check if the issue is resolved.
-
-If none of these steps resolve the issue, please provide more details about your device, the app version, and the error message you're encountering. I'll be happy to assist you further.
-
-inquiry: What are your business hours?
-category: GENERAL
-response: Our business hours are from Monday to Friday, 8:00 AM to 6:00 PM, and Saturday, 9:00 AM to 5:00 PM. We are closed on Sundays and all major holidays. 
-
-If you need assistance outside of our regular business hours, you can reach us through our automated phone system or send us an email. We will respond to your inquiry as soon as possible. 
-
-Would you like to know more about our services or is there something specific I can help you with?
-~~~
-
 ---
 
 ## Multi-stage data transformation pipeline
@@ -363,63 +289,6 @@ def get_user(id):
 print("running code review pipeline...")
 result = code_review_pipeline(sample_code)
 print(f"\n=== final report ===\n{result['report']}")
-```
-
-~~~
-Output
-running code review pipeline...
-  analysis done: score 4/10, 4 issues
-  suggestions done
-  report done
-
-=== final report ===
-**Code Review Report**
-
-**Overall Assessment:** The original code has several issues that need to be addressed to improve its security, reliability, and maintainability. The corrected code addresses these issues and provides a more robust and secure solution.
-
-**Key Improvements:**
-
-1. **Prevent SQL Injection Vulnerability:** The corrected code uses parameterized queries to prevent SQL injection attacks.
-2. **Properly Handle Database Connection Errors:** The corrected code handles `sqlite3.Error` exceptions and provides meaningful error messages.
-3. **Close Cursor and Database Connection:** The corrected code uses `with` statements to automatically close the cursor and database connection.
-4. **Handle Non-Existent Users or Database Errors:** The corrected code checks for `None` results and returns meaningful error messages.
-
-**Recommended Actions:**
-
-1. Implement the corrected code to prevent SQL injection vulnerabilities.
-2. Handle database connection errors properly by catching `sqlite3.Error` exceptions.
-3. Use `with` statements to close resources and ensure they are properly cleaned up.
-4. Return meaningful error messages in case of non-existent users or database errors.
-
-**Score:** 5/5 (The corrected code addresses all issues and provides a robust and secure solution.)
-~~~python
-def get_user(id):
-    try:
-        import sqlite3
-        conn = sqlite3.connect('users.db')
-        cursor = conn.cursor()
-        
-        # Validate the user ID
-        if not isinstance(id, int) or id < 1:
-            raise ValueError("Invalid user ID")
-        
-        cursor.execute("SELECT * FROM users WHERE id = ?", (id,))
-        result = cursor.fetchone()
-    except sqlite3.Error as e:
-        # Handle the SQLite error
-        print(f"Error: {e}")
-    except ValueError as e:
-        # Handle the invalid user ID
-        print(f"Error: {e}")
-    except Exception as e:
-        # Handle any other exceptions
-        print(f"Error: {e}")
-    finally:
-        # Close the database connection
-        if conn:
-            conn.close()
-    return result
-```
 ```
 
 ---
