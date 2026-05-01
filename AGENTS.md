@@ -244,3 +244,64 @@ This pass is in addition to the existing `check-ko.sh` gate (which catches grep-
 5. Run `python3 .sisyphus/medium/finalize-posts.py` to insert tags + TOC + normalize refs
 6. Update `README.md` series table
 7. Verify: no `## References` in ko, all 3 variants have tag + TOC, mermaid count = 0
+
+## Post status lifecycle
+
+Article-level status values (set in front matter `status:` field):
+
+| Status | Meaning |
+| --- | --- |
+| `draft` | Skeleton or placeholder — not ready for any review |
+| `content-ready` | Body complete, references in, no code yet checked |
+| `code-checked` | All code blocks verified to run on stated versions |
+| `publish-ready` | Final polish done, channel-specific titles set |
+| `ready` | Legacy alias for `publish-ready`; prefer `publish-ready` in new posts |
+| `published` | Live on at least one channel; `published:` URLs present |
+| `needs-update` | Content is stale (API changes, deprecated features) |
+
+Series-level `status:` in series.yaml uses: `planned`, `draft`, `active`, `complete`.
+
+When bumping an article from `content-ready` → `code-checked`, add or confirm `last_reviewed: YYYY-MM-DD`.
+
+## A-grade post structure
+
+Every post targeting `publish-ready` or higher MUST include, in order:
+
+1. H1 title (matches `title:` in front matter)
+2. "이 글에서 답할 질문" block (ko) / "Questions this post answers" (en) — 3–5 bullet questions
+3. One-sentence mental model (quoted block `> ...`)
+4. Key diagram (Mermaid → PNG)
+5. Minimal runnable example
+6. Code walkthrough ("이 코드에서 봐야 할 것" / "What to notice in this code")
+7. Common confusion points ("실무에서 헷갈리는 지점" / "Where engineers get confused")
+8. Checklist
+9. Summary / next post link (`blog-only` block)
+10. Series TOC
+11. References
+12. Tags line
+
+Items 2, 6, 7 are the most commonly missing. Check these before marking `publish-ready`.
+
+## Channel-specific title fields (optional, recommended for publish-ready)
+
+When a post is close to publication, add channel-specific titles to front matter:
+
+```yaml
+title: Azure Functions란? — 이벤트가 함수를 호출하는 세상    # canonical (H1 must match)
+seo_title: Azure Functions란? Trigger, Binding, Host 구조 한 번에 이해하기
+blogger_title: What Is Azure Functions? — A World Where Events Call Your Code
+medium_title: Azure Functions Is Not Just "Serverless"
+ebook_title: The Azure Functions Mental Model
+```
+
+`title` is required and must match H1. Others are optional. `check_frontmatter.py` accepts all five.
+
+## Syncing per-article metadata
+
+After adding, renaming, or bulk-updating article status:
+
+```bash
+python3 scripts/sync_series_per.py
+```
+
+This reads front matter from disk and writes the `per.{ko,en}.articles` block in `series.yaml`. Run before `make ebook` or any eBook export.

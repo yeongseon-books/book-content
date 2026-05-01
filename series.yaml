@@ -1,367 +1,1684 @@
-# Single source of truth for the series catalog.
-# SERIES.md is the human-readable summary; scripts/build_series_index.py will
-# generate SERIES.md and mkdocs.yml nav from this file.
-# status enum: planned | draft | ready | published | needs-update
-
 meta:
-  # GitHub coordinates used to build absolute URLs (commit-pinned) in:
-  #   - .sisyphus/medium/to-medium.py     (Medium import-ready raw image URLs)
-  #   - scripts/export_ebook_source.py    (ebook bundle cross-series + canonical links)
-  #
-  # `repo`: When the repo is renamed (Phase 9: tech-blog -> tech-writing), update
-  # this AND re-run to-medium.py / export_ebook_source.py to regenerate artifacts.
-  #
-  # `published_ref`: IMMUTABLE publishing snapshot. All external-facing absolute
-  # URLs (Medium raw images, ebook canonical/cross-series links) point here.
-  # Bump only when publishing a new snapshot of the content; readers of already-
-  # published Medium articles depend on this commit existing forever.
-  #
-  # `validated_ref`: optional internal tracking of "latest commit that passed
-  # all gates". Not consumed by any URL builder. Useful for humans answering
-  # "is published_ref behind master?". Update freely.
   repo: yeongseon-books/tech-writing
   published_ref: f24a126
   validated_ref: f24a126
-
 series:
-  # Azure
-  - id: azure-app-service-101
-    category: azure
-    title:
-      ko: Azure App Service 101
-      en: Azure App Service 101
-    description:
-      ko: Azure App Service 입문 7부작 — 호스팅, 설정, 로그, 스케일링.
-      en: A 7-part beginner guide to Azure App Service.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: draft
-    path: content/azure-app-service-101
-
-  - id: azure-app-service-deep-dive
-    category: azure
-    title:
-      ko: Azure App Service Deep Dive
-      en: Azure App Service Deep Dive
-    description:
-      ko: App Service 내부 — Front-End, Worker, Sandbox, Kudu, Scaling.
-      en: Inside App Service — Front-End, Worker, Sandbox, Kudu, Scaling.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 301
-    status: draft
-    path: content/azure-app-service-deep-dive
-
-  - id: azure-functions-101
-    category: azure
-    title:
-      ko: Azure Functions 101
-      en: Azure Functions 101
-    description:
-      ko: Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
-      en: A 7-part beginner guide to Azure Functions.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: draft
-    path: content/azure-functions-101
-
-  - id: azure-functions-deep-dive
-    category: azure
-    title:
-      ko: Azure Functions Deep Dive
-      en: Azure Functions Deep Dive
-    description:
-      ko: Azure Functions Host 소스 분석 시리즈 (commit-pinned).
-      en: Source-level dive into Azure Functions Host (commit-pinned).
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 301
-    status: draft
-    path: content/azure-functions-deep-dive
-
-  - id: azure-aks-101
-    category: azure
-    title:
-      ko: Azure Kubernetes Service 101
-      en: Azure Kubernetes Service 101
-    description:
-      ko: AKS 입문 시리즈.
-      en: AKS beginner guide.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: draft
-    path: content/azure-aks-101
-
-  - id: azure-aks-deep-dive
-    category: azure
-    title:
-      ko: Azure Kubernetes Service Deep Dive
-      en: Azure Kubernetes Service Deep Dive
-    description:
-      ko: AKS control plane / data plane 내부 동작.
-      en: AKS control plane / data plane internals.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 301
-    status: draft
-    path: content/azure-aks-deep-dive
-
-  - id: azure-aca-101
-    category: azure
-    title:
-      ko: Azure Container Apps 101
-      en: Azure Container Apps 101
-    description:
-      ko: Container Apps 입문 시리즈.
-      en: Container Apps beginner guide.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: draft
-    path: content/azure-aca-101
-
-  - id: azure-aca-deep-dive
-    category: azure
-    title:
-      ko: Azure Container Apps Deep Dive
-      en: Azure Container Apps Deep Dive
-    description:
-      ko: ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
-      en: Inside ACA — KEDA, Dapr, Envoy.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 301
-    status: draft
-    path: content/azure-aca-deep-dive
-
-  # AI
-  - id: ai-web-dev-101
-    category: ai
-    title:
-      ko: AI 웹 개발 입문
-      en: AI Web Development 101
-    description:
-      ko: AI API 부터 배포까지, 초급 개발자를 위한 7부작.
-      en: 7-part guide for junior developers — from AI API basics to deployment.
-    languages: [ko]
-    targets: { tistory: true, blogger: false, medium: false, mkdocs: true, ebook: true }
-    level: 101
-    status: needs-update
-    path: content/ai-web-dev-101
-
-  - id: llm-from-scratch-101
-    category: ai
-    title:
-      ko: LLM from Scratch 101
-      en: LLM from Scratch 101
-    description:
-      ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
-      en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: draft
-    path: content/llm-from-scratch-101
-
-  # RAG
-  - id: rag-deep-dive
-    category: ai
-    title:
-      ko: RAG Deep Dive
-      en: RAG Deep Dive
-    description:
-      ko: LangChain · FAISS · RAGAS 소스로 따라가는 RAG 파이프라인 심층 분석 6부작.
-      en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 301
-    status: draft
-    path: content/rag-deep-dive
-
-  # LLM / AI application series (new roadmap — sequential 101s)
-  - id: llm-app-foundations-101
-    category: ai
-    title:
-      ko: LLM 앱 기초
-      en: LLM App Foundations 101
-    description:
-      ko: LLM API 기초, 토큰, 프롬프트 엔지니어링 — 6부작.
-      en: LLM API basics, tokens, and prompt engineering in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/llm-app-foundations-101
-
-  - id: llm-api-production-101
-    category: ai
-    title:
-      ko: LLM API 프로덕션 101
-      en: LLM API Production 101
-    description:
-      ko: Structured Output, Tool Calling, Streaming, Caching, Retry, Rate Limit — 6부작.
-      en: Structured Output, Tool Calling, Streaming, Caching, Retry, and Rate Limit in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/llm-api-production-101
-
-  - id: vector-search-101
-    category: ai
-    title:
-      ko: 벡터 검색 101
-      en: Vector Search 101
-    description:
-      ko: 임베딩, FAISS, 유사도, 청크 전략 — 6부작.
-      en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/vector-search-101
-
-  - id: langchain-101
-    category: ai
-    title:
-      ko: LangChain 101
-      en: LangChain 101
-    description:
-      ko: LCEL, Runnable, Retriever, Tool Calling 기본, Streaming — LangChain API 사용법 6부작.
-      en: LCEL, Runnable, Retriever, Tool Calling, and Streaming — LangChain API in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/langchain-101
-
-  - id: ai-app-patterns-101
-    category: ai
-    title:
-      ko: AI 앱 패턴 101
-      en: AI App Patterns 101
-    description:
-      ko: 챗봇, RAG Q&A, 문서비서, Agent, Workflow, Human-in-the-loop — LLM 앱 설계 패턴 6부작.
-      en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/ai-app-patterns-101
-
-  - id: korean-ai-stack-101
-    category: ai
-    title:
-      ko: 한국어 AI 스택 101
-      en: Korean AI Stack 101
-    description:
-      ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
-      en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/korean-ai-stack-101
-
-  - id: document-ingestion-101
-    category: ai
-    title:
-      ko: 문서 수집과 인덱싱 101
-      en: Document Ingestion 101
-    description:
-      ko: PDF 파싱, 메타데이터, 증분 인덱싱 — 6부작.
-      en: PDF parsing, metadata, and incremental indexing in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/document-ingestion-101
-
-  - id: llm-apps-ops-101
-    category: ai
-    title:
-      ko: LLM 앱 운영 101
-      en: LLM Apps Ops 101
-    description:
-      ko: 관측, 평가, 비용, 보안, 배포 — 6부작.
-      en: Observability, evaluation, cost, security, and deployment in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/llm-apps-ops-101
-
-  - id: rag-benchmark-101
-    category: ai
-    title:
-      ko: RAG 벤치마크 101
-      en: RAG Benchmark 101
-    description:
-      ko: VectorDB, Embedding, Retriever, RAG 평가 비교 — 6부작.
-      en: VectorDB, embedding model, retriever, and RAG pipeline evaluation in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/rag-benchmark-101
-
-  - id: langgraph-101
-    category: ai
-    title:
-      ko: LangGraph 101
-      en: LangGraph 101
-    description:
-      ko: 그래프 에이전트, 체크포인트, 멀티에이전트 — 6부작.
-      en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/langgraph-101
-
-  - id: llm-finetuning-101
-    category: ai
-    title:
-      ko: LLM 파인튜닝 101
-      en: LLM Fine-tuning 101
-    description:
-      ko: LoRA, 데이터셋, 서빙 — 6부작 (선택).
-      en: LoRA, datasets, and serving in 6 parts (optional).
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/llm-finetuning-101
-
-  # AX (planned)
-  - id: ax-practical-guide
-    category: ax
-    title:
-      ko: AX 실전 가이드
-      en: AI Transformation Practical Guide
-    description:
-      ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
-      en: Practical strategies for AI Transformation in real organizations.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/ax-practical-guide
-
-  # Technical writing (planned)
-  - id: technical-writing
-    category: writing
-    title:
-      ko: 엔지니어를 위한 기술 글쓰기
-      en: Technical Writing for Engineers
-    description:
-      ko: 시리즈를 설계하고, 한 편을 다듬는 법.
-      en: Designing a series and shipping a single article.
-    languages: [ko, en]
-    targets: { tistory: true, blogger: true, medium: true, mkdocs: true, ebook: true }
-    level: 101
-    status: planned
-    path: content/technical-writing
+- id: azure-app-service-101
+  category: azure
+  title:
+    ko: Azure App Service 101
+    en: Azure App Service 101
+  description:
+    ko: Azure App Service 입문 7부작 — 호스팅, 설정, 로그, 스케일링.
+    en: A 7-part beginner guide to Azure App Service.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: draft
+  path: content/azure-app-service-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-app-service
+        title: Azure App Service란? - 플랫폼 아키텍처 이해하기
+        status: ready
+      - idx: 2
+        slug: 02-request-lifecycle
+        title: 'Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까'
+        status: ready
+      - idx: 3
+        slug: 03-hosting-models
+        title: 'Hosting Models: 어떤 플랜을 선택해야 할까?'
+        status: ready
+      - idx: 4
+        slug: 04-first-deploy
+        title: '첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)'
+        status: ready
+      - idx: 5
+        slug: 05-configuration
+        title: 'Configuration 마스터하기: App Settings & 환경변수'
+        status: ready
+      - idx: 6
+        slug: 06-logging-monitoring
+        title: '로그와 모니터링 기초: “앱이 느려요”에 답할 수 있는 상태 만들기'
+        status: ready
+      - idx: 7
+        slug: 07-scaling-101
+        title: 'Scaling 101: 언제 Scale Up vs Scale Out?'
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-app-service
+        title: What is Azure App Service? - Understanding the Platform Architecture
+        status: ready
+      - idx: 2
+        slug: 02-request-lifecycle
+        title: 'Request Lifecycle: How Requests Reach Your App'
+        status: ready
+      - idx: 3
+        slug: 03-hosting-models
+        title: 'Hosting Models: Which Plan Should You Choose?'
+        status: ready
+      - idx: 4
+        slug: 04-first-deploy
+        title: 'First Deployment: From Local to Azure (Python/Flask)'
+        status: ready
+      - idx: 5
+        slug: 05-configuration
+        title: 'Mastering Configuration: App Settings & Environment Variables'
+        status: ready
+      - idx: 6
+        slug: 06-logging-monitoring
+        title: Logging and Monitoring Basics
+        status: ready
+      - idx: 7
+        slug: 07-scaling-101
+        title: 'Scaling 101: When to Scale Up vs Scale Out?'
+        status: ready
+- id: azure-app-service-deep-dive
+  category: azure
+  title:
+    ko: Azure App Service Deep Dive
+    en: Azure App Service Deep Dive
+  description:
+    ko: App Service 내부 — Front-End, Worker, Sandbox, Kudu, Scaling.
+    en: Inside App Service — Front-End, Worker, Sandbox, Kudu, Scaling.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 301
+  status: draft
+  path: content/azure-app-service-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-platform-architecture
+        title: App Service 플랫폼 아키텍처 — Front-End·Worker·File Server
+        status: ready
+      - idx: 2
+        slug: 02-front-end-and-arr
+        title: Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
+        status: ready
+      - idx: 3
+        slug: 03-worker-and-sandbox
+        title: Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
+        status: ready
+      - idx: 4
+        slug: 04-deployment-and-kudu
+        title: 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
+        status: ready
+      - idx: 5
+        slug: 05-scaling-internals
+        title: 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
+        status: ready
+      - idx: 6
+        slug: 06-cold-start-and-warmup
+        title: 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-platform-architecture
+        title: App Service platform architecture — Front-End, Worker, File Server
+        status: ready
+      - idx: 2
+        slug: 02-front-end-and-arr
+        title: Front-End and ARR — how a request reaches a worker
+        status: ready
+      - idx: 3
+        slug: 03-worker-and-sandbox
+        title: Workers and the sandbox — where user code actually runs
+        status: ready
+      - idx: 4
+        slug: 04-deployment-and-kudu
+        title: Deployment and Kudu — build, sync, release from the inside
+        status: ready
+      - idx: 5
+        slug: 05-scaling-internals
+        title: Scaling internals — how Scale Out decisions become new workers
+        status: ready
+      - idx: 6
+        slug: 06-cold-start-and-warmup
+        title: Cold start and warmup — why the first request is expensive
+        status: ready
+- id: azure-functions-101
+  category: azure
+  title:
+    ko: Azure Functions 101
+    en: Azure Functions 101
+  description:
+    ko: Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
+    en: A 7-part beginner guide to Azure Functions.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: draft
+  path: content/azure-functions-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-azure-functions
+        title: Azure Functions란? — 이벤트가 함수를 호출하는 세상
+        status: ready
+      - idx: 2
+        slug: 02-triggers-and-bindings
+        title: 트리거와 바인딩 — 함수 입출력의 모든 것
+        status: ready
+      - idx: 3
+        slug: 03-host-and-worker
+        title: Host와 Worker — 함수는 누가 실행하는가
+        status: ready
+      - idx: 4
+        slug: 04-first-deploy
+        title: 함수 하나 배포하기 — 로컬에서 Azure까지
+        status: ready
+      - idx: 5
+        slug: 05-choosing-a-plan
+        title: 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated
+        status: ready
+      - idx: 6
+        slug: 06-scaling-and-cold-start
+        title: 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간
+        status: ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: 모니터링과 운영 기초
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-azure-functions
+        title: What Is Azure Functions? — A World Where Events Call Your Code
+        status: ready
+      - idx: 2
+        slug: 02-triggers-and-bindings
+        title: Triggers and Bindings — Everything About Function I/O
+        status: ready
+      - idx: 3
+        slug: 03-host-and-worker
+        title: Host and Worker — Who Actually Runs Your Functions?
+        status: ready
+      - idx: 4
+        slug: 04-first-deploy
+        title: Deploy a Function App — From Localhost to Azure
+        status: ready
+      - idx: 5
+        slug: 05-choosing-a-plan
+        title: Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
+        status: ready
+      - idx: 6
+        slug: 06-scaling-and-cold-start
+        title: Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t
+        status: ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: Monitoring and Operations Fundamentals
+        status: ready
+- id: azure-functions-deep-dive
+  category: azure
+  title:
+    ko: Azure Functions Deep Dive
+    en: Azure Functions Deep Dive
+  description:
+    ko: Azure Functions Host 소스 분석 시리즈 (commit-pinned).
+    en: Source-level dive into Azure Functions Host (commit-pinned).
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 301
+  status: draft
+  path: content/azure-functions-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-host-bootstrap
+        title: 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기
+        status: ready
+      - idx: 2
+        slug: 02-worker-process
+        title: Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법
+        status: ready
+      - idx: 3
+        slug: 03-grpc-event-stream
+        title: gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
+        status: ready
+      - idx: 4
+        slug: 04-dispatcher-and-invocation
+        title: Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지
+        status: ready
+      - idx: 5
+        slug: 05-scaling-internals
+        title: 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이
+        status: ready
+      - idx: 6
+        slug: 06-cold-start-placeholder
+        title: 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-host-bootstrap
+        title: Host Bootstrap — Following `WebJobsScriptHostService`
+        status: ready
+      - idx: 2
+        slug: 02-worker-process
+        title: Worker Processes — How One Host Hosts Many Languages
+        status: ready
+      - idx: 3
+        slug: 03-grpc-event-stream
+        title: The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
+        status: ready
+      - idx: 4
+        slug: 04-dispatcher-and-invocation
+        title: Dispatcher and Invocation — How a Function Call Reaches the Worker
+        status: ready
+      - idx: 5
+        slug: 05-scaling-internals
+        title: Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
+        status: ready
+      - idx: 6
+        slug: 06-cold-start-placeholder
+        title: Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
+        status: ready
+- id: azure-aks-101
+  category: azure
+  title:
+    ko: Azure Kubernetes Service 101
+    en: Azure Kubernetes Service 101
+  description:
+    ko: AKS 입문 시리즈.
+    en: AKS beginner guide.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: draft
+  path: content/azure-aks-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-aks
+        title: Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
+        status: ready
+      - idx: 2
+        slug: 02-cluster-architecture
+        title: 클러스터 아키텍처 — Control Plane과 Node Pool
+        status: ready
+      - idx: 3
+        slug: 03-first-cluster-and-deploy
+        title: 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
+        status: ready
+      - idx: 4
+        slug: 04-pod-deployment-service
+        title: Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식
+        status: ready
+      - idx: 5
+        slug: 05-networking-and-ingress
+        title: 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
+        status: ready
+      - idx: 6
+        slug: 06-scaling-hpa-ca-keda
+        title: 스케일링 — HPA, Cluster Autoscaler, KEDA
+        status: ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: 모니터링과 운영 — Container Insights, 로그, 알람
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-aks
+        title: What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
+        status: ready
+      - idx: 2
+        slug: 02-cluster-architecture
+        title: Cluster architecture — control plane and node pools
+        status: ready
+      - idx: 3
+        slug: 03-first-cluster-and-deploy
+        title: Your first cluster, your first deploy — Python/FastAPI
+        status: ready
+      - idx: 4
+        slug: 04-pod-deployment-service
+        title: Pod, Deployment, Service — the three ways you express a workload
+        status: ready
+      - idx: 5
+        slug: 05-networking-and-ingress
+        title: Networking and Ingress — the path in and out of the cluster
+        status: ready
+      - idx: 6
+        slug: 06-scaling-hpa-ca-keda
+        title: Scaling — HPA, Cluster Autoscaler, KEDA
+        status: ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: Monitoring and ops — Container Insights, logs, alerts
+        status: ready
+- id: azure-aks-deep-dive
+  category: azure
+  title:
+    ko: Azure Kubernetes Service Deep Dive
+    en: Azure Kubernetes Service Deep Dive
+  description:
+    ko: AKS control plane / data plane 내부 동작.
+    en: AKS control plane / data plane internals.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 301
+  status: draft
+  path: content/azure-aks-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-control-plane-anatomy
+        title: Control Plane 해부 — AKS가 사용자에게서 가린 것
+        status: ready
+      - idx: 2
+        slug: 02-kubelet-and-containerd
+        title: kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
+        status: ready
+      - idx: 3
+        slug: 03-cni-and-azure-cni-overlay
+        title: CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가
+        status: ready
+      - idx: 4
+        slug: 04-scheduler-and-pod-placement
+        title: Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
+        status: ready
+      - idx: 5
+        slug: 05-hpa-and-cluster-autoscaler-internals
+        title: HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
+        status: ready
+      - idx: 6
+        slug: 06-keda-internals
+        title: KEDA 내부 — ScaledObject가 HPA를 만드는 방식
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-control-plane-anatomy
+        title: Control plane anatomy — what AKS hides from you
+        status: ready
+      - idx: 2
+        slug: 02-kubelet-and-containerd
+        title: kubelet and containerd — how a container actually starts on a node
+        status: ready
+      - idx: 3
+        slug: 03-cni-and-azure-cni-overlay
+        title: CNI and Azure CNI Overlay — where Pod IPs come from
+        status: ready
+      - idx: 4
+        slug: 04-scheduler-and-pod-placement
+        title: Scheduler and Pod placement — who decides which node
+        status: ready
+      - idx: 5
+        slug: 05-hpa-and-cluster-autoscaler-internals
+        title: HPA and Cluster Autoscaler internals — two control loops
+        status: ready
+      - idx: 6
+        slug: 06-keda-internals
+        title: KEDA internals — how a ScaledObject builds an HPA
+        status: ready
+- id: azure-aca-101
+  category: azure
+  title:
+    ko: Azure Container Apps 101
+    en: Azure Container Apps 101
+  description:
+    ko: Container Apps 입문 시리즈.
+    en: Container Apps beginner guide.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: draft
+  path: content/azure-aca-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-aca
+        title: Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기
+        status: ready
+      - idx: 2
+        slug: 02-environment-app-revision
+        title: Environment·Container App·Revision — 세 단어로 보는 ACA
+        status: ready
+      - idx: 3
+        slug: 03-first-deploy
+        title: 첫 앱 배포하기 — Python/FastAPI
+        status: ready
+      - idx: 4
+        slug: 04-ingress-and-traffic-split
+        title: Ingress와 트래픽 분할 — Revision 기반 배포 전략
+        status: ready
+      - idx: 5
+        slug: 05-scaling-with-keda
+        title: 스케일링 — KEDA scaler와 0-to-N
+        status: ready
+      - idx: 6
+        slug: 06-dapr-integration
+        title: Dapr 통합 — 사이드카로 얻는 것
+        status: ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: 모니터링과 운영 — Log Analytics와 Application Insights
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-aca
+        title: What is Azure Container Apps? — running containers without Kubernetes
+        status: ready
+      - idx: 2
+        slug: 02-environment-app-revision
+        title: Environment, Container App, Revision — ACA in three words
+        status: ready
+      - idx: 3
+        slug: 03-first-deploy
+        title: Your first deploy — Python/FastAPI
+        status: ready
+      - idx: 4
+        slug: 04-ingress-and-traffic-split
+        title: Ingress and traffic splitting — revision-based deployment strategies
+        status: ready
+      - idx: 5
+        slug: 05-scaling-with-keda
+        title: Scaling — KEDA scalers and zero-to-N
+        status: ready
+      - idx: 6
+        slug: 06-dapr-integration
+        title: Dapr integration — what you get from a sidecar
+        status: ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: Monitoring and ops — Log Analytics and Application Insights
+        status: ready
+- id: azure-aca-deep-dive
+  category: azure
+  title:
+    ko: Azure Container Apps Deep Dive
+    en: Azure Container Apps Deep Dive
+  description:
+    ko: ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
+    en: Inside ACA — KEDA, Dapr, Envoy.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 301
+  status: draft
+  path: content/azure-aca-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-aca-architecture
+        title: ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
+        status: ready
+      - idx: 2
+        slug: 02-environment-internals
+        title: Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
+        status: ready
+      - idx: 3
+        slug: 03-revision-and-traffic-split
+        title: Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
+        status: ready
+      - idx: 4
+        slug: 04-keda-in-aca
+        title: ACA 안의 KEDA — Scale Rule이 만드는 것
+        status: ready
+      - idx: 5
+        slug: 05-dapr-sidecar-internals
+        title: Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
+        status: ready
+      - idx: 6
+        slug: 06-envoy-ingress-path
+        title: Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-aca-architecture
+        title: ACA architecture — what Microsoft layered on a hidden Kubernetes
+        status: ready
+      - idx: 2
+        slug: 02-environment-internals
+        title: Environment internals — the network, observability, and Dapr scope boundary
+        status: ready
+      - idx: 3
+        slug: 03-revision-and-traffic-split
+        title: Revisions and traffic splitting — where Envoy weights come from
+        status: ready
+      - idx: 4
+        slug: 04-keda-in-aca
+        title: KEDA inside ACA — what a scale rule actually creates
+        status: ready
+      - idx: 5
+        slug: 05-dapr-sidecar-internals
+        title: Dapr sidecar internals — the Go process that lives next to your container
+        status: ready
+      - idx: 6
+        slug: 06-envoy-ingress-path
+        title: The Envoy ingress path — how the first request reaches your container
+        status: ready
+- id: ai-web-dev-101
+  category: ai
+  title:
+    ko: AI 웹 개발 입문
+    en: AI Web Development 101
+  description:
+    ko: AI API 부터 배포까지, 초급 개발자를 위한 7부작.
+    en: 7-part guide for junior developers — from AI API basics to deployment.
+  languages:
+  - ko
+  targets:
+    tistory: true
+    blogger: false
+    medium: false
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: needs-update
+  path: content/ai-web-dev-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-hello-ai-api
+        title: AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기
+        status: needs-update
+      - idx: 2
+        slug: 02-prompt-engineering
+        title: 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술
+        status: needs-update
+      - idx: 3
+        slug: 03-ai-chatbot
+        title: AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
+        status: needs-update
+      - idx: 4
+        slug: 04-rag-intro
+        title: RAG 입문 — 내 데이터로 답하는 AI 만들기
+        status: needs-update
+      - idx: 5
+        slug: 05-ai-agent
+        title: AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
+        status: needs-update
+      - idx: 6
+        slug: 06-deploy
+        title: 'AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기'
+        status: needs-update
+      - idx: 7
+        slug: 07-eval-improve
+        title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
+        status: needs-update
+- id: llm-from-scratch-101
+  category: ai
+  title:
+    ko: LLM from Scratch 101
+    en: LLM from Scratch 101
+  description:
+    ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
+    en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: draft
+  path: content/llm-from-scratch-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-tokenizer
+        title: 글자를 숫자로 바꾸기
+        status: ready
+      - idx: 2
+        slug: 02-embedding
+        title: 정수에서 벡터로, 그리고 위치
+        status: ready
+      - idx: 3
+        slug: 03-attention
+        title: 어떤 토큰을 얼마나 볼지 스스로 정하기
+        status: ready
+      - idx: 4
+        slug: 04-transformer-block
+        title: 블록 하나, 깊이의 단위
+        status: ready
+      - idx: 5
+        slug: 05-gpt-model
+        title: '조립: GPT 모델 클래스 완성'
+        status: ready
+      - idx: 6
+        slug: 06-training-loop
+        title: 기울기로 배우기
+        status: ready
+      - idx: 7
+        slug: 07-inference
+        title: 샘플링 — 학습된 모델에서 글 뽑아내기
+        status: ready
+      - idx: 8
+        slug: 08-finetuning
+        title: 베이스 모델을 우리 작업에 맞추기
+        status: ready
+      - idx: 9
+        slug: 09-chatbot-wrapper
+        title: 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
+        status: ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-tokenizer
+        title: Turning Text into Numbers
+        status: ready
+      - idx: 2
+        slug: 02-embedding
+        title: From Integers to Vectors and Positions
+        status: ready
+      - idx: 3
+        slug: 03-attention
+        title: Deciding Which Tokens to Focus On
+        status: ready
+      - idx: 4
+        slug: 04-transformer-block
+        title: 'The Transformer Block: A Unit of Depth'
+        status: ready
+      - idx: 5
+        slug: 05-gpt-model
+        title: 'Assembly: Completing the GPT Model Class'
+        status: ready
+      - idx: 6
+        slug: 06-training-loop
+        title: Learning via Gradients
+        status: ready
+      - idx: 7
+        slug: 07-inference
+        title: Sampling — Generating Text from a Trained Model
+        status: ready
+      - idx: 8
+        slug: 08-finetuning
+        title: Adapting the Base Model to Specific Tasks
+        status: ready
+      - idx: 9
+        slug: 09-chatbot-wrapper
+        title: Turning Your LLM into a Chatbot — FastAPI + Streaming
+        status: ready
+- id: rag-deep-dive
+  category: ai
+  title:
+    ko: RAG Deep Dive
+    en: RAG Deep Dive
+  description:
+    ko: LangChain · FAISS · RAGAS 소스로 따라가는 RAG 파이프라인 심층 분석 6부작.
+    en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 301
+  status: draft
+  path: content/rag-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-document-loading-and-chunking
+        title: 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
+        status: draft
+      - idx: 2
+        slug: 02-embeddings-and-vector-index
+        title: 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
+        status: draft
+      - idx: 3
+        slug: 03-retriever-design
+        title: Retriever 설계 — VectorStoreRetriever와 MMR
+        status: draft
+      - idx: 4
+        slug: 04-prompt-construction-and-context-injection
+        title: 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
+        status: draft
+      - idx: 5
+        slug: 05-rag-chain-assembly
+        title: RAG Chain 조립 — RetrievalQA vs LCEL
+        status: draft
+      - idx: 6
+        slug: 06-evaluation-and-quality-gates
+        title: 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-document-loading-and-chunking
+        title: Document Loading and Chunking — Inside LangChain TextSplitter
+        status: draft
+      - idx: 2
+        slug: 02-embeddings-and-vector-index
+        title: Embeddings and the Vector Index — Inside FAISS IndexFlatL2
+        status: draft
+      - idx: 3
+        slug: 03-retriever-design
+        title: Retriever Design — VectorStoreRetriever and MMR
+        status: draft
+      - idx: 4
+        slug: 04-prompt-construction-and-context-injection
+        title: Prompt Construction and Context Injection — Inside PromptTemplate
+        status: draft
+      - idx: 5
+        slug: 05-rag-chain-assembly
+        title: Assembling the RAG Chain — RetrievalQA vs LCEL
+        status: draft
+      - idx: 6
+        slug: 06-evaluation-and-quality-gates
+        title: Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
+        status: draft
+- id: llm-app-foundations-101
+  category: ai
+  title:
+    ko: LLM 앱 기초
+    en: LLM App Foundations 101
+  description:
+    ko: LLM API 기초, 토큰, 프롬프트 엔지니어링 — 6부작.
+    en: LLM API basics, tokens, and prompt engineering in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/llm-app-foundations-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-llm-api-first-call
+        title: LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
+        status: draft
+      - idx: 2
+        slug: 02-understanding-tokens
+        title: 토큰 이해하기 — 비용, 한계, 컨텍스트 창
+        status: draft
+      - idx: 3
+        slug: 03-prompt-engineering-basics
+        title: 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
+        status: draft
+      - idx: 4
+        slug: 04-few-shot-and-cot
+        title: Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
+        status: draft
+      - idx: 5
+        slug: 05-conversation-state
+        title: 대화 상태 관리 — 멀티턴 챗봇 만들기
+        status: draft
+      - idx: 6
+        slug: 06-streaming-responses
+        title: 스트리밍 응답 처리 — 실시간으로 출력 받기
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-llm-api-first-call
+        title: LLM API first call — sending your first request
+        status: draft
+      - idx: 2
+        slug: 02-understanding-tokens
+        title: Understanding tokens — cost, limits, and context windows
+        status: draft
+      - idx: 3
+        slug: 03-prompt-engineering-basics
+        title: Prompt engineering basics — system, user, and assistant roles
+        status: draft
+      - idx: 4
+        slug: 04-few-shot-and-cot
+        title: Few-shot and chain-of-thought — steering better answers
+        status: draft
+      - idx: 5
+        slug: 05-conversation-state
+        title: Managing conversation state — building a multi-turn chatbot
+        status: draft
+      - idx: 6
+        slug: 06-streaming-responses
+        title: Handling streaming responses — real-time output
+        status: draft
+- id: llm-api-production-101
+  category: ai
+  title:
+    ko: LLM API 프로덕션 101
+    en: LLM API Production 101
+  description:
+    ko: Structured Output, Tool Calling, Streaming, Caching, Retry, Rate Limit — 6부작.
+    en: Structured Output, Tool Calling, Streaming, Caching, Retry, and Rate Limit in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/llm-api-production-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-structured-output
+        title: 구조화 출력 — JSON 모드와 응답 스키마
+        status: draft
+      - idx: 2
+        slug: 02-tool-calling
+        title: 툴 호출 — 함수를 모델에 연결하기
+        status: draft
+      - idx: 3
+        slug: 03-streaming-in-depth
+        title: 스트리밍 심화 — 청크 처리와 오류 복구
+        status: draft
+      - idx: 4
+        slug: 04-caching-strategies
+        title: 캐싱 전략 — 비용과 지연 시간 줄이기
+        status: draft
+      - idx: 5
+        slug: 05-retry-and-error-handling
+        title: 재시도와 오류 처리 — 안정적인 API 호출 만들기
+        status: draft
+      - idx: 6
+        slug: 06-rate-limit-management
+        title: 속도 제한 관리 — Rate Limit 대응 패턴
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-structured-output
+        title: Structured output — JSON mode and response schemas
+        status: draft
+      - idx: 2
+        slug: 02-tool-calling
+        title: Tool calling — connecting functions to the model
+        status: draft
+      - idx: 3
+        slug: 03-streaming-in-depth
+        title: Streaming in depth — chunk handling and error recovery
+        status: draft
+      - idx: 4
+        slug: 04-caching-strategies
+        title: Caching strategies — reducing cost and latency
+        status: draft
+      - idx: 5
+        slug: 05-retry-and-error-handling
+        title: Retry and error handling — making API calls reliable
+        status: draft
+      - idx: 6
+        slug: 06-rate-limit-management
+        title: Rate limit management — patterns for staying within limits
+        status: draft
+- id: vector-search-101
+  category: ai
+  title:
+    ko: 벡터 검색 101
+    en: Vector Search 101
+  description:
+    ko: 임베딩, FAISS, 유사도, 청크 전략 — 6부작.
+    en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/vector-search-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-embedding
+        title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
+        status: draft
+      - idx: 2
+        slug: 02-huggingface-embeddings
+        title: HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
+        status: draft
+      - idx: 3
+        slug: 03-cosine-similarity
+        title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
+        status: draft
+      - idx: 4
+        slug: 04-faiss-fundamentals
+        title: FAISS 입문 — 고속 근사 최근접 이웃 검색
+        status: draft
+      - idx: 5
+        slug: 05-chunking-strategies
+        title: 청크 전략 — 긴 문서를 어떻게 나눌 것인가
+        status: draft
+      - idx: 6
+        slug: 06-vector-search-pipeline
+        title: 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-embedding
+        title: What is an embedding — converting text into vectors
+        status: draft
+      - idx: 2
+        slug: 02-huggingface-embeddings
+        title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
+        status: draft
+      - idx: 3
+        slug: 03-cosine-similarity
+        title: Cosine similarity and vector search — computing sentence distances
+        status: draft
+      - idx: 4
+        slug: 04-faiss-fundamentals
+        title: FAISS fundamentals — fast approximate nearest-neighbor search
+        status: draft
+      - idx: 5
+        slug: 05-chunking-strategies
+        title: Chunking strategies — how to split long documents
+        status: draft
+      - idx: 6
+        slug: 06-vector-search-pipeline
+        title: Vector search pipeline — from document ingestion to query
+        status: draft
+- id: langchain-101
+  category: ai
+  title:
+    ko: LangChain 101
+    en: LangChain 101
+  description:
+    ko: LCEL, Runnable, Retriever, Tool Calling 기본, Streaming — LangChain API 사용법 6부작.
+    en: LCEL, Runnable, Retriever, Tool Calling, and Streaming — LangChain API in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/langchain-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-lcel-runnable-basics
+        title: LangChain 소개 — LCEL과 Runnable 기본
+        status: draft
+      - idx: 2
+        slug: 02-prompt-llm-chain
+        title: Prompt와 LLM Chain — 체인 첫 번째 구성
+        status: draft
+      - idx: 3
+        slug: 03-retriever
+        title: Retriever — 문서 검색과 컨텍스트 주입
+        status: draft
+      - idx: 4
+        slug: 04-tool-calling
+        title: Tool Calling — 외부 도구 연결하기
+        status: draft
+      - idx: 5
+        slug: 05-streaming
+        title: Streaming — 실시간 출력 처리
+        status: draft
+      - idx: 6
+        slug: 06-putting-it-together
+        title: 실전 체인 조립 — 컴포넌트를 하나로 연결하기
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-lcel-runnable-basics
+        title: LangChain introduction — LCEL and the Runnable interface
+        status: draft
+      - idx: 2
+        slug: 02-prompt-llm-chain
+        title: Prompt and LLM chain — assembling your first chain
+        status: draft
+      - idx: 3
+        slug: 03-retriever
+        title: Retriever — document search and context injection
+        status: draft
+      - idx: 4
+        slug: 04-tool-calling
+        title: Tool calling — connecting external tools
+        status: draft
+      - idx: 5
+        slug: 05-streaming
+        title: Streaming — handling real-time output
+        status: draft
+      - idx: 6
+        slug: 06-putting-it-together
+        title: Putting it together — a complete chain in one file
+        status: draft
+- id: ai-app-patterns-101
+  category: ai
+  title:
+    ko: AI 앱 패턴 101
+    en: AI App Patterns 101
+  description:
+    ko: 챗봇, RAG Q&A, 문서비서, Agent, Workflow, Human-in-the-loop — LLM 앱 설계 패턴 6부작.
+    en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/ai-app-patterns-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-chatbot-pattern
+        title: 챗봇 패턴 — 대화 이력 관리와 상태
+        status: draft
+      - idx: 2
+        slug: 02-rag-qa-pattern
+        title: RAG Q&A 패턴 — 문서 기반 질의응답
+        status: draft
+      - idx: 3
+        slug: 03-document-assistant
+        title: 문서 어시스턴트 — 요약, 추출, 분류
+        status: draft
+      - idx: 4
+        slug: 04-agent-tool-pattern
+        title: Agent + Tool 패턴 — 자율 도구 선택
+        status: draft
+      - idx: 5
+        slug: 05-workflow-automation
+        title: 워크플로 자동화 — 다단계 체인 설계
+        status: draft
+      - idx: 6
+        slug: 06-human-in-the-loop
+        title: Human-in-the-loop — 사람 개입 설계 패턴
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-chatbot-pattern
+        title: Chatbot pattern — managing conversation history and state
+        status: draft
+      - idx: 2
+        slug: 02-rag-qa-pattern
+        title: RAG Q&A pattern — document-based question answering
+        status: draft
+      - idx: 3
+        slug: 03-document-assistant
+        title: Document assistant — summarization, extraction, classification
+        status: draft
+      - idx: 4
+        slug: 04-agent-tool-pattern
+        title: Agent and tool pattern — autonomous tool selection
+        status: draft
+      - idx: 5
+        slug: 05-workflow-automation
+        title: Workflow automation — designing multi-step chains
+        status: draft
+      - idx: 6
+        slug: 06-human-in-the-loop
+        title: Human-in-the-loop — designing for human intervention
+        status: draft
+- id: korean-ai-stack-101
+  category: ai
+  title:
+    ko: 한국어 AI 스택 101
+    en: Korean AI Stack 101
+  description:
+    ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
+    en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/korean-ai-stack-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-korean-embedding-models
+        title: 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar
+        status: draft
+      - idx: 2
+        slug: 02-kosimcse-similarity
+        title: KoSimCSE로 문장 유사도 구현하기
+        status: draft
+      - idx: 3
+        slug: 03-bge-m3-multilingual
+        title: BGE-M3 다국어 임베딩 실전
+        status: draft
+      - idx: 4
+        slug: 04-clova-ocr
+        title: CLOVA OCR API로 문서 텍스트 추출
+        status: draft
+      - idx: 5
+        slug: 05-hyperclova-solar-api
+        title: HyperCLOVA X와 Solar API 사용하기
+        status: draft
+      - idx: 6
+        slug: 06-korean-rag-pipeline
+        title: 한국어 RAG 파이프라인 조합하기
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-korean-embedding-models
+        title: Korean embedding models compared — KoSimCSE, BGE-M3, Solar
+        status: draft
+      - idx: 2
+        slug: 02-kosimcse-similarity
+        title: Building sentence similarity search with KoSimCSE
+        status: draft
+      - idx: 3
+        slug: 03-bge-m3-multilingual
+        title: BGE-M3 multilingual embedding in practice
+        status: draft
+      - idx: 4
+        slug: 04-clova-ocr
+        title: Document text extraction with CLOVA OCR API
+        status: draft
+      - idx: 5
+        slug: 05-hyperclova-solar-api
+        title: Using HyperCLOVA X and Solar API
+        status: draft
+      - idx: 6
+        slug: 06-korean-rag-pipeline
+        title: Assembling a Korean RAG pipeline
+        status: draft
+- id: document-ingestion-101
+  category: ai
+  title:
+    ko: 문서 수집과 인덱싱 101
+    en: Document Ingestion 101
+  description:
+    ko: PDF 파싱, 메타데이터, 증분 인덱싱 — 6부작.
+    en: PDF parsing, metadata, and incremental indexing in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/document-ingestion-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-pdf-parsing
+        title: PDF 파싱과 텍스트 추출
+        status: draft
+      - idx: 2
+        slug: 02-chunking-strategies
+        title: 청킹 전략 — 문서 유형별 최적화
+        status: draft
+      - idx: 3
+        slug: 03-metadata-filtering
+        title: 메타데이터 설계와 필터링
+        status: draft
+      - idx: 4
+        slug: 04-incremental-indexing
+        title: 증분 인덱싱 — 변경된 문서만 업데이트
+        status: draft
+      - idx: 5
+        slug: 05-multi-format-pipeline
+        title: 다중 포맷 문서 파이프라인
+        status: draft
+      - idx: 6
+        slug: 06-pipeline-completion
+        title: 문서 수집 파이프라인 완성
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-pdf-parsing
+        title: PDF parsing and text extraction
+        status: draft
+      - idx: 2
+        slug: 02-chunking-strategies
+        title: Chunking strategies — optimizing by document type
+        status: draft
+      - idx: 3
+        slug: 03-metadata-filtering
+        title: Metadata design and filtering
+        status: draft
+      - idx: 4
+        slug: 04-incremental-indexing
+        title: Incremental indexing — updating only changed documents
+        status: draft
+      - idx: 5
+        slug: 05-multi-format-pipeline
+        title: Multi-format document pipeline
+        status: draft
+      - idx: 6
+        slug: 06-pipeline-completion
+        title: Completing the document ingestion pipeline
+        status: draft
+- id: llm-apps-ops-101
+  category: ai
+  title:
+    ko: LLM 앱 운영 101
+    en: LLM Apps Ops 101
+  description:
+    ko: 관측, 평가, 비용, 보안, 배포 — 6부작.
+    en: Observability, evaluation, cost, security, and deployment in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/llm-apps-ops-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-monitoring-and-logging
+        title: LLM 앱 모니터링과 로깅
+        status: draft
+      - idx: 2
+        slug: 02-cost-tracking
+        title: LLM 비용 추적과 최적화
+        status: draft
+      - idx: 3
+        slug: 03-evaluation
+        title: LLM 출력 품질 평가
+        status: draft
+      - idx: 4
+        slug: 04-security
+        title: LLM 앱 보안
+        status: draft
+      - idx: 5
+        slug: 05-deployment
+        title: LLM 앱 배포 전략
+        status: draft
+      - idx: 6
+        slug: 06-ops-complete
+        title: LLM 앱 운영 완성
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-monitoring-and-logging
+        title: Monitoring and logging for LLM apps
+        status: draft
+      - idx: 2
+        slug: 02-cost-tracking
+        title: LLM cost tracking and optimization
+        status: draft
+      - idx: 3
+        slug: 03-evaluation
+        title: Evaluating LLM output quality
+        status: draft
+      - idx: 4
+        slug: 04-security
+        title: LLM app security
+        status: draft
+      - idx: 5
+        slug: 05-deployment
+        title: LLM app deployment strategies
+        status: draft
+      - idx: 6
+        slug: 06-ops-complete
+        title: Completing the LLM ops pipeline
+        status: draft
+- id: rag-benchmark-101
+  category: ai
+  title:
+    ko: RAG 벤치마크 101
+    en: RAG Benchmark 101
+  description:
+    ko: VectorDB, Embedding, Retriever, RAG 평가 비교 — 6부작.
+    en: VectorDB, embedding model, retriever, and RAG pipeline evaluation in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/rag-benchmark-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-evaluation-metrics
+        title: RAG 평가 지표 이해
+        status: draft
+      - idx: 2
+        slug: 02-retrieval-benchmarking
+        title: 검색 성능 측정
+        status: draft
+      - idx: 3
+        slug: 03-embedding-comparison
+        title: 임베딩 모델 비교
+        status: draft
+      - idx: 4
+        slug: 04-vectordb-selection
+        title: VectorDB 선택 기준
+        status: draft
+      - idx: 5
+        slug: 05-e2e-evaluation
+        title: 종단 간 RAG 파이프라인 평가
+        status: draft
+      - idx: 6
+        slug: 06-benchmark-complete
+        title: RAG 벤치마크 완성
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-evaluation-metrics
+        title: Understanding RAG evaluation metrics
+        status: draft
+      - idx: 2
+        slug: 02-retrieval-benchmarking
+        title: Measuring retrieval performance
+        status: draft
+      - idx: 3
+        slug: 03-embedding-comparison
+        title: Comparing embedding models
+        status: draft
+      - idx: 4
+        slug: 04-vectordb-selection
+        title: VectorDB selection criteria
+        status: draft
+      - idx: 5
+        slug: 05-e2e-evaluation
+        title: End-to-end RAG pipeline evaluation
+        status: draft
+      - idx: 6
+        slug: 06-benchmark-complete
+        title: Completing the RAG benchmark
+        status: draft
+- id: langgraph-101
+  category: ai
+  title:
+    ko: LangGraph 101
+    en: LangGraph 101
+  description:
+    ko: 그래프 에이전트, 체크포인트, 멀티에이전트 — 6부작.
+    en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/langgraph-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-graph-basics
+        title: LangGraph 소개와 그래프 기초
+        status: draft
+      - idx: 2
+        slug: 02-state-and-checkpoints
+        title: 상태 관리와 체크포인트
+        status: draft
+      - idx: 3
+        slug: 03-conditional-edges
+        title: 조건부 엣지와 분기 흐름
+        status: draft
+      - idx: 4
+        slug: 04-tool-calling-agent
+        title: 도구 호출 에이전트
+        status: draft
+      - idx: 5
+        slug: 05-multi-agent
+        title: 멀티 에이전트 시스템
+        status: draft
+      - idx: 6
+        slug: 06-langgraph-complete
+        title: LangGraph 완성
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-graph-basics
+        title: LangGraph introduction and graph basics
+        status: draft
+      - idx: 2
+        slug: 02-state-and-checkpoints
+        title: State management and checkpoints
+        status: draft
+      - idx: 3
+        slug: 03-conditional-edges
+        title: Conditional edges and branching
+        status: draft
+      - idx: 4
+        slug: 04-tool-calling-agent
+        title: Tool-calling agents
+        status: draft
+      - idx: 5
+        slug: 05-multi-agent
+        title: Multi-agent systems
+        status: draft
+      - idx: 6
+        slug: 06-langgraph-complete
+        title: Completing LangGraph
+        status: draft
+- id: llm-finetuning-101
+  category: ai
+  title:
+    ko: LLM 파인튜닝 101
+    en: LLM Fine-tuning 101
+  description:
+    ko: LoRA, 데이터셋, 서빙 — 6부작 (선택).
+    en: LoRA, datasets, and serving in 6 parts (optional).
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/llm-finetuning-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-intro
+        title: LLM 파인튜닝 입문
+        status: draft
+      - idx: 2
+        slug: 02-dataset
+        title: 데이터셋 준비와 전처리
+        status: draft
+      - idx: 3
+        slug: 03-lora
+        title: LoRA 어댑터 구성
+        status: draft
+      - idx: 4
+        slug: 04-training
+        title: 학습 루프와 하이퍼파라미터
+        status: draft
+      - idx: 5
+        slug: 05-evaluation
+        title: 모델 평가
+        status: draft
+      - idx: 6
+        slug: 06-serving
+        title: 모델 서빙
+        status: draft
+    en:
+      articles:
+      - idx: 1
+        slug: 01-intro
+        title: Introduction to LLM Fine-tuning
+        status: draft
+      - idx: 2
+        slug: 02-dataset
+        title: Dataset preparation and preprocessing
+        status: draft
+      - idx: 3
+        slug: 03-lora
+        title: Configuring the LoRA adapter
+        status: draft
+      - idx: 4
+        slug: 04-training
+        title: Training loop and hyperparameters
+        status: draft
+      - idx: 5
+        slug: 05-evaluation
+        title: Model evaluation
+        status: draft
+      - idx: 6
+        slug: 06-serving
+        title: Model serving
+        status: draft
+- id: ax-practical-guide
+  category: ax
+  title:
+    ko: AX 실전 가이드
+    en: AI Transformation Practical Guide
+  description:
+    ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
+    en: Practical strategies for AI Transformation in real organizations.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/ax-practical-guide
+- id: technical-writing
+  category: writing
+  title:
+    ko: 엔지니어를 위한 기술 글쓰기
+    en: Technical Writing for Engineers
+  description:
+    ko: 시리즈를 설계하고, 한 편을 다듬는 법.
+    en: Designing a series and shipping a single article.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    blogger: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  status: planned
+  path: content/technical-writing

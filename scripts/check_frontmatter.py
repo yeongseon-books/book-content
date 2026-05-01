@@ -29,11 +29,12 @@ CONTENT_DIR = REPO_ROOT / "content"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 REQUIRED_FIELDS = {"title", "series", "episode", "language", "status", "targets", "tags", "last_reviewed"}
-OPTIONAL_FIELDS = {"seo_title", "medium_title", "published"}
+OPTIONAL_FIELDS = {"seo_title", "blogger_title", "medium_title", "ebook_title", "published"}
 VALID_STATUS = {"draft", "content-ready", "code-checked", "publish-ready", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 TARGET_KEYS = {"tistory", "medium", "mkdocs", "ebook"}
-PUBLISHED_KEYS = {"tistory_url", "medium_url", "mkdocs_url"}
+OPTIONAL_TARGET_KEYS = {"blogger"}
+PUBLISHED_KEYS = {"tistory_url", "blogger_url", "medium_url", "mkdocs_url"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PREFIX_RE = re.compile(r"^(\d+)")
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
@@ -93,11 +94,11 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> list[str]:
             errors.append(f"targets must be a mapping, got {type(targets).__name__}")
         else:
             missing_targets = TARGET_KEYS - set(targets.keys())
-            unknown_targets = set(targets.keys()) - TARGET_KEYS
+            unknown_targets = set(targets.keys()) - TARGET_KEYS - OPTIONAL_TARGET_KEYS
             if missing_targets:
                 errors.append(f"targets missing required channels: {sorted(missing_targets)}")
             if unknown_targets:
-                errors.append(f"targets has unknown channels: {sorted(unknown_targets)} (allowed: {sorted(TARGET_KEYS)})")
+                errors.append(f"targets has unknown channels: {sorted(unknown_targets)} (allowed: {sorted(TARGET_KEYS | OPTIONAL_TARGET_KEYS)})")
             for k, v in targets.items():
                 if not isinstance(v, bool):
                     errors.append(f"targets.{k} must be boolean, got {type(v).__name__}")
