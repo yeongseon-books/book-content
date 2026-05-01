@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Document Ingestion 101 (2/6)
 
+Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/02-chunking-strategies)
+
 Chunking splits documents into units small enough to embed. Chunks that are too large pull in irrelevant context alongside the relevant passage. Chunks that are too small leave the LLM without enough context to generate a useful answer. The right chunk size depends on the document type.
 
 Topics:

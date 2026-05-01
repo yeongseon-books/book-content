@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Document Ingestion 101 (6/6)
 
+Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/06-pipeline-completion)
+
 This post assembles all components from the series into one complete pipeline: PDF/Word/HTML/Markdown parsing, format-aware chunking, metadata attachment, incremental indexing, FAISS retrieval, and a LangChain RAG chain.
 
 ---

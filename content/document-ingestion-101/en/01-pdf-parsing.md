@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Document Ingestion 101 (1/6)
 
+Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/01-pdf-parsing)
+
 The first step in a RAG pipeline is pulling text out of documents. Plain text files are trivial to read, but most real-world documents arrive as PDFs. PDF is a complex format where text, images, tables, and layout information are interleaved — a naive read rarely gives you the right content in the right order. This post covers PDF text extraction step by step.
 
 Topics:

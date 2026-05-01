@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Document Ingestion 101 (3/6)
 
+Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/03-metadata-filtering)
+
 Consider the query "find marketing-related content from the Q4 2024 report." Embedding similarity alone cannot filter by date and category simultaneously. Metadata filtering handles this: attach structured metadata to each chunk, then apply metadata conditions alongside semantic similarity at query time.
 
 Topics:

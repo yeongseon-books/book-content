@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 The previous posts evaluated individual components — retriever, embedding model, vector database — in isolation. This post evaluates the full RAG pipeline as a single unit: one evaluation loop measures retrieval metrics and generation metrics simultaneously, from question to answer.
 
+The companion code lives in [`yeongseon-books/rag-benchmark-101/en/05-e2e-evaluation`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/en/05-e2e-evaluation).
+
 ---
 
 ## End-to-end evaluation design

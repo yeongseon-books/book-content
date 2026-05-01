@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 문서 수집과 인덱싱 101 시리즈 (1/6)
 
+예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/01-pdf-parsing)
+
 RAG 파이프라인의 첫 단계는 문서에서 텍스트를 꺼내는 것입니다. 텍스트 파일은 바로 읽으면 되지만, 실무에서 마주치는 문서의 대부분은 PDF입니다. PDF는 텍스트, 이미지, 표, 레이아웃 정보가 뒤섞인 복잡한 포맷이어서 단순 읽기로는 충분하지 않습니다. 이번 글에서는 PDF에서 텍스트를 추출하는 방법을 단계별로 다룹니다.
 
 다룰 내용은 다음과 같습니다.

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 FAISS, Chroma, Qdrant — every vector database makes different trade-offs. This post benchmarks FAISS and Chroma head-to-head on indexing speed, query latency, memory footprint, and metadata filtering support, then establishes clear selection criteria.
 
+The companion code lives in [`yeongseon-books/rag-benchmark-101/en/04-vectordb-selection`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/en/04-vectordb-selection).
+
 ---
 
 ## Evaluation axes

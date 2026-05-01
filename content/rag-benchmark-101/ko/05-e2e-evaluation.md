@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 지금까지 개별 구성 요소(검색기, 임베딩, VectorDB)를 각각 평가했습니다. 이 포스트에서는 전체 RAG 파이프라인을 하나의 단위로 평가하는 방법을 다룹니다. 입력(질문)부터 출력(답변)까지 한 번의 평가 루프로 검색 지표와 생성 지표를 동시에 측정합니다.
 
+예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/05-e2e-evaluation`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/05-e2e-evaluation)에서 확인할 수 있습니다.
+
 ---
 
 ## 종단 간 평가 설계

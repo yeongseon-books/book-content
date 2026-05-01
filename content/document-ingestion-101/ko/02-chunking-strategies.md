@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 문서 수집과 인덱싱 101 시리즈 (2/6)
 
+예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/02-chunking-strategies)
+
 청킹은 문서를 임베딩 가능한 작은 단위로 나누는 과정입니다. 청크 크기가 너무 크면 검색된 청크가 관련 없는 내용을 많이 포함합니다. 너무 작으면 맥락 정보가 부족해서 LLM이 좋은 답변을 생성하지 못합니다. 최적의 청크 크기는 문서 유형에 따라 다릅니다.
 
 다룰 내용은 다음과 같습니다.

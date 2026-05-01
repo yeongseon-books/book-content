@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 RAG 파이프라인은 검색과 생성 두 단계로 구성됩니다. 두 단계를 각각 측정하지 않으면 품질 문제의 원인을 파악할 수 없습니다. 검색이 나쁜 건지, 생성이 나쁜 건지, 아니면 둘 다인지 알아야 개선할 수 있습니다. 이 포스트에서는 RAG 평가에 쓰이는 핵심 지표를 구현과 함께 설명합니다.
 
+예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/01-evaluation-metrics`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/01-evaluation-metrics)에서 확인할 수 있습니다.
+
 ---
 
 ## RAG 평가의 두 축

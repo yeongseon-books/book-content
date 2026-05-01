@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 A RAG pipeline has two distinct stages: retrieval and generation. Without measuring each stage separately, you cannot diagnose quality problems. Is retrieval returning the wrong documents? Is the model ignoring what it retrieved? You need to know before you can fix anything. This post covers the core RAG evaluation metrics and implements them from scratch.
 
+The companion code lives in [`yeongseon-books/rag-benchmark-101/en/01-evaluation-metrics`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/en/01-evaluation-metrics).
+
 ---
 
 ## Two evaluation layers

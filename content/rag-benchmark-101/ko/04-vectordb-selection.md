@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 FAISS, Chroma, Qdrant — 벡터 DB마다 트레이드오프가 다릅니다. 이 포스트에서는 인덱싱 속도, 쿼리 속도, 메모리 사용량, 필터링 지원을 기준으로 FAISS와 Chroma를 직접 비교하고 선택 기준을 정립합니다.
 
+예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/04-vectordb-selection`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/04-vectordb-selection)에서 확인할 수 있습니다.
+
 ---
 
 ## 비교 기준

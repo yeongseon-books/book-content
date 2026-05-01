@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 문서 수집과 인덱싱 101 시리즈 (6/6)
 
+예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/06-pipeline-completion)
+
 이 시리즈에서 다룬 모든 요소를 하나의 완전한 파이프라인으로 조합합니다. PDF/Word/HTML/Markdown 파싱, 문서 유형별 청킹, 메타데이터 부착, 증분 인덱싱, FAISS 검색, LangChain RAG 체인까지 모두 포함합니다.
 
 ---

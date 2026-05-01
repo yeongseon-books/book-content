@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 문서 수집과 인덱싱 101 시리즈 (4/6)
 
+예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/04-incremental-indexing)
+
 문서가 1,000개라면 처음 인덱싱은 한 번만 하면 됩니다. 하지만 매일 새 문서가 추가되고 기존 문서가 수정된다면 어떻게 할까요? 매번 전체를 다시 인덱싱하면 시간과 비용이 큽니다. 증분 인덱싱은 변경된 문서만 찾아서 처리하고, 변경되지 않은 문서는 그대로 두는 방법입니다.
 
 다룰 내용은 다음과 같습니다.

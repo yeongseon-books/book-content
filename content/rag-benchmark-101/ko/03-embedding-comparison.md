@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 임베딩 모델은 RAG 파이프라인의 핵심입니다. 같은 검색기와 LLM을 써도 임베딩 모델이 바뀌면 검색 품질이 크게 달라집니다. 이 포스트에서는 여러 임베딩 모델을 동일한 쿼리 집합으로 벤치마킹해 모델 선택 기준을 정립합니다.
 
+예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/03-embedding-comparison`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/03-embedding-comparison)에서 확인할 수 있습니다.
+
 ---
 
 ## 비교할 임베딩 모델

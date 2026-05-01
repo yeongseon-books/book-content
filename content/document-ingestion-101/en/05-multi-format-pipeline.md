@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Document Ingestion 101 (5/6)
 
+Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/05-multi-format-pipeline)
+
 Real services do not process only PDFs. Word documents, HTML pages, Markdown files, and plain text files arrive together. The pipeline needs to select the right parser for each format and convert every source into a common representation.
 
 Topics:

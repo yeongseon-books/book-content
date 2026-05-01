@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > Document Ingestion 101 (4/6)
 
+Example code: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/en/04-incremental-indexing)
+
 With 1,000 documents, the initial indexing run happens once. But if new documents arrive daily and existing ones get revised, rebuilding the full index every time is expensive. Incremental indexing identifies which documents changed and processes only those, leaving unchanged documents untouched.
 
 Topics:

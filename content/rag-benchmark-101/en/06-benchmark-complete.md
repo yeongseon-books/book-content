@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 This post assembles the evaluation metrics, retrieval benchmark, embedding comparison, VectorDB selection, and end-to-end evaluation from across the series into one complete benchmark pipeline. The result is a framework for systematically comparing RAG configurations and finding the optimal setup.
 
+The companion code lives in [`yeongseon-books/rag-benchmark-101/en/06-benchmark-complete`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/en/06-benchmark-complete).
+
 ---
 
 ## Complete RAG benchmark framework

@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 문서 수집과 인덱싱 101 시리즈 (3/6)
 
+예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/03-metadata-filtering)
+
 "2024년 4분기 보고서에서 마케팅 관련 내용을 찾아줘"라는 쿼리를 생각해 보세요. 임베딩만으로는 날짜와 카테고리를 동시에 필터링하기 어렵습니다. 메타데이터 필터링은 이런 경우를 위한 것입니다. 각 청크에 구조화된 메타데이터를 붙이고, 검색 시 메타데이터 조건과 의미 유사도를 함께 적용합니다.
 
 다룰 내용은 다음과 같습니다.

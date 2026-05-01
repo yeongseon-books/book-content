@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 A good RAG retriever surfaces relevant documents at the top. This post runs a systematic benchmark across a query set, aggregates results into a system-level retrieval report, and compares chunking strategies using the same evaluation harness.
 
+The companion code lives in [`yeongseon-books/rag-benchmark-101/en/02-retrieval-benchmarking`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/en/02-retrieval-benchmarking).
+
 ---
 
 ## Benchmark design

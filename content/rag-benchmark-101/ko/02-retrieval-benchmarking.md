@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 좋은 RAG 시스템은 관련 문서를 높은 순위에 배치합니다. 이 포스트에서는 FAISS 기반 검색기의 성능을 쿼리 집합으로 체계적으로 측정하고, 결과를 집계해 시스템 수준의 검색 성능 리포트를 만드는 방법을 다룹니다.
 
+예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/02-retrieval-benchmarking`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/02-retrieval-benchmarking)에서 확인할 수 있습니다.
+
 ---
 
 ## 검색 성능 벤치마크 설계

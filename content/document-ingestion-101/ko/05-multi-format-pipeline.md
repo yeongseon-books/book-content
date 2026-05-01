@@ -21,6 +21,8 @@ last_reviewed: '2026-05-01'
 
 > 문서 수집과 인덱싱 101 시리즈 (5/6)
 
+예제 코드: [github.com/yeongseon-books/document-ingestion-101](https://github.com/yeongseon-books/document-ingestion-101/tree/main/ko/05-multi-format-pipeline)
+
 실제 서비스에서는 PDF 하나만 처리하지 않습니다. Word 문서, HTML 페이지, Markdown 파일, 텍스트 파일이 한 번에 들어옵니다. 각 포맷마다 적절한 파서를 선택하고 공통 포맷으로 변환하는 파이프라인이 필요합니다.
 
 다룰 내용은 다음과 같습니다.

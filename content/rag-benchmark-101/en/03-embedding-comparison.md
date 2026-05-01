@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 The embedding model is the foundation of a RAG pipeline. Swap it out while keeping everything else constant and retrieval quality shifts significantly. This post benchmarks three common models against the same query set to establish a model selection framework.
 
+The companion code lives in [`yeongseon-books/rag-benchmark-101/en/03-embedding-comparison`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/en/03-embedding-comparison).
+
 ---
 
 ## Models under comparison

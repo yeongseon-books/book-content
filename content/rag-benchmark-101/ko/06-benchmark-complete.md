@@ -23,6 +23,8 @@ last_reviewed: '2026-05-01'
 
 이 시리즈에서 다룬 평가 지표, 검색 벤치마크, 임베딩 비교, VectorDB 선택, 종단 간 평가를 하나의 완전한 벤치마크 파이프라인으로 통합합니다. 서로 다른 RAG 구성을 체계적으로 비교하고 최적 설정을 찾는 프레임워크를 만듭니다.
 
+예제 코드는 [`yeongseon-books/rag-benchmark-101`의 `ko/06-benchmark-complete`](https://github.com/yeongseon-books/rag-benchmark-101/tree/main/ko/06-benchmark-complete)에서 확인할 수 있습니다.
+
 ---
 
 ## 완전한 RAG 벤치마크 프레임워크
