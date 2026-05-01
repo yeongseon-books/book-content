@@ -25,13 +25,6 @@ This post covers logs, traces, and day-two operations. The most important distin
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 7 of 7 in the series.
-The previous chapter covered **Dapr integration — what you get from a sidecar**.
-<!-- ebook-only:end -->
-
 ## The observability map
 
 Log Analytics tells you what happened.

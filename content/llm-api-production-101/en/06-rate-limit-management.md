@@ -31,17 +31,18 @@ This post implements two simple local limiters for that job: a token bucket and 
 
 The main idea is simple: **rate-limit handling is not apologizing after a 429, it is controlling request flow before the 429 happens**.
 
+```mermaid
+flowchart LR
+    A[Incoming request] --> B[Queue]
+    B --> C[Check token bucket]
+    C --> D{Enough tokens}
+    D -->|Yes| E[Call LLM]
+    D -->|No| F[Wait and retry]
+    F --> C
+    E --> G[Return response]
+```
+
 ---
-
-<!-- ebook-only:start -->
-
-**The key idea**: rate limits hit on two axes — tokens per minute and requests per minute. Track both and use a queue to smooth the load.
-
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Retry and error handling — making API calls reliable**.
-<!-- ebook-only:end -->
 
 ## Runtime setup
 

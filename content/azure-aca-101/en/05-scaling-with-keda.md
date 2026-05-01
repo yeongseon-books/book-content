@@ -27,14 +27,6 @@ And custom KEDA rules such as Service Bus, CPU, and memory.
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 7 in the series.
-The previous chapter covered **Ingress and traffic splitting — revision-based deployment strategies**.
-After this chapter, the next one moves on to **Dapr integration — what you get from a sidecar**.
-<!-- ebook-only:end -->
-
 ## The scaling path
 
 Scaling remains declarative.

@@ -25,13 +25,6 @@ last_reviewed: '2026-04-29'
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 7 of 7 in the series.
-The previous chapter covered **Logging and Monitoring Basics**.
-<!-- ebook-only:end -->
-
 ## Two Directions of Scaling
 
 ```

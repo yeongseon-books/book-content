@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Scaling internals — how Scale Out decisions become new workers
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Deployment and Kudu — build, sync, release from the inside**.
-After this chapter, the next one moves on to **Cold start and warmup — why the first request is expensive**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 This post grounds its claims in the following public sources.

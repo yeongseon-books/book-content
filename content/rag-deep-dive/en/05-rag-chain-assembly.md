@@ -43,14 +43,6 @@ flowchart LR
 
 > RAG Deep Dive series (5/6)
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Prompt Construction and Context Injection — Inside PromptTemplate**.
-After this chapter, the next one moves on to **Evaluation and Quality Gates — RAGAS Metrics and Faithfulness**.
-<!-- ebook-only:end -->
-
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 

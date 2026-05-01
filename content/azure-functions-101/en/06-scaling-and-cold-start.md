@@ -25,14 +25,6 @@ This chapter revisits the hosting-plan decision from an operations angle. When t
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 6 of 7 in the series.
-The previous chapter covered **Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated**.
-After this chapter, the next one moves on to **Monitoring and Operations Fundamentals**.
-<!-- ebook-only:end -->
-
 ## Scaling Has Two Axes — Instance Count and In-Instance Concurrency
 
 “Scaling” hides two different controls.

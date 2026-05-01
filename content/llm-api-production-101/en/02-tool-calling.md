@@ -33,15 +33,17 @@ In this post, we will build the full loop with Groq's `tools` parameter and the 
 
 The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
 
+```mermaid
+flowchart LR
+    A[User request] --> B[LLM]
+    B --> C[Tool call selection]
+    C --> D[Application runs tool]
+    D --> E[Tool result]
+    E --> F[LLM]
+    F --> G[Final response]
+```
+
 ---
-
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **Structured output — JSON mode and response schemas**.
-After this chapter, the next one moves on to **Streaming in depth — chunk handling and error recovery**.
-<!-- ebook-only:end -->
 
 ## Runtime setup
 

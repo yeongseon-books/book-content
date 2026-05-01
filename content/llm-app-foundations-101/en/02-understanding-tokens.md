@@ -23,6 +23,17 @@ last_reviewed: '2026-05-01'
 
 Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/02-understanding-tokens)
 
+The diagram below summarizes how raw text becomes tokens and then turns into model budget.
+
+```mermaid
+flowchart LR
+    T[Raw text] --> Z[Tokenizer]
+    Z --> K[Token pieces]
+    K --> B[Token count]
+    B --> C[Context window budget]
+    C --> M[Model input]
+```
+
 When people first connect an LLM API, they usually focus on answer quality. That makes sense at the demo stage. In real applications, though, the first hard constraints show up somewhere else: cost, latency, and length limits. A prompt gets a little longer, and the response slows down. A few more messages are added, and token usage jumps. A large chunk of reference text is attached, and the model starts cutting answers short. The shared unit behind all of those behaviors is the token.
 
 A token is the unit the model uses to read and generate text. Humans think in sentences, paragraphs, and words. Models do not. They process smaller pieces, and those pieces do not map cleanly to words. That is why developers new to LLM systems often misjudge size. A prompt that looks short in plain text can still be expensive. A block of code can consume more tokens than expected. A Korean sentence can fragment differently from an English sentence.
@@ -40,14 +51,6 @@ This post puts token accounting in the center of the mental model. We will cover
 The central idea is simple: **LLM applications run on token budgets, not on raw strings**.
 
 ---
-
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **LLM API first call — sending your first request**.
-After this chapter, the next one moves on to **Prompt engineering basics — system, user, and assistant roles**.
-<!-- ebook-only:end -->
 
 ## What a token actually is
 

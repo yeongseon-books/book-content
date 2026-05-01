@@ -27,14 +27,6 @@ This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling 
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 4 of 7 in the series.
-The previous chapter covered **Your first cluster, your first deploy — Python/FastAPI**.
-After this chapter, the next one moves on to **Networking and Ingress — the path in and out of the cluster**.
-<!-- ebook-only:end -->
-
 ## One picture first
 
 ![Relationship between Pod, Deployment, and Service](../../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)

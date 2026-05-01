@@ -25,14 +25,6 @@ Different environments need different connection strings, API keys, and log leve
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 7 in the series.
-The previous chapter covered **First Deployment: From Local to Azure (Python/Flask)**.
-After this chapter, the next one moves on to **Logging and Monitoring Basics**.
-<!-- ebook-only:end -->
-
 ## Why Configuration Matters
 
 ### The Twelve-Factor App Principle

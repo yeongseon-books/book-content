@@ -44,16 +44,6 @@ flowchart LR
 
 > RAG Deep Dive 시리즈 (1/6)
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **청크 품질이 RAG 전체 성능을 결정한다.** 로더가 읽고 TextSplitter가 나눈 결과가 검색 정확도의 첫 번째 변수다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리**으로 이어집니다.
-<!-- ebook-only:end -->
-
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 

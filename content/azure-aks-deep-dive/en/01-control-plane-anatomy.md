@@ -19,13 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Control plane anatomy — what AKS hides from you
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **kubelet and containerd — how a container actually starts on a node**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

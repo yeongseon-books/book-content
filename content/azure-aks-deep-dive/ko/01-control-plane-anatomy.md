@@ -19,13 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Control Plane 해부 — AKS가 사용자에게서 가린 것
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

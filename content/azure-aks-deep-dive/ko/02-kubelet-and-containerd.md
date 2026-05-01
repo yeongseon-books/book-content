@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 2번째 장입니다.
-앞 장에서는 **Control Plane 해부 — AKS가 사용자에게서 가린 것**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

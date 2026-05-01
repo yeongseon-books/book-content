@@ -33,17 +33,16 @@ We will cover five things: why natural-language parsing breaks under production 
 
 The main idea is simple: **structured output in production is a contract design problem, not a prompt trick**.
 
+```mermaid
+flowchart LR
+    A[User input] --> B[LLM]
+    B --> C[JSON schema requirement]
+    C --> D[JSON response]
+    D --> E[Pydantic validation]
+    E --> F[Validated output]
+```
+
 ---
-
-<!-- ebook-only:start -->
-
-**The key idea**: Structured Output constrains the model to a JSON schema. A Pydantic model locks the output shape and eliminates parsing errors.
-
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **Tool calling — connecting functions to the model**.
-<!-- ebook-only:end -->
 
 ## Runtime setup
 

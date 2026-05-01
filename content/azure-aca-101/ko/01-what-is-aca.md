@@ -33,13 +33,6 @@ Azure Container Apps는 그 구간을 겨냥합니다.
 
 ---
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 7편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **Environment·Container App·Revision — 세 단어로 보는 ACA**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## 전체 그림 — Azure Container Apps 환경 한 장면
 
 이 그림이 시리즈 전체의 지도입니다.

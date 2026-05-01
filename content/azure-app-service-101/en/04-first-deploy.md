@@ -25,14 +25,6 @@ This post covers the entire process from local development environment setup to 
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 4 of 7 in the series.
-The previous chapter covered **Hosting Models: Which Plan Should You Choose?**.
-After this chapter, the next one moves on to **Mastering Configuration: App Settings & Environment Variables**.
-<!-- ebook-only:end -->
-
 ## Goals
 
 By the end, you will have a Flask app running locally, an App Service app in Azure, and a repeatable deployment path you can verify with logs and a health endpoint.

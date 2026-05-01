@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # ACA 안의 KEDA — Scale Rule이 만드는 것
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 4번째 장입니다.
-앞 장에서는 **Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다:

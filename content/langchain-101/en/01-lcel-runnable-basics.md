@@ -108,16 +108,6 @@ Topics:
 
 ---
 
-<!-- ebook-only:start -->
-
-**The key idea**: LangChain connects components with the pipe operator (`|`). The Runnable interface is the shared language of every component.
-
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **Prompt and LLM chain — assembling your first chain**.
-<!-- ebook-only:end -->
-
 ## The problem LangChain addresses
 
 LLM application code develops a recurring pattern: assemble a prompt, call the model, parse the output, pass it to the next step. The plumbing between those steps accumulates.

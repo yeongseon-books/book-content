@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # HPA and Cluster Autoscaler internals — two control loops
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Scheduler and Pod placement — who decides which node**.
-After this chapter, the next one moves on to **KEDA internals — how a ScaledObject builds an HPA**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

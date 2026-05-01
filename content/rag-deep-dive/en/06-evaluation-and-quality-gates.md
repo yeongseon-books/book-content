@@ -44,16 +44,6 @@ flowchart LR
 
 > RAG Deep Dive series (6/6)
 
-<!-- ebook-only:start -->
-
-**The key idea**: without evaluation metrics there is no improvement direction. RAGAS faithfulness, relevancy, and precision turn RAG quality into numbers.
-
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Assembling the RAG Chain — RetrievalQA vs LCEL**.
-<!-- ebook-only:end -->
-
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 

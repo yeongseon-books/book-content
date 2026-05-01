@@ -52,16 +52,6 @@ Topics:
 
 ---
 
-<!-- ebook-only:start -->
-
-**The key idea**: Human-in-the-loop inserts a person at uncertain decision points. The design challenge is deciding when to intervene.
-
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Workflow automation — designing multi-step chains**.
-<!-- ebook-only:end -->
-
 ## When HITL is the right choice
 
 HITL adds latency and cost. Use it when the cost of an unchecked error is high.

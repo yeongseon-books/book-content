@@ -33,7 +33,14 @@ This post implements all three metrics from scratch, shows why normalization mat
 - running a real query and examining the results
 - when to use each metric
 
----
+```mermaid
+flowchart LR
+    A[Query vector] --> C[Cosine similarity calculation]
+    B[Document vectors] --> C
+    C --> D[Similarity scores]
+    D --> E[Rank descending]
+    E --> F[Top-K matches]
+```
 
 <!-- ebook-only:start -->
 
@@ -45,6 +52,8 @@ This is chapter 3 of 6 in the series.
 The previous chapter covered **HuggingFace embeddings in practice — creating your first vectors with sentence-transformers**.
 After this chapter, the next one moves on to **FAISS fundamentals — fast approximate nearest-neighbor search**.
 <!-- ebook-only:end -->
+
+---
 
 ## Three distance metrics
 

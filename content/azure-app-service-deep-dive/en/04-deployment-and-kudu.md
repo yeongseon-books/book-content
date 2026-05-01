@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Deployment and Kudu — build, sync, release from the inside
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 4 of 6 in the series.
-The previous chapter covered **Workers and the sandbox — where user code actually runs**.
-After this chapter, the next one moves on to **Scaling internals — how Scale Out decisions become new workers**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 This post grounds its claims in the following public sources.

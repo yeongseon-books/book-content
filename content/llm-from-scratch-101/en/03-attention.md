@@ -31,14 +31,6 @@ Today's mental model is this: **Each token asks a question with its Query, provi
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 3 of 9 in the series.
-The previous chapter covered **From Integers to Vectors and Positions**.
-After this chapter, the next one moves on to **The Transformer Block: A Unit of Depth**.
-<!-- ebook-only:end -->
-
 ## QKV are Just Three Linear Transformations
 
 If the input `x` is `(B, T, C)`, attention creates three projections: `q = Wq x`, `k = Wk x`, and `v = Wv x`. All three come from the same source, but they serve different roles. The Query asks "What am I looking for?", the Key says "Here's what I have," and the Value provides the "actual content to be retrieved."

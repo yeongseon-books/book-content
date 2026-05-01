@@ -25,14 +25,6 @@ This chapter draws that line clearly. We’ll cover the main trigger types, the 
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 2 of 7 in the series.
-The previous chapter covered **What Is Azure Functions? — A World Where Events Call Your Code**.
-After this chapter, the next one moves on to **Host and Worker — Who Actually Runs Your Functions?**.
-<!-- ebook-only:end -->
-
 ## A trigger is the “cause” that wakes a function up
 
 Let’s nail the definition first. **A trigger is the external event that causes a function to run.** An incoming HTTP request, a message landing in a queue, a file being uploaded to Blob storage, the top of every hour — those are all triggers.

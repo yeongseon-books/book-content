@@ -19,13 +19,6 @@ last_reviewed: '2026-04-29'
 
 # ACA architecture — what Microsoft layered on a hidden Kubernetes
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **Environment internals — the network, observability, and Dapr scope boundary**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:

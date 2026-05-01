@@ -25,14 +25,6 @@ last_reviewed: '2026-04-29'
 
 ---
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 7편 중 6번째 장입니다.
-앞 장에서는 **스케일링 — KEDA scaler와 0-to-N**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **모니터링과 운영 — Log Analytics와 Application Insights**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## Dapr가 붙는 위치
 
 앱 옆에 사이드카가 붙고.

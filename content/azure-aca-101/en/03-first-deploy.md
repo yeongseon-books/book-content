@@ -25,14 +25,6 @@ This post walks through the first complete FastAPI deployment path. The importan
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 3 of 7 in the series.
-The previous chapter covered **Environment, Container App, Revision — ACA in three words**.
-After this chapter, the next one moves on to **Ingress and traffic splitting — revision-based deployment strategies**.
-<!-- ebook-only:end -->
-
 ## The end-to-end path
 
 The path makes the first deployment much easier to reason about.

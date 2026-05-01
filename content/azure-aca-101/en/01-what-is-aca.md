@@ -32,13 +32,6 @@ It keeps the container workflow while hiding direct Kubernetes cluster operation
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 1 of 7 in the series.
-After this chapter, the next one moves on to **Environment, Container App, Revision — ACA in three words**.
-<!-- ebook-only:end -->
-
 ## The big picture — one ACA environment at a glance
 
 This diagram is the map for the whole series.

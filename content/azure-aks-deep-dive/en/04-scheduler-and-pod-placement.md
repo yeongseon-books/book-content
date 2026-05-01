@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Scheduler and Pod placement — who decides which node
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 4 of 6 in the series.
-The previous chapter covered **CNI and Azure CNI Overlay — where Pod IPs come from**.
-After this chapter, the next one moves on to **HPA and Cluster Autoscaler internals — two control loops**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

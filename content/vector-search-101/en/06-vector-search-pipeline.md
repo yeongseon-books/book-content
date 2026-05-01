@@ -35,7 +35,16 @@ Topics:
 - querying and displaying results
 - hybrid search concept and a minimal implementation
 
----
+```mermaid
+flowchart LR
+    A[Source documents] --> B[Chunking]
+    B --> C[Embedding]
+    C --> D[FAISS indexing]
+    E[User query] --> F[Query embedding]
+    F --> G[Vector search]
+    D --> G
+    G --> H[Ranked results]
+```
 
 <!-- ebook-only:start -->
 
@@ -46,6 +55,8 @@ Topics:
 This is chapter 6 of 6 in the series.
 The previous chapter covered **Chunking strategies — how to split long documents**.
 <!-- ebook-only:end -->
+
+---
 
 ## Pipeline structure
 

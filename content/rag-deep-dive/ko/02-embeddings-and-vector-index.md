@@ -42,17 +42,6 @@ flowchart LR
 
 > RAG Deep Dive 시리즈 (2/6)
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **임베딩은 텍스트를 거리로 바꾼다.** 의미가 비슷할수록 벡터 공간에서 가깝고, FAISS는 그 거리를 빠르게 찾는다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 2번째 장입니다.
-앞 장에서는 **문서 로딩과 청크 전략 — LangChain TextSplitter 내부**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **Retriever 설계 — VectorStoreRetriever와 MMR**으로 이어집니다.
-<!-- ebook-only:end -->
-
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 

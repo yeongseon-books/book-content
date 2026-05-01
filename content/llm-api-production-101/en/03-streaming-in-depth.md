@@ -31,18 +31,18 @@ This post focuses on the consumer side of the Groq streaming path. We will start
 
 The goal is not a clever UI effect. The goal is a streaming consumer that can explain what happened when the stream is incomplete.
 
+```mermaid
+flowchart LR
+    A[Stream starts] --> B[Chunk arrives]
+    B --> C{Delta present}
+    C -->|Yes| D[Accumulate text]
+    C -->|No| E[Handle metadata only]
+    D --> F[Wait for next chunk]
+    E --> F
+    F --> G[Reconstruct final response]
+```
+
 ---
-
-<!-- ebook-only:start -->
-
-**The key idea**: streaming eliminates time-to-first-token (TTFT). The longer the response, the greater the perceived speed improvement.
-
-## Where this chapter fits
-
-This is chapter 3 of 6 in the series.
-The previous chapter covered **Tool calling — connecting functions to the model**.
-After this chapter, the next one moves on to **Caching strategies — reducing cost and latency**.
-<!-- ebook-only:end -->
 
 ## Runtime setup
 

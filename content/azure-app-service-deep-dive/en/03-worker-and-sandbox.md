@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Workers and the sandbox — where user code actually runs
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 3 of 6 in the series.
-The previous chapter covered **Front-End and ARR — how a request reaches a worker**.
-After this chapter, the next one moves on to **Deployment and Kudu — build, sync, release from the inside**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 This post grounds its claims in the following public sources.

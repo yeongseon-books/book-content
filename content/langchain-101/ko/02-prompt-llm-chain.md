@@ -108,17 +108,6 @@ flowchart LR
 
 ---
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **Prompt + LLM = 가장 단순한 체인.** ChatPromptTemplate이 입력을 구조화하고 LLM이 응답을 반환한다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 2번째 장입니다.
-앞 장에서는 **LangChain 소개 — LCEL과 Runnable 기본**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **Retriever — 문서 검색과 컨텍스트 주입**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## ChatPromptTemplate 구조
 
 `ChatPromptTemplate`은 대화 형식의 프롬프트를 만드는 클래스입니다. 메시지 목록을 받아 LLM에 전달할 형식으로 렌더링합니다.

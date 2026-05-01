@@ -31,14 +31,6 @@ Today's mental model is this: **The input vector for a token is the sum of its t
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 2 of 9 in the series.
-The previous chapter covered **Turning Text into Numbers**.
-After this chapter, the next one moves on to **Deciding Which Tokens to Focus On**.
-<!-- ebook-only:end -->
-
 ## nn.Embedding is Just a Lookup Table
 
 `nn.Embedding(vocab_size, n_embd)` is essentially a large table with dimensions `(vocab_size, n_embd)`. When a token ID comes in, it simply pulls the corresponding row. That's it. It might look complex through the lens of linear algebra, but the operation itself is just indexing.

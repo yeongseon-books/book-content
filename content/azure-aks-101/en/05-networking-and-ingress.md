@@ -27,14 +27,6 @@ They get easier once you separate two layers: how pod IPs are assigned, and how 
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 7 in the series.
-The previous chapter covered **Pod, Deployment, Service — the three ways you express a workload**.
-After this chapter, the next one moves on to **Scaling — HPA, Cluster Autoscaler, KEDA**.
-<!-- ebook-only:end -->
-
 ## Start with the request path
 
 ![External request flow through Ingress](../../../assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png)

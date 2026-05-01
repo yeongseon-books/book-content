@@ -21,14 +21,6 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive 시리즈 (4/6)
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 4번째 장입니다.
-앞 장에서는 **gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

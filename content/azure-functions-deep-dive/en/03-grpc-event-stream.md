@@ -21,14 +21,6 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive series (3/6)
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 3 of 6 in the series.
-The previous chapter covered **Worker Processes — How One Host Hosts Many Languages**.
-After this chapter, the next one moves on to **Dispatcher and Invocation — How a Function Call Reaches the Worker**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).

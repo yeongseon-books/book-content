@@ -25,14 +25,6 @@ To answer these questions, you need to understand the **complete journey of a re
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 2 of 7 in the series.
-The previous chapter covered **What is Azure App Service? - Understanding the Platform Architecture**.
-After this chapter, the next one moves on to **Hosting Models: Which Plan Should You Choose?**.
-<!-- ebook-only:end -->
-
 ## Overall Request Flow
 
 A user's HTTP request passes through these layers before reaching your app:

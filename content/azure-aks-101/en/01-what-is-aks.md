@@ -28,13 +28,6 @@ AKS is Azure's answer to that cost. This first post is about understanding AKS m
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 1 of 7 in the series.
-After this chapter, the next one moves on to **Cluster architecture — control plane and node pools**.
-<!-- ebook-only:end -->
-
 ## The big picture — one AKS cluster at a glance
 
 This is the map for the whole series.

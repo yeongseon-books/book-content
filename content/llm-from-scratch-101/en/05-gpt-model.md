@@ -31,14 +31,6 @@ The mental model for today is this: **GPT is an autoregressive model that stacks
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 9 in the series.
-The previous chapter covered **The Transformer Block: A Unit of Depth**.
-After this chapter, the next one moves on to **Learning via Gradients**.
-<!-- ebook-only:end -->
-
 ## The Forward Pass at a Glance
 
 The input is a tensor of token IDs with shape `(B, T)`. We add token and position embeddings, then pass them through six blocks sequentially. After a final `ln_f` layer, we project to the vocab dimension via `lm_head` to produce logits of shape `(B, T, vocab_size)`.

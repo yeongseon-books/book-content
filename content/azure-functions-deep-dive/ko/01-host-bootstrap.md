@@ -21,13 +21,6 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive 시리즈 (1/6)
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

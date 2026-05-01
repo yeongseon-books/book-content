@@ -42,17 +42,6 @@ flowchart LR
 
 > RAG Deep Dive series (4/6)
 
-<!-- ebook-only:start -->
-
-**The key idea**: a prompt is the glue between context and question. PromptTemplate turns two inputs into a single LLM call.
-
-## Where this chapter fits
-
-This is chapter 4 of 6 in the series.
-The previous chapter covered **Retriever Design — VectorStoreRetriever and MMR**.
-After this chapter, the next one moves on to **Assembling the RAG Chain — RetrievalQA vs LCEL**.
-<!-- ebook-only:end -->
-
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 

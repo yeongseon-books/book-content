@@ -120,16 +120,6 @@ flowchart LR
 
 ---
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **실전 체인은 retriever · prompt · llm · parser의 조합이다.** 각 컴포넌트가 독립적으로 교체 가능하다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 6번째 장입니다.
-앞 장에서는 **Streaming — 실시간 출력 처리**을 다뤘습니다.
-<!-- ebook-only:end -->
-
 ## 문서 인덱싱 파이프라인
 
 ```python

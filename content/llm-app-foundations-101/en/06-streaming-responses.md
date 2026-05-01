@@ -23,6 +23,18 @@ last_reviewed: '2026-05-01'
 
 Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/06-streaming-responses)
 
+The diagram below shows the basic event flow of a streamed response.
+
+```mermaid
+flowchart LR
+    U[User request] --> S[Server starts request]
+    S --> M[Model generation]
+    M --> C1[chunk 1]
+    C1 --> C2[chunk 2]
+    C2 --> C3[chunk 3]
+    C3 --> D[done and usage]
+```
+
 One of the easiest ways to make an LLM application feel slow is to treat it like an ordinary blocking API call. The server sends a prompt, waits in silence, and only returns once the entire answer is finished. The feature works, but the experience feels worse than it needs to. A user stares at a blank box for several seconds and has no idea whether the model is thinking, the network is stalled, or the app is broken.
 
 That is the real value of streaming. It does not magically reduce the model's total generation time. What it changes is visibility. The first partial output can reach the user quickly, the UI can start rendering immediately, and long answers stop feeling like dead time. In practice, that difference matters a lot. A five-second wait with no feedback feels suspicious. A five-second wait where text starts appearing after a few hundred milliseconds feels responsive.
@@ -42,13 +54,6 @@ This post closes the series by building that mental model with the Groq Python S
 The main idea is simple: **streaming does not make the model smarter or faster, but it makes waiting legible**.
 
 ---
-
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Managing conversation state — building a multi-turn chatbot**.
-<!-- ebook-only:end -->
 
 ## Why streaming matters
 

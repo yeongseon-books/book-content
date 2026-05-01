@@ -35,7 +35,16 @@ This post covers five things:
 - how chunk boundaries affect retrieval quality
 - choosing a chunking strategy for different document types
 
----
+```mermaid
+flowchart LR
+    A[Original document] --> B[Chunking decision]
+    B --> C[Fixed-size strategy]
+    B --> D[Recursive strategy]
+    B --> E[Semantic strategy]
+    C --> F[Compare chunk sets]
+    D --> F
+    E --> F
+```
 
 <!-- ebook-only:start -->
 
@@ -47,6 +56,8 @@ This is chapter 5 of 6 in the series.
 The previous chapter covered **FAISS fundamentals — fast approximate nearest-neighbor search**.
 After this chapter, the next one moves on to **Vector search pipeline — from document ingestion to query**.
 <!-- ebook-only:end -->
+
+---
 
 ## Chunk size and overlap
 

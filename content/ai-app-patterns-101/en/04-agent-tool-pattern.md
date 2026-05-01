@@ -52,17 +52,6 @@ Topics:
 
 ---
 
-<!-- ebook-only:start -->
-
-**The key idea**: an agent delegates tool selection to the model. The ReAct loop cycles through Thought → Action → Observation.
-
-## Where this chapter fits
-
-This is chapter 4 of 6 in the series.
-The previous chapter covered **Document assistant — summarization, extraction, classification**.
-After this chapter, the next one moves on to **Workflow automation — designing multi-step chains**.
-<!-- ebook-only:end -->
-
 ## Agent vs chain
 
 **Chain**: input → step A → step B → output. The execution path is determined at design time.

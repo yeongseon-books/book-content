@@ -31,18 +31,19 @@ That is why retries work only when they begin with error classification. A retry
 
 The main idea is simple: **a retry is not a friendly loop, it is a bounded recovery strategy built on top of error classification**.
 
+```mermaid
+flowchart LR
+    A[Attempt request] --> B{Succeeded}
+    B -->|Yes| C[Return response]
+    B -->|No| D{Retryable error}
+    D -->|No| E[Fail immediately]
+    D -->|Yes| F[Wait with backoff]
+    F --> G{Attempts exhausted}
+    G -->|No| A
+    G -->|Yes| E
+```
+
 ---
-
-<!-- ebook-only:start -->
-
-**The key idea**: retry with exponential backoff absorbs transient errors. Controlling retry count and interval handles most 429 and 503 responses.
-
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Caching strategies — reducing cost and latency**.
-After this chapter, the next one moves on to **Rate limit management — patterns for staying within limits**.
-<!-- ebook-only:end -->
 
 ## Runtime setup
 

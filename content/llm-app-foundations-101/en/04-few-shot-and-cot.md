@@ -23,6 +23,16 @@ last_reviewed: '2026-05-01'
 
 Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/04-few-shot-and-cot)
 
+The diagram below shows how examples and stepwise reasoning steer one request.
+
+```mermaid
+flowchart LR
+    E[Example user and assistant turns] --> F[Few-shot pattern]
+    F --> Q[Real user question]
+    Q --> C[Stepwise reasoning prompt]
+    C --> A[Final answer]
+```
+
 Post 03 established the basic shape of prompt design: split policy into `system`, put the current request in `user`, and replay earlier answers as `assistant` when you need conversation state. Once that foundation is in place, the next practical question shows up immediately. Why does the same model sometimes follow the format you want very closely, while other times it gives something that feels almost right but not dependable enough to automate?
 
 In application work, two of the first steering tools you reach for are few-shot prompting and chain-of-thought prompting. Few-shot means showing the model one or more examples of the behavior you want. Chain-of-thought means nudging the model to solve the task in intermediate steps instead of jumping straight to the final answer. Neither technique retrains the model. Both are ways to make an already capable model behave more predictably on the request in front of it.
@@ -40,17 +50,6 @@ This post uses Groq's `llama-3.1-8b-instant` to cover both patterns in runnable 
 The operating idea is simple: better prompts are often less about clever wording and more about showing the model a clear pattern to follow.
 
 ---
-
-<!-- ebook-only:start -->
-
-**The key idea**: few-shot examples show the model a pattern. Chain-of-Thought exposes intermediate reasoning steps so the model can solve harder problems.
-
-## Where this chapter fits
-
-This is chapter 4 of 6 in the series.
-The previous chapter covered **Prompt engineering basics — system, user, and assistant roles**.
-After this chapter, the next one moves on to **Managing conversation state — building a multi-turn chatbot**.
-<!-- ebook-only:end -->
 
 ## Few-shot prompting teaches by example inside the messages array
 

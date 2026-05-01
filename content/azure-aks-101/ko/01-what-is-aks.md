@@ -27,13 +27,6 @@ AKS는 그 부담을 줄이기 위해 나온 Azure의 관리형 Kubernetes입니
 
 ---
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 7편 중 1번째 장입니다.
-이 장을 마치면 다음 장에서 **클러스터 아키텍처 — Control Plane과 Node Pool**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## 전체 그림 — AKS 클러스터 한 장면
 
 이 그림이 이번 시리즈 전체의 지도입니다.

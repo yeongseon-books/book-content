@@ -58,17 +58,6 @@ Topics:
 
 ---
 
-<!-- ebook-only:start -->
-
-**The key idea**: RAG Q&A is retrieve → inject → generate. Find relevant documents, put them in context, then generate an answer.
-
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **Chatbot pattern — managing conversation history and state**.
-After this chapter, the next one moves on to **Document assistant — summarization, extraction, classification**.
-<!-- ebook-only:end -->
-
 ## The two phases of RAG
 
 **Indexing** (offline): split documents into chunks, embed them, store in a vector index.

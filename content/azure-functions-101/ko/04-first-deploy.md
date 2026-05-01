@@ -34,14 +34,6 @@ last_reviewed: '2026-04-29'
 
 ---
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 7편 중 4번째 장입니다.
-앞 장에서는 **Host와 Worker — 함수는 누가 실행하는가**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## 도구 준비 — 세 가지면 충분합니다
 
 배포까지 가는 데 필요한 도구는 셋입니다.

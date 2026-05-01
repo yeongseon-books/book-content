@@ -27,14 +27,6 @@ This post is about reading that boundary. We'll look at what the control plane d
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 2 of 7 in the series.
-The previous chapter covered **What is Azure Kubernetes Service? — what managed Kubernetes actually gives you**.
-After this chapter, the next one moves on to **Your first cluster, your first deploy — Python/FastAPI**.
-<!-- ebook-only:end -->
-
 ## Cut the cluster in half
 
 ![Responsibility boundary between control plane and node pools](../../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)

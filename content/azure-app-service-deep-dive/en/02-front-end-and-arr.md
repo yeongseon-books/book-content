@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Front-End and ARR — how a request reaches a worker
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **App Service platform architecture — Front-End, Worker, File Server**.
-After this chapter, the next one moves on to **Workers and the sandbox — where user code actually runs**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 This post grounds its claims in the following public sources.

@@ -27,14 +27,6 @@ The goal is simple: **understand what each plan gives you, what it constrains, a
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 7 in the series.
-The previous chapter covered **Deploy a Function App — From Localhost to Azure**.
-After this chapter, the next one moves on to **Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t**.
-<!-- ebook-only:end -->
-
 ## One-line definitions
 
 | Plan | One-line definition |

@@ -42,17 +42,6 @@ flowchart LR
 
 > RAG Deep Dive 시리즈 (3/6)
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **리트리버는 검색 전략의 캡슐이다.** 같은 VectorStore에 어떤 search_type을 붙이느냐에 따라 결과가 달라진다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 3번째 장입니다.
-앞 장에서는 **임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부**으로 이어집니다.
-<!-- ebook-only:end -->
-
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 

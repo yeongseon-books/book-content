@@ -25,13 +25,6 @@ This series is an introductory guide for developers who are picking up Azure Fun
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 1 of 7 in the series.
-After this chapter, the next one moves on to **Triggers and Bindings — Everything About Function I/O**.
-<!-- ebook-only:end -->
-
 ## A One-Sentence Definition — "An event arrives, my function runs, and then it's gone"
 
 Here's Azure Functions in a single line:

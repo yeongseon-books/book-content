@@ -44,16 +44,6 @@ flowchart LR
 
 > RAG Deep Dive 시리즈 (6/6)
 
-<!-- ebook-only:start -->
-
-이 장의 핵심: **평가 지표 없이는 개선 방향이 없다.** RAGAS의 faithfulness·relevancy·precision이 RAG 품질을 숫자로 만든다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 6번째 장입니다.
-앞 장에서는 **RAG Chain 조립 — RetrievalQA vs LCEL**을 다뤘습니다.
-<!-- ebook-only:end -->
-
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 

@@ -19,13 +19,6 @@ last_reviewed: '2026-04-29'
 
 # The Envoy ingress path — how the first request reaches your container
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Dapr sidecar internals — the Go process that lives next to your container**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:

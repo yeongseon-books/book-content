@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
 
-<!-- ebook-only:start -->
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 2번째 장입니다.
-앞 장에서는 **ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가**으로 이어집니다.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다:

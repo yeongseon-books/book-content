@@ -19,14 +19,6 @@ last_reviewed: '2026-04-29'
 
 # Revisions and traffic splitting — where Envoy weights come from
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 3 of 6 in the series.
-The previous chapter covered **Environment internals — the network, observability, and Dapr scope boundary**.
-After this chapter, the next one moves on to **KEDA inside ACA — what a scale rule actually creates**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:

@@ -23,6 +23,18 @@ last_reviewed: '2026-05-01'
 
 Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/05-conversation-state)
 
+The diagram below summarizes how message history accumulates across turns.
+
+```mermaid
+flowchart LR
+    U1[User turn] --> H[messages history]
+    H --> G[Groq API call]
+    G --> A1[assistant reply]
+    A1 --> H
+    U2[Next user turn] --> H
+    H --> N[Next response]
+```
+
 One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.
 
 An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.
@@ -40,14 +52,6 @@ This post uses Groq's `llama-3.1-8b-instant` to build that mental model and turn
 The main idea is simple: **conversation memory lives in your application layer, not inside the model session**.
 
 ---
-
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **Few-shot and chain-of-thought — steering better answers**.
-After this chapter, the next one moves on to **Handling streaming responses — real-time output**.
-<!-- ebook-only:end -->
 
 ## Why LLM calls are stateless
 

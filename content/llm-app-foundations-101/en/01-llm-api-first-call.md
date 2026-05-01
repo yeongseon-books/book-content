@@ -23,6 +23,18 @@ last_reviewed: '2026-05-01'
 
 Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/01-llm-api-first-call)
 
+The diagram below shows the smallest round trip behind a first LLM API call.
+
+```mermaid
+flowchart LR
+    U[User] --> P[Prompt]
+    P --> A[Application code]
+    A --> G[Groq API request]
+    G --> M[LLM model]
+    M --> R[JSON response]
+    R --> O[Output text]
+```
+
 The first confusing thing about LLM application development is not the model. It is the boundary between your code and the model service. A chat UI makes the whole thing feel magical, but the runtime reality is plain: your application sends an HTTP request and receives a JSON response. That round trip is the foundation.
 
 That is why Post 01 starts here. If you do not understand what goes into the request body, what comes back in the response, and where token usage shows up, every later feature feels blurry.
@@ -42,13 +54,6 @@ We will cover seven things:
 The main idea is simple: **an LLM app begins with request and response structure, not with prompt cleverness**.
 
 ---
-
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **Understanding tokens — cost, limits, and context windows**.
-<!-- ebook-only:end -->
 
 ## What an LLM API is
 

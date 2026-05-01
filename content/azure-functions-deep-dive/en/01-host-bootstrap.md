@@ -21,13 +21,6 @@ last_reviewed: '2026-04-29'
 
 > Azure Functions Deep Dive series (1/6)
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **Worker Processes — How One Host Hosts Many Languages**.
-<!-- ebook-only:end -->
-
 ## Source Version
 
 All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).

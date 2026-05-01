@@ -54,16 +54,6 @@ Topics:
 
 ---
 
-<!-- ebook-only:start -->
-
-**The key idea**: a chatbot is a loop that accumulates message history. How you manage that history determines response quality and cost.
-
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **RAG Q&A pattern — document-based question answering**.
-<!-- ebook-only:end -->
-
 ## Basic chatbot: manual history
 
 The simplest approach: accumulate messages in a list and send the full list with every request.

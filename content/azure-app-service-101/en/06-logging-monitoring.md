@@ -25,14 +25,6 @@ To answer these questions, **logging and monitoring** are essential. In this pos
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 6 of 7 in the series.
-The previous chapter covered **Mastering Configuration: App Settings & Environment Variables**.
-After this chapter, the next one moves on to **Scaling 101: When to Scale Up vs Scale Out?**.
-<!-- ebook-only:end -->
-
 ## Where Do Logs Go?
 
 Understanding the log flow in App Service is the first step.

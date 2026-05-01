@@ -35,7 +35,14 @@ This post covers five things:
 - practical tips for speeding up encoding on CPU
 - comparing the wrapper to the raw `SentenceTransformer` API
 
----
+```mermaid
+flowchart LR
+    A[Sentence or document batch] --> B[HuggingFaceEmbeddings init]
+    B --> C[SentenceTransformer model load]
+    C --> D[encode call]
+    D --> E[Normalized vector output]
+    E --> F[Save or search]
+```
 
 <!-- ebook-only:start -->
 
@@ -47,6 +54,8 @@ This is chapter 2 of 6 in the series.
 The previous chapter covered **What is an embedding — converting text into vectors**.
 After this chapter, the next one moves on to **Cosine similarity and vector search — computing sentence distances**.
 <!-- ebook-only:end -->
+
+---
 
 ## Installation
 

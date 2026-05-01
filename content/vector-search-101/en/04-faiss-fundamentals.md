@@ -35,7 +35,15 @@ This post covers five things:
 - running real queries against a small corpus
 - how to choose between index types
 
----
+```mermaid
+flowchart LR
+    A[Document corpus] --> B[Embedding generation]
+    B --> C[float32 vector matrix]
+    C --> D[FAISS index build]
+    E[User query] --> F[Query embedding]
+    F --> D
+    D --> G[Top-K nearest documents]
+```
 
 <!-- ebook-only:start -->
 
@@ -47,6 +55,8 @@ This is chapter 4 of 6 in the series.
 The previous chapter covered **Cosine similarity and vector search — computing sentence distances**.
 After this chapter, the next one moves on to **Chunking strategies — how to split long documents**.
 <!-- ebook-only:end -->
+
+---
 
 ## Installation
 

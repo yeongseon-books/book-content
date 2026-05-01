@@ -27,14 +27,6 @@ They are related, but they are not the same. This post separates them by input s
 
 ---
 
-<!-- ebook-only:start -->
-## Where this chapter fits
-
-This is chapter 6 of 7 in the series.
-The previous chapter covered **Networking and Ingress — the path in and out of the cluster**.
-After this chapter, the next one moves on to **Monitoring and ops — Container Insights, logs, alerts**.
-<!-- ebook-only:end -->
-
 ## One diagram first
 
 ![Relationship among HPA, CA, and KEDA](../../../assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
