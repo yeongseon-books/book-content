@@ -50,17 +50,7 @@ print(chain.invoke("LCEL이 무엇인가요?"))
 
 ~~~
 출력 결과
-LCEL은 "Lightweight Core-Loops Executor"의 약자입니다. LCEL은 Java에서 사용 가능한 Executor 프레임워크의 한 종류입니다. Executor 프레임워크는 스레드 풀을 관리하여 동시성 프로그래밍을 지원하는 표준 Java API입니다.
-
-LCEL은 Runnable 인터페이스를 파이프로 연결하는 Executor입니다. Runnable 인터페이스는 Java에서 스레드에서 수행할 작업을 정의하는 인터페이스입니다. LCEL은 이 Runnable 인터페이스를 파이프로 연결하여 작업을 수행할 스레드를 관리하는 역할을 합니다.
-
-LCEL은 다음과 같은 특징을 가지고 있습니다.
-
-- 가벼운-weight: LCEL은 다른 Executor 프레임워크와 비교하여 가볍고 빠릅니다.
-- Core-Loops Executor: LCEL은 Core-Loops Executor를 지원하여 작업을 효율적으로 수행할 수 있습니다.
-- 동시성 프로그래밍: LCEL은 동시성 프로그래밍을 지원하여 작업을 병렬로 수행할 수 있습니다.
-
-LCEL은 Java 개발자들에게 유용한 도구로 간주될 수 있습니다. 특히, 작업을 효율적으로 수행하고 동시성 프로그래밍을 지원하는 경우에 LCEL을 사용할 수 있습니다.
+LCEL은 Linux Container Execution Layer의 약자입니다. LCEL은 Linux에서 컨테이너를 실행하기 위한 하드웨어 가속 플랫폼입니다. LCEL은 Runnable을 파이프로 연결하는 것을 말하는 것으로, 컨테이너를 실행하기 위한 가속 플랫폼으로 동작하는 것 같네요.
 ~~~
 
 ## 이 코드에서 봐야 할 것

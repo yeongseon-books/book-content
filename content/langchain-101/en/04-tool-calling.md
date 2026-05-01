@@ -49,7 +49,7 @@ print(response.tool_calls)
 
 ~~~
 Output
-[{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '408k48v5c', 'type': 'tool_call'}]
+[{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '8h2grbjb0', 'type': 'tool_call'}]
 ~~~
 
 ## What to notice in this code
@@ -168,7 +168,7 @@ print(f"tool_calls: {response.tool_calls}")
 ~~~
 Output
 content: ''
-tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': 'jn4t7a4yg', 'type': 'tool_call'}]
+tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': '6r0bdxb9y', 'type': 'tool_call'}]
 ~~~
 
 When `tool_calls` is non-empty, the LLM is requesting a tool execution.
@@ -253,7 +253,7 @@ Output
 
 question: What is 15 plus 27?
   executed: add_numbers({'a': 15, 'b': 27}) = 42.0
-answer: The answer is 42.
+answer: The result is 42.
 
 question: What is 7 times 8?
 answer: <multiply_numbers>{"a": 7, "b": 8}</multiply_numbers>
@@ -261,7 +261,7 @@ answer: <multiply_numbers>{"a": 7, "b": 8}</multiply_numbers>
 question: Add 5 and 3, then multiply the result by 4. What do you get?
   executed: add_numbers({'a': 5, 'b': 3}) = 8.0
   executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
-answer: So, adding 5 and 3 gives us 8, and multiplying 8 by 4 gives us 32.
+answer: So the result of adding 5 and 3, then multiplying the result by 4 is 32.
 ~~~
 
 The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a `ToolMessage` and appended to the conversation history.
@@ -319,6 +319,14 @@ def run_with_tools(question: str) -> str:
 print(run_with_tools("What time is it now?"))
 print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
 ```
+
+~~~
+Output
+  get_current_time({}) = 2026-05-01 23:44:50
+Unfortunately, it seems like the output of the function call is not properly formatted to be displayed as requested.
+  calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
+This is the calculated BMI value.
+~~~
 
 ---
 

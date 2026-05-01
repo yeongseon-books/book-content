@@ -163,10 +163,7 @@ question: Who created Python?
 answer: Python was created by Guido van Rossum in 1991.
 
 question: What are Python's weaknesses?
-answer: Python's main weaknesses are:
-
-1. Execution speed, as it is slower than C or Java for CPU-bound tasks.
-2. The GIL (Global Interpreter Lock), which limits multi-threaded performance.
+answer: One of Python's main weaknesses is execution speed. It is also slower than C or Java for CPU-bound tasks due to its nature as an interpreted language.
 
 question: When did Python 2 reach end of life?
 answer: Python 2 reached its official end of life in January 2020.
@@ -249,7 +246,7 @@ print(f"sources: {result['sources']}")
 
 ~~~
 Output
-answer: Python was created by Guido van Rossum in 1991.
+answer: Python was created by Guido van Rossum.
 sources: ['python_intro.txt', 'python_features.txt']
 ~~~
 

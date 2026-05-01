@@ -227,30 +227,30 @@ In Python, `lists` and `tuples` are two types of data structures that can store 
 A `list` is a mutable data structure that can be modified after creation. It is defined using square brackets `[]` and elements are separated by commas.
 
 **Example:**
-```python
-my_list = [1, 2, 3, 4, 5]
-print(my_list)  # Output: [1, 2, 3, 4, 5]
-
-# Modifying the list
-my_list[0] = 10
-print(my_list)  # Output: [10, 2, 3, 4, 5]
-```
+    ```python
+    my_list = [1, 2, 3, 4, 5]
+    print(my_list)  # Output: [1, 2, 3, 4, 5]
+    
+    # Modifying the list
+    my_list[0] = 10
+    print(my_list)  # Output: [10, 2, 3, 4, 5]
+    ```
 **Tuples**
 ---------
 
 A `tuple` is an immutable data structure that cannot be modified after creation. It is defined using parentheses `()` and elements are separated by commas.
 
 **Example:**
-```python
-my_tuple = (1, 2, 3, 4, 5)
-print(my_tuple)  # Output: (1, 2, 3, 4, 5)
-
-# Attempting to modify the tuple will raise an error
-try:
-    my_tuple[0] = 10
-except TypeError:
-    print("Tuples are immutable")
-```
+    ```python
+    my_tuple = (1, 2, 3, 4, 5)
+    print(my_tuple)  # Output: (1, 2, 3, 4, 5)
+    
+    # Attempting to modify the tuple will raise an error
+    try:
+        my_tuple[0] = 10
+    except TypeError:
+        print("Tuples are immutable")
+    ```
 **Key differences:**
 
 1. **Mutability**: Lists are mutable, while tuples are immutable.

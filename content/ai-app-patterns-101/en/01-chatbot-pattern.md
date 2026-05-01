@@ -78,11 +78,11 @@ print(chat("What is my name?"))  # must recall earlier turn
 
 ~~~
 Output
-Hello Alice, nice to meet you. How can I assist you today?
+Hello Alice, it's nice to meet you. How can I assist you today?
 Two advantages of Python are:
 
-1. Easy to learn: Python has a simple syntax and is beginner-friendly.
-2. Versatile: Python can be used for web development, data analysis, machine learning, and more.
+1. **Easy to learn**: Python has a simple syntax and is relatively easy to read and write.
+2. **Versatile**: Python can be used for various applications, such as web development, data analysis, machine learning, and automation.
 Your name is Alice.
 ~~~
 
@@ -290,14 +290,14 @@ print(f"session A history length: {len(sessions[session_a])}")
 
 ~~~
 Output
-[Alice] Hello Alice, it's nice to meet you. Is there something I can help you with or would you like to chat...
+[Alice] Hello Alice, it's nice to meet you. How can I assist you today? Do you have a specific question, top...
 
-[Bob] Hi Bob, it's nice to meet you. I'm here to help with any questions or topics you'd like to discuss. ...
+[Bob] Nice to meet you, Bob. I'm here to help with any questions or topics you'd like to discuss. How's yo...
 
-[Alice continued] Your name is Alice. How are you doing today?...
+[Alice continued] Your name is Alice....
 
-session A: bfae30a3-40b8-41bd-855b-57ed87fb8f42
-session B: 3a0c134f-ee40-4c0b-8f5a-01982d5885d6
+session A: 3857a52f-bd06-4d45-9ce7-3f51a7955048
+session B: 6dd02009-8940-43df-bdbf-bf6ad536b019
 session A history length: 4
 ~~~
 

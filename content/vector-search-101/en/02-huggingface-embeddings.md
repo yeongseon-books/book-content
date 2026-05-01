@@ -134,7 +134,7 @@ print(f"elapsed: {elapsed:.3f}s")
 ~~~
 Output
 matrix shape: (5, 384)
-elapsed: 0.139s
+elapsed: 0.097s
 ~~~
 
 The gap between batch and loop grows with document count. For large corpora, always prefer `embed_documents()`.

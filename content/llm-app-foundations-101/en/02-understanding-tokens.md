@@ -115,41 +115,43 @@ print(f"total_tokens={usage.total_tokens}")
 
 ~~~
 Output
-**What are Python Decorators?**
+**Python Decorators**
+--------------------
 
-Python decorators are a design pattern that allows programmers to wrap another function in order to extend the behavior of the wrapped function, without permanently modifying it. Decorators are a powerful tool for adding some new functionality to an existing function without changing its source code. They are often used to implement common patterns like caching, logging, authentication, and authorization.
+Python decorators are a powerful feature that allows programmers to modify the behavior of a function or class without changing its implementation. A decorator is essentially a higher-order function that takes another function as an argument and extends its behavior by wrapping it in a new function or performing some operations before or after it's executed. Decorators are denoted by the `@` symbol, which is just a shorthand for the `decorator_name(function_to_decorate)` syntax.
 
-**The Basic Syntax and Usage**
+Here's a basic example of a decorator:
 
-A decorator is a function that takes another function as an argument and extends its behavior without explicitly modifying it. The basic syntax for a decorator is as follows:
-```python
-def decorator_function(original_function):
-    # do something before the original function is called
-    def wrapper_function(*args, **kwargs):
-        # do something before calling the original function
-        result = original_function(*args, **kwargs)
-        # do something after the original function is called
-        return result
-    return wrapper_function
-```
-To use a decorator, you apply the decorator function to the original function using the `@` symbol:
-```python
-@decorator_function
-def original_function():
-    # this function is now extended by the decorator
-    pass
-```
-This is then equivalent to:
-```python
-original_function = decorator_function(original_function)
-```
+    ```python
+    def my_decorator(func):
+        def wrapper():
+            print("Something is happening before the function is called.")
+            func()
+            print("Something is happening after the function is called.")
+        return wrapper
+    
+    @my_decorator
+    def say_hello():
+        print("Hello!")
+    
+    say_hello()
+    ```
+
+When you call `say_hello()`, you'll see the output:
+
+    ```
+    Something is happening before the function is called.
+    Hello!
+    Something is happening after the function is called.
+    ```
+
+In this example, the `my_decorator` function takes `say_hello` as an argument and returns a new function `wrapper`, which executes before and after `say_hello`. The `@my_decorator` above the `say_hello` function is just a shortcut to apply the decorator.
 
 finish_reason=stop
 prompt_tokens=46
-completion_tokens=255
-total_tokens=301
-~~~python
-def my_decorator(func):
+completion_tokens=263
+total_tokens=309
+~~~def my_decorator(func):
     def wrapper():
         print("Something is happening before the function is called.")
         func()
@@ -219,7 +221,6 @@ Output
 [7979, 69774, 4037, 3160, 1603, 264, 1715, 3727, 10137, 11850, 30549, 13]
 token_count=12
 ~~~
-
 There is one important caveat here. `cl100k_base` is a well-known encoding from the OpenAI ecosystem. It does not automatically mean that Groq's `llama-3.1-8b-instant` uses the exact same tokenizer internally. Because of that, treat this number as a **practical estimate**, not as the provider's billing source of truth. For billing and final accounting, the provider's `usage` field is authoritative.
 
 That does not make the estimate useless. In most applications, the first question is not “what is the exact invoice number for this one request?” The first question is “is this prompt short, large, or dangerously large?” An approximate count is often enough to trigger the right control flow.
@@ -255,7 +256,6 @@ user: Add one short code example too.
 
 estimated_prompt_tokens=41
 ~~~
-
 This is not a provider-exact calculation. It is a useful operational estimate. For a chatbot, you can run this just before the API call and start trimming or summarizing once the estimate crosses a threshold.
 
 ---
@@ -316,24 +316,19 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 
 ~~~
 Output
-**Generators vs Lists in Python**
+**Generator vs List in Python**
 =====================================
 
-Python generators and lists are two fundamental data structures that serve different purposes.
+In Python, generators and lists are two different ways to store and manage data. While both can store collections of items, they have distinct differences in terms of memory usage, performance, and usage scenarios.
 
 **Lists**
 ---------
 
-A list is a collection of items stored in a single variable. Each item is identified by an index or key, which allows you to access, modify, and iterate over the elements in a list.
-
-**Example of a List**
-```python
-numbers =
+A list is a built-in Python data type that stores a collection of items that can be of any data type, including strings,
 
 completion_tokens=80
 finish_reason=length
 ~~~
-
 `max_tokens` affects more than length alone.
 
 - a smaller value often produces shorter, faster, cheaper answers
@@ -398,11 +393,9 @@ if choice.finish_reason == "length":
 ~~~
 Output
 estimated_prompt_tokens=3015
-It seems there appears to be an error with the provided text, but a summary of the topic is possible.
+Since you did not provide any information about the text content, I will provide a general summary of why a Python web application should keep both request logs and exception logs in the following 10 bullets:
 
-**Why a Python web application should keep both request logs and exception logs:**
-
-1. **Troubleshooting and debugging**: Request logs and exception logs enable the developers to identify and troubleshoot
+- **Request Logs Purpose**: Keep a record of every HTTP request made to the application, including information like
 
 prompt_tokens=3050
 completion_tokens=60
@@ -410,7 +403,6 @@ total_tokens=3110
 finish_reason=length
 Warning: the response stopped because it hit a length limit.
 ~~~
-
 Three things matter here.
 
 First, the script estimates prompt size before the call. That estimate is useful for preflight control.

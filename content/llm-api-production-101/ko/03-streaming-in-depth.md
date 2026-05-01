@@ -102,67 +102,67 @@ print(final_text)
 
 ~~~
 출력 결과
-FastAPI는 Python으로 작성된 웹 프레임워크로, 의존성 주입(Dependency Injection, DI) 기능을 제공합니다. 의존성 주입은 객체 간의 의존성을 분리하여 객체를 독립적으로 개발하고 테스트할 수 있도록 합니다.
+FastAPI는 Python으로 작성된 웹 프레임워크로, 의존성 주입(Dependency Injection) 기능을 제공합니다. 의존성 주입은 객체 간의 의존성을 분리하여 객체를 독립적으로 개발하고 테스트할 수 있도록 하는 디자인 패턴입니다.
 
 ### 의존성 주입이란?
 
-의존성 주입은 객체가 다른 객체에 의존하는 것을 줄이거나 없애는 기법입니다. 객체가 다른 객체에 의존하는 것을 줄이면 객체를 독립적으로 개발하고 테스트할 수 있습니다.
+의존성 주입은 객체가 다른 객체에 의존하는 것을 분리하여, 객체를 독립적으로 개발하고 테스트할 수 있도록 하는 디자인 패턴입니다. 예를 들어, 객체 A가 객체 B에 의존하는 경우, 객체 A는 객체 B의 구현을 알 필요가 없으며, 객체 B의 인터페이스만 알면 됩니다.
 
 ### FastAPI에서 의존성 주입 사용하기
 
-FastAPI에서는 의존성 주입을 위해 `@inject` 데코레이터를 제공합니다. `@inject` 데코레이터는 객체의 의존성을 주입할 수 있도록 합니다.
+FastAPI에서는 의존성 주입을 위해 `Depends` 데코레이터를 제공합니다. `Depends` 데코레이터는 함수에 의존성을 주입할 수 있도록 합니다.
 
-#### 예제
+#### 예시
 
-```python
-from fastapi import FastAPI
-from fastapi import Depends
-from pydantic import BaseModel
+    ```python
+    from fastapi import FastAPI, Depends
+    from pydantic import BaseModel
+    
+    app = FastAPI()
+    
+    class User(BaseModel):
+        id: int
+        name: str
+    
+    def get_user():
+        return User(id=1, name="John")
+    
+    @app.get("/user")
+    async def read_user(user: User = Depends(get_user)):
+        return user
+    ```
 
-# 의존성 주입을 위한 클래스
-class User:
-    def __init__(self, id: int, name: str):
-        self.id = id
-        self.name = name
-
-# 의존성 주입을 위한 함수
-def get_user(id: int):
-    return User(id, f"User {id}")
-
-# FastAPI 애플리케이션 생성
-app = FastAPI()
-
-# 의존성 주입을 사용하는 함수
-@app.get("/user/{user_id}")
-async def read_user(user_id: int, user: User = Depends(get_user)):
-    return {"id": user.id, "name": user.name}
-```
+위 예시에서, `get_user` 함수는 `User` 객체를 반환합니다. `Depends` 데코레이터를 사용하여 `read_user` 함수에 `get_user` 함수의 결과를 주입합니다.
 
 #### 의존성 주입의 장점
 
 의존성 주입의 장점은 다음과 같습니다.
 
-*   **객체 독립성**: 객체를 독립적으로 개발하고 테스트할 수 있습니다.
-*   **유연성**: 객체 간의 의존성을 줄이면 객체를 쉽게 교체할 수 있습니다.
-*   **테스트 용이성**: 객체를 독립적으로 테스트할 수 있습니다.
+*   객체를 독립적으로 개발하고 테스트할 수 있습니다.
+*   객체 간의 의존성을 분리하여, 객체를 쉽게 교체할 수 있습니다.
+*   객체의 의존성을 관리하기가 더 쉽습니다.
 
 #### 의존성 주입의 단점
 
 의존성 주입의 단점은 다음과 같습니다.
 
-*   **복잡성**: 의존성 주입을 사용하면 코드가 복잡해질 수 있습니다.
-*   **오버 엔지니어링**: 의존성 주입을 과도하게 사용하면 코드가 복잡해질 수 있습니다.
+*   의존성 주입을 사용할 때, 코드가 더 복잡해질 수 있습니다.
+*   의존성 주입을 사용할 때, 객체 간의 의존성을 관리하기가 더 어려울 수 있습니다.
 
-### 결론
+### 의존성 주입의 유형
 
-의존성 주입은 객체 간의 의존성을 분리하여 객체를 독립적으로 개발하고 테스트할 수 있도록 합니다. FastAPI에서는 의존성 주입을 위해 `@inject` 데코레이터를 제공합니다. 의존성 주입의 장점은 객체 독립성, 유연성, 테스트 용이성입니다. 단점은 복잡성, 오버 엔지니어링입니다.
----
-FastAPI는 Python으로 작성된 웹 프레임워크로, 의존성 주입(Dependency Injection, DI) 기능을 제공합니다. 의존성 주입은 객체 간의 의존성을 분리하여 객체를 독립적으로 개발하고 테스트할 수 있도록 합니다.
+의존성 주입에는 두 가지 유형이 있습니다.
 
-### 의존성 주입이란?
+*   **생성자 주입**: 객체를 생성할 때, 의존성을 주입합니다.
+*   ** setter 주입**: 객체가 생성된 후, 의존성을 주입합니다.
 
-의존성 주입은 객체가 다른 객체에 의존하는 것을 줄이거나 없애는 기법입니다. 객체가 다른 객체에 의존하는 것을 줄이면 객체를 독립적으로 개발하고 테스트할 수 있습니다.
-... (truncated)
+FastAPI에서는 생성자 주입을 사용합니다.
+
+### 의존성 주입의 예시
+
+    ```python
+    from fastapi import FastAPI, Depends
+    ... (truncated)
 ~~~python
 from fastapi import FastAPI
 from fastapi import Depends
@@ -285,46 +285,46 @@ asyncio.run(consume_stream("Python에서 context manager가 필요한 이유를 
 
 ~~~
 출력 결과
-Python의 `with` 문은 자원(리소스)을 관리하는 데 사용되는 데코레이터 인 `context manager`를 제공합니다. `context manager`는 다음과 같은 이유로 유용합니다:
+Python의 context manager는 try-except문과 finally문을 편리하게 사용하도록 도와주는 기능입니다. 다음의 장점으로 필요성을 느낄 수 있습니다.
 
-1. **리소스 관리**: `context manager`는 특정 리소스(예: 파일, 데이터베이스 连接, 세션 등)가 사용 중일 때를 위한 특정 코드블록을 관리하는 데 사용됩니다. 리소스가 사용되고 있는 동안 예외가 발생했다면, `context manager`는 해당 리소스를 릴리즈하는 역할을 하여 자원 낭비를 방지할 수 있습니다.
+### 1. 예외 처리를 편리하게 사용할 수 있다.
 
-2. **코드 재사용**: `context manager`는 자원이 사용될 때 발생하는 여러 가지 처리를 하나의 단위로 만들 수 있습니다. 이러한 재사용성은 개발에 시간과 노력을 절약하는 데 도움이 됩니다.
+try-except문과 finally문은 일반적인 프로그래밍에서 자주 사용되지만, 그 코드가 길어지면 유지 보수를 어렵게 만든다. 또한, 자원을 사용하는 경우에는 finally문에서 자원을 반납해줘야 하는데, 이는 예외가 발생했을 때도 반납하도록 하기 위해 try-except문이 여러 번 나열되어야 하므로 코드의 복잡성이 높아집니다. context manager는 이 문제를 해결해 줍니다.
 
-3. **코드 가독성**: `context manager`는 읽기 쉬운 코드를 작성하는 데 도움이 됩니다. 예를 들어, 특정 리소스를 사용하는 동안에 일련의 처리가 필요하다면, `with` 문 안에서 해당 처리를 적시하는 것이 보다 명확하고 간결합니다.
+### 2. 자원을 사용 후 반납하는 코드를 간결화 할 수 있다.
 
-4. **에러 핸들링**: `context manager`는 try/except 블록에서 리소스를 해제하는 것을 자동으로 처리합니다. 이렇게 하면 try/except 블록을 작성하는 개발자가 이를 고려할 필요가 없게 됩니다.
+자원을 사용한 코드를 작성해야 할 때, try-finally문이 나열되어 복잡하다. context manager는 이 문제를 해결해 줍니다.
 
-5. **thread safety**: 여러 스레드가 같은 리소스를 공유할 때, thread-safe한 context manager를 사용해야 합니다. Python의 `Lock` 객체나 `RLock` 객체를 사용하는 thread-safe한 context manager를 작성할 수 있습니다.
+### 3. 안전하고 깔끔한 자원 관리
 
-6-1. **예시 1 - 파일 사용**
-```python
-with open("file.txt", "r") as file:
-    contents = file.readlines()
-```
+context manager를 사용하면 finally 문에 자원이 release 된것을 보장할 수 있습니다. 또한 이 문이 실행되었을 때, 예외가 나더라도 자원이 release 되기 때문에 안전하게 코드를 작성할 수 있습니다.
 
-6-2. **예시 2 - 데이터베이스 연결**
-```python
-import sqlite3
+### 4. 복잡한 리소스 관리
 
-with sqlite3.connect("example.db") as conn:
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users")
-    rows = cursor.fetchall()
-```
+리소스를 사용할 떈, 리소스를 반납하는 코드가 복잡해졌다면 context manager를 사용할수 있습니다. context manager 는 리소스를 반납하는 코드를 관리해주기 때문에 코드를 더 깔끔하게 관리할수 있습니다.
 
-7. **예시 3 - 세션 관리**
-```python
-import requests
+### 5. 더 많은 메모리를 저장할 수 있다.
 
-s = requests.Session()
-s.auth = ("username", "password")
+contextmanager로 메모리를 관리할 수 있습니다. 메모리를 너무 많이 사용하게 되면 메모리 문제가 발생할 수 있는데 contextmanager로 메모리 관리를 할 수 있으니 메모리를 관리할 수 있습니다.
 
-with s:
-    response = s.get("https://example.com")
-    print(response.text)
-```
-여기서 `requests.Session` object는 context manager입니다. 해당 세션은 자동으로 종료되고, 세션의 상태가 릴리스됩니다.
+### 예제 코드
+
+    ```python
+    import contextlib
+    
+    # 자원을 사용할 때 context manager를 사용하지 않을 경우
+    file = open('test.txt', 'r')
+    try:
+        contents = file.read()
+    finally:
+        file.close()
+    
+    # 자원을 사용할 때 context manager를 사용
+    with open('test.txt', 'r') as file:
+        contents = file.read()
+    ```
+
+위 예제에서 context manager를 사용하지 않았을 때는 finally문이 코드의 끝 부분에 위치해야 하는 것이 보입니다. 반면에 context manager를 사용하면 with문을 사용하여 코드를 더 깔끔하게 관리할 수 있습니다.
 ~~~python
 class ResourceContext:
     def __init__(self, name):
@@ -399,61 +399,66 @@ for chunk in stream:
 ~~~
 출력 결과
 **Python의 Generator**
+=======================
 
-Python의 Generator는 함수의 결과가 메모리를 사용하지 않고, 순차적으로 값을 리턴하는 특별한 형태의 iterator입니다. Generator는 함수에서 값을 하나씩 리턴하는 반드시 반복가능한 루프를 사용하는 방식으로 작성된다.
+Generator는 이터레이터를 포함하는 함수입니다. 이터레이터는 다음 항목을 반환할 수 있는 시퀀스 객체를 나타냅니다. Generator 함수는 반복 가능한 객체를 생성하고, 반복자 객체를 반환합니다.
 
-### Generator와 Iterable 차이점
+**Generator의 특징**
+-------------------
 
-- **Iterable**: 리스트, 튜플, 세트, 문자열 등과 같은 iterable은 한번에 데이터를 모두 메모리에 로딩한 후, 순회(iterate)할 수 있다. 메모리 사용이 많아질 수 있는 장점이 있다.
+1.  **반복 가능한 객체 생성**: Generator 함수는 반복 가능한 객체를 생성합니다.
+2.  **이터레이터 반환**: Generator 함수는 이터레이터 객체를 반환합니다.
+3.  **중간에 멈출 수 있다**: Generator는 반복 중에 멈출 수 있습니다.
+4.  **다음 항목 생성**: Generator를 다시 호출하면 이전의 값을 유지하고 다음 항목을 반환합니다.
 
-- **Generator**: Generator는 한번에 데이터를 메모리에 로딩하지 않고, 순차적으로 값을 생성(Generate)함으로써, 메모리 사용의 문제를 해결한다.
+### 예제 코드
 
-### Generator를 사용하는 이유
+    ```python
+    def generator(n):
+        for i in range(n):
+            yield i
+    
+    gen = generator(5)
+    print(next(gen))  # 0
+    print(next(gen))  # 1
+    print(next(gen))  # 2
+    print(next(gen))  # 3
+    print(next(gen))  # 4
+    
+    # Generator에서 멈추고 다시 시작
+    gen = generator(10)
+    print(next(gen))  # 0
+    ```
 
-- 메모리를 효율적으로 사용할 수 있다.
-- 데이터가 너무 많을 경우 메모리 부족 에러를 피할 수 있다.
-- 데이터를 순차적으로 처리할 수 있다.
+### 사용 방법
 
-### Example 1: 반복가능한 데이터 생성
+1.  Generator 함수를 정의합니다.
+2.  `yield` 키워드를 사용하여 값이나 시퀀스를 반환합니다.
+3.  Generator 함수를 호출하여 이터레이터를 획득합니다.
+4.  `next()` 함수를 호출하여 다음 항목을 획득합니다.
 
-```python
-def generator_func():
-    for i in range(10):
-        yield i
+### Generator Advantages
 
-gen = generator_func()
-for _ in gen:
-    print(_)
-```
+1.  **메모리 절약**: Generator는 전체 시퀀스를 메모리에 로드하지 않습니다. 대신, 필요할 때만 이터레이터가 다음 항목을 생성합니다.
+2.  **연산 성능 향상**: Generator는 데이터가 많을 때 성능이 오히려 저하되는 이터레이터보다 더 빠르게 작동할 수 있습니다.
 
-### Example 2: 반복가능한 데이터 생성 (List Comprehension 사용하기)
+### Best Practices
 
-```python
-def generator_func(n):
-    return (i**2 for i in range(n))
+1.  Generator 함수에서 `yield` 키워드를 사용하여 반복 가능한 값이나 시퀀스를 반환합니다.
+2.  반복 중에 멈추고 다시시작하기 위해 Generator 함수에서 `yield from` 키워드를 사용합니다.
+3.  이터레이터를 사용하는 코드에서는 `next()` 함수 대신 Generator 함수를 호출합니다.
 
-gen = generator_func(10)
-for _ in gen:
-    print(_)
-```
-
-### Example 3: 실생활에 적용
-
-```python
-def read_large_file(filename, chunk_size=1024):
-    with open(filename, 'r') as f:
-        while True:
-            chunk = f.read(chunk_size)
-            if not chunk:
-                break
-            yield chunk
-
-file_gen = read_large_file('large_file.txt')
-for line in file_gen:
-    print(line)
-```
-
-이러한 예시를 통해 GENERATOR에 대한 이해를深히 하면서, GENERATOR의 장점을 실무에 적용할 수 있습니다. GENERATOR는 메모리 사용의 문제를 해결할 수 있으며, 데이터를 순차적으로 처리할 수 있습니다.
+### 예제 (2)
+    ```python
+    def fibonacci(n):
+        a, b = 0, 1
+        for _ in range(n):
+            yield a
+            a, b = b, a + b
+    
+    fib_gen = fibonacci(10)
+    for item in fib_gen:
+    ... (truncated)
 ~~~python
 def 제너레이터_함수(인수):
     for 반복문:

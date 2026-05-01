@@ -159,7 +159,7 @@ print(message.tool_calls)
 
 ~~~
 Output
-[ChatCompletionMessageToolCall(id='09d0pn0j5', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
+[ChatCompletionMessageToolCall(id='z7y17359a', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
 ~~~
 
 `tool_choice="auto"` lets the model decide whether a tool is needed. In practice, the interesting case is when the assistant message contains one or more `tool_calls`. That means your application has more work to do before a final user-facing answer exists.

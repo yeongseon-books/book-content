@@ -155,7 +155,7 @@ print(message.tool_calls)
 
 ~~~
 출력 결과
-[ChatCompletionMessageToolCall(id='7c26812ke', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
+[ChatCompletionMessageToolCall(id='6qx0r8yje', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
 ~~~
 
 `tool_choice="auto"`는 모델이 필요할 때 도구를 고르게 합니다. 응답 텍스트가 곧바로 오지 않고 `tool_calls`가 채워지는 경우가 핵심입니다. 이때 애플리케이션은 그 구조를 읽고 실제 함수를 실행해야 합니다.

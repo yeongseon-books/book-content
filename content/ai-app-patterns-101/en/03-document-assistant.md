@@ -109,27 +109,22 @@ print(dev_summary)
 ~~~
 Output
 === Executive summary ===
-Here's a business-focused summary of the document in three sentences or fewer:
+Here is a three-sentence summary of the document in a business-focused style:
 
-Python remains the most popular programming language for the fifth consecutive year, with 67% of developers using it as their primary language. Python's versatility is evident in its applications across data science and machine learning, web development, and automation scripting, with notable performance improvements in the latest version, Python 3.12. Major frameworks and libraries such as FastAPI, Django, Flask, pandas, numpy, and scikit-learn continue to dominate the Python ecosystem, indicating strong developer adoption and commitment to the language.
+Python remains the most widely used programming language for the fifth consecutive year, with 67% of respondents using it as their primary language. The language's versatility is evident in its use cases, which span data science and machine learning (45%), web development (28%), and automation scripting (18%). Popular frameworks and libraries, such as FastAPI, Django, and pandas, continue to dominate the Python ecosystem, supporting the language's enduring popularity.
 
 === Developer summary ===
-Technical Summary:
+**Key Findings from the 2024 Python Developer Survey**
 
-* **Language Popularity**: Python has maintained its position as the most popular programming language for the fifth consecutive year, with 67% of respondents using it as their primary language.
-* **Workload Distribution**: The primary use cases for Python are:
-	+ Data science and machine learning (45%), 
-	+ Web development (28%), and 
-	+ Automation scripting (18%).
-* **Framework Adoption**: The most-used frameworks in Python development are:
-	+ FastAPI (52%), 
-	+ Django (38%), and 
-	+ Flask (34%).
-* **Data Science Libraries**: The most widely used libraries in data science are:
-	+ Pandas (78%), 
-	+ NumPy (72%), and 
-	+ scikit-learn (65%).
-* **Python Version Adoption**: The majority of respondents (89%) utilize Python 3.x, while only 2% still run Python 2.x, indicating a significant shift towards the more modern and efficient Python 3.x version.
+• **Language Popularity:** Python remains the top programming language for the fifth consecutive year, with 67% of respondents using it as their primary language, and 45% applying it to data science and machine learning workloads.
+
+• **Performance Improvement:** Python 3.12 delivers a 25% performance improvement over the previous version, showcasing significant advancements in efficiency and speed.
+
+• **Type Hint Support:** The latest Python version strengthens type hint support, enhancing the development experience and promoting code quality.
+
+• **Framework Adoption:** The most-used frameworks are FastAPI (52%), Django (38%), and Flask (34%), with FastAPI exhibiting the highest adoption rate among respondents.
+
+• **Data Science Libraries:** In the data science domain, pandas (78%), numpy (72%), and scikit-learn (65%) dominate the landscape, indicating their widespread adoption and utility among Python developers.
 ~~~
 
 ---
@@ -229,13 +224,15 @@ Starting Map-Reduce summarization...
   chunk 5/5 summarized
 
 === Final summary ===
-Here is a coherent summary of the provided document segments, removing duplicates and preserving logical flow:
+Here's a coherent summary that merges the given segment summaries:
 
-Artificial intelligence (AI) is the field of computer science focused on creating machines that simulate human thought. This field originated with the question posed by Alan Turing in the 1950s, "Can machines think?" It has experienced periods of enthusiasm and disillusionment over the years. A key subfield of AI is machine learning, where computers learn from data by creating their own rules, rather than following explicit instructions. Algorithms such as decision trees, random forests, and support vector machines are commonly used in machine learning.
+Artificial intelligence (AI) is the field of computer science that aims to replicate human cognitive abilities in machines. The concept of AI was first posed as a question by Alan Turing in the 1950s: "Can machines think?" Since then, the field has experienced multiple periods of excitement and disappointment, but it continues to grow and evolve.
 
-Machine learning has given rise to deep learning, a branch that uses artificial neural networks modeled on the human brain. This approach gained widespread attention in 2012 after a deep learning model dominated the ImageNet competition, leading to breakthroughs in image recognition, speech recognition, and natural language processing. A significant application of deep learning is large language models (LLMs), which are trained on massive text data and can perform tasks such as text generation, summarization, and translation. Examples of prominent LLMs include GPT, BERT, and LLaMA.
+One of the key subfields of AI is machine learning, which involves computers learning rules from data, rather than following explicitly programmed instructions. Machine learning algorithms, such as decision trees, random forests, and support vector machines, have been instrumental in driving AI advancements. A branch of machine learning, deep learning, uses artificial neural networks modeled on the human brain and has achieved significant breakthroughs in image recognition, speech recognition, and natural language processing.
 
-The release of ChatGPT in late 2022 brought LLMs into widespread public attention. However, the future of AI also presents significant challenges, including explainability, bias, privacy, energy consumption, and labor displacement. Despite these challenges, AI is expected to play a vital role in addressing pressing issues in medicine, climate change, and education, holding promise for a positive impact on society.
+Large language models (LLMs), a type of deep learning model, have been trained on vast text datasets and can perform various tasks, including text generation and translation. Models like GPT, BERT, and LLaMA have been at the forefront of AI advancements, with the release of ChatGPT in 2022 bringing LLMs to the public's attention.
+
+Despite the promise of AI, there are significant challenges that require coordinated social responses, including explainability, bias, privacy, energy consumption, and labor displacement. However, AI is expected to play a crucial role in addressing pressing issues in medicine, climate change, and education, making it a critical area of research and development in the years to come.
 ~~~
 
 ---
@@ -317,7 +314,7 @@ Output
   location: remote
   salary_range: None
   required_skills: ['React', 'Node.js', 'PostgreSQL']
-  experience_years: 3
+  experience_years: 3 or more
   employment_type: contract
 ~~~
 
@@ -371,19 +368,19 @@ for text in texts:
 Output
 text: Python 3.12 significantly improved generic type handling spe...
   category: Technology/IT, confidence: 1.00
-  reason: mentions programming language and performance improvement
+  reason: mentions programming language and improvement in performance
 
 text: Operating profit for Q3 rose 15 percent year-over-year, driv...
-  category: Business/Finance, confidence: 0.80
-  reason: financial data and business expansion mentioned
+  category: Business/Finance, confidence: 1.00
+  reason: financial terms and company performance
 
 text: A new study reports that regular aerobic exercise reduces ca...
   category: Health/Medicine, confidence: 0.90
-  reason: Text mentions a study related to physical exercise and cardiovascular disease, which falls under health/medicine category.
+  reason: mention of cardiovascular disease and exercise
 
 text: Real Madrid defeated Manchester City 2-1 in the Champions Le...
   category: Sports, confidence: 1.00
-  reason: mention of a sports team and a tournament
+  reason: Mention of football teams (Real Madrid and Manchester City) and the Champions League
 ~~~
 
 ---

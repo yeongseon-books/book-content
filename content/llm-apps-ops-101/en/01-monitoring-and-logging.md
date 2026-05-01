@@ -138,8 +138,8 @@ Output
 {
   "calls": 2,
   "latency_ms": [
-    662.3,
-    648.6
+    685.7,
+    323.7
   ],
   "total_tokens": 262
 }

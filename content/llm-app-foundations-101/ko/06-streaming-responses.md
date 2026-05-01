@@ -118,19 +118,18 @@ for chunk in stream:
 
 ~~~
 출력 결과
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='', annotations=None, function_call=None, reasoning=None, role='assistant', tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=XGroq(id='req_01kqhw44abfwhvq3mjgvtrvr0s', debug=None, seed=1449096274, usage=None, usage_breakdown=None, error=None))
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='파', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='이', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='썬', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content=' 제', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='너', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='레이', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='터', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content='는', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777642639, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-8f17a6d6-fa07-4781-8add-98cf35151dcc', choices=[Choice(delta=ChoiceDelta(content=' 함수', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, 
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='', annotations=None, function_call=None, reasoning=None, role='assistant', tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=XGroq(id='req_01kqhzp2pfez1ttdw88hpw756d', debug=None, seed=1266322018, usage=None, usage_breakdown=None, error=None))
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='파', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='이', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='썬', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content=' 제', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='너', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='레이', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='터', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content='는', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777646373, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_7ccc667439', usage=None, x_groq=None)
+ChatCompletionChunk(id='chatcmpl-f6772fe5-5e26-4db5-9aed-ce6119a142e5', choices=[Choice(delta=ChoiceDelta(content=' 함수', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, 
 ... (truncated)
 ~~~
-
 여기서 반환되는 `stream`은 완성된 응답 객체가 아니라 청크 이터레이터에 가깝습니다. 각 청크에는 그 시점에 새로 생성된 조각과 메타데이터가 들어 있습니다. 입문 단계에서 가장 중요한 변화는 사고방식입니다. 이제 응답은 문자열 한 덩어리가 아니라 순차적으로 도착하는 이벤트 묶음입니다.
 
 이벤트 스트림을 다룰 때는 보통 세 가지를 구분합니다.
@@ -183,69 +182,68 @@ print(final_text)
 
 ~~~
 출력 결과
-FastAPI와 Flask는 두 가지 인기 있는 Python 웹 프레임워크입니다. 둘 다 웹 애플리케이션을 개발하기 위해 사용할 수 있지만, 사용법과 성능에 차이가 있습니다. 입문자 관점에서 FastAPI와 Flask의 차이를 비교해 보겠습니다.
+FastAPI와 Flask는 두 가지 인기 있는 Python 웹 프레임워크입니다. 둘 다 웹 애플리케이션을 개발하기 위해 사용할 수 있지만, 사용 목적, 성능, 그리고 개발 경험에 차이가 있습니다.
 
-### 1. 성능
+### Flask
 
-FastAPI는 Flask보다 성능이 좋습니다. FastAPI는 ASGI(Asynchronous Server Gateway Interface) 표준을 사용하여 비동기 처리를 지원하며, Flask는 WSGI(Web Server Gateway Interface) 표준을 사용하여 동기 처리를 지원합니다. 비동기 처리는 요청과 응답을 동시에 처리할 수 있으므로, FastAPI는 Flask보다 빠른 성능을 제공합니다.
+Flask는 2010년부터 개발되어 오는 Python 웹 프레임워크입니다. Flask는 매우 가볍고灵活한 프레임워크로, 작은 프로젝트나 빠르게 개발해야 하는 프로젝트에 적합합니다. Flask는 마이크로 프레임워크(Micro Framework)로, 기본적으로는 HTTP 요청과 응답을 처리하는 기능만 제공합니다. 개발자는 필요한 기능을 직접 구현해야 합니다.
 
-### 2. 코드 작성
+### FastAPI
 
-FastAPI는 Flask보다 코드 작성이 더 간단합니다. FastAPI는 OpenAPI specification을 자동으로 생성하여 API 문서를 생성할 수 있습니다. 또한, FastAPI는 type hinting을 지원하여 코드를 더 읽기 쉽게 만들 수 있습니다.
+FastAPI는 2018년부터 개발되어 오는 Python 웹 프레임워크입니다. FastAPI는 Flask와 비슷하게 마이크로 프레임워크로, 하지만 더 빠르고 강력한 기능을 제공합니다. FastAPI는 Python 3.7 이상에서만 작동하며, async/await 문법을 지원합니다. FastAPI는 OpenAPI 자동 생성, 강력한 타입 체크, 그리고 자동 문서화 기능을 제공합니다.
 
-### 3. API 문서 생성
+### 차이점
 
-FastAPI는 OpenAPI specification을 자동으로 생성하여 API 문서를 생성할 수 있습니다. Flask는 API 문서를 생성하는 데 별도의 라이브러리를 사용해야 합니다.
-
-### 4. 비동기 처리
-
-FastAPI는 비동기 처리를 지원하여 요청과 응답을 동시에 처리할 수 있습니다. Flask는 동기 처리를 지원하여 요청과 응답을 순차적으로 처리합니다.
-
-### 5. 확장성
-
-FastAPI는 Flask보다 확장성이 좋습니다. FastAPI는 다양한 확장 모듈을 제공하여 개발자가 쉽게 확장할 수 있습니다.
+- **성능**: FastAPI는 Flask보다 성능이 좋습니다. FastAPI는 async/await 문법을 지원하여 비동기 처리를 더 효율적으로 처리할 수 있습니다.
+- **자동 문서화**: FastAPI는 OpenAPI 자동 생성 기능을 제공하여 API 문서를 자동으로 생성할 수 있습니다. Flask는 직접 문서를 작성해야 합니다.
+- **타입 체크**: FastAPI는 강력한 타입 체크 기능을 제공하여 코드의 오류를 더 쉽게 찾을 수 있습니다.
+- **개발 경험**: FastAPI는 더 강력한 기능과 자동 문서화 기능을 제공하여 개발 경험을 더 좋게 만듭니다.
 
 ### 예시
 
-FastAPI와 Flask를 사용하여 간단한 API를 생성해 보겠습니다.
+Flask 예시:
 
-#### FastAPI 예시
-```python
-from fastapi import FastAPI
+    ```python
+    from flask import Flask, jsonify
+    
+    app = Flask(__name__)
+    
+    @app.route('/hello', methods=['GET'])
+    def hello():
+        return jsonify({'message': 'Hello, World!'})
+    
+    if __name__ == '__main__':
+        app.run(debug=True)
+    ```
 
-app = FastAPI()
+FastAPI 예시:
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
-```
+    ```python
+    from fastapi import FastAPI
+    
+    app = FastAPI()
+    
+    @app.get('/hello')
+    def hello():
+        return {'message': 'Hello, World!'}
+    ```
 
-#### Flask 예시
-```python
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route("/")
-def read_root():
-    return {"message": "Hello, World!"}
-```
-
-FastAPI와 Flask의 차이를 입문자 관점에서 설명해 보았습니다. FastAPI는 Flask보다 성능이 좋으며, 코드 작성이 더 간단합니다. 또한, API 문서 생성과 비동기 처리를 지원합니다. Flask는 확장성이 좋으며, 다양한 확장 모듈을 제공합니다. 개발자가 선택할 때 고려해야 할 사항입니다.
+FastAPI는 더 간단하고 강력한 기능을 제공하여 개발을 더 쉽게 만듭니다. 하지만 Flask는 더 가볍고灵活한 프레임워크로, 작은 프로젝트나 빠르게 개발해야 하는 프로젝트에 적합합니다.
 ---
-FastAPI와 Flask는 두 가지 인기 있는 Python 웹 프레임워크입니다. 둘 다 웹 애플리케이션을 개발하기 위해 사용할 수 있지만, 사용법과 성능에 차이가 있습니다. 입문자 관점에서 FastAPI와 Flask의 차이를 비교해 보겠습니다.
+FastAPI와 Flask는 두 가지 인기 있는 Python 웹 프레임워크입니다. 둘 다 웹 애플리케이션을 개발하기 위해 사용할 수 있지만, 사용 목적, 성능, 그리고 개발 경험에 차이가 있습니다.
 
-### 1. 성능
+### Flask
 
-FastAPI는 Flask보다 성능이 좋습니다. FastAPI는 ASGI(Asynchronous Server Gateway Interface) 표준을 사용하여 비동기 처리를 지원하며, Flask는 WSGI(Web Server Gateway Interface) 표준을 사용하여 동기 처리를 지원합니다. 비동기 처리는 요청과 응답을 동시에 처리할 수 있으므로, FastAPI는 Flask보다 빠른 성능을 제공합니다.
+Flask는 2010년부터 개발되어 오는 Python 웹 프레임워크입니다. Flask는 매우 가볍고灵活한 프레임워크로, 작은 프로젝트나 빠르게 개발해야 하는 프로젝트에 적합합니다. Flask는 마이크로 프레임워크(Micro Framework)로, 기본적으로는 HTTP 요청과 응답을 처리하는 기능만 제공합니다. 개발자는 필요한 기능을 직접 구현해야 합니다.
 
-### 2. 코드 작성
+### FastAPI
 
-FastAPI는 Flask보다 코드 작성이 더 간단합니다. FastAPI는 OpenAPI specification을 자동으로 생성하여 API 문서를 생성할 수 있습니다. 또한, FastAPI는 type hinting을 지원하여 코드를 더 읽기 쉽게 만들 수 있습니다.
+FastAPI는 2018년부터 개발되어 오는 Python 웹 프레임워크입니다. FastAPI는 Flask와 비슷하게 마이크로 프레임워크로, 하지만 더 빠르고 강력한 기능을 제공합니다. FastAPI는 Python 3.7 이상에서만 작동하며, async/await 문법을 지원합니다. FastAPI는 OpenAPI 자동 생성, 강력한 타입 체크, 그리고 자동 문서화 기능을 제공합니다.
+
+### 차이점
 
 ... (truncated)
-~~~python
-from fastapi import FastAPI
+~~~from fastapi import FastAPI
 
 app = FastAPI()
 
@@ -339,69 +337,51 @@ asyncio.run(main())
 
 ~~~
 출력 결과
-asyncio는 Python에서 제공하는 비동기 입출력 라이브러리입니다. 웹 서버에서 asyncio를 사용하는 이유는 다음과 같습니다.
+asyncio는 Python에서 제공하는 비동기 I/O 라이브러리입니다. 웹 서버에서 asyncio를 사용하는 이유는 다음과 같습니다.
 
-### 1. 높은 성능
+1. **비동기 처리**: 웹 서버는 일반적으로 요청을 처리하는 동안 다른 요청을 기다리지 않고, 여러 요청을 동시에 처리할 수 있습니다. asyncio는 비동기 처리를 지원하여, 서버가 여러 요청을 동시에 처리할 수 있습니다.
+2. **성능 향상**: asyncio는 동시성 처리를 지원하여, 서버의 성능을 향상시킬 수 있습니다. 서버가 여러 요청을 동시에 처리할 수 있기 때문에, 요청 처리 시간이 단축되고, 서버의 부하가 감소합니다.
+3. **이벤트 루프**: asyncio는 이벤트 루프를 제공하여, 서버가 이벤트를 처리할 수 있습니다. 이벤트 루프는 서버가 이벤트를 처리할 때, 이벤트를 큐에 넣고, 큐에서 이벤트를 꺼내서 처리하는 방식입니다.
+4. **코루틴**: asyncio는 코루틴을 지원하여, 서버가 비동기 처리를 쉽게 구현할 수 있습니다. 코루틴은 함수가 비동기적으로 실행되는 방식입니다.
+5. **성능 최적화**: asyncio는 성능 최적화를 지원하여, 서버의 성능을 최적화할 수 있습니다. 서버가 여러 요청을 동시에 처리할 수 있기 때문에, 서버의 부하가 감소하고, 성능이 향상됩니다.
 
-asyncio는 비동기 입출력을 지원하기 때문에, 웹 서버가 동시에 여러 요청을 처리할 수 있습니다. 이는 서버의 성능을 향상시켜줍니다. 예를 들어, 서버가 100개의 요청을 처리해야 할 때, asyncio를 사용하면 1개의 스레드나 프로세스에서 100개의 요청을 동시에 처리할 수 있습니다.
+asyncio를 사용하는 웹 서버의 예는 다음과 같습니다.
 
-### 2. 낮은 메모리 사용량
+* **Tornado**: Tornado는 Python에서 제공하는 웹 서버 프레임워크입니다. Tornado는 asyncio를 사용하여, 비동기 처리를 지원합니다.
+* **Sanic**: Sanic은 Python에서 제공하는 웹 서버 프레임워크입니다. Sanic은 asyncio를 사용하여, 비동기 처리를 지원합니다.
+* **FastAPI**: FastAPI는 Python에서 제공하는 웹 서버 프레임워크입니다. FastAPI는 asyncio를 사용하여, 비동기 처리를 지원합니다.
 
-asyncio는 스레드나 프로세스를 생성하지 않기 때문에, 메모리 사용량이 줄어듭니다. 이는 서버의 메모리 사용량을 줄여줍니다.
+asyncio를 사용하는 웹 서버의 장점은 다음과 같습니다.
 
-### 3. 높은 확장성
+* **성능 향상**: asyncio를 사용하는 웹 서버는 성능이 향상됩니다.
+* **비동기 처리**: asyncio를 사용하는 웹 서버는 비동기 처리를 지원합니다.
+* **이벤트 루프**: asyncio를 사용하는 웹 서버는 이벤트 루프를 지원합니다.
+* **코루틴**: asyncio를 사용하는 웹 서버는 코루틴을 지원합니다.
+* **성능 최적화**: asyncio를 사용하는 웹 서버는 성능 최적화를 지원합니다.
 
-asyncio는 비동기 입출력을 지원하기 때문에, 서버가 확장할 때도 쉽습니다. 예를 들어, 서버가 1000개의 요청을 처리해야 할 때, asyncio를 사용하면 1개의 스레드나 프로세스에서 1000개의 요청을 동시에 처리할 수 있습니다.
+asyncio를 사용하는 웹 서버의 단점은 다음과 같습니다.
 
-### 4. 쉬운 코드 작성
+* **학습 곡선**: asyncio를 사용하는 웹 서버는 학습 곡선이 높습니다.
+* **디버깅**: asyncio를 사용하는 웹 서버는 디버깅이 어려울 수 있습니다.
+* **성능 최적화**: asyncio를 사용하는 웹 서버는 성능 최적화가 어려울 수 있습니다.
 
-asyncio는 비동기 입출력을 지원하기 때문에, 코드를 작성할 때도 쉽습니다. 예를 들어, 서버가 100개의 요청을 처리해야 할 때, asyncio를 사용하면 100개의 요청을 동시에 처리하는 코드를 작성할 수 있습니다.
+asyncio를 사용하는 웹 서버의 결론은 다음과 같습니다.
 
-### 예제
+* **성능 향상**: asyncio를 사용하는 웹 서버는 성능이 향상됩니다.
+* **비동기 처리**: asyncio를 사용하는 웹 서버는 비동기 처리를 지원합니다.
+* **이벤트 루프**: asyncio를 사용하는 웹 서버는 이벤트 루프를 지원합니다.
+* **코루틴**: asyncio를 사용하는 웹 서버는 코루틴을 지원합니다.
+* **성능 최적화**: asyncio를 사용하는 웹 서버는 성능 최적화를 지원합니다.
 
-다음은 asyncio를 사용한 간단한 웹 서버 예제입니다.
+asyncio를 사용하는 웹 서버의 추천 사항은 다음과 같습니다.
 
-```python
-import asyncio
-from aiohttp import web
-
-async def handle_request(request):
-    return web.Response(text="Hello, World!")
-
-async def main():
-    app = web.Application()
-    app.router.add_get('/', handle_request)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, 'localhost', 8080)
-    print("Server started on port 8080")
-    await site.start()
-
-asyncio.run(main())
-```
-
-이 예제는 aiohttp를 사용하여 asyncio를 사용한 웹 서버를 생성합니다. handle_request 함수는 요청을 처리하는 함수입니다. main 함수는 서버를 시작하는 함수입니다.
-
-### 결론
-
-asyncio는 웹 서버에서 유리한 이유는 다음과 같습니다.
-
-* 높은 성능
-* 낮은 메모리 사용량
-* 높은 확장성
-* 쉬운 코드 작성
-
-asyncio를 사용하여 웹 서버를 구축하면, 서버의 성능을 향상시킬 수 있습니다.
+* **Tornado**: Tornado는 Python에서 제공하는 웹 서버 프레임워크입니다. Tornado는 asyncio를 사용하여, 비동기 처리를 지원합니다.
+* **Sanic**: Sanic은 Python에서 제공하는 웹 서버 프레임워크입니다. Sanic은 asyncio를 사용하여, 비동기 처리를 지원합니다.
+* **FastAPI**: FastAPI는 Python에서 제공하는 웹 서버 프레임워크입니다. FastAPI는 asyncio를 사용하여, 비동기 처리를 지원합니다.
 ---
-asyncio는 Python에서 제공하는 비동기 입출력 라이브러리입니다. 웹 서버에서 asyncio를 사용하는 이유는 다음과 같습니다.
-
-### 1. 높은 성능
-
-asyncio는 비동기 입출력을 지원하기 때문에, 웹 서버가 동시에 여러 요청을 처리할 수 있습니다. 이는 서버의 성능을 향상시켜줍니다. 예를 들어, 서버가 100개의 요청을 처리해야 할 때, asyncio를 사용하면 1개의 스레드나 프로세스에서 100개의 요청을 동시에 처리할 수 있습니다.
-
+asyncio는 Python에서 제공하는 비동기 I/O 라이브러리입니다. 웹 서버에서 asyncio를 사�
 ... (truncated)
-~~~python
-import asyncio
+~~~import asyncio
 
 async def handle_request(reader, writer):
     data = await reader.read(100)
@@ -502,48 +482,68 @@ else:
 
 ~~~
 출력 결과
-파이썬 데코레이터(Decorator)는 함수를 감싸서 추가적인 기능을 제공하고, 함수의 구현을 유지하는 디자인 패턴입니다. 데코레이터는 함수가 호출되기 전에, 함수가 호출된 후, 또는 함수가 호출되는 과정에 특정 코드를 추가할 수 있도록 해 줍니다.
+파이썬 데코레이터는 함수를 다른函數으로包싸기 위한 문법적 기법입니다. 데코레이터를 사용하면 함수의 입출력을 조작하거나 함수에 비즈니스 로직을 추가할 수 있습니다. 데코레이터의 이름은 함수를 꾸미는 것에서 비롯되었습니다.
 
-데코레이터를 사용하면 함수를 직접 변경하지 않고도 함수의 동작을 변경할 수 있습니다. 데코레이터는 함수의 이름, 구현, 및 기타 정보를 변경하지 않지만, 함수에 대한 액세스를 제어하거나 함수의 입출력을 변경할 수 있습니다.
+### 데코레이터의 기본 구조
 
-데코레이터의 일반적인 사용 예는 다음과 같습니다.
+데코레이터 함수는 일반 함수와 마찬가지로 정의하며, 데코레이터 함수의 첫 번째 매개변수는 데코레이터 자체의 매개변수와는 별개로, 함수의 이름을 참조하는 특별한 매개변수인 `func`를 갖습니다. 예를 들어, `@example` 데코레이터를 적용하는 함수는 그 함수가 사용될 때 `example` 함수를 호출하는 코드를 다음과 같이 선언할 수 있습니다:
 
-1.  로깅: 데코레이터를 사용하여 함수의 호출을 로깅할 수 있습니다.
-2.  캐싱: 데코레이터를 사용하여 함수의 출력을 캐시할 수 있습니다.
-3.  인증 및 권한: 데코레이터를 사용하여 함수가 çağ르려면 누구든지 접근할 수 있도록 하거나 접근 범위를 제한을 할 수 있습니다.
+    ```python
+    def example(func):
+        def wrapper(*args, **kwargs):
+            print(f"데코레이터 {func.__name__!r}()가 작동 중입니다.")
+            return func(*args, **kwargs)
+        return wrapper
+    
+    @example
+    def say_hello(name):
+        return f"안녕하세요, {name}!"
+    
+    print(say_hello("월요일"))
+    ```
 
-데코레이터를 만드는 방법에는 여러 가지 방법이 있습니다. 가장 간단한 방법은 다음의 코드와 같습니다:
+### 데코레이터를 적용하는 방법
 
-```python
-# 데코레이터 함수
-def log_decorator(func):
-    def wrapper(*args, **kwargs):
-        print(f"{func.__name__} 함수가 호출되었습니다.")
-        return func(*args, **kwargs)
-    return wrapper
+데코레이터를 사용하려면 원하는 함수에 `@` 기호를 사용해 데코레이터의 이름을 추가합니다. 다음은 데코레이터의 예시입니다:
 
-# 데코레이터 사용
-@log_decorator
-def greet(name):
-    return f"Hello, {name}!"
+    ```python
+    def example(func):
+        def wrapper(*args, **kwargs):
+            print(f"데코레이터 {func.__name__!r}()가 작동 중입니다.")
+            return func(*args, **kwargs)
+        return wrapper
+    
+    @example
+    def say_hello(name):
+        return f"안녕하세요, {name}!"
+    
+    @example
+    def say_goodbye(name):
+        return f"안녕히 가세요, {name}!"
+    
+    print(say_hello("월요일"))  # 데코레이터 'say_hello()'가 작동 중입니다.
+    print(say_goodbye("화요일"))  # 데코레이터 'say_goodbye()'가 작동 중입니다.
+    ```
 
-print(greet("John"))  # Output: greet 함수가 호출되었습니다. Hello, John!
-```
+### 다중 데코레이터를 사용하는 방법
 
-위의 코드에서, `log_decorator` 함수는 `greet` 함수를 감싸는 데코레이터입니다. `log_decorator` 함수는 `greet` 함수를 호출하는 대신 `wrapper` 함수를 반환합니다. `wrapper` 함수는 `greet` 함수를 호출합니다.
+다중 데코레이터를 사용하려면 데코레이터를 나열해 원하는 순서로 적용합니다:
 
-데코레이터는 다음과 같은 특성으로 정의할 수 있습니다.
-
-*   데코레이터는 함수를 반환하지 않습니다. 대신, 데코레이터는 새로운 함수(`wrapper` 함수)를 반환합니다.
-*   데코레이터는 함수의 이름을 변경할 수 없지만, 함수에 대한 액세스를 제어할 수 있습니다.
-*   데코레이터는 함수의 입출력을 변경할 수 있습니다.
-
-데코레이터를 사용하면 함수를 유지하면서 함수의 동작을 변경할 수 있습니다. 데코레이터는 함수 개발과 테스트에서 매우 유용합니다.
-prompt_tokens: 50
-completion_tokens: 572
-total_tokens: 622
-~~~python
-def 데코레이터_이름(기능_기능):
+    ```python
+    def example1(func):
+        def wrapper(*args, **kwargs):
+            print(f"데코레이터 {func.__name__!r}()가 작동 중입니다.")
+            return func(*args, **kwargs)
+        return wrapper
+    
+    def example2(func):
+        def wrapper(*args, **kwargs):
+            print(f"데코레이터 {func.__name__!r}()가 작동 중입니다.")
+            return func(*args, **kwargs)
+        return wrapper
+    
+    ... (truncated)
+~~~def 데코레이터_이름(기능_기능):
     def wrapper(원 함수):
         # 원 함수에 추가 기능을 구현
         결과 = 기능_기능(원 함수)
@@ -642,19 +642,19 @@ with open("summary.txt", "w", encoding="utf-8") as file:
 
 ~~~
 출력 결과
-Redis는 오픈 소스 키-밸류 저장소입니다. 
-1. **키-밸류 저장소** : Redis는 문자열, 해시, 리스트, 집합, 셋 등의 자료형을 사용해 데이터를 저장합니다. 
-2. **인메모리** : Redis의 자료형은 RAM에 저장되므로 빠른 조회, 삽입, 삭제가 가능합니다. 
-3. **데이터 구조** : Redis는 기본 자료형(문자열, 해시, 리스트, 집합, 셋)과 데이터셋(TSDB, GIS)을 지원합니다.
-4. **트랜잭션** : Redis는 트랜잭션 지원을 해서 원자성을 보장하거나 데이터 불일치를 방지할 수 있습니다.
-5. **분산** : Redis는 여러 서버를 클러스터로 구성하여 부하 분산 가능합니다.
-6. **스케일링** : Redis의 대용량 캐시 기능으로 대규모 애플리케이션을 확장할 수 있습니다.
-7. **오픈 소스** : Redis는 GPL-2.0 조건하에 오픈 소스입니다.
-8. **개발 환경** : Redis는 다양한 개발 언어(Java, Python, C++, Node.js, Go, Ruby)에서 사용할 수 있습니다.
-9. **데이터베이스** : Redis는 데이터베이스의 일부와 함께 작업하는 데이터를 비롯하여 다양한 데이터 타입을 저장하고 처리할 수 있습니다. 
-10. Redis는 다양한 기능(스레드 처리, 클러스터링, 분산 잠금 등)을 제공하여 대규모 애플리케이션에 적합합니다.
-~~~
+Redis는 인메모리 데이터 저장소로, 빠른 읽기와 쓰기에 최적화된 NoSQL 데이터베이스입니다._redis 입문자를 위한 10줄 요약을 다음과 같습니다:
 
+1. **Redis란?**: Redis는 인메모리 데이터 저장소로, 데이터를 메모리에 캐싱하여 빠른 읽기와 쓰기를 지원합니다.
+2. **NoSQL**: Redis는 기존의 관계형 데이터베이스와 다른 스토리지 모델을 사용하여, 높은 성능과 가용성 등을 제공합니다.
+3. **Key-Value 저장소**: Redis는 key-value 쌍을 저장하고 읽는 구조를 사용하여, 빠른 데이터 접근을 지원합니다.
+4. **트리스트, 세트, 해시**: Redis는 집합 연산을 제공하는 트리스트, 세트, 해시 구조를 제공하여, 빠른 집합 연산을 지원합니다.
+5. **_pub/sub_** : Redis는 publish/subscribe 모델을 제공하여, 실시간 통신을 지원합니다.
+6. **transaction** : Redis는 원자성이 보장되는 트랜잭션을 지원하여, 안전하게 데이터를 처리합니다.
+7. **서버 운영**: Redis는 다중 인스턴스 운영이 가능하여, 하드웨어를 분산 운영하여, 고가용성을 제공합니다.
+8. **메모리 기반**: Redis는 메모리 기반임으로, 메모리가 많이 필요합니다.
+9. **리더- 팔로워 구조**: Redis는 리더-팔로워 구조를 제공하여, 데이터 복제를 지원합니다.
+10. **오픈 소스**: Redis는 오픈 소스임으로, 사용자가 자유롭게 수집 및 개선할 수 있습니다.
+~~~
 이 코드는 생성되는 즉시 파일과 표준 출력에 동시에 기록합니다. 생성이 길어지더라도 중간 결과가 디스크에 남기 때문에, 운영 중간에 프로세스가 끊겼을 때도 일부 결과를 복구하기 쉽습니다.
 
 조금 더 흥미로운 패턴은 다음 단계로 파이프하는 방식입니다. 예를 들어 모델 응답을 한 문장씩 받아 금칙어 검사나 요약기, 번역기, TTS 엔진에 순차적으로 넘길 수 있습니다. 이때는 “토큰마다 바로 후처리”보다 “작은 버퍼를 모았다가 의미 있는 경계에서 넘기기”가 실용적입니다.

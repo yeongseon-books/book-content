@@ -47,7 +47,7 @@ print(chain.invoke({"topic": "LCEL"}))
 
 ~~~
 Output
-Low-Carbon Economy Linkage (LCEL) is a framework used to assess and quantify the potential greenhouse gas (GHG) emissions reductions from large-scale renewable energy projects. It is designed to help project developers, investors, and regulators understand the emissions-reducing impact of renewable energy projects, such as large wind or solar farms, by linking them to specific carbon credits or certificates that can be traded on carbon markets. LCEL typically involves the estimation of the avoided emissions from fossil fuels that would have been used to generate electricity in the absence of the renewable energy project, as well as the consideration of potential emissions reductions from other sectors, such as transportation or industry, that may be influenced by the project's power output. By providing a standardized and transparent method for evaluating the emissions-reducing impact of renewable energy projects, LCEL can help facilitate the development and deployment of low-carbon energy infrastructure.
+Light Communication Equipment (LCEL) refers to a category of wireless communication devices that use light as a medium to transmit data. These devices can transmit data at high speeds, often in the range of gigabits per second, while also providing low latency and high reliability. LCEL technology typically operates in the visible light spectrum, using LEDs or lasers to transmit information. It is often used in applications such as indoor wireless communication systems, where it can provide faster and more reliable connectivity than traditional radio frequency (RF) wireless systems, while also being less susceptible to interference and more energy-efficient.
 ~~~
 
 ## What to notice in this code
@@ -143,7 +143,7 @@ print(response.content)
 
 ~~~
 Output
-Python offers several advantages, including its simplicity and ease of use, making it an ideal language for beginners and experienced developers alike, as well as its versatility in handling various tasks, such as web development, data analysis, artificial intelligence, and automation. Additionally, Python's extensive libraries and frameworks, such as NumPy, pandas, and Flask, provide a wide range of tools and resources that facilitate efficient and effective development.
+Python is a versatile and widely-used programming language that offers several advantages, including its simplicity and ease of use, making it an ideal choice for beginners and experienced developers alike, as well as its vast number of libraries and frameworks that enable rapid development and deployment of complex applications. Additionally, Python's cross-platform compatibility, flexibility, and extensive community support make it an attractive choice for a wide range of applications, from web development to data analysis and artificial intelligence.
 ~~~
 
 `ChatGroq` implements Runnable, so `invoke()` is available directly.
@@ -192,7 +192,7 @@ print(result)
 
 ~~~
 Output
-Embedding vectors are a way to represent words, phrases, or other discrete data as continuous numerical vectors in a high-dimensional space, allowing for mathematical operations to be performed on them. This is typically done using techniques like word2vec or GloVe, which map words to vectors that capture their semantic relationships and context, enabling applications like language modeling and natural language processing.
+Embedding vectors is a technique in natural language processing (NLP) and machine learning where words, phrases, or objects are represented as dense numerical vectors in a high-dimensional space, allowing machines to better understand semantic relationships and similarities between them. These vectors are typically learned through algorithms such as Word2Vec or GloVe, which analyze large datasets to identify patterns and associations between words or objects.
 ~~~
 
 What each component does:
@@ -256,10 +256,10 @@ Output
 
 === step 2: AIMessage ===
   type: AIMessage
-  content: Embedding vectors is a technique used in machine learning where words, phrases, ...
+  content: Embedding vectors is a technique used in natural language processing and machine...
 
 === step 3: string ===
-  Embedding vectors is a technique used in machine learning where words, phrases, or other data points are assigned a high-dimensional vector representation, allowing similar concepts to be closer together and dissimilar ones farther apart in a mathematical space. This is often achieved through algorithms like Word2Vec or GloVe, which analyze the relationships and patterns within the data to generate these vector representations, facilitating tasks like text classification, clustering, and natural language processing.
+  Embedding vectors is a technique used in natural language processing and machine learning where words or phrases are represented as numerical vectors in a high-dimensional space, allowing computers to understand and analyze their semantic meaning. These vectors can be learned through various algorithms, such as word2vec or GloVe, to capture the relationships and analogies between words, enabling more accurate and meaningful representations of language.
 ~~~
 
 ---
@@ -298,9 +298,9 @@ print(result)
 
 ~~~
 Output
-Vector search is a technique that converts text into numerical vectors, allowing for efficient and meaningful searches based on the semantic relationships between words, rather than exact keyword matches.
+Vector search, also known as semantic search, converts text into numerical vectors that represent the meaning of words and phrases, enabling more accurate and relevant retrieval in search applications.
 
-(character count: 204)
+(character count: 201)
 ~~~
 
 `RunnableLambda` lets any plain Python function participate in a pipe chain. It is useful for output post-processing, logging, and lightweight transforms.
@@ -343,11 +343,11 @@ for topic_dict, result in zip(topics, results):
 
 ~~~
 Output
-[embeddings] In the context of machine learning and natural language processing, an embedding is a numeric vector representation of a word, phrase, or concept that captures its semantic meaning and relationships with other words, enabling more effective and efficient processing of language data.
+[embeddings] In machine learning, embeddings are a way to represent complex data, such as text or images, as dense vectors of numbers in a high-dimensional space, allowing for efficient similarity calculations and model learning.
 
-[FAISS] FAISS (Facebook AI Similarity Search) is an open-source library for efficient similarity search and clustering of dense vectors, used in various machine learning and data science applications.
+[FAISS] FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook AI, optimized for efficient similarity search and clustering of dense vectors, widely used in applications such as image and audio search, recommendation systems, and natural language processing.
 
-[RAG] RAG is a project management and governance framework that uses a traffic light system to categorize projects or initiatives into three stages: Red (stopping or paused), Amber (in progress or caution), and Green (complete or successful).
+[RAG] RAG is an acronym that stands for Red, Amber, and Green, a color-coding system used to categorize and track the status of tasks, projects, or goals by indicating whether they are in a critical (Red), cautionary (Amber), or satisfactory (Green) condition.
 ~~~
 
 `batch()` attempts parallel processing internally. Use `max_concurrency` to cap simultaneous requests when working within API rate limits.

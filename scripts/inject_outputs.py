@@ -116,7 +116,24 @@ def run_block(code: str, lang: str) -> str | None:
     if len(out.encode()) > MAX_OUTPUT_BYTES:
         out = out.encode()[:MAX_OUTPUT_BYTES].decode(errors="replace") + "\n... (truncated)"
 
+    out = _sanitize_output(out)
     return out.rstrip()
+
+
+def _sanitize_output(text: str) -> str:
+    lines = text.splitlines()
+    result = []
+    in_fence = False
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped.startswith("```") or stripped.startswith("~~~"):
+            in_fence = not in_fence
+            result.append("    " + line)
+        elif in_fence:
+            result.append("    " + line)
+        else:
+            result.append(line)
+    return "\n".join(result)
 
 
 def label_for(lang: str) -> str:

@@ -112,9 +112,8 @@ print(completion.choices[0].message.content)
 Output
 category: technical
 priority: high
-reason: The issue is directly related to the functionality of the service, causing a critical error.
+reason: The error prevents the user from completing the intended action, which is uploading a file.
 ~~~
-
 Three things matter here. First, few-shot is just message-array design. Second, the example has to show the desired answer shape, not merely a related question. Third, every example consumes tokens, so compact representative examples are usually better than long ones.
 
 ---
@@ -190,14 +189,13 @@ Output
 [zero-shot]
 category: billing
 priority: high
-reason: The discrepancy in the invoice suggests an unexpected change in pricing or billing calculation.
+reason: Unexpected invoice amount discrepancy from expected costs.
 
 [few-shot]
 category: billing
 priority: high
-reason: Unexpected billing discrepancies can cause financial disruptions for the customer.
+reason: Unexpected charges can cause financial disruption and require immediate resolution.
 ~~~
-
 In many runs, zero-shot will still produce a reasonable answer. Few-shot usually improves a different dimension: repeatability. It tends to stabilize the label vocabulary, the line order, the explanation length, and the way ambiguous cases are interpreted.
 
 That difference matters because applications care less about one impressive answer than about hundreds of answers arriving in a shape the rest of the system can rely on.
@@ -306,9 +304,8 @@ reason: The customer is unable to access their account due to a failed password 
 [good examples]
 category: technical
 priority: high
-reason: The inability to reset the password prevents the user from accessing their account.
+reason: The inability to reset the password prevents the customer from accessing their account.
 ~~~
-
 The stronger examples do more than show correct answers. They demonstrate a stable schema, a clear priority policy, and the expected sentence length. That is why example quality matters more than raw example count. Two clean examples often outperform six messy ones.
 
 In practice, good few-shot examples are usually:
@@ -387,7 +384,6 @@ Final price = Discounted price + VAT amount
 
 final_answer: 118800 won.
 ~~~
-
 This tends to reduce mistakes in ordering and intermediate arithmetic. It is especially handy when the task has words like “first,” “then,” “except,” or “only if,” because those are exactly the cases where skipping an intermediate check causes the answer to drift.
 
 ---
@@ -450,7 +446,6 @@ Output
 3) Add the 5000 won shipping fee to get 65000 won.
 final_answer: 65000 won
 ~~~
-
 The difference is easy to summarize:
 
 - zero-shot CoT: ask for step-by-step reasoning
@@ -540,7 +535,6 @@ policy_check:
 decision: denied
 reason: The request exceeds the allowed time window for a refund, regardless of the watch progress.
 ~~~
-
 This pattern is useful because it improves more than answer quality. It improves debuggability. If the output is wrong, you can inspect which policy check went wrong rather than treating the whole response as a black box.
 
 ---

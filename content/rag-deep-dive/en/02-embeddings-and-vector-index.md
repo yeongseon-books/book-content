@@ -285,7 +285,7 @@ if __name__ == "__main__":
 Output
 InMemoryDocstore
 2
-{0: 'b2edbe39-2ff8-4d74-98b4-8745e43e2e2a', 1: '52b2a2a8-82ec-4544-bbc8-bdc6bef5fe88'}
+{0: 'b5524666-2cbc-46ac-8970-d7e06301503f', 1: '5fb6fc61-a779-4d09-a563-f27d89e22594'}
 ~~~
 
 The main operational takeaway is that retrieval bugs can happen in any of these layers. A bad score is not the same as a bad reconstruction, and a bad reconstruction is not the same as a bad metadata filter path.

@@ -138,8 +138,8 @@ if __name__ == "__main__":
 {
   "calls": 2,
   "latency_ms": [
-    379.6,
-    326.1
+    402.7,
+    898.4
   ],
   "total_tokens": 262
 }
