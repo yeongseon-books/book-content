@@ -192,11 +192,6 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-~~~
-Output
-Python list comprehensions are a powerful feature that allows you to create new lists in a concise and readable manner. They consist of brackets containing the expression, which is executed for each element, along with the 'for' loop to specify the input iterable and the 'if' clause to filter the elements. The general syntax is: `[expression for element in iterable if condition]`, where 'expression' is the operation performed on each 'element' from the 'iterable', and 'condition' is an optional filter applied to the result. For example, `[x**2 for x in range(10) if x % 2 == 0]` creates a new list containing the squares of even numbers from 0 to 9. List comprehensions provide a compact way to manipulate data and are often used for tasks such as filtering, sorting, and transforming data.
-~~~
-
 Three lines matter most.
 
 `Groq(...)` creates the client object that will talk to the API.
@@ -235,43 +230,6 @@ completion = client.chat.completions.create(
 
 print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
 ```
-
-~~~
-Output
-{
-  "id": "chatcmpl-315171e7-e2ec-4bb3-8e24-d9eb6ef54e57",
-  "choices": [
-    {
-      "finish_reason": "stop",
-      "index": 0,
-      "logprobs": null,
-      "message": {
-        "content": "An HTTP API is a remote service that exposes endpoints for sending and receiving data over the web using HTTP protocols. It typically requires clients to manually construct and send HTTP requests, parse responses, and handle errors, making it a more low-level interface. \n\nOn the other hand, an SDK (Software Development Kit) is a pre-built library or framework that provides a higher-level abstraction for interacting with a service or API, allowing developers to write more code in their chosen programming language, with less manual HTTP request management.",
-        "role": "assistant"
-      }
-    }
-  ],
-  "created": 1777647296,
-  "model": "llama-3.1-8b-instant",
-  "object": "chat.completion",
-  "service_tier": "on_demand",
-  "system_fingerprint": "fp_7ccc667439",
-  "usage": {
-    "completion_tokens": 103,
-    "prompt_tokens": 50,
-    "total_tokens": 153,
-    "completion_time": 0.199277411,
-    "prompt_time": 0.002788606,
-    "queue_time": 0.007095763,
-    "total_time": 0.202066017
-  },
-  "usage_breakdown": null,
-  "x_groq": {
-    "id": "req_01kqj0j86rf7rr6s9538vfmav7",
-    "seed": 512895673
-  }
-}
-~~~
 
 When you look through that output, pay attention to three fields first.
 
@@ -365,11 +323,6 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-~~~
-Output
-Asynchronous programming is a technique used in software development where certain operations are executed in the background without blocking the main thread of execution. This allows the program to continue running without waiting for the completion of a specific task, improving overall responsiveness and efficiency. Asynchronous code is typically written using callback functions, promises, or async/await syntax, which enables the program to proceed with other tasks while waiting for the completion of a time-consuming operation, such as I/O operations (e.g., reading from a file or database), network requests, or computations that may take a long time to complete. By utilizing concurrency and non-blocking I/O, asynchronous programming enables the development of scalable, high-performance applications that can handle multiple tasks simultaneously.
-~~~
-
 And here is the async version. This block is also executable on its own.
 
 ```python
@@ -395,71 +348,6 @@ async def main() -> None:
 
 asyncio.run(main())
 ```
-
-~~~
-Output
-**Asynchronous Programming with asyncio**
-
-Asynchronous programming allows for non-blocking I/O operations, leading to efficient use of system resources and improved responsiveness in applications. `asyncio` in Python is a built-in module that simplifies asynchronous programming and makes it easier to write concurrent code.
-
-### Situation 1: Making API Calls
-
-Imagine you're building a web scraper that needs to fetch data from multiple APIs concurrently. You can use `asyncio` to make simultaneous requests to each API endpoint and then wait for all responses.
-
-    ```python
-import asyncio
-
-async def fetch_data(url):
-    # Simulate a network delay using async.sleep()
-    await asyncio.sleep(2)
-    return f"Fetched data from {url}"
-
-async def main():
-    # Create a list of URLs to fetch data from
-    urls = ["https://api1.com", "https://api2.com", "https://api3.com"]
-
-    # Use asyncio.gather() to run fetch_data() concurrently for each URL
-    tasks = [fetch_data(url) for url in urls]
-    results = await asyncio.gather(*tasks)
-
-    # Print the results
-    for result in results:
-        print(result)
-
-asyncio.run(main())
-    ```
-
-### Situation 2: Handling Multiple Database Queries
-
-Suppose you're building a database-driven application that needs to execute multiple queries on different tables concurrently. You can use `asyncio` to create a task for each query and wait for all tasks to complete.
-
-    ```python
-import asyncio
-import sqlite3
-
-async def execute_query(db, query):
-    # Simulate a database query using async.sleep()
-    await asyncio.sleep(2)
-    return f"Query executed on {db}"
-
-async def main():
-    # Connect to the database
-    conn = sqlite3.connect(":memory:")
-    db = conn.cursor()
-
-    # Create a list of queries to execute
-    queries = ["SELECT * FROM table1", "SELECT * FROM table2", "SELECT * FROM table3"]
-
-    # Use asyncio.gather() to run execute_query() concurrently for each query
-    tasks = [execute_query(db, query) for query in queries]
-    results = await asyncio.gather(*tasks)
-
-    # Print the results
-    for result in results:
-        print(result)
-
-... (truncated)
-~~~
 
 The structure barely changes. Replace `Groq` with `AsyncGroq`, add `await`, and run the top-level coroutine with `asyncio.run()`.
 
@@ -493,71 +381,6 @@ async def main() -> None:
 
 asyncio.run(main())
 ```
-
-~~~
-Output
-[1] In Python, both lists and tuples are used to store a collection of items, but they are implemented differently and provide different functionality.
-
-**Lists:**
-
-Lists are ordered collections of items, which can be of any data type, including strings, integers, floats, and other lists. Lists are denoted by square brackets `[]` and are mutable, meaning their contents can be modified after creation.
-
-Here are some key characteristics of lists:
-
-*   Ordered: The elements in a list have a specific order and can be accessed by their index position.
-*   Mutable: Lists can be modified after creation by adding, removing, or modifying their elements.
-*   Dynamic: The size of a list can be increased or decreased dynamically.
-
-**Tuples:**
-
-Tuples are also ordered collections of items, but unlike lists, they are immutable, meaning their contents cannot be modified after creation. Tuples are denoted by parentheses `()`.
-
-Here are some key characteristics of tuples:
-
-*   Ordered: The elements in a tuple have a specific order and can be accessed by their index position.
-*   Immutable: Tuples cannot be modified after creation by adding, removing, or modifying their elements.
-*   Dynamic: The size of a tuple can be determined at creation time and cannot be changed.
-
-**Key differences:**
-
-1.  **Immutability**: The most significant difference between lists and tuples is that lists are mutable, while tuples are immutable.
-2.  **Performance**: Tuples are generally faster and more memory-efficient than lists because they cannot be modified.
-3.  **Function call arguments**: Tuples can be used as function call arguments, but lists cannot.
-4.  **Return values**: Tuples can be returned from functions, and they provide an easy way to group multiple return values.
-
-**Example:**
-
-    ```python
-# Create a list
-my_list = [1, 2, 3, 4, 5]
-print(my_list)  # Output: [1, 2, 3, 4, 5]
-
-# Modify the list
-my_list.append(6)
-print(my_list)  # Output: [1, 2, 3, 4, 5, 6]
-
-# Create a tuple
-my_tuple = (1, 2, 3, 4, 5)
-print(my_tuple)  # Output: (1, 2, 3, 4, 5)
-
-# Try to modify the tuple (this will result in an error)
-try:
-    my_tuple[0] = 10
-except TypeError:
-    print("Error: Tuples are immutable.")
-
-    ```
-
-In summary, while both lists and tuples can be used to store collections of items in Python, lists are mutable, while tuples are immutable. The choice between a list and a tuple depends on whether you need to modify the contents of the collection after its creation.
-
-[2] **Key Properties of Python Dictionaries**
-
-In Python, a dictionary is an unordered collection of key-value pairs. The key properties of a Python dictionary are:
-
-1. **Uniqueness**: Each key in a dictionary must be unique. If you try to assign a key that already exists in the dictionary, its associated value will be overwritten.
-2. **Hashable**: Keys of a dictionary must be hashable, which means they must be immutable and have a unique hash value. This allows the dictionary to efficiently store and retrieve key-value pairs.
-... (truncated)
-~~~
 
 This is where async becomes a design choice. Once several requests are in flight, you also need to think about rate limits, retries, backoff, and timeouts.
 
@@ -607,30 +430,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-~~~
-Output
-=== answer ===
-In Python, a function is a standalone block of code that can be called multiple times from various parts of a program. A method, on the other hand, is a function that belongs to a class or object. 
-Methods operate on the state of the object they belong to, whereas functions do not. 
-Here's an example of the difference: 
-
-    ```python
-# Function: can be called standalone
-def greet(name): return "Hello, " + name
-
-# Method: part of a class
-class Person: 
-    def __init__(self, name): self.name = name
-    def greet(self): return "Hello, " + self.name
-    ```
-
-=== metadata ===
-model: llama-3.1-8b-instant
-prompt_tokens: 67
-completion_tokens: 136
-total_tokens: 203
-~~~
 
 If you save it as `first_call.py`, run it with:
 

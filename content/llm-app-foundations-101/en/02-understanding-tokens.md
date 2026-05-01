@@ -111,47 +111,7 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 print(f"prompt_tokens={usage.prompt_tokens}")
 print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
-```
-
-~~~
-Output
-**Python Decorators**
---------------------
-
-Python decorators are a powerful feature that allows programmers to modify the behavior of a function or class without changing its implementation. A decorator is essentially a higher-order function that takes another function as an argument and extends its behavior by wrapping it in a new function or performing some operations before or after it's executed. Decorators are denoted by the `@` symbol, which is just a shorthand for the `decorator_name(function_to_decorate)` syntax.
-
-Here's a basic example of a decorator:
-
-    ```python
-    def my_decorator(func):
-        def wrapper():
-            print("Something is happening before the function is called.")
-            func()
-            print("Something is happening after the function is called.")
-        return wrapper
-    
-    @my_decorator
-    def say_hello():
-        print("Hello!")
-    
-    say_hello()
-    ```
-
-When you call `say_hello()`, you'll see the output:
-
-    ```
-    Something is happening before the function is called.
-    Hello!
-    Something is happening after the function is called.
-    ```
-
-In this example, the `my_decorator` function takes `say_hello` as an argument and returns a new function `wrapper`, which executes before and after `say_hello`. The `@my_decorator` above the `say_hello` function is just a shortcut to apply the decorator.
-
-finish_reason=stop
-prompt_tokens=46
-completion_tokens=263
-total_tokens=309
-~~~def my_decorator(func):
+```def my_decorator(func):
     def wrapper():
         print("Something is happening before the function is called.")
         func()
@@ -313,22 +273,6 @@ print()
 print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
-
-~~~
-Output
-**Generator vs List in Python**
-=====================================
-
-In Python, generators and lists are two different ways to store and manage data. While both can store collections of items, they have distinct differences in terms of memory usage, performance, and usage scenarios.
-
-**Lists**
----------
-
-A list is a built-in Python data type that stores a collection of items that can be of any data type, including strings,
-
-completion_tokens=80
-finish_reason=length
-~~~
 `max_tokens` affects more than length alone.
 
 - a smaller value often produces shorter, faster, cheaper answers
@@ -389,20 +333,6 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("Warning: the response stopped because it hit a length limit.")
 ```
-
-~~~
-Output
-estimated_prompt_tokens=3015
-Since you did not provide any information about the text content, I will provide a general summary of why a Python web application should keep both request logs and exception logs in the following 10 bullets:
-
-- **Request Logs Purpose**: Keep a record of every HTTP request made to the application, including information like
-
-prompt_tokens=3050
-completion_tokens=60
-total_tokens=3110
-finish_reason=length
-Warning: the response stopped because it hit a length limit.
-~~~
 Three things matter here.
 
 First, the script estimates prompt size before the call. That estimate is useful for preflight control.

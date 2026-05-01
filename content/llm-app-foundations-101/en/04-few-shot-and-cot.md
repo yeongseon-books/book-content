@@ -107,13 +107,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-~~~
-Output
-category: technical
-priority: high
-reason: The error prevents the user from completing the intended action, which is uploading a file.
-~~~
 Three things matter here. First, few-shot is just message-array design. Second, the example has to show the desired answer shape, not merely a related question. Third, every example consumes tokens, so compact representative examples are usually better than long ones.
 
 ---
@@ -183,19 +176,6 @@ print()
 print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
-
-~~~
-Output
-[zero-shot]
-category: billing
-priority: high
-reason: Unexpected invoice amount discrepancy from expected costs.
-
-[few-shot]
-category: billing
-priority: high
-reason: Unexpected charges can cause financial disruption and require immediate resolution.
-~~~
 In many runs, zero-shot will still produce a reasonable answer. Few-shot usually improves a different dimension: repeatability. It tends to stabilize the label vocabulary, the line order, the explanation length, and the way ambiguous cases are interpreted.
 
 That difference matters because applications care less about one impressive answer than about hundreds of answers arriving in a shape the rest of the system can rely on.
@@ -293,19 +273,6 @@ print()
 print("[good examples]")
 print(good_run.choices[0].message.content)
 ```
-
-~~~
-Output
-[bad examples]
-category: technical
-priority: high
-reason: The customer is unable to access their account due to a failed password reset process.
-
-[good examples]
-category: technical
-priority: high
-reason: The inability to reset the password prevents the customer from accessing their account.
-~~~
 The stronger examples do more than show correct answers. They demonstrate a stable schema, a clear priority policy, and the expected sentence length. That is why example quality matters more than raw example count. Two clean examples often outperform six messy ones.
 
 In practice, good few-shot examples are usually:
@@ -357,33 +324,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-~~~
-Output
-To find the final payment amount, we'll follow the steps you mentioned.
-
-Step 1: Apply a 10% coupon to the original price of 120,000 won.
-
-First, we need to find 10% of 120,000 won. 
-10% of 120,000 won = (10/100) * 120,000 = 0.1 * 120,000 = 12,000 won
-
-Now, subtract the coupon amount from the original price.
-Discounted price = Original price - Coupon amount
-= 120,000 won - 12,000 won
-= 108,000 won
-
-Step 2: Add 10% VAT to the discounted price.
-
-First, we need to find 10% of the discounted price.
-10% of 108,000 won = (10/100) * 108,000 = 0.1 * 108,000 = 10,800 won
-
-Now, add the VAT amount to the discounted price.
-Final price = Discounted price + VAT amount
-= 108,000 won + 10,800 won
-= 118,800 won
-
-final_answer: 118800 won.
-~~~
 This tends to reduce mistakes in ordering and intermediate arithmetic. It is especially handy when the task has words like “first,” “then,” “except,” or “only if,” because those are exactly the cases where skipping an intermediate check causes the answer to drift.
 
 ---
@@ -438,14 +378,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-~~~
-Output
-1) 25% of 80000 won is 20000 won.
-2) After the discount, the subtotal is 60000 won.
-3) Add the 5000 won shipping fee to get 65000 won.
-final_answer: 65000 won
-~~~
 The difference is easy to summarize:
 
 - zero-shot CoT: ask for step-by-step reasoning
@@ -526,15 +458,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-~~~
-Output
-policy_check:
-1) The request is more than 7 days after purchase.
-2) Watch progress is under 20%.
-decision: denied
-reason: The request exceeds the allowed time window for a refund, regardless of the watch progress.
-~~~
 This pattern is useful because it improves more than answer quality. It improves debuggability. If the output is wrong, you can inspect which policy check went wrong rather than treating the whole response as a black box.
 
 ---

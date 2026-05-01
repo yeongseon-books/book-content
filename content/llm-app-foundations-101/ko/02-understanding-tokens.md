@@ -109,47 +109,7 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 print(f"prompt_tokens={usage.prompt_tokens}")
 print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
-```
-
-~~~
-출력 결과
-데코레이터(decorator)는 함수나 메서드에 추가 기능을 제공하는 파이썬 장치입니다. 데코레이터를 통해 함수나 메서드의 동작을 변경하거나 추가할 수 있습니다. 데코레이터는 함수에 @記号를 사용하여 적용하고, 일반 함수나 클래스를 데코레이터 함수로 변환해 사용합니다.
-
-데코레이터의 일반 형태는 다음과 같습니다.
-
-    ```python
-    def 데코레이터_이름(원 함수명):
-        def wrapper(*args, **kwargs):
-            # 원 함수를 호출하기 전에 수행할 코드
-            원 함수명(*args, **kwargs)
-            # 원 함수를 호출한 후 수행할 코드
-        return wrapper
-    ```
-
-사용 예시는 다음과 같습니다.
-
-    ```python
-    def 디버그_로그(원 함수명):
-        def wrapper(*args, **kwargs):
-            print(f"{원 함수명.__name__} 호출")
-            원 함수명(*args, **kwargs)
-            print(f"{원 함수명.__name__} 종료")
-        return wrapper
-    
-    @디버그_로그
-    def 사과_구매():
-        print("사과 구매 중")
-    
-    사과_구매()
-    ```
-
-이 예시는 디버그 로그를 출력하는 데코레이터를 사용해 사과 구매 함수를 데코레이터로 변환한 후, 데코레이터 적용 후 함수 호출 결과를 출력합니다.
-
-finish_reason=stop
-prompt_tokens=53
-completion_tokens=309
-total_tokens=362
-~~~import logging
+```import logging
 import functools
 
 def log_decorator(func):
@@ -316,22 +276,6 @@ print()
 print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
-
-~~~
-출력 결과
-제너레이터와 리스트의 차이를 설명하기 전에 각각의 개념을 이해할 수 있도록 예제와 함께 설명하겠습니다.
-
-**리스트**
-
-리스트는 파이썬의 시퀀스 타입 중 하나로, 리스트안의 요소들이 순서에 따라 나열된다. 리스트는 다음과 같은 특징을 가지고 있다.
-
-### 장점
-
-
-
-completion_tokens=80
-finish_reason=length
-~~~
 `max_tokens`는 길이 비용과 응답 스타일을 함께 바꿉니다.
 
 - 값을 작게 주면 짧고 빠른 답이 나올 가능성이 큽니다.
@@ -392,20 +336,6 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.")
 ```
-
-~~~
-출력 결과
-estimated_prompt_tokens=8827
-Python 웹 애플리케이션에서 요청 로그와 예외 로그를 함께 남기는 이유는 다음과 같습니다.
-
-* 요청 로그는 웹 애플리케이션의 수행 과정을 기록하므로, 애플리케이션의 동작 방식을
-
-prompt_tokens=5856
-completion_tokens=60
-total_tokens=5916
-finish_reason=length
-경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.
-~~~
 이 코드에서 볼 포인트는 세 가지입니다.
 
 첫째, 요청 전에 `estimated_prompt_tokens`를 계산합니다. 사전 점검용 근사치입니다.

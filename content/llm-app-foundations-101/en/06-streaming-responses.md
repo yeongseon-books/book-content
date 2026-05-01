@@ -114,21 +114,6 @@ for chunk in stream:
     print(chunk)
 ```
 
-~~~
-Output
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content='', annotations=None, function_call=None, reasoning=None, role='assistant', tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=XGroq(id='req_01kqj0jdd1ejsva9s5vgpj40dn', debug=None, seed=779874273, usage=None, usage_breakdown=None, error=None))
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content='Python', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=' generators', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=' are', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=' a', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=' type', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=' of', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=' iterable', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=',', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_reason=None, index=0, logprobs=None)], created=1777647302, model='llama-3.1-8b-instant', object='chat.completion.chunk', system_fingerprint='fp_020e283281', usage=None, x_groq=None)
-ChatCompletionChunk(id='chatcmpl-85f9ccf9-cb20-4ae1-93c6-9c4406b50016', choices=[Choice(delta=ChoiceDelta(content=' like', annotations=None, function_call=None, reasoning=None, role=None, tool_calls=None, executed_tools=None), finish_rea
-... (truncated)
-~~~
-
 That small change is enough to shift your mental model. A streamed response is not one text value. It is a sequence of events. Some events carry new text. Some carry only structural metadata. One of them ends the interaction.
 
 In practice, most applications care about three separate tasks while consuming a stream:
@@ -178,71 +163,6 @@ final_text = "".join(parts)
 print("\n---")
 print(final_text)
 ```
-
-~~~
-Output
-**Introduction to FastAPI and Flask**
-
-FastAPI and Flask are two popular Python web frameworks used for building web applications. While both frameworks share some similarities, they have distinct differences in their design, architecture, and use cases.
-
-**Flask**
-
-Flask is a micro web framework that provides a lightweight and flexible way to build web applications. It was created by Armin Ronacher and is one of the most popular Python web frameworks. Flask is ideal for building small to medium-sized web applications, prototyping, and proof-of-concepts.
-
-**Key Features of Flask**
-
-*   Lightweight and flexible
-*   Modular design
-*   Supports multiple databases and templates
-*   Easy to learn and use
-*   Suitable for small to medium-sized web applications
-
-**FastAPI**
-
-FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints. It's designed to be fast, scalable, and secure, making it ideal for building large-scale web applications, APIs, and microservices.
-
-**Key Features of FastAPI**
-
-*   Fast and scalable
-*   Supports asynchronous programming
-*   Automatic API documentation
-*   Supports multiple databases and templates
-*   Suitable for large-scale web applications, APIs, and microservices
-
-**Comparison of FastAPI and Flask**
-
-| Feature | Flask | FastAPI |
-| --- | --- | --- |
-| **Performance** | Medium | High |
-| **Scalability** | Medium | High |
-| **Async Support** | No | Yes |
-| **API Documentation** | Manual | Automatic |
-| **Learning Curve** | Easy | Medium |
-
-**When to Choose Flask**
-
-*   You're building a small to medium-sized web application.
-*   You need a lightweight and flexible framework.
-*   You're new to web development and want a easy-to-learn framework.
-
-**When to Choose FastAPI**
-
-*   You're building a large-scale web application, API, or microservice.
-*   You need high performance and scalability.
-*   You want automatic API documentation and support for asynchronous programming.
-
-**Example Use Cases**
-
-*   **Flask**: Building a simple blog or a small e-commerce website.
-*   **FastAPI**: Building a large-scale API for a social media platform or a real-time analytics dashboard.
-
-**Conclusion**
-
-In conclusion, both Flask and FastAPI are popular Python web frameworks with their own strengths and weaknesses. Flask is ideal for small to medium-sized web applications, while FastAPI is suitable for large-scale web applications, APIs, and microservices. Choose the framework that best fits your project's needs and your personal preferences.
-
-**Example Code**
-... (truncated)
-~~~
 
 This pattern does two jobs at once. It renders incremental text immediately, and it keeps a stable final copy of the answer in memory. That second part matters more than beginners often expect. Once you want to save the completion to a database, run moderation, cache the result, or feed it into another step, you need the full reconstructed string.
 
@@ -305,71 +225,6 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-~~~
-Output
-**Asyncio and Web Servers: A Match Made in Heaven**
-
-Asyncio is a built-in Python library that allows developers to write single-threaded concurrent code using coroutines, multiplexing I/O access over sockets and other resources, and implementing network clients and servers. In the context of web servers, asyncio helps in several ways:
-
-### 1. **Non-Blocking I/O**
-
-Traditional web servers use a blocking I/O model, where a thread is dedicated to handling each incoming request. When a request is made, the thread waits for the response from the database, file system, or other resources before sending the response back to the client. This can lead to thread starvation and decreased performance.
-
-Asyncio, on the other hand, uses a non-blocking I/O model, where a single thread can handle multiple requests concurrently. When a request is made, the thread yields control to the event loop, allowing other tasks to run while waiting for the response.
-
-### 2. **Concurrency**
-
-Asyncio enables concurrency by allowing multiple tasks to run simultaneously. This is particularly useful in web servers, where multiple requests can be handled concurrently, improving responsiveness and throughput.
-
-### 3. **Efficient Resource Utilization**
-
-By using a single thread to handle multiple requests, asyncio reduces the overhead of thread creation and management. This leads to more efficient resource utilization, as the operating system can schedule threads more effectively.
-
-### 4. **Improved Scalability**
-
-Asyncio's non-blocking I/O and concurrency features make it an ideal choice for scalable web servers. As the number of requests increases, asyncio can handle them efficiently, without the need for additional threads or processes.
-
-### 5. **Simplified Code**
-
-Asyncio's syntax and API make it easy to write concurrent code, reducing the complexity of web server development.
-
-### Example Use Case: Asynchronous Web Server with asyncio
-
-Here's a simple example of an asynchronous web server using asyncio:
-    ```python
-import asyncio
-
-async def handle_request(reader, writer):
-    data = await reader.read(100)
-    writer.write(b"Hello, world!")
-    await writer.drain()
-    writer.close()
-
-async def main():
-    server = await asyncio.start_server(handle_request, '127.0.0.1', 8080)
-    async with server:
-        await server.serve_forever()
-
-asyncio.run(main())
-    ```
-In this example, the `handle_request` function is an asynchronous coroutine that handles incoming requests. The `main` function creates an asynchronous server and starts serving requests.
-
-### Conclusion
-
-Asyncio is a powerful tool for building high-performance web servers. Its non-blocking I/O, concurrency, and efficient resource utilization features make it an ideal choice for scalable web applications. By using asyncio, developers can write concurrent code that is efficient, scalable, and easy to maintain.
----
-**Asyncio and Web Servers: A Match Made in Heaven**
-
-Asyncio is a built-in Python library that allows developers to write single-threaded concurrent code using coroutines, multiplexing I/O access over sockets and other resources, and implementing network clients and servers. In the context of web servers, asyncio helps in several ways:
-
-### 1. **Non-Blocking I/O**
-
-Traditional web servers use a blocking I/O model, where a thread is dedicated to handling each incoming request. When a request is made, the thread waits for the response from the database, file system, or other resources before sending the response back to the client. This can lead to thread starvation and decreased performance.
-
-Asyncio, on the other hand, uses a non-blocking I/O model, where a single thread can handle multiple requests concurrently. When a request is made, the thread yields control to the event loop, allowing other tasks to run while waiting for the response.
-... (truncated)
-~~~
-
 The body of the loop is almost identical to the synchronous version. The real difference is where this pattern belongs architecturally.
 
 - Use synchronous streaming for local experiments, command-line tools, and one-shot automation.
@@ -424,71 +279,6 @@ else:
     print("usage metadata was not present in the final chunk")
 ```
 
-~~~
-Output
-**What are Python Decorators?**
-================================
-
-Python decorators are a design pattern in Python that allows a user to add new functionality to an existing object without modifying its structure. It is a special type of function that can modify or extend the behavior of another function.
-
-**Basic Syntax**
----------------
-
-A decorator is defined using the `@` symbol, followed by the name of the decorator function. Here's a basic example:
-
-    ```python
-def my_decorator(func):
-    def wrapper():
-        print("Something is happening before the function is called.")
-        func()
-        print("Something is happening after the function is called.")
-    return wrapper
-
-@my_decorator
-def say_hello():
-    print("Hello!")
-
-say_hello()
-    ```
-
-In this example, `my_decorator` is a function that takes another function `func` as an argument. The `wrapper` function is defined inside `my_decorator`, and it calls the original function `func` and adds some extra functionality. The `@my_decorator` line is equivalent to `say_hello = my_decorator(say_hello)`.
-
-**How Decorators Work**
-----------------------
-
-When you apply a decorator to a function using the `@` syntax, you're effectively replacing the original function with the decorated function. The decorated function is the one returned by the decorator, which in this case is the `wrapper` function.
-
-Here's what happens when you call the decorated function:
-
-1. The decorated function (`wrapper`) is called.
-2. The `wrapper` function calls the original function `func`.
-3. The `wrapper` function then continues executing and prints the second message.
-
-**Real-World Example**
---------------------
-
-Decorators are commonly used to add functionality such as:
-
-* Logging function calls
-* Measuring execution time
-* Authentication and authorization
-* Rate limiting
-
-Here's an example of a decorator that logs function calls:
-
-    ```python
-import logging
-import functools
-
-def log_calls(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        logging.info(f"Calling {func.__name__} with args {args} and kwargs {kwargs}")
-        return func(*args, **kwargs)
-    return wrapper
-... (truncated)
-~~~
-
 That works well as a local reference pattern, but production systems usually add a second layer of accounting. Why? Because streaming paths are operationally messy. An SDK version may change, a reverse proxy may behave differently, or a client may disconnect before you finish relaying the final event.
 
 For that reason, many teams keep two views of usage:
@@ -540,22 +330,6 @@ with open("summary.txt", "w", encoding="utf-8") as file:
             file.flush()
             print(delta, end="", flush=True)
 ```
-
-~~~
-Output
-Here's a beginner's summary of Redis in ten lines:
-
-Redis is an open-source, in-memory data store. 
-It can be used as a database or a data structure server. 
-Redis stores data in RAM for faster access. 
-It supports various data structures like strings, hashes, lists, sets, and more. 
-Redis uses a master-slave replication model for high availability. 
-This ensures data is copied in real-time to prevent loss in case of failure. 
-Redis has built-in support for distributed transactions. 
-It supports pub/sub messaging for real-time communication between clients. 
-Redis is often used in conjunction with other databases for caching purposes. 
-This helps to reduce the load on the primary database by storing less frequently used data.
-~~~
 
 This is a small pattern, but it is operationally useful. If the process fails halfway through a long generation, you still keep the already emitted content. You also avoid holding the entire answer in memory before persisting it.
 

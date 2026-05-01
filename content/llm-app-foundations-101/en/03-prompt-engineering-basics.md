@@ -123,72 +123,7 @@ print(without_system.choices[0].message.content)
 print()
 print("[with system]")
 print(with_system.choices[0].message.content)
-```
-
-~~~
-Output
-[without system]
-**Python Dictionaries vs Lists: Key Differences**
-
-In Python, dictionaries and lists are two fundamental data structures used to store and manipulate data. While both can store multiple values, they differ significantly in their structure, usage, and application.
-
-### Dictionaries
-
-A dictionary, also known as a hash table or associative array, is an unordered collection of key-value pairs. Each key is unique and maps to a specific value.
-
-**Characteristics:**
-
-*   **Key-value pairs**: Dictionaries store data as key-value pairs, where each key is unique and maps to a specific value.
-*   **Unordered**: Dictionaries do not maintain a specific order of elements.
-*   **Fast lookups**: Dictionaries provide fast lookups, insertions, and deletions using the key.
-*   **Mutable**: Dictionaries are mutable, meaning they can be modified after creation.
-
-**Example:**
-    ```python
-    person = {
-        "name": "John Doe",
-        "age": 30,
-        "city": "New York"
-    }
-    ```
-### Lists
-
-A list is an ordered collection of elements, which can be of any data type, including strings, integers, floats, and other lists.
-
-**Characteristics:**
-
-*   **Ordered**: Lists maintain a specific order of elements.
-*   **Index-based access**: Lists provide index-based access to elements, allowing for efficient retrieval and modification.
-*   **Mutable**: Lists are mutable, meaning they can be modified after creation.
-*   **Flexible**: Lists can store elements of different data types.
-
-**Example:**
-    ```python
-    fruits = ["Apple", "Banana", "Cherry"]
-    ```
-### Key differences
-
-|  | Dictionaries | Lists |
-| --- | --- | --- |
-| **Structure** | Key-value pairs | Ordered collection of elements |
-| **Order** | Unordered | Ordered |
-| **Lookup** | Fast lookups using keys | Index-based access |
-| **Mutability** | Mutable | Mutable |
-
-**When to use each:**
-
-*   Use dictionaries when:
-    *   You need to store data with unique identifiers (keys).
-    *   You need fast lookups, insertions, and deletions.
-    *   You need to store data with varying data types.
-*   Use lists when:
-    *   You need to store a collection of elements in a specific order.
-    *   You need to perform index-based access to elements.
-    *   You need to store elements of the same data type.
-
-In summary, dictionaries are ideal for storing data with unique identifiers and requiring fast lookups, while lists are suitable for storing ordered collections of elements with index-based access.
-... (truncated)
-~~~my_list = [1, 2, 3, "hello", 4.5]
+```my_list = [1, 2, 3, "hello", 4.5]
 print(my_list[0])  # Output: 1
 ```
 ### **Dictionaries**
@@ -295,28 +230,7 @@ second = client.chat.completions.create(
 
 print("[assistant turn 2]")
 print(second.choices[0].message.content)
-```
-
-~~~
-Output
-[assistant turn 1]
-In Python, lists and tuples are both data structures used to store multiple values, but they differ in their mutability and performance. Lists are mutable, meaning they can be modified after creation, and are implemented as dynamic arrays, allowing for efficient insertion and deletion of elements. Tuples, on the other hand, are immutable, meaning their contents cannot be changed after creation, and are implemented as static arrays, providing faster access times due to their fixed size. This difference in mutability and implementation makes lists suitable for scenarios where data needs to be modified, while tuples are ideal for scenarios where data is constant and needs to be accessed quickly.
-
-[assistant turn 2]
-In Python, lists and tuples are both data structures used to store multiple values, but they differ in their mutability and performance. Lists are mutable, meaning they can be modified after creation, and are implemented as dynamic arrays, allowing for efficient insertion and deletion of elements. Tuples, on the other hand, are immutable, meaning their contents cannot be changed after creation, and are implemented as static arrays, providing faster access times due to their fixed size. This difference in mutability and implementation makes lists suitable for scenarios where data needs to be modified, while tuples are ideal for scenarios where data is constant and needs to be accessed quickly.
-
-    ```python
-    # Creating a list and a tuple
-    my_list = [1, 2, 3]
-    my_tuple = (1, 2, 3)
-    
-    # Trying to modify the tuple will raise an error
-    try:
-        my_tuple[0] = 4
-    except TypeError:
-        print("Tuples are immutable")
-    ```
-~~~# Creating a list and a tuple
+```# Creating a list and a tuple
 my_list = [1, 2, 3]
 my_tuple = (1, 2, 3)
 
@@ -381,15 +295,6 @@ for temperature in (0.0, 0.9):
     print(completion.choices[0].message.content)
     print()
 ```
-
-~~~
-Output
-[temperature=0.0]
-FastAPI is a modern, fast (high-performance), web framework for building APIs with Python. It allows developers to create robust, scalable, and secure APIs quickly and efficiently, with features like automatic API documentation and support for asynchronous programming. FastAPI is designed to be highly productive, with a focus on simplicity, readability, and ease of use, making it an ideal choice for building web APIs.
-
-[temperature=0.9]
-FastAPI is a modern, fast, and scalable Python web framework that allows developers to build high-performance APIs quickly and efficiently. It supports automatic API documentation, interactive shell, and real-time API testing, making it ideal for building robust and maintainable applications. With features like type hints and async support, FastAPI streamlines the development process, reducing the need for boilerplate code and making it a popular choice for web development.
-~~~
 ### `top_p`
 
 `top_p` constrains token selection by cumulative probability mass. Lower values keep the model inside a narrower band of likely continuations. Higher values admit a wider range.
@@ -445,28 +350,7 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
-```
-
-~~~
-Output
-**What is a dataclass?**
-A dataclass is a special type of class in Python that automatically generates special methods like `__init__`, `__repr__`, and `__eq__` based on the class's attributes. This makes it easy to create classes that primarily hold data.
-
-**Code example:**
-    ```python
-    from dataclasses import dataclass
-    
-    @dataclass
-    class Person:
-        name: str
-        age: int
-    
-    p = Person("John", 30)
-    print(p)  # Output: Person(name='John', age=30)
-    ```
-
-**Use case:** Use dataclasses to create simple data structures, such as representing a user's profile or a product's details, where the primary focus is on storing and retrieving data rather than complex logic.
-~~~from dataclasses import dataclass
+```from dataclasses import dataclass
 
 @dataclass
 class Person:
@@ -522,12 +406,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-~~~
-Output
-Definition: A decorator is a function that modifies or extends the behavior of another function without permanently changing it.
-Analogy: It is like a gift wrapper that adds a new layer of functionality to a function without altering its original content.
-~~~
 This can be very effective, but every example consumes tokens. Short, representative examples usually work better than long ones.
 
 ---

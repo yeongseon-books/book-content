@@ -73,9 +73,15 @@ AI_SERIES = [
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 
+_LLM_CALL_PATTERNS = re.compile(
+    r"chat\.completions\.create|AsyncGroq|stream=True|\.stream\(|EventSource|StreamingResponse",
+)
+
 def run_block(code: str, lang: str) -> str | None:
     """Execute code, return trimmed stdout or None on skip/error."""
     if "input(" in code:
+        return None
+    if _LLM_CALL_PATTERNS.search(code):
         return None
 
     env = {**os.environ, "GROQ_API_KEY": os.environ.get("GROQ_API_KEY", "")}

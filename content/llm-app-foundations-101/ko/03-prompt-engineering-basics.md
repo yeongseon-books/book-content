@@ -125,72 +125,7 @@ print(without_system.choices[0].message.content)
 print()
 print("[with system]")
 print(with_system.choices[0].message.content)
-```
-
-~~~
-출력 결과
-[without system]
-**딕셔너리(Dict)와 리스트(List)의 차이**
-
-Python의 딕셔너리와 리스트는 모두 데이터를 저장하고 관리하는 데 사용되는 자료형입니다. 그러나 두 자료형은 서로 다른 특징을 가지고 있습니다.
-
-### 1. 데이터의 저장 방식
-
-- **리스트(List)**: 리스트는 순서가 있는 데이터의 목록입니다. 각 요소는 인덱스(0-based indexing)로 참조할 수 있습니다.
-- **딕셔너리(Dict)**: 딕셔너리는 키-값 쌍으로 구성된 데이터의 집합입니다. 각 키는 고유하고, 값은 키에 매핑됩니다.
-
-### 2. 데이터의 접근 방식
-
-- **리스트(List)**: 리스트의 요소를 접근할 때 인덱스를 사용합니다. 예를 들어, `my_list[0]`은 첫 번째 요소를 반환합니다.
-- **딕셔너리(Dict)**: 딕셔너리의 값을 접근할 때 키를 사용합니다. 예를 들어, `my_dict['key']`은 해당 키에 매핑된 값을 반환합니다.
-
-### 3. 데이터의 추가 및 삭제
-
-- **리스트(List)**: 리스트의 요소를 추가하거나 삭제할 때 인덱스를 사용합니다. 예를 들어, `my_list.append('new_item')`은 새로운 요소를 추가하고, `del my_list[0]`은 첫 번째 요소를 삭제합니다.
-- **딕셔너리(Dict)**: 딕셔너리의 값을 추가하거나 삭제할 때 키를 사용합니다. 예를 들어, `my_dict['new_key'] = 'new_value'`은 새로운 키-값 쌍을 추가하고, `del my_dict['key']`은 해당 키에 매핑된 값을 삭제합니다.
-
-### 4. 데이터의 검색
-
-- **리스트(List)**: 리스트의 요소를 검색할 때 인덱스를 사용합니다. 예를 들어, `my_list.index('item')`은 해당 요소의 인덱스를 반환합니다.
-- **딕셔너리(Dict)**: 딕셔너리의 값을 검색할 때 키를 사용합니다. 예를 들어, `my_dict.get('key')`은 해당 키에 매핑된 값을 반환합니다.
-
-### 예제 코드
-
-    ```python
-    # 리스트(List)
-    my_list = ['apple', 'banana', 'cherry']
-    print(my_list[0])  # apple
-    my_list.append('date')
-    print(my_list)  # ['apple', 'banana', 'cherry', 'date']
-    del my_list[0]
-    print(my_list)  # ['banana', 'cherry', 'date']
-    
-    # 딕셔너리(Dict)
-    my_dict = {'name': 'John', 'age': 30}
-    print(my_dict['name'])  # John
-    my_dict['city'] = 'New York'
-    print(my_dict)  # {'name': 'John', 'age': 30, 'city': 'New York'}
-    del my_dict['age']
-    print(my_dict)  # {'name': 'John', 'city': 'New York'}
-    ```
-
-결론적으로, 리스트는 순서가 있는 데이터의 목록을 저장하고 관리하는 데 사용되며, 딕셔너리는 키-값 쌍으로 구성된 데이터의 집합을 저장하고 관리하는 데 사용됩니다.
-
-[with system]
-Python의 딕셔너리와 리스트는 모두 데이터를 저장하고 관리하는 데 사용되는 자료형입니다. 하지만 두 자료형은 서로 다른 특징을 가지고 있습니다.
-
-딕셔너리는 키-값 쌍으로 데이터를 저장하는 자료형입니다. 예를 들어, 학생의 이름과 학점을 저장하는 딕셔너리는 다음과 같습니다.
-
-    ```python
-    학생 = {'이름': '김철수', '학점': 90}
-    ```
-
-딕셔너리에서 키는 고유한 값이고, 값은 키에 해당하는 데이터입니다. 딕셔너리는 키를 사용하여 데이터를 조회하고 수정할 수 있습니다.
-
-리스트는 순서가 있는 데이터의 모음입니다. 예를 들어, 학생의 이름을 저장하는 리스트는 다음과 같습니다.
-
-... (truncated)
-~~~python
+```python
 # 리스트 예시
 fruits = ['apple', 'banana', 'apple']
 print(fruits)  # ['apple', 'banana', 'apple']
@@ -295,36 +230,7 @@ second = client.chat.completions.create(
 
 print("[assistant turn 2]")
 print(second.choices[0].message.content)
-```
-
-~~~
-출력 결과
-[assistant turn 1]
-파이썬의 리스트와 튜플은 모두 순서가 있는 컬렉션입니다. 하지만 차이점은 다음과 같습니다. 리스트는 변경 가능하고, 튜플은 변경 불가능합니다. 리스트는 []로 선언하고, 튜플은 ()로 선언합니다. 또한, 리스트는 append(), insert(), remove()와 같은 메서드를 사용할 수 있지만, 튜플은 이러한 메서드를 사용할 수 없습니다.
-
-[assistant turn 2]
-파이썬의 리스트와 튜플은 모두 순서가 있는 컬렉션입니다. 하지만 차이점은 다음과 같습니다. 리스트는 변경 가능하고, 튜플은 변경 불가능합니다. 리스트는 []로 선언하고, 튜플은 ()로 선언합니다. 또한, 리스트는 append(), insert(), remove()와 같은 메서드를 사용할 수 있지만, 튜플은 이러한 메서드를 사용할 수 없습니다.
-
-    ```python
-    # 리스트 선언
-    my_list = [1, 2, 3]
-    print(my_list)  # [1, 2, 3]
-    
-    # 튜플 선언
-    my_tuple = (1, 2, 3)
-    print(my_tuple)  # (1, 2, 3)
-    
-    # 리스트 변경
-    my_list.append(4)
-    print(my_list)  # [1, 2, 3, 4]
-    
-    # 튜플 변경 시 에러 발생
-    try:
-        my_tuple.append(4)
-    except AttributeError:
-        print("튜플은 변경할 수 없습니다.")
-    ```
-~~~# 리스트 선언
+```# 리스트 선언
 my_list = [1, 2, 3]
 print(my_list)  # [1, 2, 3]
 my_list.append(4)
@@ -393,19 +299,6 @@ for temperature in (0.0, 0.9):
     print(completion.choices[0].message.content)
     print()
 ```
-
-~~~
-출력 결과
-[temperature=0.0]
-FastAPI는 파이썬으로 작성된 웹 프레임워크로, 빠른 개발과 강력한 기능을 제공합니다. 
-FastAPI는 ASGI를 기반으로 하며, 유니티, Django, Flask와 같은 다른 프레임워크와 호환성이 좋습니다.
-FastAPI는 강력한 자동 문서화 기능을 제공하며, API 개발을 위한 다양한 도구와 라이브러리를 지원합니다.
-
-[temperature=0.9]
-FastAPI는 파이썬에서 빠른 개발을 위한 고성능 웹 프레임워크입니다. 
-API 개발을 위한 기본 문법이 간결하고 읽기 쉬운 코드를 작성하도록 도와줍니다. 
-RESTful API를 빠르게 구축할 수 있도록 기본적인 기능과 예제 코드를 제공합니다.
-~~~
 ### `top_p`
 
 `top_p`는 확률이 높은 후보 집합을 얼마나 넓게 열어둘지 정합니다. 개념적으로는 “상위 누적 확률 질량 안에서만 뽑기”에 가깝습니다. 낮추면 더 보수적이고, 높이면 더 다양한 후보를 허용합니다.
@@ -463,32 +356,7 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
-```
-
-~~~
-출력 결과
-**데이터 클래스란?**
-
-데이터 클래스(dataclass)는 Python 3.7에서 소개된 새로운 문법으로, 클래스를 간단하게 정의할 수 있는 방법입니다. 데이터 클래스는 클래스의 속성을 자동으로 생성자, __repr__ 메소드, __eq__ 메소드, __lt__ 메소드 등과 같은 기본 메소드를 생성해 주는 기능을 제공합니다.
-
-**예제 코드**
-
-    ```python
-    from dataclasses import dataclass
-    
-    @dataclass
-    class Person:
-        name: str
-        age: int
-    
-    p = Person("John", 30)
-    print(p)  # Person(name='John', age=30)
-    ```
-
-** 언제 쓰면 좋은지?**
-
-데이터 클래스는 데이터를 표현하고 조작하는 클래스를 만들 때 유용합니다. 예를 들어, 데이터베이스에서 데이터를 조회한 후에, 그 데이터를 클래스로 표현하고, 그 클래스를 사용하여 데이터를 조작할 수 있습니다.
-~~~from dataclasses import dataclass
+```from dataclasses import dataclass
 
 @dataclass
 class Person:
@@ -547,12 +415,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-~~~
-출력 결과
-정의: 데코레이터는 함수나 클래스를 수정하지 않고 기능을 추가하거나 변경할 수 있는 특별한 함수입니다.
-비유: 함수나 클래스에 겉옷을 입히는 것과 비슷합니다. 겉옷을 입히면 겉옷의 기능이 추가되지만 원래의 함수나 클래스는 변하지 않습니다.
-~~~
 이 방식은 강력하지만 공짜는 아닙니다. 예시가 늘수록 토큰도 늘어납니다. 따라서 무작정 많이 넣기보다, 원하는 패턴을 가장 잘 보여주는 짧고 대표적인 예시를 고르는 편이 낫습니다.
 
 ---

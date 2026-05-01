@@ -187,60 +187,7 @@ completion = client.chat.completions.create(
 )
 
 print(completion.choices[0].message.content)
-```
-
-~~~
-출력 결과
-**리스트 컴프리헨션**
-
-리스트 컴프리헨션은 리스트를 생성하는 데 사용되는 고급 리스트 기능입니다. 기본적으로, 컴프리헨션은 반복을 수행하는 데 사용되는 하나의 표현식입니다. 이 표현식은 원하는 요소를 생성하기 위해 사용됩니다.
-
-**기본 문법**
-
-리스트 컴프리헨션의 기본 문법은 다음과 같습니다.
-    ```python
-    new_list = [expression for variable in iterable if condition]
-    ```
-여기서:
-
-- `new_list`: 새로운 리스트
-- `expression`: 각 요소를 만들기 위한 표현식
-- `variable`: 반복 가능한 객체에서 추출한 요소
-- `iterable`: 반복할 수 있는 객체(리스트, 튜플, 집합 등)
-- `condition`: 필터 조건 (선택 사항)
-
-**예제**
-
-다음 예제는 다음과 같은 문장을 표현합니다.
-
-"숫자 1에서 10까지 2씩 증가하는 모든 요소를 리스트로 만들라."
-
-    ```python
-    numbers = [i for i in range(1, 11) if i % 2 == 0]
-    print(numbers)  # [2, 4, 6, 8, 10]
-    ```
-이 예제에서 `i`는 `range(1, 11)`의 요소를 나타내고, `i % 2 == 0`가 필터 조건입니다. 조건을 만족하는 모든 요소가 `numbers` 리스트에 추가됩니다.
-
-**리스트 컴프리헨션의 장점**
-
-리스트 컴프리헨션은 코드의 brevity와 readability를提高하는 데 도움이 됩니다.
-
-*   **코드 길이가 짧아집니다**: 컴프리헨션은 반복을 수행하는 코드를 대신할 수 있으므로, 코드의 길이를 줄일 수 있습니다.
-*   **읽기쉽게됩니다**: 코드가 더 간단해지고, 반복문과 조건문이 숨겨져 있으므로, 코드의 내용을 더 쉽게 이해할 수 있습니다.
-
-**리스트 컴프리헨션의 사용 예**
-
-1.  **조건에 따라 요소 필터링**: `numbers = [i for i in range(1, 11) if i % 2 == 0]`를 사용하여 짝수만 있는 리스트를 만들 수 있습니다.
-2.  **리스트 내에 요소 변환**: `scores = [name + " - " + str(score) for name, score in scores.items()]`를 사용하여 리스트의 요소를 변환할 수 있습니다.
-3.  **네비게이션과 함께 필터링**: `prices = [(index, price) for index, price in enumerate(prices) if price > 10]`를 사용하여 리스트 내에 요소가 특정 값 이상인 것을 필터링할 수 있습니다.
-
-리스트 컴프리헨션은 데이터를 처리할 때 유용한 도구라고 할 수 있습니다. 그러나 반복을 수행하는 코드는 명시적으로 작성하는 것이 좋습니다. 그 이유는 다음과 같습니다.
-
-*   **읽기성 향상**: 명시적으로 반복문과 조건문을 사용하면, 코드의 의미를 더 명확히 알 수 있습니다.
-*   **유지보수성 향상**: 반복문을 명시적으로 작성하면, 코드를 이해하고維護하기가 더容易합니다.
-
-따라서 상황에 따라 적절히 사용한다면, 리스트 컴프리헨션은 코드 작성의 시간과 노력을 줄여 줄 수 있지만, 명시적인 코드를 작성하는 것이 보다 좋습니다.
-~~~[식 for 변수 in 열거 가능한 객체]
+```[식 for 변수 in 열거 가능한 객체]
 ```
 
 이 식은 다음과 같이 작동합니다:
@@ -329,43 +276,6 @@ completion = client.chat.completions.create(
 
 print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
 ```
-
-~~~
-출력 결과
-{
-  "id": "chatcmpl-84280051-e5f0-4a2f-91d6-514a52f447e5",
-  "choices": [
-    {
-      "finish_reason": "stop",
-      "index": 0,
-      "logprobs": null,
-      "message": {
-        "content": "HTTP API와 SDK의 차이는 다음과 같습니다.\n\nHTTP API는 API(Application Programming Interface)를 통해 클라이언트가 서버에 요청을 보내고 서버가 응답하는 방식입니다. 클라이언트는 일반적으로 브라우저나 모바일 앱으로 구성되며 HTTP 요청을 보낼 수 있습니다. HTTP API는 클라이언트가 직접 HTTP를 통해 API를 호출할 수 있기 때문에 서버 간의 통신과 데이터 교환을 위한 표준적인 방법입니다.\n\nSDK는 Software Development Kit의 줄임말로, 프로그래밍 언어를 통해 프로그램을 개발할 때 사용되는 도구 및 도움이 모인 도구 세트입니다. SDK는 특정 라이브러리를 포함하여 프로그래머가 쉽게 프로그램을 개발할 수 있도록 도와주는 역할을 하는데, 이는 보통 특정 프로그래밍 언어로 API를 호출하는 표준된 방법에 의해 정의됩니다. SDK는 프로그래머가 라이브러리를 사용하고 API를 호출할 수 있도록 지원하기 때문에 API의 복잡한 세부 정보를 숨길 수 있습니다.",
-        "role": "assistant"
-      }
-    }
-  ],
-  "created": 1777646263,
-  "model": "llama-3.1-8b-instant",
-  "object": "chat.completion",
-  "service_tier": "on_demand",
-  "system_fingerprint": "fp_7ccc667439",
-  "usage": {
-    "completion_tokens": 238,
-    "prompt_tokens": 51,
-    "total_tokens": 289,
-    "completion_time": 0.492699382,
-    "prompt_time": 0.00249493,
-    "queue_time": 0.007412127,
-    "total_time": 0.495194312
-  },
-  "usage_breakdown": null,
-  "x_groq": {
-    "id": "req_01kqhzjpf1ey4syzd2s5n8dtzr",
-    "seed": 1007482985
-  }
-}
-~~~
 출력을 보면 필드가 여럿 보이겠지만, 처음에는 세 가지를 우선 읽으면 됩니다.
 
 ### `choices[0].message.content`
@@ -457,11 +367,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-~~~
-출력 결과
-비동기 프로그래밍은 컴퓨터 프로그램이 어떤 작업을 처리하는 도중도 다른 작업을 수행할 수 있도록 하게 하는 프로그래밍 기법입니다. 이전의 동의어로 프로그램이 한 가지 일을 끝마치기 전까지는 다음 일들을 진행할 수 없던 것과는 대조된다. 비동기 프로그래밍은 동시성을 제공하여 프로그램이 한 가지 일과 다른 일들을 모두 동시에 처리할 수 있기 때문에, 작업을 처리할 수 있는 성능을 향상시킬 수 있습니다. 예를 들어, 웹 브라우저에서 다음 URL로 이동할 때도 웹 브라우저는 현재 페이지를 로딩하는 동시에 그 다음 페이지를 로딩할 수 있습니다.
-~~~
 다음은 비동기 버전입니다. 이 코드 블록도 독립 실행 가능합니다.
 
 ```python
@@ -487,71 +392,6 @@ async def main() -> None:
 
 asyncio.run(main())
 ```
-
-~~~
-출력 결과
-아Syncio는 동시성 프로그래밍을 위해 도입된 Python 모듈입니다. 다음과 같은 두 가지 상황에서 asyncio를 사용하는 것이 유용합니다.
-
-### 1. 네트워크 작업(Non-blocking I/O)
-
-아Syncio는 네트워크 연결이나 파일 읽기와 같은 비 블록킹 입/출력을 가능하게 해줍니다. 이런 작업은 자바스크립트나 PHP와 같이 싱글 쓰레드 환경에서 작업하는 언어에서 자주 필요합니다.
-
-만약 사용하는 언어가 싱글 쓰레드이며, 사용자가 여러 요청을 넣어주었다고 가정합시다. 이 경우, 이전 요청이 처리가 끝나지 않은 상태에서 새로운 요청을 처리하게 되면 이전 요청에대한 리소스가 새로오는 요청으로 넘어가게되는데 이는 결과적으로 이전 요청이 처리가 늦어지며 요청이 쌓이게 될 것입니다.
-
-    ```python
-    import asyncio
-    import time
-    
-    async def my_coroutine(task_id):
-        print(f"Coroutine {task_id} has started.")
-        await asyncio.sleep(1)
-        print(f"Coroutine {task_id} has finished.")
-        return task_id
-    
-    async def main():
-        await asyncio.gather(
-            my_coroutine(1),
-            my_coroutine(2),
-            my_coroutine(3),
-        )
-    
-    start_time = time.time()
-    
-    asyncio.run(main())
-    
-    print(f"Time taken to complete all coroutines: {time.time() - start_time} seconds")
-    ```
-
-### 2. 입출력 작업(I/O Bound)
-
-아Syncio는 여러 입/출력(I/O) 작업이 있을 때 각 작업을 동시에 수행할 수 있습니다. 예를 들어, 사용자가 여러 데이터를 읽어오게 되면 데이터가 읽어온 속도가 느려지는 결과를 방지할 수 있습니다.
-
-    ```python
-    import asyncio
-    
-    async def read_data(task_id, sleep_time):
-        print(f"Reading data for task {task_id}")
-        await asyncio.sleep(sleep_time)
-        print(f"Finished reading data for task {task_id}")
-        return f"Data for task {task_id}"
-    
-    async def main():
-        tasks = []
-        for i in range(1, 10):
-            tasks.append(read_data(i, 1))
-        result = await asyncio.gather(*tasks)
-        print(result)
-    
-    asyncio.run(main())
-    ```
-
-### 예시
-
-위 두 예시에 대해서는 다음과 같이 해석이 가능합니다. 예시 1번에서 async로 처리된 작업은 블록킹 처리가 안된다는 의미입니다. 예시2번에서는 I/O 작업을 처리할때 여러개의 task를 동시에 처리합니다.
-
-1. 사용하기
-... (truncated)
-~~~
 차이는 두 가지뿐입니다. `Groq` 대신 `AsyncGroq`를 쓰고, API 호출 앞에 `await`를 붙입니다. 구조는 거의 같습니다. 그래서 입문 시점에는 “동기 코드로 개념을 익히고, 웹 앱으로 가져갈 때 비동기로 옮긴다”는 순서가 무난합니다.
 
 여러 요청을 동시에 보내는 장점도 비동기에서 분명해집니다. 아래 예시는 세 질문을 병렬로 호출합니다. 이 코드는 바로 실행할 수 있는 완전한 예제입니다.
@@ -583,72 +423,7 @@ async def main() -> None:
         print(f"[{index}] {answer}\n")
 
 asyncio.run(main())
-```
-
-~~~
-출력 결과
-[1] 리스트와 튜플은 모두 데이터를 여러 개의 원소(요소)로 저장하기 위한 자료 구조입니다. 하지만 두 자료 구조는 생성과 편집 방식에 차이가 있습니다.
-
-### 리스트(List)
-
-리스트는 여러 원소를 포함하는 자료 구조로, 생성한 리스트는 언제든지 새로운 원소가 추가되거나 기존 원소가 삭제되거나 수정될 수 있습니다. 리스트는 인덱스 순서에 따라 원소에 접근할 수 있습니다.
-
-**예시:**
-
-    ```python
-    # 리스트 생성
-    numbers = [1, 2, 3, 4, 5]
-    
-    # 새로운 원소 추가
-    numbers.append(6)
-    print(numbers)  # [1, 2, 3, 4, 5, 6]
-    
-    # 인덱스 순서에 따라 원소접근
-    print(numbers[0])  # 1
-    
-    # 원소 수정
-    numbers[0] = 10
-    print(numbers)  # [10, 2, 3, 4, 5, 6]
-    ```
-
-### 튜플(Tuple)
-
-튜플은 생성된 후에 어떤 변화도 할 수 없습니다. 원래의 튜플에는 수정, 삽입, 삭제가 가능하지 않으며, 새로운 튜플을 만들고 이전 정보만 그대로 유지하는 방법 밖에는 없습니다.
-
-**예시:**
-
-    ```python
-    # 튜플 생성
-    colors = ('red', 'green', 'blue')
-    
-    # 새로운 원소 추가는 불가
-    # colors.append('yellow')  # TypeError: 'tuple' object does not support item assignment
-    
-    # 튜플에 접근
-    print(colors[0])  # 'red'
-    ```
-
-### 차이점
-
-| 특성 | 리스트 | 튜플 |
-| --- | --- | --- |
-| 생성 전후 | 언제든지 | 한번만 |
-| 수정 | 허용 | 허용하지 않음 |
-| 삽입/삭제 | 허용 | 허용하지 않음 |
-| 인덱스 순서 | 허용 | 허용 |
-| 접근 | 허용 | 허용 |
-
-리스트는 다양한 데이터를 편리하게 관리하고 조작할 수 있지만, 튜플은 불변성 때문에 데이터의 일관성을 유지할 수 있습니다. 데이터의 불변성에 중점을 둔다면 튜플을 선택하는 것이 좋고, 데이터의 관리와 편집 여지가 필요하다면 리스트를 선택하는 것이 좋습니다.
-
-[2] 파이썬 딕셔너리의 핵심 특징을 설명하겠습니다.
-
-### 1. 키-값 쌍(key-value pair)입니다.
-
-파이썬의 딕셔너리는 키-값 쌍으로 구성되어 있습니다. 각 키에는 해당하는 값이 할당됩니다. 예를 들어, `{ 'name': 'John', 'age': 30 }`은 'name' 키에 'John', 'age' 키에 30이 할당된 딕셔너리를示しています.
-
-### 2. 키는 유일해야합니다.
-... (truncated)
-~~~my_list = [1, 2, 3, "hello"]
+```my_list = [1, 2, 3, "hello"]
 print(my_list[0])  # 출력: 1
 my_list[0] = 10
 print(my_list)     # 출력: [10, 2, 3, "hello"]
@@ -755,42 +530,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-```
-
-~~~
-출력 결과
-=== answer ===
-Python에서 함수(funciton)와 메서드(method)는 둘 다 기능을 하는 코드 블록입니다. 
-
-다만, 메서드는 클래스 안에 작성 된 함수가며, 메서드 이름은 인스턴스의 이름 + 메서드 이름으로 호출합니다. 
-
-함수는 클래스 밖에서 호출하며, 인스턴스의 상태를 변경하지 않습니다. 
-
-함수는 재사용성이 높으며, 여러 종류를 만들 수 있습니다. 
-
-만약 클래스와 관련된 동작이라면 메서드를, 클래스와 독립된 동작이라면 함수를 사용하는 것이 좋습니다.
-
-    ```python
-    class Person:
-        def __init__(self, name):
-            self.name = name
-        
-        def say_hello(self):
-            return f"안녕하세요, 저는 {self.name}입니다."
-    
-    def say_goodbye():
-        return "잘 가세요."
-    
-    print(Person("김철수").say_hello())  # 메서드
-    print(say_goodbye())  # 함수调用
-    ```
-
-=== metadata ===
-model: llama-3.1-8b-instant
-prompt_tokens: 81
-completion_tokens: 214
-total_tokens: 295
-~~~# 함수 예시
+```# 함수 예시
 def say_hello(name):
     return f"Hello, {name}!"
 
