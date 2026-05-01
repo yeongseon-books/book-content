@@ -35,16 +35,7 @@ This post covers five things:
 - running real queries against a small corpus
 - how to choose between index types
 
-```mermaid
-flowchart LR
-    A[Document corpus] --> B[Embedding generation]
-    B --> C[float32 vector matrix]
-    C --> D[FAISS index build]
-    E[User query] --> F[Query embedding]
-    F --> D
-    D --> G[Top-K nearest documents]
-```
-
+![FAISS fundamentals: fast approximate nearest-neighbor search](../../../assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: FAISS finds vectors fast. IndexFlatL2 is the simplest option; switch to IVF or HNSW when the dataset grows.

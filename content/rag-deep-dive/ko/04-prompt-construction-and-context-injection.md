@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 > 프롬프트 계층은 문서를 예쁘게 붙이는 단계가 아니라, 구조화된 데이터를 모델이 실제로 읽는 계약으로 바꾸는 단계입니다.
 
-```mermaid
-flowchart LR
-    A[Retrieved documents] --> B[Context formatting]
-    C[Question] --> D[Variable binding]
-    E[History] --> D
-    B --> D
-    D --> F[ChatPromptTemplate]
-    F --> G[Role tagged messages]
-```
+![이 글에서 답할 질문](../../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.ko.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (4/6)

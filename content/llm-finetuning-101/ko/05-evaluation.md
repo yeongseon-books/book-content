@@ -37,14 +37,7 @@ last_reviewed: '2026-05-01'
 
 perplexity는 낮을수록 좋지만, 절대값만으로 품질을 단정하면 안 됩니다. 작은 데모 모델, 작은 데이터셋, 짧은 문맥에서는 값이 크게 튈 수 있습니다. 그래서 실무에서는 perplexity를 **회귀 방지용 기준선**으로 주로 씁니다. 학습 전보다 나빠졌는지, 설정을 바꿨을 때 추세가 개선되는지를 보는 데 강합니다.
 
-```mermaid
-flowchart LR
-    A[평가용 텍스트] --> B[input_ids와 labels 준비]
-    B --> C[모델 forward loss 계산]
-    C --> D[평균 loss 집계]
-    D --> E[exp loss로 perplexity 변환]
-```
-
+![perplexity를 해석하는 기본 태도](../../../assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.ko.png)
 ## 최소 실행 예제
 
 ```python

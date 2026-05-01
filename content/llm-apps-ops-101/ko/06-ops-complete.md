@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 > 운영 완성의 핵심은 기능을 많이 넣는 것이 아니라, 한 요청이 남기는 로그·비용·품질 신호가 서로 연결되도록 만드는 것입니다.
 
 ## 큰 그림
-```mermaid
-flowchart LR
-    Request[채팅 요청] --> Validate[입력 검증]
-    Validate --> Groq[Groq API]
-    Groq --> Eval[품질 평가]
-    Eval --> Cost[토큰·비용 계산]
-    Cost --> Log[JSON 운영 로그]
-    Log --> Response[최종 응답]
-```
-
+![LLM 운영 파이프라인 전체 구성](../../../assets/llm-apps-ops-101/06/06-01-big-picture.ko.png)
 ## 왜 이 레이어가 필요한가
 통합 파이프라인은 개별 기능 소개가 아니라, 한 요청이 남기는 운영 신호를 연결하는 단계입니다.
 

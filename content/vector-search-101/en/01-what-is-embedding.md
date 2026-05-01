@@ -35,15 +35,7 @@ This post focuses on the concept and intuition behind embeddings. Code is minima
 - a first hands-on example that produces real vectors
 - where embeddings fall short and what to watch for
 
-```mermaid
-flowchart LR
-    A[Input text] --> B[Embedding model]
-    B --> C[384-dimensional vector]
-    C --> D[Nearby semantic neighbors]
-    D --> E[Cosine similarity comparison]
-    E --> F[Meaning-based retrieval]
-```
-
+![What is an embedding: converting text into vectors](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: an embedding compresses text into a high-dimensional vector. Sentences with similar meaning land close together in that space.

@@ -35,17 +35,7 @@ This post covers five things:
 - how chunk boundaries affect retrieval quality
 - choosing a chunking strategy for different document types
 
-```mermaid
-flowchart LR
-    A[Original document] --> B[Chunking decision]
-    B --> C[Fixed-size strategy]
-    B --> D[Recursive strategy]
-    B --> E[Semantic strategy]
-    C --> F[Compare chunk sets]
-    D --> F
-    E --> F
-```
-
+![Chunking strategies: how to split long documents](../../../assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: chunk size and overlap control retrieval quality. Too large adds noise; too small loses context.

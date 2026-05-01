@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 
 > A chatbot is not a model with memory; it is an application loop that keeps replaying the accumulated messages list.
 
-```mermaid
-flowchart LR
-    User[User input] --> Session[Session messages list]
-    Session --> Prompt[System plus history plus new question]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Reply[Generated reply]
-    Reply --> Session
-    Reply --> User
-```
-
+![Questions this post answers](../../../assets/ai-app-patterns-101/01/01-01-questions-this-post-answers.en.png)
 > AI App Patterns 101 (1/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/01-chatbot-pattern)

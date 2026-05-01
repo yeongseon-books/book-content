@@ -31,17 +31,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 Real agent workflows do not follow one path forever. Some requests should go to code generation, some to conceptual explanation, and others to debugging. LangGraph makes that branch visible with one routing node and one conditional edge definition.
 
-```mermaid
-flowchart LR
-    A[Question] --> B[classify]
-    B -->|code| C[answer_code]
-    B -->|concept| D[answer_concept]
-    B -->|debug| E[answer_debug]
-    C --> F[END]
-    D --> F
-    E --> F
-```
-
+![Questions this post answers](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python

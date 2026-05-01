@@ -37,14 +37,7 @@ last_reviewed: '2026-05-01'
 
 샘플 수와 step 수는 줄여도 됩니다. 하지만 **토큰화된 입력, labels, optimizer step, loss 계산**은 줄이면 학습 검증이 아니라 단순 추론 테스트가 됩니다. 그래서 이 글의 예제는 가장 작은 데이터셋을 쓰더라도 학습 구성요소는 그대로 유지합니다.
 
-```mermaid
-flowchart LR
-    A[질문 답변 텍스트] --> B[토크나이즈와 labels 생성]
-    B --> C[LoRA 모델 준비]
-    C --> D[TrainingArguments 설정]
-    D --> E[Trainer 1 step 실행]
-```
-
+![학습 루프에서 줄여도 되는 것과 줄이면 안 되는 것](../../../assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.ko.png)
 ## 최소 실행 예제
 
 ```python

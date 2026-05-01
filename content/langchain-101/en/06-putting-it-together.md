@@ -28,21 +28,7 @@ last_reviewed: '2026-05-01'
 
 > The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.
 
-```mermaid
-flowchart LR
-    A[documents] --> B[text splitter]
-    B --> C[embeddings]
-    C --> D[FAISS]
-    E[question] --> F[Retriever]
-    D --> F
-    F --> G[context formatter]
-    G --> H[ChatPromptTemplate]
-    E --> H
-    H --> I[ChatGroq]
-    I --> J[StrOutputParser]
-    J --> K[streamed answer]
-```
-
+![Questions this post answers](../../../assets/langchain-101/06/06-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python
@@ -96,19 +82,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## The flow at a glance
 
-```mermaid
-flowchart LR
-    Docs[Document set] --> Split[Chunking]
-    Split --> Embed[Embeddings]
-    Embed --> Store[FAISS]
-    Question[User question] --> Retriever[Retriever]
-    Store --> Retriever
-    Retriever --> Prompt[Prompt]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Parser[StrOutputParser]
-    Parser --> Output[Final answer or stream]
-```
-
+![The flow at a glance](../../../assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
 The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.
 
 Topics:

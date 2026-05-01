@@ -28,15 +28,7 @@ last_reviewed: '2026-05-01'
 
 세 번째 글에서는 retriever 구조를 그대로 두고 임베딩 모델만 바꿉니다. 이렇게 해야 품질 차이를 모델 쪽으로 귀속할 수 있습니다. 예제는 두 sentence-transformers 모델을 같은 corpus, 같은 query set, 같은 k 값으로 평가합니다.
 
-```mermaid
-flowchart LR
-    Q[공통 질문 집합] --> B[동일한 벤치마크 루프]
-    C[공통 코퍼스] --> B
-    M1[all-MiniLM-L6-v2] --> B
-    M2[paraphrase-MiniLM-L3-v2] --> B
-    B --> O[hit rate · MRR · latency 비교]
-```
-
+![이 글에서 답할 질문](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 실행 코드는 `rag-benchmark-101/ko/03-embedding-comparison/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.

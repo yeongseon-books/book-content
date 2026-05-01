@@ -28,15 +28,7 @@ last_reviewed: '2026-05-01'
 
 > A Retriever does not store knowledge by itself; it turns a question into the subset of documents worth showing the model.
 
-```mermaid
-flowchart LR
-    A[question] --> B[Retriever]
-    B --> C[relevant documents]
-    C --> D[document formatter]
-    D --> E[ChatPromptTemplate]
-    E --> F[ChatGroq]
-```
-
+![Questions this post answers](../../../assets/langchain-101/03/03-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python
@@ -87,17 +79,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## The flow at a glance
 
-```mermaid
-flowchart LR
-    Docs[Source documents] --> Embed[Embeddings]
-    Embed --> Store[FAISS VectorStore]
-    Store --> Retriever[Retriever]
-    Question[User question] --> Retriever
-    Retriever --> Context[Context string]
-    Context --> Prompt[Prompt]
-    Prompt --> LLM[ChatGroq]
-```
-
+![The flow at a glance](../../../assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)
 A Retriever accepts a query and returns a list of relevant documents. LangChain defines the Retriever interface around a single method: `get_relevant_documents(query)`. Whatever search system sits behind it — FAISS, Chroma, Elasticsearch — the chain uses it the same way.
 
 This post builds a FAISS-based Retriever, connects it to a prompt, and assembles the basic form of a RAG pattern.

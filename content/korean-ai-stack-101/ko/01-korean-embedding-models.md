@@ -40,15 +40,7 @@ last_reviewed: '2026-05-01'
 
 ## 핵심 흐름
 
-```mermaid
-flowchart LR
-    A[문장 쌍 준비] --> B[all-MiniLM 임베딩]
-    A --> C[ko-sbert-nli 임베딩]
-    B --> D[코사인 유사도 계산]
-    C --> D
-    D --> E[similar 평균과 unrelated 평균 비교]
-```
-
+![핵심 흐름](../../../assets/korean-ai-stack-101/01/01-01-core-flow.ko.png)
 ---
 
 ## 왜 재현 가능한 비교부터 시작할까

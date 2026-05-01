@@ -27,19 +27,7 @@ last_reviewed: '2026-05-01'
 
 > RAG는 모델이 답을 외우는 구조가 아니라, 검색된 문서를 프롬프트에 주입해 답하게 만드는 조립식 파이프라인입니다.
 
-```mermaid
-flowchart LR
-    Docs[원본 문서] --> Split[문서 청킹]
-    Split --> Embed[임베딩 생성]
-    Embed --> Index[FAISS 인덱스]
-    Question[사용자 질문] --> QueryEmbed[질문 임베딩]
-    QueryEmbed --> Index
-    Index --> Retrieved[관련 청크 검색]
-    Retrieved --> Prompt[질문 + 컨텍스트]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Answer[답변 + 출처]
-```
-
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.ko.png)
 > AI 앱 패턴 101 시리즈 (2/6)
 
 예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/02-rag-qa-pattern)

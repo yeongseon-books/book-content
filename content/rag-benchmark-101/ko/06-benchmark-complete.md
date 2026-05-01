@@ -28,18 +28,7 @@ last_reviewed: '2026-05-01'
 
 마지막 글에서는 지금까지의 조각을 하나로 연결합니다. 먼저 FAISS retriever로 관련 문서를 찾고, 그 컨텍스트를 Groq LLM에 넣어 답변을 만들고, 마지막으로 retrieval 지표와 RAGAS 점수를 함께 집계합니다. 이렇게 해야 “검색이 문제인지, 답변 생성이 문제인지”를 같은 실행 로그 안에서 볼 수 있습니다.
 
-```mermaid
-flowchart LR
-    C[평가 코퍼스] --> E[임베딩 · FAISS]
-    Q[벤치마크 질문] --> R[retriever]
-    E --> R
-    R --> G[Groq 답변 생성]
-    R --> RM[hit rate · MRR]
-    G --> DS[question · answer · contexts]
-    DS --> RG[ragas.evaluate]
-    RG --> GM[faithfulness · answer_relevancy]
-```
-
+![이 글에서 답할 질문](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 실행 코드는 `rag-benchmark-101/ko/06-benchmark-complete/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.

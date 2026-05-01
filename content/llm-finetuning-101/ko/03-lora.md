@@ -37,14 +37,7 @@ last_reviewed: '2026-05-01'
 
 `r`은 저랭크 차원, `lora_alpha`는 스케일, `lora_dropout`은 어댑터 경로에만 적용되는 드롭아웃입니다. 그리고 실무에서 가장 사고가 많이 나는 항목이 `target_modules`입니다. 이 목록이 틀리면 어댑터가 전혀 붙지 않거나, 원하지 않는 레이어에 붙습니다.
 
-```mermaid
-flowchart LR
-    A[베이스 GPT-2 모델] --> B[target_modules 선택]
-    B --> C[LoraConfig 정의]
-    C --> D[get_peft_model 적용]
-    D --> E[학습 가능 파라미터 비율 확인]
-```
-
+![설정에서 의미가 큰 필드](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.ko.png)
 ## 최소 실행 예제
 
 ```python

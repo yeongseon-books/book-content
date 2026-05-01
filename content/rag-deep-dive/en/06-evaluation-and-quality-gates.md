@@ -29,17 +29,7 @@ last_reviewed: '2026-05-01'
 
 > Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.
 
-```mermaid
-flowchart LR
-    A[Question] --> E[Evaluation row]
-    B[Contexts] --> E
-    C[Answer] --> E
-    D[Ground truth] --> E
-    E --> F[Faithfulness]
-    E --> G[Answer relevancy]
-    F --> H[Quality gate]
-    G --> H
-```
+![Questions this post answers](../../../assets/rag-deep-dive/06/06-01-questions-this-post-answers.en.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (6/6)

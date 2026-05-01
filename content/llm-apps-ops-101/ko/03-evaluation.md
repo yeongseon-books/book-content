@@ -27,14 +27,7 @@ last_reviewed: '2026-05-01'
 > 평가 자동화의 첫 단계는 의미를 완벽히 이해하는 심판을 만드는 것이 아니라, 명확하게 실패한 응답을 빠르게 걸러내는 체를 만드는 것입니다.
 
 ## 큰 그림
-```mermaid
-flowchart LR
-    Prompt[평가용 질문] --> Groq[Groq API]
-    Groq --> Json[JSON 응답]
-    Json --> Rules[길이·키워드·형식 검사]
-    Rules --> Gate[Pass 또는 Fail]
-```
-
+![LLM 출력 품질 평가 파이프라인](../../../assets/llm-apps-ops-101/03/03-01-big-picture.ko.png)
 ## 왜 이 레이어가 필요한가
 자동 평가는 모델을 심판으로 쓰기 전에, 기계적으로 실패를 걸러내는 규칙층부터 만드는 편이 실용적입니다.
 

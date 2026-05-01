@@ -33,16 +33,7 @@ In this post, we will build the full loop with Groq's `tools` parameter and the 
 
 The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
 
-```mermaid
-flowchart LR
-    A[User request] --> B[LLM]
-    B --> C[Tool call selection]
-    C --> D[Application runs tool]
-    D --> E[Tool result]
-    E --> F[LLM]
-    F --> G[Final response]
-```
-
+![Tool calling: connecting functions to the model](../../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
 ---
 
 ## Runtime setup

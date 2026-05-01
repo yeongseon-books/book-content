@@ -38,14 +38,7 @@ last_reviewed: '2026-05-01'
 
 ## 핵심 흐름
 
-```mermaid
-flowchart LR
-    A[시스템 프롬프트] --> C[Groq Chat Completions]
-    B[한국어 사용자 프롬프트] --> C
-    C --> D[한국어 설명 응답]
-    D --> E[형식과 사실성 점검]
-```
-
+![핵심 흐름](../../../assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
 ---
 
 ## 왜 공급자 대체 실습이 유효한가

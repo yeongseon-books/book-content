@@ -35,17 +35,7 @@ title: 청크 전략 — 긴 문서를 어떻게 나눌 것인가
 - 청크 경계가 검색 품질에 미치는 영향
 - 상황별 청킹 전략 선택 기준
 
-```mermaid
-flowchart LR
-    A[원본 문서] --> B[청킹 대상 분석]
-    B --> C[고정 크기 전략]
-    B --> D[재귀 분할 전략]
-    B --> E[의미 기반 전략]
-    C --> F[청크 집합 비교]
-    D --> F
-    E --> F
-```
-
+![청크 전략: 긴 문서를 나누는 방법과 기준](../../../assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.ko.png)
 <!-- ebook-only:start -->
 
 이 장의 핵심: **청크 크기와 중복(overlap)이 검색 품질을 결정한다.** 너무 크면 노이즈, 너무 작으면 맥락 손실이다.

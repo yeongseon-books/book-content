@@ -29,14 +29,7 @@ last_reviewed: '2026-05-01'
 
 Example code: `/root/Github/document-ingestion-101/en/03-metadata-filtering/main.py`
 
-```mermaid
-flowchart LR
-    A[Raw document] --> B[Create chunks]
-    B --> C[Attach category quarter source metadata]
-    C --> D[Store in FAISS]
-    D --> E[similarity_search plus filter]
-```
-
+![Questions this post answers](../../../assets/document-ingestion-101/03/03-01-questions-this-post-answers.en.png)
 One of the most common RAG mistakes is mixing “similar meaning” with “allowed scope.” Quarter, source, and category usually need structured filtering, not just vector similarity.
 
 This example loads three tiny documents into FAISS and changes the `filter` parameter by category and quarter so the retrieval behavior is explicit.

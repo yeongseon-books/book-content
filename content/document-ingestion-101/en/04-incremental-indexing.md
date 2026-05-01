@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 Example code: `/root/Github/document-ingestion-101/en/04-incremental-indexing/main.py`
 
-```mermaid
-flowchart LR
-    A[Scan files] --> B[Read state store]
-    B --> C{Existing hash?}
-    C -->|no| D[added]
-    C -->|same| E[unchanged]
-    C -->|different| F[updated]
-```
-
+![Questions this post answers](../../../assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
 A full rebuild is acceptable for dozens of files, but it becomes wasteful once the corpus grows into the thousands.
 
 This example uses only file hashes and a JSON state file to classify `added`, `unchanged`, and `updated`. That simple classifier is the foundation for every later vector-store update step.

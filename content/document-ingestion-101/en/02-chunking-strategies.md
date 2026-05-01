@@ -29,13 +29,7 @@ last_reviewed: '2026-05-01'
 
 Example code: `/root/Github/document-ingestion-101/en/02-chunking-strategies/main.py`
 
-```mermaid
-flowchart LR
-    A[Choose document type] --> B[Set chunk size and overlap]
-    B --> C[Run RecursiveCharacterTextSplitter]
-    C --> D[Compare chunk counts and size ranges]
-```
-
+![Questions this post answers](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png)
 A bad chunking choice leaks into every later stage. Too small means broken context, too large means noisy retrieval.
 
 This example runs FAQ, manual, and policy-style text through the same splitter and shows with numbers why per-document presets matter.

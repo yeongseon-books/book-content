@@ -27,19 +27,7 @@ last_reviewed: '2026-05-01'
 
 > RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.
 
-```mermaid
-flowchart LR
-    Docs[Source documents] --> Split[Chunking]
-    Split --> Embed[Embeddings]
-    Embed --> Index[FAISS index]
-    Question[User question] --> QueryEmbed[Query embedding]
-    QueryEmbed --> Index
-    Index --> Retrieved[Relevant chunks]
-    Retrieved --> Prompt[Question plus context]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Answer[Answer plus sources]
-```
-
+![Questions this post answers](../../../assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.en.png)
 > AI App Patterns 101 (2/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/02-rag-qa-pattern)

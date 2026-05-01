@@ -35,17 +35,7 @@ Topics:
 - querying and displaying results
 - hybrid search concept and a minimal implementation
 
-```mermaid
-flowchart LR
-    A[Source documents] --> B[Chunking]
-    B --> C[Embedding]
-    C --> D[FAISS indexing]
-    E[User query] --> F[Query embedding]
-    F --> G[Vector search]
-    D --> G
-    G --> H[Ranked results]
-```
-
+![Vector search pipeline: from document ingestion to query](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: a vector search pipeline is four steps — embed, index, query, retrieve. Each step should be independently replaceable.

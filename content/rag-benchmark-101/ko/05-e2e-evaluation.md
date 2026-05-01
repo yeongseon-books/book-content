@@ -28,16 +28,7 @@ last_reviewed: '2026-05-01'
 
 다섯 번째 글에서는 RAGAS를 붙여 생성 품질을 측정합니다. 여기서 중요한 것은 ragas 버전에 맞는 실제 API를 쓰는 것입니다. 예제는 `Faithfulness()`와 `AnswerRelevancy(strictness=1)`를 사용하고, `LangchainLLMWrapper`와 `LangchainEmbeddingsWrapper`로 Groq LLM과 sentence-transformers 임베딩을 연결합니다.
 
-```mermaid
-flowchart LR
-    A[질문 · 답변 · contexts] --> D[Dataset.from_dict]
-    D --> E[ragas.evaluate]
-    L[LangchainLLMWrapper] --> E
-    EM[LangchainEmbeddingsWrapper] --> E
-    E --> F[faithfulness]
-    E --> R[answer_relevancy]
-```
-
+![이 글에서 답할 질문](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 실행 코드는 `rag-benchmark-101/ko/05-e2e-evaluation/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.

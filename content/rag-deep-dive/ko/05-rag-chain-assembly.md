@@ -29,16 +29,7 @@ last_reviewed: '2026-05-01'
 
 > RAG 체인은 질문에서 답변까지 이어지는 그래프이며, LCEL은 그 그래프의 각 경계를 바깥으로 끌어내는 조립 언어입니다.
 
-```mermaid
-flowchart LR
-    A[Question] --> B[Retriever]
-    B --> C[Context docs]
-    A --> D[Question passthrough]
-    C --> E[Prompt assembly]
-    D --> E
-    E --> F[ChatGroq]
-    F --> G[Answer]
-```
+![이 글에서 답할 질문](../../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.ko.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (5/6)

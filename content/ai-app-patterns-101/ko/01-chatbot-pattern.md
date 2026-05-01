@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 
 > 챗봇은 모델이 기억하는 시스템이 아니라, 앱이 messages 리스트를 계속 다시 보내는 재생 루프입니다.
 
-```mermaid
-flowchart LR
-    User[사용자 입력] --> Session[세션별 messages 리스트]
-    Session --> Prompt[System + history + 새 질문]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Reply[응답 생성]
-    Reply --> Session
-    Reply --> User
-```
-
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/01/01-01-questions-this-post-answers.ko.png)
 > AI 앱 패턴 101 시리즈 (1/6)
 
 예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/01-chatbot-pattern)

@@ -25,16 +25,7 @@ Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://githu
 
 The diagram below summarizes how message history accumulates across turns.
 
-```mermaid
-flowchart LR
-    U1[User turn] --> H[messages history]
-    H --> G[Groq API call]
-    G --> A1[assistant reply]
-    A1 --> H
-    U2[Next user turn] --> H
-    H --> N[Next response]
-```
-
+![Managing conversation state: building a multi-turn chatbot](../../../assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)
 One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.
 
 An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.

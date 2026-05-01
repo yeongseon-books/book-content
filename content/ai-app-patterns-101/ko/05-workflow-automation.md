@@ -27,14 +27,7 @@ last_reviewed: '2026-05-01'
 
 > 워크플로 자동화는 모델에게 선택권을 주는 대신, 사람이 정한 단계와 데이터 계약을 따라가게 만드는 파이프라인입니다.
 
-```mermaid
-flowchart LR
-    Raw[원문 티켓] --> Sum[요약 단계]
-    Sum --> Classify[분류 단계]
-    Classify --> Tag[태그 단계]
-    Tag --> Result[최종 구조화 결과]
-```
-
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.ko.png)
 > AI 앱 패턴 101 시리즈 (5/6)
 
 예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/05-workflow-automation)

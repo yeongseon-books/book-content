@@ -31,14 +31,7 @@ last_reviewed: '2026-05-01'
 
 LangGraph를 처음 볼 때 가장 중요한 감각은 "체인 여러 개"가 아니라 "상태가 흐르는 그래프"라는 점입니다. 이 글에서는 가장 작은 그래프를 직접 만들면서 노드 추가, 엣지 연결, `invoke()` 실행까지 한 번에 정리합니다.
 
-```mermaid
-flowchart LR
-    A[사용자 요청] --> B[choose_topic]
-    B --> C[build_outline]
-    C --> D[write_answer]
-    D --> E[최종 상태]
-```
-
+![이 글에서 답할 질문](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python

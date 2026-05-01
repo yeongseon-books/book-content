@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 
 > An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.
 
-```mermaid
-flowchart LR
-    Question[User question] --> Agent[AgentExecutor]
-    Agent --> Decide[Tool choice]
-    Decide --> Calc[calculate tool]
-    Decide --> Search[search_docs tool]
-    Calc --> Result[Tool result]
-    Search --> Result
-```
-
+![Questions this post answers](../../../assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.en.png)
 > AI App Patterns 101 (4/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/04-agent-tool-pattern)

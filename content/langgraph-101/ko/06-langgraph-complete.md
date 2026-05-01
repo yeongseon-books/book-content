@@ -31,18 +31,7 @@ last_reviewed: '2026-05-01'
 
 이제 시리즈의 조각들을 한 그래프에 모읍니다. 질문을 먼저 분류하고, 단순 설명은 직접 답하고, 계산이나 카운팅은 도구 호출 루프로 보내고, 전체 대화는 `MemorySaver`에 저장합니다. 이 정도 구성만 해도 실제 서비스용 프로토타입의 뼈대가 됩니다.
 
-```mermaid
-flowchart LR
-    A[사용자 메시지] --> B[supervisor]
-    B -->|direct_answer| C[direct_answer]
-    B -->|tool_agent| D[tool_agent]
-    D -->|tool call| E[ToolNode]
-    E --> D
-    C --> F[END]
-    D -->|final answer| F
-    F --> G[MemorySaver checkpoint]
-```
-
+![이 글에서 답할 질문](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python

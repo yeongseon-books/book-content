@@ -31,16 +31,7 @@ This post builds the smallest useful cache for an LLM API path: an in-memory cac
 
 The main idea is simple: **an LLM cache is not a box for prompt outputs, it is a contract for when a request should not be recomputed**.
 
-```mermaid
-flowchart LR
-    A[Normalize request] --> B[Build cache key]
-    B --> C{Cache lookup}
-    C -->|Hit| D[Return cached response]
-    C -->|Miss| E[Call LLM]
-    E --> F[Store response]
-    F --> G[Return to caller]
-```
-
+![Caching strategies: reducing cost and latency](../../../assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)
 ---
 
 ## Runtime setup

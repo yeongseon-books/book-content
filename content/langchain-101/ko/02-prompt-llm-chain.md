@@ -28,14 +28,7 @@ last_reviewed: '2026-05-01'
 
 > Prompt chain은 문자열을 만드는 코드가 아니라 입력 구조를 메시지 구조로 바꾸는 작은 변환 파이프입니다.
 
-```mermaid
-flowchart LR
-    A[topic and audience] --> B[ChatPromptTemplate]
-    B --> C[ChatGroq]
-    C --> D[StrOutputParser]
-    D --> E[설명 문자열]
-```
-
+![이 글에서 답할 질문](../../../assets/langchain-101/02/02-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python
@@ -88,14 +81,7 @@ LangChain 101 시리즈 (2/6)
 
 ## 핵심 흐름 한눈에 보기
 
-```mermaid
-flowchart LR
-    Input[입력 변수] --> Prompt[ChatPromptTemplate]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Parser[OutputParser]
-    Parser --> App[애플리케이션 출력]
-```
-
+![핵심 흐름 한눈에 보기](../../../assets/langchain-101/02/02-02-the-flow-at-a-glance.ko.png)
 지난 글에서 LCEL의 기본 구조를 잡았다면, 이번 글에서는 실제로 자주 쓰는 패턴을 하나씩 만들어 봅니다. `ChatPromptTemplate`을 깊이 이해하고, 출력 파서를 선택하고, 체인에 변수를 넣는 방법을 다룹니다.
 
 이번 글에서 다룰 내용은 다음과 같습니다.

@@ -37,15 +37,7 @@ The example script applies one toy LoRA update to a tiny GPT-2 model, builds a F
 
 Real serving systems also need request validation, authentication, observability, batching, and timeout policy. This post intentionally isolates two concerns only: **preparing a model object for inference** and **wrapping it in a stable HTTP interface**. Even that small boundary is worth learning cleanly.
 
-```mermaid
-flowchart LR
-    A[One toy LoRA update] --> B[Create FastAPI app]
-    B --> C[Health endpoint]
-    B --> D[Generate endpoint]
-    C --> E[TestClient verification]
-    D --> E
-```
-
+![What this demo isolates on purpose](../../../assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.en.png)
 ## Minimal runnable example
 
 ```python

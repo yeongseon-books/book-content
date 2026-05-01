@@ -27,15 +27,7 @@ last_reviewed: '2026-05-01'
 
 > 문서 어시스턴트는 대화를 이어가는 시스템이 아니라, 긴 입력을 잘게 나눠 목적에 맞는 짧은 출력으로 바꾸는 변환기입니다.
 
-```mermaid
-flowchart LR
-    Doc[긴 문서] --> Split[청크 분할]
-    Split --> Map[청크별 요약]
-    Map --> Merge[요약 모음]
-    Merge --> Reduce[최종 통합 요약]
-    Reduce --> Output[실무용 결과]
-```
-
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.ko.png)
 > AI 앱 패턴 101 시리즈 (3/6)
 
 예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/03-document-assistant)

@@ -27,15 +27,7 @@ last_reviewed: '2026-05-01'
 > Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting across separate systems.
 
 ## Big picture
-```mermaid
-flowchart LR
-    User[User request] --> App[LLM application]
-    App --> Log[Structured JSON log]
-    App --> Groq[Groq API]
-    Groq --> App
-    App --> Metrics[Latency and token metrics]
-```
-
+![Monitoring and logging component layout](../../../assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
 ## Why this layer matters
 Observability starts with a log record that can fully explain one call after the fact.
 

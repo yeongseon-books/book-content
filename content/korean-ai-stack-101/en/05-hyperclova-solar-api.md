@@ -38,14 +38,7 @@ The title points to HyperCLOVA X and Solar because they matter in the Korean mod
 
 ## Core flow
 
-```mermaid
-flowchart LR
-    A[System prompt] --> C[Groq chat completion]
-    B[Korean user prompt] --> C
-    C --> D[Korean explanation]
-    D --> E[Format and grounding checks]
-```
-
+![Core flow](../../../assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
 ---
 
 ## Why a provider-substitution exercise still helps

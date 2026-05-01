@@ -29,13 +29,7 @@ last_reviewed: '2026-05-01'
 
 Example code: `/root/Github/document-ingestion-101/en/01-pdf-parsing/main.py`
 
-```mermaid
-flowchart LR
-    A[Script creates sample PDF] --> B[pypdf extracts page text]
-    B --> C[Count pages and characters]
-    C --> D[Verify extracted output]
-```
-
+![Questions this post answers](../../../assets/document-ingestion-101/01/01-01-questions-this-post-answers.en.png)
 The first practical problem in a PDF parsing tutorial is usually the sample file. If readers cannot reproduce the example from scratch, the pipeline story starts with friction.
 
 This example generates its own PDF with `reportlab`, then reads it back with `pypdf` and prints page-level text summaries. That is exactly the shape you want for the first ingestion step.

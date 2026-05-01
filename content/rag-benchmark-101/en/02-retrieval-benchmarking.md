@@ -28,15 +28,7 @@ last_reviewed: '2026-05-01'
 
 The second post moves the hand-written metrics onto a real retriever. Even with a tiny corpus and three questions, you can collect hit rate, MRR, and average latency together. Once that loop exists, you can reuse it for later embedding and index comparisons.
 
-```mermaid
-flowchart LR
-    D[Document corpus] --> E[Embedding step]
-    E --> F[FAISS index]
-    Q[Evaluation queries] --> R[Retriever.invoke]
-    F --> R
-    R --> M[hit rate · MRR · latency]
-```
-
+![Questions this post answers](../../../assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 The runnable code lives in `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.

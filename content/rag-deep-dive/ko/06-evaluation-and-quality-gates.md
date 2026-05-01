@@ -29,17 +29,7 @@ last_reviewed: '2026-05-01'
 
 > 평가 단계는 RAG 답변을 다시 질문, 근거, 답변, 기준 답의 관계로 펼친 뒤, 그 관계를 점수로 바꾸는 단계입니다.
 
-```mermaid
-flowchart LR
-    A[Question] --> E[Evaluation row]
-    B[Contexts] --> E
-    C[Answer] --> E
-    D[Ground truth] --> E
-    E --> F[Faithfulness]
-    E --> G[Answer relevancy]
-    F --> H[Quality gate]
-    G --> H
-```
+![이 글에서 답할 질문](../../../assets/rag-deep-dive/06/06-01-questions-this-post-answers.ko.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (6/6)

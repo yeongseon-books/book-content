@@ -35,15 +35,7 @@ This post covers five things:
 - practical tips for speeding up encoding on CPU
 - comparing the wrapper to the raw `SentenceTransformer` API
 
-```mermaid
-flowchart LR
-    A[Sentence or document batch] --> B[HuggingFaceEmbeddings init]
-    B --> C[SentenceTransformer model load]
-    C --> D[encode call]
-    D --> E[Normalized vector output]
-    E --> F[Save or search]
-```
-
+![HuggingFace embeddings in practice: creating your first vectors with sentence-transformers](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: HuggingFace embeddings run locally for free. `sentence-transformers` downloads the model and returns vectors.

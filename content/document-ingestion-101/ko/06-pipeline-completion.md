@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 예제 코드: `/root/Github/document-ingestion-101/ko/06-pipeline-completion/main.py`
 
-```mermaid
-flowchart LR
-    A[PDF TXT MD 로딩] --> B[청크 생성]
-    B --> C[임베딩 생성]
-    C --> D[FAISS 저장]
-    D --> E[FAISS 재로딩]
-    E --> F[유사도 검색 검증]
-```
-
+![이 글에서 답할 질문](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.ko.png)
 시리즈 마지막 글에서는 조각별 예제를 하나의 실제 흐름으로 이어 붙입니다. 이제 중요한 것은 개별 함수보다도 단계 간 계약이 끊기지 않는지입니다.
 
 이번 예제는 세 포맷을 읽고, 청크를 만들고, 오프라인 임베딩으로 FAISS를 저장한 뒤 다시 로드해서 검색 결과를 확인합니다. 이 정도면 ingestion MVP가 끝까지 한 번 돈 것입니다.

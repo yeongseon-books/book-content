@@ -38,15 +38,7 @@ Mixed-language corpora appear quickly in real systems. Rollback guides may be in
 
 ## Core flow
 
-```mermaid
-flowchart LR
-    A[Mixed Korean and English documents] --> B[BGE-M3 embeddings]
-    B --> C[Shared vector space]
-    C --> D[FAISS retrieval]
-    E[Korean or English query] --> B
-    D --> F[Top documents across languages]
-```
-
+![Core flow](../../../assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
 ---
 
 ## Why start with a dense baseline

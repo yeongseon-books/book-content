@@ -33,15 +33,7 @@ We will cover five things: why natural-language parsing breaks under production 
 
 The main idea is simple: **structured output in production is a contract design problem, not a prompt trick**.
 
-```mermaid
-flowchart LR
-    A[User input] --> B[LLM]
-    B --> C[JSON schema requirement]
-    C --> D[JSON response]
-    D --> E[Pydantic validation]
-    E --> F[Validated output]
-```
-
+![Structured output: JSON mode and response schemas](../../../assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
 ---
 
 ## Runtime setup

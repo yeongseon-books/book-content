@@ -38,17 +38,7 @@ The final post connects the earlier pieces. Korean documents are split into smal
 
 ## Core flow
 
-```mermaid
-flowchart LR
-    A[Korean documents] --> B[Chunk into smaller units]
-    B --> C[KoSimCSE embeddings]
-    C --> D[FAISS retrieval]
-    E[User question] --> F[Question embedding]
-    F --> D
-    D --> G[Assemble top context]
-    G --> H[Groq answer generation]
-```
-
+![Core flow](../../../assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
 ---
 
 ## Why a simpler pipeline teaches more

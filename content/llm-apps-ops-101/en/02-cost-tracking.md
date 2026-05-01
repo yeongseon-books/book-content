@@ -27,14 +27,7 @@ last_reviewed: '2026-05-01'
 > Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.
 
 ## Big picture
-```mermaid
-flowchart LR
-    Prompt[Prompt] --> Groq[Groq API]
-    Groq --> Usage[usage.total_tokens]
-    Usage --> Cost[Cost calculator]
-    Cost --> Report[Cumulative report]
-```
-
+![Cost tracking flow and optimization points](../../../assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
 ## Why this layer matters
 Cost becomes more important as the feature succeeds, which is exactly why the math should exist in code early.
 

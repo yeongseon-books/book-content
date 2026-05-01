@@ -28,21 +28,7 @@ last_reviewed: '2026-05-01'
 
 > 통합 체인은 새로운 마법이 아니라 앞에서 본 Runnable들을 입력 타입 순서대로 이어 붙인 결과입니다.
 
-```mermaid
-flowchart LR
-    A[documents] --> B[text splitter]
-    B --> C[embeddings]
-    C --> D[FAISS]
-    E[question] --> F[Retriever]
-    D --> F
-    F --> G[context formatter]
-    G --> H[ChatPromptTemplate]
-    E --> H
-    H --> I[ChatGroq]
-    I --> J[StrOutputParser]
-    J --> K[streamed answer]
-```
-
+![이 글에서 답할 질문](../../../assets/langchain-101/06/06-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python
@@ -96,19 +82,7 @@ LangChain 101 시리즈 (6/6)
 
 ## 핵심 흐름 한눈에 보기
 
-```mermaid
-flowchart LR
-    Docs[문서 집합] --> Split[청킹]
-    Split --> Embed[임베딩]
-    Embed --> Store[FAISS]
-    Question[사용자 질문] --> Retriever[Retriever]
-    Store --> Retriever
-    Retriever --> Prompt[Prompt]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Parser[StrOutputParser]
-    Parser --> Output[최종 답변 또는 스트림]
-```
-
+![핵심 흐름 한눈에 보기](../../../assets/langchain-101/06/06-02-the-flow-at-a-glance.ko.png)
 지금까지 LCEL, 프롬프트, Retriever, Tool Calling, Streaming을 각각 다뤘습니다. 마지막 글에서는 이 컴포넌트들을 하나의 실행 가능한 앱으로 조립합니다. 문서를 인덱싱하고, 쿼리로 검색하고, LLM이 답변을 생성하고, 결과를 스트리밍으로 출력하는 전체 흐름입니다.
 
 다룰 내용은 다음과 같습니다.

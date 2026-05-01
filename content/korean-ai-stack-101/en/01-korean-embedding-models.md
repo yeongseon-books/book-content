@@ -40,15 +40,7 @@ In practice, the real question is not "which model wins the benchmark?" It is "w
 
 ## Core flow
 
-```mermaid
-flowchart LR
-    A[Prepare sentence pairs] --> B[Embed with all-MiniLM]
-    A --> C[Embed with ko-sbert-nli]
-    B --> D[Compute cosine similarity]
-    C --> D
-    D --> E[Compare similar and unrelated averages]
-```
-
+![Core flow](../../../assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
 ---
 
 ## Why start with a reproducible comparison

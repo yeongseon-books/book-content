@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 > Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.
 
-```mermaid
-flowchart LR
-    A[Chunk text] --> B[HuggingFaceEmbeddings]
-    B --> C[Dense vectors]
-    C --> D[IndexFlatL2]
-    E[User query] --> F[Query embedding]
-    F --> D
-    D --> G[Top k nearest chunks]
-```
+![Questions this post answers](../../../assets/rag-deep-dive/02/02-01-questions-this-post-answers.en.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (2/6)

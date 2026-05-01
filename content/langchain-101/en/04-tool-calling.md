@@ -28,15 +28,7 @@ last_reviewed: '2026-05-01'
 
 > Tool calling works when the model stops pretending to do the work itself and starts choosing which real function should do it.
 
-```mermaid
-flowchart LR
-    A[user question] --> B[LLM with tools]
-    B --> C[tool call]
-    C --> D[Python function execution]
-    D --> E[ToolMessage]
-    E --> F[final answer]
-```
-
+![Questions this post answers](../../../assets/langchain-101/04/04-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python
@@ -89,16 +81,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## The flow at a glance
 
-```mermaid
-flowchart LR
-    Question[User question] --> LLM[ChatGroq with bind_tools]
-    LLM --> Decision{tool_calls?}
-    Decision -->|yes| Tool[Python function execution]
-    Tool --> ToolMessage[ToolMessage]
-    ToolMessage --> LLM
-    Decision -->|no| Answer[Final answer]
-```
-
+![The flow at a glance](../../../assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)
 LLMs generate text. Calculation, weather lookup, database queries — those require external tools. Tool calling is the pattern where the LLM produces a structured request ("call this function with these arguments"), the application executes the actual function, and the result goes back to the LLM.
 
 This post covers defining tools with the `@tool` decorator, connecting them to an LLM with `bind_tools()`, and handling tool results in a simple loop.

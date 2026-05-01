@@ -28,18 +28,7 @@ last_reviewed: '2026-05-01'
 
 The final post connects all the earlier pieces. A FAISS retriever finds the evidence, Groq generates the answer from that context, and the script aggregates both retrieval metrics and RAGAS scores. That gives you one run log where you can separate search failures from answer-generation failures.
 
-```mermaid
-flowchart LR
-    C[Evaluation corpus] --> E[Embeddings · FAISS]
-    Q[Benchmark questions] --> R[retriever]
-    E --> R
-    R --> G[Groq answer generation]
-    R --> RM[hit rate · MRR]
-    G --> DS[question · answer · contexts]
-    DS --> RG[ragas.evaluate]
-    RG --> GM[faithfulness · answer_relevancy]
-```
-
+![Questions this post answers](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 The runnable code lives in `rag-benchmark-101/en/06-benchmark-complete/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.

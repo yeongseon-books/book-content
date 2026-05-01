@@ -25,15 +25,7 @@ Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://githu
 
 The diagram below shows the basic flow of role-based prompt construction.
 
-```mermaid
-flowchart LR
-    S[system rules] --> M[messages array]
-    U[user request] --> M
-    A[assistant history] --> M
-    M --> G[Groq API call]
-    G --> R[Structured answer]
-```
-
+![Prompt engineering basics: system, user, and assistant roles](../../../assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
 Prompt engineering is often described as clever wording. In application work, that is too narrow. The real job is to separate instructions by role, decide which rules stay stable across requests, and shape how the model responds. The difference between a weak prompt and a dependable prompt is usually the structure of the `messages` array.
 
 That structure matters early. Without it, tone drifts, output format changes between calls, follow-up questions lose context, and parameter tuning feels random. Many “model reliability” problems are really input-structure problems.

@@ -25,14 +25,7 @@ last_reviewed: '2026-05-01'
 
 아래 다이어그램은 예시 기반 유도와 단계적 추론이 한 요청 안에서 어떻게 이어지는지 보여 줍니다.
 
-```mermaid
-flowchart LR
-    E[예시 질문과 답변] --> F[few-shot 패턴 학습]
-    F --> Q[실제 사용자 질문]
-    Q --> C[단계별 추론 유도]
-    C --> A[최종 답변 생성]
-```
-
+![Few-shot과 Chain-of-Thought: 더 나은 답변 유도하기](../../../assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)
 이전 글에서는 `system`, `user`, `assistant` 역할을 분리해 프롬프트를 설계하는 기본 구조를 잡았습니다. 그다음 단계에서 바로 부딪히는 질문은 이것입니다. 같은 모델인데도 어떤 요청은 기대한 형식을 잘 따르고, 어떤 요청은 어딘가 비슷하지만 애매하게 빗나갑니다. 이 차이는 모델 자체보다도 모델을 어떻게 유도했는지에서 자주 갈립니다.
 
 실무에서 가장 먼저 꺼내는 손잡이 두 개가 few-shot prompting과 chain-of-thought prompting입니다. few-shot은 원하는 답변 패턴을 예시로 먼저 보여 주는 방식이고, chain-of-thought는 문제를 한 번에 찍게 두지 않고 단계적으로 풀도록 유도하는 방식입니다. 둘 다 새 모델을 학습시키는 기법이 아닙니다. 이미 있는 모델의 행동을 더 안정적으로 끌어내는 입력 설계 기법입니다.

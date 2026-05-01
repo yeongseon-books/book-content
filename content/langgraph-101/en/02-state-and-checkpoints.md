@@ -31,15 +31,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 As soon as an agent becomes conversational, single-shot execution stops being enough. You need to save state between turns, reload it with the same session key, and verify what the graph actually kept. In LangGraph, that job belongs to the checkpointer.
 
-```mermaid
-flowchart LR
-    A[First invoke] --> B[assistant]
-    B --> C[MemorySaver stores state]
-    C --> D[Invoke again with same thread_id]
-    D --> E[Restore prior state]
-    E --> F[assistant runs again]
-```
-
+![Questions this post answers](../../../assets/langgraph-101/02/02-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python

@@ -31,16 +31,7 @@ last_reviewed: '2026-05-01'
 
 복잡한 요청을 하나의 에이전트에 모두 밀어 넣으면 프롬프트가 비대해지고 역할이 흐려집니다. 반대로 supervisor가 요청 성격을 판단하고 적절한 worker에게 넘기면 책임이 분리되고 그래프도 읽기 쉬워집니다.
 
-```mermaid
-flowchart LR
-    A[사용자 요청] --> B[supervisor]
-    B -->|research| C[research_worker]
-    B -->|code| D[code_worker]
-    C --> E[finalize]
-    D --> E
-    E --> F[END]
-```
-
+![이 글에서 답할 질문](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python

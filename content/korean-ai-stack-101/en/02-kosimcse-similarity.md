@@ -38,15 +38,7 @@ This post moves from model comparison into an actual Korean retrieval loop. The 
 
 ## Core flow
 
-```mermaid
-flowchart LR
-    A[FAQ questions] --> B[KoSimCSE embeddings]
-    B --> C[FAISS IndexFlatIP]
-    D[User query] --> E[Query embedding]
-    E --> C
-    C --> F[Top FAQ results]
-```
-
+![Core flow](../../../assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
 ---
 
 ## Why index only the questions first

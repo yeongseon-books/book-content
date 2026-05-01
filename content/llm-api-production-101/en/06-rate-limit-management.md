@@ -31,17 +31,7 @@ This post implements two simple local limiters for that job: a token bucket and 
 
 The main idea is simple: **rate-limit handling is not apologizing after a 429, it is controlling request flow before the 429 happens**.
 
-```mermaid
-flowchart LR
-    A[Incoming request] --> B[Queue]
-    B --> C[Check token bucket]
-    C --> D{Enough tokens}
-    D -->|Yes| E[Call LLM]
-    D -->|No| F[Wait and retry]
-    F --> C
-    E --> G[Return response]
-```
-
+![Rate limit management: patterns for staying within limits](../../../assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
 ---
 
 ## Runtime setup

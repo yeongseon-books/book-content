@@ -31,16 +31,7 @@ title: 툴 호출 — 함수를 모델에 연결하기
 
 핵심은 간단합니다. **툴 호출은 모델 자율성이 아니라 애플리케이션이 설계한 실행 경계입니다.**
 
-```mermaid
-flowchart LR
-    A[사용자 질문] --> B[LLM]
-    B --> C[툴 호출 결정]
-    C --> D[애플리케이션 툴 실행]
-    D --> E[툴 결과]
-    E --> F[LLM]
-    F --> G[최종 응답]
-```
-
+![툴 호출: 함수를 모델에 연결하기](../../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.ko.png)
 ---
 
 ## 실행 준비

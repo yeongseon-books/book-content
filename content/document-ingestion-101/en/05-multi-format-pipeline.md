@@ -29,13 +29,7 @@ last_reviewed: '2026-05-01'
 
 Example code: `/root/Github/document-ingestion-101/en/05-multi-format-pipeline/main.py`
 
-```mermaid
-flowchart LR
-    A[PDF TXT MD inputs] --> B[Pick loader by extension]
-    B --> C[Create shared Document objects]
-    C --> D[Normalize source and format metadata]
-```
-
+![Questions this post answers](../../../assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png)
 Real ingestion systems rarely deal with PDFs alone. Operational notes may be TXT, team runbooks may be Markdown, and external reports may be PDF.
 
 This example reads three formats separately but emits the same `Document` structure for all of them. That keeps later chunking and indexing stages format-agnostic.

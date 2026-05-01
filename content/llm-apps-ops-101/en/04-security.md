@@ -27,15 +27,7 @@ last_reviewed: '2026-05-01'
 > LLM security is about moving failure earlier. Block risky input before the model sees it, then block risky output before the user sees it.
 
 ## Big picture
-```mermaid
-flowchart LR
-    User[User input] --> Guard[Injection and PII checks]
-    Guard -->|allowed| Groq[Groq API]
-    Guard -->|blocked| Reject[Immediate rejection]
-    Groq --> Filter[Output filter]
-    Filter --> Final[Final answer]
-```
-
+![LLM app security layer structure](../../../assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
 ## Why this layer matters
 A useful security layer fails early both before the model call and after the model response.
 

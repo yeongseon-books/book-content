@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 예제 코드: `/root/Github/document-ingestion-101/ko/04-incremental-indexing/main.py`
 
-```mermaid
-flowchart LR
-    A[파일 스캔] --> B[상태 저장소 조회]
-    B --> C{이전 해시 존재?}
-    C -->|없음| D[added]
-    C -->|같음| E[unchanged]
-    C -->|다름| F[updated]
-```
-
+![이 글에서 답할 질문](../../../assets/document-ingestion-101/04/04-01-questions-this-post-answers.ko.png)
 문서가 수십 개일 때는 전체 재처리도 견딜 수 있지만, 수천 개가 되면 매 실행마다 같은 비용을 내는 구조가 병목이 됩니다.
 
 이번 예제는 해시와 JSON 상태 파일만으로 `added`, `unchanged`, `updated`를 구분합니다. 먼저 이 단순한 기준을 확실히 이해해야 이후에 벡터 저장소 업데이트도 깔끔해집니다.

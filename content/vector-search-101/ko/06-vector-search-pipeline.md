@@ -35,17 +35,7 @@ title: 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
 - 자연어 쿼리로 검색하고 결과 출력하기
 - 하이브리드 검색 개념과 기본 구현
 
-```mermaid
-flowchart LR
-    A[원본 문서] --> B[청킹]
-    B --> C[임베딩]
-    C --> D[FAISS 인덱싱]
-    E[사용자 쿼리] --> F[쿼리 임베딩]
-    F --> G[벡터 검색]
-    D --> G
-    G --> H[정렬된 결과 반환]
-```
-
+![벡터 검색 파이프라인: 문서 수집부터 쿼리까지](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.ko.png)
 <!-- ebook-only:start -->
 
 이 장의 핵심: **벡터 검색 파이프라인은 embed → index → query → retrieve 네 단계다.** 각 단계를 독립적으로 교체할 수 있어야 한다.

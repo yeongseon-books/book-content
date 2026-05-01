@@ -31,15 +31,7 @@ last_reviewed: '2026-05-01'
 
 에이전트를 서비스로 만들기 시작하면 "이번 호출만 잘 끝나면 된다"는 가정이 바로 깨집니다. 사용자와 두 번째, 세 번째 턴을 이어 가려면 상태를 저장하고 같은 세션으로 다시 불러와야 합니다. LangGraph에서는 체크포인터가 이 역할을 맡습니다.
 
-```mermaid
-flowchart LR
-    A[첫 호출] --> B[assistant]
-    B --> C[MemorySaver 저장]
-    C --> D[같은 thread_id 재호출]
-    D --> E[이전 상태 복원]
-    E --> F[assistant 재실행]
-```
-
+![이 글에서 답할 질문](../../../assets/langgraph-101/02/02-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python

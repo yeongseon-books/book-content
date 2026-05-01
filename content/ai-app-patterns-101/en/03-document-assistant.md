@@ -27,15 +27,7 @@ last_reviewed: '2026-05-01'
 
 > A document assistant is not a conversational system; it is a transformer that turns long input into short, task-shaped output.
 
-```mermaid
-flowchart LR
-    Doc[Long document] --> Split[Chunk split]
-    Split --> Map[Per-chunk summary]
-    Map --> Merge[Summary bundle]
-    Merge --> Reduce[Final synthesis]
-    Reduce --> Output[Usable result]
-```
-
+![Questions this post answers](../../../assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.en.png)
 > AI App Patterns 101 (3/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/03-document-assistant)

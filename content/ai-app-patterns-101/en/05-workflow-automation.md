@@ -27,14 +27,7 @@ last_reviewed: '2026-05-01'
 
 > Workflow automation removes model choice and replaces it with a pipeline that follows human-defined stages and data contracts.
 
-```mermaid
-flowchart LR
-    Raw[Raw ticket] --> Sum[Summarize step]
-    Sum --> Classify[Classification step]
-    Classify --> Tag[Tagging step]
-    Tag --> Result[Structured result]
-```
-
+![Questions this post answers](../../../assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.en.png)
 > AI App Patterns 101 (5/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/05-workflow-automation)

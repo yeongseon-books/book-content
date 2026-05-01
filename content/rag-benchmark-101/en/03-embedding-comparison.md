@@ -28,15 +28,7 @@ last_reviewed: '2026-05-01'
 
 The third post keeps the retriever structure fixed and swaps only the embedding model. That isolates quality differences to the embedding layer. The example benchmarks two sentence-transformers models on the same corpus, query set, and k value.
 
-```mermaid
-flowchart LR
-    Q[Shared query set] --> B[Common benchmark loop]
-    C[Shared corpus] --> B
-    M1[all-MiniLM-L6-v2] --> B
-    M2[paraphrase-MiniLM-L3-v2] --> B
-    B --> O[hit rate · MRR · latency comparison]
-```
-
+![Questions this post answers](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 The runnable code lives in `rag-benchmark-101/en/03-embedding-comparison/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.

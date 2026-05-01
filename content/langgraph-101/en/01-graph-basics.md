@@ -31,14 +31,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 The most useful first mental shift is this: LangGraph is not “a few chains glued together.” It is a graph where state moves through named steps. This post builds the smallest possible graph so you can see node registration, edge wiring, and `invoke()` in one place.
 
-```mermaid
-flowchart LR
-    A[User request] --> B[choose_topic]
-    B --> C[build_outline]
-    C --> D[write_answer]
-    D --> E[Final state]
-```
-
+![Questions this post answers](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python

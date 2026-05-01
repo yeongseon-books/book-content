@@ -29,16 +29,7 @@ last_reviewed: '2026-05-01'
 
 > A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
 
-```mermaid
-flowchart LR
-    A[Question] --> B[Retriever]
-    B --> C[Context docs]
-    A --> D[Question passthrough]
-    C --> E[Prompt assembly]
-    D --> E
-    E --> F[ChatGroq]
-    F --> G[Answer]
-```
+![Questions this post answers](../../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.en.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (5/6)

@@ -37,14 +37,7 @@ The executable example in this article does not load a model at all. Instead, it
 
 The first question in fine-tuning is not which dataset to use. It is **which weights will actually move**. Full fine-tuning updates every parameter and therefore drags optimizer state and memory pressure with it. LoRA freezes the base model and adds small low-rank matrices, so you should always look at the trainable subset separately from the full model size.
 
-```mermaid
-flowchart LR
-    A[Pretrained model shape] --> B[Estimate linear layer size]
-    B --> C[Choose LoRA rank]
-    C --> D[Compute adapter parameters]
-    D --> E[Compare against full fine tuning]
-```
-
+![What to understand first](../../../assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
 ## Minimal runnable example
 
 ```python

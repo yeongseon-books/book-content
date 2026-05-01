@@ -38,14 +38,7 @@ This example defaults to a bundled mock response so it stays runnable without a 
 
 ## Core flow
 
-```mermaid
-flowchart LR
-    A[Receipt or scanned image] --> B[CLOVA OCR JSON payload]
-    B --> C[Interpret lineBreak and confidence]
-    C --> D[Reconstruct text lines]
-    D --> E[Preprocess for embeddings or RAG]
-```
-
+![Core flow](../../../assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
 ---
 
 ## Why start with a mock payload

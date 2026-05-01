@@ -31,14 +31,7 @@ last_reviewed: '2026-05-01'
 
 에이전트에서 중요한 건 LLM이 똑똑해 보이는지가 아니라 도구 호출 흐름이 명확하게 드러나는지입니다. LangGraph 0.4.5에서는 `ToolNode`와 `tools_condition` 조합으로 이 패턴을 가장 깔끔하게 표현할 수 있습니다.
 
-```mermaid
-flowchart LR
-    A[사용자 질문] --> B[agent]
-    B -->|tool call| C[ToolNode]
-    C --> B
-    B -->|final answer| D[END]
-```
-
+![이 글에서 답할 질문](../../../assets/langgraph-101/04/04-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python

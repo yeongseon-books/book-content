@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 > The prompt layer is where structured retrieval output becomes the exact contract the model will read.
 
-```mermaid
-flowchart LR
-    A[Retrieved documents] --> B[Context formatting]
-    C[Question] --> D[Variable binding]
-    E[History] --> D
-    B --> D
-    D --> F[ChatPromptTemplate]
-    F --> G[Role tagged messages]
-```
+![Questions this post answers](../../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.en.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (4/6)

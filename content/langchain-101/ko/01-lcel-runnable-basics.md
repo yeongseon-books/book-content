@@ -28,14 +28,7 @@ last_reviewed: '2026-05-01'
 
 > LangChain에서는 입력과 출력 타입만 맞으면 거의 모든 컴포넌트를 같은 파이프 규칙으로 연결할 수 있습니다.
 
-```mermaid
-flowchart LR
-    A[입력 딕셔너리] --> B[ChatPromptTemplate]
-    B --> C[ChatGroq]
-    C --> D[StrOutputParser]
-    D --> E[문자열 출력]
-```
-
+![이 글에서 답할 질문](../../../assets/langchain-101/01/01-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python
@@ -86,14 +79,7 @@ LangChain 101 시리즈 (1/6)
 
 ## 핵심 흐름 한눈에 보기
 
-```mermaid
-flowchart LR
-    Input[입력 딕셔너리] --> Prompt[ChatPromptTemplate]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Parser[StrOutputParser]
-    Parser --> Output[최종 문자열]
-```
-
+![핵심 흐름 한눈에 보기](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.ko.png)
 LangChain을 처음 접하면 코드보다 용어가 더 먼저 막힙니다. LCEL, Runnable, Chain, Pipe — 개념은 많은데 어떤 게 핵심인지 잘 보이지 않습니다. 이번 글은 LangChain의 설계 중심인 LCEL(LangChain Expression Language)과 Runnable 인터페이스가 무엇인지, 그리고 왜 이런 구조를 썼는지부터 잡습니다.
 
 이 시리즈는 LangChain을 API로 사용하는 방법에 집중합니다. 챗봇, RAG, 에이전트 같은 애플리케이션 패턴은 별도 시리즈(ai-app-patterns-101)에서 다룹니다.

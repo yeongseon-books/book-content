@@ -28,15 +28,7 @@ last_reviewed: '2026-05-01'
 
 두 번째 글에서는 손계산용 지표를 실제 retriever 위로 올립니다. 작은 코퍼스와 세 개의 질문만 있어도 hit rate, MRR, 평균 지연 시간을 함께 수집할 수 있습니다. 이 패턴이 있으면 이후 임베딩이나 인덱스를 바꿔도 같은 측정 루프를 재사용할 수 있습니다.
 
-```mermaid
-flowchart LR
-    D[문서 코퍼스] --> E[임베딩 생성]
-    E --> F[FAISS 인덱스]
-    Q[평가 질문] --> R[Retriever.invoke]
-    F --> R
-    R --> M[hit rate · MRR · latency]
-```
-
+![이 글에서 답할 질문](../../../assets/rag-benchmark-101/02/02-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 실행 코드는 `rag-benchmark-101/ko/02-retrieval-benchmarking/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.

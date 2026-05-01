@@ -33,15 +33,7 @@ LLM API를 처음 붙인 뒤 가장 먼저 겪는 운영 문제는 모델 품질
 
 핵심은 단순합니다. **프로덕션의 구조화 출력은 프롬프트 요령이 아니라 응답 계약 설계 문제입니다.**
 
-```mermaid
-flowchart LR
-    A[사용자 입력] --> B[LLM]
-    B --> C[JSON 스키마 요구]
-    C --> D[JSON 응답]
-    D --> E[Pydantic 검증]
-    E --> F[검증된 출력]
-```
-
+![구조화 출력: JSON 모드와 응답 스키마](../../../assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.ko.png)
 ---
 
 ## 실행 준비

@@ -31,18 +31,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 This final example pulls the series together. It classifies the incoming question, answers simple conceptual prompts directly, routes calculation-heavy prompts into a tool loop, and stores the whole conversation with `MemorySaver`. That is already enough structure for a serious prototype.
 
-```mermaid
-flowchart LR
-    A[User message] --> B[supervisor]
-    B -->|direct_answer| C[direct_answer]
-    B -->|tool_agent| D[tool_agent]
-    D -->|tool call| E[ToolNode]
-    E --> D
-    C --> F[END]
-    D -->|final answer| F
-    F --> G[MemorySaver checkpoint]
-```
-
+![Questions this post answers](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python

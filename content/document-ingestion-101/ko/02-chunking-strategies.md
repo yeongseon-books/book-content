@@ -29,13 +29,7 @@ last_reviewed: '2026-05-01'
 
 예제 코드: `/root/Github/document-ingestion-101/ko/02-chunking-strategies/main.py`
 
-```mermaid
-flowchart LR
-    A[문서 유형 선택] --> B[청크 크기와 겹침 설정]
-    B --> C[RecursiveCharacterTextSplitter 실행]
-    C --> D[청크 수와 길이 분포 비교]
-```
-
+![이 글에서 답할 질문](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.ko.png)
 청킹을 한 번 잘못 잡으면 뒤 단계가 모두 비효율적이 됩니다. 너무 작으면 답변 맥락이 잘리고, 너무 크면 검색 결과에 잡음이 섞입니다.
 
 이번 예제는 FAQ, 매뉴얼, 정책 문서 세 가지 텍스트를 같은 분할기로 돌려 보고, 문서 유형별 프리셋이 왜 필요한지 숫자로 보여줍니다.

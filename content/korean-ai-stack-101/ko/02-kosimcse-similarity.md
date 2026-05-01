@@ -38,15 +38,7 @@ last_reviewed: '2026-05-01'
 
 ## 핵심 흐름
 
-```mermaid
-flowchart LR
-    A[FAQ 질문 모음] --> B[KoSimCSE 임베딩]
-    B --> C[FAISS IndexFlatIP]
-    D[사용자 질문] --> E[질문 임베딩]
-    E --> C
-    C --> F[상위 FAQ 반환]
-```
-
+![핵심 흐름](../../../assets/korean-ai-stack-101/02/02-01-core-flow.ko.png)
 ---
 
 ## 왜 FAQ 질문만 먼저 인덱싱할까

@@ -27,15 +27,7 @@ last_reviewed: '2026-05-01'
 > 로그 한 줄이 곧 호출 한 건의 운영 계약서라고 생각하면, 나중에 비용·장애·품질 문제를 같은 레코드에서 추적할 수 있습니다.
 
 ## 큰 그림
-```mermaid
-flowchart LR
-    User[사용자 요청] --> App[LLM 애플리케이션]
-    App --> Log[JSON 구조화 로그]
-    App --> Groq[Groq API]
-    Groq --> App
-    App --> Metrics[지연 시간·토큰 집계]
-```
-
+![모니터링과 로깅 컴포넌트 구성](../../../assets/llm-apps-ops-101/01/01-01-big-picture.ko.png)
 ## 왜 이 레이어가 필요한가
 관측 가능성의 시작은 화려한 대시보드가 아니라, 호출 한 건을 다시 설명할 수 있는 로그 레코드입니다.
 

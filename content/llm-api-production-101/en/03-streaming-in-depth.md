@@ -31,17 +31,7 @@ This post focuses on the consumer side of the Groq streaming path. We will start
 
 The goal is not a clever UI effect. The goal is a streaming consumer that can explain what happened when the stream is incomplete.
 
-```mermaid
-flowchart LR
-    A[Stream starts] --> B[Chunk arrives]
-    B --> C{Delta present}
-    C -->|Yes| D[Accumulate text]
-    C -->|No| E[Handle metadata only]
-    D --> F[Wait for next chunk]
-    E --> F
-    F --> G[Reconstruct final response]
-```
-
+![Streaming in depth: chunk handling and error recovery](../../../assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.en.png)
 ---
 
 ## Runtime setup

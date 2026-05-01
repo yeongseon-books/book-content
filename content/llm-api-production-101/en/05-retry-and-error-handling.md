@@ -31,18 +31,7 @@ That is why retries work only when they begin with error classification. A retry
 
 The main idea is simple: **a retry is not a friendly loop, it is a bounded recovery strategy built on top of error classification**.
 
-```mermaid
-flowchart LR
-    A[Attempt request] --> B{Succeeded}
-    B -->|Yes| C[Return response]
-    B -->|No| D{Retryable error}
-    D -->|No| E[Fail immediately]
-    D -->|Yes| F[Wait with backoff]
-    F --> G{Attempts exhausted}
-    G -->|No| A
-    G -->|Yes| E
-```
-
+![Retry and error handling: making API calls reliable](../../../assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)
 ---
 
 ## Runtime setup

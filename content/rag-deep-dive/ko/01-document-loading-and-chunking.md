@@ -29,17 +29,7 @@ last_reviewed: '2026-05-01'
 
 > 청킹은 문서를 잘게 자르는 작업이 아니라, 나중에 다시 찾을 의미 경계를 먼저 고정하는 작업입니다.
 
-```mermaid
-flowchart LR
-    A[원본 문서] --> B[Loader]
-    B --> C[Character splitter]
-    B --> D[Recursive splitter]
-    B --> E[Token splitter]
-    C --> F[청크 후보]
-    D --> F
-    E --> F
-    F --> G[검색 가능한 문맥]
-```
+![이 글에서 답할 질문](../../../assets/rag-deep-dive/01/01-01-questions-this-post-answers.ko.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (1/6)

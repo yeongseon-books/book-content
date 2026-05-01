@@ -37,14 +37,7 @@ The script for this post defines a `LoraConfig`, applies it with `get_peft_model
 
 `r` controls the low-rank width, `lora_alpha` controls scaling, and `lora_dropout` regularizes only the adapter path. The field that most often breaks real projects is `target_modules`. If that list is wrong, the adapter attaches nowhere useful—or nowhere at all.
 
-```mermaid
-flowchart LR
-    A[Base GPT-2 model] --> B[Pick target modules]
-    B --> C[Define LoraConfig]
-    C --> D[Apply get_peft_model]
-    D --> E[Inspect trainable parameter ratio]
-```
-
+![The fields with real operational impact](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
 ## Minimal runnable example
 
 ```python

@@ -28,14 +28,7 @@ last_reviewed: '2026-05-01'
 
 > A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.
 
-```mermaid
-flowchart LR
-    A[topic and audience] --> B[ChatPromptTemplate]
-    B --> C[ChatGroq]
-    C --> D[StrOutputParser]
-    D --> E[explanation text]
-```
-
+![Questions this post answers](../../../assets/langchain-101/02/02-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python
@@ -88,14 +81,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## The flow at a glance
 
-```mermaid
-flowchart LR
-    Input[Input variables] --> Prompt[ChatPromptTemplate]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Parser[OutputParser]
-    Parser --> App[Application output]
-```
-
+![The flow at a glance](../../../assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
 Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.
 
 Topics:

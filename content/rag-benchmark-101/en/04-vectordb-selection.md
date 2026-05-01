@@ -28,16 +28,7 @@ last_reviewed: '2026-05-01'
 
 The fourth post focuses on the algorithm layer inside the vector store. Annoy is not installed in this environment, so the runnable example compares a FAISS flat index against IVF. The key is to hold the vectors constant and change only the search strategy.
 
-```mermaid
-flowchart LR
-    V[Same dense vectors] --> F[IndexFlatIP]
-    V --> I[IndexIVFFlat]
-    Q[Evaluation query vectors] --> S[search top-k]
-    F --> S
-    I --> S
-    S --> R[hit rate · MRR · search latency]
-```
-
+![Questions this post answers](../../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 The runnable code lives in `rag-benchmark-101/en/04-vectordb-selection/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.

@@ -38,17 +38,7 @@ last_reviewed: '2026-05-01'
 
 ## 핵심 흐름
 
-```mermaid
-flowchart LR
-    A[한국어 문서] --> B[문단/문장 청킹]
-    B --> C[KoSimCSE 임베딩]
-    C --> D[FAISS 검색]
-    E[사용자 질문] --> F[질문 임베딩]
-    F --> D
-    D --> G[상위 문맥 묶기]
-    G --> H[Groq LLM 답변 생성]
-```
-
+![핵심 흐름](../../../assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
 ---
 
 ## 왜 단순한 파이프라인이 더 많이 알려 주는가

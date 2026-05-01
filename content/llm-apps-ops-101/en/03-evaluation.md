@@ -27,14 +27,7 @@ last_reviewed: '2026-05-01'
 > The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.
 
 ## Big picture
-```mermaid
-flowchart LR
-    Prompt[Evaluation prompt] --> Groq[Groq API]
-    Groq --> Json[JSON output]
-    Json --> Rules[Length, keyword, format checks]
-    Rules --> Gate[Pass or fail]
-```
-
+![LLM output quality evaluation pipeline](../../../assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
 ## Why this layer matters
 Before adding complex judges, build a rule layer that catches obviously bad output cheaply and consistently.
 

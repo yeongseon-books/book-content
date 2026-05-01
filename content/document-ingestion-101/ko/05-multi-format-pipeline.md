@@ -29,13 +29,7 @@ last_reviewed: '2026-05-01'
 
 예제 코드: `/root/Github/document-ingestion-101/ko/05-multi-format-pipeline/main.py`
 
-```mermaid
-flowchart LR
-    A[PDF TXT MD 입력] --> B[확장자별 로더 선택]
-    B --> C[공통 Document 생성]
-    C --> D[source format 메타데이터 표준화]
-```
-
+![이 글에서 답할 질문](../../../assets/document-ingestion-101/05/05-01-questions-this-post-answers.ko.png)
 실제 문서 수집은 PDF만 다루지 않습니다. 운영 노트는 TXT로, 팀 런북은 Markdown으로, 외부 자료는 PDF로 들어오는 경우가 흔합니다.
 
 이번 예제는 세 포맷을 각각 읽되 최종 출력은 모두 같은 `Document` 구조로 맞춥니다. 그래야 이후 청킹과 인덱싱 단계가 포맷 차이를 의식하지 않아도 됩니다.

@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 > retriever는 가장 가까운 벡터를 기계적으로 꺼내는 부품이 아니라, 후보 집합을 어떤 정책으로 줄일지 결정하는 선택기입니다.
 
-```mermaid
-flowchart LR
-    A[Query] --> B[VectorStoreRetriever]
-    B --> C[Similarity top k]
-    B --> D[MMR fetch_k 후보]
-    D --> E[다양성 재선택]
-    C --> F[최종 문맥]
-    E --> F
-```
+![이 글에서 답할 질문](../../../assets/rag-deep-dive/03/03-01-questions-this-post-answers.ko.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (3/6)

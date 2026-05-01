@@ -28,15 +28,7 @@ last_reviewed: '2026-05-01'
 
 > Retriever는 문서를 저장하는 컴포넌트가 아니라 질문을 검색 가능한 컨텍스트로 바꾸는 진입점입니다.
 
-```mermaid
-flowchart LR
-    A[질문] --> B[Retriever]
-    B --> C[관련 문서 리스트]
-    C --> D[문서 포매터]
-    D --> E[ChatPromptTemplate]
-    E --> F[ChatGroq]
-```
-
+![이 글에서 답할 질문](../../../assets/langchain-101/03/03-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python
@@ -87,17 +79,7 @@ LangChain 101 시리즈 (3/6)
 
 ## 핵심 흐름 한눈에 보기
 
-```mermaid
-flowchart LR
-    Docs[원본 문서] --> Embed[임베딩]
-    Embed --> Store[FAISS VectorStore]
-    Store --> Retriever[Retriever]
-    Question[사용자 질문] --> Retriever
-    Retriever --> Context[컨텍스트 문자열]
-    Context --> Prompt[Prompt]
-    Prompt --> LLM[ChatGroq]
-```
-
+![핵심 흐름 한눈에 보기](../../../assets/langchain-101/03/03-02-the-flow-at-a-glance.ko.png)
 Retriever는 쿼리를 받아 관련 문서 목록을 반환하는 컴포넌트입니다. LangChain의 Retriever 인터페이스는 `get_relevant_documents(query)` 메서드 하나로 정의됩니다. 뒤에 어떤 검색 시스템이 있든 — FAISS, Chroma, Elasticsearch — 체인에서는 같은 방식으로 사용합니다.
 
 이번 글에서는 FAISS 기반 Retriever를 만들고, 그 결과를 프롬프트에 주입하는 RAG 패턴의 기본 형태를 구현합니다.

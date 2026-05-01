@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 Example code: `/root/Github/document-ingestion-101/en/06-pipeline-completion/main.py`
 
-```mermaid
-flowchart LR
-    A[Load PDF TXT MD] --> B[Create chunks]
-    B --> C[Generate embeddings]
-    C --> D[Save FAISS index]
-    D --> E[Reload FAISS index]
-    E --> F[Verify similarity search]
-```
-
+![Questions this post answers](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
 The final post assembles the earlier isolated examples into one real flow. At this point the important question is whether the stage boundaries still line up.
 
 This example loads three formats, chunks them, stores embeddings in FAISS, reloads the saved index, and runs a search against it. That is enough to prove an ingestion MVP works end to end.

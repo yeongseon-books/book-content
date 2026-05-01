@@ -29,14 +29,7 @@ last_reviewed: '2026-05-01'
 
 예제 코드: `/root/Github/document-ingestion-101/ko/03-metadata-filtering/main.py`
 
-```mermaid
-flowchart LR
-    A[원본 문서] --> B[청크 생성]
-    B --> C[category quarter source 메타데이터 부착]
-    C --> D[FAISS 저장]
-    D --> E[similarity_search + filter]
-```
-
+![이 글에서 답할 질문](../../../assets/document-ingestion-101/03/03-01-questions-this-post-answers.ko.png)
 RAG 검색이 생각보다 엉뚱한 결과를 내는 가장 흔한 이유는 “비슷한 내용”과 “찾고 싶은 범위”를 분리하지 않았기 때문입니다. 분기, 문서 종류, 출처 같은 조건은 임베딩만으로 깔끔하게 처리되지 않습니다.
 
 이번 예제는 작은 문서 세 개를 FAISS에 넣고, `filter` 파라미터로 category와 quarter를 바꾸면서 검색 결과가 어떻게 달라지는지 확인합니다.

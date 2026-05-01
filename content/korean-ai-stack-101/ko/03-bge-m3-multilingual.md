@@ -38,15 +38,7 @@ last_reviewed: '2026-05-01'
 
 ## 핵심 흐름
 
-```mermaid
-flowchart LR
-    A[한국어와 영어 문서] --> B[BGE-M3 임베딩]
-    B --> C[공유 벡터 공간]
-    C --> D[FAISS 검색]
-    E[한국어 또는 영어 질의] --> B
-    D --> F[언어를 가리지 않는 상위 문서]
-```
-
+![핵심 흐름](../../../assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
 ---
 
 ## Dense 기준선을 먼저 잡는 이유

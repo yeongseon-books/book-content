@@ -25,16 +25,7 @@ Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://githu
 
 The diagram below shows the smallest round trip behind a first LLM API call.
 
-```mermaid
-flowchart LR
-    U[User] --> P[Prompt]
-    P --> A[Application code]
-    A --> G[Groq API request]
-    G --> M[LLM model]
-    M --> R[JSON response]
-    R --> O[Output text]
-```
-
+![LLM API first call: sending your first request](../../../assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)
 The first confusing thing about LLM application development is not the model. It is the boundary between your code and the model service. A chat UI makes the whole thing feel magical, but the runtime reality is plain: your application sends an HTTP request and receives a JSON response. That round trip is the foundation.
 
 That is why Post 01 starts here. If you do not understand what goes into the request body, what comes back in the response, and where token usage shows up, every later feature feels blurry.

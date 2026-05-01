@@ -38,14 +38,7 @@ last_reviewed: '2026-05-01'
 
 ## 핵심 흐름
 
-```mermaid
-flowchart LR
-    A[영수증 또는 스캔 이미지] --> B[CLOVA OCR 응답 JSON]
-    B --> C[lineBreak와 confidence 해석]
-    C --> D[줄 단위 텍스트 재구성]
-    D --> E[임베딩 또는 RAG 전처리]
-```
-
+![핵심 흐름](../../../assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
 ---
 
 ## 왜 mock 응답부터 다루는가

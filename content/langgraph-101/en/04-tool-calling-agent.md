@@ -31,14 +31,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 The key question is not whether the LLM can look clever. It is whether the tool path is explicit, inspectable, and easy to extend. In LangGraph 0.4.5, `ToolNode` plus `tools_condition` is the cleanest low-level pattern for that loop.
 
-```mermaid
-flowchart LR
-    A[User question] --> B[agent]
-    B -->|tool call| C[ToolNode]
-    C --> B
-    B -->|final answer| D[END]
-```
-
+![Questions this post answers](../../../assets/langgraph-101/04/04-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python

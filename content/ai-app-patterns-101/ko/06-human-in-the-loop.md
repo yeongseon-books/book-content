@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 
 > Human-in-the-loop는 자동화를 포기하는 패턴이 아니라, 위험한 지점에서만 사람 판단을 끼워 넣는 제어 장치입니다.
 
-```mermaid
-flowchart LR
-    Request[고객 요청] --> Draft[LLM 초안 생성]
-    Draft --> Score[신뢰도 평가]
-    Score -->|높음| Auto[자동 승인]
-    Score -->|낮음| Human[사람 검토]
-    Human --> Final[최종 답변]
-    Auto --> Final
-```
-
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/06/06-01-questions-this-post-answers.ko.png)
 > AI 앱 패턴 101 시리즈 (6/6)
 
 예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/06-human-in-the-loop)

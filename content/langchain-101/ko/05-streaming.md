@@ -28,14 +28,7 @@ last_reviewed: '2026-05-01'
 
 > Streaming은 응답이 끝난 뒤 받는 방식이 아니라 생성 중간 상태를 그대로 소비하는 실행 모드입니다.
 
-```mermaid
-flowchart LR
-    A[질문] --> B[Prompt or chain]
-    B --> C[ChatGroq]
-    C --> D[token chunks]
-    D --> E[CLI or API response]
-```
-
+![이 글에서 답할 질문](../../../assets/langchain-101/05/05-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python
@@ -89,15 +82,7 @@ LangChain 101 시리즈 (5/6)
 
 ## 핵심 흐름 한눈에 보기
 
-```mermaid
-flowchart LR
-    Prompt[Prompt 또는 Chain] --> Stream[stream / astream]
-    Stream --> Chunk[토큰 청크]
-    Chunk --> UI[콘솔 또는 UI]
-    Stream --> Events[astream_events]
-    Events --> Monitor[이벤트 관찰]
-```
-
+![핵심 흐름 한눈에 보기](../../../assets/langchain-101/05/05-02-the-flow-at-a-glance.ko.png)
 LLM이 긴 응답을 생성할 때, 전체 텍스트가 완성될 때까지 기다리면 사용자 경험이 나빠집니다. 스트리밍은 토큰이 생성되는 즉시 화면에 출력하는 방식입니다. ChatGPT나 Claude에서 응답이 문자 단위로 흘러나오는 것이 바로 이 방식입니다.
 
 LangChain에서 스트리밍은 `stream()` 메서드 하나로 시작합니다. 체인을 구성하는 방식은 `invoke()`와 동일하고, 호출 방법만 바뀝니다.

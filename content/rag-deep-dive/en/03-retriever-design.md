@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 > A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.
 
-```mermaid
-flowchart LR
-    A[Query] --> B[VectorStoreRetriever]
-    B --> C[Similarity top k]
-    B --> D[MMR fetch_k candidates]
-    D --> E[Diversity re-selection]
-    C --> F[Final context]
-    E --> F
-```
+![Questions this post answers](../../../assets/rag-deep-dive/03/03-01-questions-this-post-answers.en.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (3/6)

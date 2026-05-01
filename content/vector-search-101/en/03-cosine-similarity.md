@@ -33,15 +33,7 @@ This post implements all three metrics from scratch, shows why normalization mat
 - running a real query and examining the results
 - when to use each metric
 
-```mermaid
-flowchart LR
-    A[Query vector] --> C[Cosine similarity calculation]
-    B[Document vectors] --> C
-    C --> D[Similarity scores]
-    D --> E[Rank descending]
-    E --> F[Top-K matches]
-```
-
+![Cosine similarity and vector search: computing sentence distances](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: cosine similarity measures the alignment of two vector directions. It ignores magnitude, so sentence length differences do not matter.

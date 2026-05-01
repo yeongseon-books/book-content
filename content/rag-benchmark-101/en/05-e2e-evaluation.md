@@ -28,16 +28,7 @@ last_reviewed: '2026-05-01'
 
 The fifth post adds RAGAS to score generation quality. The crucial detail is using the real API that works with ragas 0.1.22. The example uses `Faithfulness()` and `AnswerRelevancy(strictness=1)`, with `LangchainLLMWrapper` and `LangchainEmbeddingsWrapper` connecting Groq and sentence-transformers.
 
-```mermaid
-flowchart LR
-    A[Question · answer · contexts] --> D[Dataset.from_dict]
-    D --> E[ragas.evaluate]
-    L[LangchainLLMWrapper] --> E
-    EM[LangchainEmbeddingsWrapper] --> E
-    E --> F[faithfulness]
-    E --> R[answer_relevancy]
-```
-
+![Questions this post answers](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 The runnable code lives in `rag-benchmark-101/en/05-e2e-evaluation/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.

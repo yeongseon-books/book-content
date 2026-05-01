@@ -37,14 +37,7 @@ The example script writes a `toy.jsonl` file, reads it with `datasets.load_datas
 
 It helps to separate fine-tuning data into three layers: the **raw samples**, the **formatted prompts**, and the **tokenized tensors**. When these layers are explicit, you can debug filtering issues and token-length issues independently instead of mixing them together.
 
-```mermaid
-flowchart LR
-    A[Raw JSONL samples] --> B[Validation and filtering]
-    B --> C[Instruction template formatting]
-    C --> D[Tokenizer preprocessing]
-    D --> E[Training columns inspection]
-```
-
+![The three layers of dataset preparation](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
 ## Minimal runnable example
 
 ```python

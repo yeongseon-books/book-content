@@ -131,4 +131,5 @@ def transform_for_tistory(text: str) -> str:
     text = strip_front_matter(text)
     text = strip_ebook_only(text)
     text = strip_blog_only_markers_keep_body(text)
+    text = strip_toc_markers(text)
     return text

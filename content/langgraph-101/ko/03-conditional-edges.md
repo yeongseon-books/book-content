@@ -31,17 +31,7 @@ last_reviewed: '2026-05-01'
 
 LLM 워크플로가 실제 서비스로 가면 모든 요청이 같은 경로를 타지 않습니다. 어떤 질문은 코드 생성으로, 어떤 질문은 개념 설명으로, 어떤 질문은 디버깅 흐름으로 보내야 합니다. LangGraph에서는 이 결정을 조건부 엣지 하나로 드러낼 수 있습니다.
 
-```mermaid
-flowchart LR
-    A[질문] --> B[classify]
-    B -->|code| C[answer_code]
-    B -->|concept| D[answer_concept]
-    B -->|debug| E[answer_debug]
-    C --> F[END]
-    D --> F
-    E --> F
-```
-
+![이 글에서 답할 질문](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 ```python

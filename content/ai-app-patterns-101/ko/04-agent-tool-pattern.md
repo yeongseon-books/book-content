@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 
 > 에이전트는 단계를 직접 하드코딩하는 대신, 모델이 도구 호출 경로를 런타임에 고르게 만드는 제어기입니다.
 
-```mermaid
-flowchart LR
-    Question[사용자 질문] --> Agent[AgentExecutor]
-    Agent --> Decide[도구 선택]
-    Decide --> Calc[calculate 도구]
-    Decide --> Search[search_docs 도구]
-    Calc --> Result[도구 결과]
-    Search --> Result
-```
-
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.ko.png)
 > AI 앱 패턴 101 시리즈 (4/6)
 
 예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/04-agent-tool-pattern)

@@ -29,15 +29,7 @@ last_reviewed: '2026-05-01'
 
 > 임베딩 단계는 청크를 좌표로 바꾸고, 인덱스 단계는 그 좌표들 사이의 가까움을 순위로 바꿉니다.
 
-```mermaid
-flowchart LR
-    A[청크 텍스트] --> B[HuggingFaceEmbeddings]
-    B --> C[Dense vectors]
-    C --> D[IndexFlatL2]
-    E[질문] --> F[Query embedding]
-    F --> D
-    D --> G[Top k 거리 결과]
-```
+![이 글에서 답할 질문](../../../assets/rag-deep-dive/02/02-01-questions-this-post-answers.ko.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (2/6)

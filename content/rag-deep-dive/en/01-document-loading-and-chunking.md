@@ -29,17 +29,7 @@ last_reviewed: '2026-05-01'
 
 > Chunking is not just slicing text smaller. It is freezing the semantic boundary you hope retrieval can recover later.
 
-```mermaid
-flowchart LR
-    A[Source document] --> B[Loader]
-    B --> C[Character splitter]
-    B --> D[Recursive splitter]
-    B --> E[Token splitter]
-    C --> F[Chunk candidates]
-    D --> F
-    E --> F
-    F --> G[Retrievable context]
-```
+![Questions this post answers](../../../assets/rag-deep-dive/01/01-01-questions-this-post-answers.en.png)
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (1/6)

@@ -27,15 +27,7 @@ last_reviewed: '2026-05-01'
 > LLM 보안은 완벽한 차단보다 실패 지점을 앞당기는 작업입니다. 위험 입력을 모델 앞에서 끊고, 위험 출력을 사용자 앞에서 한 번 더 끊어야 합니다.
 
 ## 큰 그림
-```mermaid
-flowchart LR
-    User[사용자 입력] --> Guard[인젝션·PII 검사]
-    Guard -->|통과| Groq[Groq API]
-    Guard -->|차단| Reject[즉시 거절]
-    Groq --> Filter[출력 필터]
-    Filter --> UserOut[최종 응답]
-```
-
+![LLM 앱 보안 레이어 구성](../../../assets/llm-apps-ops-101/04/04-01-big-picture.ko.png)
 ## 왜 이 레이어가 필요한가
 보안 레이어는 모델 앞과 모델 뒤에서 각각 한 번씩 실패를 조기에 만들도록 설계하는 것이 핵심입니다.
 

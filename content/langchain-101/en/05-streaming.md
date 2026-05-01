@@ -28,14 +28,7 @@ last_reviewed: '2026-05-01'
 
 > Streaming is not a different chain design; it is a different way of consuming the chain while the model is still generating.
 
-```mermaid
-flowchart LR
-    A[question] --> B[prompt or chain]
-    B --> C[ChatGroq]
-    C --> D[token chunks]
-    D --> E[CLI or API response]
-```
-
+![Questions this post answers](../../../assets/langchain-101/05/05-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python
@@ -89,15 +82,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## The flow at a glance
 
-```mermaid
-flowchart LR
-    Prompt[Prompt or chain] --> Stream[stream or astream]
-    Stream --> Chunk[Token chunks]
-    Chunk --> UI[Console or UI]
-    Stream --> Events[astream_events]
-    Events --> Monitor[Event inspection]
-```
-
+![The flow at a glance](../../../assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png)
 When an LLM generates a long response, waiting for the full text before displaying anything makes the experience feel slow. Streaming sends tokens to the output as they are generated. That is what you see in ChatGPT or Claude when text appears character by character.
 
 In LangChain, streaming starts with `stream()`. Chain construction is identical to `invoke()` — only the call method changes.

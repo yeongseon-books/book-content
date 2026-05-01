@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 > Operational maturity is not about stacking features. It is about making one request produce connected signals for validation, cost, quality, and logs.
 
 ## Big picture
-```mermaid
-flowchart LR
-    Request[Chat request] --> Validate[Input validation]
-    Validate --> Groq[Groq API]
-    Groq --> Eval[Quality evaluation]
-    Eval --> Cost[Token and cost calculation]
-    Cost --> Log[Structured ops log]
-    Log --> Response[Final response]
-```
-
+![LLM ops pipeline complete overview](../../../assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
 ## Why this layer matters
 An integrated pipeline matters because one request should leave connected traces for validation, cost, quality, and logging.
 

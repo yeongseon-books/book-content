@@ -29,13 +29,7 @@ last_reviewed: '2026-05-01'
 
 예제 코드: `/root/Github/document-ingestion-101/ko/01-pdf-parsing/main.py`
 
-```mermaid
-flowchart LR
-    A[스크립트가 샘플 PDF 생성] --> B[pypdf가 페이지별 텍스트 추출]
-    B --> C[페이지 번호와 문자 수 계산]
-    C --> D[추출 결과 검증]
-```
-
+![이 글에서 답할 질문](../../../assets/document-ingestion-101/01/01-01-questions-this-post-answers.ko.png)
 실무에서 PDF 파싱 예제를 설명할 때 가장 먼저 막히는 부분은 샘플 파일입니다. 저장소에 PDF를 커밋하지 않아도 글만 보고 바로 실행할 수 있어야 재현성이 생깁니다.
 
 이번 예제는 `reportlab`으로 PDF를 스크립트 안에서 만들고, `pypdf`로 다시 읽어서 페이지별 텍스트와 문자 수를 출력합니다. 문서 수집 파이프라인의 출발점으로 딱 맞는 구조입니다.

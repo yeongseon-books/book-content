@@ -28,14 +28,7 @@ last_reviewed: '2026-05-01'
 
 > In LangChain, most components become interchangeable once their input and output shapes line up.
 
-```mermaid
-flowchart LR
-    A[input dict] --> B[ChatPromptTemplate]
-    B --> C[ChatGroq]
-    C --> D[StrOutputParser]
-    D --> E[string output]
-```
-
+![Questions this post answers](../../../assets/langchain-101/01/01-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python
@@ -86,14 +79,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## The flow at a glance
 
-```mermaid
-flowchart LR
-    Input[Input dictionary] --> Prompt[ChatPromptTemplate]
-    Prompt --> LLM[ChatGroq]
-    LLM --> Parser[StrOutputParser]
-    Parser --> Output[Final string]
-```
-
+![The flow at a glance](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png)
 LangChain throws a lot of terminology at you before the code makes sense: LCEL, Runnable, Chain, Pipe. This post cuts through that by focusing on what LCEL (LangChain Expression Language) and the Runnable interface actually are and why the library is structured around them.
 
 This series covers LangChain as an API — how to use its components. Application-level patterns such as chatbots, RAG, and agents are in a separate series (ai-app-patterns-101).

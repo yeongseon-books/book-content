@@ -37,14 +37,7 @@ The example in this post trains a tiny LoRA-wrapped GPT-2 model for one step and
 
 Lower perplexity is usually better, but the absolute value can be noisy on tiny models, tiny datasets, and short contexts. That is why perplexity is most useful as a regression guardrail. It is excellent for asking whether a change made things worse or better relative to a baseline.
 
-```mermaid
-flowchart LR
-    A[Evaluation texts] --> B[Prepare input_ids and labels]
-    B --> C[Run model loss]
-    C --> D[Average losses]
-    D --> E[Convert with exp loss to perplexity]
-```
-
+![The right way to read perplexity](../../../assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png)
 ## Minimal runnable example
 
 ```python

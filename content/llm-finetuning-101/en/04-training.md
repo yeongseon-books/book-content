@@ -37,14 +37,7 @@ The example wraps a tiny GPT-2 model with LoRA, builds a two-row question-answer
 
 You can shrink the number of rows and the number of optimizer steps aggressively. What you cannot remove is the training structure itself: tokenized inputs, labels, loss computation, and an optimizer step. Remove those, and you no longer have a training test—you only have an inference test.
 
-```mermaid
-flowchart LR
-    A[Question answer texts] --> B[Tokenization and labels]
-    B --> C[LoRA model ready]
-    C --> D[TrainingArguments setup]
-    D --> E[Trainer runs one step]
-```
-
+![What you can shrink and what you cannot](../../../assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png)
 ## Minimal runnable example
 
 ```python

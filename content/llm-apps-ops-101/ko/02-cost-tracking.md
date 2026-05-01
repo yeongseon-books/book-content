@@ -27,14 +27,7 @@ last_reviewed: '2026-05-01'
 > 비용 추적은 회계가 아니라 피드백 루프입니다. 호출 한 건이 얼마였는지 알아야 캐시, 프롬프트 압축, 모델 라우팅이 의미를 가집니다.
 
 ## 큰 그림
-```mermaid
-flowchart LR
-    Prompt[프롬프트] --> Groq[Groq API]
-    Groq --> Usage[usage.total_tokens]
-    Usage --> Cost[단가 계산기]
-    Cost --> Report[누적 비용 리포트]
-```
-
+![비용 추적 흐름과 최적화 지점](../../../assets/llm-apps-ops-101/02/02-01-big-picture.ko.png)
 ## 왜 이 레이어가 필요한가
 비용은 LLM 기능이 성공할수록 더 중요해지는 운영 지표입니다. 그래서 초기에 계산식을 코드로 박아 두는 편이 낫습니다.
 

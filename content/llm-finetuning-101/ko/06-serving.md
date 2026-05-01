@@ -37,15 +37,7 @@ last_reviewed: '2026-05-01'
 
 실전에서는 모델 로딩, 요청 검증, 생성 옵션, 응답 직렬화, 관측성 로그가 서로 다른 책임입니다. 이 글의 예제는 이 중 **모델 준비**와 **HTTP 계약**만 최소 단위로 보여 줍니다. 작은 데모라도 health check와 generate endpoint를 분리해 두면 운영 코드로 확장하기 쉬워집니다.
 
-```mermaid
-flowchart LR
-    A[LoRA 어댑터 한 step 업데이트] --> B[FastAPI 앱 생성]
-    B --> C[health 엔드포인트]
-    B --> D[generate 엔드포인트]
-    C --> E[TestClient 검증]
-    D --> E
-```
-
+![데모 서빙에서 꼭 분리해서 볼 것](../../../assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.ko.png)
 ## 최소 실행 예제
 
 ```python

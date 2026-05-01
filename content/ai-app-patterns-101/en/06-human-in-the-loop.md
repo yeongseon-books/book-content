@@ -27,16 +27,7 @@ last_reviewed: '2026-05-01'
 
 > Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.
 
-```mermaid
-flowchart LR
-    Request[Customer request] --> Draft[LLM draft]
-    Draft --> Score[Confidence check]
-    Score -->|High| Auto[Auto approval]
-    Score -->|Low| Human[Human review]
-    Human --> Final[Final response]
-    Auto --> Final
-```
-
+![Questions this post answers](../../../assets/ai-app-patterns-101/06/06-01-questions-this-post-answers.en.png)
 > AI App Patterns 101 (6/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/06-human-in-the-loop)

@@ -31,16 +31,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 If you push every task into one giant agent, prompts grow, roles blur, and behavior becomes harder to debug. A supervisor-worker graph fixes that by separating routing, execution, and final assembly into named nodes.
 
-```mermaid
-flowchart LR
-    A[User request] --> B[supervisor]
-    B -->|research| C[research_worker]
-    B -->|code| D[code_worker]
-    C --> E[finalize]
-    D --> E
-    E --> F[END]
-```
-
+![Questions this post answers](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
 ```python

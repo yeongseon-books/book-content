@@ -28,16 +28,7 @@ last_reviewed: '2026-05-01'
 
 네 번째 글에서는 벡터 저장소의 “알고리즘 레이어”를 봅니다. 현재 환경에는 annoy가 없으므로 예제는 FAISS flat index와 IVF index를 비교합니다. 중요한 점은 벡터는 그대로 두고 검색 방식만 바꿔야 한다는 것입니다.
 
-```mermaid
-flowchart LR
-    V[동일한 dense vectors] --> F[IndexFlatIP]
-    V --> I[IndexIVFFlat]
-    Q[평가 query vectors] --> S[search top-k]
-    F --> S
-    I --> S
-    S --> R[hit rate · MRR · search latency]
-```
-
+![이 글에서 답할 질문](../../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
 실행 코드는 `rag-benchmark-101/ko/04-vectordb-selection/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.

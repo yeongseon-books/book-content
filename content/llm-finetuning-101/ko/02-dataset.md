@@ -37,14 +37,7 @@ last_reviewed: '2026-05-01'
 
 파인튜닝 데이터는 보통 세 층으로 나뉩니다. **원본 샘플**, **프롬프트 템플릿을 적용한 텍스트**, **토크나이즈된 텐서**입니다. 이 세 층을 분리해서 생각해야 필터링 문제와 토큰 길이 문제를 따로 잡을 수 있습니다.
 
-```mermaid
-flowchart LR
-    A[원본 JSONL] --> B[유효성 검사]
-    B --> C[Instruction 템플릿 적용]
-    C --> D[토크나이저 전처리]
-    D --> E[학습용 컬럼 확인]
-```
-
+![데이터셋에서 먼저 고정할 것](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.ko.png)
 ## 최소 실행 예제
 
 ```python
