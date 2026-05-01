@@ -14,7 +14,6 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
-title: What is an embedding — converting text into vectors
 ---
 
 # What is an embedding — converting text into vectors
@@ -35,7 +34,7 @@ This post focuses on the concept and intuition behind embeddings. Code is minima
 - a first hands-on example that produces real vectors
 - where embeddings fall short and what to watch for
 
-![What is an embedding: converting text into vectors](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
+![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: an embedding compresses text into a high-dimensional vector. Sentences with similar meaning land close together in that space.
@@ -50,6 +49,7 @@ After this chapter, the next one moves on to **HuggingFace embeddings in practic
 
 ## The ceiling of keyword search
 
+![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
 Traditional search ranks results by term frequency and position. TF-IDF and BM25 are the canonical examples. These methods are fast, interpretable, and accurate when the query shares vocabulary with the document.
 
 The problem is that language does not stay still. The same concept surfaces in many forms.
@@ -66,6 +66,7 @@ Embeddings reframe the problem. Instead of asking "does this document contain th
 
 ## Vector space intuition
 
+![Text entering vector space flow](../../../assets/vector-search-101/01/01-02-vector-space-intuition.en.png)
 An embedding model converts text into a fixed-length array of floating-point numbers. With `sentence-transformers/all-MiniLM-L6-v2`, every input — regardless of length — becomes a 384-dimensional vector. Models with 768 or 1536 dimensions are also common.
 
 ```
@@ -88,6 +89,7 @@ The value ranges from -1 to 1. Closer to 1 means more similar; 0 means unrelated
 
 ## How embedding models learn
 
+![Positive and negative pair training structure](../../../assets/vector-search-101/01/01-03-how-embedding-models-learn.en.png)
 An embedding model is trained to place semantically similar sentence pairs close together and unrelated pairs far apart. The dominant training paradigm is contrastive learning.
 
 Training data is typically structured like this:
@@ -103,6 +105,7 @@ The model updates its parameters to reduce the vector distance between positive 
 
 ## Creating your first vectors
 
+![Three sentence encoding execution path](../../../assets/vector-search-101/01/01-04-creating-your-first-vectors.en.png)
 Running the code once is faster than re-reading the theory. Install `sentence-transformers` and encode three sentences.
 
 ```bash
@@ -126,6 +129,15 @@ print(f"number of vectors: {len(embeddings)}")
 print(f"vector dimension: {embeddings[0].shape[0]}")
 print(f"first vector (first 5 values): {embeddings[0][:5]}")
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    number of vectors: 3
+    vector dimension: 384
+    first vector (first 5 values): [-0.09979379  0.00370044 -0.10362536  0.14163396 -0.04871269]
+
+<!-- injected-output:end -->
 
 Running this gives output similar to:
 
@@ -158,6 +170,14 @@ print(f"[0] vs [1] (similar meaning): {cosine_similarity(embeddings[0], embeddin
 print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddings[2]):.4f}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    [0] vs [1] (similar meaning): 0.6201
+    [0] vs [2] (unrelated):       0.0056
+
+<!-- injected-output:end -->
+
 Expected output:
 
 ```
@@ -171,6 +191,7 @@ Expected output:
 
 ## Where embeddings fall short
 
+![Limits with exact strings and long documents](../../../assets/vector-search-101/01/01-05-where-embeddings-fall-short.en.png)
 Embeddings are not a universal replacement for keyword search. Several situations favor the older approach.
 
 **Exact identifiers and codes.** Searching for `ERR_CONNECTION_REFUSED` or `CVE-2024-12345` works better with keyword search. Embedding models abstract meaning, and in doing so they can blur precise symbolic information.

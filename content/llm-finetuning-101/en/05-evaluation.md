@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## Questions this post answers
 
+![Separation between pre-training and post-training evaluation](../../../assets/llm-finetuning-101/05/05-01-questions-this-post-answers.en.png)
 - How do you compute perplexity right after fine-tuning?
 - Why is perplexity useful but still incomplete as a quality signal?
 - Why should evaluation live outside the training loop even in a tiny demo?
@@ -35,6 +36,7 @@ The example in this post trains a tiny LoRA-wrapped GPT-2 model for one step and
 
 ## The right way to read perplexity
 
+![Relationship between perplexity and other quality metrics](../../../assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
 Lower perplexity is usually better, but the absolute value can be noisy on tiny models, tiny datasets, and short contexts. That is why perplexity is most useful as a regression guardrail. It is excellent for asking whether a change made things worse or better relative to a baseline.
 
 ![The right way to read perplexity](../../../assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png)
@@ -61,12 +63,14 @@ after = perplexity(peft_model, eval_dataset)
 
 ## What to notice in this code
 
+![Flow from mean loss to perplexity](../../../assets/llm-finetuning-101/05/05-03-what-to-notice-in-this-code.en.png)
 - The evaluation function stays separate from training so you do not accidentally update parameters while measuring them.
 - `model.eval()` and `torch.no_grad()` keep dropout and memory usage stable during evaluation.
 - In real work, perplexity should sit beside task metrics and human review, not replace them.
 
 ## Where engineers get confused
 
+![Overfitting signal and comparison flow](../../../assets/llm-finetuning-101/05/05-04-where-engineers-get-confused.en.png)
 - Better perplexity does not automatically mean better answer formatting or factuality.
 - Using identical train and eval text can make metrics look optimistic. This demo accepts that trade-off to keep the example small.
 - Small numeric changes are normal in a one-step tiny-model example. The point is validating the evaluation pipeline.

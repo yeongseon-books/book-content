@@ -60,6 +60,7 @@ Once you think in those layers, prompt design becomes easier to maintain.
 
 ## Understanding the three roles
 
+![Roles merged into one messages array](../../assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.en.png)
 Each role has a different purpose.
 
 ### `system`
@@ -82,6 +83,7 @@ That means multi-turn conversation is not a hidden built-in memory feature. It i
 
 ## How a system message changes the answer
 
+![Same question with and without system](../../assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.en.png)
 It is easier to understand `system` by comparing outputs directly. The script below sends the same user question twice. The first request has no system message. The second adds a system instruction that constrains language, audience, and output structure. The contrast is usually obvious.
 
 ```python
@@ -125,6 +127,63 @@ print("[with system]")
 print(with_system.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    [without system]
+    **Python Dictionaries vs Lists: Key Differences**
+    =====================================================
+
+    In Python, `dict` (dictionary) and `list` are two fundamental data structures used to store collections of data. While both can store multiple values, they differ significantly in their structure, usage, and application.
+
+    **List**
+    --------
+
+    A `list` is an ordered collection of items that can be of any data type, including strings, integers, floats, and other lists. Lists are denoted by square brackets `[]` and are indexed, meaning each item has a unique position.
+
+    **Example:**
+    ```python
+    my_list = [1, 2, 3, "hello", 4.5]
+    print(my_list[0])  # Output: 1
+    ```
+    **Dictionary**
+    --------------
+
+    A `dict` (dictionary) is an unordered collection of key-value pairs. Dictionaries are denoted by curly brackets `{}` and are indexed by keys, which can be any immutable data type (e.g., strings, integers, tuples).
+
+    **Example:**
+    ```python
+    my_dict = {"name": "John", "age": 30, "city": "New York"}
+    print(my_dict["name"])  # Output: John
+    ```
+    **Key differences:**
+
+    1. **Order**: Lists are ordered, while dictionaries are unordered.
+    2. **Indexing**: Lists are indexed by their position, while dictionaries are indexed by keys.
+    3. **Data type**: Lists can store any data type, while dictionaries can only store key-value pairs.
+    4. **Lookup**: Lists require iterating through the collection to find a specific item, while dictionaries allow for fast lookup using the key.
+
+    **When to use each:**
+
+    * Use a `list` when:
+    	+ You need to store a collection of items in a specific order.
+    	+ You need to perform operations like indexing, slicing, or sorting.
+    * Use a `dict` when:
+    	+ You need to store key-value pairs.
+    	+ You need to perform fast lookups using keys.
+
+    In summary, while both lists and dictionaries can store multiple values, they differ in their structure, usage, and application. Choose the right data structure based on your specific needs.
+
+    [with system]
+    In Python, a dictionary and a list are two different data structures that are used to store collections of data. The main difference between them is that a list is an ordered collection of items, where each item has an index or position, whereas a dictionary is an unordered collection of key-value pairs. Think of a list like a shopping list where you have items in a specific order, and a dictionary like a phonebook where you have names (keys) associated with phone numbers (values).
+
+    Here are some key differences:
+    * **Ordered vs Unordered**: Lists are ordered, while dictionaries are unordered.
+    * **Indexed vs Keyed**: Lists are indexed by a numerical index, while dictionaries are keyed by a unique value.
+    * **Homogeneous vs Heterogeneous**: Lists can only contain items of the same data type, while dictionaries can contain items of different data types.
+
+<!-- injected-output:end -->
+
 The facts may overlap, but the style usually does not. A good system message makes these parts more stable:
 
 - response language
@@ -139,6 +198,7 @@ A system message is not a perfect hard lock. It is the strongest steering input,
 
 ## Building multi-turn history with assistant messages
 
+![Assistant reply replay in the next turn](../../assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.en.png)
 In many application flows, the provider does not remember the full conversation for you. If the next request only includes the latest user message, the model only sees that latest message.
 
 To preserve context, the application has to replay the conversation, including the model's earlier answer as an `assistant` message.
@@ -190,6 +250,29 @@ print("[assistant turn 2]")
 print(second.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    [assistant turn 1]
+    In Python, lists and tuples are both data structures used to store multiple values, but they differ in their mutability. Lists are mutable, meaning their contents can be modified after creation, and are denoted by square brackets `[]`. Tuples, on the other hand, are immutable, meaning their contents cannot be modified after creation, and are denoted by parentheses `()`. This difference in mutability affects how they are used in code, with lists often being used when the data needs to be changed, and tuples when the data is fixed and should not be altered.
+
+    [assistant turn 2]
+    In Python, lists and tuples are both data structures used to store multiple values, but they differ in their mutability. Lists are mutable, meaning their contents can be modified after creation, and are denoted by square brackets `[]`. Tuples, on the other hand, are immutable, meaning their contents cannot be modified after creation, and are denoted by parentheses `()`. This difference in mutability affects how they are used in code, with lists often being used when the data needs to be changed, and tuples when the data is fixed and should not be altered.
+
+    ```python
+    # Create a list and a tuple
+    my_list = [1, 2, 3]
+    my_tuple = (1, 2, 3)
+
+    # Attempt to modify the tuple (will raise an error)
+    try:
+        my_tuple[0] = 4
+    except TypeError:
+        print("Tuples are immutable!")
+    ```
+
+<!-- injected-output:end -->
+
 That append step is the core of chatbot memory.
 
 This cannot grow forever. As Post 02 showed, conversation history consumes tokens. In practice, applications usually choose one of three strategies:
@@ -204,6 +287,7 @@ Post 05 will cover conversation state in more depth. For now, the key takeaway i
 
 ## Temperature and top_p: consistency versus variety
 
+![Low and high sampling control comparison](../../assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.en.png)
 Prompt wording is only part of output control. Sampling parameters matter too. The first two to learn are `temperature` and `top_p`.
 
 ### `temperature`
@@ -243,6 +327,17 @@ for temperature in (0.0, 0.9):
     print(completion.choices[0].message.content)
     print()
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    [temperature=0.0]
+    FastAPI is a modern, fast (high-performance), web framework for building APIs with Python. It allows developers to create robust, scalable, and secure APIs quickly and efficiently, with features like automatic API documentation and support for asynchronous programming. FastAPI is designed to be highly productive, with a focus on simplicity, readability, and ease of use, making it an ideal choice for building web APIs.
+
+    [temperature=0.9]
+    FastAPI is a modern, fast (high-performance), web framework for building APIs with Python. It's designed to simplify the creation of robust and efficient APIs, with features like automatic API documentation, built-in support for WebSockets, and high performance thanks to the use of asynchronous programming. FastAPI is ideal for building scalable APIs that can handle high traffic and are easy to maintain.
+
+<!-- injected-output:end -->
 
 ### `top_p`
 
@@ -301,6 +396,30 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    **What is a dataclass?**
+
+    A dataclass is a special type of class in Python that automatically generates special methods like `__init__`, `__repr__`, and `__eq__` based on the class's attributes. This makes it easier to create classes that primarily hold data and don't need complex logic.
+
+    **Example code:**
+    ```python
+    from dataclasses import dataclass
+
+    @dataclass
+    class Person:
+        name: str
+        age: int
+
+    p = Person("John", 30)
+    print(p)  # Output: Person(name='John', age=30)
+    ```
+
+    **Use case:** Use dataclasses to define simple data structures, such as user profiles, product information, or game objects, where the focus is on storing and representing data rather than complex behavior.
+
+<!-- injected-output:end -->
+
 This works well because the task is explicit, the background stays visible, and the output shape becomes testable.
 
 ---
@@ -345,12 +464,21 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    Definition: A decorator is a function that modifies or extends the behavior of another function without permanently changing it.
+    Analogy: It is like a gift wrapper that adds a new layer to a present without altering its original contents.
+
+<!-- injected-output:end -->
+
 This can be very effective, but every example consumes tokens. Short, representative examples usually work better than long ones.
 
 ---
 
 ## Common prompt design mistakes
 
+![Prompt mistakes that destabilize output](../../assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.en.png)
 These mistakes show up repeatedly in first-generation LLM apps.
 
 ### Putting shared policy only in the user message

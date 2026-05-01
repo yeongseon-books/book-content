@@ -43,12 +43,14 @@ last_reviewed: '2026-05-01'
 
 ## 왜 mock 응답부터 다루는가
 
+![왜 mock 응답부터 다루는가](../../../assets/korean-ai-stack-101/04/04-01-mock.ko.png)
 OCR 연동의 난점은 API 호출 자체보다 응답 후처리에 있는 경우가 많습니다. 표 셀 순서가 뒤바뀌거나 줄바꿈이 어긋나는 문제는 mock 응답만으로도 충분히 재현할 수 있습니다.
 
 ---
 
 ## 최소 실행 예제
 
+![최소 실행 예제](../../../assets/korean-ai-stack-101/04/04-02-diagram.ko.png)
 ```python
 MOCK_RESPONSE = {
     'images': [
@@ -76,6 +78,7 @@ for image in MOCK_RESPONSE['images']:
 
 ## 이 코드에서 봐야 할 것
 
+![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/04/04-03-diagram-2.ko.png)
 - `inferText`만 보는 것이 아니라 `lineBreak`를 같이 봅니다.
 - confidence를 남겨 둬야 후속 단계에서 재검토가 가능합니다.
 - raw payload와 후처리 결과를 함께 출력하는 습관이 중요합니다.
@@ -85,6 +88,7 @@ for image in MOCK_RESPONSE['images']:
 
 ## 실무에서 헷갈리는 지점
 
+![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/04/04-04-diagram-3.ko.png)
 - OCR 정확도가 높다고 바로 RAG 품질이 좋아지지는 않습니다.
 - confidence는 절대 진실값이 아닙니다.
 - PDF와 이미지 OCR은 전처리 포인트가 다릅니다.

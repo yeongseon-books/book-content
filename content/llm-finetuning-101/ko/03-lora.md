@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## 이 글에서 답할 질문
 
+![LoRA 어댑터 부착과 학습 경로 흐름](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.ko.png)
 - `LoraConfig`에서 꼭 이해해야 할 필드는 무엇일까?
 - `target_modules`를 잘못 고르면 어떤 문제가 생길까?
 - 소형 GPT-2 계열에서 학습 가능한 파라미터 비율은 어느 정도로 내려갈까?
@@ -35,6 +36,7 @@ last_reviewed: '2026-05-01'
 
 ## 설정에서 의미가 큰 필드
 
+![저랭크 분해와 스케일 적용 구조](../../../assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.ko.png)
 `r`은 저랭크 차원, `lora_alpha`는 스케일, `lora_dropout`은 어댑터 경로에만 적용되는 드롭아웃입니다. 그리고 실무에서 가장 사고가 많이 나는 항목이 `target_modules`입니다. 이 목록이 틀리면 어댑터가 전혀 붙지 않거나, 원하지 않는 레이어에 붙습니다.
 
 ![설정에서 의미가 큰 필드](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.ko.png)
@@ -58,12 +60,14 @@ peft_model.print_trainable_parameters()
 
 ## 이 코드에서 봐야 할 것
 
+![GPT 계열 target module 선택 구조](../../../assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.ko.png)
 - GPT-2 계열은 attention과 projection 모듈 이름이 `c_attn`, `c_proj` 형태라서 target module을 문자열로 정확히 맞춰야 합니다.
 - 실행 시 `fan_in_fan_out` 경고가 보일 수 있는데, GPT-2의 `Conv1D` 래퍼에 맞게 PEFT가 내부적으로 보정하는 정상 동작입니다.
 - 이 글의 예제는 설정 확인용입니다. 실제 학습은 4편에서 `Trainer`와 연결합니다.
 
 ## 실무에서 헷갈리는 지점
 
+![풀 파인튜닝과 LoRA 파라미터 규모 비교](../../../assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.ko.png)
 - LoRA를 붙였다고 바로 학습되는 것은 아닙니다. 어댑터를 붙이는 단계와 옵티마이저로 업데이트하는 단계는 별개입니다.
 - `r`을 크게 잡으면 성능이 무조건 좋아지지 않습니다. 데이터가 작을수록 과적합과 메모리 증가를 함께 봐야 합니다.
 - 작은 데모 모델에서 맞는 모듈 이름이 큰 모델에서도 그대로 통하지 않을 수 있습니다. 항상 모델별 모듈 구조를 확인해야 합니다.

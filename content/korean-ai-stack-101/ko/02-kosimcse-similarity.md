@@ -43,12 +43,14 @@ last_reviewed: '2026-05-01'
 
 ## 왜 FAQ 질문만 먼저 인덱싱할까
 
+![왜 FAQ 질문만 먼저 인덱싱할까](../../../assets/korean-ai-stack-101/02/02-01-faq.ko.png)
 질문과 답변을 한 번에 임베딩하면 어디서 검색이 어긋나는지 읽기 어렵습니다. 첫 버전은 질문만 인덱싱하고, 검색된 질문에 연결된 답변을 붙여 보는 편이 디버깅이 쉽습니다.
 
 ---
 
 ## 최소 실행 예제
 
+![최소 실행 예제](../../../assets/korean-ai-stack-101/02/02-02-diagram.ko.png)
 ```python
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -75,6 +77,7 @@ print(distances, indices)
 
 ## 이 코드에서 봐야 할 것
 
+![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/02/02-03-diagram-2.ko.png)
 - 답변이 아니라 **질문 문장**을 인덱싱합니다.
 - `normalize_embeddings=True`와 `IndexFlatIP`를 같이 쓰면 코사인 유사도를 단순하게 계산할 수 있습니다.
 - 질의를 여러 표현으로 바꿔도 상위 결과가 비슷하게 유지되는지 봐야 합니다.
@@ -84,6 +87,7 @@ print(distances, indices)
 
 ## 실무에서 헷갈리는 지점
 
+![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/02/02-04-diagram-3.ko.png)
 - 문장 유사도 검색은 생성이 아닙니다. 검색과 답변 생성을 분리해서 봐야 합니다.
 - 높은 점수 하나보다 후보 간 간격과 실제 문장 의미를 함께 봐야 합니다.
 - FAQ용 설정을 긴 문서 검색에 그대로 가져가면 안 됩니다.

@@ -34,6 +34,7 @@ As soon as an agent becomes conversational, single-shot execution stops being en
 ![Questions this post answers](../../../assets/langgraph-101/02/02-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+![Resume flow through thread_id](../../../assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
 ```python
 from typing import Annotated
 
@@ -96,12 +97,14 @@ Runnable file: `/root/Github/langgraph-101/en/02-state-and-checkpoints/main.py`
 
 ## What to notice in this code
 
+![Message accumulation and turn_count updates](../../../assets/langgraph-101/02/02-02-what-to-notice-in-this-code.en.png)
 - `add_messages` appends new messages instead of overwriting history.
 - `graph.compile(checkpointer=MemorySaver())` attaches persistence in one place.
 - The second `invoke()` sends only the new message, but the same `thread_id` restores prior state automatically.
 
 ## Where engineers get confused
 
+![Checkpointer and merge rule relationships](../../../assets/langgraph-101/02/02-03-where-engineers-get-confused.en.png)
 - A checkpointer is not “memory magic.” It is a state store that makes memory-like behavior possible.
 - A weak `thread_id` strategy can mix sessions from different users.
 - Persistence does not mean every field merges the way you want. Accumulating fields must be modeled explicitly.
@@ -114,6 +117,7 @@ Runnable file: `/root/Github/langgraph-101/en/02-state-and-checkpoints/main.py`
 
 ## Summary
 
+![Conversation resume timeline across turns](../../../assets/langgraph-101/02/02-04-summary.en.png)
 Once you add a checkpointer, a graph stops being a one-off function call and becomes a resumable conversation system. In the next post, we use saved state to decide which node should run next with conditional edges.
 
 <!-- toc:begin -->

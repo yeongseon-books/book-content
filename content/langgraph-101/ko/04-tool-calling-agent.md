@@ -34,6 +34,7 @@ last_reviewed: '2026-05-01'
 ![이 글에서 답할 질문](../../../assets/langgraph-101/04/04-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
+![agent와 tools가 왕복하는 도구 루프 흐름](../../../assets/langgraph-101/04/04-01-minimal-runnable-example.ko.png)
 ```python
 import ast
 import json
@@ -156,12 +157,14 @@ export GROQ_API_KEY=... && python main.py
 
 ## 이 코드에서 봐야 할 것
 
+![도구 호출과 ToolMessage가 이어지는 구조](../../../assets/langgraph-101/04/04-02-what-to-notice-in-this-code.ko.png)
 - `@tool` docstring이 곧 모델이 읽는 도구 설명입니다.
 - `ToolNode(TOOLS)`가 실제 호출과 `ToolMessage` 생성 책임을 가져갑니다.
 - `tools_condition`은 마지막 AI 메시지에 tool call이 있으면 `tools`, 없으면 `END`로 보냅니다.
 
 ## 실무에서 헷갈리는 지점
 
+![마지막 메시지로 종료를 판단하는 분기 흐름](../../../assets/langgraph-101/04/04-03-where-engineers-get-confused.ko.png)
 - 도구 실행 코드를 직접 루프 안에 쓰기 시작하면 나중에 재시도, 로깅, 테스트가 모두 꼬입니다. `ToolNode`로 분리하는 편이 낫습니다.
 - `bind_tools()`만 한다고 그래프가 도구를 자동 실행하지는 않습니다. 실행 노드와 복귀 엣지가 따로 있어야 합니다.
 - 계산 도구처럼 결정적이어야 디버깅이 쉽습니다. 계산 도구는 raw `eval()` 대신 엄격한 산술 파서를 유지하는 편이 안전합니다.
@@ -174,6 +177,7 @@ export GROQ_API_KEY=... && python main.py
 
 ## 정리
 
+![질문에서 근거 있는 답으로 가는 반응 흐름](../../../assets/langgraph-101/04/04-04-summary.ko.png)
 여기까지 오면 LangGraph가 단순 오케스트레이션 도구가 아니라 에이전트 런타임처럼 느껴지기 시작합니다. 다음 글에서는 이 패턴을 확장해 감독자와 작업자가 협력하는 멀티 에이전트 그래프로 넘어갑니다.
 
 <!-- toc:begin -->

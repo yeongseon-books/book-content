@@ -47,6 +47,9 @@ Topics:
 
 ## Basic chatbot: manual history
 
+### Stateless call with replayed history
+
+![Stateless call with replayed history](../../../assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png)
 The simplest approach: accumulate messages in a list and send the full list with every request.
 
 ```python
@@ -82,6 +85,9 @@ As history accumulates, the context window fills up. `llama-3.1-8b-instant` has 
 
 ## Memory window — keeping the last N messages
 
+### Sliding window message retention
+
+![Sliding window message retention](../../../assets/ai-app-patterns-101/01/01-02-sliding-window-message-retention.en.png)
 Drop old messages and retain only the most recent N. This keeps context length predictable.
 
 ```python
@@ -139,6 +145,9 @@ for turn in turns:
 
 ## Conversation summary to control context
 
+### Summary memory with recent turns
+
+![Summary memory with recent turns](../../../assets/ai-app-patterns-101/01/01-03-summary-memory-with-recent-turns.en.png)
 A window simply discards old messages. Summarization compresses them.
 
 ```python
@@ -223,6 +232,9 @@ for msg in conversations:
 
 ## Session-based chatbot
 
+### Session-scoped conversation state
+
+![Session-scoped conversation state](../../../assets/ai-app-patterns-101/01/01-04-session-scoped-conversation-state.en.png)
 Apps with multiple users need conversation state keyed by session ID.
 
 ```python
@@ -290,6 +302,9 @@ print(f"session A history length: {len(sessions[session_a])}")
 
 ## Where engineers get confused
 
+### Branching from full history to compression
+
+![Branching from full history to compression](../../../assets/ai-app-patterns-101/01/01-05-branching-from-full-history-to-compressi.en.png)
 - Persisting chat history does not give the model durable memory; it only replays prior turns on every request.
 - Session identity and user identity are related but not identical. One user can have multiple concurrent sessions.
 - As history grows, cost and latency often break first, long before the chatbot stops working.

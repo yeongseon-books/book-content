@@ -43,12 +43,14 @@ last_reviewed: '2026-05-01'
 
 ## 왜 공급자 대체 실습이 유효한가
 
+![왜 공급자 대체 실습이 유효한가](../../../assets/korean-ai-stack-101/05/05-01-diagram.ko.png)
 독자가 항상 HyperCLOVA X나 Solar 키를 가지고 있지는 않습니다. 예제가 실행되지 않으면 프롬프트 설계와 후처리 포인트를 체감하기 어렵습니다. 호출 인터페이스와 운영 감각을 먼저 잡는 데는 Groq 예제로도 충분합니다.
 
 ---
 
 ## 최소 실행 예제
 
+![최소 실행 예제](../../../assets/korean-ai-stack-101/05/05-02-diagram-2.ko.png)
 ```python
 import os
 from groq import Groq
@@ -70,6 +72,7 @@ print(response.choices[0].message.content)
 
 ## 이 코드에서 봐야 할 것
 
+![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/05/05-03-diagram-3.ko.png)
 - 시스템 메시지를 한국어로 구체화합니다.
 - `temperature`를 낮게 두면 설명형 응답의 흔들림이 줄어듭니다.
 - 출력 형식을 미리 제한하면 후처리가 쉬워집니다.
@@ -79,6 +82,7 @@ print(response.choices[0].message.content)
 
 ## 실무에서 헷갈리는 지점
 
+![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/05/05-04-diagram-4.ko.png)
 - 한국어에 자연스럽게 답한다고 해서 사실성까지 자동으로 보장되지는 않습니다.
 - OpenAI 호환 인터페이스라고 해도 모델별 한도와 오류 특성은 다를 수 있습니다.
 - 자세한 프롬프트와 응답 검증은 별개입니다.

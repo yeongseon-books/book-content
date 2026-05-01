@@ -34,6 +34,16 @@ One of the most common RAG mistakes is mixing “similar meaning” with “allo
 
 This example loads three tiny documents into FAISS and changes the `filter` parameter by category and quarter so the retrieval behavior is explicit.
 
+## Metadata schema design
+
+![Retrieval metadata schema flow](../../../assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
+The schema is less about collecting many fields and more about keeping the few keys that actually shrink the candidate set.
+
+## How filters narrow the candidate set
+
+![Filtered retrieval candidate flow](../../../assets/document-ingestion-101/03/03-02-how-filters-narrow-the-candidate-set.en.png)
+Even when multiple chunks are semantically similar, filters stabilize retrieval by narrowing scope before ranking.
+
 ## Runnable example
 
 ```python
@@ -144,11 +154,21 @@ Q4 infrastructure cost engineering - ...
 
 ## What to notice in this code
 
+### How similarity and filters combine
+
+![Similarity and filter processing flow](../../../assets/document-ingestion-101/03/03-01-how-similarity-and-filters-combine.en.png)
+Similarity and filtering work best as separate stages with a visible order, not as one opaque retrieval step.
+
 - `ChunkSpec` keeps text and metadata together, so the retrieval schema is visible in one place.
 - `SimpleHashEmbeddings` keeps the demo offline while still exercising the real `filter` path.
 - The key observation is that the same query yields different result sets once the filter changes.
 
 ## Where engineers get confused
+
+### How source tracking supports audits
+
+![Source tracking and audit path](../../../assets/document-ingestion-101/03/03-02-how-source-tracking-supports-audits.en.png)
+When an answer looks wrong, source and scope metadata usually explain the failure faster than the chunk text alone.
 
 - More metadata is not automatically better. Keep the fields you will actually filter on.
 - When retrieval looks wrong, the issue may be the candidate set rather than the embedding model.

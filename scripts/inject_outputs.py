@@ -65,7 +65,7 @@ MARKER_BLOCK_RE = re.compile(
 
 MAX_OUTPUT_LINES = 60
 MAX_OUTPUT_BYTES = 4096
-TIMEOUT_SECS = 45
+TIMEOUT_SECS = 60
 
 AI_SERIES = [
     "llm-app-foundations-101",
@@ -82,23 +82,12 @@ AI_SERIES = [
     "rag-deep-dive",
 ]
 
-_LLM_CALL_PATTERNS = re.compile(
-    r"chat\.completions\.create"
-    r"|AsyncGroq"
-    r"|stream=True"
-    r"|\.stream\("
+_SKIP_PATTERNS = re.compile(
+    r"stream=True"
     r"|EventSource"
     r"|StreamingResponse"
-    r"|ChatGroq\("
-    r"|ChatOpenAI\("
-    r"|langchain"
-    r"|\.invoke\("
-    r"|chain\.run\("
-    r"|llm\.predict\("
-    r"|agent_executor"
-    r"|rag_chain"
-    r"|groq\.Client\(\)"
-    r"|Groq\(\)",
+    r"|AsyncGroq"
+    r"|asyncio\.run\(",
 )
 
 
@@ -124,7 +113,7 @@ def _make_output_block(out: str, lang: str) -> str:
 def run_block(code: str) -> str | None:
     if "input(" in code:
         return None
-    if _LLM_CALL_PATTERNS.search(code):
+    if _SKIP_PATTERNS.search(code):
         return None
 
     env = {**os.environ, "GROQ_API_KEY": os.environ.get("GROQ_API_KEY", "")}

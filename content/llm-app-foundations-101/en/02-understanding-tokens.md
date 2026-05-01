@@ -46,6 +46,7 @@ The central idea is simple: **LLM applications run on token budgets, not on raw 
 
 ## What a token actually is
 
+![Text split into model token pieces](../../assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.en.png)
 A token is a chunk of text from the model's point of view. That chunk is not guaranteed to be a word. Sometimes a short common word becomes one token. Sometimes a longer word is split into several pieces. Korean text can split across stems, particles, and endings. Numbers, whitespace, newlines, punctuation, and code symbols all count too.
 
 These three inputs may feel similar to a human reader:
@@ -64,6 +65,7 @@ For application work, you do not need to master tokenizer theory. You do need on
 
 ## Why tokens matter so much
 
+![Similar inputs with uneven token cost](../../assets/llm-app-foundations-101/02/02-02-why-tokens-matter-so-much.en.png)
 Tokens are not just an internal implementation detail. They drive the three things that shape application behavior most often: cost, speed, and limits.
 
 Start with cost. Most LLM APIs charge based on input tokens and output tokens. The exact pricing table varies by provider and model, but the structure stays familiar. A longer prompt costs more on the input side. A longer answer costs more on the output side. Adding a system prompt, a large conversation history, or multiple retrieved passages increases total token usage, even if the user only asked a short question.
@@ -84,6 +86,7 @@ Once you start looking at logs through that lens, many “mysterious” LLM beha
 
 ## Revisiting `usage.prompt_tokens`, `completion_tokens`, and `total_tokens`
 
+![Usage fields for input output and total](../../assets/llm-app-foundations-101/02/02-03-revisiting-usage-prompt-tokens-completio.en.png)
 Post 01 introduced the `usage` field. Now we need to read it like an operator, not like a curious beginner. Every code example in this post is written so you can copy and run it directly. The example below makes a real call with the Groq Python SDK and prints the usage numbers.
 
 ```python
@@ -113,6 +116,40 @@ print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    **Introduction to Python Decorators**
+
+    Python decorators are a powerful feature in Python that allow developers to modify or extend the behavior of a function or class without permanently changing its implementation. A decorator is essentially a small function that takes another function as an argument and returns a new function that "wraps" the original function. This allows decorators to add additional functionality to the original function, such as logging, authentication, or caching, without modifying the function itself.
+
+    **Basic Decorator Syntax**
+
+    A basic decorator in Python typically follows this syntax:
+    ```python
+    def my_decorator(func):
+        def wrapper():
+            # Additional functionality or logic here
+            func()
+        return wrapper
+
+    @my_decorator
+    def my_function():
+        # Function implementation
+        pass
+    ```
+    Here, `my_decorator` is the decorator function, `wrapper` is the function returned by the decorator, and `my_function` is the original function being decorated. When `my_function` is called, it will actually execute `wrapper`, which includes the additional functionality provided by the decorator. This syntax, using the `@` symbol before the decorator name, is a shorthand for:
+    ```python
+    my_function = my_decorator(my_function)
+    ```
+
+    finish_reason=stop
+    prompt_tokens=46
+    completion_tokens=242
+    total_tokens=288
+
+<!-- injected-output:end -->
+
 Each field tells you something different.
 
 ### `prompt_tokens`
@@ -135,6 +172,7 @@ In production-style logging, it is worth storing `model`, `prompt_tokens`, `comp
 
 ## Estimating token count with `tiktoken`
 
+![Token estimate path before API send](../../assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.en.png)
 Reading usage after the call is necessary, but it is not enough. You also want a preflight estimate before sending the request. That helps you decide whether to trim input, summarize older messages, or split one large job into multiple calls.
 
 Install `tiktoken` like this:
@@ -261,6 +299,26 @@ print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    **Generators vs Lists in Python**
+    =====================================
+
+    Python generators and lists are two different data structures that can be used to store and retrieve collections of values. Here's a brief overview of their key differences:
+
+    **Lists**
+    ---------
+
+    A list is a data structure in Python that stores multiple values in a single variable. Lists are defined using square brackets `[]` and are ordered collections of values.
+
+    **
+
+    completion_tokens=80
+    finish_reason=length
+
+<!-- injected-output:end -->
+
 `max_tokens` affects more than length alone.
 
 - a smaller value often produces shorter, faster, cheaper answers
@@ -273,6 +331,7 @@ It is also important to remember what `max_tokens` is not. It is not a promise t
 
 ## Detecting long-prompt problems with `finish_reason`
 
+![Context overflow and length cutoff branches](../../assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.en.png)
 Once prompts get longer, two failure modes show up often. The request itself may approach the context limit, or the answer may hit a generation cap and stop midstream. In both cases, you want explicit detection instead of guessing from the final text.
 
 The script below creates a long repeated input, estimates its token size with `tiktoken`, sends the request with a small `max_tokens`, and checks `finish_reason`.
@@ -321,6 +380,19 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("Warning: the response stopped because it hit a length limit.")
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    estimated_prompt_tokens=3015
+    Unfortunately, there was no text provided to summarize. The text consisted of repeated sentences stating the same question numerous times. If you provide the actual text, I would be happy to assist you in summarizing the key points as 10 bullets for you.
+
+    prompt_tokens=3050
+    completion_tokens=51
+    total_tokens=3101
+    finish_reason=stop
+
+<!-- injected-output:end -->
 
 Three things matter here.
 

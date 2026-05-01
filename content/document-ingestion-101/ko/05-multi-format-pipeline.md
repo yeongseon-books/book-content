@@ -34,6 +34,16 @@ last_reviewed: '2026-05-01'
 
 이번 예제는 세 포맷을 각각 읽되 최종 출력은 모두 같은 `Document` 구조로 맞춥니다. 그래야 이후 청킹과 인덱싱 단계가 포맷 차이를 의식하지 않아도 됩니다.
 
+## 포맷별 로더 라우팅 흐름
+
+![포맷별 로더가 선택되는 라우팅 흐름](../../../assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.ko.png)
+다중 포맷 지원의 출발점은 로더를 많이 만드는 일보다 라우팅 책임을 한곳에 모으는 일입니다.
+
+## 포맷별 전처리 분기 구조
+
+![포맷별 전처리가 갈리는 분기 구조](../../../assets/document-ingestion-101/05/05-02-format-specific-preprocessing.ko.png)
+포맷별 전처리는 서로 달라도 마지막 출력이 같은 본문 문자열 계약으로 수렴해야 후속 단계가 단순해집니다.
+
 ## 실행 예제
 
 ```python
@@ -118,11 +128,21 @@ source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 
 ## 이 코드에서 봐야 할 것
 
+### 공통 Document 계약 스키마
+
+![공통 Document 계약이 모이는 스키마](../../../assets/document-ingestion-101/05/05-01-shared-document-contract-schema.ko.png)
+`page_content`, `source`, `format` 세 축만 맞아도 뒤 단계는 포맷별 조건문 없이 꽤 멀리 갈 수 있습니다.
+
 - `load_document()`가 확장자 분기를 한곳에 모아서 라우팅 책임을 명확히 합니다.
 - 각 로더가 `source`와 `format` 메타데이터를 공통 키로 맞추기 때문에 후속 단계 코드가 단순해집니다.
 - PDF는 `pypdf`, TXT/MD는 파일 읽기로 처리해도 출력 계약은 동일합니다.
 
 ## 실무에서 헷갈리는 지점
+
+### 포맷 오류와 우회 처리 흐름
+
+![포맷 오류를 우회하는 예외 처리 흐름](../../../assets/document-ingestion-101/05/05-02-error-handling-across-file-formats.ko.png)
+지원 포맷이 늘어날수록 실패를 숨기기보다 어떤 포맷에서 어떤 우회 경로를 탔는지 드러내는 편이 운영에 유리합니다.
 
 - 다중 포맷 지원은 로더 개수를 늘리는 문제가 아니라 메타데이터 키를 통일하는 문제입니다.
 - Markdown도 결국 텍스트처럼 읽을 수 있지만 헤더 보존이 필요하면 이후 청킹 설정을 별도로 가져가야 합니다.

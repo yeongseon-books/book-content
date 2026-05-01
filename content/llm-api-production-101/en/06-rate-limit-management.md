@@ -49,6 +49,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why the application needs its own limiter
 
+![Local limiter controlling flow before the provider](../../assets/llm-api-production-101/06/06-01-why-the-application-needs-its-own-limite.en.png)
 Retries and backoff are necessary, but they are still reactive once you have already exceeded the provider’s allowance. A local limiter is useful for three reasons:
 
 - it absorbs short traffic spikes before they reach the provider
@@ -61,6 +62,7 @@ Imagine twenty web requests arriving at the same moment, all triggering the same
 
 ## Where a token bucket fits best
 
+![Refill and consume cycle of a token bucket](../../assets/llm-api-production-101/06/06-02-where-a-token-bucket-fits-best.en.png)
 A token bucket refills at a steady rate. Each request consumes one or more tokens. That gives you a useful balance: short bursts are allowed up to the bucket size, but the long-term average stays bounded.
 
 For example, if five tokens are added per second and the bucket capacity is ten, a quiet period can accumulate enough room for a burst of ten requests. After that, sustained traffic still settles back to about five per second.
@@ -167,6 +169,7 @@ This keeps only recent events inside the active window and rejects requests once
 
 ## Putting a limiter in front of Groq calls
 
+![Execution path from local gate to provider call](../../assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.en.png)
 Here is a small end-to-end example using a token bucket as a gate before the provider call.
 
 ```python
@@ -214,12 +217,67 @@ def limited_completion(prompt: str) -> str:
 print(limited_completion("Explain the difference between a list and a tuple in Python."))
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    **Lists vs Tuples in Python**
+    =====================================
+
+    In Python, `lists` and `tuples` are two types of data structures that can store multiple values. While they share some similarities, they have distinct differences in terms of their usage, behavior, and performance.
+
+    **Lists**
+    ---------
+
+    A `list` is a mutable data structure that can be modified after creation. It is defined using square brackets `[]` and elements are separated by commas.
+
+    **Example:**
+    ```python
+    my_list = [1, 2, 3, 4, 5]
+    print(my_list)  # Output: [1, 2, 3, 4, 5]
+
+    # Modifying the list
+    my_list[0] = 10
+    print(my_list)  # Output: [10, 2, 3, 4, 5]
+    ```
+    **Tuples**
+    ---------
+
+    A `tuple` is an immutable data structure that cannot be modified after creation. It is defined using parentheses `()` and elements are separated by commas.
+
+    **Example:**
+    ```python
+    my_tuple = (1, 2, 3, 4, 5)
+    print(my_tuple)  # Output: (1, 2, 3, 4, 5)
+
+    # Attempting to modify the tuple will raise an error
+    try:
+        my_tuple[0] = 10
+    except TypeError:
+        print("Tuples are immutable")
+    ```
+    **Key differences:**
+
+    1. **Mutability**: Lists are mutable, while tuples are immutable.
+    2. **Syntax**: Lists use square brackets `[]`, while tuples use parentheses `()`.
+    3. **Performance**: Tuples are generally faster than lists because they are immutable and can be stored in a single block of memory.
+    4. **Use cases**: Lists are suitable for dynamic data structures, while tuples are suitable for static data structures.
+
+    **When to use each:**
+
+    * Use lists when you need to modify the data structure frequently.
+    * Use tuples when you need to store a fixed set of values and don't need to modify them.
+
+    In summary, while both lists and tuples can store multiple values, lists are mutable and suitable for dynamic data structures, while tuples are immutable and suitable for static data structures.
+
+<!-- injected-output:end -->
+
 The important detail is ordering: the application acquires local permission before it talks to the provider. That turns a remote hard limit into a local flow-control decision.
 
 ---
 
 ## What to do after a 429 anyway
 
+![Recovery path after a provider 429](../../assets/llm-api-production-101/06/06-04-what-to-do-after-a-429-anyway.en.png)
 Even with a local limiter, you may still receive a 429. Multiple workers may be competing. The provider may enforce token-based limits that your simple request counter does not see. That is why 429 handling still matters.
 
 A good default rule is:
@@ -297,6 +355,7 @@ def limited_completion_with_429(prompt: str) -> str:
 
 ## Choosing token bucket versus sliding window
 
+![Comparison for choosing a limiter](../../assets/llm-api-production-101/06/06-05-choosing-token-bucket-versus-sliding-win.en.png)
 Both are valid. The better choice depends on the traffic pattern.
 
 ### Token bucket works well when

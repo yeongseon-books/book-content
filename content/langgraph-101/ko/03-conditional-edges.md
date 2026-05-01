@@ -34,6 +34,7 @@ LLM 워크플로가 실제 서비스로 가면 모든 요청이 같은 경로를
 ![이 글에서 답할 질문](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
+![분기 노드가 세 경로로 나뉘는 구조](../../../assets/langgraph-101/03/03-01-minimal-runnable-example.ko.png)
 ```python
 from typing import Literal, TypedDict
 
@@ -102,12 +103,14 @@ if __name__ == "__main__":
 
 ## 이 코드에서 봐야 할 것
 
+![질문이 route 필드로 바뀌는 흐름](../../../assets/langgraph-101/03/03-02-what-to-notice-in-this-code.ko.png)
 - `classify_question()`은 분기 판단에 필요한 값을 상태에 씁니다.
 - `route_question()`은 부작용 없이 다음 노드 이름만 반환합니다.
 - `path_map` 딕셔너리 덕분에 문자열 라벨과 실제 노드 이름 매핑이 명시적으로 남습니다.
 
 ## 실무에서 헷갈리는 지점
 
+![분기와 반복 경로를 닫는 종료 구조](../../../assets/langgraph-101/03/03-03-where-engineers-get-confused.ko.png)
 - 라우팅 함수 안에서 LLM 호출까지 같이 넣으면 디버깅이 어려워집니다. 분류와 라우팅은 분리하는 편이 낫습니다.
 - 조건부 엣지는 if/else 한 번으로 끝나지 않습니다. 루프를 만들 수도 있으므로 종료 조건을 항상 같이 설계해야 합니다.
 - 라우트 문자열이 오타 나면 런타임에 바로 깨집니다. `Literal[...]` 힌트를 두는 이유가 여기 있습니다.
@@ -120,6 +123,7 @@ if __name__ == "__main__":
 
 ## 정리
 
+![질문 유형별 다음 경로 선택 흐름](../../../assets/langgraph-101/03/03-04-summary.ko.png)
 조건부 엣지는 LangGraph가 "그래프답게" 느껴지는 첫 지점입니다. 다음 글에서는 이 분기 흐름 위에 실제 도구 호출 루프를 얹어 에이전트 형태로 발전시켜 보겠습니다.
 
 <!-- toc:begin -->

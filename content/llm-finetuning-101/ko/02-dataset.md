@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## 이 글에서 답할 질문
 
+![원본 샘플에서 학습 배치까지 이어지는 흐름](../../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.ko.png)
 - instruction, input, output 세 필드를 어떤 형태로 정리해야 할까?
 - Hugging Face datasets로 작은 JSONL 파일을 어떻게 바로 읽어 올릴까?
 - 전처리 단계에서 꼭 확인해야 할 최소 검증 포인트는 무엇일까?
@@ -35,6 +36,7 @@ last_reviewed: '2026-05-01'
 
 ## 데이터셋에서 먼저 고정할 것
 
+![데이터셋 세 층과 경계 관리 구조](../../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.ko.png)
 파인튜닝 데이터는 보통 세 층으로 나뉩니다. **원본 샘플**, **프롬프트 템플릿을 적용한 텍스트**, **토크나이즈된 텐서**입니다. 이 세 층을 분리해서 생각해야 필터링 문제와 토큰 길이 문제를 따로 잡을 수 있습니다.
 
 ![데이터셋에서 먼저 고정할 것](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.ko.png)
@@ -63,12 +65,14 @@ tokenizer = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
 
 ## 이 코드에서 봐야 할 것
 
+![포맷 검증과 토큰 길이 확인 순서 흐름](../../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.ko.png)
 - `datasets.load_dataset()`을 쓰면 실전에서 받는 JSONL 구조를 그대로 흉내 낼 수 있습니다.
 - 템플릿 적용과 토크나이즈를 분리하면 나중에 모델별 chat template으로 교체하기 쉽습니다.
 - 예제는 `padding="max_length"`, `max_length=64`로 고정해 아주 작은 실습에서도 길이 통계를 바로 볼 수 있게 했습니다.
 
 ## 실무에서 헷갈리는 지점
 
+![중복 제거와 학습 분할 판단 흐름](../../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.ko.png)
 - 데이터가 많다고 좋은 것이 아닙니다. 중복 답변이 많거나 형식이 섞이면 작은 모델은 더 빨리 망가집니다.
 - 전처리에서 `input_ids`만 만들고 `labels`를 만들지 않는 것은 정상입니다. 4편에서 학습용 레이블을 붙입니다.
 - instruction과 output 길이 필터는 정답이 아니라 출발점입니다. 실제 프로젝트에서는 금칙어, PII, 중복, 클래스 불균형 검사가 더 필요합니다.

@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## 이 글에서 답할 질문
 
+![학습 전후 평가 루프 분리 흐름](../../../assets/llm-finetuning-101/05/05-01-questions-this-post-answers.ko.png)
 - 파인튜닝 직후 가장 먼저 볼 정량 지표로 perplexity를 어떻게 계산할까?
 - 학습 전후 perplexity 비교가 왜 완벽한 품질 평가가 아닌가?
 - tiny 모델 데모에서도 평가 루프를 따로 두는 이유는 무엇일까?
@@ -35,6 +36,7 @@ last_reviewed: '2026-05-01'
 
 ## perplexity를 해석하는 기본 태도
 
+![perplexity와 품질 지표 해석 관계 구조](../../../assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.ko.png)
 perplexity는 낮을수록 좋지만, 절대값만으로 품질을 단정하면 안 됩니다. 작은 데모 모델, 작은 데이터셋, 짧은 문맥에서는 값이 크게 튈 수 있습니다. 그래서 실무에서는 perplexity를 **회귀 방지용 기준선**으로 주로 씁니다. 학습 전보다 나빠졌는지, 설정을 바꿨을 때 추세가 개선되는지를 보는 데 강합니다.
 
 ![perplexity를 해석하는 기본 태도](../../../assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.ko.png)
@@ -62,12 +64,14 @@ print(before, after)
 
 ## 이 코드에서 봐야 할 것
 
+![평균 loss에서 perplexity로 변환되는 계산 흐름](../../../assets/llm-finetuning-101/05/05-03-what-to-notice-in-this-code.ko.png)
 - 평가 함수는 학습 루프와 분리되어 있어야 합니다. 그렇지 않으면 loss를 보는 순간에도 파라미터가 바뀌는 실수를 하게 됩니다.
 - `torch.no_grad()`와 `model.eval()`은 메모리 사용과 드롭아웃 동작을 안정화하는 기본 장치입니다.
 - 이 글의 예제는 추세 확인용입니다. 실제 프로젝트에서는 hold-out set, task metric, human review가 함께 필요합니다.
 
 ## 실무에서 헷갈리는 지점
 
+![과적합 징후와 비교 기준 판단 흐름](../../../assets/llm-finetuning-101/05/05-04-where-engineers-get-confused.ko.png)
 - perplexity가 좋아졌다고 서비스 품질이 무조건 좋아지는 것은 아닙니다. 포맷 준수나 사실성은 별도 평가가 필요합니다.
 - 평가 데이터와 학습 데이터를 완전히 같게 쓰면 수치가 낙관적으로 보일 수 있습니다. 데모에서는 구조 이해를 위해 같게 썼습니다.
 - tiny 모델에서 수치 차이가 작아 보여도 정상입니다. 1 step 데모의 목적은 평가 파이프라인 검증입니다.

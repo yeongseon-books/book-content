@@ -49,6 +49,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why all failures should not share one retry policy
 
+![Comparison between transient and permanent failures](../../assets/llm-api-production-101/05/05-01-why-all-failures-should-not-share-one-re.en.png)
 Retries help only when the failure is likely to go away. A short network interruption may resolve on the next attempt. A temporary timeout may succeed after a brief pause. Some 5xx provider failures are also retry candidates.
 
 Other failures are different:
@@ -85,6 +86,7 @@ That is only the shape. In a real LLM path, the important part is constraining *
 
 ## Creating an error hierarchy for retry decisions
 
+![Structure for wrapping provider exceptions](../../assets/llm-api-production-101/05/05-02-creating-an-error-hierarchy-for-retry-de.en.png)
 One practical pattern is to normalize low-level exceptions into application-level categories.
 
 ```python
@@ -101,6 +103,7 @@ Once those exist, the retry layer can ignore provider-specific details and focus
 
 ## Adding exponential backoff to a Groq call
 
+![Retry flow with exponential backoff](../../assets/llm-api-production-101/05/05-03-adding-exponential-backoff-to-a-groq-cal.en.png)
 The example below retries only errors that the application classifies as transient. One operational detail matters before the code starts: the Groq client can apply its own retries. To avoid stacking SDK retries on top of `tenacity` retries by accident, the sample disables SDK retries and lets the application policy own the loop.
 
 ```python
@@ -164,6 +167,13 @@ except RetryableLLMError as exc:
     logger.error("request still failed after retries: %s", exc)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    Python context managers are used to manage resources such as files, connections, or locks, ensuring they are properly cleaned up after use, even if exceptions occur. They are implemented using the `with` statement, which automatically calls the `__enter__` method when entering the block and the `__exit__` method when exiting, allowing for resource acquisition and release. This approach helps prevent resource leaks and makes code more readable and maintainable.
+
+<!-- injected-output:end -->
+
 Three things matter here.
 
 First, `retry_if_exception_type(RetryableLLMError)` makes the retry scope explicit.
@@ -176,6 +186,7 @@ Third, `reraise=True` ensures that the final failure is not swallowed after all 
 
 ## Which failures are retryable
 
+![Decision flow for retryable error classes](../../assets/llm-api-production-101/05/05-04-which-failures-are-retryable.en.png)
 In practice, a useful first-pass classification looks like this.
 
 ### Usually retryable
@@ -241,6 +252,7 @@ For interactive UI paths, two or three attempts are often enough. Background job
 
 ## What the user should see after final failure
 
+![Paths after the final failed attempt](../../assets/llm-api-production-101/05/05-05-what-the-user-should-see-after-final-fai.en.png)
 Retries do not eliminate failure. They shape failure.
 
 After the last allowed attempt, the application should make at least three things clear:

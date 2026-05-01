@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## 이 글에서 답할 질문
 
+![토큰 배치에서 옵티마이저 스텝까지 이어지는 흐름](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.ko.png)
 - `TrainingArguments`에서 최소한 무엇을 지정해야 1 step 학습이 돌까?
 - 왜 작은 실습에서도 `labels`와 data collator가 필요한가?
 - 학습 루프를 디버깅할 때 먼저 봐야 할 출력은 무엇일까?
@@ -35,6 +36,7 @@ last_reviewed: '2026-05-01'
 
 ## 학습 루프에서 줄여도 되는 것과 줄이면 안 되는 것
 
+![축소 가능한 요소와 유지해야 할 요소 비교](../../../assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.ko.png)
 샘플 수와 step 수는 줄여도 됩니다. 하지만 **토큰화된 입력, labels, optimizer step, loss 계산**은 줄이면 학습 검증이 아니라 단순 추론 테스트가 됩니다. 그래서 이 글의 예제는 가장 작은 데이터셋을 쓰더라도 학습 구성요소는 그대로 유지합니다.
 
 ![학습 루프에서 줄여도 되는 것과 줄이면 안 되는 것](../../../assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.ko.png)
@@ -70,12 +72,14 @@ trainer.train()
 
 ## 이 코드에서 봐야 할 것
 
+![배치 크기와 gradient accumulation 관계 구조](../../../assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.ko.png)
 - `labels = input_ids.copy()`는 causal LM에서 다음 토큰 예측 손실을 계산하기 위한 최소 설정입니다.
 - `max_steps=1`로 줄여도 backward와 optimizer step은 실제로 일어납니다.
 - 이 예제는 `training_loss`와 `global_step`만 확인하면 충분합니다. 숫자 자체보다 루프가 끝까지 도는지가 더 중요합니다.
 
 ## 실무에서 헷갈리는 지점
 
+![학습 디버깅 출력 우선순위 판단 흐름](../../../assets/llm-finetuning-101/04/04-04-where-engineers-get-confused.ko.png)
 - 샘플이 적다고 collator가 불필요한 것은 아닙니다. 배치 차원 정리가 필요하면 작은 실습에서도 collator가 도와줍니다.
 - loss가 높게 나와도 실패가 아닙니다. tiny 모델에 한 step만 돌리는 예제라서 손실 절대값보다 실행 가능성이 중요합니다.
 - Trainer가 편해 보여도 입력 컬럼 이름이 틀리면 바로 깨집니다. 그래서 2편에서 전처리 구조를 먼저 맞춘 것입니다.

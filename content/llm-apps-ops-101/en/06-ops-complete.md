@@ -29,6 +29,7 @@ last_reviewed: '2026-05-01'
 ## Big picture
 ![LLM ops pipeline complete overview](../../../assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
 ## Why this layer matters
+![Ops flow from validation to logging](../../../assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.en.png)
 An integrated pipeline matters because one request should leave connected traces for validation, cost, quality, and logging.
 
 When each operational layer lives alone, demos look clean but incidents stay hard to explain. In production, you need one place to tell whether a bad outcome came from unsafe input, rising cost, or degrading output quality.
@@ -221,11 +222,13 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
+![Health state exposes cumulative calls and cost](../../../assets/llm-apps-ops-101/06/06-02-what-to-notice-in-this-code.en.png)
 - Returning `quality`, `total_tokens`, and `cost_usd` in one response gives both server and client immediate operating context.
 - Adding cumulative call count and cost to `/health` makes state changes visible even in a tiny demo.
 - The structured `quality` payload can later be aligned with batch evaluation jobs and dashboards.
 
 ## Where engineers get confused
+![Deploy monitor evaluate optimize redeploy loop](../../../assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png)
 - An integrated pipeline does not remove the need for storage, alerts, and dashboards. It just gives them better signals.
 - Inline evaluation improves visibility but can add latency. Production systems often split synchronous and asynchronous checks.
 - A simple cost formula is fine for the demo, but real billing models may require input/output separation and model-specific tables.

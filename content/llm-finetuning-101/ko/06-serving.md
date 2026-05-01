@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## 이 글에서 답할 질문
 
+![어댑터 병합부터 추론 응답까지 이어지는 흐름](../../../assets/llm-finetuning-101/06/06-01-questions-this-post-answers.ko.png)
 - 파인튜닝된 소형 모델을 FastAPI 엔드포인트로 감싸는 최소 구조는 무엇일까?
 - 서빙 코드에서 학습과 추론 경계를 어디서 끊어야 할까?
 - 브라우저를 열지 않고도 엔드포인트를 어떻게 실행 검증할 수 있을까?
@@ -35,6 +36,7 @@ last_reviewed: '2026-05-01'
 
 ## 데모 서빙에서 꼭 분리해서 볼 것
 
+![모델 준비와 HTTP 계약 분리 구조](../../../assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.ko.png)
 실전에서는 모델 로딩, 요청 검증, 생성 옵션, 응답 직렬화, 관측성 로그가 서로 다른 책임입니다. 이 글의 예제는 이 중 **모델 준비**와 **HTTP 계약**만 최소 단위로 보여 줍니다. 작은 데모라도 health check와 generate endpoint를 분리해 두면 운영 코드로 확장하기 쉬워집니다.
 
 ![데모 서빙에서 꼭 분리해서 볼 것](../../../assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.ko.png)
@@ -63,12 +65,14 @@ print(client.post("/generate", json={"prompt": "파이썬 함수 예시"}).json(
 
 ## 이 코드에서 봐야 할 것
 
+![FastAPI 추론 요청과 엔드포인트 분기 흐름](../../../assets/llm-finetuning-101/06/06-03-what-to-notice-in-this-code.ko.png)
 - 예제는 실제로 toy training loss를 한 번 계산한 뒤 앱 상태에 저장합니다. 즉, 완전히 순수한 베이스 모델 서빙이 아닙니다.
 - `TestClient`를 쓰면 uvicorn을 띄우지 않아도 엔드포인트 계약을 검증할 수 있어 CI 친화적입니다.
 - `/health`와 `/generate`를 분리해 두면 모델 상태 확인과 추론 실패 원인 분리가 쉬워집니다.
 
 ## 실무에서 헷갈리는 지점
 
+![지연 시간과 품질 사이 서빙 선택 기준](../../../assets/llm-finetuning-101/06/06-04-where-engineers-get-confused.ko.png)
 - 서빙 코드 안에서 학습을 계속 돌리는 것은 실전 기본값이 아닙니다. 이 글은 전체 흐름을 한 파일에서 재현하기 위한 데모입니다.
 - 생성 결과 문장이 자연스럽지 않은 것은 tiny 모델 한계 때문입니다. 서빙 구조 검증과 생성 품질 평가는 별개 문제입니다.
 - FastAPI 엔드포인트가 성공했다고 운영 준비가 끝난 것은 아닙니다. 배치, 타임아웃, 인증, 로깅은 별도 설계가 필요합니다.

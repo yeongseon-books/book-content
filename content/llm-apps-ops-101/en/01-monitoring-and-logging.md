@@ -29,6 +29,7 @@ last_reviewed: '2026-05-01'
 ## Big picture
 ![Monitoring and logging component layout](../../../assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
 ## Why this layer matters
+![Request and response logs per call](../../../assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png)
 Observability starts with a log record that can fully explain one call after the fact.
 
 A normal API can often get away with status code and response time. An LLM app cannot. Two calls may both succeed with HTTP 200 while one burns far more tokens or returns a suspiciously short answer.
@@ -133,11 +134,13 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
+![Shared log schema for operating questions](../../../assets/llm-apps-ops-101/01/01-02-what-to-notice-in-this-code.en.png)
 - `JsonFormatter` keeps every event in one schema, so downstream ingestion stays simple.
 - Putting `request_id` and `total_tokens` in the same record keeps debugging and cost analysis connected.
 - Logging a short preview instead of the full answer reduces both data leakage risk and log volume.
 
 ## Where engineers get confused
+![Metrics and logs narrow failures together](../../../assets/llm-apps-ops-101/01/01-03-where-engineers-get-confused.en.png)
 - Structured logs do not replace metrics. Metrics show trends; logs explain individual failures.
 - Token counts include system instructions and generated output, not just the visible user prompt.
 - Full-response logging feels convenient early on, but it becomes a privacy and storage liability fast.

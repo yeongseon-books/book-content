@@ -31,6 +31,9 @@ The third post keeps the retriever structure fixed and swaps only the embedding 
 ![Questions this post answers](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+### Fixed-corpus embedding comparison structure
+
+![Fixed-corpus embedding comparison structure](../../../assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
 The runnable code lives in `rag-benchmark-101/en/03-embedding-comparison/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -48,16 +51,28 @@ print(json.dumps(results, indent=2))
 ```
 
 ## What to notice in this code
+
+### Quality and latency comparison axes
+
+![Quality and latency comparison axes](../../../assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.en.png)
 - Fixing the corpus and query set is what makes the model comparison fair.
 - MRR adds rank sensitivity, so you can see whether a model finds the right passage earlier.
 - Keeping latency in the report helps you judge whether the extra quality is worth the runtime cost.
 
 ## Where engineers get confused
+
+### One-variable-at-a-time experiment boundary
+
+![One-variable-at-a-time experiment boundary](../../../assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.en.png)
 - If you change chunking and embeddings at the same time, you lose causal clarity.
 - The same hit rate can still produce different downstream answers when MRR differs a lot.
 - A win on a tiny toy benchmark is only a directional signal, not a production conclusion.
 
 ## Checklist
+
+### Speed quality and cost selection flow
+
+![Speed quality and cost selection flow](../../../assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.en.png)
 - [ ] Benchmark both models on the same corpus and query set.
 - [ ] Compare hit rate and MRR together.
 - [ ] Include latency so the runtime cost stays visible.

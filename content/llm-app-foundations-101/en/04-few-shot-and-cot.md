@@ -46,6 +46,7 @@ The operating idea is simple: better prompts are often less about clever wording
 
 ## Few-shot prompting teaches by example inside the messages array
 
+![Example pairs steering the final answer](../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png)
 Few-shot prompting is the practice of placing one or more worked examples before the real question. In chat APIs, those examples are not stored in a separate training field. They live in the same `messages` array as everything else, usually as paired `user` and `assistant` turns.
 
 The basic pattern looks like this:
@@ -108,12 +109,22 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    category: technical
+    priority: high
+    reason: The error is likely related to a product bug that prevents the user from using a core feature.
+
+<!-- injected-output:end -->
+
 Three things matter here. First, few-shot is just message-array design. Second, the example has to show the desired answer shape, not merely a related question. Third, every example consumes tokens, so compact representative examples are usually better than long ones.
 
 ---
 
 ## Zero-shot versus few-shot on the same request
 
+![Zero-shot and few-shot stability comparison](../../assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.en.png)
 Zero-shot means you ask for the task directly with no examples. You rely on the model's general training and instruction-following ability. That often works surprisingly well, especially for simple classification or summarization tasks. The weakness is consistency. The model may understand the task but still vary the label wording, the answer structure, or the level of explanation.
 
 The script below sends the same support ticket twice: once as zero-shot and once with few-shot examples.
@@ -178,6 +189,21 @@ print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    [zero-shot]
+    category: billing
+    priority: high
+    reason: The discrepancy in the invoice suggests an unexpected change in the billing plan or pricing.
+
+    [few-shot]
+    category: billing
+    priority: high
+    reason: Unexpected charges can cause financial disruption and require immediate resolution.
+
+<!-- injected-output:end -->
+
 In many runs, zero-shot will still produce a reasonable answer. Few-shot usually improves a different dimension: repeatability. It tends to stabilize the label vocabulary, the line order, the explanation length, and the way ambiguous cases are interpreted.
 
 That difference matters because applications care less about one impressive answer than about hundreds of answers arriving in a shape the rest of the system can rely on.
@@ -186,6 +212,7 @@ That difference matters because applications care less about one impressive answ
 
 ## Example quality can help or hurt
 
+![Weak and strong example comparison](../../assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.en.png)
 Few-shot prompting is only as good as the examples you provide. That sounds obvious, but it is one of the most common failure modes in early LLM applications. Developers add examples expecting an automatic boost, and the outputs become less consistent instead of more consistent.
 
 Bad examples usually fail in one of four ways:
@@ -276,6 +303,21 @@ print("[good examples]")
 print(good_run.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    [bad examples]
+    category: technical
+    priority: high
+    reason: The customer is unable to access their account due to a failed password reset process.
+
+    [good examples]
+    category: technical
+    priority: high
+    reason: The inability to access the account due to a failed password reset process creates a significant barrier to service.
+
+<!-- injected-output:end -->
+
 The stronger examples do more than show correct answers. They demonstrate a stable schema, a clear priority policy, and the expected sentence length. That is why example quality matters more than raw example count. Two clean examples often outperform six messy ones.
 
 In practice, good few-shot examples are usually:
@@ -289,6 +331,7 @@ In practice, good few-shot examples are usually:
 
 ## Chain-of-thought helps the model decompose the task
 
+![Stepwise reasoning path to final_answer](../../assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.en.png)
 If few-shot is about answer patterns, chain-of-thought is about solution process. The familiar version is a phrase such as “Let's think step by step.” The reason this often works is not mystical. Multi-step tasks become easier when the model is nudged to compute or check intermediate states instead of leaping directly to the conclusion.
 
 That is useful for arithmetic, rule application, ordered constraints, and cases where the final answer depends on several earlier checks. The model is not gaining new facts. It is being guided to use its existing knowledge more methodically.
@@ -327,6 +370,35 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    To find the final payment amount, we'll follow the steps you mentioned.
+
+    Step 1: Apply a 10% coupon to the original price of 120,000 won.
+
+    First, we need to find 10% of 120,000 won. 
+    10% of 120,000 won = (10/100) * 120,000 = 0.1 * 120,000 = 12,000 won
+
+    Now, subtract the coupon amount from the original price.
+    Discounted price = Original price - Coupon amount
+    = 120,000 won - 12,000 won
+    = 108,000 won
+
+    Step 2: Add 10% VAT to the discounted price.
+
+    First, we need to find 10% of the discounted price.
+    10% of 108,000 won = (10/100) * 108,000 = 0.1 * 108,000 = 10,800 won
+
+    Now, add the VAT amount to the discounted price.
+    Final price = Discounted price + VAT amount
+    = 108,000 won + 10,800 won
+    = 118,800 won
+
+    final_answer: 118800 won.
+
+<!-- injected-output:end -->
 
 This tends to reduce mistakes in ordering and intermediate arithmetic. It is especially handy when the task has words like “first,” “then,” “except,” or “only if,” because those are exactly the cases where skipping an intermediate check causes the answer to drift.
 
@@ -382,6 +454,16 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    1) 25% of 80000 won is 20000 won.
+    2) After the discount, the subtotal is 60000 won.
+    3) Add the 5000 won shipping fee to get 65000 won.
+    final_answer: 65000 won
+
+<!-- injected-output:end -->
 
 The difference is easy to summarize:
 
@@ -464,12 +546,24 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    policy_check:
+    1) The request is more than 7 days after purchase.
+    2) Watch progress is under 20%.
+    decision: denied
+    reason: The request exceeds the allowed time window for a refund, regardless of the watch progress.
+
+<!-- injected-output:end -->
+
 This pattern is useful because it improves more than answer quality. It improves debuggability. If the output is wrong, you can inspect which policy check went wrong rather than treating the whole response as a black box.
 
 ---
 
 ## Where these techniques stop helping
 
+![When prompting should yield to other tools](../../assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.en.png)
 Few-shot and CoT are powerful, but they are not universal fixes.
 
 ### When the model lacks the required knowledge

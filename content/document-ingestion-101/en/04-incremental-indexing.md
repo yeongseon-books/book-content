@@ -34,6 +34,16 @@ A full rebuild is acceptable for dozens of files, but it becomes wasteful once t
 
 This example uses only file hashes and a JSON state file to classify `added`, `unchanged`, and `updated`. That simple classifier is the foundation for every later vector-store update step.
 
+## Incremental scan and change detection
+
+![Incremental scan and change detection flow](../../../assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
+The first win in incremental indexing is narrowing the work set before any expensive downstream processing starts.
+
+## State store and hash comparison
+
+![State store and hash comparison flow](../../../assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.en.png)
+A content hash next to timestamps makes the change detector much more trustworthy than mtime alone.
+
 ## Runnable example
 
 ```python
@@ -143,11 +153,21 @@ python main.py
 
 ## What to notice in this code
 
+### Added updated and deleted paths
+
+![Added updated and deleted decision flow](../../../assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.en.png)
+Once deletion is modeled as its own path, index cleanup becomes an extension of the same state machine.
+
 - `IndexStateStore` keeps hash, mtime, and indexed_at together, which makes debugging easier.
 - The script intentionally runs three passes to replay the added → unchanged → updated lifecycle.
 - Using JSON first keeps the logic transparent before moving the same pattern into a database.
 
 ## Where engineers get confused
+
+### Index version and run history flow
+
+![Index version and run history flow](../../../assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.en.png)
+Past a certain scale, knowing which run produced which index version becomes as important as change detection itself.
 
 - mtime-only checks are fast but can over-report changes. That is why content hashes still matter.
 - Incremental indexing has two separate concerns: detecting change and applying the change.

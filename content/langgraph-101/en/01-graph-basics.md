@@ -34,6 +34,7 @@ The most useful first mental shift is this: LangGraph is not “a few chains glu
 ![Questions this post answers](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+![Basic graph flow from START to END](../../../assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
 ```python
 from typing import TypedDict
 
@@ -103,12 +104,14 @@ Runnable file: `/root/Github/langgraph-101/en/01-graph-basics/main.py`
 
 ## What to notice in this code
 
+![Request to state field mapping](../../../assets/langgraph-101/01/01-02-what-to-notice-in-this-code.en.png)
 - `StateGraph(ArticleState)` declares the shared schema for the whole workflow.
 - Each node receives full state and returns only the fields it wants to update.
 - `START -> choose_topic -> build_outline -> write_answer -> END` makes execution order explicit in code.
 
 ## Where engineers get confused
 
+![Execution flow from definition to invoke](../../../assets/langgraph-101/01/01-03-where-engineers-get-confused.en.png)
 - A node does not need to reconstruct the entire state object. Returning changed fields is enough.
 - `StateGraph` is not limited to DAG-style pipelines. Later posts add loops and branches on the same abstraction.
 - `invoke()` returns the final state, not just the output of the last node.
@@ -121,6 +124,7 @@ Runnable file: `/root/Github/langgraph-101/en/01-graph-basics/main.py`
 
 ## Summary
 
+![State schema and node assembly](../../../assets/langgraph-101/01/01-04-summary.en.png)
 At this stage, the important skill is not “building a graph” but learning to see workflow as visible state transitions. In the next post, we keep that state alive across calls with checkpoints and `thread_id`.
 
 <!-- toc:begin -->

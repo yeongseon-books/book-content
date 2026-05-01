@@ -46,6 +46,7 @@ last_reviewed: '2026-05-01'
 
 ## LLM은 왜 상태가 없는가
 
+![이력 재전송 유무에 따른 상태 차이](../../assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.ko.png)
 채팅 제품을 쓰다 보면 모델이 세션을 기억하는 것처럼 보이지만, API 경계에서는 그렇지 않습니다. `client.chat.completions.create()` 호출 하나는 그 요청 본문 안에 들어 있는 정보만 보고 답합니다. 서버가 이전 요청의 의미를 자동으로 이어 붙여 주지 않습니다.
 
 예를 들어 첫 번째 요청에서 아래 메시지를 보냈다고 하겠습니다.
@@ -79,6 +80,7 @@ messages = [
 
 ## 멀티턴 대화는 messages 배열 누적으로 만듭니다
 
+![사용자 턴마다 이력이 누적되는 흐름](../../assets/llm-app-foundations-101/05/05-02-multi-turn-chat-comes-from-replaying-his.ko.png)
 멀티턴 대화의 원리는 의외로 단순합니다. 새 질문을 보낼 때 이전 턴들을 함께 다시 보냅니다. 모델은 그 배열을 읽고 “지금까지 이런 대화가 있었고, 이제 이 다음 답을 해야 한다”고 해석합니다.
 
 채팅 API에서 대화 이력은 보통 아래 세 역할로 표현합니다.
@@ -118,6 +120,13 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    튜플이 더 적합합니다. 튜플은 변경 불가능하고, 딕셔너리 키는 변경 불가능해야 하기 때문입니다.
+
+<!-- injected-output:end -->
+
 여기서 핵심은 마지막 질문 하나가 아니라 그 앞에 붙어 있는 이력입니다. 모델은 `그럼`과 `둘 중`이 무엇을 가리키는지 스스로 추론하는 것이 아니라, 앞선 메시지에서 그 대상을 읽습니다. 같은 질문을 이력 없이 보내면 훨씬 덜 안정적인 답이 나옵니다.
 
 이 패턴을 구현할 때 애플리케이션은 보통 다음 순서를 반복합니다.
@@ -133,6 +142,7 @@ print(completion.choices[0].message.content)
 
 ## 전체 이력 유지는 가장 단순한 시작점입니다
 
+![전체 이력 payload가 커지는 구조](../../assets/llm-app-foundations-101/05/05-03-keeping-the-full-history-is-the-simplest.ko.png)
 가장 먼저 구현하기 쉬운 방식은 전체 이력을 계속 들고 가는 것입니다. 버그가 적고 이해도 쉽습니다. 대화가 짧거나 내부 운영 도구처럼 세션 길이가 제한된 경우에는 지금도 충분히 실용적입니다.
 
 ```python
@@ -166,6 +176,14 @@ print(ask("내 서비스는 월 구독형 SaaS야. 기억해 줘."))
 print(ask("그럼 환불 정책 문구를 한 줄로 써 줘."))
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    네, 월 구독형 SaaS 서비스입니다. 어떤 도움을 드릴까요?
+    "월 구독은 자동 연장되며, 30일 이내에 구독을 취소하시면 다음 월의 결제가 취소됩니다."
+
+<!-- injected-output:end -->
+
 이 방식의 장점은 분명합니다.
 
 - 구현이 가장 쉽습니다.
@@ -180,6 +198,7 @@ print(ask("그럼 환불 정책 문구를 한 줄로 써 줘."))
 
 ## sliding window는 최근 N턴만 남깁니다
 
+![전체 이력과 window 요약 방식 비교](../../assets/llm-app-foundations-101/05/05-04-sliding-windows-retain-only-the-last-n-t.ko.png)
 대화 길이가 길어질수록 보통 중요한 정보는 최근 구간에 몰립니다. 이 점을 이용한 방식이 sliding window입니다. 시스템 프롬프트는 고정으로 유지하고, 최근 N개의 user/assistant 턴만 남깁니다.
 
 ```python
@@ -301,6 +320,7 @@ def build_messages(user_text: str) -> list[dict[str, str]]:
 
 ## 컨텍스트 창 초과는 미리 감지하고 줄여야 합니다
 
+![컨텍스트 초과 전 예산 점검 분기](../../assets/llm-app-foundations-101/05/05-05-detecting-context-overflow-before-the-re.ko.png)
 멀티턴 챗봇에서 흔한 장애는 모델 품질보다도 입력이 너무 길어지는 문제입니다. 대화가 계속 누적되면 어느 순간 provider가 요청을 거절하거나, 응답 길이를 줄이느라 품질이 흔들립니다. 이를 피하려면 보내기 전에 길이를 대략이라도 점검해야 합니다.
 
 토큰을 정확히 세는 전용 토크나이저가 가장 좋지만, 입문 단계에서는 거친 추정치만으로도 충분히 위험 신호를 잡을 수 있습니다. 아래 예제는 문자 수 기반으로 입력 길이를 대강 추정합니다.

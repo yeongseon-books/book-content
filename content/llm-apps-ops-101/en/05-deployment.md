@@ -27,16 +27,9 @@ last_reviewed: '2026-05-01'
 > A deployable example is not defined by nice-looking server code. It is defined by whether the same script can start the server, hit health, and complete a real chat request.
 
 ## Big picture
-```mermaid
-flowchart LR
-    SelfTest[Self-test] --> Health[/health]
-    SelfTest --> Chat[/chat]
-    Health --> App[FastAPI app]
-    Chat --> App
-    App --> Groq[Groq API]
-```
-
+![Self-test flow for health and chat](../../../assets/llm-apps-ops-101/05/05-01-big-picture.en.png)
 ## Why this layer matters
+![Startup verification reaches health check](../../../assets/llm-apps-ops-101/05/05-02-why-this-layer-matters.en.png)
 A deployment example is only credible when it can start the server and verify a real request on its own.
 
 The most common documentation mistake is showing server code without proving that it actually boots. For an operations-focused post, health check plus one representative request is the minimum bar.
@@ -134,11 +127,13 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
+![Async endpoint offloads sync model calls](../../../assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png)
 - `asyncio.to_thread` prevents the synchronous Groq SDK from blocking the FastAPI event loop.
 - Starting `uvicorn.Server` in code keeps documentation and verification in one place.
 - Hitting both `/health` and `/chat` checks more than process startup; it verifies the real dependency path.
 
 ## Where engineers get confused
+![Self-test verifies startup and shutdown](../../../assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.en.png)
 - A health endpoint does not guarantee model quality. It only confirms basic service readiness.
 - Using an async web framework does not magically make every external SDK async.
 - A local self-test passing does not remove the need to verify secrets, networking, and timeout settings in deployment.

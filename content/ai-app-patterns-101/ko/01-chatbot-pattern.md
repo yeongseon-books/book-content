@@ -47,6 +47,9 @@ LLM API는 무상태(stateless)입니다. 요청마다 독립적으로 처리하
 
 ## 기본 챗봇: 대화 이력 직접 관리
 
+### 무상태 호출과 이력 재전송 흐름
+
+![무상태 호출과 이력 재전송 흐름](../../../assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.ko.png)
 가장 단순한 챗봇입니다. 메시지 리스트에 대화를 쌓고, 매 요청마다 전체를 LLM에 보냅니다.
 
 ```python
@@ -83,6 +86,9 @@ print(chat("제 이름이 뭐라고 했죠?"))  # 이전 대화를 기억해야 
 
 ## 메모리 윈도우 — 최근 N개만 유지
 
+### 최근 N개 메시지 유지 구조
+
+![최근 N개 메시지 유지 구조](../../../assets/ai-app-patterns-101/01/01-02-sliding-window-message-retention.ko.png)
 오래된 대화를 버리고 최근 N개만 유지합니다. 구현이 간단하고 컨텍스트 길이를 예측 가능하게 유지합니다.
 
 ```python
@@ -140,6 +146,9 @@ for turn in turns:
 
 ## 대화 요약으로 컨텍스트 제어
 
+### 요약 메모리와 최근 대화 결합 구조
+
+![요약 메모리와 최근 대화 결합 구조](../../../assets/ai-app-patterns-101/01/01-03-summary-memory-with-recent-turns.ko.png)
 메모리 윈도우는 오래된 대화를 잘라버립니다. 대화 요약은 오래된 내용을 압축해서 보존합니다.
 
 ```python
@@ -224,6 +233,9 @@ for msg in conversations:
 
 ## 세션 기반 챗봇
 
+### 세션별 대화 상태 분리 구조
+
+![세션별 대화 상태 분리 구조](../../../assets/ai-app-patterns-101/01/01-04-session-scoped-conversation-state.ko.png)
 여러 사용자를 지원하는 앱에서는 세션 ID로 대화를 구분합니다.
 
 ```python
@@ -291,6 +303,9 @@ print(f"세션 A 이력 길이: {len(sessions[session_a])}")
 
 ## 실무에서 헷갈리는 지점
 
+### 긴 대화에서 윈도우와 요약으로 넘어가는 분기
+
+![긴 대화에서 윈도우와 요약으로 넘어가는 분기](../../../assets/ai-app-patterns-101/01/01-05-branching-from-full-history-to-compressi.ko.png)
 - 대화 이력을 저장한다고 해서 모델이 장기 기억을 갖는 것은 아닙니다. 매 요청마다 다시 보내는 것뿐입니다.
 - 세션 분리와 사용자 인증은 다른 문제입니다. 같은 사용자라도 여러 세션을 가질 수 있습니다.
 - 이력이 길어질수록 품질보다 먼저 비용과 지연 시간이 문제 되므로 요약이나 윈도잉 전략이 필요합니다.

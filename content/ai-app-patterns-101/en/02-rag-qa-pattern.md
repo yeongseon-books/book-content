@@ -48,6 +48,9 @@ Topics:
 
 ## The two phases of RAG
 
+### Offline indexing pipeline
+
+![Offline indexing pipeline](../../../assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
 **Indexing** (offline): split documents into chunks, embed them, store in a vector index.
 
 **Retrieval** (online): embed the query, find similar chunks, inject them into the prompt.
@@ -61,6 +64,9 @@ retrieval: query → embedding → FAISS search → prompt injection → LLM →
 
 ## Complete RAG Q&A implementation
 
+### Online question answering flow
+
+![Online question answering flow](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
 ```python
 import os
 
@@ -160,6 +166,9 @@ for question in test_questions:
 
 ## Returning answers with source attribution
 
+### Answer and source return structure
+
+![Answer and source return structure](../../../assets/ai-app-patterns-101/02/02-03-answer-and-source-return-structure.en.png)
 Showing which document supported the answer improves user trust.
 
 ```python
@@ -229,6 +238,12 @@ print(f"sources: {result['sources']}")
 
 ## When RAG fails
 
+### Defense layers against retrieval misses
+
+![Defense layers against retrieval misses](../../../assets/ai-app-patterns-101/02/02-04-defense-layers-against-retrieval-misses.en.png)
+### Fallback branch for missing evidence
+
+![Fallback branch for missing evidence](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
 **The relevant chunk was not retrieved.** If the query does not match any stored chunk, the LLM falls back on its internal knowledge and may hallucinate. The prompt instruction "say you don't know if it's not in the documents" is the first line of defense.
 
 **Information splits across chunk boundaries.** Important context that spans two chunks may not appear complete in any single retrieved result. Sufficient `chunk_overlap` reduces this risk.

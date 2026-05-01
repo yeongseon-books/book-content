@@ -49,6 +49,7 @@ Most OCR integration pain lives after the API call. Teams usually struggle with 
 
 ## Minimal runnable example
 
+![Minimal runnable example](../../../assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.en.png)
 ```python
 MOCK_RESPONSE = {
     'images': [
@@ -76,6 +77,7 @@ for image in MOCK_RESPONSE['images']:
 
 ## What to notice in this code
 
+![What to notice in this code](../../../assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.en.png)
 - The code reads `lineBreak` as carefully as `inferText`.
 - Confidence values are preserved because downstream cleanup often needs them.
 - The raw payload and reconstructed lines should be inspected together.
@@ -85,6 +87,7 @@ for image in MOCK_RESPONSE['images']:
 
 ## Where engineers get confused
 
+![Where engineers get confused](../../../assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
 - Better OCR accuracy does not automatically mean better RAG quality.
 - Confidence is not a truth oracle.
 - PDF OCR and image OCR look similar but fail differently.

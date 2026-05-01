@@ -14,7 +14,6 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
-title: Vector search pipeline — from document ingestion to query
 ---
 
 # Vector search pipeline — from document ingestion to query
@@ -35,7 +34,7 @@ Topics:
 - querying and displaying results
 - hybrid search concept and a minimal implementation
 
-![Vector search pipeline: from document ingestion to query](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
+![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: a vector search pipeline is four steps — embed, index, query, retrieve. Each step should be independently replaceable.
@@ -50,6 +49,8 @@ The previous chapter covered **Chunking strategies — how to split long documen
 
 ## Pipeline structure
 
+![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-pipeline-structure.en.png)
+![Pipeline component connection structure](../../../assets/vector-search-101/06/06-02-pipeline-structure-2.en.png)
 A vector search pipeline has two phases.
 
 **Indexing** is an offline step: process documents once and produce a searchable index.
@@ -70,6 +71,7 @@ Separating the two phases means you build the index once and query it many times
 
 ## Complete pipeline
 
+![Build save load search execution path](../../../assets/vector-search-101/06/06-03-complete-pipeline.en.png)
 One self-contained, executable file.
 
 ```python
@@ -192,6 +194,32 @@ for query in queries:
         print(f"  [{rank}] {score:.4f} — {text.strip()[:70]}...")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    total chunks: 4
+    vector shape: (4, 384)
+    saved: faiss.index, chunks.json
+    loaded: 4 vectors
+
+    query: 'how vector search differs from keyword search'
+      [1] 0.7285 — Vector search converts text into numeric vectors for meaning-based ret...
+      [2] 0.4562 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
+
+    query: 'FAISS index types'
+      [1] 0.5547 — FAISS is a high-speed vector search library developed at Facebook AI R...
+      [2] 0.1110 — Vector search converts text into numeric vectors for meaning-based ret...
+
+    query: 'choosing chunk size'
+      [1] 0.4771 — Chunking strategies split long documents into units the embedding mode...
+      [2] 0.1839 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
+
+    query: 'role of retrieval in RAG'
+      [1] 0.5931 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
+      [2] 0.1908 — Chunking strategies split long documents into units the embedding mode...
+
+<!-- injected-output:end -->
+
 Expected output:
 
 ```
@@ -213,6 +241,7 @@ query: 'FAISS index types'
 
 ## Hybrid search
 
+![Combining vector scores with BM25 scores](../../../assets/vector-search-101/06/06-04-hybrid-search.en.png)
 Vector search alone is weak when exact terms matter — error codes, product IDs, proper nouns. Keyword search handles those well but misses semantic variation. Hybrid search combines both.
 
 The standard approach normalizes each score to [0, 1] and takes a weighted sum.
@@ -262,6 +291,7 @@ def hybrid_search(
 
 ## Operational considerations
 
+![Index update and deletion constraint path](../../../assets/vector-search-101/06/06-05-operational-considerations.en.png)
 **Index updates.** Adding new documents is straightforward: embed them and call `index.add()`. `IndexFlatIP` does not support deletion. If you need to remove vectors, rebuild the index periodically or use `IndexIDMap` to track and skip deleted entries.
 
 **Memory.** `IndexFlatIP` keeps all vectors in memory. 100,000 vectors at 384 dimensions and 4 bytes each is roughly 147 MB. At 1 million vectors that becomes 1.5 GB. Beyond that, `IndexIVFFlat` or a quantization index like `IndexPQ` reduces memory use.

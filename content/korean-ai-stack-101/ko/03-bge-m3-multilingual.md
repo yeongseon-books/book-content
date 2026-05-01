@@ -43,12 +43,14 @@ last_reviewed: '2026-05-01'
 
 ## Dense 기준선을 먼저 잡는 이유
 
+![Dense 기준선을 먼저 잡는 이유](../../../assets/korean-ai-stack-101/03/03-01-dense.ko.png)
 하이브리드 검색까지 한 번에 올리면 무엇이 성능에 기여했는지 읽기 어렵습니다. dense 검색만으로도 한국어 질의가 영어 운영 문서를 끌어오는지, 영어 질의가 한국어 문서 근처로 가는지 충분히 확인할 수 있습니다.
 
 ---
 
 ## 최소 실행 예제
 
+![최소 실행 예제](../../../assets/korean-ai-stack-101/03/03-02-diagram.ko.png)
 ```python
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -75,6 +77,7 @@ print(distances, indices)
 
 ## 이 코드에서 봐야 할 것
 
+![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/03/03-03-diagram-2.ko.png)
 - 문서 언어를 일부러 섞어 둡니다.
 - 질의를 한국어와 영어 모두로 시험해 봐야 합니다.
 - 이번 예제는 **dense retrieval만** 사용합니다.
@@ -84,6 +87,7 @@ print(distances, indices)
 
 ## 실무에서 헷갈리는 지점
 
+![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/03/03-04-diagram-3.ko.png)
 - 다국어 모델을 쓴다고 번역 고민이 완전히 사라지지는 않습니다.
 - 하이브리드 검색이 항상 정답은 아닙니다.
 - 언어보다 주제 경계가 더 큰 변수인 경우도 많습니다.

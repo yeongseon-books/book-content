@@ -34,6 +34,16 @@ A bad chunking choice leaks into every later stage. Too small means broken conte
 
 This example runs FAQ, manual, and policy-style text through the same splitter and shows with numbers why per-document presets matter.
 
+## Chunking flow by document type
+
+![Chunking strategy selection flow](../../../assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png)
+Even with one splitter, the starting chunk size and overlap should differ by document shape.
+
+## Recursive splitter fallback order
+
+![Recursive separator fallback flow](../../../assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.en.png)
+The strength of recursive splitting is that it preserves larger semantic boundaries first and only falls back when needed.
+
 ## Runnable example
 
 ```python
@@ -102,11 +112,21 @@ python main.py
 
 ## What to notice in this code
 
+### How chunk overlap preserves context
+
+![Chunk boundaries with overlap flow](../../../assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.en.png)
+Overlap is the handoff mechanism that keeps a bit of prior context alive across adjacent chunks.
+
 - The example makes it obvious that small changes in `chunk_size`, `chunk_overlap`, and `separators` change the output a lot.
 - It prints min and max length alongside the average so skewed chunks stand out immediately.
 - The first-chunk preview is a cheap way to verify that headings and numbered lists survive the split.
 
 ## Where engineers get confused
+
+### How to review chunk quality
+
+![Chunk quality review flow](../../../assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.en.png)
+Chunk count alone is too weak. Distribution and preview checks reveal whether the split still respects structure.
 
 - Better chunking does not always mean smaller chunks. Quality depends on boundary choice and overlap together.
 - Per-document presets are starting points, not universal truths. Retrieval logs should tune them later.

@@ -34,6 +34,16 @@ The final post assembles the earlier isolated examples into one real flow. At th
 
 This example loads three formats, chunks them, stores embeddings in FAISS, reloads the saved index, and runs a search against it. That is enough to prove an ingestion MVP works end to end.
 
+## End-to-end ingestion pipeline
+
+![End-to-end ingestion pipeline flow](../../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
+The final post is mostly about clean handoffs between stages rather than deeper logic inside any single function.
+
+## Stage verification checkpoints
+
+![Stage verification checkpoint flow](../../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.en.png)
+A small set of stage-level checkpoints is often enough to localize where the pipeline broke.
+
 ## Runnable example
 
 ```python
@@ -167,11 +177,21 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 
 ## What to notice in this code
 
+### Monitoring and recovery path
+
+![Monitoring and recovery flow](../../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.en.png)
+Production ingestion needs a visible recovery path, not only a happy-path diagram.
+
 - `load_file()` absorbs format differences, and `chunk_documents()` creates the shared chunk contract.
 - `SimpleHashEmbeddings` lets the example verify FAISS save-reload behavior without depending on a network model download.
 - The log keeps four tight checkpoints: `loaded_documents`, `chunks`, `faiss_saved`, and `result`.
 
 ## Where engineers get confused
+
+### Retry and replay control
+
+![Retry and replay control flow](../../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.en.png)
+Retrying and replaying are different control paths, and collapsing them into one action usually wastes time and compute.
 
 - An end-to-end demo does not need an LLM call on day one. Verifying index save and reload is more important first.
 - Embedding quality and pipeline correctness are different concerns. Reproducibility wins at the demo stage.

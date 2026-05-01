@@ -14,7 +14,6 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
-title: FAISS fundamentals — fast approximate nearest-neighbor search
 ---
 
 # FAISS fundamentals — fast approximate nearest-neighbor search
@@ -35,7 +34,7 @@ This post covers five things:
 - running real queries against a small corpus
 - how to choose between index types
 
-![FAISS fundamentals: fast approximate nearest-neighbor search](../../../assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
+![FAISS index type comparison structure](../../../assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: FAISS finds vectors fast. IndexFlatL2 is the simplest option; switch to IVF or HNSW when the dataset grows.
@@ -63,6 +62,7 @@ Replace `faiss-cpu` with `faiss-gpu` if a compatible GPU is available.
 
 ## Understanding index types
 
+![FAISS index type comparison structure](../../../assets/vector-search-101/04/04-01-understanding-index-types.en.png)
 FAISS supports many index types, each with different speed-accuracy tradeoffs. Two are essential at the start.
 
 **IndexFlatL2**: exact search using Euclidean distance. Compares every vector without skipping. Accuracy is 100%, but search time scales linearly with the number of vectors.
@@ -75,6 +75,7 @@ Larger deployments use approximate indexes like `IndexIVFFlat` or `IndexHNSWFlat
 
 ## Exact search with IndexFlatIP
 
+![Flow from embeddings to index creation](../../../assets/vector-search-101/04/04-02-exact-search-with-indexflatip.en.png)
 The standard pattern for text retrieval: normalized vectors plus inner-product index.
 
 ```python
@@ -113,6 +114,14 @@ print(f"total vectors in index: {index.ntotal}")
 print(f"vector dimension: {dimension}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    total vectors in index: 10
+    vector dimension: 384
+
+<!-- injected-output:end -->
+
 ```
 total vectors in index: 10
 vector dimension: 384
@@ -124,6 +133,7 @@ FAISS requires `float32` arrays. Without the explicit `dtype=np.float32` cast, N
 
 ## Running queries
 
+![Query to FAISS result path](../../../assets/vector-search-101/04/04-03-running-queries.en.png)
 ```python
 def search(query: str, top_k: int = 3) -> list[tuple[float, str]]:
     query_vector = np.array(
@@ -222,6 +232,18 @@ for score, idx in zip(scores[0], indices[0]):
     print(f"  {score:.4f} — {loaded_documents[idx]}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    saved: 3 vectors
+    reloaded: 3 vectors
+
+    results:
+      0.5446 — FAISS is a high-speed vector search library from Facebook AI Research.
+      0.4393 — Cosine similarity measures the directional similarity between two vectors.
+
+<!-- injected-output:end -->
+
 ```
 saved: 3 vectors
 reloaded: 3 vectors
@@ -277,6 +299,19 @@ for score, idx in zip(scores_l2[0], indices_l2[0]):
     print(f"  {score:.4f} — {sentences[idx]}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    IndexFlatIP (higher = more similar):
+      0.9508 — handling concurrency in Python
+      0.6413 — Python async programming
+
+    IndexFlatL2 (lower = more similar):
+      0.0984 — handling concurrency in Python
+      0.7173 — Python async programming
+
+<!-- injected-output:end -->
+
 ```
 IndexFlatIP (higher = more similar):
   0.8241 — handling concurrency in Python
@@ -293,6 +328,7 @@ Both indexes return the correct ranking. For text retrieval, `IndexFlatIP` with 
 
 ## Choosing an index
 
+![float64 input error path](../../../assets/vector-search-101/04/04-04-choosing-an-index.en.png)
 | Index | Accuracy | Speed | Memory | Typical scale |
 |---|---|---|---|---|
 | IndexFlatL2 / IP | 100% | O(n) | n × d × 4B | up to ~100K |

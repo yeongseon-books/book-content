@@ -45,6 +45,9 @@ last_reviewed: '2026-05-01'
 
 ## HITL이 필요한 상황
 
+### 위험도에 따른 사람 개입 범위
+
+![위험도에 따른 사람 개입 범위](../../../assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.ko.png)
 모든 작업에 HITL이 필요한 것은 아닙니다. 다음 경우에 적합합니다.
 
 **고위험 결정**: 금전 이체, 계약 생성, 개인정보 처리처럼 실수의 비용이 큰 경우입니다.
@@ -59,6 +62,9 @@ last_reviewed: '2026-05-01'
 
 ## 기본 승인 게이트
 
+### 초안 생성과 승인 게이트 흐름
+
+![초안 생성과 승인 게이트 흐름](../../../assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.ko.png)
 가장 단순한 HITL 패턴은 파이프라인 중간에 사람의 입력을 기다리는 것입니다.
 
 ```python
@@ -132,6 +138,9 @@ if final_response:
 
 ## 신뢰도 기반 자동/수동 분기
 
+### 신뢰도 임계값 라우팅 구조
+
+![신뢰도 임계값 라우팅 구조](../../../assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.ko.png)
 LLM에 신뢰도 점수를 함께 반환하도록 하고, 점수가 낮으면 자동으로 사람 검토 경로로 보냅니다.
 
 ```python
@@ -193,6 +202,9 @@ for text in texts:
 
 ## 감사 로그
 
+### 검토 결정과 감사 로그 기록 구조
+
+![검토 결정과 감사 로그 기록 구조](../../../assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.ko.png)
 HITL 시스템에서는 누가, 언제, 무엇을 검토했는지 기록이 필수입니다.
 
 ```python
@@ -276,6 +288,9 @@ print(f"감사 로그: {LOG_FILE}")
 
 ## 실무에서 헷갈리는 지점
 
+### 사람 피드백이 정책으로 돌아가는 루프
+
+![사람 피드백이 정책으로 돌아가는 루프](../../../assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.ko.png)
 - HITL은 사람을 항상 마지막에 두는 패턴이 아닙니다. 분류 전, 전송 전, 결제 전 등 여러 위치에 들어갈 수 있습니다.
 - 신뢰도 점수는 사실상 라우팅 힌트이지 객관적 진실값이 아닙니다. 사람 검토 기준은 별도 정책으로 정해야 합니다.
 - 사람 검토를 넣으면 품질만 좋아지는 것이 아니라 처리량이 줄어듭니다. SLA와 운영 인력까지 같이 계산해야 합니다.

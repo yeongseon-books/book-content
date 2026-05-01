@@ -43,12 +43,14 @@ last_reviewed: '2026-05-01'
 
 ## 왜 단순한 파이프라인이 더 많이 알려 주는가
 
+![왜 단순한 파이프라인이 더 많이 알려 주는가](../../../assets/korean-ai-stack-101/06/06-01-diagram.ko.png)
 청킹 함수, 임베딩, 검색, 생성이 드러나는 코드는 품질 문제를 훨씬 빨리 좁혀 줍니다. 질문이 "결제는 됐는데 주문 내역이 없다"일 때 어떤 청크가 선택되는지 먼저 보고 답변을 읽어야 합니다.
 
 ---
 
 ## 최소 실행 예제
 
+![최소 실행 예제](../../../assets/korean-ai-stack-101/06/06-02-diagram-2.ko.png)
 ```python
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -72,6 +74,7 @@ print(distances, indices)
 
 ## 이 코드에서 봐야 할 것
 
+![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/06/06-03-diagram-3.ko.png)
 - 문서를 **청크 목록**으로 분리합니다.
 - 검색된 청크를 점수와 함께 출력합니다.
 - 시스템 메시지에서 문맥에 없는 내용은 추측하지 말라고 못 박습니다.
@@ -81,6 +84,7 @@ print(distances, indices)
 
 ## 실무에서 헷갈리는 지점
 
+![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/06/06-04-diagram-4.ko.png)
 - 좋은 LLM을 붙였다고 RAG가 좋아지는 것은 아닙니다.
 - 임베딩 모델 선택만큼 청킹 전략도 중요합니다.
 - 민감 정보는 외부 API로 보내기 전에 마스킹이 필요할 수 있습니다.

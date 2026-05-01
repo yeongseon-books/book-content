@@ -31,6 +31,9 @@ The final post connects all the earlier pieces. A FAISS retriever finds the evid
 ![Questions this post answers](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+### End-to-end benchmark pipeline in one run
+
+![End-to-end benchmark pipeline in one run](../../../assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
 The runnable code lives in `rag-benchmark-101/en/06-benchmark-complete/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -48,16 +51,28 @@ ragas_result = evaluate(dataset=Dataset.from_list(rows), ...)
 ```
 
 ## What to notice in this code
+
+### Retrieval and generation report split
+
+![Retrieval and generation report split](../../../assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.en.png)
 - Keep retrieval and generation in separate report sections so bottlenecks remain obvious.
 - Logging retrieved IDs together with the final answer makes failure analysis much faster.
 - A full pipeline benchmark is only meaningful when corpus, embedding model, top-k, and LLM are fixed.
 
 ## Where engineers get confused
+
+### Branching search failures from generation failures
+
+![Branching search failures from generation failures](../../../assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.en.png)
 - Low faithfulness does not always mean the LLM failed; the retriever may have supplied the wrong evidence.
 - Strong retrieval can still produce low answer relevancy if the generation step ignores the question intent.
 - Sorting everything by one overall number hides which layer actually needs work.
 
 ## Checklist
+
+### Baseline to decision benchmark loop
+
+![Baseline to decision benchmark loop](../../../assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png)
 - [ ] Run retrieval, generation, and evaluation in one script.
 - [ ] Report retrieval metrics separately from generation metrics.
 - [ ] Keep both per-question logs and a final summary report.

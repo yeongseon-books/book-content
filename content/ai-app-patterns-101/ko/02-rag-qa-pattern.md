@@ -48,6 +48,9 @@ RAG(Retrieval-Augmented Generation)는 LLM의 고질적인 문제 두 가지를 
 
 ## RAG의 두 단계
 
+### 오프라인 인덱싱 단계 흐름
+
+![오프라인 인덱싱 단계 흐름](../../../assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.ko.png)
 **인덱싱 단계** (오프라인): 문서를 청크로 나누고 임베딩해서 벡터 인덱스에 저장합니다.
 
 **검색 단계** (온라인): 쿼리를 임베딩하고, 유사한 청크를 찾아, LLM 프롬프트에 주입합니다.
@@ -61,6 +64,9 @@ RAG(Retrieval-Augmented Generation)는 LLM의 고질적인 문제 두 가지를 
 
 ## 완전한 RAG Q&A 구현
 
+### 온라인 질의응답 실행 흐름
+
+![온라인 질의응답 실행 흐름](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.ko.png)
 ```python
 import os
 
@@ -165,6 +171,9 @@ for question in test_questions:
 
 ## 출처 추적과 함께 반환하기
 
+### 검색 결과와 출처 반환 구조
+
+![검색 결과와 출처 반환 구조](../../../assets/ai-app-patterns-101/02/02-03-answer-and-source-return-structure.ko.png)
 답변과 함께 어떤 문서에서 정보를 가져왔는지 반환하면 신뢰도가 높아집니다.
 
 ```python
@@ -236,6 +245,12 @@ print(f"출처: {result['sources']}")
 
 ## RAG가 실패하는 경우
 
+### 검색 실패를 줄이는 방어 계층
+
+![검색 실패를 줄이는 방어 계층](../../../assets/ai-app-patterns-101/02/02-04-defense-layers-against-retrieval-misses.ko.png)
+### 문서 없음 상황의 fallback 분기
+
+![문서 없음 상황의 fallback 분기](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.ko.png)
 **청크에 정보가 없을 때.** 쿼리와 관련된 청크가 검색되지 않으면 LLM은 hallucination을 일으킵니다. 프롬프트에 "문서에 없으면 모른다고 하라"는 지시가 중요합니다.
 
 **청크 경계에서 정보가 잘릴 때.** 중요한 정보가 두 청크에 걸쳐 있으면 하나의 청크에서 전체 맥락을 얻지 못합니다. `chunk_overlap`을 충분히 설정하면 도움이 됩니다.

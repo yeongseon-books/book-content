@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## Questions this post answers
 
+![Flow from adapter merge to inference response](../../../assets/llm-finetuning-101/06/06-01-questions-this-post-answers.en.png)
 - What is the smallest FastAPI shape for serving a fine-tuned language model?
 - Where should you separate training concerns from inference concerns?
 - How can you verify an endpoint without manually starting a browser or server process?
@@ -35,6 +36,7 @@ The example script applies one toy LoRA update to a tiny GPT-2 model, builds a F
 
 ## What this demo isolates on purpose
 
+![Separation between model preparation and HTTP contract](../../../assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png)
 Real serving systems also need request validation, authentication, observability, batching, and timeout policy. This post intentionally isolates two concerns only: **preparing a model object for inference** and **wrapping it in a stable HTTP interface**. Even that small boundary is worth learning cleanly.
 
 ![What this demo isolates on purpose](../../../assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.en.png)
@@ -63,12 +65,14 @@ print(client.post("/generate", json={"prompt": "Example Python function"}).json(
 
 ## What to notice in this code
 
+![FastAPI inference request branching flow](../../../assets/llm-finetuning-101/06/06-03-what-to-notice-in-this-code.en.png)
 - This script performs a single toy fine-tuning step before exposing the model, so the endpoint is not serving a pristine base model.
 - `TestClient` is ideal for CI-friendly endpoint validation because it exercises the HTTP contract without booting a standalone server.
 - Separating `/health` from `/generate` makes it easier to isolate infrastructure failures from inference failures later.
 
 ## Where engineers get confused
 
+![Serving choice by latency and quality trade-off](../../../assets/llm-finetuning-101/06/06-04-where-engineers-get-confused.en.png)
 - Keeping training logic inside serving code is not the production default. This post does it only to keep the demo self-contained.
 - The generated text is not meant to be beautiful. Tiny models validate control flow, not product-quality completions.
 - A working FastAPI endpoint is only the beginning. Operational concerns still need their own design.

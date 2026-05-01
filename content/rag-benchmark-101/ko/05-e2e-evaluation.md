@@ -31,6 +31,9 @@ last_reviewed: '2026-05-01'
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
+### 질문과 컨텍스트와 답변이 평가 입력으로 묶이는 구조
+
+![질문과 컨텍스트와 답변이 평가 입력으로 묶이는 구조](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.ko.png)
 실행 코드는 `rag-benchmark-101/ko/05-e2e-evaluation/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
@@ -49,16 +52,28 @@ result = evaluate(
 ```
 
 ## 이 코드에서 봐야 할 것
+
+### LLM wrapper와 임베딩 wrapper가 평가기에 연결되는 경로
+
+![LLM wrapper와 임베딩 wrapper가 평가기에 연결되는 경로](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.ko.png)
 - `contexts` 컬럼은 문자열 리스트여야 합니다. 단일 문자열로 넘기면 ragas 기대 형태와 어긋납니다.
 - `AnswerRelevancy(strictness=1)`로 두면 예제 실행 시간을 줄이면서도 실제 API 흐름을 그대로 볼 수 있습니다.
 - `RunConfig(timeout=300, max_workers=1)`는 네트워크 LLM 평가에서 타임아웃과 동시성 문제를 줄여 줍니다.
 
 ## 실무에서 헷갈리는 지점
+
+### 검색 실패와 생성 실패를 분리해 읽는 해석 축
+
+![검색 실패와 생성 실패를 분리해 읽는 해석 축](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.ko.png)
 - faithfulness는 ground truth 없이도 계산되지만, answer_relevancy는 답변이 질문을 직접 겨냥하는지 보므로 “그럴듯한 우회 답변”을 낮게 줄 수 있습니다.
 - RAGAS 점수는 검색 품질이 이미 반영된 최종 결과입니다. 따라서 검색 실패와 생성 실패를 따로 보고 싶다면 retrieval benchmark도 병행해야 합니다.
 - 버전이 다르면 import 경로와 metric 생성 방식이 달라질 수 있습니다. 이 글은 ragas 0.1.22 기준입니다.
 
 ## 체크리스트
+
+### 데이터셋 형태와 실행 조건을 먼저 확인하는 흐름
+
+![데이터셋 형태와 실행 조건을 먼저 확인하는 흐름](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.ko.png)
 - [ ] ragas 0.1.22 API로 metric 객체를 생성했다.
 - [ ] LLM과 임베딩을 wrapper로 감쌌다.
 - [ ] 질문·답변·contexts 형태의 Dataset을 만들었다.

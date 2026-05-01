@@ -49,6 +49,7 @@ Readers do not always have HyperCLOVA X or Solar keys available. If the example 
 
 ## Minimal runnable example
 
+![Minimal runnable example](../../../assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.en.png)
 ```python
 import os
 from groq import Groq
@@ -70,6 +71,7 @@ print(response.choices[0].message.content)
 
 ## What to notice in this code
 
+![What to notice in this code](../../../assets/korean-ai-stack-101/05/05-02-what-to-notice-in-this-code.en.png)
 - The system message is already in Korean and already specific.
 - A lower `temperature` keeps explanatory answers more stable.
 - Constraining the output format makes downstream handling easier.
@@ -79,6 +81,7 @@ print(response.choices[0].message.content)
 
 ## Where engineers get confused
 
+![Where engineers get confused](../../../assets/korean-ai-stack-101/05/05-03-where-engineers-get-confused.en.png)
 - Natural Korean phrasing does not automatically mean factual correctness.
 - OpenAI-compatible does not mean every provider behaves the same.
 - A detailed prompt is not a substitute for response validation.

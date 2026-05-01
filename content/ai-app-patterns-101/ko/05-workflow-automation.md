@@ -45,6 +45,12 @@ last_reviewed: '2026-05-01'
 
 ## 순차 체인
 
+### 순차 체인 데이터 전달 흐름
+
+![순차 체인 데이터 전달 흐름](../../../assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
+### DAG 스타일 분기와 병렬 실행 구조
+
+![DAG 스타일 분기와 병렬 실행 구조](../../../assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.ko.png)
 LCEL의 `|` 연산자로 여러 단계를 연결합니다. 왼쪽 단계의 출력이 오른쪽 단계의 입력이 됩니다.
 
 ```python
@@ -125,6 +131,12 @@ print(f"제목: {step3}")
 
 ## 분기(Routing) 패턴
 
+### 분류 기반 라우팅 구조
+
+![분류 기반 라우팅 구조](../../../assets/ai-app-patterns-101/05/05-03-classification-driven-routing.ko.png)
+### 승인 게이트와 재시도 복구 경로
+
+![승인 게이트와 재시도 복구 경로](../../../assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.ko.png)
 입력에 따라 다른 처리 경로로 보냅니다. 먼저 분류 단계에서 카테고리를 판단하고, 그 결과에 따라 적절한 체인을 실행합니다.
 
 ```python
@@ -218,6 +230,9 @@ for inquiry in test_inquiries:
 
 ## 다단계 데이터 변환 파이프라인
 
+### 코드 리뷰 워크플로 산출물 계약 구조
+
+![코드 리뷰 워크플로 산출물 계약 구조](../../../assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.ko.png)
 각 단계가 이전 단계의 결과를 받아 처리하는 실용적인 패턴입니다. 코드 리뷰 워크플로를 예로 듭니다.
 
 ```python

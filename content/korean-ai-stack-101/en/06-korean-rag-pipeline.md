@@ -49,6 +49,7 @@ A simpler implementation makes failure visible sooner. When the question is abou
 
 ## Minimal runnable example
 
+![Minimal runnable example](../../../assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.en.png)
 ```python
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -72,6 +73,7 @@ print(distances, indices)
 
 ## What to notice in this code
 
+![What to notice in this code](../../../assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.en.png)
 - The documents are broken into **chunks** before indexing.
 - Retrieved chunks are printed with scores.
 - The full script forbids unsupported speculation in the system prompt.
@@ -81,6 +83,7 @@ print(distances, indices)
 
 ## Where engineers get confused
 
+![Where engineers get confused](../../../assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.en.png)
 - A better LLM does not rescue weak retrieval.
 - Chunking strategy matters almost as much as model choice.
 - Sensitive documents may need masking before context is sent to an external API.

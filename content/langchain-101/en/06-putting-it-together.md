@@ -96,6 +96,7 @@ Topics:
 
 ## Document indexing pipeline
 
+![From document chunking to index build](../../assets/langchain-101/06/06-01-document-indexing-pipeline.en.png)
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -146,10 +147,18 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    index vector count: 4
+
+<!-- injected-output:end -->
+
 ---
 
 ## Assembling the RAG chain
 
+![Retriever prompt llm parser assembly](../../assets/langchain-101/06/06-02-assembling-the-rag-chain.en.png)
 ```python
 import os
 
@@ -191,6 +200,7 @@ rag_chain = (
 
 ## Running with streaming
 
+![Integrated RAG streaming execution path](../../assets/langchain-101/06/06-03-running-with-streaming.en.png)
 ```python
 questions = [
     "How is vector search different from keyword search?",
@@ -211,6 +221,7 @@ for question in questions:
 
 ## Multi-turn RAG with conversation history
 
+![Multi turn RAG with history flow](../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.en.png)
 A simple RAG chain treats each question independently. To reference earlier turns, pass conversation history to the chain.
 
 ```python

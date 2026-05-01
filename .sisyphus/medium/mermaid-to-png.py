@@ -170,7 +170,10 @@ def process_file(md_path: Path) -> tuple[int, list[tuple[int, str]]]:
         slug = base_slug if count == 1 else f"{base_slug}-{count}"
 
         png_name = f"{ep}-{idx:02d}-{slug}.{lang}.png"
-        rel_png = Path(f"../../assets/{series}/{ep}/{png_name}")
+        if "content" in md_path.parts:
+            rel_png = Path(f"../../../assets/{series}/{ep}/{png_name}")
+        else:
+            rel_png = Path(f"../../assets/{series}/{ep}/{png_name}")
         abs_png = REPO_ROOT / "assets" / series / ep / png_name
 
         alt = extract_alt_text(mermaid_src, ko_heading or slug_heading or f"{series} diagram {idx}")

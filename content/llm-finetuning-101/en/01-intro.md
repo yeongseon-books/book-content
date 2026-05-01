@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## Questions this post answers
 
+![Prompting, RAG, and fine-tuning choice flow](../../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)
 - Why is LoRA so much lighter than full fine-tuning?
 - How do you separate tasks that need fine-tuning from tasks that only need prompting or RAG?
 - What can you verify in Post 01 without loading a real model?
@@ -35,6 +36,7 @@ The executable example in this article does not load a model at all. Instead, it
 
 ## What to understand first
 
+![Boundary between frozen weights and trainable adapters](../../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
 The first question in fine-tuning is not which dataset to use. It is **which weights will actually move**. Full fine-tuning updates every parameter and therefore drags optimizer state and memory pressure with it. LoRA freezes the base model and adds small low-rank matrices, so you should always look at the trainable subset separately from the full model size.
 
 ![What to understand first](../../../assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
@@ -63,12 +65,14 @@ def lora_params_per_layer(hidden_size: int, intermediate_size: int, rank: int) -
 
 ## What to notice in this code
 
+![LoRA coverage across transformer linear layers](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
 - The example uses `hidden_size=768`, `intermediate_size=3072`, and `num_layers=12` to mimic a GPT-2-small-scale layout.
 - The calculation focuses on the linear surfaces that LoRA touches, not on every parameter in the architecture.
 - The ratio you get here becomes a useful intuition anchor for Post 03, where `LoraConfig(r=8)` appears in code.
 
 ## Where engineers get confused
 
+![Base model selection by task constraints](../../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
 - LoRA does not shrink the base model itself. It shrinks the trainable slice and the amount of new state you need to store.
 - A cheaper training method does not make bad data good. Small adapters can still learn the wrong behavior very efficiently.
 - The exact ratio changes by architecture and target modules, so treat this post as a mental model, not a universal constant.

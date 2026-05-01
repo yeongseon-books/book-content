@@ -49,6 +49,7 @@ export GROQ_API_KEY="여기에-발급받은-키"
 
 ## 왜 모든 실패를 같은 예외로 다루면 안 되는가
 
+![재시도 가능 오류와 영구 오류의 분기 비교](../../assets/llm-api-production-101/05/05-01-why-all-failures-should-not-share-one-re.ko.png)
 재시도는 일시적 실패를 흡수할 때만 가치가 있습니다. 예를 들어 잠깐의 네트워크 흔들림, 순간적인 read timeout, 짧은 5xx 응답은 몇 초 뒤 다시 성공할 수 있습니다. 반대로 아래 경우는 재시도로 해결되지 않을 가능성이 큽니다.
 
 - API 키가 잘못된 인증 오류
@@ -83,6 +84,7 @@ def flaky_operation() -> str:
 
 ## 오류 분류용 예외 계층 만들기
 
+![공급자 예외를 앱 예외로 감싸는 구조](../../assets/llm-api-production-101/05/05-02-creating-an-error-hierarchy-for-retry-de.ko.png)
 가장 다루기 쉬운 패턴은 애플리케이션 안에서 오류를 다시 분류하는 것입니다. 아래처럼 일시적 오류와 영구 오류를 나눌 수 있습니다.
 
 ```python
@@ -99,6 +101,7 @@ class NonRetryableLLMError(Exception):
 
 ## 지수 백오프 재시도 붙이기
 
+![지수 백오프가 반복되는 재시도 흐름](../../assets/llm-api-production-101/05/05-03-adding-exponential-backoff-to-a-groq-cal.ko.png)
 이제 Groq 호출을 감싸 보겠습니다. 아래 예제는 일시적 공급자 오류만 재시도 대상으로 올리고, 그 외는 즉시 실패시킵니다. 한 가지 운영 포인트가 더 있습니다. Groq 클라이언트 자체에도 기본 재시도 동작이 있을 수 있으므로, `tenacity` 예제를 보여 줄 때는 SDK 재시도를 꺼 두는 편이 정책을 읽기 쉽습니다.
 
 ```python
@@ -162,12 +165,22 @@ except RetryableLLMError as exc:
     logger.error("재시도 후에도 실패한 요청입니다: %s", exc)
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    Python의 context manager는 자원 관리를 위한 디자인 패턴입니다. 
+    이 패턴은 try-finally 블록을 사용하여 자원을 열고 닫는 것을 자동화합니다. 
+    context manager는 with 문을 사용하여 사용할 수 있으며, try-finally 블록의 복잡성을 줄여줍니다.
+
+<!-- injected-output:end -->
+
 핵심은 세 가지입니다. 첫째, `retry_if_exception_type(RetryableLLMError)`로 재시도 대상을 명시합니다. 둘째, `wait_exponential_jitter`로 대기 간격을 점진적으로 늘리면서 동시에 지터를 섞습니다. 셋째, `reraise=True`로 최종 실패를 숨기지 않습니다.
 
 ---
 
 ## 재시도 가능한 오류와 불가능한 오류를 어떻게 나눌까
 
+![오류 유형별 처리 정책 결정 흐름](../../assets/llm-api-production-101/05/05-04-which-failures-are-retryable.ko.png)
 현장에서 자주 쓰는 기준은 아래 정도입니다.
 
 ### 재시도 가능
@@ -233,6 +246,7 @@ except Exception as exc:
 
 ## 최종 실패를 어떻게 사용자에게 드러낼 것인가
 
+![최종 실패 뒤 사용자와 로그로 나뉘는 경로](../../assets/llm-api-production-101/05/05-05-what-the-user-should-see-after-final-fai.ko.png)
 재시도는 실패를 없애는 기술이 아닙니다. 최종 실패를 더 낫게 다루는 기술입니다. 모든 시도가 끝난 뒤에는 애플리케이션이 아래 정도를 분명히 해야 합니다.
 
 - 사용자에게 보여 줄 메시지

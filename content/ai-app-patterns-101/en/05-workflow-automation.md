@@ -45,6 +45,12 @@ Topics:
 
 ## Sequential chains
 
+### Sequential handoff across stages
+
+![Sequential handoff across stages](../../../assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png)
+### DAG style branching with parallel work
+
+![DAG style branching with parallel work](../../../assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.en.png)
 LCEL's `|` operator connects stages: the left stage's output becomes the right stage's input.
 
 ```python
@@ -121,6 +127,12 @@ print(f"title: {step3}")
 
 ## Routing — branching based on classification
 
+### Classification driven routing
+
+![Classification driven routing](../../../assets/ai-app-patterns-101/05/05-03-classification-driven-routing.en.png)
+### Approval gate and retry recovery
+
+![Approval gate and retry recovery](../../../assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.en.png)
 Classify the input first, then route it to the appropriate chain. The classifier's output is the only dependency between the two stages.
 
 ```python
@@ -211,6 +223,9 @@ for inquiry in test_inquiries:
 
 ## Multi-stage data transformation pipeline
 
+### Code review artifact contract
+
+![Code review artifact contract](../../../assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.en.png)
 Each stage transforms the previous stage's output. The code review pipeline below shows three chained transformations: analysis → suggestions → report.
 
 ```python

@@ -31,6 +31,9 @@ The fourth post focuses on the algorithm layer inside the vector store. Annoy is
 ![Questions this post answers](../../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+### Same-vector flat and IVF comparison structure
+
+![Same-vector flat and IVF comparison structure](../../../assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
 The runnable code lives in `rag-benchmark-101/en/04-vectordb-selection/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -49,16 +52,28 @@ ivf_index.nprobe = 1
 ```
 
 ## What to notice in this code
+
+### Boundary between embedding and search timing
+
+![Boundary between embedding and search timing](../../../assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png)
 - Document and query embeddings are precomputed so the loop measures pure `index.search()` latency.
 - `nprobe` is the main IVF control for trading recall against speed.
 - The fallback to flat vs IVF keeps the benchmark useful even without Annoy installed.
 
 ## Where engineers get confused
+
+### nprobe trade-off between speed and accuracy
+
+![nprobe trade-off between speed and accuracy](../../../assets/rag-benchmark-101/04/04-03-nprobe-trade-off-between-speed-and-accur.en.png)
 - If embedding time dominates the benchmark, index differences disappear into noise.
 - Approximate search does not always reduce quality in a visible way; the effect depends on the data and `nprobe`.
 - A tie on a toy corpus does not guarantee a tie on a much larger production collection.
 
 ## Checklist
+
+### Index decision axes for real workloads
+
+![Index decision axes for real workloads](../../../assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.en.png)
 - [ ] Benchmark the same vectors across both indexes.
 - [ ] Measure search latency separately from embedding time.
 - [ ] Choose the index with both speed and accuracy in view.

@@ -49,6 +49,7 @@ If you attach sparse retrieval and reranking immediately, it becomes hard to tel
 
 ## Minimal runnable example
 
+![Minimal runnable example](../../../assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.en.png)
 ```python
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -75,6 +76,7 @@ print(distances, indices)
 
 ## What to notice in this code
 
+![What to notice in this code](../../../assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.en.png)
 - The corpus is intentionally multilingual.
 - Queries should be tested in both Korean and English.
 - The example uses **dense retrieval only** to establish a clean baseline.
@@ -84,6 +86,7 @@ print(distances, indices)
 
 ## Where engineers get confused
 
+![Where engineers get confused](../../../assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png)
 - Multilingual retrieval does not eliminate all language-specific tuning.
 - Hybrid search is not automatically better.
 - Topic ambiguity can matter more than language ambiguity.

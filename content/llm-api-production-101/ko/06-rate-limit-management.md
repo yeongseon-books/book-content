@@ -49,6 +49,7 @@ export GROQ_API_KEY="여기에-발급받은-키"
 
 ## 왜 애플리케이션 쪽 제한기가 필요한가
 
+![로컬 제한기가 공급자 앞에서 흐름을 조절하는 구조](../../assets/llm-api-production-101/06/06-01-why-the-application-needs-its-own-limite.ko.png)
 재시도와 백오프만으로는 rate limit을 풀 수 없습니다. 이미 공급자 제한을 넘겨 실패한 뒤에 다시 천천히 보내는 것은 사후 대응입니다. 물론 필요하지만, 더 좋은 방법은 애초에 초과 가능성을 줄이는 것입니다.
 
 애플리케이션 내부 제한기가 필요한 이유는 세 가지입니다.
@@ -63,6 +64,7 @@ export GROQ_API_KEY="여기에-발급받은-키"
 
 ## 토큰 버킷은 어떤 문제에 잘 맞는가
 
+![토큰 버킷의 채움 소비 반복 구조](../../assets/llm-api-production-101/06/06-02-where-a-token-bucket-fits-best.ko.png)
 토큰 버킷은 일정 속도로 토큰이 다시 채워지고, 요청이 들어올 때 토큰을 하나씩 소비하는 방식입니다. 장점은 짧은 burst를 어느 정도 허용하면서도 평균 속도를 제어하기 쉽다는 점입니다.
 
 예를 들어 초당 5개의 토큰이 채워지고 버킷 최대 크기가 10이면, 한가한 시간에 모인 여유분으로 잠깐의 10개 burst를 처리할 수 있습니다. 하지만 그 뒤에는 평균적으로 초당 5개 이상을 계속 보낼 수 없습니다. 사용자 요청이 짧게 몰렸다가 다시 잦아드는 웹 트래픽에 잘 맞는 이유가 여기 있습니다.
@@ -169,6 +171,7 @@ class SlidingWindowLimiter:
 
 ## Groq 호출 앞에 제한기 붙이기
 
+![제한기 통과 뒤 외부 호출로 가는 실행 경로](../../assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.ko.png)
 이제 실제 호출 경로 앞에 제한기를 둡니다. 아래 예제는 토큰 버킷을 사용합니다.
 
 ```python
@@ -216,12 +219,80 @@ def limited_completion(prompt: str) -> str:
 print(limited_completion("Python의 list와 tuple 차이를 설명해 주세요."))
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    Python의 list와 tuple은 모두 순서가 있는 데이터 구조입니다. 하지만 두 데이터 구조는 다음과 같은 차이가 있습니다.
+
+    ### 1. Mutable vs Immutable
+
+    - **List**: Mutable, 즉 변경이 가능합니다. List의 요소를 추가, 삭제, 수정할 수 있습니다.
+    - **Tuple**: Immutable, 즉 변경이 불가능합니다. Tuple의 요소를 추가, 삭제, 수정할 수 없습니다.
+
+    ### 2. Syntax
+
+    - **List**: 대괄호 `[]`를 사용합니다.
+    - **Tuple**: 소괄호 `()`를 사용합니다.
+
+    ### 3. Performance
+
+    - **List**: List는 동적 할당을 사용하므로, 요소가 추가되면 메모리가 자동으로 할당됩니다. 하지만 이로 인해 성능이 떨어질 수 있습니다.
+    - **Tuple**: Tuple은 정적 할당을 사용하므로, 요소가 추가되면 메모리가 미리 할당됩니다. 따라서 Tuple은 List보다 성능이 좋습니다.
+
+    ### 4. 사용 예시
+
+    ```python
+    # List
+    my_list = [1, 2, 3]
+    print(my_list)  # [1, 2, 3]
+
+    # 요소 추가
+    my_list.append(4)
+    print(my_list)  # [1, 2, 3, 4]
+
+    # 요소 삭제
+    my_list.remove(2)
+    print(my_list)  # [1, 3, 4]
+
+    # 요소 수정
+    my_list[0] = 10
+    print(my_list)  # [10, 3, 4]
+
+    # Tuple
+    my_tuple = (1, 2, 3)
+    print(my_tuple)  # (1, 2, 3)
+
+    # 요소 추가 (불가능)
+    try:
+        my_tuple.append(4)
+    except AttributeError:
+        print("요소 추가는 불가능합니다.")
+
+    # 요소 삭제 (불가능)
+    try:
+        my_tuple.remove(2)
+    except AttributeError:
+        print("요소 삭제는 불가능합니다.")
+
+    # 요소 수정 (불가능)
+    try:
+        my_tuple[0] = 10
+    except TypeError:
+        print("요소 수정은 불가능합니다.")
+    ```
+
+    ### 결론
+    ... (truncated)
+
+<!-- injected-output:end -->
+
 이 코드는 공급자에게 보내기 전에 먼저 내부 버킷에서 토큰을 확보합니다. 허용량이 없으면 잠깐 기다립니다. 핵심은 외부 API가 막기 전에 내부 제어가 먼저 동작한다는 점입니다.
 
 ---
 
 ## 429를 받았을 때는 어떻게 할까
 
+![429 응답 뒤 backoff와 재허가가 이어지는 경로](../../assets/llm-api-production-101/06/06-04-what-to-do-after-a-429-anyway.ko.png)
 내부 제한기가 있다고 해도 429를 완전히 없애지는 못할 수 있습니다. 여러 프로세스가 있거나, 공급자 측 정책이 토큰 기준으로 더 복잡할 수도 있기 때문입니다. 그래서 429는 여전히 처리해야 합니다.
 
 좋은 기본 원칙은 아래와 같습니다.
@@ -299,6 +370,7 @@ def limited_completion_with_429(prompt: str) -> str:
 
 ## 토큰 버킷과 슬라이딩 윈도우를 언제 고를까
 
+![제한기 선택 기준이 갈리는 비교 구조](../../assets/llm-api-production-101/06/06-05-choosing-token-bucket-versus-sliding-win.ko.png)
 둘 다 정답일 수 있지만 쓰임새가 조금 다릅니다.
 
 ### 토큰 버킷이 잘 맞는 경우

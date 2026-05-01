@@ -14,7 +14,6 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
-title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 ---
 
 # 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
@@ -35,7 +34,7 @@ title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 - 실제로 벡터를 만들어 보는 첫 예제
 - 임베딩의 한계와 주의점
 
-![임베딩이란 무엇인가: 텍스트를 벡터로 변환하기](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.ko.png)
+![키워드 검색과 임베딩 검색의 차이](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.ko.png)
 <!-- ebook-only:start -->
 
 이 장의 핵심: **임베딩은 텍스트를 고차원 벡터로 압축한 것이다.** 의미가 비슷한 문장은 벡터 공간에서 가깝다.
@@ -50,6 +49,7 @@ title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 
 ## 키워드 검색의 벽
 
+![키워드 검색과 임베딩 검색의 차이](../../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.ko.png)
 전통 검색은 단어 빈도와 위치로 순위를 매깁니다. TF-IDF, BM25 같은 방식이 대표적입니다. 이 방법은 계산이 빠르고 이해하기 쉬우며, 정확한 단어가 있을 때 정확도도 높습니다.
 
 문제는 언어가 그렇게 단순하지 않다는 데 있습니다. 같은 개념을 표현하는 방법은 무수히 많습니다.
@@ -66,6 +66,7 @@ title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 
 ## 벡터 공간 직관
 
+![텍스트가 벡터 공간으로 들어가는 흐름](../../../assets/vector-search-101/01/01-02-vector-space-intuition.ko.png)
 임베딩 모델은 텍스트를 고정 길이의 부동소수점 배열로 바꿉니다. `sentence-transformers/all-MiniLM-L6-v2`를 쓰면 모든 텍스트가 384차원 벡터가 됩니다. 768차원, 1536차원 모델도 흔합니다.
 
 ```
@@ -88,6 +89,7 @@ title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 
 ## 임베딩 모델은 어떻게 학습하는가
 
+![긍정 쌍과 부정 쌍 학습 구조](../../../assets/vector-search-101/01/01-03-how-embedding-models-learn.ko.png)
 임베딩 모델은 "의미가 비슷한 문장 쌍은 가깝게, 관련 없는 문장 쌍은 멀게" 놓도록 학습합니다. 대표적인 방법이 대조 학습(contrastive learning)입니다.
 
 학습 데이터는 보통 아래처럼 구성됩니다.
@@ -103,6 +105,7 @@ title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 
 ## 첫 번째 벡터 만들어 보기
 
+![문장 세 개를 벡터로 인코딩하는 실행 경로](../../../assets/vector-search-101/01/01-04-creating-your-first-vectors.ko.png)
 이론보다 코드를 한 번 돌려보는 편이 직관을 잡는 데 더 빠릅니다. `sentence-transformers` 패키지를 설치하고 세 문장을 임베딩해 봅니다.
 
 ```bash
@@ -126,6 +129,15 @@ print(f"벡터 개수: {len(embeddings)}")
 print(f"벡터 차원: {embeddings[0].shape[0]}")
 print(f"첫 번째 벡터 (앞 5개): {embeddings[0][:5]}")
 ```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    벡터 개수: 3
+    벡터 차원: 384
+    첫 번째 벡터 (앞 5개): [-0.0324095   0.04004027 -0.01644003 -0.02052497 -0.03649969]
+
+<!-- injected-output:end -->
 
 실행하면 이런 결과가 나옵니다.
 
@@ -158,6 +170,14 @@ print(f"[0] vs [1] (의미 유사): {cosine_similarity(embeddings[0], embeddings
 print(f"[0] vs [2] (의미 무관): {cosine_similarity(embeddings[0], embeddings[2]):.4f}")
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    [0] vs [1] (의미 유사): 0.9624
+    [0] vs [2] (의미 무관): 0.6169
+
+<!-- injected-output:end -->
+
 결과는 대략 아래처럼 나옵니다. 정확한 수치는 모델 버전에 따라 조금씩 달라질 수 있습니다.
 
 ```
@@ -171,6 +191,7 @@ print(f"[0] vs [2] (의미 무관): {cosine_similarity(embeddings[0], embeddings
 
 ## 임베딩이 잘 작동하지 않는 경우
 
+![정확 문자열과 긴 문서에서 생기는 한계](../../../assets/vector-search-101/01/01-05-where-embeddings-fall-short.ko.png)
 임베딩은 만능이 아닙니다. 몇 가지 상황에서는 키워드 검색보다 성능이 떨어집니다.
 
 **정확한 ID나 코드를 찾는 경우.** `ERR_CONNECTION_REFUSED`나 `CVE-2024-12345` 같은 정확한 문자열을 찾을 때는 임베딩보다 키워드 검색이 낫습니다. 임베딩은 의미를 추상화하는 과정에서 정확한 기호 정보를 희석시킬 수 있습니다.

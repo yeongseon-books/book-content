@@ -31,6 +31,9 @@ last_reviewed: '2026-05-01'
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
+### 검색과 생성과 평가가 한 실행으로 이어지는 파이프라인
+
+![검색과 생성과 평가가 한 실행으로 이어지는 파이프라인](../../../assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.ko.png)
 실행 코드는 `rag-benchmark-101/ko/06-benchmark-complete/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
@@ -48,16 +51,28 @@ ragas_result = evaluate(dataset=Dataset.from_list(rows), ...)
 ```
 
 ## 이 코드에서 봐야 할 것
+
+### Retrieval 리포트와 generation 리포트를 나누는 구조
+
+![Retrieval 리포트와 generation 리포트를 나누는 구조](../../../assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.ko.png)
 - retrieval 리포트와 generation 리포트를 별도 key로 나눠서 출력해야 병목 분석이 쉬워집니다.
 - 질문별로 retrieved ids와 최종 answer를 함께 로그에 남기면 숫자 뒤의 실패 사례를 빠르게 추적할 수 있습니다.
 - 전체 파이프라인 벤치마크에서는 코퍼스, 임베딩 모델, top-k, LLM 모델을 고정해야 비교가 의미 있습니다.
 
 ## 실무에서 헷갈리는 지점
+
+### 낮은 점수를 검색 문제와 생성 문제로 가르는 분기
+
+![낮은 점수를 검색 문제와 생성 문제로 가르는 분기](../../../assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.ko.png)
 - 최종 faithfulness가 낮다고 해서 항상 LLM만 문제인 것은 아닙니다. 검색기가 잘못된 문서를 가져오면 생성기는 그 문서에 충실하게 틀릴 수 있습니다.
 - 반대로 retrieval 지표가 좋아도 answer_relevancy가 낮으면 프롬프트나 생성 단계가 질문을 제대로 반영하지 못한 것입니다.
 - 전체 점수 하나로만 정렬하면 어떤 레이어를 개선해야 하는지 감이 사라집니다. 최소한 retrieval과 generation을 분리해 유지하세요.
 
 ## 체크리스트
+
+### 기준선 비교부터 최종 의사결정까지 이어지는 벤치마크 루프
+
+![기준선 비교부터 최종 의사결정까지 이어지는 벤치마크 루프](../../../assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.ko.png)
 - [ ] 검색, 생성, 평가를 한 실행 파일에 묶었다.
 - [ ] retrieval 지표와 generation 지표를 분리해 출력했다.
 - [ ] 질문별 로그와 최종 요약 리포트를 함께 남겼다.

@@ -45,6 +45,9 @@ Topics:
 
 ## When HITL is the right choice
 
+### Human review by risk level
+
+![Human review by risk level](../../../assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
 HITL adds latency and cost. Use it when the cost of an unchecked error is high.
 
 **High-stakes decisions**: money transfers, contract generation, personal data processing — anything where a mistake is expensive or irreversible.
@@ -59,6 +62,9 @@ HITL adds latency and cost. Use it when the cost of an unchecked error is high.
 
 ## Basic approval gate
 
+### Draft generation with approval gate
+
+![Draft generation with approval gate](../../../assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.en.png)
 The simplest HITL pattern is a blocking prompt that waits for human input before the pipeline continues.
 
 ```python
@@ -129,6 +135,9 @@ if final_response:
 
 ## Confidence-based branching
 
+### Confidence threshold routing
+
+![Confidence threshold routing](../../../assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.en.png)
 Ask the LLM to return a confidence score alongside its output. Route low-confidence results to a human reviewer automatically.
 
 ```python
@@ -190,6 +199,9 @@ for text in texts:
 
 ## Audit logging
 
+### Review decisions with audit events
+
+![Review decisions with audit events](../../../assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.en.png)
 HITL systems require a record of who reviewed what and when. The audit log also becomes training data for improving the model over time.
 
 ```python
@@ -271,6 +283,9 @@ print(f"audit log: {LOG_FILE}")
 
 ## Where engineers get confused
 
+### Human feedback back into policy loop
+
+![Human feedback back into policy loop](../../../assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.en.png)
 - HITL does not always sit at the very end; human review can appear before classification, before sending, or before money moves.
 - A confidence score is only a routing hint, not an objective truth signal. Review thresholds still require policy decisions.
 - Adding human review improves control but reduces throughput, so staffing and SLA impact must be designed alongside quality.

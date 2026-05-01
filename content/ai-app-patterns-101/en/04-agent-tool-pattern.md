@@ -45,6 +45,9 @@ Topics:
 
 ## Agent vs chain
 
+### Fixed chain versus dynamic agent
+
+![Fixed chain versus dynamic agent](../../../assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
 **Chain**: input → step A → step B → output. The execution path is determined at design time.
 
 **Agent**: input → LLM reasons → selects tool → executes tool → observes result → repeats if needed → final answer. The execution path is determined at runtime.
@@ -55,6 +58,9 @@ Agents use the ReAct (Reason + Act) loop: Thought → Action → Observation, re
 
 ## Defining tools
 
+### Tool registry and selection surface
+
+![Tool registry and selection surface](../../../assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.en.png)
 In LangChain, a tool is a Python function decorated with `@tool`. The docstring becomes the description the LLM reads when deciding which tool to use. Write it precisely — a vague docstring leads to wrong tool selection.
 
 ```python
@@ -132,6 +138,9 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
 
 ## Building a ReAct agent
 
+### Thought action observation loop
+
+![Thought action observation loop](../../../assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.en.png)
 ```python
 import os
 
@@ -199,6 +208,9 @@ for question in questions:
 
 ## Observing the agent's reasoning
 
+### Execution trace and stopping conditions
+
+![Execution trace and stopping conditions](../../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
 With `verbose=True`, the console prints every Thought, Action, Action Input, and Observation. For a simple question, the agent usually completes in one round. For a two-step question — count words, then multiply — it completes in two rounds, using the output of the first tool as input to the next computation.
 
 `max_iterations` prevents infinite loops. Five to ten iterations cover most practical tasks.
@@ -207,6 +219,9 @@ With `verbose=True`, the console prints every Thought, Action, Action Input, and
 
 ## Handling tool errors gracefully
 
+### Returning tool errors as observations
+
+![Returning tool errors as observations](../../../assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.en.png)
 If a tool raises an unhandled exception, the agent stops. Catching exceptions inside the tool and returning a descriptive error string keeps the agent running. The error string becomes the Observation, and the LLM can decide to try a different approach or explain the failure.
 
 ```python

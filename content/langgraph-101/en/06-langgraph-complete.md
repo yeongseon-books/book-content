@@ -34,6 +34,7 @@ This final example pulls the series together. It classifies the incoming questio
 ![Questions this post answers](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+![Combined graph with supervisor and tool loop](../../../assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
 ```python
 import ast
 import json
@@ -208,12 +209,14 @@ export GROQ_API_KEY=... && python main.py
 
 ## What to notice in this code
 
+![Checkpoint and route state structure](../../../assets/langgraph-101/06/06-02-what-to-notice-in-this-code.en.png)
 - The supervisor keeps graph complexity under control by splitting direct answers from tool-driven requests.
 - The `tool_agent -> ToolNode -> tool_agent` loop is isolated to the cases that need tools.
 - `compile(checkpointer=MemorySaver())` makes the entire conversation resumable across turns.
 
 ## Where engineers get confused
 
+![Validation path with human review interrupt](../../../assets/langgraph-101/06/06-03-where-engineers-get-confused.en.png)
 - Sending every request through the tool loop usually makes the agent slower and more expensive than necessary.
 - Even with checkpointing, routing should stay simple enough to reason about from the latest message.
 - Tool execution is not evaluation. You still need explicit regression cases, and the calculator tool should stay on a strict arithmetic parser rather than raw `eval()`.
@@ -227,6 +230,7 @@ export GROQ_API_KEY=... && python main.py
 
 ## Summary
 
+![Production agent flow across turns](../../../assets/langgraph-101/06/06-04-summary.en.png)
 The real goal of this series was never memorizing LangGraph APIs. It was learning how to design state, edges, checkpoints, and tool loops as one coherent system. Once that mental model is in place, building a usable agent skeleton becomes much more straightforward.
 
 <!-- toc:begin -->

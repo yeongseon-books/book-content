@@ -31,6 +31,9 @@ The second post moves the hand-written metrics onto a real retriever. Even with 
 ![Questions this post answers](../../../assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+### Benchmark loop for queries and latency
+
+![Benchmark loop for queries and latency](../../../assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
 The runnable code lives in `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -48,16 +51,28 @@ for question, relevant_ids in QUERIES:
 ```
 
 ## What to notice in this code
+
+### Retrieval quality axes with hit rate and MRR
+
+![Retrieval quality axes with hit rate and MRR](../../../assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.en.png)
 - Latency is measured around `retriever.invoke()`, which isolates retrieval instead of document setup.
 - Normalizing results to `metadata["id"]` makes later benchmarks reuse the same scoring logic.
 - Hit rate is a fast sanity check for whether top-k returns anything usable at all.
 
 ## Where engineers get confused
+
+### High hit rate with weak ranking
+
+![High hit rate with weak ranking](../../../assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png)
 - A hit rate of 1.0 can still hide poor ranking if relevant documents always appear late.
 - If you mix embedding time into retrieval latency, you lose the signal for the retriever itself.
 - A tiny corpus is enough to validate the benchmark loop, but not enough to claim production readiness.
 
 ## Checklist
+
+### Benchmark record with gold IDs and logs
+
+![Benchmark record with gold IDs and logs](../../../assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.en.png)
 - [ ] Prepare gold relevant document IDs for each query.
 - [ ] Measure retrieval quality and latency in the same loop.
 - [ ] Keep the ranked IDs in the output, not just the average.

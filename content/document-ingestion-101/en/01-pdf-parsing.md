@@ -34,6 +34,16 @@ The first practical problem in a PDF parsing tutorial is usually the sample file
 
 This example generates its own PDF with `reportlab`, then reads it back with `pypdf` and prints page-level text summaries. That is exactly the shape you want for the first ingestion step.
 
+## PDF parsing flow
+
+![PDF generation and extraction flow](../../../assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png)
+Keeping generation and extraction in one script makes the demo reproducible and the output easy to verify.
+
+## Page structure and extraction points
+
+![Page structure and table detection path](../../../assets/document-ingestion-101/01/01-02-page-structure-and-extraction-points.en.png)
+A real PDF often mixes plain text, tables, and images, so extraction quality depends on which branch each page element takes.
+
 ## Runnable example
 
 ```python
@@ -135,11 +145,21 @@ page=2 chars=173 preview=Page 2 Operational checks ...
 
 ## What to notice in this code
 
+### How page metadata carries forward
+
+![Page metadata fields per document](../../../assets/document-ingestion-101/01/01-01-how-page-metadata-carries-forward.en.png)
+Once page number and character count are preserved together, later chunking and debugging steps stay much easier to reason about.
+
 - `create_sample_pdf()` creates the input data, so the example has no hidden file dependency.
 - `extract_pages()` returns page number, character count, and preview together, which maps cleanly to later metadata work.
 - The output stays human-readable, so layout failures are easy to catch by inspection.
 
 ## Where engineers get confused
+
+### When OCR becomes the fallback
+
+![Text-layer check and OCR fallback flow](../../../assets/document-ingestion-101/01/01-02-when-ocr-becomes-the-fallback.en.png)
+OCR is safer as a fallback path after a text-layer check, not as the default path for every PDF.
 
 - PDF parsing is not the same as OCR. If the PDF already has a text layer, verify plain extraction first.
 - A high character count does not automatically mean high quality. Reading order and repeated headers still matter.

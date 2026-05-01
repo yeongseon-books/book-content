@@ -31,6 +31,9 @@ The fifth post adds RAGAS to score generation quality. The crucial detail is usi
 ![Questions this post answers](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
 ## Minimal runnable example
 
+### Dataset structure for end-to-end evaluation
+
+![Dataset structure for end-to-end evaluation](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
 The runnable code lives in `rag-benchmark-101/en/05-e2e-evaluation/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -49,16 +52,28 @@ result = evaluate(
 ```
 
 ## What to notice in this code
+
+### Wrapper path into the RAGAS evaluator
+
+![Wrapper path into the RAGAS evaluator](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.en.png)
 - The `contexts` column must be a list of strings, not one flattened string.
 - `AnswerRelevancy(strictness=1)` keeps the example fast while staying on the real 0.1.22 API.
 - `RunConfig(timeout=300, max_workers=1)` reduces timeout noise during network LLM evaluation.
 
 ## Where engineers get confused
+
+### Reading retrieval and generation failures apart
+
+![Reading retrieval and generation failures apart](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.en.png)
 - Faithfulness can be computed without a ground-truth answer, but answer relevancy still penalizes evasive answers.
 - RAGAS scores reflect the final pipeline behavior, so they mix retrieval quality and answer quality unless you benchmark retrieval separately.
 - Different ragas versions expose different APIs. This example is pinned to 0.1.22 behavior.
 
 ## Checklist
+
+### Verification flow before metric execution
+
+![Verification flow before metric execution](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png)
 - [ ] Instantiate the metrics with the ragas 0.1.22 API.
 - [ ] Wrap both the LLM and embeddings for RAGAS.
 - [ ] Build a Dataset with question, answer, and contexts columns.

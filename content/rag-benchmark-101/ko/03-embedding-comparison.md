@@ -31,6 +31,9 @@ last_reviewed: '2026-05-01'
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
+### 같은 코퍼스에서 임베딩 모델만 바꾸는 비교 구조
+
+![같은 코퍼스에서 임베딩 모델만 바꾸는 비교 구조](../../../assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.ko.png)
 실행 코드는 `rag-benchmark-101/ko/03-embedding-comparison/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
@@ -48,16 +51,28 @@ print(json.dumps(results, indent=2))
 ```
 
 ## 이 코드에서 봐야 할 것
+
+### 품질 점수와 지연 시간을 함께 보는 비교 축
+
+![품질 점수와 지연 시간을 함께 보는 비교 축](../../../assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.ko.png)
 - Corpus와 query set을 고정해야 모델 간 비교가 공정해집니다.
 - MRR을 함께 보면 두 모델이 관련 문서를 “찾는지”뿐 아니라 “얼마나 앞에 두는지”까지 볼 수 있습니다.
 - 평균 latency를 같이 저장하면 더 좋은 점수가 실제 운영 비용과 맞는지도 판단할 수 있습니다.
 
 ## 실무에서 헷갈리는 지점
+
+### 한 번에 한 변수만 바꿔야 하는 실험 경계
+
+![한 번에 한 변수만 바꿔야 하는 실험 경계](../../../assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.ko.png)
 - 임베딩 차이와 chunking 차이를 동시에 바꾸면 원인 분리가 되지 않습니다. 한 번에 한 축만 바꿔야 합니다.
 - 같은 hit rate라도 MRR 차이가 크면 실제 응답 품질은 달라질 수 있습니다. LLM은 상위 문서 몇 개의 순서에 민감합니다.
 - 작은 데이터셋에서 한 모델이 이겼다고 끝내면 안 됩니다. 도메인 질문으로 다시 검증해야 합니다.
 
 ## 체크리스트
+
+### 속도와 정확도와 비용을 합치는 선택 흐름
+
+![속도와 정확도와 비용을 합치는 선택 흐름](../../../assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.ko.png)
 - [ ] 동일한 corpus, 동일한 query set으로 두 모델을 평가했다.
 - [ ] hit rate와 MRR을 함께 비교했다.
 - [ ] latency까지 포함해 운영 관점의 비용을 함께 봤다.

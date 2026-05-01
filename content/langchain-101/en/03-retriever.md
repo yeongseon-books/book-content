@@ -45,6 +45,13 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
 print(retriever.invoke("What does a Retriever do?")[0].page_content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    A Retriever finds documents relevant to a question.
+
+<!-- injected-output:end -->
+
 ## What to notice in this code
 
 - The embedding model turns text into vectors, while the Retriever exposes a query-to-documents interface.
@@ -96,6 +103,7 @@ Topics:
 
 ## Creating a FAISS VectorStore
 
+![Documents turning into a vector index](../../assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png)
 LangChain's `FAISS` class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.
 
 ```bash
@@ -130,10 +138,18 @@ vectorstore = FAISS.from_texts(
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    index vector count: 7
+
+<!-- injected-output:end -->
+
 ---
 
 ## Creating a Retriever
 
+![Similarity mmr threshold search paths](../../assets/langchain-101/03/03-02-creating-a-retriever.en.png)
 `as_retriever()` wraps the VectorStore in the Retriever interface.
 
 ```python
@@ -166,6 +182,7 @@ retriever_mmr = vectorstore.as_retriever(
 
 ## Connecting a Retriever to a chain
 
+![Retrieved documents becoming prompt context](../../assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.en.png)
 The standard RAG pattern: retrieve relevant documents, inject them as context, pass to the LLM.
 
 ```python
@@ -237,6 +254,21 @@ for question in questions:
     print(f"answer: {answer}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+
+    question: What is FAISS?
+    answer: FAISS is a high-speed vector search library developed at Facebook AI Research.
+
+    question: How does the RAG pattern work?
+    answer: According to the documents, RAG (Retrieval Augmented Generator) combines retrieved documents with an LLM (Large Language Model) prompt, but it doesn't explain the specifics of the pattern.
+
+    question: What do embedding models do?
+    answer: Embedding models project text into a high-dimensional vector space.
+
+<!-- injected-output:end -->
+
 The key is the chain input dict:
 
 ```python
@@ -252,6 +284,7 @@ The key is the chain input dict:
 
 ## Saving and reloading a VectorStore
 
+![Saving and reloading index lifecycle](../../assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png)
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -285,6 +318,16 @@ print(f"reloaded: {loaded_store.index.ntotal} vectors")
 results = loaded_store.similarity_search("vector search", k=1)
 print(f"\nresult: {results[0].page_content}")
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    saved
+    reloaded: 2 vectors
+
+    result: FAISS is a high-speed vector search library developed at Facebook AI Research.
+
+<!-- injected-output:end -->
 
 ---
 

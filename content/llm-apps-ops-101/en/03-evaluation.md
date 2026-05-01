@@ -29,6 +29,7 @@ last_reviewed: '2026-05-01'
 ## Big picture
 ![LLM output quality evaluation pipeline](../../../assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
 ## Why this layer matters
+![Rule checks catch obvious failures first](../../../assets/llm-apps-ops-101/03/03-01-why-this-layer-matters.en.png)
 Before adding complex judges, build a rule layer that catches obviously bad output cheaply and consistently.
 
 At scale, nobody reads every answer. A practical pipeline starts by blocking machine-detectable failures: malformed JSON, missing keywords, and answers that are far too short or too long.
@@ -114,11 +115,13 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
+![Format length and keyword checks split](../../../assets/llm-apps-ops-101/03/03-02-what-to-notice-in-this-code.en.png)
 - Forcing JSON output narrows the shape of the problem before evaluation starts.
 - Returning `missing_keywords` makes failures actionable instead of mysterious.
 - Length thresholds should reflect the product, not an abstract best practice.
 
 ## Where engineers get confused
+![Rule checks layer before judge models](../../../assets/llm-apps-ops-101/03/03-03-where-engineers-get-confused.en.png)
 - Passing format checks does not mean the answer is good. Failing format checks usually means the answer is unusable.
 - Keyword checks work best in domains with explicit terminology, not creative tasks.
 - Even if you later add LLM-as-judge, rule-based checks remain a cheap first-pass guardrail.

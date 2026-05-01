@@ -44,6 +44,9 @@ last_reviewed: '2026-05-01'
 
 ## 문서 요약
 
+### 짧은 문서 요약 처리 흐름
+
+![짧은 문서 요약 처리 흐름](../../../assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.ko.png)
 짧은 문서는 단순하게 처리합니다. 전체를 프롬프트에 넣고 요약을 요청합니다.
 
 ```python
@@ -107,6 +110,9 @@ print(dev_summary)
 
 ## 긴 문서 요약 — Map-Reduce 패턴
 
+### 청크 요약과 최종 통합 구조
+
+![청크 요약과 최종 통합 구조](../../../assets/ai-app-patterns-101/03/03-02-chunk-summaries-and-final-synthesis.ko.png)
 문서가 컨텍스트 창 한계를 넘으면 전체를 한 번에 처리할 수 없습니다. Map-Reduce는 청크별로 요약하고(Map), 그 요약들을 다시 요약하는(Reduce) 방식입니다.
 
 ```python
@@ -179,6 +185,9 @@ print(f"\n=== 최종 요약 ===\n{final}")
 
 ## 정보 추출
 
+### 비정형 문서에서 JSON을 뽑는 흐름
+
+![비정형 문서에서 JSON을 뽑는 흐름](../../../assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.ko.png)
 비정형 텍스트에서 구조화된 데이터를 뽑아냅니다.
 
 ```python
@@ -239,6 +248,9 @@ for i, posting in enumerate(job_postings, start=1):
 
 ## 문서 분류
 
+### 분류 배치 처리와 신뢰도 반환 구조
+
+![분류 배치 처리와 신뢰도 반환 구조](../../../assets/ai-app-patterns-101/03/03-04-batch-classification-with-confidence-out.ko.png)
 문서를 카테고리로 분류합니다.
 
 ```python
@@ -293,6 +305,9 @@ for text in texts:
 
 ## 실무에서 헷갈리는 지점
 
+### 요약 추출 분류 패턴 선택 비교
+
+![요약 추출 분류 패턴 선택 비교](../../../assets/ai-app-patterns-101/03/03-05-pattern-choice-across-summary-extraction.ko.png)
 - 요약 품질이 낮다고 바로 모델 크기만 키우는 경우가 많지만, chunk 크기와 overlap 조정이 먼저입니다.
 - Map-Reduce는 병렬화에 유리하지만 청크 간 전역 맥락은 약해집니다. 그래서 reduce 프롬프트가 중요합니다.
 - 문서 요약과 문서 질의응답은 입력 모양이 비슷해 보여도 운영 메트릭은 다릅니다. 전자는 일관성, 후자는 근거성이 더 중요합니다.

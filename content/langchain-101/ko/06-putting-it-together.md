@@ -48,6 +48,26 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("LCEL이 무엇인가요?"))
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    LCEL은 Likely Callable Element Listener의 약자입니다. 
+
+    Runnable을 파이프로 연결하는 것은 Runnable 인터페이스를 구현한 객체를 사용하여 작업을 수행할 수 있는 파이프 라인에 연결하는 것을 의미합니다.
+
+    LCEL은 Java의 ExecutorService를 사용하여 태스크를 실행하는 데 사용할 수 있습니다. ExecutorService는 태스크를 실행하고 관리하는 데 사용할 수 있는 추상화입니다. 
+
+    일반적으로 LCEL은 다음과 같은 형태로 사용됩니다.
+
+    1. `ExecutorService executor = Executors.newSingleThreadExecutor();`
+    2. `executor.execute(new Runnable() { ... });`
+
+    이 코드는 ExecutorService를 사용하여 Runnable 인터페이스를 구현한 객체를 실행합니다. 
+
+    LCEL은 동시성 프로그래밍에서 태스크를 관리하는 데 사용할 수 있는 유용한 도구입니다.
+
+<!-- injected-output:end -->
+
 ## 이 코드에서 봐야 할 것
 
 - 인덱싱 단계와 질의 단계는 시간축이 다르므로 코드에서도 분리하는 편이 좋습니다.
@@ -96,6 +116,7 @@ LangChain 101 시리즈 (6/6)
 
 ## 문서 인덱싱 파이프라인
 
+![문서 청킹부터 인덱스 생성까지 흐름](../../assets/langchain-101/06/06-01-document-indexing-pipeline.ko.png)
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -146,10 +167,18 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 print(f"인덱스 벡터 수: {vectorstore.index.ntotal}")
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    인덱스 벡터 수: 4
+
+<!-- injected-output:end -->
+
 ---
 
 ## RAG 체인 조립
 
+![retriever prompt llm parser 조립 구조](../../assets/langchain-101/06/06-02-assembling-the-rag-chain.ko.png)
 ```python
 import os
 
@@ -190,6 +219,7 @@ rag_chain = (
 
 ## 스트리밍으로 실행
 
+![통합 RAG 체인의 스트리밍 실행 경로](../../assets/langchain-101/06/06-03-running-with-streaming.ko.png)
 ```python
 questions = [
     "벡터 검색은 키워드 검색과 어떻게 다른가요?",
@@ -210,6 +240,7 @@ for question in questions:
 
 ## 대화 이력을 반영한 멀티턴 RAG
 
+![대화 이력이 반영되는 멀티턴 RAG 흐름](../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.ko.png)
 단순 RAG 체인은 각 질문을 독립적으로 처리합니다. 이전 대화를 참고해서 답하려면 대화 이력을 체인에 넘겨야 합니다.
 
 ```python

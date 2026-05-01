@@ -14,7 +14,6 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
-title: Cosine similarity and vector search — computing sentence distances
 ---
 
 # Cosine similarity and vector search — computing sentence distances
@@ -33,7 +32,7 @@ This post implements all three metrics from scratch, shows why normalization mat
 - running a real query and examining the results
 - when to use each metric
 
-![Cosine similarity and vector search: computing sentence distances](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
+![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: cosine similarity measures the alignment of two vector directions. It ignores magnitude, so sentence length differences do not matter.
@@ -49,6 +48,7 @@ After this chapter, the next one moves on to **FAISS fundamentals — fast appro
 
 ## Three distance metrics
 
+![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
 ### Cosine similarity
 
 Cosine similarity measures the angle between two vectors, ignoring their magnitudes.
@@ -100,6 +100,7 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 ## Comparing all three metrics
 
+![Three metrics on one pair flow](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.en.png)
 Apply all three to the same sentence pairs.
 
 ```python
@@ -137,6 +138,27 @@ for text_a, text_b in pairs:
     print(f"  euclidean:  {l2:.4f}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+
+    'Python async programming' vs 'handling concurrency in P'
+      cosine:     0.6201
+      dot:        0.6201
+      euclidean:  0.8717
+
+    'Python async programming' vs 'training a machine learni'
+      cosine:     0.1399
+      dot:        0.1399
+      euclidean:  1.3115
+
+    'Python async programming' vs 'walking the dog in the pa'
+      cosine:     -0.0400
+      dot:        -0.0400
+      euclidean:  1.4423
+
+<!-- injected-output:end -->
+
 Expected output:
 
 ```
@@ -162,6 +184,7 @@ With normalized vectors, cosine and dot product match exactly. Euclidean distanc
 
 ## Why normalization matters
 
+![Before and after normalization difference](../../../assets/vector-search-101/03/03-03-why-normalization-matters.en.png)
 Without normalization, dot product and cosine similarity diverge.
 
 ```python
@@ -191,6 +214,20 @@ print(f"\nnorm cosine: {cosine_similarity(a_norm, b_norm):.4f}")
 print(f"norm dot:    {float(np.dot(a_norm, b_norm)):.4f}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    raw magnitudes: a=1.0000, b=1.0000
+    norm magnitudes: a=1.0000, b=1.0000
+
+    raw cosine: 0.6201
+    raw dot:    0.6201
+
+    norm cosine: 0.6201
+    norm dot:    0.6201
+
+<!-- injected-output:end -->
+
 ```
 raw magnitudes: a=4.2318, b=4.1092
 norm magnitudes: a=1.0000, b=1.0000
@@ -208,6 +245,7 @@ Without normalization, the raw dot product (14.15) is dominated by the vector ma
 
 ## Brute-force nearest-neighbor search
 
+![Brute force nearest neighbor execution path](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.en.png)
 For a few hundred documents, NumPy alone is sufficient for retrieval.
 
 ```python
@@ -248,6 +286,22 @@ for rank, (score, text) in enumerate(results, start=1):
     print(f"    {text}\n")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    query: 'how vector search finds similar documents'
+
+    [1] score: 0.6824
+        Vector search captures semantic similarity that keyword search misses.
+
+    [2] score: 0.4593
+        Chunking strategies split long documents into searchable units.
+
+    [3] score: 0.4517
+        FAISS is a high-speed vector search library from Facebook AI Research.
+
+<!-- injected-output:end -->
+
 ```
 query: 'how vector search finds similar documents'
 
@@ -269,6 +323,7 @@ This approach is called exact search or brute-force search. It is accurate but s
 
 ## When to use each metric
 
+![Metric selection decision flow](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.en.png)
 | Metric | Best for | Watch out for |
 |---|---|---|
 | Cosine similarity | Text meaning comparison, documents of different lengths | Ignores magnitude |

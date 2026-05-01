@@ -14,7 +14,6 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
-title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
 ---
 
 # HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
@@ -35,7 +34,7 @@ This post covers five things:
 - practical tips for speeding up encoding on CPU
 - comparing the wrapper to the raw `SentenceTransformer` API
 
-![HuggingFace embeddings in practice: creating your first vectors with sentence-transformers](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
+![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
 <!-- ebook-only:start -->
 
 **The key idea**: HuggingFace embeddings run locally for free. `sentence-transformers` downloads the model and returns vectors.
@@ -63,6 +62,7 @@ pip install langchain-community sentence-transformers numpy
 
 ## First embedding
 
+![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-first-embedding.en.png)
 Initialize the model and encode a single sentence.
 
 ```python
@@ -100,6 +100,7 @@ first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
 
 ## Batch embedding
 
+![Single call and batch call contrast](../../../assets/vector-search-101/02/02-02-batch-embedding.en.png)
 For multiple documents, a single `embed_documents()` call outperforms a loop of `embed_query()` calls. The model processes inputs in batches internally, and the overhead of repeated setup adds up fast.
 
 ```python
@@ -131,12 +132,21 @@ print(f"matrix shape: {vectors_np.shape}")  # (5, 384)
 print(f"elapsed: {elapsed:.3f}s")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    matrix shape: (5, 384)
+    elapsed: 0.101s
+
+<!-- injected-output:end -->
+
 The gap between batch and loop grows with document count. For large corpora, always prefer `embed_documents()`.
 
 ---
 
 ## Saving and reloading vectors
 
+![Vector and document save flow](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
 Recomputing embeddings for the same documents on every run wastes time. Save the matrix once and reload it.
 
 ```python
@@ -166,6 +176,15 @@ loaded = np.load("embeddings.npy")
 print(f"reloaded: {loaded.shape}")
 print(f"identical: {np.allclose(vectors, loaded)}")
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    saved: (3, 384)
+    reloaded: (3, 384)
+    identical: True
+
+<!-- injected-output:end -->
 
 ```
 saved: (3, 384)
@@ -201,12 +220,20 @@ with open("documents.json", "w") as f:
 print("saved embeddings and documents")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    saved embeddings and documents
+
+<!-- injected-output:end -->
+
 Post 4 uses exactly this pattern to build a working FAISS search system.
 
 ---
 
 ## Practical speed tips
 
+![Model reuse and batch size path](../../../assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
 CPU encoding is slow at scale. Several adjustments help.
 
 **Increase batch size.** The default is 32. If memory allows, bumping to 64 or 128 reduces overhead.
@@ -239,6 +266,7 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 
 ## Comparing wrapper and raw API
 
+![Wrapper and raw API comparison structure](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
 `HuggingFaceEmbeddings` wraps `SentenceTransformer`. Their outputs are numerically identical.
 
 ```python
@@ -262,6 +290,15 @@ print(f"HuggingFaceEmbeddings shape: {hf_vector.shape}")
 print(f"SentenceTransformer shape:   {st_vector.shape}")
 print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 ```
+
+<!-- injected-output:start -->
+**Output**
+
+    HuggingFaceEmbeddings shape: (384,)
+    SentenceTransformer shape:   (384,)
+    max difference: 0.000000
+
+<!-- injected-output:end -->
 
 ```
 HuggingFaceEmbeddings shape: (384,)

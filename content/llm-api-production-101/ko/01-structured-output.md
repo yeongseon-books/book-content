@@ -53,6 +53,7 @@ export GROQ_API_KEY="여기에-발급받은-키"
 
 ## 왜 자연어 파싱은 오래 버티지 못하는가
 
+![자연어 응답이 계약 없이 깨지는 흐름](../../assets/llm-api-production-101/01/01-01-why-plain-text-parsing-does-not-age-well.ko.png)
 입문 단계에서 흔한 패턴은 아래와 같습니다. 모델에게 상품 후기에서 감정을 뽑아 달라고 요청하고, 답을 문자열로 받아 몇 줄의 후처리로 해석합니다.
 
 ```python
@@ -74,6 +75,7 @@ label, confidence = raw_text.split(",")
 
 ## JSON 모드가 해 주는 일과 해 주지 않는 일
 
+![JSON 모드와 스키마 검증의 책임 경계](../../assets/llm-api-production-101/01/01-02-what-json-mode-guarantees-and-what-it-do.ko.png)
 Groq의 `response_format={"type": "json_object"}`는 모델 출력 형식을 JSON 객체로 유도합니다. 이것이 중요한 이유는 최소한의 구문 계약을 만들기 때문입니다. 응답이 자유로운 산문이 아니라 중괄호 기반 객체 형태로 돌아오게 만들 수 있습니다.
 
 다만 여기서 과신하면 안 됩니다. JSON 모드는 **JSON 문법 쪽 문제를 줄여 주는 도구**이지, **비즈니스 스키마를 완전히 보장하는 도구**는 아닙니다. 예를 들어 모델이 아래처럼 응답할 수는 있습니다.
@@ -96,6 +98,7 @@ Groq의 `response_format={"type": "json_object"}`는 모델 출력 형식을 JSO
 
 ## Groq SDK로 JSON 모드 요청 보내기
 
+![JSON 모드 요청과 응답 파싱 흐름](../../assets/llm-api-production-101/01/01-03-sending-a-json-mode-request-with-the-gro.ko.png)
 아래 예제는 고객 문의 문장에서 `category`, `priority`, `summary`를 추출합니다. 모델은 `llama-3.1-8b-instant`, 패키지는 `groq`를 사용합니다.
 
 ```python
@@ -139,6 +142,13 @@ payload = json.loads(content)
 print(payload)
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    {'category': 'billing', 'priority': 3, 'summary': '결제 완료 후 주문 내역 미보이기'}
+
+<!-- injected-output:end -->
+
 여기서 운영적으로 중요한 지점은 세 군데입니다.
 
 첫째, 시스템 메시지에서 "JSON 객체 하나만 반환"을 명시합니다. JSON 모드를 걸더라도 프롬프트 계약을 같이 적어 두는 편이 좋습니다. 모델이 해야 할 일을 사람도 읽을 수 있게 남겨 두는 효과가 있기 때문입니다.
@@ -151,6 +161,7 @@ print(payload)
 
 ## Pydantic으로 응답 스키마를 고정하기
 
+![모델 출력과 검증기 구조의 관계](../../assets/llm-api-production-101/01/01-04-locking-the-response-with-pydantic.ko.png)
 구조화 출력이 프로덕션에서 힘을 가지는 순간은 검증이 붙을 때입니다. 아래 예제는 모델 응답을 Python 타입으로 변환하면서 누락과 타입 오류를 즉시 감지합니다.
 
 ```python
@@ -214,6 +225,13 @@ except ValidationError as exc:
 print(ticket.model_dump())
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    {'category': <Category.bug: 'bug'>, 'priority': 5, 'summary': '비밀번호 재설정 메일이 오지 않습니다. 업무를 시작해야 해서 오늘 안에 해결이 필요합니다.', 'customer_needs_followup': True}
+
+<!-- injected-output:end -->
+
 이 코드가 하는 일은 단순하지만 효과는 큽니다. 모델이 `priority`를 문자열로 내거나, 허용되지 않은 `category`를 반환하거나, `summary`를 비워 두면 예외가 발생합니다. 그 순간 애플리케이션은 실패를 숨기지 않고 드러낼 수 있습니다. 운영에서는 이 동작이 중요합니다. 잘못된 데이터를 조용히 저장하는 것보다, 명시적으로 실패하고 재시도나 폴백 경로로 넘기는 편이 훨씬 안전하기 때문입니다.
 
 Pydantic을 붙이면 후속 코드도 단순해집니다. `ticket.priority`는 이미 정수이고, `ticket.category`는 열거형이며, `ticket.customer_needs_followup`는 불리언입니다. 다운스트림 로직이 일일이 형 변환과 방어 코드를 반복하지 않아도 됩니다.
@@ -222,6 +240,7 @@ Pydantic을 붙이면 후속 코드도 단순해집니다. `ticket.priority`는 
 
 ## 실패를 어떻게 다뤄야 하는가
 
+![구조화 출력 실패 계층과 복구 경로](../../assets/llm-api-production-101/01/01-05-thinking-in-failure-layers.ko.png)
 구조화 출력 경로에서 실패는 크게 세 층으로 나뉩니다.
 
 첫 번째는 **API 호출 실패**입니다. 인증 오류, 네트워크 오류, 타임아웃이 여기에 들어갑니다. 이 경우에는 모델 출력 이전 단계에서 실패한 것이므로 일반적인 재시도 정책을 검토하면 됩니다.

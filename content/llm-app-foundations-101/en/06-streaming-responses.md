@@ -85,6 +85,7 @@ That distinction is worth keeping in mind throughout this article. Streaming is 
 
 ## The smallest Groq streaming example
 
+![Stream chunks arriving before full completion](../../assets/llm-app-foundations-101/06/06-01-the-smallest-groq-streaming-example.en.png)
 With the Groq SDK, streaming starts with one parameter: `stream=True`. Instead of receiving one completed response object, you receive an iterable stream of chunks.
 
 ```python
@@ -128,6 +129,7 @@ You usually want all three, not just the first one.
 
 ## Extracting text from each chunk
 
+![Chunk fields for text finish and usage](../../assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.en.png)
 In chat streaming, the text you usually want to render lives in `chunk.choices[0].delta.content`. Not every chunk contains visible text, so your loop should treat missing content as normal.
 
 Here is the most useful baseline pattern.
@@ -172,6 +174,7 @@ There is also an important defensive habit here: always expect some chunks to co
 
 ## Streaming versus sync and async patterns
 
+![Sync and async streaming execution comparison](../../assets/llm-app-foundations-101/06/06-03-streaming-versus-sync-and-async-patterns.en.png)
 Streaming and async are related in practice, but they are not the same concept.
 
 Streaming describes **how the response arrives**. Instead of one final payload, the result arrives in pieces.
@@ -236,6 +239,7 @@ If you keep those boundaries clear, the decision becomes much easier. Pick strea
 
 ## Reading token usage during or after streaming
 
+![Final chunk usage and fallback aggregation](../../assets/llm-app-foundations-101/06/06-04-reading-token-usage-during-or-after-stre.en.png)
 In non-streaming responses, reading usage is straightforward: check `completion.usage` after the request finishes. Streaming changes the timing. Intermediate chunks often contain only incremental deltas, while usage metadata usually appears at the end.
 
 With Groq, the final chunk may expose provider metadata under `x_groq`, including usage details. The safest pattern is to keep a reference to the last chunk you saw and inspect it after the loop completes.
@@ -369,6 +373,7 @@ The downstream consumer here could be almost anything: a moderation layer, a tra
 
 ## Relaying the stream through FastAPI
 
+![FastAPI relaying chunks to the browser](../../assets/llm-app-foundations-101/06/06-05-relaying-the-stream-through-fastapi.en.png)
 In a browser-based product, your frontend usually should not call the model provider directly. The server remains the right place for API keys, authentication, prompt policy, logging, and usage tracking. That means the server needs to receive the provider stream and relay it onward.
 
 FastAPI's `StreamingResponse` is a clean starting point for that.

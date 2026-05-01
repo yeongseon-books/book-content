@@ -34,6 +34,16 @@ last_reviewed: '2026-05-01'
 
 이번 예제는 해시와 JSON 상태 파일만으로 `added`, `unchanged`, `updated`를 구분합니다. 먼저 이 단순한 기준을 확실히 이해해야 이후에 벡터 저장소 업데이트도 깔끔해집니다.
 
+## 증분 스캔과 변경 감지 흐름
+
+![증분 스캔과 변경 감지가 이어지는 흐름](../../../assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.ko.png)
+증분 인덱싱의 핵심은 파일을 읽는 비용보다 먼저 어떤 파일이 다시 처리 대상인지 좁히는 데 있습니다.
+
+## 상태 저장소와 해시 비교 구조
+
+![상태 저장소와 해시 비교가 맞물리는 구조](../../../assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.ko.png)
+mtime만 보는 방식보다 해시 비교를 같이 넣으면 운영에서 오탐과 누락을 줄이기 쉽습니다.
+
 ## 실행 예제
 
 ```python
@@ -143,11 +153,21 @@ python main.py
 
 ## 이 코드에서 봐야 할 것
 
+### 추가 업데이트 삭제 분기
+
+![추가 업데이트 삭제를 가르는 처리 분기](../../../assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.ko.png)
+삭제 처리까지 모델에 넣어 두면 나중에 전체 재색인 없이도 index 청소 경로를 자연스럽게 확장할 수 있습니다.
+
 - `IndexStateStore`가 해시, mtime, indexed_at을 함께 저장해 디버깅 포인트를 남깁니다.
 - 동일한 스크립트를 세 번 연속 실행하면서 added → unchanged → updated 흐름을 재현합니다.
 - 상태 저장소가 JSON이어서 로직을 먼저 이해하고 나중에 DB로 옮기기 쉽습니다.
 
 ## 실무에서 헷갈리는 지점
+
+### 인덱스 버전과 실행 기록 흐름
+
+![인덱스 버전과 실행 기록이 남는 흐름](../../../assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.ko.png)
+운영 자동화에서는 변경 감지 자체보다도 어떤 실행이 어떤 인덱스 버전을 만들었는지 남기는 일이 더 중요해지는 시점이 옵니다.
 
 - mtime만 비교하면 빠르지만 오탐이 생길 수 있습니다. 내용 해시를 같이 보는 이유가 여기에 있습니다.
 - 증분 인덱싱은 “변경 감지”와 “변경 반영” 두 단계입니다. 둘을 섞어 생각하면 구현이 꼬입니다.

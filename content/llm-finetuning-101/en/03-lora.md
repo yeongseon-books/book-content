@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## Questions this post answers
 
+![LoRA attachment and training path flow](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)
 - Which `LoraConfig` fields matter most in practice?
 - What goes wrong when `target_modules` is chosen poorly?
 - How small does the trainable ratio become on a tiny GPT-2 model?
@@ -35,6 +36,7 @@ The script for this post defines a `LoraConfig`, applies it with `get_peft_model
 
 ## The fields with real operational impact
 
+![Low-rank decomposition and scaling structure](../../../assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
 `r` controls the low-rank width, `lora_alpha` controls scaling, and `lora_dropout` regularizes only the adapter path. The field that most often breaks real projects is `target_modules`. If that list is wrong, the adapter attaches nowhere useful—or nowhere at all.
 
 ![The fields with real operational impact](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
@@ -58,12 +60,14 @@ peft_model.print_trainable_parameters()
 
 ## What to notice in this code
 
+![GPT-style target module selection structure](../../../assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.en.png)
 - On GPT-2-style models, `c_attn` and `c_proj` are the names you usually need to target for a minimal demo.
 - The `fan_in_fan_out` warning is expected here because PEFT adapts GPT-2's `Conv1D` wrapper internally.
 - This post is about correct attachment. The actual optimizer step comes in Post 04.
 
 ## Where engineers get confused
 
+![Full fine-tuning and LoRA parameter scale comparison](../../../assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.en.png)
 - Attaching an adapter is not the same as training it. You still need a training loop to update those new parameters.
 - A larger `r` is not a free win. It also increases memory use and overfitting risk.
 - Module names do not transfer automatically across model families. Always inspect the target architecture.

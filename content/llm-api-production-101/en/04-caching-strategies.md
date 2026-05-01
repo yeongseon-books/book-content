@@ -49,6 +49,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why an LLM path needs caching
 
+![Cost flow of repeated uncached requests](../../assets/llm-api-production-101/04/04-01-why-an-llm-path-needs-caching.en.png)
 Production logs usually show more repetition than people expect. It appears in at least four places:
 
 - FAQ-style chatbots
@@ -64,6 +65,7 @@ The important part is defining “the same task” correctly. A human may think 
 
 ## What belongs in the cache key
 
+![Structure of a normalized cache key](../../assets/llm-api-production-101/04/04-02-what-belongs-in-the-cache-key.en.png)
 The most common mistake is caching only by the visible user prompt.
 
 ```python
@@ -119,12 +121,20 @@ request_payload = {
 print(build_cache_key(request_payload))
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    6b8029d33b678c483174d55c429edd51a4ab075fab3943a4069fbc89476a6d8f
+
+<!-- injected-output:end -->
+
 This matters because equivalent requests should serialize to the same string before hashing. `sort_keys=True` protects you from dictionary key-order differences. Fixed separators remove whitespace variation. The result is a compact key that still represents the full request contract.
 
 ---
 
 ## Why TTL matters
 
+![Lifecycle stages of a cached entry](../../assets/llm-api-production-101/04/04-03-why-ttl-matters.en.png)
 A hash key is not enough. Without TTL, stale responses can live forever. A model may change, a prompt policy may change, or the underlying business meaning may shift while the cache keeps serving old output. Memory usage also grows without any bound.
 
 TTL makes the cache honest about what it is: a temporary copy, not the source of truth.
@@ -185,6 +195,7 @@ This uses lazy eviction: expired entries are removed when they are read. That ke
 
 ## Putting the cache in front of Groq calls
 
+![Execution path for cache hit and miss](../../assets/llm-api-production-101/04/04-04-putting-the-cache-in-front-of-groq-calls.en.png)
 Now we can place the cache directly in front of a completion request.
 
 ```python
@@ -254,6 +265,14 @@ print(cached_completion(payload))
 print(cached_completion(payload))
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    {'source': 'model', 'content': 'Python dataclasses are a feature introduced in Python 3.7 that allows you to create classes with minimal boilerplate code, making it easier to define simple data structures. They automatically generate special methods like `__init__`, `__repr__`, and `__eq__` for you, reducing the amount of code you need to write. Dataclasses can be used to create immutable or mutable data structures, and they support features like type hints and fields with default values.'}
+    {'source': 'cache', 'content': 'Python dataclasses are a feature introduced in Python 3.7 that allows you to create classes with minimal boilerplate code, making it easier to define simple data structures. They automatically generate special methods like `__init__`, `__repr__`, and `__eq__` for you, reducing the amount of code you need to write. Dataclasses can be used to create immutable or mutable data structures, and they support features like type hints and fields with default values.'}
+
+<!-- injected-output:end -->
+
 The first call goes to the model. The second one hits the cache because the payload is the same. The example stores only the answer text, but you could also store usage data, model name, or metadata if those are useful to downstream consumers.
 
 It also helps to record the response source explicitly. A field such as `source: "cache" | "model"` makes cache-hit behavior observable in logs and metrics.
@@ -262,6 +281,7 @@ It also helps to record the response source explicitly. A field such as `source:
 
 ## When not to cache
 
+![Comparison between cacheable and unsafe paths](../../assets/llm-api-production-101/04/04-05-when-not-to-cache.en.png)
 Caches are useful, but applying them blindly creates new risks. A few cases deserve extra caution:
 
 - answers that depend on rapidly changing external data

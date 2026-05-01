@@ -14,7 +14,6 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
-title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
 ---
 
 # 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
@@ -33,7 +32,7 @@ title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
 - 실제 쿼리를 입력해 검색 결과 확인하기
 - 각 척도를 언제 쓸 것인가
 
-![코사인 유사도와 벡터 검색: 문장 간 거리 계산하기](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
+![코사인 내적 유클리드 비교 구조](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
 <!-- ebook-only:start -->
 
 이 장의 핵심: **코사인 유사도는 벡터 방향의 일치 정도다.** 크기는 무시하고 방향만 비교하므로 문장 길이 차이에 강건하다.
@@ -49,6 +48,7 @@ title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
 
 ## 세 가지 거리 척도
 
+![코사인 내적 유클리드 비교 구조](../../../assets/vector-search-101/03/03-01-three-distance-metrics.ko.png)
 ### 코사인 유사도
 
 코사인 유사도는 두 벡터가 이루는 각도의 코사인 값입니다. 벡터의 크기는 무시하고 방향만 비교합니다.
@@ -100,6 +100,7 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 ## 세 척도 비교
 
+![같은 문장 쌍에 세 척도를 적용하는 흐름](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.ko.png)
 같은 문장 쌍에 세 척도를 모두 적용해 봅니다.
 
 ```python
@@ -137,6 +138,27 @@ for text_a, text_b in pairs:
     print(f"  유클리드:     {l2:.4f}")
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+
+    '파이썬 비동기 프로그래밍...' vs '파이썬으로 동시성 처리하기...'
+      코사인 유사도: 0.9624
+      내적:         0.9624
+      유클리드:     0.2742
+
+    '파이썬 비동기 프로그래밍...' vs '머신러닝 모델 학습하기...'
+      코사인 유사도: 0.6861
+      내적:         0.6861
+      유클리드:     0.7923
+
+    '파이썬 비동기 프로그래밍...' vs '강아지 산책 시키기...'
+      코사인 유사도: 0.7102
+      내적:         0.7102
+      유클리드:     0.7614
+
+<!-- injected-output:end -->
+
 결과는 대략 이렇습니다.
 
 ```
@@ -162,6 +184,7 @@ for text_a, text_b in pairs:
 
 ## 정규화가 왜 중요한가
 
+![정규화 전후 점수 해석 차이](../../../assets/vector-search-101/03/03-03-why-normalization-matters.ko.png)
 정규화를 켜지 않으면 코사인 유사도와 내적이 달라집니다.
 
 ```python
@@ -194,6 +217,20 @@ print(f"\n정규화 후 코사인 유사도: {cosine_similarity(a_norm, b_norm):
 print(f"정규화 후 내적:         {float(np.dot(a_norm, b_norm)):.4f}")
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    정규화 전 벡터 크기: a=1.0000, b=1.0000
+    정규화 후 벡터 크기: a=1.0000, b=1.0000
+
+    정규화 전 코사인 유사도: 0.9624
+    정규화 전 내적:         0.9624
+
+    정규화 후 코사인 유사도: 0.9624
+    정규화 후 내적:         0.9624
+
+<!-- injected-output:end -->
+
 ```
 정규화 전 벡터 크기: a=4.2318, b=4.1092
 정규화 후 벡터 크기: a=1.0000, b=1.0000
@@ -211,6 +248,7 @@ print(f"정규화 후 내적:         {float(np.dot(a_norm, b_norm)):.4f}")
 
 ## 브루트 포스 최근접 이웃 검색
 
+![브루트 포스 최근접 이웃 실행 경로](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.ko.png)
 문서가 수백 개 이하라면 FAISS 없이 NumPy만으로 검색을 구현할 수 있습니다. 모든 문서 벡터와 쿼리 벡터의 유사도를 계산해서 가장 높은 것을 고릅니다.
 
 ```python
@@ -251,6 +289,22 @@ for rank, (score, text) in enumerate(results, start=1):
     print(f"    {text}\n")
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    쿼리: '벡터 검색의 원리'
+
+    [1] 유사도: 0.7137
+        벡터 검색은 키워드 검색이 놓치는 의미적 유사성을 잡아냅니다.
+
+    [2] 유사도: 0.6036
+        청크 전략은 긴 문서를 검색 가능한 단위로 나누는 방법입니다.
+
+    [3] 유사도: 0.5958
+        임베딩 모델은 텍스트를 고차원 벡터 공간에 투영합니다.
+
+<!-- injected-output:end -->
+
 ```
 쿼리: '벡터 검색의 원리'
 
@@ -270,6 +324,7 @@ for rank, (score, text) in enumerate(results, start=1):
 
 ## 언제 어떤 척도를 쓸 것인가
 
+![거리 척도 선택 기준 흐름](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.ko.png)
 | 척도 | 언제 유리한가 | 주의점 |
 |---|---|---|
 | 코사인 유사도 | 텍스트 의미 비교, 문서 길이가 다를 때 | 크기 정보 무시 |

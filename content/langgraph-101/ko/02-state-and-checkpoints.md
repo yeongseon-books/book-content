@@ -34,6 +34,7 @@ last_reviewed: '2026-05-01'
 ![이 글에서 답할 질문](../../../assets/langgraph-101/02/02-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
+![thread_id로 상태를 다시 잇는 복원 흐름](../../../assets/langgraph-101/02/02-01-minimal-runnable-example.ko.png)
 ```python
 from typing import Annotated
 
@@ -96,12 +97,14 @@ if __name__ == "__main__":
 
 ## 이 코드에서 봐야 할 것
 
+![메시지 누적과 turn_count 갱신 구조](../../../assets/langgraph-101/02/02-02-what-to-notice-in-this-code.ko.png)
 - `add_messages`는 새 메시지를 덮어쓰지 않고 누적합니다.
 - `graph.compile(checkpointer=MemorySaver())` 한 줄로 저장과 복원 동작이 붙습니다.
 - 두 번째 `invoke()`에서 전체 히스토리를 다시 넘기지 않아도 같은 `thread_id`면 이전 상태가 복원됩니다.
 
 ## 실무에서 헷갈리는 지점
 
+![체크포인터와 병합 규칙의 관계](../../../assets/langgraph-101/02/02-03-where-engineers-get-confused.ko.png)
 - 체크포인터는 "메모리 기능"이 아니라 "상태 저장소"입니다. 기억처럼 보이는 것은 저장된 상태를 다시 읽기 때문입니다.
 - `thread_id`를 잘못 설계하면 서로 다른 사용자의 상태가 섞일 수 있습니다.
 - 체크포인터를 붙였다고 모든 필드가 자동 병합되는 것은 아닙니다. 누적 필드는 `Annotated[..., add_messages]`처럼 명시해야 합니다.
@@ -114,6 +117,7 @@ if __name__ == "__main__":
 
 ## 정리
 
+![저장된 대화를 다시 여는 재개 흐름](../../../assets/langgraph-101/02/02-04-summary.ko.png)
 체크포인터를 붙이는 순간 LangGraph는 단발성 함수 호출에서 대화형 시스템으로 한 단계 올라갑니다. 다음 글에서는 저장된 상태를 읽어 다음 노드를 바꾸는 조건부 엣지로 넘어갑니다.
 
 <!-- toc:begin -->

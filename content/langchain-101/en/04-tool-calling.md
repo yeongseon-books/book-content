@@ -47,6 +47,13 @@ response = llm.bind_tools([add_numbers]).invoke("Add 13 and 29.")
 print(response.tool_calls)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    [{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '0r7b2zrqg', 'type': 'tool_call'}]
+
+<!-- injected-output:end -->
+
 ## What to notice in this code
 
 - The tool name, description, and input schema come from the function signature and docstring.
@@ -98,6 +105,7 @@ Topics:
 
 ## Defining tools
 
+![Function definition into tool metadata](../../assets/langchain-101/04/04-01-defining-tools.en.png)
 The `@tool` decorator turns a Python function into a LangChain tool. The docstring tells the LLM what the tool does and when to use it. Type hints define the input schema.
 
 ```python
@@ -127,6 +135,7 @@ print(f"schema: {add_numbers.args_schema.model_json_schema()}")
 
 ## Connecting tools with bind_tools()
 
+![Binding tool metadata to the model](../../assets/langchain-101/04/04-02-connecting-tools-with-bind-tools.en.png)
 `bind_tools()` informs the LLM which tools are available.
 
 ```python
@@ -160,6 +169,14 @@ print(f"content: {response.content!r}")
 print(f"tool_calls: {response.tool_calls}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    content: ''
+    tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': 'yc5j64vch', 'type': 'tool_call'}]
+
+<!-- injected-output:end -->
+
 When `tool_calls` is non-empty, the LLM is requesting a tool execution.
 
 ```
@@ -171,6 +188,7 @@ tool_calls: [{'name': 'add_numbers', 'args': {'a': 15.0, 'b': 27.0}, 'id': 'call
 
 ## A minimal tool-call loop
 
+![Tool call execution and reinjection loop](../../assets/langchain-101/04/04-03-a-minimal-tool-call-loop.en.png)
 After the LLM requests a tool call, the application must execute the function and return the result as a `ToolMessage`.
 
 ```python
@@ -237,6 +255,24 @@ for q in questions:
     print(f"answer: {answer}")
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+
+    question: What is 15 plus 27?
+      executed: add_numbers({'a': 15, 'b': 27}) = 42.0
+    answer: The result of 15 plus 27 is 42.
+
+    question: What is 7 times 8?
+    answer: <multiply_numbers>{"a": 7, "b": 8}</multiply_numbers>
+
+    question: Add 5 and 3, then multiply the result by 4. What do you get?
+      executed: add_numbers({'a': 5, 'b': 3}) = 8.0
+      executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
+    answer: So, adding 5 and 3 gives 8, and multiplying 8 by 4 gives 32.
+
+<!-- injected-output:end -->
+
 The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a `ToolMessage` and appended to the conversation history.
 
 ---
@@ -293,10 +329,23 @@ print(run_with_tools("What time is it now?"))
 print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+      get_current_time({}) = 2026-05-02 00:33:24
+      get_current_time({}) = 2026-05-02 00:33:24
+      get_current_time({}) = 2026-05-02 00:33:24
+    It seems that you can't get the current time because I do not have the get_current_time function.
+      calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
+    This is the calculated BMI for someone weighing 70 kg at 1.75 m.
+
+<!-- injected-output:end -->
+
 ---
 
 ## What to watch out for
 
+![Guardrails for invalid tool requests](../../assets/langchain-101/04/04-04-what-to-watch-out-for.en.png)
 **Docstrings drive tool selection.** The LLM reads docstrings to decide which tool to use and when. Vague or overlapping descriptions cause wrong tool selection.
 
 **Validate inputs inside the tool.** Type hints define the schema but do not prevent the LLM from passing invalid values at runtime. For tools with side effects, validate inputs before executing.

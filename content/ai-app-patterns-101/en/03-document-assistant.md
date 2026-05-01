@@ -45,6 +45,9 @@ Topics:
 
 ## Document summarization
 
+### Short document summarization flow
+
+![Short document summarization flow](../../../assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
 For short documents, pass the full text directly and request a summary. Parameterizing style, length, and audience lets the same chain serve different consumers.
 
 ```python
@@ -110,6 +113,9 @@ print(dev_summary)
 
 ## Long document summarization — Map-Reduce
 
+### Chunk summaries and final synthesis
+
+![Chunk summaries and final synthesis](../../../assets/ai-app-patterns-101/03/03-02-chunk-summaries-and-final-synthesis.en.png)
 When a document exceeds the context window it cannot be processed in one call. Map-Reduce splits the document into chunks, summarizes each independently (Map), then merges those summaries into a single coherent result (Reduce).
 
 ```python
@@ -196,6 +202,9 @@ print(f"\n=== Final summary ===\n{final}")
 
 ## Information extraction
 
+### JSON extraction from unstructured text
+
+![JSON extraction from unstructured text](../../../assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.en.png)
 Unstructured text often contains structured data that downstream systems need. Prompt the LLM to extract specific fields and return them as JSON, then parse the output with `JsonOutputParser`.
 
 ```python
@@ -257,6 +266,9 @@ for i, posting in enumerate(job_postings, start=1):
 
 ## Document classification
 
+### Batch classification with confidence output
+
+![Batch classification with confidence output](../../../assets/ai-app-patterns-101/03/03-04-batch-classification-with-confidence-out.en.png)
 Classifying documents into categories is a common preprocessing step in content pipelines, support ticket routing, and compliance workflows.
 
 ```python
@@ -311,6 +323,9 @@ for text in texts:
 
 ## Where engineers get confused
 
+### Pattern choice across summary extraction and classification
+
+![Pattern choice across summary extraction and classification](../../../assets/ai-app-patterns-101/03/03-05-pattern-choice-across-summary-extraction.en.png)
 - Teams often reach for a larger model first, but chunk size and overlap usually matter more to summary quality.
 - Map-Reduce parallelizes well, but it weakens cross-chunk global context, which makes the reduce prompt critical.
 - Document summarization and document Q&A may look similar at the input layer, but they optimize for different production metrics.

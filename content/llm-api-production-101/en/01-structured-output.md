@@ -53,6 +53,7 @@ All examples in this post assume `llama-3.1-8b-instant` and the official `groq` 
 
 ## Why plain-text parsing does not age well
 
+![Failure path of plain-text parsing](../../assets/llm-api-production-101/01/01-01-why-plain-text-parsing-does-not-age-well.en.png)
 An early implementation often looks like this: ask the model to classify a support ticket, get a small text answer back, and split the string.
 
 ```python
@@ -74,6 +75,7 @@ Imagine a ticket classifier. `category` should come from a finite set. `priority
 
 ## What JSON mode guarantees and what it does not
 
+![Responsibility split between JSON mode and validation](../../assets/llm-api-production-101/01/01-02-what-json-mode-guarantees-and-what-it-do.en.png)
 Groq's `response_format={"type": "json_object"}` pushes the model toward returning a JSON object instead of free-form prose. That is useful because it creates a minimum syntactic contract. Your response is much more likely to be machine-readable without string surgery.
 
 Still, JSON mode is not the whole solution. It reduces formatting failures. It does not automatically guarantee business correctness.
@@ -98,6 +100,7 @@ If the first step is missing, parsing becomes unreliable. If the second step is 
 
 ## Sending a JSON-mode request with the Groq SDK
 
+![JSON mode request and parse flow](../../assets/llm-api-production-101/01/01-03-sending-a-json-mode-request-with-the-gro.en.png)
 The example below extracts `category`, `priority`, and `summary` from a customer support message.
 
 ```python
@@ -141,6 +144,13 @@ payload = json.loads(content)
 print(payload)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    {'category': 'billing', 'priority': 3, 'summary': 'Order missing from order history after successful payment'}
+
+<!-- injected-output:end -->
+
 Three details matter here.
 
 First, the system prompt still says "exactly one JSON object." JSON mode is a provider-side constraint, but it is still helpful to make the contract legible in the prompt itself.
@@ -153,6 +163,7 @@ Third, `json.loads()` only answers one question: is this string parseable JSON? 
 
 ## Locking the response with Pydantic
 
+![Relationship between model output and schema checks](../../assets/llm-api-production-101/01/01-04-locking-the-response-with-pydantic.en.png)
 This is where structured output becomes operationally useful. The code below parses the model output and validates it against a typed schema.
 
 ```python
@@ -216,6 +227,13 @@ except ValidationError as exc:
 print(ticket.model_dump())
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    {'category': <Category.bug: 'bug'>, 'priority': 5, 'summary': 'Password reset emails not arriving, urgent access restoration needed', 'customer_needs_followup': True}
+
+<!-- injected-output:end -->
+
 This gives you a much stronger application boundary. If the model returns an unknown category, an out-of-range priority, a missing field, or the wrong type, validation fails immediately. That is a good thing. In production, explicit failure is safer than silently storing bad data and discovering the damage later.
 
 There is also a downstream benefit. Once validation succeeds, the rest of your code gets real typed values. `ticket.priority` is already an integer. `ticket.category` is already a constrained enum. `ticket.customer_needs_followup` is already a boolean. The rest of the pipeline becomes simpler because defensive parsing logic is no longer spread everywhere.
@@ -224,6 +242,7 @@ There is also a downstream benefit. Once validation succeeds, the rest of your c
 
 ## Thinking in failure layers
 
+![Failure layers in structured output handling](../../assets/llm-api-production-101/01/01-05-thinking-in-failure-layers.en.png)
 Structured output failures are easier to operate if you separate them into layers.
 
 The first layer is the **request layer**. Authentication problems, timeouts, and network failures belong here. These are normal API concerns and may be retryable.

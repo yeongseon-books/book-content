@@ -29,6 +29,7 @@ last_reviewed: '2026-05-01'
 ## Big picture
 ![LLM app security layer structure](../../../assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
 ## Why this layer matters
+![Input guard and output filter flow](../../../assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.en.png)
 A useful security layer fails early both before the model call and after the model response.
 
 Prompt injection is not just a model problem. If risky input reaches the model, it also reaches logs, caches, and downstream analytics unless you stop it earlier in the stack.
@@ -107,11 +108,13 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
+![Injection detection splits from PII masking](../../../assets/llm-apps-ops-101/04/04-02-what-to-notice-in-this-code.en.png)
 - Separating input validation from output filtering tells you which layer actually blocked a request.
 - Regex detection is incomplete, but it is a cheap and effective first barrier.
 - PII masking protects users and shrinks legal and observability risk at the same time.
 
 ## Where engineers get confused
+![Input and output defenses split roles](../../../assets/llm-apps-ops-101/04/04-03-where-engineers-get-confused.en.png)
 - More blocking rules also create more false positives, so rejection messages should be useful without exposing internal policy details.
 - Output filtering does not make input validation optional. They protect different edges.
 - Prompt-injection defense also depends on model choice, system prompts, and tool permissions.

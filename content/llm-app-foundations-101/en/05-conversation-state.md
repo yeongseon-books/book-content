@@ -46,6 +46,7 @@ The main idea is simple: **conversation memory lives in your application layer, 
 
 ## Why LLM calls are stateless
 
+![Stateless calls with and without replayed history](../../assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.en.png)
 At the API boundary, each chat completion request is independent. The model sees only the payload you send. If you do not include earlier turns, those turns do not exist from the model's point of view.
 
 Suppose your first request is:
@@ -72,6 +73,7 @@ This statelessness is easy to misread as a limitation, but it is also what makes
 
 ## Multi-turn chat comes from replaying history in messages
 
+![History append loop across user turns](../../assets/llm-app-foundations-101/05/05-02-multi-turn-chat-comes-from-replaying-his.en.png)
 Every new request includes prior turns alongside the latest user input. The model reads the whole array and continues from there.
 
 In chat APIs, that history is usually represented with three roles:
@@ -111,12 +113,20 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    A tuple is better as a dictionary key. This is because dictionaries in Python cannot have mutable keys, and lists are mutable. Tuples, being immutable, can be used as dictionary keys.
+
+<!-- injected-output:end -->
+
 The important part is not just the last question. It is the replayed context before it. Terms like “which one” and “then” become meaningful only because the earlier turns are present in the same request. In application code, the loop is simple: append the new user message, send the current history, append the assistant reply, and repeat.
 
 ---
 
 ## Keeping the full history is the simplest memory pattern
 
+![Full history payload growth and token cost](../../assets/llm-app-foundations-101/05/05-03-keeping-the-full-history-is-the-simplest.en.png)
 The first implementation most teams write is also the easiest to understand: keep the entire conversation and resend it every time. For short sessions, that is still a perfectly reasonable design.
 
 ```python
@@ -150,12 +160,21 @@ print(ask("My product is a monthly SaaS service. Please remember that."))
 print(ask("Now write a one-line refund policy statement."))
 ```
 
+<!-- injected-output:start -->
+**Output**
+
+    I'll keep in mind that your product is a monthly SaaS (Software as a Service) service. What issue or question do you need assistance with?
+    "We offer a 30-day money-back guarantee for our monthly SaaS service; if you're not satisfied, please contact us within 30 days of your initial subscription to initiate a refund."
+
+<!-- injected-output:end -->
+
 The appeal is obvious: implementation is trivial, context retention is strong, and debugging stays easy because nothing is hidden or compressed. The weakness is just as obvious. Prompt size, latency, and cost grow with every turn until the request hits the model's context window.
 
 ---
 
 ## Sliding windows retain only the last N turns
 
+![Full history window and summary comparison](../../assets/llm-app-foundations-101/05/05-04-sliding-windows-retain-only-the-last-n-t.en.png)
 In many conversations, the most important details live near the end. Sliding-window memory takes advantage of that. You keep the fixed `system` message, then preserve only the most recent N user and assistant turns.
 
 ```python
@@ -254,6 +273,7 @@ The practical risk here is information loss. A summary is lossy. If it drops a c
 
 ## Detecting context overflow before the request fails
 
+![Budget check before context overflow](../../assets/llm-app-foundations-101/05/05-05-detecting-context-overflow-before-the-re.en.png)
 Long conversations usually fail because the prompt gets too large. Once accumulated history grows past the usable context budget, the provider may reject the request or force trade-offs between prompt size and completion length.
 
 The best approach is to estimate prompt size before sending. Exact token counting is ideal, but even a rough estimate is enough to trigger trimming and summarization.

@@ -34,6 +34,7 @@ last_reviewed: '2026-05-01'
 ![이 글에서 답할 질문](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.ko.png)
 ## 최소 실행 예제
 
+![감독자와 도구 루프가 합쳐진 전체 그래프 흐름](../../../assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
 ```python
 import ast
 import json
@@ -208,12 +209,14 @@ export GROQ_API_KEY=... && python main.py
 
 ## 이 코드에서 봐야 할 것
 
+![체크포인터와 route 필드가 묶이는 상태 구조](../../../assets/langgraph-101/06/06-02-what-to-notice-in-this-code.ko.png)
 - supervisor가 먼저 direct path와 tool path를 나눠 그래프 복잡도를 통제합니다.
 - `tool_agent -> ToolNode -> tool_agent` 루프가 계산형 질문만 처리합니다.
 - `compile(checkpointer=MemorySaver())` 덕분에 멀티턴 대화가 같은 `thread_id`로 이어집니다.
 
 ## 실무에서 헷갈리는 지점
 
+![검증 단계와 사람 검토 interrupt 흐름](../../../assets/langgraph-101/06/06-03-where-engineers-get-confused.ko.png)
 - 완성형 예제라고 해서 모든 질문을 도구 루프로 보내면 오히려 느리고 비쌉니다. 먼저 라우팅해서 값비싼 경로를 줄여야 합니다.
 - 체크포인터가 있더라도 라우팅 기준은 최신 메시지 중심으로 단순하게 두는 편이 디버깅에 유리합니다.
 - ToolNode가 있다고 평가 체계가 자동으로 생기지는 않습니다. 실제 서비스에서는 별도의 테스트 케이스와 회귀 검증이 필요하고, 계산 도구도 raw `eval()` 대신 엄격한 산술 파서를 유지하는 편이 안전합니다.
@@ -227,6 +230,7 @@ export GROQ_API_KEY=... && python main.py
 
 ## 정리
 
+![다음 턴까지 이어지는 운영용 에이전트 흐름](../../../assets/langgraph-101/06/06-04-summary.ko.png)
 이 시리즈의 핵심은 LangGraph API를 외우는 것이 아니라 상태, 엣지, 체크포인트를 조합해 흐름을 설계하는 감각을 만드는 데 있습니다. 이제 작은 튜토리얼 그래프를 넘어서 실제 업무용 에이전트 뼈대를 직접 만들 수 있는 단계에 들어왔습니다.
 
 <!-- toc:begin -->

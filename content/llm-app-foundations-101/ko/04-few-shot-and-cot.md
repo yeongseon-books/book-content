@@ -46,6 +46,7 @@ last_reviewed: '2026-05-01'
 
 ## few-shot prompting은 예시로 패턴을 가르치는 일입니다
 
+![예시 쌍이 최종 답을 유도하는 흐름](../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.ko.png)
 few-shot prompting은 모델에게 “이런 식으로 답하면 된다”는 예시를 먼저 보여 준 뒤, 마지막에 실제 질문을 넣는 방식입니다. 채팅 API에서는 이 예시를 별도 필드에 넣지 않습니다. 앞선 글에서 본 것처럼 같은 `messages` 배열 안에 `user`와 `assistant` 쌍으로 배치합니다.
 
 구조는 대개 아래와 같습니다.
@@ -108,12 +109,22 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    category: technical
+    priority: high
+    reason: CSV 업로드 오류는 시스템의 안정성과 사용자 경험에 영향을 줄 수 있다.
+
+<!-- injected-output:end -->
+
 이 예시는 긴 설명보다 세 가지를 분명하게 보여 줍니다. 첫째, few-shot은 결국 메시지 배열 설계입니다. 둘째, 예시는 질문만이 아니라 원하는 답변 형식까지 포함해야 합니다. 셋째, 예시 수가 늘수록 토큰도 늘어나므로 대표성 있는 짧은 예시를 고르는 편이 낫습니다.
 
 ---
 
 ## zero-shot과 few-shot은 같은 질문도 다르게 끌고 갑니다
 
+![zero-shot과 few-shot 안정성 비교](../../assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.ko.png)
 zero-shot은 예시 없이 바로 요청하는 방식입니다. 모델이 이미 학습한 일반 능력에 기대는 형태입니다. 단일 라벨 분류나 짧은 변환 작업에서는 zero-shot만으로도 꽤 잘 됩니다. 다만 출력 형식이 미묘하게 흔들리거나, 라벨 경계가 애매한 문제에서 일관성이 부족할 수 있습니다.
 
 아래 코드는 같은 문의를 zero-shot과 few-shot으로 각각 보내 비교합니다.
@@ -178,6 +189,21 @@ print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    [zero-shot]
+    category: billing
+    priority: high
+    reason: 팀 요금제의 청구 금액이 예상보다 두 배 가까이 높아 고객이 불편함을 겪고 있습니다.
+
+    [few-shot]
+    category: billing
+    priority: high
+    reason: 팀 요금제 청구 금액 오류는 비정상적인 비용 부담을 야기할 수 있다.
+
+<!-- injected-output:end -->
+
 실행해 보면 zero-shot도 꽤 그럴듯하게 맞추는 경우가 많습니다. 그런데 few-shot 쪽이 보통 더 안정적으로 아래 요소를 맞춥니다.
 
 - 라벨 이름
@@ -191,6 +217,7 @@ print(few_shot.choices[0].message.content)
 
 ## 예시 품질이 낮으면 few-shot은 오히려 독이 됩니다
 
+![약한 예시와 강한 예시의 차이](../../assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.ko.png)
 few-shot은 예시를 보여 주는 기법이기 때문에, 예시 자체의 품질이 결과 품질을 강하게 끌고 갑니다. 이 점이 가장 자주 과소평가됩니다. 많은 입문자가 “예시를 넣었는데 왜 더 이상해졌지?”를 겪는데, 대부분 예시가 나쁘거나 서로 일관되지 않습니다.
 
 나쁜 예시는 대개 네 부류입니다.
@@ -281,6 +308,21 @@ print("[good examples]")
 print(good_run.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    [bad examples]
+    category: technical
+    priority: high
+    reason: 비밀번호 재설정 메일이 오지 않아 로그인하지 못하는 문제가 발생했습니다.
+
+    [good examples]
+    category: account
+    priority: high
+    reason: 계정 잠금으로 인해 서비스 이용이 불가능하여 즉각적인 해결이 필요하다.
+
+<!-- injected-output:end -->
+
 코드만 보면 차이가 작아 보일 수 있지만, 결과는 꽤 크게 갈립니다. 나쁜 예시는 모델에게 형식을 가르치지 못하고 애매함만 전달합니다. 좋은 예시는 라벨, 우선순위 판단 기준, 문장 길이를 함께 고정합니다. few-shot의 핵심은 예시 개수가 아니라 예시의 선명도입니다.
 
 실무에서는 아래 기준으로 예시를 고르는 편이 안전합니다.
@@ -294,6 +336,7 @@ print(good_run.choices[0].message.content)
 
 ## chain-of-thought는 복합 문제를 단계로 쪼개게 만듭니다
 
+![단계적 판단이 최종 답에 닿는 흐름](../../assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.ko.png)
 few-shot이 답변 패턴을 보여 주는 기법이라면, chain-of-thought는 문제 풀이 과정을 단계로 나누게 하는 기법입니다. 가장 널리 알려진 형태는 프롬프트 끝에 “단계적으로 생각해 주세요” 혹은 영어로 “Let's think step by step”를 붙이는 방식입니다.
 
 이 말이 왜 통할까요. 이유는 마법이 아니라 작업 구조입니다. 모델이 한 번에 최종 답만 내야 할 때보다, 중간 판단 단계를 거치도록 유도할 때 복합 제약을 놓칠 가능성이 줄어듭니다. 산술, 규칙 적용, 조건 비교, 여러 문장을 함께 읽는 추론에서 자주 도움이 됩니다.
@@ -334,6 +377,22 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    온라인 강의의 가격은 120,000원입니다. 쿠폰 10%를 적용해 보겠습니다.
+
+    1. 쿠폰 10%를 적용하기 전 가격은 120,000원입니다.
+    2. 쿠폰 10%를 적용하면, 10%의 가격은 120,000 x 0.1 = 12,000원입니다.
+    3. 쿠폰 10%를 적용한 가격은 원래 가격에서 쿠폰 가격을 뺀 가격입니다. 따라서, 120,000 - 12,000 = 108,000원입니다.
+    4. 부가세 10%를 붙이기 전 가격은 108,000원입니다.
+    5. 부가세 10%를 붙이면, 10%의 가격은 108,000 x 0.1 = 10,800원입니다.
+    6. 부가세 10%를 붙인 가격은 원래 가격에서 부가세 가격을 더한 가격입니다. 따라서, 108,000 + 10,800 = 118,800원입니다.
+
+    final_answer: 118800원
+
+<!-- injected-output:end -->
 
 이 방식은 중간 추론 단계를 더 분명하게 끌어내는 경향이 있습니다. 그 결과 산술 순서나 조건 적용 순서를 덜 놓칩니다. 특히 “먼저 할인, 그다음 세금”처럼 순서가 중요한 문제에서 효과를 체감하기 쉽습니다.
 
@@ -389,6 +448,16 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    1) 80000원의 25%는 20000원입니다.
+    2) 할인 적용 후 금액은 60000원입니다.
+    3) 배송비 5000원을 더하면 65000원입니다.
+    final_answer: 65000원
+
+<!-- injected-output:end -->
 
 둘의 차이는 이런 식으로 보면 됩니다.
 
@@ -471,12 +540,23 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    policy_check:
+    1) 결제 후 7일 초과입니다.
+    decision: denied
+    reason: 기간 조건을 넘어 환불할 수 없습니다. 시청률은 무관합니다.
+
+<!-- injected-output:end -->
+
 이 패턴의 장점은 둘입니다. 먼저 예시가 답변 껍데기를 고정합니다. 이어서 `policy_check` 단계가 판단 순서를 고정합니다. 단순히 `approved`나 `denied`만 받는 것보다 디버깅도 쉬워집니다. 잘못 분류되면 어느 단계에서 판단이 틀어졌는지 확인할 수 있기 때문입니다.
 
 ---
 
 ## 언제는 잘 먹히고, 언제는 기대만큼 안 먹힙니다
 
+![프롬프트 기법을 접어야 하는 판단 분기](../../assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.ko.png)
 few-shot과 CoT는 강력하지만 만능은 아닙니다. 아래 상황에서는 효과가 제한되거나 오히려 비용만 늘 수 있습니다.
 
 ### 모델이 원래 모르는 지식을 물을 때

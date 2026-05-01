@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## Questions this post answers
 
+![Flow from raw samples to training batches](../../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)
 - How should instruction, input, and output fields be structured?
 - How do you load a tiny JSONL dataset with Hugging Face datasets?
 - Which preprocessing checks matter before you ever start training?
@@ -35,6 +36,7 @@ The example script writes a `toy.jsonl` file, reads it with `datasets.load_datas
 
 ## The three layers of dataset preparation
 
+![Dataset layers and boundary management structure](../../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
 It helps to separate fine-tuning data into three layers: the **raw samples**, the **formatted prompts**, and the **tokenized tensors**. When these layers are explicit, you can debug filtering issues and token-length issues independently instead of mixing them together.
 
 ![The three layers of dataset preparation](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
@@ -63,12 +65,14 @@ tokenizer = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
 
 ## What to notice in this code
 
+![Format validation and token length review flow](../../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.en.png)
 - Using `datasets.load_dataset()` keeps the example close to real JSONL-based workflows.
 - Formatting prompts before tokenization makes it much easier to swap in a model-specific chat template later.
 - The example fixes `max_length=64` so even a CPU-only run can expose token-length behavior immediately.
 
 ## Where engineers get confused
 
+![Deduplication and split decision flow](../../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.en.png)
 - More rows do not automatically mean better training. Duplicates and inconsistent answer style can hurt a small model very quickly.
 - It is normal that this post stops at tokenization. The `labels` field appears in Post 04, where the training loop is introduced.
 - The simple length filters here are just a starting point. Production pipelines need checks for duplicates, PII, policy violations, and class balance.

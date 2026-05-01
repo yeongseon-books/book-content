@@ -49,6 +49,7 @@ If you embed both questions and answers on day one, debugging becomes harder. A 
 
 ## Minimal runnable example
 
+![Minimal runnable example](../../../assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.en.png)
 ```python
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -75,6 +76,7 @@ print(distances, indices)
 
 ## What to notice in this code
 
+![What to notice in this code](../../../assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.en.png)
 - The index stores the **question strings**, not the full answers.
 - `normalize_embeddings=True` makes inner product equivalent to cosine similarity.
 - The test queries paraphrase the indexed questions instead of repeating them exactly.
@@ -84,6 +86,7 @@ print(distances, indices)
 
 ## Where engineers get confused
 
+![Where engineers get confused](../../../assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.en.png)
 - Sentence similarity search is retrieval, not generation.
 - A score above 0.9 is not automatically correct.
 - Settings that work for short FAQ questions do not transfer directly to long document chunks.

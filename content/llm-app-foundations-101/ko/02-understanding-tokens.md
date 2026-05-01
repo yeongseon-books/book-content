@@ -46,6 +46,7 @@ LLM API를 처음 붙이면 응답 품질에 먼저 눈이 갑니다. 하지만 
 
 ## 토큰은 무엇인가
 
+![텍스트가 모델 토큰으로 쪼개지는 흐름](../../assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.ko.png)
 토큰은 모델이 텍스트를 다루기 위해 자른 조각입니다. 이 조각은 꼭 단어와 일치하지 않습니다. 짧은 영어 단어 하나가 토큰 하나일 때도 있지만, 긴 단어는 여러 조각으로 나뉠 수 있습니다. 한국어는 조사와 어미가 붙는 구조라 한 어절이 여러 토큰이 되기 쉽습니다. 숫자, 공백, 줄바꿈, 괄호, 코드 기호도 모두 토큰 계산에 들어갑니다.
 
 예를 들어 사람이 보기에 아래 세 입력은 비슷한 길이처럼 느껴질 수 있습니다.
@@ -64,6 +65,7 @@ LLM API를 처음 붙이면 응답 품질에 먼저 눈이 갑니다. 하지만 
 
 ## 왜 토큰이 중요한가
 
+![비슷한 입력 길이와 다른 토큰 비용 비교](../../assets/llm-app-foundations-101/02/02-02-why-tokens-matter-so-much.ko.png)
 토큰은 단순한 내부 구현 디테일이 아닙니다. 호출 비용, 응답 지연 시간, 모델 한계가 모두 여기에 묶입니다.
 
 먼저 비용입니다. 대부분의 LLM API는 입력 토큰과 출력 토큰을 기준으로 과금합니다. 공급자마다 단가 표시는 다르지만 구조는 비슷합니다. 프롬프트가 길수록 입력 비용이 커지고, 모델이 길게 답할수록 출력 비용도 커집니다. 같은 질문이라도 시스템 프롬프트를 길게 붙이거나 긴 문서 조각을 여러 개 끼워 넣으면 총 토큰 수가 늘어납니다.
@@ -82,6 +84,7 @@ LLM API를 처음 붙이면 응답 품질에 먼저 눈이 갑니다. 하지만 
 
 ## `usage.prompt_tokens`, `completion_tokens`, `total_tokens` 다시 보기
 
+![입력 출력 총합을 나누는 usage 구조](../../assets/llm-app-foundations-101/02/02-03-revisiting-usage-prompt-tokens-completio.ko.png)
 Post 01에서 `usage` 필드를 잠깐 봤습니다. 이제는 이 숫자를 해석해야 합니다. 이 글의 예제 코드는 모두 그대로 복사해 실행할 수 있게 구성했습니다. 아래 코드는 Groq API를 실제로 호출한 뒤 사용량을 읽는 가장 작은 예제입니다.
 
 ```python
@@ -111,6 +114,49 @@ print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    **데코레이터의 개념**
+
+    데코레이터는 함수의 실행 이전에 다른 함수를 실행하고, 그 결과를 원래 함수의 결과와 덮어써서, 원래 함수의 기능에 접근할 수 있도록 하는 기법입니다.
+
+    데코레이터는 함수에 대한 정보를 저장하고 있는 데이터 구조인 `descriptor`를 사용하여 구현이 됩니다. 데코레이터 내에서 원래 함수를 실행하고 결과를 리턴할 수 있고, 이 방법으로 원래 함수를 변경하거나, 주변 로직을 추가할 수 있습니다.
+
+    **데코레이터의 사용법**
+
+    데코레이터를 사용하는 방법은 다음과 같이 나타낼 수 있습니다.
+
+    ```python
+    def 데코레이터_이름(원래_함수):
+        def 데코레이팅_함수():
+            # 원래 함수를 실행하는 코드
+            print("데코레이션 실행")
+            원래_함수()
+            # 원래 함수를 실행한 후 추가 로직
+            print("다음")
+        return 데코레이팅_함수
+
+    @데코레이터_이름
+    def 원래_함수():
+        print("원래 함수 실행")
+
+    원래_함수()
+    ```
+
+    **데코레이터의 특징**
+
+    * 데코레이터는 원래 함수의 기능을 변경하거나 주변 로직을 추가할 수 있습니다.
+    * 데코레이터는 함수에 대한 정보를 저장하고 있는 데이터 구조인 `descriptor`를 사용하여 구현이 됩니다.
+    * 데코레이터 내에서 원래 함수를 실행하고 결과를 리턴할 수 있습니다.
+
+    finish_reason=stop
+    prompt_tokens=53
+    completion_tokens=349
+    total_tokens=402
+
+<!-- injected-output:end -->
+
 세 필드는 각자 역할이 분명합니다.
 
 ### `prompt_tokens`
@@ -133,6 +179,7 @@ print(f"total_tokens={usage.total_tokens}")
 
 ## `tiktoken`으로 토큰 수 미리 세기
 
+![전송 전 토큰 수를 가늠하는 단계](../../assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.ko.png)
 응답을 받은 뒤 사용량을 읽는 것만으로는 부족합니다. 요청을 보내기 전에 길이를 미리 재야 프롬프트를 잘라야 할지, 요약해야 할지, 여러 요청으로 나눌지 판단할 수 있습니다. 이때 많이 쓰는 도구가 `tiktoken`입니다.
 
 설치는 아래처럼 합니다.
@@ -259,6 +306,22 @@ print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
 
+<!-- injected-output:start -->
+**출력 결과**
+
+    파이썬 제너레이터와 리스트의 차이를 이해하기 위해서는 먼저 각각의 개념을 이해하고 예제를 통해서 살펴보겠습니다.
+
+    ### 리스트 (List)
+
+    리스트는 순서가 있으면서, 중복 허용이 되는 데이터의 수열입니다. 각 요소는 인덱스에 따라 접근할 수 있습니다.
+
+
+
+    completion_tokens=80
+    finish_reason=length
+
+<!-- injected-output:end -->
+
 `max_tokens`는 길이 비용과 응답 스타일을 함께 바꿉니다.
 
 - 값을 작게 주면 짧고 빠른 답이 나올 가능성이 큽니다.
@@ -271,6 +334,7 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 
 ## 긴 프롬프트를 보낼 때 주의할 점
 
+![컨텍스트 초과와 length 종료 분기](../../assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.ko.png)
 긴 프롬프트를 다루기 시작하면 두 가지 상황이 자주 생깁니다. 하나는 요청 자체가 너무 길어지는 경우이고, 다른 하나는 출력이 제한에 걸려 중간에서 잘리는 경우입니다. 두 경우 모두 토큰 감시 코드가 있어야 바로 알아차릴 수 있습니다.
 
 아래 예제는 긴 본문을 여러 번 반복해 넣고, `max_tokens`를 작게 잡은 뒤 `finish_reason`을 확인하는 코드입니다.
@@ -319,6 +383,22 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.")
 ```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    estimated_prompt_tokens=8827
+    Python 웹 애플리케이션에서 요청 로그와 예외 로그를 함께 남기는 이유에 대한 핵심 10 개의 정리:
+
+    1. **로그 분석의 용이성**: 요청 로그와 예외 로그를 하나의 단위로 남기
+
+    prompt_tokens=5856
+    completion_tokens=60
+    total_tokens=5916
+    finish_reason=length
+    경고: 출력이 길이 제한에 걸려 중간에서 끝났습니다.
+
+<!-- injected-output:end -->
 
 이 코드에서 볼 포인트는 세 가지입니다.
 

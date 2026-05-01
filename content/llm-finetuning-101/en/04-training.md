@@ -21,6 +21,7 @@ last_reviewed: '2026-05-01'
 
 ## Questions this post answers
 
+![Flow from token batch to optimizer step](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png)
 - Which `TrainingArguments` fields are required for a one-step fine-tuning demo?
 - Why do even tiny experiments still need labels and a data collator?
 - Which outputs should you inspect first when debugging a training loop?
@@ -35,6 +36,7 @@ The example wraps a tiny GPT-2 model with LoRA, builds a two-row question-answer
 
 ## What you can shrink and what you cannot
 
+![Comparison of shrinkable and essential training parts](../../../assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
 You can shrink the number of rows and the number of optimizer steps aggressively. What you cannot remove is the training structure itself: tokenized inputs, labels, loss computation, and an optimizer step. Remove those, and you no longer have a training test—you only have an inference test.
 
 ![What you can shrink and what you cannot](../../../assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png)
@@ -63,12 +65,14 @@ trainer.train()
 
 ## What to notice in this code
 
+![Relationship between batch size and accumulation](../../../assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png)
 - `labels = input_ids.copy()` is the minimal causal-LM setup for next-token loss.
 - `max_steps=1` still executes a real backward pass and optimizer update.
 - For this kind of smoke test, `training_loss` and `global_step` matter more than the absolute loss value.
 
 ## Where engineers get confused
 
+![Training debug output priority flow](../../../assets/llm-finetuning-101/04/04-04-where-engineers-get-confused.en.png)
 - A tiny dataset does not mean the collator is optional. Batch shaping still matters.
 - A high loss is not a failure here. One step on a tiny random-sized model is meant to validate the loop, not to converge.
 - Trainer feels simple only after the columns are correct. That is exactly why the previous post focused on preprocessing structure.

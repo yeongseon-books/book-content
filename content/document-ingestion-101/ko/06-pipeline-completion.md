@@ -34,6 +34,16 @@ last_reviewed: '2026-05-01'
 
 이번 예제는 세 포맷을 읽고, 청크를 만들고, 오프라인 임베딩으로 FAISS를 저장한 뒤 다시 로드해서 검색 결과를 확인합니다. 이 정도면 ingestion MVP가 끝까지 한 번 돈 것입니다.
 
+## 엔드투엔드 수집 파이프라인
+
+![전체 수집 단계가 이어지는 파이프라인 흐름](../../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.ko.png)
+마지막 글의 핵심은 각 단계의 세부 구현보다도 앞 단계 출력이 다음 단계 입력으로 자연스럽게 이어지는지 확인하는 데 있습니다.
+
+## 단계별 검증 체크포인트
+
+![단계별 검증 지표가 남는 체크포인트 흐름](../../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.ko.png)
+체크포인트를 적게 두더라도 단계 경계마다 숫자와 경로를 하나씩 남기면 원인 추적 속도가 크게 빨라집니다.
+
 ## 실행 예제
 
 ```python
@@ -167,11 +177,21 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 
 ## 이 코드에서 봐야 할 것
 
+### 모니터링과 장애 복구 흐름
+
+![모니터링과 장애 복구가 이어지는 흐름](../../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.ko.png)
+운영용 ingestion은 성공 경로만 그리면 부족하고 어느 단계에서 멈췄는지 되짚을 복구 경로도 함께 있어야 합니다.
+
 - `load_file()`가 포맷 차이를 흡수하고, `chunk_documents()`가 공통 청크 계약을 만듭니다.
 - `SimpleHashEmbeddings` 덕분에 외부 모델 다운로드 없이도 FAISS 저장·재로딩 흐름을 끝까지 검증할 수 있습니다.
 - 검증 포인트를 `loaded_documents`, `chunks`, `faiss_saved`, `result` 네 줄로 남겨서 실패 지점을 빠르게 좁힐 수 있습니다.
 
 ## 실무에서 헷갈리는 지점
+
+### 재시도와 재처리 제어 구조
+
+![재시도와 재처리를 나누는 제어 구조](../../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.ko.png)
+재시도와 재처리를 같은 버튼으로 취급하면 중복 비용이 커지므로 둘을 다른 제어 경로로 나눠 두는 편이 좋습니다.
 
 - 엔드투엔드 데모라고 해서 LLM 호출까지 꼭 넣을 필요는 없습니다. 먼저 인덱스가 정상 저장·재로딩되는지 확인하는 편이 중요합니다.
 - 임베딩 품질과 파이프라인 동작 검증은 다른 문제입니다. 데모 단계에서는 재현성이 더 중요합니다.
