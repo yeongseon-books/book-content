@@ -6,6 +6,18 @@
 
 ---
 
+## Writing Rules vs Publishing Rules
+
+이 문서는 원본 Markdown을 각 플랫폼 산출물로 변환하는 **기술적 규칙**을 다룬다.
+
+원고를 어떻게 써야 하는가는 아래 문서를 따른다.
+
+- [`BLOG_WRITING_GUIDE.md`](./BLOG_WRITING_GUIDE.md) — Tistory/Medium 블로그 글 작성 규칙 (SEO 제목, 글 구조, blog-only 블록, 발행 체크리스트)
+- [`EBOOK_WRITING_GUIDE.md`](./EBOOK_WRITING_GUIDE.md) — 시리즈를 eBook으로 묶을 때의 원고 구성 규칙 (장 구조, ebook-only 블록, Part 구성, 반복 제거)
+- [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) — 문체, 이미지, 코드, 태그, 참고자료 공통 규칙
+
+---
+
 ## 1. Source Principle
 
 모든 글은 `content/` 아래에서 작성한다.
