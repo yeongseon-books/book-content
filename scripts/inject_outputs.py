@@ -74,11 +74,25 @@ AI_SERIES = [
 
 
 _LLM_CALL_PATTERNS = re.compile(
-    r"chat\.completions\.create|AsyncGroq|stream=True|\.stream\(|EventSource|StreamingResponse",
+    r"chat\.completions\.create"
+    r"|AsyncGroq"
+    r"|stream=True"
+    r"|\.stream\("
+    r"|EventSource"
+    r"|StreamingResponse"
+    r"|ChatGroq\("
+    r"|ChatOpenAI\("
+    r"|langchain"
+    r"|\.invoke\("
+    r"|chain\.run\("
+    r"|llm\.predict\("
+    r"|agent_executor"
+    r"|rag_chain"
+    r"|groq\.Client\(\)"
+    r"|Groq\(\)",
 )
 
 def run_block(code: str, lang: str) -> str | None:
-    """Execute code, return trimmed stdout or None on skip/error."""
     if "input(" in code:
         return None
     if _LLM_CALL_PATTERNS.search(code):
