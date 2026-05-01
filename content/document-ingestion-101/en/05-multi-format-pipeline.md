@@ -1,3 +1,22 @@
+---
+title: 'Multi-format document pipeline'
+series: document-ingestion-101
+episode: 5
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Multi-format document pipeline
 
 > Document Ingestion 101 (5/6)

@@ -1,3 +1,22 @@
+---
+title: 'LLM 앱 모니터링과 로깅'
+series: llm-apps-ops-101
+episode: 1
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLMOps
+- Observability
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LLM 앱 모니터링과 로깅
 
 > LLM 앱 운영 101 (1/6)

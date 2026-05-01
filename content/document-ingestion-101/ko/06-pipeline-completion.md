@@ -1,3 +1,22 @@
+---
+title: '문서 수집 파이프라인 완성'
+series: document-ingestion-101
+episode: 6
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 문서 수집 파이프라인 완성
 
 > 문서 수집과 인덱싱 101 시리즈 (6/6)

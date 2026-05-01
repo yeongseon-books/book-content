@@ -1,3 +1,22 @@
+---
+title: 'Monitoring and logging for LLM apps'
+series: llm-apps-ops-101
+episode: 1
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLMOps
+- Observability
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Monitoring and logging for LLM apps
 
 > LLM Apps Ops 101 (1/6)

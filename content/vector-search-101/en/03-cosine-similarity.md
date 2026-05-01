@@ -1,3 +1,22 @@
+---
+title: 'Cosine similarity and vector search — computing sentence distances'
+series: vector-search-101
+episode: 3
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Cosine similarity and vector search — computing sentence distances
 
 > Vector Search 101 (3/6)

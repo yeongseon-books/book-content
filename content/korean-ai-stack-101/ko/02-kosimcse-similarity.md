@@ -1,3 +1,22 @@
+---
+title: 'KoSimCSE로 문장 유사도 구현하기'
+series: korean-ai-stack-101
+episode: 2
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Korean NLP
+- LLM
+- Embeddings
+- OCR
+last_reviewed: '2026-05-01'
+---
+
 # KoSimCSE로 문장 유사도 구현하기
 
 > 한국어 AI 스택 101 시리즈 (2/6)

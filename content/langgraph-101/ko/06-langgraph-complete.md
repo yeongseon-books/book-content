@@ -1,3 +1,22 @@
+---
+title: 'LangGraph 완성'
+series: langgraph-101
+episode: 6
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LangGraph 완성
 
 > LangGraph 101 (6/6)

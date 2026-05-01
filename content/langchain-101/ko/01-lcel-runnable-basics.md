@@ -1,3 +1,22 @@
+---
+title: 'LangChain 소개 — LCEL과 Runnable 기본'
+series: langchain-101
+episode: 1
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangChain
+- LCEL
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LangChain 소개 — LCEL과 Runnable 기본
 
 > LangChain 101 시리즈 (1/6)

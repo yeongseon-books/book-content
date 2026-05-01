@@ -1,3 +1,22 @@
+---
+title: 'Training loop and hyperparameters'
+series: llm-finetuning-101
+episode: 4
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Fine-tuning
+- LoRA
+- LLM
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Training loop and hyperparameters
 
 > LLM Fine-tuning 101 (4/6)

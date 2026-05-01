@@ -1,3 +1,22 @@
+---
+title: 'Conditional edges and branching'
+series: langgraph-101
+episode: 3
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Conditional edges and branching
 
 > LangGraph 101 (3/6)

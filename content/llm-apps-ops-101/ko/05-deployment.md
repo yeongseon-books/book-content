@@ -1,3 +1,22 @@
+---
+title: 'LLM 앱 배포 전략'
+series: llm-apps-ops-101
+episode: 5
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLMOps
+- Observability
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LLM 앱 배포 전략
 
 > LLM 앱 운영 101 (5/6)

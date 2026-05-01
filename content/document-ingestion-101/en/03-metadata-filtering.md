@@ -1,3 +1,22 @@
+---
+title: 'Metadata design and filtering'
+series: document-ingestion-101
+episode: 3
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Metadata design and filtering
 
 > Document Ingestion 101 (3/6)

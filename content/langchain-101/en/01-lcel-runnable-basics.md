@@ -1,3 +1,22 @@
+---
+title: 'LangChain introduction — LCEL and the Runnable interface'
+series: langchain-101
+episode: 1
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangChain
+- LCEL
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LangChain introduction — LCEL and the Runnable interface
 
 > LangChain 101 (1/6)

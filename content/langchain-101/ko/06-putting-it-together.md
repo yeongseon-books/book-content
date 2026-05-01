@@ -1,3 +1,22 @@
+---
+title: '실전 체인 조립 — 컴포넌트를 하나로 연결하기'
+series: langchain-101
+episode: 6
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangChain
+- LCEL
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # 실전 체인 조립 — 컴포넌트를 하나로 연결하기
 
 > LangChain 101 시리즈 (6/6)

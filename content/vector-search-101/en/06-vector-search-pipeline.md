@@ -1,3 +1,22 @@
+---
+title: 'Vector search pipeline — from document ingestion to query'
+series: vector-search-101
+episode: 6
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Vector search pipeline — from document ingestion to query
 
 > Vector Search 101 (6/6)

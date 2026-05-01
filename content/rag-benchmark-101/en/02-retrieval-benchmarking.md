@@ -1,3 +1,22 @@
+---
+title: 'Measuring retrieval performance'
+series: rag-benchmark-101
+episode: 2
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- VectorDB
+- Benchmarking
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Measuring retrieval performance
 
 > RAG Benchmark 101 (2/6)

@@ -1,3 +1,22 @@
+---
+title: 'LangGraph introduction and graph basics'
+series: langgraph-101
+episode: 1
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LangGraph introduction and graph basics
 
 > LangGraph 101 (1/6)

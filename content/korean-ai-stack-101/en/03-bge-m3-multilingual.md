@@ -1,3 +1,22 @@
+---
+title: 'BGE-M3 multilingual embedding in practice'
+series: korean-ai-stack-101
+episode: 3
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Korean NLP
+- LLM
+- Embeddings
+- OCR
+last_reviewed: '2026-05-01'
+---
+
 # BGE-M3 multilingual embedding in practice
 
 > Korean AI Stack 101 (3/6)

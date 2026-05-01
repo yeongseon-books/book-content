@@ -1,3 +1,22 @@
+---
+title: 'Human-in-the-loop — designing for human intervention'
+series: ai-app-patterns-101
+episode: 6
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Human-in-the-loop — designing for human intervention
 
 > AI App Patterns 101 (6/6)

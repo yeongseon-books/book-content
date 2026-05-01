@@ -5,6 +5,9 @@ check:
 	bash .sisyphus/style/check-ko.sh
 	python3 scripts/check_catalog.py
 	python3 scripts/check_exports.py
+	python3 scripts/check_frontmatter.py
+	python3 scripts/lint_captions.py
+	python3 scripts/check_links.py
 
 finalize:
 	python3 .sisyphus/medium/finalize-posts.py

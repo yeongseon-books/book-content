@@ -1,3 +1,22 @@
+---
+title: 'PDF parsing and text extraction'
+series: document-ingestion-101
+episode: 1
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # PDF parsing and text extraction
 
 > Document Ingestion 101 (1/6)

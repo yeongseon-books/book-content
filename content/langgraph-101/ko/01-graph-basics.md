@@ -1,3 +1,22 @@
+---
+title: 'LangGraph 소개와 그래프 기초'
+series: langgraph-101
+episode: 1
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LangGraph 소개와 그래프 기초
 
 > LangGraph 101 (1/6)

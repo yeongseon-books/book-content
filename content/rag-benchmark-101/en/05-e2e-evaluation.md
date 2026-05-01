@@ -1,3 +1,22 @@
+---
+title: 'End-to-end RAG pipeline evaluation'
+series: rag-benchmark-101
+episode: 5
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- VectorDB
+- Benchmarking
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # End-to-end RAG pipeline evaluation
 
 > RAG Benchmark 101 (5/6)

@@ -1,3 +1,22 @@
+---
+title: 'BGE-M3 다국어 임베딩 실전'
+series: korean-ai-stack-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Korean NLP
+- LLM
+- Embeddings
+- OCR
+last_reviewed: '2026-05-01'
+---
+
 # BGE-M3 다국어 임베딩 실전
 
 > 한국어 AI 스택 101 시리즈 (3/6)

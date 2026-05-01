@@ -1,3 +1,22 @@
+---
+title: 'LoRA 어댑터 구성'
+series: llm-finetuning-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Fine-tuning
+- LoRA
+- LLM
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # LoRA 어댑터 구성
 
 > LLM 파인튜닝 101 (3/6)

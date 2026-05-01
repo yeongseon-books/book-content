@@ -1,3 +1,22 @@
+---
+title: 'RAG Q&A pattern — document-based question answering'
+series: ai-app-patterns-101
+episode: 2
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # RAG Q&A pattern — document-based question answering
 
 > AI App Patterns 101 (2/6)

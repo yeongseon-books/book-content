@@ -1,3 +1,22 @@
+---
+title: 'LLM 출력 품질 평가'
+series: llm-apps-ops-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLMOps
+- Observability
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LLM 출력 품질 평가
 
 > LLM 앱 운영 101 (3/6)

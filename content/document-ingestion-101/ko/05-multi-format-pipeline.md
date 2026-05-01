@@ -1,3 +1,22 @@
+---
+title: '다중 포맷 문서 파이프라인'
+series: document-ingestion-101
+episode: 5
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 다중 포맷 문서 파이프라인
 
 > 문서 수집과 인덱싱 101 시리즈 (5/6)

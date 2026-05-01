@@ -1,3 +1,22 @@
+---
+title: '임베딩 모델 비교'
+series: rag-benchmark-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- VectorDB
+- Benchmarking
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # 임베딩 모델 비교
 
 > RAG 벤치마크 101 (3/6)

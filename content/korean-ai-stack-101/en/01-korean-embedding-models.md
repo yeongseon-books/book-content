@@ -1,3 +1,22 @@
+---
+title: 'Korean embedding models compared — KoSimCSE, BGE-M3, Solar'
+series: korean-ai-stack-101
+episode: 1
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Korean NLP
+- LLM
+- Embeddings
+- OCR
+last_reviewed: '2026-05-01'
+---
+
 # Korean embedding models compared — KoSimCSE, BGE-M3, Solar
 
 > Korean AI Stack 101 (1/6)

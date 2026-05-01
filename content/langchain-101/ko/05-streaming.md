@@ -1,3 +1,22 @@
+---
+title: 'Streaming — 실시간 출력 처리'
+series: langchain-101
+episode: 5
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangChain
+- LCEL
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Streaming — 실시간 출력 처리
 
 > LangChain 101 시리즈 (5/6)

@@ -1,3 +1,22 @@
+---
+title: 'Agent + Tool 패턴 — 자율 도구 선택'
+series: ai-app-patterns-101
+episode: 4
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Agent + Tool 패턴 — 자율 도구 선택
 
 > AI 앱 패턴 101 시리즈 (4/6)

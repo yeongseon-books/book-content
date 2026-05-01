@@ -1,3 +1,22 @@
+---
+title: 'Completing the RAG benchmark'
+series: rag-benchmark-101
+episode: 6
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- VectorDB
+- Benchmarking
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Completing the RAG benchmark
 
 > RAG Benchmark 101 (6/6)

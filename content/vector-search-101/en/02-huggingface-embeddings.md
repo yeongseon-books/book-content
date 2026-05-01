@@ -1,3 +1,22 @@
+---
+title: 'HuggingFace embeddings in practice — creating your first vectors with sentence-transformers'
+series: vector-search-101
+episode: 2
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
 
 > Vector Search 101 (2/6)

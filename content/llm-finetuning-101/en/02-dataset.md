@@ -1,3 +1,22 @@
+---
+title: 'Dataset preparation and preprocessing'
+series: llm-finetuning-101
+episode: 2
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Fine-tuning
+- LoRA
+- LLM
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Dataset preparation and preprocessing
 
 > LLM Fine-tuning 101 (2/6)

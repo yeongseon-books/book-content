@@ -1,3 +1,22 @@
+---
+title: '학습 루프와 하이퍼파라미터'
+series: llm-finetuning-101
+episode: 4
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Fine-tuning
+- LoRA
+- LLM
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 학습 루프와 하이퍼파라미터
 
 > LLM 파인튜닝 101 (4/6)

@@ -1,3 +1,22 @@
+---
+title: '워크플로 자동화 — 다단계 체인 설계'
+series: ai-app-patterns-101
+episode: 5
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 워크플로 자동화 — 다단계 체인 설계
 
 > AI 앱 패턴 101 시리즈 (5/6)

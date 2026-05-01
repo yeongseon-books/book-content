@@ -1,3 +1,22 @@
+---
+title: 'RAG Q&A 패턴 — 문서 기반 질의응답'
+series: ai-app-patterns-101
+episode: 2
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # RAG Q&A 패턴 — 문서 기반 질의응답
 
 > AI 앱 패턴 101 시리즈 (2/6)

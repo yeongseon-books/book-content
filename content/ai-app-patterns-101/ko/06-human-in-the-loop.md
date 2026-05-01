@@ -1,3 +1,22 @@
+---
+title: 'Human-in-the-loop — 사람 개입 설계 패턴'
+series: ai-app-patterns-101
+episode: 6
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Human-in-the-loop — 사람 개입 설계 패턴
 
 > AI 앱 패턴 101 시리즈 (6/6)

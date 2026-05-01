@@ -1,3 +1,22 @@
+---
+title: 'LLM app deployment strategies'
+series: llm-apps-ops-101
+episode: 5
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLMOps
+- Observability
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # LLM app deployment strategies
 
 > LLM Apps Ops 101 (5/6)

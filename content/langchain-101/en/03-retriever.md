@@ -1,3 +1,22 @@
+---
+title: 'Retriever — document search and context injection'
+series: langchain-101
+episode: 3
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangChain
+- LCEL
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Retriever — document search and context injection
 
 > LangChain 101 (3/6)

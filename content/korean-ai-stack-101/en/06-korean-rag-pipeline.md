@@ -1,3 +1,22 @@
+---
+title: 'Assembling a Korean RAG pipeline'
+series: korean-ai-stack-101
+episode: 6
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Korean NLP
+- LLM
+- Embeddings
+- OCR
+last_reviewed: '2026-05-01'
+---
+
 # Assembling a Korean RAG pipeline
 
 > Korean AI Stack 101 (6/6)

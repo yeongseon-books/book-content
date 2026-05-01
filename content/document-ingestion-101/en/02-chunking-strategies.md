@@ -1,3 +1,22 @@
+---
+title: 'Chunking strategies — optimizing by document type'
+series: document-ingestion-101
+episode: 2
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Chunking strategies — optimizing by document type
 
 > Document Ingestion 101 (2/6)

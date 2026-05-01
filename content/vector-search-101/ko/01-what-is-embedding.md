@@ -1,3 +1,22 @@
+---
+title: '임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기'
+series: vector-search-101
+episode: 1
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 
 > 벡터 검색 101 시리즈 (1/6)

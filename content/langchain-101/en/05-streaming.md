@@ -1,3 +1,22 @@
+---
+title: 'Streaming — handling real-time output'
+series: langchain-101
+episode: 5
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangChain
+- LCEL
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Streaming — handling real-time output
 
 > LangChain 101 (5/6)

@@ -1,3 +1,22 @@
+---
+title: '상태 관리와 체크포인트'
+series: langgraph-101
+episode: 2
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # 상태 관리와 체크포인트
 
 > LangGraph 101 (2/6)

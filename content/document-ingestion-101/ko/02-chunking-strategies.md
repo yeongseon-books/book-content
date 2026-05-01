@@ -1,3 +1,22 @@
+---
+title: '청킹 전략 — 문서 유형별 최적화'
+series: document-ingestion-101
+episode: 2
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 청킹 전략 — 문서 유형별 최적화
 
 > 문서 수집과 인덱싱 101 시리즈 (2/6)

@@ -1,3 +1,22 @@
+---
+title: '문서 어시스턴트 — 요약, 추출, 분류'
+series: ai-app-patterns-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 문서 어시스턴트 — 요약, 추출, 분류
 
 > AI 앱 패턴 101 시리즈 (3/6)

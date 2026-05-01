@@ -1,3 +1,22 @@
+---
+title: '증분 인덱싱 — 변경된 문서만 업데이트'
+series: document-ingestion-101
+episode: 4
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 증분 인덱싱 — 변경된 문서만 업데이트
 
 > 문서 수집과 인덱싱 101 시리즈 (4/6)

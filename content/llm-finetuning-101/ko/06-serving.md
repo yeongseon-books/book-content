@@ -1,3 +1,22 @@
+---
+title: '모델 서빙'
+series: llm-finetuning-101
+episode: 6
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Fine-tuning
+- LoRA
+- LLM
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 모델 서빙
 
 > LLM 파인튜닝 101 (6/6)

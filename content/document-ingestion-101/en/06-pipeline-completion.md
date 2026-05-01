@@ -1,3 +1,22 @@
+---
+title: 'Completing the document ingestion pipeline'
+series: document-ingestion-101
+episode: 6
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Completing the document ingestion pipeline
 
 > Document Ingestion 101 (6/6)

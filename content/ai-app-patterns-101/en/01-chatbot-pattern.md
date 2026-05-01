@@ -1,3 +1,22 @@
+---
+title: 'Chatbot pattern — managing conversation history and state'
+series: ai-app-patterns-101
+episode: 1
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Chatbot pattern — managing conversation history and state
 
 > AI App Patterns 101 (1/6)

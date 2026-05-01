@@ -1,3 +1,22 @@
+---
+title: '조건부 엣지와 분기 흐름'
+series: langgraph-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # 조건부 엣지와 분기 흐름
 
 > LangGraph 101 (3/6)

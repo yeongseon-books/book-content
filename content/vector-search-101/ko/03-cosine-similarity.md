@@ -1,3 +1,22 @@
+---
+title: '코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기'
+series: vector-search-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
 
 > 벡터 검색 101 시리즈 (3/6)

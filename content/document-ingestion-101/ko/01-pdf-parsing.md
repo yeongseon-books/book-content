@@ -1,3 +1,22 @@
+---
+title: 'PDF 파싱과 텍스트 추출'
+series: document-ingestion-101
+episode: 1
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # PDF 파싱과 텍스트 추출
 
 > 문서 수집과 인덱싱 101 시리즈 (1/6)

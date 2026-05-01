@@ -1,3 +1,22 @@
+---
+title: 'FAISS 입문 — 고속 근사 최근접 이웃 검색'
+series: vector-search-101
+episode: 4
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # FAISS 입문 — 고속 근사 최근접 이웃 검색
 
 > 벡터 검색 101 시리즈 (4/6)

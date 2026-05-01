@@ -1,3 +1,22 @@
+---
+title: 'Evaluating LLM output quality'
+series: llm-apps-ops-101
+episode: 3
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLMOps
+- Observability
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Evaluating LLM output quality
 
 > LLM Apps Ops 101 (3/6)

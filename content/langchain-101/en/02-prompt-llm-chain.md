@@ -1,3 +1,22 @@
+---
+title: 'Prompt and LLM chain — assembling your first chain'
+series: langchain-101
+episode: 2
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangChain
+- LCEL
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Prompt and LLM chain — assembling your first chain
 
 > LangChain 101 (2/6)

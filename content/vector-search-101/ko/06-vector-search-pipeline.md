@@ -1,3 +1,22 @@
+---
+title: '벡터 검색 파이프라인 — 문서 수집부터 쿼리까지'
+series: vector-search-101
+episode: 6
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
 
 > 벡터 검색 101 시리즈 (6/6)

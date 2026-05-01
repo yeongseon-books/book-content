@@ -1,3 +1,22 @@
+---
+title: '메타데이터 설계와 필터링'
+series: document-ingestion-101
+episode: 3
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 메타데이터 설계와 필터링
 
 > 문서 수집과 인덱싱 101 시리즈 (3/6)

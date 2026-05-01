@@ -1,3 +1,22 @@
+---
+title: 'VectorDB 선택 기준'
+series: rag-benchmark-101
+episode: 4
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- VectorDB
+- Benchmarking
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # VectorDB 선택 기준
 
 > RAG 벤치마크 101 (4/6)

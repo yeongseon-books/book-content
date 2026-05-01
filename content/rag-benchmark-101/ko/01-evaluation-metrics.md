@@ -1,3 +1,22 @@
+---
+title: 'RAG 평가 지표 이해'
+series: rag-benchmark-101
+episode: 1
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- VectorDB
+- Benchmarking
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # RAG 평가 지표 이해
 
 > RAG 벤치마크 101 (1/6)

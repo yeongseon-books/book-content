@@ -1,3 +1,22 @@
+---
+title: 'State management and checkpoints'
+series: langgraph-101
+episode: 2
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # State management and checkpoints
 
 > LangGraph 101 (2/6)

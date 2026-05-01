@@ -1,3 +1,22 @@
+---
+title: '도구 호출 에이전트'
+series: langgraph-101
+episode: 4
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # 도구 호출 에이전트
 
 > LangGraph 101 (4/6)

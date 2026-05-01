@@ -1,3 +1,22 @@
+---
+title: 'Completing the LLM ops pipeline'
+series: llm-apps-ops-101
+episode: 6
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLMOps
+- Observability
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # Completing the LLM ops pipeline
 
 > LLM Apps Ops 101 (6/6)

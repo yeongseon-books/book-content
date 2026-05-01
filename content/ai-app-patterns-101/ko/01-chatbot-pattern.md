@@ -1,3 +1,22 @@
+---
+title: '챗봇 패턴 — 대화 이력 관리와 상태'
+series: ai-app-patterns-101
+episode: 1
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # 챗봇 패턴 — 대화 이력 관리와 상태
 
 > AI 앱 패턴 101 시리즈 (1/6)

@@ -1,3 +1,22 @@
+---
+title: '멀티 에이전트 시스템'
+series: langgraph-101
+episode: 5
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LangGraph
+- Agent
+- Python
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # 멀티 에이전트 시스템
 
 > LangGraph 101 (5/6)

@@ -1,3 +1,22 @@
+---
+title: '종단 간 RAG 파이프라인 평가'
+series: rag-benchmark-101
+episode: 5
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- VectorDB
+- Benchmarking
+- LLM
+last_reviewed: '2026-05-01'
+---
+
 # 종단 간 RAG 파이프라인 평가
 
 > RAG 벤치마크 101 (5/6)

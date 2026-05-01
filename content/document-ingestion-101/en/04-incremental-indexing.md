@@ -1,3 +1,22 @@
+---
+title: 'Incremental indexing — updating only changed documents'
+series: document-ingestion-101
+episode: 4
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- RAG
+- Document Processing
+- LangChain
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Incremental indexing — updating only changed documents
 
 > Document Ingestion 101 (4/6)

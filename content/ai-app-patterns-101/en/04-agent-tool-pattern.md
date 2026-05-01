@@ -1,3 +1,22 @@
+---
+title: 'Agent and tool pattern — autonomous tool selection'
+series: ai-app-patterns-101
+episode: 4
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # Agent and tool pattern — autonomous tool selection
 
 > AI App Patterns 101 (4/6)

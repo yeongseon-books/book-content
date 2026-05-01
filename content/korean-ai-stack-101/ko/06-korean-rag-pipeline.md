@@ -1,3 +1,22 @@
+---
+title: '한국어 RAG 파이프라인 조합하기'
+series: korean-ai-stack-101
+episode: 6
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Korean NLP
+- LLM
+- Embeddings
+- OCR
+last_reviewed: '2026-05-01'
+---
+
 # 한국어 RAG 파이프라인 조합하기
 
 > 한국어 AI 스택 101 시리즈 (6/6)

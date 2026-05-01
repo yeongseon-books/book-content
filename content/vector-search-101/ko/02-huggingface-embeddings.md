@@ -1,3 +1,22 @@
+---
+title: 'HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기'
+series: vector-search-101
+episode: 2
+language: ko
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Vector Search
+- FAISS
+- Embeddings
+- Python
+last_reviewed: '2026-05-01'
+---
+
 # HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
 
 > 벡터 검색 101 시리즈 (2/6)
