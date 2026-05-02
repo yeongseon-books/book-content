@@ -109,6 +109,18 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 3. Medium HTML: `python3 .sisyphus/medium/to-medium.py content/<series>/en`
 4. Finalize: `python3 .sisyphus/medium/finalize-posts.py`
 5. Verify: `make check`
+6. Tistory export: `make tistory SERIES=<series-id>` or `make tistory-one SERIES=<series-id> EPISODE=<N>`
+7. Hashnode export: `make hashnode SERIES=<series-id>` or `make hashnode-one SERIES=<series-id> EPISODE=<N>`
+
+## Public Asset Validation
+
+발행 전 public asset 검증:
+
+```bash
+make assets-sync-dry
+make assets-sync
+make assets-check
+```
 
 ## Detailed References
 

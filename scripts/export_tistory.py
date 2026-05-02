@@ -79,6 +79,8 @@ def export_one(src: Path, dst: Path, *, local_assets: bool = False) -> None:
         meta.get("copyright_holder", "YeongseonBooks"),
         meta.get("copyright_year", "2026"),
         meta.get("license", "all-rights-reserved"),
+        visible=False,
+        lang="ko",
     )
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(out, encoding="utf-8")
@@ -94,6 +96,8 @@ def main() -> int:
     args = ap.parse_args()
 
     s = load_series(args.series)
+    if not s.get("targets", {}).get("tistory"):
+        raise SystemExit(f"series {args.series} does not target tistory (targets.tistory=false)")
     if "ko" not in s.get("languages", []):
         raise SystemExit(f"series {args.series} has no ko/ language")
     series_ko = REPO_ROOT / s["path"] / "ko"

@@ -9,7 +9,7 @@
 | Pipeline | Platform | URL | Source | Output | Purpose |
 | --- | --- | --- | --- | --- | --- |
 | Korean Blog | Tistory | `https://yeongseonchoe.tistory.com/` | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
-| English Blog | Hashnode | `https://hashnode.com/@yeongseon` | `content/<series>/en/*.md` | (Hashnode 직접 Markdown 발행) | 한국어 원문의 충실한 영어 대응본 |
+| English Blog | Hashnode | `https://hashnode.com/@yeongseon` | `content/<series>/en/*.md` | `exports/hashnode/<series>/*.md` | 한국어 원문의 충실한 영어 대응본 |
 | Medium | Medium | `https://medium.com/@yeongseonchoe` | `content/<series>/en/*.md` (adaptation) | `content/<series>/medium/*.html` → `exports/medium/<series>/*.html` | 영어권 독자용 발행 변형 |
 | Web Book | MkDocs | GitHub Pages 또는 내부 preview | `content/<series>/{ko,en}/*.md` | `docs/` | 웹북 형태의 학습 콘텐츠 |
 | eBook | private `mkdocs-ebook` | — | `content/<series>/{ko,en}/*.md` | `exports/ebook-source/<series>-<lang>/` | 시리즈를 책처럼 묶은 학습형 원고 |
@@ -35,8 +35,11 @@
 ## Quality Gates
 
 ```bash
-# 전체 파이프라인 한 번에
+# 저장소 검증 (public asset 검증은 별도)
 make check
+
+# 발행 전 전체 검증 (public asset 포함)
+make publish-check
 
 # 개별 실행
 python3 .sisyphus/medium/finalize-posts.py    # idempotent: tags + TOC + ko refs
@@ -71,6 +74,7 @@ book-content/                               # private — canonical source
 ├── docs/                                   # MkDocs 웹북 산출물
 ├── exports/
 │   ├── tistory/                            # Tistory 붙여넣기용 Markdown
+│   ├── hashnode/                           # Hashnode 발행용 Markdown 사본
 │   ├── medium/                             # Medium 발행용 HTML 사본
 │   └── ebook-source/                       # private mkdocs-ebook 입력용 source bundle
 ├── templates/, scripts/
@@ -80,5 +84,24 @@ book-content/                               # private — canonical source
 book-public-assets/                         # public — GitHub Pages 호스팅
 ├── assets/<series>/<NN>/...                # book-content/assets/ 의 미러
 └── index.html                              # GitHub Pages placeholder
+```
 
-자세한 변환 규칙은 [`PUBLISHING.md`](./PUBLISHING.md)를 참조하세요.
+## Public Assets
+
+`book-content`는 private 원본 콘텐츠 및 파이프라인 저장소입니다.
+
+외부 발행 플랫폼에서 이미지를 안정적으로 불러오기 위해, 공개 가능한 이미지 사본은 별도 public repository에 동기화합니다.
+
+- Private source assets: `book-content/assets/`
+- Public publishing assets: `yeongseon-books/book-public-assets`
+- Public URL base: `https://yeongseon-books.github.io/book-public-assets`
+
+Canonical articles keep local relative image paths such as:
+
+`../../../assets/<series>/<episode>/<file>.png`
+
+External publishing outputs may rewrite those paths to public asset URLs:
+
+`https://yeongseon-books.github.io/book-public-assets/assets/<series>/<episode>/<file>.png`
+
+Only image assets are mirrored publicly. Manuscripts, example code, publishing scripts, and eBook source bundles remain private.

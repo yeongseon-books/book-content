@@ -1,4 +1,4 @@
-.PHONY: check finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade assets-sync assets-sync-dry assets-sync-prune
+.PHONY: check finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade assets-sync assets-sync-dry assets-sync-prune assets-check tistory tistory-one hashnode hashnode-one publish-check
 
 check:
 	python3 .sisyphus/medium/finalize-posts.py --check
@@ -9,7 +9,6 @@ check:
 	python3 scripts/lint_captions.py
 	python3 scripts/check_links.py
 	python3 scripts/check_article_structure.py
-	python3 scripts/check_public_assets.py
 
 finalize:
 	python3 .sisyphus/medium/finalize-posts.py
@@ -87,3 +86,44 @@ assets-sync:
 
 assets-sync-prune:
 	python3 scripts/sync_assets.py --target $(ASSET_TARGET) --apply --prune
+
+assets-check:
+	python3 scripts/check_public_assets.py --target $(ASSET_TARGET)
+
+# --- Publishing targets ---
+
+tistory:
+ifndef SERIES
+	$(error SERIES is required: make tistory SERIES=azure-functions-101)
+endif
+	python3 scripts/export_tistory.py $(SERIES) --all
+
+tistory-one:
+ifndef SERIES
+	$(error SERIES is required: make tistory-one SERIES=azure-functions-101 EPISODE=1)
+endif
+ifndef EPISODE
+	$(error EPISODE is required: make tistory-one SERIES=azure-functions-101 EPISODE=1)
+endif
+	python3 scripts/export_tistory.py $(SERIES) --episode $(EPISODE)
+
+hashnode:
+ifndef SERIES
+	$(error SERIES is required: make hashnode SERIES=rag-deep-dive)
+endif
+	python3 scripts/export_hashnode.py $(SERIES) --all
+
+hashnode-one:
+ifndef SERIES
+	$(error SERIES is required: make hashnode-one SERIES=rag-deep-dive EPISODE=1)
+endif
+ifndef EPISODE
+	$(error EPISODE is required: make hashnode-one SERIES=rag-deep-dive EPISODE=1)
+endif
+	python3 scripts/export_hashnode.py $(SERIES) --episode $(EPISODE)
+
+# Validate existing export artifacts (does not generate them)
+publish-check:
+	$(MAKE) check
+	$(MAKE) docs-build
+	$(MAKE) assets-check

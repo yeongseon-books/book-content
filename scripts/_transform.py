@@ -189,27 +189,55 @@ def rewrite_public_asset_urls(text: str, asset_base_url: str) -> str:
 
 # --------------- Copyright notice ---------------
 
-
-def make_copyright_comment(holder: str, year: str, license_type: str, *, html: bool = False) -> str:
-    """Return a copyright notice as an HTML comment.
-
-    The ``html`` parameter is accepted for API symmetry with
-    :func:`append_copyright` but does not change the output format;
-    the result is always an HTML comment ``<!-- ... -->``.
+def make_copyright_notice(
+    holder: str,
+    year: str,
+    license_type: str,
+    *,
+    visible: bool = False,
+    lang: str = "en",
+) -> str:
+    """Return a copyright notice as HTML comment or visible text.
 
     Args:
         holder: Copyright holder name (e.g. 'YeongseonBooks').
         year: Copyright year (e.g. '2026').
         license_type: License identifier (e.g. 'all-rights-reserved').
-        html: Reserved for API symmetry. Output is always HTML comment.
+        visible: If True, return a visible Markdown line instead of HTML comment.
+        lang: 'ko' for Korean notice, 'en' for English.
     """
+    if visible:
+        if lang == "ko":
+            text = f"\u00a9 {year} \uc601\uc120\ubd81\uc2a4. \uc774 \uae00\uc758 \uc800\uc791\uad8c\uc740 \uc800\uc790\uc5d0\uac8c \uc788\uc2b5\ub2c8\ub2e4."
+        else:
+            text = f"\u00a9 {year} {holder}. All rights reserved."
+        return f"---\n\n{text}"
     text = f"\u00a9 {year} {holder}. {license_type.replace('-', ' ').title()}."
     return f"<!-- {text} -->"
 
 
-def append_copyright(body: str, holder: str, year: str, license_type: str, *, html: bool = False) -> str:
-    """Append a copyright comment to the end of *body* if not already present."""
-    comment = make_copyright_comment(holder, year, license_type, html=html)
-    if comment in body:
+def make_copyright_comment(holder: str, year: str, license_type: str, *, html: bool = False) -> str:
+    """Return a copyright notice as an HTML comment.
+
+    .. deprecated:: Use :func:`make_copyright_notice` instead.
+    """
+    return make_copyright_notice(holder, year, license_type, visible=False, lang="en")
+
+
+def append_copyright(
+    body: str,
+    holder: str,
+    year: str,
+    license_type: str,
+    *,
+    html: bool = False,
+    visible: bool = False,
+    lang: str = "en",
+) -> str:
+    """Append a copyright notice to the end of *body* if not already present."""
+    notice = make_copyright_notice(
+        holder, year, license_type, visible=visible, lang=lang,
+    )
+    if notice in body:
         return body
-    return body.rstrip() + "\n\n" + comment + "\n"
+    return body.rstrip() + "\n\n" + notice + "\n"
