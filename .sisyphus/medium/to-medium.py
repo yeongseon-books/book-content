@@ -91,6 +91,40 @@ ASSET_PATH_RE = re.compile(
 )
 
 
+def _apply_outside_fences(text: str, line_fn) -> str:
+    """Apply *line_fn* only to lines outside fenced code blocks.
+
+    Tracks the opening fence marker (backtick vs tilde) and its minimum
+    length so that, e.g., a `~~~` line inside a ```` ``` ```` block does
+    not accidentally close the fence.
+    """
+    out: list[str] = []
+    fence_char: str | None = None   # '`' or '~' when inside a fence
+    fence_len: int = 0
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if fence_char is None:
+            # Not inside a fence — check for opening.
+            for ch in ('`', '~'):
+                run = len(stripped) - len(stripped.lstrip(ch))
+                if run >= 3:
+                    fence_char = ch
+                    fence_len = run
+                    break
+            if fence_char is not None:
+                out.append(line)
+                continue
+            out.append(line_fn(line))
+        else:
+            # Inside a fence — check for matching close.
+            run = len(stripped) - len(stripped.lstrip(fence_char))
+            if run >= fence_len and stripped.rstrip() == fence_char * run:
+                fence_char = None
+                fence_len = 0
+            out.append(line)
+    return "".join(out)
+
+
 def replace_images(text: str, src_md: Path) -> str:
     """Rewrite image paths based on _asset_mode.
 
@@ -112,22 +146,14 @@ def replace_images(text: str, src_md: Path) -> str:
         suffix = m.group(4)
         return f"{prefix}{base}/assets/{asset_rel}{suffix}"
 
-    out: list[str] = []
-    in_fence = False
-    for line in text.splitlines(keepends=True):
-        stripped = line.lstrip()
-        if stripped.startswith("```") or stripped.startswith("~~~"):
-            in_fence = not in_fence
-            out.append(line)
-            continue
-        if in_fence:
-            out.append(line)
-        else:
-            out.append(ASSET_PATH_RE.sub(_repl, line))
-    return "".join(out)
+    return _apply_outside_fences(text, lambda line: ASSET_PATH_RE.sub(_repl, line))
 
 
 def replace_links(text: str, src_md: Path) -> str:
+    """Rewrite relative non-image links to pinned GitHub blob URLs.
+
+    Fence-aware: links inside code blocks are left untouched.
+    """
     def sub(m: re.Match) -> str:
         label, url = m.group(1), m.group(2)
         rel = resolve_relative(src_md, url)
@@ -138,28 +164,50 @@ def replace_links(text: str, src_md: Path) -> str:
             frag = "#" + url.split("#", 1)[1]
         return f"[{label}]({BLOB_BASE}/{rel}{frag})"
 
-    return LINK_RE.sub(sub, text)
+    return _apply_outside_fences(text, lambda line: LINK_RE.sub(sub, line))
 
 
 def split_code_segments(text: str) -> list[tuple[bool, str]]:
-    """Return list of (is_code, segment) preserving order. Code = inside ``` fences."""
+    """Return list of (is_code, segment) preserving order.
+
+    Code = inside ``` or ~~~ fences. Tracks the opening delimiter so that
+    a tilde fence inside a backtick block (or vice versa) is not treated
+    as a boundary.
+    """
     segments: list[tuple[bool, str]] = []
     in_code = False
+    fence_char: str | None = None
+    fence_len: int = 0
     buf: list[str] = []
     for line in text.split("\n"):
-        if line.startswith("```"):
-            buf.append(line)
-            if in_code:
-                segments.append((True, "\n".join(buf)))
+        stripped = line.lstrip()
+        # Detect fence boundary
+        detected_char: str | None = None
+        detected_len: int = 0
+        for ch in ('`', '~'):
+            run = len(stripped) - len(stripped.lstrip(ch))
+            if run >= 3:
+                detected_char = ch
+                detected_len = run
+                break
+        if not in_code and detected_char is not None:
+            # Opening fence
+            opening = line
+            if buf:
+                segments.append((False, "\n".join(buf)))
                 buf = []
-                in_code = False
-            else:
-                opening = buf.pop()
-                if buf:
-                    segments.append((False, "\n".join(buf)))
-                    buf = []
-                buf.append(opening)
-                in_code = True
+            buf.append(opening)
+            in_code = True
+            fence_char = detected_char
+            fence_len = detected_len
+        elif in_code and detected_char == fence_char and detected_len >= fence_len and stripped.rstrip() == detected_char * detected_len:
+            # Closing fence
+            buf.append(line)
+            segments.append((True, "\n".join(buf)))
+            buf = []
+            in_code = False
+            fence_char = None
+            fence_len = 0
         else:
             buf.append(line)
     if buf:

@@ -86,24 +86,35 @@ def strip_bottom_tags_line(text: str) -> str:
 def rewrite_outside_fences(text: str, rewrite_line: Callable[[str], str]) -> str:
     """Apply `rewrite_line` only to lines outside fenced code blocks.
 
-    Lines inside ``` or ~~~ fences are passed through unchanged. The fence
-    delimiter lines themselves (the opening and closing ``` ) are also passed
-    through. This protects example code in tutorials from accidental link
-    rewriting (e.g. cross-series link rewrites or asset path rewrites should
-    not silently mutate URL strings shown to readers as code).
+    Tracks the opening fence marker (backtick vs tilde) and its minimum
+    length so that, e.g., a `~~~` line inside a ```` ``` ```` block does
+    not accidentally close the fence.  The fence delimiter lines themselves
+    are passed through unchanged.
     """
     out: list[str] = []
-    in_fence = False
+    fence_char: str | None = None
+    fence_len: int = 0
     for line in text.splitlines(keepends=True):
         stripped = line.lstrip()
-        if stripped.startswith("```") or stripped.startswith("~~~"):
-            in_fence = not in_fence
-            out.append(line)
-            continue
-        if in_fence:
-            out.append(line)
-        else:
+        if fence_char is None:
+            # Not inside a fence — check for opening.
+            for ch in ('`', '~'):
+                run = len(stripped) - len(stripped.lstrip(ch))
+                if run >= 3:
+                    fence_char = ch
+                    fence_len = run
+                    break
+            if fence_char is not None:
+                out.append(line)
+                continue
             out.append(rewrite_line(line))
+        else:
+            # Inside a fence — check for matching close.
+            run = len(stripped) - len(stripped.lstrip(fence_char))
+            if run >= fence_len and stripped.rstrip() == fence_char * run:
+                fence_char = None
+                fence_len = 0
+            out.append(line)
     return "".join(out)
 
 

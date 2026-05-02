@@ -2,7 +2,8 @@
 
 Thin wrapper around `.sisyphus/medium/to-medium.py`, which already produces
 the canonical Medium artifact at `content/<series>/medium/<NN>.html` with:
-- base64-inlined PNG images (self-contained; no external asset URLs needed)
+- public asset URLs for images (rewritten from local paths via series.yaml
+  meta.asset_base_url; can be switched to base64-inline with --asset-mode inline)
 - native HTML headings, lists, code blocks
 - H3+ headings demoted for Medium compatibility
 - TOC marker comments stripped (TOC body lines retained)

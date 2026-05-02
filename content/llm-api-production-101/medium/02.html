@@ -235,7 +235,7 @@ for tool_call in message.tool_calls or []:
         raise ValueError(f&quot;unknown tool: {function_name}&quot;)
 
     validated_args = OrderStatusArgs.model_validate(arguments)
-    result = available_tools[function_name](https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/**validated_args.model_dump())
+    result = available_tools[function_name](**validated_args.model_dump())
     print(function_name, arguments, result)
 </code></pre>
 <!-- injected-output:start -->
@@ -330,7 +330,7 @@ for tool_call in assistant_message.tool_calls or []:
     except json.JSONDecodeError as exc:
         raise ValueError(&quot;tool arguments were not valid JSON&quot;) from exc
 
-    tool_result = available_tools[function_name](https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/**validated_args.model_dump())
+    tool_result = available_tools[function_name](**validated_args.model_dump())
 
     messages.append(
         {

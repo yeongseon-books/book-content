@@ -154,7 +154,7 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -&gt; str:
     key = (from_unit.lower(), to_unit.lower())
     if key not in conversions:
         return f&quot;unsupported conversion: {from_unit} to {to_unit}&quot;
-    result = conversions[key](https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-app-patterns-101/en/value)
+    result = conversions[key](value)
     return f&quot;{value} {from_unit} = {result:.4f} {to_unit}&quot;
 </code></pre>
 <hr>
