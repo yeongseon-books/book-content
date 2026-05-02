@@ -4,7 +4,8 @@
 
 ## Repository Name
 
-- **현재**: `yeongseon-books/technical-content`
+- **현재**: `yeongseon-books/book-content`
+- **이전**: `yeongseon-books/technical-content` (Phase 9 2차 rename)
 - **이전**: `yeongseon-books/tech-writing` (Phase 9 1차 rename)
 - **최초**: `yeongseon-books/tech-blog`
 

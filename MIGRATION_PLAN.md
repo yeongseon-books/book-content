@@ -1,14 +1,14 @@
-> **Archive** — 이 문서는 과거 `tech-blog → tech-writing` 개편 과정을 기록한 migration archive입니다.
+> **Archive** — 이 문서는 과거 `tech-blog → tech-writing → technical-content → book-content` 개편 과정을 기록한 migration archive입니다.
 > 현재 저장소 구조와 운영 규칙은 [`README.md`](./README.md), [`ARCHITECTURE.md`](./ARCHITECTURE.md), [`PUBLISHING.md`](./PUBLISHING.md), [`EBOOK.md`](./EBOOK.md), [`AGENTS.md`](./AGENTS.md)를 기준으로 합니다.
 
-# tech-blog → tech-writing 개편 계획
+# tech-blog → tech-writing → book-content 개편 계획
 
-> 이 문서는 본 저장소(`yeongseon-books/tech-writing`, 구 `yeongseon-books/tech-writing`)를 다채널 기술 콘텐츠 파이프라인 저장소로 단계적으로 개편하기 위한 마스터 플랜이다.
-> 실제 진행 상황은 [`ROADMAP.md`](./ROADMAP.md)에서 추적한다. **Phase 9 리포지토리 rename 은 완료되었다 (`cb179c5`).**
+> 이 문서는 본 저장소(`yeongseon-books/book-content`, 구 `yeongseon-books/tech-blog`)를 다채널 기술 콘텐츠 파이프라인 저장소로 단계적으로 개편하기 위한 마스터 플랜이다.
+> 실제 진행 상황은 [`ROADMAP.md`](./ROADMAP.md)에서 추적한다. **Phase 9 리포지토리 rename 은 세 차례 완료되었다 (`tech-blog → tech-writing`: `cb179c5`, `tech-writing → technical-content`, `technical-content → book-content`).**
 
 ## 1. 개편 목적
 
-`yeongseon-books/tech-writing`(구 `yeongseon-books/tech-writing`)은 기술 블로그 원고를 저장하는 저장소로 시작했지만, 단순 블로그 저장소를 넘어 다음 목적을 모두 지원한다.
+`yeongseon-books/book-content`(구 `yeongseon-books/tech-blog`)은 기술 블로그 원고를 저장하는 저장소로 시작했지만, 단순 블로그 저장소를 넘어 다음 목적을 모두 지원한다.
 
 - Tistory 한국어 글 발행
 - Medium 영어 글 발행
@@ -24,7 +24,7 @@
 tech-blog = 블로그 원고 저장소
 
 변경:
-tech-writing = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파이프라인
+book-content = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파이프라인
 ```
 
 ## 2. 리포지토리 이름 변경
@@ -33,18 +33,19 @@ tech-writing = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파
 | --- | --- | --- | --- |
 | Phase 9 (1차) | `yeongseon-books/tech-blog` | `yeongseon-books/tech-writing` | `cb179c5` |
 | Phase 9 (2차) | `yeongseon-books/tech-writing` | `yeongseon-books/technical-content` | 별도 커밋 |
+| Phase 9 (3차) | `yeongseon-books/technical-content` | `yeongseon-books/book-content` | 별도 커밋 |
 
-`tech-blog`는 블로그 전용 저장소처럼 보인다. `tech-writing`도 글쓰기 행위에 초점이 맞춰져 있다. 이 저장소는 Tistory, Medium, MkDocs, eBook을 모두 대상으로 하므로 콘텐츠 자산 관리 성격을 반영하는 `technical-content`로 최종 rename하였다.
+`tech-blog`는 블로그 전용 저장소처럼 보인다. `tech-writing`은 글쓰기 행위에, `technical-content`는 기술 콘텐츠에 초점이 맞춰져 있다. 이 저장소는 기술서, 웹북, 블로그 시리즈 원고를 관리하는 영선북스의 콘텐츠 자산 저장소이므로 `book-content`로 최종 rename하였다.
 
 ## 3. 저장소 정체성
 
 ### README 한 줄 요약
 
-> Tistory, Medium, MkDocs, eBook 발행을 위한 기술 콘텐츠 원본 저장소.
+> 영선북스의 기술서, 웹북, 블로그 시리즈 원고를 관리하는 canonical content repository.
 
 ### English description
 
-> Technical writing source repository for blog posts, MkDocs web books, and eBook publishing.
+> Canonical content repository for tech books, web books, and blog series by Yeongseon Books.
 
 ## 4. 핵심 설계 원칙 (목표 상태 — Phase 6 이후)
 
@@ -88,14 +89,14 @@ exports/ebook-source/ = private mkdocs-ebook 입력용 eBook source bundle
 `mkdocs-ebook`은 private repository이므로 `requirements.txt`에 필수 의존성으로 넣지 않는다. 본 저장소는 eBook 빌드 자체를 수행하지 않고, eBook 빌드에 필요한 source bundle까지만 생성한다.
 
 ```text
-tech-writing  = 콘텐츠 원본 + eBook source export
+book-content  = 콘텐츠 원본 + eBook source export
 mkdocs-ebook  = private eBook compiler (PDF/EPUB)
 ```
 
 ## 5. 최종 디렉토리 구조 (목표 상태)
 
 ```text
-tech-writing/
+book-content/
 ├── README.md
 ├── SERIES.md
 ├── PUBLISHING.md
@@ -215,7 +216,7 @@ tech-writing/
 | 6 | 시리즈 파일 이동 (`<series>/` → `content/<series>/`) + per-series `series.yaml` 동시 추가 | **높음** | 완료 (10/10 시리즈, 시리즈별 원자 커밋) |
 | 7 | 콘텐츠 품질 (front matter 도입, 스크립트 실 동작, mkdocs build 검증) | 중간 | 완료 (129/129 front matter, 7개 스크립트 실 동작, mkdocs build --strict 통과) |
 | 8 | eBook source bundle 통합 (`export_ebook_source.py` 실 동작 + private `mkdocs-ebook` 빌드) | 중간 | 완료 (19/19 번들 strict-pass; 빌더 contract 는 EBOOK.md §4.1) |
-| 9 | 리포지토리 rename (`tech-blog` → `tech-writing`) + medium URL 일괄 재생성 | 낮음 | 수동 (아래 9.1) |
+| 9 | 리포지토리 rename (`tech-blog` → `tech-writing` → `technical-content` → `book-content`) + medium URL 일괄 재생성 | 낮음 | 수동 (아래 9.1) |
 
 ### 9.1 Phase 9 수동 절차 (rename 후 실행)
 
