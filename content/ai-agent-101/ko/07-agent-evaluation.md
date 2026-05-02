@@ -3,7 +3,7 @@ title: Agent 평가
 series: ai-agent-101
 episode: 7
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

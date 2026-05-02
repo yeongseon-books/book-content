@@ -3,7 +3,7 @@ title: 에러 처리와 안정성
 series: ai-agent-101
 episode: 8
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

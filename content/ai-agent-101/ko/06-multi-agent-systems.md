@@ -3,7 +3,7 @@ title: Multi-Agent 시스템
 series: ai-agent-101
 episode: 6
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

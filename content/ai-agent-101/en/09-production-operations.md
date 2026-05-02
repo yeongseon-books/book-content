@@ -3,7 +3,7 @@ title: Production Operations
 series: ai-agent-101
 episode: 9
 language: en
-status: publish-ready
+status: draft
 targets:
   tistory: false
   hashnode: true

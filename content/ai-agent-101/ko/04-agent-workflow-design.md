@@ -3,7 +3,7 @@ title: Agent Workflow 설계
 series: ai-agent-101
 episode: 4
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

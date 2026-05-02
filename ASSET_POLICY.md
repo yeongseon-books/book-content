@@ -180,14 +180,17 @@ python3 scripts/export_tistory.py rag-deep-dive --episode 1
 python3 scripts/export_hashnode.py rag-deep-dive --episode 1
 python3 scripts/export_medium.py rag-deep-dive --episode 1
 
-# 3. Validate
-python3 scripts/check_public_assets.py
+# 3. Validate (against synced public assets)
+cd ../book-public-assets
+git pull  # Ensure up-to-date
+cd ../book-content
+python3 scripts/check_public_assets.py --target ../book-public-assets
 ```
 
 Expected results:
 
-- ✅ `exports/tistory/rag-deep-dive/01-document-loading-and-chunking.md` image URLs use `book-public-assets`
-- ✅ `exports/hashnode/rag-deep-dive/01-document-loading-and-chunking.md` image URLs use `book-public-assets`
-- ✅ `exports/medium/rag-deep-dive/01.html` image URLs use `book-public-assets`
-- ✅ `check_public_assets.py` reports 620+ references verified
-- ✅ No `../../../assets/` paths remain in external publishing outputs
+- Pass `exports/tistory/rag-deep-dive/01-document-loading-and-chunking.md` image URLs use `book-public-assets`
+- Pass `exports/hashnode/rag-deep-dive/01-document-loading-and-chunking.md` image URLs use `book-public-assets`
+- Pass `exports/medium/rag-deep-dive/01.html` image URLs use `book-public-assets`
+- Pass `check_public_assets.py` reports 620+ references verified
+- Pass No `../../../assets/` paths remain in external publishing outputs

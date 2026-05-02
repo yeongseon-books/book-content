@@ -3,7 +3,7 @@ title: Agent Workflow Design
 series: ai-agent-101
 episode: 4
 language: en
-status: publish-ready
+status: draft
 targets:
   tistory: false
   hashnode: true

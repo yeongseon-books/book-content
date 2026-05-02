@@ -3,7 +3,7 @@ title: 첫 Agent 만들기
 series: ai-agent-101
 episode: 10
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: 운영
 series: ai-agent-101
 episode: 9
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

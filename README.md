@@ -103,10 +103,6 @@ make check              # repository quality gates
 make docs-build         # MkDocs strict build
 make assets-check       # public asset validation
 ```
-
-```bash
-python3 .sisyphus/medium/to-medium.py content/<series>/en   # → medium/<NN>.html
-python3 .sisyphus/medium/finalize-posts.py
 ```
 
 ## 폴더 구조

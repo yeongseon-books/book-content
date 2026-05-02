@@ -3,7 +3,7 @@ title: Agent Evaluation
 series: ai-agent-101
 episode: 7
 language: en
-status: publish-ready
+status: draft
 targets:
   tistory: false
   hashnode: true

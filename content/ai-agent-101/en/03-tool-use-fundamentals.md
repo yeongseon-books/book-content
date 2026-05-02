@@ -3,7 +3,7 @@ title: Tool Use Fundamentals
 series: ai-agent-101
 episode: 3
 language: en
-status: publish-ready
+status: draft
 targets:
   tistory: false
   hashnode: true

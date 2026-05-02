@@ -3,7 +3,7 @@ title: Tool Use 기초
 series: ai-agent-101
 episode: 3
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

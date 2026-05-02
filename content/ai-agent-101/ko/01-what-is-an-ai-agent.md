@@ -3,7 +3,7 @@ title: AI Agent란 무엇인가?
 series: ai-agent-101
 episode: 1
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

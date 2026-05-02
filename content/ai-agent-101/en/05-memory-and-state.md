@@ -3,7 +3,7 @@ title: Memory and State
 series: ai-agent-101
 episode: 5
 language: en
-status: publish-ready
+status: draft
 targets:
   tistory: false
   hashnode: true

@@ -3,7 +3,7 @@ title: 컨텍스트 엔지니어링
 series: ai-agent-101
 episode: 2
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true

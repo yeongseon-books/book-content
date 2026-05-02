@@ -3,7 +3,7 @@ title: Memory와 State
 series: ai-agent-101
 episode: 5
 language: ko
-status: publish-ready
+status: draft
 targets:
   tistory: true
   medium: true
