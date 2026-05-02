@@ -14,7 +14,7 @@ Canonical source는 `content/<series>/{ko,en}/`에 둔다.
 - `en/`: 영어 원본 또는 번역본
 - `medium/`: Medium 발행용 생성 산출물 (`.sisyphus/medium/to-medium.py` 생성)
 
-`medium/`은 직접 수정하지 않는다. 이미지는 Markdown 변환 단계에서 상대 경로를 유지하고, HTML 렌더링 단계에서 base64 data URI로 인라인한다.
+`medium/`은 직접 수정하지 않는다. 이미지는 Markdown 변환 단계에서 상대 경로를 유지하고, HTML 렌더링 단계에서 public GitHub Pages URL로 재작성한다(기본). `--asset-mode inline`을 사용하면 base64 data URI로 인라인할 수도 있다.
 
 ## Repository Split
 
