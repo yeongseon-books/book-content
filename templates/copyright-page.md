@@ -29,8 +29,8 @@ Sharing links for personal learning purposes is permitted.
 
 ## Insertion Policy
 
-- **Tistory**: Not inserted automatically. The author adds a copyright footer
-  manually if desired.
+- **Tistory**: `export_tistory.py`가 HTML 주석으로 자동 삽입한다 (`series.yaml` meta 기반).
+  - **Hashnode**: `export_hashnode.py`가 HTML 주석으로 자동 삽입한다 (`series.yaml` meta 기반).
 - **Medium**: Not inserted automatically. Medium's own terms cover republishing.
 - **eBook**: Inserted as a copyright page by `mkdocs-ebook` builder. The builder
   reads `meta.copyright_holder` and `meta.copyright_year` from the source bundle's

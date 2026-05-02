@@ -1,25 +1,25 @@
-"""Export a Korean source post for Tistory paste-publishing.
+"""Export an English source post for Hashnode publishing.
 
-Reads `content/<series>/ko/<NN>-<slug>.md` and writes to
-`exports/tistory/<series>/<NN>-<slug>.md`.
+Reads ``content/<series>/en/<NN>-<slug>.md`` and writes to
+``exports/hashnode/<series>/<NN>-<slug>.md``.
 
-Per PUBLISHING.md (Tistory column):
-- strip YAML front matter (Tistory has its own meta fields)
+Per PUBLISHING.md (Hashnode column):
+- strip YAML front matter
 - keep blog-only blocks (markers stripped, body kept)
 - strip ebook-only blocks
-- keep TOC and series nav (visible to readers)
-- keep visible bottom `Tags: A, B, C, D` line — this is the copy-paste source
-  for Tistory's tag input field
+- strip TOC markers (keep TOC body; Hashnode renders Markdown natively)
+- keep visible bottom ``Tags: A, B, C, D`` line
+- rewrite images to public GitHub Pages URLs by default
 
 Image handling:
 - By default, local image paths are rewritten to public GitHub Pages URLs
   using series.yaml meta.asset_base_url.
-- With --local-assets, relative `../../../assets/...` paths are kept unchanged
-  for interactive Tistory upload.
+- With --local-assets, relative ``../../../assets/...`` paths are kept
+  unchanged for manual Hashnode upload.
 
 Usage:
-    python3 scripts/export_tistory.py <series-id> --episode N
-    python3 scripts/export_tistory.py <series-id> --all
+    python3 scripts/export_hashnode.py <series-id> --episode N
+    python3 scripts/export_hashnode.py <series-id> --all
 """
 
 from __future__ import annotations
@@ -31,11 +31,11 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-EXPORT_DIR = REPO_ROOT / "exports" / "tistory"
+EXPORT_DIR = REPO_ROOT / "exports" / "hashnode"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _transform import append_copyright, rewrite_public_asset_urls, transform_for_tistory
+from _transform import append_copyright, rewrite_public_asset_urls, transform_for_hashnode
 
 
 def _load_meta() -> dict:
@@ -70,7 +70,7 @@ def find_article(series_dir: Path, episode: int) -> Path:
 
 def export_one(src: Path, dst: Path, *, local_assets: bool = False) -> None:
     text = src.read_text(encoding="utf-8")
-    out = transform_for_tistory(text)
+    out = transform_for_hashnode(text)
     if not local_assets:
         out = rewrite_public_asset_urls(out, _load_asset_base_url())
     meta = _load_meta()
@@ -83,26 +83,34 @@ def export_one(src: Path, dst: Path, *, local_assets: bool = False) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(out, encoding="utf-8")
 
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("series", help="series id, e.g. azure-functions-101")
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--episode", "-e", type=int, help="episode number (1-based)")
-    g.add_argument("--all", action="store_true", help="export every episode in the series")
-    ap.add_argument("--local-assets", action="store_true",
-                    help="keep relative image paths instead of rewriting to public URLs")
+    g.add_argument(
+        "--all", action="store_true", help="export every episode in the series"
+    )
+    ap.add_argument(
+        "--local-assets",
+        action="store_true",
+        help="keep relative image paths instead of rewriting to public URLs",
+    )
     args = ap.parse_args()
 
     s = load_series(args.series)
-    if "ko" not in s.get("languages", []):
-        raise SystemExit(f"series {args.series} has no ko/ language")
-    series_ko = REPO_ROOT / s["path"] / "ko"
+    if not s.get("targets", {}).get("hashnode"):
+        raise SystemExit(f"series {args.series} does not target hashnode (targets.hashnode=false)")
+    if "en" not in s.get("languages", []):
+        raise SystemExit(f"series {args.series} has no en/ language")
+    series_en = REPO_ROOT / s["path"] / "en"
     series_out = EXPORT_DIR / args.series
 
     if args.all:
-        sources = sorted(series_ko.glob("*.md"))
+        sources = sorted(series_en.glob("*.md"))
     else:
-        sources = [find_article(series_ko, args.episode)]
+        sources = [find_article(series_en, args.episode)]
 
     for src in sources:
         dst = series_out / src.name

@@ -146,6 +146,18 @@ def transform_for_tistory(text: str) -> str:
     return text
 
 
+def transform_for_hashnode(text: str) -> str:
+    """Transform en/ source for Hashnode publishing.
+
+    Identical to Tistory transform: strip front matter, strip ebook-only,
+    keep blog-only body (markers removed), strip TOC markers (keep TOC body), keep Tags line.
+    """
+    text = strip_front_matter(text)
+    text = strip_ebook_only(text)
+    text = strip_blog_only_markers_keep_body(text)
+    text = strip_toc_markers(text)
+    return text
+
 # --------------- Public Asset URL rewriting ---------------
 
 ASSET_MD_IMAGE_RE = re.compile(
@@ -172,3 +184,32 @@ def rewrite_public_asset_urls(text: str, asset_base_url: str) -> str:
         text,
         lambda line: _rewrite_asset_line(line, asset_base_url),
     )
+
+
+
+# --------------- Copyright notice ---------------
+
+
+def make_copyright_comment(holder: str, year: str, license_type: str, *, html: bool = False) -> str:
+    """Return a copyright notice as an HTML comment.
+
+    The ``html`` parameter is accepted for API symmetry with
+    :func:`append_copyright` but does not change the output format;
+    the result is always an HTML comment ``<!-- ... -->``.
+
+    Args:
+        holder: Copyright holder name (e.g. 'YeongseonBooks').
+        year: Copyright year (e.g. '2026').
+        license_type: License identifier (e.g. 'all-rights-reserved').
+        html: Reserved for API symmetry. Output is always HTML comment.
+    """
+    text = f"\u00a9 {year} {holder}. {license_type.replace('-', ' ').title()}."
+    return f"<!-- {text} -->"
+
+
+def append_copyright(body: str, holder: str, year: str, license_type: str, *, html: bool = False) -> str:
+    """Append a copyright comment to the end of *body* if not already present."""
+    comment = make_copyright_comment(holder, year, license_type, html=html)
+    if comment in body:
+        return body
+    return body.rstrip() + "\n\n" + comment + "\n"

@@ -1,0 +1,132 @@
+"""Verify that medium HTML artifacts reference only existing public assets.
+
+Scans ``content/<series>/medium/*.html`` for ``<img src="...">`` tags whose
+``src`` matches the configured ``asset_base_url``, then checks that the
+corresponding file exists under the local ``assets/`` tree (which mirrors
+``book-public-assets``).
+
+Also scans ``exports/tistory/`` and ``exports/hashnode/`` Markdown exports
+for Markdown image references to the same base URL.
+
+Detects:
+- Missing local files for referenced public URLs.
+- Wrong-host image URLs (not matching ``asset_base_url``).
+- Residual local relative image paths (``../../../assets/``) in exports.
+
+Exit code 0 = all referenced assets found.  Exit code 1 = errors detected.
+"""
+
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+import yaml
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SERIES_YAML = REPO_ROOT / "series.yaml"
+
+# Match <img src="https://..."> in HTML
+HTML_IMG_RE = re.compile(r'<img\s[^>]*src="([^"]+)"', re.IGNORECASE)
+
+# Match ![alt](url) in Markdown
+MD_IMG_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
+
+# Detect residual local relative image paths
+LOCAL_ASSET_RE = re.compile(r"\.\./\.\./\.\./assets/")
+
+
+def _load_asset_base_url() -> str:
+    catalog = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8"))
+    meta = catalog.get("meta") or {}
+    url = meta.get("asset_base_url", "")
+    if not url:
+        raise SystemExit("series.yaml meta.asset_base_url is required.")
+    return url.rstrip("/")
+
+
+def _extract_urls(text: str, *, html: bool) -> list[str]:
+    """Return all image URLs found in text."""
+    pattern = HTML_IMG_RE if html else MD_IMG_RE
+    return [m.group(1) for m in pattern.finditer(text)]
+
+
+def _check_file(
+    filepath: Path,
+    base_url: str,
+    errors: list[str],
+    *,
+    html: bool,
+) -> int:
+    """Check a single file.  Returns number of refs checked."""
+    text = filepath.read_text(encoding="utf-8")
+    rel_display = filepath.relative_to(REPO_ROOT)
+    checked = 0
+    prefix = f"{base_url}/"
+
+    for src in _extract_urls(text, html=html):
+        if src.startswith(prefix):
+            # Public URL — verify local file exists
+            rel = src[len(prefix) :]
+            local = REPO_ROOT / rel
+            if not local.is_file():
+                errors.append(f"{rel_display}: references missing {rel}")
+            checked += 1
+        elif LOCAL_ASSET_RE.search(src):
+            # Residual local relative path — should have been rewritten
+            errors.append(f"{rel_display}: residual local path {src}")
+            checked += 1
+        elif src.startswith("http://") or src.startswith("https://"):
+            # External URL not matching our base — flag as wrong host
+            # Skip known safe hosts (e.g. mermaid, badge services)
+            if "assets/" in src and base_url not in src:
+                errors.append(f"{rel_display}: wrong-host asset URL {src}")
+                checked += 1
+
+    return checked
+
+
+def main() -> int:
+    base_url = _load_asset_base_url()
+    catalog = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8"))
+    errors: list[str] = []
+    checked = 0
+    warnings: list[str] = []
+
+    # 1. Scan medium HTML artifacts
+    for s in catalog["series"]:
+        sid = s["id"]
+        if not s.get("targets", {}).get("medium"):
+            continue
+        if "en" not in s.get("languages", []):
+            continue
+        medium_dir = REPO_ROOT / s["path"] / "medium"
+        if not medium_dir.is_dir():
+            continue
+        for html_file in sorted(medium_dir.glob("*.html")):
+            checked += _check_file(html_file, base_url, errors, html=True)
+
+    # 2. Scan Tistory/Hashnode Markdown exports (warn if dirs absent)
+    for export_name in ("tistory", "hashnode"):
+        export_root = REPO_ROOT / "exports" / export_name
+        if not export_root.is_dir():
+            warnings.append(f"exports/{export_name}/ not found — skipped")
+            continue
+        for md_file in sorted(export_root.rglob("*.md")):
+            checked += _check_file(md_file, base_url, errors, html=False)
+
+    for w in warnings:
+        print(f"WARNING: {w}", file=sys.stderr)
+
+    if errors:
+        for e in errors:
+            print(f"ERROR: {e}", file=sys.stderr)
+        return 1
+
+    print(f"OK: {checked} public asset references verified")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

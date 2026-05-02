@@ -9,6 +9,7 @@ check:
 	python3 scripts/lint_captions.py
 	python3 scripts/check_links.py
 	python3 scripts/check_article_structure.py
+	python3 scripts/check_public_assets.py
 
 finalize:
 	python3 .sisyphus/medium/finalize-posts.py

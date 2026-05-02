@@ -52,7 +52,7 @@ make assets-sync-prune
 | --- | --- |
 | Canonical source | 상대 경로 유지 (`../../../assets/...`) |
 | Tistory | 기본: public URL 재작성. `--local-assets`로 상대 경로 유지 가능 |
-| Hashnode | 에디터에 PNG 직접 업로드 |
+| Hashnode | 기본: public URL 재작성. `--local-assets`로 상대 경로 유지 가능 |
 | Medium | `--asset-mode public` (기본): public URL. `inline`: base64. `local`: 상대 경로 |
 | MkDocs | `../../assets/...` (docs 기준 상대 경로) |
 | eBook | `assets/...` (bundle 내부 상대 경로). Public URL 미사용 (self-contained) |
