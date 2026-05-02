@@ -138,3 +138,56 @@ def test_split_mixed_no_false_close():
     assert "~~~" in segs[1][1]
     assert "code" in segs[1][1]
     assert segs[2] == (False, "prose")
+
+
+# --------------- to-medium replace_images (integration) ----------------------
+
+replace_images = _to_medium.replace_images
+replace_links = _to_medium.replace_links
+
+
+def test_replace_images_skips_code_block(tmp_path):
+    """replace_images() must not rewrite asset paths inside fenced code."""
+    # Set module globals for public mode
+    _to_medium._asset_mode = "public"
+    orig_base = _to_medium.ASSET_BASE_URL
+    _to_medium.ASSET_BASE_URL = "https://example.io"
+    try:
+        src = tmp_path / "en" / "01-test.md"
+        src.parent.mkdir(parents=True)
+        src.touch()
+        text = (
+            "![a](../../../assets/s/01/a.png)\n"
+            "```\n"
+            "![b](../../../assets/s/01/b.png)\n"
+            "```\n"
+            "![c](../../../assets/s/01/c.png)\n"
+        )
+        result = replace_images(text, src)
+        lines = result.splitlines()
+        assert "example.io" in lines[0], "outside fence: should rewrite"
+        assert "example.io" not in lines[2], "inside fence: must NOT rewrite"
+        assert "example.io" in lines[4], "outside fence: should rewrite"
+    finally:
+        _to_medium._asset_mode = "public"
+        _to_medium.ASSET_BASE_URL = orig_base
+
+
+def test_replace_links_skips_code_block():
+    """replace_links() must not rewrite relative links inside fenced code."""
+    # Use a real file inside the repo so resolve_relative works
+    src = REPO_ROOT / "content" / "azure-functions-101" / "en" / "01-why-serverless.md"
+    text = (
+        "[link](../ko/01-why-serverless.md)\n"
+        "```\n"
+        "[link](../ko/01-why-serverless.md)\n"
+        "```\n"
+        "[link](../ko/01-why-serverless.md)\n"
+    )
+    result = replace_links(text, src)
+    lines = result.splitlines()
+    # Outside fence: links should be rewritten (contain github.com)
+    # Inside fence: links must stay as-is
+    assert "github.com" in lines[0], "outside fence: should rewrite"
+    assert "../ko/01-why-serverless.md" in lines[2], "inside fence: must NOT rewrite"
+    assert "github.com" in lines[4], "outside fence: should rewrite"
