@@ -44,6 +44,7 @@ if "repo" not in _meta or "published_ref" not in _meta:
     )
 REPO = _meta["repo"]
 TAG = _meta["published_ref"]
+ASSET_BASE_URL = _meta.get("asset_base_url", "")
 
 from _catalog import is_present, load_catalog
 from importlib import import_module
@@ -83,12 +84,32 @@ def resolve_relative(src_md: Path, target: str) -> str | None:
     return rel.as_posix()
 
 
+# Module-level asset mode — set by main() before processing.
+_asset_mode: str = "inline"
+
+ASSET_PATH_RE = re.compile(
+    r"(!\[[^\]]*\]\()(\.\.[\/]\.\.[\/]\.\.[\/]assets[\/])([^)]+)(\))"
+)
+
+
 def replace_images(text: str, src_md: Path) -> str:
-    # Images are kept as relative local paths. Medium import doesn't fetch
-    # private-repo raw URLs anyway; the author uploads PNGs manually via
-    # Medium's UI, using the local path as a guide for which file to attach.
-    _ = src_md
-    return text
+    """Rewrite image paths based on _asset_mode.
+
+    - public: rewrite ../../../assets/... to public URLs.
+    - inline: keep relative local paths (HTML renderer will base64-inline them).
+    - local: keep relative local paths as-is.
+    """
+    if _asset_mode != "public" or not ASSET_BASE_URL:
+        return text
+    base = ASSET_BASE_URL.rstrip("/")
+
+    def _repl(m: re.Match) -> str:
+        prefix = m.group(1)
+        asset_rel = m.group(3)
+        suffix = m.group(4)
+        return f"{prefix}{base}/assets/{asset_rel}{suffix}"
+
+    return ASSET_PATH_RE.sub(_repl, text)
 
 
 def replace_links(text: str, src_md: Path) -> str:
@@ -291,15 +312,29 @@ def process_series(en_dir: Path) -> tuple[int, int]:
         body = convert(md)
         tags = extract_tags(body)
         md_out = finalize_md_for_medium(body, tags)
-        html_out = render_md_text_to_html(md_out, md.parent)
+        html_out = render_md_text_to_html(md_out, md.parent, asset_mode=_asset_mode)
         (medium_dir / f"{prefix}.html").write_text(html_out, encoding="utf-8")
         written += 1
     return written, skipped
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) > 1:
-        en_dirs = [Path(p).resolve() for p in argv[1:]]
+    global _asset_mode
+    import argparse as _ap
+
+    parser = _ap.ArgumentParser(description="Convert en/*.md to Medium HTML.")
+    parser.add_argument("en_dirs", nargs="*", help="en/ directories to process")
+    parser.add_argument(
+        "--asset-mode",
+        choices=["public", "inline", "local"],
+        default="inline",
+        help="Image handling: public=rewrite to CDN URLs, inline=base64 (default), local=keep relative paths.",
+    )
+    args = parser.parse_args(argv[1:])
+    _asset_mode = args.asset_mode
+
+    if args.en_dirs:
+        en_dirs = [Path(p).resolve() for p in args.en_dirs]
     else:
         en_dirs = [
             entry.path / "en"

@@ -145,15 +145,22 @@ def extract_title(md_text: str) -> str:
     return m.group(1).strip() if m else "Untitled"
 
 
-def render_md_text_to_html(md_text: str, base_dir: Path) -> str:
+def render_md_text_to_html(md_text: str, base_dir: Path, *, asset_mode: str = "inline") -> str:
     """Render Medium-flavored markdown text to a self-contained HTML document.
 
     base_dir is the directory used to resolve relative image paths (so
     in-memory markdown produced by to-medium.py can be rendered without
-    writing an intermediate .md file)."""
+    writing an intermediate .md file).
+
+    asset_mode controls image handling:
+    - inline: base64-encode local images into data: URIs (default).
+    - public: images already rewritten to public URLs; skip inlining.
+    - local: keep relative paths as-is.
+    """
     title = extract_title(md_text)
     body_html = markdown.markdown(md_text, extensions=MD_EXTENSIONS, output_format="html5")
-    body_html = rewrite_image_srcs(body_html, base_dir)
+    if asset_mode == "inline":
+        body_html = rewrite_image_srcs(body_html, base_dir)
     body_html = re.sub(
         r"<p>Tags:\s*([^<]+)</p>",
         r'<p class="tags-line">Tags: \1</p>',

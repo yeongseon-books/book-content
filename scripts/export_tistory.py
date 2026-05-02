@@ -33,7 +33,17 @@ EXPORT_DIR = REPO_ROOT / "exports" / "tistory"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _transform import transform_for_tistory
+from _transform import rewrite_public_asset_urls, transform_for_tistory
+
+
+def _load_asset_base_url() -> str:
+    """Read asset_base_url from series.yaml meta block."""
+    catalog = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8"))
+    meta = catalog.get("meta") or {}
+    url = meta.get("asset_base_url", "")
+    if not url:
+        raise SystemExit("series.yaml meta.asset_base_url is required for public asset export.")
+    return url
 
 
 def load_series(series_id: str) -> dict:
@@ -51,12 +61,13 @@ def find_article(series_dir: Path, episode: int) -> Path:
     return matches[0]
 
 
-def export_one(src: Path, dst: Path) -> None:
+def export_one(src: Path, dst: Path, *, local_assets: bool = False) -> None:
     text = src.read_text(encoding="utf-8")
     out = transform_for_tistory(text)
+    if not local_assets:
+        out = rewrite_public_asset_urls(out, _load_asset_base_url())
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(out, encoding="utf-8")
-
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -64,6 +75,8 @@ def main() -> int:
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--episode", "-e", type=int, help="episode number (1-based)")
     g.add_argument("--all", action="store_true", help="export every episode in the series")
+    ap.add_argument("--local-assets", action="store_true",
+                    help="keep relative image paths instead of rewriting to public URLs")
     args = ap.parse_args()
 
     s = load_series(args.series)
@@ -79,7 +92,7 @@ def main() -> int:
 
     for src in sources:
         dst = series_out / src.name
-        export_one(src, dst)
+        export_one(src, dst, local_assets=args.local_assets)
         print(f"wrote {dst.relative_to(REPO_ROOT)}")
     print(f"\ntotal: {len(sources)} file(s) -> {series_out.relative_to(REPO_ROOT)}/")
     return 0

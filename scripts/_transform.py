@@ -133,3 +133,31 @@ def transform_for_tistory(text: str) -> str:
     text = strip_blog_only_markers_keep_body(text)
     text = strip_toc_markers(text)
     return text
+
+
+# --------------- Public Asset URL rewriting ---------------
+
+ASSET_MD_IMAGE_RE = re.compile(
+    r"(!\[[^\]]*\]\()(\.\.[\/]\.\.[\/]\.\.[\/]assets[\/])([^)]+)(\))"
+)
+
+
+def _rewrite_asset_line(line: str, asset_base_url: str) -> str:
+    """Rewrite ``../../../assets/X`` image refs to public URLs in a single line."""
+    base = asset_base_url.rstrip("/")
+
+    def _repl(m: re.Match) -> str:
+        prefix = m.group(1)   # ![alt](
+        asset_rel = m.group(3)  # <series>/<NN>/<file>
+        suffix = m.group(4)   # )
+        return f"{prefix}{base}/assets/{asset_rel}{suffix}"
+
+    return ASSET_MD_IMAGE_RE.sub(_repl, line)
+
+
+def rewrite_public_asset_urls(text: str, asset_base_url: str) -> str:
+    """Rewrite local asset image paths to public URLs, skipping code fences."""
+    return rewrite_outside_fences(
+        text,
+        lambda line: _rewrite_asset_line(line, asset_base_url),
+    )
