@@ -2,7 +2,7 @@
 
 ## Repository Role
 
-`tech-writing`은 Markdown 기반 기술 콘텐츠 출판 저장소이다.
+`technical-content`는 Markdown 기반 기술 콘텐츠 출판 저장소이다.
 
 하나의 canonical source를 기준으로 블로그, 웹북, eBook source bundle을 생성한다.
 

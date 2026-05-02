@@ -20,7 +20,7 @@
 
 ## Publication Pipelines
 
-`tech-writing`은 하나의 canonical content base를 다섯 가지 발행 파이프라인으로 변환한다.
+`technical-content`는 하나의 canonical content base를 다섯 가지 발행 파이프라인으로 변환한다.
 
 | Pipeline | Platform | Source | Output | Purpose |
 | --- | --- | --- | --- | --- |

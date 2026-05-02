@@ -8,7 +8,7 @@ eBook export·build 정책은 [`EBOOK.md`](./EBOOK.md), 변환 규칙은 [`PUBLI
 
 ## Blog Series to eBook Workflow
 
-`tech-writing`의 기본 출판 흐름은 다음과 같다.
+`technical-content`의 기본 출판 흐름은 다음과 같다.
 
 ```text
 1. 블로그 시리즈로 먼저 발행한다.
