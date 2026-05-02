@@ -1,6 +1,6 @@
-# Technical Content
+# Book Content
 
-하나의 canonical content base를 Tistory / Hashnode / Medium / MkDocs / eBook 다섯 가지 발행 대상으로 변환하는 멀티채널 기술 콘텐츠 저장소입니다.
+영선북스의 기술서, 웹북, 블로그 시리즈 원고를 관리하는 canonical content repository입니다.
 
 > 모든 시리즈가 `content/<series>/` 아래로 이동 완료되었습니다 (Phase 6 완료).
 
@@ -16,7 +16,7 @@
 
 `ko/`와 `en/`이 canonical source다. `medium/`은 `to-medium.py`가 생성하는 발행 변형 산출물이며 canonical source가 아니다.
 
-> eBook PDF/EPUB 생성은 항상 최신 private `mkdocs-ebook` builder 기준으로 수행한다. `technical-content`는 source bundle까지만 생성하며, 실제 빌드 환경에서 `mkdocs-ebook`을 최신으로 설치/갱신(`--upgrade --force-reinstall`)한 뒤 `mkdocs-ebook build`를 실행한다. 자세한 정책은 `EBOOK.md §1.3` 참조.
+> eBook PDF/EPUB 생성은 항상 최신 private `mkdocs-ebook` builder 기준으로 수행한다. `book-content`는 source bundle까지만 생성하며, 실제 빌드 환경에서 `mkdocs-ebook`을 최신으로 설치/갱신(`--upgrade --force-reinstall`)한 뒤 `mkdocs-ebook build`를 실행한다. 자세한 정책은 `EBOOK.md §1.3` 참조.
 
 ## Key Documents
 
@@ -56,7 +56,7 @@ python3 .sisyphus/medium/finalize-posts.py
 ## 폴더 구조
 
 ```text
-technical-content/
+book-content/
 ├── README.md
 ├── SERIES.md, PUBLISHING.md, STYLE_GUIDE.md, EBOOK.md, ROADMAP.md, AGENTS.md, ARCHITECTURE.md, CONTENT_MODEL.md
 ├── mkdocs.yml, requirements.txt, requirements-dev.txt

@@ -1,5 +1,5 @@
-site_name: Technical Content
-site_description: Technical writing source for blog posts, MkDocs web books, and eBook publishing.
+site_name: Book Content
+site_description: 영선북스의 기술서, 웹북, 블로그 시리즈 원고를 관리하는 canonical content repository.
 site_author: Yeongseon Choe
 
 # docs/ is generated from content/ by scripts/build_docs.py before `mkdocs build`.

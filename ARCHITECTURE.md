@@ -2,7 +2,7 @@
 
 ## Repository Role
 
-`technical-content`는 Markdown 기반 기술 콘텐츠 출판 저장소이다.
+`book-content`는 영선북스의 기술서, 웹북, 블로그 시리즈 원고를 관리하는 canonical content repository이다.
 
 하나의 canonical source를 기준으로 블로그, 웹북, eBook source bundle을 생성한다.
 
