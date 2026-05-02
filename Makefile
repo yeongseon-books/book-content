@@ -1,14 +1,24 @@
-.PHONY: check finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade assets-sync assets-sync-dry assets-sync-prune assets-check tistory tistory-one hashnode hashnode-one publish-check
+.PHONY: check check-content check-generated check-links finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade assets-sync assets-sync-dry assets-sync-prune assets-check tistory tistory-one hashnode hashnode-one publish-check
 
-check:
-	python3 .sisyphus/medium/finalize-posts.py --check
+check: check-content check-generated check-links
+
+# Validate source content (style, structure, metadata)
+check-content:
 	bash .sisyphus/style/check-ko.sh
 	python3 scripts/check_catalog.py
-	python3 scripts/check_exports.py
 	python3 scripts/check_frontmatter.py
 	python3 scripts/lint_captions.py
-	python3 scripts/check_links.py
 	python3 scripts/check_article_structure.py
+
+# Validate generated outputs (Medium HTML, exports)
+check-generated:
+	python3 .sisyphus/medium/finalize-posts.py --check
+	python3 scripts/check_exports.py
+	python3 scripts/check_drift.py
+
+# Validate internal and external links (can be slow)
+check-links:
+	python3 scripts/check_links.py
 
 finalize:
 	python3 .sisyphus/medium/finalize-posts.py
@@ -23,8 +33,8 @@ medium:
 ifndef SERIES
 	$(error SERIES is required: make medium SERIES=azure-functions-101)
 endif
-	python3 .sisyphus/medium/finalize-posts.py
 	python3 .sisyphus/medium/to-medium.py content/$(SERIES)/en --asset-mode $(ASSET_MODE)
+	python3 .sisyphus/medium/finalize-posts.py
 
 docs-build:
 	python3 scripts/build_docs.py

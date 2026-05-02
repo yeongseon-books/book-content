@@ -19,9 +19,7 @@ __pycache__/
 # Reference checkouts (not part of this repo)
 azure-functions-host/
 
-# Build outputs (regenerated; not tracked)
-docs/
+# Build outputs (regenerated; tracked for publishing review)
 site/
-exports/
 .playwright-mcp/
 medium-test.html

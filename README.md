@@ -42,12 +42,14 @@ make check
 make publish-check
 
 # 개별 실행
-python3 .sisyphus/medium/finalize-posts.py    # idempotent: tags + TOC + ko refs
-.sisyphus/style/check-ko.sh                   # ko translation-smell + im-not-ai S1 check
+python3 .sisyphus/medium/finalize-posts.py --check   # idempotent dry-run: tags + TOC + ko refs
+bash .sisyphus/style/check-ko.sh                      # ko translation-smell + im-not-ai S1 check
+python3 scripts/check_catalog.py                      # validates series.yaml consistency
+python3 scripts/check_exports.py                      # validates export outputs
 python3 scripts/check_frontmatter.py
-python3 scripts/check_links.py
 python3 scripts/lint_captions.py
-python3 scripts/check_article_structure.py     # article structure (A-grade) check
+python3 scripts/check_links.py
+python3 scripts/check_article_structure.py            # article structure (A-grade) check
 ```
 
 medium 변형 재생성 시:

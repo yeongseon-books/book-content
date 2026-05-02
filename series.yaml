@@ -26,9 +26,8 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: draft
+  lifecycle: active
   path: content/ai-agent-101
-- id: azure-app-service-101
 - id: azure-app-service-101
   category: azure
   title:
@@ -47,7 +46,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: complete
+  lifecycle: active
   path: content/azure-app-service-101
   per:
     ko:
@@ -128,7 +127,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: complete
+  lifecycle: active
   path: content/azure-app-service-deep-dive
   per:
     ko:
@@ -201,7 +200,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: complete
+  lifecycle: active
   path: content/azure-functions-101
   per:
     ko:
@@ -282,7 +281,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: complete
+  lifecycle: active
   path: content/azure-functions-deep-dive
   per:
     ko:
@@ -355,7 +354,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: complete
+  lifecycle: active
   path: content/azure-aks-101
   per:
     ko:
@@ -436,7 +435,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: complete
+  lifecycle: active
   path: content/azure-aks-deep-dive
   per:
     ko:
@@ -509,7 +508,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: complete
+  lifecycle: active
   path: content/azure-aca-101
   per:
     ko:
@@ -590,7 +589,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: complete
+  lifecycle: active
   path: content/azure-aca-deep-dive
   per:
     ko:
@@ -662,7 +661,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: needs-update
+  lifecycle: archived
   note: Superseded by llm-app-foundations-101 and ai-app-patterns-101. Do not add new posts. Existing content will be absorbed
     into the new series.
   path: content/ai-web-dev-101
@@ -715,7 +714,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: active
+  lifecycle: active
   path: content/llm-from-scratch-101
   per:
     ko:
@@ -814,7 +813,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: active
+  lifecycle: active
   path: content/rag-deep-dive
   per:
     ko:
@@ -889,7 +888,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/llm-app-foundations-101
   per:
     ko:
@@ -964,7 +963,7 @@ series:
     mkdocs: true
     ebook: true
   level: 201
-  status: planned
+  lifecycle: active
   path: content/llm-api-production-101
   per:
     ko:
@@ -1039,7 +1038,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/vector-search-101
   per:
     ko:
@@ -1114,7 +1113,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/langchain-101
   per:
     ko:
@@ -1189,7 +1188,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/ai-app-patterns-101
   per:
     ko:
@@ -1264,7 +1263,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/korean-ai-stack-101
   per:
     ko:
@@ -1339,7 +1338,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/document-ingestion-101
   per:
     ko:
@@ -1414,7 +1413,7 @@ series:
     mkdocs: true
     ebook: true
   level: 201
-  status: planned
+  lifecycle: active
   path: content/llm-apps-ops-101
   per:
     ko:
@@ -1489,7 +1488,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/rag-benchmark-101
   per:
     ko:
@@ -1564,7 +1563,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/langgraph-101
   per:
     ko:
@@ -1639,7 +1638,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/llm-finetuning-101
   per:
     ko:
@@ -1714,7 +1713,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/ax-practical-guide
 - id: technical-writing
   category: writing
@@ -1734,5 +1733,5 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: planned
+  lifecycle: active
   path: content/technical-writing
