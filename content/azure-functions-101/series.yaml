@@ -23,22 +23,22 @@ tags:
 articles:
 - idx: 1
   slug: 01-what-is-azure-functions
-  status: ready
+  status: publish-ready
 - idx: 2
   slug: 02-triggers-and-bindings
-  status: ready
+  status: publish-ready
 - idx: 3
   slug: 03-host-and-worker
-  status: ready
+  status: publish-ready
 - idx: 4
   slug: 04-first-deploy
-  status: ready
+  status: publish-ready
 - idx: 5
   slug: 05-choosing-a-plan
-  status: ready
+  status: publish-ready
 - idx: 6
   slug: 06-scaling-and-cold-start
-  status: ready
+  status: publish-ready
 - idx: 7
   slug: 07-monitoring-and-ops
-  status: ready
+  status: publish-ready

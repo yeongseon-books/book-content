@@ -124,6 +124,9 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> tuple[list[str], l
     if last is not None and not (isinstance(last, str) and DATE_RE.match(last)):
         errors.append(f"last_reviewed must be YYYY-MM-DD string, got {last!r}")
 
+    code_req = fm.get("code_required")
+    if code_req is not None and not isinstance(code_req, bool):
+        errors.append(f"code_required must be boolean, got {type(code_req).__name__}: {code_req!r}")
     # Deprecation warning for 'ready' status
     if status == "ready":
         warnings.append("status 'ready' is deprecated; use 'publish-ready' instead")

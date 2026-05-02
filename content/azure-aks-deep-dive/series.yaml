@@ -23,19 +23,19 @@ tags:
 articles:
 - idx: 1
   slug: 01-control-plane-anatomy
-  status: ready
+  status: publish-ready
 - idx: 2
   slug: 02-kubelet-and-containerd
-  status: ready
+  status: publish-ready
 - idx: 3
   slug: 03-cni-and-azure-cni-overlay
-  status: ready
+  status: publish-ready
 - idx: 4
   slug: 04-scheduler-and-pod-placement
-  status: ready
+  status: publish-ready
 - idx: 5
   slug: 05-hpa-and-cluster-autoscaler-internals
-  status: ready
+  status: publish-ready
 - idx: 6
   slug: 06-keda-internals
-  status: ready
+  status: publish-ready

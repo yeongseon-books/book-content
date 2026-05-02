@@ -42,7 +42,10 @@ CATEGORY_LABELS = {
 STATUS_LABELS = {
     "planned": "Planned",
     "draft": "Draft",
-    "ready": "Ready",
+    "content-ready": "Content Ready",
+    "code-checked": "Code Checked",
+    "publish-ready": "Publish Ready",
+    "ready": "Ready (legacy)",
     "published": "Published",
     "needs-update": "Needs Update",
 }
@@ -92,7 +95,10 @@ def render_series_md(catalog: list[dict]) -> str:
         meanings = {
             "planned": "기획 중",
             "draft": "초안 작성 중",
-            "ready": "발행 준비 완료",
+            "content-ready": "본문 작성 완료, 코드 검증 전",
+            "code-checked": "예제 코드 검증 완료",
+            "publish-ready": "발행 준비 완료",
+            "ready": "발행 준비 완료 (legacy)",
             "published": "발행 완료",
             "needs-update": "업데이트 필요",
         }

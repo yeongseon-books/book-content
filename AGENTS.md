@@ -58,6 +58,7 @@ python3 .sisyphus/medium/finalize-posts.py    # idempotent: tags + TOC + ko refs
 python3 scripts/check_frontmatter.py           # front matter validation
 python3 scripts/check_links.py                 # internal link check
 python3 scripts/lint_captions.py               # image caption lint
+python3 scripts/check_article_structure.py     # article structure (A-grade) check
 ```
 
 ## Status Rules

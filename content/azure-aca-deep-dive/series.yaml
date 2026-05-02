@@ -23,19 +23,19 @@ tags:
 articles:
 - idx: 1
   slug: 01-aca-architecture
-  status: ready
+  status: publish-ready
 - idx: 2
   slug: 02-environment-internals
-  status: ready
+  status: publish-ready
 - idx: 3
   slug: 03-revision-and-traffic-split
-  status: ready
+  status: publish-ready
 - idx: 4
   slug: 04-keda-in-aca
-  status: ready
+  status: publish-ready
 - idx: 5
   slug: 05-dapr-sidecar-internals
-  status: ready
+  status: publish-ready
 - idx: 6
   slug: 06-envoy-ingress-path
-  status: ready
+  status: publish-ready

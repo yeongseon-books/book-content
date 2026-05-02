@@ -43,6 +43,7 @@ python3 .sisyphus/medium/finalize-posts.py    # idempotent: tags + TOC + ko refs
 python3 scripts/check_frontmatter.py
 python3 scripts/check_links.py
 python3 scripts/lint_captions.py
+python3 scripts/check_article_structure.py     # article structure (A-grade) check
 ```
 
 medium 변형 재생성 시:

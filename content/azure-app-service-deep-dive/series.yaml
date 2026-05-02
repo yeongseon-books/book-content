@@ -23,19 +23,19 @@ tags:
 articles:
 - idx: 1
   slug: 01-platform-architecture
-  status: ready
+  status: publish-ready
 - idx: 2
   slug: 02-front-end-and-arr
-  status: ready
+  status: publish-ready
 - idx: 3
   slug: 03-worker-and-sandbox
-  status: ready
+  status: publish-ready
 - idx: 4
   slug: 04-deployment-and-kudu
-  status: ready
+  status: publish-ready
 - idx: 5
   slug: 05-scaling-internals
-  status: ready
+  status: publish-ready
 - idx: 6
   slug: 06-cold-start-and-warmup
-  status: ready
+  status: publish-ready

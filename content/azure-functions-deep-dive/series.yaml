@@ -23,19 +23,19 @@ tags:
 articles:
 - idx: 1
   slug: 01-host-bootstrap
-  status: ready
+  status: publish-ready
 - idx: 2
   slug: 02-worker-process
-  status: ready
+  status: publish-ready
 - idx: 3
   slug: 03-grpc-event-stream
-  status: ready
+  status: publish-ready
 - idx: 4
   slug: 04-dispatcher-and-invocation
-  status: ready
+  status: publish-ready
 - idx: 5
   slug: 05-scaling-internals
-  status: ready
+  status: publish-ready
 - idx: 6
   slug: 06-cold-start-placeholder
-  status: ready
+  status: publish-ready

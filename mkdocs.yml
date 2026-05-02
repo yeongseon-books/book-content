@@ -118,6 +118,13 @@ nav:
               - "샘플링 — 학습된 모델에서 글 뽑아내기": ko/llm-from-scratch-101/07-inference.md
               - "베이스 모델을 우리 작업에 맞추기": ko/llm-from-scratch-101/08-finetuning.md
               - "직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍": ko/llm-from-scratch-101/09-chatbot-wrapper.md
+          - RAG Deep Dive:
+              - "문서 로딩과 청크 전략 — LangChain TextSplitter 내부": ko/rag-deep-dive/01-document-loading-and-chunking.md
+              - "임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리": ko/rag-deep-dive/02-embeddings-and-vector-index.md
+              - "Retriever 설계 — VectorStoreRetriever와 MMR": ko/rag-deep-dive/03-retriever-design.md
+              - "프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부": ko/rag-deep-dive/04-prompt-construction-and-context-injection.md
+              - "RAG Chain 조립 — RetrievalQA vs LCEL": ko/rag-deep-dive/05-rag-chain-assembly.md
+              - "평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness": ko/rag-deep-dive/06-evaluation-and-quality-gates.md
   - English:
       - en/index.md
       - Azure:
@@ -192,4 +199,11 @@ nav:
               - "Sampling — Generating Text from a Trained Model": en/llm-from-scratch-101/07-inference.md
               - "Adapting the Base Model to Specific Tasks": en/llm-from-scratch-101/08-finetuning.md
               - "Turning Your LLM into a Chatbot — FastAPI + Streaming": en/llm-from-scratch-101/09-chatbot-wrapper.md
+          - RAG Deep Dive:
+              - "Document Loading and Chunking — Inside LangChain TextSplitter": en/rag-deep-dive/01-document-loading-and-chunking.md
+              - "Embeddings and the Vector Index — Inside FAISS IndexFlatL2": en/rag-deep-dive/02-embeddings-and-vector-index.md
+              - "Retriever Design — VectorStoreRetriever and MMR": en/rag-deep-dive/03-retriever-design.md
+              - "Prompt Construction and Context Injection — Inside PromptTemplate": en/rag-deep-dive/04-prompt-construction-and-context-injection.md
+              - "Assembling the RAG Chain — RetrievalQA vs LCEL": en/rag-deep-dive/05-rag-chain-assembly.md
+              - "Evaluation and Quality Gates — RAGAS Metrics and Faithfulness": en/rag-deep-dive/06-evaluation-and-quality-gates.md
 # AUTOGEN-NAV-END
