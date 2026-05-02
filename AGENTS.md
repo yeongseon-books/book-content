@@ -72,6 +72,7 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 
 - 신규 글은 `ready`를 사용하지 않고 `publish-ready`를 사용한다.
 - Status lifecycle: [`CONTENT_MODEL.md`](./CONTENT_MODEL.md) 참조.
+- Historical repository names (`tech-blog`, `tech-writing`, `technical-content`)는 새 산출물, canonical 링크, 발행 URL에 사용하지 않는다. 역사적 기록은 `MIGRATION_PLAN.md`와 `ROADMAP.md`에만 남긴다.
 
 ## Writing Style
 
