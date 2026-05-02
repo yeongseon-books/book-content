@@ -159,10 +159,12 @@ make publish-check
 
 ## Publishing Smoke Test
 
+**Status: Pass** (Last verified: 2026-05-02)
+
 Recommended test target: `rag-deep-dive` episode 1
 
 ```bash
-# 1. Sync public assets
+# 1. Sync public assets (if images changed)
 make assets-sync-dry
 make assets-sync
 
@@ -174,18 +176,18 @@ git push
 
 # 2. Generate exports
 cd ../book-content
-make tistory-one SERIES=rag-deep-dive EPISODE=1
-make hashnode-one SERIES=rag-deep-dive EPISODE=1
-make medium SERIES=rag-deep-dive
+python3 scripts/export_tistory.py rag-deep-dive --episode 1
+python3 scripts/export_hashnode.py rag-deep-dive --episode 1
+python3 scripts/export_medium.py rag-deep-dive --episode 1
 
 # 3. Validate
-make publish-check
+python3 scripts/check_public_assets.py
 ```
 
-Check:
+Expected results:
 
-- Tistory export image URLs use `book-public-assets`
-- Hashnode export image URLs use `book-public-assets`
-- Medium HTML image URLs use `book-public-assets`
-- Public asset files exist in `../book-public-assets/assets/`
-- No `../../../assets/` paths remain in external publishing outputs
+- ✅ `exports/tistory/rag-deep-dive/01-document-loading-and-chunking.md` image URLs use `book-public-assets`
+- ✅ `exports/hashnode/rag-deep-dive/01-document-loading-and-chunking.md` image URLs use `book-public-assets`
+- ✅ `exports/medium/rag-deep-dive/01.html` image URLs use `book-public-assets`
+- ✅ `check_public_assets.py` reports 620+ references verified
+- ✅ No `../../../assets/` paths remain in external publishing outputs

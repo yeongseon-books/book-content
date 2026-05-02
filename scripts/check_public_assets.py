@@ -17,6 +17,9 @@ Also detects:
 - wrong YeongseonBooks asset host URLs
 - unsupported public asset extensions
 
+Typical usage before publishing:
+    python3 scripts/check_public_assets.py --target ../book-public-assets
+
 Exit code 0 = all referenced assets found. Exit code 1 = errors detected.
 """
 
@@ -63,7 +66,7 @@ def _check_file(
     errors: list[str],
     *,
     html: bool,
-    asset_root: Path,
+    asset_repo_root: Path,
 ) -> int:
     """Check a single file.  Returns number of refs checked."""
     text = filepath.read_text(encoding="utf-8")
@@ -75,7 +78,7 @@ def _check_file(
         if src.startswith(prefix):
             # Public URL — verify local file exists and extension is allowed
             rel = src[len(prefix):]
-            local = asset_root / rel
+            local = asset_repo_root / rel
             ext = Path(rel).suffix.lower()
             allowed = {".png", ".jpg", ".jpeg", ".webp", ".svg"}
             if ext not in allowed:
@@ -101,24 +104,27 @@ def main(argv: list[str] | None = None) -> int:
         "--target",
         type=Path,
         default=None,
-        help="Directory to verify asset files in (default: REPO_ROOT)",
+        help=(
+            "Optional local checkout of yeongseon-books/book-public-assets. "
+            "When provided, asset URLs are verified under <target>/assets/."
+        ),
     )
     args = parser.parse_args(argv)
 
-    asset_root = args.target.resolve() if args.target else REPO_ROOT
+    asset_repo_root = args.target.resolve() if args.target else REPO_ROOT
 
     # If --target is given, verify it looks like a valid asset tree
     if args.target:
-        if asset_root.name != "book-public-assets":
+        if asset_repo_root.name != "book-public-assets":
             print(
-                f"ERROR: --target directory must be named 'book-public-assets', got: {asset_root.name}",
+                f"ERROR: --target directory must be named 'book-public-assets', got: {asset_repo_root.name}",
                 file=sys.stderr,
             )
             return 1
-        marker = asset_root / ".no-content-here"
+        marker = asset_repo_root / ".no-content-here"
         if not marker.is_file():
             print(
-                f"ERROR: {asset_root} has no .no-content-here marker",
+                f"ERROR: {asset_repo_root} has no .no-content-here marker",
                 file=sys.stderr,
             )
             return 1
@@ -139,7 +145,7 @@ def main(argv: list[str] | None = None) -> int:
         if not medium_dir.is_dir():
             continue
         for html_file in sorted(medium_dir.glob("*.html")):
-            checked += _check_file(html_file, base_url, errors, html=True, asset_root=asset_root)
+            checked += _check_file(html_file, base_url, errors, html=True, asset_repo_root=asset_repo_root)
 
     # 2. Scan Tistory/Hashnode Markdown exports (warn if dirs absent)
     for export_name in ("tistory", "hashnode"):
@@ -148,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
             warnings.append(f"exports/{export_name}/ not found — skipped")
             continue
         for md_file in sorted(export_root.rglob("*.md")):
-            checked += _check_file(md_file, base_url, errors, html=False, asset_root=asset_root)
+            checked += _check_file(md_file, base_url, errors, html=False, asset_repo_root=asset_repo_root)
 
     for w in warnings:
         print(f"WARNING: {w}", file=sys.stderr)

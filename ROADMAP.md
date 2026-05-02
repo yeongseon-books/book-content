@@ -7,9 +7,10 @@
 3. `ready` status 제거 및 `publish-ready`로 통일
 4. ~~`ARCHITECTURE.md` 추가~~ (완료)
 5. ~~`.sisyphus/medium`과 `scripts/`의 책임 경계 정리~~ (현재 구조 유지 결정, ARCHITECTURE.md 문서화 완료)
-6. `assets/` Git LFS 또는 외부 CDN 이전 검토 (29 MB / 1,396 PNG)
-7. GitHub Actions CI 고도화 (캐싱, 병렬 job 분리)
-8. ~~Repository rename (`tech-writing` → `technical-content` → `book-content`)~~ (완료)
+6. ~~Public asset pipeline hardening~~ (완료: validation, dual-repo, documentation, smoke test)
+7. `assets/` Git LFS 또는 외부 CDN 이전 검토 (29 MB / 1,396 PNG)
+8. GitHub Actions CI 고도화 (캐싱, 병렬 job 분리)
+9. ~~Repository rename (`tech-writing` → `technical-content` → `book-content`)~~ (완료)
 ## Next Content Priorities
 
 | Priority | Series | Track | Notes |

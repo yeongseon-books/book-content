@@ -57,6 +57,58 @@ python3 .sisyphus/medium/to-medium.py content/<series>/en   # → medium/<NN>.ht
 python3 .sisyphus/medium/finalize-posts.py
 ```
 
+## Common Publishing Commands
+
+### Generate Publishing Exports
+
+```bash
+# Tistory (Korean blog)
+make tistory SERIES=<series-id>              # entire series
+make tistory-one SERIES=<series-id> EPISODE=N  # single episode
+
+# Hashnode (English blog)
+make hashnode SERIES=<series-id>
+make hashnode-one SERIES=<series-id> EPISODE=N
+
+# Medium (English adaptation)
+make medium SERIES=<series-id>
+python3 scripts/export_medium.py <series-id> --episode N
+
+# eBook source bundle
+make ebook-source SERIES=<series-id>
+```
+
+### Sync Public Assets
+
+```bash
+# Preview what will be synced
+make assets-sync-dry
+
+# Sync book-content/assets/ → book-public-assets/assets/
+make assets-sync
+
+# Verify asset references in publishing outputs
+make assets-check
+python3 scripts/check_public_assets.py --target ../book-public-assets
+```
+
+### Publish Verification
+
+```bash
+# Full pre-publish validation (repo checks + docs build + asset check)
+make publish-check
+
+# Individual checks
+make check              # repository quality gates
+make docs-build         # MkDocs strict build
+make assets-check       # public asset validation
+```
+
+```bash
+python3 .sisyphus/medium/to-medium.py content/<series>/en   # → medium/<NN>.html
+python3 .sisyphus/medium/finalize-posts.py
+```
+
 ## 폴더 구조
 
 ```text
