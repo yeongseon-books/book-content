@@ -1,42 +1,28 @@
 #!/usr/bin/env python3
 """Convert en/*.md to Medium browser-paste-ready medium/<NN>.html.
 
-Output is a self-contained HTML document for the workflow: open in Chrome,
-select-all, copy, paste into a fresh empty Medium draft. The first H1 lands
-in Medium's title slot; the trailing 'Tags: ...' line is visually separated
-for the author to copy into Medium's tag input field.
+Workflow:
+1. Read canonical English Markdown from content/<series>/en/*.md.
+2. Apply Medium-specific Markdown transforms.
+3. Render the transformed Markdown to self-contained HTML.
+4. Write content/<series>/medium/<NN>.html.
+5. Open the HTML in Chrome, select all, copy, and paste into a fresh Medium draft.
 
 Image handling:
-- Markdown transform stage: image refs `![alt](../../../assets/...)` are kept
-  as-is (relative local path).
-- HTML rendering stage (to-medium-html.py): local PNGs are base64-inlined.
-- If base64 inline doesn't survive Medium paste, the author uses the local
-  path as reference to manually drag-and-drop the correct PNG via Medium UI.
-- Private-repo raw.githubusercontent.com URLs are NOT used.
-Medium draft. The first H1 lands in Medium's title slot; the trailing
-'Tags: ...' line is visually separated for the author to copy into
-Medium's tag input field.
+- Markdown transform stage keeps image refs as relative local paths.
+- HTML rendering stage inlines local PNGs as base64 data URIs.
+- If images do not survive Medium paste, the author uses the local path as a reference
+  and manually uploads the PNG via Medium UI.
+- Private-repo raw.githubusercontent.com URLs are not used.
 
-HTML rendering is delegated to the to-medium-html helper module; this
-module owns the Medium-specific markdown transforms first:
-
-- Image refs `![alt](../../assets/...)` -> kept as-is (relative local path).
-  Medium import does not fetch private-repo raw URLs, so PNGs are uploaded
-  manually via Medium's UI (drag-and-drop) when the base64 inline doesn't
-  survive paste. The local path doubles as a reference so the author knows
-  which PNG to attach where.
-- Other relative links `[text](../something)` or `[text](./something)` -> github.com/<owner>/<repo>/blob/<TAG>/<resolved>
-- H3+ (### and deeper) -> bold paragraph (`**text**`)
-- Tables -> bullet list, each row: "- **col1**: v1 / **col2**: v2 ..."
-- Code fences left as-is
-- Front matter (YAML between ---) stripped
-- TOC marker comments (<!-- toc:begin --> / <!-- toc:end -->) removed
-- Output starts with H1 on line 1 (no leading HTML comments). Medium's web
-  editor maps the first H1 in a fresh empty draft to the title slot, so any
-  preface garbage breaks title detection on paste.
-- Tag line preserved as the very last line in the form `Tags: A, B, C, D`
-  (sourced from SERIES_TAGS, same as Tistory ko/en posts). Author copies the
-  comma list manually into Medium's tag input field on publish.
+Other transforms:
+- Relative non-image links are rewritten to pinned GitHub blob URLs.
+- H3+ headings are demoted to bold paragraphs.
+- Tables are converted to Medium-friendlier bullets where possible.
+- Front matter is stripped.
+- TOC marker comments are removed.
+- The output starts with H1 so Medium can map it to the title slot.
+- The trailing Tags line is preserved for manual copy into Medium tags.
 """
 
 from __future__ import annotations
