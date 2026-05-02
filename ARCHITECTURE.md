@@ -18,12 +18,14 @@ Canonical source는 `content/<series>/{ko,en}/`에 둔다.
 
 ## Publication Pipelines
 
-```text
-Canonical Markdown (content/<series>/{ko,en}/)
-        |
- ┌──────┬──────────┬──────────┬──────────┬────────┐
- │      │          │          │          │        │
-Tistory Hashnode  Medium    MkDocs     eBook
+```mermaid
+flowchart LR
+  SRC["Canonical Markdown\ncontent/&lt;series&gt;/{ko,en}/"]
+  SRC --> Tistory
+  SRC --> Hashnode
+  SRC --> Medium
+  SRC --> MkDocs
+  SRC --> eBook
 ```
 
 | Pipeline | Source | Output | Tool |
