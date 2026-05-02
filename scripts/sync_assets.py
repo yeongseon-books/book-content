@@ -143,6 +143,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
 
+    if target.name != "book-public-assets":
+        print(
+            f"WARNING: target directory is named '{target.name}', expected 'book-public-assets'. "
+            "Proceeding anyway — double-check the --target path.",
+            file=sys.stderr,
+        )
+
     if not ASSETS_DIR.is_dir():
         print(f"ERROR: assets directory not found: {ASSETS_DIR}", file=sys.stderr)
         return 1
