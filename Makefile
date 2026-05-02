@@ -1,4 +1,4 @@
-.PHONY: check finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade
+.PHONY: check finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade assets-sync assets-sync-dry assets-sync-prune
 
 check:
 	python3 .sisyphus/medium/finalize-posts.py --check
@@ -24,7 +24,7 @@ ifndef SERIES
 	$(error SERIES is required: make medium SERIES=azure-functions-101)
 endif
 	python3 .sisyphus/medium/finalize-posts.py
-	python3 .sisyphus/medium/to-medium.py content/$(SERIES)/en
+	python3 .sisyphus/medium/to-medium.py content/$(SERIES)/en --asset-mode $(ASSET_MODE)
 
 docs-build:
 	python3 scripts/build_docs.py
@@ -71,3 +71,18 @@ endif
 	python3 scripts/export_ebook_source.py $(SERIES) --lang $(LANG)
 	mkdocs-ebook doctor
 	mkdocs-ebook build exports/ebook-source/$(SERIES)-$(LANG)
+
+# Asset sync targets — require ASSET_TARGET pointing to a book-public-assets checkout.
+# See ASSET_POLICY.md for details.
+
+ASSET_TARGET ?= ../book-public-assets
+ASSET_MODE ?= public
+
+assets-sync-dry:
+	python3 scripts/sync_assets.py --target $(ASSET_TARGET)
+
+assets-sync:
+	python3 scripts/sync_assets.py --target $(ASSET_TARGET) --apply
+
+assets-sync-prune:
+	python3 scripts/sync_assets.py --target $(ASSET_TARGET) --apply --prune
