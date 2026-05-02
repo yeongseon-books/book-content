@@ -31,8 +31,9 @@ CHECKBOX_RE = re.compile(r"^- \[[ x]\]", re.MULTILINE)
 BLOCKQUOTE_RE = re.compile(r"^> .+", re.MULTILINE)
 TAGS_RE = re.compile(r"^Tags: .+$", re.MULTILINE)
 
-KO_QUESTIONS = re.compile(r"이 글에서 답할 질문|이 글에서 다룰 질문")
-EN_QUESTIONS = re.compile(r"Questions this post answers")
+KO_QUESTIONS = re.compile(r"^## .*(\uc9c8\ubb38|\ub2f5\ud560 \uc9c8\ubb38|\ub2e4\ub8f0 \uc9c8\ubb38)", re.MULTILINE)
+EN_QUESTIONS = re.compile(r"^## .*(Questions|answers|What you will learn)", re.MULTILINE)
+A_GRADE_MARKER = "<!-- a-grade-intro:begin -->"
 
 KO_REFS = re.compile(r"^## 참고 자료", re.MULTILINE)
 EN_REFS = re.compile(r"^## References", re.MULTILINE)
@@ -70,14 +71,16 @@ def check_article(path: Path) -> tuple[list[str], list[str]]:
         errors.append("missing or misplaced Tags line (must be last line)")
 
     # --- advisory checks (warnings) ---
-    questions_re = KO_QUESTIONS if lang == "ko" else EN_QUESTIONS
-    if not questions_re.search(body):
-        warnings.append("missing questions block")
+    if A_GRADE_MARKER not in body:
+        questions_re = KO_QUESTIONS if lang == "ko" else EN_QUESTIONS
+        if not questions_re.search(body):
+            warnings.append("missing questions block")
 
     if not BLOCKQUOTE_RE.search(body):
         warnings.append("missing mental model blockquote (> ...)")
 
-    if not CODE_BLOCK_RE.search(body):
+    code_required = post.metadata.get("code_required", True)
+    if code_required and not CODE_BLOCK_RE.search(body):
         warnings.append("missing code block")
 
     if not CHECKBOX_RE.search(body):
