@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Helper module: render Medium-flavored markdown text to a self-contained HTML document.
+"""Helper module: render Medium-flavored markdown text to a browser-paste-ready HTML document.
 
 Imported by to-medium.py to convert en/<NN>-<slug>.md (after Medium markdown
 transforms) directly to medium/<NN>.html. No standalone CLI; the only
@@ -20,7 +20,7 @@ Why HTML and not raw markdown?
 
 Image handling (determined by to-medium.py --asset-mode):
 - public (default): <img src> points to public GitHub Pages URLs.
-  - inline: local PNGs are base64-inlined as data: URIs so the browser renders
+- inline: local PNGs are base64-inlined as data: URIs so the browser renders
   them. On paste, Medium MAY embed them; if not, the author drags the PNG.
 - local: relative paths are kept as-is (browser cannot render without server).
 - External images are kept as-is in all modes.
@@ -146,7 +146,7 @@ def extract_title(md_text: str) -> str:
 
 
 def render_md_text_to_html(md_text: str, base_dir: Path, *, asset_mode: str = "public") -> str:
-    """Render Medium-flavored markdown text to a self-contained HTML document.
+    """Render Medium-flavored markdown text to a browser-paste-ready HTML document.
 
     base_dir is the directory used to resolve relative image paths (so
     in-memory markdown produced by to-medium.py can be rendered without

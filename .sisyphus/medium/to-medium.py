@@ -4,7 +4,7 @@
 Workflow:
 1. Read canonical English Markdown from content/<series>/en/*.md.
 2. Apply Medium-specific Markdown transforms.
-3. Render the transformed Markdown to self-contained HTML.
+3. Render the transformed Markdown to browser-paste-ready HTML.
 4. Write content/<series>/medium/<NN>.html.
 5. Open the HTML in Chrome, select all, copy, and paste into a fresh Medium draft.
 
@@ -56,10 +56,8 @@ render_md_text_to_html = _html_renderer.render_md_text_to_html
 BLOB_BASE = f"https://github.com/{REPO}/blob/{TAG}"
 
 FRONT_MATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
-IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\(([^)]+)\)")
 HEADING_RE = re.compile(r"^(#{3,6})\s+(.*)$", re.MULTILINE)
-CODE_FENCE_RE = re.compile(r"^```", re.MULTILINE)
 TOC_BEGIN_RE = re.compile(r"^<!--\s*toc:begin\s*-->\s*$", re.MULTILINE)
 TOC_END_RE = re.compile(r"^<!--\s*toc:end\s*-->\s*$", re.MULTILINE)
 TAGS_LINE_RE = re.compile(r"^Tags:\s*(.+?)\s*$", re.MULTILINE)
@@ -114,7 +112,19 @@ def replace_images(text: str, src_md: Path) -> str:
         suffix = m.group(4)
         return f"{prefix}{base}/assets/{asset_rel}{suffix}"
 
-    return ASSET_PATH_RE.sub(_repl, text)
+    out: list[str] = []
+    in_fence = False
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("```") or stripped.startswith("~~~"):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if in_fence:
+            out.append(line)
+        else:
+            out.append(ASSET_PATH_RE.sub(_repl, line))
+    return "".join(out)
 
 
 def replace_links(text: str, src_md: Path) -> str:
