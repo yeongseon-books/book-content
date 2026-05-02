@@ -11,9 +11,11 @@ Per PUBLISHING.md (Tistory column):
 - keep visible bottom `Tags: A, B, C, D` line — this is the copy-paste source
   for Tistory's tag input field
 
-Image references are left as relative `../../../assets/...` paths since
-Tistory uploads happen interactively; the human pastes the body and
-attaches images via the editor.
+Image handling:
+- By default, local image paths are rewritten to public GitHub Pages URLs
+  using series.yaml meta.asset_base_url.
+- With --local-assets, relative `../../../assets/...` paths are kept unchanged
+  for interactive Tistory upload.
 
 Usage:
     python3 scripts/export_tistory.py <series-id> --episode N

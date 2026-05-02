@@ -18,12 +18,12 @@ Why HTML and not raw markdown?
   H1 -> title slot, headings, lists, blockquotes, code blocks, links.
 - Pasting raw markdown shows literal '#' / '*' / '|' characters.
 
-Image handling:
-- Local images (`../../../assets/...`) are inlined as base64 `data:` URIs so
-  the browser can render them. On paste, Medium MAY embed them; if not, the
-  rendered <img> still tells the author which PNG to manually drag-drop.
-- External images are kept as-is.
-
+Image handling (determined by to-medium.py --asset-mode):
+- public (default): <img src> points to public GitHub Pages URLs.
+  - inline: local PNGs are base64-inlined as data: URIs so the browser renders
+  them. On paste, Medium MAY embed them; if not, the author drags the PNG.
+- local: relative paths are kept as-is (browser cannot render without server).
+- External images are kept as-is in all modes.
 Table handling:
 - 4+ col tables marked with the TODO PNG comment in the source markdown are
   rendered as native HTML <table>. Whether Medium preserves the table on

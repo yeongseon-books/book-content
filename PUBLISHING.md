@@ -156,7 +156,7 @@ Medium 산출물은 **브라우저 붙여넣기용 .html** 파일이다.
 
 - Chrome에서 열고 전체 선택(Ctrl+A) → 복사 → 빈 Medium 초안에 붙여넣기
 - 첫 번째 `<h1>` 이 Medium의 제목 슬롯에 매핑된다
-- 이미지는 Markdown 변환 단계에서는 상대 경로(`../../../assets/...`)를 유지하고, HTML 렌더링 단계에서 base64 data URI로 인라인한다. Medium 붙여넣기에서 이미지가 유지되지 않으면, 상대 경로를 참고해 PNG를 Medium UI에 수동 업로드한다.
+- 이미지는 기본적으로 public GitHub Pages URL로 재작성된다(`--asset-mode public`). `--asset-mode inline`을 사용하면 base64 data URI로 인라인할 수도 있다. Medium 붙여넣기에서 이미지가 유지되지 않으면, 원본 경로를 참고해 PNG를 Medium UI에 수동 업로드한다.
 - 하단 `Tags: A, B, C` visible 라인을 Medium의 태그 입력칸에 수동 복사
 
 ### 변환 규칙
@@ -164,7 +164,7 @@ Medium 산출물은 **브라우저 붙여넣기용 .html** 파일이다.
 - `ebook-only` 블록은 제거한다.
 - `blog-only` 블록은 유지한다.
 - H3+ 헤딩은 demote한다 (Medium 호환성).
-- 이미지는 Markdown 변환 단계에서는 상대 경로를 유지하고, HTML 렌더링 단계에서 base64 data URI로 인라인한다. Medium 붙여넣기에서 이미지가 유지되지 않으면 PNG를 수동 업로드한다. private repository의 `raw.githubusercontent.com` URL은 사용하지 않는다.
+- 이미지는 기본적으로 public GitHub Pages URL로 재작성된다(`--asset-mode public`). `--asset-mode inline`(base64) 또는 `--asset-mode local`(상대 경로)도 선택 가능하다. Medium 붙여넣기에서 이미지가 유지되지 않으면 PNG를 수동 업로드한다. private repository의 `raw.githubusercontent.com` URL은 사용하지 않는다.
 - TOC 처리: `<!-- toc:begin --> ... <!-- toc:end -->` 마커는 제거되지만 TOC 본문 라인은 유지된다.
 - 태그 처리: 하단 visible `Tags:` 라인은 **그대로 유지**한다. Medium 발행 시 태그칸에 수동 복사한다.
 - `finalize-posts.py` 는 `medium/` 디렉토리를 스킵한다. medium 변형의 태그·TOC 는 `to-medium.py` 단독 책임이다.
@@ -267,7 +267,7 @@ python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
 | `ebook-only` 블록 | 제거 | 제거 | 제거 | 옵션 | 유지 |
 | Visible 하단 `Tags:` 라인 | 유지 | 유지 | **유지** (Medium 태그칸에 수동 복사) | 제거 | 제거 |
 | TOC `<!-- toc:* -->` 마커 | 유지 | 유지 | 제거 (마커만; TOC 본문은 유지) | 제거 (전체) | 제거 (전체) |
-| 이미지 경로 | 상대 / Tistory 업로드 | 상대 / Hashnode 업로드 | **base64 data URI (인라인)** | 상대 (`docs/` 기준) | 번들 내부 상대 |
+| 이미지 경로 | 상대 / Tistory 업로드 | 상대 / Hashnode 업로드 | **public URL (기본)** / inline / local | 상대 (`docs/` 기준) | 번들 내부 상대 |
 | Mermaid | PNG | PNG | PNG | mermaid 또는 PNG | PNG |
 | H3+ demote | 그대로 | 그대로 | demote | 그대로 | 그대로 |
 | `finalize-posts.py` 적용 | 적용 | 적용 | **스킵** (`to-medium.py` 단독 책임) | N/A | N/A |

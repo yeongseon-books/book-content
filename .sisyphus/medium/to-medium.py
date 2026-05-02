@@ -8,12 +8,13 @@ Workflow:
 4. Write content/<series>/medium/<NN>.html.
 5. Open the HTML in Chrome, select all, copy, and paste into a fresh Medium draft.
 
-Image handling:
-- Markdown transform stage keeps image refs as relative local paths.
-- HTML rendering stage inlines local PNGs as base64 data URIs.
-- If images do not survive Medium paste, the author uses the local path as a reference
-  and manually uploads the PNG via Medium UI.
-- Private-repo raw.githubusercontent.com URLs are not used.
+Image handling (--asset-mode):
+- public (default): rewrite local image paths to public GitHub Pages URLs
+  using series.yaml meta.asset_base_url. Fails fast if asset_base_url is
+  not configured. Preferred mode for production publishing.
+- inline: embed local PNGs as base64 data URIs. Useful for offline preview
+  or when the public asset CDN is not yet available.
+- local: keep relative paths unchanged. For debugging only.
 
 Other transforms:
 - Relative non-image links are rewritten to pinned GitHub blob URLs.
