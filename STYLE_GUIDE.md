@@ -213,3 +213,25 @@ ko/en 본문은 로컬 상대 경로를, medium 본문은 commit-pinned `raw.git
 - mermaid를 PNG로 대체하지 않은 채 Tistory 업로드.
 - medium 변형에서 `master`/`HEAD`/`main` URL 사용 (반드시 commit-pinned `TAG`).
 - 타입/린트 에러 suppression (`as any`, `# type: ignore` 등) 코드 예제에서 사용.
+
+---
+
+## 11. Asset Policy
+
+### Location
+
+Generated PNG assets are stored under `assets/<series>/<NN>/`.
+
+### Rules
+
+- Generated PNG files should not be regenerated unless the source diagram changed.
+- Do not commit duplicate images with only minor filename differences.
+- Medium publishing must not depend on private raw GitHub image URLs.
+- If repository size exceeds the agreed threshold, migrate assets to Git LFS or external hosting.
+
+### Future Options
+
+- Git LFS
+- Public asset repository
+- Cloudflare R2 public bucket
+- Azure Blob Storage static website

@@ -66,7 +66,10 @@ tech-writing/
 │       ├── en/                          # 영어 번역
 │       └── medium/                      # Medium 브라우저 붙여넣기용 .html (to-medium.py 생성)
 ├── docs/                                # MkDocs 웹북 산출물
-├── exports/                             # tistory/, medium/, ebook-source/
+├── exports/
+│   ├── tistory/                         # Tistory 붙여넣기용 Markdown
+│   ├── medium/                          # Medium 발행용 HTML 사본
+│   └── ebook-source/                    # private mkdocs-ebook 입력용 source bundle
 ├── templates/, scripts/
 ├── assets/<series>/<NN>/...             # 이미지 (본문에서 ../../../assets/ 로 참조)
 └── .sisyphus/medium/                    # finalize-posts.py / to-medium.py / _catalog.py
