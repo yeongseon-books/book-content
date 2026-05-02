@@ -265,7 +265,6 @@ for q in questions:
 <!-- injected-output:start -->
 **출력 결과**
 
-
     질문: 15 더하기 27은 얼마인가요?
       도구 실행: add_numbers({'a': 15, 'b': 27}) = 42.0
     답변: 15와 27의 합은 42입니다.

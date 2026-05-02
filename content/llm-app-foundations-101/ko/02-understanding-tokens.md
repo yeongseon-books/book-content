@@ -315,8 +315,6 @@ print(f"finish_reason={completion.choices[0].finish_reason}")
 
     리스트는 순서가 있으면서, 중복 허용이 되는 데이터의 수열입니다. 각 요소는 인덱스에 따라 접근할 수 있습니다.
 
-
-
     completion_tokens=80
     finish_reason=length
 

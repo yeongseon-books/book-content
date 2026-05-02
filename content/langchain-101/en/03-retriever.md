@@ -257,7 +257,6 @@ for question in questions:
 <!-- injected-output:start -->
 **Output**
 
-
     question: What is FAISS?
     answer: FAISS is a high-speed vector search library developed at Facebook AI Research.
 

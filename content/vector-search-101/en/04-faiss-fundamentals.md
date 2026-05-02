@@ -162,7 +162,6 @@ for query in queries:
 <!-- injected-output:start -->
 **Output**
 
-
     query: 'how vector search finds similar content'
       [1] 0.6746 — Vector search captures semantic similarity that keyword sear
       [2] 0.4981 — Cosine similarity measures the directional similarity betwee

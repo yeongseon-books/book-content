@@ -257,7 +257,6 @@ for question in questions:
 <!-- injected-output:start -->
 **출력 결과**
 
-
     질문: FAISS는 무엇인가요?
     답변: FAISS는 Fast Approximate Nearest Neighbors Search의 약자로, 벡터를 효율적으로 검색하고 검색 결과의 정확도와 속도 trade-off를 관리할 수 있는 오픈 소스 라이브러리에요.
 

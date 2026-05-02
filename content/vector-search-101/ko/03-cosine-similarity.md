@@ -141,7 +141,6 @@ for text_a, text_b in pairs:
 <!-- injected-output:start -->
 **출력 결과**
 
-
     '파이썬 비동기 프로그래밍...' vs '파이썬으로 동시성 처리하기...'
       코사인 유사도: 0.9624
       내적:         0.9624

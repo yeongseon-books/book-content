@@ -258,7 +258,6 @@ for q in questions:
 <!-- injected-output:start -->
 **Output**
 
-
     question: What is 15 plus 27?
       executed: add_numbers({'a': 15, 'b': 27}) = 42.0
     answer: The result of 15 plus 27 is 42.

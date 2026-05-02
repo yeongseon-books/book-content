@@ -141,7 +141,6 @@ for text_a, text_b in pairs:
 <!-- injected-output:start -->
 **Output**
 
-
     'Python async programming' vs 'handling concurrency in P'
       cosine:     0.6201
       dot:        0.6201
