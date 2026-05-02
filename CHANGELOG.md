@@ -6,7 +6,7 @@
 - `scripts/export_medium.py`: artifact extension corrected from `.md` to `.html`
 
 ### Changed
-- `PUBLISHING.md`: Medium policy updated to reflect `.html` browser-paste workflow and base64-inlined images; migration-complete state noted
+- `PUBLISHING.md`: Medium policy updated to reflect `.html` browser-paste workflow and public asset URLs (default); migration-complete state noted
 - `README.md`: simplified landing page; series catalog delegated to `SERIES.md`; Medium column shows `.html` artifact
 - `SERIES.md`: all Medium links corrected from `medium/<NN>.md` to `medium/<NN>.html`
 - `series.yaml`: `ax-practical-guide` and `technical-writing` paths normalized to `content/` prefix
