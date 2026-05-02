@@ -1,4 +1,4 @@
-.PHONY: check finalize medium docs series sync ebook ebook-build ebook-doctor ebook-upgrade
+.PHONY: check finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade
 
 check:
 	python3 .sisyphus/medium/finalize-posts.py --check
@@ -8,6 +8,7 @@ check:
 	python3 scripts/check_frontmatter.py
 	python3 scripts/lint_captions.py
 	python3 scripts/check_links.py
+	python3 scripts/check_article_structure.py
 
 finalize:
 	python3 .sisyphus/medium/finalize-posts.py
@@ -25,9 +26,15 @@ endif
 	python3 .sisyphus/medium/finalize-posts.py
 	python3 .sisyphus/medium/to-medium.py content/$(SERIES)/en
 
-docs:
+docs-build:
+	python3 scripts/build_docs.py
+	mkdocs build --strict
+
+docs-serve:
 	python3 scripts/build_docs.py
 	mkdocs serve
+
+docs: docs-serve
 
 # eBook targets — require mkdocs-ebook installed from private repo.
 # Run `make ebook-upgrade` first to ensure the latest builder is installed.

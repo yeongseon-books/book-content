@@ -45,8 +45,9 @@ def load_catalog() -> dict[str, dict]:
     return {s["id"]: s for s in raw.get("series", [])}
 
 
-def validate_article(path: Path, catalog: dict[str, dict]) -> list[str]:
+def validate_article(path: Path, catalog: dict[str, dict]) -> tuple[list[str], list[str]]:
     errors: list[str] = []
+    warnings: list[str] = []
     text = path.read_text(encoding="utf-8")
     try:
         post = frontmatter.loads(text)
@@ -123,6 +124,17 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> list[str]:
     if last is not None and not (isinstance(last, str) and DATE_RE.match(last)):
         errors.append(f"last_reviewed must be YYYY-MM-DD string, got {last!r}")
 
+    # Deprecation warning for 'ready' status
+    if status == "ready":
+        warnings.append("status 'ready' is deprecated; use 'publish-ready' instead")
+    # published status requires published URLs
+    if status == "published" and not fm.get("published"):
+        errors.append("status is 'published' but no 'published' field with URLs")
+
+    # publish-ready or higher requires last_reviewed
+    if status in ("publish-ready", "published") and not fm.get("last_reviewed"):
+        errors.append(f"status '{status}' requires 'last_reviewed' field")
+
     fm_title = fm.get("title")
     if fm_title is not None:
         body = post.content
@@ -140,7 +152,7 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> list[str]:
     if unknown:
         errors.append(f"unknown fields: {sorted(unknown)}")
 
-    return errors
+    return errors, warnings
 
 
 def main() -> int:
@@ -149,18 +161,27 @@ def main() -> int:
         return 1
     catalog = load_catalog()
     failures = 0
+    warned = 0
     checked = 0
     for md in sorted(CONTENT_DIR.glob("*/*/*.md")):
         if md.parent.name not in VALID_LANGUAGE:
             continue
         checked += 1
-        errs = validate_article(md, catalog)
-        if errs:
-            failures += 1
-            print(f"FAIL {md.relative_to(REPO_ROOT)}")
-            for e in errs:
-                print(f"  - {e}")
-    print(f"\nchecked: {checked}, failures: {failures}")
+        errs, warns = validate_article(md, catalog)
+        if errs or warns:
+            rel = md.relative_to(REPO_ROOT)
+            if errs:
+                failures += 1
+                print(f"FAIL {rel}")
+                for e in errs:
+                    print(f"  - {e}")
+            if warns:
+                warned += 1
+                if not errs:
+                    print(f"WARN {rel}")
+                for w in warns:
+                    print(f"  - [warning] {w}")
+    print(f"\nchecked: {checked}, failures: {failures}, warnings: {warned}")
     return 1 if failures else 0
 
 
