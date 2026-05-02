@@ -29,12 +29,12 @@ tech-writing = 기술 콘텐츠 원본 저장소 + 멀티채널 퍼블리싱 파
 
 ## 2. 리포지토리 이름 변경
 
-- 구: `yeongseon-books/tech-writing`
-- 현재: `yeongseon-books/tech-writing` (rename 완료, `cb179c5`)
+| 시점 | 이전 이름 | 새 이름 | 커밋 |
+| --- | --- | --- | --- |
+| Phase 9 (1차) | `yeongseon-books/tech-blog` | `yeongseon-books/tech-writing` | `cb179c5` |
+| Phase 9 (2차) | `yeongseon-books/tech-writing` | `yeongseon-books/technical-content` | 별도 커밋 |
 
-`tech-blog`는 블로그 전용 저장소처럼 보인다. 이 저장소는 Tistory, Medium, MkDocs, eBook을 모두 대상으로 하므로 더 포괄적인 이름이 필요하다. `cloud-*`, `azure-*` 계열은 부적절하다(AI, AX, 기술 글쓰기 등을 모두 다룸).
-
-> **완료**: 리포지토리 rename 은 `gh repo rename tech-writing` 으로 수행 완료. `series.yaml` `meta.repo` 갱신, medium/ 변형 재생성, 모든 raw URL 새 pin (`cb179c5`) 으로 일괄 갱신.
+`tech-blog`는 블로그 전용 저장소처럼 보인다. `tech-writing`도 글쓰기 행위에 초점이 맞춰져 있다. 이 저장소는 Tistory, Medium, MkDocs, eBook을 모두 대상으로 하므로 콘텐츠 자산 관리 성격을 반영하는 `technical-content`로 최종 rename하였다.
 
 ## 3. 저장소 정체성
 

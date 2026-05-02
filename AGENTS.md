@@ -2,6 +2,12 @@
 
 > Persistent conventions for any agent (human or AI) working in this repository.
 
+## Repository Name
+
+- **현재**: `yeongseon-books/technical-content`
+- **이전**: `yeongseon-books/tech-writing` (Phase 9 1차 rename)
+- **최초**: `yeongseon-books/tech-blog`
+
 ## Canonical Source
 
 1. Canonical source는 항상 `content/<series>/{ko,en}/`이다.
