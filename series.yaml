@@ -21,7 +21,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: draft
+  status: complete
   path: content/azure-app-service-101
   per:
     ko:
@@ -102,7 +102,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: draft
+  status: complete
   path: content/azure-app-service-deep-dive
   per:
     ko:
@@ -175,7 +175,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: draft
+  status: complete
   path: content/azure-functions-101
   per:
     ko:
@@ -256,7 +256,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: draft
+  status: complete
   path: content/azure-functions-deep-dive
   per:
     ko:
@@ -329,7 +329,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: draft
+  status: complete
   path: content/azure-aks-101
   per:
     ko:
@@ -410,7 +410,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: draft
+  status: complete
   path: content/azure-aks-deep-dive
   per:
     ko:
@@ -483,7 +483,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: draft
+  status: complete
   path: content/azure-aca-101
   per:
     ko:
@@ -564,7 +564,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: draft
+  status: complete
   path: content/azure-aca-deep-dive
   per:
     ko:
@@ -689,7 +689,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  status: draft
+  status: active
   path: content/llm-from-scratch-101
   per:
     ko:
@@ -788,7 +788,7 @@ series:
     mkdocs: true
     ebook: true
   level: 301
-  status: draft
+  status: active
   path: content/rag-deep-dive
   per:
     ko:
