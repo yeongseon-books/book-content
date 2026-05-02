@@ -1,3 +1,6 @@
+> **Archive** — 이 문서는 과거 `tech-blog → tech-writing` 개편 과정을 기록한 migration archive입니다.
+> 현재 저장소 구조와 운영 규칙은 [`README.md`](./README.md), [`ARCHITECTURE.md`](./ARCHITECTURE.md), [`PUBLISHING.md`](./PUBLISHING.md), [`EBOOK.md`](./EBOOK.md), [`AGENTS.md`](./AGENTS.md)를 기준으로 합니다.
+
 # tech-blog → tech-writing 개편 계획
 
 > 이 문서는 본 저장소(`yeongseon-books/tech-writing`, 구 `yeongseon-books/tech-writing`)를 다채널 기술 콘텐츠 파이프라인 저장소로 단계적으로 개편하기 위한 마스터 플랜이다.
@@ -241,14 +244,13 @@ tech-writing/
 
 다음은 **이번 사이클에서 수행하지 않는다**. 후속 세션에서 시리즈 단위로 진행한다.
 
-- 156+ Markdown 파일을 `content/`로 실제 이동
-- 모든 파일에 YAML front matter 삽입
-- 이미지 경로 일괄 재작성
+- ~~156+ Markdown 파일을 `content/`로 실제 이동~~ (완료)
+- ~~모든 파일에 YAML front matter 삽입~~ (완료)
+- ~~이미지 경로 일괄 재작성~~ (완료)
 - AI Web Dev 101 OpenAI API 예제 갱신
 - Deep Dive 글에 Source Version / Call Path Summary 추가
-- GitHub repository rename
-- private `mkdocs-ebook` 통합 테스트 — gh-token HTTPS 설치 경로로 19/19 번들 lint 통과 (Phase 8)
-
+- ~~GitHub repository rename~~ (완료)
+- ~~private `mkdocs-ebook` 통합 테스트~~ (완료)
 각 항목은 [`ROADMAP.md`](./ROADMAP.md)의 Phase 6/7/8에 추적된다.
 
 ## 11. 검증 기준

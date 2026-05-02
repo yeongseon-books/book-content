@@ -1,6 +1,6 @@
 # Tech Writing
 
-하나의 canonical content base를 Tistory / Hashnode / Medium / eBook 네 가지 파이프라인으로 변환하는 멀티채널 퍼블리싱 저장소입니다.
+하나의 canonical content base를 Tistory / Hashnode / Medium / MkDocs / eBook 다섯 가지 발행 대상으로 변환하는 멀티채널 기술 콘텐츠 저장소입니다.
 
 > 모든 시리즈가 `content/<series>/` 아래로 이동 완료되었습니다 (Phase 6 완료).
 
@@ -11,6 +11,7 @@
 | Korean Blog | Tistory | `https://yeongseonchoe.tistory.com/` | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
 | English Blog | Hashnode | `https://hashnode.com/@yeongseon` | `content/<series>/en/*.md` | (Hashnode 직접 Markdown 발행) | 한국어 원문의 충실한 영어 대응본 |
 | Medium | Medium | `https://medium.com/@yeongseonchoe` | `content/<series>/en/*.md` (adaptation) | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
+| Web Book | MkDocs | GitHub Pages 또는 내부 preview | `content/<series>/{ko,en}/*.md` | `docs/` | 웹북 형태의 학습 콘텐츠 |
 | eBook | private `mkdocs-ebook` | — | `content/<series>/{ko,en}/*.md` | `exports/ebook-source/<series>-<lang>/` | 시리즈를 책처럼 묶은 학습형 원고 |
 
 `ko/`와 `en/`이 canonical source다. `medium/`은 `to-medium.py`가 생성하는 발행 변형 산출물이며 canonical source가 아니다.
@@ -25,7 +26,9 @@
 - [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) — 문체, 구조, 이미지, 태그, 참고자료 공통 규칙
 - [`PUBLISHING.md`](./PUBLISHING.md) — 원본 Markdown → 각 파이프라인 산출물 변환 기술 규칙
 - [`EBOOK.md`](./EBOOK.md) — eBook export·build 정책 및 private builder 연동
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — 저장소 구조와 빌드 흐름
 - [`ROADMAP.md`](./ROADMAP.md) — 개편 로드맵과 진행 상황
+- [`CONTENT_MODEL.md`](./CONTENT_MODEL.md) — 시리즈 카탈로그, front matter, status 체계
 - [`AGENTS.md`](./AGENTS.md) — 에이전트(인간/AI) 운영 규칙
 
 ## Quality Gates
@@ -54,7 +57,7 @@ python3 .sisyphus/medium/finalize-posts.py
 ```text
 tech-writing/
 ├── README.md
-├── SERIES.md, PUBLISHING.md, STYLE_GUIDE.md, EBOOK.md, ROADMAP.md, AGENTS.md
+├── SERIES.md, PUBLISHING.md, STYLE_GUIDE.md, EBOOK.md, ROADMAP.md, AGENTS.md, ARCHITECTURE.md, CONTENT_MODEL.md
 ├── mkdocs.yml, requirements.txt, requirements-dev.txt
 ├── series.yaml                          # 시리즈 카탈로그 단일 출처 (path: 필드로 위치 해석)
 ├── content/
@@ -62,7 +65,9 @@ tech-writing/
 │       ├── ko/                          # 한국어 원본
 │       ├── en/                          # 영어 번역
 │       └── medium/                      # Medium 브라우저 붙여넣기용 .html (to-medium.py 생성)
-├── docs/, exports/, templates/, scripts/
+├── docs/                                # MkDocs 웹북 산출물
+├── exports/                             # tistory/, ebook-source/
+├── templates/, scripts/
 ├── assets/<series>/<NN>/...             # 이미지 (본문에서 ../../../assets/ 로 참조)
 └── .sisyphus/medium/                    # finalize-posts.py / to-medium.py / _catalog.py
 ```
