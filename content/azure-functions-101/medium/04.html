@@ -113,7 +113,8 @@ def hello(req: func.HttpRequest) -&gt; func.HttpResponse:
     name = req.params.get(&quot;name&quot;)
 
     if not name:
-        name = req.get_body().decode(&quot;utf-8&quot;) if req.get_body() else &quot;world&quot;
+        body = req.get_body()
+        name = body.decode(&quot;utf-8&quot;) if body else &quot;world&quot;
 
     return func.HttpResponse(f&quot;Hello, {name}!&quot;)
 </code></pre>
@@ -173,6 +174,9 @@ az functionapp create \
 </code></pre>
 <p>When the last command finishes, the Function App exists in Azure. The compute target is ready; the code just is not deployed yet.</p>
 <p>The <code>az functionapp create</code> shape changes by hosting plan. For Flex, the key switch is <code>--flexconsumption-location</code>; from there you add the same runtime, Functions version, storage account, and optional sizing limits you want the app to start with. <code>--instance-memory 2048</code> is a practical default for Python because it leaves room for imports and common SDKs without immediately jumping to the largest size.</p>
+<blockquote>
+<p>This example assumes the latest Azure CLI version. If <code>--flexconsumption-location</code>, <code>--instance-memory</code>, or <code>--maximum-instance-count</code> do not appear in <code>az functionapp create -h</code>, run <code>az upgrade</code> to update the CLI.</p>
+</blockquote>
 <p>When that command finishes, the Azure-side skeleton is ready in the shape most new serverless apps should start from.</p>
 <p><strong>Legacy path — classic Consumption when you explicitly need it</strong></p>
 <p>Classic Consumption is still useful when you are maintaining an existing app, staying on a Windows-first legacy footprint, or reproducing an older tutorial exactly. In that case, the create command switches back to the Consumption-specific location flag.</p>
@@ -229,9 +233,9 @@ You should see something like this at the end.</p>
 <hr>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
-<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
-<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
+<li><a href="https://github.com/yeongseon-books/technical-content/blob/f24a126/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><a href="https://github.com/yeongseon-books/technical-content/blob/f24a126/content/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
+<li><a href="https://github.com/yeongseon-books/technical-content/blob/f24a126/content/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
 <li><strong>Deploy a Function App — From Localhost to Azure (current)</strong></li>
 <li>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
 <li>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>

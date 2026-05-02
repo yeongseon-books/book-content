@@ -1,7 +1,7 @@
 meta:
   repo: yeongseon-books/technical-content
-  published_ref: f24a126
-  validated_ref: f24a126
+  published_ref: a58be9d
+  validated_ref: a58be9d
 series:
 - id: azure-app-service-101
   category: azure

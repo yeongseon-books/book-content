@@ -54,13 +54,13 @@
 </head>
 <body>
 <h1>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</h1>
-<p>The deployment chapter created the app on Flex Consumption because that is the current default candidate for new serverless work. Classic Consumption still matters historically and operationally, but in current Microsoft Learn guidance <strong>it is a legacy plan</strong>, while <strong>Flex Consumption is the default serverless recommendation for new apps</strong>.</p>
+<p>The deployment chapter created the app on Flex Consumption because that is the current default candidate for new serverless work. Classic Consumption still matters historically and operationally, but current Microsoft Learn guidance recommends <strong>evaluating Flex Consumption first for new serverless apps</strong>.</p>
 <p>That does not make Consumption irrelevant. You still need to understand all four hosting models to make a sound decision. This chapter covers <strong>Consumption / Flex Consumption / Premium / Dedicated (App Service Plan)</strong> side by side, with the current caveats left intact.</p>
 <p>The goal is simple: <strong>understand what each plan gives you, what it constrains, and which one fits your workload</strong>.</p>
 <hr>
 <h2>One-line definitions</h2>
 <p><strong>Consumption</strong><br>
-- One-line definition: The simplest pay-per-use serverless plan. Today it is a legacy option and should be treated as Windows-first.</p>
+- One-line definition: The simplest pay-per-use serverless plan. An older path, and Windows-first in practice.</p>
 <p><strong>Flex Consumption</strong><br>
 - One-line definition: Microsoft's recommended Linux-based pay-per-use plan for new serverless apps, with VNet support, selectable memory, and per-function scaling.</p>
 <p><strong>Premium</strong><br>
@@ -88,7 +88,7 @@ Now put the differences on one table.</p>
 <tbody>
 <tr>
 <td><strong>Current status</strong></td>
-<td>Legacy</td>
+<td>Older path</td>
 <td>Default serverless recommendation</td>
 <td>Advanced serverless</td>
 <td>App Service family</td>
@@ -116,7 +116,7 @@ Now put the differences on one table.</p>
 </tr>
 <tr>
 <td><strong>OS</strong></td>
-<td>Windows legacy; Linux Consumption retired/retiring</td>
+<td>Windows-first; Linux Consumption availability varies by region</td>
 <td>Linux only</td>
 <td>Windows / Linux</td>
 <td>Windows / Linux</td>
@@ -177,7 +177,7 @@ Now put the differences on one table.</p>
 </blockquote>
 <p>When you read the table, the three columns that eliminate options fastest are usually <strong>OS, VNet, and scale behavior</strong>. Cost often comes after those constraints, not before.</p>
 <hr>
-<h2>Consumption — still the simplest, now clearly legacy</h2>
+<h2>Consumption — still the simplest, but no longer the default starting point</h2>
 <p>Consumption is still easy to explain. No traffic means no bill, and the setup path is simple. The problem is that it is no longer the default answer for a new serverless app.</p>
 <p><strong>Pick it when:</strong></p>
 <ul>
@@ -191,10 +191,10 @@ Now put the differences on one table.</p>
 <li>Cold starts</li>
 <li>No VNet integration</li>
 <li>Fixed 1.5 GB memory</li>
-<li>Long-term risk from being a legacy plan</li>
-<li>Linux Consumption is already retired or retiring, so it is not a stable target for new architecture decisions</li>
+<li>Long-term migration risk if Microsoft guidance continues shifting away from this plan</li>
+<li>Linux Consumption availability varies by region, making it a less stable target for new architecture decisions</li>
 </ul>
-<p>That is why the deployment chapter treated Consumption only as a legacy path note. For a fresh production design, the case for starting here is much weaker than it used to be.</p>
+<p>That is why the deployment chapter included Consumption only as a reference path for those with specific constraints. For a new production design, start with Flex unless a concrete requirement points elsewhere.</p>
 <hr>
 <h2>Flex Consumption — the default candidate for new serverless apps</h2>
 <p>Flex Consumption is the plan Microsoft now recommends for new serverless workloads. It keeps the economic shape of serverless while removing several of the platform limits that used to push teams toward Premium.</p>
@@ -275,10 +275,10 @@ Dedicated sits outside the main path on purpose. It is not a bad plan. It is a p
 <hr>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
-<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
-<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
-<li><a href="https://github.com/yeongseon-books/tech-writing/blob/f24a126/content/azure-functions-101/en/04-first-deploy.md">Deploy a Function App — From Localhost to Azure</a></li>
+<li><a href="https://github.com/yeongseon-books/technical-content/blob/f24a126/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><a href="https://github.com/yeongseon-books/technical-content/blob/f24a126/content/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
+<li><a href="https://github.com/yeongseon-books/technical-content/blob/f24a126/content/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
+<li><a href="https://github.com/yeongseon-books/technical-content/blob/f24a126/content/azure-functions-101/en/04-first-deploy.md">Deploy a Function App — From Localhost to Azure</a></li>
 <li><strong>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (current)</strong></li>
 <li>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
 <li>Monitoring and Operations Fundamentals (upcoming)</li>
