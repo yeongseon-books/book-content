@@ -87,6 +87,8 @@ assets-sync:
 assets-sync-prune:
 	python3 scripts/sync_assets.py --target $(ASSET_TARGET) --apply --prune
 
+# Validate public asset URLs against the local book-public-assets checkout.
+# Requires ASSET_TARGET to point to a checked-out yeongseon-books/book-public-assets repo.
 assets-check:
 	python3 scripts/check_public_assets.py --target $(ASSET_TARGET)
 
@@ -122,7 +124,9 @@ ifndef EPISODE
 endif
 	python3 scripts/export_hashnode.py $(SERIES) --episode $(EPISODE)
 
-# Validate existing export artifacts (does not generate them)
+# Validate existing export artifacts and public asset references.
+# This target does not regenerate publishing outputs.
+# Run export targets and assets-sync before publish-check when content changed.
 publish-check:
 	$(MAKE) check
 	$(MAKE) docs-build

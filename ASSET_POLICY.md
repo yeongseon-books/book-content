@@ -99,3 +99,93 @@ git add assets
 git commit -m "assets: sync book-content images"
 git push
 ```
+
+## Publishing Asset Workflow
+
+Before publishing to external platforms (Tistory, Hashnode, Medium), ensure public assets are synced and validated:
+
+1. Dry-run asset sync:
+
+```bash
+make assets-sync-dry
+```
+
+2. Apply asset sync:
+
+```bash
+make assets-sync
+```
+
+3. Commit and push public assets:
+
+```bash
+cd ../book-public-assets
+git status
+git add assets
+git commit -m "assets: sync book-content images"
+git push
+```
+
+4. Return to `book-content` and run publish checks:
+
+```bash
+cd ../book-content
+make publish-check
+```
+
+`assets-check` validates the local `book-public-assets` checkout. GitHub Pages deployment may take a short time after pushing, so public URL availability can be verified separately if needed.
+
+## Publish Check
+
+`make publish-check` runs:
+
+- repository quality checks (`make check`)
+- MkDocs strict build (`make docs-build`)
+- public asset reference validation (`make assets-check`)
+
+It does not generate publishing outputs.
+
+Before running `make publish-check`, regenerate the required outputs and sync public assets if content has changed:
+
+```bash
+# Regenerate exports if content changed
+make tistory SERIES=<series-id>
+make hashnode SERIES=<series-id>
+make medium SERIES=<series-id>
+
+# Then validate
+make publish-check
+```
+
+## Publishing Smoke Test
+
+Recommended test target: `rag-deep-dive` episode 1
+
+```bash
+# 1. Sync public assets
+make assets-sync-dry
+make assets-sync
+
+cd ../book-public-assets
+git status
+git add assets
+git commit -m "assets: sync book-content images"
+git push
+
+# 2. Generate exports
+cd ../book-content
+make tistory-one SERIES=rag-deep-dive EPISODE=1
+make hashnode-one SERIES=rag-deep-dive EPISODE=1
+make medium SERIES=rag-deep-dive
+
+# 3. Validate
+make publish-check
+```
+
+Check:
+
+- Tistory export image URLs use `book-public-assets`
+- Hashnode export image URLs use `book-public-assets`
+- Medium HTML image URLs use `book-public-assets`
+- Public asset files exist in `../book-public-assets/assets/`
+- No `../../../assets/` paths remain in external publishing outputs

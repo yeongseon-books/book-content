@@ -1,19 +1,23 @@
-"""Verify that medium HTML artifacts reference only existing public assets.
+"""Verify that publishing artifacts reference existing public assets.
 
-Scans ``content/<series>/medium/*.html`` for ``<img src="...">`` tags whose
-``src`` matches the configured ``asset_base_url``, then checks that the
-corresponding file exists under the local ``assets/`` tree (which mirrors
-``book-public-assets``).
+Scans:
+- content/<series>/medium/*.html
+- exports/tistory/**/*.md
+- exports/hashnode/**/*.md
 
-Also scans ``exports/tistory/`` and ``exports/hashnode/`` Markdown exports
-for Markdown image references to the same base URL.
+For URLs under series.yaml meta.asset_base_url, verifies that the referenced
+file exists either:
 
-Detects:
-- Missing local files for referenced public URLs.
-- Wrong-host image URLs (not matching ``asset_base_url``).
-- Residual local relative image paths (``../../../assets/``) in exports.
+- under the local book-content repository when --target is omitted, or
+- under the provided book-public-assets checkout when --target is passed.
 
-Exit code 0 = all referenced assets found.  Exit code 1 = errors detected.
+Also detects:
+- missing referenced public assets
+- residual ../../../assets/ paths in external publishing outputs
+- wrong YeongseonBooks asset host URLs
+- unsupported public asset extensions
+
+Exit code 0 = all referenced assets found. Exit code 1 = errors detected.
 """
 
 from __future__ import annotations
@@ -127,7 +131,6 @@ def main(argv: list[str] | None = None) -> int:
 
     # 1. Scan medium HTML artifacts
     for s in catalog["series"]:
-        sid = s["id"]
         if not s.get("targets", {}).get("medium"):
             continue
         if "en" not in s.get("languages", []):

@@ -135,17 +135,17 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: target directory does not exist: {target}", file=sys.stderr)
         return 1
 
-    if not _has_safety_marker(target):
+    if target.name != "book-public-assets":
         print(
-            f"ERROR: {target} does not contain '{SAFETY_MARKER}'. "
-            "This file must exist in the book-public-assets root as a safety check.",
+            f"ERROR: target directory must be named 'book-public-assets', got: {target.name}",
             file=sys.stderr,
         )
         return 1
 
-    if target.name != "book-public-assets":
+    if not _has_safety_marker(target):
         print(
-            f"ERROR: target directory must be named 'book-public-assets', got: {target.name}",
+            f"ERROR: {target} does not contain '{SAFETY_MARKER}'. "
+            "This file must exist in the book-public-assets root as a safety check.",
             file=sys.stderr,
         )
         return 1
