@@ -61,6 +61,5 @@ jobs:
 
       - name: Build MkDocs (strict)
         run: |
-          pip install -r requirements.txt
           python3 scripts/build_docs.py
           mkdocs build --strict
