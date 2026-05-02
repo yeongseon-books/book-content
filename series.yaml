@@ -2,6 +2,11 @@ meta:
   repo: yeongseon-books/book-content
   published_ref: 6cdcb0e
   validated_ref: 6cdcb0e
+  asset_repo: yeongseon-books/book-public-assets
+  asset_base_url: https://yeongseon-books.github.io/book-public-assets
+  copyright_holder: YeongseonBooks
+  copyright_year: "2026"
+  license: all-rights-reserved
 series:
 - id: azure-app-service-101
   category: azure
