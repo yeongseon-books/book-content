@@ -1,15 +1,19 @@
 """Check article body structure for publish-ready and published articles.
 
-For articles with status 'publish-ready' or 'published', verifies:
+Blocking checks:
 - H1 exists
-- Questions block exists ("이 글에서 답할 질문" for ko, "Questions this post answers" for en)
-- Mental model block exists (blockquote `> ...`)
-- At least one code block exists
-- Checklist exists (checkbox `- [ ]` or `- [x]`)
-- References section exists ("## 참고 자료" for ko, "## References" for en)
-- Tags line exists as last line
+- References section exists
+- Tags line exists as the last line
 
-Exit code: 0 on success, 1 on any validation error.
+Advisory checks:
+- Questions block exists
+- Mental model block exists
+- Code block exists when code_required is true
+- Checklist exists
+
+Exit code: 0 when there are no blocking errors.
+Warnings are printed but do not fail the command.
+For 'published' articles, advisory checks are promoted to blocking errors.
 """
 
 from __future__ import annotations
@@ -31,8 +35,14 @@ CHECKBOX_RE = re.compile(r"^- \[[ x]\]", re.MULTILINE)
 BLOCKQUOTE_RE = re.compile(r"^> .+", re.MULTILINE)
 TAGS_RE = re.compile(r"^Tags: .+$", re.MULTILINE)
 
-KO_QUESTIONS = re.compile(r"^## .*(\uc9c8\ubb38|\ub2f5\ud560 \uc9c8\ubb38|\ub2e4\ub8f0 \uc9c8\ubb38)", re.MULTILINE)
-EN_QUESTIONS = re.compile(r"^## .*(Questions|answers|What you will learn)", re.MULTILINE)
+KO_QUESTIONS = re.compile(
+    r"^##\s+.*(질문|답할 질문|다룰 질문)",
+    re.MULTILINE,
+)
+EN_QUESTIONS = re.compile(
+    r"^##\s+.*(Questions|answers|What you will learn)",
+    re.MULTILINE,
+)
 A_GRADE_MARKER = "<!-- a-grade-intro:begin -->"
 
 KO_REFS = re.compile(r"^## 참고 자료", re.MULTILINE)
@@ -67,25 +77,27 @@ def check_article(path: Path) -> tuple[list[str], list[str]]:
 
     # Tags line should be the last non-empty line
     lines = text.rstrip().split("\n")
-    if lines and not lines[-1].startswith("Tags: "):
+    last_line = lines[-1] if lines else ""
+    if not TAGS_RE.match(last_line):
         errors.append("missing or misplaced Tags line (must be last line)")
 
-    # --- advisory checks (warnings) ---
+    # --- advisory checks (warnings, promoted to errors for 'published') ---
+    target = errors if status == "published" else warnings
+
     if A_GRADE_MARKER not in body:
         questions_re = KO_QUESTIONS if lang == "ko" else EN_QUESTIONS
         if not questions_re.search(body):
-            warnings.append("missing questions block")
+            target.append("missing questions block")
 
     if not BLOCKQUOTE_RE.search(body):
-        warnings.append("missing mental model blockquote (> ...)")
+        target.append("missing mental model blockquote (> ...)")
 
     code_required = post.metadata.get("code_required", True)
     if code_required and not CODE_BLOCK_RE.search(body):
-        warnings.append("missing code block")
+        target.append("missing code block")
 
     if not CHECKBOX_RE.search(body):
-        warnings.append("missing checklist")
-
+        target.append("missing checklist")
     return errors, warnings
 
 
