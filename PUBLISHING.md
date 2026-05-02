@@ -187,7 +187,7 @@ python3 scripts/export_medium.py <series-id> --all
 - [ ] 전체 선택 후 Medium 빈 초안에 붙여넣었다.
 - [ ] 첫 번째 H1이 Medium 제목 슬롯에 들어갔는지 확인했다.
 - [ ] 이미지가 정상 표시되는지 확인했다.
-- [ ] 깨진 이미지는 `../../../assets/...` 경로를 기준으로 Medium UI에 수동 업로드했다.
+- [ ] 깨진 이미지는 원본 상대 경로를 참고해 Medium UI에 수동 업로드했다.
 - [ ] 마지막 `Tags:` 라인을 Medium tag input에 복사했다.
 - [ ] 본문에 남은 `Tags:` 라인은 삭제했다.
 - [ ] wide table 또는 TODO table marker가 남아 있지 않은지 확인했다.

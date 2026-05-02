@@ -145,7 +145,7 @@ def extract_title(md_text: str) -> str:
     return m.group(1).strip() if m else "Untitled"
 
 
-def render_md_text_to_html(md_text: str, base_dir: Path, *, asset_mode: str = "inline") -> str:
+def render_md_text_to_html(md_text: str, base_dir: Path, *, asset_mode: str = "public") -> str:
     """Render Medium-flavored markdown text to a self-contained HTML document.
 
     base_dir is the directory used to resolve relative image paths (so
@@ -153,8 +153,8 @@ def render_md_text_to_html(md_text: str, base_dir: Path, *, asset_mode: str = "i
     writing an intermediate .md file).
 
     asset_mode controls image handling:
-    - inline: base64-encode local images into data: URIs (default).
-    - public: images already rewritten to public URLs; skip inlining.
+    - public: images already rewritten to public URLs; skip inlining (default).
+    - inline: base64-encode local images into data: URIs.
     - local: keep relative paths as-is.
     """
     title = extract_title(md_text)
