@@ -97,7 +97,7 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 
 1. `ko/<NN>-<slug>.md` + `en/<NN>-<slug>.md` 작성 (front matter 포함)
 2. Mermaid → PNG: `python3 .sisyphus/medium/mermaid-to-png.py <ko-file> <en-file>`
-3. Medium HTML: `python3 .sisyphus/medium/to-medium.py <series>/en`
+3. Medium HTML: `python3 .sisyphus/medium/to-medium.py content/<series>/en`
 4. Finalize: `python3 .sisyphus/medium/finalize-posts.py`
 5. Verify: `make check`
 

@@ -10,7 +10,7 @@
 | --- | --- | --- | --- | --- | --- |
 | Korean Blog | Tistory | `https://yeongseonchoe.tistory.com/` | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
 | English Blog | Hashnode | `https://hashnode.com/@yeongseon` | `content/<series>/en/*.md` | (Hashnode 직접 Markdown 발행) | 한국어 원문의 충실한 영어 대응본 |
-| Medium | Medium | `https://medium.com/@yeongseonchoe` | `content/<series>/en/*.md` (adaptation) | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
+| Medium | Medium | `https://medium.com/@yeongseonchoe` | `content/<series>/en/*.md` (adaptation) | `content/<series>/medium/*.html` → `exports/medium/<series>/*.html` | 영어권 독자용 발행 변형 |
 | Web Book | MkDocs | GitHub Pages 또는 내부 preview | `content/<series>/{ko,en}/*.md` | `docs/` | 웹북 형태의 학습 콘텐츠 |
 | eBook | private `mkdocs-ebook` | — | `content/<series>/{ko,en}/*.md` | `exports/ebook-source/<series>-<lang>/` | 시리즈를 책처럼 묶은 학습형 원고 |
 

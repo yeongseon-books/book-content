@@ -42,7 +42,7 @@ Tistory Hashnode  Medium    MkDocs     eBook
 | `exports/tistory/` | Tistory 붙여넣기용 Markdown |
 | `exports/medium/` | Medium 발행용 HTML 사본 (`export_medium.py` 복사) |
 | `exports/ebook-source/` | private `mkdocs-ebook` 입력용 source bundle |
-| `content/<series>/medium/` | Medium 브라우저 붙여넣기용 HTML (원본) |
+| `content/<series>/medium/` | Medium 브라우저 붙여넣기용 HTML (`to-medium.py` 생성) |
 
 ## Build Flow
 
