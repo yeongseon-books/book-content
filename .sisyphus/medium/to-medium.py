@@ -85,7 +85,7 @@ def resolve_relative(src_md: Path, target: str) -> str | None:
 
 
 # Module-level asset mode — set by main() before processing.
-_asset_mode: str = "inline"
+_asset_mode: str = "public"
 
 ASSET_PATH_RE = re.compile(
     r"(!\[[^\]]*\]\()(\.\.[\/]\.\.[\/]\.\.[\/]assets[\/])([^)]+)(\))"
@@ -99,8 +99,12 @@ def replace_images(text: str, src_md: Path) -> str:
     - inline: keep relative local paths (HTML renderer will base64-inline them).
     - local: keep relative local paths as-is.
     """
-    if _asset_mode != "public" or not ASSET_BASE_URL:
+    if _asset_mode != "public":
         return text
+    if not ASSET_BASE_URL:
+        raise SystemExit(
+            "series.yaml meta.asset_base_url is required when --asset-mode public is used."
+        )
     base = ASSET_BASE_URL.rstrip("/")
 
     def _repl(m: re.Match) -> str:
@@ -327,8 +331,13 @@ def main(argv: list[str]) -> int:
     parser.add_argument(
         "--asset-mode",
         choices=["public", "inline", "local"],
-        default="inline",
-        help="Image handling: public=rewrite to CDN URLs, inline=base64 (default), local=keep relative paths.",
+        default="public",
+        help=(
+            "Image handling: "
+            "public=rewrite to public asset URLs (default), "
+            "inline=base64 data URIs, "
+            "local=keep relative paths."
+        ),
     )
     args = parser.parse_args(argv[1:])
     _asset_mode = args.asset_mode
