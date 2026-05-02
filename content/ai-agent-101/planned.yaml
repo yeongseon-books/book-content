@@ -1,0 +1,63 @@
+ko:
+  1:
+    title: "AI Agent란 무엇인가?"
+    filename: "01-what-is-an-ai-agent.md"
+  2:
+    title: "컨텍스트 엔지니어링"
+    filename: "02-context-engineering.md"
+  3:
+    title: "Tool Use 기초"
+    filename: "03-tool-use-fundamentals.md"
+  4:
+    title: "Agent Workflow 설계"
+    filename: "04-agent-workflow-design.md"
+  5:
+    title: "Memory와 State"
+    filename: "05-memory-and-state.md"
+  6:
+    title: "Multi-Agent 시스템"
+    filename: "06-multi-agent-systems.md"
+  7:
+    title: "Agent 평가"
+    filename: "07-agent-evaluation.md"
+  8:
+    title: "에러 처리와 안정성"
+    filename: "08-error-handling-reliability.md"
+  9:
+    title: "운영"
+    filename: "09-production-operations.md"
+  10:
+    title: "첫 Agent 만들기"
+    filename: "10-building-first-agent.md"
+
+en:
+  1:
+    title: "What is an AI Agent?"
+    filename: "01-what-is-an-ai-agent.md"
+  2:
+    title: "Context Engineering"
+    filename: "02-context-engineering.md"
+  3:
+    title: "Tool Use Fundamentals"
+    filename: "03-tool-use-fundamentals.md"
+  4:
+    title: "Agent Workflow Design"
+    filename: "04-agent-workflow-design.md"
+  5:
+    title: "Memory and State"
+    filename: "05-memory-and-state.md"
+  6:
+    title: "Multi-Agent Systems"
+    filename: "06-multi-agent-systems.md"
+  7:
+    title: "Agent Evaluation"
+    filename: "07-agent-evaluation.md"
+  8:
+    title: "Error Handling and Reliability"
+    filename: "08-error-handling-reliability.md"
+  9:
+    title: "Production Operations"
+    filename: "09-production-operations.md"
+  10:
+    title: "Building Your First Agent"
+    filename: "10-building-first-agent.md"
