@@ -3,7 +3,7 @@ title: Adapting the Base Model to Specific Tasks
 series: llm-from-scratch-101
 episode: 8
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

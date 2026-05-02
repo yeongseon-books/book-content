@@ -3,7 +3,7 @@ title: 모니터링과 운영 기초
 series: azure-functions-101
 episode: 7
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

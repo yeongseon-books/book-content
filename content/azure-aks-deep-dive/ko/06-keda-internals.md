@@ -3,7 +3,7 @@ title: KEDA 내부 — ScaledObject가 HPA를 만드는 방식
 series: azure-aks-deep-dive
 episode: 6
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

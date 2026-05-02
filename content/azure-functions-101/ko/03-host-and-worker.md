@@ -3,7 +3,7 @@ title: Host와 Worker — 함수는 누가 실행하는가
 series: azure-functions-101
 episode: 3
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

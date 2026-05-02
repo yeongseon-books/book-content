@@ -3,7 +3,7 @@ title: Deciding Which Tokens to Focus On
 series: llm-from-scratch-101
 episode: 3
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

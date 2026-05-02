@@ -3,7 +3,7 @@ title: 'Configuration 마스터하기: App Settings & 환경변수'
 series: azure-app-service-101
 episode: 5
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

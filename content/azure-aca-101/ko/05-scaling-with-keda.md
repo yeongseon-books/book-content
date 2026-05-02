@@ -3,7 +3,7 @@ title: 스케일링 — KEDA scaler와 0-to-N
 series: azure-aca-101
 episode: 5
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

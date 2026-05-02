@@ -3,7 +3,7 @@ title: 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
 series: llm-from-scratch-101
 episode: 9
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

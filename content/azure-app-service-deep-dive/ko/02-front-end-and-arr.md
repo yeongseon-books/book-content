@@ -3,7 +3,7 @@ title: Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
 series: azure-app-service-deep-dive
 episode: 2
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

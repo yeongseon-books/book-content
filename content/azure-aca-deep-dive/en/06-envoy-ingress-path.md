@@ -3,7 +3,7 @@ title: The Envoy ingress path — how the first request reaches your container
 series: azure-aca-deep-dive
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

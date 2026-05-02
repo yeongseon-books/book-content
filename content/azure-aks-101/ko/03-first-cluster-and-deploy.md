@@ -3,7 +3,7 @@ title: 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
 series: azure-aks-101
 episode: 3
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

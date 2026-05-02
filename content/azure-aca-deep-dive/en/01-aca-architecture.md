@@ -3,7 +3,7 @@ title: ACA architecture — what Microsoft layered on a hidden Kubernetes
 series: azure-aca-deep-dive
 episode: 1
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

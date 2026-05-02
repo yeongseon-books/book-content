@@ -3,7 +3,7 @@ title: Workers and the sandbox — where user code actually runs
 series: azure-app-service-deep-dive
 episode: 3
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

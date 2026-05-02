@@ -3,7 +3,7 @@ title: Triggers and Bindings — Everything About Function I/O
 series: azure-functions-101
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

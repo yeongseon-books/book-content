@@ -3,7 +3,7 @@ title: kubelet and containerd — how a container actually starts on a node
 series: azure-aks-deep-dive
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

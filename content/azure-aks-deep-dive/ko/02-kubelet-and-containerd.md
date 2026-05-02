@@ -3,7 +3,7 @@ title: kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
 series: azure-aks-deep-dive
 episode: 2
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

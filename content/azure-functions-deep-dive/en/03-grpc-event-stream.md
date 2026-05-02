@@ -3,7 +3,7 @@ title: The gRPC Event Stream — What Do the Host and Worker Actually Exchange?
 series: azure-functions-deep-dive
 episode: 3
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Ingress and traffic splitting — revision-based deployment strategies
 series: azure-aca-101
 episode: 4
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

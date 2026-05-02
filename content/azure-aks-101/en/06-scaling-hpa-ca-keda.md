@@ -3,7 +3,7 @@ title: Scaling — HPA, Cluster Autoscaler, KEDA
 series: azure-aks-101
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

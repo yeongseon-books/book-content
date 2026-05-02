@@ -3,7 +3,7 @@ title: Your first deploy — Python/FastAPI
 series: azure-aca-101
 episode: 3
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

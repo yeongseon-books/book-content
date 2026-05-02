@@ -3,7 +3,7 @@ title: 블록 하나, 깊이의 단위
 series: llm-from-scratch-101
 episode: 4
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

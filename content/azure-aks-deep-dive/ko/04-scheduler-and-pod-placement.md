@@ -3,7 +3,7 @@ title: Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
 series: azure-aks-deep-dive
 episode: 4
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

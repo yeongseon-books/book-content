@@ -3,7 +3,7 @@ title: 모니터링과 운영 — Container Insights, 로그, 알람
 series: azure-aks-101
 episode: 7
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: 'Hosting Models: 어떤 플랜을 선택해야 할까?'
 series: azure-app-service-101
 episode: 3
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

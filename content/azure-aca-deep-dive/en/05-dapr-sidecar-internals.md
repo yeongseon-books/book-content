@@ -3,7 +3,7 @@ title: Dapr sidecar internals — the Go process that lives next to your contain
 series: azure-aca-deep-dive
 episode: 5
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

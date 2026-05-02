@@ -3,7 +3,7 @@ title: Environment·Container App·Revision — 세 단어로 보는 ACA
 series: azure-aca-101
 episode: 2
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

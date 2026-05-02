@@ -3,7 +3,7 @@ title: 'First Deployment: From Local to Azure (Python/Flask)'
 series: azure-app-service-101
 episode: 4
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

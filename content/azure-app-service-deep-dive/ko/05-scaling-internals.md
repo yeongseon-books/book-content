@@ -3,7 +3,7 @@ title: 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
 series: azure-app-service-deep-dive
 episode: 5
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

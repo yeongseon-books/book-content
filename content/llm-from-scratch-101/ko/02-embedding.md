@@ -3,7 +3,7 @@ title: 정수에서 벡터로, 그리고 위치
 series: llm-from-scratch-101
 episode: 2
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

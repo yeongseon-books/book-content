@@ -3,7 +3,7 @@ title: 'Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까'
 series: azure-app-service-101
 episode: 2
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

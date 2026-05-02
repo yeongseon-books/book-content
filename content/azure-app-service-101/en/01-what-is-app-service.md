@@ -3,7 +3,7 @@ title: What is Azure App Service? - Understanding the Platform Architecture
 series: azure-app-service-101
 episode: 1
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

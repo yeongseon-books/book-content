@@ -3,7 +3,7 @@ title: 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 
 series: azure-functions-deep-dive
 episode: 5
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

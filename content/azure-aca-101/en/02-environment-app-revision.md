@@ -3,7 +3,7 @@ title: Environment, Container App, Revision — ACA in three words
 series: azure-aca-101
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

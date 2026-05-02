@@ -3,7 +3,7 @@ title: 콜드 스타트와 Warmup — 첫 요청이 비싼 이유
 series: azure-app-service-deep-dive
 episode: 6
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

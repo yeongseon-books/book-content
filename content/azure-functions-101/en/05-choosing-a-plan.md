@@ -3,7 +3,7 @@ title: Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
 series: azure-functions-101
 episode: 5
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

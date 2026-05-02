@@ -3,7 +3,7 @@ title: Scaling internals — how Scale Out decisions become new workers
 series: azure-app-service-deep-dive
 episode: 5
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

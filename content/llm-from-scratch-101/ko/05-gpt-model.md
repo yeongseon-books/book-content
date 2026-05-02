@@ -3,7 +3,7 @@ title: '조립: GPT 모델 클래스 완성'
 series: llm-from-scratch-101
 episode: 5
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

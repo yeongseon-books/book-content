@@ -3,7 +3,7 @@ title: 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질
 series: azure-functions-deep-dive
 episode: 6
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

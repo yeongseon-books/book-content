@@ -3,7 +3,7 @@ title: What is Azure Container Apps? — running containers without Kubernetes
 series: azure-aca-101
 episode: 1
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

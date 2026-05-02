@@ -3,7 +3,7 @@ title: Logging and Monitoring Basics
 series: azure-app-service-101
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

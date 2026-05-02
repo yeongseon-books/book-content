@@ -3,7 +3,7 @@ title: Sampling — Generating Text from a Trained Model
 series: llm-from-scratch-101
 episode: 7
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

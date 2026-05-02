@@ -3,7 +3,7 @@ title: Control Plane 해부 — AKS가 사용자에게서 가린 것
 series: azure-aks-deep-dive
 episode: 1
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

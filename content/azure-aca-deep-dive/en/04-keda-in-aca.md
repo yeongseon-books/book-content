@@ -3,7 +3,7 @@ title: KEDA inside ACA — what a scale rule actually creates
 series: azure-aca-deep-dive
 episode: 4
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

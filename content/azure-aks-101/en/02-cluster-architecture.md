@@ -3,7 +3,7 @@ title: Cluster architecture — control plane and node pools
 series: azure-aks-101
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: 함수 하나 배포하기 — 로컬에서 Azure까지
 series: azure-functions-101
 episode: 4
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

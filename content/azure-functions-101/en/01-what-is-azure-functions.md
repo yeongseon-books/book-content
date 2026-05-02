@@ -3,7 +3,7 @@ title: What Is Azure Functions? — A World Where Events Call Your Code
 series: azure-functions-101
 episode: 1
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: HPA and Cluster Autoscaler internals — two control loops
 series: azure-aks-deep-dive
 episode: 5
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

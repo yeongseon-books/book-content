@@ -3,7 +3,7 @@ title: 'Request Lifecycle: How Requests Reach Your App'
 series: azure-app-service-101
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

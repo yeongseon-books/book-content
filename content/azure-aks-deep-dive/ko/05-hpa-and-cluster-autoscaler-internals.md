@@ -3,7 +3,7 @@ title: HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
 series: azure-aks-deep-dive
 episode: 5
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

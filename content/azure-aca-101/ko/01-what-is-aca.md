@@ -3,7 +3,7 @@ title: Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기
 series: azure-aca-101
 episode: 1
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

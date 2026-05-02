@@ -3,7 +3,7 @@ title: Worker Processes — How One Host Hosts Many Languages
 series: azure-functions-deep-dive
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

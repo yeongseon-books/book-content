@@ -3,7 +3,7 @@ title: 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
 series: azure-app-service-deep-dive
 episode: 4
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

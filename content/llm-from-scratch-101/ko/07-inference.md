@@ -3,7 +3,7 @@ title: 샘플링 — 학습된 모델에서 글 뽑아내기
 series: llm-from-scratch-101
 episode: 7
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

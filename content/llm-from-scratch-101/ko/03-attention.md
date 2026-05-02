@@ -3,7 +3,7 @@ title: 어떤 토큰을 얼마나 볼지 스스로 정하기
 series: llm-from-scratch-101
 episode: 3
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

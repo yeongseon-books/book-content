@@ -3,7 +3,7 @@ title: 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
 series: azure-aks-101
 episode: 5
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가
 series: azure-aks-deep-dive
 episode: 3
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

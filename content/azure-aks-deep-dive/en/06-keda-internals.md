@@ -3,7 +3,7 @@ title: KEDA internals — how a ScaledObject builds an HPA
 series: azure-aks-deep-dive
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

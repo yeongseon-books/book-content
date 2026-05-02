@@ -3,7 +3,7 @@ title: 클러스터 아키텍처 — Control Plane과 Node Pool
 series: azure-aks-101
 episode: 2
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

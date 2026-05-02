@@ -3,7 +3,7 @@ title: Monitoring and Operations Fundamentals
 series: azure-functions-101
 episode: 7
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

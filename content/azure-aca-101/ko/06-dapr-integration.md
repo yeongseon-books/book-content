@@ -3,7 +3,7 @@ title: Dapr 통합 — 사이드카로 얻는 것
 series: azure-aca-101
 episode: 6
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

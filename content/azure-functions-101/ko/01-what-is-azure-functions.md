@@ -6,7 +6,7 @@ ebook_title: 이벤트가 함수를 호출하는 세상
 series: azure-functions-101
 episode: 1
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Dispatcher and Invocation — How a Function Call Reaches the Worker
 series: azure-functions-deep-dive
 episode: 4
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Revisions and traffic splitting — where Envoy weights come from
 series: azure-aca-deep-dive
 episode: 3
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

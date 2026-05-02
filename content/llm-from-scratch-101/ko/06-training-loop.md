@@ -3,7 +3,7 @@ title: 기울기로 배우기
 series: llm-from-scratch-101
 episode: 6
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kub
 series: azure-aks-101
 episode: 1
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Front-End and ARR — how a request reaches a worker
 series: azure-app-service-deep-dive
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

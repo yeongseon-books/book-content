@@ -3,7 +3,7 @@ title: 첫 앱 배포하기 — Python/FastAPI
 series: azure-aca-101
 episode: 3
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

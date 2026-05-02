@@ -3,7 +3,7 @@ title: Monitoring and ops — Log Analytics and Application Insights
 series: azure-aca-101
 episode: 7
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

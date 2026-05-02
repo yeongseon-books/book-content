@@ -3,7 +3,7 @@ title: Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가
 series: azure-app-service-deep-dive
 episode: 3
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

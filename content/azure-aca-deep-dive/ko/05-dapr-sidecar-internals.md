@@ -3,7 +3,7 @@ title: Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
 series: azure-aca-deep-dive
 episode: 5
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

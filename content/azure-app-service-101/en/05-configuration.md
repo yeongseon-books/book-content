@@ -3,7 +3,7 @@ title: 'Mastering Configuration: App Settings & Environment Variables'
 series: azure-app-service-101
 episode: 5
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Scheduler and Pod placement — who decides which node
 series: azure-aks-deep-dive
 episode: 4
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

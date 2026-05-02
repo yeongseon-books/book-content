@@ -4,7 +4,7 @@ title: What is Azure Kubernetes Service? — what managed Kubernetes actually gi
 series: azure-aks-101
 episode: 1
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

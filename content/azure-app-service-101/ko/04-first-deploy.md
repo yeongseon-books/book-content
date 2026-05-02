@@ -3,7 +3,7 @@ title: '첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)'
 series: azure-app-service-101
 episode: 4
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

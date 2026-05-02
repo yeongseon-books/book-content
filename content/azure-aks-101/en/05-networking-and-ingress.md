@@ -3,7 +3,7 @@ title: Networking and Ingress — the path in and out of the cluster
 series: azure-aks-101
 episode: 5
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

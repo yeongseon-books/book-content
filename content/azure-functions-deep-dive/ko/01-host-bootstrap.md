@@ -3,7 +3,7 @@ title: 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기
 series: azure-functions-deep-dive
 episode: 1
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Monitoring and ops — Container Insights, logs, alerts
 series: azure-aks-101
 episode: 7
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Pod, Deployment, Service — the three ways you express a workload
 series: azure-aks-101
 episode: 4
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: 베이스 모델을 우리 작업에 맞추기
 series: llm-from-scratch-101
 episode: 8
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

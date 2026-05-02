@@ -3,7 +3,7 @@ title: Your first cluster, your first deploy — Python/FastAPI
 series: azure-aks-101
 episode: 3
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

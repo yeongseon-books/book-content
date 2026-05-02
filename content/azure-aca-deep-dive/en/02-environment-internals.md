@@ -3,7 +3,7 @@ title: Environment internals — the network, observability, and Dapr scope boun
 series: azure-aca-deep-dive
 episode: 2
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: From Integers to Vectors and Positions
 series: llm-from-scratch-101
 episode: 2
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

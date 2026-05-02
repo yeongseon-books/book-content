@@ -3,7 +3,7 @@ title: App Service 플랫폼 아키텍처 — Front-End·Worker·File Server
 series: azure-app-service-deep-dive
 episode: 1
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

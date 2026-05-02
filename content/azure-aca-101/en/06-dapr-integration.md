@@ -3,7 +3,7 @@ title: Dapr integration — what you get from a sidecar
 series: azure-aca-101
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

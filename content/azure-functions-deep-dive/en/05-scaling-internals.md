@@ -4,7 +4,7 @@ title: Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Ac
 series: azure-functions-deep-dive
 episode: 5
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

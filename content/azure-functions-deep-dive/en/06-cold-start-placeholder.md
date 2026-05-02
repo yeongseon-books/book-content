@@ -3,7 +3,7 @@ title: Cold Start and Placeholder Mode — What Happens When a New Instance Is B
 series: azure-functions-deep-dive
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

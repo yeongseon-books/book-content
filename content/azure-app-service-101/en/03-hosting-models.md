@@ -3,7 +3,7 @@ title: 'Hosting Models: Which Plan Should You Choose?'
 series: azure-app-service-101
 episode: 3
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

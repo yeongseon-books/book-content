@@ -3,7 +3,7 @@ title: 글자를 숫자로 바꾸기
 series: llm-from-scratch-101
 episode: 1
 language: ko
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

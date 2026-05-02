@@ -3,7 +3,7 @@ title: Ingress와 트래픽 분할 — Revision 기반 배포 전략
 series: azure-aca-101
 episode: 4
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

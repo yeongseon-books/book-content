@@ -3,7 +3,7 @@ title: Scaling and Cold Starts â€” When Serverless Feels Fast and When It Doesnâ
 series: azure-functions-101
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

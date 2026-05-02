@@ -3,7 +3,7 @@ title: ACA 안의 KEDA — Scale Rule이 만드는 것
 series: azure-aca-deep-dive
 episode: 4
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

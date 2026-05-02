@@ -3,7 +3,7 @@ title: 'Assembly: Completing the GPT Model Class'
 series: llm-from-scratch-101
 episode: 5
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

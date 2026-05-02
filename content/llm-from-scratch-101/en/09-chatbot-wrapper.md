@@ -3,7 +3,7 @@ title: Turning Your LLM into a Chatbot — FastAPI + Streaming
 series: llm-from-scratch-101
 episode: 9
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

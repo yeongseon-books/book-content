@@ -3,7 +3,7 @@ title: Learning via Gradients
 series: llm-from-scratch-101
 episode: 6
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

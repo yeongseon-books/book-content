@@ -3,7 +3,7 @@ title: Cold start and warmup — why the first request is expensive
 series: azure-app-service-deep-dive
 episode: 6
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

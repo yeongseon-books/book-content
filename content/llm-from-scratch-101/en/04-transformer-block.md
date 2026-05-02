@@ -3,7 +3,7 @@ title: 'The Transformer Block: A Unit of Depth'
 series: llm-from-scratch-101
 episode: 4
 language: en
-status: ready
+status: code-checked
 targets:
   tistory: true
   medium: true

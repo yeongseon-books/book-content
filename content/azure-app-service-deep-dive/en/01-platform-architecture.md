@@ -3,7 +3,7 @@ title: App Service platform architecture — Front-End, Worker, File Server
 series: azure-app-service-deep-dive
 episode: 1
 language: en
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

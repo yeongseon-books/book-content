@@ -3,7 +3,7 @@ title: Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
 series: azure-aca-deep-dive
 episode: 2
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: 트리거와 바인딩 — 함수 입출력의 모든 것
 series: azure-functions-101
 episode: 2
 language: ko
-status: ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
