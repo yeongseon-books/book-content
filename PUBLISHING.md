@@ -1,6 +1,6 @@
 # Publishing Guide
 
-이 문서는 `content/` 아래의 원본 Markdown을 Tistory, Hashnode, Medium, eBook source로 변환하는 규칙을 정의한다.
+이 문서는 `content/` 아래의 원본 Markdown을 Tistory, Hashnode, Medium, MkDocs, eBook source로 변환하는 규칙을 정의한다.
 
 > **현재 상태**: 모든 시리즈가 `content/<series>/` 아래로 이동 완료되었다 (Phase 6 완료). 이행 전 경로(`<series>/{ko,en,medium}/`)는 더 이상 사용하지 않는다.
 
@@ -20,13 +20,14 @@
 
 ## Publication Pipelines
 
-`tech-writing`은 하나의 canonical content base를 네 가지 발행 파이프라인으로 변환한다.
+`tech-writing`은 하나의 canonical content base를 다섯 가지 발행 파이프라인으로 변환한다.
 
 | Pipeline | Platform | Source | Output | Purpose |
 | --- | --- | --- | --- | --- |
 | Korean Blog | Tistory | `content/<series>/ko/*.md` | `exports/tistory/<series>/*.md` | 한국어 검색 유입용 블로그 |
 | English Blog | Hashnode | `content/<series>/en/*.md` | (Hashnode에 직접 Markdown 붙여넣기) | 한국어 원문의 충실한 영어 대응본 |
 | Medium | Medium | `content/<series>/en/*.md` + adaptation | `content/<series>/medium/*.html` | 영어권 독자용 발행 변형 |
+| Web Book | MkDocs | `content/<series>/{ko,en}/*.md` | `docs/` | 웹북 형태의 학습 콘텐츠 |
 | eBook | private `mkdocs-ebook` | `content/<series>/{ko,en}/*.md` + ebook-only blocks | `exports/ebook-source/<series>-<lang>/` | 책 단위 학습형 원고 |
 
 `ko/`와 `en/`은 canonical source다. `medium/`은 `to-medium.py`가 생성하는 발행 변형 산출물이며 canonical source가 아니다.
@@ -52,12 +53,13 @@ content/azure-functions-101/en/01-what-is-azure-functions.md
 
 ```text
 exports/tistory/<series>/<NN>-<slug>.md
-exports/hashnode/<series>/<NN>-<slug>.md    ← planned (Hashnode는 Markdown 직접 사용)
 exports/medium/<series>/<NN>.html
 exports/ebook-source/<series>-<lang>/...
 ```
 
-> **현행 워크플로우**: `content/<series>/medium/<NN>.html` 이 `exports/medium/` 의 역할을 수행한다. `scripts/export_medium.py` 는 이 .html 파일을 `exports/medium/` 로 복사하는 thin wrapper다.
+> **Hashnode**: 별도 export 디렉터리를 사용하지 않는다. `content/<series>/en/*.md`를 직접 사용한다. 필요해지면 `exports/hashnode/`를 추가한다.
+
+> **Medium**: `content/<series>/medium/<NN>.html`이 `exports/medium/`의 역할을 수행한다. `scripts/export_medium.py`는 이 .html 파일을 `exports/medium/`로 복사하는 thin wrapper다.
 
 ---
 
@@ -104,9 +106,7 @@ content/<series>/en/*.md
 
 ### 변환 결과
 
-```text
-exports/hashnode/<series>/<NN>-<slug>.md   ← planned
-```
+Hashnode는 별도 export 디렉터리를 사용하지 않는다. `en/*.md`를 직접 사용한다. 필요해지면 `exports/hashnode/`를 추가한다.
 
 Hashnode는 Markdown 네이티브 에디터를 제공하므로 HTML 변환 없이 `.md` 원본을 그대로 사용한다.
 
@@ -146,7 +146,7 @@ Medium 산출물은 **브라우저 붙여넣기용 .html** 파일이다.
 
 - Chrome에서 열고 전체 선택(Ctrl+A) → 복사 → 빈 Medium 초안에 붙여넣기
 - 첫 번째 `<h1>` 이 Medium의 제목 슬롯에 매핑된다
-- 이미지는 base64 data URI로 인라인 처리되어 외부 URL 없이 자급자족
+- 이미지는 Markdown 변환 단계에서는 상대 경로(`../../../assets/...`)를 유지하고, HTML 렌더링 단계에서 base64 data URI로 인라인한다. Medium 붙여넣기에서 이미지가 유지되지 않으면, 상대 경로를 참고해 PNG를 Medium UI에 수동 업로드한다.
 - 하단 `Tags: A, B, C` visible 라인을 Medium의 태그 입력칸에 수동 복사
 
 ### 변환 규칙
@@ -154,7 +154,7 @@ Medium 산출물은 **브라우저 붙여넣기용 .html** 파일이다.
 - `ebook-only` 블록은 제거한다.
 - `blog-only` 블록은 유지한다.
 - H3+ 헤딩은 demote한다 (Medium 호환성).
-- 이미지는 base64 data URI로 인라인 처리한다 (저장소가 private이므로 raw URL 불가).
+- 이미지는 Markdown 변환 단계에서는 상대 경로를 유지하고, HTML 렌더링 단계에서 base64 data URI로 인라인한다. Medium 붙여넣기에서 이미지가 유지되지 않으면 PNG를 수동 업로드한다. private repository의 `raw.githubusercontent.com` URL은 사용하지 않는다.
 - TOC 처리: `<!-- toc:begin --> ... <!-- toc:end -->` 마커는 제거되지만 TOC 본문 라인은 유지된다.
 - 태그 처리: 하단 visible `Tags:` 라인은 **그대로 유지**한다. Medium 발행 시 태그칸에 수동 복사한다.
 - `finalize-posts.py` 는 `medium/` 디렉토리를 스킵한다. medium 변형의 태그·TOC 는 `to-medium.py` 단독 책임이다.
@@ -191,11 +191,14 @@ docs/en/<series>/...
 - `ebook-only` 블록은 MkDocs 웹북에서는 선택적으로 포함한다 (옵션 플래그).
 - nav 메타데이터는 `scripts/build_series_index.py` 가 `series.yaml` 에서 생성하여 `mkdocs.yml` 에 inject 한다.
 
-### 명령 (예정)
+### 명령
 
 ```bash
-python3 scripts/build_docs.py
-mkdocs serve
+# 검증용 build (strict mode)
+make docs-build
+
+# 로컬 preview
+make docs-serve
 ```
 
 ---

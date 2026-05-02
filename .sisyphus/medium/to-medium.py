@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 """Convert en/*.md to Medium browser-paste-ready medium/<NN>.html.
 
-Output is a self-contained HTML document (PNG images base64-inlined) for
-the workflow: open in Chrome, select-all, copy, paste into a fresh empty
+Output is a self-contained HTML document for the workflow: open in Chrome,
+select-all, copy, paste into a fresh empty Medium draft. The first H1 lands
+in Medium's title slot; the trailing 'Tags: ...' line is visually separated
+for the author to copy into Medium's tag input field.
+
+Image handling:
+- Markdown transform stage: image refs `![alt](../../../assets/...)` are kept
+  as-is (relative local path).
+- HTML rendering stage (to-medium-html.py): local PNGs are base64-inlined.
+- If base64 inline doesn't survive Medium paste, the author uses the local
+  path as reference to manually drag-and-drop the correct PNG via Medium UI.
+- Private-repo raw.githubusercontent.com URLs are NOT used.
 Medium draft. The first H1 lands in Medium's title slot; the trailing
 'Tags: ...' line is visually separated for the author to copy into
 Medium's tag input field.

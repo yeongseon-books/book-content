@@ -14,15 +14,15 @@ Canonical source는 `content/<series>/{ko,en}/`에 둔다.
 - `en/`: 영어 원본 또는 번역본
 - `medium/`: Medium 발행용 생성 산출물 (`.sisyphus/medium/to-medium.py` 생성)
 
-`medium/`은 직접 수정하지 않는다.
+`medium/`은 직접 수정하지 않는다. 이미지는 Markdown 변환 단계에서 상대 경로를 유지하고, HTML 렌더링 단계에서 base64 data URI로 인라인한다.
 
 ## Publication Pipelines
 
 ```text
 Canonical Markdown (content/<series>/{ko,en}/)
         |
- ┌──────┬──────────┬──────────┬───────────┐
- │      │          │          │           │
+ ┌──────┬──────────┬──────────┬──────────┬────────┐
+ │      │          │          │          │        │
 Tistory Hashnode  Medium    MkDocs     eBook
 ```
 
@@ -40,8 +40,9 @@ Tistory Hashnode  Medium    MkDocs     eBook
 | --- | --- |
 | `docs/` | MkDocs 웹북 산출물 |
 | `exports/tistory/` | Tistory 붙여넣기용 Markdown |
+| `exports/medium/` | Medium 발행용 HTML 사본 (`export_medium.py` 복사) |
 | `exports/ebook-source/` | private `mkdocs-ebook` 입력용 source bundle |
-| `content/<series>/medium/` | Medium 브라우저 붙여넣기용 HTML |
+| `content/<series>/medium/` | Medium 브라우저 붙여넣기용 HTML (원본) |
 
 ## Build Flow
 
@@ -62,3 +63,10 @@ Tistory Hashnode  Medium    MkDocs     eBook
 | `.sisyphus/skills/` | Agent skill 정의 |
 
 장기적으로 `.sisyphus/medium/`의 publishing 로직은 `scripts/`로 통합할 계획이다.
+
+## Asset Policy
+
+- Generated PNG assets는 `assets/<series>/<episode>/`에 저장한다.
+- 바이너리 자산은 불필요하게 반복 재생성하지 않는다.
+- 저장소 크기가 합의된 임계치를 초과하면 Git LFS 또는 외부 호스팅으로 이전한다.
+- Medium 발행은 private raw GitHub 이미지 URL에 의존하지 않는다.
