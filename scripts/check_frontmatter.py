@@ -29,7 +29,7 @@ CONTENT_DIR = REPO_ROOT / "content"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 REQUIRED_FIELDS = {"title", "series", "episode", "language", "status", "targets", "tags", "last_reviewed"}
-OPTIONAL_FIELDS = {"seo_title", "hashnode_title", "medium_title", "ebook_title", "published"}
+OPTIONAL_FIELDS = {"seo_title", "hashnode_title", "medium_title", "ebook_title", "published", "code_required"}
 VALID_STATUS = {"draft", "content-ready", "code-checked", "publish-ready", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 TARGET_KEYS = {"tistory", "medium", "mkdocs", "ebook"}
@@ -52,11 +52,11 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> tuple[list[str], l
     try:
         post = frontmatter.loads(text)
     except Exception as e:
-        return [f"front matter parse error: {e}"]
+        return [f"front matter parse error: {e}"], []
 
     fm = post.metadata
     if not fm:
-        return ["missing front matter (no `---` block at top)"]
+        return ["missing front matter (no `---` block at top)"], []
 
     missing = REQUIRED_FIELDS - set(fm.keys())
     if missing:
