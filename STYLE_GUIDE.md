@@ -228,10 +228,17 @@ Generated PNG assets are stored under `assets/<series>/<NN>/`.
 - Do not commit duplicate images with only minor filename differences.
 - Medium publishing must not depend on private raw GitHub image URLs.
 - If repository size exceeds the agreed threshold, migrate assets to Git LFS or external hosting.
+- 외부 발행용 이미지는 `book-public-assets` 저장소(public)를 경유한다.
+- Canonical source에 public asset URL을 hardcode하지 않는다.
+
+### Public Asset Workflow
+
+- 동기화: `scripts/sync_assets.py`로 `book-content/assets/` → `book-public-assets/assets/`를 미러링한다.
+- Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
+- 상세 정책은 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
 
 ### Future Options
 
 - Git LFS
-- Public asset repository
 - Cloudflare R2 public bucket
 - Azure Blob Storage static website

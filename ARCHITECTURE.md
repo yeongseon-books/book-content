@@ -2,9 +2,9 @@
 
 ## Repository Role
 
-`book-content`는 영선북스의 기술서, 웹북, 블로그 시리즈 원고를 관리하는 canonical content repository이다.
+`book-content`는 영선북스의 기술서, 웹북, 블로그 시리즈 원고를 관리하는 private canonical content repository이다.
 
-하나의 canonical source를 기준으로 블로그, 웹북, eBook source bundle을 생성한다.
+발행 모델은 blog-first / book-later — 블로그 글을 먼저 쓰고, 쌓인 시리즈를 eBook으로 묶는다.
 
 ## Source of Truth
 
@@ -15,6 +15,15 @@ Canonical source는 `content/<series>/{ko,en}/`에 둔다.
 - `medium/`: Medium 발행용 생성 산출물 (`.sisyphus/medium/to-medium.py` 생성)
 
 `medium/`은 직접 수정하지 않는다. 이미지는 Markdown 변환 단계에서 상대 경로를 유지하고, HTML 렌더링 단계에서 base64 data URI로 인라인한다.
+
+## Repository Split
+
+| Repository | Visibility | Purpose |
+| --- | --- | --- |
+| `yeongseon-books/book-content` | private | Canonical source, scripts, exports |
+| `yeongseon-books/book-public-assets` | **public** | GitHub Pages로 호스팅하는 이미지 CDN |
+
+Canonical source에는 public asset URL을 hardcode하지 않는다. Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
 
 ## Publication Pipelines
 
@@ -72,3 +81,17 @@ flowchart LR
 - 바이너리 자산은 불필요하게 반복 재생성하지 않는다.
 - 저장소 크기가 합의된 임계치를 초과하면 Git LFS 또는 외부 호스팅으로 이전한다.
 - Medium 발행은 private raw GitHub 이미지 URL에 의존하지 않는다.
+- 외부 발행(블로그, Medium)의 이미지는 `book-public-assets` 를 경유한 public URL을 사용한다.
+- 상세 정책은 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
+
+## Asset Flow
+
+```mermaid
+flowchart LR
+  SRC["assets/&lt;series&gt;/&lt;NN&gt;/"]
+  SRC -->|sync_assets.py| PUB["book-public-assets"]
+  PUB -->|GitHub Pages| CDN["https://yeongseon-books.github.io/book-public-assets/"]
+  CDN --> Medium
+  CDN --> Tistory
+  CDN --> Hashnode
+```

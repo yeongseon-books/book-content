@@ -94,6 +94,14 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 - Labels with `()`, `/`, `;` must be quoted: `["Label (with parens)"]`
 - en diagrams: English labels; ko diagrams: Korean labels
 
+## Public Asset Rules
+
+- 이미지 원본은 `assets/<series>/<NN>/`에 저장한다 (private `book-content`).
+- 외부 발행용 이미지는 `book-public-assets` 저장소(public)를 경유한다.
+- Canonical source(`ko/*.md`, `en/*.md`)에 public asset URL을 hardcode하지 않는다.
+- Exporter가 `series.yaml`의 `meta.asset_base_url`를 읽어 경로를 재작성한다.
+- 동기화: `scripts/sync_assets.py`로 `book-content/assets/` → `book-public-assets/assets/`를 미러링한다.
+- 상세 정책은 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
 ## When Adding a New Post
 
 1. `ko/<NN>-<slug>.md` + `en/<NN>-<slug>.md` 작성 (front matter 포함)
@@ -116,3 +124,4 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 | 시리즈 카탈로그 | [`SERIES.md`](./SERIES.md) |
 | 개편 로드맵 | [`ROADMAP.md`](./ROADMAP.md) |
 | Migration archive | [`MIGRATION_PLAN.md`](./MIGRATION_PLAN.md) |
+| 공개 이미지 자산 정책 | [`ASSET_POLICY.md`](./ASSET_POLICY.md) |

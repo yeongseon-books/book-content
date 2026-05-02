@@ -2,6 +2,16 @@
 
 이 문서는 `content/` 아래의 원본 Markdown을 Tistory, Hashnode, Medium, MkDocs, eBook source로 변환하는 규칙을 정의한다.
 
+## 출판 모델
+
+본 저장소의 발행 모델은 **blog-first / book-later**이다.
+
+1. 블로그 글을 먼저 쓴다 (Tistory, Hashnode, Medium).
+2. 쌓인 시리즈를 eBook으로 묶는다.
+3. 이미지는 private `book-content`에 원본을 두고, public `book-public-assets`를 거쳐 외부에 제공한다.
+
+이미지 자산 정책의 상세 사항은 [`ASSET_POLICY.md`](./ASSET_POLICY.md)를 참조한다.
+
 > **현재 상태**: 모든 시리즈가 `content/<series>/` 아래로 이동 완료되었다 (Phase 6 완료). 이행 전 경로(`<series>/{ko,en,medium}/`)는 더 이상 사용하지 않는다.
 
 ---
@@ -261,6 +271,21 @@ python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
 | Mermaid | PNG | PNG | PNG | mermaid 또는 PNG | PNG |
 | H3+ demote | 그대로 | 그대로 | demote | 그대로 | 그대로 |
 | `finalize-posts.py` 적용 | 적용 | 적용 | **스킵** (`to-medium.py` 단독 책임) | N/A | N/A |
+
+---
+
+## 9. External Asset URL Policy
+
+외부 발행(Medium, Tistory, Hashnode)에서 이미지를 참조할 때의 규칙이다.
+
+- Canonical source(`ko/*.md`, `en/*.md`)에는 public asset URL을 hardcode하지 않는다.
+- Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
+- `asset_base_url`에는 trailing slash를 넣지 않는다.
+- Base URL 형식: `https://yeongseon-books.github.io/book-public-assets`
+- 최종 이미지 URL 예시: `{asset_base_url}/assets/{series}/{NN}/{file}.png`
+- Medium은 `--asset-mode` 플래그로 `public` (기본) / `inline` (base64) / `local` (상대 경로)을 선택한다.
+- Tistory는 `--local-assets` 플래그로 상대 경로 유지를 선택할 수 있다. 기본은 public URL 재작성.
+- `check_links.py`는 외부 public asset URL을 검증하지 않는다 (로컬 파일 존재 여부만 확인).
 
 ---
 

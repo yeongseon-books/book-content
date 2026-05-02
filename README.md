@@ -1,6 +1,6 @@
 # Book Content
 
-영선북스의 기술서, 웹북, 블로그 시리즈 원고를 하나의 원본 콘텐츠로 관리하고, 여러 발행 채널로 변환하는 저장소입니다.
+블로그 글을 먼저 쓰고, 쌓인 시리즈를 eBook으로 묶는 blog-first / book-later 저장소입니다. 하나의 원본 콘텐츠를 여러 발행 채널로 변환합니다.
 
 > 모든 시리즈가 `content/<series>/` 아래로 이동 완료되었습니다 (Phase 6 완료).
 
@@ -30,6 +30,7 @@
 - [`ROADMAP.md`](./ROADMAP.md) — 개편 로드맵과 진행 상황
 - [`CONTENT_MODEL.md`](./CONTENT_MODEL.md) — 시리즈 카탈로그, front matter, status 체계
 - [`AGENTS.md`](./AGENTS.md) — 에이전트(인간/AI) 운영 규칙
+- [`ASSET_POLICY.md`](./ASSET_POLICY.md) — 공개 이미지 자산 정책 및 dual-repo 구조
 
 ## Quality Gates
 
@@ -56,24 +57,28 @@ python3 .sisyphus/medium/finalize-posts.py
 ## 폴더 구조
 
 ```text
-book-content/
+book-content/                               # private — canonical source
 ├── README.md
 ├── SERIES.md, PUBLISHING.md, STYLE_GUIDE.md, EBOOK.md, ROADMAP.md, AGENTS.md, ARCHITECTURE.md, CONTENT_MODEL.md
+├── ASSET_POLICY.md                         # 공개 이미지 자산 정책
 ├── mkdocs.yml, requirements.txt, requirements-dev.txt
-├── series.yaml                          # 시리즈 카탈로그 단일 출처 (path: 필드로 위치 해석)
+├── series.yaml                             # 시리즈 카탈로그 단일 출처 (path: 필드로 위치 해석)
 ├── content/
 │   └── <series>/
-│       ├── ko/                          # 한국어 원본
-│       ├── en/                          # 영어 번역
-│       └── medium/                      # Medium 브라우저 붙여넣기용 .html (to-medium.py 생성)
-├── docs/                                # MkDocs 웹북 산출물
+│       ├── ko/                             # 한국어 원본
+│       ├── en/                             # 영어 번역
+│       └── medium/                         # Medium 브라우저 붙여넣기용 .html (to-medium.py 생성)
+├── docs/                                   # MkDocs 웹북 산출물
 ├── exports/
-│   ├── tistory/                         # Tistory 붙여넣기용 Markdown
-│   ├── medium/                          # Medium 발행용 HTML 사본
-│   └── ebook-source/                    # private mkdocs-ebook 입력용 source bundle
+│   ├── tistory/                            # Tistory 붙여넣기용 Markdown
+│   ├── medium/                             # Medium 발행용 HTML 사본
+│   └── ebook-source/                       # private mkdocs-ebook 입력용 source bundle
 ├── templates/, scripts/
-├── assets/<series>/<NN>/...             # 이미지 (본문에서 ../../../assets/ 로 참조)
-└── .sisyphus/medium/                    # finalize-posts.py / to-medium.py / _catalog.py
-```
+├── assets/<series>/<NN>/...                # 이미지 (본문에서 ../../../assets/ 로 참조)
+└── .sisyphus/medium/                       # finalize-posts.py / to-medium.py / _catalog.py
+
+book-public-assets/                         # public — GitHub Pages 호스팅
+├── assets/<series>/<NN>/...                # book-content/assets/ 의 미러
+└── index.html                              # GitHub Pages placeholder
 
 자세한 변환 규칙은 [`PUBLISHING.md`](./PUBLISHING.md)를 참조하세요.

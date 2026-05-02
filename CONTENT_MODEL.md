@@ -4,6 +4,21 @@
 
 Root `series.yaml`은 저장소 전체의 시리즈 카탈로그이며 단일 출처(single source of truth)이다.
 
+시리즈 카탈로그 외에 `meta` 블록이 저장소 전역 메타데이터를 정의한다.
+
+### Root `meta` Fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `repo` | string | GitHub 저장소 경로 (`owner/repo`) |
+| `published_ref` | string | 외부 발행물에 사용된 검증된 commit SHA |
+| `validated_ref` | string | 산출물 검증 시점의 commit SHA |
+| `asset_repo` | string | Public 이미지 저장소 경로 (e.g. `yeongseon-books/book-public-assets`) |
+| `asset_base_url` | string | Public 이미지 base URL (trailing slash 없음) |
+| `copyright_holder` | string | 저작권 보유자 |
+| `copyright_year` | string | 저작권 연도 |
+| `license` | string | 콘텐츠 라이선스 (e.g. `CC BY-NC-ND 4.0`) |
+
 정의하는 필드:
 
 - `id`: 시리즈 식별자
@@ -103,3 +118,9 @@ Optional key: `hashnode`
 `series.yaml`의 `meta.validated_ref`는 `published_ref`와 동일한 정책을 따르되, 산출물 검증 시점의 커밋을 기록한다.
 - `published_ref`와 `validated_ref`는 동시에 갱신하는 것이 원칙이다.
 - 검증 없이 커밋 해시만 올리지 않는다.
+
+## Disclosure Policy
+
+본 저장소의 콘텐츠는 AI 도구를 활용하여 작성한다. 최종 검토와 기술적 확인은 저자가 직접 수행한다.
+
+블로그 및 eBook 발행물에 이 사실을 명시할 수 있도록 `templates/copyright-page.md`에 표준 disclosure 문구를 둔다.

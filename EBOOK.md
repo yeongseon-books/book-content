@@ -318,3 +318,20 @@ eBook 파이프라인은 다음 순서로 활성화된다.
 | 모든 ebook-target 시리즈에 front matter 도입 | 완료 (Phase 7b) | 129/129 article |
 | Azure Functions 101 첫 빌드 | 완료 | `exports/ebook-source/azure-functions-101-{ko,en}/` |
 | private mkdocs-ebook 통합 테스트 | 보류 | private repo 접근 환경에서 |
+
+---
+
+## 10. Privacy 및 자산 정책
+
+### 이미지 자산
+
+- eBook source bundle은 self-contained이다. 본문이 참조하는 모든 이미지는 `docs/assets/` 안에 복사되어 있다.
+- eBook 리더가 런타임에 외부 URL에 접근할 필요가 없다.
+- `book-public-assets`의 public URL은 eBook bundle에서 사용하지 않는다 (self-contained 원칙).
+- 상세 정책은 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
+
+### Privacy
+
+- eBook front matter에 저자 연락처를 포함하지 않는다.
+- 스크린샷에 개인 정보(PII)가 노출되지 않도록 주의한다.
+- 외부 트래커나 폼 요소는 EPUB/PDF에 삽입하지 않는다.
