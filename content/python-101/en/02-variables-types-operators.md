@@ -11,7 +11,7 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
+  - variables
   - python-types
   - equality-vs-identity
   - floating-point
@@ -32,7 +32,7 @@ By the end of this chapter you will be able to explain and code the following yo
 - How arithmetic, comparison, logical, and assignment operators behave, including the precedence rules people get wrong
 - The classic traps every beginner hits at least once: `is` versus `==`, floating-point comparison, and mutable defaults
 
-This chapter targets Python 3.12. Every snippet runs in an activated venv, either at the REPL or in a small script.
+This chapter targets Python 3.12. Blocks shown as REPL sessions (with the `>>>` prompt) run line by line in an activated venv. Short snippets without the prompt are illustrative excerpts and assume surrounding names are defined.
 
 ## Why it matters
 
@@ -264,7 +264,7 @@ class Order:
 
 Before moving to the next chapter, walk through these by hand at least once.
 
-- [ ] Ran `a = 1000; b = 1000; print(a == b, a is b)` in the REPL
+- [ ] Ran `a = [1, 2]; b = [1, 2]; print(a == b, a is b)` in the REPL
 - [ ] Confirmed that `0.1 + 0.2` is not equal to `0.3`
 - [ ] Can describe `int`, `float`, `str`, `bool`, and `None` in one sentence each
 - [ ] Understand that type hints do not change runtime behavior
