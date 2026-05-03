@@ -37,7 +37,7 @@ By the end of this chapter you can do the following.
 
 File code touches outside resources. Unlike in-memory variables, a file handle is a limited operating system resource, and many failure modes come along with it. The disk may be full, permissions may be missing, or another process may hold the file open.
 
-Code that ignores these conditions tends to work fine in development and break in production. Forgetting to close a handle leaks file descriptors in long-running servers; swallowing exceptions can leave half-written data behind. Catching every exception with a bare `except:` hides real bugs in plain sight.
+Code that ignores these conditions tends to work fine in development and break in production. Forgetting to close a handle leaks file descriptors in long-running servers; swallowing exceptions can leave half-written data behind. Catching unexpected exceptions with a bare `except:` hides real bugs in plain sight.
 
 The `with` statement and narrow `except` clauses are the simplest tools for avoiding both traps. This chapter shows where each tool fits and how to combine them.
 
@@ -93,7 +93,7 @@ The handle is closed even when an exception is raised inside the block, so resou
 
 - `f.read()` — read the whole file into one string. Fits small files.
 - `f.readline()` — read one line, advance to the next on the next call.
-- `f.readlines()` — read every line into a list at once.
+- `f.readlines()` — read the remaining lines into a list at once.
 - `for line in f:` — iterate one line at a time. Stays small in memory for large files.
 
 For a large log file the last form fits best. For a tiny config file `read()` is the simpler option.
@@ -170,7 +170,7 @@ This snippet has three problems.
 
 - `open()` is used without `with`, so an exception during `read()` can leak the handle.
 - `encoding` is not specified, so the result depends on the platform default.
-- The bare `except:` swallows every exception, so a permission error and a code bug both end up as an empty string.
+- The bare `except:` swallows unexpected exceptions too, so a permission error and a code bug both end up as an empty string.
 
 **After**
 
