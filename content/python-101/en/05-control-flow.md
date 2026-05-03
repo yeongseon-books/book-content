@@ -35,7 +35,7 @@ By the end of this chapter you will be able to explain and code the following:
 
 ## Why it matters
 
-Branching and looping take up more than half of almost any codebase, so when this part is messy nothing else reads well. Python's branching and loop syntax is leaner than most languages, but it adds a few unfamiliar tools — `for`-`else` and comprehensions — that pay off once you know them. With them in your toolbox you stop writing tall `if` ladders, and you can switch between regular loops and comprehensions on purpose.
+Branching and looping make up a large share of application code, so when this part is messy the rest is harder to read. Python's branching and loop syntax is leaner than most languages, but it adds a few unfamiliar tools — `for`-`else` and comprehensions — that pay off once you know them. With them in your toolbox you stop writing tall `if` ladders, and you can switch between regular loops and comprehensions on purpose.
 
 There is a second reason: in Python an `if` does not test "is the value true" but "is the value truthy". `0`, `0.0`, `""`, `[]`, `{}`, and `None` are all falsy. The rule lets you write short, clear conditions, but if you forget it you end up with code that "checks whether a list is empty" yet behaves unexpectedly when the list contains a single zero. This chapter pins down truthy and falsy once.
 
@@ -223,7 +223,7 @@ for name, score in zip(names, scores):
     result.append(f"{name}:{score}")
 ```
 
-Once you can move freely between these two shapes, half of the branching-and-looping code in any project takes care of itself.
+Once you can move freely between these two shapes, branching-and-looping code becomes much easier to read and maintain.
 
 ## Step-by-step practice
 
