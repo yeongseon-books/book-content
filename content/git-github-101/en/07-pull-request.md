@@ -285,7 +285,7 @@ The next article zooms in on something you saw in the PR body: `Closes #42`. Tha
 - [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
 - [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
 - **Collaborating with Pull Requests (current)**
-- Tracking Work with Issues and Projects (upcoming)
+- [Tracking Work with Issues and Projects](./08-issue-and-project.md)
 - Writing Good Commit Messages (upcoming)
 - Real-World Workflow at a Glance (upcoming)
 <!-- toc:end -->

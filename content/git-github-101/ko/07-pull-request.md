@@ -285,7 +285,7 @@ PR은 merge 도구라기보다 의사결정 기록 도구입니다. 실무에서
 - [merge와 conflict 해결하기](./05-merge-and-conflict.md)
 - [GitHub repository 만들기와 remote, push, pull](./06-github-repository.md)
 - **Pull Request로 협업하기 (현재 글)**
-- Issue와 Project로 일감 관리 (예정)
+- [Issue와 Project로 일감 관리하기](./08-issue-and-project.md)
 - 좋은 commit message 쓰기 (예정)
 - 실무 워크플로 한눈에 보기 (예정)
 <!-- toc:end -->
