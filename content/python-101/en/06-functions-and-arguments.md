@@ -295,7 +295,7 @@ When the key function is a single expression, `lambda` is short and clear. Once 
    `def f(items=[]):` builds the list once at definition time and shares it across calls. As calls accumulate, the list grows. If you really want an empty list as the default, write `def f(items=None): items = items if items is not None else []`.
 
 2. **Forgetting `return`.**
-   A function without `return` returns `None`. If `result = compute(...)` always gives you `None`, the body is probably missing `return` somewhere.
+   A function without `return` returns `None`. If `result = compute(...)` keeps coming back as `None`, the body is often missing a `return`.
 
 3. **Mixing positional and keyword arguments and clashing.**
    `f(1, a=2)` raises `TypeError` if the first positional already binds to `a`. Re-check the signature to see which slot maps to which name.

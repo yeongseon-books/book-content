@@ -98,7 +98,7 @@ greet(name="ada", message="hello")  # keyword
 greet("ada", message="hello")       # 혼합 (positional이 keyword 앞)
 ```
 
-혼합할 때는 positional이 항상 keyword 앞에 와야 합니다. 시그니처가 길어질수록 호출부에서 keyword를 쓰는 편이 무엇이 무엇인지 분명해집니다.
+혼합 호출에서는 positional 인자가 keyword 인자보다 먼저 와야 합니다. 시그니처가 길어질수록 호출부에서 keyword를 쓰는 편이 각 값의 의미를 더 분명하게 드러냅니다.
 
 ### 3. default 인자
 
@@ -295,7 +295,7 @@ TypeError: make_url() got some positional-only arguments passed as keyword argum
    `def f(items=[]):`는 정의 시점에 리스트를 한 번 만들고 호출 사이에 공유합니다. 호출이 누적될수록 리스트가 자랍니다. 기본값이 빈 리스트여야 한다면 `def f(items=None): items = items if items is not None else []`로 작성합니다.
 
 2. **`return`을 빠뜨립니다.**
-   `return`이 없는 함수는 `None`을 돌려줍니다. 호출부 `result = compute(...)`에서 `result`가 항상 `None`이라면 함수 본문 끝에 `return`이 빠진 경우가 많습니다.
+   `return`이 없는 함수는 `None`을 돌려줍니다. 호출부 `result = compute(...)`에서 `result`가 계속 `None`이라면 함수 본문 끝에 `return`이 빠졌는지 먼저 확인합니다.
 
 3. **positional과 keyword를 섞어 호출하다 충돌.**
    `f(1, a=2)`처럼 첫 positional이 이미 `a`에 묶이는데 다시 `a=2`를 주면 `TypeError`가 납니다. 시그니처를 다시 보고 어느 자리가 어떤 이름인지 확인합니다.
@@ -340,12 +340,12 @@ def with_logging(fn):
 
 ## 체크리스트
 
-- [ ] `def`로 함수를 만들고 `return` 값과 부수효과를 구분해서 설명할 수 있다.
-- [ ] positional, keyword, default, `*args`, `**kwargs` 다섯 가지 인자 형태를 시그니처에 섞어 쓸 수 있다.
-- [ ] mutable 기본값 함정을 한 줄로 설명하고 안전한 패턴을 쓸 수 있다.
-- [ ] `/`와 `*` 구분자로 positional-only / keyword-only를 강제해 보았다.
-- [ ] `lambda`가 적합한 자리와 그렇지 않은 자리를 한 가지씩 들 수 있다.
-- [ ] 함수 시그니처에 가벼운 type hint를 붙여 보았다.
+- [ ] `def`로 함수를 만들고 `return` 값과 부수효과를 구분해서 설명할 수 있습니다.
+- [ ] positional, keyword, default, `*args`, `**kwargs` 다섯 가지 인자 형태를 시그니처에 섞어 쓸 수 있습니다.
+- [ ] mutable 기본값 함정을 한 줄로 설명하고 안전한 패턴을 쓸 수 있습니다.
+- [ ] `/`와 `*` 구분자로 positional-only / keyword-only를 강제할 수 있습니다.
+- [ ] `lambda`가 적합한 자리와 그렇지 않은 자리를 한 가지씩 들 수 있습니다.
+- [ ] 함수 시그니처에 가벼운 type hint를 붙일 수 있습니다.
 
 ## 연습 문제
 
