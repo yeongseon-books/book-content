@@ -171,7 +171,7 @@ False
 True
 ```
 
-For computed float results, use `math.isclose` when tolerance matters, or switch to `Decimal` when exactness matters. Comparisons against exactly representable constants such as `0.0` or `float('inf')` are safe with `==`.
+For computed float results, use `math.isclose` when tolerance matters, or switch to `Decimal` when exactness matters. Even if the constant itself is exactly representable, equality can still fail when the other side is a computed float, so do not generalize this into a rule.
 
 ### 3) Type conversion
 
