@@ -327,7 +327,7 @@ The leading empty string means "the current working directory," which is why `im
    `python pay/cli.py` does not treat `cli.py` as part of a package, so `from .db import ...` fails. Use `python -m pay.cli` instead, or keep the entry point outside the package.
 
 4. **Doing heavy work at module top level.**
-   If a single import triggers a network call or a large file load, every importer pays that cost. Move heavy work into functions and call them when needed.
+   If a single import triggers a network call or a large file load, that cost shows up as soon as the module is imported. Move heavy work into functions and call them when needed.
 
 5. **Circular imports.**
    If `a.py` imports `b` and `b.py` imports `a`, one side sees the other half-built. Pull the shared dependency into a third module, or move the import inside a function to break the cycle.
@@ -345,7 +345,7 @@ Real projects use modules and packages roughly like this.
 - **Tests**: importing modules individually lets `pytest` pick out specific functions. A monolithic file forces tests to drag everything in.
 - **Config split**: environment-specific settings live in their own modules (`config_dev.py`, `config_prod.py`) and the entry point picks one.
 
-This shape barely changes as the project grows. You can start with a single `myapp/__init__.py` and add subpackages later without rewriting anything.
+This shape often stays similar as a project grows. You can start with a single `myapp/__init__.py` and add subpackages later as needed.
 
 ## Checklist
 
