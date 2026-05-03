@@ -48,6 +48,30 @@ series:
   level: 101
   lifecycle: active
   path: content/harness-engineering-101
+- id: ai-evaluation-101
+  category: ai
+  title:
+    ko: AI Evaluation 101
+    en: AI Evaluation 101
+  description:
+    ko: LLM 애플리케이션을 정량적으로 평가하는 방법을 배우는 입문 시리즈. 평가 데이터셋 설계, 자동 채점, LLM-as-judge, 회귀 테스트, A/B 비교, 운영 평가까지 다룹니다.
+    en: A beginner-friendly guide to quantitatively evaluating LLM applications, covering dataset design, automated scoring, LLM-as-judge, regression testing, A/B comparison, and production evaluation.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: draft
+  tags:
+    - AI Evaluation
+    - LLM
+    - Testing
+    - Quality
+  path: content/ai-evaluation-101
 - id: azure-app-service-101
   category: azure
   title:
