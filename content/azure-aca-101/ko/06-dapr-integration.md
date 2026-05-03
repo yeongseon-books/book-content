@@ -12,8 +12,10 @@ targets:
 tags:
 - Azure
 - Container Apps
-- Serverless
-- Containers
+- Dapr
+- Sidecar
+- Pub-Sub
+- Service Invocation
 last_reviewed: '2026-04-29'
 ---
 
@@ -21,70 +23,211 @@ last_reviewed: '2026-04-29'
 
 > Azure Container Apps 101 시리즈 (6/7)
 
-이번 글은 Dapr 사이드카가 어디에 붙고 무엇을 단순하게 만드는지 설명합니다. Service invocation, Pub/Sub, state store, secret store가 반복해서 등장하지만, 실무에서 더 중요한 포인트는 범위입니다. 앱 수준 설정과 Environment 수준 컴포넌트 구성이 어디서 갈리는지 알아야 Dapr를 안전하게 붙일 수 있습니다.
+## 이 글에서 배울 것
 
----
+- Dapr가 무엇이고 ACA의 어느 위치에 사이드카로 붙는지 이해합니다.
+- App 수준 설정과 Environment 수준 component의 분리를 구분할 수 있습니다.
+- Service invocation, Pub/Sub, State store, Secret store 네 가지 building block의 역할을 설명할 수 있습니다.
+- `--enable-dapr` 플래그와 component YAML로 실제 Dapr 통합을 구성할 수 있습니다.
 
-## Dapr가 붙는 위치
+## 왜 중요한가
 
-앱 옆에 사이드카가 붙고.
-Environment 수준 컴포넌트와 외부 서비스를 중개합니다.
+마이크로서비스를 만들면 똑같은 문제가 반복됩니다.
+서비스 A가 서비스 B를 호출하려면 service discovery가 필요하고, 둘 사이에 메시지를 주고받으려면 메시지 브로커 SDK를 골라야 하고, 상태를 저장하려면 Redis나 Cosmos DB SDK를 직접 다뤄야 합니다.
+**Dapr는 이 네 가지 문제를 표준 HTTP/gRPC API로 추상화합니다.** 앱은 `localhost:3500`의 Dapr 사이드카에 요청을 보내고, 사이드카가 실제 backend(Service Bus, Redis, Key Vault 등)와 통신합니다.
+
+ACA에서 Dapr가 특히 매력적인 이유는 **runtime 설치가 0**이기 때문입니다.
+Kubernetes에서 Dapr를 쓰려면 Helm chart를 설치하고 control plane을 운영해야 하지만, ACA는 control plane을 플랫폼이 직접 관리합니다.
+앱에서 `--enable-dapr true` 한 줄이면 사이드카가 자동으로 주입됩니다.
+
+## Mental Model
+
+Dapr를 두 개의 "수준"으로 보면 단순해집니다.
+
+1. **App 수준** — 이 앱이 Dapr를 쓰는가? `app-id`는 무엇인가? 앱이 듣는 포트는?
+2. **Environment 수준** — 이 ACA Environment가 어떤 component를 제공하는가? Service Bus를 pubsub으로 쓸 것인가, Redis를 state store로 쓸 것인가?
+
+App 수준은 **개별 앱의 옵트인**, Environment 수준은 **공유 인프라 카탈로그**입니다.
+component 하나를 Environment에 등록하면, 같은 Environment의 여러 앱이 scope 설정으로 그 component를 공유합니다.
 
 ![앱 옆 Dapr 사이드카와 외부 서비스 연결 구조](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
----
 
-## enable 명령
+## 핵심 개념
 
-```bash
-az containerapp create   --name api-app   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --ingress external   --target-port 8000   --enable-dapr true   --dapr-app-id api-app   --dapr-app-port 8000
+### 1. 사이드카 모델
 
-az containerapp dapr enable   --name api-app   --resource-group $RG   --dapr-app-id api-app   --dapr-app-port 8000
+`--enable-dapr true`를 주면 ACA가 앱 컨테이너 옆에 `daprd` 사이드카를 함께 띄웁니다.
+앱은 자기 비즈니스 로직만 작성하고, 외부 시스템과의 통신은 사이드카에 위임합니다.
+
+```
+┌─────────────────────────────────────┐
+│  Container App: api-app             │
+│  ┌──────────────┐  ┌─────────────┐  │
+│  │ Your code    │  │ Dapr        │  │
+│  │ FastAPI      │◄─┤ sidecar     │──┼──► Service Bus
+│  │ :8000        │  │ :3500       │  │    Redis
+│  └──────────────┘  └─────────────┘  │    Key Vault
+└─────────────────────────────────────┘
 ```
 
----
+### 2. 네 가지 핵심 building block
 
-## App 수준과 Environment 수준
+| Building block | 역할 | ACA 대표 backend |
+| --- | --- | --- |
+| **Service invocation** | 앱 간 호출 (service discovery + retry + mTLS) | 다른 Container App (`app-id` 기반) |
+| **Pub/Sub** | 메시지 발행·구독 | Azure Service Bus, Event Hubs, Kafka |
+| **State store** | key-value 상태 저장 | Cosmos DB, Redis, PostgreSQL |
+| **Secret store** | secret 조회 추상화 | Azure Key Vault, ACA secrets |
 
-- App 수준 — enable 여부, app id, app port
-- Environment 수준 — component 정의와 scope
+### 3. Component와 scope
 
----
+Component YAML은 "이 backend를 어떤 이름으로 사용할지" 정의합니다.
+`scopes:` 필드로 어떤 `app-id`가 그 component에 접근할지 명시적으로 제한합니다.
+scope를 비우면 같은 Environment의 모든 앱이 사용 가능합니다 — 운영에서는 항상 명시하는 편이 안전합니다.
 
-## 대표 building blocks
+## Before-After
 
-- Service invocation
-- Pub/Sub
-- State store
-- Secret store
+### Before (Dapr 없이 직접 SDK 사용)
 
----
+```python
+# Service Bus SDK 직접 사용
+from azure.servicebus import ServiceBusClient, ServiceBusMessage
 
-## component 스케치 — 읽기용 예시, 그대로 적용하는 파일은 아님
+connection_str = os.environ["SERVICE_BUS_CONNECTION_STRING"]
+with ServiceBusClient.from_connection_string(connection_str) as client:
+    sender = client.get_queue_sender(queue_name="orders")
+    sender.send_messages(ServiceBusMessage("order-123"))
+```
+
+backend가 바뀌면(Service Bus → Kafka) SDK, 의존성, 코드를 모두 교체해야 합니다.
+
+### After (Dapr Pub/Sub API)
+
+```python
+import requests
+
+requests.post(
+    "http://localhost:3500/v1.0/publish/orderpubsub/orders",
+    json={"orderId": "order-123"}
+)
+```
+
+backend가 바뀌어도 코드는 그대로입니다. component YAML만 교체하면 됩니다.
+
+## 단계별 실습
+
+### Step 1: 앱에 Dapr 활성화
+
+```bash
+RG=rg-aca-demo
+ACA_ENV=aca-env-demo
+IMAGE=myacr.azurecr.io/api-app:latest
+
+az containerapp create \
+  --name api-app --resource-group $RG --environment $ACA_ENV \
+  --image $IMAGE --ingress external --target-port 8000 \
+  --enable-dapr true \
+  --dapr-app-id api-app \
+  --dapr-app-port 8000
+```
+
+이미 만든 앱이라면:
+
+```bash
+az containerapp dapr enable \
+  --name api-app --resource-group $RG \
+  --dapr-app-id api-app --dapr-app-port 8000
+```
+
+### Step 2: Pub/Sub component 등록 (Service Bus)
+
+`pubsub.yaml`:
 
 ```yaml
-componentType: pubsub.azure.servicebus.queue
+componentType: pubsub.azure.servicebus.queues
 version: v1
 metadata:
   - name: namespaceName
     value: mybus.servicebus.windows.net
-  - name: queueName
-    value: orders
   - name: connectionString
     secretRef: servicebus-connection-string
+secrets:
+  - name: servicebus-connection-string
+    value: "<SERVICE_BUS_CONNECTION_STRING>"
 scopes:
-  - publisher-app
-  - subscriber-app
+  - api-app
+  - worker-app
 ```
 
-이 예시는 구조를 읽기 위한 스케치입니다. 실제로 동작하게 하려면 Environment 수준 secret가 먼저 있어야 하고, 인증 방식도 connection string, managed identity 등 어떤 경로를 택할지 함께 정해야 합니다.
+```bash
+az containerapp env dapr-component set \
+  --name $ACA_ENV --resource-group $RG \
+  --dapr-component-name orderpubsub \
+  --yaml pubsub.yaml
+```
 
----
+### Step 3: 앱에서 호출
 
-## 운영에서 기억할 점
+```python
+import requests
 
-- 앱에서 Dapr를 켜는 일과 Environment에 component를 정의하는 일은 다른 결정입니다.
-- 인증 연결이 빠진 component YAML은 배포 계획이 아니라 구조 설명에 가깝습니다.
-- Dapr가 보일러플레이트를 줄여 주더라도 scope, retry, 실패 처리 정책까지 대신 정해 주지는 않습니다.
+# 발행
+requests.post(
+    "http://localhost:3500/v1.0/publish/orderpubsub/orders",
+    json={"orderId": "order-123"}
+)
+
+# 다른 앱 호출 (service invocation)
+requests.post(
+    "http://localhost:3500/v1.0/invoke/worker-app/method/process",
+    json={"orderId": "order-123"}
+)
+```
+
+## 자주 하는 실수
+
+- **App 수준 enable과 Environment 수준 component를 혼동** — 앱에서 `--enable-dapr`만 켜고 component를 등록하지 않으면 사이드카는 떠도 publish가 실패합니다.
+- **Scope 미지정** — 모든 앱이 모든 component에 접근 가능해져 보안 경계가 무너집니다.
+- **Secret을 inline value로 작성** — component YAML에 connection string을 평문으로 넣지 말고 `secretRef`와 `secrets:` 블록 또는 Key Vault secret store를 사용해야 합니다.
+- **`dapr-app-port` 누락** — service invocation이 들어와도 사이드카가 어느 포트로 forwarding할지 몰라 502가 발생합니다.
+- **HTTP API와 gRPC API 혼용 후 디버깅 혼선** — Dapr는 둘 다 지원하지만, 한 앱에서는 한 가지를 선택하는 편이 트러블슈팅에 유리합니다.
+
+## 실무에서
+
+언제 Dapr를 쓰고, 언제 쓰지 말까:
+
+- **쓸 만한 경우**: 마이크로서비스 3개 이상, pub/sub과 service invocation을 모두 사용, backend를 추후 교체할 가능성이 있는 경우.
+- **굳이 쓰지 않아도 되는 경우**: 단일 모놀리식 API + DB 한 개. SDK 호출이 한두 줄이면 추상화 레이어가 오히려 복잡도를 더합니다.
+- **production checklist**: managed identity 기반 인증으로 전환, scope 명시, retry policy 설정, Application Insights에 Dapr telemetry 연동.
+
+ACA의 Dapr 버전은 플랫폼이 관리하므로, breaking change가 있는 major upgrade는 release notes를 확인해야 합니다.
+
+## 체크리스트
+
+- [ ] `--enable-dapr true`와 `--dapr-app-id`, `--dapr-app-port`를 모두 설정했는가?
+- [ ] component YAML이 Environment에 등록되었는가?
+- [ ] `scopes:`로 접근 가능한 app-id를 명시했는가?
+- [ ] Secret이 inline value가 아니라 `secretRef` 또는 Key Vault로 관리되는가?
+- [ ] Service invocation과 Pub/Sub 호출 경로가 Application Insights에서 추적 가능한가?
+- [ ] 단일 앱 시나리오라면 Dapr가 정말 필요한지 재검토했는가?
+
+## 연습 문제
+
+1. 같은 Environment에 두 개의 앱(`api-app`, `worker-app`)이 있고, `api-app`만 Service Bus pubsub component를 사용해야 합니다. component YAML의 `scopes:`를 어떻게 작성하시겠습니까?
+2. Dapr service invocation과 직접 HTTP 호출(앱 FQDN으로 호출)의 차이점 세 가지를 나열하세요.
+3. State store backend를 Redis에서 Cosmos DB로 바꾸려고 합니다. 앱 코드는 얼마나 바뀌어야 하나요? 이유는?
+
+## 정리·다음 글
+
+이번 글의 핵심:
+
+- Dapr는 사이드카로 동작하며, 분산 시스템 building block을 표준 API로 추상화합니다.
+- App 수준 설정(enable, app-id)과 Environment 수준 component 정의는 다른 결정입니다.
+- 네 가지 핵심 building block: Service invocation, Pub/Sub, State store, Secret store.
+- Scope, secret 관리, retry policy는 Dapr가 자동으로 정해 주지 않으므로 명시적으로 설계해야 합니다.
+
+다음 글에서는 시리즈 마지막 주제 **모니터링과 운영**을 다룹니다.
+Log Analytics와 Application Insights를 ACA에 연결해 로그·메트릭·trace를 수집하고, 운영 알림을 구성하는 방법을 보여드립니다.
 
 ---
 
@@ -116,4 +259,4 @@ scopes:
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Serverless, Containers
+Tags: Azure, Container Apps, Dapr, Sidecar, Pub-Sub, Service Invocation
