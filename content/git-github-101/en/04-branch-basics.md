@@ -195,7 +195,7 @@ e7d2c1a Add author line to README
 4f1a2c0 Initial commit
 ```
 
-Switch back to `main` and the new file disappears (more precisely, `main` does not have that commit at all).
+Switch back to `main` and the new file disappears (more precisely, that commit is not on `main`).
 
 ```text
 $ git switch main
