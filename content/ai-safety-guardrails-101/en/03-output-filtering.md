@@ -3,7 +3,7 @@ title: Output Filtering and Content Moderation
 series: ai-safety-guardrails-101
 episode: 3
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

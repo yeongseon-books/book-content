@@ -3,7 +3,7 @@ title: Rate Limiting과 남용 방지
 series: ai-safety-guardrails-101
 episode: 8
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

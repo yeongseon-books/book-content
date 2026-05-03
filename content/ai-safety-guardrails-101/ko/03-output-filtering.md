@@ -3,7 +3,7 @@ title: 출력 필터링과 콘텐츠 모더레이션
 series: ai-safety-guardrails-101
 episode: 3
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

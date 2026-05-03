@@ -3,7 +3,7 @@ title: Why AI Safety Matters
 series: ai-safety-guardrails-101
 episode: 1
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

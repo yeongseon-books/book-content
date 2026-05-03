@@ -3,7 +3,7 @@ title: Hallucination Guardrail — Grounding 검증
 series: ai-safety-guardrails-101
 episode: 7
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

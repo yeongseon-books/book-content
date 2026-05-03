@@ -3,7 +3,7 @@ title: Audit Logging and Compliance
 series: ai-safety-guardrails-101
 episode: 9
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

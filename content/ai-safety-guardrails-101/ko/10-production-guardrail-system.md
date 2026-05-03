@@ -3,7 +3,7 @@ title: 운영 가드레일 시스템 구축
 series: ai-safety-guardrails-101
 episode: 10
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

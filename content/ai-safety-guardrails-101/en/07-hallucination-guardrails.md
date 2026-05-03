@@ -3,7 +3,7 @@ title: Hallucination Guardrails — Grounding Checks
 series: ai-safety-guardrails-101
 episode: 7
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

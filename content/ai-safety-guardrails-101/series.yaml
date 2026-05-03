@@ -15,7 +15,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: content-ready
 tags:
   - AI Safety
   - Guardrails
@@ -24,31 +24,31 @@ tags:
 articles:
 - idx: 1
   slug: 01-why-ai-safety-matters
-  status: draft
+  status: content-ready
 - idx: 2
   slug: 02-prompt-injection-defense
-  status: draft
+  status: content-ready
 - idx: 3
   slug: 03-output-filtering
-  status: draft
+  status: content-ready
 - idx: 4
   slug: 04-pii-detection-redaction
-  status: draft
+  status: content-ready
 - idx: 5
   slug: 05-jailbreak-detection
-  status: draft
+  status: content-ready
 - idx: 6
   slug: 06-toxicity-bias-detection
-  status: draft
+  status: content-ready
 - idx: 7
   slug: 07-hallucination-guardrails
-  status: draft
+  status: content-ready
 - idx: 8
   slug: 08-rate-limiting-abuse-prevention
-  status: draft
+  status: content-ready
 - idx: 9
   slug: 09-audit-logging-compliance
-  status: draft
+  status: content-ready
 - idx: 10
   slug: 10-production-guardrail-system
-  status: draft
+  status: content-ready

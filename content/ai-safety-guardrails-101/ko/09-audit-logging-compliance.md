@@ -3,7 +3,7 @@ title: 감사 로깅과 컴플라이언스
 series: ai-safety-guardrails-101
 episode: 9
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

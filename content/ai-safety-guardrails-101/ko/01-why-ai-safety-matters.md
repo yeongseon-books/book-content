@@ -3,7 +3,7 @@ title: AI Safety가 왜 중요한가
 series: ai-safety-guardrails-101
 episode: 1
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

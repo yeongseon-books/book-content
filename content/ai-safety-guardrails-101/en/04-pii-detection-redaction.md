@@ -3,7 +3,7 @@ title: PII Detection and Redaction
 series: ai-safety-guardrails-101
 episode: 4
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

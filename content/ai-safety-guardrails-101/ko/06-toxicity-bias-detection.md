@@ -3,7 +3,7 @@ title: 독성과 편향 탐지
 series: ai-safety-guardrails-101
 episode: 6
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

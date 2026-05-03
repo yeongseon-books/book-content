@@ -3,7 +3,7 @@ title: Building a Production Guardrail System
 series: ai-safety-guardrails-101
 episode: 10
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

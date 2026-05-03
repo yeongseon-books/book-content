@@ -89,7 +89,7 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  status: draft
+  status: content-ready
   tags:
     - AI Safety
     - Guardrails

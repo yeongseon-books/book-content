@@ -3,7 +3,7 @@ title: PII 감지와 마스킹
 series: ai-safety-guardrails-101
 episode: 4
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true
