@@ -168,7 +168,7 @@ class User:
     email: str
 ```
 
-This block produces the same `__init__`, `__repr__`, and `__eq__` as the hand-written version above. Add methods directly when you need extra behavior.
+This block generates field-based `__init__`, `__eq__`, and a default `__repr__` automatically. Its default `__repr__` includes field names, such as `User(name='Ada', email='a@x')`, so it is not identical to the hand-written example above.
 
 ## Before-After
 
@@ -285,12 +285,19 @@ False
 ### 5. Inheritance with `super()`
 
 ```text
+>>> class User:
+...     def __init__(self, name, email):
+...         self.name = name
+...         self.email = email
+...     def label(self):
+...         return f"{self.name} <{self.email}>"
+...
 >>> class Member(User):
 ...     def label(self):
-...         return f"[member] {super().__repr__()}"
+...         return f"[member] {super().label()}"
 ...
 >>> Member("Ada", "a@x").label()
-"[member] User('Ada', 'a@x')"
+'[member] Ada <a@x>'
 ```
 
 ### 6. Compress with `@dataclass`

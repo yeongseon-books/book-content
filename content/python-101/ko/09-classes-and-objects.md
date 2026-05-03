@@ -168,7 +168,7 @@ class User:
     email: str
 ```
 
-이 한 블록은 위에서 손으로 작성한 `__init__`, `__repr__`, `__eq__`와 같은 결과를 줍니다. 동작이 더 필요한 경우에는 그냥 메서드를 추가로 정의하면 됩니다.
+이 한 블록은 필드 기반의 `__init__`, `__eq__`, 그리고 기본 `__repr__`를 자동으로 만듭니다. 다만 기본 `__repr__` 형식은 `User(name='Ada', email='a@x')`처럼 필드 이름을 포함하므로, 앞의 손작성 예시와 완전히 같지는 않습니다.
 
 ## Before-After
 
@@ -285,12 +285,19 @@ False
 ### 5. 상속과 `super()`
 
 ```text
+>>> class User:
+...     def __init__(self, name, email):
+...         self.name = name
+...         self.email = email
+...     def label(self):
+...         return f"{self.name} <{self.email}>"
+...
 >>> class Member(User):
 ...     def label(self):
-...         return f"[member] {super().__repr__()}"
+...         return f"[member] {super().label()}"
 ...
 >>> Member("Ada", "a@x").label()
-"[member] User('Ada', 'a@x')"
+'[member] Ada <a@x>'
 ```
 
 ### 6. `@dataclass`로 줄이기
