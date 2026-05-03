@@ -334,7 +334,7 @@ Deleted branch feature/sign-up (was f1e2d3c).
 - [첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
 - [변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
 - **branch 기초 - 만들고 옮기고 비교하기 (현재 글)**
-- merge와 conflict 해결하기 (예정)
+- [merge와 conflict 해결하기 - 두 줄기를 다시 합치기](./05-merge-and-conflict.md)
 - GitHub 저장소와 remote 연결 (예정)
 - Pull Request로 협업하기 (예정)
 - Issue와 Project로 일감 관리 (예정)

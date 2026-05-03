@@ -372,8 +372,8 @@ The next post moves into branches: how to start a parallel line of work in the s
 - [What is Git? - foundations of distributed version control](./01-what-is-git.md)
 - [Your first commit - init, status, add, commit](./02-first-commit.md)
 - **Reading change history - status, diff, log (current)**
-- Branch basics - create, switch, and combine (upcoming)
-- Merge and conflict resolution (upcoming)
+- [Branch Basics - Create, Switch, Compare](./04-branch-basics.md)
+- [Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
 - Connecting GitHub repositories and remotes (upcoming)
 - Collaborating with Pull Requests (upcoming)
 - Tracking work with Issues and Projects (upcoming)

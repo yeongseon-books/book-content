@@ -258,9 +258,9 @@ The next post takes a closer look at `git status` output and uses `git diff` and
 
 - [What is Git? - foundations of distributed version control](./01-what-is-git.md)
 - **Your first commit - init, status, add, commit (current)**
-- Reading change history with status, diff, and log (upcoming)
-- Branch basics - create, switch, and combine (upcoming)
-- Merge and conflict resolution (upcoming)
+- [Tracking Changes - Reading status, diff, and log](./03-status-diff-log.md)
+- [Branch Basics - Create, Switch, Compare](./04-branch-basics.md)
+- [Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
 - Connecting GitHub repositories and remotes (upcoming)
 - Collaborating with Pull Requests (upcoming)
 - Tracking work with Issues and Projects (upcoming)

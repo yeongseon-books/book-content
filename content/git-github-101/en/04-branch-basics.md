@@ -334,7 +334,7 @@ The next article picks up from a diverged history and walks through `git merge`,
 - [Make your first commit - init, status, add, commit](./02-first-commit.md)
 - [Reading change history - status, diff, log](./03-status-diff-log.md)
 - **Branch basics - create, switch, and compare (current)**
-- Merge and resolving conflicts (upcoming)
+- [Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
 - GitHub repositories and remote connections (upcoming)
 - Collaborating with Pull Requests (upcoming)
 - Managing work with Issues and Projects (upcoming)
