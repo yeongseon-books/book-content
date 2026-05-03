@@ -1,0 +1,73 @@
+---
+title: Approval Gates — Designing Where Humans Must Approve
+series: harness-engineering-101
+episode: 8
+language: en
+status: draft
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- AI Agent
+- Harness
+- Reliability
+- Production
+last_reviewed: '2026-05-03'
+---
+
+# Approval Gates — Designing Where Humans Must Approve
+
+> Harness Engineering 101 Series (8/10)
+
+Some actions must never run automatically. Payments, deploys, deletes, and outbound messages need human approval. An Approval Gate makes the place where a human must stop and review explicit.
+
+---
+
+## Section 1
+
+[TBD placeholder]
+
+## Section 2
+
+[TBD placeholder]
+
+## Section 3
+
+[TBD placeholder]
+
+## Section 4
+
+[TBD placeholder]
+
+---
+
+## Key Takeaways
+
+- Key takeaway 1
+- Key takeaway 2
+- Key takeaway 3
+
+---
+
+<!-- toc:begin -->
+## Harness Engineering 101 Series
+
+- What Is Harness Engineering? (upcoming)
+- Task Harness — Turning Vague Work into Executable Tasks (upcoming)
+- Context Harness — Designing What the Agent Should Know and Not Know (upcoming)
+- Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
+- Tool Harness — Designing Safe Tools for Agents (upcoming)
+- Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- **Approval Gates — Designing Where Humans Must Approve (current)**
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+<!-- toc:end -->
+
+## References
+
+- [TBD]
+
+Tags: AI Agent, Harness, Reliability, Production

@@ -28,6 +28,26 @@ series:
   level: 101
   lifecycle: active
   path: content/ai-agent-101
+- id: harness-engineering-101
+  category: ai
+  title:
+    ko: Harness Engineering 101
+    en: Harness Engineering 101
+  description:
+    ko: AI Agent가 안정적으로 작업하도록 task, context, constraint, tool, test, feedback, approval, observability, production harness를 설계하는 입문 시리즈.
+    en: A beginner-friendly guide to designing task, context, constraint, tool, test, feedback, approval, observability, and production harnesses for reliable AI agents.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/harness-engineering-101
 - id: azure-app-service-101
   category: azure
   title:
