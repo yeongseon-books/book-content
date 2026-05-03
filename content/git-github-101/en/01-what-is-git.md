@@ -40,7 +40,7 @@ Even when you write code alone, given enough time you hit situations like these.
 
 Git lets you answer those questions. You can pull back any past version of your code and see who changed what and when. Add collaboration, and the value grows further: multiple people can edit the same file and only the conflicting spots need human attention.
 
-Today most companies and open-source projects treat Git as a standard tool. Learning it is less a "nice to have" and more a shared language for collaboration.
+Many teams and open-source projects treat Git as a standard tool. Learning it is less a "nice to have" and more a shared language for collaboration.
 
 ## Mental model
 
@@ -58,14 +58,14 @@ Git distinguishes three areas.
 
 - **Working Directory**: where the files you are editing live.
 - **Staging Area** (a.k.a. the index): a buffer where you collect the changes that will go into the next commit.
-- **Repository**: the store of commits over time. It is split into local and remote.
+- **Repository**: the local store of commits over time. A remote repository is a separate repository you sync with; it sits outside these three local areas.
 
 Once you internalize this model, the reason `add`, `commit`, and `push` are separate commands becomes natural.
 
 ## Core concepts
 
 - **Version Control System (VCS)**: A tool that records and recovers changes to files over time.
-- **Distributed VCS**: A model where each developer's local repository contains the full history. Git is the canonical example. Work continues even when the central server is briefly unreachable.
+- **Distributed VCS**: A model where a normal clone gives the local repository the full history. Git is the canonical example. Work continues even when the central server is briefly unreachable.
 - **Snapshot model**: Git stores a snapshot of the tracked files at commit time, not just the changed lines (internally, identical files are reused to save space).
 - **Commit**: The unit of change. It records a message, an author, a timestamp, and the parent commit.
 - **Branch**: A movable pointer to a commit. Creating a branch does not copy files.
@@ -156,14 +156,16 @@ init.defaultBranch=main
 
 ### 5. Use the help system
 
-When you forget how a command works, two patterns cover most cases.
+When you forget how a command works, three patterns cover most cases.
 
 ```text
-$ git help commit       # full manual (browser or man page)
-$ git commit -h         # one-screen option summary
+$ git help                # list of common Git commands
+$ git help commit         # full manual (browser or man page)
+$ git commit --help       # same manual as `git help commit`
+$ git commit -h           # one-screen option summary (short usage)
 ```
 
-The lower-case `-h` flag is handy when an option name is on the tip of your tongue.
+`git help <cmd>` and `git <cmd> --help` open the same full manual. The lower-case `-h` flag is the short usage summary, handy when an option name is on the tip of your tongue.
 
 ## Common mistakes
 
@@ -193,14 +195,14 @@ When you are first learning Git, the most useful exercise is not memorizing comm
 - [ ] `git config --global init.defaultBranch` is set (e.g. to `main`).
 - [ ] You can describe Working Directory, Staging Area, and Repository in one sentence each.
 - [ ] You can describe the relationship between `git` and GitHub in one sentence.
-- [ ] You know the difference between `git help <command>` and `git <command> -h`.
+- [ ] You know the difference between `git help <command>`, `git <command> --help`, and `git <command> -h`.
 
 ## Exercises
 
 1. Install Git on your OS and write down what `git --version` prints.
 2. Set `git config --global user.name` and `user.email`, then confirm with `git config --global --list`.
 3. Set `git config --global init.defaultBranch main`, then run `git init` in a fresh directory and verify the default branch is `main`.
-4. Run `git help commit` and `git commit -h` and compare how the two outputs differ.
+4. Run `git help commit`, `git commit --help`, and `git commit -h` and compare how the three outputs differ.
 5. Define "Working Directory", "Staging Area", and "Repository" in your own words, one sentence each.
 
 ## Wrap-up and next post
