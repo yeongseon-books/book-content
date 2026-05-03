@@ -11,72 +11,199 @@ targets:
   ebook: true
 tags:
 - RAG
-- VectorDB
-- Benchmarking
+- RAGAS
+- Faithfulness
+- AnswerRelevancy
 - LLM
+- Evaluation
 last_reviewed: '2026-05-01'
 ---
 
 # End-to-end RAG pipeline evaluation
 
 ## Questions this post answers
-- How do you calculate faithfulness and answer_relevancy in ragas 0.1.22?
-- How do you connect LangChain models to the RAGAS wrappers?
-- What dataset shape is required when you evaluate final answers instead of retrieval?
-
-> End-to-end evaluation is not “does the answer feel okay”; it is “is the answer grounded in context and directly relevant to the question.”
-
-The fifth post adds RAGAS to score generation quality. The crucial detail is using the real API that works with ragas 0.1.22. The example uses `Faithfulness()` and `AnswerRelevancy(strictness=1)`, with `LangchainLLMWrapper` and `LangchainEmbeddingsWrapper` connecting Groq and sentence-transformers.
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
-## Minimal runnable example
 
-### Dataset structure for end-to-end evaluation
+- How do you actually compute `Faithfulness` and `AnswerRelevancy` with ragas 0.1.22?
+- How do you wire a LangChain LLM and embedding model into the RAGAS evaluator?
+- What dataset shape do you need when measuring **answer quality**, not retrieval?
+- How do you separate retrieval failures from generation failures?
 
-![Dataset structure for end-to-end evaluation](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
-The runnable code lives in `rag-benchmark-101/en/05-e2e-evaluation/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
+> End-to-end evaluation is not "does the answer look right?". It is a structured score for **whether the answer is grounded in the context and actually addresses the question**.
 
-```bash
-cd /root/Github/rag-benchmark-101/en/05-e2e-evaluation
-export GROQ_API_KEY=... && python3 main.py
+## Why this matters
+
+Everything we measured in Episodes 2–4 was the quality of retrieval. What the user sees is the LLM's final answer. Perfect retrieval still hallucinates if the LLM ignores the context. A great LLM still produces bad answers when retrieval grabbed the wrong documents.
+
+So a RAG system in production has to measure both layers.
+
+- **Retrieval metrics**: hit rate, MRR, recall — "did we get the right documents?"
+- **Generation metrics**: faithfulness, answer relevancy — "is the answer grounded in those documents and does it address the question?"
+
+This post builds the second axis. The main tool is [RAGAS](https://docs.ragas.io/), which uses an LLM as a judge to score answer faithfulness and relevancy.
+
+## Mental model
+
+The data flow of an end-to-end evaluation:
+
+```
+question  ──►  retriever  ──►  contexts (List[str])
+                                    │
+question + contexts  ──►  LLM  ──►  answer
+                                    │
+question + contexts + answer  ──►  RAGAS metrics
+                                    │
+                                    ▼
+                          {faithfulness, answer_relevancy}
 ```
 
+A row in the evaluation dataset is a `(question, contexts, answer)` tuple. With ground truth you can add metrics like `context_precision` and `context_recall`.
+
+RAGAS internally calls an LLM again to compute scores, so evaluation itself costs LLM tokens and latency.
+
+## Core concepts
+
+| Metric | What it measures | Needs ground truth? |
+| --- | --- | --- |
+| Faithfulness | Are all claims in the answer derivable from the context? | No |
+| Answer Relevancy | Does the answer directly address the question? | No |
+| Context Precision | What fraction of retrieved documents was actually used? | Yes |
+| Context Recall | Does the context contain everything needed for the gold answer? | Yes |
+
+Faithfulness and Answer Relevancy work without ground truth, which makes them the right starting point when your gold set is small or non-existent.
+
+## Before vs. after
+
+**Before**: PR review approves with "the answer looks plausible". Hallucinations only surface when a user reports "the system gave me a confident wrong answer" in production.
+
+**After**: Every PR runs RAGAS automatically against 50 questions and reports faithfulness / answer_relevancy.
+
+```
+metric              before  after
+faithfulness        0.78    0.91
+answer_relevancy    0.82    0.85
+```
+
+Faithfulness rising from 0.78 to 0.91 is direct evidence that hallucinations dropped.
+
+## Step-by-step walkthrough
+
+### Step 1 — Build the evaluation dataset
+
+![Dataset structure for end-to-end evaluation](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
+
 ```python
+from datasets import Dataset
+
+samples = []
+for question in QUESTIONS:
+    docs = retriever.invoke(question)
+    contexts = [doc.page_content for doc in docs]
+    answer = llm.invoke(build_prompt(question, contexts)).content
+    samples.append({
+        "question": question,
+        "contexts": contexts,   # List[str], not a single string
+        "answer": answer,
+    })
+
+dataset = Dataset.from_list(samples)
+```
+
+`contexts` MUST be a list of strings. A single string raises a KeyError inside RAGAS.
+
+### Step 2 — Wire LLM and embeddings via wrappers
+
+![Wrapper path into the RAGAS evaluator](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.en.png)
+
+```python
+from langchain_groq import ChatGroq
+from langchain_huggingface import HuggingFaceEmbeddings
+from ragas.llms import LangchainLLMWrapper
+from ragas.embeddings import LangchainEmbeddingsWrapper
+
+llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
+embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+ragas_llm = LangchainLLMWrapper(llm)
+ragas_emb = LangchainEmbeddingsWrapper(embedding)
+```
+
+### Step 3 — Run the evaluation
+
+```python
+from ragas import evaluate
+from ragas.metrics import Faithfulness, AnswerRelevancy
+from ragas.run_config import RunConfig
+
 result = evaluate(
     dataset=dataset,
     metrics=[Faithfulness(), AnswerRelevancy(strictness=1)],
-    llm=LangchainLLMWrapper(llm),
-    embeddings=LangchainEmbeddingsWrapper(embedding),
+    llm=ragas_llm,
+    embeddings=ragas_emb,
     run_config=RunConfig(timeout=300, max_workers=1),
 )
+print(result)
 ```
 
-## What to notice in this code
+The runnable code lives in `rag-benchmark-101/en/05-e2e-evaluation/main.py`. `GROQ_API_KEY` is required.
 
-### Wrapper path into the RAGAS evaluator
+```bash
+cd /root/Github/rag-benchmark-101/en/05-e2e-evaluation
+export GROQ_API_KEY=...
+python3 main.py
+```
 
-![Wrapper path into the RAGAS evaluator](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.en.png)
-- The `contexts` column must be a list of strings, not one flattened string.
-- `AnswerRelevancy(strictness=1)` keeps the example fast while staying on the real 0.1.22 API.
-- `RunConfig(timeout=300, max_workers=1)` reduces timeout noise during network LLM evaluation.
+### Step 4 — Read the results
 
-## Where engineers get confused
+![Reading retrieval and generation failure separately](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.en.png)
 
-### Reading retrieval and generation failures apart
+| Faithfulness | Answer Relevancy | Diagnosis |
+| --- | --- | --- |
+| Low | Low | Retrieval pulled irrelevant docs, or the LLM ignored context |
+| Low | High | Plausible but hallucinated — most dangerous |
+| High | Low | Faithful to context but misses the question — suspect the prompt |
+| High | High | Healthy |
 
-![Reading retrieval and generation failures apart](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.en.png)
-- Faithfulness can be computed without a ground-truth answer, but answer relevancy still penalizes evasive answers.
-- RAGAS scores reflect the final pipeline behavior, so they mix retrieval quality and answer quality unless you benchmark retrieval separately.
-- Different ragas versions expose different APIs. This example is pinned to 0.1.22 behavior.
+The "Low / High" cell is the system confidently giving wrong answers. Make it the highest priority to fix.
+
+## Common mistakes
+
+- **Passing `contexts` as a single string** — must be `List[str]`. The most common KeyError cause.
+- **Setting `max_workers` too high** — Groq, OpenAI, etc. have rate limits. Start at 1 and grow.
+- **`temperature > 0`** — the evaluator LLM must be deterministic. Force `temperature=0`.
+- **Not separating retrieval from generation scores** — when RAGAS scores drop, you cannot tell whether retrieval or generation broke. Always look at hit rate and MRR alongside.
+- **Ignoring version differences** — RAGAS 0.1.x and 0.2.x diverge in import paths and metric construction. This post is on 0.1.22.
+
+## In production
+
+![Verification flow before metric execution](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png)
+
+- **Eval dataset size**: start at 30–50 questions. Stabilize, then grow to 200–500. Beyond ~1,000 cost and time become painful.
+- **Sampling**: stratified 50 on every PR, full set in a nightly job.
+- **Choice of evaluator LLM**: pick a **different** model for evaluation than for generation to reduce self-bias (e.g. generate with Llama-3.1, judge with GPT-4o-mini).
+- **Result storage**: never store only the score. Persist `(question, answer, contexts, score, reasoning)`. That is the starting point for any regression debug.
+- **CI gate**: block PRs when faithfulness drops below threshold. Start answer_relevancy as a warning only.
 
 ## Checklist
 
-### Verification flow before metric execution
+- [ ] Used the class-based ragas 0.1.22 API (`Faithfulness()`, `AnswerRelevancy()`).
+- [ ] Wrapped LLM and embeddings in `LangchainLLMWrapper` / `LangchainEmbeddingsWrapper`.
+- [ ] Built a `Dataset` with `question`, `contexts` (List[str]), and `answer` columns.
+- [ ] `temperature=0` and conservative `max_workers`.
+- [ ] Reported retrieval metrics (hit rate, MRR) alongside generation metrics.
 
-![Verification flow before metric execution](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png)
-- [ ] Instantiate the metrics with the ragas 0.1.22 API.
-- [ ] Wrap both the LLM and embeddings for RAGAS.
-- [ ] Build a Dataset with question, answer, and contexts columns.
+## Exercises
+
+1. Add ground truth and extend the run to compute `ContextPrecision` and `ContextRecall`. What new signal appears?
+2. Force the retriever to return a wrong document for the same question. Which metric drops first — faithfulness or answer_relevancy?
+3. Run the evaluation twice — once with the same model for generation and judging, once with different models — and compare the scores.
+
+## Wrap-up · what's next
+
+This post built an end-to-end evaluation loop with RAGAS, scoring faithfulness and answer relevancy to surface hallucinations and off-topic answers. Key ideas: **match the dataset shape**, **wire LLM/embedding via wrappers**, and **read retrieval and generation scores together**.
+
+Episode 6 — the final episode — combines every measurement tool from Episodes 1–5 into a single benchmark report.
 
 <!-- toc:begin -->
 ## In this series
@@ -97,5 +224,6 @@ result = evaluate(
 - [RAGAS documentation](https://docs.ragas.io/)
 - [RAGAS GitHub repository](https://github.com/explodinggradients/ragas)
 - [Groq Python integration in LangChain](https://python.langchain.com/docs/integrations/chat/groq/)
+- [HuggingFace Datasets](https://huggingface.co/docs/datasets)
 
-Tags: RAG, VectorDB, Benchmarking, LLM
+Tags: RAG, RAGAS, Faithfulness, AnswerRelevancy, LLM, Evaluation
