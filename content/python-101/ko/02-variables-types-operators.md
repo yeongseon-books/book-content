@@ -12,11 +12,11 @@ targets:
   ebook: true
 tags:
   - Python
-  - variables
+  - python-types
+  - equality-vs-identity
+  - floating-point
+  - decimal
   - type-hints
-  - dynamic-typing
-  - operators
-  - python-basics
 last_reviewed: '2026-05-03'
 ---
 
@@ -91,7 +91,7 @@ def total_price(quantity: int, unit_price: float) -> float:
 | --- | --- | --- |
 | `int` | `42`, `-7`, `1_000_000` | 임의 정밀도. 오버플로가 없습니다. |
 | `float` | `3.14`, `1e-9` | 64-bit IEEE 754. 부동소수 오차가 있습니다. |
-| `str` | `"hello"`, `'world'` | 불변(immutable). UTF-8 텍스트입니다. |
+| `str` | `"hello"`, `'world'` | 불변(immutable). 유니코드 텍스트입니다. |
 | `bool` | `True`, `False` | `int`의 하위 타입입니다 (`True == 1`). |
 | `None` | `None` | "값이 없음"을 나타내는 단 하나의 객체입니다. |
 
@@ -146,18 +146,18 @@ REPL을 열고 한 줄씩 따라 입력해 보세요. 결과가 책과 다르면
 ### 1) 같은 객체와 다른 객체
 
 ```python
->>> a = 1000
->>> b = 1000
+>>> a = [1, 2]
+>>> b = [1, 2]
 >>> a == b      # 값 비교: True
 True
->>> a is b      # 정체성 비교: 보통 False (작은 정수는 캐시되어 True가 될 수도 있습니다)
+>>> a is b      # 정체성 비교: False (서로 다른 list 객체입니다)
 False
 >>> c = a
->>> c is a      # True — 같은 객체에 이름표 두 개
+>>> c is a      # True — 같은 list 객체에 이름표 두 개
 True
 ```
 
-핵심은 `==`은 값을, `is`는 객체 정체성을 본다는 점입니다. None을 비교할 때만 `is None`을 쓰고, 그 외에는 거의 항상 `==`을 씁니다.
+위 예제에서 `a`와 `b`는 내용이 같은 list지만 서로 다른 객체입니다. 그래서 `a == b`는 `True`, `a is b`는 `False`입니다. 반면 `c = a`로 이름표를 하나 더 붙이면 `c`와 `a`는 같은 객체를 가리키므로 `c is a`는 `True`입니다. 핵심은 `==`은 값을, `is`는 객체 정체성을 본다는 점입니다. None을 비교할 때만 `is None`을 쓰고, 그 외에는 거의 항상 `==`을 씁니다.
 
 ### 2) 부동소수의 함정
 
@@ -171,7 +171,7 @@ False
 True
 ```
 
-부동소수는 절대 `==`로 비교하지 않습니다. `math.isclose`나 `Decimal`을 사용합니다.
+계산 결과로 나온 float를 비교할 때, 허용 오차가 필요하면 `math.isclose`를 씁니다. 정확한 값이 필요하면 `Decimal`로 갈아탑니다. `0.0`이나 `float('inf')`처럼 정확히 표현되는 상수와의 비교는 `==`이라도 안전합니다.
 
 ### 3) 타입 변환
 
@@ -285,15 +285,13 @@ class Order:
    `input("나이: ")`을 받아 정수로 변환하되, 음수거나 숫자가 아니면 다시 묻는 함수 `read_age() -> int`를 작성하세요.
    - 성공 기준: `"25"`는 `25`를, `"-1"`이나 `"abc"`는 다시 입력을 받습니다.
 
-## 정리
+## 정리·다음 글
 
 - Python 변수는 객체에 붙는 이름표입니다. `=`은 값을 복사하지 않고 이름표를 옮깁니다.
 - 동적 타입은 자유롭지만, 큰 코드에서는 type hint와 mypy로 안전을 보강합니다.
 - `int`는 오버플로가 없고, `float`는 부동소수 오차가 있으며, `bool`은 `int`의 하위 타입입니다.
 - `==`은 값을, `is`는 객체 정체성을 비교합니다. None만 `is None`으로 비교합니다.
 - 금액은 `Decimal`로, float 비교는 `math.isclose`로, 사용자 입력은 명시적으로 캐스팅합니다.
-
-## 다음 글
 
 다음 글에서는 문자열을 깊이 있게 다룹니다. f-string과 format spec, str·bytes 차이, 정규표현식의 첫 만남까지 짚어 봅니다.
 
@@ -308,4 +306,4 @@ class Order:
 - PEP 8 — Style Guide for Python Code: https://peps.python.org/pep-0008/
 - mypy 공식 문서: https://mypy.readthedocs.io/
 
-Tags: Python, variables, type-hints, dynamic-typing, operators, python-basics
+Tags: variables, python-types, equality-vs-identity, floating-point, decimal, type-hints

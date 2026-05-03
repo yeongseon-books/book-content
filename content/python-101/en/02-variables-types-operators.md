@@ -12,11 +12,11 @@ targets:
   ebook: true
 tags:
   - Python
-  - variables
+  - python-types
+  - equality-vs-identity
+  - floating-point
+  - decimal
   - type-hints
-  - dynamic-typing
-  - operators
-  - python-basics
 last_reviewed: '2026-05-03'
 ---
 
@@ -146,18 +146,18 @@ Open a REPL and type these lines yourself. If a result differs from what's print
 ### 1) Same object versus different object
 
 ```python
->>> a = 1000
->>> b = 1000
+>>> a = [1, 2]
+>>> b = [1, 2]
 >>> a == b      # value comparison: True
 True
->>> a is b      # identity comparison: usually False (small ints may be cached)
+>>> a is b      # identity comparison: False (two distinct list objects)
 False
 >>> c = a
->>> c is a      # True — two name tags on the same object
+>>> c is a      # True — two name tags on the same list object
 True
 ```
 
-The rule: `==` compares values, `is` compares object identity. Use `is None` for None checks; for almost everything else, use `==`.
+In the example above, `a` and `b` hold lists with the same contents but distinct objects, so `a == b` is `True` while `a is b` is `False`. Once you bind another name with `c = a`, both `c` and `a` point at the same object and `c is a` is `True`. The rule: `==` compares values, `is` compares object identity. Use `is None` for None checks; for almost everything else, use `==`.
 
 ### 2) The floating-point trap
 
@@ -171,7 +171,7 @@ False
 True
 ```
 
-Never compare floats with `==`. Use `math.isclose`, or switch to `Decimal` when exactness matters.
+For computed float results, use `math.isclose` when tolerance matters, or switch to `Decimal` when exactness matters. Comparisons against exactly representable constants such as `0.0` or `float('inf')` are safe with `==`.
 
 ### 3) Type conversion
 
@@ -285,15 +285,13 @@ Before moving to the next chapter, walk through these by hand at least once.
    Write `read_age() -> int` that calls `input("Age: ")`, converts to int, and re-prompts on negative numbers or non-numeric input.
    - Success criteria: `"25"` returns `25`; `"-1"` and `"abc"` both re-prompt without raising.
 
-## Summary
+## Summary and next chapter
 
 - A Python variable is a name tag attached to an object. `=` doesn't copy the value; it moves the tag.
 - Dynamic typing is convenient, but at scale you reinforce it with type hints and mypy.
 - `int` has no overflow, `float` carries IEEE 754 error, and `bool` is a subtype of `int`.
 - `==` compares values, `is` compares identity. The only `is` you write regularly is `is None`.
 - Use `Decimal` for money, `math.isclose` for floating-point checks, and explicit casts for user input.
-
-## Next chapter
 
 The next chapter dives into strings: f-strings and format specs, the difference between `str` and `bytes`, and a first look at regular expressions.
 
@@ -308,4 +306,4 @@ The next chapter dives into strings: f-strings and format specs, the difference 
 - PEP 8 — Style Guide for Python Code: https://peps.python.org/pep-0008/
 - mypy documentation: https://mypy.readthedocs.io/
 
-Tags: Python, variables, type-hints, dynamic-typing, operators, python-basics
+Tags: variables, python-types, equality-vs-identity, floating-point, decimal, type-hints
