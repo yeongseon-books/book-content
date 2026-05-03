@@ -3,7 +3,7 @@ title: 원본 데이터 수집과 카탈로깅
 series: ai-data-preparation-101
 episode: 2
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

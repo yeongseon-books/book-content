@@ -3,7 +3,7 @@ title: Synthetic Data Generation
 series: ai-data-preparation-101
 episode: 7
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

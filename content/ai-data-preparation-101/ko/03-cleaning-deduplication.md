@@ -3,7 +3,7 @@ title: 데이터 정제와 중복 제거
 series: ai-data-preparation-101
 episode: 3
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

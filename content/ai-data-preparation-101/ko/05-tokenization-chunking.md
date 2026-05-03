@@ -3,7 +3,7 @@ title: 토큰화와 청킹 전략
 series: ai-data-preparation-101
 episode: 5
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Building a Production Data Pipeline
 series: ai-data-preparation-101
 episode: 10
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

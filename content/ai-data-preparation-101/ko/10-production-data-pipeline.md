@@ -3,7 +3,7 @@ title: 프로덕션 데이터 파이프라인 구축
 series: ai-data-preparation-101
 episode: 10
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

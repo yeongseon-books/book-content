@@ -3,7 +3,7 @@ title: 데이터 품질 필터링
 series: ai-data-preparation-101
 episode: 6
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

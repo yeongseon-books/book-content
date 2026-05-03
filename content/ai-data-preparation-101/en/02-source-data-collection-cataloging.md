@@ -3,7 +3,7 @@ title: Source Data Collection and Cataloging
 series: ai-data-preparation-101
 episode: 2
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Data Augmentation Techniques
 series: ai-data-preparation-101
 episode: 8
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: 합성 데이터 생성
 series: ai-data-preparation-101
 episode: 7
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -114,7 +114,7 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  status: draft
+  status: content-ready
   tags:
     - Data Preparation
     - ML Foundations

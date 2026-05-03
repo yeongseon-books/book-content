@@ -3,7 +3,7 @@ title: 학습 데이터 PII 탐지와 익명화
 series: ai-data-preparation-101
 episode: 4
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

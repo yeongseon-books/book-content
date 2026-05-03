@@ -3,7 +3,7 @@ title: Tokenization and Chunking Strategies
 series: ai-data-preparation-101
 episode: 5
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: 데이터 증강 기법
 series: ai-data-preparation-101
 episode: 8
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

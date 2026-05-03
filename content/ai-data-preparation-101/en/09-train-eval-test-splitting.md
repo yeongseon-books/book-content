@@ -3,7 +3,7 @@ title: Train/Eval/Test Splitting and Contamination Control
 series: ai-data-preparation-101
 episode: 9
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

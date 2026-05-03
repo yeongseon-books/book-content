@@ -3,7 +3,7 @@ title: Cleaning and Deduplication
 series: ai-data-preparation-101
 episode: 3
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

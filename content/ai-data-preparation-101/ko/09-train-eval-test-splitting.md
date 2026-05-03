@@ -3,7 +3,7 @@ title: 학습/평가/테스트 분할과 오염 통제
 series: ai-data-preparation-101
 episode: 9
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

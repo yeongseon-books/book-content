@@ -3,7 +3,7 @@ title: Why Data Preparation Determines Model Quality
 series: ai-data-preparation-101
 episode: 1
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true
