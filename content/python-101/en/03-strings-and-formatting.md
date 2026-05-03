@@ -99,7 +99,7 @@ Raw strings keep backslashes as-is. Use them for Windows paths and regex.
 C:\Users\name\file.txt
 ```
 
-`b"..."` is a byte literal. It can only contain ASCII.
+`b"..."` is a byte literal. ASCII characters can appear directly; other byte values must be written with escape sequences such as `\xFF`.
 
 ```python
 >>> b"hello"
@@ -111,7 +111,7 @@ SyntaxError: bytes can only contain ASCII literal characters
 
 ### 2) The boundary between str and bytes
 
-Data coming from a file or the network arrives as `bytes`. Decoding (usually with UTF-8) turns it into `str`.
+At the OS and protocol boundary the data is bytes. Many Python text APIs (such as `open(..., "r")` or `requests.Response.text`) already decode it to `str` for you. When you do work with raw bytes, assume UTF-8 and call `decode` to get a `str`.
 
 ```python
 >>> data = "hi".encode("utf-8")
@@ -179,7 +179,7 @@ To "change" part of a string, build a new one.
 
 ### 5) f-strings and format specs
 
-f-strings (PEP 498) are the shortest and fastest formatting tool. Variables and expressions go directly into braces.
+f-strings (PEP 498) are the clearest default for inline formatting. Variables and expressions go directly into braces.
 
 ```python
 >>> name = "yeongseon"
