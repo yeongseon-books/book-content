@@ -336,7 +336,7 @@ Episode 7 picks up where this one leaves off: the most common collaboration unit
 - [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
 - [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
 - **Creating a GitHub Repository: remote, push, pull (current)**
-- Collaborating with Pull Requests (upcoming)
+- [Collaborating with Pull Requests](./07-pull-request.md)
 - Tracking Work with Issues and Projects (upcoming)
 - Writing Good Commit Messages (upcoming)
 - Real-World Workflow at a Glance (upcoming)
