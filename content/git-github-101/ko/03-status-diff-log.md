@@ -208,6 +208,23 @@ index 6e85ca6..b7f5a1e 100644
 
 `git diff` 출력은 비어 있습니다(이미 staging에 올라갔기 때문). `--cached`를 붙이면 "지금 commit하면 들어갈 내용"이 보입니다. commit 직전에 한 번 실행해 보는 습관이 안전합니다.
 
+이 시점의 `git status` 긴 형식도 함께 봐 두면 staging 영역의 안내 문구가 눈에 들어옵니다.
+
+```text
+$ git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        draft.md
+
+```
+
+`Changes to be committed:` 아래의 `(use "git restore --staged <file>..." to unstage)`는 "이 변경을 다시 working directory 쪽으로 돌려놓고 싶다면 어떤 명령을 쓰는지"까지 알려 주는 안내입니다.
+
 ### 4. `git diff HEAD`로 두 영역을 합쳐 보기
 
 `draft.md`는 아직 untracked, README는 이미 staging됐다고 합시다. 이 상태에서 `git diff HEAD`는 두 영역을 합쳐 "마지막 commit과의 전체 차이"를 보여 줍니다.
@@ -247,7 +264,7 @@ index a1b2c3d..6e85ca6 100644
 
 ### 6. `git log`를 모양 좋게 출력하기
 
-먼저 staging된 README를 commit하고 새 commit을 추가합니다.
+먼저 staging된 README를 commit한 뒤 결과를 다양한 형식으로 살펴봅니다.
 
 ```text
 $ git commit -m "Add author line to README"
@@ -275,7 +292,7 @@ $ git log --oneline --graph
 
 ```text
 $ git log --stat
-commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8 (HEAD -> main)
+commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8
 Author: Me <me@example.com>
 Date:   Mon May 4 10:30:00 2026 +0900
 
@@ -289,7 +306,7 @@ Date:   Mon May 4 10:30:00 2026 +0900
 
 ```text
 $ git log -p -1
-commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8 (HEAD -> main)
+commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8
 Author: Me <me@example.com>
 Date:   Mon May 4 10:30:00 2026 +0900
 

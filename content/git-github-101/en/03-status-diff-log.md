@@ -206,6 +206,23 @@ index 6e85ca6..b7f5a1e 100644
 
 `git diff` is empty because the change has moved into staging. `--cached` shows "what would land in the next commit." Running it once before each `commit` is a cheap habit that catches surprises.
 
+The long-form `git status` at this point also makes the staging-area hint visible.
+
+```text
+$ git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        draft.md
+
+```
+
+The line `(use "git restore --staged <file>..." to unstage)` under `Changes to be committed:` is Git telling you exactly which command moves the change back out of staging.
+
 ### 4. `git diff HEAD` to combine both areas
 
 `draft.md` is still untracked while README is staged. `git diff HEAD` collapses both areas into a single comparison against the last commit.
@@ -245,7 +262,7 @@ The order is "older then newer." Swap the order and `+` and `-` flip. To see the
 
 ### 6. Shape `git log` output
 
-Commit the staged README change, then add another commit so the log has something to show.
+Commit the staged README change and then read the resulting log in different shapes.
 
 ```text
 $ git commit -m "Add author line to README"
@@ -273,7 +290,7 @@ The graph is a straight line today because there are no branches yet. Once branc
 
 ```text
 $ git log --stat
-commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8 (HEAD -> main)
+commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8
 Author: Me <me@example.com>
 Date:   Mon May 4 10:30:00 2026 +0900
 
@@ -287,7 +304,7 @@ Date:   Mon May 4 10:30:00 2026 +0900
 
 ```text
 $ git log -p -1
-commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8 (HEAD -> main)
+commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8
 Author: Me <me@example.com>
 Date:   Mon May 4 10:30:00 2026 +0900
 
