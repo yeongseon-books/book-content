@@ -1,0 +1,55 @@
+id: alembic-101
+category: data
+title:
+  ko: Alembic 101
+  en: Alembic 101
+description:
+  ko: Alembic으로 SQLAlchemy 마이그레이션을 운영하는 입문 시리즈. autogenerate, branch와 merge, 데이터 마이그레이션, downgrade 전략, 배포 순서를 SQLite 기준으로 다룹니다.
+  en: A beginner-friendly Alembic tour for SQLAlchemy migrations using SQLite. Covers autogenerate, branches and merges, data migrations, downgrade strategy, and deploy ordering.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+tags:
+  - Python
+  - Alembic
+  - SQLAlchemy
+  - Migration
+  - SQLite
+articles:
+- idx: 1
+  slug: 01-why-alembic-and-init
+  status: draft
+- idx: 2
+  slug: 02-env-py-and-target-metadata
+  status: draft
+- idx: 3
+  slug: 03-first-revision-upgrade-downgrade
+  status: draft
+- idx: 4
+  slug: 04-autogenerate-and-its-limits
+  status: draft
+- idx: 5
+  slug: 05-branches-and-merges
+  status: draft
+- idx: 6
+  slug: 06-data-migrations
+  status: draft
+- idx: 7
+  slug: 07-online-vs-offline-and-batch
+  status: draft
+- idx: 8
+  slug: 08-downgrade-strategy
+  status: draft
+- idx: 9
+  slug: 09-deploy-ordering-and-blue-green
+  status: draft
+- idx: 10
+  slug: 10-production-and-team-workflow
+  status: draft
