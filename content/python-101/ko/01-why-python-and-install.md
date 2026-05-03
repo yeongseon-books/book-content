@@ -112,7 +112,7 @@ $ sudo pip install requests   # 절대 하지 마세요
 **After — venv 안에 설치한 경우**
 
 ```bash
-$ python3 -m venv .venv
+$ python3.12 -m venv .venv
 $ source .venv/bin/activate         # macOS/Linux
 (.venv) $ pip install requests
 Successfully installed requests-2.32.3
@@ -188,7 +188,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 ### 4) 격리되었는지 검증
 
-이 단계가 가장 중요합니다. 활성화만으로 끝내지 말고, **정말로 venv 안의 Python을 쓰고 있는지** 두 가지 명령으로 확인하세요.
+이 단계가 가장 중요합니다. 활성화만으로 끝내지 말고, **정말로 venv 안의 Python을 쓰고 있는지** 세 가지 명령으로 확인하세요.
 
 macOS / Linux:
 
@@ -285,7 +285,7 @@ $
 shell에서 `python`을 쳤을 때 어떤 Python이 나올지 예측할 수 없습니다. **venv 활성화 전에는 항상 `python3` (Windows에서는 `py -3`)** 을 쓰세요. 활성화 후에는 `python`을 써도 venv의 것을 가리킵니다.
 
 **3. venv를 만들었는데 활성화하지 않음**
-`python3 -m venv .venv`만 실행하고 `source .venv/bin/activate`를 잊는 경우가 흔합니다. 활성화 안 된 상태로 `pip install`을 하면 또다시 system Python에 설치됩니다. **`(.venv)` 프롬프트와 `which python` 결과를 항상 확인**하세요.
+`python3.12 -m venv .venv`만 실행하고 `source .venv/bin/activate`를 잊는 경우가 흔합니다. 활성화 안 된 상태로 `pip install`을 하면 또다시 system Python에 설치됩니다. **`(.venv)` 프롬프트와 `which python` 결과를 항상 확인**하세요.
 
 **4. PowerShell 활성화 실패를 "Python 문제"로 오해**
 "스크립트를 실행할 수 없습니다" 오류는 Python 문제가 아니라 Windows 보안 정책입니다. `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`을 한 번 실행하면 해결됩니다.

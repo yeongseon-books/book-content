@@ -112,7 +112,7 @@ $ sudo pip install requests   # please don't
 **After — installing inside a venv**
 
 ```bash
-$ python3 -m venv .venv
+$ python3.12 -m venv .venv
 $ source .venv/bin/activate         # macOS/Linux
 (.venv) $ pip install requests
 Successfully installed requests-2.32.3
@@ -188,7 +188,7 @@ When activation succeeds, your prompt is prefixed with `(.venv)`.
 
 ### 4) Verify the isolation (do not skip this)
 
-This step is the most important one in the entire article. Activation alone is not proof — confirm that you are really running the venv's Python with two commands.
+This step is the most important one in the entire article. Activation alone is not proof — confirm that you are really running the venv's Python with three commands.
 
 macOS / Linux:
 
@@ -285,7 +285,7 @@ Seeing a "permission denied" error makes you want to add `sudo`. Do not. The per
 Typing `python` in a shell can resolve to almost anything depending on the OS and history. **Before activating a venv, always type `python3` (or `py -3` on Windows).** After activation, plain `python` is safe — it resolves to the venv.
 
 **3. Creating the venv but forgetting to activate it**
-A surprising number of beginners run `python3 -m venv .venv`, then immediately `pip install ...` without activating. The install lands in system Python again. Always confirm the `(.venv)` prompt **and** the output of `which python`.
+A surprising number of beginners run `python3.12 -m venv .venv`, then immediately `pip install ...` without activating. The install lands in system Python again. Always confirm the `(.venv)` prompt **and** the output of `which python`.
 
 **4. Misreading PowerShell activation errors as "Python errors"**
 "Running scripts is disabled on this system" is a Windows security policy issue, not a Python problem. One-time fix: `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`.
