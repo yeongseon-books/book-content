@@ -35,13 +35,13 @@ After reading this chapter you will be able to:
 
 ## Why it matters
 
-Once you are comfortable writing functions, code starts piling up. A single file with hundreds of lines runs into the same problems every time:
+Once you are comfortable writing functions, code starts piling up. A single file with hundreds of lines usually runs into familiar problems:
 
 - Function and variable names start to clash.
 - It is hard to find where any given function was defined.
 - Reusing the same code in another project becomes a copy-paste exercise.
 
-Modules and packages are Python's primary tools for solving this. You break code into files, group files into directories, and import only the parts you need. CLI scripts, web servers, and data pipelines all sit on top of this same structure. Learning it on a tiny project means there is almost nothing new to learn when projects grow.
+Modules and packages are among Python's main tools for solving this. You break code into files, group files into directories, and import only the parts you need. CLI scripts, web servers, and data pipelines often rely on this structure. Learning it on a tiny project makes the jump to larger projects much smoother.
 
 ## Mental model
 
@@ -96,7 +96,7 @@ from .sibling import foo   # import foo from a sibling module in the same packag
 
 ### 4. `__name__` and the `__main__` guard
 
-Every module gets a string attribute called `__name__`. When a module is imported by another file, `__name__` is the module name. When the file is run directly with `python file.py`, `__name__` becomes `"__main__"`.
+In normal Python code, a module exposes a string attribute called `__name__`. When a module is imported by another file, `__name__` is the module name. When the file is run directly with `python file.py`, `__name__` becomes `"__main__"`.
 
 ```python
 def main():
