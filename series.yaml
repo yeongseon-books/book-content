@@ -122,6 +122,17 @@ series:
     - Pipelines
   path: content/ai-data-preparation-101
 
+- id: multimodal-ai-101
+  category: ai
+  title:
+    ko: Multimodal AI 101
+    en: Multimodal AI 101
+  description:
+    ko: 텍스트 + 이미지 + 오디오 + 영상을 다루는 multimodal AI 입문 시리즈. CLIP, ViT, VLM, Whisper, Diffusion, multimodal RAG, video understanding을 production 관점에서 배웁니다.
+    en: A beginner-friendly guide to multimodal AI covering text + image + audio + video. Learn CLIP, ViT, VLMs, Whisper, Diffusion, multimodal RAG, and video understanding from a production lens.
+  status: draft
+  path: content/multimodal-ai-101
+
 - id: azure-app-service-101
   category: azure
   title:
