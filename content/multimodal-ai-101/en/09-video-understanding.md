@@ -3,7 +3,7 @@ title: Video Understanding - From Frame Sampling to Video-LLaVA
 series: multimodal-ai-101
 episode: 9
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: false
   medium: true

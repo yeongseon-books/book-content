@@ -3,7 +3,7 @@ title: Video 이해 - Frame Sampling에서 Video-LLaVA까지
 series: multimodal-ai-101
 episode: 9
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

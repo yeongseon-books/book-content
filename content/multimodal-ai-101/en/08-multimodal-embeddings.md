@@ -3,7 +3,7 @@ title: Multimodal Embeddings and Cross-modal Search
 series: multimodal-ai-101
 episode: 8
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: false
   medium: true

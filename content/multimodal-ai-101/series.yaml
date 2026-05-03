@@ -15,7 +15,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: content-ready
 tags:
   - Multimodal AI
   - VLM
@@ -24,31 +24,31 @@ tags:
 articles:
 - idx: 1
   slug: 01-why-multimodal-matters
-  status: draft
+  status: content-ready
 - idx: 2
   slug: 02-image-encoders-clip-vit
-  status: draft
+  status: content-ready
 - idx: 3
   slug: 03-vlm-architecture
-  status: draft
+  status: content-ready
 - idx: 4
   slug: 04-captioning-ocr-pipelines
-  status: draft
+  status: content-ready
 - idx: 5
   slug: 05-multimodal-rag
-  status: draft
+  status: content-ready
 - idx: 6
   slug: 06-audio-whisper
-  status: draft
+  status: content-ready
 - idx: 7
   slug: 07-text-to-image-diffusion
-  status: draft
+  status: content-ready
 - idx: 8
   slug: 08-multimodal-embeddings
-  status: draft
+  status: content-ready
 - idx: 9
   slug: 09-video-understanding
-  status: draft
+  status: content-ready
 - idx: 10
   slug: 10-production-multimodal-app
-  status: draft
+  status: content-ready

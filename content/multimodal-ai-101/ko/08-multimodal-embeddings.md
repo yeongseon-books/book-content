@@ -3,7 +3,7 @@ title: Multimodal Embedding과 Cross-modal 검색
 series: multimodal-ai-101
 episode: 8
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true
