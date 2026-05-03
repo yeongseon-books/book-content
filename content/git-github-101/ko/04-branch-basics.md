@@ -101,7 +101,7 @@ $ git branch
 ```
 
 - 같은 폴더에서 두 줄기를 오갑니다. 디스크는 `.git/refs/heads/`의 작은 파일이 늘어날 뿐입니다.
-- 어느 branch에 있는지는 항상 `*` 표시로 보입니다.
+- 어느 branch에 있는지는 `*` 표시로 보입니다.
 - 변경을 합치는 표준 방법(merge, rebase)이 준비돼 있습니다.
 
 ## 단계별 실습
@@ -201,7 +201,7 @@ e7d2c1a Add author line to README
 $ git switch main
 Switched to branch 'main'
 $ ls
-README.md
+README.md  notes.md
 $ git log --oneline
 e7d2c1a Add author line to README
 9b8c3e2 Add intro paragraph to notes
@@ -222,14 +222,14 @@ a2b3c4d Add login form draft
 `A..B`는 "B에는 있지만 A에는 없는 commit"을 의미합니다. 양방향으로 비교하려면 `...`을 씁니다.
 
 ```text
-$ git log --oneline --graph --all
+$ git log --oneline --graph --decorate --all
 * a2b3c4d (feature/login) Add login form draft
-* e7d2c1a (HEAD -> main) Add author line to README
+* e7d2c1a (HEAD -> main, feature/signup) Add author line to README
 * 9b8c3e2 Add intro paragraph to notes
 * 4f1a2c0 Initial commit
 ```
 
-`--all`은 모든 branch의 commit을, `--graph`는 갈래 모양을 함께 보여 줍니다. `(HEAD -> main)`과 `(feature/login)` 같은 표시도 자동으로 붙습니다.
+`--all`은 다른 branch에 있는 commit까지 묶어서, `--graph`는 갈래 모양을, `--decorate`는 `(HEAD -> main, feature/signup)`이나 `(feature/login)` 같은 branch 이름 라벨을 함께 보여 줍니다.
 
 파일 단위 차이는 `git diff`로 봅니다.
 
@@ -248,13 +248,28 @@ index 0000000..2c4e0d2
 
 ### 6. branch 이름 바꾸기와 삭제
 
+step 3에서 만들어 둔 `feature/signup`은 아직 commit을 하나도 더하지 않아 main과 같은 자리에 있습니다. 여기에 작은 commit을 하나 얹어 둔 다음, 이름을 바꾸고, 삭제까지 따라가 봅니다.
+
+```text
+$ git switch feature/signup
+Switched to branch 'feature/signup'
+$ echo "signup form" > signup.md
+$ git add signup.md
+$ git commit -m "Add signup form draft"
+[feature/signup f1e2d3c] Add signup form draft
+ 1 file changed, 1 insertion(+)
+ create mode 100644 signup.md
+$ git switch main
+Switched to branch 'main'
+```
+
 이름을 바꿉니다.
 
 ```text
 $ git branch -m feature/signup feature/sign-up
 ```
 
-이미 합쳤거나 더 이상 필요 없는 branch는 삭제합니다(아직 합치지 않았다면 안전을 위해 거부됩니다).
+이미 합쳤거나 더 이상 필요 없는 branch는 삭제합니다. 아직 합치지 않았다면 Git이 안전을 위해 한 번 거부합니다.
 
 ```text
 $ git branch -d feature/sign-up
@@ -264,6 +279,11 @@ If you are sure you want to delete it, run 'git branch -D feature/sign-up'.
 
 정말 버려도 되는 작업이면 대문자 `-D`로 강제 삭제합니다. 실수가 잦은 옵션이므로 한 번 더 생각하고 누릅니다.
 
+```text
+$ git branch -D feature/sign-up
+Deleted branch feature/sign-up (was f1e2d3c).
+```
+
 ## 자주 하는 실수
 
 - **`git branch <name>`만 하고 옮긴 줄 알기** — branch가 만들어지지만 `HEAD`는 그대로입니다. 이어서 `git switch <name>`을 실행해야 옮겨집니다(또는 처음부터 `git switch -c <name>`).
@@ -271,7 +291,7 @@ If you are sure you want to delete it, run 'git branch -D feature/sign-up'.
 - **`git checkout <branch>`와 `git checkout -- <file>`을 헷갈림** — 옛 `checkout`은 두 가지 일을 했습니다. 새 환경에서는 branch는 `switch`, 파일 복원은 `restore`로 나누면 헷갈림이 줄어듭니다.
 - **branch 이름에 공백·한글·대문자 혼용** — 협업에서 문제 소지가 있습니다. 보통 소문자 + `-` 또는 `/`로 짓습니다(예: `feature/login`, `bugfix/null-check`).
 - **합치지도 않은 branch를 `-D`로 삭제** — 그 branch에서만 한 commit은 다른 곳에서 참조하지 않으면 회수가 어렵습니다. 가능하면 `-d`(소문자)로 시도하고, 거부 메시지를 본 뒤에 결정합니다.
-- **`HEAD`를 commit hash에 직접 붙이고 잊어버림(detached HEAD)** — `git switch <hash>` 또는 `git checkout <hash>`로 commit을 직접 가리키면 어느 branch에도 속하지 않은 상태가 됩니다. 잠깐 살펴볼 때만 쓰고, 변경을 남기려면 `git switch -c <name>`으로 새 branch를 만듭니다.
+- **`HEAD`를 commit hash에 직접 붙이고 잊어버림(detached HEAD)** — `git checkout <hash>`나 `git switch --detach <hash>`로 commit을 직접 가리키면 어느 branch에도 속하지 않은 상태가 됩니다. 잠깐 살펴볼 때만 쓰고, 변경을 남기려면 `git switch -c <name>`으로 새 branch를 만듭니다.
 
 ## 실무
 
@@ -285,7 +305,7 @@ If you are sure you want to delete it, run 'git branch -D feature/sign-up'.
 
 - [ ] `git branch`로 현재 branch 목록과 `*` 표시를 확인했습니다.
 - [ ] `git switch -c`로 새 branch를 만들면서 옮기는 흐름을 손으로 따라갔습니다.
-- [ ] 두 branch에서 각각 다른 commit을 만들고 `git log --oneline --graph --all`로 모양을 봤습니다.
+- [ ] 두 branch에서 각각 다른 commit을 만들고 `git log --oneline --graph --decorate --all`로 모양을 봤습니다.
 - [ ] `main..feature/login` 표기가 무엇을 뜻하는지 한 문장으로 설명할 수 있습니다.
 - [ ] `git switch`와 `git checkout`이 어떻게 다르고 왜 분리됐는지 한 문장으로 설명할 수 있습니다.
 - [ ] `-d`와 `-D`의 차이를 알고, 어느 쪽을 먼저 시도해야 하는지 안내할 수 있습니다.
@@ -294,7 +314,7 @@ If you are sure you want to delete it, run 'git branch -D feature/sign-up'.
 
 1. `feature/notes`라는 branch를 `git branch`로만 만들고, `git status`와 `git branch`로 자신이 여전히 `main`에 있다는 것을 확인하세요.
 2. `git switch -c feature/notes-2`로 만들면서 옮긴 뒤, `notes.md` 파일을 만들어 commit하세요. 그런 다음 `main`으로 돌아가 파일이 보이지 않는 것을 확인합니다.
-3. `git log --oneline --graph --all`로 두 branch가 같은 commit에서 갈라진 모습을 캡처하세요.
+3. `git log --oneline --graph --decorate --all`로 두 branch가 같은 commit에서 갈라진 모습을 캡처하세요.
 4. `git diff main feature/notes-2`로 두 branch의 파일 차이를 출력하고, `/dev/null`이 어느 쪽에 등장하는지 한 줄로 설명해 보세요.
 5. `git branch -d feature/notes-2`를 시도해 거부 메시지를 본 뒤, `git branch -D feature/notes-2`로 강제 삭제하면 어떤 메시지가 나오는지 적어 보세요.
 
@@ -303,7 +323,7 @@ If you are sure you want to delete it, run 'git branch -D feature/sign-up'.
 - branch는 commit을 가리키는 가벼운 포인터이고, `HEAD`는 "지금 어느 branch에 있는가"를 가리키는 두 번째 포인터입니다.
 - `git branch <name>`은 만들기만, `git switch <name>`은 옮기기만, `git switch -c <name>`은 둘을 한 번에 합니다.
 - 두 branch의 차이는 `git log A..B`로 commit 목록을, `git diff A B`로 파일 내용을 봅니다.
-- `git log --oneline --graph --all`은 갈래 모양을 한눈에 보여 주는 가장 자주 쓰는 조합입니다.
+- `git log --oneline --graph --decorate --all`은 갈래 모양과 branch 라벨을 한눈에 보여 주는 가장 자주 쓰는 조합입니다.
 
 다음 글에서는 갈라진 두 branch를 다시 합치는 `git merge`를 다루고, 자주 마주치는 conflict를 손으로 풀어 봅니다.
 

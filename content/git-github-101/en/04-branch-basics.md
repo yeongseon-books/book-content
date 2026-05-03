@@ -59,7 +59,7 @@ Two ideas to hold together:
 - **A branch itself is cheap.** It is roughly a 41-byte file under `.git/refs/heads/<name>` that stores a commit hash.
 - **`HEAD` is a second pointer that says "which branch am I on right now."** When you switch branches, `HEAD` moves with you.
 
-Once that picture is in your head, behaviors like "I created a branch and disk usage barely changed" or "I switched and the files in my working tree changed" stop feeling magical.
+Once that picture is in your head, behaviors like "I created a branch and disk usage stayed about the same" or "I switched and the files in my working tree changed" stop feeling magical.
 
 ## Core concepts
 
@@ -201,7 +201,7 @@ Switch back to `main` and the new file disappears (more precisely, `main` does n
 $ git switch main
 Switched to branch 'main'
 $ ls
-README.md
+README.md  notes.md
 $ git log --oneline
 e7d2c1a Add author line to README
 9b8c3e2 Add intro paragraph to notes
@@ -222,14 +222,14 @@ a2b3c4d Add login form draft
 `A..B` means "commits that are in B but not in A." For a two-way comparison use `...`.
 
 ```text
-$ git log --oneline --graph --all
+$ git log --oneline --graph --decorate --all
 * a2b3c4d (feature/login) Add login form draft
-* e7d2c1a (HEAD -> main) Add author line to README
+* e7d2c1a (HEAD -> main, feature/signup) Add author line to README
 * 9b8c3e2 Add intro paragraph to notes
 * 4f1a2c0 Initial commit
 ```
 
-`--all` includes commits from each branch and `--graph` draws the shape. Decorations like `(HEAD -> main)` and `(feature/login)` show up automatically with `--oneline`.
+`--all` includes commits from each branch, `--graph` draws the shape, and `--decorate` adds the branch labels you see in `(HEAD -> main, feature/signup)` and `(feature/login)`.
 
 For file-level differences use `git diff`.
 
@@ -248,13 +248,28 @@ index 0000000..2c4e0d2
 
 ### 6. Rename and delete branches
 
-Rename a branch.
+The `feature/signup` branch we created in Step 3 still has no commits of its own and points to the same commit as `main`. Add a small commit there, rename it, and then delete it.
+
+```text
+$ git switch feature/signup
+Switched to branch 'feature/signup'
+$ echo "signup form" > signup.md
+$ git add signup.md
+$ git commit -m "Add signup form draft"
+[feature/signup f1e2d3c] Add signup form draft
+ 1 file changed, 1 insertion(+)
+ create mode 100644 signup.md
+$ git switch main
+Switched to branch 'main'
+```
+
+Rename the branch.
 
 ```text
 $ git branch -m feature/signup feature/sign-up
 ```
 
-Delete a branch you no longer need (Git refuses if it has not been merged yet, as a safety net).
+Delete a branch you no longer need. Git refuses if it has not been merged yet, as a safety net.
 
 ```text
 $ git branch -d feature/sign-up
@@ -264,6 +279,11 @@ If you are sure you want to delete it, run 'git branch -D feature/sign-up'.
 
 If you really want to throw the work away, force the delete with capital `-D`. This is a frequent source of accidents, so pause once before you press it.
 
+```text
+$ git branch -D feature/sign-up
+Deleted branch feature/sign-up (was f1e2d3c).
+```
+
 ## Common mistakes
 
 - **Running `git branch <name>` and assuming you have moved.** The branch is created, but `HEAD` does not move. Follow up with `git switch <name>`, or start with `git switch -c <name>` from the beginning.
@@ -271,7 +291,7 @@ If you really want to throw the work away, force the delete with capital `-D`. T
 - **Confusing `git checkout <branch>` with `git checkout -- <file>`.** The old `checkout` did two different jobs. In the modern split, branches are `switch` and file restoration is `restore`, which removes most of the confusion.
 - **Branch names with spaces, mixed case, or special characters.** They cause friction in team work. Stick to lowercase with `-` or `/` separators (for example `feature/login`, `bugfix/null-check`).
 - **Force-deleting a branch that has not yet been merged.** Commits that exist only on that branch and are not referenced elsewhere are hard to recover. Try `-d` (lowercase) first and decide only after you read the rejection message.
-- **Pinning `HEAD` to a commit hash and forgetting (detached HEAD).** `git switch <hash>` or `git checkout <hash>` puts you on a commit that does not belong to any branch. Use it for a quick look. If you want to keep changes from that state, create a real branch with `git switch -c <name>`.
+- **Pinning `HEAD` to a commit hash and forgetting (detached HEAD).** `git checkout <hash>` or `git switch --detach <hash>` puts you on a commit that does not belong to any branch. Use it for a quick look. If you want to keep changes from that state, create a real branch with `git switch -c <name>`.
 
 ## In practice
 
@@ -285,7 +305,7 @@ If you really want to throw the work away, force the delete with capital `-D`. T
 
 - [ ] You ran `git branch` and identified the current branch by the `*` marker.
 - [ ] You walked through `git switch -c` to create and switch in one step.
-- [ ] You made different commits on two branches and inspected them with `git log --oneline --graph --all`.
+- [ ] You made different commits on two branches and inspected them with `git log --oneline --graph --decorate --all`.
 - [ ] You can explain in one sentence what `main..feature/login` means.
 - [ ] You can explain in one sentence how `git switch` and `git checkout` differ and why they were split.
 - [ ] You know the difference between `-d` and `-D` and which one to try first.
@@ -294,7 +314,7 @@ If you really want to throw the work away, force the delete with capital `-D`. T
 
 1. Create a `feature/notes` branch with `git branch` only and confirm with `git status` and `git branch` that you are still on `main`.
 2. Use `git switch -c feature/notes-2` to create and switch, add a `notes.md` file, and commit it. Then switch back to `main` and confirm the file is not visible.
-3. Run `git log --oneline --graph --all` and capture the picture of two branches diverging from a shared commit.
+3. Run `git log --oneline --graph --decorate --all` and capture the picture of two branches diverging from a shared commit.
 4. Run `git diff main feature/notes-2`, look at the file diff, and write one line about which side `/dev/null` shows up on.
 5. Try `git branch -d feature/notes-2`, read the rejection message, then run `git branch -D feature/notes-2` and write down what message comes back.
 
@@ -303,7 +323,7 @@ If you really want to throw the work away, force the delete with capital `-D`. T
 - A branch is a lightweight pointer to a commit, and `HEAD` is a second pointer that says "which branch am I on."
 - `git branch <name>` creates only, `git switch <name>` moves only, and `git switch -c <name>` does both at once.
 - Compare branches with `git log A..B` for the commit list and `git diff A B` for file content.
-- `git log --oneline --graph --all` is the most common combination for seeing the shape of branches at a glance.
+- `git log --oneline --graph --decorate --all` is the most common combination for seeing the shape of branches and their labels at a glance.
 
 The next article picks up from a diverged history and walks through `git merge`, including a hands-on conflict resolution.
 
