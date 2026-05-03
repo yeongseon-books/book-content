@@ -90,8 +90,8 @@ notes_v2_FINAL.txt
 
 ```text
 $ git log --oneline
-4f1a2c0 Add intro paragraph to notes
-9b8c3e2 Initial notes
+9b8c3e2 Add intro paragraph to notes
+4f1a2c0 Initial commit
 ```
 
 - 최신은 `HEAD`가 가리킵니다. 파일명 추측이 사라집니다.
@@ -186,7 +186,10 @@ $ git status
 On branch main
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
         modified:   README.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
 이번에는 `Untracked`가 아닌 `modified` 상태입니다. Git이 추적 중인 파일이 바뀌었기 때문입니다.
