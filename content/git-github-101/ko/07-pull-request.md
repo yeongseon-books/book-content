@@ -118,7 +118,7 @@ $ git pull
 
 ## 단계별 실습
 
-Episode 6에서 만든 `vacation-notes` 저장소를 그대로 사용합니다. `main`은 `7e8f9a0 Add deployment notes from cloned dir`를 가리키고 있고, `origin`은 GitHub에 연결돼 있습니다.
+Episode 6에서 만든 `vacation-notes` 저장소를 그대로 사용합니다. `main`은 `7e8f9a0 Add deployment notes`를 가리키고 있고, `origin`은 GitHub에 연결돼 있습니다.
 
 ### 1. main을 최신 상태로 맞추기
 
@@ -151,7 +151,7 @@ $ printf '\n## Release checklist\n\n- [ ] Tag version\n- [ ] Update CHANGELOG\n'
 $ git add notes.md
 $ git commit -m "Add release checklist"
 [feature/release-notes 3c4d5e6] Add release checklist
- 1 file changed, 4 insertions(+)
+ 1 file changed, 5 insertions(+)
 ```
 
 PR로 올라갈 첫 commit을 만듭니다. 한 commit 안에 너무 많은 주제를 담지 않는 편이 review를 받기 쉽습니다.

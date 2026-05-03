@@ -118,7 +118,7 @@ It is the same branch, but now the intent (PR description), the feedback (review
 
 ## Step-by-step walkthrough
 
-Reuse the `vacation-notes` repository from Episode 6. `main` points at `7e8f9a0 Add deployment notes from cloned dir`, and `origin` is wired up to GitHub.
+Reuse the `vacation-notes` repository from Episode 6. `main` points at `7e8f9a0 Add deployment notes`, and `origin` is wired up to GitHub.
 
 ### 1. Sync main first
 
@@ -151,7 +151,7 @@ $ printf '\n## Release checklist\n\n- [ ] Tag version\n- [ ] Update CHANGELOG\n'
 $ git add notes.md
 $ git commit -m "Add release checklist"
 [feature/release-notes 3c4d5e6] Add release checklist
- 1 file changed, 4 insertions(+)
+ 1 file changed, 5 insertions(+)
 ```
 
 This is the first commit that will appear on the PR. Try not to mix unrelated changes in one commit - smaller commits are easier to review.
