@@ -94,7 +94,7 @@ fatal: No configured push destination.
 Either specify the URL from the command-line or configure a remote repository using
     git remote add <name> <url>
 and then push using the remote name
-    git remote
+    git push <name>
 ```
 
 With no remote, there is nowhere to push. The history exists only on your laptop.
@@ -105,14 +105,14 @@ With no remote, there is nowhere to push. The history exists only on your laptop
 $ git remote -v
 origin  https://github.com/<your-id>/vacation-notes.git (fetch)
 origin  https://github.com/<your-id>/vacation-notes.git (push)
-$ git push
+$ git push -u origin main
 Enumerating objects: 12, done.
 ...
 To https://github.com/<your-id>/vacation-notes.git
-   1c2d3e4..2b3c4d5  main -> main
+ * [new branch]      main -> main
 ```
 
-Now a single `git push` mirrors the same commits onto GitHub, and any other machine that runs `git clone` receives the same copy.
+Once the remote is registered and upstream is set, a single `git push` mirrors the same commits onto GitHub, and any other machine that runs `git clone` receives the same copy. The role of `-u origin main` is covered in detail in Step 3 of the walkthrough.
 
 ## Step-by-step walkthrough
 
@@ -327,16 +327,6 @@ This episode walked through the lifecycle of connecting a local repository to Gi
 
 Episode 7 picks up where this one leaves off: the most common collaboration unit on GitHub, the Pull Request. We'll commit and push on a branch, request review, and follow the change back to `main`.
 
-## References
-
-- Git docs, `git remote`: <https://git-scm.com/docs/git-remote>
-- Git docs, `git push`: <https://git-scm.com/docs/git-push>
-- Git docs, `git fetch`: <https://git-scm.com/docs/git-fetch>
-- Git docs, `git pull`: <https://git-scm.com/docs/git-pull>
-- Git docs, `git clone`: <https://git-scm.com/docs/git-clone>
-- GitHub Docs, "About remote repositories": <https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories>
-- GitHub Docs, "Connecting to GitHub with SSH": <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>
-
 <!-- toc:begin -->
 ## Series Table of Contents
 
@@ -351,5 +341,15 @@ Episode 7 picks up where this one leaves off: the most common collaboration unit
 - Writing Good Commit Messages (upcoming)
 - Real-World Workflow at a Glance (upcoming)
 <!-- toc:end -->
+
+## References
+
+- Git docs, `git remote`: <https://git-scm.com/docs/git-remote>
+- Git docs, `git push`: <https://git-scm.com/docs/git-push>
+- Git docs, `git fetch`: <https://git-scm.com/docs/git-fetch>
+- Git docs, `git pull`: <https://git-scm.com/docs/git-pull>
+- Git docs, `git clone`: <https://git-scm.com/docs/git-clone>
+- GitHub Docs, "About remote repositories": <https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories>
+- GitHub Docs, "Connecting to GitHub with SSH": <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>
 
 Tags: github-remote, git-push, git-pull, git-clone, git-fetch, origin
