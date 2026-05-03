@@ -260,7 +260,7 @@ The next post stitches the tools from this series into one realistic workflow. W
 - [Collaborating with Pull Requests](./07-pull-request.md)
 - [Tracking Work with Issues and Projects](./08-issue-and-project.md)
 - **Writing Good Commit Messages (current)**
-- Real-World Workflow at a Glance (upcoming)
+- [Building a Real-World Git Workflow](./10-real-world-workflow.md)
 <!-- toc:end -->
 
 ## References

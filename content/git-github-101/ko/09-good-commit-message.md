@@ -260,7 +260,7 @@ PR 제목 자체도 Conventional Commits 형식으로 적는 팀이 많습니다
 - [Pull Request로 협업하기](./07-pull-request.md)
 - [Issue와 Project로 일감 관리하기](./08-issue-and-project.md)
 - **좋은 commit message 쓰기 (현재 글)**
-- 실무 워크플로 한눈에 보기 (예정)
+- [실전 Git workflow 만들기](./10-real-world-workflow.md)
 <!-- toc:end -->
 
 ## 참고 자료
