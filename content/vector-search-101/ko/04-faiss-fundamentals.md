@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: FAISS 입문 — 고속 근사 최근접 이웃 검색
 ---
 
 # FAISS 입문 — 고속 근사 최근접 이웃 검색

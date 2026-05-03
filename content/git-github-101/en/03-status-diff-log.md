@@ -1,21 +1,23 @@
 ---
-title: "Reading change history - status, diff, log"
-description: "Read git status more accurately, distinguish which area each git diff command compares, and shape git log output for both quick scans and detailed review."
-date: '2026-05-04'
+episode: 3
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 3
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-status
-  - git-diff
-  - git-log
-  - change-history
-  - working-tree-vs-index
-  - log-formatting
+- git-status
+- git-diff
+- git-log
+- change-history
+- working-tree-vs-index
+- log-formatting
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Reading change history - status, diff, log
 ---
 
 # Reading change history - status, diff, log

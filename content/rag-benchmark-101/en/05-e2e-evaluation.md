@@ -213,7 +213,7 @@ Episode 6 — the final episode — combines every measurement tool from Episode
 - [Comparing embedding models](./03-embedding-comparison.md)
 - [VectorDB selection criteria](./04-vectordb-selection.md)
 - **End-to-end RAG pipeline evaluation (current)**
-- Completing the RAG benchmark (upcoming)
+- Completing the RAG Benchmark (upcoming)
 
 <!-- toc:end -->
 
@@ -226,4 +226,4 @@ Episode 6 — the final episode — combines every measurement tool from Episode
 - [Groq Python integration in LangChain](https://python.langchain.com/docs/integrations/chat/groq/)
 - [HuggingFace Datasets](https://huggingface.co/docs/datasets)
 
-Tags: RAG, RAGAS, Faithfulness, AnswerRelevancy, LLM, Evaluation
+Tags: RAG, VectorDB, Benchmarking, LLM

@@ -131,7 +131,7 @@ print('출처:', [c['id'] for c in chunks])    # 출처 명시
 
 ### 단계 1 — 청킹과 인덱싱
 
-![왜 단순한 파이프라인이 더 많이 알려 주는가](../../../assets/korean-ai-stack-101/06/06-01-diagram.ko.png)
+![단순한 RAG 파이프라인의 단계별 구성](../../../assets/korean-ai-stack-101/06/06-01-diagram.ko.png)
 
 ```python
 import faiss
@@ -304,4 +304,4 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 - [RAGAS — RAG evaluation framework](https://github.com/explodinggradients/ragas)
 - [Reciprocal Rank Fusion 설명](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf)
 
-Tags: Korean NLP, RAG, Pipeline, Retrieval, LLM, Python
+Tags: Korean NLP, LLM, Embeddings, OCR

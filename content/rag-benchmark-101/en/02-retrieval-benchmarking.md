@@ -192,7 +192,7 @@ In Episode 3 we swap the embedding model on top of the same loop. The code chang
 - Comparing embedding models (upcoming)
 - VectorDB selection criteria (upcoming)
 - End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG benchmark (upcoming)
+- Completing the RAG Benchmark (upcoming)
 
 <!-- toc:end -->
 
@@ -205,4 +205,4 @@ In Episode 3 we swap the embedding model on top of the same loop. The code chang
 - [Python `time.perf_counter`](https://docs.python.org/3/library/time.html#time.perf_counter)
 - [BEIR: heterogeneous benchmark for IR](https://github.com/beir-cellar/beir)
 
-Tags: RAG, VectorDB, Benchmarking, Hit-Rate, Latency, MRR
+Tags: RAG, VectorDB, Benchmarking, LLM

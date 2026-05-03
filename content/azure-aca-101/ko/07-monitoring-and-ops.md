@@ -274,4 +274,4 @@ production checklist:
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Log Analytics, Application Insights, Observability, Monitoring
+Tags: Azure, Container Apps, Serverless, Containers

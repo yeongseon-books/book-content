@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Regression Testing — Don't Let Yesterday's Wins Break Today</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Regression Testing — Don't Let Yesterday's Wins Break Today</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (8/10)</p>
+</blockquote>
+<p>Changing one line of a prompt can break other cases. This post covers a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.</p>
+<hr>
+<h2>Evaluate Every Time, Not Just Once</h2>
+<p>Ep1-Ep7 covered evaluation methods. But <strong>when</strong> do you run them? The common pattern:</p>
+<ul>
+<li>Run once after a big prompt change</li>
+<li>Run once when switching models</li>
+<li>Otherwise forget</li>
+</ul>
+<p>The problem is that <strong>regressions reach production</strong>. Yesterday's good answers are worse today, and nobody notices. Evaluation must run <strong>like unit tests, automatically on every PR</strong>.</p>
+<p>This post covers:</p>
+<ul>
+<li>Golden dataset design</li>
+<li>Thresholds and fail policy</li>
+<li>GitHub Actions integration</li>
+<li>What to do when a regression fires</li>
+</ul>
+<hr>
+<h2>Golden Dataset — The Tests That Should Never Move</h2>
+<p>A regression dataset is different from your production eval dataset (Ep2).</p>
+<p><strong>Size</strong><br>
+- Production eval (Ep2): 100-1000<br>
+- Regression (Ep8): 20-50</p>
+<p><strong>Churn</strong><br>
+- Production eval (Ep2): Add monthly<br>
+- Regression (Ep8): Almost never</p>
+<p><strong>Purpose</strong><br>
+- Production eval (Ep2): Overall quality<br>
+- Regression (Ep8): Block core regressions</p>
+<p><strong>Cost</strong><br>
+- Production eval (Ep2): $10-100 per run<br>
+- Regression (Ep8): $0.50-5 per PR</p>
+<p><strong>Selection criteria</strong>:<br>
+1. <strong>Top 20% of usage</strong> — most common query patterns<br>
+2. <strong>Past regression cases</strong> — inputs that have broken before<br>
+3. <strong>Edge cases</strong> — empty, very long, multilingual, ambiguous intent</p>
+<pre><code class="language-python"># regression/golden_dataset.py
+import json
+
+GOLDEN = [
+    # Top usage cases
+    {&quot;id&quot;: &quot;freq-001&quot;, &quot;input&quot;: &quot;today's weather&quot;, &quot;expected_intent&quot;: &quot;weather_query&quot;},
+    {&quot;id&quot;: &quot;freq-002&quot;, &quot;input&quot;: &quot;change my password&quot;, &quot;expected_intent&quot;: &quot;account_password&quot;},
+
+    # Past regressions (with commit reference)
+    {&quot;id&quot;: &quot;reg-001&quot;, &quot;input&quot;: &quot;where is my order?&quot;,
+     &quot;expected_contains&quot;: [&quot;order&quot;, &quot;status&quot;],
+     &quot;note&quot;: &quot;v1.2 returned 'item' instead of 'order' (PR #234)&quot;},
+
+    # Edge cases
+    {&quot;id&quot;: &quot;edge-001&quot;, &quot;input&quot;: &quot;&quot;, &quot;expected_behavior&quot;: &quot;ask_clarification&quot;},
+    {&quot;id&quot;: &quot;edge-002&quot;, &quot;input&quot;: &quot;asdfgh&quot;, &quot;expected_behavior&quot;: &quot;ask_clarification&quot;},
+    {&quot;id&quot;: &quot;edge-003&quot;, &quot;input&quot;: &quot;Hi! I'm John. Actually I'm Mike. No wait, Sarah.&quot;,
+     &quot;expected_behavior&quot;: &quot;ask_clarification&quot;},
+]
+
+with open(&quot;regression/golden.jsonl&quot;, &quot;w&quot;) as f:
+    for item in GOLDEN:
+        f.write(json.dumps(item, ensure_ascii=False) + &quot;\n&quot;)
+</code></pre>
+<p><strong>Rule</strong>: keep Golden at <strong>20-50 items</strong>. Larger sets make every PR slow and expensive.</p>
+<hr>
+<h2>Thresholds and Fail Policy</h2>
+<p>A score is not enough. You must define <strong>what counts as fail</strong>.</p>
+<pre><code class="language-python"># regression/thresholds.py
+THRESHOLDS = {
+    &quot;exact_match&quot;:  0.80,   # Ep3
+    &quot;bleu&quot;:         0.40,
+    &quot;judge_score&quot;:  4.0,    # Ep4 on 1-5 scale
+    &quot;faithfulness&quot;: 0.85,   # Ep6 RAG
+    &quot;task_success&quot;: 0.90,   # Ep7 agent
+}
+
+FAIL_POLICY = &quot;any&quot;  # &quot;any&quot; | &quot;majority&quot; | &quot;weighted&quot;
+</code></pre>
+<p>Three fail policies compared:</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Meaning</th>
+<th>Pro</th>
+<th>Con</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>any</code></td>
+<td>Any metric below threshold → fail</td>
+<td>Safe</td>
+<td>Many false positives</td>
+</tr>
+<tr>
+<td><code>majority</code></td>
+<td>Majority below → fail</td>
+<td>Balanced</td>
+<td>Misses single sharp drops</td>
+</tr>
+<tr>
+<td><code>weighted</code></td>
+<td>Weighted average below → fail</td>
+<td>Domain-tuned</td>
+<td>Requires weight tuning</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation</strong>: start with <code>any</code>. If false positives are noisy, move to <code>weighted</code>.</p>
+<hr>
+<h2>CI Integration — GitHub Actions</h2>
+<p>A workflow that runs evaluation on every PR:</p>
+<pre><code class="language-yaml"># .github/workflows/eval.yml
+name: Regression Eval
+on:
+  pull_request:
+    paths:
+      - &quot;src/**&quot;
+      - &quot;prompts/**&quot;
+      - &quot;regression/**&quot;
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: &quot;3.11&quot;
+      - run: pip install -r requirements.txt
+
+      - name: Run regression eval
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python -m regression.run &gt; eval_report.json
+
+      - name: Check thresholds
+        run: |
+          python -m regression.check_thresholds eval_report.json
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval_report.json
+</code></pre>
+<pre><code class="language-python"># regression/check_thresholds.py
+import json, sys
+from .thresholds import THRESHOLDS, FAIL_POLICY
+
+def check(report_path: str) -&gt; int:
+    with open(report_path) as f:
+        report = json.load(f)
+
+    failures = []
+    for metric, threshold in THRESHOLDS.items():
+        if metric not in report:
+            continue
+        score = report[metric]
+        if score &lt; threshold:
+            failures.append(f&quot;{metric}: {score:.3f} &lt; {threshold}&quot;)
+
+    if FAIL_POLICY == &quot;any&quot; and failures:
+        print(&quot;FAIL — threshold violations:&quot;)
+        for f in failures:
+            print(f&quot;  - {f}&quot;)
+        return 1
+
+    print(&quot;PASS — all metrics above threshold&quot;)
+    return 0
+
+if __name__ == &quot;__main__&quot;:
+    sys.exit(check(sys.argv[1]))
+</code></pre>
+<p>The PR cannot merge if the eval fails. Regressions are stopped before they reach main.</p>
+<hr>
+<h2>Handling Non-Determinism — Seed and Tolerance</h2>
+<p>LLM evaluation is not deterministic. The same PR can score 0.02 differently across two runs. Two responses:</p>
+<p><strong>Response 1: Pin temperature and seed</strong></p>
+<pre><code class="language-python">response = client.chat.completions.create(
+    model=&quot;gpt-4o&quot;,
+    messages=[...],
+    temperature=0,
+    seed=42,  # OpenAI seed parameter
+)
+</code></pre>
+<p><code>seed</code> is best-effort, not guaranteed, but it cuts variance significantly.</p>
+<p><strong>Response 2: Add tolerance to thresholds</strong></p>
+<pre><code class="language-python"># regression/thresholds.py
+THRESHOLDS_WITH_TOLERANCE = {
+    &quot;exact_match&quot;:  (0.80, 0.02),  # pass at &gt;= 0.78 (0.02 tolerance)
+    &quot;judge_score&quot;:  (4.0,  0.1),
+    &quot;faithfulness&quot;: (0.85, 0.02),
+}
+
+def check_with_tolerance(metric: str, score: float) -&gt; bool:
+    threshold, tol = THRESHOLDS_WITH_TOLERANCE[metric]
+    return score &gt;= (threshold - tol)
+</code></pre>
+<p><strong>Rule</strong>: set tolerance at roughly <strong>2x the standard deviation of recent main branch scores</strong>. Too large and you miss regressions; too small and you ship false positives.</p>
+<hr>
+<h2>What to Do When the Eval Fails</h2>
+<p>When a PR fails the regression eval:</p>
+<ol>
+<li><strong>Re-run</strong>: it could be non-determinism. Try once more.</li>
+<li><strong>Look at individual cases</strong>: which inputs regressed?<br>
+<code>python
+   # regression/diff_report.py
+   def diff_against_main(current: dict, main_baseline: dict) -&gt; list[str]:
+       regressed = []
+       for case_id in current:
+           if current[case_id]["score"] &lt; main_baseline[case_id]["score"] - 0.1:
+               regressed.append(case_id)
+       return regressed</code></li>
+<li><strong>Decide</strong>:<br>
+   - <strong>Intentional change</strong>: update the threshold to the new baseline and document in the PR description.<br>
+   - <strong>Bug</strong>: fix the code or prompt and re-run.</li>
+</ol>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Golden dataset too large</strong></p>
+<p>500 golden cases per PR means 30 minutes and $20-50 per run. <strong>Cap at 20-50</strong> and run the larger production dataset nightly.</p>
+<p><strong>Mistake 2: Thresholds set too high</strong></p>
+<p><code>exact_match &gt;= 0.95</code> will fail constantly due to natural LLM variance. <strong>Start at -2σ from the current main score.</strong></p>
+<p><strong>Mistake 3: Setting thresholds once and forgetting</strong></p>
+<p>Models, prompts, and data improve. Baselines should rise. <strong>Review thresholds quarterly</strong> and tighten ones that have become loose.</p>
+<p><strong>Mistake 4: Not testing the eval code itself</strong></p>
+<p>A bug in the eval function makes every score fake. <strong>Write unit tests for eval functions</strong> with known input → expected score.</p>
+<p><strong>Mistake 5: Not monitoring eval cost</strong></p>
+<p>$5 per PR over 100 PRs/month = $500/month. <strong>Track CI cost weekly</strong>; if it climbs more than 10% switch to sampling.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Evaluation must run on <strong>every PR like unit tests</strong>, otherwise regressions reach production.</li>
+<li>Golden datasets are <strong>20-50 items</strong>: top usage + edge cases + past regressions.</li>
+<li>Three fail policies (any/majority/weighted) plus tolerance manage false positives.</li>
+<li>GitHub Actions runs the eval on every PR and blocks merge on threshold violations.</li>
+<li>On failure: re-run → diff → decide if it's an intentional change (raise threshold) or a bug (fix it).</li>
+</ul>
+<p>The next post covers <strong>A/B testing</strong> to decide statistically which of two models or prompts is actually better.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Ep2 Evaluation Dataset Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">Ep4 LLM-as-Judge — Evaluating Models with Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">Ep5 Rubric-Based Multi-Dimensional Scoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">Ep6 RAG Evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/07-agent-evaluation.md">Ep7 Agent Evaluation</a></li>
+<li><strong>Ep8 Regression Testing (current)</strong></li>
+<li>Ep9 A/B Testing LLMs (upcoming)</li>
+<li>Ep10 Production Evaluation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/api-reference/chat/create#chat-create-seed">OpenAI — Reproducible Outputs with seed parameter</a></li>
+<li><a href="https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions">GitHub Actions — Workflow syntax</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation/tutorials/regression">LangSmith — Regression Testing for LLM Apps</a></li>
+<li><a href="https://eugeneyan.com/writing/llm-evaluators/">Eugene Yan — Patterns for LLM Eval in CI</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, Regression Testing, CI, GitHub Actions</p>
+</body>
+</html>

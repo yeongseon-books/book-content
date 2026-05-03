@@ -236,4 +236,4 @@ print(len(tokenized[0]["input_ids"]))   # 64
 - [Alpaca dataset format](https://github.com/tatsu-lab/stanford_alpaca#data-release)
 - [Llama 3 chat template](https://huggingface.co/docs/transformers/main/en/chat_templating)
 
-Tags: Fine-tuning, Dataset, JSONL, Tokenizer, HuggingFace, Python
+Tags: Fine-tuning, LoRA, LLM, Python

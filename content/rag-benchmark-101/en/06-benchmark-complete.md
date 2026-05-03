@@ -253,13 +253,13 @@ The recurring idea is **not a single fused number, but repeatable measurement un
 Natural follow-ups from here include longer corpora (100k+), hybrid retrievers (BM25 + vector), rerankers, and multi-turn conversation evaluation.
 
 <!-- toc:begin -->
-## Series Contents
+## In this series
 
-- [Understanding RAG Evaluation Metrics](./01-evaluation-metrics.md)
-- [Measuring Retrieval Performance](./02-retrieval-benchmarking.md)
-- [Comparing Embedding Models](./03-embedding-comparison.md)
-- [Choosing a Vector DB](./04-vectordb-selection.md)
-- [End-to-End RAG Pipeline Evaluation](./05-e2e-evaluation.md)
+- [Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
+- [Measuring retrieval performance](./02-retrieval-benchmarking.md)
+- [Comparing embedding models](./03-embedding-comparison.md)
+- [VectorDB selection criteria](./04-vectordb-selection.md)
+- [End-to-end RAG pipeline evaluation](./05-e2e-evaluation.md)
 - **Completing the RAG Benchmark (current)**
 
 <!-- toc:end -->
@@ -273,4 +273,4 @@ Natural follow-ups from here include longer corpora (100k+), hybrid retrievers (
 - [FAISS documentation](https://faiss.ai/)
 - [GitHub Actions](https://docs.github.com/en/actions)
 
-Tags: RAG, Benchmarking, Pipeline, CI, Reproducibility, Reporting
+Tags: RAG, VectorDB, Benchmarking, LLM

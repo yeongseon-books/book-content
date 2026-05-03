@@ -256,4 +256,4 @@ The next article (episode 4) covers the CLOVA OCR API. We will reliably pull tex
 - [FAISS getting started](https://github.com/facebookresearch/faiss/wiki/Getting-started)
 - [SentenceTransformers semantic search examples](https://www.sbert.net/examples/sentence_transformer/applications/semantic-search/README.html)
 
-Tags: Korean NLP, BGE-M3, Multilingual, FAISS, Embeddings, Python
+Tags: Korean NLP, LLM, Embeddings, OCR

@@ -258,4 +258,4 @@ Next post wraps up the series with **Monitoring and ops** — connecting Log Ana
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Dapr, Sidecar, Pub-Sub, Service Invocation
+Tags: Azure, Container Apps, Serverless, Containers

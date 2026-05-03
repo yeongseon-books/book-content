@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: What is an embedding — converting text into vectors
 ---
 
 # What is an embedding — converting text into vectors

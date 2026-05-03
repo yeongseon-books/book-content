@@ -197,14 +197,14 @@ The point of LoRA configuration is **wiring verification**, not performance tuni
 Post 4 covers the training loop. We push real gradients through this adapter and watch how learning rate / batch size / gradient accumulation reshape the loss curve.
 
 <!-- toc:begin -->
-## Series Contents
+## In this series
 
 - [LLM Fine-tuning Primer](./01-intro.md)
 - [Dataset Preparation and Preprocessing](./02-dataset.md)
 - **Configuring LoRA Adapters (current)**
-- Training loop and hyperparameters (upcoming)
-- Model evaluation (upcoming)
-- Model serving (upcoming)
+- Training Loop and Hyperparameters (upcoming)
+- Model Evaluation (upcoming)
+- Model Serving (upcoming)
 
 <!-- toc:end -->
 
@@ -217,4 +217,4 @@ Post 4 covers the training loop. We push real gradients through this adapter and
 - [LoRA paper](https://arxiv.org/abs/2106.09685)
 - [PEFT LoraConfig source](https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py)
 
-Tags: Fine-tuning, LoRA, PEFT, Adapter, Transformers, Python
+Tags: Fine-tuning, LoRA, LLM, Python

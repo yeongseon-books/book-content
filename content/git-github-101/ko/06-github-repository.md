@@ -1,21 +1,23 @@
 ---
-title: "GitHub repository 만들기 - remote, push, pull 한 번에 익히기"
-description: "로컬 저장소만 있던 프로젝트를 GitHub에 올리고, remote를 연결하고, push와 pull로 양쪽을 동기화하는 흐름을 손으로 따라가며 익힙니다."
-date: '2026-05-04'
+episode: 6
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 6
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-remote
-  - git-push
-  - git-pull
-  - git-clone
-  - git-fetch
-  - origin
+- github-remote
+- git-push
+- git-pull
+- git-clone
+- git-fetch
+- origin
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: GitHub repository 만들기 - remote, push, pull 한 번에 익히기
 ---
 
 # GitHub repository 만들기 - remote, push, pull 한 번에 익히기

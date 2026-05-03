@@ -233,4 +233,4 @@ Next post covers **Dapr integration** — how a sidecar gives you distributed-sy
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, KEDA, Autoscaling, Scale-to-Zero, Serverless
+Tags: Azure, Container Apps, Serverless, Containers

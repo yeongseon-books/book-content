@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Why Evaluate LLM Applications</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Why Evaluate LLM Applications</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (1/10)</p>
+</blockquote>
+<p>LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today. This post covers why LLM evaluation differs from regular software testing and what to measure.</p>
+<hr>
+<h2>Why Is LLM Evaluation Different from Regular Testing?</h2>
+<p>Traditional unit tests are deterministic: <code>assert add(2, 3) == 5</code>. The same input produces the same output, and there is exactly one right answer.</p>
+<p>LLMs are different.</p>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def summarize(text: str) -&gt; str:
+    resp = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;Summarize in one sentence: {text}&quot;}],
+    )
+    return resp.choices[0].message.content
+</code></pre>
+<p>Send the same <code>text</code> twice and the two responses will not match exactly. Several answers can reasonably be called "correct," and many are hard to call "wrong" with confidence. <code>==</code> comparison alone cannot evaluate this.</p>
+<h2>What Breaks if You Run Without Evaluation?</h2>
+<p>Three things break at once.</p>
+<ol>
+<li><strong>You cannot detect regressions.</strong> You change one line of a prompt, another case breaks, and without evals you only learn from a user complaint.</li>
+<li><strong>You become afraid to upgrade models.</strong> You want to move from gpt-4o-mini to gpt-4.1, but with no way to measure "is it better?" you simply do not move.</li>
+<li><strong>You have no proof you improved anything.</strong> Saying "this prompt is better" carries no weight without numbers; you cannot convince stakeholders.</li>
+</ol>
+<pre><code class="language-python"># What changing a prompt without evals looks like
+# Before: &quot;Summarize in one sentence:&quot;
+# After:  &quot;Summarize concisely in one sentence in a friendly tone:&quot;
+# -&gt; You have no idea which cases got better and which got worse.
+</code></pre>
+<h2>What Should You Measure?</h2>
+<p>LLM responses have at least four dimensions, and each needs a different measurement approach.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class EvalResult:
+    correctness: float  # are the facts right
+    relevance: float    # does it answer the question
+    safety: float       # any harm or bias
+    style: float        # does it follow the requested format and tone
+</code></pre>
+<ol>
+<li><strong>Correctness</strong>: are the facts right? In RAG, does the answer match retrieved context?</li>
+<li><strong>Relevance</strong>: does the answer address the question or wander around it?</li>
+<li><strong>Safety</strong>: any PII leakage, discriminatory language, or dangerous advice?</li>
+<li><strong>Style</strong>: does it follow the JSON schema, length limit, or tone you required?</li>
+</ol>
+<p>Later posts in this series cover which metrics fit each dimension, one at a time.</p>
+<h2>The Four Stages of an Evaluation Pipeline</h2>
+<p>Whatever tool you use, an LLM evaluation system has the same four stages.</p>
+<pre><code class="language-python">def run_evaluation(eval_set: list[dict], system_under_test) -&gt; dict:
+    # 1. Generate — feed inputs to the system under test, collect responses
+    predictions = [system_under_test(ex[&quot;input&quot;]) for ex in eval_set]
+
+    # 2. Score — score each response
+    scores = [score_one(ex, pred) for ex, pred in zip(eval_set, predictions)]
+
+    # 3. Aggregate — roll up the scores
+    summary = {
+        &quot;accuracy&quot;: sum(s[&quot;correct&quot;] for s in scores) / len(scores),
+        &quot;avg_relevance&quot;: sum(s[&quot;relevance&quot;] for s in scores) / len(scores),
+    }
+
+    # 4. Compare — compare against the previous version
+    return summary
+</code></pre>
+<ol>
+<li><strong>Generate</strong>: produce system responses for the eval set inputs.</li>
+<li><strong>Score</strong>: score each response (deterministic metric, LLM-as-judge, human rating, or a combination).</li>
+<li><strong>Aggregate</strong>: roll up by dimension — average, pass rate, p95.</li>
+<li><strong>Compare</strong>: compare against the previous version or a baseline to catch regressions.</li>
+</ol>
+<h2>Your First Evaluation — Start with Ten</h2>
+<p>"I will evaluate once we have enough data" means you will not start a year from now. Start with ten.</p>
+<pre><code class="language-python">eval_set = [
+    {&quot;input&quot;: &quot;What is RAG?&quot;, &quot;expected_keywords&quot;: [&quot;retrieval&quot;, &quot;generation&quot;]},
+    {&quot;input&quot;: &quot;Explain async/await&quot;, &quot;expected_keywords&quot;: [&quot;coroutine&quot;, &quot;await&quot;]},
+    # ... 8 more
+]
+
+def score_one(ex, pred: str) -&gt; dict:
+    keywords_found = sum(1 for kw in ex[&quot;expected_keywords&quot;] if kw.lower() in pred.lower())
+    return {
+        &quot;correct&quot;: keywords_found == len(ex[&quot;expected_keywords&quot;]),
+        &quot;keyword_recall&quot;: keywords_found / len(ex[&quot;expected_keywords&quot;]),
+    }
+
+results = run_evaluation(eval_set, summarize)
+print(f&quot;Accuracy: {results['accuracy']:.0%}&quot;)
+</code></pre>
+<p>Even ten cases give you signals like "case #5 dropped after the prompt change." That single signal catches 90% of regressions.</p>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>"We will evaluate once production stabilizes."</strong> Without evaluation, you cannot know whether it has stabilized. Start with ten cases on day one.</li>
+<li><strong>Obsessing over a single score.</strong> "87% accuracy" hides a drop in safety. Always look per dimension.</li>
+<li><strong>The prompt author writes the eval set.</strong> They cherry-pick cases that favor their own prompt and the result is inflated. Pull cases from someone else or from production traces.</li>
+<li><strong>Using only deterministic metrics.</strong> BLEU alone penalizes "right meaning, different wording." Combine with LLM-as-judge or rubric scoring.</li>
+<li><strong>Running the eval once.</strong> LLMs are stochastic, so the same input can score differently. Repeat important comparisons 3-5 times and look at the variance too.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>LLM responses are not deterministic, so <code>==</code> comparison does not work.</li>
+<li>Without evaluation you cannot detect regressions, upgrade models, or prove improvements.</li>
+<li>Measure at least four dimensions separately: correctness, relevance, safety, style.</li>
+<li>The pipeline is four stages: generate, score, aggregate, compare.</li>
+<li>Do not wait for data to accumulate — start with ten cases today.</li>
+</ul>
+<p>The next post covers how to design evaluation datasets — where to source them, how many you need, and how to label them.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><strong>Why Evaluate LLM Applications (current)</strong></li>
+<li>Designing Evaluation Datasets (upcoming)</li>
+<li>Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)</li>
+<li>LLM-as-Judge (upcoming)</li>
+<li>Rubric-Based Scoring (upcoming)</li>
+<li>Evaluating RAG Systems (upcoming)</li>
+<li>Evaluating Agents (upcoming)</li>
+<li>Regression Testing (upcoming)</li>
+<li>A/B Testing LLMs (upcoming)</li>
+<li>Continuous Evaluation in Production (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/openai/evals">OpenAI — Evals framework</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests">Anthropic — Building evals</a></li>
+<li><a href="https://huggingface.co/learn/cookbook/en/llm_judge">Hugging Face — Evaluating LLMs</a></li>
+<li><a href="https://eugeneyan.com/writing/llm-evaluators/">Eugene Yan — LLM evaluation patterns</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, LLM, Testing, Quality</p>
+</body>
+</html>

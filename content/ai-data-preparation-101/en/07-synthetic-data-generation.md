@@ -1,14 +1,9 @@
 ---
-title: Synthetic Data Generation
-series: ai-data-preparation-101
 episode: 7
 language: en
+last_reviewed: '2026-05-03'
+series: ai-data-preparation-101
 status: content-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Synthetic Data
 - Self-Instruct
@@ -16,7 +11,12 @@ tags:
 - Distillation
 - GPT-4
 - Alpaca
-last_reviewed: '2026-05-03'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Synthetic Data Generation - From Self-Instruct to Distillation
 ---
 
 # Synthetic Data Generation - From Self-Instruct to Distillation

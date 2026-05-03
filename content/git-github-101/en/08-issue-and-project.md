@@ -1,21 +1,23 @@
 ---
-title: "Tracking Work with Issues and Projects - How GitHub Records What's Next"
-description: "Define a unit of work as a GitHub Issue, link it to a Pull Request that auto-closes it on merge, and put both on a Project board to see status at a glance."
-date: '2026-05-04'
+episode: 8
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 8
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-issue
-  - github-project
-  - issue-tracking
-  - kanban-board
-  - issue-pr-linking
-  - closes-keyword
+- github-issue
+- github-project
+- issue-tracking
+- kanban-board
+- issue-pr-linking
+- closes-keyword
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Tracking Work with Issues and Projects - How GitHub Records What's Next
 ---
 
 # Tracking Work with Issues and Projects - How GitHub Records What's Next

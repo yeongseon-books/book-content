@@ -205,4 +205,4 @@ print(f"avg latency = {sum(latencies_ms)/len(latencies_ms):.1f} ms")
 - [Python `time.perf_counter`](https://docs.python.org/3/library/time.html#time.perf_counter)
 - [BEIR: heterogeneous benchmark for IR](https://github.com/beir-cellar/beir)
 
-Tags: RAG, VectorDB, Benchmarking, Hit-Rate, Latency, MRR
+Tags: RAG, VectorDB, Benchmarking, LLM

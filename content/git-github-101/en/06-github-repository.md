@@ -1,21 +1,23 @@
 ---
-title: "Creating a GitHub repository - remote, push, and pull in one go"
-description: "Take a local-only project, create a GitHub repository, connect them through a remote, and keep both sides in sync with push and pull."
-date: '2026-05-04'
+episode: 6
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 6
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-remote
-  - git-push
-  - git-pull
-  - git-clone
-  - git-fetch
-  - origin
+- github-remote
+- git-push
+- git-pull
+- git-clone
+- git-fetch
+- origin
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Creating a GitHub repository - remote, push, and pull in one go
 ---
 
 # Creating a GitHub repository - remote, push, and pull in one go

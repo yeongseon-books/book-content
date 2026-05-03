@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: 청크 전략 — 긴 문서를 어떻게 나눌 것인가
 ---
 
 # 청크 전략 — 긴 문서를 어떻게 나눌 것인가

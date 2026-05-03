@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Continuous Evaluation in Production</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Continuous Evaluation in Production</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (10/10)</p>
+</blockquote>
+<p>Evaluation is not a one-shot pre-deploy check; it must run continuously in production. This post covers sampling evaluation cases from production traces, monitoring online metrics, and detecting drift.</p>
+<hr>
+<h2>Deployment Is Where It Starts</h2>
+<p>Pre-deployment evaluation is a controlled simulation. Real users send unexpected inputs, model providers silently update their models, and data distributions drift over time. When evaluation stops at deployment, quality regressions go unnoticed.</p>
+<p>This post covers:</p>
+<ul>
+<li>Production trace sampling strategies</li>
+<li>Online metric collection (feedback, latency, re-ask rate)</li>
+<li>Drift detection for input/output distribution shifts</li>
+<li>Shadow mode for safe model rollout</li>
+<li>Baseline-relative alert thresholds</li>
+<li>Cost monitoring for evaluation itself</li>
+</ul>
+<p>This is the final episode, connecting the previous nine into a continuous operational cycle.</p>
+<hr>
+<h2>Section 1 — Production Trace Sampling</h2>
+<p>Evaluating every production request is prohibitively expensive. You need to sample, but without bias.</p>
+<p><strong>Uniform sampling</strong></p>
+<pre><code class="language-python">import random
+
+def uniform_sample(traces: list[dict], rate: float = 0.01) -&gt; list[dict]:
+    &quot;&quot;&quot;Pick `rate` fraction of traces uniformly.&quot;&quot;&quot;
+    return [t for t in traces if random.random() &lt; rate]
+
+# 1% of 100k daily requests = 1,000 traces for evaluation
+sampled = uniform_sample(today_traces, rate=0.01)
+</code></pre>
+<p>Simple, but rare categories (medical, legal queries) are barely represented.</p>
+<p><strong>Stratified sampling</strong></p>
+<p>Guarantee a minimum N per category:</p>
+<pre><code class="language-python">from collections import defaultdict
+
+def stratified_sample(traces: list[dict], per_category: int = 50) -&gt; list[dict]:
+    buckets = defaultdict(list)
+    for t in traces:
+        buckets[t[&quot;category&quot;]].append(t)
+    sampled = []
+    for cat, items in buckets.items():
+        n = min(per_category, len(items))
+        sampled.extend(random.sample(items, n))
+    return sampled
+</code></pre>
+<p>Now you can track quality even in low-volume slices.</p>
+<p><strong>Failure-biased sampling</strong></p>
+<p>Prioritize traces with low confidence, short responses, or thumbs-down feedback. Spend the evaluation budget where problems likely exist.</p>
+<pre><code class="language-python">def failure_biased_sample(traces, rate_pass=0.005, rate_fail=0.5):
+    sampled = []
+    for t in traces:
+        threshold = rate_fail if t.get(&quot;user_feedback&quot;) == &quot;down&quot; else rate_pass
+        if random.random() &lt; threshold:
+            sampled.append(t)
+    return sampled
+</code></pre>
+<hr>
+<h2>Section 2 — Online Metric Collection</h2>
+<p>Heavy LLM-as-judge evaluation runs daily. Lightweight online signals run in real time.</p>
+<p><strong>Thumbs up/down rate</strong><br>
+- Meaning: Direct user feedback<br>
+- How to measure: UI button click logging</p>
+<p><strong>Re-ask rate</strong><br>
+- Meaning: Same user repeats a similar question within 5 minutes<br>
+- How to measure: session id + query similarity</p>
+<p><strong>Conversation length</strong><br>
+- Meaning: Turns to complete a task<br>
+- How to measure: session log aggregation</p>
+<p><strong>Latency p50 / p95</strong><br>
+- Meaning: Response speed<br>
+- How to measure: per-request timestamps</p>
+<p><strong>Cost per request</strong><br>
+- Meaning: Tokens × price<br>
+- How to measure: usage field aggregation</p>
+<pre><code class="language-python">from dataclasses import dataclass
+from datetime import datetime
+
+@dataclass
+class TraceMetric:
+    trace_id: str
+    timestamp: datetime
+    latency_ms: int
+    input_tokens: int
+    output_tokens: int
+    user_feedback: str | None  # &quot;up&quot;, &quot;down&quot;, None
+    re_asked: bool
+
+def daily_summary(metrics: list[TraceMetric]) -&gt; dict:
+    n = len(metrics)
+    return {
+        &quot;total&quot;: n,
+        &quot;thumbs_down_rate&quot;: sum(1 for m in metrics if m.user_feedback == &quot;down&quot;) / n,
+        &quot;re_ask_rate&quot;: sum(1 for m in metrics if m.re_asked) / n,
+        &quot;p95_latency_ms&quot;: sorted(m.latency_ms for m in metrics)[int(n * 0.95)],
+        &quot;avg_cost_usd&quot;: sum(m.input_tokens * 0.000005 + m.output_tokens * 0.000015 for m in metrics) / n,
+    }
+</code></pre>
+<p>Online metrics are an <strong>early warning system</strong>. Judge evaluations run daily because they are expensive; online metrics run by the minute.</p>
+<hr>
+<h2>Section 3 — Drift Detection</h2>
+<p>When the input distribution changes (user behavior shift, new traffic source), your existing evaluation set no longer reflects production quality.</p>
+<p><strong>Input distribution comparison — KL divergence</strong></p>
+<pre><code class="language-python">import math
+from collections import Counter
+
+def kl_divergence(p: dict[str, float], q: dict[str, float], eps: float = 1e-9) -&gt; float:
+    &quot;&quot;&quot;KL(P || Q): how much P diverges from Q.&quot;&quot;&quot;
+    total = 0.0
+    for key, p_val in p.items():
+        q_val = q.get(key, eps)
+        total += p_val * math.log((p_val + eps) / (q_val + eps))
+    return total
+
+def category_distribution(traces: list[dict]) -&gt; dict[str, float]:
+    counts = Counter(t[&quot;category&quot;] for t in traces)
+    n = sum(counts.values())
+    return {k: v / n for k, v in counts.items()}
+
+baseline = category_distribution(traces_last_week)
+current = category_distribution(traces_today)
+drift = kl_divergence(current, baseline)
+
+if drift &gt; 0.1:
+    alert(&quot;Input distribution drift detected&quot;)
+</code></pre>
+<p>A KL value above 0.1 indicates meaningful shift. Calibrate the threshold by measuring 30 days of baseline volatility first.</p>
+<p><strong>Output drift</strong></p>
+<p>If response length, refusal rate, or tone changes for a fixed input category, the provider may have silently updated the model.</p>
+<pre><code class="language-python">def refusal_rate(traces: list[dict]) -&gt; float:
+    refusals = sum(1 for t in traces if &quot;I cannot&quot; in t[&quot;output&quot;] or &quot;I'm sorry&quot; in t[&quot;output&quot;])
+    return refusals / len(traces)
+</code></pre>
+<p>Silent provider updates are invisible without monitoring.</p>
+<hr>
+<h2>Section 4 — Shadow Mode and Canary</h2>
+<p>Before sending users to a new model or prompt, run it in <strong>shadow mode</strong> alongside the current one.</p>
+<pre><code class="language-python">async def shadow_call(input_text: str):
+    &quot;&quot;&quot;Serve from the primary model, log a shadow call to the candidate.&quot;&quot;&quot;
+    primary = await call_model(&quot;gpt-4o&quot;, input_text)
+    asyncio.create_task(log_shadow(input_text, primary))
+    return primary
+
+async def log_shadow(input_text: str, primary_output: str):
+    shadow = await call_model(&quot;gpt-4o-mini&quot;, input_text)
+    await db.insert_shadow_comparison({
+        &quot;input&quot;: input_text,
+        &quot;primary&quot;: primary_output,
+        &quot;shadow&quot;: shadow,
+        &quot;timestamp&quot;: datetime.utcnow(),
+    })
+</code></pre>
+<p>Run pairwise LLM-as-judge (Ep4) on shadow records and you can measure the candidate's win rate without exposing users to risk. Canary takes the next step: route 5% of real traffic to the candidate and compare online metrics.</p>
+<hr>
+<h2>Section 5 — Alert Threshold Design</h2>
+<p>Fixed thresholds (<code>thumbs_down_rate &gt; 5%</code>) are dangerous. Baselines vary by category, weekday, and hour.</p>
+<p><strong>Baseline-relative thresholds</strong></p>
+<pre><code class="language-python">def relative_alert(current: float, baseline_mean: float, baseline_std: float, k: float = 3.0) -&gt; bool:
+    &quot;&quot;&quot;Alert when current value is more than k std from baseline mean.&quot;&quot;&quot;
+    return abs(current - baseline_mean) &gt; k * baseline_std
+
+# Learn baseline from past 30 days
+baseline_mean = 0.03
+baseline_std = 0.008
+if relative_alert(today_rate, baseline_mean, baseline_std):
+    page_oncall(&quot;thumbs_down_rate anomaly&quot;)
+</code></pre>
+<p>A 3-sigma rule fires only ~0.27% of the time under a normal baseline, which keeps false positives manageable.</p>
+<p><strong>Avoid alert fatigue</strong></p>
+<p>Group repeated alerts within an hour. Separate severity levels (warning vs page). If on-call wakes up for every blip, every alert eventually gets ignored.</p>
+<hr>
+<h2>Section 6 — Evaluation Cost Monitoring</h2>
+<p>LLM-as-judge has a per-call cost. Without monitoring, evaluation cost can exceed serving cost.</p>
+<pre><code class="language-python">@dataclass
+class JudgeUsage:
+    date: str
+    judge_calls: int
+    judge_cost_usd: float
+    serving_cost_usd: float
+
+def cost_ratio_alert(usage: JudgeUsage, max_ratio: float = 0.1):
+    ratio = usage.judge_cost_usd / usage.serving_cost_usd
+    if ratio &gt; max_ratio:
+        alert(f&quot;Judge cost is {ratio:.1%} of serving cost — exceeds {max_ratio:.0%} budget&quot;)
+</code></pre>
+<p>When evaluation cost exceeds 10% of serving cost, lower the sampling rate or switch to a cheaper judge model.</p>
+<hr>
+<h2>Section 7 — Recycling Production Failures into Regression Sets</h2>
+<p>Failures discovered in production (low rating, re-ask, escalation) are the most valuable evaluation data you have. Add them to the regression set from Ep8 so the next deploy automatically guards against them.</p>
+<pre><code class="language-python">def harvest_failures_to_regression_set(failed_traces: list[dict], regression_path: str):
+    new_cases = [
+        {
+            &quot;input&quot;: t[&quot;input&quot;],
+            &quot;expected&quot;: t.get(&quot;ground_truth&quot;) or &quot;TBD - human label needed&quot;,
+            &quot;category&quot;: t[&quot;category&quot;],
+            &quot;source&quot;: &quot;production_failure&quot;,
+            &quot;harvested_at&quot;: datetime.utcnow().isoformat(),
+        }
+        for t in failed_traces
+    ]
+    with open(regression_path, &quot;a&quot;) as f:
+        for case in new_cases:
+            f.write(json.dumps(case) + &quot;\n&quot;)
+</code></pre>
+<p>Closing this loop turns production → regression set → next deploy → production into an automated cycle. Every failure becomes a permanent asset.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Uniform sampling only</strong> — rare categories become invisible. Combine stratified and failure-biased sampling.</li>
+<li><strong>Fixed-threshold alerts</strong> — ignoring category and time-of-day patterns produces false positives that erode trust.</li>
+<li><strong>Relying on judge alone</strong> — judges cannot run by the minute. Pair them with lightweight signals like thumbs and re-ask.</li>
+<li><strong>Logging shadow mode without analyzing it</strong> — collection without comparison is wasted I/O. Schedule weekly win-rate reviews.</li>
+<li><strong>Not tracking evaluation cost</strong> — judge calls quietly outgrow serving cost. Cost is a metric too.</li>
+</ol>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li><strong>Production trace sampling</strong> combines uniform, stratified, and failure-biased strategies.</li>
+<li><strong>Online metrics</strong> (thumbs, re-ask, latency, cost) are the early-warning layer above judge evaluation.</li>
+<li><strong>Drift detection</strong> uses KL divergence on inputs and refusal rate on outputs.</li>
+<li><strong>Shadow mode and canary</strong> validate new models without exposing users.</li>
+<li><strong>Baseline-relative alerts</strong> (mean ± 3σ) outperform fixed thresholds.</li>
+<li><strong>Recycle production failures into regression sets</strong> to close the evaluation-deployment loop.</li>
+</ul>
+<p>Evaluation is not a pre-deployment milestone. It is a continuous operational discipline. This concludes the AI Evaluation 101 series.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Why Evaluate LLM Apps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Evaluation Dataset Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">LLM-as-Judge — Evaluating Models with Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">Rubric-Based Multi-Dimensional Scoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">RAG Evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/07-agent-evaluation.md">Agent Evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/08-regression-testing.md">Regression Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/09-ab-testing-llms.md">A/B Testing LLMs</a></li>
+<li><strong>Continuous Evaluation in Production (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/openai/evals">OpenAI Evals — Production Monitoring Patterns</a></li>
+<li><a href="https://docs.smith.langchain.com/observability/how_to_guides/online_evaluations">LangSmith Online Evaluations</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE Book — Monitoring Distributed Systems</a></li>
+<li><a href="https://docs.evidentlyai.com/presets/data-drift">Evidently AI — Data Drift Detection</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, Production, Drift Detection, Monitoring</p>
+</body>
+</html>

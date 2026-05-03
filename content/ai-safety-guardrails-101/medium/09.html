@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Audit Logging and Compliance</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Audit Logging and Compliance</h1>
+<blockquote>
+<p>AI Safety &amp; Guardrails 101 Series (9/10)</p>
+</blockquote>
+<hr>
+<h2>Section 1</h2>
+<h2>Why Audit Logs Differ From Application Logs</h2>
+<p>In LLM systems, audit logs are the basis for compliance, incident investigation, and model improvement, not casual debugging. Design them separately from application logs.</p>
+<p><strong>Retention</strong><br>
+- Application log: 7 to 30 days<br>
+- Audit log: 1 to 7 years (regulation-dependent)</p>
+<p><strong>Mutability</strong><br>
+- Application log: Freely editable<br>
+- Audit log: Append-only, immutable</p>
+<p><strong>Access</strong><br>
+- Application log: Engineers in general<br>
+- Audit log: Security and compliance only</p>
+<p><strong>Format</strong><br>
+- Application log: Free-form text<br>
+- Audit log: Structured schema</p>
+<p><strong>PII</strong><br>
+- Application log: Masking recommended<br>
+- Audit log: Masking required, keys stored separately</p>
+<p>Application logs answer "what happened" quickly. Audit logs reconstruct "why a decision was made" much later.</p>
+<h2>What to Record</h2>
+<p>For each LLM request, the audit record carries these fields.</p>
+<pre><code class="language-python">from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
+import hashlib
+import uuid
+
+@dataclass
+class AuditRecord:
+    request_id: str
+    timestamp: str
+    user_id_hash: str          # PII becomes a hash
+    api_key_id: str
+    model: str
+    input_token_count: int
+    output_token_count: int
+    cost_usd: float
+    guardrail_decisions: list  # [&quot;pii_redacted&quot;, &quot;moderation_passed&quot;, ...]
+    blocked: bool
+    block_reason: str | None
+    prompt_hash: str           # raw text lives in a separate store
+    response_hash: str
+    retrieved_chunk_ids: list[int]
+    latency_ms: int
+
+def make_record(user_id: str, prompt: str, response: str, **kw) -&gt; AuditRecord:
+    return AuditRecord(
+        request_id=str(uuid.uuid4()),
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        user_id_hash=hashlib.sha256(user_id.encode()).hexdigest()[:16],
+        prompt_hash=hashlib.sha256(prompt.encode()).hexdigest(),
+        response_hash=hashlib.sha256(response.encode()).hexdigest(),
+        **kw,
+    )
+</code></pre>
+<p>Raw prompt and response do not enter the audit record. Store them in a separate PII-aware store with KMS encryption. The audit log keeps only the hashes for integrity checks and later joins.</p>
+<h2>PII Masking and Separate Storage</h2>
+<p>GDPR, PIPA, and HIPAA all require that data with different processing purposes live in different stores. Audit serves verification; raw prompts serve model improvement.</p>
+<pre><code class="language-python">def store_audit(record: AuditRecord, prompt: str, response: str):
+    # 1. Audit log: append-only, hashes only
+    audit_db.insert(asdict(record))
+
+    # 2. PII store: KMS encrypted, short retention based on user consent
+    if user_consent_to_train(record.user_id_hash):
+        encrypted_prompt = kms.encrypt(prompt)
+        encrypted_response = kms.encrypt(response)
+        pii_store.put(record.request_id, {
+            &quot;prompt&quot;: encrypted_prompt,
+            &quot;response&quot;: encrypted_response,
+            &quot;ttl&quot;: 90,  # days
+        })
+</code></pre>
+<p>When a user requests deletion, remove from the PII store but keep the audit log hashes for integrity.</p>
+<h2>Append-Only Storage</h2>
+<p>Once written, an audit record must be unchangeable by anyone. Three patterns:</p>
+<ol>
+<li><strong>WORM (Write Once Read Many) S3 bucket</strong>: Object Lock with Compliance Mode. Even root cannot delete within retention.</li>
+<li><strong>Append-only database</strong>: ClickHouse or TimescaleDB. Do not grant UPDATE or DELETE to application users.</li>
+<li><strong>Hash chain</strong>: each record contains the previous record's hash, so any tampering is detectable later.</li>
+</ol>
+<pre><code class="language-python">from hashlib import sha256
+
+def chain_hash(prev_hash: str, record: dict) -&gt; str:
+    payload = prev_hash + str(sorted(record.items()))
+    return sha256(payload.encode()).hexdigest()
+
+def append_with_chain(record: dict):
+    prev = audit_db.last_hash() or &quot;0&quot; * 64
+    record[&quot;prev_hash&quot;] = prev
+    record[&quot;self_hash&quot;] = chain_hash(prev, record)
+    audit_db.insert(record)
+</code></pre>
+<p>Hash chains are nearly free and let you automate audit verification.</p>
+<h2>Capturing Decision Rationale</h2>
+<p>The most common regulatory question is "why did the system answer that way?" For RAG systems, capture:</p>
+<ul>
+<li>User query (hash)</li>
+<li>Retrieved chunk IDs and scores</li>
+<li>Guardrail decisions applied</li>
+<li>Model, temperature, seed</li>
+<li>Final response (hash)</li>
+</ul>
+<pre><code class="language-python">def log_decision(request_id: str, query: str, chunks: list[dict], answer: str, params: dict):
+    audit_db.insert({
+        &quot;request_id&quot;: request_id,
+        &quot;type&quot;: &quot;rag_decision&quot;,
+        &quot;query_hash&quot;: sha256(query.encode()).hexdigest(),
+        &quot;chunk_ids&quot;: [c[&quot;id&quot;] for c in chunks],
+        &quot;chunk_scores&quot;: [c[&quot;score&quot;] for c in chunks],
+        &quot;model&quot;: params[&quot;model&quot;],
+        &quot;temperature&quot;: params[&quot;temperature&quot;],
+        &quot;seed&quot;: params.get(&quot;seed&quot;),
+        &quot;answer_hash&quot;: sha256(answer.encode()).hexdigest(),
+        &quot;timestamp&quot;: datetime.now(timezone.utc).isoformat(),
+    })
+</code></pre>
+<p>If replaying the same query at the same model, temperature, and seed produces a different answer, treat it as a model-drift signal.</p>
+<h2>Retention and Automatic Deletion</h2>
+<p>Each regulation suggests its own retention.</p>
+<p><strong>GDPR</strong><br>
+- Suggested retention: Until processing purpose ends<br>
+- Notes: Right to erasure required</p>
+<p><strong>HIPAA</strong><br>
+- Suggested retention: 6 years<br>
+- Notes: Health information</p>
+<p><strong>SOC 2</strong><br>
+- Suggested retention: 1 year<br>
+- Notes: Security audit</p>
+<p><strong>PCI DSS</strong><br>
+- Suggested retention: 1 year, last 3 months instantly searchable<br>
+- Notes: Payments</p>
+<p><strong>PIPA (KR)</strong><br>
+- Suggested retention: 5 years<br>
+- Notes: PII processing records</p>
+<p>Run a daily garbage-collection job.</p>
+<pre><code class="language-python">from datetime import timedelta
+
+RETENTION = {
+    &quot;audit_log&quot;: timedelta(days=365 * 7),     # 7 years
+    &quot;pii_store&quot;: timedelta(days=90),
+}
+
+def gc_pii_store():
+    cutoff = datetime.now(timezone.utc) - RETENTION[&quot;pii_store&quot;]
+    pii_store.delete_where(lambda r: r[&quot;created_at&quot;] &lt; cutoff)
+</code></pre>
+<p>Record the deletion itself in the audit log as well ("PII record X was deleted at Y per retention policy").</p>
+<h2>Auto-Generated Compliance Reports</h2>
+<p>Audit logs are valuable only when humans can read them. Build periodic reports.</p>
+<pre><code class="language-python">def monthly_report(year: int, month: int) -&gt; dict:
+    rows = audit_db.query(year=year, month=month)
+    return {
+        &quot;total_requests&quot;: len(rows),
+        &quot;blocked_requests&quot;: sum(1 for r in rows if r[&quot;blocked&quot;]),
+        &quot;block_reasons&quot;: Counter(r[&quot;block_reason&quot;] for r in rows if r[&quot;blocked&quot;]),
+        &quot;pii_redaction_count&quot;: sum(1 for r in rows if &quot;pii_redacted&quot; in r[&quot;guardrail_decisions&quot;]),
+        &quot;models_used&quot;: Counter(r[&quot;model&quot;] for r in rows),
+        &quot;total_cost_usd&quot;: sum(r[&quot;cost_usd&quot;] for r in rows),
+        &quot;p95_latency_ms&quot;: percentile([r[&quot;latency_ms&quot;] for r in rows], 95),
+    }
+</code></pre>
+<p>Send the report monthly to security, compliance, and leadership. Anomalies show up before incidents do.</p>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Logging raw prompt and response in application logs.</strong> PII ends up in seven years of logs and triggers GDPR violations. Hash in audit, encrypt in a separate store.</li>
+<li><strong>Append-only in name only.</strong> A regular DB without permission controls cannot defeat tampering claims. Add WORM or hash-chain enforcement.</li>
+<li><strong>Skipping decision rationale.</strong> Without "why we answered" you cannot reproduce or defend the decision later. Capture retrieval, params, and guardrail decisions.</li>
+<li><strong>Keeping logs forever.</strong> "Just in case" causes GDPR violations and storage cost runaway. Apply per-regulation retention with an automatic GC job.</li>
+<li><strong>Not logging deletions.</strong> If no one knows who deleted what when, the audit log itself loses integrity. Record deletions as immutable records too.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Audit logs are separate systems with their own schema, retention, permissions, and PII rules.</li>
+<li>Store raw prompts and responses encrypted in a separate KMS-backed store; keep only hashes in audit.</li>
+<li>Enforce append-only with WORM storage or hash chains, not just policy.</li>
+<li>Capture decision rationale (query, chunks, params, guardrail decisions) so replay and regulatory response are possible.</li>
+<li>Automate retention deletion and log the deletions themselves to preserve audit integrity.</li>
+</ul>
+<hr>
+<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">Ep6 Toxicity and Bias Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/07-hallucination-guardrails.md">Ep7 Hallucination Guardrails - Grounding Checks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/08-rate-limiting-abuse-prevention.md">Ep8 Rate Limiting and Abuse Prevention</a></li>
+<li><strong>Ep9 Audit Logging and Compliance (current)</strong></li>
+<li>Ep10 Building a Production Guardrail System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://gdpr-info.eu/art-30-gdpr/">GDPR - Article 30: Records of processing activities</a></li>
+<li><a href="https://www.hhs.gov/hipaa/for-professionals/security/index.html">HIPAA Security Rule - Audit controls</a></li>
+<li><a href="https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services">SOC 2 - Trust Services Criteria</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html">AWS S3 Object Lock - Compliance mode</a></li>
+</ul>
+<p class="tags-line">Tags: AI Safety, Audit Logging, Compliance, GDPR</p>
+</body>
+</html>

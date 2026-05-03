@@ -227,4 +227,4 @@ args.max_steps = 1
 - [DataCollatorForLanguageModeling](https://huggingface.co/docs/transformers/main_classes/data_collator)
 - [Mixed precision training](https://huggingface.co/docs/transformers/perf_train_gpu_one)
 
-Tags: Fine-tuning, Trainer, Hyperparameters, LearningRate, Optimizer, Python
+Tags: Fine-tuning, LoRA, LLM, Python

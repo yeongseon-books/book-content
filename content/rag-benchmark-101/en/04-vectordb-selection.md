@@ -106,7 +106,7 @@ dimension = doc_vectors.shape[1]
 
 ### Step 2 — Build the flat index
 
-![Same vectors in flat and IVF — comparison structure](../../../assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
+![same vectors compared across flat and IVF indexes](../../../assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
 
 The runnable code lives in `rag-benchmark-101/en/04-vectordb-selection/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
@@ -213,7 +213,7 @@ Episode 5 evaluates the **end-to-end RAG pipeline** with the retriever wired to 
 - [Comparing embedding models](./03-embedding-comparison.md)
 - **VectorDB selection criteria (current)**
 - End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG benchmark (upcoming)
+- Completing the RAG Benchmark (upcoming)
 
 <!-- toc:end -->
 
@@ -226,4 +226,4 @@ Episode 5 evaluates the **end-to-end RAG pipeline** with the retriever wired to 
 - [pgvector](https://github.com/pgvector/pgvector)
 - [Qdrant benchmarks](https://qdrant.tech/benchmarks/)
 
-Tags: RAG, VectorDB, FAISS, IVF, Recall, ANN
+Tags: RAG, VectorDB, Benchmarking, LLM

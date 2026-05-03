@@ -245,8 +245,6 @@ production canary 운영 룰:
 
 다음 글에서는 KEDA 기반 scaling을 다룹니다. HTTP 트래픽뿐 아니라 queue length, CPU, 사용자 정의 metric으로 0-to-N 스케일링을 구성하는 법을 봅니다.
 
----
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -257,7 +255,10 @@ production canary 운영 룰:
 - 스케일링 — KEDA scaler와 0-to-N (예정)
 - Dapr 통합 — 사이드카로 얻는 것 (예정)
 - 모니터링과 운영 — Log Analytics와 Application Insights (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -272,4 +273,4 @@ production canary 운영 룰:
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Ingress, Canary, Blue-Green, Traffic Split
+Tags: Azure, Container Apps, Serverless, Containers

@@ -1,14 +1,9 @@
 ---
-title: 데이터 증강 기법
-series: ai-data-preparation-101
 episode: 8
 language: ko
+last_reviewed: '2026-05-03'
+series: ai-data-preparation-101
 status: content-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Data Augmentation
 - EDA
@@ -16,7 +11,12 @@ tags:
 - Paraphrase
 - nlpaug
 - KoNLPy
-last_reviewed: '2026-05-03'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 데이터 증강 기법 — EDA부터 Back-Translation까지
 ---
 
 # 데이터 증강 기법 — EDA부터 Back-Translation까지

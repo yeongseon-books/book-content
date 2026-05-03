@@ -267,8 +267,6 @@ production 첫 배포 점검 항목:
 
 다음 글에서는 ingress와 traffic split을 깊게 다룹니다. 두 Revision을 만들어 90/10 canary로 흘려보내고, 문제 발견 시 즉시 100/0으로 되돌리는 패턴을 손에 익힙니다.
 
----
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -279,7 +277,10 @@ production 첫 배포 점검 항목:
 - 스케일링 — KEDA scaler와 0-to-N (예정)
 - Dapr 통합 — 사이드카로 얻는 것 (예정)
 - 모니터링과 운영 — Log Analytics와 Application Insights (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -294,4 +295,4 @@ production 첫 배포 점검 항목:
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, FastAPI, ACR, Dockerfile, az containerapp
+Tags: Azure, Container Apps, Serverless, Containers

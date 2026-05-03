@@ -1,21 +1,23 @@
 ---
-title: "Building a real-world Git workflow: from issue to release in one cycle"
-description: "Stitch the commands from Episodes 1–9 into a single GitHub Flow loop, with a recovery table for the moments things go wrong"
-date: 2026-05-05
+episode: 10
+language: en
 last_reviewed: '2026-05-05'
-status: publish-ready
 series: git-github-101
-order: 10
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-flow
-  - git-workflow
-  - conventional-commits
-  - semantic-versioning
-  - code-review
-  - release-tag
+- github-flow
+- git-workflow
+- conventional-commits
+- semantic-versioning
+- code-review
+- release-tag
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 'Building a real-world Git workflow: from issue to release in one cycle'
 ---
 
 # Building a real-world Git workflow: from issue to release in one cycle

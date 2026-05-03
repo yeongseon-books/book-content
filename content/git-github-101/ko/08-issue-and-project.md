@@ -1,21 +1,23 @@
 ---
-title: "Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법"
-description: "GitHub Issue로 작업을 정의하고, Project board로 진행 상황을 한눈에 보고, PR과 issue를 연결해 자동으로 닫는 한 사이클을 손으로 따라갑니다."
-date: '2026-05-04'
+episode: 8
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 8
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-issue
-  - github-project
-  - issue-tracking
-  - kanban-board
-  - issue-pr-linking
-  - closes-keyword
+- github-issue
+- github-project
+- issue-tracking
+- kanban-board
+- issue-pr-linking
+- closes-keyword
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법
 ---
 
 # Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법

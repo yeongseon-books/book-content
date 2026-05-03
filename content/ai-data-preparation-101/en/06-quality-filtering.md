@@ -1,14 +1,9 @@
 ---
-title: Quality Filtering for Training Data
-series: ai-data-preparation-101
 episode: 6
 language: en
+last_reviewed: '2026-05-03'
+series: ai-data-preparation-101
 status: content-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Quality Filtering
 - Heuristic Rules
@@ -16,7 +11,12 @@ tags:
 - perplexity
 - KenLM
 - fastText
-last_reviewed: '2026-05-03'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Quality Filtering - Heuristics and Classifiers
 ---
 
 # Quality Filtering - Heuristics and Classifiers

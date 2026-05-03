@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: Chunking strategies — how to split long documents
 ---
 
 # Chunking strategies — how to split long documents

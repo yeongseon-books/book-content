@@ -1,21 +1,23 @@
 ---
-title: "첫 commit 만들기 - init, status, add, commit"
-description: "빈 디렉터리에서 출발해 git init부터 첫 commit까지 한 번에 따라가며 Working Directory, Staging Area, Repository의 흐름을 손에 익힙니다."
-date: '2026-05-04'
+episode: 2
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 2
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-init
-  - git-status
-  - git-add
-  - git-commit
-  - staging-area
-  - first-repository
+- git-init
+- git-status
+- git-add
+- git-commit
+- staging-area
+- first-repository
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 첫 commit 만들기 - init, status, add, commit
 ---
 
 # 첫 commit 만들기 - init, status, add, commit

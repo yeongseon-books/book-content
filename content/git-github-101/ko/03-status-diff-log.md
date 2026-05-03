@@ -1,21 +1,23 @@
 ---
-title: "변경 사항 확인하기 - status, diff, log로 읽기"
-description: "git status를 더 정확히 읽고, git diff로 어느 영역의 변경을 보고 있는지 구분하며, git log로 commit history를 다양한 형식으로 살펴보는 방법을 익힙니다."
-date: '2026-05-04'
+episode: 3
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 3
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-status
-  - git-diff
-  - git-log
-  - change-history
-  - working-tree-vs-index
-  - log-formatting
+- git-status
+- git-diff
+- git-log
+- change-history
+- working-tree-vs-index
+- log-formatting
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 변경 사항 확인하기 - status, diff, log로 읽기
 ---
 
 # 변경 사항 확인하기 - status, diff, log로 읽기

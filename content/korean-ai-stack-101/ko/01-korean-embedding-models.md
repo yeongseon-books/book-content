@@ -45,7 +45,7 @@ last_reviewed: '2026-05-01'
 
 ## 왜 재현 가능한 비교부터 시작할까
 
-![왜 재현 가능한 비교부터 시작할까](../../../assets/korean-ai-stack-101/01/01-01-why-start-with-a-reproducible-comparison.ko.png)
+![재현 가능한 비교를 위한 시작 조건](../../../assets/korean-ai-stack-101/01/01-01-why-start-with-a-reproducible-comparison.ko.png)
 모델 비교 글이 실전에서 도움이 되려면 독자가 같은 코드를 돌려서 비슷한 경향을 확인할 수 있어야 합니다. API 전용 모델이나 사내 전용 평가셋만으로 비교하면 읽을 때는 그럴듯하지만, 다음 날 바로 다시 확인하기 어렵습니다.
 
 이번 예제는 두 가지 관찰 포인트를 남깁니다. 첫째, 한국어 전용에 가까운 `ko-sbert-nli`는 유사 문장과 무관 문장을 더 크게 벌려 놓는 경향을 보입니다. 둘째, 범용 `all-MiniLM-L6-v2`는 영어 표현이 섞일 때 기준선으로는 유용하지만, 한국어만 놓고 보면 separation gap이 더 좁게 나올 수 있습니다. 이 차이를 알아두면 다음 글에서 KoSimCSE를 볼 때도 "한국어 문장끼리 더 잘 모이는가"를 같은 방식으로 확인할 수 있습니다.

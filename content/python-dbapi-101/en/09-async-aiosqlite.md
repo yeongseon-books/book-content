@@ -1,12 +1,23 @@
 ---
-title: "Asynchronous SQLite with aiosqlite"
-description: "How aiosqlite actually works, holding connections and transactions in async contexts, integrating with FastAPI, and an honest answer to whether async gives you concurrency wins on SQLite."
-series: python-dbapi-101
 episode: 9
-status: publish-ready
 language: en
-targets: [github, medium]
-tags: [Python, SQLite, asyncio, aiosqlite, Async, PEP 249]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- asyncio
+- aiosqlite
+- Async
+- PEP 249
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Asynchronous SQLite with aiosqlite
 ---
 
 # Asynchronous SQLite with aiosqlite

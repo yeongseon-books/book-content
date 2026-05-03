@@ -1,14 +1,9 @@
 ---
-title: 학습/평가/테스트 분할과 오염 통제
-series: ai-data-preparation-101
 episode: 9
 language: ko
+last_reviewed: '2026-05-03'
+series: ai-data-preparation-101
 status: content-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Train/Test Split
 - Contamination
@@ -16,7 +11,12 @@ tags:
 - Stratification
 - Temporal Split
 - scikit-learn
-last_reviewed: '2026-05-03'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 학습/평가/테스트 분할과 Contamination 통제
 ---
 
 # 학습/평가/테스트 분할과 Contamination 통제

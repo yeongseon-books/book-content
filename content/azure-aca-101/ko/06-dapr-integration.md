@@ -259,4 +259,4 @@ Log Analytics와 Application Insights를 ACA에 연결해 로그·메트릭·tra
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Dapr, Sidecar, Pub-Sub, Service Invocation
+Tags: Azure, Container Apps, Serverless, Containers

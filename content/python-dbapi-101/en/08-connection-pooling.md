@@ -1,12 +1,23 @@
 ---
-title: "SQLite Connection Management: thread-safety, check_same_thread, and Pooling"
-description: "SQLite's thread-safety modes, the check_same_thread option, per-thread vs shared connection trade-offs, and connection management patterns in FastAPI."
-series: python-dbapi-101
 episode: 8
-status: publish-ready
 language: en
-targets: [github, medium]
-tags: [Python, SQLite, Connection Pool, Concurrency, Threading, PEP 249]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- Connection Pool
+- Concurrency
+- Threading
+- PEP 249
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 'SQLite Connection Management: thread-safety, check_same_thread, and Pooling'
 ---
 
 # SQLite Connection Management: thread-safety, check_same_thread, and Pooling

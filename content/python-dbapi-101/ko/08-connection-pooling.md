@@ -1,12 +1,23 @@
 ---
-title: "SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링"
-description: "SQLite의 thread-safety 모드, check_same_thread 옵션, per-thread vs shared connection 트레이드오프, FastAPI에서의 connection 관리 패턴을 다룹니다."
-series: python-dbapi-101
 episode: 8
-status: publish-ready
 language: ko
-targets: [github]
-tags: [Python, SQLite, Connection Pool, Concurrency, Threading, PEP 249]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- Connection Pool
+- Concurrency
+- Threading
+- PEP 249
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 'SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링'
 ---
 
 # SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링

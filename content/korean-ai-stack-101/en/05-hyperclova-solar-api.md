@@ -296,4 +296,4 @@ The next article (episode 6, the final one) assembles a Korean RAG pipeline. We 
 - [Upstage Solar documentation](https://developers.upstage.ai/docs/getting-started/overview)
 - [NAVER Cloud HyperCLOVA X overview](https://www.ncloud.com/product/aiService/clovaStudio)
 
-Tags: Korean NLP, HyperCLOVA, Solar, LLM API, Naver, Upstage
+Tags: Korean NLP, LLM, Embeddings, OCR

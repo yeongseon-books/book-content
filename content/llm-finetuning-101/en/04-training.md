@@ -207,11 +207,11 @@ The training loop can be validated in surprisingly small units. Once a single st
 The next article (episode 5) covers evaluation. We will use perplexity as a quick sanity check and combine it with golden-set qualitative and quantitative evaluation, all in code.
 
 <!-- toc:begin -->
-## Series Contents
+## In this series
 
-- [LLM Fine-Tuning Introduction](./01-intro.md)
+- [LLM Fine-tuning Primer](./01-intro.md)
 - [Dataset Preparation and Preprocessing](./02-dataset.md)
-- [LoRA Adapter Configuration](./03-lora.md)
+- [Configuring LoRA Adapters](./03-lora.md)
 - **Training Loop and Hyperparameters (current)**
 - Model Evaluation (upcoming)
 - Model Serving (upcoming)
@@ -227,4 +227,4 @@ The next article (episode 5) covers evaluation. We will use perplexity as a quic
 - [DataCollatorForLanguageModeling](https://huggingface.co/docs/transformers/main_classes/data_collator)
 - [Mixed precision training](https://huggingface.co/docs/transformers/perf_train_gpu_one)
 
-Tags: Fine-tuning, Trainer, Hyperparameters, LearningRate, Optimizer, Python
+Tags: Fine-tuning, LoRA, LLM, Python

@@ -211,11 +211,11 @@ Evaluation is unglamorous, but it is the step that earns trust in a fine-tuning 
 The next article (episode 6) covers serving. We will deploy the LoRA adapter separated from the base model and reduce inference memory and latency in code.
 
 <!-- toc:begin -->
-## Series Contents
+## In this series
 
-- [LLM Fine-Tuning Introduction](./01-intro.md)
+- [LLM Fine-tuning Primer](./01-intro.md)
 - [Dataset Preparation and Preprocessing](./02-dataset.md)
-- [LoRA Adapter Configuration](./03-lora.md)
+- [Configuring LoRA Adapters](./03-lora.md)
 - [Training Loop and Hyperparameters](./04-training.md)
 - **Model Evaluation (current)**
 - Model Serving (upcoming)
@@ -231,4 +231,4 @@ The next article (episode 6) covers serving. We will deploy the LoRA adapter sep
 - [LLM-as-a-judge survey](https://arxiv.org/abs/2306.05685)
 - [HELM: Holistic Evaluation of Language Models](https://crfm.stanford.edu/helm/)
 
-Tags: Fine-tuning, Evaluation, Perplexity, GoldenSet, Metrics, Python
+Tags: Fine-tuning, LoRA, LLM, Python

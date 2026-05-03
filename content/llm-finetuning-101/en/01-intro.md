@@ -84,7 +84,7 @@ With this table in hand, "we just want to nudge the response tone" branches natu
 
 ## What to understand first
 
-![What to understand first — base weights vs. trainable boundary](../../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
+![base weights vs trainable boundary in fine-tuning](../../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
 
 The point most easily missed in fine-tuning is **what we choose as the training target**. Full fine-tuning updates every existing weight, so memory and optimizer state both balloon. LoRA freezes the existing weights and adds two low-rank matrices instead. So when discussing cost, look at the **trainable parameter count** separately from the total model parameters.
 
@@ -144,7 +144,7 @@ You will see a ratio around 1.5%. Try `rank` 16 and 32 to feel how the number sc
 
 ## What to notice in this code
 
-![What to notice in this code — LoRA's surface area per linear layer](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
+![LoRA's surface area per linear layer measured by the script](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
 
 - `hidden_size=768`, `intermediate_size=3072`, `num_layers=12` mimic GPT-2 small.
 - The script measures LoRA's surface area against attention/MLP linear layers, not against total model parameters.
@@ -152,7 +152,7 @@ You will see a ratio around 1.5%. Try `rank` 16 and 32 to feel how the number sc
 
 ## Common mistakes
 
-![Where engineers get confused — picking a base model by problem type](../../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
+![picking a base model by problem type](../../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
 
 - **Confusing model size with trainable parameters** — LoRA still requires the base model in VRAM at inference time. If the base model itself does not fit, LoRA alone will not help; pair it with quantization (QLoRA).
 - **Assuming bigger rank is better** — At rank 64 or 128 trainable parameters can balloon to 10–20% of full fine-tuning while generalization often gets worse. Start from r=8–16.
@@ -188,14 +188,14 @@ The point of post 1 is to stop treating fine-tuning as a mystical GPU ritual. Ju
 Post 2 covers dataset preparation. We compare three formats — instruction, chat, completion — and verify in code why label masking and `eos_token` handling are decisive for training stability.
 
 <!-- toc:begin -->
-## Series Contents
+## In this series
 
 - **LLM Fine-tuning Primer (current)**
-- Dataset preparation and preprocessing (upcoming)
-- Configuring LoRA adapters (upcoming)
-- Training loop and hyperparameters (upcoming)
-- Model evaluation (upcoming)
-- Model serving (upcoming)
+- Dataset Preparation and Preprocessing (upcoming)
+- Configuring LoRA Adapters (upcoming)
+- Training Loop and Hyperparameters (upcoming)
+- Model Evaluation (upcoming)
+- Model Serving (upcoming)
 
 <!-- toc:end -->
 
@@ -208,4 +208,4 @@ Post 2 covers dataset preparation. We compare three formats — instruction, cha
 - [QLoRA paper](https://arxiv.org/abs/2305.14314)
 - [GPT-2 model card](https://huggingface.co/gpt2)
 
-Tags: Fine-tuning, LoRA, LLM, PEFT, Python, GPT-2
+Tags: Fine-tuning, LoRA, LLM, Python

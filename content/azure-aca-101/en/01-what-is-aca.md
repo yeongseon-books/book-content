@@ -235,8 +235,6 @@ If the first three answers are yes and the last two are no, ACA is the most natu
 
 The next post zooms into ACA's operational model through three words: Environment, Container App, and Revision.
 
----
-
 <!-- toc:begin -->
 ## In this series
 
@@ -247,7 +245,10 @@ The next post zooms into ACA's operational model through three words: Environmen
 - Scaling — KEDA scalers and zero-to-N (upcoming)
 - Dapr integration — what you get from a sidecar (upcoming)
 - Monitoring and ops — Log Analytics and Application Insights (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -262,4 +263,4 @@ The next post zooms into ACA's operational model through three words: Environmen
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Serverless, KEDA, Dapr, Containers
+Tags: Azure, Container Apps, Serverless, Containers

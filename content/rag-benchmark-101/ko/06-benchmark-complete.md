@@ -273,4 +273,4 @@ def gate(deltas):
 - [FAISS documentation](https://faiss.ai/)
 - [GitHub Actions](https://docs.github.com/en/actions)
 
-Tags: RAG, Benchmarking, Pipeline, CI, Reproducibility, Reporting
+Tags: RAG, VectorDB, Benchmarking, LLM

@@ -102,7 +102,7 @@ OCR 파이프라인은 4단계로 분해됩니다.
 
 ## 왜 mock 응답부터 다루는가
 
-![왜 mock 응답부터 다루는가](../../../assets/korean-ai-stack-101/04/04-01-mock.ko.png)
+![mock 응답으로 OCR 후처리를 검증하는 흐름](../../../assets/korean-ai-stack-101/04/04-01-mock.ko.png)
 
 OCR 연동의 난점은 API 호출 자체보다 응답 후처리에 있습니다. 표 셀 순서가 뒤바뀌거나 줄바꿈이 어긋나는 문제는 mock 응답만으로도 충분히 재현할 수 있습니다. mock부터 시작하면 CI에서 같은 입력으로 매번 같은 후처리 결과를 검증할 수 있고, 실제 키가 추가됐을 때 변경 지점이 "응답을 어디서 가져오는가" 한 줄로 좁혀집니다.
 
@@ -275,4 +275,4 @@ CLOVA OCR 예제의 핵심은 응답 구조에 대한 이해를 텍스트 추출
 - [pdfplumber](https://github.com/jsvine/pdfplumber)
 - [OCR post-processing patterns](https://cloud.google.com/document-ai/docs/process-documents-client-libraries)
 
-Tags: Korean NLP, CLOVA, OCR, NaverCloud, DocumentAI, Python
+Tags: Korean NLP, LLM, Embeddings, OCR

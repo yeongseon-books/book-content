@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
 ---
 
 # HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기

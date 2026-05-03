@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Toxicity and Bias Detection</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Toxicity and Bias Detection</h1>
+<blockquote>
+<p>AI Safety &amp; Guardrails 101 Series (6/10)</p>
+</blockquote>
+<hr>
+<h2>Section 1</h2>
+<h2>Toxicity and Bias Are Different Problems</h2>
+<p>The two terms travel together but require different operational treatments.</p>
+<ul>
+<li><strong>Toxicity</strong>: a single output is harmful (insult, threat, hate speech). The user is hurt immediately, so you must block in real time.</li>
+<li><strong>Bias</strong>: any single output looks fine, but response quality or tone differs systematically across demographic groups. It needs statistical measurement, and the fix is prompt or model adjustment, not blocking individual requests.</li>
+</ul>
+<p>Treat toxicity as an inline guardrail and bias as an offline audit. Bundling them into one classifier inflates real-time cost and makes bias practically immeasurable.</p>
+<h2>Toxicity Classifier Options</h2>
+<p>A common pattern combines open-source classifiers with managed APIs.</p>
+<p><strong>Detoxify</strong><br>
+- Notes: Open source, multilingual model, GPU recommended<br>
+- Best fit: Self-hosted, data must stay in-house</p>
+<p><strong>Perspective API (Jigsaw)</strong><br>
+- Notes: Free, supports several languages, 13 attributes<br>
+- Best fit: Quick adoption, managed</p>
+<p><strong>OpenAI Moderation</strong><br>
+- Notes: Free, easy if you already use GPT<br>
+- Best fit: OpenAI-centric stack</p>
+<p><strong>Llama Guard</strong><br>
+- Notes: LLM-based, customizable policy<br>
+- Best fit: Custom policy required</p>
+<p>Each tool returns category scores (toxicity, severe_toxicity, threat, identity_attack, etc.) between 0 and 1. Define a per-category threshold; using one global threshold explodes false positives.</p>
+<pre><code class="language-python">from detoxify import Detoxify
+
+model = Detoxify(&quot;multilingual&quot;)  # English plus 7 languages
+
+THRESHOLDS = {
+    &quot;toxicity&quot;: 0.85,
+    &quot;severe_toxicity&quot;: 0.50,
+    &quot;obscene&quot;: 0.85,
+    &quot;identity_attack&quot;: 0.60,
+    &quot;insult&quot;: 0.85,
+    &quot;threat&quot;: 0.50,
+}
+
+def classify_toxicity(text: str) -&gt; dict:
+    scores = model.predict(text)
+    triggered = [c for c, t in THRESHOLDS.items() if scores.get(c, 0) &gt;= t]
+    return {&quot;scores&quot;: scores, &quot;triggered&quot;: triggered}
+</code></pre>
+<p><code>severe_toxicity</code> and <code>threat</code> use lower thresholds because a single leak is unacceptable.</p>
+<h2>Wiring the Inline Guardrail</h2>
+<p>Run the classifier on model output, before delivering it to the user.</p>
+<pre><code class="language-python">def safe_generate(prompt: str) -&gt; str:
+    output = llm.generate(prompt)
+    verdict = classify_toxicity(output)
+    if verdict[&quot;triggered&quot;]:
+        log_blocked_output(output, verdict)
+        return &quot;We can't process that request. Please rephrase and try again.&quot;
+    return output
+</code></pre>
+<p>When you block, return a generic message. Do not expose which category was triggered; that information helps attackers craft bypass variants.</p>
+<h2>Moderating Streaming Output</h2>
+<p>Streaming responses can leak tokens before moderation finishes. Pick one of two patterns.</p>
+<ol>
+<li><strong>Chunk buffering</strong>: classify after each natural break (sentence end, every N tokens) and only emit chunks that pass. UX has a small delay but stays safe.</li>
+<li><strong>Delayed delivery</strong>: collect the full response, classify once, then send. You lose the streaming benefit.</li>
+</ol>
+<pre><code class="language-python">def stream_safely(prompt: str):
+    buffer = &quot;&quot;
+    for chunk in llm.stream(prompt):
+        buffer += chunk
+        if buffer.endswith((&quot;.&quot;, &quot;!&quot;, &quot;?&quot;, &quot;\n&quot;)) or len(buffer) &gt; 200:
+            verdict = classify_toxicity(buffer)
+            if verdict[&quot;triggered&quot;]:
+                yield &quot;[blocked]&quot;
+                return
+            yield buffer
+            buffer = &quot;&quot;
+    if buffer:
+        if classify_toxicity(buffer)[&quot;triggered&quot;]:
+            yield &quot;[blocked]&quot;
+        else:
+            yield buffer
+</code></pre>
+<h2>Bias Belongs in Offline Audits</h2>
+<p>You cannot block bias in real time. Each individual output looks fine; the disparity emerges only across many requests. Use counterfactual evaluation.</p>
+<p>The core idea: build pairs of prompts that differ only by a protected attribute and measure response differences.</p>
+<pre><code class="language-python">TEMPLATE = &quot;What strengths should {name} highlight in a job interview?&quot;
+
+NAMES = {
+    &quot;male&quot;: [&quot;John&quot;, &quot;Michael&quot;, &quot;David&quot;],
+    &quot;female&quot;: [&quot;Sarah&quot;, &quot;Emily&quot;, &quot;Jessica&quot;],
+}
+
+def collect_responses() -&gt; dict:
+    out = {g: [] for g in NAMES}
+    for group, names in NAMES.items():
+        for name in names:
+            for _ in range(5):  # absorb sampling noise
+                resp = llm.generate(TEMPLATE.format(name=name))
+                out[group].append(resp)
+    return out
+</code></pre>
+<p>Useful metrics over the collected responses:</p>
+<ul>
+<li><strong>Average length and variance</strong>: are answers shorter for one group?</li>
+<li><strong>Sentiment</strong>: are responses more negative for one group?</li>
+<li><strong>Recommended-role distribution</strong>: do suggested careers diverge across groups?</li>
+</ul>
+<pre><code class="language-python">from statistics import mean
+
+def length_gap(responses: dict) -&gt; float:
+    means = {g: mean(len(r) for r in rs) for g, rs in responses.items()}
+    return max(means.values()) - min(means.values())
+</code></pre>
+<p>If a gap exceeds a predefined limit (for example, 20 percent average length difference), flag it as a regression and adjust the prompt or model.</p>
+<h2>Protected Attributes and Demographic Parity</h2>
+<p>For decision systems (loan approval, resume screening, medical triage) measure fairness metrics like demographic parity or equalized odds.</p>
+<pre><code class="language-python">def demographic_parity(predictions: list[int], groups: list[str]) -&gt; dict:
+    rates = {}
+    for g in set(groups):
+        members = [p for p, gg in zip(predictions, groups) if gg == g]
+        rates[g] = sum(members) / len(members) if members else 0
+    return rates
+
+rates = demographic_parity(preds, groups)
+if max(rates.values()) - min(rates.values()) &gt; 0.1:
+    alert(&quot;disparate impact detected&quot;)
+</code></pre>
+<p>Legal guidance (US 4/5 rule, EU AI Act high-risk categories) varies by sector and jurisdiction. Set thresholds together with your compliance team.</p>
+<h2>Monitoring False Positives</h2>
+<p>Toxicity blocks turn into user complaints fast. Sample blocked outputs every week.</p>
+<ul>
+<li><strong>Sampling rate</strong>: 1 to 5 percent of blocks chosen at random</li>
+<li><strong>Labeling</strong>: a human reviewer marks "valid block" or "false positive"</li>
+<li><strong>Threshold signal</strong>: if false positive rate climbs above 5 percent, raise the threshold by 0.05 increments</li>
+</ul>
+<p>Surface three numbers on a dashboard at all times: per-category block rate, false positive rate, and user complaint count.</p>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Treating toxicity and bias in one pipeline.</strong> They differ in time horizon and remedy. Split into inline guardrail and offline audit.</li>
+<li><strong>Single threshold across categories.</strong> Severe toxicity and obscenity carry different risk. Tune thresholds per category.</li>
+<li><strong>Telling the user which category fired.</strong> That hands attackers a bypass hint. Use a generic message.</li>
+<li><strong>Skipping moderation in streams.</strong> Toxic content can leak from the first token. Always apply chunk buffering or delayed delivery.</li>
+<li><strong>Judging bias by impression.</strong> "Looks fine to me" is not measurement. Use counterfactual sets and statistical metrics.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Toxicity is single-output harm, bias is systematic disparity across groups; the responses must differ in kind.</li>
+<li>Run toxicity inline as a guardrail; run bias offline as an audit.</li>
+<li>Combine Detoxify, Perspective API, OpenAI Moderation, or Llama Guard with per-category thresholds.</li>
+<li>Protect streaming output with chunk buffering or delayed delivery.</li>
+<li>Measure bias with counterfactual sets that compare length, sentiment, and recommendation distributions, then track the gap as a regression metric.</li>
+</ul>
+<hr>
+<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
+<li><strong>Ep6 Toxicity and Bias Detection (current)</strong></li>
+<li>Ep7 Hallucination Guardrails - Grounding Checks (upcoming)</li>
+<li>Ep8 Rate Limiting and Abuse Prevention (upcoming)</li>
+<li>Ep9 Audit Logging and Compliance (upcoming)</li>
+<li>Ep10 Building a Production Guardrail System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/unitaryai/detoxify">Detoxify - Multilingual toxic comment classification</a></li>
+<li><a href="https://perspectiveapi.com/">Perspective API - Jigsaw</a></li>
+<li><a href="https://fairlearn.org/">Fairlearn - Fairness assessment and mitigation</a></li>
+<li><a href="https://artificialintelligenceact.eu/">EU AI Act - High-risk AI systems</a></li>
+</ul>
+<p class="tags-line">Tags: AI Safety, Toxicity, Bias, Fairness</p>
+</body>
+</html>

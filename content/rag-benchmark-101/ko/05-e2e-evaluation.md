@@ -226,4 +226,4 @@ python3 main.py
 - [Groq Python integration in LangChain](https://python.langchain.com/docs/integrations/chat/groq/)
 - [HuggingFace Datasets](https://huggingface.co/docs/datasets)
 
-Tags: RAG, RAGAS, Faithfulness, AnswerRelevancy, LLM, Evaluation
+Tags: RAG, VectorDB, Benchmarking, LLM

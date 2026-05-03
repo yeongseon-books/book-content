@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: FAISS fundamentals — fast approximate nearest-neighbor search
 ---
 
 # FAISS fundamentals — fast approximate nearest-neighbor search

@@ -1,21 +1,23 @@
 ---
-title: "Merge and Conflict Resolution - Bringing Two Lines Back Together"
-description: "Learn how fast-forward and three-way merges differ, how to read and resolve conflict markers, and how git merge --abort gets you back to a clean state."
-date: '2026-05-04'
+episode: 5
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 5
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-merge
-  - fast-forward
-  - three-way-merge
-  - merge-conflict
-  - merge-abort
-  - conflict-markers
+- git-merge
+- fast-forward
+- three-way-merge
+- merge-conflict
+- merge-abort
+- conflict-markers
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Merge and Conflict Resolution - Bringing Two Lines Back Together
 ---
 
 # Merge and Conflict Resolution - Bringing Two Lines Back Together

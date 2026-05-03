@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Deterministic Metrics — Exact Match, BLEU, ROUGE</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Deterministic Metrics — Exact Match, BLEU, ROUGE</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (3/10)</p>
+</blockquote>
+<p>Deterministic metrics are fast and reproducible, but they penalize different wording even when the meaning matches. This post covers when to use Exact Match, F1, BLEU, and ROUGE — and when not to.</p>
+<hr>
+<h2>What Are Deterministic Metrics?</h2>
+<p>A deterministic metric always returns the same score for the same input and answer. It uses string and token comparison only — no LLM call — so it is fast and reproducible.</p>
+<pre><code class="language-python">def exact_match(pred: str, expected: str) -&gt; int:
+    return int(pred.strip() == expected.strip())
+
+assert exact_match(&quot;Seoul&quot;, &quot;Seoul&quot;) == 1
+assert exact_match(&quot;Seoul.&quot;, &quot;Seoul&quot;) == 0  # one period away from a zero
+</code></pre>
+<p>Behind the speed lies a serious weakness: any answer with the same meaning but different wording scores zero. This post covers four deterministic metrics and explains when each is useful — and when it is not.</p>
+<h2>Exact Match — The Simplest Metric</h2>
+<p>Question: "What is the capital of Korea?"<br>
+Reference: "Seoul"<br>
+Model output: "The capital of Korea is Seoul."</p>
+<p>Exact match scores zero. It is meaningful only when the answer is fixed to a single word or token.</p>
+<pre><code class="language-python">def exact_match_normalized(pred: str, expected: str) -&gt; int:
+    def normalize(s: str) -&gt; str:
+        return s.lower().strip().rstrip(&quot;.!?&quot;)
+    return int(normalize(pred) == normalize(expected))
+</code></pre>
+<p>Adding normalization helps a little, but at heart it is reliable only for "QA where the answer is locked to 1-2 tokens." It fits short-answer extraction tasks like SQuAD.</p>
+<h2>Token-level F1 — More Forgiving than Exact Match</h2>
+<p>F1 treats prediction and reference as token sets and computes the harmonic mean of precision and recall.</p>
+<pre><code class="language-python">from collections import Counter
+
+def token_f1(pred: str, expected: str) -&gt; float:
+    pred_tokens = Counter(pred.lower().split())
+    exp_tokens = Counter(expected.lower().split())
+    common = pred_tokens &amp; exp_tokens
+    num_same = sum(common.values())
+    if num_same == 0:
+        return 0.0
+    precision = num_same / sum(pred_tokens.values())
+    recall = num_same / sum(exp_tokens.values())
+    return 2 * precision * recall / (precision + recall)
+
+print(token_f1(&quot;the capital is Seoul&quot;, &quot;Seoul&quot;))   # ~0.4 — partial credit
+print(token_f1(&quot;Seoul&quot;, &quot;Seoul&quot;))                  # 1.0
+</code></pre>
+<p>It awards partial credit on cases like "the capital is Seoul" vs "Seoul." But it ignores word order: "Seoul is the capital" and "the capital is Seoul" get the same score.</p>
+<h2>BLEU — N-gram Overlap from Machine Translation</h2>
+<p>BLEU computes overlap of 1-grams, 2-grams, 3-grams, and 4-grams. It is standard for machine translation evaluation, but the limits are real for free-form LLM output.</p>
+<pre><code class="language-python"># pip install nltk
+from nltk.translate.bleu_score import sentence_bleu
+
+reference = [[&quot;the&quot;, &quot;cat&quot;, &quot;sat&quot;, &quot;on&quot;, &quot;the&quot;, &quot;mat&quot;]]
+candidate1 = [&quot;the&quot;, &quot;cat&quot;, &quot;sat&quot;, &quot;on&quot;, &quot;the&quot;, &quot;mat&quot;]
+candidate2 = [&quot;a&quot;, &quot;cat&quot;, &quot;is&quot;, &quot;sitting&quot;, &quot;on&quot;, &quot;a&quot;, &quot;mat&quot;]
+
+print(sentence_bleu(reference, candidate1))  # 1.0
+print(sentence_bleu(reference, candidate2))  # ~0.0 — same meaning, near zero
+</code></pre>
+<p>BLEU's weaknesses:</p>
+<ol>
+<li><strong>It does not know synonyms.</strong> "car" and "automobile" are different tokens.</li>
+<li><strong>It is order-sensitive.</strong> Same meaning, different word order, lower score.</li>
+<li><strong>It needs multiple references.</strong> With one reference, scores get inflated or deflated unpredictably.</li>
+</ol>
+<p>BLEU works for "machine translation with multiple reference translations." It does not work for "free-form chatbot answers."</p>
+<h2>ROUGE — Recall-Oriented, from Summarization</h2>
+<p>ROUGE resembles BLEU but emphasizes recall. ROUGE-L in particular uses the longest common subsequence and is less sensitive to small word-order changes.</p>
+<pre><code class="language-python"># pip install rouge-score
+from rouge_score import rouge_scorer
+
+scorer = rouge_scorer.RougeScorer([&quot;rouge1&quot;, &quot;rougeL&quot;], use_stemmer=True)
+scores = scorer.score(
+    &quot;The cat sat on the mat&quot;,                    # reference
+    &quot;A cat is sitting on a mat&quot;,                 # prediction
+)
+print(scores[&quot;rouge1&quot;].fmeasure)  # ~0.5
+print(scores[&quot;rougeL&quot;].fmeasure)  # ~0.5
+</code></pre>
+<p>For summarization, ROUGE correlates better with human judgment than BLEU does, but it still rewards "wrong facts but similar words" with a high score.</p>
+<h2>When Should You Use Deterministic Metrics — and When Not?</h2>
+<p><strong>Short extractive QA (SQuAD-style)</strong><br>
+- Right metric: Exact Match, Token F1<br>
+- Notes: When the answer is fixed</p>
+<p><strong>Code generation</strong><br>
+- Right metric: Exact Match (after normalization) + execution tests<br>
+- Notes: Compile/run is the ground truth</p>
+<p><strong>Classification (intent, sentiment)</strong><br>
+- Right metric: Exact Match, Accuracy, F1<br>
+- Notes: Closed label set</p>
+<p><strong>Summarization (single reference)</strong><br>
+- Right metric: ROUGE (as a side signal) + LLM-as-judge<br>
+- Notes: Use ROUGE only as auxiliary</p>
+<p><strong>Free-form chatbot</strong><br>
+- Right metric: Deterministic metrics do not fit<br>
+- Notes: Use LLM-as-judge / rubric</p>
+<p><strong>Machine translation (multi-reference)</strong><br>
+- Right metric: BLEU, chrF<br>
+- Notes: Only meaningful with multiple references</p>
+<p>Core rule: <strong>deterministic metrics work when the answer space is closed and short. When the answer is free-form and long, switch to LLM-as-judge or rubric.</strong></p>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using BLEU on free-form answers.</strong> Answers with right meaning but different wording all score zero, leading you to the wrong "the model is bad" conclusion.</li>
+<li><strong>Using ROUGE with a single reference.</strong> ROUGE is meaningful with multiple references; with one, it punishes paraphrase too harshly.</li>
+<li><strong>Skipping normalization.</strong> "Seoul", "seoul.", and "Seoul " count as different answers. Apply lowercase, strip, and trailing-punctuation removal by default.</li>
+<li><strong>Looking at scores without reading the cases.</strong> A 0.7 average is useless if you do not look at which cases got penalized. Always read the bottom five by hand.</li>
+<li><strong>Relying on a single deterministic metric.</strong> BLEU 0.5 and ROUGE 0.5 dropping together can still mean human judgment improved. Always pair with LLM-as-judge or human spot checks.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Deterministic metrics are fast and reproducible but penalize "same meaning, different wording."</li>
+<li>Exact Match and Token F1 fit short extractive QA.</li>
+<li>Use BLEU only for multi-reference MT; use ROUGE only as an auxiliary signal for summarization.</li>
+<li>Free-form chatbot answers need LLM-as-judge, not deterministic metrics.</li>
+<li>Never depend on a single deterministic metric — pair with LLM-as-judge or human spot checks.</li>
+</ul>
+<p>The next post covers LLM-as-judge — delegating scoring to a strong LLM, designing the judge prompt, controlling bias, and measuring agreement with human evaluators.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Why Evaluate LLM Applications</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Designing Evaluation Datasets</a></li>
+<li><strong>Deterministic Metrics — Exact Match, BLEU, ROUGE (current)</strong></li>
+<li>LLM-as-Judge (upcoming)</li>
+<li>Rubric-Based Scoring (upcoming)</li>
+<li>Evaluating RAG Systems (upcoming)</li>
+<li>Evaluating Agents (upcoming)</li>
+<li>Regression Testing (upcoming)</li>
+<li>A/B Testing LLMs (upcoming)</li>
+<li>Continuous Evaluation in Production (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://huggingface.co/docs/evaluate/index">Hugging Face — A guide to LLM evaluation</a></li>
+<li><a href="https://aclanthology.org/P02-1040/">Papineni et al. — BLEU paper</a></li>
+<li><a href="https://aclanthology.org/W04-1013/">Lin — ROUGE paper</a></li>
+<li><a href="https://rajpurkar.github.io/SQuAD-explorer/">SQuAD — Exact Match and F1</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, LLM, Metrics, BLEU</p>
+</body>
+</html>

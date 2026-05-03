@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Designing Evaluation Datasets</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Designing Evaluation Datasets</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (2/10)</p>
+</blockquote>
+<p>A good evaluation dataset mirrors production traffic distribution while including enough edge cases. This post covers the principles for designing a starter eval set of 50-200 examples and how to collect the data.</p>
+<hr>
+<h2>What Makes a Good Evaluation Dataset?</h2>
+<p>A good eval set satisfies two things at once.</p>
+<ol>
+<li><strong>It mirrors production traffic distribution.</strong> The mix of cases should look like what users actually send.</li>
+<li><strong>It includes enough edge cases.</strong> Cases that are rare in normal traffic but cause major incidents when they break — collect those deliberately.</li>
+</ol>
+<p>You need both to catch the "average score looks great, but one case is catastrophically broken" situation.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class EvalExample:
+    id: str
+    input: dict
+    expected: dict | None       # only filled when a deterministic answer exists
+    category: str               # one of &quot;happy_path&quot;, &quot;edge_case&quot;, &quot;adversarial&quot;
+    notes: str = &quot;&quot;
+</code></pre>
+<p>Adding <code>category</code> explicitly lets you "look at edge case scores separately." Looking only at the average lets the bulk of cases hide the problems.</p>
+<h2>Where Do You Source the Data?</h2>
+<p>Combine three sources.</p>
+<p><strong>1. Sample from production traces</strong></p>
+<p>The best source is real user input. Each week, randomly draw 50 cases from production logs as eval candidates.</p>
+<pre><code class="language-python">import random
+
+def sample_from_production(traces: list[dict], n: int = 50) -&gt; list[dict]:
+    return random.sample(traces, min(n, len(traces)))
+</code></pre>
+<p>If they contain PII, mask them or convert to synthetic data (see Ep9 Observability).</p>
+<p><strong>2. Collect failure cases</strong></p>
+<p>User complaints, incidents from on-call, cases broken in internal dogfooding — put all of them in the eval set. This is the start of "what broke once never breaks the same way again" regression testing.</p>
+<pre><code class="language-python">def add_failure_case(eval_set: list[dict], failed_input: dict, expected: dict, source: str):
+    eval_set.append({
+        &quot;id&quot;: f&quot;regression-{len(eval_set)+1:04d}&quot;,
+        &quot;input&quot;: failed_input,
+        &quot;expected&quot;: expected,
+        &quot;category&quot;: &quot;regression&quot;,
+        &quot;notes&quot;: f&quot;From: {source}&quot;,
+    })
+</code></pre>
+<p><strong>3. Deliberately authored adversarial cases</strong></p>
+<p>A domain expert hand-writes cases they suspect will break — prompt injection, ambiguous questions, questions with no answer.</p>
+<h2>How Many Cases Do You Need?</h2>
+<p>The size depends on the purpose.</p>
+<p><strong>Smoke test (every CI run)</strong><br>
+- Recommended size: 10-30<br>
+- Notes: Runs fast, catches obvious regressions</p>
+<p><strong>Regression test (pre-deploy)</strong><br>
+- Recommended size: 100-300<br>
+- Notes: Yields meaningful per-dimension scores</p>
+<p><strong>Model comparison (gpt-4o vs claude)</strong><br>
+- Recommended size: 300-1000<br>
+- Notes: Lets you draw statistically meaningful conclusions</p>
+<p><strong>Academic benchmark</strong><br>
+- Recommended size: 1000+<br>
+- Notes: Required for generalization claims</p>
+<p>Start at 10-30, add 5-10 from production each week, and you reach 200 within three months.</p>
+<h2>Labeling — How Do You Fill <code>expected</code>?</h2>
+<p>There are three labeling styles, and you can use different ones per case.</p>
+<pre><code class="language-python">@dataclass
+class Label:
+    style: str  # &quot;exact&quot;, &quot;keywords&quot;, &quot;rubric&quot;
+    payload: dict
+</code></pre>
+<ol>
+<li><strong>Exact answer</strong>: "What is the capital of Korea?" → "Seoul". Use when there is only one right answer.</li>
+<li><strong>Required keywords</strong>: a list of words the summary must contain.</li>
+<li><strong>Rubric</strong>: when many answers are valid, score per dimension like "accuracy: X out of 5" (covered in detail in Ep5).</li>
+</ol>
+<pre><code class="language-python">examples = [
+    EvalExample(
+        id=&quot;qa-001&quot;,
+        input={&quot;question&quot;: &quot;What is the capital of Korea?&quot;},
+        expected={&quot;style&quot;: &quot;exact&quot;, &quot;answer&quot;: &quot;Seoul&quot;},
+        category=&quot;happy_path&quot;,
+    ),
+    EvalExample(
+        id=&quot;summary-001&quot;,
+        input={&quot;text&quot;: &quot;...&quot;},
+        expected={&quot;style&quot;: &quot;keywords&quot;, &quot;must_include&quot;: [&quot;microservice&quot;, &quot;latency&quot;]},
+        category=&quot;happy_path&quot;,
+    ),
+    EvalExample(
+        id=&quot;advice-001&quot;,
+        input={&quot;question&quot;: &quot;How should I structure my React app?&quot;},
+        expected={&quot;style&quot;: &quot;rubric&quot;},
+        category=&quot;edge_case&quot;,
+    ),
+]
+</code></pre>
+<h2>How Do You Version-Control the Eval Set?</h2>
+<p>The eval set lives next to the code, in version control. Save as JSONL and commit to git.</p>
+<pre><code class="language-python">import json
+from pathlib import Path
+
+def save_eval_set(eval_set: list[EvalExample], path: Path):
+    with path.open(&quot;w&quot;) as f:
+        for ex in eval_set:
+            f.write(json.dumps({
+                &quot;id&quot;: ex.id,
+                &quot;input&quot;: ex.input,
+                &quot;expected&quot;: ex.expected,
+                &quot;category&quot;: ex.category,
+                &quot;notes&quot;: ex.notes,
+            }, ensure_ascii=False) + &quot;\n&quot;)
+
+def load_eval_set(path: Path) -&gt; list[EvalExample]:
+    with path.open() as f:
+        return [EvalExample(**json.loads(line)) for line in f]
+</code></pre>
+<p>Pinning the version into the filename is a good habit: <code>evals/customer-support/v3.jsonl</code>. When you create a new version, do not delete the old one — bump the name.</p>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>The prompt author writes the eval set.</strong> You collect only cases that flatter your prompt and end up with the wrong "it works" conclusion. Have a teammate or production source the cases.</li>
+<li><strong>Happy path only.</strong> With no edge cases, you miss the "90% average but 1% of users break" situation. Manage the category mix deliberately.</li>
+<li><strong>Storing PII verbatim.</strong> Committing real user data to git is a major incident. Mask before labeling.</li>
+<li><strong>Filling <code>expected</code> with one style only.</strong> Forcing exact match on every case zeros out every free-form answer. Pick a label style per case.</li>
+<li><strong>Building the eval set once and never updating it.</strong> When production traffic shifts, the old eval set loses meaning. Refresh 5-10 cases per week.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>A good eval set blends production distribution with deliberate edge cases.</li>
+<li>Source from three places: production samples, failure cases, intentional adversarial cases.</li>
+<li>Target sizes: 10-30 smoke, 100-300 regression, 300-1000 model comparison.</li>
+<li>Choose the label style per case from exact, keywords, or rubric.</li>
+<li>Save as JSONL, commit to git, pin the version into the filename.</li>
+</ul>
+<p>The next post covers deterministic metrics — when Exact Match, F1, BLEU, and ROUGE help, and when they hurt.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Why Evaluate LLM Applications</a></li>
+<li><strong>Designing Evaluation Datasets (current)</strong></li>
+<li>Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)</li>
+<li>LLM-as-Judge (upcoming)</li>
+<li>Rubric-Based Scoring (upcoming)</li>
+<li>Evaluating RAG Systems (upcoming)</li>
+<li>Evaluating Agents (upcoming)</li>
+<li>Regression Testing (upcoming)</li>
+<li>A/B Testing LLMs (upcoming)</li>
+<li>Continuous Evaluation in Production (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://hamel.dev/blog/posts/evals/">Hamel Husain — Your AI product needs evals</a></li>
+<li><a href="https://github.com/openai/evals">OpenAI — Evals framework</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation/concepts">LangSmith — Dataset best practices</a></li>
+<li><a href="https://eugeneyan.com/writing/evals/">Eugene Yan — Building eval datasets</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, LLM, Dataset, Quality</p>
+</body>
+</html>

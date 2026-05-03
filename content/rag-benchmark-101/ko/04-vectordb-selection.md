@@ -226,4 +226,4 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 - [pgvector](https://github.com/pgvector/pgvector)
 - [Qdrant benchmarks](https://qdrant.tech/benchmarks/)
 
-Tags: RAG, VectorDB, FAISS, IVF, Recall, ANN
+Tags: RAG, VectorDB, Benchmarking, LLM

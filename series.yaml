@@ -130,6 +130,9 @@ series:
   description:
     ko: 텍스트 + 이미지 + 오디오 + 영상을 다루는 multimodal AI 입문 시리즈. CLIP, ViT, VLM, Whisper, Diffusion, multimodal RAG, video understanding을 production 관점에서 배웁니다.
     en: A beginner-friendly guide to multimodal AI covering text + image + audio + video. Learn CLIP, ViT, VLMs, Whisper, Diffusion, multimodal RAG, and video understanding from a production lens.
+  languages:
+  - ko
+  - en
   status: content-ready
   path: content/multimodal-ai-101
 
@@ -141,6 +144,9 @@ series:
   description:
     ko: Python의 표준 데이터베이스 인터페이스 PEP 249(DB-API 2.0)를 SQLite 기준으로 다루는 입문 시리즈.
     en: A beginner-friendly tour of Python's PEP 249 (DB-API 2.0) using SQLite, covering connection lifecycle, transactions, error handling, async, and production patterns.
+  languages:
+  - ko
+  - en
   status: draft
   path: content/python-dbapi-101
 

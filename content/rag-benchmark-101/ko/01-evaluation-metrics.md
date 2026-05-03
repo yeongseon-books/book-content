@@ -246,4 +246,4 @@ production RAG 평가의 현실적 가이드:
 - [BEIR: A heterogeneous benchmark for zero-shot evaluation of IR models](https://arxiv.org/abs/2104.08663)
 - [MTEB: Massive Text Embedding Benchmark](https://arxiv.org/abs/2210.07316)
 
-Tags: RAG, VectorDB, Benchmarking, Precision, Recall, MRR
+Tags: RAG, VectorDB, Benchmarking, LLM

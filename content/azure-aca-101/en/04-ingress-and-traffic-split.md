@@ -245,8 +245,6 @@ Production canary playbook:
 
 The next post covers KEDA-based scaling. We will configure 0-to-N scaling driven not just by HTTP traffic but also by queue length, CPU, and custom metrics.
 
----
-
 <!-- toc:begin -->
 ## In this series
 
@@ -257,7 +255,10 @@ The next post covers KEDA-based scaling. We will configure 0-to-N scaling driven
 - Scaling — KEDA scalers and zero-to-N (upcoming)
 - Dapr integration — what you get from a sidecar (upcoming)
 - Monitoring and ops — Log Analytics and Application Insights (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -272,4 +273,4 @@ The next post covers KEDA-based scaling. We will configure 0-to-N scaling driven
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Ingress, Canary, Blue-Green, Traffic Split
+Tags: Azure, Container Apps, Serverless, Containers

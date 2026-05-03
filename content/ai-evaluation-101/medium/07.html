@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evaluating Agents — Trajectories, Not Single Responses</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Evaluating Agents — Trajectories, Not Single Responses</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (7/10)</p>
+</blockquote>
+<p>Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.' This post covers trajectory-level evaluation.</p>
+<hr>
+<h2>Why Agent Evaluation Is Different</h2>
+<p>Through Ep1-Ep6 we evaluated <strong>single responses</strong>: one question paired with one answer.</p>
+<p>Agents are different. An agent goes through multiple steps to complete a task.</p>
+<pre><code>User: &quot;Email me a summary of this week's schedule&quot;
+  ↓
+Step 1: read_calendar()  → [10 meetings]
+Step 2: read_emails()    → [3 emails]
+Step 3: summarize(...)   → &quot;This week's summary: ...&quot;
+Step 4: send_email(...)  → &quot;sent&quot;
+  ↓
+Final reply: &quot;Done, I sent the email.&quot;
+</code></pre>
+<p>Agent evaluation <strong>cannot stop at the final reply</strong>. You must measure five things together:</p>
+<ol>
+<li><strong>Task success</strong> — did the user get what they wanted</li>
+<li><strong>Tool selection</strong> — was the right tool called</li>
+<li><strong>Tool arguments</strong> — were the arguments correct</li>
+<li><strong>Trajectory efficiency</strong> — did it take the shortest path</li>
+<li><strong>Recovery</strong> — did it bounce back from failures along the way</li>
+</ol>
+<p>Let's go through each.</p>
+<hr>
+<h2>Two Levels of Evaluation — End-to-End vs Step-Level</h2>
+<p>Agent evaluation has two perspectives.</p>
+<p><strong>End-to-end (final outcome)</strong></p>
+<p>Look only at the result. "Was the email actually sent?"</p>
+<pre><code class="language-python"># agent_eval/end_to_end.py
+def end_to_end_success(agent_run: dict) -&gt; bool:
+    return agent_run[&quot;final_state&quot;][&quot;email_sent&quot;] is True
+</code></pre>
+<p><strong>Pro</strong>: Simple. Maps to user value directly.<br>
+<strong>Con</strong>: When it fails, you do not know <strong>where</strong> it broke.</p>
+<p><strong>Step-level</strong></p>
+<p>For each step, check whether the agent <strong>called the right tool with the right arguments</strong>.</p>
+<pre><code class="language-python"># agent_eval/step_level.py
+expected_trajectory = [
+    {&quot;tool&quot;: &quot;read_calendar&quot;, &quot;args_match&quot;: lambda a: &quot;week&quot; in a.get(&quot;range&quot;, &quot;&quot;)},
+    {&quot;tool&quot;: &quot;read_emails&quot;,   &quot;args_match&quot;: lambda a: a.get(&quot;limit&quot;, 0) &lt;= 10},
+    {&quot;tool&quot;: &quot;summarize&quot;,     &quot;args_match&quot;: lambda a: True},
+    {&quot;tool&quot;: &quot;send_email&quot;,    &quot;args_match&quot;: lambda a: &quot;@&quot; in a.get(&quot;to&quot;, &quot;&quot;)},
+]
+
+def step_match_score(actual: list[dict], expected: list[dict]) -&gt; float:
+    matches = 0
+    for i, exp in enumerate(expected):
+        if i &gt;= len(actual):
+            break
+        a = actual[i]
+        if a[&quot;tool&quot;] == exp[&quot;tool&quot;] and exp[&quot;args_match&quot;](a[&quot;args&quot;]):
+            matches += 1
+    return matches / len(expected)
+</code></pre>
+<p><strong>Pro</strong>: Pinpoints which step broke.<br>
+<strong>Con</strong>: Multiple valid trajectories exist; strict matching gives false negatives.</p>
+<p><strong>Practical recommendation</strong>: use end-to-end for the headline number, drop into step-level only for failure analysis.</p>
+<hr>
+<h2>Tool Selection — Confusion Matrix</h2>
+<p>Agents pick the wrong tool more often than you would think — calling <code>draft_email</code> instead of <code>send_email</code>. Treat tool selection as a classification problem.</p>
+<pre><code class="language-python"># agent_eval/tool_confusion.py
+from sklearn.metrics import classification_report
+
+# 100 test cases
+expected_tools = [&quot;send_email&quot;, &quot;read_calendar&quot;, &quot;send_email&quot;, ...]
+actual_tools   = [&quot;draft_email&quot;,&quot;read_calendar&quot;, &quot;send_email&quot;, ...]
+
+print(classification_report(expected_tools, actual_tools))
+#                precision  recall  f1-score
+# read_calendar      0.95    0.98    0.96
+# send_email         0.85    0.70    0.77   ← often confused with draft_email
+# draft_email        0.60    0.90    0.72
+</code></pre>
+<p><strong>Reading</strong>: send_email recall of 0.70 means 30% of cases the agent called draft instead. <strong>Add an explicit example to the prompt</strong>: "Use send, not draft."</p>
+<hr>
+<h2>Trajectory Efficiency — Step Count</h2>
+<p>An agent that finishes in 4 steps is not the same as one that finishes in 12. Twelve steps means 3x tokens, 3x latency, and 3x failure surface.</p>
+<pre><code class="language-python"># agent_eval/efficiency.py
+def trajectory_metrics(agent_run: dict, expected_steps: int) -&gt; dict:
+    actual_steps = len(agent_run[&quot;steps&quot;])
+    return {
+        &quot;step_count&quot;:      actual_steps,
+        &quot;step_overhead&quot;:   actual_steps / expected_steps,  # 1.0 = optimal
+        &quot;total_latency_s&quot;: sum(s[&quot;latency_s&quot;] for s in agent_run[&quot;steps&quot;]),
+        &quot;total_tokens&quot;:    sum(s[&quot;tokens&quot;] for s in agent_run[&quot;steps&quot;]),
+        &quot;tool_calls&quot;:      sum(1 for s in agent_run[&quot;steps&quot;] if &quot;tool&quot; in s),
+    }
+
+overheads = [trajectory_metrics(r, 4)[&quot;step_overhead&quot;] for r in runs]
+print(f&quot;avg step overhead: {sum(overheads)/len(overheads):.2f}&quot;)
+# avg step overhead: 1.8  ← agent uses ~2x more steps than needed
+</code></pre>
+<p><strong>Rule of thumb</strong>: step overhead above 2.0 means the prompt or tool design needs rework.</p>
+<hr>
+<h2>Recovery — Does the Agent Bounce Back</h2>
+<p>Production agents hit tool failures (API rate limits, network errors). The question is whether the agent <strong>retries or finds an alternative path</strong>.</p>
+<pre><code class="language-python"># agent_eval/recovery.py
+def evaluate_recovery(agent_run: dict) -&gt; str:
+    steps = agent_run[&quot;steps&quot;]
+    for i, s in enumerate(steps):
+        if s.get(&quot;tool_result&quot;, {}).get(&quot;error&quot;):
+            if i + 1 &gt;= len(steps):
+                return &quot;GAVE_UP&quot;
+            next_step = steps[i + 1]
+            if next_step.get(&quot;tool&quot;) == s[&quot;tool&quot;]:
+                return &quot;RETRIED&quot;
+            if &quot;tool&quot; in next_step:
+                return &quot;ALTERNATIVE&quot;
+            return &quot;GAVE_UP&quot;
+    return &quot;NO_FAILURE&quot;
+
+# 50 runs with injected failures
+results = [evaluate_recovery(r) for r in fault_injected_runs]
+from collections import Counter
+print(Counter(results))
+# Counter({'RETRIED': 30, 'ALTERNATIVE': 12, 'GAVE_UP': 8})
+# → 16% of cases the agent gave up. Reinforce recovery in the prompt.
+</code></pre>
+<p><strong>Fault injection pattern</strong>: deliberately inject errors into a subset of tool calls during evaluation and see how the agent reacts (automated as a regression test in Ep8).</p>
+<hr>
+<h2>Putting It Together — An Agent Eval Dashboard</h2>
+<p>Five metrics in one dashboard tells the full story.</p>
+<pre><code class="language-python"># agent_eval/dashboard.py
+import pandas as pd
+
+results = []
+for run in agent_runs:  # 100 runs
+    results.append({
+        &quot;task_success&quot;:    end_to_end_success(run),
+        &quot;tool_f1&quot;:         step_match_score(run[&quot;steps&quot;], expected),
+        &quot;step_overhead&quot;:   trajectory_metrics(run, 4)[&quot;step_overhead&quot;],
+        &quot;recovered&quot;:       evaluate_recovery(run) in (&quot;RETRIED&quot;, &quot;ALTERNATIVE&quot;),
+    })
+
+df = pd.DataFrame(results)
+print(df.describe())
+#                  task_success  tool_f1  step_overhead  recovered
+# mean             0.78          0.85     1.6            0.72
+# std              0.41          0.18     0.7            0.45
+</code></pre>
+<p><strong>Reading</strong>:<br>
+- task_success 0.78 → 22% failure. Too high.<br>
+- tool_f1 0.85 → tool selection is OK.<br>
+- step_overhead 1.6 → 60% extra steps. Cost issue.<br>
+- recovered 0.72 → 28% caves on failures. Needs work.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Evaluating only the final answer</strong></p>
+<p>If you only check whether the email was sent, an agent that sent five wrong emails before the sixth correct one still gets a PASS. <strong>Always include trajectory metrics.</strong></p>
+<p><strong>Mistake 2: Allowing only one expected trajectory</strong></p>
+<p>Multiple paths can solve the same task. "send_email first" or "summarize first" should both be acceptable if the outcome matches. <strong>Define expected as a set or partial order.</strong></p>
+<p><strong>Mistake 3: Step-level passing without end-to-end check</strong></p>
+<p>Every step can pass while the final outcome is wrong (bad argument combinations). <strong>Always pair with end-to-end success.</strong></p>
+<p><strong>Mistake 4: Skipping recovery evaluation</strong></p>
+<p>API failures are constant in production. Without recovery testing you ship into a flood of user-facing errors. <strong>Inject failures into 30% of runs</strong> and measure.</p>
+<p><strong>Mistake 5: Ignoring token cost and latency</strong></p>
+<p>The same task solved in 1K tokens vs 10K tokens looks identical on accuracy but the latter is unfit for production. <strong>Put step_overhead, total_tokens, and total_latency_s on the dashboard.</strong></p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Agent evaluation is not single-response evaluation. Measure <strong>task success and trajectory together</strong>.</li>
+<li>Five metrics: task success, tool selection, tool arguments, trajectory efficiency, recovery.</li>
+<li>Use end-to-end for the headline number and step-level for failure analysis.</li>
+<li>Tool selection → <code>classification_report</code>. Recovery → fault injection.</li>
+<li>Token cost and latency are production metrics on equal footing with accuracy.</li>
+</ul>
+<p>The next post integrates evaluation into <strong>CI</strong> so regressions are blocked automatically.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Ep2 Evaluation Dataset Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">Ep4 LLM-as-Judge — Evaluating Models with Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">Ep5 Rubric-Based Multi-Dimensional Scoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">Ep6 RAG Evaluation</a></li>
+<li><strong>Ep7 Agent Evaluation (current)</strong></li>
+<li>Ep8 Regression Testing (upcoming)</li>
+<li>Ep9 A/B Testing LLMs (upcoming)</li>
+<li>Ep10 Production Evaluation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2210.03629">Yao et al. (2022). ReAct — Synergizing Reasoning and Acting in Language Models</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation/tutorials/agents">LangSmith — Agent Evaluation Patterns</a></li>
+<li><a href="https://arxiv.org/abs/2308.03688">AgentBench — Evaluating LLMs as Agents (Liu et al., 2023)</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html">scikit-learn — classification_report</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, Agent, Trajectory, Tool Use</p>
+</body>
+</html>

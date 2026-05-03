@@ -1,12 +1,23 @@
 ---
-title: "PEP 249 Exception Hierarchy and SQLite Error Handling"
-description: "The eight exception classes PEP 249 defines, how sqlite3 maps SQLite error codes onto them, the difference between BUSY and LOCKED, and a safe retry pattern."
-series: python-dbapi-101
 episode: 7
-status: publish-ready
 language: en
-targets: [github, medium]
-tags: [Python, SQLite, Error Handling, Exception, Retry, PEP 249]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- Error Handling
+- Exception
+- Retry
+- PEP 249
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: PEP 249 Exception Hierarchy and SQLite Error Handling
 ---
 
 # PEP 249 Exception Hierarchy and SQLite Error Handling

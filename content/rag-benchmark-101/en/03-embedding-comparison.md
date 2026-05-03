@@ -203,7 +203,7 @@ Episode 4 applies the same thinking to vector DB selection: FAISS, Chroma, pgvec
 - **Comparing embedding models (current)**
 - VectorDB selection criteria (upcoming)
 - End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG benchmark (upcoming)
+- Completing the RAG Benchmark (upcoming)
 
 <!-- toc:end -->
 
@@ -216,4 +216,4 @@ Episode 4 applies the same thinking to vector DB selection: FAISS, Chroma, pgvec
 - [LangChain HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
 - [FAISS index types](https://github.com/facebookresearch/faiss/wiki/Faiss-indexes)
 
-Tags: RAG, Embedding, Benchmarking, Sentence-Transformers, MTEB, Latency
+Tags: RAG, VectorDB, Benchmarking, LLM

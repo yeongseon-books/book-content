@@ -1,21 +1,23 @@
 ---
-title: "실전 Git workflow 만들기: issue부터 release까지 한 흐름으로"
-description: "Episode 1~9에서 익힌 명령들을 GitHub Flow 한 사이클로 묶고, 실수가 잦은 지점에서 어떤 명령으로 회복하는지 정리합니다"
-date: 2026-05-05
+episode: 10
+language: ko
 last_reviewed: '2026-05-05'
-status: publish-ready
 series: git-github-101
-order: 10
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-flow
-  - git-workflow
-  - conventional-commits
-  - semantic-versioning
-  - code-review
-  - release-tag
+- github-flow
+- git-workflow
+- conventional-commits
+- semantic-versioning
+- code-review
+- release-tag
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: '실전 Git workflow 만들기: issue부터 release까지 한 흐름으로'
 ---
 
 # 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로

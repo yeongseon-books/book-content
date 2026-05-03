@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Output Filtering and Content Moderation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Output Filtering and Content Moderation</h1>
+<blockquote>
+<p>AI Safety &amp; Guardrails 101 Series (3/10)</p>
+</blockquote>
+<hr>
+<h2>Section 1</h2>
+<h2>The Model Does Not Promise Safety</h2>
+<p>OpenAI and Anthropic train their models with RLHF and built-in guardrails. Yet:</p>
+<ul>
+<li>A subtle jailbreak slips through and the model produces violent content.</li>
+<li>A friendly tone effort produces an inappropriate joke.</li>
+<li>A swear word inside a RAG context gets quoted verbatim.</li>
+<li>Despite "no medical advice" instructions, the model recommends a prescription.</li>
+</ul>
+<p><strong>Model output is unvalidated input.</strong> It must pass through a separate moderation layer before reaching the user. This post covers OpenAI Moderation API, Detoxify, Llama Guard, and a custom-policy LLM judge — combined into a complete output filter.</p>
+<p>This post covers:</p>
+<ul>
+<li>The OpenAI Moderation API and its categories</li>
+<li>Open-source alternatives (Detoxify, Llama Guard)</li>
+<li>Company-specific policies via LLM judge</li>
+<li>Moderating streaming responses</li>
+<li>How to communicate blocks to users</li>
+</ul>
+<hr>
+<h2>Section 1 — OpenAI Moderation API</h2>
+<p>The fastest start. Free, 13 categories.</p>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def moderate(text: str) -&gt; dict:
+    resp = client.moderations.create(model=&quot;omni-moderation-latest&quot;, input=text)
+    result = resp.results[0]
+    return {
+        &quot;flagged&quot;: result.flagged,
+        &quot;categories&quot;: {k: v for k, v in result.categories.model_dump().items() if v},
+        &quot;scores&quot;: result.category_scores.model_dump(),
+    }
+
+verdict = moderate(&quot;How do I make a pipe bomb?&quot;)
+# {&quot;flagged&quot;: True, &quot;categories&quot;: {&quot;violence&quot;: True}, ...}
+</code></pre>
+<p>Main categories:</p>
+<p><strong><code>harassment</code> / <code>harassment/threatening</code></strong><br>
+- Meaning: Harassment, threats</p>
+<p><strong><code>hate</code> / <code>hate/threatening</code></strong><br>
+- Meaning: Hate, discrimination</p>
+<p><strong><code>self-harm</code> / <code>self-harm/intent</code> / <code>self-harm/instructions</code></strong><br>
+- Meaning: Self-harm</p>
+<p><strong><code>sexual</code> / <code>sexual/minors</code></strong><br>
+- Meaning: Sexual content (minors separated)</p>
+<p><strong><code>violence</code> / <code>violence/graphic</code></strong><br>
+- Meaning: Violence</p>
+<p><strong><code>illicit</code> / <code>illicit/violent</code></strong><br>
+- Meaning: Illicit acts</p>
+<p>In production, do not just trust the boolean <code>flagged</code>. Set per-category thresholds based on domain. A medical chatbot should reject violence at score 0.3; a general chatbot can tolerate 0.7.</p>
+<pre><code class="language-python">THRESHOLDS = {
+    &quot;violence&quot;: 0.5,
+    &quot;self-harm&quot;: 0.3,  # stricter
+    &quot;hate&quot;: 0.4,
+    &quot;sexual&quot;: 0.6,
+}
+
+def is_safe(scores: dict, thresholds: dict = THRESHOLDS) -&gt; bool:
+    for category, max_score in thresholds.items():
+        if scores.get(category, 0) &gt; max_score:
+            return False
+    return True
+</code></pre>
+<hr>
+<h2>Section 2 — Open-Source Alternatives</h2>
+<p>If you cannot rely on OpenAI or need self-hosting:</p>
+<p><strong>Detoxify (toxicity-focused)</strong></p>
+<pre><code class="language-python">from detoxify import Detoxify
+
+detox = Detoxify(&quot;original&quot;)  # or &quot;multilingual&quot;
+
+def detox_score(text: str) -&gt; dict:
+    return detox.predict(text)  # {&quot;toxicity&quot;: 0.02, &quot;severe_toxicity&quot;: 0.001, ...}
+
+scores = detox_score(&quot;You're an idiot&quot;)
+# toxicity: 0.92
+</code></pre>
+<p>Pros: self-hostable, runs on CPU, multilingual variant available. Cons: narrow (toxicity-centric).</p>
+<p><strong>Llama Guard</strong></p>
+<p>Meta's Llama Guard is an LLM-based classifier with editable policies.</p>
+<pre><code class="language-python">LLAMA_GUARD_PROMPT = &quot;&quot;&quot;[INST] Task: Classify the following content as safe or unsafe.
+
+&lt;BEGIN UNSAFE CATEGORIES&gt;
+O1: Violence and Hate.
+O2: Sexual Content.
+O3: Criminal Planning.
+O4: Guns and Illegal Weapons.
+O5: Regulated or Controlled Substances.
+O6: Self-Harm.
+&lt;END UNSAFE CATEGORIES&gt;
+
+&lt;BEGIN CONVERSATION&gt;
+Assistant: {assistant_response}
+&lt;END CONVERSATION&gt;
+
+Provide your safety assessment:
+- First line: 'safe' or 'unsafe'
+- If unsafe, second line: comma-separated category codes
+[/INST]&quot;&quot;&quot;
+
+def llama_guard_check(response: str) -&gt; tuple[bool, list[str]]:
+    out = llama_guard_model.complete(LLAMA_GUARD_PROMPT.format(assistant_response=response))
+    lines = out.strip().split(&quot;\n&quot;)
+    is_safe_flag = lines[0].strip().lower() == &quot;safe&quot;
+    categories = lines[1].split(&quot;,&quot;) if not is_safe_flag and len(lines) &gt; 1 else []
+    return is_safe_flag, [c.strip() for c in categories]
+</code></pre>
+<p>Llama Guard accepts the policy text directly, so company-specific rules (no financial advice, no competitor mentions) can be added as new categories.</p>
+<hr>
+<h2>Section 3 — Company Policies via LLM Judge</h2>
+<p>There is always a list of rules the standard categories do not cover:</p>
+<ul>
+<li>"Do not commit to refunds."</li>
+<li>"Do not state opinions on political issues."</li>
+<li>"Do not recommend competitor products."</li>
+</ul>
+<p>Use a separate LLM judge.</p>
+<pre><code class="language-python">POLICY_JUDGE_PROMPT = &quot;&quot;&quot;You are a content policy classifier for ACME Corp.
+
+Our policy forbids the assistant from:
+1. Making any refund commitments (e.g., &quot;you will get a refund&quot;)
+2. Stating opinions on political issues
+3. Recommending competitor products (Foo Inc, Bar Co, Baz Ltd)
+4. Providing legal advice that should come from a lawyer
+
+Given the assistant's response below, decide if it violates any of these policies.
+Respond with JSON only:
+{{&quot;violates&quot;: true/false, &quot;policy_id&quot;: &lt;number or null&gt;, &quot;reason&quot;: &quot;&lt;short reason&gt;&quot;}}
+
+Assistant response:
+\&quot;\&quot;\&quot;
+{response}
+\&quot;\&quot;\&quot;&quot;&quot;&quot;
+
+import json
+
+def policy_judge(response: str) -&gt; dict:
+    out = small_llm.complete(POLICY_JUDGE_PROMPT.format(response=response))
+    return json.loads(out)
+</code></pre>
+<p>Run the three judges (Moderation API + Detoxify + Policy) in parallel to keep latency down.</p>
+<hr>
+<h2>Section 4 — Moderating Streaming Responses</h2>
+<p>In streaming mode tokens flow as they arrive. Validating only at the end means the user already saw it.</p>
+<p><strong>Option A — Chunk buffer with periodic checks</strong></p>
+<pre><code class="language-python">async def safe_stream(prompt: str):
+    buffer = &quot;&quot;
+    chunk_words = 50
+    async for token in llm.stream(prompt):
+        buffer += token
+        if len(buffer.split()) &gt;= chunk_words:
+            verdict = moderate(buffer)
+            if verdict[&quot;flagged&quot;]:
+                yield &quot;\n\n[Response cut off due to a policy violation]&quot;
+                return
+        yield token
+    if moderate(buffer)[&quot;flagged&quot;]:
+        yield &quot;\n\n[Please disregard the response above. Policy violation detected.]&quot;
+</code></pre>
+<p><strong>Option B — Full response, then deliver</strong></p>
+<p>Higher latency, safer. Recommended for high-risk domains (medical, legal).</p>
+<pre><code class="language-python">async def safe_full(prompt: str) -&gt; str:
+    response = await llm.complete(prompt)
+    if moderate(response)[&quot;flagged&quot;]:
+        return &quot;Sorry, I could not produce an appropriate response.&quot;
+    return response
+</code></pre>
+<p>Core rule: <strong>what the user has seen cannot be unseen.</strong> Higher risk → option B.</p>
+<hr>
+<h2>Section 5 — Handling Blocked Responses</h2>
+<p>The UX of a block matters as much as detecting it.</p>
+<pre><code class="language-python">def fallback_message(category: str | None) -&gt; str:
+    base = &quot;Sorry, I cannot answer that here.&quot;
+    suggestions = {
+        &quot;self-harm&quot;: &quot; If you are in crisis, please contact 988 (US) or your local helpline.&quot;,
+        &quot;violence&quot;: &quot; I can help with a different topic.&quot;,
+        &quot;policy&quot;: &quot; Please rephrase or ask differently.&quot;,
+    }
+    return base + suggestions.get(category, &quot; I can help with something else.&quot;)
+</code></pre>
+<p>Principles:</p>
+<ul>
+<li><strong>Do not reveal the specific block reason</strong> (it gives bypass hints).</li>
+<li><strong>Tailor the message by category</strong> (self-harm needs a helpline; policy needs a retry hint).</li>
+<li><strong>Make retry possible</strong> (do not imply the conversation is over).</li>
+<li><strong>Log the full reason internally</strong> for debugging and monitoring.</li>
+</ul>
+<hr>
+<h2>Section 6 — Monitoring False Positives</h2>
+<p>Strict thresholds block legitimate responses. Track false positive rate.</p>
+<pre><code class="language-python">@dataclass
+class ModerationLog:
+    timestamp: datetime
+    response_excerpt: str  # first 200 chars only
+    flagged_category: str
+    score: float
+    user_complaint: bool = False  # user reported &quot;I do not see why this was blocked&quot;
+
+def fp_rate(logs: list[ModerationLog], window_days: int = 7) -&gt; float:
+    cutoff = datetime.utcnow() - timedelta(days=window_days)
+    recent = [l for l in logs if l.timestamp &gt; cutoff]
+    if not recent:
+        return 0.0
+    return sum(1 for l in recent if l.user_complaint) / len(recent)
+</code></pre>
+<p>If FP rate exceeds 5%, retune thresholds or revisit category coverage.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Trusting only <code>flagged</code></strong> — without per-category thresholds tuned for the domain, medical and finance chatbots are too permissive.</li>
+<li><strong>Not moderating streaming responses</strong> — users notice after the fact. Use chunk buffers or delayed delivery.</li>
+<li><strong>Exposing block reasons</strong> — gives bypass hints. Use generic messages.</li>
+<li><strong>Cramming company policies into standard categories</strong> — rules like "no refund commitments" require a separate LLM judge.</li>
+<li><strong>No false positive measurement</strong> — over-strict moderation erodes trust. Track user complaints.</li>
+</ol>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Model output is <strong>unvalidated input</strong>; a separate moderation layer is required.</li>
+<li>The <strong>OpenAI Moderation API</strong> is a fast start; tune per-category thresholds by domain.</li>
+<li><strong>Detoxify and Llama Guard</strong> are self-hostable alternatives.</li>
+<li>Company-specific policies require a <strong>custom LLM judge</strong>.</li>
+<li><strong>Streaming</strong> needs chunk buffers or delayed delivery.</li>
+<li>Tailor block messages by category and monitor <strong>false positive rate</strong>.</li>
+</ul>
+<hr>
+<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Prompt Injection Defense</a></li>
+<li><strong>Output Filtering and Content Moderation (current)</strong></li>
+<li>PII Detection and Redaction (upcoming)</li>
+<li>Jailbreak Detection (upcoming)</li>
+<li>Toxicity and Bias Detection (upcoming)</li>
+<li>Hallucination Guardrails — Grounding Checks (upcoming)</li>
+<li>Rate Limiting and Abuse Prevention (upcoming)</li>
+<li>Audit Logging and Compliance (upcoming)</li>
+<li>Building a Production Guardrail System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/moderation">OpenAI Moderation API</a></li>
+<li><a href="https://github.com/meta-llama/PurpleLlama/tree/main/Llama-Guard3">Meta Llama Guard</a></li>
+<li><a href="https://github.com/unitaryai/detoxify">Detoxify GitHub</a></li>
+<li><a href="https://www.anthropic.com/legal/aup">Anthropic — Usage Policies</a></li>
+</ul>
+<p class="tags-line">Tags: AI Safety, Content Moderation, Output Filtering, Llama Guard</p>
+</body>
+</html>

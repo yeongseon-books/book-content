@@ -1,21 +1,23 @@
 ---
-title: "branch 기초 - 만들고 옮기고 비교하기"
-description: "같은 폴더 안에서 안전하게 두 가지 작업을 분리하기 위해 branch가 무엇인지, 어떻게 만들고 옮기고 비교하는지를 손으로 따라가며 익힙니다."
-date: '2026-05-04'
+episode: 4
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 4
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-branch
-  - git-switch
-  - git-checkout
-  - HEAD
-  - parallel-development
-  - feature-branch
+- git-branch
+- git-switch
+- git-checkout
+- HEAD
+- parallel-development
+- feature-branch
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: branch 기초 - 만들고 옮기고 비교하기
 ---
 
 # branch 기초 - 만들고 옮기고 비교하기

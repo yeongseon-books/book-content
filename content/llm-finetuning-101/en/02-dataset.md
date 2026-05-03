@@ -216,14 +216,14 @@ The point of dataset preparation is to make the input/output boundary the model 
 Post 3 moves on to LoRA adapter configuration. We dissect `LoraConfig`'s `r`, `alpha`, `target_modules`, and `dropout` line by line and see how each one shows up in training behavior.
 
 <!-- toc:begin -->
-## Series Contents
+## In this series
 
 - [LLM Fine-tuning Primer](./01-intro.md)
 - **Dataset Preparation and Preprocessing (current)**
-- Configuring LoRA adapters (upcoming)
-- Training loop and hyperparameters (upcoming)
-- Model evaluation (upcoming)
-- Model serving (upcoming)
+- Configuring LoRA Adapters (upcoming)
+- Training Loop and Hyperparameters (upcoming)
+- Model Evaluation (upcoming)
+- Model Serving (upcoming)
 
 <!-- toc:end -->
 
@@ -236,4 +236,4 @@ Post 3 moves on to LoRA adapter configuration. We dissect `LoraConfig`'s `r`, `a
 - [Alpaca dataset format](https://github.com/tatsu-lab/stanford_alpaca#data-release)
 - [Llama 3 chat template](https://huggingface.co/docs/transformers/main/en/chat_templating)
 
-Tags: Fine-tuning, Dataset, JSONL, Tokenizer, HuggingFace, Python
+Tags: Fine-tuning, LoRA, LLM, Python

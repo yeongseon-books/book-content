@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tokenization and Chunking Strategies</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tokenization and Chunking Strategies</h1>
+<blockquote>
+<p>AI Data Preparation 101 series (5/10)</p>
+</blockquote>
+<hr>
+<h2>"The tokenizer decides model quality?"</h2>
+<p>In LLMs, tokenization is not just preprocessing. The moment the tokenizer is fixed, the units the model can see and the efficiency of its context window are decided. The reason GPT-4 uses far fewer tokens than GPT-3 for the same Korean text is that its tokenizer was retrained.</p>
+<p>This episode covers two topics.</p>
+<ol>
+<li><strong>Tokenization</strong>: text -&gt; token id conversion (subword algorithms)</li>
+<li><strong>Chunking</strong>: long documents -&gt; splits that fit the model input</li>
+</ol>
+<h2>Tokenization algorithms - 4 options</h2>
+<p><strong>Word-level</strong><br>
+- Representative model: Old NLP<br>
+- Notes: Severe OOV; rarely used</p>
+<p><strong>Character-level</strong><br>
+- Representative model: Some multilingual models<br>
+- Notes: Sequence length explodes</p>
+<p><strong>BPE (Byte-Pair Encoding)</strong><br>
+- Representative model: GPT-2, GPT-3, RoBERTa<br>
+- Notes: Most common</p>
+<p><strong>WordPiece</strong><br>
+- Representative model: BERT, DistilBERT<br>
+- Notes: Similar to BPE, different scoring</p>
+<p><strong>SentencePiece (Unigram)</strong><br>
+- Representative model: T5, LLaMA, Gemma<br>
+- Notes: Language-agnostic</p>
+<p>For new production models, BPE or SentencePiece are the default choice.</p>
+<h2>Counting tokens with tiktoken</h2>
+<p>For OpenAI models, <code>tiktoken</code> measures token counts quickly.</p>
+<pre><code class="language-python"># pip install tiktoken
+import tiktoken
+
+def count_tokens(text: str, model: str = &quot;gpt-4o&quot;) -&gt; int:
+    enc = tiktoken.encoding_for_model(model)
+    return len(enc.encode(text))
+
+samples = {
+    &quot;english&quot;: &quot;The quick brown fox jumps over the lazy dog.&quot;,
+    &quot;korean&quot;: &quot;빠른 갈색 여우가 게으른 개를 뛰어넘는다.&quot;,
+    &quot;code&quot;: &quot;def add(a, b):\n    return a + b&quot;,
+}
+for name, text in samples.items():
+    n = count_tokens(text)
+    chars = len(text)
+    print(f&quot;{name:8s} chars={chars:3d} tokens={n:3d} ratio={chars/n:.2f}&quot;)
+</code></pre>
+<p>For the same meaning, Korean is 1.5-2x less token-efficient than English. Under cl100k_base (GPT-4), one Korean character expands to 1-3 tokens.</p>
+<h2>Training a tokenizer on your own corpus</h2>
+<p>For a domain-specific model, training a tokenizer from scratch is worthwhile.</p>
+<pre><code class="language-python"># pip install tokenizers
+from tokenizers import Tokenizer
+from tokenizers.models import BPE
+from tokenizers.trainers import BpeTrainer
+from tokenizers.pre_tokenizers import ByteLevel
+
+tokenizer = Tokenizer(BPE(unk_token=&quot;&lt;unk&gt;&quot;))
+tokenizer.pre_tokenizer = ByteLevel()
+
+trainer = BpeTrainer(
+    vocab_size=32000,
+    special_tokens=[&quot;&lt;pad&gt;&quot;, &quot;&lt;unk&gt;&quot;, &quot;&lt;s&gt;&quot;, &quot;&lt;/s&gt;&quot;, &quot;&lt;mask&gt;&quot;],
+    min_frequency=2,
+)
+
+files = [&quot;data/corpus_ko.txt&quot;, &quot;data/corpus_en.txt&quot;]
+tokenizer.train(files, trainer)
+tokenizer.save(&quot;custom-bpe-32k.json&quot;)
+
+# Use it
+loaded = Tokenizer.from_file(&quot;custom-bpe-32k.json&quot;)
+ids = loaded.encode(&quot;Hello 안녕하세요&quot;).ids
+print(ids, &quot;-&gt;&quot;, loaded.decode(ids))
+</code></pre>
+<p>vocab size directly affects model size and memory. Rough guidance:</p>
+<ul>
+<li>Sub-7B models: 32k</li>
+<li>7B - 70B: 50k - 100k</li>
+<li>Multilingual: 128k or more</li>
+</ul>
+<p>A larger vocab shortens sequence length and speeds training, but the embedding matrix grows and consumes more memory.</p>
+<h2>Chunking - 4 strategies for long documents</h2>
+<p>LLM context windows are finite. Long documents must be split into chunks.</p>
+<p><strong>1. Fixed-size chunking</strong></p>
+<p>Simplest. Mostly used as a baseline.</p>
+<pre><code class="language-python">def fixed_chunk(text: str, chunk_size: int = 1000, overlap: int = 100) -&gt; list[str]:
+    chunks = []
+    start = 0
+    while start &lt; len(text):
+        end = min(start + chunk_size, len(text))
+        chunks.append(text[start:end])
+        start += chunk_size - overlap
+    return chunks
+</code></pre>
+<p>Problem: it ignores sentence and paragraph boundaries, so meaning gets cut.</p>
+<p><strong>2. Sentence-aware chunking</strong></p>
+<pre><code class="language-python">import re
+
+def sentence_chunk(text: str, max_tokens: int = 500,
+                   token_count=count_tokens) -&gt; list[str]:
+    sentences = re.split(r&quot;(?&lt;=[.!?])\s+&quot;, text)
+    chunks, current, current_tokens = [], [], 0
+    for sent in sentences:
+        n = token_count(sent)
+        if current_tokens + n &gt; max_tokens and current:
+            chunks.append(&quot; &quot;.join(current))
+            current, current_tokens = [], 0
+        current.append(sent)
+        current_tokens += n
+    if current:
+        chunks.append(&quot; &quot;.join(current))
+    return chunks
+</code></pre>
+<p>Splits by sentence and accumulates without exceeding the token budget.</p>
+<p><strong>3. Recursive chunking (LangChain style)</strong></p>
+<p>Tries separators in priority order.</p>
+<pre><code class="language-python">def recursive_chunk(text: str, max_tokens: int = 500,
+                    separators: list[str] | None = None,
+                    token_count=count_tokens) -&gt; list[str]:
+    separators = separators or [&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;, &quot;&quot;]
+    if token_count(text) &lt;= max_tokens:
+        return [text]
+    sep = separators[0]
+    if not sep:
+        # base case: forced length-based split
+        mid = len(text) // 2
+        return recursive_chunk(text[:mid], max_tokens, separators[1:]) + \
+               recursive_chunk(text[mid:], max_tokens, separators[1:])
+    parts = text.split(sep)
+    chunks, current = [], &quot;&quot;
+    for p in parts:
+        candidate = current + sep + p if current else p
+        if token_count(candidate) &gt; max_tokens:
+            if current:
+                chunks.append(current)
+            if token_count(p) &gt; max_tokens:
+                chunks.extend(recursive_chunk(p, max_tokens, separators[1:]))
+                current = &quot;&quot;
+            else:
+                current = p
+        else:
+            current = candidate
+    if current:
+        chunks.append(current)
+    return chunks
+</code></pre>
+<p>By trying paragraph -&gt; sentence -&gt; word -&gt; char order, meaning is preserved at the largest possible unit. This is the most common choice in RAG pipelines.</p>
+<p><strong>4. Semantic chunking</strong></p>
+<p>Splits where embedding similarity drops.</p>
+<pre><code class="language-python">from sentence_transformers import SentenceTransformer
+import numpy as np
+
+def semantic_chunk(text: str, threshold: float = 0.3) -&gt; list[str]:
+    model = SentenceTransformer(&quot;all-MiniLM-L6-v2&quot;)
+    sentences = re.split(r&quot;(?&lt;=[.!?])\s+&quot;, text)
+    if len(sentences) &lt;= 1:
+        return sentences
+    embs = model.encode(sentences, normalize_embeddings=True)
+    chunks, current = [], [sentences[0]]
+    for i in range(1, len(sentences)):
+        sim = float(np.dot(embs[i-1], embs[i]))
+        if sim &lt; threshold:  # topic shift detected
+            chunks.append(&quot; &quot;.join(current))
+            current = [sentences[i]]
+        else:
+            current.append(sentences[i])
+    if current:
+        chunks.append(&quot; &quot;.join(current))
+    return chunks
+</code></pre>
+<p>Costly, but effective on documents with clear chapter or topic boundaries.</p>
+<h2>Chunk overlap - why it matters</h2>
+<p>Entities and references cut at chunk boundaries lose information. Overlap shares some tokens with adjacent chunks. 10-20% of chunk size is a safe starting point.</p>
+<p><strong>500</strong><br>
+- overlap: 50 (10%)<br>
+- Recommended use: RAG short context</p>
+<p><strong>1000</strong><br>
+- overlap: 150 (15%)<br>
+- Recommended use: RAG balanced</p>
+<p><strong>2000</strong><br>
+- overlap: 300 (15%)<br>
+- Recommended use: Long context</p>
+<p>If overlap exceeds 50%, duplicate information actually degrades retrieval quality.</p>
+<h2>5 common mistakes</h2>
+<ol>
+<li><strong>Applying English BPE directly to Korean</strong>: one Korean character explodes to 3-4 tokens. If your domain is Korean-heavy, train a ko-aware tokenizer or use a multilingual SentencePiece model.</li>
+<li><strong>Using fixed-size chunking in production</strong>: ignores sentence boundaries and loses meaning. Move to sentence-aware at minimum.</li>
+<li><strong>Setting overlap to 0</strong>: entities cut at boundaries break retrieval. 10-20% overlap is the baseline.</li>
+<li><strong>Estimating token count from char count</strong>: ratios shift with Korean/English/code mix. Always measure with the actual tokenizer.</li>
+<li><strong>Blindly increasing vocab size</strong>: the embedding matrix balloons memory. 32k is enough below 7B.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>BPE / WordPiece / SentencePiece are the default options for production tokenizers.</li>
+<li>Korean is 1.5-2x less token-efficient than English, so domain-level measurement is mandatory.</li>
+<li>For domain-specific models, training a tokenizer in-house can substantially shrink sequence length.</li>
+<li>Chunking has 4 strategies; recursive chunking with 10-20% overlap is the typical RAG starting point.</li>
+<li>Always validate chunk_size, overlap, and vocab_size against actual token counts.</li>
+<li>Episode 6 covers quality filtering.</li>
+</ul>
+<hr>
+<h2>AI Data Preparation 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
+<li><strong>Tokenization and Chunking Strategies (current)</strong></li>
+<li>Quality Filtering (upcoming)</li>
+<li>Synthetic Data Generation (upcoming)</li>
+<li>Data Augmentation Techniques (upcoming)</li>
+<li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
+<li>Building a Production Data Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1508.07909">Neural Machine Translation of Rare Words with Subword Units (Sennrich et al., 2016)</a></li>
+<li><a href="https://arxiv.org/abs/1808.06226">SentencePiece: A simple and language independent subword tokenizer</a></li>
+<li><a href="https://github.com/openai/tiktoken">tiktoken - OpenAI tokenizer library</a></li>
+<li><a href="https://huggingface.co/docs/tokenizers/index">HuggingFace tokenizers documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Tokenization, BPE, SentencePiece, Chunking, RAG, tiktoken</p>
+</body>
+</html>

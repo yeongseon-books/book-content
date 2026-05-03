@@ -1,12 +1,23 @@
 ---
-title: "aiosqlite로 비동기 SQLite 다루기"
-description: "aiosqlite의 동작 원리, async/await 컨텍스트에서의 connection과 트랜잭션, FastAPI async path와의 통합, 그리고 진짜로 동시성 이득이 있는지에 대한 정직한 답을 다룹니다."
-series: python-dbapi-101
 episode: 9
-status: publish-ready
 language: ko
-targets: [github]
-tags: [Python, SQLite, asyncio, aiosqlite, Async, PEP 249]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- asyncio
+- aiosqlite
+- Async
+- PEP 249
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: aiosqlite로 비동기 SQLite 다루기
 ---
 
 # aiosqlite로 비동기 SQLite 다루기

@@ -60,7 +60,7 @@ The seating (Revision) is a snapshot of the office at one point in time. Move a 
 
 Environment is a boundary. Container App is a logical service. Revision is an immutable snapshot of image and configuration.
 
-![Hierarchy of Environment, Container App, and Revision](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
+![environment, container app, and revision hierarchy](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
 
 The cardinality is:
 
@@ -255,8 +255,6 @@ The following changes **do not create a new Revision**:
 
 The next post puts this model into your hands. We deploy a Python/FastAPI app to ACA for the first time and watch a Container App and its Revision get created step by step.
 
----
-
 <!-- toc:begin -->
 ## In this series
 
@@ -267,7 +265,10 @@ The next post puts this model into your hands. We deploy a Python/FastAPI app to
 - Scaling — KEDA scalers and zero-to-N (upcoming)
 - Dapr integration — what you get from a sidecar (upcoming)
 - Monitoring and ops — Log Analytics and Application Insights (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -282,4 +283,4 @@ The next post puts this model into your hands. We deploy a Python/FastAPI app to
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Revision, Environment, Blue-Green, Canary
+Tags: Azure, Container Apps, Serverless, Containers

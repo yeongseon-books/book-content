@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Production Data Pipeline</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Production Data Pipeline</h1>
+<blockquote>
+<p>AI Data Preparation 101 series (10/10)</p>
+</blockquote>
+<hr>
+<h2>"How do I tie everything we learned into one pipeline?"</h2>
+<p>Episodes 1-9 covered cleaning, dedup, PII redaction, tokenization, chunking, quality filtering, synthesis, augmentation, and splitting. In production these stages must run automatically every week or every day. The final episode is a pipeline design that integrates all of them.</p>
+<p>Four requirements for a production data pipeline:</p>
+<ol>
+<li><strong>Reproducibility</strong> - the same input must always produce the same output</li>
+<li><strong>Versioning</strong> - track dataset versions like git</li>
+<li><strong>Observability</strong> - measure per-stage statistics, drift, and failures</li>
+<li><strong>Idempotency</strong> - rerunning a stage twice must not change the result</li>
+</ol>
+<h2>Architecture - a 6-stage pipeline</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[Raw Source] --&gt; B[Stage 1: Ingest + Catalog]
+    B --&gt; C[Stage 2: Clean + Dedup]
+    C --&gt; D[Stage 3: PII Redaction]
+    D --&gt; E[Stage 4: Quality Filter]
+    E --&gt; F[Stage 5: Tokenize + Chunk]
+    F --&gt; G[Stage 6: Split + Version]
+    G --&gt; H[&quot;Versioned Dataset (v2026.05.03)&quot;]
+</code></pre>
+<p>Each stage owns input/output parquet files plus a manifest. The manifest records input fingerprints, code versions, and parameters.</p>
+<h2>Dataset versioning with DVC</h2>
+<p>Manage datasets like git. Code commits and data versions are tied 1:1.</p>
+<pre><code class="language-bash"># pip install dvc
+dvc init
+dvc remote add -d s3 s3://my-bucket/datasets
+
+# Track per-stage outputs
+dvc add data/02_clean.parquet
+dvc add data/05_chunked.parquet
+git add data/02_clean.parquet.dvc data/05_chunked.parquet.dvc
+git commit -m &quot;data: v2026.05.03&quot;
+dvc push
+</code></pre>
+<pre><code class="language-python"># pipeline.py
+import yaml, hashlib, pathlib, pandas as pd
+
+class Stage:
+    name: str
+    inputs: list[str]
+    outputs: list[str]
+    params: dict
+
+    def fingerprint(self) -&gt; str:
+        h = hashlib.sha256()
+        h.update(self.name.encode())
+        for p in sorted(self.inputs):
+            h.update(pathlib.Path(p).read_bytes())
+        h.update(yaml.safe_dump(self.params, sort_keys=True).encode())
+        return h.hexdigest()[:12]
+
+    def is_cached(self) -&gt; bool:
+        manifest = pathlib.Path(f&quot;manifests/{self.name}.yaml&quot;)
+        if not manifest.exists():
+            return False
+        return yaml.safe_load(manifest.read_text())[&quot;fingerprint&quot;] == self.fingerprint()
+
+    def run(self):
+        if self.is_cached():
+            print(f&quot;[skip] {self.name} cached&quot;)
+            return
+        self.execute()  # implemented by subclass
+        self.write_manifest()
+</code></pre>
+<p>When <code>fingerprint</code> is unchanged, the stage is not re-executed. Idempotency and caching are solved together.</p>
+<h2>Per-stage implementation - integrated pipeline</h2>
+<pre><code class="language-python">import pandas as pd
+from datetime import datetime
+
+# Stage 1: Ingest
+def stage_ingest(sources: list[str]) -&gt; pd.DataFrame:
+    dfs = [pd.read_json(s, lines=True) for s in sources]
+    df = pd.concat(dfs, ignore_index=True)
+    df[&quot;ingested_at&quot;] = datetime.utcnow()
+    return df
+
+# Stage 2: Clean + Dedup (Ep3)
+def stage_clean(df: pd.DataFrame) -&gt; pd.DataFrame:
+    df[&quot;text&quot;] = df[&quot;text&quot;].str.strip().str.replace(r&quot;\s+&quot;, &quot; &quot;, regex=True)
+    df = df[df[&quot;text&quot;].str.len() &gt;= 50]
+    df = df.drop_duplicates(subset=[&quot;text&quot;])
+    return df
+
+# Stage 3: PII (Ep4)
+from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
+
+analyzer = AnalyzerEngine()
+anonymizer = AnonymizerEngine()
+
+def stage_pii(df: pd.DataFrame) -&gt; pd.DataFrame:
+    def redact(t: str) -&gt; str:
+        results = analyzer.analyze(text=t, language=&quot;en&quot;)
+        return anonymizer.anonymize(text=t, analyzer_results=results).text
+    df[&quot;text&quot;] = df[&quot;text&quot;].map(redact)
+    return df
+
+# Stage 4: Quality (Ep6)
+def stage_quality(df: pd.DataFrame) -&gt; pd.DataFrame:
+    def passes(t: str) -&gt; bool:
+        words = t.split()
+        return 50 &lt;= len(words) &lt;= 100_000
+    return df[df[&quot;text&quot;].map(passes)]
+
+# Stage 5: Tokenize/Chunk (Ep5)
+def stage_chunk(df: pd.DataFrame, max_tokens: int = 500) -&gt; pd.DataFrame:
+    rows = []
+    for _, r in df.iterrows():
+        # recursive_chunk from Ep5
+        chunks = [r[&quot;text&quot;][i:i+2000] for i in range(0, len(r[&quot;text&quot;]), 1800)]
+        for i, c in enumerate(chunks):
+            rows.append({**r.to_dict(), &quot;chunk_id&quot;: i, &quot;text&quot;: c})
+    return pd.DataFrame(rows)
+
+# Stage 6: Split + Version (Ep9)
+def stage_split(df: pd.DataFrame, time_col: str = &quot;ingested_at&quot;) -&gt; dict:
+    df = df.sort_values(time_col)
+    n = len(df)
+    return {
+        &quot;train&quot;: df.iloc[:int(n*0.8)],
+        &quot;val&quot;:   df.iloc[int(n*0.8):int(n*0.9)],
+        &quot;test&quot;:  df.iloc[int(n*0.9):],
+    }
+</code></pre>
+<h2>Pipeline orchestration - Airflow example</h2>
+<p>Production picks one of Airflow, Prefect, or Dagster. Airflow is the most common.</p>
+<pre><code class="language-python"># dags/data_prep.py
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime, timedelta
+
+default = {&quot;owner&quot;: &quot;ml-platform&quot;, &quot;retries&quot;: 2, &quot;retry_delay&quot;: timedelta(minutes=10)}
+
+with DAG(&quot;data_prep&quot;, default_args=default,
+         schedule_interval=&quot;@daily&quot;, start_date=datetime(2026, 1, 1)) as dag:
+    t1 = PythonOperator(task_id=&quot;ingest&quot;,  python_callable=stage_ingest_task)
+    t2 = PythonOperator(task_id=&quot;clean&quot;,   python_callable=stage_clean_task)
+    t3 = PythonOperator(task_id=&quot;pii&quot;,     python_callable=stage_pii_task)
+    t4 = PythonOperator(task_id=&quot;quality&quot;, python_callable=stage_quality_task)
+    t5 = PythonOperator(task_id=&quot;chunk&quot;,   python_callable=stage_chunk_task)
+    t6 = PythonOperator(task_id=&quot;split&quot;,   python_callable=stage_split_task)
+    t1 &gt;&gt; t2 &gt;&gt; t3 &gt;&gt; t4 &gt;&gt; t5 &gt;&gt; t6
+</code></pre>
+<p>Airflow provides retry, scheduling, and a lineage UI. Failed stages alone can be rerun, saving cost.</p>
+<h2>Observability - per-stage statistics</h2>
+<pre><code class="language-python">import json, time
+
+def with_stats(stage_fn):
+    def wrapper(df, *args, **kwargs):
+        n_in = len(df)
+        t0 = time.time()
+        out = stage_fn(df, *args, **kwargs)
+        n_out = len(out) if hasattr(out, &quot;__len__&quot;) else sum(len(v) for v in out.values())
+        stats = {
+            &quot;stage&quot;: stage_fn.__name__,
+            &quot;rows_in&quot;: n_in,
+            &quot;rows_out&quot;: n_out,
+            &quot;drop_rate&quot;: 1 - n_out / max(n_in, 1),
+            &quot;duration_s&quot;: round(time.time() - t0, 2),
+            &quot;ts&quot;: datetime.utcnow().isoformat(),
+        }
+        with open(f&quot;stats/{stage_fn.__name__}.jsonl&quot;, &quot;a&quot;) as f:
+            f.write(json.dumps(stats) + &quot;\n&quot;)
+        return out
+    return wrapper
+
+stage_clean = with_stats(stage_clean)
+</code></pre>
+<p>Plotting per-stage drop_rate over time exposes source distribution drift immediately. A quality drop_rate that normally sits at 0.1 jumping to 0.5 signals the source broke.</p>
+<h2>Schema validation - Great Expectations / pandera</h2>
+<p>If the input/output schema changes, the pipeline breaks silently. Schema checks are the last safety net.</p>
+<pre><code class="language-python"># pip install pandera
+import pandera as pa
+from pandera.typing import Series
+
+class TextSchema(pa.DataFrameModel):
+    id: Series[str] = pa.Field(unique=True)
+    text: Series[str] = pa.Field(str_length={&quot;min_value&quot;: 1})
+    source: Series[str]
+    ingested_at: Series[&quot;datetime64[ns]&quot;]
+
+# Validate at every stage entry
+TextSchema.validate(df)
+</code></pre>
+<p>Stages fail loudly when the schema breaks. Better than silently producing a broken dataset.</p>
+<h2>5 common mistakes</h2>
+<ol>
+<li><strong>Re-running the entire pipeline without caching</strong>: cost and time explode. Fingerprint-based stage caching is mandatory.</li>
+<li><strong>Skipping schema validation</strong>: silent source format changes let pipelines pass while producing broken datasets in production.</li>
+<li><strong>Decoupling dataset version from code commit</strong>: when bugs hit, you cannot trace which dataset version trained the model. DVC + git tag is the standard pairing.</li>
+<li><strong>Not collecting stage statistics</strong>: drift detection is delayed and root-cause analysis becomes impossible.</li>
+<li><strong>Doing PII redaction last</strong>: even one raw PII landing on disk is a compliance violation. Redact right after ingest or clean.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>A production data pipeline has 6 stages: ingest -&gt; clean/dedup -&gt; PII -&gt; quality -&gt; tokenize/chunk -&gt; split.</li>
+<li>Use DVC to map dataset versions 1:1 with git commits.</li>
+<li>Per-stage fingerprint caching solves both idempotency and cost.</li>
+<li>Airflow / Prefect / Dagster handle schedule, retry, and lineage.</li>
+<li>Collect drop_rate, duration, and schema stats at every stage to monitor drift.</li>
+<li>Redact PII immediately after ingest.</li>
+</ul>
+<p>This concludes the series. We started from GIGO in Ep1 and ended at a production pipeline. Next up: multimodal data preparation, or model evaluation.</p>
+<hr>
+<h2>AI Data Preparation 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">Tokenization and Chunking Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">Quality Filtering - Heuristics and Classifiers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/07-synthetic-data-generation.md">Synthetic Data Generation - From Self-Instruct to Distillation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/08-data-augmentation.md">Data Augmentation - From EDA to Back-Translation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/09-train-eval-test-splitting.md">Train/Eval/Test Splitting and Contamination Control</a></li>
+<li><strong>Building a Production Data Pipeline (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://dvc.org/doc">DVC - Data Version Control</a></li>
+<li><a href="https://airflow.apache.org/docs/">Apache Airflow Documentation</a></li>
+<li><a href="https://pandera.readthedocs.io/">pandera - Statistical Data Testing</a></li>
+<li><a href="https://docs.greatexpectations.io/">Great Expectations - Data Quality Pipeline</a></li>
+</ul>
+<p class="tags-line">Tags: Data Pipelines, Production, DVC, Airflow, pandera, MLOps</p>
+</body>
+</html>

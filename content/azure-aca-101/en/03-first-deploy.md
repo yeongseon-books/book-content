@@ -267,8 +267,6 @@ A production first-deploy checklist:
 
 The next post goes deep on ingress and traffic splitting. We create two Revisions, run a 90/10 canary, and practice the instant flip back to 100/0 when something goes wrong.
 
----
-
 <!-- toc:begin -->
 ## In this series
 
@@ -279,7 +277,10 @@ The next post goes deep on ingress and traffic splitting. We create two Revision
 - Scaling — KEDA scalers and zero-to-N (upcoming)
 - Dapr integration — what you get from a sidecar (upcoming)
 - Monitoring and ops — Log Analytics and Application Insights (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -294,4 +295,4 @@ The next post goes deep on ingress and traffic splitting. We create two Revision
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, FastAPI, ACR, Dockerfile, az containerapp
+Tags: Azure, Container Apps, Serverless, Containers

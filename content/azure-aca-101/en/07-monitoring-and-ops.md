@@ -273,4 +273,4 @@ Natural next steps: compare the same approach across **Azure App Service 101**, 
 - [Azure AKS 101](../../azure-aks-101/en/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/en/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Log Analytics, Application Insights, Observability, Monitoring
+Tags: Azure, Container Apps, Serverless, Containers

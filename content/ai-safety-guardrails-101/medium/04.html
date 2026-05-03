@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PII Detection and Redaction</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>PII Detection and Redaction</h1>
+<blockquote>
+<p>AI Safety &amp; Guardrails 101 Series (4/10)</p>
+</blockquote>
+<hr>
+<h2>Section 1</h2>
+<h2>"Did You Mask the Email?"</h2>
+<p>The most frequent question from legal. LLM applications touch PII in two directions:</p>
+<ul>
+<li><strong>Inbound</strong>: users send credit card numbers, addresses, or national IDs to the model. They appear in provider logs (privacy violation) and may end up in training data.</li>
+<li><strong>Outbound</strong>: another user's email sits in your RAG context and leaks into the response.</li>
+</ul>
+<p>This post defines PII categories, then builds a detection and masking pipeline using regex and Microsoft Presidio. We close with a GDPR / privacy-law checklist.</p>
+<p>This post covers:</p>
+<ul>
+<li>PII categories and regional variants (US SSN, EU identifiers)</li>
+<li>Regex vs NER-based detection trade-offs</li>
+<li>Microsoft Presidio walkthrough</li>
+<li>Reversible tokenization vs irreversible masking</li>
+<li>Inbound masking and outbound re-checks</li>
+</ul>
+<hr>
+<h2>Section 1 — PII Categories</h2>
+<p><strong>National ID</strong><br>
+- Examples: SSN, passport, EU national IDs</p>
+<p><strong>Contact</strong><br>
+- Examples: Phone, email</p>
+<p><strong>Financial</strong><br>
+- Examples: Credit card, bank account</p>
+<p><strong>Address</strong><br>
+- Examples: Street address</p>
+<p><strong>Medical</strong><br>
+- Examples: Diagnosis, prescription (HIPAA-protected in US)</p>
+<p><strong>Credentials</strong><br>
+- Examples: Password, API key</p>
+<p><strong>Location</strong><br>
+- Examples: GPS coordinates</p>
+<p>GDPR also classifies names, locations, and online identifiers (cookie ID, IP) as personal data. Sensitive categories (health, religion, political opinion) get extra protection in most jurisdictions.</p>
+<hr>
+<h2>Section 2 — Regex Detection (Starting Point)</h2>
+<p>For PII with a fixed format, regex is fast.</p>
+<pre><code class="language-python">import re
+
+PII_PATTERNS = {
+    &quot;us_ssn&quot;: re.compile(r&quot;\b\d{3}-\d{2}-\d{4}\b&quot;),
+    &quot;us_phone&quot;: re.compile(r&quot;\b(?:\+?1[-\s.]?)?\(?\d{3}\)?[-\s.]?\d{3}[-\s.]?\d{4}\b&quot;),
+    &quot;email&quot;: re.compile(r&quot;\b[\w.+-]+@[\w-]+\.[\w.-]+\b&quot;),
+    &quot;credit_card&quot;: re.compile(r&quot;\b(?:\d[ -]*?){13,19}\b&quot;),
+    &quot;ipv4&quot;: re.compile(r&quot;\b(?:\d{1,3}\.){3}\d{1,3}\b&quot;),
+}
+
+def detect_pii(text: str) -&gt; list[tuple[str, int, int, str]]:
+    &quot;&quot;&quot;Returns list of (category, start, end, value).&quot;&quot;&quot;
+    found = []
+    for cat, pat in PII_PATTERNS.items():
+        for m in pat.finditer(text):
+            found.append((cat, m.start(), m.end(), m.group()))
+    return found
+
+text = &quot;Reach me at 555-123-4567 or alice@example.com.&quot;
+print(detect_pii(text))
+# [('us_phone', 12, 24, '555-123-4567'), ('email', 28, 45, 'alice@example.com')]
+</code></pre>
+<p>Limits:</p>
+<ul>
+<li>Names ("Alice Kim", "John Doe") have no fixed format.</li>
+<li>Addresses are too varied for regex.</li>
+<li>Credit-card regex generates many false positives — validate with the Luhn algorithm.</li>
+</ul>
+<hr>
+<h2>Section 3 — Microsoft Presidio</h2>
+<p>Presidio is an NER-based PII detection and anonymization library. It combines regex with spaCy NER to catch unstructured PII.</p>
+<pre><code class="language-python">from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
+
+analyzer = AnalyzerEngine()
+anonymizer = AnonymizerEngine()
+
+text = &quot;Alice Kim called from 555-123-4567 about her order.&quot;
+
+results = analyzer.analyze(text=text, language=&quot;en&quot;)
+# [&lt;RecognizerResult PERSON, 0, 9, 0.85&gt;, &lt;PHONE_NUMBER, 22, 34, 0.75&gt;, ...]
+
+masked = anonymizer.anonymize(text=text, analyzer_results=results)
+print(masked.text)
+# &quot;&lt;PERSON&gt; called from &lt;PHONE_NUMBER&gt; about her order.&quot;
+</code></pre>
+<p>For other languages, register language-specific spaCy models or NER models alongside the analyzer.</p>
+<pre><code class="language-python">from presidio_analyzer import PatternRecognizer, Pattern
+
+custom_id = PatternRecognizer(
+    supported_entity=&quot;EMPLOYEE_ID&quot;,
+    patterns=[Pattern(name=&quot;emp_id&quot;, regex=r&quot;\bEMP-\d{6}\b&quot;, score=0.95)],
+    supported_language=&quot;en&quot;,
+)
+analyzer.registry.add_recognizer(custom_id)
+</code></pre>
+<hr>
+<h2>Section 4 — Reversible Tokenization</h2>
+<p>Plain masking (<code>&lt;PERSON&gt;</code>) breaks coreference. "Send Alice's order to Alice" becomes "Send <PERSON>'s order to <PERSON>" — ambiguous.</p>
+<p>Reversible tokenization (per-request mapping or format-preserving encryption) preserves identity:</p>
+<pre><code class="language-python">import secrets
+from dataclasses import dataclass, field
+
+@dataclass
+class PIITokenizer:
+    mapping: dict[str, str] = field(default_factory=dict)
+    reverse: dict[str, str] = field(default_factory=dict)
+
+    def tokenize(self, text: str, detected: list[tuple]) -&gt; str:
+        # Iterate in reverse order so offsets stay valid
+        for cat, start, end, value in sorted(detected, key=lambda x: -x[1]):
+            if value not in self.mapping:
+                token = f&quot;&lt;{cat.upper()}_{secrets.token_hex(4)}&gt;&quot;
+                self.mapping[value] = token
+                self.reverse[token] = value
+            text = text[:start] + self.mapping[value] + text[end:]
+        return text
+
+    def detokenize(self, text: str) -&gt; str:
+        for token, value in self.reverse.items():
+            text = text.replace(token, value)
+        return text
+
+tk = PIITokenizer()
+src = &quot;Alice (alice@example.com) ordered. Send to alice@example.com.&quot;
+detected = detect_pii(src)
+masked = tk.tokenize(src, detected)
+# &quot;Alice (&lt;EMAIL_a3b2c1d0&gt;) ordered. Send to &lt;EMAIL_a3b2c1d0&gt;.&quot;
+# Same email maps to the same token → model treats it as one entity.
+
+response = llm.complete(masked)
+final = tk.detokenize(response)  # restore before sending to user
+</code></pre>
+<p>Principles:</p>
+<ul>
+<li>Keep the mapping <strong>per-request only</strong> (cross-request mapping is itself a leak risk).</li>
+<li>Embed category info in the token so the model can reason about type.</li>
+<li>Identical values share tokens to preserve coreference.</li>
+</ul>
+<hr>
+<h2>Section 5 — Outbound Re-Check</h2>
+<p>The model can include PII it saw in the RAG context or system prompt. Run the same detector on the output.</p>
+<pre><code class="language-python">def safe_call(user_input: str, retrieved_docs: list[str]) -&gt; str:
+    user_detected = detect_pii(user_input)
+    masked_input = mask_text(user_input, user_detected)
+
+    masked_docs = [mask_text(d, detect_pii(d)) for d in retrieved_docs]
+
+    response = llm.complete(SYSTEM_PROMPT, user=masked_input, context=&quot;\n&quot;.join(masked_docs))
+
+    output_detected = detect_pii(response)
+    if output_detected:
+        log_pii_leak(output_detected, response)
+        # Option 1: block
+        # return &quot;Response blocked due to detected personal information.&quot;
+        # Option 2: mask and pass through
+        response = mask_text(response, output_detected)
+
+    return response
+</code></pre>
+<hr>
+<h2>Section 6 — Compliance Checklist</h2>
+<p>GDPR / privacy-law angle:</p>
+<ul>
+<li>[ ] <strong>Minimization</strong>: strip unneeded PII before sending to the model.</li>
+<li>[ ] <strong>Purpose disclosure</strong>: obtain user consent for LLM processing.</li>
+<li>[ ] <strong>Cross-border notice</strong>: disclose use of foreign providers like OpenAI.</li>
+<li>[ ] <strong>Right to delete</strong>: support deletion from logs and caches on request.</li>
+<li>[ ] <strong>Logging policy</strong>: ensure PII does not land in logs (covered in Ep9).</li>
+<li>[ ] <strong>DPA in place</strong>: Data Processing Agreement signed with each provider.</li>
+<li>[ ] <strong>Sensitive categories</strong>: extra consent for health, religion, etc.</li>
+</ul>
+<p>Provider zero-data-retention options (OpenAI Enterprise, Azure OpenAI) reduce provider-side retention risk.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Stopping at regex</strong> — names and addresses need NER. Add Presidio.</li>
+<li><strong>Plain masking without coreference</strong> — <code>&lt;PERSON&gt;</code> collisions confuse the model. Use reversible tokenization.</li>
+<li><strong>Skipping the outbound re-check</strong> — RAG-context PII flows into responses untouched.</li>
+<li><strong>PII in logs</strong> — debug logs are the most common leak surface. Mask before logging too.</li>
+<li><strong>Not disclosing foreign LLM providers</strong> — direct GDPR / privacy-law violation.</li>
+</ol>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>PII handling is required <strong>inbound and outbound</strong>.</li>
+<li>Regex catches structured PII (phone, card); <strong>Microsoft Presidio</strong> adds NER for unstructured PII.</li>
+<li><strong>Reversible tokenization</strong> lets the model reason about entities consistently.</li>
+<li>An <strong>outbound re-check</strong> catches leaks from RAG and system prompts.</li>
+<li>Apply a <strong>compliance checklist</strong> (minimization, consent, deletion right, DPA) from day one.</li>
+</ul>
+<hr>
+<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Output Filtering and Content Moderation</a></li>
+<li><strong>PII Detection and Redaction (current)</strong></li>
+<li>Jailbreak Detection (upcoming)</li>
+<li>Toxicity and Bias Detection (upcoming)</li>
+<li>Hallucination Guardrails — Grounding Checks (upcoming)</li>
+<li>Rate Limiting and Abuse Prevention (upcoming)</li>
+<li>Audit Logging and Compliance (upcoming)</li>
+<li>Building a Production Guardrail System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://microsoft.github.io/presidio/">Microsoft Presidio</a></li>
+<li><a href="https://gdpr.eu/article-4-definitions/">GDPR Article 4 — Definitions</a></li>
+<li><a href="https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html">HIPAA — Privacy Rule Summary</a></li>
+<li><a href="https://openai.com/enterprise-privacy">OpenAI — Enterprise Privacy</a></li>
+</ul>
+<p class="tags-line">Tags: AI Safety, PII, Presidio, GDPR</p>
+</body>
+</html>

@@ -1,12 +1,23 @@
 ---
-title: "SQLite Production Patterns: retry, timeout, observability, backup"
-description: "Core patterns for running SQLite-backed services in production: combined retry+timeout, slow query logging, OpenTelemetry instrumentation, and a safe backup strategy."
-series: python-dbapi-101
 episode: 10
-status: publish-ready
 language: en
-targets: [github, medium]
-tags: [Python, SQLite, Production, Observability, OpenTelemetry, Retry]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- Production
+- Observability
+- OpenTelemetry
+- Retry
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 'SQLite Production Patterns: retry, timeout, observability, backup'
 ---
 
 # SQLite Production Patterns: retry, timeout, observability, backup

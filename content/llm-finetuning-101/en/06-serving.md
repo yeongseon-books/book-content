@@ -213,11 +213,11 @@ The minimum end-to-end path of the fine-tuning series is now complete. You built
 The next step is leaving the series and repeating this same flow on your own domain data. 100-1000 examples, LoRA rank 8-16, 1 epoch, perplexity + golden-set evaluation, FastAPI serving — once this one-line recipe is in your hands, you can ship any small model into a service.
 
 <!-- toc:begin -->
-## Series Contents
+## In this series
 
-- [LLM Fine-Tuning Introduction](./01-intro.md)
+- [LLM Fine-tuning Primer](./01-intro.md)
 - [Dataset Preparation and Preprocessing](./02-dataset.md)
-- [LoRA Adapter Configuration](./03-lora.md)
+- [Configuring LoRA Adapters](./03-lora.md)
 - [Training Loop and Hyperparameters](./04-training.md)
 - [Model Evaluation](./05-evaluation.md)
 - **Model Serving (current)**
@@ -233,4 +233,4 @@ The next step is leaving the series and repeating this same flow on your own dom
 - [PEFT — Multiple adapters](https://huggingface.co/docs/peft/main/en/developer_guides/lora#multiple-adapters)
 - [vLLM — high-throughput LLM serving](https://github.com/vllm-project/vllm)
 
-Tags: Fine-tuning, Serving, FastAPI, Inference, Adapter, Python
+Tags: Fine-tuning, LoRA, LLM, Python

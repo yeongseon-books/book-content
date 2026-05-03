@@ -1,12 +1,23 @@
 ---
-title: "SQLite Production 패턴: retry, timeout, 관측성, 백업"
-description: "운영 환경에서 SQLite 기반 애플리케이션을 안정적으로 굴리기 위한 핵심 패턴: retry+timeout 조합, slow query logging, OpenTelemetry instrumentation, 그리고 안전한 백업 전략을 다룹니다."
-series: python-dbapi-101
 episode: 10
-status: publish-ready
 language: ko
-targets: [github]
-tags: [Python, SQLite, Production, Observability, OpenTelemetry, Retry]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- Production
+- Observability
+- OpenTelemetry
+- Retry
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 'SQLite Production 패턴: retry, timeout, 관측성, 백업'
 ---
 
 # SQLite Production 패턴: retry, timeout, 관측성, 백업

@@ -1,21 +1,23 @@
 ---
-title: "Branch basics - create, switch, and compare"
-description: "Learn what a branch really is, how to create one, how to move between branches with git switch, and how to compare two branches with git log and git diff."
-date: '2026-05-04'
+episode: 4
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 4
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-branch
-  - git-switch
-  - git-checkout
-  - HEAD
-  - parallel-development
-  - feature-branch
+- git-branch
+- git-switch
+- git-checkout
+- HEAD
+- parallel-development
+- feature-branch
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Branch basics - create, switch, and compare
 ---
 
 # Branch basics - create, switch, and compare

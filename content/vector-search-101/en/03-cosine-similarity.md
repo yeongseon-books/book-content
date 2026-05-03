@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: Cosine similarity and vector search — computing sentence distances
 ---
 
 # Cosine similarity and vector search — computing sentence distances

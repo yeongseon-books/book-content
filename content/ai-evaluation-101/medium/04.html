@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LLM-as-Judge — Evaluating Models with Models</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>LLM-as-Judge — Evaluating Models with Models</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (4/10)</p>
+</blockquote>
+<p>When humans cannot grade every response, you can delegate scoring to a strong LLM. This post covers writing judge prompts, controlling bias, and measuring agreement with human evaluators.</p>
+<hr>
+<h2>Why LLM-as-Judge</h2>
+<p>The deterministic metrics from Ep3 (BLEU, ROUGE, Exact Match) work well only when the answer is short and unambiguous. Real LLM outputs are often the opposite:</p>
+<ul>
+<li>Free-form answers with many valid responses (e.g. "Explain this code")</li>
+<li>Subjective qualities like tone, clarity, helpfulness</li>
+<li>Too much data for human grading (thousands to tens of thousands of samples)</li>
+</ul>
+<p>LLM-as-judge <strong>delegates scoring to a strong LLM</strong> (GPT-4, Claude Opus, etc.). It is faster than humans and more flexible than deterministic metrics.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Speed</th>
+<th>Cost</th>
+<th>Free-form</th>
+<th>Consistency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Human</td>
+<td>Slow</td>
+<td>Very expensive</td>
+<td>Excellent</td>
+<td>Varies by rater</td>
+</tr>
+<tr>
+<td>Deterministic</td>
+<td>Very fast</td>
+<td>Near-free</td>
+<td>Weak</td>
+<td>100% reproducible</td>
+</tr>
+<tr>
+<td>LLM-as-judge</td>
+<td>Fast</td>
+<td>Medium</td>
+<td>Excellent</td>
+<td>70-90% (prompt-dependent)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Judge Prompt Design — Three Patterns</h2>
+<p><strong>Pattern 1: Single scoring (1-5 scale)</strong></p>
+<p>The simplest approach. Show the judge one response and ask for a score.</p>
+<pre><code class="language-python"># eval/judge_single.py
+from openai import OpenAI
+
+client = OpenAI()
+
+JUDGE_PROMPT = &quot;&quot;&quot;You are a strict evaluator. Read the question and answer below and grade on a 1-5 scale.
+
+Question: {question}
+Answer: {answer}
+
+Rubric:
+- 5: Accurate, complete, clear
+- 4: Accurate but missing minor details or slightly ambiguous
+- 3: Partially accurate
+- 2: Mostly inaccurate
+- 1: Completely wrong or off-topic
+
+Write a one-sentence reasoning first, then output only 'Score: N' on the last line.
+&quot;&quot;&quot;
+
+def judge_single(question: str, answer: str) -&gt; tuple[int, str]:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: JUDGE_PROMPT.format(
+            question=question, answer=answer
+        )}],
+        temperature=0,  # reproducibility
+    )
+    text = response.choices[0].message.content
+    last_line = text.strip().split(&quot;\n&quot;)[-1]
+    score = int(last_line.replace(&quot;Score:&quot;, &quot;&quot;).strip())
+    return score, text
+
+if __name__ == &quot;__main__&quot;:
+    score, reasoning = judge_single(
+        &quot;What is the difference between list and tuple in Python?&quot;,
+        &quot;Lists are mutable and tuples are immutable.&quot;
+    )
+    print(f&quot;Score: {score}\nReasoning: {reasoning}&quot;)
+</code></pre>
+<p><strong>Pros</strong>: Simple. Each response is graded independently.<br>
+<strong>Cons</strong>: Score inflation. Judges tend to give 4-5 to almost everything.</p>
+<p><strong>Pattern 2: Pairwise comparison (pick one)</strong></p>
+<p>Show two responses and ask which is better. Ideal for A/B model comparison.</p>
+<pre><code class="language-python"># eval/judge_pairwise.py
+PAIRWISE_PROMPT = &quot;&quot;&quot;Pick the better answer to the question.
+
+Question: {question}
+Answer A: {answer_a}
+Answer B: {answer_b}
+
+Respond with one of: 'A', 'B', 'Tie'.
+Write a one-sentence reasoning first, then output only 'Verdict: X' on the last line.
+&quot;&quot;&quot;
+
+def judge_pairwise(question: str, answer_a: str, answer_b: str) -&gt; str:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: PAIRWISE_PROMPT.format(
+            question=question, answer_a=answer_a, answer_b=answer_b
+        )}],
+        temperature=0,
+    )
+    text = response.choices[0].message.content
+    last_line = text.strip().split(&quot;\n&quot;)[-1]
+    return last_line.replace(&quot;Verdict:&quot;, &quot;&quot;).strip()
+</code></pre>
+<p><strong>Pros</strong>: No score inflation. Aligns with human intuition.<br>
+<strong>Cons</strong>: You learn relative quality, not absolute (one wins even if both are bad).</p>
+<p><strong>Pattern 3: Reference-based (compare to ground truth)</strong></p>
+<p>When you have a reference answer, ask whether the response is semantically equivalent.</p>
+<pre><code class="language-python"># eval/judge_reference.py
+REFERENCE_PROMPT = &quot;&quot;&quot;Decide whether the answer is semantically equivalent to the reference.
+
+Question: {question}
+Reference: {reference}
+Answer: {answer}
+
+If the answer covers all the key points of the reference, output 'PASS'. Otherwise 'FAIL'.
+Write a one-sentence reasoning, then output only 'Result: PASS' or 'Result: FAIL' on the last line.
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Pros</strong>: Great for QA datasets with ground truth. Better semantic match than BLEU/ROUGE.<br>
+<strong>Cons</strong>: You must build the reference set up front.</p>
+<hr>
+<h2>Three Biases and How to Control Them</h2>
+<p>LLM judges are biased differently from humans. You must understand these three.</p>
+<p><strong>Bias 1: Position bias</strong></p>
+<p>In pairwise evaluation, the judge tends to <strong>prefer the first answer</strong> (about 60% A-preference for GPT-4). Control by <strong>swapping the order and judging twice</strong>.</p>
+<pre><code class="language-python"># eval/debias_position.py
+def judge_pairwise_debiased(question: str, ans_a: str, ans_b: str) -&gt; str:
+    v1 = judge_pairwise(question, ans_a, ans_b)  # A=ans_a, B=ans_b
+    v2 = judge_pairwise(question, ans_b, ans_a)  # A=ans_b, B=ans_a (swapped)
+
+    # In v2, &quot;A&quot; really means ans_b, so flip and compare
+    flip = {&quot;A&quot;: &quot;B&quot;, &quot;B&quot;: &quot;A&quot;, &quot;Tie&quot;: &quot;Tie&quot;}
+    v2_normalized = flip[v2]
+
+    if v1 == v2_normalized:
+        return v1  # consistent
+    return &quot;Tie&quot;  # if order changes the verdict, call it a tie
+</code></pre>
+<p><strong>Bias 2: Length bias</strong></p>
+<p>Longer answers are scored higher than shorter, equally accurate ones. Controls:</p>
+<ul>
+<li>State explicitly in the judge prompt: "Length must not influence the score. Grade only the accuracy of the key information."</li>
+<li>Add a length-normalized metric alongside (e.g. score / log(length))</li>
+</ul>
+<p><strong>Bias 3: Self-preference bias</strong></p>
+<p>When GPT-4 grades GPT-4 outputs, it prefers them over outputs from other model families. Controls:</p>
+<ul>
+<li>Use different model families for generator and judge (e.g. generate with Claude, judge with GPT-4)</li>
+<li>Cross-validate with a second judge when possible</li>
+</ul>
+<hr>
+<h2>Measuring Agreement With Humans — Cohen's Kappa</h2>
+<p>How do you know the judge is trustworthy? <strong>Compare 50-100 human-graded samples to the judge scores</strong> and measure agreement. Plain accuracy (percentage agreement) does not correct for chance, so use <strong>Cohen's kappa</strong>.</p>
+<pre><code class="language-python"># eval/agreement.py
+from sklearn.metrics import cohen_kappa_score
+
+# Human grader scores 50 samples on a 1-5 scale
+human_scores  = [5, 4, 3, 5, 2, 4, 5, 3, 4, 5, ...]  # len=50
+judge_scores  = [5, 4, 4, 5, 2, 3, 5, 3, 4, 4, ...]  # len=50
+
+# Cohen's kappa: -1 to 1 (1=perfect, 0=chance, &lt;0=worse than random)
+kappa = cohen_kappa_score(human_scores, judge_scores, weights=&quot;quadratic&quot;)
+print(f&quot;Cohen's kappa: {kappa:.3f}&quot;)
+
+# Interpretation (Landis &amp; Koch, 1977):
+# 0.0-0.2: slight
+# 0.2-0.4: fair
+# 0.4-0.6: moderate
+# 0.6-0.8: substantial
+# 0.8-1.0: almost perfect
+</code></pre>
+<p><strong>Rule of thumb</strong>: kappa &gt;= 0.6 is acceptable for production. Below 0.4, redesign the prompt.</p>
+<hr>
+<h2>Cost — Judges Are Not Free</h2>
+<p>A GPT-4o judge call costs about $0.01-0.03. Evaluating 10K samples is $100-300. Cost-control strategies:</p>
+<ul>
+<li><strong>Sample in CI</strong>: grade 100 samples per PR, not the full 10K</li>
+<li><strong>Tier the pipeline</strong>: fast deterministic metrics first, then LLM judge only on suspicious samples</li>
+<li><strong>Cheaper judge</strong>: simple PASS/FAIL works fine on GPT-4o-mini (10x cheaper)</li>
+</ul>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Writing the judge prompt once and shipping it</strong></p>
+<p>Your judge prompt is as much a production asset as the eval dataset. The first version is almost always insufficient. <strong>Iterate the prompt 3-5 times while measuring kappa against 50 human-graded samples</strong>.</p>
+<p><strong>Mistake 2: Ignoring position bias</strong></p>
+<p>If you skip the order swap in pairwise eval, half your "wins" come from position bias. <strong>Always evaluate both orderings</strong>.</p>
+<p><strong>Mistake 3: Using the same model to generate and to judge</strong></p>
+<p>GPT-4 grading GPT-4 outputs inflates scores. <strong>Use a different model family</strong> for the judge, or cross-check against humans.</p>
+<p><strong>Mistake 4: Forgetting temperature=0</strong></p>
+<p>If the judge call is not temperature=0, grading the same response twice gives different scores. <strong>Always use temperature=0</strong> for reproducibility.</p>
+<p><strong>Mistake 5: Trusting the judge with no human baseline</strong></p>
+<p>A judge giving 90 does not mean the system is good. <strong>Before production, grade 50-100 samples by hand</strong> and measure kappa with the judge.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>LLM-as-judge is powerful for free-form evaluation, but the judge prompt determines the result.</li>
+<li>Three patterns: single scoring (simple), pairwise (no score inflation), reference-based (compare to ground truth).</li>
+<li>Three biases to control: position (swap order), length (state in prompt), self-preference (use a different model).</li>
+<li>Cohen's kappa measures agreement with humans. <strong>kappa &gt;= 0.6 is the production threshold</strong>.</li>
+<li>Temperature=0, cost control (sampling, tiering), and a human baseline are non-negotiable.</li>
+</ul>
+<p>The next post covers <strong>multi-dimensional rubrics</strong>, where you grade several axes instead of one number.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Ep2 Evaluation Dataset Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><strong>Ep4 LLM-as-Judge — Evaluating Models with Models (current)</strong></li>
+<li>Ep5 Rubric-Based Multi-Dimensional Scoring (upcoming)</li>
+<li>Ep6 RAG Evaluation (upcoming)</li>
+<li>Ep7 Agent Evaluation (upcoming)</li>
+<li>Ep8 Regression Testing (upcoming)</li>
+<li>Ep9 A/B Testing LLMs (upcoming)</li>
+<li>Ep10 Production Evaluation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2306.05685">Zheng et al. (2023). Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena (NeurIPS)</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/develop-tests">Anthropic — Evaluating Claude (judge prompting guide)</a></li>
+<li><a href="https://github.com/openai/evals/blob/main/docs/eval-templates.md">OpenAI Evals — model-graded evaluations</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html">scikit-learn — Cohen's kappa score</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, LLM-as-Judge, Bias, Cohen's Kappa</p>
+</body>
+</html>

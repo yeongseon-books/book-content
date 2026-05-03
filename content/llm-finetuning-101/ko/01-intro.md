@@ -208,4 +208,4 @@ print(f"ratio = {lora_params / base_linear_params:.4%}")
 - [QLoRA paper](https://arxiv.org/abs/2305.14314)
 - [GPT-2 model card](https://huggingface.co/gpt2)
 
-Tags: Fine-tuning, LoRA, LLM, PEFT, Python, GPT-2
+Tags: Fine-tuning, LoRA, LLM, Python

@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
 ---
 
 # 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지

@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
 ---
 
 # 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기

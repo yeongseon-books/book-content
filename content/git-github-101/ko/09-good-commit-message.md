@@ -1,21 +1,23 @@
 ---
-title: "좋은 commit message 쓰기: Conventional Commits와 좋은 본문"
-description: "subject, body, footer로 commit message를 구성하고, Conventional Commits 규칙으로 변경 이력을 읽기 쉽게 만드는 방법"
-date: 2026-05-04
+episode: 9
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 9
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-commit-message
-  - conventional-commits
-  - commit-style
-  - imperative-mood
-  - git-amend
-  - code-blame
+- git-commit-message
+- conventional-commits
+- commit-style
+- imperative-mood
+- git-amend
+- code-blame
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: '좋은 commit message 쓰기: Conventional Commits와 좋은 본문'
 ---
 
 # 좋은 commit message 쓰기: Conventional Commits와 좋은 본문

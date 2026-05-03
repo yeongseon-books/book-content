@@ -1,21 +1,23 @@
 ---
-title: "Your first commit - init, status, add, commit"
-description: "Walk from an empty directory to a first commit in one sitting and feel the flow between Working Directory, Staging Area, and Repository."
-date: '2026-05-04'
+episode: 2
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 2
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-init
-  - git-status
-  - git-add
-  - git-commit
-  - staging-area
-  - first-repository
+- git-init
+- git-status
+- git-add
+- git-commit
+- staging-area
+- first-repository
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Your first commit - init, status, add, commit
 ---
 
 # Your first commit - init, status, add, commit

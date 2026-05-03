@@ -1,14 +1,9 @@
 ---
-title: Data Augmentation Techniques
-series: ai-data-preparation-101
 episode: 8
 language: en
+last_reviewed: '2026-05-03'
+series: ai-data-preparation-101
 status: content-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Data Augmentation
 - EDA
@@ -16,7 +11,12 @@ tags:
 - Paraphrase
 - nlpaug
 - AST Transform
-last_reviewed: '2026-05-03'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Data Augmentation - From EDA to Back-Translation
 ---
 
 # Data Augmentation - From EDA to Back-Translation

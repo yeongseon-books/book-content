@@ -1,12 +1,23 @@
 ---
-title: "PEP 249 예외 계층과 SQLite 에러 처리"
-description: "PEP 249가 정의하는 8개의 예외 클래스, sqlite3가 이를 매핑하는 방식, BUSY와 LOCKED의 차이, 안전한 retry 패턴을 다룹니다."
-series: python-dbapi-101
 episode: 7
-status: publish-ready
 language: ko
-targets: [github]
-tags: [Python, SQLite, Error Handling, Exception, Retry, PEP 249]
+last_reviewed: '2026-05-03'
+series: python-dbapi-101
+status: publish-ready
+tags:
+- Python
+- SQLite
+- Error Handling
+- Exception
+- Retry
+- PEP 249
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: PEP 249 예외 계층과 SQLite 에러 처리
 ---
 
 # PEP 249 예외 계층과 SQLite 에러 처리

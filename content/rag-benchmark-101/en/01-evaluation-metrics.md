@@ -231,7 +231,7 @@ The next post moves to **measuring retrieval performance** — wrapping a real r
 - Comparing embedding models (upcoming)
 - VectorDB selection criteria (upcoming)
 - End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG benchmark (upcoming)
+- Completing the RAG Benchmark (upcoming)
 
 <!-- toc:end -->
 
@@ -244,4 +244,4 @@ The next post moves to **measuring retrieval performance** — wrapping a real r
 - [BEIR: A heterogeneous benchmark for zero-shot evaluation of IR models](https://arxiv.org/abs/2104.08663)
 - [MTEB: Massive Text Embedding Benchmark](https://arxiv.org/abs/2210.07316)
 
-Tags: RAG, VectorDB, Benchmarking, Precision, Recall, MRR
+Tags: RAG, VectorDB, Benchmarking, LLM

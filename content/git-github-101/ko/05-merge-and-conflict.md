@@ -1,21 +1,23 @@
 ---
-title: "merge와 conflict 해결하기 - 두 줄기를 다시 합치기"
-description: "fast-forward와 three-way merge가 어떻게 다른지, conflict marker는 어떻게 읽고 푸는지, --abort로 어떻게 안전하게 되돌리는지를 손으로 따라가며 익힙니다."
-date: '2026-05-04'
+episode: 5
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 5
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-merge
-  - fast-forward
-  - three-way-merge
-  - merge-conflict
-  - merge-abort
-  - conflict-markers
+- git-merge
+- fast-forward
+- three-way-merge
+- merge-conflict
+- merge-abort
+- conflict-markers
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: merge와 conflict 해결하기 - 두 줄기를 다시 합치기
 ---
 
 # merge와 conflict 해결하기 - 두 줄기를 다시 합치기

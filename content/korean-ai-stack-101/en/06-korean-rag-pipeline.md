@@ -303,4 +303,4 @@ A small evaluation set and a four-stage pipeline are the only two habits you rea
 - [RAGAS — RAG evaluation framework](https://github.com/explodinggradients/ragas)
 - [Reciprocal Rank Fusion paper](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf)
 
-Tags: Korean NLP, RAG, Pipeline, Retrieval, LLM, Python
+Tags: Korean NLP, LLM, Embeddings, OCR

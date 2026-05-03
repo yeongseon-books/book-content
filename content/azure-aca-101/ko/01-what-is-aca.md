@@ -235,8 +235,6 @@ production에서 ACA를 고를 때 던지는 질문은 보통 이렇습니다.
 
 다음 글에서는 Environment·Container App·Revision 세 단어로 ACA의 운영 모델을 더 깊게 들여다봅니다.
 
----
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -247,7 +245,10 @@ production에서 ACA를 고를 때 던지는 질문은 보통 이렇습니다.
 - 스케일링 — KEDA scaler와 0-to-N (예정)
 - Dapr 통합 — 사이드카로 얻는 것 (예정)
 - 모니터링과 운영 — Log Analytics와 Application Insights (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -262,4 +263,4 @@ production에서 ACA를 고를 때 던지는 질문은 보통 이렇습니다.
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Serverless, KEDA, Dapr, Containers
+Tags: Azure, Container Apps, Serverless, Containers

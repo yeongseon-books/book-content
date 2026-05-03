@@ -233,4 +233,4 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 - [PEFT — Multiple adapters](https://huggingface.co/docs/peft/main/en/developer_guides/lora#multiple-adapters)
 - [vLLM — high-throughput LLM serving](https://github.com/vllm-project/vllm)
 
-Tags: Fine-tuning, Serving, FastAPI, Inference, Adapter, Python
+Tags: Fine-tuning, LoRA, LLM, Python

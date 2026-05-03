@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Designing Rubric-Based Scoring</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Designing Rubric-Based Scoring</h1>
+<blockquote>
+<p>AI Evaluation 101 Series (5/10)</p>
+</blockquote>
+<p>Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score. This post covers defining evaluation dimensions, writing anchors for each, and aggregating scores.</p>
+<hr>
+<h2>The Limits of Single Scores</h2>
+<p>Ep4 covered single scoring: one number from 1 to 5. But what does "3" actually mean? It could be 3 because the facts are wrong, or 3 because the tone is off. <strong>A single score does not tell you what is broken.</strong></p>
+<p>Rubric-based scoring breaks each response into multiple dimensions and grades each separately. For an LLM chatbot, you might use:</p>
+<p><strong>Correctness</strong><br>
+- Meaning: Are the facts right<br>
+- Score: 1-5</p>
+<p><strong>Completeness</strong><br>
+- Meaning: Is anything missing<br>
+- Score: 1-5</p>
+<p><strong>Clarity</strong><br>
+- Meaning: Is it easy to understand<br>
+- Score: 1-5</p>
+<p><strong>Tone</strong><br>
+- Meaning: Is the tone appropriate<br>
+- Score: 1-5</p>
+<p>Now you can pinpoint weakness: "Correctness 5, Tone 2."</p>
+<hr>
+<h2>Defining Rubric Dimensions — A Four-Step Process</h2>
+<p>A good rubric is not improvised. Use these four steps.</p>
+<p><strong>Step 1: Derive dimensions from user value</strong></p>
+<p>Write what "a good response" means from the user's view. For a customer support bot:</p>
+<ul>
+<li>The user asks "Did this solve my problem?" → <strong>Correctness, Completeness</strong></li>
+<li>The user asks "Can I understand it?" → <strong>Clarity</strong></li>
+<li>The user asks "Did the bot treat me well?" → <strong>Tone, Empathy</strong></li>
+</ul>
+<p>Domains differ. A code-review bot might use Correctness, Specificity, Actionability instead.</p>
+<p><strong>Step 2: Write anchors per dimension</strong></p>
+<p>For each dimension, give <strong>concrete examples</strong> of what 1, 3, and 5 look like.</p>
+<pre><code class="language-yaml"># rubric/clarity.yaml
+dimension: Clarity
+anchors:
+  5: |
+    Short and clear. Understood on first read.
+    Example: &quot;Set the API key in the OPENAI_API_KEY environment variable.&quot;
+  3: |
+    Understandable, but you have to re-read. Slightly verbose or vague.
+    Example: &quot;Configure the authentication credential appropriately in your environment settings.&quot;
+  1: |
+    Incomprehensible. Jargon dump or rambling.
+    Example: &quot;Leverage implicit context propagation for credential provisioning...&quot;
+</code></pre>
+<p>Without anchors, both the judge LLM and humans grade inconsistently.</p>
+<p><strong>Step 3: Verify dimensions are independent</strong></p>
+<p>If two dimensions measure the same thing, they are redundant. "Accuracy" and "Correctness" are the same. Check correlation across 50 samples.</p>
+<pre><code class="language-python"># rubric/check_independence.py
+import pandas as pd
+
+df = pd.DataFrame({
+    &quot;correctness&quot;: [5, 4, 3, 5, 2, ...],
+    &quot;clarity&quot;:     [4, 3, 4, 5, 3, ...],
+    &quot;tone&quot;:        [5, 5, 3, 4, 4, ...],
+})
+print(df.corr())
+# Correlation &gt; 0.9 means the two dimensions are effectively the same
+# → merge or drop one
+</code></pre>
+<p><strong>Step 4: Cap at 3-5 dimensions</strong></p>
+<p>Beyond 10 dimensions the judge cannot grade consistently. <strong>Stick to 3-5 core ones.</strong></p>
+<hr>
+<h2>Putting the Rubric Into the Judge Prompt</h2>
+<p>Extend the Ep4 single-score prompt with the rubric.</p>
+<pre><code class="language-python"># rubric/judge_rubric.py
+from openai import OpenAI
+import json
+
+client = OpenAI()
+
+RUBRIC_PROMPT = &quot;&quot;&quot;Grade the answer on each dimension from 1 to 5.
+
+Question: {question}
+Answer: {answer}
+
+Dimensions:
+1. Correctness — Are the facts right (5: all correct, 1: contains false info)
+2. Completeness — Is the key information complete (5: complete, 1: more than half missing)
+3. Clarity — Easy to understand (5: understood on first read, 1: incomprehensible)
+4. Tone — Appropriate tone (5: polite and professional, 1: rude or off)
+
+Respond with JSON only. No other text.
+{{
+  &quot;correctness&quot;: &lt;int&gt;,
+  &quot;completeness&quot;: &lt;int&gt;,
+  &quot;clarity&quot;: &lt;int&gt;,
+  &quot;tone&quot;: &lt;int&gt;,
+  &quot;reasoning&quot;: &quot;one-sentence justification&quot;
+}}
+&quot;&quot;&quot;
+
+def judge_rubric(question: str, answer: str) -&gt; dict:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: RUBRIC_PROMPT.format(
+            question=question, answer=answer
+        )}],
+        temperature=0,
+        response_format={&quot;type&quot;: &quot;json_object&quot;},
+    )
+    return json.loads(response.choices[0].message.content)
+
+if __name__ == &quot;__main__&quot;:
+    result = judge_rubric(
+        &quot;Where do I set the API key?&quot;,
+        &quot;Set it in the OPENAI_API_KEY environment variable.&quot;
+    )
+    print(result)
+    # {'correctness': 5, 'completeness': 4, 'clarity': 5, 'tone': 5, 'reasoning': '...'}
+</code></pre>
+<p>Forcing <code>response_format={"type": "json_object"}</code> almost eliminates parse failures.</p>
+<hr>
+<h2>Aggregating Scores — The Mean Is Not the Answer</h2>
+<p>How do you collapse per-dimension scores into one number? The common mistake is <strong>plain averaging</strong>, which hides weakness.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Response</th>
+<th>Correct</th>
+<th>Complete</th>
+<th>Clarity</th>
+<th>Tone</th>
+<th>Mean</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>5.0</td>
+<td>Excellent</td>
+</tr>
+<tr>
+<td>B</td>
+<td>1</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>4.0</td>
+<td><strong>Hallucination</strong></td>
+</tr>
+</tbody>
+</table>
+<p>B averages 4 but is <strong>unusable</strong>. A 1 in Correctness must be a fail no matter what other dimensions look like.</p>
+<p><strong>Three recommended aggregation strategies</strong></p>
+<p><strong>Strategy 1: Weighted average + threshold</strong></p>
+<pre><code class="language-python"># rubric/aggregate.py
+def aggregate_weighted(scores: dict) -&gt; tuple[float, str]:
+    weights = {&quot;correctness&quot;: 0.5, &quot;completeness&quot;: 0.2,
+               &quot;clarity&quot;: 0.15, &quot;tone&quot;: 0.15}
+    weighted = sum(scores[k] * weights[k] for k in weights)
+
+    # Correctness &lt; 3 is an automatic FAIL
+    if scores[&quot;correctness&quot;] &lt; 3:
+        return weighted, &quot;FAIL&quot;
+    if weighted &gt;= 4.0:
+        return weighted, &quot;PASS&quot;
+    return weighted, &quot;REVIEW&quot;
+</code></pre>
+<p><strong>Strategy 2: Minimum (weakest link)</strong></p>
+<pre><code class="language-python">def aggregate_min(scores: dict) -&gt; int:
+    return min(scores.values())
+# The weakest dimension defines overall quality
+</code></pre>
+<p><strong>Strategy 3: No aggregation — report per dimension</strong></p>
+<p>Show all four dimensions on the dashboard. Refusing to average is the most honest option.</p>
+<pre><code class="language-python"># rubric/dashboard.py
+import pandas as pd
+df = pd.DataFrame(scored_responses)
+print(df[[&quot;correctness&quot;,&quot;completeness&quot;,&quot;clarity&quot;,&quot;tone&quot;]].describe())
+#         correct  complete  clarity  tone
+# mean      4.2      4.5      3.8      4.7
+# min       1        2        1        3
+</code></pre>
+<hr>
+<h2>Agreement With Humans — Per Dimension</h2>
+<p>Ep4 measured Cohen's kappa on a single score. With a rubric you measure kappa <strong>per dimension</strong>.</p>
+<pre><code class="language-python"># rubric/agreement_per_dim.py
+from sklearn.metrics import cohen_kappa_score
+
+dimensions = [&quot;correctness&quot;, &quot;completeness&quot;, &quot;clarity&quot;, &quot;tone&quot;]
+for dim in dimensions:
+    h = [s[dim] for s in human_scores]
+    j = [s[dim] for s in judge_scores]
+    k = cohen_kappa_score(h, j, weights=&quot;quadratic&quot;)
+    print(f&quot;{dim}: kappa={k:.3f}&quot;)
+# correctness: kappa=0.78  ← trustworthy
+# completeness: kappa=0.65 ← trustworthy
+# clarity:     kappa=0.42  ← fair, prompt needs work
+# tone:        kappa=0.31  ← weak, rewrite anchors
+</code></pre>
+<p>When kappa varies by dimension, <strong>rewrite the anchors of the weakest one</strong> and iterate until every dimension exceeds 0.6.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Too many dimensions</strong></p>
+<p>Correctness, Completeness, Clarity, Tone, Empathy, Conciseness, Helpfulness, Friendliness... eight dimensions and the judge cannot stay consistent. <strong>Cap at 3-5.</strong></p>
+<p><strong>Mistake 2: Naming dimensions without anchors</strong></p>
+<p>Writing "Clarity (1-5)" with no anchors leaves both the LLM judge and humans guessing. <strong>Per-dimension anchors at 1, 3, and 5 are mandatory.</strong></p>
+<p><strong>Mistake 3: Plain averaging</strong></p>
+<p>Reporting a hallucinated answer as 3.0 lets garbage through. Use <strong>weighted average with thresholds</strong> or <strong>report per dimension</strong>.</p>
+<p><strong>Mistake 4: Equal weights on all dimensions</strong></p>
+<p>Domains have different priorities. A medical bot may weight Correctness at 70%; a marketing bot may give Tone 30%. <strong>Tune weights to your use case.</strong></p>
+<p><strong>Mistake 5: Skipping the independence check</strong></p>
+<p>If Helpfulness and Completeness correlate at 0.95 they are one dimension. <strong>Merge anything above 0.9 correlation.</strong></p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>A single score hides weakness. <strong>3-5 dimensions</strong> show what is actually broken.</li>
+<li>Rubric design has four steps: derive from user value → define dimensions → write anchors → check independence.</li>
+<li>Put dimensions and anchors into the judge prompt and <strong>force JSON output</strong> to avoid parse failures.</li>
+<li>Plain averaging is dangerous. Use <strong>weighted average + threshold</strong> or <strong>report per dimension</strong>.</li>
+<li>Measure Cohen's kappa <strong>per dimension</strong> and rewrite anchors for any dimension below 0.6.</li>
+</ul>
+<p>The next post covers RAG pipeline evaluation — retrieval, faithfulness, answer relevance.</p>
+<hr>
+<h2>AI Evaluation 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Ep2 Evaluation Dataset Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">Ep4 LLM-as-Judge — Evaluating Models with Models</a></li>
+<li><strong>Ep5 Rubric-Based Multi-Dimensional Scoring (current)</strong></li>
+<li>Ep6 RAG Evaluation (upcoming)</li>
+<li>Ep7 Agent Evaluation (upcoming)</li>
+<li>Ep8 Regression Testing (upcoming)</li>
+<li>Ep9 A/B Testing LLMs (upcoming)</li>
+<li>Ep10 Production Evaluation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2303.16634">Liu et al. (2023). G-Eval — NLG Evaluation using GPT-4 with Better Human Alignment</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/develop-tests">Anthropic — Multi-dimensional evaluation patterns</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation/how_to_guides/custom_evaluator">LangSmith — Custom Evaluators with Rubrics</a></li>
+<li><a href="https://huggingface.co/learn/cookbook/en/llm_judge">Hugging Face — Evaluating LLMs with multi-dimensional criteria</a></li>
+</ul>
+<p class="tags-line">Tags: AI Evaluation, Rubric, Multi-Dimensional, JSON Output</p>
+</body>
+</html>

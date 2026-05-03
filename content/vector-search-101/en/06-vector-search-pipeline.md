@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: Vector search pipeline — from document ingestion to query
 ---
 
 # Vector search pipeline — from document ingestion to query

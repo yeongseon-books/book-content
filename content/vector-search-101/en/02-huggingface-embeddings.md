@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
 ---
 
 # HuggingFace embeddings in practice — creating your first vectors with sentence-transformers

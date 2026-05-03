@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hallucination Guardrails — Grounding Checks</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Hallucination Guardrails — Grounding Checks</h1>
+<blockquote>
+<p>AI Safety &amp; Guardrails 101 Series (7/10)</p>
+</blockquote>
+<hr>
+<h2>Section 1</h2>
+<h2>The Trap in the Word "Hallucination"</h2>
+<p>People call any confidently wrong LLM output a hallucination, but for operations you need a tighter definition.</p>
+<ul>
+<li><strong>Closed-domain hallucination</strong>: in RAG-style systems with explicit context, an output that is not supported by that context. This is verifiable.</li>
+<li><strong>Open-domain hallucination</strong>: a factual error in answers generated from model knowledge alone, with no source. Verifying it requires external fact-checking and is expensive.</li>
+</ul>
+<p>This episode focuses on <strong>closed-domain</strong>, because most production guardrails are RAG-based and grounding checks are the most reliable defense.</p>
+<h2>What Grounding Actually Means</h2>
+<p>Grounding is the property that every factual claim in an output is entailed by the provided context. Split it into three levels.</p>
+<p><strong>Citation grounding</strong><br>
+- Meaning: Every factual sentence carries a citation marker<br>
+- Check: Regex + length</p>
+<p><strong>Source grounding</strong><br>
+- Meaning: The cited chunk actually appears in retrieved results<br>
+- Check: Chunk-ID match</p>
+<p><strong>Semantic grounding</strong><br>
+- Meaning: The cited chunk really supports the claim<br>
+- Check: NLI model or LLM judge</p>
+<p>All three must pass. It is common to see citations on chunks that say something else, or chunks that match but do not support the claim.</p>
+<h2>Claim Extraction</h2>
+<p>Verify at the claim (atomic factual assertion) level, not the sentence level. A single sentence frequently packs two or three independently verifiable claims.</p>
+<pre><code class="language-python">import json
+
+CLAIM_PROMPT = &quot;&quot;&quot;Decompose the answer below into atomic factual claims.
+Each claim must be a single declarative sentence that can be verified independently.
+Return JSON: {&quot;claims&quot;: [{&quot;id&quot;: 1, &quot;text&quot;: &quot;...&quot;}, ...]}.
+
+ANSWER:
+\&quot;\&quot;\&quot;{answer}\&quot;\&quot;\&quot;&quot;&quot;&quot;
+
+def extract_claims(answer: str) -&gt; list[dict]:
+    resp = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: CLAIM_PROMPT.format(answer=answer)}],
+        response_format={&quot;type&quot;: &quot;json_object&quot;},
+        temperature=0,
+    )
+    return json.loads(resp.choices[0].message.content)[&quot;claims&quot;]
+</code></pre>
+<p>If claims become too granular, downstream NLI cost grows, so add a post-processing step that merges along sentence boundaries.</p>
+<h2>NLI-Based Entailment Check</h2>
+<p>Use a natural-language-inference model to decide whether each claim is entailed by retrieved chunks. <code>roberta-large-mnli</code> or <code>deberta-v3-large-mnli</code> are the standards.</p>
+<pre><code class="language-python">from transformers import pipeline
+
+nli = pipeline(
+    &quot;text-classification&quot;,
+    model=&quot;cross-encoder/nli-deberta-v3-large&quot;,
+    return_all_scores=True,
+)
+
+def entails(premise: str, hypothesis: str) -&gt; float:
+    &quot;&quot;&quot;Return entailment probability between 0 and 1.&quot;&quot;&quot;
+    pairs = [{&quot;text&quot;: premise, &quot;text_pair&quot;: hypothesis}]
+    out = nli(pairs)[0]
+    return next(s[&quot;score&quot;] for s in out if s[&quot;label&quot;] == &quot;ENTAILMENT&quot;)
+</code></pre>
+<p>For each claim, compute entailment against every retrieved chunk and treat it as a hallucination if the maximum is below the threshold (0.7 is a reasonable starting point).</p>
+<pre><code class="language-python">def grounded(claims: list[dict], chunks: list[str], threshold: float = 0.7) -&gt; dict:
+    failures = []
+    for c in claims:
+        best = max(entails(chunk, c[&quot;text&quot;]) for chunk in chunks)
+        if best &lt; threshold:
+            failures.append({&quot;claim&quot;: c[&quot;text&quot;], &quot;score&quot;: best})
+    return {&quot;ok&quot;: not failures, &quot;failures&quot;: failures}
+</code></pre>
+<h2>Reinforce With an LLM Judge</h2>
+<p>NLI models excel at short text but struggle with claims that need multi-step reasoning. Use an LLM judge as a backup.</p>
+<pre><code class="language-python">JUDGE_PROMPT = &quot;&quot;&quot;Decide whether the CLAIM is supported by the EVIDENCE.
+Reply with JSON: {&quot;supported&quot;: true|false, &quot;reason&quot;: &quot;...&quot;}.
+
+CLAIM: {claim}
+
+EVIDENCE:
+\&quot;\&quot;\&quot;{evidence}\&quot;\&quot;\&quot;&quot;&quot;&quot;
+
+def judge_grounding(claim: str, evidence: str) -&gt; dict:
+    resp = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: JUDGE_PROMPT.format(claim=claim, evidence=evidence)}],
+        response_format={&quot;type&quot;: &quot;json_object&quot;},
+        temperature=0,
+    )
+    return json.loads(resp.choices[0].message.content)
+</code></pre>
+<p>In production, use NLI as the first filter and only send claims in the grey zone (scores roughly 0.4 to 0.7) to the judge. Clear pass and clear fail skip the judge entirely, which keeps cost down.</p>
+<h2>Enforce Citation Format</h2>
+<p>To enforce citation grounding, fix the output format. The simplest approach injects chunk IDs in the body.</p>
+<pre><code class="language-text">Seoul is the capital of South Korea, with a population of about 9.7 million [chunk-3]. ...
+</code></pre>
+<p>Validation has two steps:</p>
+<ol>
+<li>Regex-check that every factual sentence carries a <code>[chunk-N]</code> marker.</li>
+<li>Confirm each cited chunk-N is actually in the retrieved set.</li>
+</ol>
+<pre><code class="language-python">import re
+
+CITE_RE = re.compile(r&quot;\[chunk-(\d+)\]&quot;)
+
+def citation_check(answer: str, retrieved_ids: set[int]) -&gt; dict:
+    cited = {int(m.group(1)) for m in CITE_RE.finditer(answer)}
+    missing = cited - retrieved_ids
+    sentences = [s for s in re.split(r&quot;(?&lt;=[.!?])\s+&quot;, answer) if s.strip()]
+    uncited = [s for s in sentences if not CITE_RE.search(s)]
+    return {&quot;missing_chunks&quot;: missing, &quot;uncited_sentences&quot;: uncited}
+</code></pre>
+<p><code>uncited_sentences</code> means the model asserted a fact without a source, which raises hallucination risk.</p>
+<h2>Putting the Pipeline Together</h2>
+<p>Wrap the three layers in a single verifier.</p>
+<pre><code class="language-python">def verify_grounding(answer: str, chunks: list[dict]) -&gt; dict:
+    chunk_texts = [c[&quot;text&quot;] for c in chunks]
+    chunk_ids = {c[&quot;id&quot;] for c in chunks}
+
+    cite = citation_check(answer, chunk_ids)
+    if cite[&quot;missing_chunks&quot;] or cite[&quot;uncited_sentences&quot;]:
+        return {&quot;ok&quot;: False, &quot;stage&quot;: &quot;citation&quot;, &quot;detail&quot;: cite}
+
+    claims = extract_claims(answer)
+    nli_result = grounded(claims, chunk_texts)
+    if not nli_result[&quot;ok&quot;]:
+        rechecked = []
+        for f in nli_result[&quot;failures&quot;]:
+            best_chunk = max(chunk_texts, key=lambda ch: entails(ch, f[&quot;claim&quot;]))
+            verdict = judge_grounding(f[&quot;claim&quot;], best_chunk)
+            if not verdict[&quot;supported&quot;]:
+                rechecked.append(f[&quot;claim&quot;])
+        if rechecked:
+            return {&quot;ok&quot;: False, &quot;stage&quot;: &quot;semantic&quot;, &quot;claims&quot;: rechecked}
+
+    return {&quot;ok&quot;: True}
+</code></pre>
+<p>When verification fails, do not always block. Show the user a "this part is not confirmed by the source" indicator, retry retrieval with different parameters, or strip the unverified claims from the response.</p>
+<h2>Regression Sets and Metrics</h2>
+<p>Grounding checks have a sharp accuracy-cost tradeoff. Always measure on a regression set.</p>
+<ul>
+<li><strong>TruthfulQA, FEVER, HaluEval</strong>: public grounding evaluation sets</li>
+<li><strong>Internal set</strong>: 200 to 500 (question, context, answer, label) tuples sampled from real RAG traffic</li>
+<li><strong>Metrics</strong>: claim-level precision and recall, average verification latency, cost per claim</li>
+</ul>
+<p>Example targets: claim recall 0.90, precision 0.85, average latency under 800 ms.</p>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Verifying at sentence level only.</strong> When one sentence packs multiple claims, partial hallucinations slip through. Decompose into claims.</li>
+<li><strong>Enforcing citations without checking support.</strong> Models invent plausible-looking citations. Pair chunk-ID matching with NLI.</li>
+<li><strong>Using a single NLI threshold.</strong> Forcing grey-zone claims (0.4 to 0.7) to fail explodes false positives. Reserve the LLM judge for that zone.</li>
+<li><strong>Treating open-domain the same way.</strong> Without context, grounding cannot be checked at all. You need an external fact-check API or a usage policy that limits open-domain answers.</li>
+<li><strong>Hard-blocking on any failure.</strong> UX collapses. Design tiered fallbacks: partial display, re-retrieval, or answer rewriting.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Separate closed-domain hallucinations (grounding) from open-domain (fact checking) to make the problem tractable.</li>
+<li>Grounding has three levels - citation, source, semantic - and all three must pass.</li>
+<li>Order checks by cost: claim extraction, NLI first pass, LLM judge only for the grey zone.</li>
+<li>Enforce citation format so chunk-ID matching can verify source grounding automatically.</li>
+<li>Track claim-level precision and recall on public and internal regression sets to tune thresholds with data.</li>
+</ul>
+<hr>
+<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">Ep6 Toxicity and Bias Detection</a></li>
+<li><strong>Ep7 Hallucination Guardrails - Grounding Checks (current)</strong></li>
+<li>Ep8 Rate Limiting and Abuse Prevention (upcoming)</li>
+<li>Ep9 Audit Logging and Compliance (upcoming)</li>
+<li>Ep10 Building a Production Guardrail System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2109.07958">TruthfulQA: Measuring How Models Mimic Human Falsehoods</a></li>
+<li><a href="https://fever.ai/">FEVER - Fact Extraction and VERification</a></li>
+<li><a href="https://arxiv.org/abs/2305.11747">HaluEval - A Large-Scale Hallucination Evaluation Benchmark</a></li>
+<li><a href="https://huggingface.co/cross-encoder/nli-deberta-v3-large">Cross-Encoder NLI - DeBERTa v3 large</a></li>
+</ul>
+<p class="tags-line">Tags: AI Safety, Hallucination, RAG, Grounding</p>
+</body>
+</html>

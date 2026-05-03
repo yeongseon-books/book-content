@@ -1,21 +1,23 @@
 ---
-title: "Pull Request로 협업하기 - branch에서 review를 거쳐 main까지"
-description: "GitHub의 핵심 협업 단위인 Pull Request를 만들고 review를 받고 merge한 뒤 다시 로컬로 가져오는 한 사이클을 손으로 따라갑니다."
-date: '2026-05-04'
+episode: 7
+language: ko
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 7
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-pull-request
-  - code-review
-  - feature-branch
-  - merge-commit
-  - github-collaboration
-  - pr-workflow
+- github-pull-request
+- code-review
+- feature-branch
+- merge-commit
+- github-collaboration
+- pr-workflow
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Pull Request로 협업하기 - branch에서 review를 거쳐 main까지
 ---
 
 # Pull Request로 협업하기 - branch에서 review를 거쳐 main까지

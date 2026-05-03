@@ -1,21 +1,23 @@
 ---
-title: "Collaborating with Pull Requests - From Branch to Review to Main"
-description: "Walk through one full Pull Request cycle on GitHub: branching, pushing, opening the PR, responding to review comments, merging, and updating your local main."
-date: '2026-05-04'
+episode: 7
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 7
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - github-pull-request
-  - code-review
-  - feature-branch
-  - merge-commit
-  - github-collaboration
-  - pr-workflow
+- github-pull-request
+- code-review
+- feature-branch
+- merge-commit
+- github-collaboration
+- pr-workflow
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Collaborating with Pull Requests - From Branch to Review to Main
 ---
 
 # Collaborating with Pull Requests - From Branch to Review to Main

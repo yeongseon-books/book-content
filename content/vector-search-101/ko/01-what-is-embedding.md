@@ -14,6 +14,7 @@ targets:
   medium: true
   mkdocs: true
   tistory: true
+title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 ---
 
 # 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기

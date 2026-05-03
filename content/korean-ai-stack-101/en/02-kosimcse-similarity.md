@@ -241,4 +241,4 @@ The next article (episode 3) covers BGE-M3. We will see where it surpasses KoSim
 - [FAISS getting started](https://github.com/facebookresearch/faiss/wiki/Getting-started)
 - [SentenceTransformers semantic search examples](https://www.sbert.net/examples/sentence_transformer/applications/semantic-search/README.html)
 
-Tags: Korean NLP, KoSimCSE, FAISS, SemanticSearch, Embeddings, Python
+Tags: Korean NLP, LLM, Embeddings, OCR

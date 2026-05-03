@@ -273,4 +273,4 @@ The next article (episode 5) covers HyperCLOVA X and Solar API. We will look at 
 - [pdfplumber](https://github.com/jsvine/pdfplumber)
 - [OCR post-processing patterns](https://cloud.google.com/document-ai/docs/process-documents-client-libraries)
 
-Tags: Korean NLP, CLOVA, OCR, NaverCloud, DocumentAI, Python
+Tags: Korean NLP, LLM, Embeddings, OCR

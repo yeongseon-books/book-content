@@ -1,21 +1,23 @@
 ---
-title: "Writing Good Commit Messages: Conventional Commits and Useful Bodies"
-description: "Compose commit messages with subject, body, and footer, and use Conventional Commits to make change history scannable"
-date: 2026-05-04
+episode: 9
+language: en
 last_reviewed: '2026-05-04'
-status: publish-ready
 series: git-github-101
-order: 9
-targets:
-  ko: tistory
-  en: hashnode
+status: publish-ready
 tags:
-  - git-commit-message
-  - conventional-commits
-  - commit-style
-  - imperative-mood
-  - git-amend
-  - code-blame
+- git-commit-message
+- conventional-commits
+- commit-style
+- imperative-mood
+- git-amend
+- code-blame
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 'Writing Good Commit Messages: Conventional Commits and Useful Bodies'
 ---
 
 # Writing Good Commit Messages: Conventional Commits and Useful Bodies
