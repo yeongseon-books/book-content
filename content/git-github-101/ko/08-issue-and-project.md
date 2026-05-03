@@ -81,7 +81,7 @@ flowchart LR
 | Milestone | 여러 issue/PR을 묶어 마감일과 진행률을 보여 주는 단위입니다. 보통 "v1.2 release"처럼 씁니다. |
 | Assignee | issue/PR을 맡은 사람입니다. 한 명 또는 여러 명을 지정할 수 있습니다. |
 | Project (Projects v2) | 여러 issue와 PR을 카드로 올려 두고 status, priority 등을 별도 column으로 관리하는 보드입니다. |
-| Closing keywords | `Closes`, `Fixes`, `Resolves` 같은 단어로, PR 본문이나 commit message에 `Closes #42`라고 적으면 merge 시 해당 issue가 자동으로 닫힙니다. |
+| Closing keywords | `Closes`, `Fixes`, `Resolves` 같은 단어로, PR 본문에 `Closes #42`라고 적으면 PR이 default branch로 merge될 때 해당 issue가 자동으로 닫힙니다. |
 | Reference | `#42`, `org/repo#42` 같이 issue/PR을 가리키는 표기입니다. 자동으로 링크가 걸립니다. |
 
 `Closes`, `Fixes`, `Resolves`는 모두 같은 뜻입니다. 셋 다 단·복수형(`Closes`, `Close`)을 지원합니다.
@@ -120,7 +120,7 @@ merge하는 순간 issue #42가 자동으로 닫히고, 6개월 뒤 누군가 co
 
 ## 단계별 실습
 
-Episode 7에서 만든 `vacation-notes` 저장소를 그대로 사용합니다. `main`은 `5e6f7a8 Merge pull request #1 ...`을 가리키고, 직전 작업은 깔끔하게 마무리된 상태입니다.
+Episode 7에서 만든 `vacation-notes` 저장소를 그대로 사용합니다. `main`은 `5e6f7a8 Merge pull request #1 from feature/release-notes`를 가리키고, 직전 작업은 깔끔하게 마무리된 상태입니다.
 
 ### 1. 첫 번째 issue 만들기
 
@@ -201,7 +201,7 @@ Closes #2
 \uae30\ubcf8 \ud56d\ubaa9\ub9cc \ub123\uc5b4 \ub461\uace0, \uc138\ubd80 \uad6c\uc870\ub294 \ucd94\ud6c4 PR\uc5d0\uc11c \ub2e4\ub8f0 \uc218 \uc788\ub3c4\ub85d \uc81c\ud55c\ud588\uc2b5\ub2c8\ub2e4.
 ```
 
-`Closes #2`라고 쓰는 순간 PR 화면 오른쪽에 `Linked issues` 표시가 자동으로 생깁니다. 같은 줄에 `Closes #2, #3` 식으로 여러 issue를 한꺼번에 연결할 수도 있습니다.
+`Closes #2`라고 쓰는 순간 PR 화면 오른쪽 `Development` 섹션에 issue가 자동으로 연결됩니다. 한 PR에서 여러 issue를 함께 닫으려면 `Closes #2, closes #3`처럼 키워드를 issue마다 반복해서 적어야 합니다. `Closes #2, #3` 형태는 두 번째 번호를 닫지 못합니다.
 
 ### 6. PR을 merge하면 issue가 자동으로 닫힘
 
@@ -229,7 +229,7 @@ PR을 검토한 뒤 `Merge pull request` 버튼을 누릅니다. merge가 끝나
 - 작업을 끝내고 issue를 닫는 것을 잊습니다. PR 본문에 `Closes #N`을 적는 습관을 들이면 따로 닫지 않아도 됩니다.
 - issue 본문에 한 줄짜리 제목만 적습니다. 한 달 뒤의 본인이 그 issue를 다시 봤을 때 무슨 뜻이었는지 알아야 합니다. 짧게라도 background와 goal을 적어 둡니다.
 - label을 너무 많이 만듭니다. 처음에는 `bug`, `enhancement`, `chore` 정도로 시작하고 늘려 가는 편이 안전합니다.
-- PR 본문이 아닌 commit message에만 `Closes #N`을 적고 squash merge로 합칩니다. squash merge에서는 commit message가 PR 본문으로 바뀌므로 결과적으로 동작하지만, 일반 merge commit 방식에서는 PR 본문에 적어야 안전합니다.
+- PR 본문이 아닌 commit message에만 `Closes #N`을 적습니다. default branch에 들어간 commit message에 키워드가 그대로 남아 있으면 동작하지만, squash나 rebase 과정에서 message가 다시 쓰이면 잘못 닫히거나 아예 닫히지 않을 수 있습니다. PR 본문에 적는 편이 안전합니다.
 - 혼자 쓰는 저장소라서 issue를 안 쓰고 메모장에 적습니다. issue로 옮기면 commit과 자동으로 연결되고 검색이 됩니다.
 
 ## 실무에서의 활용

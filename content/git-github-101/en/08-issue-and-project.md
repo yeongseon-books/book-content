@@ -81,7 +81,7 @@ The key idea: issues are the work, PRs are the change that finishes the work.
 | Milestone | A group of issues and PRs sharing a deadline and a percent-complete bar. Often used like "v1.2 release". |
 | Assignee | The person responsible for an issue or PR. One or several people can be assigned. |
 | Project (Projects v2) | A board view that pulls issues and PRs into columns by status, priority, or any custom field. |
-| Closing keywords | Words like `Closes`, `Fixes`, `Resolves`. Writing `Closes #42` in a PR body closes that issue when the PR merges. |
+| Closing keywords | Words like `Closes`, `Fixes`, `Resolves`. Writing `Closes #42` in a PR body closes that issue when the PR merges into the repository's default branch. |
 | Reference | Notation like `#42` or `org/repo#42` that links to an issue or PR. GitHub auto-renders it as a link. |
 
 `Closes`, `Fixes`, and `Resolves` mean the same thing here. GitHub also accepts singular and plural forms (`Close`, `Fix`).
@@ -120,7 +120,7 @@ The moment the PR merges, issue #42 closes itself. Six months later, anyone who 
 
 ## Step-by-step walkthrough
 
-Reuse the `vacation-notes` repository from Episode 7. `main` is at `5e6f7a8 Merge pull request #1 ...` and the working tree is clean.
+Reuse the `vacation-notes` repository from Episode 7. `main` is at `5e6f7a8 Merge pull request #1 from feature/release-notes` and the working tree is clean.
 
 ### 1. Open the first issue
 
@@ -201,7 +201,7 @@ Adds a place to write packing items before a trip.
 Only the default items are included so follow-up PRs can refine the structure.
 ```
 
-Writing `Closes #2` instantly fills in the `Linked issues` panel on the right side of the PR. Multiple issues can be closed at once with `Closes #2, #3` on the same line.
+Writing `Closes #2` immediately links the issue under the PR's right-side `Development` section. To close multiple issues from one PR, repeat the keyword for each number, for example `Closes #2, closes #3`. The shorter `Closes #2, #3` form does not close the second issue.
 
 ### 6. Merging the PR auto-closes the issue
 
@@ -229,7 +229,7 @@ Start with manual moves first. Even hand-dragging cards is a clear improvement o
 - Forgetting to close the issue when the work is done. Train the habit of writing `Closes #N` in the PR body so closing happens for you.
 - Issue bodies that say only the title in long form. The reader six months later has to know what it meant. A few lines of background and goal are enough.
 - Inventing too many labels too early. Start with `bug`, `enhancement`, and `chore`, then add more when you actually want to filter by them.
-- Putting `Closes #N` in a commit message instead of the PR body, then using a regular merge commit. With squash merges that still works because the commit message becomes the PR body, but with a normal merge the PR body is the safe place.
+- Putting `Closes #N` only in a commit message rather than the PR body. Keywords inside commit messages do close issues, but only when those exact messages reach the default branch — and squash or rebase can rewrite them. The PR body is the safe place.
 - Skipping issues on a solo repository because "I will just remember." Issues turn that mental note into something searchable that links to commits.
 
 ## In real-world projects
