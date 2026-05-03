@@ -65,13 +65,38 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  status: draft
+  status: content-ready
   tags:
     - AI Evaluation
     - LLM
     - Testing
     - Quality
   path: content/ai-evaluation-101
+- id: ai-safety-guardrails-101
+  category: ai
+  title:
+    ko: AI Safety & Guardrails 101
+    en: AI Safety & Guardrails 101
+  description:
+    ko: LLM 애플리케이션에 안전 장치를 적용하는 방법을 배우는 입문 시리즈. Prompt injection 방어, 출력 필터링, PII 감지, jailbreak 탐지, hallucination 방지, 감사 로깅까지 다룹니다.
+    en: A beginner-friendly guide to applying safety guardrails to LLM applications, covering prompt injection defense, output filtering, PII detection, jailbreak detection, hallucination prevention, and audit logging.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: draft
+  tags:
+    - AI Safety
+    - Guardrails
+    - LLM Security
+    - Compliance
+  path: content/ai-safety-guardrails-101
+
 - id: azure-app-service-101
   category: azure
   title:
