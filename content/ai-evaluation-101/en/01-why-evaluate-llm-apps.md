@@ -3,7 +3,7 @@ title: Why Evaluate LLM Applications
 series: ai-evaluation-101
 episode: 1
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

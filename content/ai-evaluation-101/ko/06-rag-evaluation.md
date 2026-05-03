@@ -3,7 +3,7 @@ title: RAG 시스템 평가하기
 series: ai-evaluation-101
 episode: 6
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

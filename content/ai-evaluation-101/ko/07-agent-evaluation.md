@@ -3,7 +3,7 @@ title: Agent 평가하기 — 단일 응답이 아닌 trajectory
 series: ai-evaluation-101
 episode: 7
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

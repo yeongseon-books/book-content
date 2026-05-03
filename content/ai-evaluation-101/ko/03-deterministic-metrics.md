@@ -3,7 +3,7 @@ title: 결정적 지표 — Exact Match, BLEU, ROUGE
 series: ai-evaluation-101
 episode: 3
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

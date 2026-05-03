@@ -3,7 +3,7 @@ title: 왜 LLM 애플리케이션을 평가해야 하는가
 series: ai-evaluation-101
 episode: 1
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

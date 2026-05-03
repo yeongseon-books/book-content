@@ -3,7 +3,7 @@ title: 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게
 series: ai-evaluation-101
 episode: 8
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

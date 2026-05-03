@@ -3,7 +3,7 @@ title: A/B Testing LLMs — Which Prompt Is Better?
 series: ai-evaluation-101
 episode: 9
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: LLM A/B 테스팅 — 어느 prompt가 더 나은가
 series: ai-evaluation-101
 episode: 9
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

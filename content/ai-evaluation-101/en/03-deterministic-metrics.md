@@ -3,7 +3,7 @@ title: Deterministic Metrics — Exact Match, BLEU, ROUGE
 series: ai-evaluation-101
 episode: 3
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

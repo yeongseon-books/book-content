@@ -3,7 +3,7 @@ title: Regression Testing — Don't Let Yesterday's Wins Break Today
 series: ai-evaluation-101
 episode: 8
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

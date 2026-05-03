@@ -3,7 +3,7 @@ title: Evaluating RAG Systems
 series: ai-evaluation-101
 episode: 6
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

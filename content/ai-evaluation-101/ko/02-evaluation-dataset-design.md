@@ -3,7 +3,7 @@ title: 평가 데이터셋 설계하기
 series: ai-evaluation-101
 episode: 2
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

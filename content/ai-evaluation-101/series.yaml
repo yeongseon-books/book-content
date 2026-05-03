@@ -15,7 +15,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: content-ready
 tags:
   - AI Evaluation
   - LLM
@@ -24,31 +24,31 @@ tags:
 articles:
 - idx: 1
   slug: 01-why-evaluate-llm-apps
-  status: draft
+  status: content-ready
 - idx: 2
   slug: 02-evaluation-dataset-design
-  status: draft
+  status: content-ready
 - idx: 3
   slug: 03-deterministic-metrics
-  status: draft
+  status: content-ready
 - idx: 4
   slug: 04-llm-as-judge
-  status: draft
+  status: content-ready
 - idx: 5
   slug: 05-rubric-based-scoring
-  status: draft
+  status: content-ready
 - idx: 6
   slug: 06-rag-evaluation
-  status: draft
+  status: content-ready
 - idx: 7
   slug: 07-agent-evaluation
-  status: draft
+  status: content-ready
 - idx: 8
   slug: 08-regression-testing
-  status: draft
+  status: content-ready
 - idx: 9
   slug: 09-ab-testing-llms
-  status: draft
+  status: content-ready
 - idx: 10
   slug: 10-production-evaluation
-  status: draft
+  status: content-ready

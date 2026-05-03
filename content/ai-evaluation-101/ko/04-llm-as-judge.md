@@ -3,7 +3,7 @@ title: LLM-as-Judge — 모델로 모델을 평가하기
 series: ai-evaluation-101
 episode: 4
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Evaluating Agents — Trajectories, Not Single Responses
 series: ai-evaluation-101
 episode: 7
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

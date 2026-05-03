@@ -3,7 +3,7 @@ title: LLM-as-Judge — Evaluating Models with Models
 series: ai-evaluation-101
 episode: 4
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true
