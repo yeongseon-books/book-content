@@ -278,7 +278,7 @@ issue와 project를 실무에서 쓰는 패턴은 다음과 같습니다.
 - [GitHub repository 만들기와 remote, push, pull](./06-github-repository.md)
 - [Pull Request로 협업하기](./07-pull-request.md)
 - **Issue와 Project로 일감 관리하기 (현재 글)**
-- 좋은 commit message 쓰기 (예정)
+- [좋은 commit message 쓰기](./09-good-commit-message.md)
 - 실무 워크플로 한눈에 보기 (예정)
 <!-- toc:end -->
 

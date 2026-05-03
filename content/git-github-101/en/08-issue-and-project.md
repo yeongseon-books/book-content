@@ -278,7 +278,7 @@ The next article looks at something even shorter than a PR body: the commit mess
 - [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
 - [Collaborating with Pull Requests](./07-pull-request.md)
 - **Tracking Work with Issues and Projects (current)**
-- Writing Good Commit Messages (upcoming)
+- [Writing Good Commit Messages](./09-good-commit-message.md)
 - Real-World Workflow at a Glance (upcoming)
 <!-- toc:end -->
 
