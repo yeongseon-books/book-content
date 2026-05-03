@@ -133,6 +133,17 @@ series:
   status: content-ready
   path: content/multimodal-ai-101
 
+- id: python-dbapi-101
+  category: data
+  title:
+    ko: Python DB-API 101
+    en: Python DB-API 101
+  description:
+    ko: Python의 표준 데이터베이스 인터페이스 PEP 249(DB-API 2.0)를 SQLite 기준으로 다루는 입문 시리즈.
+    en: A beginner-friendly tour of Python's PEP 249 (DB-API 2.0) using SQLite, covering connection lifecycle, transactions, error handling, async, and production patterns.
+  status: draft
+  path: content/python-dbapi-101
+
 - id: azure-app-service-101
   category: azure
   title:
