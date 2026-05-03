@@ -334,8 +334,14 @@ $ printf "**Awesome Project**\n" > header.md
 $ git add header.md
 $ git commit -m "Bold the header"
 [feature/header-bold 9d8e7f6] Bold the header
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 $ git switch main
 Switched to branch 'main'
+$ printf "### Awesome Project\n" > header.md
+$ git add header.md
+$ git commit -m "Demote header to h3"
+[main 1c2d3e4] Demote header to h3
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 $ git merge feature/header-bold
 Auto-merging header.md
 CONFLICT (content): Merge conflict in header.md
@@ -351,7 +357,7 @@ On branch main
 nothing to commit, working tree clean
 ```
 
-`header.md` is restored to whatever it was before the merge started (`## Awesome Project`). `--abort` only works while a merge is in progress; once you've committed, you need other tools (`git reset`, `git revert`) to roll back. Those land in the workflow chapter near the end of this series.
+`header.md` is restored to whatever it was before the merge started (`### Awesome Project`). `--abort` only works while a merge is in progress; once you've committed, you need other tools (`git reset`, `git revert`) to roll back. Those land in the workflow chapter near the end of this series.
 
 ## Common Mistakes
 

@@ -334,8 +334,14 @@ $ printf "**Awesome Project**\n" > header.md
 $ git add header.md
 $ git commit -m "Bold the header"
 [feature/header-bold 9d8e7f6] Bold the header
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 $ git switch main
 Switched to branch 'main'
+$ printf "### Awesome Project\n" > header.md
+$ git add header.md
+$ git commit -m "Demote header to h3"
+[main 1c2d3e4] Demote header to h3
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 $ git merge feature/header-bold
 Auto-merging header.md
 CONFLICT (content): Merge conflict in header.md
@@ -351,7 +357,7 @@ On branch main
 nothing to commit, working tree clean
 ```
 
-`header.md`는 merge 직전 상태(`## Awesome Project`)로 복구됩니다. abort는 conflict 도중에만 의미가 있고, 이미 commit한 merge를 되돌리려면 다른 도구(`git reset`, `git revert`)가 필요합니다. 이 부분은 시리즈 후반의 워크플로 글에서 다시 다룹니다.
+`header.md`는 merge 직전 상태(`### Awesome Project`)로 복구됩니다. abort는 conflict 도중에만 의미가 있고, 이미 commit한 merge를 되돌리려면 다른 도구(`git reset`, `git revert`)가 필요합니다. 이 부분은 시리즈 후반의 워크플로 글에서 다시 다룹니다.
 
 ## 자주 하는 실수
 
