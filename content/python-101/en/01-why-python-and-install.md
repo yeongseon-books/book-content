@@ -91,7 +91,7 @@ In this article we use `python3` (or `py -3` on Windows) before activation, and 
 
 **3. venv (virtual environment)**
 
-`venv` is built into the Python standard library. Running `python3 -m venv .venv` creates a `.venv/` folder containing a copy (or link to) the Python interpreter and an empty `site-packages/`. Activating the venv makes `python` and `pip` point at the binaries inside it. Deactivating returns you to the system environment.
+`venv` is built into the Python standard library. Running `python3.12 -m venv .venv` (always pin the version explicitly — see Common Mistake 6) creates a `.venv/` folder containing a copy (or link to) the Python interpreter and an empty `site-packages/`. Activating the venv makes `python` and `pip` point at the binaries inside it. Deactivating returns you to the system environment.
 
 **4. pip and requirements.txt**
 
@@ -149,11 +149,11 @@ py -3.12 --version
 
 ```bash
 sudo apt update
-sudo apt install python3.12 python3.12-venv
-python3.12 --version
+sudo apt install python3 python3-venv     # whichever Python 3 your distro ships
+python3 --version
 ```
 
-You must install `python3.12-venv` separately — Debian-family distros split venv into its own package, and forgetting it is a classic trap.
+On Debian-family distros you must install the matching `-venv` package or `python3 -m venv` will fail with a cryptic error — a classic trap. If your distro's packaged Python is older than 3.12, the safest route is the `deadsnakes` PPA on Ubuntu (`sudo add-apt-repository ppa:deadsnakes/ppa` then `sudo apt install python3.12 python3.12-venv`), or installing Python 3.12 separately via `pyenv` or `uv`. The point is: never replace or upgrade the system Python itself.
 
 ### 2) Create the project folder and the venv
 
@@ -211,6 +211,9 @@ C:\Users\me\hello-python\.venv\Scripts\python.exe
 
 (.venv) PS> python -c "import sys; print(sys.executable)"
 C:\Users\me\hello-python\.venv\Scripts\python.exe
+
+(.venv) PS> pip --version
+pip 24.x from C:\Users\me\hello-python\.venv\Lib\site-packages\pip (python 3.12)
 ```
 
 If all three commands point inside `.venv`, isolation is working. If you see `/usr/bin/python` or any system path, activation failed — re-run `source .venv/bin/activate` and try again.
