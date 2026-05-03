@@ -216,7 +216,7 @@ C:\Users\me\hello-python\.venv\Scripts\python.exe
 pip 24.x from C:\Users\me\hello-python\.venv\Lib\site-packages\pip (python 3.12)
 ```
 
-If all three commands point inside `.venv`, isolation is working. If you see `/usr/bin/python` or any system path, activation failed — re-run `source .venv/bin/activate` and try again.
+If all three commands point inside `.venv`, isolation is working. If you see a system path (e.g., `/usr/bin/python` on macOS/Linux, `C:\Python312\python.exe` on Windows), activation failed — re-run `source .venv/bin/activate` (macOS/Linux) or `.\.venv\Scripts\Activate.ps1` (Windows) and try again.
 
 ### 5) Your first script (no network needed)
 
