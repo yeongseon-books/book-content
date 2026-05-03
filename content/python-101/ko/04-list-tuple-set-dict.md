@@ -52,7 +52,7 @@ last_reviewed: '2026-05-03'
 
 ## Mental Model
 
-네 자료구조를 두 축 — 가변성과 키 유무 — 으로 묶으면 머릿속에 잘 박힙니다.
+네 자료구조를 가변성·순서·해시 가능성으로 묶으면 머릿속에 잘 박힙니다.
 
 ```mermaid
 flowchart TB
@@ -60,9 +60,9 @@ flowchart TB
         L["list<br/>가변, 중복 허용"]
         T["tuple<br/>불변, 중복 허용"]
     end
-    subgraph KeyValue["키로 접근하는 묶음"]
+    subgraph HashBased["해시 기반 묶음"]
         D["dict<br/>가변, key 유일"]
-        S["set<br/>가변, 원소 유일"]
+        S["set<br/>가변, 해시 가능한 원소만, 순서 없음"]
     end
     L -- "고정해서 키로 쓰고 싶을 때" --> T
     L -- "중복 제거 / 멤버십 검사" --> S
@@ -326,7 +326,7 @@ counts = Counter(words)
    `b = a`는 같은 객체에 이름표를 하나 더 붙일 뿐입니다. 한쪽을 바꾸면 양쪽이 바뀝니다. 얕은 복사가 필요하면 `b = a[:]`이나 `b = list(a)`, 중첩까지 복사하려면 `copy.deepcopy(a)`를 씁니다.
 
 2. **mutable 기본 인자.**
-   `def f(items=[]):`는 함수 정의 시점에 리스트를 한 번 만들고, 호출 사이에 그 리스트를 공유합니다. 호출이 누적될수록 리스트가 자랍니다. 기본값이 빈 리스트여야 한다면 `def f(items=None): items = items or []`로 작성합니다.
+   `def f(items=[]):`는 함수 정의 시점에 리스트를 한 번 만들고, 호출 사이에 그 리스트를 공유합니다. 호출이 누적될수록 리스트가 자랍니다. 기본값이 빈 리스트여야 한다면 `def f(items=None): items = items if items is not None else []`로 작성합니다.
 
 3. **dict의 없는 키를 `d[key]`로 꺼낸다.**
    `KeyError`가 발생합니다. "있을 수도, 없을 수도"라면 `d.get(key)` 또는 `d.get(key, default)`를 씁니다. "없으면 만들어라"는 패턴은 `setdefault`나 `defaultdict`가 어울립니다.
@@ -375,7 +375,7 @@ counts = Counter(words)
 
 ## 정리·다음 글
 
-- list/tuple은 순서 있는 묶음, set/dict는 키로 접근하는 묶음입니다.
+- list/tuple은 순서 있는 묶음, set은 해시 기반의 유일 원소 모음, dict는 키→값 매핑입니다.
 - 가변(list, set, dict)과 불변(tuple)을 의식적으로 골라야 의도가 분명해집니다.
 - dict 키와 set 원소는 hashable해야 하며, list는 hashable이 아닙니다.
 - `b = a`는 복사가 아니라 alias입니다. 복사가 필요하면 `list(a)` 또는 `copy.deepcopy(a)`를 씁니다.

@@ -52,7 +52,7 @@ This chapter consolidates the four collections onto a single page so the next ch
 
 ## Mental model
 
-Group the four collections along two axes — mutability and key vs no key — and they sit cleanly in memory.
+Group the four collections along three axes — mutability, order, and hashability — and they sit cleanly in memory.
 
 ```mermaid
 flowchart TB
@@ -60,9 +60,9 @@ flowchart TB
         L["list<br/>mutable, duplicates allowed"]
         T["tuple<br/>immutable, duplicates allowed"]
     end
-    subgraph KeyValue["Keyed bundles"]
+    subgraph HashBased["Hash-based collections"]
         D["dict<br/>mutable, keys unique"]
-        S["set<br/>mutable, elements unique"]
+        S["set<br/>mutable, hashable elements only, unordered"]
     end
     L -- "freeze and use as a key" --> T
     L -- "deduplicate / membership" --> S
@@ -375,7 +375,7 @@ If you already know `Counter`, steps 2 and 3 collapse into a single line. After 
 
 ## Summary and next chapter
 
-- list and tuple are ordered bundles; set and dict are keyed bundles.
+- list and tuple are ordered bundles; set is an unordered collection of unique hashable elements; dict is a key→value mapping.
 - Mutable (list, set, dict) versus immutable (tuple) is a deliberate choice.
 - Dict keys and set members must be hashable; lists are not.
 - `b = a` aliases; copy with `list(a)` or `copy.deepcopy(a)` when needed.
