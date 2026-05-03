@@ -410,7 +410,7 @@ nothing to commit, working tree clean
 - [변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
 - [branch 기초 - 만들고 옮기고 비교하기](./04-branch-basics.md)
 - **merge와 conflict 해결하기 - 두 줄기를 다시 합치기 (현재 글)**
-- GitHub 저장소와 remote 연결 (예정)
+- [GitHub repository 만들기와 remote, push, pull](./06-github-repository.md)
 - Pull Request로 협업하기 (예정)
 - Issue와 Project로 일감 관리 (예정)
 - 좋은 commit message 쓰기 (예정)

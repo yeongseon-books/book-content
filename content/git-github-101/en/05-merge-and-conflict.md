@@ -410,7 +410,7 @@ In the next chapter we'll connect the local repo to a GitHub remote and walk thr
 - [Tracking Changes - Reading status, diff, and log](./03-status-diff-log.md)
 - [Branch Basics - Create, Switch, Compare](./04-branch-basics.md)
 - **Merge and Conflict Resolution - Bringing Two Lines Back Together (current)**
-- Connecting to GitHub Remotes (upcoming)
+- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
 - Collaborating with Pull Requests (upcoming)
 - Tracking Work with Issues and Projects (upcoming)
 - Writing Good Commit Messages (upcoming)
