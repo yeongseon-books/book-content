@@ -12,11 +12,11 @@ targets:
   ebook: true
 tags:
   - Python
-  - install
-  - venv
-  - pip
-  - version
-  - beginner
+  - virtual-environments
+  - environment-isolation
+  - python-installation
+  - package-management
+  - developer-setup
 last_reviewed: '2026-05-03'
 ---
 
@@ -24,195 +24,355 @@ last_reviewed: '2026-05-03'
 
 ## 이 글에서 배울 것
 
-- Python이 입문 언어로 가장 많이 선택되는 이유
-- macOS, Linux, Windows 환경별 Python 설치 방법
-- system Python을 직접 건드리면 안 되는 이유와 venv의 역할
-- venv를 만들고 활성화하는 표준 흐름
-- pip으로 패키지를 설치하고 버전을 고정하는 방법
+- Python을 "그냥 설치"하는 것이 왜 위험한지, 그리고 system Python과 project Python을 분리해야 하는 이유
+- macOS, Windows, Linux 각 환경에서 Python 3.12를 안전하게 설치하는 방법
+- venv (virtual environment)가 정확히 어떤 문제를 해결하는지
+- `python` 과 `python3`의 차이, 그리고 어느 것을 써야 하는지
+- 프로젝트별 가상 환경을 만들고, 활성화하고, 격리되었는지 검증하는 방법
+- pip로 패키지를 설치하고 `requirements.txt`로 환경을 재현하는 방법
 
 ## 왜 중요한가
 
-Python을 처음 설치할 때 가장 흔한 실수는 system이 사용하는 Python에 패키지를 마구 설치하는 것입니다. 처음에는 잘 동작하지만, 두 번째 프로젝트를 시작하면 패키지 버전이 충돌하고 결국 OS 도구가 깨집니다. 처음부터 venv 사용을 습관화하면 평생 이 문제를 겪지 않습니다. 입문자가 가장 먼저 익혀야 할 기술은 문법이 아니라 환경 격리입니다.
+Python을 시작할 때 가장 흔히 만나는 문제는 문법이 아니라 **환경**입니다.
+
+처음 하루는 잘 돌아가던 코드가 다음 날 갑자기 깨집니다. 회사 노트북에서는 동작하는 스크립트가 동료의 노트북에서는 import error를 냅니다. `pip install`을 실행했는데 권한 오류가 납니다. 이런 문제의 거의 모든 원인은 한 가지입니다 — **system Python에 직접 패키지를 설치하고 있는 것**.
+
+system Python은 운영체제 자체가 사용하는 Python입니다. macOS의 일부 도구, Linux의 `apt`, 여러 시스템 스크립트가 그 Python을 신뢰하고 그 위에서 돌아갑니다. 거기에 패키지를 설치하거나 업그레이드하면 OS의 어떤 도구가 망가질지 예측할 수 없습니다. 그래서 제대로 된 Python 사용자는 **system Python에는 절대 손대지 않습니다.** 대신 프로젝트마다 독립된 Python 환경을 만들어서 그 안에서만 패키지를 설치합니다. 이것이 venv입니다.
+
+venv를 처음부터 습관으로 만들면, 앞으로 만날 의존성 충돌, 버전 차이, "내 컴퓨터에서는 되는데" 문제의 80%가 사라집니다.
 
 ## Mental Model
 
-> Python 환경은 "**system Python은 OS의 것, 내 프로젝트는 내 venv**"라는 한 줄로 외울 수 있습니다. system Python은 OS가 자기 도구를 돌리는 데 사용하는 인터프리터이고, 내가 작업하는 모든 프로젝트는 별도 디렉터리의 venv 안에 들어가야 합니다.
+> Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 각 프로젝트는 자기만의 Python을 하나씩 들고 있어야 한다.
 
-git에 비유하면 venv는 프로젝트 디렉터리 같은 것입니다. 프로젝트마다 별도 디렉터리를 두지 않고 한 디렉터리에 모든 코드를 섞지는 않듯이, Python 환경도 프로젝트마다 분리합니다.
+이 한 문장이 이 글의 핵심입니다.
+
+- system Python: OS가 쓰는 Python. 건드리지 않는다.
+- project Python (venv): 프로젝트 폴더 안에 만든 사본. 여기에만 패키지를 설치한다.
+- 프로젝트가 10개면 venv도 10개. 서로 영향을 주지 않는다.
+
+```mermaid
+flowchart TB
+    subgraph OS["Operating System"]
+        sys["/usr/bin/python3<br/>(system Python)"]
+        ostools["OS scripts and tools<br/>(apt, brew, system utilities)"]
+        sys --> ostools
+    end
+    subgraph ProjA["Project A: web-api"]
+        venvA[".venv/bin/python<br/>fastapi==0.100<br/>requests==2.20"]
+    end
+    subgraph ProjB["Project B: data-pipeline"]
+        venvB[".venv/bin/python<br/>pandas==2.0<br/>requests==2.32"]
+    end
+    dev["Developer"] -->|activate| venvA
+    dev -->|activate| venvB
+    dev -.never installs into.-x sys
+```
+
+system Python은 OS의 영역, 각 venv는 프로젝트의 영역입니다. 개발자는 venv만 활성화해서 그 안에서 작업합니다.
 
 ## 핵심 개념
 
-### Python을 입문 언어로 고르는 이유
+**1. Python의 종류**
 
-- **읽기 쉬운 문법**: 들여쓰기 기반 블록 + 자연어에 가까운 키워드(`if`, `for`, `in`, `not`)
-- **거대한 ecosystem**: 데이터, 웹, AI, 자동화 모든 영역에 라이브러리가 존재
-- **즉시 실행 가능**: 컴파일 단계 없이 `python script.py`로 바로 실행
-- **REPL**: `python` 명령으로 대화형 셸이 떠서 한 줄씩 시험 가능
-- **취업 시장의 광범위함**: 데이터, 백엔드, ML, DevOps 어디서든 사용
+- **CPython**: 공식 Python 구현체. python.org에서 받는 것이 이것이고, 거의 모든 자료가 CPython 기준으로 쓰여 있습니다. 이 글도 CPython 3.12를 가정합니다.
+- **system Python**: OS에 미리 깔려 있는 Python. macOS와 Linux에 보통 있습니다. 버전이 낮고, 건드리면 OS가 영향을 받습니다.
+- **user-installed Python**: python.org 설치 파일, Homebrew, pyenv, uv 등으로 직접 설치한 Python. 우리가 쓸 것은 이쪽입니다.
 
-### Python 버전: 3.x만 사용
+**2. `python` vs `python3`**
 
-Python 2는 2020년에 공식 지원이 끝났습니다. 새 코드는 Python 3.10 이상을 권장합니다. `python --version`으로 확인하고, 시스템에 2.x만 있다면 새로 설치합니다.
+명령어가 두 개 있어서 처음에는 헷갈립니다. 규칙은 단순합니다.
 
-| OS | 권장 설치 방법 |
-| --- | --- |
-| macOS | `brew install python@3.12` |
-| Ubuntu/Debian | `apt install python3.12 python3.12-venv` |
-| Windows | python.org installer (PATH 추가 체크) 또는 `winget install Python.Python.3.12` |
-| 모든 OS (대안) | `pyenv` (여러 버전을 한 머신에서 관리) |
+- macOS와 Linux에서는 `python3`이 Python 3을 가리킵니다. `python`은 존재하지 않거나, 옛날 Python 2를 가리킬 수 있어서 위험합니다. 그래서 **shell에서는 항상 `python3`을 사용합니다.**
+- Windows의 공식 설치 파일은 `python` (그리고 launcher인 `py`) 명령을 만듭니다. `python3`이 없을 수 있습니다.
+- venv를 활성화한 뒤에는 어느 OS든 그냥 `python`을 써도 됩니다 — 활성화된 venv의 Python을 가리키기 때문입니다.
 
-### system Python을 건드리면 안 되는 이유
+이 글에서는 venv 활성화 전에는 `python3` (Windows에서는 `py -3`), 활성화 후에는 `python`을 쓰겠습니다.
 
-macOS와 Linux는 OS 자체가 Python을 사용합니다. `/usr/bin/python3`에 패키지를 직접 설치하면 OS 도구가 망가질 수 있습니다. 또한 두 프로젝트가 같은 패키지의 다른 버전을 요구하면 한 환경에서는 절대 동시에 만족할 수 없습니다.
+**3. venv (virtual environment)**
 
-해결책이 venv입니다. venv는 프로젝트별로 독립된 Python 환경을 만들어 주고, 그 안에서 설치한 패키지는 다른 프로젝트나 system에 전혀 영향을 주지 않습니다.
+venv는 Python 표준 라이브러리에 내장된 도구입니다. `python3 -m venv .venv`를 실행하면 `.venv/`라는 폴더가 생깁니다. 그 안에는 Python 인터프리터의 사본 (혹은 링크), 그리고 비어 있는 `site-packages/` 폴더가 들어 있습니다. 활성화하면 `python`과 `pip` 명령이 그 venv 내부의 것을 가리키게 됩니다. 비활성화하면 system 환경으로 되돌아갑니다.
 
-### venv의 동작 원리
+**4. pip와 requirements.txt**
 
-`python -m venv .venv`를 실행하면 `.venv/` 디렉터리가 생기고 그 안에 Python interpreter 사본 또는 link가 들어갑니다. 활성화(`source .venv/bin/activate`)하면 `python`이 `.venv/bin/python`을 가리키도록 PATH가 바뀌고, `pip install`은 `.venv/lib/`에 패키지를 설치합니다. 비활성화(`deactivate`)하면 PATH가 원래대로 돌아옵니다.
+`pip`는 Python의 패키지 관리자입니다. `pip install requests`처럼 사용하면 활성화된 venv의 `site-packages/`에 패키지를 설치합니다. `pip freeze > requirements.txt`로 현재 설치 상태를 파일로 저장하고, 다른 사람은 `pip install -r requirements.txt`로 같은 환경을 재현합니다. 이것이 협업과 배포의 기본 단위입니다.
 
-### pip과 requirements.txt
+## Before / After
 
-`pip`은 Python의 기본 패키지 매니저입니다. `pip install requests`처럼 패키지를 설치하고, `pip freeze > requirements.txt`로 현재 설치된 모든 패키지 버전을 파일로 저장합니다. 다른 머신에서는 `pip install -r requirements.txt`로 같은 환경을 재현할 수 있습니다.
-
-## Before-After
+**Before — system Python에 직접 설치한 경우**
 
 ```bash
-# Before: system Python에 직접 설치
-$ pip install requests          # /usr/lib/python3 에 설치
-$ pip install requests==2.20    # 다른 프로젝트에서 충돌
-ERROR: Cannot uninstall 'requests'. It is a distutils installed project.
+$ pip install requests
+ERROR: Could not install packages due to an EnvironmentError: [Errno 13] Permission denied
+$ sudo pip install requests   # 절대 하지 마세요
 ```
+
+`sudo pip install`은 일시적으로 동작하는 듯 보이지만, system Python을 오염시킵니다. 다음 OS 업데이트나 brew 명령이 실패할 수 있습니다.
+
+**After — venv 안에 설치한 경우**
 
 ```bash
-# After: venv 사용
-$ python -m venv .venv
-$ source .venv/bin/activate
-(.venv) $ pip install requests==2.20    # .venv/lib 에만 설치
-(.venv) $ deactivate                    # 시스템에 영향 없음
+$ python3 -m venv .venv
+$ source .venv/bin/activate         # macOS/Linux
+(.venv) $ pip install requests
+Successfully installed requests-2.32.3
+(.venv) $ which python
+/Users/me/myproj/.venv/bin/python
 ```
 
-After 패턴은 프로젝트가 100개로 늘어도 충돌이 발생하지 않습니다.
+`(.venv)` 프롬프트가 나타나고, `which python`이 프로젝트 폴더 안을 가리킵니다. 이 상태에서 설치한 모든 패키지는 `.venv/` 안에만 들어가고, 프로젝트를 지우면 깨끗하게 사라집니다.
 
 ## 단계별 실습
 
-### 1단계: Python 설치 확인
+### 1) Python 3.12 설치
+
+**macOS** (Homebrew 사용):
 
 ```bash
-python3 --version
-# Python 3.12.0 처럼 출력되면 OK
+brew install python@3.12
+python3.12 --version
+# Python 3.12.x
 ```
 
-3.10 미만이면 위 표를 참고해 새로 설치합니다.
+**Windows** (python.org 설치 파일):
 
-### 2단계: 프로젝트 디렉터리 생성
+1. https://www.python.org/downloads/ 에서 Python 3.12 installer를 받습니다.
+2. 설치 화면에서 **"Add python.exe to PATH"**를 반드시 체크합니다.
+3. 설치 후 PowerShell에서:
 
-```bash
-mkdir my-first-project
-cd my-first-project
+```powershell
+py -3.12 --version
+# Python 3.12.x
 ```
 
-### 3단계: venv 생성과 활성화
+**Linux** (Ubuntu/Debian):
 
 ```bash
-python3 -m venv .venv
+sudo apt update
+sudo apt install python3.12 python3.12-venv
+python3.12 --version
+```
 
-# macOS / Linux
+`python3.12-venv` 패키지를 같이 설치해야 venv를 만들 수 있습니다 (Debian 계열의 함정입니다).
+
+### 2) 프로젝트 폴더와 venv 만들기
+
+```bash
+mkdir hello-python && cd hello-python
+python3.12 -m venv .venv
+```
+
+`.venv/` 폴더가 생깁니다. 이 폴더는 git에 커밋하지 않습니다 — 나중에 `.gitignore`에 `.venv/`를 추가하면 됩니다.
+
+### 3) 활성화
+
+**macOS / Linux**:
+
+```bash
 source .venv/bin/activate
-
-# Windows (PowerShell)
-.venv\Scripts\Activate.ps1
 ```
 
-활성화되면 prompt 앞에 `(.venv)`가 표시됩니다.
+**Windows PowerShell**:
 
-### 4단계: 패키지 설치
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+만약 PowerShell에서 "이 시스템에서 스크립트를 실행할 수 없으므로..."라는 오류가 나면, 한 번만 다음 명령으로 사용자 정책을 풀어 주세요:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+활성화에 성공하면 프롬프트 앞에 `(.venv)`가 붙습니다.
+
+### 4) 격리되었는지 검증
+
+이 단계가 가장 중요합니다. 활성화만으로 끝내지 말고, **정말로 venv 안의 Python을 쓰고 있는지** 두 가지 명령으로 확인하세요.
+
+macOS / Linux:
 
 ```bash
-(.venv) $ pip install requests
-(.venv) $ pip list
-Package    Version
----------- -------
-pip        24.0
-requests   2.32.3
-...
+(.venv) $ which python
+/Users/me/hello-python/.venv/bin/python
+
+(.venv) $ python -c "import sys; print(sys.executable)"
+/Users/me/hello-python/.venv/bin/python
+
+(.venv) $ pip --version
+pip 24.x from /Users/me/hello-python/.venv/lib/python3.12/site-packages/pip (python 3.12)
 ```
 
-### 5단계: 버전 고정과 재현
+Windows:
 
-```bash
-(.venv) $ pip freeze > requirements.txt
-(.venv) $ cat requirements.txt
-requests==2.32.3
-...
+```powershell
+(.venv) PS> where python
+C:\Users\me\hello-python\.venv\Scripts\python.exe
 
-# 다른 머신에서
-$ python3 -m venv .venv
-$ source .venv/bin/activate
-(.venv) $ pip install -r requirements.txt
+(.venv) PS> python -c "import sys; print(sys.executable)"
+C:\Users\me\hello-python\.venv\Scripts\python.exe
 ```
 
-### 6단계: 첫 스크립트 실행
+세 명령 모두 `.venv` 안 경로를 가리키면 격리에 성공한 것입니다. 만약 `/usr/bin/python` 같은 system 경로가 나오면 활성화가 실패한 것이니, 다시 `source .venv/bin/activate`부터 시작하세요.
+
+### 5) 첫 스크립트 (네트워크 없음)
+
+처음에는 외부 패키지나 네트워크 없이, Python이 정말 동작하는지만 확인합니다. `hello.py`:
 
 ```python
-# hello.py
-import requests
-response = requests.get("https://httpbin.org/get")
-print(response.status_code)
-print(response.json()["url"])
+import sys
+import platform
+
+print(f"Hello from Python {sys.version_info.major}.{sys.version_info.minor}")
+print(f"Running on: {platform.system()} {platform.release()}")
+print(f"Interpreter path: {sys.executable}")
 ```
+
+실행:
 
 ```bash
 (.venv) $ python hello.py
-200
-https://httpbin.org/get
+Hello from Python 3.12
+Running on: Darwin 23.x.x
+Interpreter path: /Users/me/hello-python/.venv/bin/python
 ```
+
+이 출력이 나오면 venv 안의 Python이 정상적으로 코드를 실행하고 있다는 뜻입니다. 외부 의존성이 없으므로 Wi-Fi가 끊긴 상태에서도 동일하게 동작합니다.
+
+### 6) 패키지 설치와 requirements.txt
+
+이제 패키지를 하나 설치해 보겠습니다 (네트워크 필요):
+
+```bash
+(.venv) $ pip install requests
+(.venv) $ pip freeze > requirements.txt
+(.venv) $ cat requirements.txt
+certifi==2024.x.x
+charset-normalizer==3.x.x
+idna==3.x
+requests==2.32.3
+urllib3==2.x.x
+```
+
+`requirements.txt`를 git에 커밋하면, 동료는 같은 명령으로 동일 환경을 재현할 수 있습니다:
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 7) 비활성화
+
+작업이 끝나면:
+
+```bash
+(.venv) $ deactivate
+$
+```
+
+프롬프트에서 `(.venv)`가 사라집니다. system 환경으로 돌아왔다는 뜻입니다.
 
 ## 자주 하는 실수
 
-- **`sudo pip install`을 실행한다.** system Python을 변경하므로 OS 도구가 깨질 수 있습니다.
-- **venv를 활성화하지 않고 `pip install`.** 의도와 다른 곳에 설치되어 추적이 어려워집니다.
-- **`.venv`를 git에 커밋한다.** 수백 MB가 저장소에 들어갑니다. `.gitignore`에 `.venv/`를 추가하세요.
-- **`requirements.txt`를 만들지 않는다.** 다른 머신에서 환경 재현이 불가능합니다.
-- **Python 2를 새로 설치한다.** 2020년에 끝났습니다. 무조건 3.10+ 사용.
+**1. `sudo pip install` 사용**
+"권한이 없다"는 오류를 보면 `sudo`를 붙이고 싶어집니다. 절대 하지 마세요. 권한 오류 자체가 "지금 system Python을 건드리고 있다"는 신호입니다. 폴더로 들어가서 venv를 만들면 됩니다.
 
-## 실무에서 쓰는 패턴
+**2. `python` vs `python3` 혼용**
+shell에서 `python`을 쳤을 때 어떤 Python이 나올지 예측할 수 없습니다. **venv 활성화 전에는 항상 `python3` (Windows에서는 `py -3`)** 을 쓰세요. 활성화 후에는 `python`을 써도 venv의 것을 가리킵니다.
 
-- **프로젝트 루트에 `.venv/` 고정 위치.** 모든 프로젝트가 같은 규칙이면 IDE 설정도 단순해집니다.
-- **`.gitignore`에 `.venv/`, `__pycache__/`, `*.pyc` 기본 추가.**
-- **버전 명시 (`pip install requests==2.32.3`).** 미래의 자기에게 친절합니다.
-- **`pyproject.toml`로 점진적 이전.** 입문은 requirements.txt로 시작하고 익숙해지면 `pyproject.toml` + `uv` / `poetry`로 옮겨도 좋습니다.
-- **여러 Python 버전이 필요하면 `pyenv`.** 프로젝트마다 다른 Python 버전을 강제할 수 있습니다.
+**3. venv를 만들었는데 활성화하지 않음**
+`python3 -m venv .venv`만 실행하고 `source .venv/bin/activate`를 잊는 경우가 흔합니다. 활성화 안 된 상태로 `pip install`을 하면 또다시 system Python에 설치됩니다. **`(.venv)` 프롬프트와 `which python` 결과를 항상 확인**하세요.
+
+**4. PowerShell 활성화 실패를 "Python 문제"로 오해**
+"스크립트를 실행할 수 없습니다" 오류는 Python 문제가 아니라 Windows 보안 정책입니다. `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`을 한 번 실행하면 해결됩니다.
+
+**5. `.venv/`를 git에 커밋**
+`.venv/`는 OS와 Python 버전에 의존하는 바이너리가 들어 있어서 다른 컴퓨터에서 그대로 쓸 수 없습니다. 반드시 `.gitignore`에 추가하고, 환경 재현은 `requirements.txt`로 합니다.
+
+**6. `python3.12 -m venv` 대신 `python3 -m venv`**
+시스템에 Python 3.10과 3.12가 같이 깔려 있으면 `python3`이 어느 쪽을 가리키는지 모호합니다. **venv를 만들 때는 항상 버전을 명시**해서 `python3.12 -m venv .venv`처럼 쓰세요. 만들고 나면 그 venv는 영원히 그 버전에 묶입니다.
+
+## 실무 패턴
+
+**1. 프로젝트 폴더 표준 구조**
+
+새 프로젝트를 시작할 때 항상 같은 모양으로 만듭니다:
+
+```
+hello-python/
+├── .venv/              # git에 안 올림
+├── .gitignore          # .venv/ 와 __pycache__/ 포함
+├── requirements.txt    # 직접 설치한 핵심 패키지
+├── requirements-dev.txt # 개발 도구 (pytest, ruff 등)
+└── src/
+    └── hello.py
+```
+
+이렇게 하면 어떤 프로젝트를 열어도 폴더 구조가 같아서 인지 부하가 줄어듭니다.
+
+**2. requirements.txt를 두 개로 나누기**
+
+`requirements.txt`에는 production에서도 필요한 패키지만 넣고, `requirements-dev.txt`에는 테스트와 lint 같은 개발용만 넣습니다. CI나 production 컨테이너에서 불필요한 패키지를 빼서 빌드를 가볍게 유지하기 위함입니다.
+
+**3. 버전 고정 (pinning)**
+
+`pip freeze`의 결과는 `requests==2.32.3`처럼 버전이 정확히 박혀 있습니다. 이것이 의도된 결과입니다. "어떤 버전이든 알아서"를 허용하면, 한 달 뒤 동일한 코드가 다른 버전으로 깔려서 갑자기 깨질 수 있습니다. 의존성은 명시적으로 고정하세요.
+
+**4. Python 버전도 명시하기**
+
+프로젝트 root에 `.python-version` 파일을 두고 `3.12`를 적어 두면, pyenv·uv·일부 IDE가 자동으로 그 버전을 선택합니다. 협업할 때 "Python 몇 버전 써요?"라는 질문이 사라집니다.
+
+**5. uv·poetry는 나중에**
+
+요즘 `uv`나 `poetry` 같은 더 빠르고 강력한 도구가 있습니다. 하지만 그 도구들도 내부적으로는 venv 개념 위에 동작합니다. 표준 venv + pip를 먼저 손에 익히면, 나중에 어떤 도구로 옮겨도 원리가 보입니다.
 
 ## 체크리스트
 
-- [ ] `python3 --version`이 3.10 이상이다
-- [ ] 프로젝트마다 `.venv/`를 만든다
-- [ ] 활성화 시 prompt에 `(.venv)`가 보인다
-- [ ] `.venv/`가 `.gitignore`에 들어 있다
-- [ ] `requirements.txt`가 저장소에 커밋되어 있다
-- [ ] `sudo pip install`을 사용하지 않는다
+- [ ] Python 3.12를 설치하고 `python3.12 --version` (Windows는 `py -3.12 --version`)으로 확인했다
+- [ ] 프로젝트 폴더에 `python3.12 -m venv .venv`로 venv를 만들었다
+- [ ] 활성화 후 프롬프트에 `(.venv)`가 보인다
+- [ ] `which python` (Windows는 `where python`)이 `.venv` 안 경로를 가리킨다
+- [ ] `python -c "import sys; print(sys.executable)"`도 같은 경로를 출력한다
+- [ ] `.gitignore`에 `.venv/`를 추가했다
+- [ ] `pip install`로 설치한 뒤 `pip freeze > requirements.txt`로 저장했다
+- [ ] 새 폴더에서 `pip install -r requirements.txt`로 환경을 재현해 보았다
 
 ## 연습 문제
 
-1. 새 디렉터리에 venv를 만들고 `requests`를 설치한 뒤 `pip freeze > requirements.txt`로 저장하세요.
-2. 같은 폴더에서 venv를 삭제하고 (`rm -rf .venv`), 다시 만들어 `requirements.txt`로 환경을 재현하세요.
-3. 두 개의 폴더에 각각 venv를 만들고 한 곳에는 `requests==2.20`, 다른 곳에는 `requests==2.32`를 설치한 뒤 충돌 없이 동작함을 확인하세요.
+1. **두 개의 venv를 만들어 격리 확인**
+   `proj-a`와 `proj-b` 두 폴더를 만들고, 각각 venv를 만든 뒤, `proj-a`에는 `requests==2.20.0`, `proj-b`에는 `requests==2.32.3`을 설치하세요. 각 venv에서 `python -c "import requests; print(requests.__version__)"`을 실행해서 서로 다른 버전이 나오는지 확인하세요.
+   - 성공 기준: 두 venv가 서로 다른 버전의 requests를 가리키고, 한쪽에 영향이 가지 않는다.
 
-## 정리, 다음 글
+2. **requirements.txt로 환경 재현**
+   `proj-a`에서 `pip freeze > requirements.txt`를 만든 뒤, `proj-c`라는 새 폴더에서 그 파일로 동일 환경을 만드세요. `pip list` 결과가 `proj-a`와 같아야 합니다.
+   - 성공 기준: `pip list`로 비교한 패키지 목록과 버전이 완전히 일치한다.
 
-Python을 시작하는 데 필요한 것은 인터프리터 하나와 venv 습관입니다. system Python은 OS 도구로 두고, 내 모든 코드는 venv 안에서 돌립니다. 이 한 줄을 처음부터 지키면 환경 사고를 평생 겪지 않습니다.
+3. **system Python과 venv Python 구분**
+   venv 비활성화 상태와 활성화 상태에서 각각 `python3 -c "import sys; print(sys.executable)"`을 실행해서 경로 차이를 직접 보세요.
+   - 성공 기준: 비활성화 상태는 system 경로 (`/usr/bin/python3` 등), 활성화 상태는 `.venv` 안 경로가 나온다.
 
-다음 글에서는 Python의 변수, 타입, 연산자를 다룹니다. 동적 타입 언어가 어떻게 동작하는지, type hint가 왜 점점 표준이 되어 가는지를 살펴봅니다.
+## 정리
 
-## 참고 자료
+- system Python은 OS의 영역이다. 절대 `pip install`하지 않는다.
+- 프로젝트마다 `python3.12 -m venv .venv`로 격리된 환경을 만든다.
+- 활성화 후에는 `which python`으로 격리를 검증한다 — 이 한 단계가 미래의 버그 절반을 막는다.
+- `pip freeze > requirements.txt`로 환경을 문서화하고, 동료는 `pip install -r requirements.txt`로 재현한다.
+- venv 안에서는 `python`을 그대로 써도 좋지만, 활성화 전에는 항상 `python3`을 쓴다.
 
-- Python 공식 문서: venv — https://docs.python.org/3/library/venv.html
-- Python Packaging User Guide: pip — https://packaging.python.org/en/latest/tutorials/installing-packages/
-- pyenv — https://github.com/pyenv/pyenv
-- Real Python: Python Virtual Environments Primer — https://realpython.com/python-virtual-environments-a-primer/
+## 다음 글
+
+다음 글에서는 변수, 타입, 연산자를 다룹니다. Python의 동적 타입이 무엇을 의미하는지, type hint가 왜 필요한지, 정수·실수·문자열·bool·None이 어떻게 다르게 동작하는지 짚어 봅니다.
 
 <!-- toc:begin -->
 <!-- toc:end -->
 
-Tags: Python, install, venv, pip, version, beginner
+## 참고 자료
+
+- Python 공식 문서 — venv: https://docs.python.org/3/library/venv.html
+- Python 공식 문서 — pip user guide: https://pip.pypa.io/en/stable/user_guide/
+- PEP 405 — Python Virtual Environments: https://peps.python.org/pep-0405/
+- Python.org 다운로드: https://www.python.org/downloads/
+- Real Python — Python Virtual Environments Primer: https://realpython.com/python-virtual-environments-a-primer/
+
+Tags: Python, virtual-environments, environment-isolation, python-installation, package-management, developer-setup
