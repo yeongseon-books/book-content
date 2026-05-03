@@ -1,0 +1,54 @@
+id: sqlalchemy-101
+category: data
+title:
+  ko: SQLAlchemy 101
+  en: SQLAlchemy 101
+description:
+  ko: SQLAlchemy 2.x를 SQLite 기준으로 다루는 입문 시리즈. Engine·Connection·Core·ORM·Session·Unit of Work·Relationship·Loading 전략·Async·Production 패턴을 배웁니다.
+  en: A beginner-friendly SQLAlchemy 2.x tour using SQLite. Covers Engine, Connection, Core, ORM, Session, Unit of Work, relationships, loading strategies, async, and production patterns.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+tags:
+  - Python
+  - SQLAlchemy
+  - ORM
+  - SQLite
+articles:
+- idx: 1
+  slug: 01-sqlalchemy-2x-engine-connection
+  status: draft
+- idx: 2
+  slug: 02-core-metadata-table-types
+  status: draft
+- idx: 3
+  slug: 03-core-select-insert-update-delete
+  status: draft
+- idx: 4
+  slug: 04-orm-declarative-mapped-column
+  status: draft
+- idx: 5
+  slug: 05-session-unit-of-work-identity-map
+  status: draft
+- idx: 6
+  slug: 06-relationships-back-populates
+  status: draft
+- idx: 7
+  slug: 07-loading-strategies-n-plus-one
+  status: draft
+- idx: 8
+  slug: 08-events-hybrid-types
+  status: draft
+- idx: 9
+  slug: 09-async-aiosqlite
+  status: draft
+- idx: 10
+  slug: 10-production-patterns
+  status: draft
