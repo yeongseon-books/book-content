@@ -186,6 +186,20 @@ series:
   status: draft
   path: content/python-101
 
+
+- id: git-github-101
+  category: programming
+  title:
+    ko: Git & GitHub 101
+    en: Git & GitHub 101
+  description:
+    ko: Git의 commit, branch, merge, rebase, pull request, issue, GitHub workflow를 배우는 개발 협업 입문 시리즈.
+    en: A beginner guide to Git and GitHub covering commit, branch, merge, rebase, pull request, issue, and GitHub workflow for collaborative development.
+  languages:
+  - ko
+  - en
+  status: draft
+  path: content/git-github-101
 - id: azure-app-service-101
   category: azure
   title:
