@@ -21,8 +21,6 @@ last_reviewed: '2026-05-03'
 
 > AI Safety & Guardrails 101 Series (5/10)
 
-TBD - body to be written
-
 ---
 ## Section 1
 

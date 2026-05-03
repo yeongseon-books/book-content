@@ -21,8 +21,6 @@ last_reviewed: '2026-05-03'
 
 > AI Safety & Guardrails 101 시리즈 (7/10)
 
-TBD - 본문 작성 예정
-
 ---
 ## Section 1
 
