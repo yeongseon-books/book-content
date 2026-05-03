@@ -3,7 +3,7 @@ title: Feedback Loop — 실패를 고치게 만드는 반복 구조
 series: harness-engineering-101
 episode: 7
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

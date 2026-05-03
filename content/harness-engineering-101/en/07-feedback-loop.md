@@ -3,7 +3,7 @@ title: Feedback Loops — Building Structures That Let Agents Recover from Failu
 series: harness-engineering-101
 episode: 7
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

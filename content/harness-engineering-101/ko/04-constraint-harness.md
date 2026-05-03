@@ -3,7 +3,7 @@ title: Constraint Harness — 규칙, 경계, 금지 행동 정의하기
 series: harness-engineering-101
 episode: 4
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

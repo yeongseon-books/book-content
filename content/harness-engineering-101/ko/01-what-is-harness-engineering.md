@@ -3,7 +3,7 @@ title: Harness Engineering이란 무엇인가?
 series: harness-engineering-101
 episode: 1
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Observability — Tracing and Replaying Agent Work
 series: harness-engineering-101
 episode: 9
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

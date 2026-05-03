@@ -3,7 +3,7 @@ title: Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기
 series: harness-engineering-101
 episode: 3
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

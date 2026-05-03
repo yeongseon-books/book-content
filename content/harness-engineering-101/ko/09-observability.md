@@ -3,7 +3,7 @@ title: Observability — Agent 작업을 추적하고 재현하기
 series: harness-engineering-101
 episode: 9
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

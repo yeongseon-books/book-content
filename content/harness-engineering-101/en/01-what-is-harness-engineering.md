@@ -3,7 +3,7 @@ title: What Is Harness Engineering?
 series: harness-engineering-101
 episode: 1
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

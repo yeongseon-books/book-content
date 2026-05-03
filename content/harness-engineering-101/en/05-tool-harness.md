@@ -3,7 +3,7 @@ title: Tool Harness — Designing Safe Tools for Agents
 series: harness-engineering-101
 episode: 5
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기
 series: harness-engineering-101
 episode: 2
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

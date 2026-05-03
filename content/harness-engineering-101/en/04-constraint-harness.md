@@ -3,7 +3,7 @@ title: Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions
 series: harness-engineering-101
 episode: 4
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

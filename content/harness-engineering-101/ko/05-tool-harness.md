@@ -3,7 +3,7 @@ title: Tool Harness — Agent가 사용할 도구를 안전하게 설계하기
 series: harness-engineering-101
 episode: 5
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

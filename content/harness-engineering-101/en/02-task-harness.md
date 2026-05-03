@@ -3,7 +3,7 @@ title: Task Harness — Turning Vague Work into Executable Tasks
 series: harness-engineering-101
 episode: 2
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

@@ -3,7 +3,7 @@ title: Context Harness — Designing What the Agent Should Know and Not Know
 series: harness-engineering-101
 episode: 3
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

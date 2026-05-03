@@ -3,7 +3,7 @@ title: Approval Gate — 사람 승인이 필요한 지점 설계하기
 series: harness-engineering-101
 episode: 8
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

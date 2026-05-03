@@ -15,7 +15,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: content-ready
 tags:
   - AI Agent
   - Harness
@@ -24,31 +24,31 @@ tags:
 articles:
 - idx: 1
   slug: 01-what-is-harness-engineering
-  status: draft
+  status: content-ready
 - idx: 2
   slug: 02-task-harness
-  status: draft
+  status: content-ready
 - idx: 3
   slug: 03-context-harness
-  status: draft
+  status: content-ready
 - idx: 4
   slug: 04-constraint-harness
-  status: draft
+  status: content-ready
 - idx: 5
   slug: 05-tool-harness
-  status: draft
+  status: content-ready
 - idx: 6
   slug: 06-test-harness
-  status: draft
+  status: content-ready
 - idx: 7
   slug: 07-feedback-loop
-  status: draft
+  status: content-ready
 - idx: 8
   slug: 08-approval-gate
-  status: draft
+  status: content-ready
 - idx: 9
   slug: 09-observability
-  status: draft
+  status: content-ready
 - idx: 10
   slug: 10-production-harness
-  status: draft
+  status: content-ready

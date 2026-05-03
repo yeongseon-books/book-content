@@ -3,7 +3,7 @@ title: Approval Gates — Designing Where Humans Must Approve
 series: harness-engineering-101
 episode: 8
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

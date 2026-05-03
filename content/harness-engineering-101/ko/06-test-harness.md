@@ -3,7 +3,7 @@ title: Test Harness — 완료 조건을 테스트로 고정하기
 series: harness-engineering-101
 episode: 6
 language: ko
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true

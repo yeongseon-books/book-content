@@ -3,7 +3,7 @@ title: Test Harness — Turning Completion Criteria into Tests
 series: harness-engineering-101
 episode: 6
 language: en
-status: draft
+status: content-ready
 targets:
   tistory: true
   medium: true
