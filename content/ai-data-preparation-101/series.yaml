@@ -1,0 +1,54 @@
+id: ai-data-preparation-101
+category: ai
+title:
+  ko: AI Data Preparation 101
+  en: AI Data Preparation 101
+description:
+  ko: AI 모델을 위한 데이터 준비 전 과정을 다루는 입문 시리즈. 수집, 정제, PII 익명화, 토큰화, 품질 필터링, 합성 데이터, 분할과 오염 통제, 프로덕션 파이프라인까지 배웁니다.
+  en: A beginner-friendly guide to end-to-end data preparation for AI models, covering collection, cleaning, PII anonymization, tokenization, quality filtering, synthetic data, splitting with contamination control, and production pipelines.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: draft
+tags:
+  - Data Preparation
+  - ML Foundations
+  - Data Quality
+  - Pipelines
+articles:
+- idx: 1
+  slug: 01-why-data-preparation-matters
+  status: draft
+- idx: 2
+  slug: 02-source-data-collection-cataloging
+  status: draft
+- idx: 3
+  slug: 03-cleaning-deduplication
+  status: draft
+- idx: 4
+  slug: 04-pii-detection-anonymization
+  status: draft
+- idx: 5
+  slug: 05-tokenization-chunking
+  status: draft
+- idx: 6
+  slug: 06-quality-filtering
+  status: draft
+- idx: 7
+  slug: 07-synthetic-data-generation
+  status: draft
+- idx: 8
+  slug: 08-data-augmentation
+  status: draft
+- idx: 9
+  slug: 09-train-eval-test-splitting
+  status: draft
+- idx: 10
+  slug: 10-production-data-pipeline
+  status: draft
