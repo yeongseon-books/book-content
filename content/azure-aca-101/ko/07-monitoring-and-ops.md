@@ -12,8 +12,10 @@ targets:
 tags:
 - Azure
 - Container Apps
-- Serverless
-- Containers
+- Log Analytics
+- Application Insights
+- Observability
+- Monitoring
 last_reviewed: '2026-04-29'
 ---
 
@@ -21,69 +23,225 @@ last_reviewed: '2026-04-29'
 
 > Azure Container Apps 101 시리즈 (7/7)
 
-이번 글은 로그, 추적, 운영 절차를 함께 다룹니다. 여기서 가장 중요한 구분은 ACA가 기본으로 주는 플랫폼 로그와, 애플리케이션이 직접 내보내야 하는 Application Insights 추적이 같은 계층이 아니라는 점입니다.
+## 이 글에서 배울 것
 
----
+- ACA의 관측성이 어떤 계층으로 나뉘는지 이해합니다.
+- `ContainerAppConsoleLogs_CL`과 `ContainerAppSystemLogs_CL`의 차이를 구분할 수 있습니다.
+- Log Analytics에서 Revision 단위로 로그를 조회하는 KQL 쿼리를 작성할 수 있습니다.
+- Application Insights를 FastAPI 앱에 OpenTelemetry로 연결할 수 있습니다.
 
-## 관측성 지도
+## 왜 중요한가
 
-무슨 일이 있었는지는 Log Analytics에서 찾고.
-요청이 어디를 거쳤는지는 Application Insights에서 따라갑니다.
+production에서 ACA 앱이 5xx를 뱉기 시작했다고 가정해 봅시다.
+첫 번째 질문: "어느 revision에서 발생했는가?" — Log Analytics의 `RevisionName_s` 컬럼이 답합니다.
+두 번째 질문: "어느 dependency에서 막혔는가?" — Application Insights의 distributed trace가 답합니다.
+세 번째 질문: "replica가 몇 개까지 늘었는가?" — Azure Monitor metrics가 답합니다.
+
+**ACA가 자동으로 주는 것은 첫 번째 질문의 답까지입니다.** 두 번째와 세 번째는 앱이 직접 계측하거나 Diagnostic Settings를 켜야 합니다.
+이 경계를 이해하지 못하면 production incident에서 "왜 trace가 안 보이지?"를 한 시간씩 헤매게 됩니다.
+
+## Mental Model
+
+ACA 관측성은 세 개의 독립된 계층으로 나뉩니다.
+
+1. **Platform layer (Log Analytics)** — ACA가 자동으로 보냅니다. 컨테이너 stdout/stderr와 시스템 이벤트.
+2. **Application layer (Application Insights)** — 앱 코드가 SDK 또는 OpenTelemetry로 직접 보냅니다. distributed trace, custom metrics, dependency map.
+3. **Sidecar layer (Dapr telemetry)** — Dapr를 쓸 때만 의미가 있습니다. `--dapr-connection-string`은 이 계층 전용이지 일반 앱 추적이 아닙니다.
+
+세 계층은 같은 Application Insights 인스턴스로 합쳐서 볼 수도 있고 분리할 수도 있습니다.
+중요한 건 "이 신호가 어느 계층에서 오는가?"를 항상 의식하는 것입니다.
 
 ![로그와 추적이 모이는 관측 경로](../../../assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
----
 
-## 두 종류 로그
+## 핵심 개념
 
-- ContainerAppConsoleLogs_CL
-- ContainerAppSystemLogs_CL
+### 1. 두 종류의 platform log
 
----
+| 테이블 | 내용 | 주 사용처 |
+| --- | --- | --- |
+| `ContainerAppConsoleLogs_CL` | 컨테이너의 stdout/stderr | 앱 동작, 비즈니스 로그 추적 |
+| `ContainerAppSystemLogs_CL` | ACA 플랫폼 이벤트 (scaling, revision change, probe failure 등) | 플랫폼 의사결정 추적 |
 
-## KQL 예시
+`_CL` 접미사는 "Custom Log"의 약자입니다. 두 테이블 모두 Log Analytics workspace에 저장되며 KQL로 조회합니다.
+
+### 2. Revision은 가장 강력한 grouping key
+
+ACA는 모든 로그에 `RevisionName_s` 컬럼을 자동으로 채웁니다.
+production incident가 발생하면 첫 쿼리는 거의 항상 "어느 revision에서 에러가 늘었는가"입니다.
+
+### 3. Application Insights connection의 두 경로
+
+- **앱 직접 계측** — `APPLICATIONINSIGHTS_CONNECTION_STRING` 환경변수로 connection string을 주고, OpenTelemetry SDK로 export.
+- **Dapr telemetry** — `az containerapp env update --dapr-instrumentation-key`로 사이드카가 보내는 텔레메트리. 앱 코드 추적과는 별개.
+
+## Before-After
+
+### Before (관측 없이 운영)
+
+```bash
+az containerapp create \
+  --name fastapi-aca-demo --resource-group $RG --environment $ACA_ENV \
+  --image $IMAGE --ingress external --target-port 8000
+```
+
+incident 발생 시:
+- "어디서 5xx가 나는지 모름" → SSH도 안 되는 ACA에서 디버깅 불가능.
+- 컨테이너 재시작되면 stdout 로그도 사라짐.
+
+### After (Log Analytics + App Insights 연결)
+
+```bash
+# 1. Environment 만들 때 Log Analytics workspace 연결
+az containerapp env create \
+  --name $ACA_ENV --resource-group $RG --location koreacentral \
+  --logs-workspace-id $LOG_WORKSPACE_ID \
+  --logs-workspace-key $LOG_WORKSPACE_KEY
+
+# 2. 앱에 App Insights connection string 주입
+az containerapp create \
+  --name fastapi-aca-demo --resource-group $RG --environment $ACA_ENV \
+  --image $IMAGE --ingress external --target-port 8000 \
+  --env-vars "APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONN"
+```
+
+incident 발생 시:
+- KQL 한 줄로 revision 단위 에러 추적.
+- App Insights에서 trace, dependency, exception 자동 수집.
+
+## 단계별 실습
+
+### Step 1: Log Analytics workspace 만들기
+
+```bash
+RG=rg-aca-demo
+LOG_WS=aca-logs
+
+az monitor log-analytics workspace create \
+  --resource-group $RG --workspace-name $LOG_WS
+
+LOG_WORKSPACE_ID=$(az monitor log-analytics workspace show \
+  --resource-group $RG --workspace-name $LOG_WS \
+  --query customerId -o tsv)
+
+LOG_WORKSPACE_KEY=$(az monitor log-analytics workspace get-shared-keys \
+  --resource-group $RG --workspace-name $LOG_WS \
+  --query primarySharedKey -o tsv)
+```
+
+### Step 2: ACA Environment에 연결
+
+```bash
+az containerapp env create \
+  --name aca-env-demo --resource-group $RG --location koreacentral \
+  --logs-workspace-id $LOG_WORKSPACE_ID \
+  --logs-workspace-key $LOG_WORKSPACE_KEY
+```
+
+### Step 3: KQL로 로그 조회
+
+Azure Portal → Log Analytics workspace → Logs 에서:
 
 ```kusto
+// 최근 100건의 console 로그
 ContainerAppConsoleLogs_CL
 | where ContainerAppName_s == "fastapi-aca-demo"
 | project Time=TimeGenerated, Revision=RevisionName_s, Message=Log_s
-| take 100
+| top 100 by Time desc
 
+// Revision별 에러 카운트
+ContainerAppConsoleLogs_CL
+| where ContainerAppName_s == "fastapi-aca-demo"
+| where Log_s contains "ERROR"
+| summarize ErrorCount=count() by RevisionName_s
+| order by ErrorCount desc
+
+// Scaling 이벤트
 ContainerAppSystemLogs_CL
 | where ContainerAppName_s == "fastapi-aca-demo"
-| project Time=TimeGenerated, Revision=RevisionName_s, Message=Log_s
-| take 100
+| where Log_s contains "Scal"
+| project Time=TimeGenerated, Message=Log_s
+| top 50 by Time desc
 ```
 
----
+### Step 4: Application Insights 연결 (FastAPI)
 
-## Revision 비교
+```bash
+AI_NAME=aca-appinsights
+az monitor app-insights component create \
+  --app $AI_NAME --location koreacentral --resource-group $RG \
+  --workspace $LOG_WORKSPACE_ID
 
-```kusto
-ContainerAppConsoleLogs_CL
-| where ContainerAppName_s == "fastapi-aca-demo"
-| summarize count() by RevisionName_s
-| order by count_ desc
+AI_CONN=$(az monitor app-insights component show \
+  --app $AI_NAME --resource-group $RG --query connectionString -o tsv)
+
+az containerapp update \
+  --name fastapi-aca-demo --resource-group $RG \
+  --set-env-vars "APPLICATIONINSIGHTS_CONNECTION_STRING=$AI_CONN"
 ```
 
----
+FastAPI 앱 코드:
 
-## Application Insights
+```python
+from azure.monitor.opentelemetry import configure_azure_monitor
+from fastapi import FastAPI
 
-Application Insights는 분산 추적과 dependency 분석에 강하지만, Environment를 만들었다고 해서 앱 추적이 자동으로 완성되지는 않습니다.
+configure_azure_monitor()  # APPLICATIONINSIGHTS_CONNECTION_STRING 자동 인식
+app = FastAPI()
 
-- **Log Analytics**는 ACA 환경의 플랫폼 로그와 컨테이너 로그를 저장합니다.
-- **Application Insights**는 앱 코드가 SDK나 OpenTelemetry를 통해 직접 텔레메트리를 보내야 의미가 생깁니다.
-- **Dapr telemetry**는 별도 신호입니다. `--dapr-connection-string`은 Dapr 사이드카 텔레메트리용이지, 일반 애플리케이션 추적 설정이 아닙니다.
+@app.get("/")
+def root():
+    return {"status": "ok"}
+```
 
-즉, 플랫폼 가시성은 Log Analytics로 확보하고, 애플리케이션 추적은 앱 계측으로 붙이고, Dapr 연결 문자열은 정말 사이드카 수준 텔레메트리가 필요할 때만 구분해서 써야 합니다.
+`requirements.txt`에 `azure-monitor-opentelemetry`를 추가하면 trace, request, dependency가 자동 수집됩니다.
 
----
+## 자주 하는 실수
 
-## 운영에서 기억할 점
+- **Environment 만든 뒤 Log Analytics 연결을 잊음** — 로그가 ACA portal blade에서만 보이고 KQL로 조회 불가.
+- **App Insights connection string을 secret이 아닌 env-var로만 관리** — 운영 환경에서는 `--secrets`로 보호하는 편이 안전합니다.
+- **Application Insights를 켜면 trace가 자동 수집된다고 오해** — connection string 주입만으로는 부족합니다. 앱이 OpenTelemetry SDK로 export해야 합니다.
+- **Dapr telemetry와 앱 telemetry를 혼동** — `--dapr-instrumentation-key`는 사이드카 전용이지 앱 추적 설정이 아닙니다.
+- **Log retention을 기본값으로 둠** — Log Analytics 기본 retention은 30일입니다. 컴플라이언스 요구가 있으면 늘려야 합니다.
 
-- 로그 조회는 항상 Revision 기준으로 시작하는 편이 빠릅니다.
-- system logs는 플랫폼 판단을, console logs는 앱 동작을 읽는 데 더 적합합니다.
-- Application Insights와 Dapr telemetry는 플랫폼 로그 위에 선택적으로 얹는 별도 계층으로 이해해야 합니다.
+## 실무에서
+
+production checklist:
+
+- **Diagnostic Settings 활성화** — Log Analytics + Storage Account(장기 보관) 둘 다 연결.
+- **Alert rule 구성** — KQL 기반 alert로 "특정 revision에서 5xx 비율 5% 초과" 같은 조건을 트리거.
+- **Workbook 만들기** — Revision별 latency, error rate, replica count를 한 화면에 정리.
+- **Cost 관리** — Application Insights는 ingestion 양으로 과금됩니다. sampling rate 조정 필수.
+- **OpenTelemetry 표준** — Azure Monitor 전용 SDK보다 OTel SDK + Azure Monitor exporter가 vendor lock-in을 줄입니다.
+
+## 체크리스트
+
+- [ ] ACA Environment에 Log Analytics workspace가 연결되어 있는가?
+- [ ] `ContainerAppConsoleLogs_CL`과 `ContainerAppSystemLogs_CL` 모두 데이터가 들어오고 있는가?
+- [ ] Application Insights connection string이 secret으로 관리되고 있는가?
+- [ ] FastAPI 앱이 OpenTelemetry로 trace를 export하는가?
+- [ ] Revision 단위로 에러를 grouping하는 KQL alert이 구성되어 있는가?
+- [ ] Log retention 기간이 컴플라이언스 요구에 맞는가?
+
+## 연습 문제
+
+1. 새 revision을 배포한 직후 5xx 비율이 급증했습니다. 이전 revision과 새 revision의 에러율을 비교하는 KQL 쿼리를 작성해 보세요.
+2. App Insights connection string을 환경변수로 평문 노출하는 것과 secret으로 주입하는 것의 차이는 무엇입니까?
+3. Dapr를 쓰지 않는 단순 FastAPI 앱에서 `--dapr-instrumentation-key`를 설정할 필요가 있을까요? 왜 그런가요?
+
+## 정리·다음 글
+
+이번 글의 핵심:
+
+- ACA 관측성은 platform / application / sidecar 세 계층으로 나뉩니다.
+- Log Analytics는 `_CL` 테이블로 console과 system 로그를 자동 저장합니다.
+- Application Insights는 앱이 직접 OpenTelemetry로 export해야 의미가 생깁니다.
+- Revision은 가장 강력한 incident grouping key입니다.
+
+이로써 **Azure Container Apps 101 시리즈 7편이 모두 끝났습니다.**
+지금까지 ACA의 개념(1편), 구조(2편), 첫 배포(3편), 트래픽 분할(4편), 스케일링(5편), Dapr 통합(6편), 그리고 이번 7편의 관측성을 다뤘습니다.
+
+다음 단계로는 동일한 접근을 **Azure App Service 101**, **Azure AKS 101**, **Azure Functions 101**에서 비교하며 학습하실 수 있습니다.
+서버리스 컨테이너 플랫폼 선택의 trade-off를 이해하는 데 도움이 됩니다.
 
 ---
 
@@ -109,10 +267,11 @@ Application Insights는 분산 추적과 dependency 분석에 강하지만, Envi
 - [Observability in Azure Container Apps — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/observability)
 - [Azure Monitor Application Insights overview — Microsoft Learn](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
 - [Azure Container Apps environments — Microsoft Learn](https://learn.microsoft.com/en-us/azure/container-apps/environment)
+- [Azure Monitor OpenTelemetry distro for Python](https://learn.microsoft.com/en-us/azure/azure-monitor/app/opentelemetry-enable?tabs=python)
 
 ### 관련 시리즈
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
-Tags: Azure, Container Apps, Serverless, Containers
+Tags: Azure, Container Apps, Log Analytics, Application Insights, Observability, Monitoring
