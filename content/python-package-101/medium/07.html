@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CLI Packages</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>CLI Packages</h1>
+<blockquote>
+<p>Python Package 101 series (7/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How do you create a command that runs directly in the terminal after <code>pip install</code>?</li>
+<li>How does a <code>[project.scripts]</code> entry point work?</li>
+<li>What is the difference between <code>argparse</code> and <code>click</code>?</li>
+<li>How do you build a subcommand structure?</li>
+</ul>
+<blockquote>
+<p>An entry point registers a terminal command that runs after <code>pip install</code>, and click is a library for building CLI interfaces declaratively.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>How to register a CLI entry point with <code>[project.scripts]</code></li>
+<li>How to build a basic CLI with <code>argparse</code></li>
+<li>How to build a declarative CLI with <code>click</code></li>
+<li>How to implement subcommand structures</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Running <code>mytool</code> directly is more convenient than <code>python my_script.py</code>. When you set an entry point in your package, <code>pip install</code> makes the command available in the terminal immediately.</p>
+<blockquote>
+<p>Your team runs a data conversion script as <code>python /opt/scripts/convert.py --input data.csv</code>. Everyone has to remember the path and invoke Python directly.</p>
+</blockquote>
+<p>After <code>pip install mytools</code>, running <code>convert --input data.csv</code> is far simpler.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>An entry point is like installing an app from the app store and getting an icon on your home screen. <code>pip install</code> is the installation and the entry point is the icon. Tapping the icon (typing the command) launches the app (Python function).</p>
+</blockquote>
+<pre><code class="language-text">pyproject.toml                     Terminal
+─────────────                     ──────
+[project.scripts]                 $ greet Alice
+greet = &quot;mylib.cli:main&quot;    →    Hello, Alice!
+         ↓
+   runs the main() function in mylib/cli.py
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>entry point</strong><br>
+- Description: Executable command registered on package install<br>
+- Example: <code>greet = "mylib.cli:main"</code></p>
+<p><strong>[project.scripts]</strong><br>
+- Description: pyproject.toml section for CLI entry points<br>
+- Example: see above</p>
+<p><strong>argparse</strong><br>
+- Description: Python built-in CLI argument parser<br>
+- Example: <code>parser.add_argument('--name')</code></p>
+<p><strong>click</strong><br>
+- Description: Decorator-based CLI framework<br>
+- Example: <code>@click.command()</code></p>
+<p><strong>subcommand</strong><br>
+- Description: A command nested under a parent command<br>
+- Example: <code>git commit</code>, <code>git push</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (run script directly)</strong></p>
+<pre><code class="language-bash">python /path/to/mylib/cli.py --name Alice
+# must remember the path, must invoke python
+</code></pre>
+<p><strong>After (entry point)</strong></p>
+<pre><code class="language-bash">pip install mylib
+greet --name Alice
+# runs anywhere, no python invocation needed
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Build a basic CLI with argparse</strong></p>
+<pre><code class="language-python"># src/mylib/cli.py
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description=&quot;Greet someone&quot;)
+    parser.add_argument(&quot;name&quot;, help=&quot;Name to greet&quot;)
+    parser.add_argument(&quot;--count&quot;, type=int, default=1, help=&quot;Number of greetings&quot;)
+    args = parser.parse_args()
+
+    for i in range(args.count):
+        print(f&quot;[{i+1}] Hello, {args.name}!&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p><strong>Step 2. Register the entry point in pyproject.toml</strong></p>
+<pre><code class="language-toml">[project.scripts]
+greet = &quot;mylib.cli:main&quot;
+</code></pre>
+<pre><code class="language-bash">pip install -e .
+greet Alice
+# [1] Hello, Alice!
+
+greet Alice --count 3
+# [1] Hello, Alice!
+# [2] Hello, Alice!
+# [3] Hello, Alice!
+</code></pre>
+<p><strong>Step 3. Refactor with click</strong></p>
+<pre><code class="language-python"># src/mylib/cli.py
+import click
+
+@click.command()
+@click.argument(&quot;name&quot;)
+@click.option(&quot;--count&quot;, default=1, help=&quot;Number of greetings&quot;)
+def main(name: str, count: int):
+    &quot;&quot;&quot;Greet someone.&quot;&quot;&quot;
+    for i in range(count):
+        click.echo(f&quot;[{i+1}] Hello, {name}!&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<pre><code class="language-toml"># Add click dependency to pyproject.toml
+[project]
+dependencies = [&quot;click&gt;=8.0&quot;]
+</code></pre>
+<pre><code class="language-bash">pip install -e .
+greet Alice --count 3
+greet --help
+# Usage: greet [OPTIONS] NAME
+#   Greet someone.
+# Options:
+#   --count INTEGER  Number of greetings
+#   --help           Show this message and exit.
+</code></pre>
+<p><strong>Step 4. Subcommand structure</strong></p>
+<pre><code class="language-python"># src/mylib/cli.py
+import click
+
+@click.group()
+def main():
+    &quot;&quot;&quot;mylib CLI tool.&quot;&quot;&quot;
+    pass
+
+@main.command()
+@click.argument(&quot;name&quot;)
+def greet(name: str):
+    &quot;&quot;&quot;Greet someone.&quot;&quot;&quot;
+    click.echo(f&quot;Hello, {name}!&quot;)
+
+@main.command()
+@click.argument(&quot;path&quot;, type=click.Path(exists=True))
+def check(path: str):
+    &quot;&quot;&quot;Check a file.&quot;&quot;&quot;
+    click.echo(f&quot;Checking: {path}&quot;)
+</code></pre>
+<pre><code class="language-bash">pip install -e .
+greet                    # prints usage
+greet greet Alice        # Hello, Alice!
+greet check README.md    # Checking: README.md
+</code></pre>
+<p><strong>Step 5. Error handling and exit codes</strong></p>
+<pre><code class="language-python">import sys
+import click
+
+@click.command()
+@click.argument(&quot;path&quot;, type=click.Path())
+def main(path: str):
+    &quot;&quot;&quot;Process a file.&quot;&quot;&quot;
+    try:
+        with open(path) as f:
+            lines = f.readlines()
+        click.echo(f&quot;Processed {len(lines)} lines&quot;)
+    except FileNotFoundError:
+        click.echo(f&quot;Error: {path} not found&quot;, err=True)
+        sys.exit(1)
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>The entry point <code>"mylib.cli:main"</code> points to the <code>main</code> function in the <code>mylib/cli.py</code> module</li>
+<li>The <code>@click.command()</code> decorator turns a function into a CLI command</li>
+<li><code>click.echo</code> is safer than <code>print</code> for Unicode and piped output</li>
+<li><code>err=True</code> sends error messages to stderr</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Not reinstalling after changing the entry point</strong></p>
+<p>When you modify <code>[project.scripts]</code>, you must run <code>pip install -e .</code> again. Even editable installs require reinstallation for entry point changes.</p>
+<p><strong>Mistake 2. Adding parameters to main()</strong></p>
+<pre><code class="language-python"># Wrong: entry point cannot pass arguments on its own
+def main(name: str): ...
+
+# Correct: let argparse/click handle arguments
+def main():
+    parser = argparse.ArgumentParser()
+    ...
+</code></pre>
+<p><strong>Mistake 3. Putting if <strong>name</strong> inside the entry point function</strong></p>
+<p><code>if __name__ == "__main__": main()</code> belongs at the end of the file. It supports both entry point and <code>python -m</code> execution.</p>
+<p><strong>Mistake 4. Not returning proper exit codes</strong></p>
+<p>CLI tools should return 0 on success and 1 or higher on failure. Pipelines use exit codes to decide whether to continue.</p>
+<p><strong>Mistake 5. Not checking --help output</strong></p>
+<p><code>--help</code> is the first documentation users see. Missing or inaccurate descriptions cause confusion.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Dev tools</strong>: <code>ruff</code>, <code>black</code>, and <code>pytest</code> are all CLI packages registered via entry points</li>
+<li><strong>Data pipelines</strong>: Build CLI tools for CSV conversion, API calls, etc. and run them from cron</li>
+<li><strong>DevOps tools</strong>: Distribute deployment, monitoring, and config management CLIs as internal packages</li>
+<li><strong>Prototyping</strong>: Build a quick CLI with <code>click</code>, then add a web UI later</li>
+<li><strong>Testing</strong>: Use <code>click.testing.CliRunner</code> to verify CLI output programmatically</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>The most important thing when building a CLI is a <strong>consistent interface</strong>. Standardizing common options like <code>--verbose</code>, <code>--output</code>, and <code>--format</code> lets users work intuitively.</p>
+<p><code>argparse</code> has no external dependencies and is lightweight, but <code>click</code> includes subcommands, prompts, colored output, and a test runner out of the box, making it more productive in practice. For a library, <code>argparse</code> is fine; for a standalone CLI tool, <code>click</code> is the better fit.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can register an entry point with <code>[project.scripts]</code></li>
+<li>[ ] You can build a basic CLI with <code>argparse</code></li>
+<li>[ ] You can build a decorator-based CLI with <code>click</code></li>
+<li>[ ] You can implement subcommands with <code>click.group</code></li>
+<li>[ ] You can handle exit codes and stderr output correctly</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Build a CLI with <code>argparse</code> that takes two numbers and performs arithmetic (<code>calc add 3 5</code>, <code>calc mul 2 4</code>).</li>
+<li>Refactor the same CLI using <code>click</code> and compare the <code>--help</code> output.</li>
+<li>Write a pytest that uses <code>click.testing.CliRunner</code> to test CLI output.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li><code>[project.scripts]</code> registers CLI commands available immediately after <code>pip install</code>.</li>
+<li>An entry point uses <code>"module:function"</code> format to specify the function to execute.</li>
+<li><code>argparse</code> is built-in; <code>click</code> is a decorator-based framework that is more productive.</li>
+<li><code>click.group()</code> creates subcommand structures.</li>
+<li>CLIs should return 0 on success and 1 or higher on failure.</li>
+</ul>
+<p>The next post covers <strong>type hints and static analysis</strong> — mypy, py.typed, and type-safe packages.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/03-dependency-management.md">Dependency Management — venv, pip, uv, requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/04-building-packages.md">Building Packages — wheel and sdist</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/05-publishing-to-pypi.md">Publishing to PyPI — from TestPyPI to production</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/06-versioning-and-releases.md">Versioning and Releases</a></li>
+<li><strong>CLI Packages (current)</strong></li>
+<li>Type Hints and Static Analysis (upcoming)</li>
+<li>Documentation — README, MkDocs, API Reference (upcoming)</li>
+<li>Production Package Template (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://packaging.python.org/en/latest/specifications/entry-points/">Python Packaging - Entry Points</a></li>
+<li><a href="https://click.palletsprojects.com/">click documentation</a></li>
+<li><a href="https://docs.python.org/3/library/argparse.html">argparse documentation</a></li>
+<li><a href="https://realpython.com/python-click/">Real Python - Python CLI with Click</a></li>
+</ul>
+<p class="tags-line">Tags: Python, CLI, Entry Point, click, argparse, Command Line</p>
+</body>
+</html>

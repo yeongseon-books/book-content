@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dependency Management — venv, pip, uv, requirements</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Dependency Management — venv, pip, uv, requirements</h1>
+<blockquote>
+<p>Python Package 101 series (3/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Why do we need virtual environments and how do they work?</li>
+<li>What is the relationship between <code>pip freeze</code> and <code>requirements.txt</code>?</li>
+<li>How does <code>uv</code> differ from <code>pip</code>?</li>
+<li>How do pyproject.toml <code>dependencies</code> and <code>requirements.txt</code> differ?</li>
+</ul>
+<blockquote>
+<p>A virtual environment gives each project its own package space, and dependency management records which packages at which versions are needed.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>How to create and activate a virtual environment with <code>python -m venv</code></li>
+<li>How to manage dependencies with <code>pip install</code> and <code>pip freeze</code></li>
+<li>The difference between <code>requirements.txt</code> and pyproject.toml <code>dependencies</code></li>
+<li>How to manage environments and packages faster with <code>uv</code></li>
+</ul>
+<h2>Why it matters</h2>
+<p>Project A uses <code>requests==2.28</code> and Project B uses <code>requests==2.31</code>. Installing both into the system Python causes version conflicts.</p>
+<blockquote>
+<p>You ran <code>pip install requests==2.28</code> for Project A, and Project B broke. B was using a feature added in 2.31.</p>
+</blockquote>
+<p>Virtual environments solve this by giving each project an isolated <code>site-packages</code> directory.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A virtual environment is like giving each project its own refrigerator. If everyone shares one fridge (system Python), someone might accidentally use your ingredients. A dedicated fridge keeps your project safe from others.</p>
+</blockquote>
+<pre><code class="language-text">System Python               Virtual Environment
+─────────────              ─────────────────────
+site-packages/             project-a/.venv/site-packages/
+  requests 2.28               requests 2.28
+  flask 2.3
+                           project-b/.venv/site-packages/
+                              requests 2.31
+                              django 4.2
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>venv</strong><br>
+- Description: Python built-in virtual environment module<br>
+- Example: <code>python -m venv .venv</code></p>
+<p><strong>site-packages</strong><br>
+- Description: Directory where packages are installed<br>
+- Example: <code>.venv/lib/python3.11/site-packages/</code></p>
+<p><strong>pip freeze</strong><br>
+- Description: Prints installed packages with exact versions<br>
+- Example: <code>pip freeze &gt; requirements.txt</code></p>
+<p><strong>requirements.txt</strong><br>
+- Description: Version-pinned file for reproducible installs<br>
+- Example: <code>requests==2.31.0</code></p>
+<p><strong>uv</strong><br>
+- Description: High-speed package manager written in Rust<br>
+- Example: <code>uv pip install requests</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (shared system Python)</strong></p>
+<pre><code class="language-bash">pip install requests==2.28   # for Project A
+pip install requests==2.31   # for Project B → A breaks
+</code></pre>
+<p><strong>After (isolated virtual environments)</strong></p>
+<pre><code class="language-bash">cd project-a &amp;&amp; python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install requests==2.28   # project-a only
+
+cd project-b &amp;&amp; python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install requests==2.31   # project-b only
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Create a virtual environment</strong></p>
+<pre><code class="language-bash">cd ~/practice/mylib-project
+python -m venv .venv
+source .venv/bin/activate    # macOS/Linux
+# .venv\Scripts\activate     # Windows
+
+which python
+# /home/user/practice/mylib-project/.venv/bin/python
+</code></pre>
+<p><strong>Step 2. Install packages and freeze</strong></p>
+<pre><code class="language-bash">pip install requests flask
+pip list
+# requests  2.31.0
+# flask     3.0.0
+# ...
+
+pip freeze &gt; requirements.txt
+cat requirements.txt
+# blinker==1.7.0
+# certifi==2024.2.2
+# flask==3.0.0
+# requests==2.31.0
+# ...
+</code></pre>
+<p><strong>Step 3. Reproduce with requirements.txt</strong></p>
+<pre><code class="language-bash"># Install the same packages in another environment
+deactivate
+python -m venv .venv-test
+source .venv-test/bin/activate
+pip install -r requirements.txt
+pip list  # same packages, same versions
+</code></pre>
+<p><strong>Step 4. pyproject.toml dependencies</strong></p>
+<pre><code class="language-toml"># pyproject.toml
+[project]
+name = &quot;mylib&quot;
+version = &quot;0.1.0&quot;
+dependencies = [
+    &quot;requests&gt;=2.28&quot;,
+    &quot;flask&gt;=3.0&quot;,
+]
+
+[project.optional-dependencies]
+dev = [
+    &quot;pytest&gt;=7.0&quot;,
+    &quot;ruff&gt;=0.1&quot;,
+]
+</code></pre>
+<pre><code class="language-bash">pip install -e .            # install dependencies
+pip install -e &quot;.[dev]&quot;     # install dev dependencies too
+</code></pre>
+<p><strong>Step 5. Manage faster with uv</strong></p>
+<pre><code class="language-bash">pip install uv
+
+uv venv .venv               # create venv (0.1 seconds)
+source .venv/bin/activate
+uv pip install requests     # install (10-100x faster than pip)
+uv pip freeze               # freeze
+uv pip install -r requirements.txt  # reproduce
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li><code>source .venv/bin/activate</code> prepends <code>.venv/bin</code> to <code>PATH</code> so the virtual environment Python takes priority</li>
+<li><code>pip freeze</code> outputs all transitive dependencies, not just the packages you installed directly</li>
+<li>pyproject.toml <code>dependencies</code> uses minimum versions (<code>&gt;=</code>) while <code>requirements.txt</code> uses exact versions (<code>==</code>)</li>
+<li><code>uv</code> is a drop-in replacement for pip with the same command structure but much faster execution</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Committing the virtual environment to Git</strong></p>
+<p><code>.venv/</code> is tens of megabytes and OS-specific. Add <code>.venv/</code> to <code>.gitignore</code>.</p>
+<p><strong>Mistake 2. Putting pip freeze output directly into dependencies</strong></p>
+<pre><code class="language-toml"># Wrong: exact versions in pyproject.toml reduce compatibility
+dependencies = [&quot;requests==2.31.0&quot;, &quot;certifi==2024.2.2&quot;]
+
+# Correct: minimum compatible version ranges
+dependencies = [&quot;requests&gt;=2.28&quot;]
+</code></pre>
+<p><strong>Mistake 3. Forgetting to activate the virtual environment</strong></p>
+<p><code>pip install</code> goes into the system Python. Check the path with <code>which python</code>.</p>
+<p><strong>Mistake 4. Not updating requirements.txt</strong></p>
+<p>If you forget to run <code>pip freeze &gt; requirements.txt</code> after adding or removing packages, other environments cannot reproduce yours.</p>
+<p><strong>Mistake 5. Confusing dependencies and requirements.txt</strong></p>
+<p><code>dependencies</code> answers "what does this package need to work?" while <code>requirements.txt</code> answers "what exactly is needed to reproduce this environment?"</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>CI/CD</strong>: Reproduce the build environment with <code>pip install -r requirements.txt</code></li>
+<li><strong>Docker</strong>: Use <code>COPY requirements.txt . &amp;&amp; pip install -r requirements.txt</code> to leverage layer caching</li>
+<li><strong>Dev dependency separation</strong>: Use <code>[project.optional-dependencies]</code> to separate prod and dev dependencies</li>
+<li><strong>Security auditing</strong>: Scan installed packages for vulnerabilities with <code>pip audit</code></li>
+<li><strong>Speed improvement</strong>: Cut CI/CD install times by 10x with <code>uv</code></li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>The core of dependency management is <strong>reproducibility</strong>. "It works on my machine" almost always comes from environment differences. Pinning exact versions with <code>requirements.txt</code> (or <code>uv.lock</code>) ensures identical results everywhere.</p>
+<p><code>uv</code> is rapidly becoming the standard. It handles virtual environment creation, package installation, and lock file generation in a single tool, running 10-100x faster than pip. For new projects, consider <code>uv</code> first.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can create and activate a virtual environment with <code>python -m venv</code></li>
+<li>[ ] You can pin your environment with <code>pip freeze &gt; requirements.txt</code></li>
+<li>[ ] You can explain the difference between pyproject.toml <code>dependencies</code> and <code>requirements.txt</code></li>
+<li>[ ] You can separate dev dependencies with <code>optional-dependencies</code></li>
+<li>[ ] You know the basics of <code>uv</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a new virtual environment, install <code>httpx</code> and <code>rich</code>, and generate a <code>requirements.txt</code>.</li>
+<li>Write both <code>dependencies</code> and <code>[project.optional-dependencies]</code> <code>dev</code> in pyproject.toml, and install with <code>pip install -e ".[dev]"</code>.</li>
+<li>Install <code>uv</code> and use <code>uv venv</code> + <code>uv pip install</code> to feel the speed difference compared to <code>pip</code>.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>Virtual environments provide each project with an isolated package space.</li>
+<li><code>pip freeze</code> pins exact versions, and <code>requirements.txt</code> reproduces them.</li>
+<li>pyproject.toml <code>dependencies</code> records minimum compatible versions; <code>requirements.txt</code> records exact versions.</li>
+<li><code>optional-dependencies</code> separates development-only packages.</li>
+<li><code>uv</code> is a high-speed pip replacement that is rapidly becoming the standard.</li>
+</ul>
+<p>The next post covers <strong>building packages</strong> — wheel and sdist.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
+<li><strong>Dependency Management — venv, pip, uv, requirements (current)</strong></li>
+<li>Building Packages — wheel and sdist (upcoming)</li>
+<li>Publishing to PyPI — from TestPyPI to production (upcoming)</li>
+<li>Versioning and Releases (upcoming)</li>
+<li>CLI Packages (upcoming)</li>
+<li>Type Hints and Static Analysis (upcoming)</li>
+<li>Documentation — README, MkDocs, API Reference (upcoming)</li>
+<li>Production Package Template (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://packaging.python.org/en/latest/tutorials/managing-dependencies/">Python Packaging User Guide - Managing Dependencies</a></li>
+<li><a href="https://peps.python.org/pep-0405/">PEP 405 - Python Virtual Environments</a></li>
+<li><a href="https://github.com/astral-sh/uv">uv - An extremely fast Python package installer</a></li>
+<li><a href="https://pip.pypa.io/en/stable/user_guide/#requirements-files">pip documentation - Requirements Files</a></li>
+</ul>
+<p class="tags-line">Tags: Python, venv, pip, uv, Dependencies, Virtual Environment</p>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Production Package Template</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Production Package Template</h1>
+<blockquote>
+<p>Python Package 101 series (10/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How do you automate the repetitive setup that comes with every new package?</li>
+<li>What is the difference between cookiecutter and copier?</li>
+<li>When should you use a GitHub Template Repository?</li>
+<li>How do you combine everything from this series into a single template?</li>
+</ul>
+<blockquote>
+<p>A package template automates the repetitive setup work when starting a project, and cookiecutter and copier are the tools that make it happen.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>How to create project templates with cookiecutter and copier</li>
+<li>How to use GitHub Template Repositories</li>
+<li>A production template structure that integrates everything from this series</li>
+<li>A complete package setup with CI/CD, docs, and tests</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Writing pyproject.toml, src layout, mypy config, CI/CD, README, and .gitignore from scratch for every new package is inefficient. With a well-built template, you can start a production-grade project in 30 seconds.</p>
+<blockquote>
+<p>Every time your team creates a new microservice, someone copies config files from an existing project. Unnecessary code gets carried over, and forgetting to change the package name in pyproject.toml breaks CI.</p>
+</blockquote>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A template is a cookie cutter. You provide the dough (project name, description) and the same shaped cookie (project structure) comes out every time. A well-made cutter produces consistent quality projects.</p>
+</blockquote>
+<pre><code class="language-text">cookiecutter/copier + template
+        +
+  user input (name, description)
+        ↓
+  complete project structure
+    src/mylib/
+    tests/
+    pyproject.toml
+    .github/workflows/
+    README.md
+    ...
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>cookiecutter</strong><br>
+- Description: Jinja2-based project template tool<br>
+- Example: <code>cookiecutter gh:user/template</code></p>
+<p><strong>copier</strong><br>
+- Description: Updatable project template tool<br>
+- Example: <code>copier copy gh:user/template .</code></p>
+<p><strong>GitHub Template</strong><br>
+- Description: GitHub feature to use a repo as a template<br>
+- Example: "Use this template" button</p>
+<p><strong>Jinja2</strong><br>
+- Description: Template variable substitution syntax<br>
+- Example: <code>{{ project_name }}</code></p>
+<p><strong>.github/workflows</strong><br>
+- Description: GitHub Actions CI/CD configuration<br>
+- Example: <code>ci.yml</code>, <code>publish.yml</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (manual setup)</strong></p>
+<pre><code class="language-bash">mkdir myproject &amp;&amp; cd myproject
+# write pyproject.toml (10 min)
+# set up src layout (5 min)
+# write .gitignore, README (5 min)
+# configure CI/CD (15 min)
+# configure mypy, ruff (5 min)
+# → 40 minutes before writing the first line of code
+</code></pre>
+<p><strong>After (template)</strong></p>
+<pre><code class="language-bash">copier copy gh:yourname/python-template myproject
+# Project name? myproject
+# Description? A useful tool
+# → 30 seconds, all config done, start coding immediately
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Design the production template structure</strong></p>
+<pre><code class="language-text">python-template/
+├── {{ project_slug }}/
+│   ├── src/
+│   │   └── {{ project_slug }}/
+│   │       ├── __init__.py
+│   │       ├── core.py
+│   │       ├── cli.py
+│   │       └── py.typed
+│   ├── tests/
+│   │   ├── __init__.py
+│   │   └── test_core.py
+│   ├── docs/
+│   │   ├── index.md
+│   │   └── api.md
+│   ├── .github/
+│   │   └── workflows/
+│   │       ├── ci.yml
+│   │       └── publish.yml
+│   ├── pyproject.toml
+│   ├── README.md
+│   ├── CHANGELOG.md
+│   ├── LICENSE
+│   ├── .gitignore
+│   └── mkdocs.yml
+└── copier.yml
+</code></pre>
+<p><strong>Step 2. Write the copier configuration</strong></p>
+<pre><code class="language-yaml"># copier.yml
+_subdirectory: &quot;{{ project_slug }}&quot;
+
+project_name:
+  type: str
+  help: &quot;Project name (e.g., My Library)&quot;
+
+project_slug:
+  type: str
+  default: &quot;{{ project_name | lower | replace(' ', '-') }}&quot;
+  help: &quot;Package directory name&quot;
+
+module_name:
+  type: str
+  default: &quot;{{ project_slug | replace('-', '_') }}&quot;
+  help: &quot;Python module name&quot;
+
+description:
+  type: str
+  default: &quot;A Python package&quot;
+
+author_name:
+  type: str
+  help: &quot;Author full name&quot;
+
+author_email:
+  type: str
+  help: &quot;Author email&quot;
+
+python_version:
+  type: str
+  default: &quot;3.11&quot;
+  choices: [&quot;3.9&quot;, &quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
+</code></pre>
+<p><strong>Step 3. Template pyproject.toml</strong></p>
+<pre><code class="language-toml">[build-system]
+requires = [&quot;setuptools&gt;=68.0&quot;]
+build-backend = &quot;setuptools.build_meta&quot;
+
+[project]
+name = &quot;{{ project_slug }}&quot;
+version = &quot;0.1.0&quot;
+description = &quot;{{ description }}&quot;
+requires-python = &quot;&gt;={{ python_version }}&quot;
+license = {text = &quot;MIT&quot;}
+authors = [
+    {name = &quot;{{ author_name }}&quot;, email = &quot;{{ author_email }}&quot;},
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    &quot;pytest&gt;=7.0&quot;,
+    &quot;mypy&gt;=1.0&quot;,
+    &quot;ruff&gt;=0.1&quot;,
+]
+
+[project.scripts]
+{{ project_slug }} = &quot;{{ module_name }}.cli:main&quot;
+
+[tool.setuptools.packages.find]
+where = [&quot;src&quot;]
+
+[tool.mypy]
+python_version = &quot;{{ python_version }}&quot;
+strict = true
+
+[tool.ruff]
+target-version = &quot;py{{ python_version | replace('.', '') }}&quot;
+
+[tool.ruff.lint]
+select = [&quot;E&quot;, &quot;F&quot;, &quot;I&quot;, &quot;UP&quot;]
+</code></pre>
+<p><strong>Step 4. CI/CD workflow template</strong></p>
+<pre><code class="language-yaml"># .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [&quot;{{ python_version }}&quot;]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ &quot;{{&quot; }} matrix.python-version {{ &quot;}}&quot; }}
+      - run: pip install -e &quot;.[dev]&quot;
+      - run: ruff check src/
+      - run: mypy src/
+      - run: pytest tests/
+</code></pre>
+<p><strong>Step 5. Generate a project from the template</strong></p>
+<pre><code class="language-bash">pip install copier
+copier copy ./python-template my-new-project
+
+# ? project_name: My New Project
+# ? project_slug: my-new-project
+# ? module_name: my_new_project
+# ? description: A useful Python tool
+# ? author_name: Your Name
+# ? author_email: you@example.com
+# ? python_version: 3.11
+
+cd my-new-project
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -e &quot;.[dev]&quot;
+pytest tests/    # 1 passed
+mypy src/        # Success
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>Copier's <code>{{ }}</code> syntax is the Jinja2 template engine, substituting user inputs into file contents and names</li>
+<li>Copier can push template updates to existing projects via <code>copier update</code>, giving it a maintenance advantage over cookiecutter</li>
+<li>The CI workflow runs <code>ruff check</code>, <code>mypy</code>, and <code>pytest</code> in sequence to ensure code quality</li>
+<li><code>[project.scripts]</code> is pre-configured so you can implement a CLI immediately</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Creating a template and never updating it</strong></p>
+<p>The Python ecosystem evolves fast. Regularly update dependency versions and settings in your template.</p>
+<p><strong>Mistake 2. Adding too many options</strong></p>
+<p>If the template asks more than 10 questions, users give up. Keep only essential options and set sensible defaults for the rest.</p>
+<p><strong>Mistake 3. Generated projects that do not pass tests immediately</strong></p>
+<p>A project generated from the template must pass <code>pip install -e ".[dev]" &amp;&amp; pytest</code> right away. A broken template loses trust.</p>
+<p><strong>Mistake 4. Using GitHub Template without variable substitution</strong></p>
+<p>GitHub Template copies the repository but does not replace variables in file contents. The name <code>my-template</code> remains as-is.</p>
+<p><strong>Mistake 5. Forgetting the license</strong></p>
+<p>Without a license, usage rights are legally ambiguous. Include MIT or Apache 2.0 by default.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Internal templates</strong>: Standardize team coding rules, CI/CD config, and common dependencies in a template</li>
+<li><strong>Open source kickstart</strong>: Reference public templates like hypermodern-python and scikit-hep</li>
+<li><strong>Microservices</strong>: Create service templates that include FastAPI + Docker + Kubernetes config</li>
+<li><strong>copier update</strong>: When you improve the template, apply changes to existing projects with <code>copier update</code></li>
+<li><strong>CI for templates</strong>: Test the template itself in CI by generating, building, and testing a project</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>A good template is a "snapshot of best practices." When your team encodes agreed-upon coding rules, CI/CD patterns, and documentation structure into a template, no one has to ask "how should I set this up?" for new projects.</p>
+<p>Choosing between cookiecutter and copier is straightforward: if you use the template once and move on, cookiecutter is fine; if you want template updates to propagate to existing projects, use copier. For new projects, copier is the recommended choice.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can create a project template with copier or cookiecutter</li>
+<li>[ ] Projects generated from the template pass tests immediately</li>
+<li>[ ] CI/CD workflows are included in the template</li>
+<li>[ ] You know when to use a GitHub Template Repository</li>
+<li>[ ] You can propagate template changes to existing projects with copier update</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Build a copier template that includes everything from this series (src layout, pyproject.toml, mypy, CLI entry point, README, CI).</li>
+<li>Generate a new project from the template and verify <code>pip install -e ".[dev]" &amp;&amp; pytest &amp;&amp; mypy src/</code> passes.</li>
+<li>Create a template repository on GitHub and generate a new project using the "Use this template" button.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>Package templates automate repetitive project setup.</li>
+<li>Copier supports variable substitution and updates, making it more maintainable than cookiecutter.</li>
+<li>Projects generated from a template must pass tests immediately.</li>
+<li>Including CI/CD, docs, type checking, and linting in the template speeds up project starts.</li>
+<li>A good template codifies your team's best practices.</li>
+</ul>
+<p>This concludes the Python Package 101 series. From the concept of a package through structure, building, publishing, versioning, CLI, type hints, documentation, and templates — we have covered the entire Python packaging workflow. Now go package your code and share it with the world.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/03-dependency-management.md">Dependency Management — venv, pip, uv, requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/04-building-packages.md">Building Packages — wheel and sdist</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/05-publishing-to-pypi.md">Publishing to PyPI — from TestPyPI to production</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/06-versioning-and-releases.md">Versioning and Releases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/07-cli-packages.md">CLI Packages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/08-type-hints-and-static-analysis.md">Type Hints and Static Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/09-documentation.md">Documentation — README, MkDocs, API Reference</a></li>
+<li><strong>Production Package Template (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://copier.readthedocs.io/">copier documentation</a></li>
+<li><a href="https://cookiecutter.readthedocs.io/">cookiecutter documentation</a></li>
+<li><a href="https://cjolowicz.github.io/posts/hypermodern-python-01-setup/">Hypermodern Python - Claudio Jolowicz</a></li>
+<li><a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository">GitHub - Creating a template repository</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Template, cookiecutter, copier, GitHub Template, Best Practices</p>
+</body>
+</html>

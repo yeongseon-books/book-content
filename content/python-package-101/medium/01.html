@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is a Python Package?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is a Python Package?</h1>
+<blockquote>
+<p>Python Package 101 series (1/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What is the difference between a module and a package?</li>
+<li>What happens when you run <code>import requests</code>?</li>
+<li>What does <code>pip install</code> actually install?</li>
+<li>Why should you turn your code into a package?</li>
+</ul>
+<blockquote>
+<p>A Python package bundles reusable code for sharing. Everything you <code>import</code> is a package.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>The definitions of module, package, library, and distribution</li>
+<li>The import search path (<code>sys.path</code>)</li>
+<li>Where <code>pip install</code> puts packages and how it works</li>
+<li>When to package your own code</li>
+</ul>
+<h2>Why it matters</h2>
+<p>As a project grows, you split code across files and <code>import</code> between them. That is modules. Bundle modules together and you have a package. Copying shared code across projects means fixing a bug requires changes everywhere.</p>
+<blockquote>
+<p>You have the same utility functions copied into three projects. You find a bug but only patch two of them. The third causes an outage in production.</p>
+</blockquote>
+<p>Turn it into a package, fix it in one place, and run <code>pip install --upgrade</code> in every project.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A Python package is a LEGO set. A single brick (module) holds a specific feature. Bricks grouped into a set (package) form a theme. Upload the set to a store (PyPI) and anyone can grab it.</p>
+</blockquote>
+<pre><code class="language-text">Module              Package                  Distribution
+──────              ───────                  ────────────
+utils.py    -&gt;     mylib/               -&gt;  mylib-1.0.0.tar.gz
+                     __init__.py             (uploaded to PyPI)
+                     utils.py
+                     models.py
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>module</strong><br>
+- Description: A single <code>.py</code> file<br>
+- Example: <code>utils.py</code></p>
+<p><strong>package</strong><br>
+- Description: A directory with <code>__init__.py</code><br>
+- Example: <code>mylib/</code></p>
+<p><strong>library</strong><br>
+- Description: Informal name for a package<br>
+- Example: <code>requests</code>, <code>flask</code></p>
+<p><strong>distribution</strong><br>
+- Description: An installable archive<br>
+- Example: <code>mylib-1.0.0.tar.gz</code></p>
+<p><strong>PyPI</strong><br>
+- Description: Python Package Index, the package repository<br>
+- Example: pypi.org</p>
+<h2>Before / After</h2>
+<p><strong>Before (copy-paste code)</strong></p>
+<pre><code class="language-text">project-a/utils.py   # copy 1
+project-b/utils.py   # copy 2
+project-c/utils.py   # copy 3
+# -&gt; Fix a bug? Edit all three.
+</code></pre>
+<p><strong>After (packaged)</strong></p>
+<pre><code class="language-text">mylib/               # one package
+  utils.py
+
+project-a/           # pip install mylib
+project-b/           # pip install mylib
+project-c/           # pip install mylib
+# -&gt; Fix mylib once, pip install --upgrade everywhere
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Create a module</strong></p>
+<pre><code class="language-python"># ~/practice/python-pkg/calculator.py
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+def subtract(a: int, b: int) -&gt; int:
+    return a - b
+</code></pre>
+<pre><code class="language-python"># ~/practice/python-pkg/main.py
+from calculator import add, subtract
+
+print(add(3, 5))        # 8
+print(subtract(10, 4))  # 6
+</code></pre>
+<p><strong>Step 2. Create a package structure</strong></p>
+<pre><code class="language-bash">mkdir -p ~/practice/python-pkg/mymath
+cat &gt; ~/practice/python-pkg/mymath/__init__.py &lt;&lt; 'EOF'
+from .calculator import add, subtract
+EOF
+
+cat &gt; ~/practice/python-pkg/mymath/calculator.py &lt;&lt; 'EOF'
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+def subtract(a: int, b: int) -&gt; int:
+    return a - b
+EOF
+</code></pre>
+<pre><code class="language-python"># ~/practice/python-pkg/main.py
+from mymath import add, subtract
+
+print(add(3, 5))        # 8
+</code></pre>
+<p><strong>Step 3. Inspect sys.path</strong></p>
+<pre><code class="language-python">import sys
+for path in sys.path:
+    print(path)
+# '' (current directory)
+# /usr/lib/python3.11
+# /usr/lib/python3.11/lib-dynload
+# /home/user/.local/lib/python3.11/site-packages
+</code></pre>
+<p><strong>Step 4. Inspect installed packages</strong></p>
+<pre><code class="language-bash">pip list                          # List installed packages
+pip show requests                 # Details for requests
+pip show requests | grep Location # Installation path
+# Location: /home/user/.local/lib/python3.11/site-packages
+</code></pre>
+<p><strong>Step 5. Look inside an installed package</strong></p>
+<pre><code class="language-bash">python -c &quot;import requests; print(requests.__file__)&quot;
+# /home/user/.local/lib/python3.11/site-packages/requests/__init__.py
+
+ls /home/user/.local/lib/python3.11/site-packages/requests/
+# __init__.py  api.py  models.py  sessions.py  ...
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li><code>__init__.py</code> is what makes Python treat a directory as a package</li>
+<li><code>from .calculator import add</code> uses a relative import — the <code>.</code> refers to the current package</li>
+<li>The order of <code>sys.path</code> determines Python's module search priority</li>
+<li><code>pip install</code> ultimately copies files into <code>site-packages/</code></li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Forgetting <strong>init</strong>.py</strong></p>
+<p>Without <code>__init__.py</code>, Python 3.3+ treats the directory as a namespace package, but explicitly including it is the convention. Some tools fail to recognize the package without it.</p>
+<p><strong>Mistake 2. Naming a module the same as a standard library</strong></p>
+<pre><code class="language-python"># If you create email.py
+import email  # Your file shadows the standard library
+</code></pre>
+<p>Avoid names like <code>random.py</code>, <code>json.py</code>, <code>os.py</code>.</p>
+<p><strong>Mistake 3. Circular imports</strong></p>
+<pre><code class="language-python"># a.py: from b import func_b
+# b.py: from a import func_a
+# -&gt; ImportError
+</code></pre>
+<p>Keep dependency direction one-way, or extract shared code into a common module.</p>
+<p><strong>Mistake 4. Editing files in site-packages directly</strong></p>
+<p>Changes to installed packages get overwritten on the next <code>pip install</code>.</p>
+<p><strong>Mistake 5. Confusing hyphens and underscores in package names</strong></p>
+<pre><code class="language-bash">pip install my-package      # Install name: hyphen
+import my_package           # Import name: underscore
+</code></pre>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Internal shared libraries</strong>: Unify auth, logging, and config management as a package</li>
+<li><strong>Microservice shared code</strong>: Distribute gRPC stubs and data models as a package</li>
+<li><strong>CLI tools</strong>: <code>pip install</code> turns your code into a terminal command</li>
+<li><strong>Open source</strong>: Upload to PyPI and anyone can <code>pip install</code> it</li>
+<li><strong>Shared test fixtures</strong>: Bundle test utilities used across multiple projects</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>"Is this code used in two or more projects?" — if so, it is time to package it. Copy-pasting means maintenance cost grows linearly with the number of projects. A package centralizes management, and versioning ensures stability.</p>
+<p>At first, packaging feels like overhead. In reality, a single <code>pyproject.toml</code> is all you need. This series walks through the process step by step.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain the difference between a module, a package, and a distribution</li>
+<li>[ ] You understand the role of <code>__init__.py</code></li>
+<li>[ ] You can inspect the module search path with <code>sys.path</code></li>
+<li>[ ] You can find the install location of a package with <code>pip show</code></li>
+<li>[ ] You can judge when code should be turned into a package</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>mymath/</code> package with <code>multiply</code> and <code>divide</code> functions, then import them from <code>main.py</code>.</li>
+<li>Print <code>sys.path</code> and explore the file structure of one installed package in <code>site-packages</code>.</li>
+<li>Create a file named <code>string.py</code> and run <code>import string</code> to observe what happens.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>A module is a <code>.py</code> file; a package is a directory with <code>__init__.py</code>.</li>
+<li>Python searches for modules in <code>sys.path</code> order.</li>
+<li><code>pip install</code> copies package files into <code>site-packages/</code>.</li>
+<li>Code used in two or more projects should become a package.</li>
+<li>Package names must not collide with standard library modules.</li>
+</ul>
+<p>The next post covers <strong>project structure</strong> — src layout and pyproject.toml.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><strong>What Is a Python Package? (current)</strong></li>
+<li>Project Structure — src layout and pyproject.toml (upcoming)</li>
+<li>Dependency Management — venv, pip, uv, requirements (upcoming)</li>
+<li>Building Packages — wheel and sdist (upcoming)</li>
+<li>Publishing to PyPI — from TestPyPI to production (upcoming)</li>
+<li>Versioning and Releases (upcoming)</li>
+<li>CLI Packages (upcoming)</li>
+<li>Type Hints and Static Analysis (upcoming)</li>
+<li>Documentation — README, MkDocs, API Reference (upcoming)</li>
+<li>Production Package Template (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://packaging.python.org/">Python Packaging User Guide</a></li>
+<li><a href="https://docs.python.org/3/tutorial/modules.html">Python Modules Tutorial</a></li>
+<li><a href="https://realpython.com/python-modules-packages/">Real Python - Python Packages</a></li>
+<li><a href="https://pypi.org/">PyPI - Python Package Index</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Package, Module, Import, pip, Library</p>
+</body>
+</html>

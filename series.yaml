@@ -222,6 +222,113 @@ series:
   - en
   status: content-ready
   path: content/linux-cli-101
+
+- id: python-package-101
+  category: programming
+  title:
+    ko: Python Package 101
+    en: Python Package 101
+  description:
+    ko: Python 프로젝트 구조, pyproject.toml, 의존성 관리, 빌드, PyPI 배포, 버전 관리, CLI 패키지, 문서화까지 배우는 패키징 입문 시리즈.
+    en: A beginner series covering Python packaging from project structure and pyproject.toml to dependency management, building, PyPI publishing, versioning, CLI packages, and documentation.
+  languages:
+  - ko
+  - en
+  status: content-ready
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/python-package-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-a-python-package
+        title: Python Package란 무엇인가?
+        status: content-ready
+      - idx: 2
+        slug: 02-project-structure
+        title: 프로젝트 구조 잡기 — src layout과 pyproject.toml
+        status: content-ready
+      - idx: 3
+        slug: 03-dependency-management
+        title: 의존성 관리 — venv, pip, uv, requirements
+        status: content-ready
+      - idx: 4
+        slug: 04-building-packages
+        title: 패키지 빌드하기 — wheel과 sdist
+        status: content-ready
+      - idx: 5
+        slug: 05-publishing-to-pypi
+        title: PyPI에 배포하기 — TestPyPI부터 실제 배포까지
+        status: content-ready
+      - idx: 6
+        slug: 06-versioning-and-releases
+        title: 버전 관리와 릴리스
+        status: content-ready
+      - idx: 7
+        slug: 07-cli-packages
+        title: CLI 패키지 만들기
+        status: content-ready
+      - idx: 8
+        slug: 08-type-hints-and-static-analysis
+        title: 타입 힌트와 정적 검사
+        status: content-ready
+      - idx: 9
+        slug: 09-documentation
+        title: 문서화 — README, MkDocs, API Reference
+        status: content-ready
+      - idx: 10
+        slug: 10-package-template
+        title: 실전 패키지 템플릿 만들기
+        status: content-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-a-python-package
+        title: What Is a Python Package?
+        status: content-ready
+      - idx: 2
+        slug: 02-project-structure
+        title: Project Structure — src layout and pyproject.toml
+        status: content-ready
+      - idx: 3
+        slug: 03-dependency-management
+        title: Dependency Management — venv, pip, uv, requirements
+        status: content-ready
+      - idx: 4
+        slug: 04-building-packages
+        title: Building Packages — wheel and sdist
+        status: content-ready
+      - idx: 5
+        slug: 05-publishing-to-pypi
+        title: Publishing to PyPI — from TestPyPI to production
+        status: content-ready
+      - idx: 6
+        slug: 06-versioning-and-releases
+        title: Versioning and Releases
+        status: content-ready
+      - idx: 7
+        slug: 07-cli-packages
+        title: CLI Packages
+        status: content-ready
+      - idx: 8
+        slug: 08-type-hints-and-static-analysis
+        title: Type Hints and Static Analysis
+        status: content-ready
+      - idx: 9
+        slug: 09-documentation
+        title: Documentation — README, MkDocs, API Reference
+        status: content-ready
+      - idx: 10
+        slug: 10-package-template
+        title: Production Package Template
+        status: content-ready
 - id: azure-app-service-101
   status: content-ready
   category: azure

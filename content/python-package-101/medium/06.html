@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Versioning and Releases</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Versioning and Releases</h1>
+<blockquote>
+<p>Python Package 101 series (6/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>When do you bump each part of MAJOR.MINOR.PATCH in SemVer?</li>
+<li>Where in the code should the version be recorded?</li>
+<li>What is the relationship between Git tags and releases?</li>
+<li>Why is a CHANGELOG needed and how do you write one?</li>
+</ul>
+<blockquote>
+<p>SemVer assigns meaning to version numbers, and Git tags mark specific commits as release points.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>SemVer rules and when to bump each part</li>
+<li>How to keep the version in sync between pyproject.toml and <code>__version__</code></li>
+<li>How to mark and manage releases with Git tags</li>
+<li>How to write a CHANGELOG and automate it</li>
+</ul>
+<h2>Why it matters</h2>
+<p>When you update a package, users need to judge "is this update safe?" The version number is that signal. Meaningless version bumps confuse users, and shipping a breaking change as a PATCH breaks their code.</p>
+<blockquote>
+<p>You ran <code>pip install mylib --upgrade</code> for a patch update, but the API changed and production broke. The bump was <code>0.2.3 → 0.2.4</code>, so you assumed it was safe — but a function signature had changed.</p>
+</blockquote>
+<h2>Mental Model</h2>
+<blockquote>
+<p>SemVer is a traffic light. PATCH (green) is safe to upgrade, MINOR (yellow) adds new features but keeps existing ones, MAJOR (red) may require changes to your code.</p>
+</blockquote>
+<pre><code class="language-text">MAJOR . MINOR . PATCH
+  1   .   2   .   3
+
+PATCH  (1.2.3 → 1.2.4): Bug fix, no API changes
+MINOR  (1.2.4 → 1.3.0): New feature, existing API preserved
+MAJOR  (1.3.0 → 2.0.0): API changed or removed (breaking)
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>SemVer</strong><br>
+- Description: Semantic Versioning rules<br>
+- Example: <code>1.2.3</code></p>
+<p><strong>pre-release</strong><br>
+- Description: Test version before a stable release<br>
+- Example: <code>1.0.0rc1</code>, <code>1.0.0a1</code></p>
+<p><strong>Git tag</strong><br>
+- Description: A label attached to a specific commit<br>
+- Example: <code>git tag v1.0.0</code></p>
+<p><strong>CHANGELOG</strong><br>
+- Description: Document recording changes per version<br>
+- Example: <code>CHANGELOG.md</code></p>
+<p><strong>single source of truth</strong><br>
+- Description: Version managed from exactly one place<br>
+- Example: pyproject.toml or <code>__version__</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (no version management)</strong></p>
+<pre><code class="language-text"># commit messages only
+&quot;fixed bug&quot;
+&quot;added feature&quot;
+&quot;more fixes&quot;
+# → no way to tell which commit is which release
+</code></pre>
+<p><strong>After (SemVer + Git tag + CHANGELOG)</strong></p>
+<pre><code class="language-text">v1.2.3 ← git tag
+  CHANGELOG.md:
+  ## 1.2.3 (2026-05-04)
+  ### Fixed
+  - Fixed timeout error in API client
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Set the version in pyproject.toml</strong></p>
+<pre><code class="language-toml">[project]
+name = &quot;mylib&quot;
+version = &quot;0.1.0&quot;
+</code></pre>
+<p><strong>Step 2. Sync <strong>version</strong></strong></p>
+<pre><code class="language-python"># src/mylib/__init__.py
+&quot;&quot;&quot;mylib - A sample Python package.&quot;&quot;&quot;
+__version__ = &quot;0.1.0&quot;
+</code></pre>
+<pre><code class="language-python"># How users check the version
+import mylib
+print(mylib.__version__)  # 0.1.0
+</code></pre>
+<p><strong>Step 3. Mark a release with a Git tag</strong></p>
+<pre><code class="language-bash">git add .
+git commit -m &quot;Release v0.1.0&quot;
+git tag v0.1.0
+git push origin main --tags
+
+# List tags
+git tag
+# v0.1.0
+</code></pre>
+<p><strong>Step 4. Write a CHANGELOG</strong></p>
+<pre><code class="language-markdown"># CHANGELOG.md
+
+## 0.1.0 (2026-05-04)
+
+### Added
+- Initial release
+- `core.greet()` function
+- src layout project structure
+- pyproject.toml configuration
+</code></pre>
+<p><strong>Step 5. Bump the version and release</strong></p>
+<pre><code class="language-bash"># pyproject.toml: version = &quot;0.2.0&quot;
+# src/mylib/__init__.py: __version__ = &quot;0.2.0&quot;
+
+git add .
+git commit -m &quot;Release v0.2.0: add string utilities&quot;
+git tag v0.2.0
+python -m build
+twine upload dist/*
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>The <code>version</code> in pyproject.toml and <code>__version__</code> must always match</li>
+<li>Adding a <code>v</code> prefix to Git tags is a widely followed convention (<code>v0.1.0</code>)</li>
+<li>CHANGELOG follows the <a href="https://keepachangelog.com/">Keep a Changelog</a> format as a standard</li>
+<li>Without the <code>--tags</code> option, <code>git push</code> does not push tags to the remote</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. pyproject.toml and <strong>version</strong> are different</strong></p>
+<p>When the two versions diverge, <code>pip show</code> and <code>import</code> report different values. Manage from a single source.</p>
+<p><strong>Mistake 2. Shipping a breaking change as a PATCH</strong></p>
+<p>Changing function signatures, return values, or adding required arguments is a MAJOR bump.</p>
+<p><strong>Mistake 3. Expecting stability from 0.x versions</strong></p>
+<p>In SemVer, <code>0.x.y</code> signals initial development where the API can change at any time. <code>1.0.0</code> is the first stable release.</p>
+<p><strong>Mistake 4. Not writing a CHANGELOG</strong></p>
+<p>Users need to know "what changed in this update?" Git log alone is not enough.</p>
+<p><strong>Mistake 5. Tagging before testing</strong></p>
+<p>Tags should be applied after the build and tests pass. In CI/CD, a tag push triggers deployment, so tagging early deploys broken code.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>CI/CD trigger</strong>: Git tag push triggers automatic build and PyPI upload</li>
+<li><strong>Dependabot/Renovate</strong>: Automatically creates PRs when dependencies release new versions</li>
+<li><strong>Dynamic versioning</strong>: <code>setuptools-scm</code> extracts the version from Git tags automatically</li>
+<li><strong>Pre-release</strong>: Staged releases via <code>1.0.0a1 → 1.0.0b1 → 1.0.0rc1 → 1.0.0</code></li>
+<li><strong>GitHub Releases</strong>: Link Git tags with CHANGELOG entries to auto-generate release notes</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>The hardest part of versioning is deciding "is this change MINOR or MAJOR?" The rule is simple: <strong>if existing users' code works without modification, it is MINOR; if they need to change their code, it is MAJOR</strong>.</p>
+<p>If managing versions in two places is tedious, use <code>setuptools-scm</code>. Just tag a commit (<code>v0.1.0</code>) and the version in pyproject.toml is determined automatically.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain the criteria for each part of MAJOR.MINOR.PATCH</li>
+<li>[ ] You know how to sync pyproject.toml and <code>__version__</code></li>
+<li>[ ] You can mark releases with Git tags</li>
+<li>[ ] You can write a CHANGELOG in Keep a Changelog format</li>
+<li>[ ] You understand what pre-release versions mean</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Add a <code>v0.1.0</code> tag to the project from the previous post and verify with <code>git log --oneline --decorate</code>.</li>
+<li>Add a new function, bump to <code>0.2.0</code>, and record the changes in CHANGELOG.md.</li>
+<li>Install <code>setuptools-scm</code> and configure dynamic versioning in pyproject.toml.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>SemVer is MAJOR (breaking).MINOR (new feature).PATCH (bug fix).</li>
+<li>Keep pyproject.toml and <code>__version__</code> in sync.</li>
+<li>Git tags mark specific commits as release points.</li>
+<li>CHANGELOG is the official document where users check what changed.</li>
+<li>Tag after tests pass; tags trigger deployment.</li>
+</ul>
+<p>The next post covers <strong>CLI packages</strong> — entry points and click.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/03-dependency-management.md">Dependency Management — venv, pip, uv, requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/04-building-packages.md">Building Packages — wheel and sdist</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/05-publishing-to-pypi.md">Publishing to PyPI — from TestPyPI to production</a></li>
+<li><strong>Versioning and Releases (current)</strong></li>
+<li>CLI Packages (upcoming)</li>
+<li>Type Hints and Static Analysis (upcoming)</li>
+<li>Documentation — README, MkDocs, API Reference (upcoming)</li>
+<li>Production Package Template (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://semver.org/">Semantic Versioning 2.0.0</a></li>
+<li><a href="https://keepachangelog.com/">Keep a Changelog</a></li>
+<li><a href="https://peps.python.org/pep-0440/">PEP 440 - Version Identification and Dependency Specification</a></li>
+<li><a href="https://setuptools-scm.readthedocs.io/">setuptools-scm</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Versioning, SemVer, Release, CHANGELOG, Git Tag</p>
+</body>
+</html>
