@@ -54,17 +54,7 @@ The goal of this chapter is to remove both. By the end you should be able to pic
 
 A merge produces "a new commit that combines two commits." When the two commits sit on the same line of history, Git skips the new commit and just slides a pointer forward (fast-forward). When the two commits sit on diverged lines, Git creates a new merge commit with two parents (three-way).
 
-```mermaid
-flowchart LR
-    C1["c1: Initial"] --> C2["c2: notes"]
-    C2 --> C3["c3: author"]
-    C3 --> C4["c4: main work"]
-    C3 --> C5["c5: feature work"]
-    C4 --> M["c6: merge commit"]
-    C5 --> M
-    M -.-> MAIN(["main"])
-```
-
+![Mental Model](../../../assets/git-github-101/05/05-01-mental-model.en.png)
 Three things to internalize:
 
 - **Fast-forward**: if the target branch is a direct descendant of the current branch, Git creates no new commit and just moves the current branch pointer forward.

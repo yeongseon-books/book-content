@@ -55,21 +55,7 @@ This chapter consolidates the four collections onto a single page so the next ch
 > The four collections differ along four axes: mutability, order, duplicates allowed, and hashability. Choosing a collection is choosing which guarantees on those four axes you accept and which you give up.
 Group the four collections along three axes — mutability, order, and hashability — and they sit cleanly in memory.
 
-```mermaid
-flowchart TB
-    subgraph Sequence["Ordered bundles"]
-        L["list<br/>mutable, duplicates allowed"]
-        T["tuple<br/>immutable, duplicates allowed"]
-    end
-    subgraph HashBased["Hash-based collections"]
-        D["dict<br/>mutable, keys unique"]
-        S["set<br/>mutable, hashable elements only, unordered"]
-    end
-    L -- "freeze and use as a key" --> T
-    L -- "deduplicate / membership" --> S
-    S -- "attach a value to each key" --> D
-```
-
+![Mental model](../../../assets/python-101/04/04-01-mental-model.en.png)
 Three rules carry most of the weight.
 
 1. **Mutable (list, dict, set)** can be changed in place after creation; **immutable (tuple, str, int)** cannot.

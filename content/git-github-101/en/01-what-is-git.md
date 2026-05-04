@@ -47,14 +47,7 @@ Many teams and open-source projects treat Git as a standard tool. Learning it is
 > Git's core model is "a tool that keeps snapshots of your files in time order", and each snapshot is produced through three areas: the working directory, the staging area, and the repository.
 In one sentence, Git is "a tool that stores snapshots of your files in time order." Each commit is a photograph of the tracked files at that moment.
 
-```mermaid
-flowchart LR
-    A[Working Directory<br/>actual files] -->|git add| B[Staging Area<br/>next-commit prep]
-    B -->|git commit| C[Local Repository<br/>commit history]
-    C -->|git push| D[Remote Repository<br/>GitHub etc.]
-    D -->|git pull| C
-```
-
+![Mental model](../../../assets/git-github-101/01/01-01-mental-model.en.png)
 Git distinguishes three areas.
 
 - **Working Directory**: where the files you are editing live.

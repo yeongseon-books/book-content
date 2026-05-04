@@ -49,16 +49,7 @@ This chapter introduces the simplest tools for building that bundle: the `class`
 > A class is not a mold for data; it is the definition of behavior shared by objects of the same kind. An instance is an individual object that follows that definition. With that one line in mind, `self`, class attributes, and dunder methods all find their place.
 The diagram below shows the path from a class definition to a method call on an instance.
 
-```mermaid
-flowchart LR
-    A["class User: ..."] --> B["class object"]
-    B --> C["User('Ada', 'a@x')"]
-    C --> D["__init__(self, ...)"]
-    D --> E["instance object"]
-    E --> F["instance.method(args)"]
-    F --> G["method(self=instance, args)"]
-```
-
+![Mental model](../../../assets/python-101/09/09-01-mental-model.en.png)
 Three ideas hold this together.
 
 - **A class is a template for objects.** The `class User:` statement creates a class object named `User`, and calling `User(...)` produces an instance from that template.

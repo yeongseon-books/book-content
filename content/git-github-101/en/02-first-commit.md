@@ -47,14 +47,7 @@ After one full cycle, commands you meet later (`git diff`, `git log`, `git resto
 > A first commit is the act of "gathering changes from the working directory into the staging area, then moving them into the repository as a single snapshot". `add` and `commit` exist as separate commands precisely because those are two distinct steps.
 A single edit-to-commit cycle looks like this.
 
-```mermaid
-flowchart LR
-    A[Working Directory<br/>edited files] -->|git add| B[Staging Area<br/>next-commit candidates]
-    B -->|git commit| C[Local Repository<br/>stored snapshot]
-    C -. git status .-> A
-    C -. git log .-> C
-```
-
+![Mental model](../../../assets/git-github-101/02/02-01-mental-model.en.png)
 Three verbs work together.
 
 - **edit**: change or create files in your editor. Git does not know yet.

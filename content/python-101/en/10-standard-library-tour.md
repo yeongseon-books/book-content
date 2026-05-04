@@ -45,20 +45,7 @@ This article does not cover the entire standard library. It picks five modules t
 > The standard library is a toolbox of routines so you do not write the same thing twice. Each module sticks to one domain — time, paths, serialization, aggregation, iteration — and exposes a small focused vocabulary.
 The standard library is organized by purpose. `datetime` covers time, `pathlib` covers file paths, `json` covers serialization, `collections` adds richer data structures, and `itertools` covers iteration patterns.
 
-```mermaid
-flowchart LR
-    A[Your code] --> B[datetime: time/date]
-    A --> C[pathlib: file paths]
-    A --> D[json: serialization]
-    A --> E[collections: data structures]
-    A --> F[itertools: iteration]
-    B --> G[(System clock/strings)]
-    C --> H[(File system)]
-    D --> I[(Files/network)]
-    E --> J[(In-memory structures)]
-    F --> J
-```
-
+![Mental model](../../../assets/python-101/10/10-01-mental-model.en.png)
 Each module is designed to solve "one kind of problem" well. The naming is consistent enough that you can usually guess what a module covers from its name alone.
 
 ## Core concepts

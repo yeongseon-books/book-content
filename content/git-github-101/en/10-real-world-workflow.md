@@ -42,21 +42,7 @@ When the loop becomes muscle memory, accidents drop. Force-pushing over a teamma
 > A realistic workflow is one repeating cycle: an issue defines the work, a branch carries the change, a Pull Request invites review, a merge brings it into the shared state, a tag marks the point, and the issue is closed.
 A GitHub Flow cycle looks like this.
 
-```mermaid
-flowchart LR
-  I["Issue #42<br/>defines the unit of work"]
-  B["git switch -c<br/>feat/login-rate-limit"]
-  C["commits<br/>Conventional Commits"]
-  P["git push -u origin<br/>feat/login-rate-limit"]
-  PR["gh pr create<br/>Closes #42"]
-  R["code review<br/>--amend + force-with-lease"]
-  M["squash merge<br/>main moves forward"]
-  T["git tag -a v0.3.0<br/>git push --tags"]
-  X["Issue #42<br/>auto-closes"]
-  I --> B --> C --> P --> PR --> R --> M --> T --> X
-  M -.deploy.-> Prod["production"]
-```
-
+![Mental model](../../../assets/git-github-101/10/10-01-mental-model.en.png)
 The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.
 
 ## Core concepts

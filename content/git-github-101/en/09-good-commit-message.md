@@ -42,20 +42,7 @@ The benefit shows up in code review too. Even when a PR description is thin, wel
 > A good commit message is a small document that lets you and your teammate, six months later, see in one read what changed and why. The subject, body, and footer each carry one face of that document.
 A solid commit message has a fixed skeleton.
 
-```mermaid
-flowchart TB
-  subgraph Commit["commit message"]
-    S["subject (≤50 chars)<br/>type(scope): one-line summary"]
-    BL[" "]
-    B["body (optional, wrap at 72)<br/>why this change is needed<br/>which alternatives were considered"]
-    BL2[" "]
-    F["footer (optional)<br/>Refs: #123<br/>BREAKING CHANGE: ..."]
-  end
-  S --> BL --> B --> BL2 --> F
-  Commit --> Log["git log --oneline<br/>reviewers / future you"]
-  Commit --> Auto["changelog / version bump<br/>automation tools"]
-```
-
+![Mental model](../../../assets/git-github-101/09/09-01-mental-model.en.png)
 Three habits define the shape. Keep the subject short and in the imperative mood. Add a body — separated by a blank line — when the change needs the "why". Use the footer for issue references and breaking-change notices.
 
 ## Core concepts

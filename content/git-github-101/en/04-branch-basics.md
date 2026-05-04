@@ -47,16 +47,7 @@ This article stops just before merging. We focus on **creating, switching, and c
 > A branch is not a folder copy; it is a movable pointer to a specific commit. `HEAD` is another pointer that marks which of those branch pointers you are currently working on.
 A branch is a **pointer** to a commit. When you make a new commit, the current branch pointer moves one step forward.
 
-```mermaid
-flowchart LR
-    C1["c1: Initial"] --> C2["c2: notes"]
-    C2 --> C3["c3: author"]
-    C3 -.-> M(["main"])
-    C3 --> C4["c4: feature work"]
-    C4 -.-> F(["feature/login"])
-    M -. HEAD on main .-> M
-```
-
+![Mental Model](../../../assets/git-github-101/04/04-01-mental-model.en.png)
 Two ideas to hold together:
 
 - **A branch itself is cheap.** It is roughly a 41-byte file under `.git/refs/heads/<name>` that stores a commit hash.

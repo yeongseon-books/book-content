@@ -47,20 +47,7 @@ Used together, they let you self-review what your next commit will contain. That
 > `status`, `diff`, and `log` are three read-only windows that answer three different questions: where am I right now, what is different and how, and how did I get here.
 Each command compares a different pair of areas.
 
-```mermaid
-flowchart LR
-    WD["Working Directory"]
-    SA["Staging Area"]
-    H["HEAD commit"]
-
-    WD -- "git diff" --> D1[("WD vs Staging")]
-    SA -- "git diff --cached" --> D2[("Staging vs HEAD")]
-    WD -- "git diff HEAD" --> D3[("WD vs HEAD")]
-    H --> D2
-    H --> D3
-    H -- "git log" --> L[("commit history")]
-```
-
+![Mental model](../../../assets/git-github-101/03/03-01-mental-model.en.png)
 A one-line rule of thumb:
 
 - `git diff` shows **changes not yet staged** (WD vs Staging).

@@ -49,23 +49,7 @@ Once PRs become routine, three habits follow naturally:
 > A Pull Request is not a plain merge; it is a place to "propose merging your branch into main and host the review and discussion that surrounds that proposal".
 A PR is a request: "Please accept my branch as a proposal against `main`." The request has a title, a description, a list of changed files, and a comment thread.
 
-```mermaid
-flowchart LR
-    subgraph local["Local"]
-        A["main"] --> B["feature/release-notes"]
-        B --> B2["second commit"]
-    end
-    subgraph github["GitHub"]
-        C["origin/main"]
-        D["origin/feature/release-notes"]
-        PR["Pull Request #1"]
-    end
-    B -- "git push -u" --> D
-    D -. "open PR" .-> PR
-    PR -- "review + merge" --> C
-    C -- "git pull" --> A
-```
-
+![Mental model](../../../assets/git-github-101/07/07-01-mental-model.en.png)
 The diagram reads like this:
 
 1. Locally you create `feature/release-notes` on top of `main` and stack commits on it.

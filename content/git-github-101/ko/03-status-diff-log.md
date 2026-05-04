@@ -55,20 +55,7 @@ title: 변경 사항 확인하기 - status, diff, log로 읽기
 > `status`·`diff`·`log` 세 명령은 각각 "지금 어디에 있나", "무엇이 어떻게 다르나", "여기까지 어떻게 왔나"라는 세 질문에 대응하는 읽기 전용 창입니다.
 각 명령이 보는 영역을 그림으로 정리해 봅니다.
 
-```mermaid
-flowchart LR
-    WD["Working Directory"]
-    SA["Staging Area"]
-    H["HEAD commit"]
-
-    WD -- "git diff" --> D1[("WD vs Staging")]
-    SA -- "git diff --cached" --> D2[("Staging vs HEAD")]
-    WD -- "git diff HEAD" --> D3[("WD vs HEAD")]
-    H --> D2
-    H --> D3
-    H -- "git log" --> L[("commit history")]
-```
-
+![Mental Model](../../../assets/git-github-101/03/03-01-mental-model.ko.png)
 기억할 한 줄 규칙은 다음과 같습니다.
 
 - `git diff`는 기본적으로 **아직 staging에 올라가지 않은 변경**(WD vs Staging)을 보여 줍니다.

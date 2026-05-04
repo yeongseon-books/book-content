@@ -48,18 +48,7 @@ Modules and packages are among Python's main tools for solving this. You break c
 > A module in Python is "a namespace that is loaded once and cached"; a package is "a directory grouped by `__init__.py` that holds modules". Hold those two definitions and most import behavior collapses into one diagram.
 A module is "a `.py` file that runs once and produces a namespace." A package is "a directory that holds such modules." `import` is the act of attaching that namespace to your current code.
 
-```mermaid
-flowchart LR
-    A["import name"] --> B["sys.modules cache hit?"]
-    B -- "yes" --> H["bind name in current namespace"]
-    B -- "no" --> C["search sys.path"]
-    C --> D["find file or package"]
-    D --> E["execute module top-level code once"]
-    E --> F["create module object"]
-    F --> G["store in sys.modules"]
-    G --> H
-```
-
+![Mental model](../../../assets/python-101/07/07-01-mental-model.en.png)
 Two ideas matter most. First, **module top-level code runs once, top to bottom, the first time it is imported**. Second, **the resulting namespace object is cached and reused**. A second import does not re-read the file; it pulls the same object from cache.
 
 ## Core concepts

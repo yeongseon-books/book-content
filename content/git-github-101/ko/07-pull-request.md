@@ -57,23 +57,7 @@ PR이 익숙해지면 다음 세 가지가 자연스럽게 따라옵니다.
 > Pull Request는 단순한 merge가 아니라 "내 branch의 변경을 main에 합치자고 동료에게 제안하고, 그 제안을 두고 검토와 토론을 남기는 자리"입니다.
 PR은 "branch라는 제안서를 main에 받아 달라고 요청하는 신청서"입니다. 신청서에는 제목, 설명, 변경된 파일, 그리고 동료의 의견이 함께 붙습니다.
 
-```mermaid
-flowchart LR
-    subgraph local["Local"]
-        A["main"] --> B["feature/release-notes"]
-        B --> B2["second commit"]
-    end
-    subgraph github["GitHub"]
-        C["origin/main"]
-        D["origin/feature/release-notes"]
-        PR["Pull Request #1"]
-    end
-    B -- "git push -u" --> D
-    D -. "open PR" .-> PR
-    PR -- "review + merge" --> C
-    C -- "git pull" --> A
-```
-
+![Mental Model](../../../assets/git-github-101/07/07-01-mental-model.ko.png)
 다이어그램의 흐름은 다음과 같습니다.
 
 1. 로컬에서 `main` 위에 `feature/release-notes` branch를 만들고 commit을 쌓습니다.

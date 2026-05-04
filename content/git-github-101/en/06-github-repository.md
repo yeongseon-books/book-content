@@ -62,14 +62,7 @@ Keeping these three apart is what makes "how do I safely incorporate someone els
 > A GitHub repository is just "another Git repository that lives across the network", and a `remote` is the nickname you give to such a repository. `push` and `pull` are synchronization moves that exchange commits between the two.
 A GitHub repository is just another Git repository. The only differences are that it lives on GitHub's servers and that anyone with access can reach it. Local and remote act as mirrors of each other, and push/fetch/pull are the commands that keep them aligned.
 
-```mermaid
-flowchart LR
-    A["Local repository<br/>(working .git)"] -- "git push" --> B["Remote repository<br/>origin (GitHub)"]
-    B -- "git fetch / git pull" --> A
-    B -- "git clone" --> C["Someone else's<br/>local repository"]
-    C -- "git push" --> B
-```
-
+![Mental Model](../../../assets/git-github-101/06/06-01-mental-model.en.png)
 Three reminders make this picture solid. First, a GitHub repository is itself nothing more than a `.git` directory. Second, each collaborator owns a complete copy on their own machine. Third, synchronization is explicit - it happens when you run a command. Skip `push`, and GitHub doesn't know. Skip `pull`, and your laptop doesn't know.
 
 ## Core concepts

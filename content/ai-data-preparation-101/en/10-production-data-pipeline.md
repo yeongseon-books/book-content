@@ -37,17 +37,7 @@ Four requirements for a production data pipeline:
 
 ## Architecture - a 6-stage pipeline
 
-```mermaid
-flowchart LR
-    A[Raw Source] --> B[Stage 1: Ingest + Catalog]
-    B --> C[Stage 2: Clean + Dedup]
-    C --> D[Stage 3: PII Redaction]
-    D --> E[Stage 4: Quality Filter]
-    E --> F[Stage 5: Tokenize + Chunk]
-    F --> G[Stage 6: Split + Version]
-    G --> H["Versioned Dataset (v2026.05.03)"]
-```
-
+![Architecture - a 6-stage pipeline](../../../assets/ai-data-preparation-101/10/10-01-architecture-a-6-stage-pipeline.en.png)
 Each stage owns input/output parquet files plus a manifest. The manifest records input fingerprints, code versions, and parameters.
 
 ## Dataset versioning with DVC

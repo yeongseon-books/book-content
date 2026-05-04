@@ -46,19 +46,7 @@ The `with` statement and narrow `except` clauses are the simplest tools for avoi
 > A file is a three-step resource: open, read or write, close. Exceptions are labels that classify which step failed and how. Separating those two models makes the shape of `with` and `try` blocks fall out naturally.
 The diagram below shows the flow that runs whenever you open a file and do work with it.
 
-```mermaid
-flowchart LR
-    A["open(path, mode)"] --> B["file handle"]
-    B --> C{"work succeeds?"}
-    C -- "yes" --> D["normal flow"]
-    C -- "no" --> E["raise exception"]
-    D --> F["__exit__: close handle"]
-    E --> F
-    F --> G{"except matches?"}
-    G -- "yes" --> H["recovery code"]
-    G -- "no" --> I["propagate up"]
-```
-
+![Mental model](../../../assets/python-101/08/08-01-mental-model.en.png)
 Two ideas hold this together.
 
 - **`with` calls `__exit__` on both normal exit and exception exit, so the handle is closed in both cases.** That removes most of the need to write `try`/`finally` and call `close()` by hand.

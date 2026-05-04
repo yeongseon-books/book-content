@@ -46,24 +46,7 @@ There is one more reason: the mutable default argument trap is one of the most c
 > A function signature is a contract: what the caller must supply and what the function returns. The five argument forms and the `/` and `*` markers tune how strict that contract is.
 Lay the function signature out on a page, and the call-time rules line up in your head.
 
-```mermaid
-flowchart LR
-    Call(["Function call"]) --> Bind["Arguments bind to the signature at call time"]
-    Bind --> Order{"Argument kinds"}
-    Order --> POS["positional<br/>matched by position"]
-    Order --> KW["keyword<br/>matched by name"]
-    Order --> DEF["default<br/>used if absent in the call"]
-    Order --> VAR["*args<br/>extra positionals"]
-    Order --> KWV["**kwargs<br/>extra keywords"]
-    POS --> Sig["signature<br/>def f(a, b, /, c, *, d, **rest)"]
-    KW --> Sig
-    DEF --> Sig
-    VAR --> Sig
-    KWV --> Sig
-    Sig --> Body["Function body"]
-    Body --> Ret["return value or None"]
-```
-
+![Mental model](../../../assets/python-101/06/06-01-mental-model.en.png)
 Three rules carry most of the weight.
 
 1. **Arguments bind at call time and the body runs on top of that binding.** The signature is an interface that promises "this is the name and shape I will accept".

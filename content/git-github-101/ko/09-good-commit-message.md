@@ -50,20 +50,7 @@ Code review에서도 차이가 납니다. PR 제목·본문이 비어 있어도 
 > 좋은 commit message는 "이 변경을 6개월 뒤의 자신과 동료가 다시 읽었을 때 무엇을 왜 바꿨는지 한 번에 알게 해 주는 문서"이며, subject·body·footer 세 부분이 각각 그 역할의 한 면을 맡습니다.
 좋은 commit message는 정해진 골격을 가집니다.
 
-```mermaid
-flowchart TB
-  subgraph Commit["commit message"]
-    S["subject (≤50자)<br/>type(scope): 한 줄 요약"]
-    BL[" "]
-    B["body (선택, 72자 wrap)<br/>왜 이 변경이 필요한가<br/>어떤 대안을 고려했는가"]
-    BL2[" "]
-    F["footer (선택)<br/>Refs: #123<br/>BREAKING CHANGE: ..."]
-  end
-  S --> BL --> B --> BL2 --> F
-  Commit --> Log["git log --oneline<br/>리뷰어/미래의 자신"]
-  Commit --> Auto["changelog / version bump<br/>자동화 도구"]
-```
-
+![Mental Model](../../../assets/git-github-101/09/09-01-mental-model.ko.png)
 핵심은 세 가지입니다. 첫째, subject는 짧고 명령형(imperative)으로 씁니다. 둘째, body가 필요하면 빈 줄 한 칸을 띄우고 "왜"를 적습니다. 셋째, footer로 issue 번호나 breaking change를 명시합니다.
 
 ## 핵심 개념

@@ -46,19 +46,7 @@ This chapter is also a setup for the next one on functions and argument design. 
 > When wiring up control flow, split each branch and loop into two questions: "what truthy/falsy decision does this make" and "what is the termination condition". The same lens decides between a comprehension and a plain loop.
 Lay out the choices on a single page so that, while reading code, you can guess the next step in your head.
 
-```mermaid
-flowchart TB
-    Start(["Control flow"])
-    Start --> Branch{"One decision,<br/>or repetition?"}
-    Branch -- "single decision" --> If["if / elif / else<br/>truthy/falsy evaluation"]
-    Branch -- "repetition" --> Loop{"Do you know the length up front?"}
-    Loop -- "yes (iterable)" --> For["for x in iterable<br/>+ enumerate / zip / range"]
-    Loop -- "no (condition)" --> While["while condition:<br/>body must change the condition"]
-    For --> Comp{"Pure input -> output transform?"}
-    Comp -- "yes, one or two lines" --> Compr["list/dict/set comprehension"]
-    Comp -- "no, side effects" --> ForBody["explicit for body"]
-```
-
+![Mental model](../../../assets/python-101/05/05-01-mental-model.en.png)
 Three rules carry most of the weight.
 
 1. **A single decision is `if`; the same work repeated is a loop.** `for` and `while` are two tools for the same job — repetition — and the choice depends on whether you already have something to iterate over.

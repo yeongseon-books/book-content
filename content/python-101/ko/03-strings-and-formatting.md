@@ -61,18 +61,7 @@ last_reviewed: '2026-05-03'
 > Python 3에서 `str`은 "Unicode 코드포인트의 불변 시퀀스"이고 `bytes`는 "바이트의 불변 시퀀스"라는 두 층을 분리해 두면, 인코딩·포매팅·정규표현식 어느 자리에서도 같은 도식으로 사고할 수 있습니다.
 Python의 `str`은 "코드 포인트의 시퀀스"입니다. 사람이 읽는 글자 단위로 추상화돼 있고, 디스크나 네트워크에 나갈 때만 `bytes`로 인코딩됩니다.
 
-```mermaid
-flowchart LR
-    subgraph Memory["메모리 안 (str)"]
-        S["'안녕'<br/>code points: U+C548, U+B155"]
-    end
-    subgraph Disk["파일·네트워크 (bytes)"]
-        B["b'\\xec\\x95\\x88\\xeb\\x85\\x95'<br/>UTF-8 encoded"]
-    end
-    S -- ".encode('utf-8')" --> B
-    B -- ".decode('utf-8')" --> S
-```
-
+![Mental Model](../../../assets/python-101/03/03-01-mental-model.ko.png)
 핵심 규칙 세 가지를 외워 두면 대부분의 혼란이 사라집니다.
 
 1. **`str`은 Unicode 코드 포인트의 시퀀스입니다.** 인코딩 정보를 갖지 않습니다.

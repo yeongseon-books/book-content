@@ -49,23 +49,7 @@ Even on a solo repository, issues earn their keep. Writing down the next thing t
 > Issues record "what is to be done", Pull Requests record "how it was actually done", and Projects record "where the work currently sits" — three complementary views of the same work.
 Here is how issues, PRs, and projects interlock.
 
-```mermaid
-flowchart LR
-    subgraph plan["Define the work"]
-        I["Issue #42"]
-    end
-    subgraph work["Make the change"]
-        B["feature/x branch"] --> PR["Pull Request"]
-    end
-    subgraph track["See the status"]
-        Project["Project board"]
-    end
-    I -- "PR body says 'Closes #42'" --> PR
-    PR -- "auto-close on merge" --> I
-    I -. "shown as a card" .-> Project
-    PR -. "shown as a card" .-> Project
-```
-
+![Mental model](../../../assets/git-github-101/08/08-01-mental-model.en.png)
 Read it as a flow:
 
 1. The issue is the starting point. It explains what to do and why.

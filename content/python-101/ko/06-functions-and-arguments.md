@@ -54,24 +54,7 @@ last_reviewed: '2026-05-03'
 > 함수 시그니처는 "호출자가 무엇을 줘야 하고, 함수가 무엇을 돌려주는가"의 계약이며, 다섯 인자 형태와 `/`·`*` 구분자는 그 계약의 강도를 단계별로 조절하는 도구입니다.
 함수 시그니처를 다음과 같이 한 장에 펼쳐 두면 호출 규칙이 머릿속에서 정렬됩니다.
 
-```mermaid
-flowchart LR
-    Call(["함수 호출"]) --> Bind["호출 시 인자를 시그니처에 묶음"]
-    Bind --> Order{"인자 종류"}
-    Order --> POS["positional<br/>위치로 매칭"]
-    Order --> KW["keyword<br/>이름으로 매칭"]
-    Order --> DEF["default<br/>호출에서 빠지면 사용"]
-    Order --> VAR["*args<br/>남는 positional"]
-    Order --> KWV["**kwargs<br/>남는 keyword"]
-    POS --> Sig["시그니처<br/>def f(a, b, /, c, *, d, **rest)"]
-    KW --> Sig
-    DEF --> Sig
-    VAR --> Sig
-    KWV --> Sig
-    Sig --> Body["함수 본문"]
-    Body --> Ret["return 값 또는 None"]
-```
-
+![Mental Model](../../../assets/python-101/06/06-01-mental-model.ko.png)
 세 가지 핵심 규칙입니다.
 
 1. **인자는 호출 시점에 묶이고, 본문은 그 묶음 위에서 실행**됩니다. 시그니처는 "어떤 이름으로 어떻게 받을지"를 미리 약속해 둔 인터페이스입니다.

@@ -53,18 +53,7 @@ Handling strings precisely prevents these mistakes upfront, and the code becomes
 > In Python 3, `str` is an immutable sequence of Unicode code points and `bytes` is an immutable sequence of bytes. Keep those two layers separate and encoding, formatting, and regex questions all collapse into the same model.
 Python's `str` is a sequence of code points. It is abstracted at the level humans read; it only becomes `bytes` when it leaves memory for disk or the network.
 
-```mermaid
-flowchart LR
-    subgraph Memory["In memory (str)"]
-        S["'hi'<br/>code points: U+0068, U+0069"]
-    end
-    subgraph Disk["File / network (bytes)"]
-        B["b'hi'<br/>UTF-8 encoded"]
-    end
-    S -- ".encode('utf-8')" --> B
-    B -- ".decode('utf-8')" --> S
-```
-
+![Mental model](../../../assets/python-101/03/03-01-mental-model.en.png)
 Three rules make most of the confusion disappear.
 
 1. **`str` is a sequence of Unicode code points.** It carries no encoding information.

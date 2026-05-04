@@ -55,19 +55,7 @@ last_reviewed: '2026-05-03'
 > 제어 흐름을 짤 때는 "이 분기·반복이 무엇을 결정하느냐"를 truthy/falsy 한 단계와 종료 조건 한 단계로 분리해 두면, 컴프리헨션과 일반 루프 사이의 선택도 같은 잣대로 답이 나옵니다.
 분기와 루프를 아래와 같이 한 장에 펼쳐 두면 코드를 읽을 때 다음 단계가 무엇인지 머릿속에 빠르게 떠오릅니다.
 
-```mermaid
-flowchart TB
-    Start(["흐름 제어"])
-    Start --> Branch{"하나의 결정인가,<br/>반복인가?"}
-    Branch -- "결정 1회" --> If["if / elif / else<br/>truthy·falsy 평가"]
-    Branch -- "반복" --> Loop{"미리 길이를 아는가?"}
-    Loop -- "안다 (이터러블)" --> For["for x in iterable<br/>+ enumerate / zip / range"]
-    Loop -- "모른다 (조건)" --> While["while 조건:<br/>탈출 조건을 본문이 만든다"]
-    For --> Comp{"입력 → 출력 변환만 하는가?"}
-    Comp -- "예, 한두 줄" --> Compr["list/dict/set comprehension"]
-    Comp -- "아니오, 부수효과 있음" --> ForBody["for 본문에서 명시적으로 처리"]
-```
-
+![Mental Model](../../../assets/python-101/05/05-01-mental-model.ko.png)
 세 가지 핵심 규칙입니다.
 
 1. **결정이 1회면 `if`, 같은 일을 반복하면 루프**입니다. `for`와 `while`은 같은 일을 반복하기 위한 두 가지 도구이며, 선택 기준은 "이미 순회할 대상이 있는가"입니다.

@@ -59,15 +59,7 @@ The common root is one of two confusions: not knowing exactly what a variable po
 > In Python, a variable is not a box that holds a value but a name tag attached to an object. Holding only that picture in your head explains almost every assignment, comparison, and copying trap with the same diagram.
 In Python, a variable is not a box that holds a value. It's a **name tag attached to an object**. One object can have many name tags, and a name tag can be moved to a different object at any time.
 
-```mermaid
-flowchart LR
-    a["variable a"] --> obj1["int object: 42"]
-    b["variable b"] --> obj1
-    c["variable c"] --> obj2["str object: 'hi'"]
-    style obj1 fill:#e8f4fd,stroke:#1f77b4
-    style obj2 fill:#fff4e6,stroke:#d97706
-```
-
+![Mental model](../../../assets/python-101/02/02-01-mental-model.en.png)
 In the diagram above, after `a = 42; b = a` both `a` and `b` point at the same integer object `42`. After `a = "hi"`, only `a` moves to a fresh string object; `b` still points at `42`.
 
 Holding this picture in your head makes two behaviors feel natural.

@@ -37,17 +37,7 @@ production data pipeline의 4가지 요구사항:
 
 ## 아키텍처 — 6 stage pipeline
 
-```mermaid
-flowchart LR
-    A[Raw Source] --> B[Stage 1: Ingest + Catalog]
-    B --> C[Stage 2: Clean + Dedup]
-    C --> D[Stage 3: PII Redaction]
-    D --> E[Stage 4: Quality Filter]
-    E --> F[Stage 5: Tokenize + Chunk]
-    F --> G[Stage 6: Split + Version]
-    G --> H["Versioned Dataset (v2026.05.03)"]
-```
-
+![아키텍처 — 6 stage pipeline](../../../assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
 각 stage는 input parquet과 output parquet, manifest를 가집니다. manifest에는 input fingerprint, code version, parameters가 모두 기록됩니다.
 
 ## DVC로 dataset versioning

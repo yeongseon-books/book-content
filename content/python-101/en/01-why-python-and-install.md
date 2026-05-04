@@ -51,24 +51,7 @@ That single sentence is the heart of this article.
 - project Python (venv): a copy living inside the project folder. You install packages only here.
 - Ten projects? Ten venvs. They cannot affect each other.
 
-```mermaid
-flowchart TB
-    subgraph OS["Operating System"]
-        sys["/usr/bin/python3<br/>(system Python)"]
-        ostools["OS scripts and tools<br/>(apt, brew, system utilities)"]
-        sys --> ostools
-    end
-    subgraph ProjA["Project A: web-api"]
-        venvA[".venv/bin/python<br/>fastapi==0.100<br/>requests==2.20"]
-    end
-    subgraph ProjB["Project B: data-pipeline"]
-        venvB[".venv/bin/python<br/>pandas==2.0<br/>requests==2.32"]
-    end
-    dev["Developer"] -->|activate| venvA
-    dev -->|activate| venvB
-    dev -.never installs into.-x sys
-```
-
+![Mental Model](../../../assets/python-101/01/01-01-mental-model.en.png)
 System Python is the OS's territory. Each venv is the project's territory. As a developer you only ever activate a venv and work inside it.
 
 ## Core Concepts

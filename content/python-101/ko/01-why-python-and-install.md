@@ -59,24 +59,7 @@ venv를 처음부터 습관으로 만들면, 앞으로 만날 의존성 충돌, 
 - project Python (venv): 프로젝트 폴더 안에 만든 사본입니다. 여기에만 패키지를 설치합니다.
 - 프로젝트가 10개면 venv도 10개가 됩니다. 서로 영향을 주지 않습니다.
 
-```mermaid
-flowchart TB
-    subgraph OS["Operating System"]
-        sys["/usr/bin/python3<br/>(system Python)"]
-        ostools["OS scripts and tools<br/>(apt, brew, system utilities)"]
-        sys --> ostools
-    end
-    subgraph ProjA["Project A: web-api"]
-        venvA[".venv/bin/python<br/>fastapi==0.100<br/>requests==2.20"]
-    end
-    subgraph ProjB["Project B: data-pipeline"]
-        venvB[".venv/bin/python<br/>pandas==2.0<br/>requests==2.32"]
-    end
-    dev["Developer"] -->|activate| venvA
-    dev -->|activate| venvB
-    dev -.never installs into.-x sys
-```
-
+![Mental Model](../../../assets/python-101/01/01-01-mental-model.ko.png)
 system Python은 OS의 영역, 각 venv는 프로젝트의 영역입니다. 개발자는 venv만 활성화해서 그 안에서 작업합니다.
 
 ## 핵심 개념

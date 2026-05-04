@@ -55,19 +55,7 @@ last_reviewed: '2026-05-03'
 > 파일은 "열고 → 쓰고/읽고 → 닫는다"는 세 단계의 자원이고, 예외는 "이 단계 중 어디에서 어떤 종류의 실패가 났는지"를 분류하는 라벨이라는 두 모델을 분리해 두면 `with`와 `try` 블록 설계가 자연스럽게 따라옵니다.
 다음 그림은 파일을 열고 작업하는 동안 발생할 수 있는 흐름을 보여줍니다.
 
-```mermaid
-flowchart LR
-    A["open(path, mode)"] --> B["file handle"]
-    B --> C{"work succeeds?"}
-    C -- "yes" --> D["normal flow"]
-    C -- "no" --> E["raise exception"]
-    D --> F["__exit__: close handle"]
-    E --> F
-    F --> G{"except matches?"}
-    G -- "yes" --> H["recovery code"]
-    G -- "no" --> I["propagate up"]
-```
-
+![Mental Model](../../../assets/python-101/08/08-01-mental-model.ko.png)
 두 가지 핵심 아이디어가 있습니다.
 
 - **`with`는 정상 종료 시에도, 예외가 발생했을 때에도 `__exit__`을 호출해 핸들을 닫아 줍니다.** 그래서 파일 처리에서는 `try`/`finally`로 직접 `close()`를 호출하는 일은 드뭅니다.
