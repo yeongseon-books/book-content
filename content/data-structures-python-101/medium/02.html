@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Arrays and Lists</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Arrays and Lists</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Is Python's list an array or a linked list?</p>
+<blockquote>
+<p>Python's list is implemented internally as a dynamic array. Index access is O(1), but insertion or deletion in the middle is O(n). This article covers the difference between arrays and lists, how Python list works under the hood, and its performance characteristics.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between static arrays and dynamic arrays</li>
+<li>How Python list is implemented internally</li>
+<li>Time complexity of common list operations</li>
+<li>The difference between the array module and list</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>list is the most commonly used data structure in Python. Without understanding how it works internally, it is easy to write inefficient code. For example, if you do not know why inserting at the front of a list is slow, finding the root cause of a performance issue becomes difficult.</p>
+<blockquote>
+<p>Understanding list deeply means understanding the foundation of stacks, queues, heaps, and other data structures.</p>
+</blockquote>
+<p>list is also the building block for other data structures. Stacks use append/pop, heaps use heapq on top of list. Deep knowledge of list makes learning the rest much easier.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Dynamic array = an array that grows automatically as elements are added</p>
+</blockquote>
+<pre><code>[static array]     fixed size, determined at declaration
+  +---+---+---+---+
+  | 1 | 2 | 3 | 4 |  &lt;- 4 slots, fixed
+  +---+---+---+---+
+
+[dynamic array]    doubles when capacity is exceeded
+  +---+---+---+---+---+---+---+---+
+  | 1 | 2 | 3 | 4 |   |   |   |   |  &lt;- extra capacity reserved
+  +---+---+---+---+---+---+---+---+
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Static Array</strong><br>
+- Description: A fixed-size array, like <code>int arr[10]</code> in C</p>
+<p><strong>Dynamic Array</strong><br>
+- Description: An array that automatically grows when elements are added</p>
+<p><strong>Index Access</strong><br>
+- Description: Retrieving an element by position in O(1)</p>
+<p><strong>Slicing</strong><br>
+- Description: Creating a sub-list with <code>list[start:end]</code></p>
+<p><strong>Amortized O(1)</strong><br>
+- Description: append occasionally triggers array expansion, but averages to O(1)</p>
+<h2>Before / After</h2>
+<p>Compare an inefficient and efficient way to insert at the front of a list.</p>
+<pre><code class="language-python"># before: insert at front of list — O(n), shifts all elements
+data = [1, 2, 3, 4, 5]
+data.insert(0, 0)  # every element shifts one position to the right
+</code></pre>
+<pre><code class="language-python"># after: insert at front with deque — O(1)
+from collections import deque
+data = deque([1, 2, 3, 4, 5])
+data.appendleft(0)  # O(1) insertion at the front
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Verify basic list operations and their time complexity</strong></p>
+<pre><code class="language-python">numbers = [10, 20, 30, 40, 50]
+
+# index access — O(1)
+print(numbers[2])     # 30
+
+# append — amortized O(1)
+numbers.append(60)
+print(numbers)        # [10, 20, 30, 40, 50, 60]
+
+# pop from end — O(1)
+last = numbers.pop()
+print(last)           # 60
+</code></pre>
+<p><strong>Step 2: Measure the cost of mid-list insertion and deletion</strong></p>
+<pre><code class="language-python">import time
+
+size = 100_000
+data = list(range(size))
+
+# insert at front — O(n)
+start = time.perf_counter()
+data.insert(0, -1)
+insert_front = time.perf_counter() - start
+
+# insert at end — O(1)
+start = time.perf_counter()
+data.append(-1)
+insert_end = time.perf_counter() - start
+
+print(f&quot;front insert: {insert_front:.6f}s&quot;)
+print(f&quot;end   insert: {insert_end:.6f}s&quot;)
+print(f&quot;front insert is {insert_front / max(insert_end, 1e-9):.0f}x slower&quot;)
+</code></pre>
+<p><strong>Step 3: Use slicing</strong></p>
+<pre><code class="language-python">data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+print(data[2:5])    # [2, 3, 4]
+print(data[::2])    # [0, 2, 4, 6, 8] — even indices
+print(data[::-1])   # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] — reversed
+</code></pre>
+<p><strong>Step 4: Transform with list comprehension</strong></p>
+<pre><code class="language-python"># list of squares
+squares = [x ** 2 for x in range(10)]
+print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+# filter with condition
+evens = [x for x in range(20) if x % 2 == 0]
+print(evens)    # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+</code></pre>
+<p><strong>Step 5: Compare the array module with list</strong></p>
+<pre><code class="language-python">from array import array
+
+# array: type-fixed array — memory efficient
+int_array = array('i', [1, 2, 3, 4, 5])  # 'i' = signed int
+print(int_array[0])  # 1
+
+# list can mix types
+mixed = [1, &quot;hello&quot;, 3.14, True]
+print(mixed)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Index access and append on a list are O(1), but insert(0, x) is O(n)</li>
+<li>Slicing creates a new list and costs O(k) time and space (k = slice length)</li>
+<li>List comprehensions are faster and more readable than for loops</li>
+<li>The array module stores only one type to save memory, but list is the default choice</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Calling list.insert(0, x) in a loop</strong><br>
+- Why It Is a Problem: Becomes O(n squared), extremely slow on large data<br>
+- Fix: Use deque.appendleft()</p>
+<p><strong>Copying a list with <code>b = a</code></strong><br>
+- Why It Is a Problem: Both reference the same object; changes to one affect the other<br>
+- Fix: Use <code>b = a[:]</code> or <code>b = a.copy()</code></p>
+<p><strong>Initializing nested lists with <code>[[] * 3]</code></strong><br>
+- Why It Is a Problem: All inner lists reference the same object<br>
+- Fix: Use <code>[[] for _ in range(3)]</code></p>
+<p><strong>Modifying a list while iterating</strong><br>
+- Why It Is a Problem: Indices shift and produce unexpected results<br>
+- Fix: Create a new list or iterate in reverse</p>
+<p><strong>Assuming len() is O(n)</strong><br>
+- Why It Is a Problem: Leads to unnecessary caching of the length<br>
+- Fix: Python's len() is O(1) — call it directly</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>API responses arrive as JSON arrays and are processed as lists</li>
+<li>Log data is collected in a list and batch-processed</li>
+<li>List comprehensions build data transformation pipelines</li>
+<li>Slicing implements pagination (items[offset:offset+limit])</li>
+<li>Large numerical data uses NumPy arrays instead of the array module</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In most situations Python list is fast enough. Performance optimization comes after profiling reveals a bottleneck. But knowing that "inserting at the front of a list is slow" lets you pick the right data structure from the start.</p>
+<p>When using list in production, the first question is: "What operations will I run on this list most often?" If you only add and remove from the end, list is ideal. If you need both ends, use deque. If lookups dominate, use set or dict.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can explain that Python list is implemented as a dynamic array</li>
+<li>[ ] Can state the time complexity of major list operations</li>
+<li>[ ] Can explain why insert(0, x) is slower than append(x)</li>
+<li>[ ] Can use slicing and list comprehensions effectively</li>
+<li>[ ] Can describe the difference between the array module and list</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Measure the time to call insert(0, x) 1,000 times on a 100,000-element list versus deque.appendleft(x) 1,000 times.</li>
+<li>Initialize a 5x5 2D list correctly and verify that setting a value at (2,3) does not affect other rows.</li>
+<li>Use a list comprehension to create a list of numbers from 1 to 100 that are multiples of 3 but not multiples of 5.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Python list is implemented as a dynamic array: index access is O(1), append/pop from the end is amortized O(1), and mid-list insertion/deletion is O(n). The next article covers stacks and queues built on top of list.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><strong>Arrays and Lists (current)</strong></li>
+<li>Stacks and Queues (upcoming)</li>
+<li>Hash Tables and dict (upcoming)</li>
+<li>Linked Lists (upcoming)</li>
+<li>Trees and Binary Trees (upcoming)</li>
+<li>Heaps and Priority Queues (upcoming)</li>
+<li>Graph Representations (upcoming)</li>
+<li>Sets and Set Operations (upcoming)</li>
+<li>Choosing the Right Data Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html#more-on-lists">Python Official Docs — Lists</a></li>
+<li><a href="https://wiki.python.org/moin/TimeComplexity">Python TimeComplexity — Python Wiki</a></li>
+<li><a href="https://github.com/python/cpython/blob/main/Objects/listobject.c">CPython list implementation (GitHub)</a></li>
+<li><a href="https://realpython.com/python-lists-tuples/">Real Python — Python Lists and Tuples</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, list, array, Time Complexity</p>
+</body>
+</html>

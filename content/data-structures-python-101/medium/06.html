@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trees and Binary Trees</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Trees and Binary Trees</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Why do file systems, org charts, and the DOM all use tree structures?</p>
+<blockquote>
+<p>Trees naturally represent hierarchical relationships. Binary search trees (BSTs) enable O(log n) lookups on sorted data. This article covers tree concepts, binary tree implementation, traversal algorithms, and binary search trees.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Basic tree terminology and structure</li>
+<li>Implementing binary trees in Python</li>
+<li>Preorder, inorder, postorder, and level-order traversals</li>
+<li>How binary search trees (BSTs) work</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Trees are one of the most important data structures in computer science. File systems, HTML DOMs, database indexes (B-Trees), and JSON parse trees — trees are everywhere.</p>
+<blockquote>
+<p>Understanding trees dramatically improves your recursive thinking. Most tree algorithms are naturally expressed with recursion.</p>
+</blockquote>
+<p>Binary search trees maintain sorted data while performing insertion, deletion, and lookup in O(log n) — vastly faster than linear search O(n) on a list.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Tree = a hierarchical structure that branches from a root to child nodes</p>
+</blockquote>
+<pre><code>        [root]
+       /      \
+    [child]  [child]
+    /   \       \
+ [leaf] [leaf]  [leaf]
+
+Binary Search Tree (BST):
+        [8]
+       /   \
+     [3]   [10]
+    /   \      \
+  [1]   [6]   [14]
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>root</strong><br>
+- Description: The topmost node in a tree</p>
+<p><strong>leaf</strong><br>
+- Description: A node with no children</p>
+<p><strong>depth</strong><br>
+- Description: The distance from the root to a given node</p>
+<p><strong>height</strong><br>
+- Description: The distance from a given node to its farthest leaf</p>
+<p><strong>Binary Search Tree (BST)</strong><br>
+- Description: A tree where left child &lt; parent &lt; right child</p>
+<h2>Before / After</h2>
+<p>Compare searching a sorted list versus searching a BST.</p>
+<pre><code class="language-python"># before: linear search in a sorted list — O(n)
+data = [1, 3, 6, 8, 10, 14]
+for item in data:
+    if item == 10:
+        print(&quot;found&quot;)
+        break
+</code></pre>
+<pre><code class="language-python"># after: BST search — O(log n)
+# BST: 8 → 10 → found (2 steps)
+def search_bst(node, target):
+    if node is None:
+        return False
+    if target == node.data:
+        return True
+    elif target &lt; node.data:
+        return search_bst(node.left, target)
+    else:
+        return search_bst(node.right, target)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Define a binary tree node</strong></p>
+<pre><code class="language-python">class TreeNode:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+    def __repr__(self):
+        return f&quot;TreeNode({self.data})&quot;
+</code></pre>
+<p><strong>Step 2: Implement tree traversals</strong></p>
+<pre><code class="language-python">def inorder(node):
+    &quot;&quot;&quot;Inorder traversal: left → root → right&quot;&quot;&quot;
+    if node is None:
+        return []
+    return inorder(node.left) + [node.data] + inorder(node.right)
+
+def preorder(node):
+    &quot;&quot;&quot;Preorder traversal: root → left → right&quot;&quot;&quot;
+    if node is None:
+        return []
+    return [node.data] + preorder(node.left) + preorder(node.right)
+
+def postorder(node):
+    &quot;&quot;&quot;Postorder traversal: left → right → root&quot;&quot;&quot;
+    if node is None:
+        return []
+    return postorder(node.left) + postorder(node.right) + [node.data]
+
+# Build tree:        1
+#                  /   \
+#                 2     3
+#                / \
+#               4   5
+root = TreeNode(1)
+root.left = TreeNode(2)
+root.right = TreeNode(3)
+root.left.left = TreeNode(4)
+root.left.right = TreeNode(5)
+
+print(f&quot;inorder:   {inorder(root)}&quot;)    # [4, 2, 5, 1, 3]
+print(f&quot;preorder:  {preorder(root)}&quot;)   # [1, 2, 4, 5, 3]
+print(f&quot;postorder: {postorder(root)}&quot;)  # [4, 5, 2, 3, 1]
+</code></pre>
+<p><strong>Step 3: Level-order traversal (BFS)</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def level_order(root):
+    &quot;&quot;&quot;Level-order traversal: nodes at the same depth, left to right&quot;&quot;&quot;
+    if root is None:
+        return []
+    result = []
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        result.append(node.data)
+        if node.left:
+            queue.append(node.left)
+        if node.right:
+            queue.append(node.right)
+    return result
+
+print(f&quot;level-order: {level_order(root)}&quot;)  # [1, 2, 3, 4, 5]
+</code></pre>
+<p><strong>Step 4: Implement a binary search tree</strong></p>
+<pre><code class="language-python">class BST:
+    def __init__(self):
+        self.root = None
+
+    def insert(self, data):
+        self.root = self._insert(self.root, data)
+
+    def _insert(self, node, data):
+        if node is None:
+            return TreeNode(data)
+        if data &lt; node.data:
+            node.left = self._insert(node.left, data)
+        elif data &gt; node.data:
+            node.right = self._insert(node.right, data)
+        return node
+
+    def search(self, data):
+        return self._search(self.root, data)
+
+    def _search(self, node, data):
+        if node is None:
+            return False
+        if data == node.data:
+            return True
+        elif data &lt; node.data:
+            return self._search(node.left, data)
+        else:
+            return self._search(node.right, data)
+
+    def inorder(self):
+        return inorder(self.root)
+
+bst = BST()
+for val in [8, 3, 10, 1, 6, 14]:
+    bst.insert(val)
+
+print(bst.inorder())       # [1, 3, 6, 8, 10, 14] — sorted result
+print(bst.search(6))       # True
+print(bst.search(7))       # False
+</code></pre>
+<p><strong>Step 5: Compute tree height and node count</strong></p>
+<pre><code class="language-python">def tree_height(node):
+    if node is None:
+        return -1
+    return 1 + max(tree_height(node.left), tree_height(node.right))
+
+def count_nodes(node):
+    if node is None:
+        return 0
+    return 1 + count_nodes(node.left) + count_nodes(node.right)
+
+print(f&quot;height: {tree_height(bst.root)}&quot;)      # 2
+print(f&quot;node count: {count_nodes(bst.root)}&quot;)   # 6
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Tree algorithms are naturally expressed with recursion — the base case is node is None</li>
+<li>Inorder traversal of a BST returns a sorted result</li>
+<li>Level-order traversal uses a queue (deque) — this is the BFS pattern</li>
+<li>BST search discards half the tree at each step, achieving O(log n)</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Missing recursive base case</strong><br>
+- Why It Is a Problem: Causes infinite recursion and RecursionError<br>
+- Fix: Always check node is None first</p>
+<p><strong>Not handling duplicate values in BST</strong><br>
+- Why It Is a Problem: Produces an unexpected tree structure<br>
+- Fix: Define a clear duplicate policy (ignore or count)</p>
+<p><strong>Not recognizing skewed trees</strong><br>
+- Why It Is a Problem: BST degenerates to O(n)<br>
+- Fix: Consider balanced trees (AVL, Red-Black)</p>
+<p><strong>Confusing traversal orders</strong><br>
+- Why It Is a Problem: Produces wrong results<br>
+- Fix: Memorize: preorder (NLR), inorder (LNR), postorder (LRN)</p>
+<p><strong>Underestimating delete complexity</strong><br>
+- Why It Is a Problem: Deleting a node with two children is tricky<br>
+- Fix: Learn the in-order successor pattern</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Database indexes are implemented as B-Trees/B+Trees</li>
+<li>File system directory structures are trees</li>
+<li>HTML/XML DOMs are tree structures</li>
+<li>Expression parsers generate ASTs (abstract syntax trees)</li>
+<li>Autocomplete features are implemented with tries (prefix trees)</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In practice, you rarely implement a BST from scratch. Python's sorted(), the bisect module, and database indexes handle most sorting and searching needs. But understanding tree internals helps you grasp how those tools work under the hood.</p>
+<p>There is no better data structure than trees for practicing recursive thinking. The more tree problems you solve, the more natural recursion becomes.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can explain root, leaf, depth, and height of a tree</li>
+<li>[ ] Can implement preorder, inorder, postorder, and level-order traversals</li>
+<li>[ ] Can implement insertion and search in a BST</li>
+<li>[ ] Can explain why inorder traversal of a BST returns a sorted result</li>
+<li>[ ] Can compute tree height and node count recursively</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a function that validates whether a binary tree is a BST. (Hint: the inorder traversal result must be sorted)</li>
+<li>Write a function that checks whether two binary trees are structurally identical.</li>
+<li>Implement a function that deletes a value from a BST. (Handle cases with 0, 1, and 2 children)</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Trees represent hierarchical structures, and BSTs search sorted data in O(log n). Tree traversals are naturally implemented with recursion. The next article covers heaps and priority queues — a specialized form of trees.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Hash Tables and dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Linked Lists</a></li>
+<li><strong>Trees and Binary Trees (current)</strong></li>
+<li>Heaps and Priority Queues (upcoming)</li>
+<li>Graph Representations (upcoming)</li>
+<li>Sets and Set Operations (upcoming)</li>
+<li>Choosing the Right Data Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://realpython.com/binary-search-python/">Real Python — Binary Trees in Python</a></li>
+<li><a href="https://www.geeksforgeeks.org/binary-search-tree-data-structure/">GeeksforGeeks — Binary Search Tree</a></li>
+<li><a href="https://visualgo.net/en/bst">Visualgo — Binary Search Tree Visualization</a></li>
+<li><a href="https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html">Problem Solving with Algorithms — Trees</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, Tree, Binary Tree, BST</p>
+</body>
+</html>

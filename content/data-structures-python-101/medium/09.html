@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sets and Set Operations</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Sets and Set Operations</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: What data structure gives you O(1) deduplication and membership testing?</p>
+<blockquote>
+<p>Python's set is backed by a hash table, so adding, removing, and checking membership are all O(1). It also provides mathematical set operations — union, intersection, difference, and symmetric difference — out of the box. This article covers set internals and practical usage patterns.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Set internals and performance characteristics</li>
+<li>Union, intersection, difference, and symmetric difference</li>
+<li>frozenset use cases</li>
+<li>Practical patterns using sets</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Deduplication, membership checks, and comparing two collections are extremely common in data processing. With a list, these operations are O(n). With a set, they are O(1). The larger the data, the more decisive this difference becomes.</p>
+<blockquote>
+<p>A set is essentially a dict without values. It is a hash table that stores only keys.</p>
+</blockquote>
+<p>Set operations are used heavily in data analysis, permission management, and tag systems.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>set = a collection of unique elements, backed by a hash table</p>
+</blockquote>
+<pre><code>A = {1, 2, 3, 4}      B = {3, 4, 5, 6}
+
+union        A | B  = {1, 2, 3, 4, 5, 6}
+intersection A &amp; B  = {3, 4}
+difference   A - B  = {1, 2}
+sym. diff.   A ^ B  = {1, 2, 5, 6}
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>set</strong><br>
+- Description: A hash-based collection that does not allow duplicates</p>
+<p><strong>frozenset</strong><br>
+- Description: An immutable set that can be used as a dict key or set element</p>
+<p><strong>union</strong><br>
+- Description: All elements from both sets combined</p>
+<p><strong>intersection</strong><br>
+- Description: Elements common to both sets</p>
+<p><strong>difference</strong><br>
+- Description: Elements in one set but not the other</p>
+<h2>Before / After</h2>
+<p>Compare deduplication and finding common elements with a list versus a set.</p>
+<pre><code class="language-python"># before: deduplication and intersection with list — O(n^2)
+list_a = [1, 2, 3, 4, 2, 3]
+unique = []
+for x in list_a:
+    if x not in unique:
+        unique.append(x)
+common = [x for x in list_a if x in [3, 4, 5, 6]]
+</code></pre>
+<pre><code class="language-python"># after: deduplication and intersection with set — O(n)
+set_a = {1, 2, 3, 4, 2, 3}   # automatic dedup → {1, 2, 3, 4}
+common = set_a &amp; {3, 4, 5, 6}  # O(min(m, n)) intersection
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Basic set operations</strong></p>
+<pre><code class="language-python"># Creation
+fruits = {&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;}
+numbers = set([1, 2, 3, 2, 1])  # {1, 2, 3}
+
+# Add — O(1)
+fruits.add(&quot;date&quot;)
+
+# Remove — O(1)
+fruits.discard(&quot;banana&quot;)  # no error if missing
+# fruits.remove(&quot;banana&quot;)  # raises KeyError if missing
+
+# Membership test — O(1)
+print(&quot;apple&quot; in fruits)  # True
+
+# Size
+print(len(fruits))  # 3
+</code></pre>
+<p><strong>Step 2: Set operations</strong></p>
+<pre><code class="language-python">a = {1, 2, 3, 4, 5}
+b = {4, 5, 6, 7, 8}
+
+# Union
+print(a | b)          # {1, 2, 3, 4, 5, 6, 7, 8}
+print(a.union(b))     # same result
+
+# Intersection
+print(a &amp; b)              # {4, 5}
+print(a.intersection(b))  # same result
+
+# Difference
+print(a - b)            # {1, 2, 3}
+print(a.difference(b))  # same result
+
+# Symmetric difference (elements in only one set)
+print(a ^ b)                      # {1, 2, 3, 6, 7, 8}
+print(a.symmetric_difference(b))  # same result
+</code></pre>
+<p><strong>Step 3: Subsets and supersets</strong></p>
+<pre><code class="language-python">a = {1, 2, 3}
+b = {1, 2, 3, 4, 5}
+
+print(a &lt;= b)          # True — a is a subset of b
+print(a.issubset(b))   # True
+
+print(b &gt;= a)            # True — b is a superset of a
+print(b.issuperset(a))   # True
+
+print(a.isdisjoint({6, 7}))  # True — no common elements
+</code></pre>
+<p><strong>Step 4: frozenset usage</strong></p>
+<pre><code class="language-python"># frozenset: immutable set — can be used as a dict key
+permissions = frozenset([&quot;read&quot;, &quot;write&quot;])
+other = frozenset([&quot;read&quot;, &quot;write&quot;])
+
+# Use as dict key
+role_map = {
+    frozenset([&quot;read&quot;]): &quot;viewer&quot;,
+    frozenset([&quot;read&quot;, &quot;write&quot;]): &quot;editor&quot;,
+    frozenset([&quot;read&quot;, &quot;write&quot;, &quot;admin&quot;]): &quot;admin&quot;,
+}
+print(role_map[permissions])  # &quot;editor&quot;
+
+# Use as set element
+set_of_sets = {frozenset([1, 2]), frozenset([3, 4])}
+print(frozenset([1, 2]) in set_of_sets)  # True
+</code></pre>
+<p><strong>Step 5: Practical pattern — tag filtering</strong></p>
+<pre><code class="language-python">articles = [
+    {&quot;title&quot;: &quot;Python Intro&quot;, &quot;tags&quot;: {&quot;python&quot;, &quot;beginner&quot;}},
+    {&quot;title&quot;: &quot;Django REST&quot;, &quot;tags&quot;: {&quot;python&quot;, &quot;django&quot;, &quot;api&quot;}},
+    {&quot;title&quot;: &quot;React Hooks&quot;, &quot;tags&quot;: {&quot;javascript&quot;, &quot;react&quot;}},
+    {&quot;title&quot;: &quot;Flask API&quot;, &quot;tags&quot;: {&quot;python&quot;, &quot;flask&quot;, &quot;api&quot;}},
+]
+
+# Articles with BOTH python AND api tags
+required = {&quot;python&quot;, &quot;api&quot;}
+matches = [a for a in articles if required &lt;= a[&quot;tags&quot;]]
+for m in matches:
+    print(m[&quot;title&quot;])
+# Django REST
+# Flask API
+
+# Articles with python OR javascript tags
+any_of = {&quot;python&quot;, &quot;javascript&quot;}
+matches = [a for a in articles if a[&quot;tags&quot;] &amp; any_of]
+print([m[&quot;title&quot;] for m in matches])
+# ['Python Intro', 'Django REST', 'React Hooks', 'Flask API']
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>set's <code>in</code> operator is O(1), making it ideal for large-scale data lookups</li>
+<li><code>|</code>, <code>&amp;</code>, <code>-</code>, <code>^</code> operators express set operations concisely</li>
+<li>The <code>&lt;=</code> operator checks subset relationships</li>
+<li>frozenset is immutable, so it can serve as a dict key or element of another set</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Creating an empty set with <code>{}</code></strong><br>
+- Why It Is a Problem: <code>{}</code> creates an empty dict<br>
+- Fix: Use <code>set()</code> to create an empty set</p>
+<p><strong>Using a list as a set element</strong><br>
+- Why It Is a Problem: Lists are unhashable — causes TypeError<br>
+- Fix: Convert to tuple first</p>
+<p><strong>Relying on set ordering</strong><br>
+- Why It Is a Problem: Sets do not guarantee order<br>
+- Fix: Use sorted() when order matters</p>
+<p><strong>Using remove() for a missing element</strong><br>
+- Why It Is a Problem: Raises KeyError<br>
+- Fix: Use discard() to silently ignore missing elements</p>
+<p><strong>Expecting duplicates in set comprehensions</strong><br>
+- Why It Is a Problem: Duplicates are automatically removed<br>
+- Fix: Verify this is the intended behavior</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>User permissions are managed as sets, with intersection checks for access control</li>
+<li>Duplicate data is removed instantly with set conversion</li>
+<li>Differences between two data sources are computed with set difference</li>
+<li>Tag-based filtering leverages set operations</li>
+<li>Already-processed items are tracked in a set to prevent reprocessing</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Sets are underappreciated. Many developers default to lists, but using sets for search and deduplication makes code both cleaner and faster.</p>
+<p>When the question is "are there duplicates?" or "do these two collections share elements?", set should be the first thing that comes to mind.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can use basic set operations (add, discard, in)</li>
+<li>[ ] Can explain union, intersection, difference, and symmetric difference</li>
+<li>[ ] Can explain the purpose of frozenset</li>
+<li>[ ] Can perform O(1) deduplication and membership checks with set</li>
+<li>[ ] Can check subset and superset relationships</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a function that finds common elements of two lists using set operations and returns them in the original order.</li>
+<li>Manage course enrollments for multiple students as sets and find courses taken by every student.</li>
+<li>Extract words from two text files and find words unique to each file using symmetric difference.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Sets are hash-table-backed collections that provide O(1) lookups and rich set operations. They excel at deduplication, membership testing, and data comparison. The next article wraps up the series with a comprehensive guide for choosing the right data structure.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Hash Tables and dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/06-trees-and-binary-trees.md">Trees and Binary Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/07-heaps-and-priority-queues.md">Heaps and Priority Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/08-graph-representations.md">Graph Representations</a></li>
+<li><strong>Sets and Set Operations (current)</strong></li>
+<li>Choosing the Right Data Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset">Python Docs — Set Types</a></li>
+<li><a href="https://realpython.com/python-sets/">Real Python — Sets in Python</a></li>
+<li><a href="https://wiki.python.org/moin/TimeComplexity">Python TimeComplexity — Set</a></li>
+<li><a href="https://www.geeksforgeeks.org/python-set/">GeeksforGeeks — Python Set</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, set, Set Operations, frozenset</p>
+</body>
+</html>

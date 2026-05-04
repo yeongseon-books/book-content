@@ -2166,3 +2166,24 @@ series:
   level: 101
   lifecycle: active
   path: content/technical-writing
+- id: data-structures-python-101
+  status: content-ready
+  category: python
+  title:
+    ko: Data Structures with Python 101
+    en: Data Structures with Python 101
+  description:
+    ko: Python으로 배우는 자료구조 입문. list, dict, set, deque, 트리, 힙, 그래프를 직접 구현합니다.
+    en: A hands-on introduction to data structures in Python covering list, dict, set, deque, trees, heaps, and graphs.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/data-structures-python-101
