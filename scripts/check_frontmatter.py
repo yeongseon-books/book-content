@@ -29,7 +29,7 @@ CONTENT_DIR = REPO_ROOT / "content"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 REQUIRED_FIELDS = {"title", "series", "episode", "language", "status", "targets", "tags", "last_reviewed"}
-OPTIONAL_FIELDS = {"seo_title", "hashnode_title", "medium_title", "ebook_title", "published", "published_to", "code_required"}
+OPTIONAL_FIELDS = {"seo_title", "seo_description", "hashnode_title", "medium_title", "ebook_title", "published", "published_to", "code_required"}
 VALID_STATUS = {"draft", "content-ready", "code-checked", "publish-ready", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 TARGET_KEYS = {"tistory", "medium", "mkdocs", "ebook"}
@@ -39,6 +39,21 @@ PUBLISHED_TO_CHANNELS = {"tistory", "hashnode", "medium", "mkdocs"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PREFIX_RE = re.compile(r"^(\d+)")
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
+
+# SEO length limits (NFC code-points). emoji / ZWJ banned.
+SEO_LIMITS = {
+    "ko": {"seo_title": 36, "seo_description": 80},
+    "en": {"seo_title": 60, "seo_description": 150},
+}
+import unicodedata
+EMOJI_RE = re.compile(
+    "["
+    "\U0001F300-\U0001FAFF"
+    "\U00002600-\U000027BF"
+    "\U0001F000-\U0001F2FF"
+    "\u200d"
+    "]"
+)
 
 
 def load_catalog() -> dict[str, dict]:
@@ -151,6 +166,24 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> tuple[list[str], l
     code_req = fm.get("code_required")
     if code_req is not None and not isinstance(code_req, bool):
         errors.append(f"code_required must be boolean, got {type(code_req).__name__}: {code_req!r}")
+
+    # SEO field validation (NFC code-points, emoji/ZWJ banned)
+    for fld in ("seo_title", "seo_description"):
+        val = fm.get(fld)
+        if val is None:
+            continue
+        if not isinstance(val, str):
+            errors.append(f"{fld} must be string, got {type(val).__name__}")
+            continue
+        normalized = unicodedata.normalize("NFC", val)
+        if EMOJI_RE.search(normalized):
+            errors.append(f"{fld} contains banned emoji/ZWJ characters")
+        lang_limits = SEO_LIMITS.get(language or "", {})
+        limit = lang_limits.get(fld)
+        if limit and len(normalized) > limit:
+            errors.append(
+                f"{fld} exceeds {language} hard limit: {len(normalized)} > {limit} NFC code-points"
+            )
     # Deprecation warning for 'ready' status
     if status == "ready":
         warnings.append("status 'ready' is deprecated; use 'publish-ready' instead")
