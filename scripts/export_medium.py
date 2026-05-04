@@ -52,7 +52,7 @@ def regenerate_medium(series_path: Path) -> None:
     if not en_dir.is_dir():
         raise SystemExit(f"no en/ directory under {series_path}")
     subprocess.run(
-        [sys.executable, str(TO_MEDIUM), str(en_dir.relative_to(REPO_ROOT))],
+        [sys.executable, str(TO_MEDIUM), "--asset-mode", "inline", str(en_dir.relative_to(REPO_ROOT))],
         cwd=REPO_ROOT, check=True,
     )
 
