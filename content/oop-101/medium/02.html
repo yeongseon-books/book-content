@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Classes and Instances</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Classes and Instances</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How should you design classes and work with instances effectively?</p>
+<blockquote>
+<p>A class is the blueprint; an instance is the actual object built from it. This article covers constructors, instance methods, class methods, static methods, and Python's special dunder methods — the building blocks of any class.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Constructor (<code>__init__</code>) and instance initialization patterns</li>
+<li>Differences between instance methods, class methods, and static methods</li>
+<li>Dunder methods: <code>__repr__</code>, <code>__str__</code>, <code>__eq__</code>, and more</li>
+<li>Class design patterns used frequently in production code</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Creating a class is not hard. The hard part is deciding which data becomes attributes and which operations become methods. Good class design improves both reusability and readability.</p>
+<blockquote>
+<p>Good class = clear responsibility + proper interface + hidden internals</p>
+</blockquote>
+<p>Python's dunder methods let you integrate custom classes seamlessly with built-in syntax. <code>print()</code>, <code>==</code>, <code>len()</code>, and <code>for</code> loops all work naturally with user-defined objects when the right dunders are in place.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Anatomy of a class</p>
+</blockquote>
+<pre><code>Class
+├── class variable
+├── __init__()       → instance initialization
+├── instance method  → self as first arg
+├── @classmethod     → cls as first arg
+├── @staticmethod    → no self/cls
+└── dunder methods   → __repr__, __str__, __eq__, ...
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Constructor (<code>__init__</code>)</strong><br>
+- Description: Initializer called automatically when an instance is created</p>
+<p><strong>Instance method</strong><br>
+- Description: Takes <code>self</code> as first parameter to access instance data</p>
+<p><strong>Class method (<code>@classmethod</code>)</strong><br>
+- Description: Takes <code>cls</code> as first parameter and operates at the class level</p>
+<p><strong>Static method (<code>@staticmethod</code>)</strong><br>
+- Description: A utility function that does not depend on instance or class state</p>
+<p><strong>Dunder method</strong><br>
+- Description: Methods starting and ending with <code>__</code> that implement Python protocols</p>
+<h2>Before / After</h2>
+<p>Improving object comparison and display.</p>
+<pre><code class="language-python"># before: no dunder methods — unhelpful output and comparison
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+p1 = Point(1, 2)
+p2 = Point(1, 2)
+print(p1)        # &lt;__main__.Point object at 0x...&gt;
+print(p1 == p2)  # False — same coordinates but considered different
+</code></pre>
+<pre><code class="language-python"># after: dunder methods — intuitive output and comparison
+class Point:
+    def __init__(self, x: float, y: float) -&gt; None:
+        self.x = x
+        self.y = y
+
+    def __repr__(self) -&gt; str:
+        return f&quot;Point({self.x}, {self.y})&quot;
+
+    def __eq__(self, other: object) -&gt; bool:
+        if not isinstance(other, Point):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+
+p1 = Point(1, 2)
+p2 = Point(1, 2)
+print(p1)        # Point(1, 2)
+print(p1 == p2)  # True
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Constructor Patterns</strong></p>
+<pre><code class="language-python">class Product:
+    &quot;&quot;&quot;Product class — validation in the constructor&quot;&quot;&quot;
+
+    def __init__(self, name: str, price: int, quantity: int = 0) -&gt; None:
+        if price &lt; 0:
+            raise ValueError(f&quot;Price cannot be negative: {price}&quot;)
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+    def total_value(self) -&gt; int:
+        return self.price * self.quantity
+
+    def __repr__(self) -&gt; str:
+        return f&quot;Product({self.name!r}, {self.price}, {self.quantity})&quot;
+
+p = Product(&quot;Keyboard&quot;, 50000, 3)
+print(p.total_value())  # 150000
+print(p)                # Product('Keyboard', 50000, 3)
+</code></pre>
+<p><strong>Step 2: Alternative Constructors with @classmethod</strong></p>
+<pre><code class="language-python">class Date:
+    def __init__(self, year: int, month: int, day: int) -&gt; None:
+        self.year = year
+        self.month = month
+        self.day = day
+
+    @classmethod
+    def from_string(cls, date_str: str) -&gt; &quot;Date&quot;:
+        &quot;&quot;&quot;Create Date from 'YYYY-MM-DD' string&quot;&quot;&quot;
+        year, month, day = map(int, date_str.split(&quot;-&quot;))
+        return cls(year, month, day)
+
+    @classmethod
+    def today(cls) -&gt; &quot;Date&quot;:
+        &quot;&quot;&quot;Create Date from today's date&quot;&quot;&quot;
+        from datetime import date
+        d = date.today()
+        return cls(d.year, d.month, d.day)
+
+    def __repr__(self) -&gt; str:
+        return f&quot;Date({self.year}, {self.month}, {self.day})&quot;
+
+d1 = Date(2026, 5, 4)
+d2 = Date.from_string(&quot;2026-05-04&quot;)
+print(d1)  # Date(2026, 5, 4)
+print(d2)  # Date(2026, 5, 4)
+</code></pre>
+<p><strong>Step 3: Static Methods</strong></p>
+<pre><code class="language-python">class MathUtils:
+    @staticmethod
+    def is_even(n: int) -&gt; bool:
+        return n % 2 == 0
+
+    @staticmethod
+    def factorial(n: int) -&gt; int:
+        if n &lt; 0:
+            raise ValueError(&quot;Factorial is not defined for negative numbers&quot;)
+        result = 1
+        for i in range(2, n + 1):
+            result *= i
+        return result
+
+print(MathUtils.is_even(4))     # True
+print(MathUtils.factorial(5))   # 120
+</code></pre>
+<p><strong>Step 4: Operator Overloading with Dunders</strong></p>
+<pre><code class="language-python">class Vector:
+    def __init__(self, x: float, y: float) -&gt; None:
+        self.x = x
+        self.y = y
+
+    def __add__(self, other: &quot;Vector&quot;) -&gt; &quot;Vector&quot;:
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __mul__(self, scalar: float) -&gt; &quot;Vector&quot;:
+        return Vector(self.x * scalar, self.y * scalar)
+
+    def __abs__(self) -&gt; float:
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+
+    def __repr__(self) -&gt; str:
+        return f&quot;Vector({self.x}, {self.y})&quot;
+
+v1 = Vector(3, 4)
+v2 = Vector(1, 2)
+print(v1 + v2)    # Vector(4, 6)
+print(v1 * 2)     # Vector(6, 8)
+print(abs(v1))    # 5.0
+</code></pre>
+<p><strong>Step 5: Memory Optimization with <strong>slots</strong></strong></p>
+<pre><code class="language-python">class RegularPoint:
+    def __init__(self, x: float, y: float) -&gt; None:
+        self.x = x
+        self.y = y
+
+class OptimizedPoint:
+    __slots__ = (&quot;x&quot;, &quot;y&quot;)
+
+    def __init__(self, x: float, y: float) -&gt; None:
+        self.x = x
+        self.y = y
+
+import sys
+
+rp = RegularPoint(1, 2)
+op = OptimizedPoint(1, 2)
+print(sys.getsizeof(rp.__dict__))  # size of regular instance __dict__
+# OptimizedPoint has no __dict__ → saves memory
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>@classmethod</code> is mainly used for alternative constructors (factory methods)</li>
+<li><code>@staticmethod</code> is for utilities logically related to the class but needing no instance data</li>
+<li>The <code>isinstance</code> check and <code>NotImplemented</code> return in <code>__eq__</code> are the standard pattern for type-safe comparison</li>
+<li><code>__slots__</code> saves memory when creating millions of instances</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Returning a value from <code>__init__</code></strong><br>
+- Why It Is a Problem: <code>__init__</code> must return <code>None</code><br>
+- Fix: Only write initialization logic; omit <code>return</code></p>
+<p><strong>Confusing <code>@classmethod</code> and <code>@staticmethod</code></strong><br>
+- Why It Is a Problem: They differ in access to class data<br>
+- Fix: Use <code>@classmethod</code> when <code>cls</code> is needed, <code>@staticmethod</code> otherwise</p>
+<p><strong>Defining <code>__eq__</code> without <code>__hash__</code></strong><br>
+- Why It Is a Problem: Cannot use as dict key or set member<br>
+- Fix: Define <code>__hash__</code> whenever you define <code>__eq__</code></p>
+<p><strong>Making every method <code>@staticmethod</code></strong><br>
+- Why It Is a Problem: No reason to use a class at all<br>
+- Fix: Use instance methods when instance data is involved</p>
+<p><strong>Mutable default argument</strong><br>
+- Why It Is a Problem: All calls share the same object<br>
+- Fix: Use <code>None</code> as default and create inside the function</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Django ORM's <code>Model.objects.create()</code> is a classmethod-based factory</li>
+<li>dataclasses and Pydantic auto-generate <code>__init__</code>, <code>__repr__</code>, <code>__eq__</code></li>
+<li><code>__slots__</code> saves memory in high-volume data objects (millions of records)</li>
+<li>FastAPI uses classes as callables for dependency injection</li>
+<li>Tests use <code>__eq__</code> for <code>assert actual == expected</code> comparisons</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>The most important principle when designing classes is "one class, one responsibility." A class that does too much is hard to test and fragile against changes.</p>
+<p>Since Python 3.7, consider <code>dataclasses</code> first. They reduce boilerplate while still letting you add custom methods — suitable for most data-centric classes.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can perform validation in the constructor</li>
+<li>[ ] I can create alternative constructors with <code>@classmethod</code></li>
+<li>[ ] I can judge when <code>@staticmethod</code> is appropriate</li>
+<li>[ ] I can implement <code>__repr__</code>, <code>__eq__</code>, and other dunder methods</li>
+<li>[ ] I understand the purpose and constraints of <code>__slots__</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>Money</code> class implementing <code>__add__</code>, <code>__sub__</code>, <code>__repr__</code>, and <code>__eq__</code>.</li>
+<li>Create a <code>Temperature</code> class with a <code>from_fahrenheit()</code> classmethod.</li>
+<li>Create a <code>Pixel</code> class using <code>__slots__</code>, generate one million instances, and compare memory usage with a regular class.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>A class is composed of constructors, instance methods, class methods, static methods, and dunder methods. Understanding each component lets you design clean, Pythonic classes. In the next article, we explore encapsulation — protecting a class's internal state.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
+<li><strong>Classes and Instances (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">Python Official Docs — Data Model</a></li>
+<li><a href="https://realpython.com/python3-object-oriented-programming/">Real Python — Python Classes</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Luciano Ramalho</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">Python dataclasses Official Docs</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, Classes, Instances, Constructors</p>
+</body>
+</html>

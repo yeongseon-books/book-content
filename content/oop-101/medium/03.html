@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Encapsulation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Encapsulation</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Why and how should you protect an object's internal data?</p>
+<blockquote>
+<p>Encapsulation shields an object's internal state from direct external modification, exposing it only through a controlled interface. Python has no enforced access control, but naming conventions and the property decorator provide effective encapsulation.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The purpose and benefits of encapsulation</li>
+<li>Python naming conventions: public, _protected, __private</li>
+<li>Implementing getters and setters with the property decorator</li>
+<li>Integrating validation into properties</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When external code can freely modify an object's internals, the object can enter an invalid state and the cause is nearly impossible to trace. Encapsulation creates a contract: "modify this data only through these methods" — reducing bugs.</p>
+<blockquote>
+<p>Encapsulation = hide implementation details + provide a safe interface</p>
+</blockquote>
+<p>Python does not have <code>private</code> keywords like Java. Instead, it uses underscore (<code>_</code>) conventions and the <code>property</code> decorator. Understanding these conventions lets you read Python ecosystem code naturally.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Python access control conventions</p>
+</blockquote>
+<pre><code>Naming Pattern           Access Level
+─────────────────────────────────────
+name                    public — accessible by anyone
+_name                   protected — internal / subclass use (convention)
+__name                  private — name mangling applied (_Class__name)
+__name__                dunder — Python internal protocol
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Encapsulation</strong><br>
+- Description: Bundling data and methods together while hiding internal implementation</p>
+<p><strong>Information hiding</strong><br>
+- Description: Preventing direct access to internal state from outside</p>
+<p><strong>Property</strong><br>
+- Description: Python built-in decorator that controls attribute access via methods</p>
+<p><strong>Name mangling</strong><br>
+- Description: Transforms <code>__name</code> into <code>_ClassName__name</code></p>
+<p><strong>Getter/Setter</strong><br>
+- Description: Methods called when reading or setting an attribute value</p>
+<h2>Before / After</h2>
+<p>Comparing bank account balance management.</p>
+<pre><code class="language-python"># before: direct access — invalid state possible
+class BankAccount:
+    def __init__(self, balance):
+        self.balance = balance
+
+account = BankAccount(1000)
+account.balance = -500  # negative balance allowed — bug
+</code></pre>
+<pre><code class="language-python"># after: property protection — validation guaranteed
+class BankAccount:
+    def __init__(self, balance: int) -&gt; None:
+        self._balance = balance  # protected
+
+    @property
+    def balance(self) -&gt; int:
+        return self._balance
+
+    def deposit(self, amount: int) -&gt; None:
+        if amount &lt;= 0:
+            raise ValueError(&quot;Deposit amount must be positive&quot;)
+        self._balance += amount
+
+    def withdraw(self, amount: int) -&gt; None:
+        if amount &gt; self._balance:
+            raise ValueError(&quot;Insufficient balance&quot;)
+        self._balance -= amount
+
+account = BankAccount(1000)
+account.deposit(500)    # 1500
+account.withdraw(200)   # 1300
+# account.balance = -500  # AttributeError — no setter defined
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Understanding Underscore Conventions</strong></p>
+<pre><code class="language-python">class Employee:
+    def __init__(self, name: str, salary: int) -&gt; None:
+        self.name = name           # public
+        self._department = &quot;Unassigned&quot;  # protected (convention)
+        self.__salary = salary      # private (name mangling)
+
+    def get_salary(self) -&gt; int:
+        return self.__salary
+
+emp = Employee(&quot;Kim&quot;, 5000)
+print(emp.name)            # Kim
+print(emp._department)     # Unassigned (accessible but discouraged)
+# print(emp.__salary)      # AttributeError
+print(emp._Employee__salary)  # 5000 — mangled name access (not recommended)
+print(emp.get_salary())    # 5000
+</code></pre>
+<p><strong>Step 2: Property Basics</strong></p>
+<pre><code class="language-python">class Circle:
+    def __init__(self, radius: float) -&gt; None:
+        self._radius = radius
+
+    @property
+    def radius(self) -&gt; float:
+        return self._radius
+
+    @radius.setter
+    def radius(self, value: float) -&gt; None:
+        if value &lt;= 0:
+            raise ValueError(f&quot;Radius must be positive: {value}&quot;)
+        self._radius = value
+
+    @property
+    def area(self) -&gt; float:
+        &quot;&quot;&quot;Read-only computed property&quot;&quot;&quot;
+        import math
+        return math.pi * self._radius ** 2
+
+c = Circle(5)
+print(c.radius)   # 5
+print(c.area)     # 78.539...
+
+c.radius = 10
+print(c.area)     # 314.159...
+
+# c.radius = -1   # ValueError
+# c.area = 100    # AttributeError — no setter
+</code></pre>
+<p><strong>Step 3: Chained Validation</strong></p>
+<pre><code class="language-python">class User:
+    def __init__(self, name: str, age: int, email: str) -&gt; None:
+        self.name = name    # triggers setter validation
+        self.age = age
+        self.email = email
+
+    @property
+    def name(self) -&gt; str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -&gt; None:
+        if not value.strip():
+            raise ValueError(&quot;Name cannot be empty&quot;)
+        self._name = value.strip()
+
+    @property
+    def age(self) -&gt; int:
+        return self._age
+
+    @age.setter
+    def age(self, value: int) -&gt; None:
+        if not 0 &lt;= value &lt;= 150:
+            raise ValueError(f&quot;Invalid age: {value}&quot;)
+        self._age = value
+
+    @property
+    def email(self) -&gt; str:
+        return self._email
+
+    @email.setter
+    def email(self, value: str) -&gt; None:
+        if &quot;@&quot; not in value:
+            raise ValueError(f&quot;Invalid email: {value}&quot;)
+        self._email = value
+
+user = User(&quot;Alice&quot;, 30, &quot;alice@example.com&quot;)
+print(user.name)   # Alice
+user.age = 31      # OK
+# user.age = -1    # ValueError
+</code></pre>
+<p><strong>Step 4: Read-Only Attributes</strong></p>
+<pre><code class="language-python">class ImmutablePoint:
+    def __init__(self, x: float, y: float) -&gt; None:
+        self._x = x
+        self._y = y
+
+    @property
+    def x(self) -&gt; float:
+        return self._x
+
+    @property
+    def y(self) -&gt; float:
+        return self._y
+
+    def __repr__(self) -&gt; str:
+        return f&quot;ImmutablePoint({self._x}, {self._y})&quot;
+
+p = ImmutablePoint(3, 4)
+print(p.x, p.y)  # 3 4
+# p.x = 10       # AttributeError — read-only
+</code></pre>
+<p><strong>Step 5: Encapsulation and Interface Separation</strong></p>
+<pre><code class="language-python">class TemperatureSensor:
+    &quot;&quot;&quot;Hides internal implementation and exposes only converted values&quot;&quot;&quot;
+
+    def __init__(self) -&gt; None:
+        self._raw_readings: list[float] = []
+
+    def add_reading(self, celsius: float) -&gt; None:
+        self._raw_readings.append(celsius)
+
+    @property
+    def average_celsius(self) -&gt; float:
+        if not self._raw_readings:
+            return 0.0
+        return sum(self._raw_readings) / len(self._raw_readings)
+
+    @property
+    def average_fahrenheit(self) -&gt; float:
+        return self.average_celsius * 9 / 5 + 32
+
+    @property
+    def reading_count(self) -&gt; int:
+        return len(self._raw_readings)
+
+sensor = TemperatureSensor()
+sensor.add_reading(20.0)
+sensor.add_reading(25.0)
+sensor.add_reading(22.5)
+print(f&quot;{sensor.average_celsius:.1f}°C&quot;)     # 22.5°C
+print(f&quot;{sensor.average_fahrenheit:.1f}°F&quot;)   # 72.5°F
+print(f&quot;Readings: {sensor.reading_count}&quot;)     # Readings: 3
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>@property</code> lets you access methods like attributes, keeping the interface clean</li>
+<li>Assigning <code>self.name = value</code> in <code>__init__</code> triggers the setter for validation</li>
+<li>Omitting the setter makes a property read-only</li>
+<li>Name mangling (<code>__</code>) prevents accidental access, not security</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Making every attribute <code>__</code> private</strong><br>
+- Why It Is a Problem: Subclasses cannot access them<br>
+- Fix: <code>_</code> convention is sufficient</p>
+<p><strong>Expensive computation in property</strong><br>
+- Why It Is a Problem: Every attribute access incurs cost<br>
+- Fix: Move heavy computation into a method</p>
+<p><strong>Bypassing setter in <code>__init__</code></strong><br>
+- Why It Is a Problem: Skips validation<br>
+- Fix: Use <code>self.attr = value</code> to trigger setter in <code>__init__</code></p>
+<p><strong>Treating name mangling as security</strong><br>
+- Why It Is a Problem: <code>_Class__name</code> is still accessible<br>
+- Fix: It is a convention, not enforcement</p>
+<p><strong>Getter/setter with no logic</strong><br>
+- Why It Is a Problem: Java-style boilerplate<br>
+- Fix: If no validation or computation, use a public attribute</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Pydantic's <code>@validator</code> provides field-level validation similar to property</li>
+<li>SQLAlchemy's <code>hybrid_property</code> works on both Python and SQL sides</li>
+<li>Django models use <code>@property</code> for computed fields</li>
+<li>Config classes expose environment variables as read-only properties</li>
+<li>API response objects hide internal structure and expose values via properties</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In Python, encapsulation is a "contract," not "enforcement." Ignoring underscore conventions still works, but code that depends on internals breaks when libraries update.</p>
+<p>The most common pattern in practice is "start with public attributes, convert to property when validation is needed." Python's property decorator makes this transition transparent to callers.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between <code>_</code> and <code>__</code> conventions</li>
+<li>[ ] I can implement getters and setters with <code>@property</code></li>
+<li>[ ] I can create read-only attributes</li>
+<li>[ ] I can apply the setter-through-<code>__init__</code> validation pattern</li>
+<li>[ ] I can judge when encapsulation is needed and when it is overkill</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>Password</code> class that validates minimum 8 characters and at least one digit on set.</li>
+<li>Build a <code>Rectangle</code> class with <code>width</code> and <code>height</code> as validated properties and <code>area</code> as a read-only computed property.</li>
+<li>Implement a <code>Config</code> class with a freeze pattern: once set, values cannot be changed.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Encapsulation protects an object's internal state and provides a safe interface. Python achieves this through underscore conventions and the property decorator. In the next article, we explore inheritance — extending existing classes with new functionality.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
+<li><strong>Encapsulation (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/functions.html#property">Python Official Docs — Property</a></li>
+<li><a href="https://realpython.com/python-property/">Real Python — Python Property</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 11: A Pythonic Object</a></li>
+<li><a href="https://effectivepython.com/">Effective Python — Item 44: Use Plain Attributes Instead of Setter and Getter Methods</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, Encapsulation, Property, Information Hiding</p>
+</body>
+</html>

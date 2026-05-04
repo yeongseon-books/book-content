@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Abstraction</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Abstraction</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you define a common interface that cannot be instantiated directly?</p>
+<blockquote>
+<p>Abstraction exposes only essential interfaces while hiding implementation details. Python's <code>abc</code> module lets you define abstract classes and abstract methods that force subclasses to provide implementations.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The purpose of abstraction and the role of abstract classes</li>
+<li>Using Python <code>abc.ABC</code> and <code>@abstractmethod</code></li>
+<li>Abstract properties and abstract class methods</li>
+<li>Choosing between abstract classes and Protocol</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When multiple developers build classes for different data sources (files, databases, APIs) without a shared interface, method names and signatures diverge. Abstract classes enforce a contract — "you must implement these methods" — at instantiation time.</p>
+<blockquote>
+<p>Abstract class = cannot instantiate + forces method implementation on subclasses</p>
+</blockquote>
+<p>Protocol says "structurally matching is OK," while ABC says "you must explicitly inherit." For larger teams or framework design, ABC's explicitness reduces mistakes.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Abstract class structure</p>
+</blockquote>
+<pre><code>ABC (Abstract Base Class)
+├── @abstractmethod read()     -&gt; must implement
+├── @abstractmethod write()    -&gt; must implement
+├── close()                    -&gt; shared implementation (optional override)
+│
+├── FileStorage(ABC)
+│   ├── read()  implemented
+│   └── write() implemented
+│
+└── MemoryStorage(ABC)
+    ├── read()  implemented
+    └── write() implemented
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Abstract class</strong><br>
+- Description: A class that cannot be instantiated and forces subclasses to implement methods</p>
+<p><strong><code>@abstractmethod</code></strong><br>
+- Description: Marks a method that must be overridden in subclasses</p>
+<p><strong>ABC (Abstract Base Class)</strong><br>
+- Description: The base class provided by Python's <code>abc</code> module</p>
+<p><strong>Concrete class</strong><br>
+- Description: A class that implements all abstract methods and can be instantiated</p>
+<p><strong>Template method pattern</strong><br>
+- Description: Defines the algorithm skeleton and delegates specific steps to subclasses</p>
+<h2>Before / After</h2>
+<p>Comparing data source interfaces.</p>
+<pre><code class="language-python"># before: no interface enforcement — method name mismatch risk
+class FileStorage:
+    def read_file(self, path):
+        pass
+
+class DbStorage:
+    def fetch_data(self, query):  # different method name
+        pass
+</code></pre>
+<pre><code class="language-python"># after: ABC enforces the interface
+from abc import ABC, abstractmethod
+
+class Storage(ABC):
+    @abstractmethod
+    def read(self, key: str) -&gt; str: ...
+
+    @abstractmethod
+    def write(self, key: str, data: str) -&gt; None: ...
+
+class FileStorage(Storage):
+    def read(self, key: str) -&gt; str:
+        return f&quot;Reading {key} from file&quot;
+
+    def write(self, key: str, data: str) -&gt; None:
+        print(f&quot;Writing {key} to file: {data}&quot;)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Basic Abstract Class</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class Animal(ABC):
+    def __init__(self, name: str) -&gt; None:
+        self.name = name
+
+    @abstractmethod
+    def speak(self) -&gt; str:
+        &quot;&quot;&quot;Return the animal's sound&quot;&quot;&quot;
+        ...
+
+    def describe(self) -&gt; str:
+        &quot;&quot;&quot;Shared implementation — optional override&quot;&quot;&quot;
+        return f&quot;{self.name}: {self.speak()}&quot;
+
+class Dog(Animal):
+    def speak(self) -&gt; str:
+        return &quot;woof&quot;
+
+class Cat(Animal):
+    def speak(self) -&gt; str:
+        return &quot;meow&quot;
+
+dog = Dog(&quot;Buddy&quot;)
+print(dog.describe())  # Buddy: woof
+
+# animal = Animal(&quot;animal&quot;)  # TypeError: Can't instantiate abstract class
+</code></pre>
+<p><strong>Step 2: Abstract Properties</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class Vehicle(ABC):
+    @property
+    @abstractmethod
+    def fuel_type(self) -&gt; str: ...
+
+    @property
+    @abstractmethod
+    def max_speed(self) -&gt; int: ...
+
+    def specs(self) -&gt; str:
+        return f&quot;Fuel: {self.fuel_type}, Max speed: {self.max_speed}km/h&quot;
+
+class ElectricCar(Vehicle):
+    @property
+    def fuel_type(self) -&gt; str:
+        return &quot;electric&quot;
+
+    @property
+    def max_speed(self) -&gt; int:
+        return 250
+
+class GasCar(Vehicle):
+    @property
+    def fuel_type(self) -&gt; str:
+        return &quot;gasoline&quot;
+
+    @property
+    def max_speed(self) -&gt; int:
+        return 220
+
+ev = ElectricCar()
+gas = GasCar()
+print(ev.specs())   # Fuel: electric, Max speed: 250km/h
+print(gas.specs())  # Fuel: gasoline, Max speed: 220km/h
+</code></pre>
+<p><strong>Step 3: Template Method Pattern</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class DataPipeline(ABC):
+    &quot;&quot;&quot;Data processing pipeline — skeleton fixed, steps delegated to subclasses&quot;&quot;&quot;
+
+    def run(self) -&gt; list[str]:
+        raw = self.extract()
+        cleaned = self.transform(raw)
+        self.load(cleaned)
+        return cleaned
+
+    @abstractmethod
+    def extract(self) -&gt; list[str]: ...
+
+    @abstractmethod
+    def transform(self, data: list[str]) -&gt; list[str]: ...
+
+    @abstractmethod
+    def load(self, data: list[str]) -&gt; None: ...
+
+class CsvPipeline(DataPipeline):
+    def extract(self) -&gt; list[str]:
+        return [&quot;  Alice,30  &quot;, &quot;  Bob,25  &quot;, &quot;  Charlie,35  &quot;]
+
+    def transform(self, data: list[str]) -&gt; list[str]:
+        return [row.strip() for row in data]
+
+    def load(self, data: list[str]) -&gt; None:
+        for row in data:
+            print(f&quot;Saving: {row}&quot;)
+
+pipeline = CsvPipeline()
+result = pipeline.run()
+# Saving: Alice,30
+# Saving: Bob,25
+# Saving: Charlie,35
+print(result)  # ['Alice,30', 'Bob,25', 'Charlie,35']
+</code></pre>
+<p><strong>Step 4: ABC's register()</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class Drawable(ABC):
+    @abstractmethod
+    def draw(self) -&gt; str: ...
+
+class ThirdPartyWidget:
+    &quot;&quot;&quot;External library class — cannot modify&quot;&quot;&quot;
+    def draw(self) -&gt; str:
+        return &quot;Widget rendered&quot;
+
+Drawable.register(ThirdPartyWidget)
+
+widget = ThirdPartyWidget()
+print(isinstance(widget, Drawable))  # True
+print(widget.draw())                 # Widget rendered
+</code></pre>
+<p><strong>Step 5: ABC vs Protocol — When to Choose Which</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+from typing import Protocol
+
+# ABC: explicit inheritance required — good for frameworks, team contracts
+class Serializer(ABC):
+    @abstractmethod
+    def serialize(self, data: dict) -&gt; str: ...
+
+class JsonSerializer(Serializer):
+    def serialize(self, data: dict) -&gt; str:
+        import json
+        return json.dumps(data)
+
+# Protocol: no inheritance needed — good for cross-library compatibility
+class SerializerProto(Protocol):
+    def serialize(self, data: dict) -&gt; str: ...
+
+class YamlSerializer:  # does not inherit Protocol
+    def serialize(self, data: dict) -&gt; str:
+        return &quot;\n&quot;.join(f&quot;{k}: {v}&quot; for k, v in data.items())
+
+def save(serializer: SerializerProto, data: dict) -&gt; None:
+    print(serializer.serialize(data))
+
+save(JsonSerializer(), {&quot;name&quot;: &quot;Kim&quot;})  # {&quot;name&quot;: &quot;Kim&quot;}
+save(YamlSerializer(), {&quot;name&quot;: &quot;Kim&quot;})  # name: Kim
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Failing to implement an abstract method raises <code>TypeError</code> at instantiation</li>
+<li>The template method pattern places the algorithm skeleton in the parent and delegates steps to children</li>
+<li><code>register()</code> adds an existing class to an ABC without modifying it</li>
+<li>ABC provides explicit contracts; Protocol provides structural compatibility — choose based on context</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Leaving any abstract method unimplemented</strong><br>
+- Why It Is a Problem: TypeError at instantiation<br>
+- Fix: IDEs highlight unimplemented methods</p>
+<p><strong>Putting too much implementation in ABC</strong><br>
+- Why It Is a Problem: Increases inheritance coupling<br>
+- Fix: Include only shared utilities</p>
+<p><strong>Defining every interface as ABC</strong><br>
+- Why It Is a Problem: Forces unnecessary inheritance<br>
+- Fix: Protocol is better for external compatibility</p>
+<p><strong>Using ABC without any <code>@abstractmethod</code></strong><br>
+- Why It Is a Problem: Class can be instantiated, defeating the purpose<br>
+- Fix: Define at least one abstract method</p>
+<p><strong>Using abstract classes for data storage</strong><br>
+- Why It Is a Problem: Abstract classes are for interface definition<br>
+- Fix: Use dataclass or regular classes for data</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Python's <code>collections.abc</code> (Iterable, Sequence, Mapping) are ABCs</li>
+<li>Django's <code>View</code> class uses the template method pattern</li>
+<li>Plugin architectures define plugin interfaces with ABC</li>
+<li>Tests create mock classes inheriting ABC to guarantee implementation</li>
+<li>Data processing pipelines abstract Extract/Transform/Load steps with ABC</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Abstract classes become more valuable as team size grows. For small projects, duck typing is sufficient. But when multiple developers each build their own implementations, ABC provides a clear contract: "you must implement this."</p>
+<p>The Python ecosystem mixes ABC and Protocol based on context. Internal team code uses ABC; compatibility with external libraries favors Protocol.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can define abstract classes with ABC and <code>@abstractmethod</code></li>
+<li>[ ] I can define abstract properties</li>
+<li>[ ] I can implement the template method pattern</li>
+<li>[ ] I can explain the difference between ABC and Protocol</li>
+<li>[ ] I can register existing classes with an ABC using <code>register()</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Define a <code>NotificationSender</code> ABC and implement <code>EmailSender</code>, <code>SmsSender</code>, and <code>SlackSender</code>.</li>
+<li>Apply the template method pattern to a <code>ReportGenerator</code> ABC and create <code>HtmlReport</code> and <code>PdfReport</code>.</li>
+<li>Inherit from <code>collections.abc.Sequence</code> to implement a custom sequence class.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Abstraction manages complexity and enforces consistent interfaces. Using ABC and Protocol appropriately enables extensible and safe designs. In the next article, we compare composition and inheritance and explore when each approach is appropriate.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><strong>Abstraction (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/abc.html">Python Official Docs — abc module</a></li>
+<li><a href="https://realpython.com/python-interface/">Real Python — Abstract Base Classes</a></li>
+<li><a href="https://docs.python.org/3/library/collections.abc.html">Python collections.abc Docs</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 13: Interfaces, Protocols, and ABCs</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, Abstraction, ABC, Interface</p>
+</body>
+</html>

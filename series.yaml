@@ -2209,3 +2209,25 @@ series:
   level: 101
   lifecycle: active
   path: content/algorithms-python-101
+
+- id: oop-101
+  status: content-ready
+  category: programming-foundations
+  title:
+    ko: Object-Oriented Programming 101
+    en: Object-Oriented Programming 101
+  description:
+    ko: 클래스, 캡슐화, 상속, 다형성, 추상화, SOLID 원칙까지 객체지향의 핵심을 다루는 시리즈.
+    en: A series covering the essentials of OOP from classes and encapsulation to inheritance, polymorphism, abstraction, and SOLID principles.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/oop-101

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Object-Oriented Programming?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Object-Oriented Programming?</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Why does organizing programs around "objects" make code easier to maintain?</p>
+<blockquote>
+<p>Programming paradigms define how we structure code. Procedural programming centers on functions; object-oriented programming bundles data and behavior into objects. This article explains what OOP is, why it emerged, and when it is the right choice.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Types of programming paradigms and how they compare</li>
+<li>The core idea of OOP: binding data and behavior</li>
+<li>Structural differences between procedural and OOP code</li>
+<li>How OOP is used in Python</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Small scripts run fine with functions alone. But when code grows beyond a few thousand lines, related data and logic scatter across many functions, and every change forces you to modify multiple places at once. OOP groups related data and behavior into a single unit to solve this problem.</p>
+<blockquote>
+<p>OOP = a programming style that bundles data and behavior into objects</p>
+</blockquote>
+<p>Most modern languages — Python, Java, C++, C# — support OOP. Frameworks and libraries are built on OOP design, so without understanding the concept, even reading code becomes difficult.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Procedural vs Object-Oriented</p>
+</blockquote>
+<pre><code>Procedural                     Object-Oriented
+┌────────────────────┐        ┌────────────────────┐
+│ Function A         │        │ Object A           │
+│ Function B         │        │  ├─ Data           │
+│ Function C         │        │  └─ Methods        │
+│                    │        ├────────────────────┤
+│ Global Data        │        │ Object B           │
+│  ├─ var 1          │        │  ├─ Data           │
+│  └─ var 2          │        │  └─ Methods        │
+└────────────────────┘        └────────────────────┘
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Class</strong><br>
+- Description: A template (blueprint) for creating objects</p>
+<p><strong>Instance</strong><br>
+- Description: An actual object created from a class</p>
+<p><strong>Attribute</strong><br>
+- Description: Data held by an object</p>
+<p><strong>Method</strong><br>
+- Description: A function that belongs to an object</p>
+<p><strong>Encapsulation</strong><br>
+- Description: Bundling data and methods together while restricting external access</p>
+<h2>Before / After</h2>
+<p>Comparing user management logic.</p>
+<pre><code class="language-python"># before: procedural — data and functions are separate
+users = []
+
+def create_user(name, email):
+    user = {&quot;name&quot;: name, &quot;email&quot;: email, &quot;active&quot;: True}
+    users.append(user)
+    return user
+
+def deactivate_user(user):
+    user[&quot;active&quot;] = False
+
+def get_user_display(user):
+    status = &quot;active&quot; if user[&quot;active&quot;] else &quot;inactive&quot;
+    return f&quot;{user['name']} ({status})&quot;
+</code></pre>
+<pre><code class="language-python"># after: OOP — data and behavior live in one class
+class User:
+    def __init__(self, name: str, email: str) -&gt; None:
+        self.name = name
+        self.email = email
+        self.active = True
+
+    def deactivate(self) -&gt; None:
+        self.active = False
+
+    def display(self) -&gt; str:
+        status = &quot;active&quot; if self.active else &quot;inactive&quot;
+        return f&quot;{self.name} ({status})&quot;
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Creating Your First Class</strong></p>
+<pre><code class="language-python">class Dog:
+    &quot;&quot;&quot;A simple Dog class&quot;&quot;&quot;
+
+    def __init__(self, name: str, breed: str) -&gt; None:
+        self.name = name
+        self.breed = breed
+
+    def bark(self) -&gt; str:
+        return f&quot;{self.name} says woof!&quot;
+
+    def __repr__(self) -&gt; str:
+        return f&quot;Dog(name={self.name!r}, breed={self.breed!r})&quot;
+
+my_dog = Dog(&quot;Buddy&quot;, &quot;Golden Retriever&quot;)
+print(my_dog.bark())  # Buddy says woof!
+print(my_dog)          # Dog(name='Buddy', breed='Golden Retriever')
+</code></pre>
+<p><strong>Step 2: Creating Multiple Instances</strong></p>
+<pre><code class="language-python">dog1 = Dog(&quot;Buddy&quot;, &quot;Golden Retriever&quot;)
+dog2 = Dog(&quot;Charlie&quot;, &quot;Poodle&quot;)
+dog3 = Dog(&quot;Max&quot;, &quot;Labrador&quot;)
+
+dogs = [dog1, dog2, dog3]
+for dog in dogs:
+    print(f&quot;{dog.name} ({dog.breed}): {dog.bark()}&quot;)
+# Buddy (Golden Retriever): Buddy says woof!
+# Charlie (Poodle): Charlie says woof!
+# Max (Labrador): Max says woof!
+
+print(dog1 is dog2)  # False — different instances
+</code></pre>
+<p><strong>Step 3: Procedural to OOP Refactoring</strong></p>
+<pre><code class="language-python"># procedural version
+def create_rect(width, height):
+    return {&quot;width&quot;: width, &quot;height&quot;: height}
+
+def area(rect):
+    return rect[&quot;width&quot;] * rect[&quot;height&quot;]
+
+def perimeter(rect):
+    return 2 * (rect[&quot;width&quot;] + rect[&quot;height&quot;])
+
+r = create_rect(5, 3)
+print(area(r))       # 15
+print(perimeter(r))  # 16
+</code></pre>
+<pre><code class="language-python"># OOP version
+class Rectangle:
+    def __init__(self, width: float, height: float) -&gt; None:
+        self.width = width
+        self.height = height
+
+    def area(self) -&gt; float:
+        return self.width * self.height
+
+    def perimeter(self) -&gt; float:
+        return 2 * (self.width + self.height)
+
+    def __repr__(self) -&gt; str:
+        return f&quot;Rectangle({self.width}, {self.height})&quot;
+
+r = Rectangle(5, 3)
+print(r.area())       # 15
+print(r.perimeter())  # 16
+</code></pre>
+<p><strong>Step 4: Understanding self</strong></p>
+<pre><code class="language-python">class Counter:
+    def __init__(self) -&gt; None:
+        self.count = 0
+
+    def increment(self) -&gt; None:
+        self.count += 1
+
+    def reset(self) -&gt; None:
+        self.count = 0
+
+    def value(self) -&gt; int:
+        return self.count
+
+c1 = Counter()
+c2 = Counter()
+c1.increment()
+c1.increment()
+c2.increment()
+print(c1.value())  # 2
+print(c2.value())  # 1 — each instance is independent
+</code></pre>
+<p><strong>Step 5: Class Variables vs Instance Variables</strong></p>
+<pre><code class="language-python">class Student:
+    school = &quot;Python Academy&quot;  # class variable: shared by all instances
+
+    def __init__(self, name: str, grade: int) -&gt; None:
+        self.name = name    # instance variable: unique per instance
+        self.grade = grade
+
+    def introduce(self) -&gt; str:
+        return f&quot;{self.name} at {self.school}, grade {self.grade}&quot;
+
+s1 = Student(&quot;Alice&quot;, 3)
+s2 = Student(&quot;Bob&quot;, 2)
+print(s1.introduce())  # Alice at Python Academy, grade 3
+print(s2.introduce())  # Bob at Python Academy, grade 2
+
+Student.school = &quot;Code Academy&quot;  # changing class variable affects all instances
+print(s1.introduce())  # Alice at Code Academy, grade 3
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>__init__</code> is the initializer method called automatically when an instance is created</li>
+<li><code>self</code> refers to the current instance and is the first parameter of every instance method</li>
+<li>Class variables are shared across all instances; instance variables are unique to each</li>
+<li>Defining <code>__repr__</code> makes objects display useful information during debugging</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Forgetting self in <code>__init__</code></strong><br>
+- Why It Is a Problem: Creates a local variable instead of an instance attribute<br>
+- Fix: Always use <code>self.attr = value</code></p>
+<p><strong>Mutable class variable</strong><br>
+- Why It Is a Problem: All instances share the same list or dict<br>
+- Fix: Declare mutable objects as instance variables in <code>__init__</code></p>
+<p><strong>Confusing class and instance</strong><br>
+- Why It Is a Problem: <code>Dog.bark()</code> raises TypeError<br>
+- Fix: Always create an instance before calling methods</p>
+<p><strong>Wrapping everything in classes</strong><br>
+- Why It Is a Problem: Adds unnecessary complexity<br>
+- Fix: Simple logic is fine as plain functions</p>
+<p><strong>Not defining <code>__repr__</code></strong><br>
+- Why It Is a Problem: Prints <code>&lt;__main__.Dog object&gt;</code> during debugging<br>
+- Fix: Define <code>__repr__</code> to show useful info</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Web frameworks like Django and Flask use class-based models</li>
+<li>REST APIs represent request/response data as classes</li>
+<li>Game development models characters and items as objects</li>
+<li>Data pipelines abstract each processing step as a class</li>
+<li>Test frameworks (pytest, unittest) support class-based tests</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>OOP is not a silver bullet. Introducing classes into small scripts often makes them harder to read. But as code grows and multiple functions share the same data, OOP becomes a natural solution.</p>
+<p>In practice, the question "Should this be a class?" comes up often. The answer usually is: "Do the data and behavior change together?" If yes, bundling them in a class makes maintenance easier.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between procedural and OOP</li>
+<li>[ ] I understand the relationship between classes and instances</li>
+<li>[ ] I can explain the roles of <code>__init__</code> and <code>self</code></li>
+<li>[ ] I can distinguish class variables from instance variables</li>
+<li>[ ] I can design and implement a simple class</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>BankAccount</code> class with deposit, withdraw, and balance methods.</li>
+<li>Create a <code>Book</code> class, store multiple instances in a list, and write a function that searches by title.</li>
+<li>Refactor a procedural calculator into an OOP version.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>OOP bundles data and behavior into a single unit to make code structure clear. In the next article, we will explore classes and instances in greater depth.</p>
+<ul>
+<li><strong>What Is Object-Oriented Programming? (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/classes.html">Python Official Docs — Classes</a></li>
+<li><a href="https://realpython.com/python3-object-oriented-programming/">Real Python — Object-Oriented Programming in Python</a></li>
+<li><a href="https://www.oreilly.com/library/view/clean-code/9780136083238/">Clean Code — Robert C. Martin</a></li>
+<li><a href="https://nostarch.com/python-crash-course-3rd-edition">Python Crash Course — Eric Matthes</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, Object-Oriented, Programming Paradigm, Classes</p>
+</body>
+</html>

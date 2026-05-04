@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SOLID Principles Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SOLID Principles Basics</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: What principles should you follow to design classes that are resilient to change and flexible for extension?</p>
+<blockquote>
+<p>SOLID is a set of five core principles for object-oriented design. This article walks through Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion — each with Python code examples.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and purpose of all five SOLID principles</li>
+<li>Violation examples and improved code for each principle</li>
+<li>Practical approaches to applying SOLID in Python</li>
+<li>Relationships and trade-offs between the principles</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>You spend far more time maintaining code than writing it. SOLID principles guide you toward "code that is easy to change." The goal: modifying one place does not break another, and adding features requires minimal changes to existing code.</p>
+<blockquote>
+<p>SOLID = five principles for designs that are resilient to change and flexible for extension</p>
+</blockquote>
+<p>You do not need to apply every principle perfectly from the start. Apply them when problems emerge as the code grows.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>SOLID five principles summary</p>
+</blockquote>
+<pre><code>S — Single Responsibility    One class changes for only one reason
+O — Open/Closed             Open for extension, closed for modification
+L — Liskov Substitution     Children must be substitutable for parents
+I — Interface Segregation   Many small interfaces over one large interface
+D — Dependency Inversion    Depend on abstractions, not concretions
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Single Responsibility (SRP)</strong><br>
+- Description: A class should have only one responsibility</p>
+<p><strong>Open/Closed (OCP)</strong><br>
+- Description: Extend functionality without modifying existing code</p>
+<p><strong>Liskov Substitution (LSP)</strong><br>
+- Description: Child classes must be substitutable for parent classes</p>
+<p><strong>Interface Segregation (ISP)</strong><br>
+- Description: Do not depend on methods you do not use</p>
+<p><strong>Dependency Inversion (DIP)</strong><br>
+- Description: High-level modules should depend on abstractions, not low-level modules</p>
+<h2>Before / After</h2>
+<p>Comparing SRP violation and improvement.</p>
+<pre><code class="language-python"># before: SRP violation — one class with multiple responsibilities
+class UserManager:
+    def create_user(self, name: str) -&gt; dict:
+        user = {&quot;name&quot;: name}
+        # DB save logic
+        # email send logic
+        # log recording logic
+        return user
+</code></pre>
+<pre><code class="language-python"># after: SRP applied — each class has one responsibility
+class UserRepository:
+    def save(self, user: dict) -&gt; None:
+        print(f&quot;DB save: {user}&quot;)
+
+class EmailService:
+    def send_welcome(self, name: str) -&gt; None:
+        print(f&quot;Welcome email sent: {name}&quot;)
+
+class UserService:
+    def __init__(self, repo: UserRepository, email: EmailService) -&gt; None:
+        self._repo = repo
+        self._email = email
+
+    def create_user(self, name: str) -&gt; dict:
+        user = {&quot;name&quot;: name}
+        self._repo.save(user)
+        self._email.send_welcome(name)
+        return user
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: S — Single Responsibility Principle (SRP)</strong></p>
+<pre><code class="language-python"># Violation: Report class handles both data processing and output
+class Report:
+    def __init__(self, data: list[dict]) -&gt; None:
+        self.data = data
+
+    def calculate_total(self) -&gt; int:
+        return sum(item[&quot;amount&quot;] for item in self.data)
+
+    def to_html(self) -&gt; str:  # output format change -&gt; Report must change
+        total = self.calculate_total()
+        return f&quot;&lt;h1&gt;Total: {total}&lt;/h1&gt;&quot;
+
+# Improved: separate data processing from output
+class SalesReport:
+    def __init__(self, data: list[dict]) -&gt; None:
+        self.data = data
+
+    def calculate_total(self) -&gt; int:
+        return sum(item[&quot;amount&quot;] for item in self.data)
+
+class ReportFormatter:
+    def to_html(self, report: SalesReport) -&gt; str:
+        return f&quot;&lt;h1&gt;Total: {report.calculate_total()}&lt;/h1&gt;&quot;
+
+    def to_text(self, report: SalesReport) -&gt; str:
+        return f&quot;Total: {report.calculate_total()}&quot;
+
+data = [{&quot;amount&quot;: 100}, {&quot;amount&quot;: 200}]
+report = SalesReport(data)
+formatter = ReportFormatter()
+print(formatter.to_html(report))  # &lt;h1&gt;Total: 300&lt;/h1&gt;
+print(formatter.to_text(report))  # Total: 300
+</code></pre>
+<p><strong>Step 2: O — Open/Closed Principle (OCP)</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class Discount(Protocol):
+    def apply(self, price: int) -&gt; int: ...
+
+class NoDiscount:
+    def apply(self, price: int) -&gt; int:
+        return price
+
+class PercentDiscount:
+    def __init__(self, percent: int) -&gt; None:
+        self.percent = percent
+
+    def apply(self, price: int) -&gt; int:
+        return price - (price * self.percent // 100)
+
+class FixedDiscount:
+    def __init__(self, amount: int) -&gt; None:
+        self.amount = amount
+
+    def apply(self, price: int) -&gt; int:
+        return max(0, price - self.amount)
+
+def calculate_price(price: int, discount: Discount) -&gt; int:
+    &quot;&quot;&quot;Adding new discount types requires no changes to this function&quot;&quot;&quot;
+    return discount.apply(price)
+
+print(calculate_price(10000, NoDiscount()))           # 10000
+print(calculate_price(10000, PercentDiscount(20)))     # 8000
+print(calculate_price(10000, FixedDiscount(3000)))     # 7000
+</code></pre>
+<p><strong>Step 3: L — Liskov Substitution Principle (LSP)</strong></p>
+<pre><code class="language-python">class Bird:
+    def move(self) -&gt; str:
+        return &quot;moving&quot;
+
+class FlyingBird(Bird):
+    def move(self) -&gt; str:
+        return &quot;flying&quot;
+
+class Penguin(Bird):
+    def move(self) -&gt; str:
+        return &quot;walking&quot;
+
+def make_bird_move(bird: Bird) -&gt; None:
+    print(bird.move())
+
+# All subclasses can substitute for the parent
+make_bird_move(FlyingBird())  # flying
+make_bird_move(Penguin())     # walking
+</code></pre>
+<p><strong>Step 4: I — Interface Segregation Principle (ISP)</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+# Violation: all capabilities in one interface
+# class Worker(Protocol):
+#     def code(self) -&gt; str: ...
+#     def test(self) -&gt; str: ...
+#     def design(self) -&gt; str: ...  # unnecessary for developers
+
+# Improved: separated by role
+class Coder(Protocol):
+    def code(self) -&gt; str: ...
+
+class Tester(Protocol):
+    def test(self) -&gt; str: ...
+
+class Designer(Protocol):
+    def design(self) -&gt; str: ...
+
+class Developer:
+    def code(self) -&gt; str:
+        return &quot;Writing code&quot;
+
+    def test(self) -&gt; str:
+        return &quot;Writing tests&quot;
+
+class UxDesigner:
+    def design(self) -&gt; str:
+        return &quot;Designing UI&quot;
+
+def assign_coding(worker: Coder) -&gt; None:
+    print(worker.code())
+
+def assign_design(worker: Designer) -&gt; None:
+    print(worker.design())
+
+assign_coding(Developer())    # Writing code
+assign_design(UxDesigner())   # Designing UI
+</code></pre>
+<p><strong>Step 5: D — Dependency Inversion Principle (DIP)</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class MessageSender(Protocol):
+    def send(self, to: str, body: str) -&gt; None: ...
+
+class EmailSender:
+    def send(self, to: str, body: str) -&gt; None:
+        print(f&quot;Email -&gt; {to}: {body}&quot;)
+
+class SlackSender:
+    def send(self, to: str, body: str) -&gt; None:
+        print(f&quot;Slack -&gt; {to}: {body}&quot;)
+
+class NotificationService:
+    &quot;&quot;&quot;High-level module: depends on abstraction (Protocol), not concretions&quot;&quot;&quot;
+
+    def __init__(self, sender: MessageSender) -&gt; None:
+        self._sender = sender
+
+    def notify(self, user: str, message: str) -&gt; None:
+        self._sender.send(user, message)
+
+# Notify via email
+service = NotificationService(EmailSender())
+service.notify(&quot;kim@example.com&quot;, &quot;Deploy complete&quot;)
+
+# Switch to Slack — no changes to NotificationService
+service = NotificationService(SlackSender())
+service.notify(&quot;#deploy&quot;, &quot;Deploy complete&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>SRP keeps classes small by limiting each to a single reason for change</li>
+<li>OCP lets you add new features without modifying existing code</li>
+<li>LSP ensures children safely substitute for parents in inheritance hierarchies</li>
+<li>DIP is naturally implemented through Protocol and dependency injection</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Applying all principles from the start</strong><br>
+- Why It Is a Problem: Over-abstraction adds complexity<br>
+- Fix: Apply incrementally as needed</p>
+<p><strong>Extreme SRP — too many tiny classes</strong><br>
+- Why It Is a Problem: Classes become too granular<br>
+- Fix: Judge by "reason for change"</p>
+<p><strong>LSP violation — child throws exceptions</strong><br>
+- Why It Is a Problem: Cannot use as parent type<br>
+- Fix: Consider composition instead</p>
+<p><strong>Ignoring ISP — monolithic interfaces</strong><br>
+- Why It Is a Problem: Forces unnecessary method implementations<br>
+- Fix: Split Protocols by role</p>
+<p><strong>Ignoring DIP — depending on concrete classes</strong><br>
+- Why It Is a Problem: Hard to replace and test<br>
+- Fix: Depend on abstractions and inject</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>FastAPI's <code>Depends()</code> supports DIP at the framework level</li>
+<li>Django's settings module separates configuration following SRP</li>
+<li>Plugin systems extend functionality based on OCP</li>
+<li>REST API serialization/deserialization separates interfaces via ISP</li>
+<li>Test mocks replace concrete dependencies thanks to DIP</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>SOLID is a "guideline," not a "rule." You do not need to apply it to every piece of code. Apply it at the points where change becomes difficult as the code grows. The most practical principles are SRP and DIP.</p>
+<p>For small projects, you do not need to think about SOLID. But when team projects exceed tens of thousands of lines, the quality gap between developers who understand SOLID and those who do not becomes strikingly clear.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain each of the five SOLID principles</li>
+<li>[ ] I can identify and improve SRP violations</li>
+<li>[ ] I can implement OCP using Protocol or ABC</li>
+<li>[ ] I can identify LSP violation cases</li>
+<li>[ ] I can apply DIP through dependency injection</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Split an SRP-violating <code>OrderProcessor</code> class (order processing + payment + email) into three classes.</li>
+<li>Apply OCP to design a <code>FileExporter</code> that supports new file formats (CSV, JSON, XML) without modifying existing code.</li>
+<li>Apply DIP so that a <code>WeatherApp</code> can swap between different weather APIs (OpenWeather, WeatherAPI).</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>SOLID principles are guidelines for designs that are resilient to change and flexible for extension. Rather than applying them perfectly from the start, it is more practical to apply them when needed as the code grows. In the next article, we apply SOLID and other OOP principles to a real-world design example.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><strong>SOLID Principles Basics (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/clean-architecture/9780134494272/">Clean Architecture — Robert C. Martin</a></li>
+<li><a href="https://realpython.com/solid-principles-python/">Real Python — SOLID Principles in Python</a></li>
+<li><a href="https://www.oreilly.com/library/view/agile-software-development/0135974445/">Agile Software Development — Robert C. Martin</a></li>
+<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols: Structural subtyping</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, SOLID, Design Principles, Clean Code</p>
+</body>
+</html>
