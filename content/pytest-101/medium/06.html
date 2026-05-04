@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mock and Monkeypatch</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Mock and Monkeypatch</h1>
+<blockquote>
+<p>pytest 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you test a function without actually calling the database or an external API?</p>
+<blockquote>
+<p>A mock replaces real dependencies with fake objects to isolate the code under test. Monkeypatch temporarily swaps functions, attributes, and environment variables within the test scope. This article covers the differences between the two tools and their usage patterns.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>When to choose mock versus monkeypatch</li>
+<li>Replacing functions with <code>unittest.mock.patch</code></li>
+<li>Swapping attributes with <code>monkeypatch.setattr</code></li>
+<li>Verifying calls with <code>assert_called_with</code> patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A unit test should verify one function in isolation. When that function depends on databases, external APIs, or the file system, tests become slow, flaky, and environment-dependent. Mocking removes those dependencies, producing fast and stable tests.</p>
+<blockquote>
+<p>A mock verifies "how does this function interact with the outside world?" — without making a real call. You confirm that the right parameters were passed, without waiting for a network round-trip.</p>
+</blockquote>
+<p>In production, mocks prevent test failures caused by external service outages.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>mock = swap the real thing with a fake to isolate the test</p>
+</blockquote>
+<pre><code>[Production]                    [Test]
+function → DB query → result    function → Mock(DB) → fake result
+function → HTTP call → response function → Mock(HTTP) → fake response
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>mock</strong><br>
+- Description: A fake object that replaces the real one</p>
+<p><strong>patch</strong><br>
+- Description: Swaps an object at a given import path with a mock</p>
+<p><strong>monkeypatch</strong><br>
+- Description: Built-in pytest fixture that temporarily changes attributes and env vars</p>
+<p><strong>MagicMock</strong><br>
+- Description: A mock that records all attribute accesses and method calls</p>
+<p><strong>side_effect</strong><br>
+- Description: Specifies a function to run or an exception to raise when the mock is called</p>
+<h2>Before / After</h2>
+<p>Compare a test calling the real API with one isolated by a mock.</p>
+<pre><code class="language-python"># before: real HTTP call — slow and externally dependent
+import requests
+
+def get_user_name(user_id):
+    response = requests.get(f&quot;https://api.example.com/users/{user_id}&quot;)
+    return response.json()[&quot;name&quot;]
+
+def test_get_user_name():
+    # real API call — requires network, slow, flaky
+    name = get_user_name(1)
+    assert name == &quot;Alice&quot;
+</code></pre>
+<pre><code class="language-python"># after: mock replaces the HTTP call
+from unittest.mock import patch, MagicMock
+
+def test_get_user_name():
+    mock_response = MagicMock()
+    mock_response.json.return_value = {&quot;name&quot;: &quot;Alice&quot;}
+
+    with patch(&quot;requests.get&quot;, return_value=mock_response):
+        name = get_user_name(1)
+    assert name == &quot;Alice&quot;
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Basic Mock Usage</strong></p>
+<pre><code class="language-python"># weather.py
+import requests
+
+def get_temperature(city: str) -&gt; float:
+    response = requests.get(
+        f&quot;https://api.weather.com/v1/current?city={city}&quot;
+    )
+    data = response.json()
+    return data[&quot;temperature&quot;]
+</code></pre>
+<pre><code class="language-python"># test_weather.py
+from unittest.mock import patch, MagicMock
+from weather import get_temperature
+
+def test_get_temperature():
+    mock_response = MagicMock()
+    mock_response.json.return_value = {&quot;temperature&quot;: 22.5}
+
+    with patch(&quot;weather.requests.get&quot;, return_value=mock_response) as mock_get:
+        result = get_temperature(&quot;Seoul&quot;)
+
+    assert result == 22.5
+    mock_get.assert_called_once_with(
+        &quot;https://api.weather.com/v1/current?city=Seoul&quot;
+    )
+</code></pre>
+<p><strong>Step 2: Replacing a Function with monkeypatch</strong></p>
+<pre><code class="language-python"># notification.py
+import smtplib
+
+def send_email(to: str, subject: str, body: str) -&gt; bool:
+    server = smtplib.SMTP(&quot;smtp.example.com&quot;)
+    server.sendmail(&quot;noreply@example.com&quot;, to, f&quot;Subject: {subject}\n\n{body}&quot;)
+    server.quit()
+    return True
+</code></pre>
+<pre><code class="language-python"># test_notification.py
+from notification import send_email
+
+def test_send_email(monkeypatch):
+    sent_emails = []
+
+    class FakeSMTP:
+        def __init__(self, host):
+            self.host = host
+
+        def sendmail(self, from_addr, to_addr, msg):
+            sent_emails.append({&quot;to&quot;: to_addr, &quot;msg&quot;: msg})
+
+        def quit(self):
+            pass
+
+    monkeypatch.setattr(&quot;notification.smtplib.SMTP&quot;, FakeSMTP)
+
+    result = send_email(&quot;user@test.com&quot;, &quot;Hello&quot;, &quot;Test body&quot;)
+
+    assert result is True
+    assert len(sent_emails) == 1
+    assert sent_emails[0][&quot;to&quot;] == &quot;user@test.com&quot;
+</code></pre>
+<p><strong>Step 3: Simulating Exceptions with side_effect</strong></p>
+<pre><code class="language-python"># test_error_handling.py
+from unittest.mock import patch, MagicMock
+import requests
+from weather import get_temperature
+
+def test_network_error():
+    with patch(&quot;weather.requests.get&quot;, side_effect=requests.ConnectionError):
+        try:
+            get_temperature(&quot;Seoul&quot;)
+            assert False, &quot;Expected an exception&quot;
+        except requests.ConnectionError:
+            pass  # expected
+
+def test_invalid_json():
+    mock_response = MagicMock()
+    mock_response.json.side_effect = ValueError(&quot;Invalid JSON&quot;)
+
+    with patch(&quot;weather.requests.get&quot;, return_value=mock_response):
+        try:
+            get_temperature(&quot;Seoul&quot;)
+            assert False, &quot;Expected an exception&quot;
+        except ValueError:
+            pass
+</code></pre>
+<p><strong>Step 4: Setting Environment Variables with monkeypatch</strong></p>
+<pre><code class="language-python"># config.py
+import os
+
+def get_database_url() -&gt; str:
+    url = os.environ.get(&quot;DATABASE_URL&quot;)
+    if not url:
+        raise ValueError(&quot;DATABASE_URL is not set&quot;)
+    return url
+</code></pre>
+<pre><code class="language-python"># test_config.py
+import pytest
+from config import get_database_url
+
+def test_database_url(monkeypatch):
+    monkeypatch.setenv(&quot;DATABASE_URL&quot;, &quot;sqlite:///test.db&quot;)
+    assert get_database_url() == &quot;sqlite:///test.db&quot;
+
+def test_missing_database_url(monkeypatch):
+    monkeypatch.delenv(&quot;DATABASE_URL&quot;, raising=False)
+    with pytest.raises(ValueError, match=&quot;DATABASE_URL&quot;):
+        get_database_url()
+</code></pre>
+<p><strong>Step 5: Call Verification Patterns</strong></p>
+<pre><code class="language-python"># test_call_verification.py
+from unittest.mock import MagicMock, call
+
+def process_items(items, handler):
+    for item in items:
+        handler(item)
+
+def test_handler_called_for_each_item():
+    mock_handler = MagicMock()
+
+    process_items([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;], mock_handler)
+
+    assert mock_handler.call_count == 3
+    mock_handler.assert_has_calls([
+        call(&quot;a&quot;),
+        call(&quot;b&quot;),
+        call(&quot;c&quot;),
+    ])
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The first argument to <code>patch</code> is the import path where the target is <em>used</em> — not where it's defined</li>
+<li><code>monkeypatch</code> is a fixture, so it automatically restores original values after the test</li>
+<li><code>side_effect</code> raises exceptions to test error handling paths</li>
+<li><code>assert_called_once_with</code> verifies the exact parameters passed to a mock</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Patching the definition path</strong><br>
+- Why It's a Problem: The mock doesn't apply because the import path differs<br>
+- Fix: Patch where the target is imported, not defined</p>
+<p><strong>Overusing mocks</strong><br>
+- Why It's a Problem: Tests couple to implementation details, making refactoring painful<br>
+- Fix: Verify results, not internal calls</p>
+<p><strong>Confusing return_value and side_effect</strong><br>
+- Why It's a Problem: Fixed return vs. dynamic behavior serve different purposes<br>
+- Fix: Use return_value for constants, side_effect for functions or exceptions</p>
+<p><strong>Manual setattr without monkeypatch</strong><br>
+- Why It's a Problem: Forgetting to restore the original value leaks state<br>
+- Fix: Always use the monkeypatch fixture</p>
+<p><strong>Accessing typo'd attributes on MagicMock</strong><br>
+- Why It's a Problem: MagicMock auto-creates any attribute, hiding typos<br>
+- Fix: Use <code>spec=True</code> to enforce the real interface</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Mock external API calls so CI tests run without network access</li>
+<li>Isolate environment variables per test with monkeypatch</li>
+<li>Safely test side-effect-heavy code like payment modules</li>
+<li>Sync mock interfaces with real objects using <code>spec=True</code></li>
+<li>Simulate timeouts and network errors via side_effect</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>Mocks are powerful, but overuse leads to "tests that test the implementation." If you need more than 5 mocks, it's a signal that the code has too many dependencies.</p>
+<p>Monkeypatch fits simple substitutions like environment variables and config values. <code>unittest.mock</code> excels at complex call verification. Pick the right tool for the situation.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Used <code>unittest.mock.patch</code> to mock an external dependency</li>
+<li>[ ] Replaced a function with <code>monkeypatch.setattr</code></li>
+<li>[ ] Set an environment variable with <code>monkeypatch.setenv</code></li>
+<li>[ ] Simulated an exception with <code>side_effect</code></li>
+<li>[ ] Verified a call with <code>assert_called_once_with</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Mock <code>requests.get</code> to test both HTTP 200 and 404 responses separately.</li>
+<li>Use monkeypatch to replace <code>datetime.now()</code> with a fixed time and write a test.</li>
+<li>Use <code>spec=True</code> to confirm that calling a non-existent method on a mock raises an error.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>Mock and monkeypatch remove external dependencies to make tests fast and stable. Next, we'll explore concrete patterns for testing files, environment variables, and time-dependent code.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
+<li><strong>Mock and Monkeypatch (current)</strong></li>
+<li>Testing Files, Environment Variables, and Time (upcoming)</li>
+<li>Coverage and Test Quality (upcoming)</li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/how-to/monkeypatch.html">pytest — monkeypatch</a></li>
+<li><a href="https://docs.python.org/3/library/unittest.mock.html">unittest.mock — Python Docs</a></li>
+<li><a href="https://realpython.com/python-mock-library/">Real Python — Understanding the Python Mock Object Library</a></li>
+<li><a href="https://pytest-mock.readthedocs.io/">pytest-mock — Plugin Documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, mock, monkeypatch, Test Doubles</p>
+</body>
+</html>

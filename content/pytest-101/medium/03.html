@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Assert and Exception Testing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Assert and Exception Testing</h1>
+<blockquote>
+<p>pytest 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How is pytest's <code>assert</code> different from Python's built-in <code>assert</code>?</p>
+<blockquote>
+<p>pytest rewrites <code>assert</code> statements internally, showing the left-hand and right-hand values in detail when a test fails. This article covers various assert patterns and exception testing with <code>pytest.raises</code>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How pytest's assertion introspection mechanism works</li>
+<li>Patterns for comparing collections, strings, and floating-point numbers</li>
+<li>Verifying exception types and messages with <code>pytest.raises</code></li>
+<li>Safe floating-point comparison with <code>pytest.approx</code></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When a test fails, quickly understanding <em>why</em> it failed is critical. pytest's assertion introspection shows the failure cause immediately, dramatically reducing debugging time.</p>
+<blockquote>
+<p>unittest's <code>self.assertEqual(a, b)</code> is harder to read than <code>assert a == b</code>, yet pytest's failure messages are actually <em>more</em> detailed.</p>
+</blockquote>
+<p>Exception handling is core to production code. Without testing that exceptions fire correctly, broken error handling goes undetected.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>assertion introspection = pytest analyzes assert statements to provide detailed information on failure</p>
+</blockquote>
+<pre><code>assert result == expected
+       │          │
+       │          └─ Expected value: displayed
+       └─ Actual value: displayed
+
+On failure:
+  AssertionError: assert 3 == 5
+    where 3 = add(1, 2)
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Assertion rewriting</strong><br>
+- Description: pytest transforms assert at the AST level to generate detailed messages</p>
+<p><strong>pytest.raises</strong><br>
+- Description: Context manager that verifies a specific exception is raised</p>
+<p><strong>pytest.approx</strong><br>
+- Description: Allows tolerance in floating-point comparisons</p>
+<p><strong>match parameter</strong><br>
+- Description: Validates exception messages using regex patterns</p>
+<p><strong>ExceptionInfo</strong><br>
+- Description: Exception information object returned by pytest.raises</p>
+<h2>Before / After</h2>
+<p>Compare unittest-style and pytest-style assertions.</p>
+<pre><code class="language-python"># before: unittest style — must memorize method names
+import unittest
+
+class TestMath(unittest.TestCase):
+    def test_add(self):
+        self.assertEqual(add(1, 2), 3)
+        self.assertIn(&quot;hello&quot;, result)
+        self.assertAlmostEqual(0.1 + 0.2, 0.3, places=1)
+        self.assertRaises(ValueError, divide, 1, 0)
+</code></pre>
+<pre><code class="language-python"># after: pytest style — unified with assert
+import pytest
+
+def test_add():
+    assert add(1, 2) == 3
+    assert &quot;hello&quot; in result
+    assert 0.1 + 0.2 == pytest.approx(0.3)
+    with pytest.raises(ValueError):
+        divide(1, 0)
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Basic Assert Patterns</strong></p>
+<pre><code class="language-python"># test_assert_patterns.py
+
+def test_equality():
+    assert 1 + 1 == 2
+
+def test_inequality():
+    assert 1 + 1 != 3
+
+def test_truthiness():
+    assert [1, 2, 3]    # non-empty list is truthy
+    assert not []        # empty list is falsy
+
+def test_membership():
+    fruits = [&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;]
+    assert &quot;banana&quot; in fruits
+    assert &quot;mango&quot; not in fruits
+
+def test_identity():
+    a = None
+    assert a is None
+</code></pre>
+<p><strong>Step 2: Collection Comparison</strong></p>
+<pre><code class="language-python"># test_collections.py
+
+def test_list_comparison():
+    expected = [1, 2, 3, 4, 5]
+    result = list(range(1, 6))
+    assert result == expected
+
+def test_dict_comparison():
+    expected = {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 30}
+    result = {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 25}
+    assert result == expected  # shows differing key-values on failure
+
+def test_set_comparison():
+    expected = {1, 2, 3}
+    result = {1, 2, 4}
+    assert result == expected  # shows set difference on failure
+</code></pre>
+<p><strong>Step 3: Floating-Point Comparison</strong></p>
+<pre><code class="language-python"># test_float.py
+import pytest
+
+def test_float_naive():
+    # This test would fail:
+    # assert 0.1 + 0.2 == 0.3
+
+    # Safe comparison with pytest.approx
+    assert 0.1 + 0.2 == pytest.approx(0.3)
+
+def test_approx_with_tolerance():
+    assert 2.0 == pytest.approx(2.02, abs=0.05)
+    assert 100.0 == pytest.approx(101.0, rel=0.02)
+
+def test_approx_list():
+    result = [0.1 + 0.2, 0.2 + 0.3]
+    assert result == pytest.approx([0.3, 0.5])
+</code></pre>
+<p><strong>Step 4: Exception Testing</strong></p>
+<pre><code class="language-python"># test_exceptions.py
+import pytest
+
+def divide(a, b):
+    if b == 0:
+        raise ValueError(f&quot;Cannot divide {a} by zero&quot;)
+    return a / b
+
+def test_raises_basic():
+    with pytest.raises(ValueError):
+        divide(10, 0)
+
+def test_raises_with_match():
+    with pytest.raises(ValueError, match=&quot;by zero&quot;):
+        divide(10, 0)
+
+def test_raises_inspect_exception():
+    with pytest.raises(ValueError) as exc_info:
+        divide(10, 0)
+    assert &quot;by zero&quot; in str(exc_info.value)
+    assert exc_info.type is ValueError
+
+def test_raises_wrong_exception():
+    # This test fails because ValueError is raised, not TypeError
+    with pytest.raises(TypeError):
+        divide(10, 0)
+</code></pre>
+<p><strong>Step 5: Custom Error Messages</strong></p>
+<pre><code class="language-python"># test_custom_message.py
+
+def test_with_message():
+    value = compute_score()
+    assert value &gt;= 0, f&quot;Score cannot be negative. Got: {value}&quot;
+
+def test_complex_assertion():
+    users = fetch_active_users()
+    assert len(users) &gt; 0, &quot;No active users found&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Dict comparison failures show exactly which keys and values differ</li>
+<li><code>pytest.approx</code> works with lists and dict values too</li>
+<li>The <code>match</code> parameter supports regex for flexible message verification</li>
+<li><code>exc_info.value</code> gives direct access to the exception object for attribute inspection</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong><code>assert 0.1 + 0.2 == 0.3</code></strong><br>
+- Why It's a Problem: Always fails due to floating-point imprecision<br>
+- Fix: Use <code>pytest.approx(0.3)</code></p>
+<p><strong>Asserting inside <code>pytest.raises</code> block</strong><br>
+- Why It's a Problem: Code after the exception won't execute<br>
+- Fix: Inspect <code>exc_info</code> outside the block</p>
+<p><strong>Testing with overly broad exception types</strong><br>
+- Why It's a Problem: Catching <code>Exception</code> hides other bugs<br>
+- Fix: Specify the exact exception type</p>
+<p><strong>Forgetting to escape special characters in <code>match</code></strong><br>
+- Why It's a Problem: Interpreted as regex, causing unexpected matches<br>
+- Fix: Use <code>re.escape()</code></p>
+<p><strong>Calling functions without asserting</strong><br>
+- Why It's a Problem: Only verifies no error is raised, not the result<br>
+- Fix: Always assert the return value</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Assert API response status codes and body simultaneously</li>
+<li>Use <code>pytest.approx</code> for financial calculations with decimal tolerance</li>
+<li>Test all error cases of input validation with <code>pytest.raises</code></li>
+<li>Verify custom exception class attributes (error_code, detail) via <code>exc_info.value</code></li>
+<li>Add context to failure messages for faster root cause analysis in CI logs</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>A good test reveals its failure cause from the failure message alone. When <code>assert result == expected</code> fails, pytest shows both values — no print debugging needed.</p>
+<p>When writing exception tests, think from the perspective: "This function <em>must</em> fail for this input." If the exception doesn't fire, the test fails, preventing accidental removal of error handling.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Observed pytest's assertion introspection output</li>
+<li>[ ] Compared floating-point values with <code>pytest.approx</code></li>
+<li>[ ] Verified exception types with <code>pytest.raises</code></li>
+<li>[ ] Validated exception messages with the <code>match</code> parameter</li>
+<li>[ ] Inspected exception object attributes via <code>exc_info</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a test comparing two dicts that differ, and observe pytest's diff output.</li>
+<li>Test a <code>sqrt(n)</code> function that raises <code>ValueError</code> on negative input, and verify the error message.</li>
+<li>Experiment with the <code>rel</code> and <code>abs</code> parameters of <code>pytest.approx</code> and document the difference.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>pytest's assert is readable and provides detailed failure information. <code>pytest.raises</code> and <code>pytest.approx</code> are essential tools for exception and floating-point testing. Next, we'll learn about fixtures for managing test data.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><strong>Assert and Exception Testing (current)</strong></li>
+<li>Understanding Fixtures (upcoming)</li>
+<li>Parametrization (upcoming)</li>
+<li>Mock and Monkeypatch (upcoming)</li>
+<li>Testing Files, Environment Variables, and Time (upcoming)</li>
+<li>Coverage and Test Quality (upcoming)</li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/how-to/assert.html">pytest — Assertions</a></li>
+<li><a href="https://docs.pytest.org/en/stable/reference/reference.html#pytest-raises">pytest — pytest.raises</a></li>
+<li><a href="https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx">pytest — pytest.approx</a></li>
+<li><a href="https://realpython.com/pytest-python-testing/#testing-for-exceptions">Real Python — Testing Exceptions</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, assert, Exception Testing, pytest.raises</p>
+</body>
+</html>
