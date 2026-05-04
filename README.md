@@ -105,7 +105,6 @@ make check              # repository quality gates
 make docs-build         # MkDocs strict build
 make assets-check       # public asset validation
 ```
-```
 
 ## 폴더 구조
 

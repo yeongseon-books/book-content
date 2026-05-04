@@ -79,7 +79,7 @@ def export_one(src: Path, dst: Path, *, local_assets: bool = False) -> None:
         meta.get("copyright_holder", "YeongseonBooks"),
         meta.get("copyright_year", "2026"),
         meta.get("license", "all-rights-reserved"),
-        visible=False,
+        visible=True,
         lang="en",
     )
     dst.parent.mkdir(parents=True, exist_ok=True)
