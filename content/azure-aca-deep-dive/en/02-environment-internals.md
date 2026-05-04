@@ -50,6 +50,14 @@ It tells you why app placement into environments is a design decision, not a nam
 
 ---
 
+## Questions this chapter answers
+
+- How does a managed environment map internally to node pools and namespaces?
+- Can you explain how many IPs the infrastructure subnet needs, and exactly why?
+- If you swap the Log Analytics workspace, who breaks and what falls silent?
+- How does a workload profile change not just pricing but the isolation model?
+- What is an environment-level outbound IP, and how do you advertise it to external systems?
+
 ## The environment is the platform's isolation unit
 
 An environment is where ACA starts acting like a platform rather than a single app host.
@@ -322,6 +330,23 @@ This chapter is mostly about Microsoft-documented product boundaries, with a sma
 
 **Speculation (ACA-internal, not exposed):**
 - The exact hidden Kubernetes objects, mesh wiring, and control-plane implementation inside an environment are not public.
+
+### Inspect the environment's IPs, profiles, and outbound paths
+
+```bash
+az containerapp env show -n my-env -g my-rg \
+  --query "{infraSubnet:vnetConfiguration.infrastructureSubnetId, internal:vnetConfiguration.internal, staticIp:staticIp, outbound:vnetConfiguration.outboundType}"
+
+az containerapp env workload-profile list -n my-env -g my-rg -o table
+```
+
+## Operational checklist
+
+- [ ] Computed safety margin between subnet size and projected replica count
+- [ ] Registered outbound IPs with downstream systems (firewalls, IP allowlists)
+- [ ] Evaluated RPO/RTO impact of changing the log workspace
+- [ ] Tabulated cost vs isolation trade-offs across workload profiles
+- [ ] Aligned the internal/external ingress decision with the DNS strategy
 
 <!-- toc:begin -->
 ## In this series

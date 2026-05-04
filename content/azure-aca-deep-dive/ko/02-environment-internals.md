@@ -52,6 +52,14 @@ Dapr component가 어디서 공유되는지 알려 줍니다.
 
 ---
 
+## 이 글에서 답할 질문
+
+- managed environment는 내부적으로 어떤 노드 풀, 어떤 네임스페이스로 매핑되는가?
+- infrastructure subnet 하나에 몇 개의 IP가 필요한지, 왜 그만큼 필요한지 설명할 수 있는가?
+- log analytics workspace 연결을 바꾸면 누가 영향을 받고 무엇이 끊기는가?
+- workload profile은 가격 모델뿐 아니라 격리 모델까지 어떻게 바꾸는가?
+- 환경 단위 outbound IP는 무엇이고, 외부 시스템에 어떻게 알려야 하는가?
+
 ## Environment는 플랫폼의 격리 단위입니다
 
 Environment는 ACA가 단일 앱 호스트가 아니라 플랫폼처럼 보이기 시작하는 지점입니다.
@@ -328,6 +336,23 @@ Ingress는 이 경계 안의 app endpoint로 들어갑니다.
 
 **Speculation (ACA-internal, not exposed):**
 - Environment 내부의 숨은 Kubernetes object, mesh wiring, control-plane 구현 세부사항은 공개되지 않았습니다.
+
+### environment의 IP, profile, outbound를 점검
+
+```bash
+az containerapp env show -n my-env -g my-rg \
+  --query "{infraSubnet:vnetConfiguration.infrastructureSubnetId, internal:vnetConfiguration.internal, staticIp:staticIp, outbound:vnetConfiguration.outboundType}"
+
+az containerapp env workload-profile list -n my-env -g my-rg -o table
+```
+
+## 운영 체크리스트
+
+- [ ] infra subnet 크기와 예상 replica 수 사이의 안전 마진을 계산했다
+- [ ] outbound IP를 다운스트림 시스템(방화벽, IP allowlist)에 등록했다
+- [ ] log workspace 변경의 RPO/RTO 영향도를 평가했다
+- [ ] workload profile 별 비용/격리 trade-off를 표로 정리했다
+- [ ] internal/external ingress 결정과 DNS 전략을 일치시켰다
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -57,6 +57,14 @@ The long answer starts with revision immutability.
 
 ---
 
+## Questions this chapter answers
+
+- Revisions are immutable — exactly which field changes spawn a new revision?
+- Where in the ingress layer does traffic split happen, and can it be session-sticky?
+- Where does the cap on simultaneously active revisions come from, and why that number?
+- What is the safest blue/green and canary recipe in ACA, command by command?
+- Is rolling back to 100% on the old revision really enough?
+
 ## A revision is an immutable runtime snapshot
 
 Microsoft's revisions documentation is explicit on the important part.
@@ -380,6 +388,14 @@ This chapter intentionally separates ACA product facts from the hidden routing i
 
 **Speculation (ACA-internal, not exposed):**
 - The exact private translation pipeline, internal object names, and internal Envoy configuration layout inside ACA are not public.
+
+## Operational checklist
+
+- [ ] Listed the fields that trigger a new revision in the code-review checklist
+- [ ] Verified traffic-split changes propagate immediately under test
+- [ ] Computed limits on active revisions vs memory footprint
+- [ ] Defined canary stage percentages plus auto-promote/rollback criteria
+- [ ] Cross-checked rollback against downstream compatibility (DB schema, queued messages)
 
 <!-- toc:begin -->
 ## In this series

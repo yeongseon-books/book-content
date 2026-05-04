@@ -54,6 +54,14 @@ Pod에 주입됩니다.
 
 ---
 
+## 이 글에서 답할 질문
+
+- Dapr sidecar는 ACA에서 어떤 lifecycle을 갖고, 앱 컨테이너와 어떻게 동기화되는가?
+- service invocation은 mTLS, retry, timeout을 ‘무료로’ 준다는데, 그 비용은 어디로 가는가?
+- state store와 pub/sub component 정의는 환경 단위인가, 앱 단위인가?
+- Dapr API를 직접 호출하는 코드와 SDK 호출 코드의 추적 가능성은 어떻게 다른가?
+- Dapr가 죽거나 느려질 때 앱 컨테이너의 readiness는 어떻게 신호되는가?
+
 ## 가장 짧고 정확한 문장
 
 ACA의 Dapr는 Container Apps 제품 표면에 통합된 upstream Dapr runtime입니다.
@@ -381,6 +389,28 @@ Timeout 분석에서는 이 마지막 구분이 특히 중요합니다.
 
 **Speculation (ACA-internal, not exposed):**
 - ACA 내부에서 실제로 어떤 admission pipeline, certificate flow, control-plane address가 쓰이는지는 공개되지 않았습니다.
+
+### Dapr 활성화와 component 바인딩
+
+```bash
+az containerapp update -n my-app -g my-rg \
+  --enable-dapr true \
+  --dapr-app-id orders \
+  --dapr-app-port 8080 \
+  --dapr-app-protocol http
+
+az containerapp env dapr-component set \
+  -n my-env -g my-rg --dapr-component-name statestore \
+  --yaml dapr/statestore.yaml
+```
+
+## 운영 체크리스트
+
+- [ ] Dapr sidecar의 readiness가 앱 readiness에 반영되는지 확인했다
+- [ ] service invocation의 retry/timeout 정책을 명시적으로 설정했다
+- [ ] 환경 단위 component를 어떤 앱이 쓰는지 ownership 매트릭스를 만들었다
+- [ ] Dapr trace를 Application Insights에 연결했다
+- [ ] Dapr 장애 시 fallback 경로(직접 호출, 큐 우회)를 정의했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

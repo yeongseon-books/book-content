@@ -54,6 +54,14 @@ This episode follows that path from pod mutation to localhost API calls.
 
 ---
 
+## Questions this chapter answers
+
+- What lifecycle does the Dapr sidecar have in ACA, and how does it stay in sync with the app container?
+- Service invocation gives you mTLS, retry, and timeout 'for free' — where does the bill actually land?
+- Are state-store and pub/sub component definitions environment-scoped or app-scoped?
+- How does traceability differ between calling the Dapr API directly versus via the SDK?
+- If Dapr dies or slows down, how is the app container's readiness signalled?
+
 ## The shortest accurate sentence
 
 ACA Dapr is upstream Dapr runtime integrated into the Container Apps product surface.
@@ -381,6 +389,28 @@ This chapter separates ACA's public Dapr surface from upstream Dapr-on-Kubernete
 
 **Speculation (ACA-internal, not exposed):**
 - ACA does not publish the exact admission pipeline, certificate flow, or control-plane addresses used for Dapr inside the managed platform.
+
+### Enable Dapr and bind components
+
+```bash
+az containerapp update -n my-app -g my-rg \
+  --enable-dapr true \
+  --dapr-app-id orders \
+  --dapr-app-port 8080 \
+  --dapr-app-protocol http
+
+az containerapp env dapr-component set \
+  -n my-env -g my-rg --dapr-component-name statestore \
+  --yaml dapr/statestore.yaml
+```
+
+## Operational checklist
+
+- [ ] Confirmed Dapr sidecar readiness is reflected in app readiness
+- [ ] Explicitly set retry/timeout policies for service invocation
+- [ ] Built an ownership matrix of which apps consume which environment-scoped components
+- [ ] Wired Dapr traces into Application Insights
+- [ ] Defined a fallback path (direct call, queue bypass) when Dapr fails
 
 <!-- toc:begin -->
 ## In this series

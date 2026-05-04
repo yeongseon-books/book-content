@@ -58,6 +58,14 @@ This episode follows that hidden mapping.
 
 ---
 
+## Questions this chapter answers
+
+- What is the same and what is restricted between ACA's KEDA and stock KEDA?
+- Where is the boundary between triggers that scale to zero and triggers that cannot?
+- How do polling interval, cooldown, and max replicas trade cost against latency?
+- When multiple scalers attach to one app, how is priority resolved?
+- Where can you verify KEDA scaler metrics, and what do you suspect when they vanish?
+
 ## The short version: a scale rule is not the scaler itself
 
 In ACA, the scale rule you author is product configuration.
@@ -337,6 +345,25 @@ This chapter leans on Microsoft's KEDA-powered scaling contract and uses upstrea
 **Speculation (ACA-internal, not exposed):**
 - ACA does not publish the exact hidden Kubernetes objects or private controllers it creates for each scale rule.
 - ACA HTTP scaling should not be claimed to be a one-to-one deployment of the upstream KEDA HTTP add-on.
+
+### Define a scale rule (queue-based)
+
+```bash
+az containerapp update -n my-app -g my-rg \
+  --min-replicas 0 --max-replicas 30 \
+  --scale-rule-name queue-rule \
+  --scale-rule-type azure-queue \
+  --scale-rule-metadata queueName=jobs queueLength=5 \
+  --scale-rule-auth connection=queue-conn
+```
+
+## Operational checklist
+
+- [ ] Decided whether scale-to-zero is acceptable per the SLA
+- [ ] Tuned polling interval and cooldown to match workload spike shape
+- [ ] Confirmed max replicas will not break downstream (DB connections, API quota)
+- [ ] Documented priority and aggregation when stacking multiple scalers
+- [ ] Monitor consistency between KEDA metrics and actual replica count
 
 <!-- toc:begin -->
 ## In this series

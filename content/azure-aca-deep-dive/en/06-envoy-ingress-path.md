@@ -54,6 +54,14 @@ This final episode follows that path at the right resolution for ACA operators, 
 
 ---
 
+## Questions this chapter answers
+
+- Is ACA's ingress just one layer of Envoy, or is there another proxy on top?
+- How does the same hostname split between external and internal ingress?
+- Where does TLS terminate, and how is mTLS to the backend actually guaranteed?
+- Where do header rewriting, sticky sessions, and websockets each unlock or hit a wall?
+- What do 5xx codes at the ingress mean, and which metric flags them first?
+
 ## Start with the full path, not with the app
 
 The first mistake in ingress debugging is to start at the user container.
@@ -322,6 +330,24 @@ This chapter is the most inference-sensitive part of the series, so every major 
 
 **Speculation (ACA-internal, not exposed):**
 - The exact ingress object graph, queueing strategy, buffering behavior, and 0 -> 1 request handling inside ACA are not public and should not be stated as fact.
+
+### Inspect ingress configuration and hostnames
+
+```bash
+az containerapp ingress show -n my-app -g my-rg \
+  --query "{external:external, target:targetPort, transport:transport, traffic:traffic}"
+
+az containerapp ingress traffic show -n my-app -g my-rg -o table
+az containerapp hostname list -n my-app -g my-rg -o table
+```
+
+## Operational checklist
+
+- [ ] Use external/internal ingress consistently per hostname
+- [ ] Validated automated TLS certificate renewal
+- [ ] Aligned websocket and long-lived connection timeouts at both ingress and app
+- [ ] Separated alerts for ingress 5xx rate and p95 latency
+- [ ] Simulated traffic-split behaviour when backend health checks fail
 
 <!-- toc:begin -->
 ## In this series

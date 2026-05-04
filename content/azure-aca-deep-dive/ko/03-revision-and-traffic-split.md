@@ -57,6 +57,14 @@ Portal이나 ARM 템플릿에서 80/20을 적었을 때, 그 숫자는 어디에
 
 ---
 
+## 이 글에서 답할 질문
+
+- revision은 immutable이라고 하는데, 정확히 어떤 필드의 변경이 새 revision을 만들어내는가?
+- traffic split은 ingress 레이어 어디서 결정되며, 세션 단위 sticky가 가능한 모델인가?
+- 동시 활성 revision의 상한은 어디서 오고, 왜 그 숫자인가?
+- blue/green과 canary는 ACA에서 각각 어떤 명령으로 가장 안전하게 흉내낼 수 있는가?
+- 롤백은 ‘이전 revision을 100%로 되돌리는 것’만으로 충분한가?
+
 ## Revision은 불변 런타임 스냅샷입니다
 
 Microsoft의 revisions 문서는 중요한 지점을 분명히 적습니다.
@@ -381,6 +389,14 @@ App 설정을 Envoy 설정으로 번역하는 ACA 내부 control-plane 코드는
 
 **Speculation (ACA-internal, not exposed):**
 - Private translation pipeline, 내부 오브젝트 이름, 실제 Envoy 구성 레이아웃은 공개되지 않았습니다.
+
+## 운영 체크리스트
+
+- [ ] revision 생성 트리거가 되는 필드 목록을 코드 리뷰 체크리스트에 넣었다
+- [ ] traffic split 변경이 즉시 반영되는지 테스트로 확인했다
+- [ ] 활성 revision 수와 메모리 footprint 한도를 계산했다
+- [ ] canary 비율 단계와 자동 promote/rollback 기준을 정의했다
+- [ ] 롤백 시 외부 의존성 호환성(DB schema, queue 메시지)을 함께 점검했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

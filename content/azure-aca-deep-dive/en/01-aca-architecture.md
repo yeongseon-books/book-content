@@ -55,6 +55,14 @@ The later episodes zoom into each box.
 
 ---
 
+## Questions this chapter answers
+
+- What abstractions does ACA stack on top of which abstractions, exactly?
+- Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?
+- ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?
+- If the control plane fails, what does your app look like, and how does it recover?
+- Inside one environment, where does isolation end and where does it leak?
+
 ## The big picture — one Container Apps environment
 
 This is the map for the whole series.
@@ -327,6 +335,26 @@ This chapter mixes Microsoft-documented product behavior with carefully bounded 
 **Speculation (ACA-internal, not exposed):**
 - The exact Kubernetes substrate, cluster topology, and internal object naming inside ACA are not public.
 - The precise private adapter code that translates ACA resources into Envoy, KEDA, or Dapr configuration is not public.
+
+### Inspect the environment and its components at a glance
+
+```bash
+az containerapp env show \
+  --name my-env --resource-group my-rg \
+  --query "{name:name, vnet:vnetConfiguration.infrastructureSubnetId, dapr:daprAIInstrumentationKey, workload:workloadProfiles[].name}"
+
+az containerapp env workload-profile list \
+  --name my-env --resource-group my-rg \
+  -o table
+```
+
+## Operational checklist
+
+- [ ] Recorded ownership boundaries (Microsoft vs your team) in an ADR
+- [ ] Simulated data-plane impact during a control-plane outage
+- [ ] Reviewed trust boundaries between apps sharing one environment
+- [ ] Confirmed the upgrade policy for managed components (KEDA, Dapr, Envoy)
+- [ ] Catalogued changes that require environment recreation (VNet, log workspace)
 
 <!-- toc:begin -->
 ## In this series

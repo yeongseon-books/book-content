@@ -55,6 +55,14 @@ Microsoft는 ACA가 Kubernetes 기반이라고 문서화하지만, 각 Environme
 
 ---
 
+## 이 글에서 답할 질문
+
+- ACA는 결국 어떤 추상화 위에 어떤 추상화를 또 쌓은 플랫폼인가?
+- managed environment 안의 component(KEDA, Dapr, Envoy)는 누가 소유하고 누가 업그레이드하는가?
+- ACA가 AKS 위에서 돈다는 사실은 사용자에게 어떤 의무를 남기고 어떤 의무를 가져가는가?
+- control plane 장애가 나면 우리 앱은 어떻게 보이고 어떻게 회복되는가?
+- 한 environment 안에서 격리는 어디서 끊어지는가, 어디서 끊어지지 않는가?
+
 ## 전체 그림 — Azure Container Apps Environment
 
 이 그림이 이번 심화 시리즈 전체의 지도입니다.
@@ -331,6 +339,26 @@ ACA가 모호하다는 뜻은 아닙니다.
 **Speculation (ACA-internal, not exposed):**
 - 정확한 Kubernetes substrate, 클러스터 토폴로지, 내부 오브젝트 이름은 공개되지 않았습니다.
 - ACA 리소스를 Envoy·KEDA·Dapr 설정으로 바꾸는 private adapter 코드는 공개되지 않았습니다.
+
+### environment와 그 안의 component를 한눈에 보기
+
+```bash
+az containerapp env show \
+  --name my-env --resource-group my-rg \
+  --query "{name:name, vnet:vnetConfiguration.infrastructureSubnetId, dapr:daprAIInstrumentationKey, workload:workloadProfiles[].name}"
+
+az containerapp env workload-profile list \
+  --name my-env --resource-group my-rg \
+  -o table
+```
+
+## 운영 체크리스트
+
+- [ ] environment 단위 책임 분담(Microsoft vs 우리 팀)을 ADR로 남겼다
+- [ ] control plane 장애 시 데이터 플레인 영향 범위를 시뮬레이션해 봤다
+- [ ] 동일 environment 내 앱들의 신뢰 경계를 검토했다
+- [ ] managed component(KEDA, Dapr, Envoy) 버전 업그레이드 정책을 확인했다
+- [ ] 환경 재생성이 필요한 변경(VNet, log workspace)을 사전에 분류했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -54,6 +54,14 @@ HTTPS 트래픽을 받습니다.
 
 ---
 
+## 이 글에서 답할 질문
+
+- ACA의 ingress는 Envoy 한 겹인가, 그 위에 또 다른 프록시가 있는가?
+- external/internal ingress는 같은 이름의 hostname에서 어떻게 갈라지는가?
+- TLS 종단(termination)은 어디서 일어나고, 백엔드까지 mTLS는 어떻게 보장되는가?
+- header rewriting, sticky session, websocket은 각각 어디서 풀리고 어디서 막히는가?
+- ingress 단의 503/504는 무엇을 의미하고, 어떤 메트릭에서 가장 먼저 보이는가?
+
 ## 시작점은 앱이 아니라 전체 경로입니다
 
 Ingress 디버깅에서 가장 흔한 실수는 사용자 컨테이너부터 보는 것입니다.
@@ -323,6 +331,24 @@ Internal-only app에서는 인터넷 쪽 edge가 사라집니다.
 
 **Speculation (ACA-internal, not exposed):**
 - 정확한 ingress object graph, queueing 전략, buffering 동작, 0 -> 1 요청 처리 방식은 공개되지 않았고 사실처럼 단정하면 안 됩니다.
+
+### ingress 설정과 hostname 확인
+
+```bash
+az containerapp ingress show -n my-app -g my-rg \
+  --query "{external:external, target:targetPort, transport:transport, traffic:traffic}"
+
+az containerapp ingress traffic show -n my-app -g my-rg -o table
+az containerapp hostname list -n my-app -g my-rg -o table
+```
+
+## 운영 체크리스트
+
+- [ ] external/internal ingress를 hostname 단위로 일관되게 사용한다
+- [ ] TLS 인증서 갱신 자동화를 검증했다
+- [ ] websocket과 long-lived connection의 timeout을 ingress와 앱 양쪽에서 일치시켰다
+- [ ] ingress 5xx 비율 알림과 latency p95 알림을 분리해서 운영한다
+- [ ] ingress 백엔드 health check 실패 시 traffic split 동작을 시뮬레이션했다
 
 <!-- toc:begin -->
 ## 시리즈 목차
