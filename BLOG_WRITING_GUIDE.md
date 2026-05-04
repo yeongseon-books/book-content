@@ -87,6 +87,40 @@
   - `Most Azure App Service 502s Make More Sense Once You Understand the Request Path`
   - `Kudu Is Not Your App: Understanding the SCM Plane in Azure App Service`
 
+### 4.5 SEO front matter (`seo_title`, `seo_description`)
+
+모든 글의 front matter에는 `seo_description`이 포함되어야 한다. `seo_title`은 선택사항이며, 생략하면 canonical `title`이 사용된다.
+
+**Hard / recommended limits (NFC code-points)**
+
+| Field | ko hard | ko rec | en hard | en rec |
+| --- | --- | --- | --- | --- |
+| `seo_title` | 36 | 32 | 60 | 55 |
+| `seo_description` | 80 | 75 | 150 | 145 |
+
+Hard limit를 넘으면 `scripts/check_frontmatter.py`가 실패한다. 이모지와 ZWJ는 금지된다.
+
+**작성 원칙**
+
+- `seo_title`은 검색 결과 목록에서 독자가 클릭할 이유를 주는 단괴적인 제목이다. canonical title이 hard limit을 넘을 때만 추가한다.
+- `seo_description`은 검색 결과 스니펫에 노출되는 한 문장 설명이다. 조사 제목, 번호 매김, 매키업은 피한다.
+- ko/en은 독립적으로 작성한다. 자동 번역 금지.
+- AI slop 금지: "이 글을 마치면...", "By the end of this chapter..." 같은 meta-intro는 쓰지 않는다.
+
+**초기값 채우기**
+
+```bash
+# 단일 시리즈 dry-run
+python3 scripts/seed_seo_metadata.py --dry-run <series-id>
+
+# 실제 적용
+python3 scripts/seed_seo_metadata.py <series-id>
+
+# 전체 시리즈
+python3 scripts/seed_seo_metadata.py --all
+```
+
+Extractor 우선순위: `## Mental Model` 블록인용 → `## 왜 중요한가` / `## Why It Matters` 단락 → 메타-인트로가 아닌 첫 단락. 시드 값은 초안이며, 필요시 손으로 다듬는다.
 ---
 
 ## 5. Tistory 발행 규칙

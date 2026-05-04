@@ -3,7 +3,8 @@
 # Remove this comment block before saving. Keep only front matter and body.
 ---
 title: "Article Title"
-seo_title: "SEO title that ranks (<=60 chars)"
+seo_title: "SEO title that ranks (optional; en <=60 NFC chars; falls back to title)"
+seo_description: "One-sentence search snippet (optional; en <=150 chars, 145 recommended). Seed via scripts/seed_seo_metadata.py."
 medium_title: "Optional Medium-only title"
 series: "series-id"               # e.g. azure-functions-101
 episode: 1
