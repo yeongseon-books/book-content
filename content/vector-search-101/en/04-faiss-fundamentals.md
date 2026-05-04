@@ -138,11 +138,6 @@ print(f"vector dimension: {dimension}")
 
 <!-- injected-output:end -->
 
-```
-total vectors in index: 10
-vector dimension: 384
-```
-
 FAISS requires `float32` arrays. Without the explicit `dtype=np.float32` cast, NumPy defaults to `float64` and FAISS raises an error.
 
 ---
@@ -196,23 +191,6 @@ for query in queries:
       [3] 0.2652 — Embedding models project text into a high-dimensional vector
 
 <!-- injected-output:end -->
-
-```
-query: 'how vector search finds similar content'
-  [1] 0.7234 — Vector search captures semantic similarity that keyword...
-  [2] 0.6891 — Embedding models project text into a high-dimensional...
-  [3] 0.6312 — Cosine similarity measures the directional similarity...
-
-query: 'what embedding models do'
-  [1] 0.8012 — Embedding models project text into a high-dimensional...
-  [2] 0.7213 — sentence-transformers specializes in sentence-level...
-  [3] 0.6534 — Higher embedding dimensions can capture more information.
-
-query: 'splitting documents into pieces'
-  [1] 0.8234 — Chunking strategies split long documents into searchable...
-  [2] 0.5123 — RAG combines retrieved documents with an LLM prompt.
-  [3] 0.4891 — Vector search captures semantic similarity that keyword...
-```
 
 ---
 
@@ -282,15 +260,6 @@ for score, idx in zip(scores[0], indices[0]):
 
 <!-- injected-output:end -->
 
-```
-saved: 3 vectors
-reloaded: 3 vectors
-
-results:
-  0.6234 — Embedding models project text into a high-dimensional vector space.
-  0.5891 — Cosine similarity measures the directional similarity between two vectors.
-```
-
 `faiss.write_index()` and `faiss.read_index()` use FAISS's own binary format, which loads faster than NumPy `.npy` files at scale.
 
 ---
@@ -349,16 +318,6 @@ for score, idx in zip(scores_l2[0], indices_l2[0]):
       0.7173 — Python async programming
 
 <!-- injected-output:end -->
-
-```
-IndexFlatIP (higher = more similar):
-  0.8241 — handling concurrency in Python
-  0.7134 — Python async programming
-
-IndexFlatL2 (lower = more similar):
-  0.3512 — handling concurrency in Python
-  0.5123 — Python async programming
-```
 
 Both indexes return the correct ranking. For text retrieval, `IndexFlatIP` with normalized vectors is the standard choice.
 

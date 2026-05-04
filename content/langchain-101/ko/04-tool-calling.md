@@ -190,14 +190,6 @@ print(f"tool_calls: {response.tool_calls}")
 
 <!-- injected-output:end -->
 
-`tool_calls`가 비어있지 않으면 LLM이 도구 호출을 요청한 것입니다.
-
-```
-응답 타입: AIMessage
-content: ''
-tool_calls: [{'name': 'add_numbers', 'args': {'a': 15.0, 'b': 27.0}, 'id': 'call_...'}]
-```
-
 ---
 
 ## 도구 결과를 처리하는 단순 루프

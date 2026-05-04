@@ -174,25 +174,6 @@ for text_a, text_b in pairs:
 
 <!-- injected-output:end -->
 
-Expected output:
-
-```
-'Python async programming' vs 'handling concurrency in Py'
-  cosine:     0.8134
-  dot:        0.8134
-  euclidean:  0.6109
-
-'Python async programming' vs 'training a machine learning'
-  cosine:     0.3812
-  dot:        0.3812
-  euclidean:  1.1103
-
-'Python async programming' vs 'walking the dog in the park'
-  cosine:     0.0471
-  dot:        0.0471
-  euclidean:  1.3792
-```
-
 With normalized vectors, cosine and dot product match exactly. Euclidean distance goes in the opposite direction but produces the same ranking.
 
 ---
@@ -244,17 +225,6 @@ print(f"norm dot:    {float(np.dot(a_norm, b_norm)):.4f}")
     norm dot:    0.6201
 
 <!-- injected-output:end -->
-
-```
-raw magnitudes: a=4.2318, b=4.1092
-norm magnitudes: a=1.0000, b=1.0000
-
-raw cosine: 0.8134
-raw dot:    14.1547
-
-norm cosine: 0.8134
-norm dot:    0.8134
-```
 
 Without normalization, the raw dot product (14.15) is dominated by the vector magnitude (roughly 4.2 × 4.1 × 0.81). After normalization, both metrics land at 0.8134. FAISS's `IndexFlatIP` relies on this equivalence — it computes dot products on the assumption that inputs are pre-normalized. Setting `normalize_embeddings=True` consistently at encoding time is not optional when using those indexes.
 
@@ -320,19 +290,6 @@ for rank, (score, text) in enumerate(results, start=1):
         FAISS is a high-speed vector search library from Facebook AI Research.
 
 <!-- injected-output:end -->
-
-```
-query: 'how vector search finds similar documents'
-
-[1] score: 0.7234
-    Vector search captures semantic similarity that keyword search misses.
-
-[2] score: 0.6891
-    Embedding models project text into a high-dimensional vector space.
-
-[3] score: 0.6312
-    Cosine similarity measures the directional similarity between two vectors.
-```
 
 `doc_vectors @ query_vector` is a matrix-vector dot product — one cosine similarity computation per document, vectorized across the entire corpus. `np.argsort(scores)[::-1][:top_k]` returns the top-k indices in descending order.
 

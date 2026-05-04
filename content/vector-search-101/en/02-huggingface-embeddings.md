@@ -213,12 +213,6 @@ print(f"identical: {np.allclose(vectors, loaded)}")
 
 <!-- injected-output:end -->
 
-```
-saved: (3, 384)
-reloaded: (3, 384)
-identical: True
-```
-
 Save the source texts alongside the vectors. Without the original text, search results are just index positions.
 
 ```python
@@ -330,12 +324,6 @@ print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
     max difference: 0.000000
 
 <!-- injected-output:end -->
-
-```
-HuggingFaceEmbeddings shape: (384,)
-SentenceTransformer shape:   (384,)
-max difference: 0.000001
-```
 
 Floating-point rounding aside, the results are the same. Use `HuggingFaceEmbeddings` when building LangChain pipelines. Use `SentenceTransformer` directly when you do not need the abstraction.
 

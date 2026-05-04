@@ -159,14 +159,6 @@ print(f"first vector (first 5 values): {embeddings[0][:5]}")
 
 <!-- injected-output:end -->
 
-Running this gives output similar to:
-
-```
-number of vectors: 3
-vector dimension: 384
-first vector (first 5 values): [ 0.0812 -0.2193  0.3471  0.1034 -0.0657]
-```
-
 Now compute cosine similarity between all three pairs.
 
 ```python
@@ -197,13 +189,6 @@ print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddin
     [0] vs [2] (unrelated):       0.0056
 
 <!-- injected-output:end -->
-
-Expected output:
-
-```
-[0] vs [1] (similar meaning): 0.8134
-[0] vs [2] (unrelated):       0.0471
-```
 
 "Python async programming" and "handling concurrency in Python" score 0.81 despite sharing no common words. "Homemade dog treats" scores 0.05. These numbers are the foundation of vector search: rank documents by their cosine similarity to the query vector and return the top results.
 

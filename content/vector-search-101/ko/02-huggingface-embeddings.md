@@ -215,12 +215,6 @@ print(f"동일 여부: {np.allclose(vectors, loaded)}")
 
 <!-- injected-output:end -->
 
-```
-저장 완료: (3, 384)
-불러오기 완료: (3, 384)
-동일 여부: True
-```
-
 문서 원문도 함께 보관해야 합니다. 벡터 인덱스와 원문 텍스트를 같이 저장하면 검색 결과를 사람이 읽는 형태로 반환할 수 있습니다.
 
 ```python
@@ -334,12 +328,6 @@ print(f"최대 오차: {np.max(np.abs(hf_vector - st_vector)):.6f}")
     최대 오차: 0.000000
 
 <!-- injected-output:end -->
-
-```
-HuggingFaceEmbeddings 차원: (384,)
-SentenceTransformer 차원: (384,)
-최대 오차: 0.000001
-```
 
 부동소수점 오차 수준의 미세한 차이만 있을 뿐 결과는 동일합니다. LangChain 체인과 연동하려면 `HuggingFaceEmbeddings`를 쓰고, 단독으로 쓸 때는 `SentenceTransformer`를 직접 써도 무방합니다.
 

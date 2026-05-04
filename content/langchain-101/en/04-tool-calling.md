@@ -187,13 +187,6 @@ print(f"tool_calls: {response.tool_calls}")
 
 <!-- injected-output:end -->
 
-When `tool_calls` is non-empty, the LLM is requesting a tool execution.
-
-```
-content: ''
-tool_calls: [{'name': 'add_numbers', 'args': {'a': 15.0, 'b': 27.0}, 'id': 'call_...'}]
-```
-
 ---
 
 ## A minimal tool-call loop
