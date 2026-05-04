@@ -15,7 +15,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: content-ready
 tags:
   - Python
   - Alembic
@@ -25,31 +25,31 @@ tags:
 articles:
 - idx: 1
   slug: 01-why-alembic-and-init
-  status: draft
+  status: publish-ready
 - idx: 2
   slug: 02-env-py-and-target-metadata
-  status: draft
+  status: publish-ready
 - idx: 3
   slug: 03-first-revision-upgrade-downgrade
-  status: draft
+  status: publish-ready
 - idx: 4
   slug: 04-autogenerate-and-its-limits
-  status: draft
+  status: publish-ready
 - idx: 5
   slug: 05-branches-and-merges
-  status: draft
+  status: publish-ready
 - idx: 6
   slug: 06-data-migrations
-  status: draft
+  status: publish-ready
 - idx: 7
   slug: 07-online-vs-offline-and-batch
-  status: draft
+  status: publish-ready
 - idx: 8
   slug: 08-downgrade-strategy
-  status: draft
+  status: publish-ready
 - idx: 9
   slug: 09-deploy-ordering-and-blue-green
-  status: draft
+  status: publish-ready
 - idx: 10
   slug: 10-production-and-team-workflow
-  status: draft
+  status: publish-ready

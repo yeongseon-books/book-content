@@ -149,7 +149,7 @@ series:
   languages:
   - ko
   - en
-  status: draft
+  status: content-ready
   path: content/python-dbapi-101
 
 - id: sqlalchemy-101
@@ -177,7 +177,7 @@ series:
   languages:
   - ko
   - en
-  status: draft
+  status: content-ready
   path: content/alembic-101
 
 - id: python-101

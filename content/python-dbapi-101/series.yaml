@@ -15,7 +15,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: content-ready
 tags:
   - Python
   - DB-API
@@ -33,22 +33,22 @@ articles:
   status: publish-ready
 - idx: 4
   slug: 04-parameter-binding-sql-injection
-  status: draft
+  status: publish-ready
 - idx: 5
   slug: 05-transactions-isolation
-  status: draft
+  status: publish-ready
 - idx: 6
   slug: 06-row-factories-adapters
-  status: draft
+  status: publish-ready
 - idx: 7
   slug: 07-error-handling-exception-hierarchy
-  status: draft
+  status: publish-ready
 - idx: 8
   slug: 08-connection-pooling
-  status: draft
+  status: publish-ready
 - idx: 9
   slug: 09-async-aiosqlite
-  status: draft
+  status: publish-ready
 - idx: 10
   slug: 10-production-patterns
-  status: draft
+  status: publish-ready

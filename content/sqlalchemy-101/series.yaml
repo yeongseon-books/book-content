@@ -15,7 +15,7 @@ targets:
   medium: true
   mkdocs: true
   ebook: true
-status: draft
+status: content-ready
 tags:
   - Python
   - SQLAlchemy
@@ -24,31 +24,31 @@ tags:
 articles:
 - idx: 1
   slug: 01-sqlalchemy-2x-engine-connection
-  status: draft
+  status: publish-ready
 - idx: 2
   slug: 02-core-metadata-table-types
-  status: draft
+  status: publish-ready
 - idx: 3
   slug: 03-core-select-insert-update-delete
-  status: draft
+  status: publish-ready
 - idx: 4
   slug: 04-orm-declarative-mapped-column
-  status: draft
+  status: publish-ready
 - idx: 5
   slug: 05-session-unit-of-work-identity-map
-  status: draft
+  status: publish-ready
 - idx: 6
   slug: 06-relationships-back-populates
-  status: draft
+  status: publish-ready
 - idx: 7
   slug: 07-loading-strategies-n-plus-one
-  status: draft
+  status: publish-ready
 - idx: 8
   slug: 08-events-hybrid-types
-  status: draft
+  status: publish-ready
 - idx: 9
   slug: 09-async-aiosqlite
-  status: draft
+  status: publish-ready
 - idx: 10
   slug: 10-production-patterns
-  status: draft
+  status: publish-ready
