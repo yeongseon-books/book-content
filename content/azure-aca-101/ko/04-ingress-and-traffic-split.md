@@ -69,6 +69,8 @@ ACA의 관리형 Ingress 계층이 앞문 역할을 맡고, weight에 따라 활
 
 ![Ingress가 요청을 활성 Revision으로 보내는 경로](../../../assets/azure-aca-101/04/04-01-the-request-path.ko.png)
 
+*Ingress가 요청을 활성 Revision으로 보내는 경로*
+
 핵심 단계:
 
 1. Client가 `https://<app>.<env-id>.<region>.azurecontainerapps.io`로 접속

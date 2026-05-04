@@ -26,6 +26,8 @@ seo_description: VectorDB 비교의 골격은 다음과 같습니다.
 
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.ko.png)
 
+*이 글에서 답할 질문*
+
 - FAISS flat과 IVF index를 어떻게 비교해야 공정한가요?
 - 정확도와 검색 latency 중 무엇을 같이 기록해야 trade-off를 말할 수 있나요?
 - 작은 예제에서도 approximate nearest neighbor(ANN)의 장단점을 어떻게 드러낼 수 있나요?
@@ -109,6 +111,8 @@ dimension = doc_vectors.shape[1]
 
 ![같은 벡터를 Flat과 IVF에 넣는 인덱스 비교 구조](../../../assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.ko.png)
 
+*같은 벡터를 Flat과 IVF에 넣는 인덱스 비교 구조*
+
 실행 코드는 `rag-benchmark-101/ko/04-vectordb-selection/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
@@ -140,6 +144,8 @@ ivf_index.nprobe = 4
 
 ![임베딩 계산과 검색 시간을 분리하는 측정 경계](../../../assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.ko.png)
 
+*임베딩 계산과 검색 시간을 분리하는 측정 경계*
+
 ```python
 def search_only(index, query_vec, k=5, repeats=20):
     times = []
@@ -167,6 +173,8 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 ![nprobe가 속도와 정확도를 조절하는 흐름](../../../assets/rag-benchmark-101/04/04-03-nprobe-trade-off-between-speed-and-accur.ko.png)
 
+*nprobe가 속도와 정확도를 조절하는 흐름*
+
 `nprobe`를 1, 2, 4, 8, 16으로 바꿔 가며 recall과 latency가 어떻게 움직이는지 그래프를 그려 봅니다. 거의 항상 sweet spot이 보입니다.
 
 ## 자주 하는 실수
@@ -180,6 +188,8 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 ## 실무 적용
 
 ![운영 조건으로 인덱스를 고르는 판단 축](../../../assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.ko.png)
+
+*운영 조건으로 인덱스를 고르는 판단 축*
 
 - **VectorDB 후보 비교**: FAISS(라이브러리), Chroma(임베디드 + REST), pgvector(Postgres extension), Qdrant/Weaviate(독립 서버). 같은 query를 던져 latency, recall, 운영 비용(설치, 백업, 스케일링)을 한 표에 정리합니다.
 - **Recall 목표 정하기**: 일반 RAG 응답에는 0.95 이상이면 충분합니다. 법률·의료처럼 누락 비용이 큰 도메인은 0.99 이상을 목표로 합니다.

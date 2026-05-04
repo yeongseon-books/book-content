@@ -98,9 +98,13 @@ query = '로그인 비밀번호를 다시 설정하고 싶어요.'
 
 ![핵심 흐름](../../../assets/korean-ai-stack-101/02/02-01-core-flow.ko.png)
 
+*핵심 흐름*
+
 ## 왜 FAQ 질문만 먼저 인덱싱할까
 
 ![FAQ 질문만 먼저 인덱싱하는 첫 버전 구조](../../../assets/korean-ai-stack-101/02/02-01-faq.ko.png)
+
+*FAQ 질문만 먼저 인덱싱하는 첫 버전 구조*
 
 질문과 답변을 한 번에 임베딩하면 어디서 검색이 어긋나는지 읽기 어렵습니다. 첫 버전은 질문만 인덱싱하고, 검색된 질문에 연결된 답변을 붙여 보는 편이 디버깅이 쉽습니다.
 
@@ -140,6 +144,8 @@ index.add(embeddings)
 
 ![최소 실행 예제](../../../assets/korean-ai-stack-101/02/02-02-diagram.ko.png)
 
+*최소 실행 예제*
+
 ```python
 query = '로그인 비밀번호를 다시 설정하고 싶어요.'
 query_vec = model.encode([query], normalize_embeddings=True).astype('float32')
@@ -178,6 +184,8 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/02/02-03-diagram-2.ko.png)
 
+*이 코드에서 봐야 할 것*
+
 - 답변이 아니라 **질문 문장**을 인덱싱합니다.
 - `normalize_embeddings=True`와 `IndexFlatIP`를 같이 쓰면 코사인 유사도를 단순하게 계산할 수 있습니다.
 - 질의를 여러 표현으로 바꿔도 상위 결과가 비슷하게 유지되는지 봐야 합니다.
@@ -186,6 +194,8 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 ## 자주 하는 실수
 
 ![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/02/02-04-diagram-3.ko.png)
+
+*실무에서 헷갈리는 지점*
 
 - **정규화 누락** — `normalize_embeddings=True` 없이 `IndexFlatIP`를 쓰면 긴 문장이 부당하게 높은 점수를 받습니다.
 - **다른 모델로 인코딩** — 코퍼스는 KoSimCSE로, 쿼리는 BGE-M3로 인코딩하면 거리가 의미를 잃습니다. 항상 같은 모델을 사용합니다.

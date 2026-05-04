@@ -47,6 +47,8 @@ Today's mental model is simple. **Generation is an autoregressive loop where you
 We input the current context `idx`, extract only the last step's logits, and then append the sampled token to the sequence.
 
 ![Autoregressive loop with token-by-token appends](../../../assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png)
+
+*Autoregressive loop with token-by-token appends*
 ## Greedy Decoding — Why argmax is Boring
 
 Using `argmax` always picks the token with the highest probability. This often leads to repetitive and predictable loops. While technically correct, greedy decoding lacks the variety needed for natural-sounding text.

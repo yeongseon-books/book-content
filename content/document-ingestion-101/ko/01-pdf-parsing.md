@@ -31,6 +31,8 @@ seo_description: PDF 파싱의 첫 목표는 “보이는 문서”를 “검증
 예제 코드: `/root/Github/document-ingestion-101/ko/01-pdf-parsing/main.py`
 
 ![이 글에서 답할 질문](../../../assets/document-ingestion-101/01/01-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 실무에서 PDF 파싱 예제를 설명할 때 가장 먼저 막히는 부분은 샘플 파일입니다. 저장소에 PDF를 커밋하지 않아도 글만 보고 바로 실행할 수 있어야 재현성이 생깁니다.
 
 이번 예제는 `reportlab`으로 PDF를 스크립트 안에서 만들고, `pypdf`로 다시 읽어서 페이지별 텍스트와 문자 수를 출력합니다. 문서 수집 파이프라인의 출발점으로 딱 맞는 구조입니다.
@@ -38,11 +40,15 @@ seo_description: PDF 파싱의 첫 목표는 “보이는 문서”를 “검증
 ## PDF 파싱 흐름
 
 ![PDF 생성과 추출이 이어지는 수집 흐름](../../../assets/document-ingestion-101/01/01-01-pdf-parsing-flow.ko.png)
+
+*PDF 생성과 추출이 이어지는 수집 흐름*
 입문 예제에서는 생성과 추출을 한 스크립트에 넣어 두면 입력 재현성과 출력 검증이 동시에 잡힙니다.
 
 ## 페이지 구조와 추출 포인트
 
 ![페이지 구조와 표 감지 분기 구조](../../../assets/document-ingestion-101/01/01-02-page-structure-and-extraction-points.ko.png)
+
+*페이지 구조와 표 감지 분기 구조*
 같은 PDF라도 텍스트, 표, 이미지가 섞여 있으므로 추출 전략을 한 가지로 고정하면 품질 차이를 놓치기 쉽습니다.
 
 ## 실행 예제
@@ -149,6 +155,8 @@ page=2 chars=173 preview=Page 2 Operational checks ...
 ### 페이지 메타데이터가 이어지는 방식
 
 ![페이지별 메타데이터가 쌓이는 스키마](../../../assets/document-ingestion-101/01/01-01-how-page-metadata-carries-forward.ko.png)
+
+*페이지별 메타데이터가 쌓이는 스키마*
 페이지 번호와 문자 수를 같이 남기면 추출 품질 문제를 나중에 청킹 단계까지 끌고 가지 않고 앞단에서 잡을 수 있습니다.
 
 - `create_sample_pdf()`가 입력 데이터를 직접 만들기 때문에 외부 의존 파일이 없습니다.
@@ -160,6 +168,8 @@ page=2 chars=173 preview=Page 2 Operational checks ...
 ### 텍스트 레이어와 OCR 대체 기준
 
 ![텍스트 레이어와 OCR 대체 판단 흐름](../../../assets/document-ingestion-101/01/01-02-when-ocr-becomes-the-fallback.ko.png)
+
+*텍스트 레이어와 OCR 대체 판단 흐름*
 OCR은 첫 선택지가 아니라 텍스트 레이어가 없거나 품질이 너무 낮을 때 들어가는 우회 경로로 보는 편이 안전합니다.
 
 - PDF 파싱은 OCR과 다릅니다. 텍스트 레이어가 이미 있는 PDF라면 먼저 텍스트 추출부터 확인해야 합니다.

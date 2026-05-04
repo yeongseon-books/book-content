@@ -27,9 +27,13 @@ Deterministic metrics are fast and reproducible, but they penalize different wor
 
 ---
 ![Deterministic metrics - exact Match, BLEU, ROUGE](../../../assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.en.png)
+
+*Deterministic metrics - exact Match, BLEU, ROUGE*
 ## What Are Deterministic Metrics?
 
 ![What are deterministic Metrics](../../../assets/ai-evaluation-101/03/03-02-what-are-deterministic-metrics.en.png)
+
+*What are deterministic Metrics*
 A deterministic metric always returns the same score for the same input and answer. It uses string and token comparison only — no LLM call — so it is fast and reproducible.
 
 ```python
@@ -45,6 +49,8 @@ Behind the speed lies a serious weakness: any answer with the same meaning but d
 ## Exact Match — The Simplest Metric
 
 ![Exact match - the simplest metric](../../../assets/ai-evaluation-101/03/03-03-exact-match-the-simplest-metric.en.png)
+
+*Exact match - the simplest metric*
 Question: "What is the capital of Korea?"
 Reference: "Seoul"
 Model output: "The capital of Korea is Seoul."
@@ -63,6 +69,8 @@ Adding normalization helps a little, but at heart it is reliable only for "QA wh
 ## Token-level F1 — More Forgiving than Exact Match
 
 ![Token-level F1 - more forgiving than exact match](../../../assets/ai-evaluation-101/03/03-04-token-level-f1-more-forgiving-than-exact.en.png)
+
+*Token-level F1 - more forgiving than exact match*
 F1 treats prediction and reference as token sets and computes the harmonic mean of precision and recall.
 
 ```python
@@ -88,6 +96,8 @@ It awards partial credit on cases like "the capital is Seoul" vs "Seoul." But it
 ## BLEU — N-gram Overlap from Machine Translation
 
 ![BLEU - N-gram overlap from machine translation](../../../assets/ai-evaluation-101/03/03-05-bleu-n-gram-overlap-from-machine-transla.en.png)
+
+*BLEU - N-gram overlap from machine translation*
 BLEU computes overlap of 1-grams, 2-grams, 3-grams, and 4-grams. It is standard for machine translation evaluation, but the limits are real for free-form LLM output.
 
 ```python

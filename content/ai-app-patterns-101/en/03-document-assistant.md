@@ -30,6 +30,8 @@ seo_description: A document assistant is not a conversational system; it is a tr
 > A document assistant is not a conversational system; it is a transformer that turns long input into short, task-shaped output.
 
 ![Questions this post answers](../../../assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 > AI App Patterns 101 (3/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/03-document-assistant)
@@ -50,6 +52,8 @@ Topics:
 ### Short document summarization flow
 
 ![Short document summarization flow](../../../assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
+
+*Short document summarization flow*
 For short documents, pass the full text directly and request a summary. Parameterizing style, length, and audience lets the same chain serve different consumers.
 
 ```python
@@ -118,6 +122,8 @@ print(dev_summary)
 ### Chunk summaries and final synthesis
 
 ![Chunk summaries and final synthesis](../../../assets/ai-app-patterns-101/03/03-02-chunk-summaries-and-final-synthesis.en.png)
+
+*Chunk summaries and final synthesis*
 When a document exceeds the context window it cannot be processed in one call. Map-Reduce splits the document into chunks, summarizes each independently (Map), then merges those summaries into a single coherent result (Reduce).
 
 ```python
@@ -207,6 +213,8 @@ print(f"\n=== Final summary ===\n{final}")
 ### JSON extraction from unstructured text
 
 ![JSON extraction from unstructured text](../../../assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.en.png)
+
+*JSON extraction from unstructured text*
 Unstructured text often contains structured data that downstream systems need. Prompt the LLM to extract specific fields and return them as JSON, then parse the output with `JsonOutputParser`.
 
 ```python
@@ -271,6 +279,8 @@ for i, posting in enumerate(job_postings, start=1):
 ### Batch classification with confidence output
 
 ![Batch classification with confidence output](../../../assets/ai-app-patterns-101/03/03-04-batch-classification-with-confidence-out.en.png)
+
+*Batch classification with confidence output*
 Classifying documents into categories is a common preprocessing step in content pipelines, support ticket routing, and compliance workflows.
 
 ```python
@@ -328,6 +338,8 @@ for text in texts:
 ### Pattern choice across summary extraction and classification
 
 ![Pattern choice across summary extraction and classification](../../../assets/ai-app-patterns-101/03/03-05-pattern-choice-across-summary-extraction.en.png)
+
+*Pattern choice across summary extraction and classification*
 - Teams often reach for a larger model first, but chunk size and overlap usually matter more to summary quality.
 - Map-Reduce parallelizes well, but it weakens cross-chunk global context, which makes the reduce prompt critical.
 - Document summarization and document Q&A may look similar at the input layer, but they optimize for different production metrics.

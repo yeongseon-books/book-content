@@ -62,6 +62,8 @@ ACA 관측성은 세 개의 독립된 계층으로 나뉩니다.
 
 ![로그와 추적이 모이는 관측 경로](../../../assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
 
+*로그와 추적이 모이는 관측 경로*
+
 ## 핵심 개념
 
 ### 1. 두 종류의 platform log

@@ -34,6 +34,8 @@ In post 1 we looked at what an Engine and a Connection are, and how to execute r
 This post covers the heart of SQLAlchemy Core: `MetaData`, `Table`, `Column`, and the type system. The schema objects you build here become the raw material for the select/insert/update/delete in post 3, and they evolve naturally into the ORM's `mapped_column` from post 4 onward. Even if you only plan to use the ORM, you need this layer to understand migrations and reflection.
 
 ![SQLAlchemy core - modeling schema as python objects with MetaData, Table, and column](../../../assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.en.png)
+
+*SQLAlchemy core - modeling schema as python objects with MetaData, Table, and column*
 ## What you will learn
 
 - What a `MetaData` object is and why it becomes the single source of truth for your schema
@@ -56,6 +58,8 @@ This post covers the heart of SQLAlchemy Core: `MetaData`, `Table`, `Column`, an
 ## Why this matters
 
 ![Why this matters](../../../assets/sqlalchemy-101/02/02-02-why-this-matters.en.png)
+
+*Why this matters*
 Managing schema with raw SQL has one big problem: when the column names in your INSERT/SELECT statements drift from the actual schema, you don't find out until runtime. A `no such column` error suddenly appears in production, and your IDE can't even autocomplete column names.
 
 SQLAlchemy Core keeps the schema as Python objects, so you can build SQL through those objects. A typo in a column name turns into an `AttributeError` at import time, your IDE autocompletes `users.c.name`, and the same definition is reused by Alembic's autogenerate, Pandas' `read_sql`, FastAPI's SQL building, and more.
@@ -67,6 +71,8 @@ Finally, the `MetaData` becomes Alembic's `target_metadata`, the basis for autog
 ## Mental Model
 
 ![Mental model](../../../assets/sqlalchemy-101/02/02-03-mental-model.en.png)
+
+*Mental model*
 `MetaData` is a **catalog** of your schema. It's a container that holds every `Table` definition your application knows about, and you hand the entire container to an Engine to create or compare the schema in one go.
 
 > MetaData is your application's schema specification. A Table is a page in that spec, and a Column is one line on a page. Without an Engine, MetaData is just an in-memory document. Without MetaData, an Engine has nothing to build.
@@ -100,6 +106,8 @@ The Core flow is:
 ## Core concepts
 
 ![Core concepts](../../../assets/sqlalchemy-101/02/02-04-core-concepts.en.png)
+
+*Core concepts*
 ### MetaData
 
 ```python
@@ -309,6 +317,8 @@ Now column-name typos are caught at schema definition time or via IDE autocomple
 ## Step-by-step practice
 
 ![Step-by-step practice](../../../assets/sqlalchemy-101/02/02-05-step-by-step-practice.en.png)
+
+*Step-by-step practice*
 ### Step 1: A schema module
 
 `schema.py`:

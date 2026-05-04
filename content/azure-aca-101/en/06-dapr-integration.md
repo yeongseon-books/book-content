@@ -61,6 +61,8 @@ Register one component on the Environment, and many apps in the same Environment
 
 ![Dapr sidecar next to the app and connections to external services](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
 
+*Dapr sidecar next to the app and connections to external services*
+
 ## Core concepts
 
 ### 1. The sidecar model

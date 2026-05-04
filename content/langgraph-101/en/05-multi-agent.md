@@ -34,9 +34,13 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 If you push every task into one giant agent, prompts grow, roles blur, and behavior becomes harder to debug. A supervisor-worker graph fixes that by separating routing, execution, and final assembly into named nodes.
 
 ![Questions this post answers](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 ## Minimal runnable example
 
 ![Supervisor worker delegation structure](../../../assets/langgraph-101/05/05-01-minimal-runnable-example.en.png)
+
+*Supervisor worker delegation structure*
 ```python
 import os
 from typing import Literal, TypedDict
@@ -130,6 +134,8 @@ export GROQ_API_KEY=... && python main.py
 ## What to notice in this code
 
 ![Route and worker_result state flow](../../../assets/langgraph-101/05/05-02-what-to-notice-in-this-code.en.png)
+
+*Route and worker_result state flow*
 - The supervisor decides the route but does not try to answer the request itself.
 - Workers write to dedicated shared fields like `worker_result`.
 - `finalize` keeps answer assembly in one place, which makes future expansion easier.
@@ -137,6 +143,8 @@ export GROQ_API_KEY=... && python main.py
 ## Where engineers get confused
 
 ![Role boundaries across supervisor and workers](../../../assets/langgraph-101/05/05-03-where-engineers-get-confused.en.png)
+
+*Role boundaries across supervisor and workers*
 - “Multi-agent” does not automatically mean “better.” Weak role boundaries often produce worse results than one well-designed agent.
 - If the supervisor also does the substantive work, you are drifting back toward a monolith.
 - Oversharing state increases coupling. Most workers need a small, explicit contract instead.
@@ -150,6 +158,8 @@ export GROQ_API_KEY=... && python main.py
 ## Summary
 
 ![Cooperative topology under one supervisor](../../../assets/langgraph-101/05/05-04-summary.en.png)
+
+*Cooperative topology under one supervisor*
 The heart of multi-agent design is delegation, not model count. In the final post, we combine checkpoints, routing, and tool loops into one complete LangGraph agent skeleton.
 
 <!-- toc:begin -->

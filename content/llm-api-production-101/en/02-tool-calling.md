@@ -35,6 +35,8 @@ In this post, we will build the full loop with Groq's `tools` parameter and the 
 The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
 
 ![Tool calling: connecting functions to the model](../../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
+
+*Tool calling: connecting functions to the model*
 ---
 
 ## Questions this chapter answers
@@ -63,6 +65,8 @@ This post uses the official `groq` SDK and Pydantic for argument validation.
 ## Why string-based dispatch does not scale
 
 ![Comparison between string dispatch and tool contracts](../../../assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.en.png)
+
+*Comparison between string dispatch and tool contracts*
 Early implementations often start with something like this:
 
 ```python
@@ -89,6 +93,8 @@ That makes the system easier to reason about. The model proposes. The applicatio
 ## What goes into the `tools` parameter
 
 ![Structure of a tool definition](../../../assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.en.png)
+
+*Structure of a tool definition*
 With Groq chat completions, tools are typically defined as function descriptors. Each tool includes a name, a description, and an argument schema. Here is a small order-status example.
 
 ```python
@@ -121,6 +127,8 @@ This definition matters because it communicates function intent to the model wit
 ## Sending the first tool-enabled request
 
 ![First tool-enabled request flow](../../../assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.en.png)
+
+*First tool-enabled request flow*
 The request itself is still a normal chat completion call. The difference is that the model now receives the `tools` list and may return `tool_calls` instead of a final natural-language answer.
 
 ```python
@@ -264,6 +272,8 @@ At this stage, the model has not fully answered the user yet. It has only reques
 ## Building the full function-execution loop
 
 ![Round-trip tool execution loop](../../../assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.en.png)
+
+*Round-trip tool execution loop*
 The normal production pattern looks like this:
 
 1. send the user message and tool definitions
@@ -376,6 +386,8 @@ This loop is the important mental model. The model chooses a tool. The applicati
 ## What to guard in production
 
 ![Operational guardrails before tool execution](../../../assets/llm-api-production-101/02/02-05-what-to-guard-in-production.en.png)
+
+*Operational guardrails before tool execution*
 Tool calling makes a system more useful, but it also introduces new failure paths. A few controls are worth adding early.
 
 First, **never dispatch against arbitrary function names**. Do not let model output resolve against `globals()` or anything equivalent. Use an explicit allowlist.

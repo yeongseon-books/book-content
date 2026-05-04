@@ -60,6 +60,8 @@ PR이 익숙해지면 다음 세 가지가 자연스럽게 따라옵니다.
 PR은 "branch라는 제안서를 main에 받아 달라고 요청하는 신청서"입니다. 신청서에는 제목, 설명, 변경된 파일, 그리고 동료의 의견이 함께 붙습니다.
 
 ![Mental Model](../../../assets/git-github-101/07/07-01-mental-model.ko.png)
+
+*Mental Model*
 다이어그램의 흐름은 다음과 같습니다.
 
 1. 로컬에서 `main` 위에 `feature/release-notes` branch를 만들고 commit을 쌓습니다.

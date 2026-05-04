@@ -52,6 +52,8 @@ Once PRs become routine, three habits follow naturally:
 A PR is a request: "Please accept my branch as a proposal against `main`." The request has a title, a description, a list of changed files, and a comment thread.
 
 ![Mental model](../../../assets/git-github-101/07/07-01-mental-model.en.png)
+
+*Mental model*
 The diagram reads like this:
 
 1. Locally you create `feature/release-notes` on top of `main` and stack commits on it.

@@ -27,9 +27,13 @@ Changing one line of a prompt can break other cases. This post covers a CI-integ
 
 ---
 ![Regression testing - Don't let Yesterday's wins break today](../../../assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)
+
+*Regression testing - Don't let Yesterday's wins break today*
 ## Evaluate Every Time, Not Just Once
 
 ![Evaluate every Time, not just once](../../../assets/ai-evaluation-101/08/08-02-evaluate-every-time-not-just-once.en.png)
+
+*Evaluate every Time, not just once*
 Ep1-Ep7 covered evaluation methods. But **when** do you run them? The common pattern:
 
 - Run once after a big prompt change
@@ -50,6 +54,8 @@ This post covers:
 ## Golden Dataset — The Tests That Should Never Move
 
 ![Golden dataset - the tests that should never move](../../../assets/ai-evaluation-101/08/08-03-golden-dataset-the-tests-that-should-nev.en.png)
+
+*Golden dataset - the tests that should never move*
 A regression dataset is different from your production eval dataset (Ep2).
 
 | | Production eval (Ep2) | Regression (Ep8) |
@@ -97,6 +103,8 @@ with open("regression/golden.jsonl", "w") as f:
 ## Thresholds and Fail Policy
 
 ![Thresholds and fail policy](../../../assets/ai-evaluation-101/08/08-04-thresholds-and-fail-policy.en.png)
+
+*Thresholds and fail policy*
 A score is not enough. You must define **what counts as fail**.
 
 ```python
@@ -127,6 +135,8 @@ Three fail policies compared:
 ## CI Integration — GitHub Actions
 
 ![CI integration - GitHub actions](../../../assets/ai-evaluation-101/08/08-05-ci-integration-github-actions.en.png)
+
+*CI integration - GitHub actions*
 A workflow that runs evaluation on every PR:
 
 ```yaml

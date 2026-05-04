@@ -37,6 +37,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 - GPU가 없는 환경에서 CPU로 처리하기
 
 ![단일 질의 임베딩 호출 흐름](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.ko.png)
+
+*단일 질의 임베딩 호출 흐름*
 <!-- ebook-only:start -->
 
 이 장의 핵심: **HuggingFace 임베딩은 로컬에서 무료로 실행된다.** `sentence-transformers`가 모델을 내려받고 벡터를 반환한다.
@@ -73,6 +75,8 @@ pip install langchain-community sentence-transformers numpy
 ## 첫 임베딩
 
 ![단일 질의 임베딩 호출 흐름](../../../assets/vector-search-101/02/02-01-first-embedding.ko.png)
+
+*단일 질의 임베딩 호출 흐름*
 `HuggingFaceEmbeddings`를 초기화하는 코드부터 보겠습니다.
 
 ```python
@@ -122,6 +126,8 @@ print(f"앞 5개 값: {vector[:5]}")
 ## 배치 임베딩
 
 ![단일 호출과 배치 호출의 차이](../../../assets/vector-search-101/02/02-02-batch-embedding.ko.png)
+
+*단일 호출과 배치 호출의 차이*
 문서가 여러 개면 루프보다 배치가 훨씬 효율적입니다. `embed_documents()`는 리스트를 받아 리스트를 반환합니다.
 
 ```python
@@ -168,6 +174,8 @@ print(f"소요 시간: {elapsed:.3f}초")
 ## 벡터 저장과 불러오기
 
 ![벡터와 원문을 저장하는 파일 흐름](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.ko.png)
+
+*벡터와 원문을 저장하는 파일 흐름*
 임베딩은 한 번 계산하면 재사용하는 편이 좋습니다. 같은 문서 집합을 매번 다시 인코딩하면 시간과 비용이 낭비됩니다. NumPy의 `.npy` 형식으로 저장하는 방법이 가장 단순합니다.
 
 ```python
@@ -255,6 +263,8 @@ print("저장 완료")
 ## 속도를 높이는 실용 팁
 
 ![모델 재사용과 배치 크기 조정 경로](../../../assets/vector-search-101/02/02-04-practical-speed-tips.ko.png)
+
+*모델 재사용과 배치 크기 조정 경로*
 CPU 환경에서 임베딩 속도를 높이는 방법이 몇 가지 있습니다.
 
 **배치 크기 조정.** `encode_kwargs={"batch_size": 64}`로 배치 크기를 명시할 수 있습니다. 기본값은 32입니다. 메모리가 충분하다면 64나 128로 늘리면 처리 속도가 개선됩니다.
@@ -288,6 +298,8 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 ## 직접 SentenceTransformer와 비교하기
 
 ![래퍼와 원시 API 비교 구조](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.ko.png)
+
+*래퍼와 원시 API 비교 구조*
 `HuggingFaceEmbeddings`는 `SentenceTransformer`를 감싼 래퍼입니다. 두 방식의 결과는 동일합니다.
 
 ```python

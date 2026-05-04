@@ -50,6 +50,8 @@ Many teams and open-source projects treat Git as a standard tool. Learning it is
 In one sentence, Git is "a tool that stores snapshots of your files in time order." Each commit is a photograph of the tracked files at that moment.
 
 ![Mental model](../../../assets/git-github-101/01/01-01-mental-model.en.png)
+
+*Mental model*
 Git distinguishes three areas.
 
 - **Working Directory**: where the files you are editing live.

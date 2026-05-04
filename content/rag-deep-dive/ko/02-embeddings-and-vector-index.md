@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 > 임베딩 단계는 청크를 좌표로 바꾸고, 인덱스 단계는 그 좌표들 사이의 가까움을 순위로 바꿉니다.
 
 ![이 글에서 답할 질문](../../../assets/rag-deep-dive/02/02-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (2/6)
@@ -115,6 +117,8 @@ LangChain 0.2.17에서 우리가 흔히 쓰는 `OpenAIEmbeddings`는 `langchain_
 
 ![문서와 질의 임베딩 호출 흐름](../../../assets/rag-deep-dive/02/02-01-embedding-call-flow.ko.png)
 
+*문서와 질의 임베딩 호출 흐름*
+
 소스를 보면 `embed_documents()`와 `embed_query()`의 표면적 차이는 아주 얇습니다. `embed_documents()`는 `self._get_len_safe_embeddings(texts, engine=engine)`를 호출하고, `embed_query()`는 결국 `self.embed_documents([text])[0]`을 돌려줍니다. 즉 0.2.17의 이 구현만 놓고 보면 쿼리와 문서가 같은 경로를 탑니다. 하지만 인터페이스가 둘로 나뉘어 있는 것은 우연이 아닙니다. LangChain은 애초에 query embedding과 document embedding이 다를 수 있다는 가정을 인터페이스에 심어 두었습니다. 비대칭 검색 모델에서는 문서 쪽에는 더 긴 설명과 배경을 보존하도록 학습하고, 질문 쪽에는 짧은 질의를 더 날카롭게 쏘도록 따로 최적화하는 경우가 있기 때문입니다.
 
 이 구분이 왜 중요한지는 “현재 구현은 같다”는 사실보다 “항상 같다고 가정하면 안 된다”는 점에 있습니다. 오늘의 pinned 구현에서는 `embed_query()`가 사실상 `embed_documents()`의 얇은 래퍼지만, 다른 provider나 이후 계열 모델은 쿼리 앞에 instruction을 붙이거나 query/document를 분리된 projection으로 다룰 수 있습니다. 검색형 모델군에서 흔히 말하는 asymmetric embedding이 바로 이 경우입니다. 실무에서 `embed_query()`와 `embed_documents()`를 구분 없이 섞어 쓰면, 지금은 우연히 맞아도 provider를 바꾸는 순간 검색 품질이 조용히 무너질 수 있습니다.
@@ -156,6 +160,8 @@ if __name__ == "__main__":
 FAISS의 `IndexFlatL2`는 자주 “기본 인덱스”, “brute-force 인덱스” 정도로 설명됩니다. 맞는 말이지만 중요한 설명이 빠져 있습니다. 무엇을 brute-force 하느냐가 핵심입니다. `IndexFlatL2`는 저장된 모든 벡터를 훑으면서 질의 벡터와의 L2 거리를 정확하게 계산합니다. 근사 탐색이 아니라 정확 탐색입니다. 대신 빨라지는 지름길도 없습니다.
 
 ![질의와 전체 벡터 비교 경로](../../../assets/rag-deep-dive/02/02-02-indexflat-search-internals.ko.png)
+
+*질의와 전체 벡터 비교 경로*
 
 `faiss/IndexFlat.cpp`의 `IndexFlat::search()`를 보면 구조가 아주 직설적입니다. `metric_type == METRIC_INNER_PRODUCT`면 `knn_inner_product(...)`를, `metric_type == METRIC_L2`면 `knn_L2sqr(...)`를 호출합니다. `IndexFlatL2`는 여기서 두 번째 경로를 탑니다. 즉 FAISS가 반환하는 값은 보통 “유클리드 거리”라기보다 **제곱 L2 거리**입니다. 수식으로 쓰면 질의 벡터 `q`와 저장 벡터 `x`의 거리는 다음과 같습니다.
 
@@ -204,6 +210,8 @@ if __name__ == "__main__":
 LangChain에서 `FAISS.from_documents()`를 호출하면 한 줄로 끝나는 것처럼 보입니다. 하지만 내부 경로는 생각보다 중요합니다. 먼저 `langchain_core.vectorstores.base.VectorStore.from_documents()`가 `documents`에서 `page_content`와 `metadata`를 뽑아 `from_texts()`로 넘깁니다. 그다음 `langchain_community.vectorstores.faiss.FAISS.from_texts()`가 `embedding.embed_documents(texts)`를 호출해 벡터를 만들고, 내부 `__from()`이 실제 FAISS 인덱스와 docstore를 초기화합니다.
 
 ![문서와 FAISS 계층 연결 구조](../../../assets/rag-deep-dive/02/02-03-langchain-faiss-layers.ko.png)
+
+*문서와 FAISS 계층 연결 구조*
 
 소스를 그대로 따라가 보면 `__from()`은 distance strategy가 최대 내적이면 `faiss.IndexFlatIP`, 아니면 기본값으로 `faiss.IndexFlatL2`를 만듭니다. `docstore` 기본값은 `InMemoryDocstore()`이고, `index_to_docstore_id` 기본값은 빈 딕셔너리입니다. 그런 다음 `__add()`가 실제 데이터를 밀어 넣습니다. 여기서 세 계층이 분리됩니다.
 
@@ -254,6 +262,8 @@ if __name__ == "__main__":
 FAISS에서 가장 먼저 부딪히는 선택은 metric입니다. `IndexFlatL2`는 제곱 L2 거리를 최소화합니다. `IndexFlatIP`는 inner product를 최대화합니다. 두 인덱스 모두 flat이므로 exact search라는 점은 같습니다. 차이는 ranking rule입니다. 벡터를 미리 L2 정규화했다면 cosine similarity 최대화와 inner product 최대화가 사실상 같은 순위를 만들 수 있어, 실무에서는 “cosine 검색”을 위해 `IndexFlatIP` + 정규화를 자주 사용합니다.
 
 ![인덱스 종류와 탐색 절충 구조](../../../assets/rag-deep-dive/02/02-04-index-type-comparison.ko.png)
+
+*인덱스 종류와 탐색 절충 구조*
 
 `IndexIVFFlat`은 여기서 성격이 달라집니다. flat은 exact이지만 IVF는 approximate입니다. 아이디어는 간단합니다. 전체 벡터 공간을 `nlist`개의 coarse centroid로 나누고, 검색 때는 모든 벡터를 보지 않고 질의와 가까운 일부 inverted list만 탐색합니다. 이때 몇 개의 list를 열어 볼지 결정하는 값이 `nprobe`입니다. `faiss/IndexIVF.cpp`를 보면 검색 시 `cur_nprobe = std::min(nlist, params ? params->nprobe : this->nprobe)`로 현재 탐색할 list 수를 정합니다. `nprobe`가 작으면 빠르지만 정답이 들어 있는 list를 놓칠 수 있고, 크면 느려지지만 recall이 올라갑니다.
 
@@ -314,6 +324,8 @@ if __name__ == "__main__":
 LangChain의 FAISS 래퍼는 `save_local()`과 `load_local()`을 제공합니다. 겉으로는 간단하지만, 소스를 보면 왜 파일이 둘로 나뉘는지와 왜 역직렬화 플래그가 위험하게 보이는 이름을 갖는지가 분명합니다. `save_local()`은 먼저 `faiss.write_index(self.index, str(path / f"{index_name}.faiss"))`로 인덱스를 따로 저장하고, 그다음 `pickle.dump((self.docstore, self.index_to_docstore_id), f)`로 파이썬 객체를 `index.pkl`에 저장합니다.
 
 ![인덱스 저장과 복원 파일 흐름](../../../assets/rag-deep-dive/02/02-05-persistence-flow.ko.png)
+
+*인덱스 저장과 복원 파일 흐름*
 
 여기서 `.faiss` 파일에는 C++ 인덱스 구조와 벡터 데이터가 들어갑니다. 반면 `.pkl`에는 LangChain 쪽의 파이썬 객체, 즉 `docstore`와 `index_to_docstore_id`가 들어갑니다. 이 분리는 아주 합리적입니다. FAISS 인덱스는 picklable하지 않으니 자체 바이너리 포맷으로 저장하고, 파이썬 계층의 문서 객체와 매핑 정보는 pickle로 보관하는 것입니다.
 

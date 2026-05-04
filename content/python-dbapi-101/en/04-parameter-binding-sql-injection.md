@@ -27,6 +27,8 @@ seo_description: 'The key point: SQL tokenization happens before binding. ? tell
 # Parameter binding and SQL injection defense (sqlite3, PEP 249)
 
 ![Parameter binding and SQL injection defense (sqlite3, PEP 249)](../../../assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.en.png)
+
+*Parameter binding and SQL injection defense (sqlite3, PEP 249)*
 ## Questions this post answers
 
 - Why is building SQL with f-strings dangerous?
@@ -66,6 +68,8 @@ This post reproduces the attack with sqlite3 and contrasts it with the binding f
 ## Mental Model — keep query string and values separate
 
 ![Mental model - keep query string and values separate](../../../assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png)
+
+*Mental model - keep query string and values separate*
 ```
 [ User input ] ─┐
                 │
@@ -93,6 +97,8 @@ The key point: SQL tokenization happens **before** binding. `?` tells the parser
 ## Core concepts
 
 ![Core concepts](../../../assets/python-dbapi-101/04/04-03-core-concepts.en.png)
+
+*Core concepts*
 ### qmark style (`?`)
 
 The sqlite3 default. Position-based, so order matters.
@@ -142,6 +148,8 @@ For these positions, validate against a whitelist and inject as a string.
 ## Before / After
 
 ![Before / after](../../../assets/python-dbapi-101/04/04-04-before-after.en.png)
+
+*Before / after*
 ### Before — vulnerable code
 
 ```python

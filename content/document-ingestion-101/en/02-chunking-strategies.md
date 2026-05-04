@@ -32,6 +32,8 @@ seo_description: Chunking is not just cutting text smaller; it is designing the 
 Example code: `/root/Github/document-ingestion-101/en/02-chunking-strategies/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 A bad chunking choice leaks into every later stage. Too small means broken context, too large means noisy retrieval.
 
 This example runs FAQ, manual, and policy-style text through the same splitter and shows with numbers why per-document presets matter.
@@ -39,11 +41,15 @@ This example runs FAQ, manual, and policy-style text through the same splitter a
 ## Chunking flow by document type
 
 ![Chunking strategy selection flow](../../../assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png)
+
+*Chunking strategy selection flow*
 Even with one splitter, the starting chunk size and overlap should differ by document shape.
 
 ## Recursive splitter fallback order
 
 ![Recursive separator fallback flow](../../../assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.en.png)
+
+*Recursive separator fallback flow*
 The strength of recursive splitting is that it preserves larger semantic boundaries first and only falls back when needed.
 
 ## Runnable example
@@ -117,6 +123,8 @@ python main.py
 ### How chunk overlap preserves context
 
 ![Chunk boundaries with overlap flow](../../../assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.en.png)
+
+*Chunk boundaries with overlap flow*
 Overlap is the handoff mechanism that keeps a bit of prior context alive across adjacent chunks.
 
 - The example makes it obvious that small changes in `chunk_size`, `chunk_overlap`, and `separators` change the output a lot.
@@ -128,6 +136,8 @@ Overlap is the handoff mechanism that keeps a bit of prior context alive across 
 ### How to review chunk quality
 
 ![Chunk quality review flow](../../../assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.en.png)
+
+*Chunk quality review flow*
 Chunk count alone is too weak. Distribution and preview checks reveal whether the split still respects structure.
 
 - Better chunking does not always mean smaller chunks. Quality depends on boundary choice and overlap together.

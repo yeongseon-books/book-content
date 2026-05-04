@@ -26,6 +26,8 @@ seo_description: config에 모든 변수(임베딩 모델, top-k, LLM 모델, da
 
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.ko.png)
 
+*이 글에서 답할 질문*
+
 - 데이터셋 → 검색 → 생성 → 평가를 어떻게 **하나의 실행 파일**로 묶을까요?
 - retrieval 지표와 RAGAS 점수를 한 리포트로 합칠 때 어떤 구분이 필요한가요?
 - 최종 파이프라인 벤치마크에서 가장 먼저 고정해야 할 실험 조건은 무엇인가요?
@@ -111,6 +113,8 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 
 ![검색과 생성과 평가가 한 실행으로 이어지는 파이프라인](../../../assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.ko.png)
 
+*검색과 생성과 평가가 한 실행으로 이어지는 파이프라인*
+
 실행 코드는 `rag-benchmark-101/ko/06-benchmark-complete/main.py`에 있습니다. `GROQ_API_KEY`가 필요합니다.
 
 ```bash
@@ -153,6 +157,8 @@ def run_benchmark(config):
 
 ![Retrieval 리포트와 generation 리포트를 나누는 구조](../../../assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.ko.png)
 
+*Retrieval 리포트와 generation 리포트를 나누는 구조*
+
 ```python
 def assemble_report(retrieval_metrics, ragas_scores, rows, config):
     return {
@@ -189,6 +195,8 @@ def compare(report, baseline):
 
 ![낮은 점수를 검색 문제와 생성 문제로 가르는 분기](../../../assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.ko.png)
 
+*낮은 점수를 검색 문제와 생성 문제로 가르는 분기*
+
 ```python
 THRESHOLDS = {
     "retrieval.hit_rate@k": -0.02,
@@ -212,6 +220,8 @@ def gate(deltas):
 ## 실무 적용
 
 ![기준선 비교부터 최종 의사결정까지 이어지는 벤치마크 루프](../../../assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.ko.png)
+
+*기준선 비교부터 최종 의사결정까지 이어지는 벤치마크 루프*
 
 - **Run id에 git sha 포함**: 결과와 코드 버전을 1:1로 묶을 수 있습니다.
 - **Cost tracking**: LLM 토큰 사용량과 추정 USD 비용도 리포트에 함께 기록합니다.

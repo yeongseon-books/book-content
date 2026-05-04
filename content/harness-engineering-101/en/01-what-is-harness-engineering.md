@@ -28,6 +28,8 @@ Good agents are not made by good models alone. You must design the environment, 
 ---
 
 ![What is harness Engineering](../../../assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png)
+
+*What is harness Engineering*
 ## A Good Model Alone Is Not Enough
 
 Every time a new frontier model lands — GPT-4, Claude 3.5, Gemini 1.5 — the same hope follows: "now real agents are finally possible." But with the same model, one team builds a reliable automation system and another team gets different results on every run. The difference is rarely the model. It is **the environment around the model**.
@@ -51,6 +53,8 @@ The word is already familiar in software engineering. A test harness provides th
 ## Agents Without and With a Harness
 
 ![Agents without and with a harness](../../../assets/harness-engineering-101/01/01-02-agents-without-and-with-a-harness.en.png)
+
+*Agents without and with a harness*
 Without a harness, an agent often looks like this:
 
 ```python
@@ -133,6 +137,8 @@ Same model, completely different system.
 ## The Eight Harnesses
 
 ![The eight harnesses](../../../assets/harness-engineering-101/01/01-03-the-eight-harnesses.en.png)
+
+*The eight harnesses*
 This series covers eight harnesses. Each one designs a different aspect of the agent.
 
 | Harness | Question it answers | Episode |
@@ -195,6 +201,8 @@ If you see any one of these, switching models will not save you. You need to des
 ## A Small Example: Email Classification Agent
 
 ![A small Example: email classification agent](../../../assets/harness-engineering-101/01/01-04-a-small-example-email-classification-age.en.png)
+
+*A small Example: email classification agent*
 Enough abstraction. Consider a small task: "classify incoming emails by priority." Without a harness:
 
 ```python

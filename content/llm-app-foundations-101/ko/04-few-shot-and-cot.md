@@ -27,6 +27,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-
 아래 다이어그램은 예시 기반 유도와 단계적 추론이 한 요청 안에서 어떻게 이어지는지 보여 줍니다.
 
 ![Few-shot과 Chain-of-Thought: 더 나은 답변 유도하기](../../../assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)
+
+*Few-shot과 Chain-of-Thought: 더 나은 답변 유도하기*
 이전 글에서는 `system`, `user`, `assistant` 역할을 분리해 프롬프트를 설계하는 기본 구조를 잡았습니다. 그다음 단계에서 바로 부딪히는 질문은 이것입니다. 같은 모델인데도 어떤 요청은 기대한 형식을 잘 따르고, 어떤 요청은 어딘가 비슷하지만 애매하게 빗나갑니다. 이 차이는 모델 자체보다도 모델을 어떻게 유도했는지에서 자주 갈립니다.
 
 실무에서 가장 먼저 꺼내는 손잡이 두 개가 few-shot prompting과 chain-of-thought prompting입니다. few-shot은 원하는 답변 패턴을 예시로 먼저 보여 주는 방식이고, chain-of-thought는 문제를 한 번에 찍게 두지 않고 단계적으로 풀도록 유도하는 방식입니다. 둘 다 새 모델을 학습시키는 기법이 아닙니다. 이미 있는 모델의 행동을 더 안정적으로 끌어내는 입력 설계 기법입니다.
@@ -48,6 +50,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-
 ## few-shot prompting은 예시로 패턴을 가르치는 일입니다
 
 ![예시 쌍이 최종 답을 유도하는 흐름](../../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.ko.png)
+
+*예시 쌍이 최종 답을 유도하는 흐름*
 few-shot prompting은 모델에게 “이런 식으로 답하면 된다”는 예시를 먼저 보여 준 뒤, 마지막에 실제 질문을 넣는 방식입니다. 채팅 API에서는 이 예시를 별도 필드에 넣지 않습니다. 앞선 글에서 본 것처럼 같은 `messages` 배열 안에 `user`와 `assistant` 쌍으로 배치합니다.
 
 구조는 대개 아래와 같습니다.
@@ -126,6 +130,8 @@ print(completion.choices[0].message.content)
 ## zero-shot과 few-shot은 같은 질문도 다르게 끌고 갑니다
 
 ![zero-shot과 few-shot 안정성 비교](../../../assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.ko.png)
+
+*zero-shot과 few-shot 안정성 비교*
 zero-shot은 예시 없이 바로 요청하는 방식입니다. 모델이 이미 학습한 일반 능력에 기대는 형태입니다. 단일 라벨 분류나 짧은 변환 작업에서는 zero-shot만으로도 꽤 잘 됩니다. 다만 출력 형식이 미묘하게 흔들리거나, 라벨 경계가 애매한 문제에서 일관성이 부족할 수 있습니다.
 
 아래 코드는 같은 문의를 zero-shot과 few-shot으로 각각 보내 비교합니다.
@@ -219,6 +225,8 @@ print(few_shot.choices[0].message.content)
 ## 예시 품질이 낮으면 few-shot은 오히려 독이 됩니다
 
 ![약한 예시와 강한 예시의 차이](../../../assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.ko.png)
+
+*약한 예시와 강한 예시의 차이*
 few-shot은 예시를 보여 주는 기법이기 때문에, 예시 자체의 품질이 결과 품질을 강하게 끌고 갑니다. 이 점이 가장 자주 과소평가됩니다. 많은 입문자가 “예시를 넣었는데 왜 더 이상해졌지?”를 겪는데, 대부분 예시가 나쁘거나 서로 일관되지 않습니다.
 
 나쁜 예시는 대개 네 부류입니다.
@@ -338,6 +346,8 @@ print(good_run.choices[0].message.content)
 ## chain-of-thought는 복합 문제를 단계로 쪼개게 만듭니다
 
 ![단계적 판단이 최종 답에 닿는 흐름](../../../assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.ko.png)
+
+*단계적 판단이 최종 답에 닿는 흐름*
 few-shot이 답변 패턴을 보여 주는 기법이라면, chain-of-thought는 문제 풀이 과정을 단계로 나누게 하는 기법입니다. 가장 널리 알려진 형태는 프롬프트 끝에 “단계적으로 생각해 주세요” 혹은 영어로 “Let's think step by step”를 붙이는 방식입니다.
 
 이 말이 왜 통할까요. 이유는 마법이 아니라 작업 구조입니다. 모델이 한 번에 최종 답만 내야 할 때보다, 중간 판단 단계를 거치도록 유도할 때 복합 제약을 놓칠 가능성이 줄어듭니다. 산술, 규칙 적용, 조건 비교, 여러 문장을 함께 읽는 추론에서 자주 도움이 됩니다.
@@ -558,6 +568,8 @@ print(completion.choices[0].message.content)
 ## 언제는 잘 먹히고, 언제는 기대만큼 안 먹힙니다
 
 ![프롬프트 기법을 접어야 하는 판단 분기](../../../assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.ko.png)
+
+*프롬프트 기법을 접어야 하는 판단 분기*
 few-shot과 CoT는 강력하지만 만능은 아닙니다. 아래 상황에서는 효과가 제한되거나 오히려 비용만 늘 수 있습니다.
 
 ### 모델이 원래 모르는 지식을 물을 때

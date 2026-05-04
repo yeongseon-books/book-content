@@ -54,6 +54,8 @@ That single sentence is the heart of this article.
 - Ten projects? Ten venvs. They cannot affect each other.
 
 ![Mental Model](../../../assets/python-101/01/01-01-mental-model.en.png)
+
+*Mental Model*
 System Python is the OS's territory. Each venv is the project's territory. As a developer you only ever activate a venv and work inside it.
 
 ## Core Concepts

@@ -33,6 +33,8 @@ seo_description: 'Retrieval metrics compare two sets:'
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/01/01-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 ## Questions this post answers
 
 - What does Precision@k, Recall@k, and MRR each measure, and what question does each answer?
@@ -81,6 +83,8 @@ Q3 has **perfect precision but low recall** — three of five relevant docs foun
 Looking at one without the other leads you to the wrong conclusion.
 
 ![Top-k overlap and metric calculation flow](../../../assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png)
+
+*Top-k overlap and metric calculation flow*
 
 ### 2. MRR (Mean Reciprocal Rank)
 
@@ -182,6 +186,8 @@ python3 main.py
 
 ![Precision@k versus Recall@k decision axes](../../../assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.en.png)
 
+*Precision@k versus Recall@k decision axes*
+
 ## Common pitfalls
 
 - **Stopping at the average** — average P@3 = 0.6 can hide queries scoring 0.0 alongside queries at 1.0. Always print per-query rows too.
@@ -191,6 +197,8 @@ python3 main.py
 - **Defining the gold set too narrowly** — labeling "only this exact doc is relevant" punishes the retriever for finding semantically equivalent ones.
 
 ![Rank position changes the MRR signal](../../../assets/rag-benchmark-101/01/01-04-rank-position-changes-the-mrr-signal.en.png)
+
+*Rank position changes the MRR signal*
 
 ## In production
 
@@ -218,6 +226,8 @@ Practical guidance for production RAG evaluation:
 3. RAG passes exactly 3 chunks to the LLM. Which two metrics matter most? Why?
 
 ![Per-query and average report reading flow](../../../assets/rag-benchmark-101/01/01-05-per-query-and-average-report-reading-flo.en.png)
+
+*Per-query and average report reading flow*
 
 ## Wrap-up and next post
 

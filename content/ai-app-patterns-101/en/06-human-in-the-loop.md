@@ -30,6 +30,8 @@ seo_description: Human-in-the-loop does not abandon automation; it inserts human
 > Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.
 
 ![Questions this post answers](../../../assets/ai-app-patterns-101/06/06-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 > AI App Patterns 101 (6/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/06-human-in-the-loop)
@@ -50,6 +52,8 @@ Topics:
 ### Human review by risk level
 
 ![Human review by risk level](../../../assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
+
+*Human review by risk level*
 HITL adds latency and cost. Use it when the cost of an unchecked error is high.
 
 **High-stakes decisions**: money transfers, contract generation, personal data processing — anything where a mistake is expensive or irreversible.
@@ -67,6 +71,8 @@ HITL adds latency and cost. Use it when the cost of an unchecked error is high.
 ### Draft generation with approval gate
 
 ![Draft generation with approval gate](../../../assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.en.png)
+
+*Draft generation with approval gate*
 The simplest HITL pattern is a blocking prompt that waits for human input before the pipeline continues.
 
 ```python
@@ -140,6 +146,8 @@ if final_response:
 ### Confidence threshold routing
 
 ![Confidence threshold routing](../../../assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.en.png)
+
+*Confidence threshold routing*
 Ask the LLM to return a confidence score alongside its output. Route low-confidence results to a human reviewer automatically.
 
 ```python
@@ -204,6 +212,8 @@ for text in texts:
 ### Review decisions with audit events
 
 ![Review decisions with audit events](../../../assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.en.png)
+
+*Review decisions with audit events*
 HITL systems require a record of who reviewed what and when. The audit log also becomes training data for improving the model over time.
 
 ```python
@@ -288,6 +298,8 @@ print(f"audit log: {LOG_FILE}")
 ### Human feedback back into policy loop
 
 ![Human feedback back into policy loop](../../../assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.en.png)
+
+*Human feedback back into policy loop*
 - HITL does not always sit at the very end; human review can appear before classification, before sending, or before money moves.
 - A confidence score is only a routing hint, not an objective truth signal. Review thresholds still require policy decisions.
 - Adding human review improves control but reduces throughput, so staffing and SLA impact must be designed alongside quality.

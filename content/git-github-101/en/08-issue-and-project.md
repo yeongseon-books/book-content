@@ -52,6 +52,8 @@ Even on a solo repository, issues earn their keep. Writing down the next thing t
 Here is how issues, PRs, and projects interlock.
 
 ![Mental model](../../../assets/git-github-101/08/08-01-mental-model.en.png)
+
+*Mental model*
 Read it as a flow:
 
 1. The issue is the starting point. It explains what to do and why.

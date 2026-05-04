@@ -37,6 +37,8 @@ This post covers five things:
 - choosing a chunking strategy for different document types
 
 ![Chunk size and overlap structure](../../../assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
+
+*Chunk size and overlap structure*
 <!-- ebook-only:start -->
 
 **The key idea**: chunk size and overlap control retrieval quality. Too large adds noise; too small loses context.
@@ -61,6 +63,8 @@ After this chapter, the next one moves on to **Vector search pipeline — from d
 ## Chunk size and overlap
 
 ![Chunk size and overlap structure](../../../assets/vector-search-101/05/05-01-chunk-size-and-overlap.en.png)
+
+*Chunk size and overlap structure*
 Two parameters control chunking: `chunk_size` and `chunk_overlap`.
 
 **chunk_size**: the maximum length of one chunk, measured in characters or tokens. A common starting range is 200–500 tokens.
@@ -83,6 +87,8 @@ A common rule of thumb sets overlap at 10–20% of chunk size. Too much overlap 
 ## Fixed-size chunking from scratch
 
 ![Fixed size chunking execution flow](../../../assets/vector-search-101/05/05-02-fixed-size-chunking-from-scratch.en.png)
+
+*Fixed size chunking execution flow*
 This implementation makes the concept concrete.
 
 ```python
@@ -146,6 +152,8 @@ This version is for illustration only. Splitting by raw character count often cu
 ## RecursiveCharacterTextSplitter
 
 ![Separator priority fallback path](../../../assets/vector-search-101/05/05-03-recursivecharactertextsplitter.en.png)
+
+*Separator priority fallback path*
 LangChain's `RecursiveCharacterTextSplitter` tries to split at natural boundaries. It works down a priority list of separators, trying `\n\n` first, then `\n`, then `. `, then space, finally individual characters. This keeps sentences intact in most cases.
 
 ```bash
@@ -214,6 +222,8 @@ The `separators` list is tried in order. If `\n\n` produces a piece within `chun
 ## Full pipeline: chunking to FAISS
 
 ![Execution path from chunking to FAISS search](../../../assets/vector-search-101/05/05-04-full-pipeline-chunking-to-faiss.en.png)
+
+*Execution path from chunking to FAISS search*
 Connecting chunking to embedding to index in one block.
 
 ```python
@@ -298,6 +308,8 @@ for query in ["how vector search works", "FAISS library features", "setting chun
 ## How chunk size affects retrieval
 
 ![Retrieval quality across chunk sizes](../../../assets/vector-search-101/05/05-05-how-chunk-size-affects-retrieval.en.png)
+
+*Retrieval quality across chunk sizes*
 Chunks that are too small lack enough context to match a query accurately. Chunks that are too large mix unrelated content and dilute the semantic signal.
 
 Typical starting points:

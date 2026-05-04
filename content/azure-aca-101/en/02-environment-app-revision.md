@@ -64,6 +64,8 @@ Environment is a boundary. Container App is a logical service. Revision is an im
 
 ![environment, container app, and revision hierarchy](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
 
+*environment, container app, and revision hierarchy*
+
 The cardinality is:
 
 - One Environment can hold many Container Apps.

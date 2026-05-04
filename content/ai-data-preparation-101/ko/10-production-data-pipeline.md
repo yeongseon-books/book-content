@@ -39,6 +39,8 @@ production data pipeline의 4가지 요구사항:
 ## 아키텍처 — 6 stage pipeline
 
 ![아키텍처 - 6 stage pipeline](../../../assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
+
+*아키텍처 - 6 stage pipeline*
 각 stage는 input parquet과 output parquet, manifest를 가집니다. manifest에는 input fingerprint, code version, parameters가 모두 기록됩니다.
 
 ## DVC로 dataset versioning

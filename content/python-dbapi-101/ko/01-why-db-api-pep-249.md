@@ -35,6 +35,8 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 <!-- a-grade-intro:begin -->
 
 ![DB-API 2.0과 PEP 249가 푼 문제](../../../assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.ko.png)
+
+*DB-API 2.0과 PEP 249가 푼 문제*
 ## 핵심 질문
 
 - PEP 249가 등장하기 전에는 Python에서 DB를 어떻게 다뤘을까요?
@@ -47,6 +49,8 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 ## 1. DB-API 이전의 혼돈
 
 ![DB-API 이전의 혼돈](../../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
+
+*DB-API 이전의 혼돈*
 표준이 없던 시절, 각 데이터베이스 라이브러리는 자기만의 API를 가졌습니다.
 
 ```python
@@ -66,6 +70,8 @@ data = db.receive_rows()
 ## 2. PEP 249가 표준화한 5가지
 
 ![PEP 249가 표준화한 5가지](../../../assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.ko.png)
+
+*PEP 249가 표준화한 5가지*
 DB-API 2.0은 모든 driver가 지켜야 할 최소 contract를 정의합니다.
 
 1. **Module-level constants**: `apilevel`, `threadsafety`, `paramstyle`
@@ -122,6 +128,8 @@ conn.close()
 ## 4. paramstyle 한 가지가 다르다
 
 ![paramstyle 한 가지가 다르다](../../../assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.ko.png)
+
+*paramstyle 한 가지가 다르다*
 PEP 249는 5가지 paramstyle을 허용합니다.
 
 | paramstyle | 예시 | 사용 driver |

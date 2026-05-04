@@ -71,6 +71,8 @@ Environment는 경계입니다. Container App은 논리 서비스입니다. Revi
 
 ![Environment와 Container App와 Revision의 계층 관계](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.ko.png)
 
+*Environment와 Container App와 Revision의 계층 관계*
+
 세 단어 사이의 cardinality는 다음과 같습니다.
 
 - 한 Environment는 여러 Container App을 가질 수 있습니다.

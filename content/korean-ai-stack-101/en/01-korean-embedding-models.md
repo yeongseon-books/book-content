@@ -43,11 +43,15 @@ In practice, the real question is not "which model wins the benchmark?" It is "w
 ## Core flow
 
 ![Core flow](../../../assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
+
+*Core flow*
 ---
 
 ## Why start with a reproducible comparison
 
 ![Why start with a reproducible comparison](../../../assets/korean-ai-stack-101/01/01-01-why-start-with-a-reproducible-comparison.en.png)
+
+*Why start with a reproducible comparison*
 A model comparison is only useful if readers can reproduce the trend on their own machine. API-only models and private evaluation sets may look authoritative, but they do not help you build intuition the next morning.
 
 This example highlights two practical observations. First, `ko-sbert-nli` tends to create a wider gap between similar Korean sentences and unrelated ones. Second, `all-MiniLM-L6-v2` remains a useful baseline when Korean text mixes with English, even if its Korean-only separation is narrower. That framing gives you a stable lens for the next posts, where we move from comparison into retrieval.
@@ -57,6 +61,8 @@ This example highlights two practical observations. First, `ko-sbert-nli` tends 
 ## Minimal runnable example
 
 ![Minimal runnable example](../../../assets/korean-ai-stack-101/01/01-02-minimal-runnable-example.en.png)
+
+*Minimal runnable example*
 The example below runs the same sentence pairs through both models and compares the average score of `similar` pairs with the average score of `unrelated` pairs. The full version lives in `main.py`.
 
 ```python
@@ -89,6 +95,8 @@ for label, name in MODEL_NAMES.items():
 ## What to notice in this code
 
 ![What to notice in this code](../../../assets/korean-ai-stack-101/01/01-03-what-to-notice-in-this-code.en.png)
+
+*What to notice in this code*
 - Both models see the **same sentence pairs**. That keeps the comparison about the model, not about a hidden data change.
 - `normalize_embeddings=True` turns inner product into cosine similarity and makes the same vectors easy to reuse in FAISS.
 - The useful signal is not one high score. It is the gap between the average `similar` score and the average `unrelated` score.
@@ -99,6 +107,8 @@ for label, name in MODEL_NAMES.items():
 ## Where engineers get confused
 
 ![Where engineers get confused](../../../assets/korean-ai-stack-101/01/01-04-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 - A Korean-specific model does not automatically win every multilingual workload. If your corpus mixes Korean and English heavily, a multilingual model may still be the safer baseline.
 - A cosine score like 0.8 is not an absolute definition of quality. Each model has its own score distribution.
 - Public benchmark rankings do not always match operational quality. Korean spacing errors, typos, and short user queries often matter more than leaderboard order.

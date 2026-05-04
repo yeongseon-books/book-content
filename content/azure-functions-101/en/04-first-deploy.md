@@ -69,6 +69,8 @@ python --version     # 3.11+
 ## The full flow on one page
 
 ![Flow from local run to Azure](../../../assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png)
+
+*Flow from local run to Azure*
 ---
 
 ## 1. Create the project
@@ -159,6 +161,8 @@ Three Azure resources are required.
 | **Function App** | The compute resource that runs your functions |
 
 ![Required Azure resources before deployment](../../../assets/azure-functions-101/04/04-02-4-create-azure-resources.en.png)
+
+*Required Azure resources before deployment*
 > Note: The Storage Account is infrastructure storage for the Functions platform itself. It holds things like trigger leases, invocation metadata, and Timer schedule state. Keep business data in a separate store.
 
 Now create the resources. Names must be globally unique, so adjust them as needed.
@@ -224,6 +228,8 @@ func azure functionapp publish $APP
 Under the hood, the flow looks like this.
 
 ![Local code deployment into Function App](../../../assets/azure-functions-101/04/04-03-5-deploy.en.png)
+
+*Local code deployment into Function App*
 You should see something like this at the end.
 
 ```

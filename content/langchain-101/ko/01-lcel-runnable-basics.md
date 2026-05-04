@@ -30,6 +30,8 @@ seo_description: LangChain에서는 입력과 출력 타입만 맞으면 거의 
 > LangChain에서는 입력과 출력 타입만 맞으면 거의 모든 컴포넌트를 같은 파이프 규칙으로 연결할 수 있습니다.
 
 ![이 글에서 답할 질문](../../../assets/langchain-101/01/01-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 ## 최소 실행 예제
 
 ```python
@@ -90,6 +92,8 @@ LangChain 101 시리즈 (1/6)
 ## 핵심 흐름 한눈에 보기
 
 ![핵심 흐름 한눈에 보기](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.ko.png)
+
+*핵심 흐름 한눈에 보기*
 LangChain을 처음 접하면 코드보다 용어가 더 먼저 막힙니다. LCEL, Runnable, Chain, Pipe — 개념은 많은데 어떤 게 핵심인지 잘 보이지 않습니다. 이번 글은 LangChain의 설계 중심인 LCEL(LangChain Expression Language)과 Runnable 인터페이스가 무엇인지, 그리고 왜 이런 구조를 썼는지부터 잡습니다.
 
 이 시리즈는 LangChain을 API로 사용하는 방법에 집중합니다. 챗봇, RAG, 에이전트 같은 애플리케이션 패턴은 별도 시리즈(ai-app-patterns-101)에서 다룹니다.
@@ -107,6 +111,8 @@ LangChain을 처음 접하면 코드보다 용어가 더 먼저 막힙니다. LC
 ## LangChain이 해결하려는 문제
 
 ![반복 연결 코드와 LCEL 추상화 구조](../../../assets/langchain-101/01/01-01-langchain.ko.png)
+
+*반복 연결 코드와 LCEL 추상화 구조*
 LLM 앱을 만들면 반복되는 작업이 나타납니다. 프롬프트를 조립하고, LLM에 보내고, 응답을 파싱해서, 다음 단계로 넘기는 패턴입니다. 이 과정에서 연결 코드가 점점 늘어납니다.
 
 ```python
@@ -126,6 +132,8 @@ LangChain은 이 연결 코드를 컴포넌트로 추상화합니다. 핵심 아
 ## Runnable 인터페이스
 
 ![invoke batch stream 실행 방식 비교](../../../assets/langchain-101/01/01-02-runnable.ko.png)
+
+*invoke batch stream 실행 방식 비교*
 LangChain의 거의 모든 컴포넌트는 `Runnable` 인터페이스를 구현합니다. 세 가지 핵심 메서드가 있습니다.
 
 - `invoke(input)` — 입력을 받아 출력을 반환합니다. 동기 단일 호출입니다.
@@ -163,6 +171,8 @@ print(response.content)
 ## LCEL과 파이프 연산자
 
 ![프롬프트 모델 파서 타입 연결 흐름](../../../assets/langchain-101/01/01-03-lcel.ko.png)
+
+*프롬프트 모델 파서 타입 연결 흐름*
 LCEL은 `|` 연산자로 Runnable 컴포넌트를 연결하는 문법입니다. 왼쪽 컴포넌트의 출력이 오른쪽 컴포넌트의 입력이 됩니다.
 
 ```python
@@ -328,6 +338,8 @@ print(result)
 ## batch()로 여러 입력 처리
 
 ![batch 호출의 입력 분배와 결과 수집 흐름](../../../assets/langchain-101/01/01-04-batch.ko.png)
+
+*batch 호출의 입력 분배와 결과 수집 흐름*
 `batch()`는 입력 목록을 받아 각각 처리한 뒤 결과 목록을 반환합니다.
 
 ```python

@@ -55,6 +55,8 @@ Binding을 기록합니다.
 ## 스케줄링의 세 단계
 
 ![대기 Pod가 Binding까지 가는 스케줄링 단계](../../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.ko.png)
+
+*대기 Pod가 Binding까지 가는 스케줄링 단계*
 ---
 
 ## Filter와 Score
@@ -65,6 +67,8 @@ Score는 가능한 노드 중 더 나은 후보를 고릅니다.
 기본 plugin 집합에는 `NodeResourcesFit`, `NodeAffinity`, `PodTopologySpread`, `InterPodAffinity` 같은 이름이 보입니다.
 
 ![후보 노드를 거르고 점수화하는 배치 경로](../../../assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png)
+
+*후보 노드를 거르고 점수화하는 배치 경로*
 ---
 
 ## Binding이 뜻하는 것

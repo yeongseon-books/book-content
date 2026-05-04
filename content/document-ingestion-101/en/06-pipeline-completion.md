@@ -32,6 +32,8 @@ seo_description: A complete ingestion pipeline is not defined by how many stages
 Example code: `/root/Github/document-ingestion-101/en/06-pipeline-completion/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 The final post assembles the earlier isolated examples into one real flow. At this point the important question is whether the stage boundaries still line up.
 
 This example loads three formats, chunks them, stores embeddings in FAISS, reloads the saved index, and runs a search against it. That is enough to prove an ingestion MVP works end to end.
@@ -39,11 +41,15 @@ This example loads three formats, chunks them, stores embeddings in FAISS, reloa
 ## End-to-end ingestion pipeline
 
 ![End-to-end ingestion pipeline flow](../../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
+
+*End-to-end ingestion pipeline flow*
 The final post is mostly about clean handoffs between stages rather than deeper logic inside any single function.
 
 ## Stage verification checkpoints
 
 ![Stage verification checkpoint flow](../../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.en.png)
+
+*Stage verification checkpoint flow*
 A small set of stage-level checkpoints is often enough to localize where the pipeline broke.
 
 ## Runnable example
@@ -182,6 +188,8 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 ### Monitoring and recovery path
 
 ![Monitoring and recovery flow](../../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.en.png)
+
+*Monitoring and recovery flow*
 Production ingestion needs a visible recovery path, not only a happy-path diagram.
 
 - `load_file()` absorbs format differences, and `chunk_documents()` creates the shared chunk contract.
@@ -193,6 +201,8 @@ Production ingestion needs a visible recovery path, not only a happy-path diagra
 ### Retry and replay control
 
 ![Retry and replay control flow](../../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.en.png)
+
+*Retry and replay control flow*
 Retrying and replaying are different control paths, and collapsing them into one action usually wastes time and compute.
 
 - An end-to-end demo does not need an LLM call on day one. Verifying index save and reload is more important first.

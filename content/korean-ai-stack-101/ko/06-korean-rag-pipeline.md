@@ -66,6 +66,8 @@ RAG가 어려운 이유는 단계가 많아서가 아니라 **단계 간 책임 
 
 ![핵심 흐름](../../../assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
 
+*핵심 흐름*
+
 RAG는 4개의 독립 단계로 분해됩니다.
 
 | 단계 | 입력 | 출력 | 품질 지표 |
@@ -134,6 +136,8 @@ print('출처:', [c['id'] for c in chunks])    # 출처 명시
 
 ![단순한 RAG 파이프라인의 단계별 구성](../../../assets/korean-ai-stack-101/06/06-01-diagram.ko.png)
 
+*단순한 RAG 파이프라인의 단계별 구성*
+
 ```python
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -156,6 +160,8 @@ index.add(vectors)
 
 ![최소 실행 예제](../../../assets/korean-ai-stack-101/06/06-02-diagram-2.ko.png)
 
+*최소 실행 예제*
+
 ```python
 def retrieve(question: str, top_k: int = 2) -> list[dict]:
     query_vec = model.encode([question], normalize_embeddings=True).astype('float32')
@@ -174,6 +180,8 @@ for h in hits:
 ### 단계 3 — 생성
 
 ![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/06/06-03-diagram-3.ko.png)
+
+*이 코드에서 봐야 할 것*
 
 ```python
 from groq import Groq
@@ -226,6 +234,8 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 ## 자주 하는 실수
 
 ![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/06/06-04-diagram-4.ko.png)
+
+*실무에서 헷갈리는 지점*
 
 1. **좋은 LLM이 RAG를 구해 준다는 착각** — 검색이 잘못된 청크를 가져오면 GPT-4o든 Claude Opus든 잘못 답합니다. 먼저 Recall@k를 측정하세요.
 2. **검색 점수를 로깅하지 않음** — 답변만 보면 어느 단계가 망가졌는지 알 수 없습니다. 검색 결과·점수·선택된 청크 ID는 항상 같이 기록합니다.

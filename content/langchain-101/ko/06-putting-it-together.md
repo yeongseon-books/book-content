@@ -30,6 +30,8 @@ seo_description: 통합 체인은 새로운 마법이 아니라 앞에서 본 Ru
 > 통합 체인은 새로운 마법이 아니라 앞에서 본 Runnable들을 입력 타입 순서대로 이어 붙인 결과입니다.
 
 ![이 글에서 답할 질문](../../../assets/langchain-101/06/06-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 ## 최소 실행 예제
 
 ```python
@@ -104,6 +106,8 @@ LangChain 101 시리즈 (6/6)
 ## 핵심 흐름 한눈에 보기
 
 ![핵심 흐름 한눈에 보기](../../../assets/langchain-101/06/06-02-the-flow-at-a-glance.ko.png)
+
+*핵심 흐름 한눈에 보기*
 지금까지 LCEL, 프롬프트, Retriever, Tool Calling, Streaming을 각각 다뤘습니다. 마지막 글에서는 이 컴포넌트들을 하나의 실행 가능한 앱으로 조립합니다. 문서를 인덱싱하고, 쿼리로 검색하고, LLM이 답변을 생성하고, 결과를 스트리밍으로 출력하는 전체 흐름입니다.
 
 다룰 내용은 다음과 같습니다.
@@ -118,6 +122,8 @@ LangChain 101 시리즈 (6/6)
 ## 문서 인덱싱 파이프라인
 
 ![문서 청킹부터 인덱스 생성까지 흐름](../../../assets/langchain-101/06/06-01-document-indexing-pipeline.ko.png)
+
+*문서 청킹부터 인덱스 생성까지 흐름*
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -180,6 +186,8 @@ print(f"인덱스 벡터 수: {vectorstore.index.ntotal}")
 ## RAG 체인 조립
 
 ![retriever prompt llm parser 조립 구조](../../../assets/langchain-101/06/06-02-assembling-the-rag-chain.ko.png)
+
+*retriever prompt llm parser 조립 구조*
 ```python
 import os
 
@@ -221,6 +229,8 @@ rag_chain = (
 ## 스트리밍으로 실행
 
 ![통합 RAG 체인의 스트리밍 실행 경로](../../../assets/langchain-101/06/06-03-running-with-streaming.ko.png)
+
+*통합 RAG 체인의 스트리밍 실행 경로*
 ```python
 questions = [
     "벡터 검색은 키워드 검색과 어떻게 다른가요?",
@@ -242,6 +252,8 @@ for question in questions:
 ## 대화 이력을 반영한 멀티턴 RAG
 
 ![대화 이력이 반영되는 멀티턴 RAG 흐름](../../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.ko.png)
+
+*대화 이력이 반영되는 멀티턴 RAG 흐름*
 단순 RAG 체인은 각 질문을 독립적으로 처리합니다. 이전 대화를 참고해서 답하려면 대화 이력을 체인에 넘겨야 합니다.
 
 ```python

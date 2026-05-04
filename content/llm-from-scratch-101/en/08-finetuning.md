@@ -47,6 +47,8 @@ Today's mental model is this: **Fine-tuning isn't about discarding the base mode
 Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.
 
 ![Roles of pre-training, SFT, and RLHF](../../../assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
+
+*Roles of pre-training, SFT, and RLHF*
 ## Anatomy of an Instruction Data Row
 
 A single line in our `instructions.jsonl` follows a simple `{"instruction": ..., "response": ...}` structure. During training, we concatenate these into a `Q: {q}\nA: {a}` template.

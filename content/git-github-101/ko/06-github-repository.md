@@ -64,6 +64,8 @@ push, pull, fetch는 remote와 주고받는 세 가지 동사입니다.
 GitHub는 또 하나의 Git 저장소입니다. 차이는 그 저장소가 GitHub 서버에 있고, 누구든 권한이 있다면 접근할 수 있다는 점뿐입니다. 로컬과 remote는 서로의 거울처럼 동작하고, push/fetch/pull이 그 둘을 동기화합니다.
 
 ![Mental Model](../../../assets/git-github-101/06/06-01-mental-model.ko.png)
+
+*Mental Model*
 세 가지를 함께 기억하면 이 그림이 단단해집니다. 첫째, GitHub 저장소도 결국 `.git` 디렉터리 하나일 뿐입니다. 둘째, 협업자는 각자 자기 컴퓨터에 완전한 사본을 가집니다. 셋째, 동기화는 자동이 아니라 명령으로 일어납니다. push하지 않으면 GitHub는 모르고, pull하지 않으면 내 노트북은 모릅니다.
 
 ## 핵심 개념

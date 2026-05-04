@@ -43,6 +43,8 @@ This is the map for the whole series.
 Each later post zooms into one part of the picture.
 
 ![AKS cluster component relationships](../../../assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.en.png)
+
+*AKS cluster component relationships*
 Part 2 zooms into the control plane and node pools, parts 3 and 4 cover Deployments, Pods, and Services, part 5 covers networking and Ingress, part 6 covers scaling, and part 7 covers monitoring and operations.
 
 ---
@@ -66,6 +68,8 @@ AKS does not hide Kubernetes from you. `kubectl`, YAML manifests, Services, Ingr
 “Managed” is only useful if it cashes out into concrete operational differences.
 
 ![Azure and user responsibility boundary](../../../assets/azure-aks-101/01/01-02-what-managed-means-in-practice.en.png)
+
+*Azure and user responsibility boundary*
 Managed Kubernetes does not mean “operations disappear.” It means the center of gravity shifts. You spend less time thinking about etcd topology and control plane bootstrap, and more time thinking about workload placement, scaling, traffic management, observability, and cost.
 
 That distinction matters for two reasons.

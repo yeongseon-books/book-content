@@ -39,6 +39,8 @@ They get easier once you separate two layers: how pod IPs are assigned, and how 
 ## Start with the request path
 
 ![External request flow through Ingress](../../../assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png)
+
+*External request flow through Ingress*
 From the outside, this is the shape that matters. The Service is the stable in-cluster endpoint. The Ingress layer is the HTTP router in front of it.
 
 Pod IP allocation, subnet sizing, and CNI choice sit further down the stack. Related problems, yes. The same problem, no.
@@ -95,6 +97,8 @@ In plain terms, Azure CNI Overlay keeps Azure integration while dramatically red
 ## Three models on one diagram
 
 ![Comparison of three AKS network models](../../../assets/azure-aks-101/05/05-02-three-models-on-one-diagram.en.png)
+
+*Comparison of three AKS network models*
 At a glance, kubenet and Overlay can look similar because both separate node IPs from pod IPs. The important difference is support direction and operating model. For new AKS clusters, the modern recommendation is not “pick any overlay.” It is “start from Azure CNI Overlay unless you have a reason not to.”
 
 ---
@@ -193,6 +197,8 @@ Ingress usually targets **Services**, not pods directly.
 ## NGINX and AGIC feel different because they live in different places
 
 ![Placement difference between NGINX and AGIC](../../../assets/azure-aks-101/05/05-03-nginx-and-agic-feel-different-because-th.en.png)
+
+*Placement difference between NGINX and AGIC*
 NGINX feels like an in-cluster reverse proxy. AGIC feels like an Azure-native L7 gateway in front of the cluster. Neither is inherently “the right one” in all cases. The right answer depends on existing Azure networking standards, WAF needs, and who owns edge traffic.
 
 ---

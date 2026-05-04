@@ -35,6 +35,8 @@ seo_description: '!정규화 전후 점수 해석 차이 정규화를 켜지 않
 - 각 척도를 언제 쓸 것인가
 
 ![코사인 내적 유클리드 비교 구조](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
+
+*코사인 내적 유클리드 비교 구조*
 <!-- ebook-only:start -->
 
 이 장의 핵심: **코사인 유사도는 벡터 방향의 일치 정도다.** 크기는 무시하고 방향만 비교하므로 문장 길이 차이에 강건하다.
@@ -59,6 +61,8 @@ seo_description: '!정규화 전후 점수 해석 차이 정규화를 켜지 않
 ## 세 가지 거리 척도
 
 ![코사인 내적 유클리드 비교 구조](../../../assets/vector-search-101/03/03-01-three-distance-metrics.ko.png)
+
+*코사인 내적 유클리드 비교 구조*
 ### 코사인 유사도
 
 코사인 유사도는 두 벡터가 이루는 각도의 코사인 값입니다. 벡터의 크기는 무시하고 방향만 비교합니다.
@@ -111,6 +115,8 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 ## 세 척도 비교
 
 ![같은 문장 쌍에 세 척도를 적용하는 흐름](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.ko.png)
+
+*같은 문장 쌍에 세 척도를 적용하는 흐름*
 같은 문장 쌍에 세 척도를 모두 적용해 봅니다.
 
 ```python
@@ -194,6 +200,8 @@ for text_a, text_b in pairs:
 ## 정규화가 왜 중요한가
 
 ![정규화 전후 점수 해석 차이](../../../assets/vector-search-101/03/03-03-why-normalization-matters.ko.png)
+
+*정규화 전후 점수 해석 차이*
 정규화를 켜지 않으면 코사인 유사도와 내적이 달라집니다.
 
 ```python
@@ -258,6 +266,8 @@ print(f"정규화 후 내적:         {float(np.dot(a_norm, b_norm)):.4f}")
 ## 브루트 포스 최근접 이웃 검색
 
 ![브루트 포스 최근접 이웃 실행 경로](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.ko.png)
+
+*브루트 포스 최근접 이웃 실행 경로*
 문서가 수백 개 이하라면 FAISS 없이 NumPy만으로 검색을 구현할 수 있습니다. 모든 문서 벡터와 쿼리 벡터의 유사도를 계산해서 가장 높은 것을 고릅니다.
 
 ```python
@@ -334,6 +344,8 @@ for rank, (score, text) in enumerate(results, start=1):
 ## 언제 어떤 척도를 쓸 것인가
 
 ![거리 척도 선택 기준 흐름](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.ko.png)
+
+*거리 척도 선택 기준 흐름*
 | 척도 | 언제 유리한가 | 주의점 |
 |---|---|---|
 | 코사인 유사도 | 텍스트 의미 비교, 문서 길이가 다를 때 | 크기 정보 무시 |

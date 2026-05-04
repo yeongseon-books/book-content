@@ -26,6 +26,8 @@ seo_description: 'A retrieval benchmark binds four things together:'
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - How do you attach hit rate and MRR to a FAISS retriever?
 - Where should retrieval latency be measured, and in what unit?
 - Can you start a meaningful benchmark with only a small gold set?
@@ -95,6 +97,8 @@ QUERIES = [
 
 ![Benchmark loop for queries and latency](../../../assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
 
+*Benchmark loop for queries and latency*
+
 The runnable code lives in `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -122,6 +126,8 @@ for question, relevant_ids in QUERIES:
 
 ![Retrieval quality axes with hit rate and MRR](../../../assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.en.png)
 
+*Retrieval quality axes with hit rate and MRR*
+
 ```python
 def hit_rate(ranked, gold):
     return 1.0 if any(d in gold for d in ranked) else 0.0
@@ -148,6 +154,8 @@ Keep the per-query ranked ids in the log. Storing only averages makes regression
 
 ![High hit rate with weak ranking](../../../assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png)
 
+*High hit rate with weak ranking*
+
 - **Trusting hit rate alone** — hit rate of 1.0 with MRR of 0.4 means the gold doc is always near the bottom. Users only see the first answer.
 - **Mixing embedding time into retrieval latency** — if you wrap embedding and retrieval in one timer you lose the signal for the retriever itself.
 - **Using `time.time()`** — it is sensitive to system clock changes. Always use `time.perf_counter()` for short intervals.
@@ -166,6 +174,8 @@ As the harness grows, capture more context.
 ## Checklist
 
 ![Benchmark record with gold IDs and logs](../../../assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.en.png)
+
+*Benchmark record with gold IDs and logs*
 
 - [ ] Wrote down relevant document ids per query.
 - [ ] Wrapped only `retriever.invoke()` to isolate retrieval latency.

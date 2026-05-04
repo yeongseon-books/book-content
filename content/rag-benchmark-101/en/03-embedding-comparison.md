@@ -26,6 +26,8 @@ seo_description: Embedding comparison rests on the one-variable-at-a-time princi
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - What do you see when you run `all-MiniLM-L6-v2` and `paraphrase-MiniLM-L3-v2` on the same query set?
 - Why is hit rate alone insufficient for embedding model comparison?
 - How do you tell whether speed or accuracy is the bottleneck?
@@ -124,6 +126,8 @@ def benchmark_model(model_name: str):
 
 ![Fixed-corpus embedding comparison structure](../../../assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
 
+*Fixed-corpus embedding comparison structure*
+
 The runnable code lives in `rag-benchmark-101/en/03-embedding-comparison/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -144,6 +148,8 @@ print(json.dumps(results, indent=2))
 
 ![Quality and latency comparison axes](../../../assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.en.png)
 
+*Quality and latency comparison axes*
+
 Look at quality (hit rate, MRR) and latency together. Looking at one without the other leads to bad decisions.
 
 ### Step 4 — Measure index build time too
@@ -159,6 +165,8 @@ index_build_s = round(time.perf_counter() - t0, 2)
 ## Common mistakes
 
 ![One-variable-at-a-time experiment boundary](../../../assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.en.png)
+
+*One-variable-at-a-time experiment boundary*
 
 - **Changing two variables at once** — swapping the embedding model and the chunk size in the same run hides which one made the difference. One variable at a time.
 - **Deciding on hit rate alone** — same hit rate with MRR 0.4 vs 0.8 produces very different answer quality. LLMs are sensitive to top-document order.
@@ -177,6 +185,8 @@ index_build_s = round(time.perf_counter() - t0, 2)
 ## Checklist
 
 ![Speed, quality, and cost selection flow](../../../assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.en.png)
+
+*Speed, quality, and cost selection flow*
 
 - [ ] Same corpus, same query set, same k for every model.
 - [ ] Hit rate and MRR reported together.

@@ -50,6 +50,8 @@ This article stops just before merging. We focus on **creating, switching, and c
 A branch is a **pointer** to a commit. When you make a new commit, the current branch pointer moves one step forward.
 
 ![Mental Model](../../../assets/git-github-101/04/04-01-mental-model.en.png)
+
+*Mental Model*
 Two ideas to hold together:
 
 - **A branch itself is cheap.** It is roughly a 41-byte file under `.git/refs/heads/<name>` that stores a commit hash.

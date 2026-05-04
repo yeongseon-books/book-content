@@ -58,6 +58,8 @@ Git은 이런 질문에 답할 수 있게 해 주는 도구입니다. 어느 시
 Git의 핵심을 한 문장으로 줄이면 "파일들의 스냅샷을 시간 순서대로 보관하는 도구"입니다. 각 commit은 그 시점에 어떤 파일이 어떤 내용이었는지를 기록한 사진입니다.
 
 ![Mental Model](../../../assets/git-github-101/01/01-01-mental-model.ko.png)
+
+*Mental Model*
 Git은 세 개의 영역을 구분합니다.
 
 - **Working Directory**: 지금 편집 중인 파일들이 있는 자리.

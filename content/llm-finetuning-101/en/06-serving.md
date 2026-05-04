@@ -26,6 +26,8 @@ seo_description: A serving system decomposes into four layers.
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/06/06-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - What is the minimum structure for wrapping a fine-tuned small model behind a FastAPI endpoint?
 - In serving code, where do you draw the line between training and inference?
 - How can you validate the endpoint without opening a browser?
@@ -93,9 +95,13 @@ What matters is (1) the model is behind an HTTP contract, (2) `TestClient` valid
 
 ![Separation of model preparation and HTTP contract](../../../assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png)
 
+*Separation of model preparation and HTTP contract*
+
 In production, model loading, request validation, generation options, response serialization, and observability logs are all separate responsibilities. This article's example shows only **model preparation** and the **HTTP contract** at minimum scale. Even in a small demo, separating health check and generate endpoints makes it easy to grow into production code.
 
 ![What this demo isolates on purpose](../../../assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.en.png)
+
+*What this demo isolates on purpose*
 
 ## Step-by-step practice
 
@@ -168,6 +174,8 @@ You can now call from another machine with `curl` or test in Postman.
 
 ![FastAPI inference request and endpoint branching flow](../../../assets/llm-finetuning-101/06/06-03-what-to-notice-in-this-code.en.png)
 
+*FastAPI inference request and endpoint branching flow*
+
 - Model loading runs only once at app startup. Loading per request increases latency by tens of times.
 - Separating `/health` and `/generate` makes it easy to distinguish model state from inference failure causes.
 - `TestClient` validates the endpoint contract without uvicorn, which is CI-friendly.
@@ -176,6 +184,8 @@ You can now call from another machine with `curl` or test in Postman.
 ## Common mistakes
 
 ![Latency vs. quality decision criteria for serving](../../../assets/llm-finetuning-101/06/06-04-where-engineers-get-confused.en.png)
+
+*Latency vs. quality decision criteria for serving*
 
 - **Loading the model per request** — every cold start adds seconds of latency. Load once at app startup.
 - **Not specifying `max_new_tokens`** — relying on the default produces unintentionally long responses and latency spikes.

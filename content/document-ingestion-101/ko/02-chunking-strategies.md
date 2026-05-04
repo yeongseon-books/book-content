@@ -31,6 +31,8 @@ seo_description: 청킹은 텍스트를 잘게 자르는 작업이 아니라 검
 예제 코드: `/root/Github/document-ingestion-101/ko/02-chunking-strategies/main.py`
 
 ![이 글에서 답할 질문](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 청킹을 한 번 잘못 잡으면 뒤 단계가 모두 비효율적이 됩니다. 너무 작으면 답변 맥락이 잘리고, 너무 크면 검색 결과에 잡음이 섞입니다.
 
 이번 예제는 FAQ, 매뉴얼, 정책 문서 세 가지 텍스트를 같은 분할기로 돌려 보고, 문서 유형별 프리셋이 왜 필요한지 숫자로 보여줍니다.
@@ -38,11 +40,15 @@ seo_description: 청킹은 텍스트를 잘게 자르는 작업이 아니라 검
 ## 문서 유형별 청킹 전략 흐름
 
 ![문서 유형별 청킹 전략 선택 흐름](../../../assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)
+
+*문서 유형별 청킹 전략 선택 흐름*
 같은 분할기를 쓰더라도 문서 유형마다 경계와 겹침의 기본값을 다르게 잡아야 검색 잡음을 줄일 수 있습니다.
 
 ## 재귀 분할기 구분자 후퇴 순서
 
 ![재귀 분할기의 구분자 후퇴 흐름](../../../assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.ko.png)
+
+*재귀 분할기의 구분자 후퇴 흐름*
 재귀 분할기의 장점은 의미 있는 큰 경계를 먼저 살려 보고, 안 되면 더 작은 경계로 천천히 내려간다는 점입니다.
 
 ## 실행 예제
@@ -116,6 +122,8 @@ python main.py
 ### 청크 경계와 overlap 구조
 
 ![청크 경계와 겹침이 이어지는 구조](../../../assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.ko.png)
+
+*청크 경계와 겹침이 이어지는 구조*
 겹침은 중복 저장이 아니라 앞 청크의 문맥 실마리를 다음 청크로 이어 주는 안전장치입니다.
 
 - 예제는 `chunk_size`, `chunk_overlap`, `separators`만 바꿔도 결과가 크게 달라진다는 점을 보여줍니다.
@@ -127,6 +135,8 @@ python main.py
 ### 청크 품질 점검 흐름
 
 ![청크 품질 지표를 확인하는 점검 흐름](../../../assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.ko.png)
+
+*청크 품질 지표를 확인하는 점검 흐름*
 청크 수만 보는 것으로는 부족하고 길이 분포와 첫 청크 미리보기까지 같이 봐야 경계 품질을 빠르게 판단할 수 있습니다.
 
 - 좋은 청킹은 무조건 작은 청킹이 아닙니다. 검색 품질은 경계와 겹침이 함께 결정합니다.

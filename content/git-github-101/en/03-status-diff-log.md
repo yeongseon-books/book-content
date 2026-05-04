@@ -50,6 +50,8 @@ Used together, they let you self-review what your next commit will contain. That
 Each command compares a different pair of areas.
 
 ![Mental model](../../../assets/git-github-101/03/03-01-mental-model.en.png)
+
+*Mental model*
 A one-line rule of thumb:
 
 - `git diff` shows **changes not yet staged** (WD vs Staging).

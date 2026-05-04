@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
 > A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
 
 ![Questions this post answers](../../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (5/6)
@@ -170,6 +172,8 @@ The first file to read is `langchain/chains/retrieval_qa/base.py`. `BaseRetrieva
 
 ![RetrievalQA chain-type dispatch path](../../../assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
 
+*RetrievalQA chain-type dispatch path*
+
 The popular constructor was `from_chain_type()`. Its implementation is intentionally small. It takes an LLM, a `chain_type`, optional `chain_type_kwargs`, calls `load_qa_chain(llm, chain_type=chain_type, **kwargs)`, and stores the returned combine-documents chain in `combine_documents_chain`. In other words, `RetrievalQA` does not itself implement stuffing, map-reduce, or refinement. It delegates document combination to a separate factory and acts as the glue between retriever output and that factory-produced answer chain.
 
 The real dispatch lives in `langchain/chains/question_answering/chain.py`. In 0.2.17, `load_qa_chain()` exposes a `loader_mapping` with `"stuff"`, `"map_reduce"`, `"refine"`, and `"map_rerank"`. The three options most relevant to the mental model are `stuff`, `map_reduce`, and `refine`.
@@ -242,6 +246,8 @@ LCEL starts in `langchain_core.runnables.base.py`. The `Runnable` abstraction de
 
 ![LCEL pipe operator building a sequence](../../../assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.en.png)
 
+*LCEL pipe operator building a sequence*
+
 That matters because retrievers, prompts, models, and parsers can all implement the same runnable protocol. A composed LCEL chain therefore inherits the shared execution methods of the runnable stack. `invoke()` is the narrow path: one input in, one final output out. `stream()` is the incremental path: the default `Runnable.stream()` simply yields `invoke(...)`, but when steps implement streaming or transform semantics, chunks can propagate through the sequence instead of waiting for one final object.
 
 `batch()` and `abatch()` follow the same philosophy. The base implementations in `Runnable` run multiple invocations concurrently rather than inventing a new batch-only API shape. The sync default uses an executor to fan out `invoke()` calls. The async default uses `asyncio.gather`-style orchestration around multiple `ainvoke()` calls. If a specific runnable knows how to do better, it can override the default. Otherwise, the composition model still gives you parallel evaluation with no extra wrapper code.
@@ -296,6 +302,8 @@ chain = (
 The code is compact enough to hide what is really happening. Two source-level details matter. First, when a dict enters LCEL composition, `coerce_to_runnable(...)` wraps it as `RunnableParallel`. Second, `RunnablePassthrough()` is just the identity runnable. So the first line is really saying: take the same input question, send it to multiple branches at once, let one branch build `context`, let another preserve the original `question`, then merge those branch outputs back into one dictionary.
 
 ![Parallel split into context and question](../../../assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.en.png)
+
+*Parallel split into context and question*
 
 If you trace one invocation step by step, the flow becomes concrete.
 
@@ -378,6 +386,8 @@ The most important shift is conceptual. In LCEL, retrieval is not a hidden phase
 Sooner or later, plain string output stops being enough. Production RAG systems usually need to return the answer together with sources, IDs, scores, or diagnostic fields. The base `prompt | llm | parser` pattern discards most of that state because the chain narrows toward one final string. The tool that solves this in LCEL is `RunnablePassthrough.assign()` from `langchain_core.runnables.passthrough.py`.
 
 ![Assign enriching answer output with sources](../../../assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.en.png)
+
+*Assign enriching answer output with sources*
 
 At the source level, `RunnablePassthrough.assign(**kwargs)` returns `RunnableAssign(RunnableParallel(kwargs))`. That means “keep the original dict input, compute additional fields from it in parallel, and merge those fields back into the dict.” The merge is explicit in `RunnableAssign.invoke()`: it returns `{**input, **self.mapper.invoke(input, ...)}`. So assign is not post-processing glued on the side. It is a structured way to grow the dictionary that flows through the chain.
 
@@ -474,6 +484,8 @@ if __name__ == "__main__":
 The execution-model difference becomes sharpest with streaming and batching. `RetrievalQA` is built around `_call()` and `_acall()`. It runs retrieval, runs the combine-documents chain, and returns only after the answer is fully assembled. It can optionally return source documents, but it does not expose a first-class surface for streaming intermediate answer chunks through the chain interface.
 
 ![Streaming chunks propagating through runnable steps](../../../assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.en.png)
+
+*Streaming chunks propagating through runnable steps*
 
 LCEL does. Because a runnable sequence shares `stream()` and `transform()` semantics, chunk-producing steps can push output through the graph incrementally. There is an important caveat: streaming begins only after the blocking stages ahead of it have finished. Retrieval is usually one such stage. Prompt formatting is usually another. But once those are done, a streaming model runnable can start yielding chunks immediately, and downstream parsers can keep transforming those chunks without waiting for the entire final string.
 

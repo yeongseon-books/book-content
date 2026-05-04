@@ -34,9 +34,13 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 Real agent workflows do not follow one path forever. Some requests should go to code generation, some to conceptual explanation, and others to debugging. LangGraph makes that branch visible with one routing node and one conditional edge definition.
 
 ![Questions this post answers](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 ## Minimal runnable example
 
 ![Three way branch from classify node](../../../assets/langgraph-101/03/03-01-minimal-runnable-example.en.png)
+
+*Three way branch from classify node*
 ```python
 from typing import Literal, TypedDict
 
@@ -106,6 +110,8 @@ Runnable file: `/root/Github/langgraph-101/en/03-conditional-edges/main.py`
 ## What to notice in this code
 
 ![Question to route field flow](../../../assets/langgraph-101/03/03-02-what-to-notice-in-this-code.en.png)
+
+*Question to route field flow*
 - `classify_question()` writes the routing signal into state.
 - `route_question()` has one job: return the next node name with no side effects.
 - The path map keeps the branch labels and target nodes explicit and easy to audit.
@@ -113,6 +119,8 @@ Runnable file: `/root/Github/langgraph-101/en/03-conditional-edges/main.py`
 ## Where engineers get confused
 
 ![Termination design for branches and loops](../../../assets/langgraph-101/03/03-03-where-engineers-get-confused.en.png)
+
+*Termination design for branches and loops*
 - Mixing classification logic and side-effectful work in one routing function makes debugging painful.
 - Conditional edges are not only for one-time if/else branches. They also control loops, which means termination must be designed explicitly.
 - Route strings are runtime contracts. Typos become graph failures, which is why `Literal[...]` helps.
@@ -126,6 +134,8 @@ Runnable file: `/root/Github/langgraph-101/en/03-conditional-edges/main.py`
 ## Summary
 
 ![Routing flow by question type](../../../assets/langgraph-101/03/03-04-summary.en.png)
+
+*Routing flow by question type*
 Conditional edges are where LangGraph starts to feel meaningfully graph-shaped. In the next post, we put that branching machinery under a real tool-calling loop and move from workflow to agent behavior.
 
 <!-- toc:begin -->

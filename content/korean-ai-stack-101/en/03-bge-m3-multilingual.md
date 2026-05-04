@@ -100,9 +100,13 @@ What matters: (1) a Korean query lifts an English runbook to top-1, (2) the equi
 
 ![Core flow](../../../assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
 
+*Core flow*
+
 ## Why start from a dense-only baseline
 
 ![Minimal runnable example](../../../assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.en.png)
+
+*Minimal runnable example*
 
 The fact that BGE-M3 emits dense, sparse, and multi-vector signals at once does not mean you should fuse all three on day one. If you never measure how the dense baseline alone compares to KoSimCSE, you will not know whether a later improvement comes from sparse, dense, or the fusion weights. The simplest dense + IndexFlatIP combination, with Recall@5 captured once, becomes the reference point for every subsequent experiment.
 
@@ -144,6 +148,8 @@ Confirm the dimension once. It helps later when sizing IVF training data.
 ### Step 3 — Search English+Korean documents with a Korean query
 
 ![What to notice in this code](../../../assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.en.png)
+
+*What to notice in this code*
 
 ```python
 query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.'
@@ -192,6 +198,8 @@ If the top-1 stays the same across the Korean and English version of the same qu
 ## What to notice in this code
 
 ![Where engineers get confused](../../../assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 
 - Korean and English documents are encoded with **one model** into one index. The old per-language index pattern is unnecessary with BGE-M3.
 - Mixing the gold language inside the test cases reveals the real multilingual performance.

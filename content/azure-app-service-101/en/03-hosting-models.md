@@ -51,6 +51,8 @@ The flow for deciding your App Service hosting strategy:
 
 ![Plan choice after OS and deployment](../../../assets/azure-app-service-101/03/01-decision-flow.en.png)
 
+*Plan choice after OS and deployment*
+
 ---
 
 ## What is an App Service Plan?
@@ -196,6 +198,8 @@ az webapp create \
 
 ![Shared and dedicated resource tradeoffs](../../../assets/azure-app-service-101/03/03-shared-vs-dedicated.en.png)
 
+*Shared and dedicated resource tradeoffs*
+
 ### Shared Plan Strategy
 
 Place multiple apps on one Plan:
@@ -234,6 +238,8 @@ Internal tools, low traffic apps → Shared Plan
 Which features depend on Plan vs Deployment Model:
 
 ![Feature availability across plan tiers](../../../assets/azure-app-service-101/03/02-tier-feature-matrix.en.png)
+
+*Feature availability across plan tiers*
 
 | Feature | Plan Dependent | Deployment Model Dependent |
 |---------|----------------|---------------------------|

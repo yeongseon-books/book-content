@@ -49,6 +49,8 @@ Issues can occur at each stage, resulting in different error messages.
 
 ![Request path from client to app](../../../assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
 
+*Request path from client to app*
+
 ---
 
 ## Stage 1: DNS and Global Entry
@@ -89,6 +91,8 @@ The App Service Frontend performs these roles:
 | Instance Selection | Routes to healthy Worker |
 
 ![Frontend routing and rejection checks](../../../assets/azure-app-service-101/02/02-frontend-routing-decision.en.png)
+
+*Frontend routing and rejection checks*
 
 ### When the frontend is the failure point
 
@@ -259,6 +263,8 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 
 ![Instance state changes from health checks](../../../assets/azure-app-service-101/02/03-health-check-state-machine.en.png)
 
+*Instance state changes from health checks*
+
 ### Health Probe Design Principles
 
 ```python
@@ -332,6 +338,8 @@ az webapp log tail \
 ## Common Failure Patterns
 
 ![Status codes mapped to failure layers](../../../assets/azure-app-service-101/02/04-failure-pattern-map.en.png)
+
+*Status codes mapped to failure layers*
 
 | Symptom | Suspected Layer | First Check |
 |---------|----------------|-------------|

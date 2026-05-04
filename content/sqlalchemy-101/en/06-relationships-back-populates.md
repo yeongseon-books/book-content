@@ -27,6 +27,8 @@ seo_description: ForeignKey is the SQL-level reference; relationship() is the ob
 One of the most common database tasks is "fetch the related rows together": a user's orders, a post's comments, a post tagged with several labels. SQL handles this with JOINs, but in the ORM you express it as attribute access (`user.orders`). The bridge that makes that work is `relationship()`, and `back_populates` is the device that keeps both sides of a bidirectional link consistent. This article walks through one-to-many, many-to-one, and many-to-many in turn, and lays down the patterns that keep both sides synchronized.
 
 ![ORM Relationships: connecting both sides safely with relationship and back_populates](../../../assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.en.png)
+
+*ORM Relationships: connecting both sides safely with relationship and back_populates*
 ## Questions this post answers
 
 - What does `relationship()` actually do, and how does it relate to `ForeignKey`?
@@ -39,6 +41,8 @@ One of the most common database tasks is "fetch the related rows together": a us
 ## Why it matters
 
 ![Why it matters](../../../assets/sqlalchemy-101/06/06-02-why-it-matters.en.png)
+
+*Why it matters*
 Misconfigured relationships create a familiar set of bugs:
 
 - "I added an object on one side but the other side's collection doesn't see it." A missing `back_populates` or mismatched names.
@@ -51,6 +55,8 @@ Relationships are the skeleton of your domain model. Setting them up cleanly the
 ## Mental Model
 
 ![Mental model](../../../assets/sqlalchemy-101/06/06-03-mental-model.en.png)
+
+*Mental model*
 > `ForeignKey` is the SQL-level reference; `relationship()` is the object-level navigation channel. `back_populates` ties both ends of that channel together so a change made on one side is immediately reflected on the other.
 
 ```
@@ -68,6 +74,8 @@ orders: list[Order]   ←──┐         ┌─→  user: User
 ## Core concepts
 
 ![Core concepts](../../../assets/sqlalchemy-101/06/06-04-core-concepts.en.png)
+
+*Core concepts*
 ### 1) ForeignKey and relationship are a pair
 
 You first need the SQL-level foreign key. Only then does the object-level relationship make sense.
@@ -213,6 +221,8 @@ def get_user_orders(session, user_id):
 ## Step-by-step walkthrough
 
 ![Step-by-step walkthrough](../../../assets/sqlalchemy-101/06/06-05-step-by-step-walkthrough.en.png)
+
+*Step-by-step walkthrough*
 ```python
 from sqlalchemy import ForeignKey, String, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship

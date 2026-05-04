@@ -39,6 +39,8 @@ seo_description: 처음 Kubernetes YAML을 보면 비슷해 보이는 객체가 
 ## 세 객체를 한 장으로 보면
 
 ![Pod와 Deployment와 Service의 관계](../../../assets/azure-aks-101/04/04-01-one-picture-first.ko.png)
+
+*Pod와 Deployment와 Service의 관계*
 이 그림이 거의 전부입니다.
 
 - **Pod**는 컨테이너를 실행하는 최소 단위
@@ -213,6 +215,8 @@ NodePort는 구조를 이해하는 데는 좋지만, 외부 공개의 최종 형
 새 버전 이미지를 배포한다고 해 보겠습니다. Deployment는 보통 기존 Pod를 한 번에 다 지우지 않고, 일부씩 새 버전으로 교체합니다.
 
 ![롤링 업데이트 중 Deployment와 Service의 연결](../../../assets/azure-aks-101/04/04-02-deployment-becomes-clearer-when-you-imag.ko.png)
+
+*롤링 업데이트 중 Deployment와 Service의 연결*
 이 과정에서 Service는 Ready 상태가 된 새 Pod로 자연스럽게 붙습니다. 그래서 readiness probe가 중요합니다. “살아 있다”와 “트래픽 받아도 된다”를 구분하지 않으면, Service가 너무 일찍 새 Pod로 붙어 버릴 수 있습니다.
 
 ---

@@ -78,6 +78,8 @@ It means the running unit you shift traffic to is not a mutable deployment slot.
 It is a distinct snapshot produced from a specific revision-scope template.
 
 ![Immutable revision snapshots as traffic targets](../../../assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.en.png)
+
+*Immutable revision snapshots as traffic targets*
 This explains several product behaviors that otherwise look unrelated.
 
 - Changing the image creates a new revision.
@@ -99,6 +101,8 @@ Application-scope changes affect the app surface without minting a new revision.
 This is one of the most useful distinctions in the entire product.
 
 ![Template-scope and configuration-scope changes](../../../assets/azure-aca-deep-dive/03/03-02-revision-scope-versus-application-scope.en.png)
+
+*Template-scope and configuration-scope changes*
 Microsoft documents the `properties.template` area as revision-scope and the `properties.configuration` area as application-scope.
 
 Revision-scope examples include:
@@ -133,6 +137,8 @@ In multiple revision mode, several active revisions can coexist and receive traf
 That is the mode where canary and blue-green become natural.
 
 ![Revision modes and upstream set differences](../../../assets/azure-aca-deep-dive/03/03-03-single-revision-mode-and-multiple-revisi.en.png)
+
+*Revision modes and upstream set differences*
 The deep-dive lesson is this.
 The mode is not merely a release preference.
 It changes the set of revisions Envoy is allowed to treat as upstream candidates.
@@ -150,6 +156,8 @@ Weights distribute requests probabilistically across active revisions.
 Labels pin a separate URL to one revision at a time.
 
 ![Label direct paths and weight-based routing](../../../assets/azure-aca-deep-dive/03/03-04-labels-and-weights-solve-different-routi.en.png)
+
+*Label direct paths and weight-based routing*
 That distinction matters operationally.
 
 - Use weights when you want gradual exposure on the production app URL.
@@ -213,6 +221,8 @@ Microsoft documents that ACA traffic split rules are enforced at ingress, and th
 That is the right conceptual anchor for ACA traffic splitting.
 
 ![Revision weights to Envoy routing weights](../../../assets/azure-aca-deep-dive/03/03-05-from-revision-weight-to-envoy-weight.en.png)
+
+*Revision weights to Envoy routing weights*
 ACA itself is closed-source, so you do not see the exact product adapter code or translation pipeline.
 The prose below therefore describes the most defensible inference: Microsoft's traffic-splitting docs describe the product behavior, and Envoy's weighted-cluster model is the upstream mechanism that most consistently explains it.
 
@@ -226,6 +236,8 @@ That something is the ingress routing layer.
 If the user app had to decide, the request would already be at one revision, which defeats the point.
 
 ![Revision selection at the ingress layer](../../../assets/azure-aca-deep-dive/03/03-06-why-the-weight-belongs-at-the-ingress-la.en.png)
+
+*Revision selection at the ingress layer*
 The weight has to exist before the service hop.
 That is why the weight discussion matters operationally: the percentage only becomes real when ingress routing chooses one revision target rather than another.
 
@@ -245,6 +257,8 @@ Ready means more than "a revision object exists."
 - Startup and readiness probes passed.
 
 ![Readiness-gated traffic cutover flow](../../../assets/azure-aca-deep-dive/03/03-07-zero-downtime-rollout-depends-on-readine.en.png)
+
+*Readiness-gated traffic cutover flow*
 So when people say ACA provides zero-downtime deployment in single revision mode, the deeper statement is that the control plane waits for a readiness threshold before re-pointing ingress.
 
 ---
@@ -261,6 +275,8 @@ Common patterns map directly onto weight changes.
 - A/B test: hold two or more revisions live at fixed percentages.
 
 ![Weighted rollout across multiple revisions](../../../assets/azure-aca-deep-dive/03/03-08-multiple-revision-mode-turns-rollout-int.en.png)
+
+*Weighted rollout across multiple revisions*
 The elegant part is that the revision remains immutable while the exposure changes around it.
 That separation is exactly what you want in a controlled rollout system.
 
@@ -277,6 +293,8 @@ When you point at `latestRevision: true`, you are telling ACA to keep the app UR
 When you point at explicit revision names, you are taking that decision back.
 
 ![latestRevision versus explicit revision control](../../../assets/azure-aca-deep-dive/03/03-09-latestrevision-true-is-convenient-but-it.en.png)
+
+*latestRevision versus explicit revision control*
 This distinction often marks the difference between a fast-moving dev setup and a tightly controlled production rollout.
 
 ---
@@ -292,6 +310,8 @@ Traffic weight decides whether the main app URL sends requests there.
 Labels can still expose it directly even if the main URL gives it zero percent.
 
 ![Active and traffic-receiving revision split](../../../assets/azure-aca-deep-dive/03/03-10-a-hidden-but-important-split-active-revi.en.png)
+
+*Active and traffic-receiving revision split*
 This is how staging-style validation can happen without touching the main production path.
 
 ---
@@ -307,6 +327,8 @@ Replica count is scale policy per revision.
 They influence each other through load, but they are not the same control loop.
 
 ![Traffic weights and replica scale relationship](../../../assets/azure-aca-deep-dive/03/03-11-revision-weight-and-scale-are-related-bu.en.png)
+
+*Traffic weights and replica scale relationship*
 That is why a 5% canary can still need more than one replica, and why a 50/50 split does not mechanically force equal replica counts if the revisions differ in performance or concurrency behavior.
 
 ---
@@ -322,6 +344,8 @@ The platform-specific step you do not see is how ACA names and manages the upstr
 The proxy concept is still standard.
 
 ![Envoy weighted clusters for revision routing](../../../assets/azure-aca-deep-dive/03/03-12-where-envoy-s-weighted-cluster-model-mat.en.png)
+
+*Envoy weighted clusters for revision routing*
 This is the cleanest explanation for the user's question, "where do the weights come from?"
 They start as app-scope ACA ingress configuration and, by the most defensible inference, become ingress routing weights applied to revision upstreams.
 
@@ -338,6 +362,8 @@ That sounds obvious, but it depends on two design choices holding together.
 2. Traffic policy is separate from revision creation.
 
 ![Rollback path across immutable revisions](../../../assets/azure-aca-deep-dive/03/03-13-the-rollback-story-is-better-because-rev.en.png)
+
+*Rollback path across immutable revisions*
 The speed of that rollback is one of the strongest practical benefits of the ACA revision model.
 
 ---

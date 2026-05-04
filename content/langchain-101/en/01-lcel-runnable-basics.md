@@ -31,6 +31,8 @@ seo_description: In LangChain, most components become interchangeable once their
 > In LangChain, most components become interchangeable once their input and output shapes line up.
 
 ![Questions this post answers](../../../assets/langchain-101/01/01-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 ## Minimal runnable example
 
 ```python
@@ -89,6 +91,8 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 ## The flow at a glance
 
 ![The flow at a glance](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png)
+
+*The flow at a glance*
 LangChain throws a lot of terminology at you before the code makes sense: LCEL, Runnable, Chain, Pipe. This post cuts through that by focusing on what LCEL (LangChain Expression Language) and the Runnable interface actually are and why the library is structured around them.
 
 This series covers LangChain as an API — how to use its components. Application-level patterns such as chatbots, RAG, and agents are in a separate series (ai-app-patterns-101).
@@ -106,6 +110,8 @@ Topics:
 ## The problem LangChain addresses
 
 ![Repeated glue code and LCEL abstraction flow](../../../assets/langchain-101/01/01-01-the-problem-langchain-addresses.en.png)
+
+*Repeated glue code and LCEL abstraction flow*
 LLM application code develops a recurring pattern: assemble a prompt, call the model, parse the output, pass it to the next step. The plumbing between those steps accumulates.
 
 ```python
@@ -125,6 +131,8 @@ LangChain abstracts that glue code into components. The core insight is simple: 
 ## The Runnable interface
 
 ![Invoke batch stream execution modes](../../../assets/langchain-101/01/01-02-the-runnable-interface.en.png)
+
+*Invoke batch stream execution modes*
 Almost every LangChain component implements the Runnable interface. Three methods are essential.
 
 - `invoke(input)` — accepts one input, returns one output. Synchronous.
@@ -161,6 +169,8 @@ print(response.content)
 ## LCEL and the pipe operator
 
 ![Prompt model parser type flow](../../../assets/langchain-101/01/01-03-lcel-and-the-pipe-operator.en.png)
+
+*Prompt model parser type flow*
 LCEL uses `|` to connect Runnable components. The output of the left component becomes the input of the right component.
 
 ```python
@@ -325,6 +335,8 @@ print(result)
 ## batch() for multiple inputs
 
 ![Batch fan out and collect flow](../../../assets/langchain-101/01/01-04-batch-for-multiple-inputs.en.png)
+
+*Batch fan out and collect flow*
 `batch()` accepts a list of inputs and returns a list of outputs.
 
 ```python

@@ -33,6 +33,8 @@ The two core DB-API objects are connection and cursor. Their names are plain, bu
 <!-- a-grade-intro:begin -->
 
 ![Connection and cursor lifecycle](../../../assets/python-dbapi-101/02/02-01-connection-and-cursor-lifecycle.en.png)
+
+*Connection and cursor lifecycle*
 ## Key Questions
 
 - What are the distinct responsibilities of Connection vs Cursor?
@@ -45,6 +47,8 @@ The two core DB-API objects are connection and cursor. Their names are plain, bu
 ## 1. What a Connection Is
 
 ![What a connection is](../../../assets/python-dbapi-101/02/02-02-1-what-a-connection-is.en.png)
+
+*What a connection is*
 A connection is a single communication channel between the application and the database. It wraps a TCP socket (PostgreSQL, MySQL) or a file handle (SQLite), and one connection holds one transaction context.
 
 ```python
@@ -82,6 +86,8 @@ In SQLite (single file), a cursor is essentially a thin wrapper. In PostgreSQL, 
 ## 3. Safe Use with Context Managers
 
 ![Safe use with context managers](../../../assets/python-dbapi-101/02/02-03-3-safe-use-with-context-managers.en.png)
+
+*Safe use with context managers*
 Manual close is easy to forget. Python's `with` statement is the safer route.
 
 ```python
@@ -143,6 +149,8 @@ cur2.execute("SELECT id FROM orders")
 ## 5. Reusing vs Reopening a Connection
 
 ![Reusing vs reopening a connection](../../../assets/python-dbapi-101/02/02-04-5-reusing-vs-reopening-a-connection.en.png)
+
+*Reusing vs reopening a connection*
 Opening a fresh connection per query reads cleanly but is expensive.
 
 ```python

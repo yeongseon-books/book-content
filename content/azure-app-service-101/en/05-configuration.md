@@ -52,6 +52,8 @@ App Service injects environment variables through **App Settings**:
 
 ![Settings injected into app environment](../../../assets/azure-app-service-101/05/configuration-flow.en.png)
 
+*Settings injected into app environment*
+
 ```
 [Azure Portal/CLI] → App Settings → [Environment Variables] → [App Process]
 ```
@@ -113,6 +115,8 @@ SCM_DO_BUILD_DURING_DEPLOYMENT true
 ### Environment Separation Pattern
 
 ![Configuration strategy by environment stage](../../../assets/azure-app-service-101/05/environment-strategy.en.png)
+
+*Configuration strategy by environment stage*
 
 ```python
 # config.py
@@ -219,6 +223,8 @@ When using Deployment Slots, some settings should be **sticky to the slot**.
 
 ![Settings that stay during slot swap](../../../assets/azure-app-service-101/05/slot-settings-behavior.en.png)
 
+*Settings that stay during slot swap*
+
 ### Configuring Slot Settings
 
 ```bash
@@ -241,6 +247,8 @@ az webapp config appsettings set \
 Store sensitive values like passwords and API keys in **Key Vault** and reference them.
 
 ![Secrets flowing from Key Vault to app](../../../assets/azure-app-service-101/05/key-vault-reference-flow.en.png)
+
+*Secrets flowing from Key Vault to app*
 
 ### Why Key Vault?
 

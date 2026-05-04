@@ -60,6 +60,8 @@ Seeing the route makes the deploy feel much simpler.
 
 ![End-to-end path from local code to an ACA deploy](../../../assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
 
+*End-to-end path from local code to an ACA deploy*
+
 Critical dependencies:
 
 1. **Resource group** — container for all Azure resources

@@ -27,6 +27,8 @@ seo_description: Evaluation works best when you separate "internal model signals
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/05/05-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?
 - Why is comparing perplexity before and after training not a complete quality evaluation?
 - Why keep a separate evaluation loop even in a tiny model demo?
@@ -93,9 +95,13 @@ The absolute value does not matter. What matters is (1) evaluation is separated 
 
 ![Relationship between perplexity and quality metrics](../../../assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
 
+*Relationship between perplexity and quality metrics*
+
 Perplexity is "lower is better," but you cannot judge quality from the absolute value alone. Tiny demo models, small datasets, and short context lengths cause large swings. So in practice, perplexity is best used as a **regression baseline** — strong at detecting whether things got worse, or whether a setting change improved the trend.
 
 ![How to read perplexity correctly](../../../assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png)
+
+*How to read perplexity correctly*
 
 ## Step-by-step practice
 
@@ -167,6 +173,8 @@ The moment these two lines print together, you see the regression baseline and u
 
 ![Calculation flow from average loss to perplexity](../../../assets/llm-finetuning-101/05/05-03-what-to-notice-in-this-code.en.png)
 
+*Calculation flow from average loss to perplexity*
+
 - The evaluation function must be separate from the training loop. Otherwise you risk mutating parameters while reading the loss.
 - `torch.no_grad()` and `model.eval()` are basic protections that stabilize memory usage and dropout behavior.
 - This example is for trend confirmation only. Real projects need a hold-out set, task metric, and human review together.
@@ -175,6 +183,8 @@ The moment these two lines print together, you see the regression baseline and u
 ## Common mistakes
 
 ![Decision flow for overfit signals and comparison baselines](../../../assets/llm-finetuning-101/05/05-04-where-engineers-get-confused.en.png)
+
+*Decision flow for overfit signals and comparison baselines*
 
 - **Shipping based on perplexity alone** — format compliance, factuality, and safety need separate evaluation. Perplexity is one axis only.
 - **Using the same data for training and evaluation** — numbers look optimistically good. The demo shares them for clarity, but real projects must split them.

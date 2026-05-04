@@ -79,6 +79,8 @@ When the Host boots, the object at the center of worker-config aggregation is `W
 At `5e59423`, those providers are `DefaultWorkerConfigurationProvider`, `DynamicWorkerConfigurationProvider`, and `ExplicitWorkerConfigurationProvider`, all sharing `WorkerConfigurationProviderBase`. The default provider scans the host's built-in `workers/` directory, the dynamic provider resolves versioned workers from probing paths, and the explicit provider applies app-setting overrides for a specific worker directory.
 
 ![Worker config provider aggregation flow](../../../assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
+
+*Worker config provider aggregation flow*
 That is why language workers plug in cleanly. **The Host does not carry language-specific launch logic for each runtime; it reads a config description and builds from there.**
 
 ---
@@ -106,6 +108,8 @@ That stdout/stderr wiring matters operationally. **Every line a worker writes to
 A running OS process does not mean the Worker is “ready.” Process boot and the gRPC handshake are separate stages. The sequence below is the full path a single Worker takes to reach the “ready” state inside one instance.
 
 ![Worker process and channel readiness](../../../assets/azure-functions-deep-dive/02/02-02-worker-lifecycle-within-a-single-instanc.en.png)
+
+*Worker process and channel readiness*
 The `GrpcWorkerChannel` that appears here is “the Host-side handle that corresponds to one worker process.” When the worker dies, the channel is torn down with it, and the Host spins up a new worker along with a new channel.
 
 > Source: [`GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
@@ -129,6 +133,8 @@ Two different knobs get conflated here, and the host code keeps them separate.
 So `FUNCTIONS_WORKER_PROCESS_COUNT=4` means “start four workers for this instance.” `WorkerConcurrencyOptions` means “watch live worker latency and decide whether to add another one.” Dynamic concurrency is limited to a subset of runtimes such as Node.js, Python, and PowerShell, and it is skipped when `FUNCTIONS_WORKER_PROCESS_COUNT` is explicitly set.
 
 ![Multiple worker layout within one instance](../../../assets/azure-functions-deep-dive/02/02-03-functions-worker-process-count-multiple.en.png)
+
+*Multiple worker layout within one instance*
 ---
 
 ## What happens when a worker dies
@@ -143,6 +149,8 @@ A worker process runs arbitrary user code. Which means it can always die: infini
 Operationally, this isolation is the reason “a function may fail occasionally while the Host itself stays perfectly healthy.” The Host is designed around detecting and recovering from the death of **a child process** — not its own.
 
 ![Worker failure detection and recovery flow](../../../assets/azure-functions-deep-dive/02/02-04-what-happens-when-a-worker-dies.en.png)
+
+*Worker failure detection and recovery flow*
 ---
 
 ## Wrapping up part 2

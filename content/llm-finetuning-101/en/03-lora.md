@@ -26,6 +26,8 @@ seo_description: 'A LoRA adapter is summarized by:'
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - Which `LoraConfig` fields actually need to be understood?
 - What goes wrong when `target_modules` is mis-specified?
 - For a tiny GPT-2 class model, how low does the trainable parameter ratio go?
@@ -89,9 +91,13 @@ That single line confirms attachment. It also lines up with the 1.5% you compute
 
 ![Low-rank decomposition and scaling structure](../../../assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
 
+*Low-rank decomposition and scaling structure*
+
 `r` is the low-rank dimension, `lora_alpha` is the scale, and `lora_dropout` is dropout on the adapter path only. The most accident-prone field in practice is `target_modules`. Get this list wrong and either nothing attaches, or you attach to layers you did not mean to.
 
 ![Fields with real operational impact](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
+
+*Fields with real operational impact*
 
 ## Step-by-step walkthrough
 
@@ -154,6 +160,8 @@ Only parameters ending in `lora_A` and `lora_B` should be trainable. Anything el
 
 ![Choosing target modules for GPT-style models](../../../assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.en.png)
 
+*Choosing target modules for GPT-style models*
+
 - GPT-2 attention/projection modules are named `c_attn` and `c_proj`, so `target_modules` strings must match exactly.
 - A `fan_in_fan_out` warning may appear at runtime — that is PEFT correctly accounting for GPT-2's `Conv1D` wrapper, not an error.
 - This post's example is for wiring verification only. Actual training is connected via `Trainer` in post 4.
@@ -162,6 +170,8 @@ Only parameters ending in `lora_A` and `lora_B` should be trainable. Anything el
 ## Common mistakes
 
 ![Full fine-tuning vs. LoRA parameter scale](../../../assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.en.png)
+
+*Full fine-tuning vs. LoRA parameter scale*
 
 - **Typo in target_modules** — most common failure. `trainable params: 0` with no traceback. Always sanity-check with `print_trainable_parameters()`.
 - **Decoupling r and alpha** — setting `r=64, alpha=16` makes the correction so small that little learning happens. Default to `alpha = 2 * r`.

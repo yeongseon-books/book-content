@@ -33,9 +33,13 @@ seo_description: 멀티 에이전트 그래프는 여러 LLM을 늘어놓는 구
 복잡한 요청을 하나의 에이전트에 모두 밀어 넣으면 프롬프트가 비대해지고 역할이 흐려집니다. 반대로 supervisor가 요청 성격을 판단하고 적절한 worker에게 넘기면 책임이 분리되고 그래프도 읽기 쉬워집니다.
 
 ![이 글에서 답할 질문](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 ## 최소 실행 예제
 
 ![감독자와 작업자가 이어지는 위임 구조](../../../assets/langgraph-101/05/05-01-minimal-runnable-example.ko.png)
+
+*감독자와 작업자가 이어지는 위임 구조*
 ```python
 import os
 from typing import Literal, TypedDict
@@ -129,6 +133,8 @@ export GROQ_API_KEY=... && python main.py
 ## 이 코드에서 봐야 할 것
 
 ![route와 worker_result가 흐르는 상태 구조](../../../assets/langgraph-101/05/05-02-what-to-notice-in-this-code.ko.png)
+
+*route와 worker_result가 흐르는 상태 구조*
 - supervisor는 직접 답을 만들지 않고 `route`만 결정합니다.
 - worker는 각자 `worker_result` 같은 공유 필드에 결과를 씁니다.
 - `finalize`가 마지막 조립만 맡기 때문에 worker 수가 늘어나도 정리 지점이 흔들리지 않습니다.
@@ -136,6 +142,8 @@ export GROQ_API_KEY=... && python main.py
 ## 실무에서 헷갈리는 지점
 
 ![감독자 책임과 작업자 경계를 나누는 구조](../../../assets/langgraph-101/05/05-03-where-engineers-get-confused.ko.png)
+
+*감독자 책임과 작업자 경계를 나누는 구조*
 - 멀티 에이전트라고 해서 그래프가 자동으로 똑똑해지지는 않습니다. 역할 경계가 애매하면 단일 에이전트보다 더 나빠질 수 있습니다.
 - supervisor가 분류도 하고 답변도 하게 만들면 결국 거대한 단일 에이전트로 되돌아갑니다.
 - 공유 상태를 과하게 넓히면 worker 간 결합도가 높아집니다. 필요한 결과 필드만 남기는 편이 좋습니다.
@@ -149,6 +157,8 @@ export GROQ_API_KEY=... && python main.py
 ## 정리
 
 ![감독자 아래 작업자가 협력하는 토폴로지](../../../assets/langgraph-101/05/05-04-summary.ko.png)
+
+*감독자 아래 작업자가 협력하는 토폴로지*
 멀티 에이전트의 핵심은 LLM 개수가 아니라 작업 위임 구조입니다. 마지막 글에서는 지금까지 만든 체크포인트, 조건 분기, 도구 호출을 한 그래프로 합쳐 전체 LangGraph 에이전트를 완성하겠습니다.
 
 <!-- toc:begin -->

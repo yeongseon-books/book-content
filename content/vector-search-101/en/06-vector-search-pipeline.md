@@ -37,6 +37,8 @@ Topics:
 - hybrid search concept and a minimal implementation
 
 ![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
+
+*End to end indexing and retrieval flow*
 <!-- ebook-only:start -->
 
 **The key idea**: a vector search pipeline is four steps — embed, index, query, retrieve. Each step should be independently replaceable.
@@ -60,7 +62,11 @@ The previous chapter covered **Chunking strategies — how to split long documen
 ## Pipeline structure
 
 ![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-pipeline-structure.en.png)
+
+*End to end indexing and retrieval flow*
 ![Pipeline component connection structure](../../../assets/vector-search-101/06/06-02-pipeline-structure-2.en.png)
+
+*Pipeline component connection structure*
 A vector search pipeline has two phases.
 
 **Indexing** is an offline step: process documents once and produce a searchable index.
@@ -82,6 +88,8 @@ Separating the two phases means you build the index once and query it many times
 ## Complete pipeline
 
 ![Build save load search execution path](../../../assets/vector-search-101/06/06-03-complete-pipeline.en.png)
+
+*Build save load search execution path*
 One self-contained, executable file.
 
 ```python
@@ -252,6 +260,8 @@ query: 'FAISS index types'
 ## Hybrid search
 
 ![Combining vector scores with BM25 scores](../../../assets/vector-search-101/06/06-04-hybrid-search.en.png)
+
+*Combining vector scores with BM25 scores*
 Vector search alone is weak when exact terms matter — error codes, product IDs, proper nouns. Keyword search handles those well but misses semantic variation. Hybrid search combines both.
 
 The standard approach normalizes each score to [0, 1] and takes a weighted sum.
@@ -302,6 +312,8 @@ def hybrid_search(
 ## Operational considerations
 
 ![Index update and deletion constraint path](../../../assets/vector-search-101/06/06-05-operational-considerations.en.png)
+
+*Index update and deletion constraint path*
 **Index updates.** Adding new documents is straightforward: embed them and call `index.add()`. `IndexFlatIP` does not support deletion. If you need to remove vectors, rebuild the index periodically or use `IndexIDMap` to track and skip deleted entries.
 
 **Memory.** `IndexFlatIP` keeps all vectors in memory. 100,000 vectors at 384 dimensions and 4 bytes each is roughly 147 MB. At 1 million vectors that becomes 1.5 GB. Beyond that, `IndexIVFFlat` or a quantization index like `IndexPQ` reduces memory use.

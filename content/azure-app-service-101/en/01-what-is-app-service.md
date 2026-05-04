@@ -69,6 +69,8 @@ Each Plane has **independent APIs and failure modes**. For example:
 
 ![Three planes and their roles](../../../assets/azure-app-service-101/01/01-three-plane-architecture.en.png)
 
+*Three planes and their roles*
+
 ---
 
 ## Management Plane: The Configuration Hub
@@ -111,6 +113,8 @@ The Runtime Plane is where actual user requests are handled.
 ### Request Flow
 
 ![Request flow through frontend and worker](../../../assets/azure-app-service-101/01/02-request-flow.en.png)
+
+*Request flow through frontend and worker*
 
 ```
 Client → App Service Frontend → Worker Instance → App Process
@@ -194,6 +198,8 @@ app.run(host="0.0.0.0", port=port)
 Understanding storage behavior is key to preventing production issues.
 
 ![Ephemeral and persistent storage paths](../../../assets/azure-app-service-101/01/03-file-system-layout.en.png)
+
+*Ephemeral and persistent storage paths*
 
 ### Ephemeral Storage
 

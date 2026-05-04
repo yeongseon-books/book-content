@@ -46,6 +46,8 @@ seo_description: 로컬에서 만든 AI 챗봇을 친구에게 보여주려면 U
 **[그림] 로컬 개발 환경에서 실제 배포까지의 흐름**
 ![로컬 개발에서 실제 배포까지의 흐름](../../../assets/ai-web-dev-101/06/local-to-live-deployment.ko.png)
 
+*로컬 개발에서 실제 배포까지의 흐름*
+
 ---
 
 ## 2. 배포 플랫폼 비교
@@ -66,6 +68,8 @@ seo_description: 로컬에서 만든 AI 챗봇을 친구에게 보여주려면 U
 - **기타 대안**: 더 자유로운 설정을 원한다면 AWS App Runner나 Google Cloud Run 같은 서비스도 있습니다. 하지만 초급 단계에서는 Vercel이나 Azure로 감을 잡는 것이 가장 빠릅니다.
 
 ![Vercel과 Azure의 배포 구조 비교](../../../assets/ai-web-dev-101/06/vercel-azure-hosting-overview.ko.png)
+
+*Vercel과 Azure의 배포 구조 비교*
 
 ---
 
@@ -105,6 +109,8 @@ git push origin main
 배포가 끝나면 `[프로젝트명].vercel.app` 형태의 도메인이 생성됩니다. 이 주소로 접속해 친구들과 공유해 보세요.
 
 ![배포된 앱으로 사용자 요청이 들어오는 운영 경로](../../../assets/ai-web-dev-101/06/production-request-path.ko.png)
+
+*배포된 앱으로 사용자 요청이 들어오는 운영 경로*
 
 ### 운영 팁: 환경 변수 업데이트하기
 OpenAI API 키를 교체했거나, 다른 설정을 바꿔야 할 때가 있습니다.
@@ -221,6 +227,8 @@ node_modules/
 **[그림] 안전한 API 키 관리 vs 위험한 하드코딩**
 ![환경 변수 관리와 하드코딩 노출의 차이](../../../assets/ai-web-dev-101/06/secret-key-boundary.ko.png)
 
+*환경 변수 관리와 하드코딩 노출의 차이*
+
 ---
 
 ## 6. 비용 관리와 모니터링 기초
@@ -240,6 +248,8 @@ Azure를 쓴다면 'Cost Management' 메뉴에서 예산 알람(Budget Alert)을
 - **사용자 질문 분석**: 사용자가 어떤 질문을 하는지, AI가 적절한 정보를 제공하는지 정기적으로 확인해 보세요. 이는 다음 7편에서 다룰 '서비스 개선'을 위한 가장 소중한 데이터가 됩니다.
 
 ![예산 제한과 오류 확인으로 이어지는 운영 점검 흐름](../../../assets/ai-web-dev-101/06/cost-guardrails-flow.ko.png)
+
+*예산 제한과 오류 확인으로 이어지는 운영 점검 흐름*
 
 ---
 

@@ -66,6 +66,8 @@ The code in this post deliberately prints intermediate state and logs retrieval 
 
 ![Core flow](../../../assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
 
+*Core flow*
+
 RAG decomposes into four independent stages.
 
 | Stage | Input | Output | Quality metric |
@@ -154,6 +156,8 @@ index.add(vectors)
 
 ![Minimal runnable example](../../../assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.en.png)
 
+*Minimal runnable example*
+
 ```python
 def retrieve(question: str, top_k: int = 2) -> list[dict]:
     query_vec = model.encode([question], normalize_embeddings=True).astype('float32')
@@ -172,6 +176,8 @@ for h in hits:
 ### Step 3 — generation
 
 ![What to notice in this code](../../../assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.en.png)
+
+*What to notice in this code*
 
 ```python
 from groq import Groq
@@ -225,6 +231,8 @@ Even ten cases are enough for the impact of chunking and embedding changes to sh
 ## Common mistakes
 
 ![Where engineers get confused](../../../assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 
 1. **Believing a stronger LLM rescues RAG.** If retrieval pulls the wrong chunk, GPT-4o or Claude Opus will still answer wrong. Measure Recall@k first.
 2. **Not logging retrieval scores.** Looking at answers alone hides which stage broke. Always log retrieval results, scores, and selected chunk IDs together.

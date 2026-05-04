@@ -32,6 +32,8 @@ seo_description: Metadata is not decoration around the text; it is the first ind
 Example code: `/root/Github/document-ingestion-101/en/03-metadata-filtering/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/03/03-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 One of the most common RAG mistakes is mixing “similar meaning” with “allowed scope.” Quarter, source, and category usually need structured filtering, not just vector similarity.
 
 This example loads three tiny documents into FAISS and changes the `filter` parameter by category and quarter so the retrieval behavior is explicit.
@@ -39,11 +41,15 @@ This example loads three tiny documents into FAISS and changes the `filter` para
 ## Metadata schema design
 
 ![Retrieval metadata schema flow](../../../assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
+
+*Retrieval metadata schema flow*
 The schema is less about collecting many fields and more about keeping the few keys that actually shrink the candidate set.
 
 ## How filters narrow the candidate set
 
 ![Filtered retrieval candidate flow](../../../assets/document-ingestion-101/03/03-02-how-filters-narrow-the-candidate-set.en.png)
+
+*Filtered retrieval candidate flow*
 Even when multiple chunks are semantically similar, filters stabilize retrieval by narrowing scope before ranking.
 
 ## Runnable example
@@ -159,6 +165,8 @@ Q4 infrastructure cost engineering - ...
 ### How similarity and filters combine
 
 ![Similarity and filter processing flow](../../../assets/document-ingestion-101/03/03-01-how-similarity-and-filters-combine.en.png)
+
+*Similarity and filter processing flow*
 Similarity and filtering work best as separate stages with a visible order, not as one opaque retrieval step.
 
 - `ChunkSpec` keeps text and metadata together, so the retrieval schema is visible in one place.
@@ -170,6 +178,8 @@ Similarity and filtering work best as separate stages with a visible order, not 
 ### How source tracking supports audits
 
 ![Source tracking and audit path](../../../assets/document-ingestion-101/03/03-02-how-source-tracking-supports-audits.en.png)
+
+*Source tracking and audit path*
 When an answer looks wrong, source and scope metadata usually explain the failure faster than the chunk text alone.
 
 - More metadata is not automatically better. Keep the fields you will actually filter on.

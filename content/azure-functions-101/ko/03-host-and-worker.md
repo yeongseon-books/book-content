@@ -51,6 +51,8 @@ Functions는 다릅니다. **함수 실행을 위한 프로세스가 최소 두 
 - **Worker 프로세스** — 여러분의 언어(Node.js, Python, Java 등)로 띄워지는 별도 프로세스. **여기서 여러분의 함수 코드가 실제로 실행**됨
 
 ![Host와 Worker의 역할 분리 구조](../../../assets/azure-functions-101/03/03-01-the-big-picture-two-processes.ko.png)
+
+*Host와 Worker의 역할 분리 구조*
 이 분리가 Functions의 가장 중요한 설계 결정입니다. 왜 이렇게 했을까요?
 
 ---
@@ -76,6 +78,8 @@ Functions는 다릅니다. **함수 실행을 위한 프로세스가 최소 두 
 한 Function App 인스턴스가 트래픽을 처리하는 모습을 시퀀스로 그려보면 이렇습니다.
 
 ![한 인스턴스 안의 호출 처리 흐름](../../../assets/azure-functions-101/03/03-02-what-happens-inside-a-single-instance.ko.png)
+
+*한 인스턴스 안의 호출 처리 흐름*
 이 흐름에서 기억할 것은 두 가지입니다.
 
 1. **Host는 함수 코드를 직접 호출하지 않습니다.** “Worker야, 이 입력으로 이 함수를 실행해줘”라고 gRPC로 요청할 뿐입니다.
@@ -96,6 +100,8 @@ Functions는 다릅니다. **함수 실행을 위한 프로세스가 최소 두 
 | **Worker** | Host가 띄운 언어 런타임 프로세스 | 인스턴스당 1개 이상 (`FUNCTIONS_WORKER_PROCESS_COUNT`로 조정 가능) |
 
 ![Function App과 Host, Worker의 위계 관계](../../../assets/azure-functions-101/03/03-03-function-app-host-worker-the-hierarchy-o.ko.png)
+
+*Function App과 Host, Worker의 위계 관계*
 Function App을 스케일아웃하면 인스턴스 수가 늘어나고, 각 인스턴스는 자기 Host와 Worker를 가집니다. **인스턴스 간에는 메모리를 공유하지 않습니다.** 함수 안에서 “전역 변수에 캐시해 두면 빠르겠지” 하는 코드는 같은 인스턴스 안에서만 의미가 있고, 다른 인스턴스에서는 그 캐시가 비어 있습니다. 이 점은 뒤의 스케일링 장에서 다시 짚습니다.
 
 ---

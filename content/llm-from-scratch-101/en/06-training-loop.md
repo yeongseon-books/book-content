@@ -49,6 +49,8 @@ Today's mental model is this: **Training is about repeatedly showing the model q
 The heart of the training loop consists of just five lines: `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, and `step()`. Everything else is operational code—handling evaluation intervals, logging, and learning rate scheduling.
 
 ![Core training loop from forward to update](../../../assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
+
+*Core training loop from forward to update*
 At first, `backward()` might seem like magic. In reality, autograd traverses the computation graph in reverse to populate the `grad` attribute for each parameter. The optimizer then reads those values and takes a step.
 
 ## Why AdamW Beats SGD for Transformers

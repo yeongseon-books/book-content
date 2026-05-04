@@ -98,6 +98,8 @@ What matters is (1) queries without the exact keyword "재설정" still match, (
 
 ![Core flow](../../../assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
 
+*Core flow*
+
 ## Why index only the questions first
 
 If you embed both questions and answers on day one, debugging becomes harder. A bad match may come from the query text, the answer wording, or the fact that long answer sentences drift semantically. Start with questions only and join the answer at display time.
@@ -138,6 +140,8 @@ index.add(embeddings)
 
 ![Minimal runnable example](../../../assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.en.png)
 
+*Minimal runnable example*
+
 ```python
 query = '로그인 비밀번호를 다시 설정하고 싶어요.'
 query_vec = model.encode([query], normalize_embeddings=True).astype('float32')
@@ -176,6 +180,8 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ![What to notice in this code](../../../assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.en.png)
 
+*What to notice in this code*
+
 - The index stores the **question strings**, not the full answers.
 - `normalize_embeddings=True` makes inner product equivalent to cosine similarity.
 - The test queries paraphrase the indexed questions instead of repeating them exactly.
@@ -184,6 +190,8 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 ## Common mistakes
 
 ![Where engineers get confused](../../../assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 
 - **Skipping normalization** — using `IndexFlatIP` without `normalize_embeddings=True` lets long sentences score unfairly high.
 - **Encoding with different models** — corpus on KoSimCSE, query on BGE-M3 makes distances meaningless. Always use the same model.

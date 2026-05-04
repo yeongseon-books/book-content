@@ -47,6 +47,8 @@ seo_description: “앱이 느려요.” “결제 페이지에서 가끔 멈춰
 
 ![앱 로그가 파일과 모니터링으로 가는 흐름](../../../assets/azure-app-service-101/06/01-log-flow-architecture.ko.png)
 
+*앱 로그가 파일과 모니터링으로 가는 흐름*
+
 App Service에서 가장 먼저 기억할 포인트는 다음입니다.
 
 - 앱이 `stdout/stderr`로 출력한 내용은 컨테이너 로그로 수집됨
@@ -74,6 +76,8 @@ App Service에서 가장 먼저 기억할 포인트는 다음입니다.
 대부분의 팀은 처음부터 완성형 observability를 갖추지 못합니다. 보통 아래 단계로 올라갑니다.
 
 ![로그에서 추적까지 올라가는 관측 단계](../../../assets/azure-app-service-101/06/02-observability-maturity.ko.png)
+
+*로그에서 추적까지 올라가는 관측 단계*
 
 이 글도 그 순서대로 갑니다.
 
@@ -270,6 +274,8 @@ logger.info(
 이 질문에 답하는 핵심이 **Correlation ID**입니다.
 
 ![한 요청에 Correlation ID가 이어지는 흐름](../../../assets/azure-app-service-101/06/03-correlation-id-flow.ko.png)
+
+*한 요청에 Correlation ID가 이어지는 흐름*
 
 요청이 들어올 때 ID를 하나 만들고, 그 ID를 **모든 로그에 붙이고**, 응답 헤더로도 돌려주면 다음이 가능해집니다.
 

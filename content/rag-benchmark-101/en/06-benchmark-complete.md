@@ -26,6 +26,8 @@ seo_description: 'A finished benchmark is a single function:'
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - How do we wire dataset → retrieval → generation → evaluation into a **single executable**?
 - What separation do we need when merging retrieval metrics and RAGAS scores into one report?
 - Which experimental knobs should be frozen first in the final pipeline benchmark?
@@ -111,6 +113,8 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 
 ![End-to-end benchmark pipeline in one run](../../../assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
 
+*End-to-end benchmark pipeline in one run*
+
 The runnable code lives at `rag-benchmark-101/en/06-benchmark-complete/main.py`. It expects `GROQ_API_KEY` to be set.
 
 ```bash
@@ -153,6 +157,8 @@ def run_benchmark(config):
 
 ![Retrieval and generation report split](../../../assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.en.png)
 
+*Retrieval and generation report split*
+
 ```python
 def assemble_report(retrieval_metrics, ragas_scores, rows, config):
     return {
@@ -189,6 +195,8 @@ def compare(report, baseline):
 
 ![Branching search failures from generation failures](../../../assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.en.png)
 
+*Branching search failures from generation failures*
+
 ```python
 THRESHOLDS = {
     "retrieval.hit_rate@k": -0.02,
@@ -212,6 +220,8 @@ def gate(deltas):
 ## Field notes
 
 ![Baseline-to-decision benchmark loop](../../../assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png)
+
+*Baseline-to-decision benchmark loop*
 
 - **Embed git sha in the run id**: results and the code that produced them are tied 1:1.
 - **Cost tracking**: include LLM token usage and an estimated USD cost in the report.

@@ -56,6 +56,8 @@ and records a Binding.
 ## The three steps
 
 ![Scheduling stages from pending Pod to Binding](../../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png)
+
+*Scheduling stages from pending Pod to Binding*
 ---
 
 ## Filter and Score
@@ -66,6 +68,8 @@ Score ranks the nodes that remain.
 The default plugin set includes `NodeResourcesFit`, `NodeAffinity`, `PodTopologySpread`, and `InterPodAffinity`.
 
 ![Node filtering and scoring in placement](../../../assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png)
+
+*Node filtering and scoring in placement*
 ---
 
 ## What Binding means

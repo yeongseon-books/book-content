@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
 > Chunking is not just slicing text smaller. It is freezing the semantic boundary you hope retrieval can recover later.
 
 ![Questions this post answers](../../../assets/rag-deep-dive/01/01-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (1/6)
@@ -136,6 +138,8 @@ In LangChain, a loader does two things. First, it reads bytes from somewhere. Se
 
 ![Loader metadata flow into documents](../../../assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png)
 
+*Loader metadata flow into documents*
+
 Start with the simplest case. In [`text.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/text.py), `TextLoader.lazy_load()` opens the file, reads it into one string, and yields a single `Document` with `metadata = {"source": str(self.file_path)}`. If decoding fails and `autodetect_encoding=True`, it retries the candidate encodings returned by `detect_file_encodings`. The source-level quirk in 0.2.17 is that exhausting those candidates is not surfaced cleanly as an error in every path. The method can fall through with `text` still empty and then yield a `Document` with empty `page_content`. In other words, the default metadata surface for plain text is basically just `source`, and the default boundary is “the whole file.”
 
 `PDFMinerLoader` is more interesting because the loader class itself delegates the important part to a parser. In [`pdf.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/pdf.py), `PDFMinerLoader` wires up `PDFMinerParser`. The actual boundary logic sits in [`parsers/pdf.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/parsers/pdf.py). `PDFMinerParser.lazy_parse()` does one of two things:
@@ -205,6 +209,8 @@ Most high-level explanations say that `CharacterTextSplitter` splits on a separa
 
 ![Merge window inside CharacterTextSplitter](../../../assets/rag-deep-dive/01/01-02-character-splitter-merge-window.en.png)
 
+*Merge window inside CharacterTextSplitter*
+
 The base constructor defaults are:
 
 - `chunk_size=4000`
@@ -261,6 +267,8 @@ If you run it, you will notice that overlap feels irregular rather than exact. T
 
 ![Separator priority in recursive splitting](../../../assets/rag-deep-dive/01/01-03-recursive-separator-fallback.en.png)
 
+*Separator priority in recursive splitting*
+
 The `_split_text()` method is the whole story:
 
 1. scan the separator list until you find one that actually exists in the current text
@@ -311,6 +319,8 @@ Character count and token count are not the same thing, and language models only
 
 ![Character counts diverging from token counts](../../../assets/rag-deep-dive/01/01-04-token-aware-splitting.en.png)
 
+*Character counts diverging from token counts*
+
 LangChain's `TokenTextSplitter` addresses this directly. In [`base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/base.py), `TokenTextSplitter.split_text()` builds an internal `_encode()` function, creates a `Tokenizer` dataclass with `tokens_per_chunk=self._chunk_size` and `chunk_overlap=self._chunk_overlap`, and then delegates to `split_text_on_tokens()`. That helper slides a fixed-width window over token IDs by advancing `start_idx += tokenizer.tokens_per_chunk - tokenizer.chunk_overlap` on each iteration.
 
 This is a very different overlap model from `CharacterTextSplitter`. Here, overlap is enforced directly in token space rather than emerging indirectly from already-split text fragments. The result is more predictable against model context limits, but less aligned with semantic boundaries. Token windows do not know where a paragraph ends or where a heading begins.
@@ -359,6 +369,8 @@ On multilingual text, logs, code, and text dense with identifiers, the gap betwe
 There is no universal best chunk size. There are only chunk sizes that are better or worse for a domain, a model budget, and a question style. The most common mistake is applying one number everywhere, such as `chunk_size=1000` and `chunk_overlap=200`, across policy documents, API docs, legal contracts, logs, and source code.
 
 ![Chunk quality feedback loop](../../../assets/rag-deep-dive/01/01-05-chunk-quality-feedback-loop.en.png)
+
+*Chunk quality feedback loop*
 
 In practice, I look at three things together.
 

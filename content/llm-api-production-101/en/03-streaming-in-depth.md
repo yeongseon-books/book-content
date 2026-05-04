@@ -33,6 +33,8 @@ This post focuses on the consumer side of the Groq streaming path. We will start
 The goal is not a clever UI effect. The goal is a streaming consumer that can explain what happened when the stream is incomplete.
 
 ![Streaming in depth: chunk handling and error recovery](../../../assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.en.png)
+
+*Streaming in depth: chunk handling and error recovery*
 ---
 
 ## Questions this chapter answers
@@ -59,6 +61,8 @@ export GROQ_API_KEY="your-issued-key"
 ## What changes when the response is a stream
 
 ![Streaming session with partial-state flow](../../../assets/llm-api-production-101/03/03-01-what-changes-when-the-response-is-a-stre.en.png)
+
+*Streaming session with partial-state flow*
 A non-streaming request usually ends in one of two states: success with a final object, or failure with an exception. Streaming is more complicated because one request can contain both progress and failure.
 
 Imagine a response like this:
@@ -83,6 +87,8 @@ That state gives you something much more useful than a raw exception. It gives y
 ## The baseline chunk loop
 
 ![Execution path of the baseline chunk loop](../../../assets/llm-api-production-101/03/03-02-the-baseline-chunk-loop.en.png)
+
+*Execution path of the baseline chunk loop*
 This is still the starting point.
 
 ```python
@@ -147,6 +153,8 @@ This matters mostly because it keeps the consumer calm. Empty chunks are not nec
 ## Enforcing timeouts outside the loop
 
 ![Sync loop versus async timeout comparison](../../../assets/llm-api-production-101/03/03-03-enforcing-timeouts-outside-the-loop.en.png)
+
+*Sync loop versus async timeout comparison*
 A total request timeout is still useful, but it is not enough for streaming. From the user's point of view, the more direct question is whether progress is still happening. A long answer that keeps producing text is usually acceptable. A silent stream that has produced nothing new for ten seconds often feels broken.
 
 The subtle part is implementation. A plain synchronous `for chunk in stream:` loop cannot detect a true inter-chunk stall by itself, because it is blocked while waiting for the next chunk. Checking `time.monotonic()` inside the loop body only runs after something has already arrived.
@@ -224,6 +232,8 @@ for chunk in stream:
 ## Keeping partial output on failure
 
 ![State preserved in a streaming result object](../../../assets/llm-api-production-101/03/03-04-keeping-partial-output-on-failure.en.png)
+
+*State preserved in a streaming result object*
 When a stream fails, the easiest bad decision is to throw away everything received so far. That makes recovery and debugging harder. The user may already have seen part of the answer. The partial text may reveal whether the problem was a mid-sentence interruption, a code block that never closed, or a provider-side termination.
 
 A better pattern is to return a structured result that always includes accumulated text.
@@ -298,6 +308,8 @@ The larger point is that production streaming paths should have an idea of what 
 ## Retrying after a streaming failure
 
 ![Retry decision after stream interruption](../../../assets/llm-api-production-101/03/03-05-retrying-after-a-streaming-failure.en.png)
+
+*Retry decision after stream interruption*
 Retries are harder for streaming than for plain request-response calls because some output may already have been shown to the user.
 
 Two cases are worth separating.

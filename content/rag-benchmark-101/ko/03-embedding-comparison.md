@@ -26,6 +26,8 @@ seo_description: 임베딩 비교는 "하나만 바꾼다(one-variable-at-a-time
 
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.ko.png)
 
+*이 글에서 답할 질문*
+
 - `all-MiniLM-L6-v2`와 `paraphrase-MiniLM-L3-v2`를 같은 질의셋으로 비교하면 무엇이 보일까요?
 - 임베딩 모델 비교에서 hit rate만 보면 왜 부족할까요?
 - 속도와 정확도 중 어느 쪽이 병목인지 어떻게 읽어야 할까요?
@@ -124,6 +126,8 @@ def benchmark_model(model_name: str):
 
 ![같은 코퍼스에서 임베딩 모델만 바꾸는 비교 구조](../../../assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.ko.png)
 
+*같은 코퍼스에서 임베딩 모델만 바꾸는 비교 구조*
+
 실행 코드는 `rag-benchmark-101/ko/03-embedding-comparison/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
@@ -144,6 +148,8 @@ print(json.dumps(results, indent=2, ensure_ascii=False))
 
 ![품질 점수와 지연 시간을 함께 보는 비교 축](../../../assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.ko.png)
 
+*품질 점수와 지연 시간을 함께 보는 비교 축*
+
 품질(hit rate, MRR)과 latency를 함께 봅니다. 한쪽만 보면 잘못된 결정을 내리기 쉽습니다.
 
 ### 4단계 — index build time도 측정
@@ -159,6 +165,8 @@ index_build_s = round(time.perf_counter() - t0, 2)
 ## 자주 하는 실수
 
 ![한 번에 한 변수만 바꿔야 하는 실험 경계](../../../assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.ko.png)
+
+*한 번에 한 변수만 바꿔야 하는 실험 경계*
 
 - **변수를 동시에 바꾸기** — 임베딩 모델과 chunk size를 같이 바꾸면 어느 쪽이 차이를 만들었는지 알 수 없습니다. 한 번에 한 변수만 바꿔야 합니다.
 - **hit rate만 보고 결정** — hit rate가 같아도 MRR이 0.4 vs 0.8이면 답변 품질은 크게 달라집니다. LLM은 상위 문서 순서에 민감합니다.
@@ -177,6 +185,8 @@ index_build_s = round(time.perf_counter() - t0, 2)
 ## 체크리스트
 
 ![속도와 정확도와 비용을 합치는 선택 흐름](../../../assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.ko.png)
+
+*속도와 정확도와 비용을 합치는 선택 흐름*
 
 - [ ] 동일한 corpus, 동일한 query set, 동일한 k로 두 모델을 평가했다.
 - [ ] hit rate와 MRR을 함께 비교했다.

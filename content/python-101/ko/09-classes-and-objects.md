@@ -60,6 +60,8 @@ seo_description: 클래스는 "데이터를 담는 형틀"이 아니라 "같은 
 다음 그림은 클래스 정의에서 인스턴스 호출까지의 흐름을 보여줍니다.
 
 ![Mental Model](../../../assets/python-101/09/09-01-mental-model.ko.png)
+
+*Mental Model*
 세 가지 핵심 아이디어가 있습니다.
 
 - **클래스는 객체를 찍어내는 틀입니다.** `class User:` 문 자체가 `User`라는 클래스 객체를 만들고, `User(...)` 호출이 그 틀로부터 인스턴스를 만들어 냅니다.

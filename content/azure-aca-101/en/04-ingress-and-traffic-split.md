@@ -62,6 +62,8 @@ ACA's managed Ingress layer plays the front door, then dispatches traffic to act
 
 ![Ingress routing requests to active Revisions](../../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
 
+*Ingress routing requests to active Revisions*
+
 Key steps:
 
 1. Client hits `https://<app>.<env-id>.<region>.azurecontainerapps.io`

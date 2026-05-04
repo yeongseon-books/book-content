@@ -30,6 +30,8 @@ seo_description: Workflow automation removes model choice and replaces it with a
 > Workflow automation removes model choice and replaces it with a pipeline that follows human-defined stages and data contracts.
 
 ![Questions this post answers](../../../assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 > AI App Patterns 101 (5/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/05-workflow-automation)
@@ -50,9 +52,13 @@ Topics:
 ### Sequential handoff across stages
 
 ![Sequential handoff across stages](../../../assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png)
+
+*Sequential handoff across stages*
 ### DAG style branching with parallel work
 
 ![DAG style branching with parallel work](../../../assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.en.png)
+
+*DAG style branching with parallel work*
 LCEL's `|` operator connects stages: the left stage's output becomes the right stage's input.
 
 ```python
@@ -132,9 +138,13 @@ print(f"title: {step3}")
 ### Classification driven routing
 
 ![Classification driven routing](../../../assets/ai-app-patterns-101/05/05-03-classification-driven-routing.en.png)
+
+*Classification driven routing*
 ### Approval gate and retry recovery
 
 ![Approval gate and retry recovery](../../../assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.en.png)
+
+*Approval gate and retry recovery*
 Classify the input first, then route it to the appropriate chain. The classifier's output is the only dependency between the two stages.
 
 ```python
@@ -228,6 +238,8 @@ for inquiry in test_inquiries:
 ### Code review artifact contract
 
 ![Code review artifact contract](../../../assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.en.png)
+
+*Code review artifact contract*
 Each stage transforms the previous stage's output. The code review pipeline below shows three chained transformations: analysis → suggestions → report.
 
 ```python

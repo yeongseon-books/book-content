@@ -29,6 +29,8 @@ Unlike most databases, SQLite has no separate server process. A connection is ju
 "Can I share one connection across all threads?" "Should I open a new one per thread?" "How do I hold a connection in an async framework like FastAPI?" This post answers those questions in order.
 
 ![SQLite connection Management: thread-safety, check_same_thread, and pooling](../../../assets/python-dbapi-101/08/08-01-sqlite-connection-management-thread-safe.en.png)
+
+*SQLite connection Management: thread-safety, check_same_thread, and pooling*
 ## Questions this post answers
 
 - What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?
@@ -46,6 +48,8 @@ The right answer is to verify the thread-safety mode your build offers and pick 
 ## Mental Model: a connection is a file handle
 
 ![Mental Model: a connection is a file handle](../../../assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.en.png)
+
+*Mental Model: a connection is a file handle*
 > A SQLite connection is not the client/server connection you know from PostgreSQL or MySQL. There is no separate process. The lock is a filesystem lock, and the connection object is essentially a file handle plus cache plus transaction state.
 
 This model decides several things:
@@ -60,6 +64,8 @@ Once you internalize this, "pool connections to save handshake cost" becomes a s
 ## Core Concepts
 
 ![Core concepts](../../../assets/python-dbapi-101/08/08-03-core-concepts.en.png)
+
+*Core concepts*
 ### SQLite's three thread-safety modes
 
 The SQLite C library is compiled in one of three modes:
@@ -160,6 +166,8 @@ A new connection per request, WAL so readers do not block writers, and `busy_tim
 ## Step by Step: holding SQLite safely in FastAPI
 
 ![Step by Step: holding SQLite safely in FastAPI](../../../assets/python-dbapi-101/08/08-04-step-by-step-holding-sqlite-safely-in-fa.en.png)
+
+*Step by Step: holding SQLite safely in FastAPI*
 ### Step 1. Inspect the environment
 
 ```python

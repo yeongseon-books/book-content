@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 > 프롬프트 계층은 문서를 예쁘게 붙이는 단계가 아니라, 구조화된 데이터를 모델이 실제로 읽는 계약으로 바꾸는 단계입니다.
 
 ![이 글에서 답할 질문](../../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (4/6)
@@ -117,6 +119,8 @@ if __name__ == "__main__":
 
 ![문자열 프롬프트와 채팅 프롬프트 계층 구조](../../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
 
+*문자열 프롬프트와 채팅 프롬프트 계층 구조*
+
 가장 흔한 생성 경로는 `PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)`입니다. 구현은 생각보다 짧습니다. 먼저 `get_template_variables(template, template_format)`로 템플릿 안의 변수 이름을 뽑아 냅니다. 그다음 `partial_variables`에 이미 들어 있는 이름을 제외한 뒤 `PromptTemplate(...)`를 생성합니다. 그런데 여기서 끝이 아닙니다. `prompt.py`와 `base.py`의 validator가 두 가지를 더 강제합니다. 첫째, `stop`이라는 이름은 입력 변수나 partial 변수로 쓸 수 없습니다. 내부 예약 이름이기 때문입니다. 둘째, `input_variables`와 `partial_variables`가 겹치면 예외를 냅니다. LangChain은 변수 바인딩을 느슨한 문자열 치환이 아니라, 충돌을 미리 막아야 하는 계약으로 취급하는 셈입니다.
 
 실제 포맷팅 경로도 소스에 선명하게 드러납니다. `PromptTemplate.format(**kwargs)`는 먼저 `_merge_partial_and_user_variables(**kwargs)`를 호출합니다. 이 단계에서 미리 바인딩된 partial 값과 호출 시점의 입력이 합쳐지고, callable partial이 있다면 여기서 평가됩니다. 그다음에야 아래 호출이 실행됩니다.
@@ -163,6 +167,8 @@ if __name__ == "__main__":
 문자열 프롬프트에서 채팅 프롬프트로 넘어가면 중심이 템플릿 문자열 하나에서 메시지 템플릿 목록으로 바뀝니다. `langchain_core.prompts.chat`의 구조를 보면 이 차이가 명확합니다. `SystemMessagePromptTemplate`, `HumanMessagePromptTemplate`, `AIMessagePromptTemplate`는 모두 내부적으로 문자열 프롬프트 템플릿을 감싼 얇은 래퍼입니다. 다만 최종 출력은 문자열이 아니라 각각 `SystemMessage`, `HumanMessage`, `AIMessage` 같은 concrete message 객체입니다.
 
 ![메시지 템플릿이 채팅 메시지로 변환되는 흐름](../../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.ko.png)
+
+*메시지 템플릿이 채팅 메시지로 변환되는 흐름*
 
 가장 많이 쓰는 진입점은 `ChatPromptTemplate.from_messages(messages, template_format="f-string")`입니다. 이 메서드는 여러 형태의 message-like 입력을 내부 `self.messages` 목록으로 정규화합니다. 예를 들어 `("system", "...")` 튜플은 `SystemMessagePromptTemplate`로, `("human", "{question}")`은 `HumanMessagePromptTemplate`로 바뀝니다. 이미 만들어진 `BaseMessage`를 넘기면 그대로 저장합니다. 그래서 최종 프롬프트는 처음부터 이질적인 목록을 전제로 합니다. 어떤 항목은 정적 메시지이고, 어떤 항목은 템플릿이며, 또 어떤 항목은 대화 이력을 위한 placeholder일 수 있습니다.
 
@@ -217,6 +223,8 @@ if __name__ == "__main__":
 
 ![retrieval QA가 문맥 문자열을 조립하는 경로](../../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.ko.png)
 
+*retrieval QA가 문맥 문자열을 조립하는 경로*
+
 `RetrievalQA._get_docs()`의 구현은 아주 짧습니다. `self.retriever.invoke(question, config={"callbacks": run_manager.get_child()})`를 호출하고 `List[Document]`를 돌려줍니다. 즉 retrieval 자체는 이 시점에 끝입니다. 그다음 `_call()`은 `question = inputs[self.input_key]`로 사용자 질의를 꺼내고, `_get_docs(question)`로 문서를 얻은 뒤 아래 호출을 실행합니다.
 
 ```python
@@ -257,6 +265,8 @@ Context:
 이제 `{context}`가 어디서 오는지 봤으니, 다음은 변수들이 프롬프트 계층을 어떻게 통과하는지 정리할 차례입니다. 여기서는 `BasePromptTemplate`가 기준선입니다. 이 클래스가 partial binding과 runnable `invoke()` 둘 다 정의합니다.
 
 ![partial 변수와 invoke 입력이 합쳐지는 흐름](../../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.ko.png)
+
+*partial 변수와 invoke 입력이 합쳐지는 흐름*
 
 `partial()`은 일회성 치환이 아니라 프롬프트 구조를 바꾸는 연산입니다. `BasePromptTemplate.partial(**kwargs)`는 현재 객체의 상태를 복사한 뒤, 새로 고정할 변수들을 `input_variables`에서 제거하고 `partial_variables`에 합쳐서 같은 타입의 새 프롬프트를 돌려줍니다. 이때 partial 값은 문자열뿐 아니라 callable도 될 수 있습니다. 그래서 매번 손으로 넘기기 귀찮지만 세션 동안은 거의 고정인 값, 예를 들어 오늘 날짜, 서비스 이름, 규정 버전, 인용 규칙 같은 것들을 미리 묶어 두기에 좋습니다.
 
@@ -306,6 +316,8 @@ if __name__ == "__main__":
 좋은 RAG 프롬프트는 단순히 “문맥을 보고 답하라”로 끝나지 않습니다. 증거를 어떻게 다뤄야 하는지, 문맥이 부족할 때는 어떻게 말해야 하는지, 여러 청크가 같은 내용을 반복하거나 일부만 겹칠 때는 출처를 어떻게 표기해야 하는지를 명시해 주는 편이 훨씬 안전합니다. LangChain의 프롬프트 계층은 이런 규칙을 구조적으로 표현하기에 충분합니다.
 
 ![출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시](../../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.ko.png)
+
+*출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시*
 
 0.2.17 기준으로 가장 실용적인 기본형은 system + human 두 메시지로 나눈 채팅 프롬프트입니다. 변하지 않는 답변 정책은 system 메시지에 두고, 검색된 증거는 `{context}`에, 사용자의 실제 질문은 `{question}`에 분리해 두는 방식입니다. 이렇게 해 두면 나중에 디버깅할 때도 실패 원인이 정책 문구인지, 컨텍스트 포장 방식인지, 질문 표현인지 구분하기 쉬워집니다.
 

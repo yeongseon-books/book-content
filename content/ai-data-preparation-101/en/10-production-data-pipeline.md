@@ -40,6 +40,8 @@ Four requirements for a production data pipeline:
 ## Architecture - a 6-stage pipeline
 
 ![Architecture - a 6-stage pipeline](../../../assets/ai-data-preparation-101/10/10-01-architecture-a-6-stage-pipeline.en.png)
+
+*Architecture - a 6-stage pipeline*
 Each stage owns input/output parquet files plus a manifest. The manifest records input fingerprints, code versions, and parameters.
 
 ## Dataset versioning with DVC

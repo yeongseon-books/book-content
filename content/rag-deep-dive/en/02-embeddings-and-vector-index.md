@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
 > Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.
 
 ![Questions this post answers](../../../assets/rag-deep-dive/02/02-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (2/6)
@@ -115,6 +117,8 @@ In LangChain 0.2.17, the familiar `OpenAIEmbeddings` class lives in `langchain_c
 
 ![Document and query embedding flow](../../../assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
 
+*Document and query embedding flow*
+
 If you read the source closely, the implementation difference between `embed_documents()` and `embed_query()` is almost nonexistent. `embed_documents()` calls `_get_len_safe_embeddings(texts, engine=engine)`. `embed_query()` simply returns `self.embed_documents([text])[0]`. So in this pinned implementation, both flows converge on the same machinery.
 
 That does **not** mean they are conceptually interchangeable. The interface is split on purpose because retrieval models do not always treat documents and queries the same way. In asymmetric retrieval setups, document embeddings are optimized to preserve broad evidence, while query embeddings are optimized to point sharply toward the relevant region of the space. Some providers implement that by routing to different projections, by injecting different instructions, or by using different tuning objectives for query and document representations. That is why LangChain keeps `embed_query()` and `embed_documents()` distinct even when a specific provider implementation happens to delegate one to the other.
@@ -158,6 +162,8 @@ The baseline for the rest of this post is simple. The embedding step is already 
 `IndexFlatL2` is often described as the simplest FAISS index. That is true, but incomplete. What makes it simple is not just that it is brute-force. It is that it computes the exact L2 comparison against every stored vector and then picks the smallest `k` results. No pruning, no quantization, no approximation.
 
 ![Query against full vector scan](../../../assets/rag-deep-dive/02/02-02-indexflat-search-internals.en.png)
+
+*Query against full vector scan*
 
 In `faiss/IndexFlat.cpp`, `IndexFlat::search()` is very direct. If `metric_type == METRIC_INNER_PRODUCT`, it calls `knn_inner_product(...)`. If `metric_type == METRIC_L2`, it calls `knn_L2sqr(...)`. That second call is the important part for `IndexFlatL2`: FAISS is comparing vectors by **squared** Euclidean distance.
 
@@ -210,6 +216,8 @@ Use `IndexFlatL2` when you want exactness and a trustworthy baseline. Stop treat
 At the API level, `FAISS.from_documents()` feels like one convenience call. Under the hood, the path is important. `VectorStore.from_documents()` in `langchain_core.vectorstores.base` extracts `page_content` and `metadata` from each `Document` and delegates to `from_texts()`. In `langchain_community.vectorstores.faiss`, `FAISS.from_texts()` embeds those texts with `embedding.embed_documents(texts)` and then passes everything into the internal `__from()` constructor.
 
 ![Document to FAISS mapping layers](../../../assets/rag-deep-dive/02/02-03-langchain-faiss-layers.en.png)
+
+*Document to FAISS mapping layers*
 
 The actual design has three separate layers.
 
@@ -266,6 +274,8 @@ The main operational takeaway is that retrieval bugs can happen in any of these 
 The first FAISS choice is usually the metric. `IndexFlatL2` minimizes squared Euclidean distance. `IndexFlatIP` maximizes inner product. Both are flat indexes, which means both are exact. The difference is not speed class but similarity definition.
 
 ![Index choices and search tradeoffs](../../../assets/rag-deep-dive/02/02-04-index-type-comparison.en.png)
+
+*Index choices and search tradeoffs*
 
 If your vectors are L2-normalized, inner product often becomes the easiest route to cosine-style retrieval. That is why many production setups use normalized embeddings plus `IndexFlatIP`. If you are working with Euclidean structure directly, `IndexFlatL2` is the more literal choice.
 
@@ -335,6 +345,8 @@ For many teams, exact flat search remains the right choice longer than expected.
 LangChain's FAISS wrapper persists state through `save_local()` and restores it through `load_local()`. The implementation is important because it stores two different layers in two different formats. `save_local()` writes the FAISS index with `faiss.write_index(...)` into an `.faiss` file, then pickles `(self.docstore, self.index_to_docstore_id)` into a `.pkl` file.
 
 ![Persistence split across two files](../../../assets/rag-deep-dive/02/02-05-persistence-flow.en.png)
+
+*Persistence split across two files*
 
 The split exists for a good reason. The FAISS index is a C++ object and is not stored as a Python pickle. The LangChain-side reconstruction state is Python-native, so it is stored separately. That means:
 

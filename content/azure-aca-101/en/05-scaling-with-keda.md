@@ -63,6 +63,8 @@ You don't write YAML or imperative scaling code — you declare "if this signal 
 
 ![Scale signals changing replica counts](../../../assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
 
+*Scale signals changing replica counts*
+
 ## Core concepts
 
 ### 1. Three rule categories

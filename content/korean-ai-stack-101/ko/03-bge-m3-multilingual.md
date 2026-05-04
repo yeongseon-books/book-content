@@ -100,9 +100,13 @@ query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.
 
 ![핵심 흐름](../../../assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
 
+*핵심 흐름*
+
 ## 왜 dense baseline부터 시작할까
 
 ![dense baseline을 기준선으로 잡는 측정 흐름](../../../assets/korean-ai-stack-101/03/03-01-dense.ko.png)
+
+*dense baseline을 기준선으로 잡는 측정 흐름*
 
 BGE-M3가 dense·sparse·multi-vector를 한꺼번에 내놓는다고 해서 처음부터 셋을 합산할 필요는 없습니다. dense baseline 한 가지만으로 KoSimCSE 대비 얼마나 좋아지는지 측정해 두지 않으면, 나중에 sparse를 더했을 때 그 개선이 sparse 덕분인지 dense 덕분인지 구분할 수 없습니다. 가장 단순한 dense + IndexFlatIP 조합으로 Recall@5를 한 번 찍어 두는 일이 모든 후속 실험의 기준선이 됩니다.
 
@@ -144,6 +148,8 @@ print('dim =', embeddings.shape[1])  # 1024
 ### 3단계 — 한국어 쿼리로 영어+한국어 문서 검색
 
 ![최소 실행 예제](../../../assets/korean-ai-stack-101/03/03-02-diagram.ko.png)
+
+*최소 실행 예제*
 
 ```python
 query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.'
@@ -193,6 +199,8 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 
 ![이 코드에서 봐야 할 것](../../../assets/korean-ai-stack-101/03/03-03-diagram-2.ko.png)
 
+*이 코드에서 봐야 할 것*
+
 - 코퍼스에 영어와 한국어가 섞여 있어도 **한 모델로 같이 인코딩**합니다. 언어별 모델을 따로 두는 옛 패턴은 BGE-M3에서 필요 없습니다.
 - 정답 문서의 언어를 일부러 섞어 둔 test case가 다국어 retrieval의 진짜 성능을 드러냅니다.
 - 차원이 1024라서 KoSimCSE보다 메모리·속도 비용이 큽니다. 캐싱과 배치 인코딩이 더 중요해집니다.
@@ -201,6 +209,8 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 ## 자주 하는 실수
 
 ![실무에서 헷갈리는 지점](../../../assets/korean-ai-stack-101/03/03-04-diagram-3.ko.png)
+
+*실무에서 헷갈리는 지점*
 
 - **정규화 누락** — `normalize_embeddings=True` 없이 `IndexFlatIP`를 쓰면 dense 벡터 길이의 차이가 점수를 지배합니다.
 - **언어 분리 인덱스** — 한국어용 인덱스, 영어용 인덱스를 따로 두면 BGE-M3의 다국어 정렬 효과가 사라집니다. 같은 인덱스에 같이 넣어야 합니다.

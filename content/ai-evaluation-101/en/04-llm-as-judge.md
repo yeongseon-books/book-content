@@ -27,9 +27,13 @@ When humans cannot grade every response, you can delegate scoring to a strong LL
 
 ---
 ![LLM-as-Judge - evaluating models with models](../../../assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png)
+
+*LLM-as-Judge - evaluating models with models*
 ## Why LLM-as-Judge
 
 ![Why LLM-as-Judge](../../../assets/ai-evaluation-101/04/04-02-why-llm-as-judge.en.png)
+
+*Why LLM-as-Judge*
 The deterministic metrics from Ep3 (BLEU, ROUGE, Exact Match) work well only when the answer is short and unambiguous. Real LLM outputs are often the opposite:
 
 - Free-form answers with many valid responses (e.g. "Explain this code")
@@ -49,6 +53,8 @@ LLM-as-judge **delegates scoring to a strong LLM** (GPT-4, Claude Opus, etc.). I
 ## Judge Prompt Design — Three Patterns
 
 ![Judge prompt design - three patterns](../../../assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.en.png)
+
+*Judge prompt design - three patterns*
 ### Pattern 1: Single scoring (1-5 scale)
 
 The simplest approach. Show the judge one response and ask for a score.
@@ -155,6 +161,8 @@ Write a one-sentence reasoning, then output only 'Result: PASS' or 'Result: FAIL
 ## Three Biases and How to Control Them
 
 ![Three biases and how to control them](../../../assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.en.png)
+
+*Three biases and how to control them*
 LLM judges are biased differently from humans. You must understand these three.
 
 ### Bias 1: Position bias
@@ -195,6 +203,8 @@ When GPT-4 grades GPT-4 outputs, it prefers them over outputs from other model f
 ## Measuring Agreement With Humans — Cohen's Kappa
 
 ![Measuring agreement with humans - Cohen's kappa](../../../assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.en.png)
+
+*Measuring agreement with humans - Cohen's kappa*
 How do you know the judge is trustworthy? **Compare 50-100 human-graded samples to the judge scores** and measure agreement. Plain accuracy (percentage agreement) does not correct for chance, so use **Cohen's kappa**.
 
 ```python

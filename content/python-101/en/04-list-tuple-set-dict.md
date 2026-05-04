@@ -58,6 +58,8 @@ This chapter consolidates the four collections onto a single page so the next ch
 Group the four collections along three axes — mutability, order, and hashability — and they sit cleanly in memory.
 
 ![Mental model](../../../assets/python-101/04/04-01-mental-model.en.png)
+
+*Mental model*
 Three rules carry most of the weight.
 
 1. **Mutable (list, dict, set)** can be changed in place after creation; **immutable (tuple, str, int)** cannot.

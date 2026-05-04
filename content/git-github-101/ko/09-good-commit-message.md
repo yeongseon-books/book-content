@@ -53,6 +53,8 @@ Code review에서도 차이가 납니다. PR 제목·본문이 비어 있어도 
 좋은 commit message는 정해진 골격을 가집니다.
 
 ![Mental Model](../../../assets/git-github-101/09/09-01-mental-model.ko.png)
+
+*Mental Model*
 핵심은 세 가지입니다. 첫째, subject는 짧고 명령형(imperative)으로 씁니다. 둘째, body가 필요하면 빈 줄 한 칸을 띄우고 "왜"를 적습니다. 셋째, footer로 issue 번호나 breaking change를 명시합니다.
 
 ## 핵심 개념

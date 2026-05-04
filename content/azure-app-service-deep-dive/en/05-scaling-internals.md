@@ -63,6 +63,8 @@ The goal is to map the **publicly observable scale-decision loop** into a usable
 ## The control path in one diagram
 
 ![Autoscale control path to new workers](../../../assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png)
+
+*Autoscale control path to new workers*
 Two things matter here.
 
 1. separate the decision engine from the execution substrate
@@ -76,6 +78,8 @@ followed by App Service making more worker capacity available to that plan.
 ## What scale up and scale out actually change
 
 ![Targets changed by scale up and scale out](../../../assets/azure-app-service-deep-dive/05/05-02-what-scale-up-and-scale-out-actually-cha.en.png)
+
+*Targets changed by scale up and scale out*
 The Learn documentation states the difference plainly.
 
 - **Scale up**: move to a larger tier or SKU with more CPU, memory, or features
@@ -97,6 +101,8 @@ Even if you enter autoscale from an app-centric portal experience,
 the real target resource is the **App Service Plan**.
 
 ![Autoscale rules attached to the plan](../../../assets/azure-app-service-deep-dive/05/05-03-autoscale-attaches-to-the-plan-not-the-a.en.png)
+
+*Autoscale rules attached to the plan*
 That structure has consequences.
 If several apps share the same plan,
 one app's burst can drive plan-level scaling,
@@ -116,6 +122,8 @@ The Azure Monitor autoscale documentation is explicit about the rule engine.
 - scale-in requires all scale-in rules to be met
 
 ![Autoscale loop with metrics and cooldown](../../../assets/azure-app-service-deep-dive/05/05-04-what-azure-monitor-autoscale-actually-do.en.png)
+
+*Autoscale loop with metrics and cooldown*
 That logic matters operationally.
 Scale-out behaves like OR.
 Scale-in behaves like AND.
@@ -186,6 +194,8 @@ They still support a sound mental model.
 4. the Front-End starts sending traffic to the new healthy workers
 
 ![Desired instance count becoming new workers](../../../assets/azure-app-service-deep-dive/05/05-05-what-adding-a-worker-means-in-practice.en.png)
+
+*Desired instance count becoming new workers*
 That is as far as you need to go without drifting into undocumented internals.
 
 ---
@@ -196,6 +206,8 @@ Autoscale is reactive,
 not predictive.
 
 ![Scaling feedback loop with lag and cooldown](../../../assets/azure-app-service-deep-dive/05/05-06-why-autoscale-should-be-read-as-a-feedba.en.png)
+
+*Scaling feedback loop with lag and cooldown*
 That is why predictable spikes are safer with pre-scaling.
 Metrics need time to accumulate.
 Rules need time to evaluate.
@@ -216,6 +228,8 @@ From the Front-End's perspective,
 the worker must first become eligible.
 
 ![New worker entering the healthy pool](../../../assets/azure-app-service-deep-dive/05/05-07-health-and-readiness-are-the-real-end-of.en.png)
+
+*New worker entering the healthy pool*
 So the real end of scale-out is not the new instance count on paper.
 It is the moment the new worker enters the healthy routing pool.
 

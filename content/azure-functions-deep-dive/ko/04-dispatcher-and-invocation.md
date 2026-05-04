@@ -51,6 +51,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 먼저 한 호출의 전체 경로를 한 화면에 그리고 시작하겠습니다.
 
 ![트리거 호출이 워커에 닿는 경로](../../../assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.ko.png)
+
+*트리거 호출이 워커에 닿는 경로*
 이 그림이 4화의 전부입니다. 이제 각 단계를 코드로 봅니다.
 
 ---
@@ -220,6 +222,8 @@ gRPC stream
 다만 **logging이나 같은 함수에 대한 일부 메시지 순서**는 지켜져야 할 때가 있습니다. 그래서 [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs)가 존재합니다 — invocation 단위로 메시지 순서를 보장하면서도 invocation 사이의 병렬성은 유지합니다.
 
 ![한 워커의 동시 호출 처리 구조](../../../assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.ko.png)
+
+*한 워커의 동시 호출 처리 구조*
 같은 `invocation_id`의 메시지들은 도착 순서대로 처리되지만, 서로 다른 `invocation_id`들은 병렬로 처리됩니다.
 
 ---

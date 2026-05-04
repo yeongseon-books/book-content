@@ -37,6 +37,8 @@ This post covers five things:
 - comparing the wrapper to the raw `SentenceTransformer` API
 
 ![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
+
+*Single query embedding call flow*
 <!-- ebook-only:start -->
 
 **The key idea**: HuggingFace embeddings run locally for free. `sentence-transformers` downloads the model and returns vectors.
@@ -73,6 +75,8 @@ pip install langchain-community sentence-transformers numpy
 ## First embedding
 
 ![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-first-embedding.en.png)
+
+*Single query embedding call flow*
 Initialize the model and encode a single sentence.
 
 ```python
@@ -120,6 +124,8 @@ first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
 ## Batch embedding
 
 ![Single call and batch call contrast](../../../assets/vector-search-101/02/02-02-batch-embedding.en.png)
+
+*Single call and batch call contrast*
 For multiple documents, a single `embed_documents()` call outperforms a loop of `embed_query()` calls. The model processes inputs in batches internally, and the overhead of repeated setup adds up fast.
 
 ```python
@@ -166,6 +172,8 @@ The gap between batch and loop grows with document count. For large corpora, alw
 ## Saving and reloading vectors
 
 ![Vector and document save flow](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
+
+*Vector and document save flow*
 Recomputing embeddings for the same documents on every run wastes time. Save the matrix once and reload it.
 
 ```python
@@ -253,6 +261,8 @@ Post 4 uses exactly this pattern to build a working FAISS search system.
 ## Practical speed tips
 
 ![Model reuse and batch size path](../../../assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
+
+*Model reuse and batch size path*
 CPU encoding is slow at scale. Several adjustments help.
 
 **Increase batch size.** The default is 32. If memory allows, bumping to 64 or 128 reduces overhead.
@@ -286,6 +296,8 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 ## Comparing wrapper and raw API
 
 ![Wrapper and raw API comparison structure](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
+
+*Wrapper and raw API comparison structure*
 `HuggingFaceEmbeddings` wraps `SentenceTransformer`. Their outputs are numerically identical.
 
 ```python

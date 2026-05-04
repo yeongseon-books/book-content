@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
 > A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.
 
 ![Questions this post answers](../../../assets/rag-deep-dive/03/03-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (3/6)
@@ -127,6 +129,8 @@ In LangChain 0.2.17, the foundational retriever interface is `langchain_core.ret
 
 ![Invoke path into retriever callbacks](../../../assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
 
+*Invoke path into retriever callbacks*
+
 `invoke()` is worth reading line by line. It starts with `ensure_config(config)`, then builds a `CallbackManager` through `CallbackManager.configure(...)`. At that stage LangChain merges together several sources of execution metadata: callbacks from the run config, retriever-level tags and metadata, config-level tags and metadata, and the tracing payload from `_get_ls_params()`. After that, `callback_manager.on_retriever_start(...)` creates a `run_manager`. Only then does the retriever call the implementation hook that actually performs retrieval.
 
 That implementation hook is `_get_relevant_documents()`. If the subclass supports the newer signature, `invoke()` passes in `run_manager`. Success triggers `run_manager.on_retriever_end(result)`, and failure triggers `run_manager.on_retriever_error(e)`. So retrieval is executed as a traced run, not as an unstructured helper call.
@@ -182,6 +186,8 @@ The baseline here is straightforward: `BaseRetriever` is not merely a semantic c
 `VectorStoreRetriever` is the default adapter that turns a vector store into a retriever. Its implementation is short, but the shortness is deceptive. The class stores two policy fields, `search_type` and `search_kwargs`, and its `_get_relevant_documents()` method dispatches to different vector-store methods based on those settings. Retrieval quality is therefore shaped at this adapter boundary before it reaches FAISS or any other backend.
 
 ![Search type dispatch and parameters](../../../assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.en.png)
+
+*Search type dispatch and parameters*
 
 The allowed search types are explicitly enumerated:
 
@@ -254,6 +260,8 @@ MMR exists to counter one of the most common retrieval failure modes: a top-k li
 
 ![MMR candidate expansion and selection](../../../assets/rag-deep-dive/03/03-03-mmr-selection-flow.en.png)
 
+*MMR candidate expansion and selection*
+
 The FAISS path is easy to trace in source. `max_marginal_relevance_search()` embeds the query and hands the vector to `max_marginal_relevance_search_by_vector()`. That method then delegates to `max_marginal_relevance_search_with_score_by_vector()`, which performs the actual backend search. The implementation first calls `self.index.search(...)` to fetch `fetch_k` candidates. If a metadata filter is present, FAISS doubles the raw fetch width to `fetch_k * 2` before filtering because some candidates may be discarded later. Then it reconstructs each candidate vector with `self.index.reconstruct(int(i))` and passes those vectors into `maximal_marginal_relevance(...)`.
 
 The MMR core that FAISS actually calls lives in `langchain_community.vectorstores.utils.maximal_marginal_relevance()`. A near-identical copy also exists under `langchain_core.vectorstores.utils`, but in 0.2.17 the FAISS path imports and uses the community version. The function computes cosine similarity between the query and the candidate set, picks the single most query-similar candidate first, and then grows the result greedily. For every remaining candidate it computes:
@@ -319,6 +327,8 @@ Threshold retrieval sounds simple until you ask what the threshold is actually a
 
 ![Distance values becoming relevance scores](../../../assets/rag-deep-dive/03/03-04-threshold-score-conversion.en.png)
 
+*Distance values becoming relevance scores*
+
 When `VectorStoreRetriever` uses `search_type="similarity_score_threshold"`, it calls `vectorstore.similarity_search_with_relevance_scores(...)`. That method does not expose the backend's raw score semantics directly. Instead it calls `_similarity_search_with_relevance_scores()`, which obtains raw `(doc, score)` pairs from `similarity_search_with_score()`, then transforms each raw score through `_select_relevance_score_fn()`. Only after that transformation does it apply `score_threshold`, keeping results whose normalized relevance score is greater than or equal to the threshold.
 
 FAISS defines the fallback behavior explicitly. `_select_relevance_score_fn()` first respects any override supplied to the constructor. If none is set, it chooses a default from `distance_strategy`: max inner product, Euclidean distance, or cosine. So “no relevance score function set” does not mean “no conversion happens.” It means the vector store falls back to its built-in mapping.
@@ -373,6 +383,8 @@ So the lesson is not just that L2 is a distance. It is that threshold retrieval 
 `VectorStoreRetriever` is a solid default, but it is not always the right boundary for retrieval policy. Sometimes the real requirement is to narrow the search space before vector search begins. A common example is source scoping. If the application already knows the user should only search documents from one source, tenant, or repository, then searching a global index and discarding cross-source results afterward is structurally wasteful.
 
 ![Source-filtered routing before vector search](../../../assets/rag-deep-dive/03/03-05-custom-source-retriever.en.png)
+
+*Source-filtered routing before vector search*
 
 This is easy to miss because FAISS does support metadata filtering in LangChain. But if you read the implementation closely, filtering is not truly pre-search in the flat-index path. Similarity search first retrieves candidates from the index and then applies the metadata filter in Python. In MMR mode it may fetch even more candidates first, using `fetch_k * 2` when a filter is present, because some results may be discarded later. That means a strong metadata constraint can still force a broad vector search before most of the candidates are thrown away.
 

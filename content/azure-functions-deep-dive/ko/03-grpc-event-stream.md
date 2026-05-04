@@ -206,6 +206,8 @@ message FunctionLoadRequest {
 ### 한 화면으로
 
 ![워커 생애주기의 공통 프로토콜 흐름](../../../assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
+
+*워커 생애주기의 공통 프로토콜 흐름*
 이 시퀀스가 **모든 워커의 일생**입니다. Node 워커도, Python 워커도, Java 워커도 똑같습니다. 언어별로 다른 건 워커 측의 구현 상세이고, **프로토콜은 단일**입니다.
 
 ---
@@ -263,6 +265,8 @@ message FunctionLoadRequest {
 즉 `FunctionRpcService`는 호스트 쪽 gRPC 서버이면서, 동시에 **워커별 채널과 실제 gRPC 스트림 사이를 펌프하는 중계기**입니다.
 
 ![워커별 채널 쌍과 gRPC 펌프 구조](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
+
+*워커별 채널 쌍과 gRPC 펌프 구조*
 `IScriptEventManager`는 이 채널들을 워커 ID로 보관하고 찾는 상태 저장소로 쓰입니다. `InboundGrpcEvent`와 `OutboundGrpcEvent` 같은 래퍼 타입도 실제로 존재합니다. 다만 함수 호출 메시지의 핵심 경로를 설명할 때는, 그것들을 범용 pub-sub 버스라고 이해하기보다 **워커별 큐와 펌프 구조**로 보는 쪽이 코드와 더 가깝습니다.
 
 ---

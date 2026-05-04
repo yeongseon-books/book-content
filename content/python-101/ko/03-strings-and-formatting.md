@@ -64,6 +64,8 @@ seo_description: Python 3에서 str은 "Unicode 코드포인트의 불변 시퀀
 Python의 `str`은 "코드 포인트의 시퀀스"입니다. 사람이 읽는 글자 단위로 추상화돼 있고, 디스크나 네트워크에 나갈 때만 `bytes`로 인코딩됩니다.
 
 ![Mental Model](../../../assets/python-101/03/03-01-mental-model.ko.png)
+
+*Mental Model*
 핵심 규칙 세 가지를 외워 두면 대부분의 혼란이 사라집니다.
 
 1. **`str`은 Unicode 코드 포인트의 시퀀스입니다.** 인코딩 정보를 갖지 않습니다.

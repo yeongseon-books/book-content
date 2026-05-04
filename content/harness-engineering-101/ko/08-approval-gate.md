@@ -27,9 +27,13 @@ seo_description: 어떤 행동은 자동으로 실행되어서는 안 됩니다.
 ---
 
 ![Approval Gate - 사람 승인이 필요한 지점 설계하기](../../../assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.ko.png)
+
+*Approval Gate - 사람 승인이 필요한 지점 설계하기*
 ## Approval Gate란 무엇인가요?
 
 ![Approval Gate란 무엇인가요](../../../assets/harness-engineering-101/08/08-02-what-is-an-approval-gate.ko.png)
+
+*Approval Gate란 무엇인가요*
 Approval Gate는 에이전트가 특정 행동을 실행하기 직전에 사람의 승인을 요구하는 지점입니다. 자동화된 흐름을 일시적으로 멈추고, 결정 권한을 사람에게 넘긴 뒤, 사람의 응답을 받아 다시 진행하거나 중단합니다.
 
 ```python
@@ -79,6 +83,8 @@ def needs_approval(action_type: str, payload: dict, confidence: float) -> bool:
 ## Approval Workflow 설계하기
 
 ![Approval Workflow 설계하기](../../../assets/harness-engineering-101/08/08-03-designing-the-approval-workflow.ko.png)
+
+*Approval Workflow 설계하기*
 승인 흐름은 4단계로 구성됩니다.
 
 ```python
@@ -125,6 +131,8 @@ class ApprovalWorkflow:
 ## Dry-run vs Commit 분리
 
 ![Dry-run vs Commit 분리](../../../assets/harness-engineering-101/08/08-04-separating-dry-run-from-commit.ko.png)
+
+*Dry-run vs Commit 분리*
 승인 요청 자체에 "실행될 결과의 미리보기"를 함께 보여주면 사람이 훨씬 정확하게 결정할 수 있습니다. Dry-run은 실제 부수효과 없이 결과만 계산하는 모드입니다.
 
 ```python

@@ -75,6 +75,8 @@ Apps inside the same environment can share:
 Apps outside the environment do not automatically share those things.
 
 ![Environment-scoped isolation and shared planes](../../../assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.en.png)
+
+*Environment-scoped isolation and shared planes*
 The operational consequence is straightforward.
 If two apps belong to the same blast radius and observability plane, one environment can make sense.
 If they require hard separation of network, logging, or Dapr configuration, split them.
@@ -93,6 +95,8 @@ That is why internal service reachability and ingress posture are environment de
 The clean way to think about it is a layered boundary.
 
 ![Per-app ingress choices inside one environment](../../../assets/azure-aca-deep-dive/02/02-02-network-scope-begins-at-the-environment.en.png)
+
+*Per-app ingress choices inside one environment*
 You can turn ingress on or off per app.
 You can choose external or internal ingress per app.
 But those app decisions still live inside one environment-wide network perimeter.
@@ -110,6 +114,8 @@ That sounds app-local, and it is.
 But it is not environment-free.
 
 ![External and internal ingress within one environment](../../../assets/azure-aca-deep-dive/02/02-03-external-versus-internal-ingress-still-s.en.png)
+
+*External and internal ingress within one environment*
 In a microservice setup, the common pattern is one public-facing app with external ingress, then one or more internal apps with internal ingress only.
 All of them still live on the same environment network plane.
 
@@ -149,6 +155,8 @@ The shared observability plane typically includes:
 - System-level events and metrics exported into the workspace path.
 
 ![Environment-level shared observability boundary](../../../assets/azure-aca-deep-dive/02/02-04-observability-is-centralized-at-the-envi.en.png)
+
+*Environment-level shared observability boundary*
 That model is convenient because one workspace can answer questions across multiple services.
 It is also a governance decision.
 If a team or workload requires separate telemetry retention, access control, or cost accounting, an environment split may be the cleaner boundary.
@@ -165,6 +173,8 @@ The environment decides where logs go.
 The app, revision, sidecar, and ingress path decide what gets emitted.
 
 ![Shared workspace and per-runtime signal sources](../../../assets/azure-aca-deep-dive/02/02-05-shared-logs-do-not-mean-all-signals-are.en.png)
+
+*Shared workspace and per-runtime signal sources*
 So the environment is the collector boundary.
 The runtime units are still the producers.
 
@@ -185,6 +195,8 @@ That means there are two separate questions every time you see a component.
 2. Which Dapr-enabled apps inside that environment are allowed to load it?
 
 ![Environment-scoped components and app-level consumers](../../../assets/azure-aca-deep-dive/02/02-06-dapr-components-are-environment-resource.en.png)
+
+*Environment-scoped components and app-level consumers*
 That is a strong clue about how to model shared infrastructure.
 If several apps in one environment should reuse the same pub/sub or state store component, the environment is the natural home.
 If the component boundary itself should split with team or trust boundary changes, the environment often has to split too.
@@ -199,6 +211,8 @@ The Dapr components documentation is explicit that scopes correspond to Dapr app
 That is an important distinction because the app's Azure resource identity and its Dapr identity are related but not identical concepts.
 
 ![Dapr app ID to component scope mapping](../../../assets/azure-aca-deep-dive/02/02-07-scope-means-dapr-app-id-not-container-ap.en.png)
+
+*Dapr app ID to component scope mapping*
 If a component does not load where you expect, this mapping is one of the first things to verify.
 
 The environment contains the component definition.
@@ -232,6 +246,8 @@ That sentence has a converse.
 If two services should not share the built-in Dapr communication plane, putting them in different environments gives you a clean separation.
 
 ![Cross-app Dapr calls inside one environment](../../../assets/azure-aca-deep-dive/02/02-08-cross-app-dapr-communication-only-makes.en.png)
+
+*Cross-app Dapr calls inside one environment*
 This is less about whether cross-environment workarounds exist and more about what the product treats as its native trust and networking shape.
 
 ---
@@ -265,6 +281,8 @@ The difference is where you draw the product boundary around your apps.
 Environment scoping is easiest to see when drawn as control loops.
 
 ![Shared control loops terminating at environment boundary](../../../assets/azure-aca-deep-dive/02/02-09-control-loops-that-terminate-at-the-envi.en.png)
+
+*Shared control loops terminating at environment boundary*
 Notice what is not in that loop.
 There is no single revision node in the center.
 The environment distributes constraints to many apps at once.

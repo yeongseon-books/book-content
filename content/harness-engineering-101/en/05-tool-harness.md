@@ -28,6 +28,8 @@ Tools are the hands and feet of an agent. Poorly designed tools can corrupt data
 ---
 
 ![Tool harness - designing safe tools for agents](../../../assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png)
+
+*Tool harness - designing safe tools for agents*
 ## Tools Are an Agent's Hands and Feet
 
 Tools determine what an agent can do. Without tools, an agent is just a text-generating model. DB queries, file writes, API calls, code execution — all are tools. The agent's range of action is exactly the range of its tools.
@@ -41,6 +43,8 @@ Tool Harness is the principle of designing tools that are safe and predictable f
 ## Five Principles of a Good Tool
 
 ![Five principles of a good tool](../../../assets/harness-engineering-101/05/05-02-five-principles-of-a-good-tool.en.png)
+
+*Five principles of a good tool*
 Five rules to follow when designing a tool.
 
 **1. Single responsibility**: one tool does one thing. Not `manage_user`, but `create_user`, `delete_user`, `update_user_email`.
@@ -127,6 +131,8 @@ Schemas like this have two effects. First, the agent is less likely to construct
 ## The Idempotency Key Pattern
 
 ![The idempotency key pattern](../../../assets/harness-engineering-101/05/05-03-the-idempotency-key-pattern.en.png)
+
+*The idempotency key pattern*
 Agents retry often — network errors, timeouts, "couldn't confirm" cases all lead to repeating the same tool call. Non-idempotent tools then run twice and cause incidents.
 
 The fix is the idempotency key. The agent sends a unique key per call, and the server refuses to execute the same key twice.
@@ -233,6 +239,8 @@ The `retryable` flag matters. On `retryable=False`, the agent immediately tries 
 ## Sandboxing Dangerous Tools
 
 ![Sandboxing dangerous tools](../../../assets/harness-engineering-101/05/05-04-sandboxing-dangerous-tools.en.png)
+
+*Sandboxing dangerous tools*
 Code execution, filesystem access, and arbitrary shell commands are extremely powerful and extremely dangerous. These tools must not be exposed without sandboxing.
 
 Three isolation techniques.

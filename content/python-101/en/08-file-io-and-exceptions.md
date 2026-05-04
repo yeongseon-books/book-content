@@ -49,6 +49,8 @@ The `with` statement and narrow `except` clauses are the simplest tools for avoi
 The diagram below shows the flow that runs whenever you open a file and do work with it.
 
 ![Mental model](../../../assets/python-101/08/08-01-mental-model.en.png)
+
+*Mental model*
 Two ideas hold this together.
 
 - **`with` calls `__exit__` on both normal exit and exception exit, so the handle is closed in both cases.** That removes most of the need to write `try`/`finally` and call `close()` by hand.

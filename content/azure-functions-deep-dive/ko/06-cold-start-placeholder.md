@@ -49,6 +49,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 먼저 새 인스턴스 하나가 처음부터 함수를 실행할 준비가 될 때까지 어떤 단계들을 거치는지 정리하겠습니다.
 
 ![공통 부트스트랩과 사용자 단계 분해](../../../assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)
+
+*공통 부트스트랩과 사용자 단계 분해*
 1번부터 5번까지(VM 할당 ~ DI 컨테이너 빌드)는 **사용자 코드와 무관**합니다. 누구의 함수든 똑같이 거치는 단계입니다. 6번부터(코드 다운로드)부터 사용자별로 달라집니다.
 
 Placeholder Mode의 아이디어는 정확히 이 분리를 이용합니다.
@@ -355,6 +357,8 @@ if (Interlocked.CompareExchange(ref _specialized, 1, 0) == 0)
 지금까지 본 것을 한 장의 sequence diagram으로 정리하겠습니다.
 
 ![placeholder에서 실행까지 인스턴스 생애주기](../../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.ko.png)
+
+*placeholder에서 실행까지 인스턴스 생애주기*
 ---
 
 ## 플랜별로 콜드 스타트가 다른 이유

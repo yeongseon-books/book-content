@@ -26,6 +26,8 @@ seo_description: 'The data flow of an end-to-end evaluation:'
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - How do you actually compute `Faithfulness` and `AnswerRelevancy` with ragas 0.1.22?
 - How do you wire a LangChain LLM and embedding model into the RAGAS evaluator?
 - What dataset shape do you need when measuring **answer quality**, not retrieval?
@@ -94,6 +96,8 @@ Faithfulness rising from 0.78 to 0.91 is direct evidence that hallucinations dro
 
 ![Dataset structure for end-to-end evaluation](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
 
+*Dataset structure for end-to-end evaluation*
+
 ```python
 from datasets import Dataset
 
@@ -116,6 +120,8 @@ dataset = Dataset.from_list(samples)
 ### Step 2 — Wire LLM and embeddings via wrappers
 
 ![Wrapper path into the RAGAS evaluator](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.en.png)
+
+*Wrapper path into the RAGAS evaluator*
 
 ```python
 from langchain_groq import ChatGroq
@@ -159,6 +165,8 @@ python3 main.py
 
 ![Reading retrieval and generation failure separately](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.en.png)
 
+*Reading retrieval and generation failure separately*
+
 | Faithfulness | Answer Relevancy | Diagnosis |
 | --- | --- | --- |
 | Low | Low | Retrieval pulled irrelevant docs, or the LLM ignored context |
@@ -179,6 +187,8 @@ The "Low / High" cell is the system confidently giving wrong answers. Make it th
 ## In production
 
 ![Verification flow before metric execution](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png)
+
+*Verification flow before metric execution*
 
 - **Eval dataset size**: start at 30–50 questions. Stabilize, then grow to 200–500. Beyond ~1,000 cost and time become painful.
 - **Sampling**: stratified 50 on every PR, full set in a nightly job.

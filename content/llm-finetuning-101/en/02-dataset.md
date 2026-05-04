@@ -26,6 +26,8 @@ seo_description: 'Treat the dataset as three layers:'
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - How should we shape the three fields instruction / input / output?
 - How do we read a small JSONL file directly with Hugging Face datasets?
 - What minimum verification points must we hit during preprocessing?
@@ -94,9 +96,13 @@ The prompt prefix (everything up to `### Response:`) is masked to -100; only the
 
 ![Three layers of dataset preparation](../../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
 
+*Three layers of dataset preparation*
+
 Fine-tuning data is usually three layers: **raw samples**, **template-applied text**, and **tokenized tensors**. Separating them is what lets you isolate filtering issues from token-length issues.
 
 ![Three layers of dataset preparation](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
+
+*Three layers of dataset preparation*
 
 ## Step-by-step walkthrough
 
@@ -172,6 +178,8 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ![Format checking and length verification flow](../../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.en.png)
 
+*Format checking and length verification flow*
+
 - `datasets.load_dataset()` mimics the JSONL shape you typically receive in production.
 - Splitting templating from tokenization makes it easy to swap a model-specific chat template later.
 - The example fixes `padding="max_length"` and `max_length=64` so length stats are visible even in a tiny exercise.
@@ -180,6 +188,8 @@ print(len(tokenized[0]["input_ids"]))   # 64
 ## Common mistakes
 
 ![Deduplication and split decision flow](../../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.en.png)
+
+*Deduplication and split decision flow*
 
 - **Assuming more data is always better** — Duplicate answers or mixed formats break small models faster. 500 consistent samples almost always beat 5,000 noisy ones for LoRA.
 - **Not building `labels` at the dataset stage** — That is fine. The collator in post 4 builds them while masking the prompt to -100.

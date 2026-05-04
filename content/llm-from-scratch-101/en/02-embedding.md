@@ -88,6 +88,8 @@ This separation is quite useful in practice. Token meanings are reused across th
 The original Transformer paper used sine and cosine functions for positional encoding. Calculating coordinates with functions allows for easier generalization to different sequence lengths. However, many GPT-style models use learned positional embeddings, which is what we'll use in this series. It's concise and easier to visualize in smaller models.
 
 ![Differences between sinusoidal and learned positional embeddings](../../../assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.en.png)
+
+*Differences between sinusoidal and learned positional embeddings*
 The structure simply carries both "what character" and "which position" information within a single token vector.
 
 ## Token Vector = token_emb + pos_emb

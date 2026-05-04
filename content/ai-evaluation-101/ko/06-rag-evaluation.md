@@ -26,9 +26,13 @@ RAG는 retrieval과 generation 두 단계 모두를 평가해야 합니다. 이 
 
 ---
 ![RAG 시스템 평가하기](../../../assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.ko.png)
+
+*RAG 시스템 평가하기*
 ## RAG는 단일 모델이 아니라 파이프라인입니다
 
 ![RAG는 단일 모델이 아니라 파이프라인](../../../assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.ko.png)
+
+*RAG는 단일 모델이 아니라 파이프라인*
 RAG(Retrieval-Augmented Generation)는 두 단계로 동작합니다.
 
 ```
@@ -48,6 +52,8 @@ RAG(Retrieval-Augmented Generation)는 두 단계로 동작합니다.
 ## RAG 4대 메트릭
 
 ![RAG 4대 메트릭](../../../assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.ko.png)
+
+*RAG 4대 메트릭*
 업계 표준은 다음 4가지입니다 (RAGAS, TruLens 등이 채택).
 
 | 단계 | 메트릭 | 무엇을 묻는가 |
@@ -64,6 +70,8 @@ RAG(Retrieval-Augmented Generation)는 두 단계로 동작합니다.
 ## Retrieval 평가
 
 ![Retrieval 평가](../../../assets/ai-evaluation-101/06/06-04-evaluating-retrieval.ko.png)
+
+*Retrieval 평가*
 ### Context Recall — 필요한 정보가 검색됐는가
 
 정답을 만들 때 **반드시 알아야 하는 사실(claim)**들이 검색된 context에 모두 있는지 확인합니다.
@@ -149,6 +157,8 @@ def context_precision(question: str, chunks: list[str]) -> float:
 ## Generation 평가
 
 ![Generation 평가](../../../assets/ai-evaluation-101/06/06-05-evaluating-generation.ko.png)
+
+*Generation 평가*
 ### Faithfulness — Hallucination 탐지
 
 답변의 모든 주장이 검색된 context로 **뒷받침되는지** 확인합니다. Context에 없는 사실을 말하면 hallucination입니다.

@@ -32,6 +32,8 @@ seo_description: The essence of a multi-format pipeline is forcing varied inputs
 Example code: `/root/Github/document-ingestion-101/en/05-multi-format-pipeline/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 Real ingestion systems rarely deal with PDFs alone. Operational notes may be TXT, team runbooks may be Markdown, and external reports may be PDF.
 
 This example reads three formats separately but emits the same `Document` structure for all of them. That keeps later chunking and indexing stages format-agnostic.
@@ -39,11 +41,15 @@ This example reads three formats separately but emits the same `Document` struct
 ## Loader routing by file format
 
 ![Loader routing by file format](../../../assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png)
+
+*Loader routing by file format*
 The first step in a multi-format pipeline is centralizing routing so later stages do not need to rediscover file type.
 
 ## Format-specific preprocessing
 
 ![Format-specific preprocessing branches](../../../assets/document-ingestion-101/05/05-02-format-specific-preprocessing.en.png)
+
+*Format-specific preprocessing branches*
 Preprocessing can differ by source format as long as the final output converges on one body-text contract.
 
 ## Runnable example
@@ -133,6 +139,8 @@ source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 ### Shared Document contract schema
 
 ![Shared Document contract schema](../../../assets/document-ingestion-101/05/05-01-shared-document-contract-schema.en.png)
+
+*Shared Document contract schema*
 Once `page_content`, `source`, and `format` are normalized, later stages can stay format-agnostic much longer.
 
 - `load_document()` centralizes extension routing in one place.
@@ -144,6 +152,8 @@ Once `page_content`, `source`, and `format` are normalized, later stages can sta
 ### Error handling across file formats
 
 ![Format error handling fallback flow](../../../assets/document-ingestion-101/05/05-02-error-handling-across-file-formats.en.png)
+
+*Format error handling fallback flow*
 As the format count grows, explicit fallback paths matter more than pretending every loader fails the same way.
 
 - Supporting many formats is less about adding loaders and more about standardizing metadata keys.

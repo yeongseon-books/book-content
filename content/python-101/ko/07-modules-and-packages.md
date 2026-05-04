@@ -59,6 +59,8 @@ seo_description: Python에서 모듈은 "한 번 실행되면 캐시되는 names
 모듈은 "한 번 실행되어 namespace를 만드는 `.py` 파일"입니다. 패키지는 "그런 모듈들을 담는 디렉터리"입니다. `import`는 그 namespace를 현재 코드에 연결하는 동작입니다.
 
 ![Mental Model](../../../assets/python-101/07/07-01-mental-model.ko.png)
+
+*Mental Model*
 핵심은 두 가지입니다. 첫째, **모듈 코드는 처음 import될 때 위에서 아래로 한 번 실행됩니다**. 둘째, **그 결과 만들어진 namespace 객체가 캐시되어 재사용됩니다**. 두 번째 import는 파일을 다시 읽지 않고 캐시된 객체만 가져옵니다.
 
 ## 핵심 개념

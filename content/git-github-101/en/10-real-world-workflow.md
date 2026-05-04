@@ -45,6 +45,8 @@ When the loop becomes muscle memory, accidents drop. Force-pushing over a teamma
 A GitHub Flow cycle looks like this.
 
 ![Mental model](../../../assets/git-github-101/10/10-01-mental-model.en.png)
+
+*Mental model*
 The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.
 
 ## Core concepts

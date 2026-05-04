@@ -51,6 +51,8 @@ and Azure CNI Overlay keeps Pod IPs on a separate overlay CIDR while the VNet mo
 ## Put the three models side by side
 
 ![Comparison of three AKS network models](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
+
+*Comparison of three AKS network models*
 ---
 
 ## What CNI does
@@ -74,6 +76,8 @@ For 2026 AKS operations, the practical comparison is this:
 Pod Subnet and Node Subnet both preserve direct pod reachability from connected networks because Pod IPs still live in VNet space. Overlay conserves VNet IPs best, but direct inter-cluster pod-to-pod routing through native pod IPs is not the model there.
 
 ![IP path differences across three AKS network models](../../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.en.png)
+
+*IP path differences across three AKS network models*
 ---
 
 ## Where kubenet stands now

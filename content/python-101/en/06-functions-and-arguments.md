@@ -49,6 +49,8 @@ There is one more reason: the mutable default argument trap is one of the most c
 Lay the function signature out on a page, and the call-time rules line up in your head.
 
 ![Mental model](../../../assets/python-101/06/06-01-mental-model.en.png)
+
+*Mental model*
 Three rules carry most of the weight.
 
 1. **Arguments bind at call time and the body runs on top of that binding.** The signature is an interface that promises "this is the name and shape I will accept".

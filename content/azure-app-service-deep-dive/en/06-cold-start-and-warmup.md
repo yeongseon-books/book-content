@@ -55,6 +55,8 @@ or the new process or container has not finished becoming traffic-eligible.
 ## The cold path and the warm path
 
 ![First request waiting for a ready worker](../../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
+
+*First request waiting for a ready worker*
 That one diagram is the whole story.
 The cost the user feels on the first request is usually the cost of turning an execution unit from “not ready” into “ready.”
 
@@ -77,6 +79,8 @@ The mechanisms are not.
 - startup timeout is shaped by `WEBSITES_CONTAINER_START_TIME_LIMIT`
 
 ![Linux warm-up path and startup limit](../../../assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png)
+
+*Linux warm-up path and startup limit*
 You need that split in your head before you design a warm-up strategy.
 
 ---
@@ -94,6 +98,8 @@ that means:
 - worst-case first-request latency often improves
 
 ![Periodic pings reducing idle coldness](../../../assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png)
+
+*Periodic pings reducing idle coldness*
 Always On does not erase all startup cost.
 Redeployments,
 restarts,
@@ -115,6 +121,8 @@ Examples include:
 That is where IIS `applicationInitialization` matters.
 
 ![Extra warm-up path beyond the root ping](../../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
+
+*Extra warm-up path beyond the root ping*
 Endpoint design matters here.
 Return success too early and incomplete instances start receiving traffic.
 Make the endpoint too heavy and warm-up itself becomes a bottleneck.
@@ -131,6 +139,8 @@ The App Service app-settings reference gives the critical Linux startup contract
 - `WEBSITES_CONTAINER_START_TIME_LIMIT` bounds how long the platform waits
 
 ![Warm-up responses and startup timeout contract](../../../assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png)
+
+*Warm-up responses and startup timeout contract*
 That model creates two very common Linux mistakes.
 
 1. the app is not ready, but a permissive response still gets treated as readiness
@@ -150,6 +160,8 @@ The first-request cost is usually a stack of smaller costs.
 - health and warm-up eligibility gates
 
 ![Costs stacked inside a cold start](../../../assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png)
+
+*Costs stacked inside a cold start*
 That is why cold-start reduction is rarely a single magic setting.
 It is an app-platform contract problem.
 
@@ -181,6 +193,8 @@ you usually get one of two bad outcomes.
 Slots let the platform pay the cold-start cost off the production URL.
 
 ![Traffic switching after staging warm-up completes](../../../assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png)
+
+*Traffic switching after staging warm-up completes*
 That is the value proposition in one line.
 If staging workers have already booted and passed warm-up,
 production users are much less likely to experience that startup cost directly.
@@ -199,6 +213,8 @@ They do not do the same work.
 - **health check**: decide whether the instance should keep receiving traffic
 
 ![Different roles of Always On, warm-up, and health](../../../assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png)
+
+*Different roles of Always On, warm-up, and health*
 If you blur them together,
 the settings may be enabled while the behavior still looks wrong.
 That is where questions like “Always On is enabled, so why is deployment still slow?” come from.

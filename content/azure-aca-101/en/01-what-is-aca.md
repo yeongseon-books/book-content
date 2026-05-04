@@ -65,6 +65,8 @@ This diagram is the map for the whole series. Later posts zoom into each box.
 
 ![Ingress and app layout in one ACA environment](../../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
 
+*Ingress and app layout in one ACA environment*
+
 ## Core concept 1 — a one-sentence definition
 
 ACA is a **managed serverless container platform**. It runs on a Microsoft-operated Kubernetes foundation with KEDA-backed scaling, optional Dapr integration, and managed ingress baked in — but you never see or control the cluster itself.
@@ -156,6 +158,8 @@ The final output prints a `https://hello-aca.<unique>.azurecontainerapps.io` URL
 Walking through the simplest HTTP request makes the platform's responsibilities concrete.
 
 ![Client request flow to an active revision](../../../assets/azure-aca-101/01/01-02-the-path-of-one-request.en.png)
+
+*Client request flow to an active revision*
 
 What you decide:
 

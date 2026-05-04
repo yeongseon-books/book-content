@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 > RAG 체인은 질문에서 답변까지 이어지는 그래프이며, LCEL은 그 그래프의 각 경계를 바깥으로 끌어내는 조립 언어입니다.
 
 ![이 글에서 답할 질문](../../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive 시리즈 (5/6)
@@ -170,6 +172,8 @@ if __name__ == "__main__":
 
 ![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](../../../assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
 
+*RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
+
 이 클래스에서 가장 자주 쓰이던 생성 경로가 `from_chain_type()`입니다. 구현은 짧습니다. `chain_type`과 `chain_type_kwargs`를 받아 `load_qa_chain(llm, chain_type=chain_type, **kwargs)`를 호출하고, 그 결과를 `combine_documents_chain`에 넣은 뒤 자신을 생성합니다. 즉 `RetrievalQA`가 직접 `stuff`나 `map_reduce`를 구현하는 것은 아닙니다. 문서를 어떻게 합칠지는 `load_qa_chain()`에 위임하고, 자신은 retriever와 combine-documents 체인을 접착하는 얇은 래퍼에 가깝습니다.
 
 실제 분기는 `langchain/chains/question_answering/chain.py`의 `load_qa_chain()`에 있습니다. 0.2.17 소스를 보면 `loader_mapping`이 `"stuff"`, `"map_reduce"`, `"refine"`, `"map_rerank"` 네 가지를 지원합니다. 이 중에서 RAG 입문 문맥에서 가장 많이 언급되는 것은 `stuff`, `map_reduce`, `refine`입니다.
@@ -242,6 +246,8 @@ LCEL의 출발점은 `langchain_core.runnables.base.py`입니다. 여기서 `Run
 
 ![LCEL 파이프가 runnable 순서를 고정하는 구조](../../../assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.ko.png)
 
+*LCEL 파이프가 runnable 순서를 고정하는 구조*
+
 이 설계가 중요한 이유는 구성 단위가 모두 같은 runnable 프로토콜을 공유하기 때문입니다. retriever도 runnable일 수 있고, prompt도 runnable이고, LLM도 runnable이며, parser도 runnable입니다. 그래서 파이프를 잇는 순간 LangChain은 단순 체인 하나를 만드는 것이 아니라, 공통 실행 메서드를 가진 그래프 조각들을 순서대로 연결합니다. 이 덕분에 LCEL로 만든 체인은 자동으로 `invoke()`뿐 아니라 `ainvoke()`, `batch()`, `abatch()`, `stream()`, `astream()`까지 물려받습니다.
 
 `invoke()`는 가장 좁은 실행 경로입니다. 입력 하나를 받아 마지막 runnable의 출력 하나를 돌려줍니다. 디버깅할 때 가장 직관적이지만, 어디서 병렬화되고 어디서 스트리밍되는지는 드러나지 않습니다. `stream()`은 다릅니다. 기본 `Runnable.stream()`은 그냥 `yield self.invoke(...)`이지만, sequence 안의 각 단계가 `transform()` 또는 `stream()`을 구현하면 청크 단위 전파가 가능합니다. 즉 LCEL의 스트리밍은 “최종 LLM이 토큰을 흘릴 수 있는가”만의 문제가 아닙니다. 앞 단계가 스트림 친화적인 runnable인지, 중간에 결과를 한 번에 모아 버리는 blocking 단계가 끼어 있는지도 같이 봐야 합니다.
@@ -298,6 +304,8 @@ chain = (
 겉보기에는 간단한 dict 리터럴 하나와 파이프 몇 개뿐입니다. 하지만 소스 기준으로 보면 여기에는 두 가지 중요한 변환이 숨어 있습니다. 첫째, `|` 오른쪽이나 왼쪽에 dict가 오면 `coerce_to_runnable(...)`이 그것을 `RunnableParallel`로 감쌉니다. 둘째, `RunnablePassthrough()`는 입력을 바꾸지 않는 identity runnable입니다. 그래서 위 코드는 사실상 “질문 하나를 받아, 같은 입력을 병렬로 두 갈래에 보내고, 한 갈래에서는 retriever를 돌려 `context`를 만들고, 다른 갈래에서는 질문 원문을 그대로 `question`으로 보존한 뒤, 그 dict를 prompt에 넘긴다”는 뜻입니다.
 
 ![질문이 병렬 분기로 context와 question이 되는 흐름](../../../assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.ko.png)
+
+*질문이 병렬 분기로 context와 question이 되는 흐름*
 
 실행을 단계별로 따라가면 더 분명합니다.
 
@@ -380,6 +388,8 @@ if __name__ == "__main__":
 LCEL로 체인을 짜다 보면 곧바로 부딪히는 요구가 있습니다. 최종 답변 문자열만으로는 부족하다는 점입니다. 운영용 RAG에서는 최소한 출처 목록, 사용한 문서 ID, 점수, 때로는 최종 prompt까지 같이 보고 싶습니다. 그런데 기본 `prompt | llm | parser` 패턴은 마지막에 문자열 하나만 남깁니다. 이때 유용한 도구가 `langchain_core.runnables.passthrough.py`의 `RunnablePassthrough.assign()`입니다.
 
 ![assign이 답변 출력에 출처를 합치는 구조](../../../assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.ko.png)
+
+*assign이 답변 출력에 출처를 합치는 구조*
 
 소스를 보면 `RunnablePassthrough.assign(**kwargs)`는 결국 `RunnableAssign(RunnableParallel(kwargs))`를 반환합니다. 즉 입력 dict를 그대로 통과시키면서, 동시에 추가 계산 브랜치를 병렬로 실행한 뒤 결과 키를 merge합니다. `RunnableAssign.invoke()` 구현은 더 노골적입니다. `return {**input, **self.mapper.invoke(input, ...)}` 형태이므로, 원래 dict에 새 필드를 덧붙이는 연산입니다. 그래서 assign은 “앞단 출력을 버리지 않고 풍부하게 만들기”에 딱 맞습니다.
 
@@ -476,6 +486,8 @@ if __name__ == "__main__":
 이제 실행 모델 차이를 볼 차례입니다. `RetrievalQA`는 `_call()`과 `_acall()` 중심의 고전 체인입니다. 최종적으로 `combine_documents_chain.run(...)` 또는 `arun(...)`을 호출해 문자열 답을 다 만든 뒤에야 결과를 반환합니다. source 문서를 같이 돌려주는 옵션은 있어도, 토큰이 생성되는 중간을 체인 표면에서 바로 흘려주지는 못합니다. 반면 LCEL은 runnable마다 `stream()`과 `transform()`을 공유하므로, 뒤 단계가 청크를 생산하면 그 청크를 sequence 전체가 전파할 수 있습니다.
 
 ![스트리밍 청크가 runnable 단계를 통과하는 전파](../../../assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.ko.png)
+
+*스트리밍 청크가 runnable 단계를 통과하는 전파*
 
 물론 여기에도 조건은 있습니다. 모든 단계가 스트림 친화적이어야 가장 자연스럽게 흐릅니다. retriever처럼 본질적으로 한 번에 결과를 내는 단계는 앞부분에서 잠깐 막힐 수 있습니다. prompt formatting도 대부분 한 번에 끝납니다. 하지만 LLM 단계가 토큰을 스트리밍하고 parser가 청크 단위 출력을 받을 수 있으면, 최소한 “검색과 프롬프트 준비가 끝난 뒤부터는” 최종 사용자에게 바로 흘려보낼 수 있습니다. 이 지점이 체감 성능에 매우 큽니다. Retrieval은 200ms, 모델 생성은 4초인 시스템이라면, LCEL 스트리밍은 그 4초를 기다리는 경험을 훨씬 부드럽게 만듭니다.
 

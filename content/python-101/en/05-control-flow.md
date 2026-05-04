@@ -49,6 +49,8 @@ This chapter is also a setup for the next one on functions and argument design. 
 Lay out the choices on a single page so that, while reading code, you can guess the next step in your head.
 
 ![Mental model](../../../assets/python-101/05/05-01-mental-model.en.png)
+
+*Mental model*
 Three rules carry most of the weight.
 
 1. **A single decision is `if`; the same work repeated is a loop.** `for` and `while` are two tools for the same job — repetition — and the choice depends on whether you already have something to iterate over.

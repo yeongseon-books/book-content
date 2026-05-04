@@ -37,6 +37,8 @@ This post covers five things:
 - how to choose between index types
 
 ![FAISS index type comparison structure](../../../assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
+
+*FAISS index type comparison structure*
 <!-- ebook-only:start -->
 
 **The key idea**: FAISS finds vectors fast. IndexFlatL2 is the simplest option; switch to IVF or HNSW when the dataset grows.
@@ -73,6 +75,8 @@ Replace `faiss-cpu` with `faiss-gpu` if a compatible GPU is available.
 ## Understanding index types
 
 ![FAISS index type comparison structure](../../../assets/vector-search-101/04/04-01-understanding-index-types.en.png)
+
+*FAISS index type comparison structure*
 FAISS supports many index types, each with different speed-accuracy tradeoffs. Two are essential at the start.
 
 **IndexFlatL2**: exact search using Euclidean distance. Compares every vector without skipping. Accuracy is 100%, but search time scales linearly with the number of vectors.
@@ -86,6 +90,8 @@ Larger deployments use approximate indexes like `IndexIVFFlat` or `IndexHNSWFlat
 ## Exact search with IndexFlatIP
 
 ![Flow from embeddings to index creation](../../../assets/vector-search-101/04/04-02-exact-search-with-indexflatip.en.png)
+
+*Flow from embeddings to index creation*
 The standard pattern for text retrieval: normalized vectors plus inner-product index.
 
 ```python
@@ -144,6 +150,8 @@ FAISS requires `float32` arrays. Without the explicit `dtype=np.float32` cast, N
 ## Running queries
 
 ![Query to FAISS result path](../../../assets/vector-search-101/04/04-03-running-queries.en.png)
+
+*Query to FAISS result path*
 ```python
 def search(query: str, top_k: int = 3) -> list[tuple[float, str]]:
     query_vector = np.array(
@@ -359,6 +367,8 @@ Both indexes return the correct ranking. For text retrieval, `IndexFlatIP` with 
 ## Choosing an index
 
 ![float64 input error path](../../../assets/vector-search-101/04/04-04-choosing-an-index.en.png)
+
+*float64 input error path*
 | Index | Accuracy | Speed | Memory | Typical scale |
 |---|---|---|---|---|
 | IndexFlatL2 / IP | 100% | O(n) | n × d × 4B | up to ~100K |

@@ -27,9 +27,13 @@ How do you decide which of two prompts is better? This post covers paired compar
 
 ---
 ![A/B testing LLMs - which prompt is Better](../../../assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)
+
+*A/B testing LLMs - which prompt is Better*
 ## "Looks Better" Is Not Evidence
 
 !["Looks Better" is not evidence](../../../assets/ai-evaluation-101/09/09-01-looks-better-is-not-evidence.en.png)
+
+*"Looks Better" is not evidence*
 When a new prompt or model rolls in, the typical evaluation goes:
 
 > "GPT-4o feels more natural. Let's ship it."
@@ -48,6 +52,8 @@ A/B testing applies two variants (A and B) to the same inputs and decides which 
 ## Pairwise Comparison and Win Rate
 
 ![Pairwise comparison and win rate](../../../assets/ai-evaluation-101/09/09-03-pairwise-comparison-and-win-rate.en.png)
+
+*Pairwise comparison and win rate*
 Reuse the pairwise judge from Ep4. For each input, get a response from model A and model B, and ask the judge which is better.
 
 ```python
@@ -109,6 +115,8 @@ def ab_test(questions: list[str], model_a: str, model_b: str) -> dict:
 ## Sample Size — How Many to Evaluate
 
 ![Sample size - how many to evaluate](../../../assets/ai-evaluation-101/09/09-04-sample-size-how-many-to-evaluate.en.png)
+
+*Sample size - how many to evaluate*
 10 samples at 60% vs 40% could easily be chance. 1000 samples at the same ratio is decisive. The required sample size depends on the **effect size** you want to detect.
 
 ```python
@@ -149,6 +157,8 @@ When you build the eval dataset, decide your **target effect size first** and si
 ## Statistical Significance — Two-Proportion Z-Test
 
 ![Statistical significance - Two-Proportion Z-Test](../../../assets/ai-evaluation-101/09/09-05-statistical-significance-two-proportion.en.png)
+
+*Statistical significance - Two-Proportion Z-Test*
 To compare win rates, use a **two-proportion z-test**. The null hypothesis is that the two models win at the same rate; check the p-value.
 
 ```python

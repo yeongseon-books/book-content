@@ -31,6 +31,8 @@ This final post is a 101-level operations map for AKS: what Container Insights g
 ## The operations view in one diagram
 
 ![Operations observability across logs and metrics](../../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
+
+*Operations observability across logs and metrics*
 The useful split is between two telemetry paths.
 
 - **log path**: Log Analytics, Container Insights, KQL
@@ -152,6 +154,8 @@ Those are more useful operations questions than a raw CPU graph on its own becau
 ## Where alerts should live
 
 ![Layered structure for operations alerts](../../../assets/azure-aks-101/07/07-02-where-alerts-should-live.en.png)
+
+*Layered structure for operations alerts*
 Good alerting is layered. CPU over 80% by itself is rarely a complete operations strategy.
 
 ### Application layer

@@ -55,6 +55,8 @@ merge가 익숙해지지 않으면 두 가지 함정에 빠지기 쉽습니다.
 merge는 "두 commit을 하나로 합치는 새 commit"을 만드는 작업입니다. 두 commit이 같은 줄기 위에 있으면 새 commit 없이 포인터만 옮기면 끝납니다(fast-forward). 갈라진 줄기 위에 있으면 두 부모를 가지는 새 merge commit이 생깁니다(three-way).
 
 ![Mental Model](../../../assets/git-github-101/05/05-01-mental-model.ko.png)
+
+*Mental Model*
 핵심은 다음 세 가지입니다.
 
 - **fast-forward**: 합칠 대상 branch가 현재 branch의 직계 후손이면, Git은 새 commit을 만들지 않고 포인터만 앞으로 옮깁니다.

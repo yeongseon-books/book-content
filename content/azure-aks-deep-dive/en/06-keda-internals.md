@@ -52,6 +52,8 @@ KEDA installs two main components: the **operator**, which watches `ScaledObject
 ## The KEDA structure
 
 ![KEDA structure linking event sources to HPA](../../../assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png)
+
+*KEDA structure linking event sources to HPA*
 ---
 
 ## ScaledObjectReconciler and the generated HPA
@@ -72,6 +74,8 @@ At the scaler layer, upstream `pkg/scalers/scaler.go` defines the interface each
 `provider.go` shows the adapter reading the `scaledobject.keda.sh/name` selector and querying the metrics service over gRPC.
 
 ![External metrics path into HPA decisions](../../../assets/azure-aks-deep-dive/06/06-02-the-external-metrics-path.en.png)
+
+*External metrics path into HPA decisions*
 ---
 
 ## The scale-to-zero boundary
@@ -82,6 +86,8 @@ KEDA directly updates `/scale` for the 0↔1 region,
 while the generated HPA controls the 1↔N region.
 
 ![Scale-to-zero boundary between KEDA and HPA](../../../assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.en.png)
+
+*Scale-to-zero boundary between KEDA and HPA*
 ---
 
 ## The point of this episode

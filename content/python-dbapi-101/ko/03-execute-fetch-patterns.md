@@ -32,6 +32,8 @@ DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`�
 <!-- a-grade-intro:begin -->
 
 ![execute, executemany, fetch 패턴](../../../assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.ko.png)
+
+*execute, executemany, fetch 패턴*
 ## 핵심 질문
 
 - execute, executemany, fetchone, fetchall, fetchmany는 각각 언제 써야 할까요?
@@ -44,6 +46,8 @@ DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`�
 ## 1. execute - 한 번의 query
 
 ![execute - 한 번의 query](../../../assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.ko.png)
+
+*execute - 한 번의 query*
 `cursor.execute(operation, parameters=None)`은 single SQL statement를 실행합니다. SELECT, INSERT, UPDATE, DELETE, DDL 모두 동일한 method를 씁니다.
 
 ```python
@@ -62,6 +66,8 @@ print(cur.rowcount)    # 1 (INSERT 영향받은 row 수)
 ## 2. executemany - bulk write
 
 ![executemany - bulk write](../../../assets/python-dbapi-101/03/03-03-2-executemany-bulk-write.ko.png)
+
+*executemany - bulk write*
 같은 statement를 여러 parameter set으로 반복 실행할 때 `executemany()`를 씁니다.
 
 ```python
@@ -116,6 +122,8 @@ print(rows)   # [(1, 'hello'), (2, 'first'), (3, 'second'), (4, 'third')]
 ## 5. fetchmany - chunk 단위
 
 ![fetchmany - chunk 단위](../../../assets/python-dbapi-101/03/03-04-5-fetchmany-in-chunks.ko.png)
+
+*fetchmany - chunk 단위*
 `fetchmany(size=cursor.arraysize)`은 지정한 개수만큼만 가져옵니다.
 
 ```python

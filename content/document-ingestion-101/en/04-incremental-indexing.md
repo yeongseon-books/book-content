@@ -32,6 +32,8 @@ seo_description: Incremental indexing is less a vector-store trick and more an o
 Example code: `/root/Github/document-ingestion-101/en/04-incremental-indexing/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 A full rebuild is acceptable for dozens of files, but it becomes wasteful once the corpus grows into the thousands.
 
 This example uses only file hashes and a JSON state file to classify `added`, `unchanged`, and `updated`. That simple classifier is the foundation for every later vector-store update step.
@@ -39,11 +41,15 @@ This example uses only file hashes and a JSON state file to classify `added`, `u
 ## Incremental scan and change detection
 
 ![Incremental scan and change detection flow](../../../assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
+
+*Incremental scan and change detection flow*
 The first win in incremental indexing is narrowing the work set before any expensive downstream processing starts.
 
 ## State store and hash comparison
 
 ![State store and hash comparison flow](../../../assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.en.png)
+
+*State store and hash comparison flow*
 A content hash next to timestamps makes the change detector much more trustworthy than mtime alone.
 
 ## Runnable example
@@ -158,6 +164,8 @@ python main.py
 ### Added updated and deleted paths
 
 ![Added updated and deleted decision flow](../../../assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.en.png)
+
+*Added updated and deleted decision flow*
 Once deletion is modeled as its own path, index cleanup becomes an extension of the same state machine.
 
 - `IndexStateStore` keeps hash, mtime, and indexed_at together, which makes debugging easier.
@@ -169,6 +177,8 @@ Once deletion is modeled as its own path, index cleanup becomes an extension of 
 ### Index version and run history flow
 
 ![Index version and run history flow](../../../assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.en.png)
+
+*Index version and run history flow*
 Past a certain scale, knowing which run produced which index version becomes as important as change detection itself.
 
 - mtime-only checks are fast but can over-report changes. That is why content hashes still matter.

@@ -58,6 +58,8 @@ seo_description: status·diff·log 세 명령은 각각 "지금 어디에 있나
 각 명령이 보는 영역을 그림으로 정리해 봅니다.
 
 ![Mental Model](../../../assets/git-github-101/03/03-01-mental-model.ko.png)
+
+*Mental Model*
 기억할 한 줄 규칙은 다음과 같습니다.
 
 - `git diff`는 기본적으로 **아직 staging에 올라가지 않은 변경**(WD vs Staging)을 보여 줍니다.

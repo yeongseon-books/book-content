@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
 > The prompt layer is where structured retrieval output becomes the exact contract the model will read.
 
 ![Questions this post answers](../../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (4/6)
@@ -115,6 +117,8 @@ At the source level, `PromptTemplate` lives in `langchain_core.prompts.prompt.Pr
 
 ![String and chat prompt hierarchy](../../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
 
+*String and chat prompt hierarchy*
+
 The most common constructor is `PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)`. It calls `get_template_variables(...)`, subtracts any pre-filled partial variables, and stores the remainder in `input_variables`. The validators in `prompt.py` and `base.py` then enforce two guardrails: `stop` cannot be used as a variable name, and `input_variables` cannot overlap with `partial_variables`.
 
 `format()` is the narrowest execution path. `PromptTemplate.format(**kwargs)` first calls `_merge_partial_and_user_variables(**kwargs)`, then applies the selected formatter. With the default `f-string` format this is ordinary placeholder substitution. The source also supports `mustache` and `jinja2`, with an explicit warning that `jinja2` should not be used with untrusted templates.
@@ -156,6 +160,8 @@ The practical lesson is simple: prompt shape is enforced before any model call h
 Once you switch from string prompts to chat prompts, the center of gravity moves from one template string to a list of message templates. In `langchain_core.prompts.chat`, LangChain models that list explicitly. `SystemMessagePromptTemplate`, `HumanMessagePromptTemplate`, and `AIMessagePromptTemplate` are thin wrappers around underlying string prompt templates. Each one ultimately formats into a concrete message class such as `SystemMessage`, `HumanMessage`, or `AIMessage`.
 
 ![Message templates becoming chat messages](../../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.en.png)
+
+*Message templates becoming chat messages*
 
 The entry point most people use is `ChatPromptTemplate.from_messages(messages, template_format="f-string")`. The source accepts several message-like representations and normalizes them into the internal `self.messages` list. A tuple such as `("system", "...")` becomes a `SystemMessagePromptTemplate`. A tuple such as `("human", "{question}")` becomes a `HumanMessagePromptTemplate`. If you pass a concrete `BaseMessage`, LangChain stores it directly. The result is a prompt object whose payload is heterogeneous by design: some items are static messages, some are message templates, and some can be placeholders for conversation history.
 
@@ -208,6 +214,8 @@ The retrieval path becomes concrete in `langchain/chains/retrieval_qa/base.py`. 
 
 ![RetrievalQA context assembly path](../../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.en.png)
 
+*RetrievalQA context assembly path*
+
 In `RetrievalQA._get_docs()`, the implementation is intentionally small: it calls `self.retriever.invoke(question, config={"callbacks": run_manager.get_child()})` and returns a `List[Document]`. So retrieval is already complete at that point. `_call()` then reads `question = inputs[self.input_key]`, asks `_get_docs()` for documents, and finally executes:
 
 ```python
@@ -244,6 +252,8 @@ This is also where one of LangChain's sharpest foot-guns sits. Neither `Retrieva
 Now that we have seen where `{context}` comes from, the next question is how variables travel through the prompt layer. `BasePromptTemplate` is the key source file here. It defines both partial binding and the runnable `invoke()` path.
 
 ![Partial variables meeting invoke inputs](../../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.en.png)
+
+*Partial variables meeting invoke inputs*
 
 `partial()` is a structural operation, not a one-off string replacement. In `BasePromptTemplate.partial(**kwargs)`, LangChain copies the prompt state, removes those keys from `input_variables`, merges them into `partial_variables`, and returns a new prompt object of the same type. Because `partial_variables` may also be callables, this is a good place to bind stable policy values.
 
@@ -303,6 +313,8 @@ The key point is that `partial()` reduces the call-time surface area, while `inv
 A good RAG prompt does not merely say “use the context.” It tells the model how to treat evidence, what to do when evidence is missing, and how to cite sources.
 
 ![RAG chat prompt with citation rules](../../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.en.png)
+
+*RAG chat prompt with citation rules*
 
 The most practical baseline in 0.2.17 is a system-plus-human chat prompt. Keep stable answering policy in the system message, dynamic evidence in `{context}`, and the user question in its own field.
 

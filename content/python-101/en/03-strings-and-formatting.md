@@ -56,6 +56,8 @@ Handling strings precisely prevents these mistakes upfront, and the code becomes
 Python's `str` is a sequence of code points. It is abstracted at the level humans read; it only becomes `bytes` when it leaves memory for disk or the network.
 
 ![Mental model](../../../assets/python-101/03/03-01-mental-model.en.png)
+
+*Mental model*
 Three rules make most of the confusion disappear.
 
 1. **`str` is a sequence of Unicode code points.** It carries no encoding information.

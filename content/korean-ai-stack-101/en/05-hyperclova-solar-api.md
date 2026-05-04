@@ -103,9 +103,13 @@ What matters: (1) the same key concepts ("의미", "임베딩", "토큰") appear
 
 ![Core flow](../../../assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
 
+*Core flow*
+
 ## Why a provider-substitution exercise still helps
 
 ![Minimal runnable example](../../../assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.en.png)
+
+*Minimal runnable example*
 
 Readers do not always have HyperCLOVA X or Solar keys available. If the example cannot run, the prompt design lessons remain abstract. A stand-in provider still teaches the durable part of the workflow. At the final step, swapping the endpoint and auth header makes the same system message, sampling settings, and response handling reusable.
 
@@ -135,6 +139,8 @@ The point is to embed **language, role, and length** all into the system message
 ### Step 2 — Constrain output format (force JSON)
 
 ![What to notice in this code](../../../assets/korean-ai-stack-101/05/05-02-what-to-notice-in-this-code.en.png)
+
+*What to notice in this code*
 
 ```python
 import json
@@ -207,6 +213,8 @@ Validation runs immediately after generation, before any user-facing surface. Ma
 ### Step 5 — Switching to HyperCLOVA / Solar (concept)
 
 ![Where engineers get confused](../../../assets/korean-ai-stack-101/05/05-03-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 
 ```python
 # Solar (Upstage) call — OpenAI SDK compatible

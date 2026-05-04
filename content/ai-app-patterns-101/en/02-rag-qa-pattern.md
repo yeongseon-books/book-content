@@ -30,6 +30,8 @@ seo_description: RAG is not a model that memorizes answers; it is a pipeline tha
 > RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.
 
 ![Questions this post answers](../../../assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 > AI App Patterns 101 (2/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/02-rag-qa-pattern)
@@ -53,6 +55,8 @@ Topics:
 ### Offline indexing pipeline
 
 ![Offline indexing pipeline](../../../assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
+
+*Offline indexing pipeline*
 **Indexing** (offline): split documents into chunks, embed them, store in a vector index.
 
 **Retrieval** (online): embed the query, find similar chunks, inject them into the prompt.
@@ -69,6 +73,8 @@ retrieval: query → embedding → FAISS search → prompt injection → LLM →
 ### Online question answering flow
 
 ![Online question answering flow](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
+
+*Online question answering flow*
 ```python
 import os
 
@@ -171,6 +177,8 @@ for question in test_questions:
 ### Answer and source return structure
 
 ![Answer and source return structure](../../../assets/ai-app-patterns-101/02/02-03-answer-and-source-return-structure.en.png)
+
+*Answer and source return structure*
 Showing which document supported the answer improves user trust.
 
 ```python
@@ -243,9 +251,13 @@ print(f"sources: {result['sources']}")
 ### Defense layers against retrieval misses
 
 ![Defense layers against retrieval misses](../../../assets/ai-app-patterns-101/02/02-04-defense-layers-against-retrieval-misses.en.png)
+
+*Defense layers against retrieval misses*
 ### Fallback branch for missing evidence
 
 ![Fallback branch for missing evidence](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
+
+*Fallback branch for missing evidence*
 **The relevant chunk was not retrieved.** If the query does not match any stored chunk, the LLM falls back on its internal knowledge and may hallucinate. The prompt instruction "say you don't know if it's not in the documents" is the first line of defense.
 
 **Information splits across chunk boundaries.** Important context that spans two chunks may not appear complete in any single retrieved result. Sufficient `chunk_overlap` reduces this risk.

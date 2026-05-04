@@ -27,6 +27,8 @@ seo_description: 'A fine-tuning experiment is a decision about how to slice thre
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - How can we calculate why LoRA is so much lighter than full fine-tuning?
 - How do we tell apart problems that need fine-tuning from those a prompt can solve?
 - What can we verify in post 1 without a GPU?
@@ -88,9 +90,13 @@ With this table in hand, "we just want to nudge the response tone" branches natu
 
 ![base weights vs trainable boundary in fine-tuning](../../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
 
+*base weights vs trainable boundary in fine-tuning*
+
 The point most easily missed in fine-tuning is **what we choose as the training target**. Full fine-tuning updates every existing weight, so memory and optimizer state both balloon. LoRA freezes the existing weights and adds two low-rank matrices instead. So when discussing cost, look at the **trainable parameter count** separately from the total model parameters.
 
 ![What to understand first](../../../assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
+
+*What to understand first*
 
 ## Step-by-step walkthrough
 
@@ -148,6 +154,8 @@ You will see a ratio around 1.5%. Try `rank` 16 and 32 to feel how the number sc
 
 ![LoRA's surface area per linear layer measured by the script](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
 
+*LoRA's surface area per linear layer measured by the script*
+
 - `hidden_size=768`, `intermediate_size=3072`, `num_layers=12` mimic GPT-2 small.
 - The script measures LoRA's surface area against attention/MLP linear layers, not against total model parameters.
 - The printed ratio becomes the calibration point in post 3 when picking `LoraConfig(r=8)`.
@@ -155,6 +163,8 @@ You will see a ratio around 1.5%. Try `rank` 16 and 32 to feel how the number sc
 ## Common mistakes
 
 ![picking a base model by problem type](../../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
+
+*picking a base model by problem type*
 
 - **Confusing model size with trainable parameters** — LoRA still requires the base model in VRAM at inference time. If the base model itself does not fit, LoRA alone will not help; pair it with quantization (QLoRA).
 - **Assuming bigger rank is better** — At rank 64 or 128 trainable parameters can balloon to 10–20% of full fine-tuning while generalization often gets worse. Start from r=8–16.

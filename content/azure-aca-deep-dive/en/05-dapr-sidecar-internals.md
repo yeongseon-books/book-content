@@ -76,6 +76,8 @@ Second, enabling Dapr is not merely adding metadata to your app.
 It changes the pod shape.
 
 ![Local app calls and outward sidecar calls](../../../assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.en.png)
+
+*Local app calls and outward sidecar calls*
 The app talks locally.
 The sidecar talks outward.
 That is the basic contract.
@@ -100,6 +102,8 @@ Pinned Dapr source shows this in the injector service code and the pod patch pat
 The injector receives the admission review, builds a sidecar config from pod annotations and environment state, and generates patch operations that add the Dapr sidecar container.
 
 ![Sidecar injection through pod mutation](../../../assets/azure-aca-deep-dive/05/05-02-start-with-the-pod-mutation-model.en.png)
+
+*Sidecar injection through pod mutation*
 ACA does not expose raw Kubernetes admission mechanics to you.
 So this webhook description is upstream Dapr documentation, not an ACA-public implementation guarantee.
 It is still the best available reference model for the sidecar shape ACA produces.
@@ -139,6 +143,8 @@ That one file tells you most of what you need to know.
 - It receives readiness and liveness probes.
 
 ![Injected daprd process and container shape](../../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.en.png)
+
+*Injected daprd process and container shape*
 This is the right resolution for understanding Dapr in ACA.
 The product toggles Dapr at the app surface.
 The runtime ends up launching a Go process with a nontrivial configuration surface.
@@ -173,6 +179,8 @@ It calls into `app.Run()`.
 That bootstrap path then constructs runtime options, logging, security, and finally the Dapr runtime object before calling `Run`.
 
 ![Bootstrap path from main.go to runtime](../../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.en.png)
+
+*Bootstrap path from main.go to runtime*
 For ACA readers, the important takeaway is not every bootstrap detail.
 It is that enabling Dapr does in fact launch a complete runtime program, with a normal process lifecycle and configuration pipeline.
 
@@ -190,6 +198,8 @@ Microsoft's ACA Dapr overview also documents that the sidecar exposes HTTP on 35
 The extra public HTTP port 3501 is upstream Dapr-documented behavior; ACA does not publish ACA-specific wiring for that port.
 
 ![Dapr HTTP and gRPC ports](../../../assets/azure-aca-deep-dive/05/05-05-the-sidecar-ports-are-concrete-and-impor.en.png)
+
+*Dapr HTTP and gRPC ports*
 Those ports are not theoretical.
 They are the local contract between your code and the sidecar.
 
@@ -217,6 +227,8 @@ The sidecar says:
 - I know how to authenticate and serialize it
 
 ![Localhost API boundary between app and sidecar](../../../assets/azure-aca-deep-dive/05/05-06-why-localhost-matters-so-much.en.png)
+
+*Localhost API boundary between app and sidecar*
 That is why Dapr can make apps simpler while making the pod shape more complex.
 
 ---
@@ -230,6 +242,8 @@ The sidecar runtime loads component definitions according to the Dapr app ID and
 Microsoft's components documentation is clear that scopes map to Dapr app IDs, not Container App names.
 
 ![Environment components and sidecar loading scope](../../../assets/azure-aca-deep-dive/05/05-07-component-loading-is-where-aca-s-environ.en.png)
+
+*Environment components and sidecar loading scope*
 So the environment owns the component registry boundary.
 The sidecar makes the final runtime decision about which scoped components become live for that app.
 
@@ -248,6 +262,8 @@ That means Dapr behavior in ACA always spans at least two scopes.
 - environment scope for component availability and sharing
 
 ![App-level enablement with environment dependencies](../../../assets/azure-aca-deep-dive/05/05-08-enabling-dapr-in-aca-is-an-app-level-swi.en.png)
+
+*App-level enablement with environment dependencies*
 If an app-level Dapr setting looks correct but runtime behavior still fails, the missing piece is often at environment scope rather than app scope.
 
 ---
@@ -286,6 +302,8 @@ Besides state, pub/sub, invocation, and bindings, the sidecar exposes operationa
 - metadata
 
 ![Building-block and operational Dapr APIs](../../../assets/azure-aca-deep-dive/05/05-09-dapr-is-not-only-the-building-block-apis.en.png)
+
+*Building-block and operational Dapr APIs*
 So the sidecar is not just a convenience wrapper for remote calls.
 It is also an addressable operational endpoint in the pod.
 
@@ -299,6 +317,8 @@ There are really two local relationships to remember.
 2. The sidecar also calls into your app for certain patterns, such as service invocation delivery or pub/sub handlers.
 
 ![App calls and sidecar callbacks as dual channels](../../../assets/azure-aca-deep-dive/05/05-10-app-to-sidecar-and-sidecar-to-app-are-se.en.png)
+
+*App calls and sidecar callbacks as dual channels*
 That second arrow matters because app port and app protocol settings are not decorative.
 They tell the sidecar how to reach your code.
 
@@ -318,6 +338,8 @@ If a request fails, the sidecar may know something your user container does not.
 - sidecar startup failure
 
 ![Sidecar logs in the incident timeline](../../../assets/azure-aca-deep-dive/05/05-11-why-sidecar-logs-belong-in-your-incident.en.png)
+
+*Sidecar logs in the incident timeline*
 Treat sidecar logs as first-class evidence, not as noisy adjunct data.
 
 ---
@@ -340,6 +362,8 @@ Even when ACA abstracts the management details away, the runtime complexity rema
 ## Putting the whole sidecar lifecycle in one diagram
 
 ![Full lifecycle of the Dapr sidecar](../../../assets/azure-aca-deep-dive/05/05-12-putting-the-whole-sidecar-lifecycle-in-o.en.png)
+
+*Full lifecycle of the Dapr sidecar*
 That is the compact lifecycle that turns a single ACA checkbox into a second runtime process in your pod.
 
 ---

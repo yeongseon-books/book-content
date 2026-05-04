@@ -31,6 +31,8 @@ seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
 > Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.
 
 ![Questions this post answers](../../../assets/rag-deep-dive/06/06-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 <!-- a-grade-intro:end -->
 
 > RAG Deep Dive series (6/6)
@@ -135,6 +137,8 @@ Those four columns form the core frame for RAG evaluation. `question` is the use
 
 ![Sample fields controlling metric eligibility](../../../assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png)
 
+*Sample fields controlling metric eligibility*
+
 The schema is also your failure taxonomy. An answer can drift away from the question, inject unsupported claims, or retrieve useful evidence too late in the ranking. The row shape decides which of those failures you can measure.
 
 It also explains why metrics have different contracts. Faithfulness needs `question`, `answer`, and `contexts`. Answer relevancy also requires all three because `evaluation_mode = qac`. Its `_create_question_gen_prompt()` method reads both `row["answer"]` and `row["contexts"]`, so if `contexts` is missing, `evaluate()` validation fails before scoring starts. Context precision needs `question`, `contexts`, and an answer target from `ground_truth`.
@@ -195,6 +199,8 @@ Second, each atomic claim is checked against the retrieved context list. The `NL
 
 ![Claim decomposition and support verification flow](../../../assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.en.png)
 
+*Claim decomposition and support verification flow*
+
 Conceptually, the formula is:
 
 \[
@@ -246,6 +252,8 @@ The implementation uses a reverse-question generation prompt. `QUESTION_GEN` tak
 
 ![Reverse questions measuring answer focus](../../../assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.en.png)
 
+*Reverse questions measuring answer focus*
+
 That means answer relevancy is not a factuality metric. It does not verify whether the answer is correct. It verifies whether the answer is focused enough that, when read backward, it still points to the same question. Answers that wander into unnecessary detail, boilerplate, or adjacent explanations tend to produce reverse questions that drift away from the user’s actual request.
 
 The `noncommittal` flag makes this even clearer. In `ragas==0.1.22`, a sample whose generated reverse-question set is classified as noncommittal contributes 0 for that sample. After `evaluate()` finishes, the metric is summarized as the mean across evaluated samples. So an evasive answer like “I’m not sure” or “there is not enough information” contributes a zero-valued sample to that mean.
@@ -285,6 +293,8 @@ Context precision is the metric that looks most directly at retrieval ranking qu
 The input contract matters here too. `ragas==0.1.22` expects a `Dataset` with `question`, `contexts`, `answer`, and `ground_truth`, and `evaluate()` first normalizes aliases through `remap_column_names(dataset, column_map)`. After that normalization, context precision evaluates each context chunk against the question and the answer target carried by the dataset, which is why it is better understood as a retrieval metric than a generation metric.
 
 ![Rank-weighted precision at k scoring](../../../assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.en.png)
+
+*Rank-weighted precision at k scoring*
 
 The scoring logic lives in `_calculate_average_precision()`. Let `rel(i)` be 1 if the chunk at rank `i` is useful and 0 otherwise. Let `P(i)` be precision up to position `i`. Then the score is:
 
@@ -327,6 +337,8 @@ Computing metrics is only half the job. The real value appears when those metric
 One versioning detail matters. In `ragas==0.1.22`, the executable dataset uses `question`, `contexts`, `answer`, and `ground_truth`. If your stored dataset uses names like `query`, `retrieved_passages`, `prediction`, or `reference_answer`, pass a `column_map` in the direction canonical name -> existing dataset column. For example, `{"question": "query"}` means the RAGAS `question` slot should read from the dataset column named `query`.
 
 ![CI gate around faithfulness thresholds](../../../assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.en.png)
+
+*CI gate around faithfulness thresholds*
 
 This script shows a small but realistic quality gate. It runs faithfulness, answer relevancy, and context precision over a fixed dataset, computes mean scores, and fails immediately when average faithfulness falls below 0.8.
 

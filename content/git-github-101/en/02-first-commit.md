@@ -50,6 +50,8 @@ After one full cycle, commands you meet later (`git diff`, `git log`, `git resto
 A single edit-to-commit cycle looks like this.
 
 ![Mental model](../../../assets/git-github-101/02/02-01-mental-model.en.png)
+
+*Mental model*
 Three verbs work together.
 
 - **edit**: change or create files in your editor. Git does not know yet.

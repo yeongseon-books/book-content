@@ -34,9 +34,13 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 The key question is not whether the LLM can look clever. It is whether the tool path is explicit, inspectable, and easy to extend. In LangGraph 0.4.5, `ToolNode` plus `tools_condition` is the cleanest low-level pattern for that loop.
 
 ![Questions this post answers](../../../assets/langgraph-101/04/04-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 ## Minimal runnable example
 
 ![Tool loop between agent and tools](../../../assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
+
+*Tool loop between agent and tools*
 ```python
 import ast
 import json
@@ -160,6 +164,8 @@ export GROQ_API_KEY=... && python main.py
 ## What to notice in this code
 
 ![Tool call and ToolMessage flow](../../../assets/langgraph-101/04/04-02-what-to-notice-in-this-code.en.png)
+
+*Tool call and ToolMessage flow*
 - Tool docstrings are the instructions the model actually sees.
 - `ToolNode(TOOLS)` owns execution and the resulting `ToolMessage` objects.
 - `tools_condition` routes to `tools` only when the last AI message includes tool calls; otherwise it ends the graph.
@@ -167,6 +173,8 @@ export GROQ_API_KEY=... && python main.py
 ## Where engineers get confused
 
 ![Branching from last AI message](../../../assets/langgraph-101/04/04-03-where-engineers-get-confused.en.png)
+
+*Branching from last AI message*
 - If you inline tool execution inside the model loop, retries, logging, and testing become harder than they need to be.
 - `bind_tools()` only teaches the model how to request tools. It does not execute anything by itself.
 - Deterministic tools are easier to debug. Keep the calculator tool on a strict arithmetic parser instead of raw `eval()`.
@@ -180,6 +188,8 @@ export GROQ_API_KEY=... && python main.py
 ## Summary
 
 ![Grounded answer loop after tool use](../../../assets/langgraph-101/04/04-04-summary.en.png)
+
+*Grounded answer loop after tool use*
 At this point LangGraph starts to feel like an agent runtime rather than a workflow helper. In the next post, we extend the same pattern into a supervisor-worker design where multiple agents cooperate over shared state.
 
 <!-- toc:begin -->

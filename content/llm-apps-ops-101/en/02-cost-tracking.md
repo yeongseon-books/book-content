@@ -30,8 +30,12 @@ seo_description: Cost tracking is not bookkeeping for its own sake. It is the fe
 
 ## Big picture
 ![Cost tracking flow and optimization points](../../../assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
+
+*Cost tracking flow and optimization points*
 ## Why this layer matters
 ![Per-call tokens become cumulative cost](../../../assets/llm-apps-ops-101/02/02-01-why-this-layer-matters.en.png)
+
+*Per-call tokens become cumulative cost*
 Cost becomes more important as the feature succeeds, which is exactly why the math should exist in code early.
 
 LLM costs usually start small enough to ignore, then jump when repeated prompts, background jobs, or traffic growth hit at once. If you do not record usage per call, optimization becomes guesswork.
@@ -103,12 +107,16 @@ if __name__ == "__main__":
 
 ## What to notice in this code
 ![Repeated prompts become cache candidates](../../../assets/llm-apps-ops-101/02/02-02-what-to-notice-in-this-code.en.png)
+
+*Repeated prompts become cache candidates*
 - A single `PRICE_PER_MILLION_TOKENS` constant keeps the math obvious and easy to replace later.
 - Persisting one `CostRecord` per call lets you analyze outliers without recomputing reports.
 - Repeating one prompt on purpose gives you a baseline for later cache experiments.
 
 ## Where engineers get confused
 ![Optimization levers need quality checks](../../../assets/llm-apps-ops-101/02/02-03-where-engineers-get-confused.en.png)
+
+*Optimization levers need quality checks*
 - Many vendors price input and output tokens differently. Even if the example is simple, design for that split mentally.
 - A total-cost number alone hides spikes. You also need call count and token distribution.
 - Cost optimization without quality checks often means quietly making the product worse.

@@ -26,6 +26,8 @@ seo_description: sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으�
 # Transaction과 isolation level (sqlite3, PEP 249)
 
 ![Transaction과 isolation level (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.ko.png)
+
+*Transaction과 isolation level (sqlite3, PEP 249)*
 ## 이 글에서 답할 질문
 
 - sqlite3는 왜 기본적으로 implicit BEGIN을 자동으로 거나요?
@@ -69,6 +71,8 @@ sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이
 ## Mental Model — connection이 transaction 단위
 
 ![Mental Model - connection이 transaction 단위](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
+
+*Mental Model - connection이 transaction 단위*
 ```
 Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
@@ -96,6 +100,8 @@ Connection lifecycle (sqlite3 default)
 ## 핵심 개념
 
 ![핵심 개념](../../../assets/python-dbapi-101/05/05-03-core-concepts.ko.png)
+
+*핵심 개념*
 ### `isolation_level` 5가지 값
 
 | 값 | BEGIN 종류 | autocommit? | 자동 BEGIN 시점 |
@@ -172,6 +178,8 @@ with sqlite3.connect('shop.db') as con:
 ## 단계별 실습
 
 ![단계별 실습](../../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.ko.png)
+
+*단계별 실습*
 ### 단계 1 — 기본 동작 관찰
 
 ```python

@@ -59,6 +59,8 @@ This post follows that path end to end.
 ## The deployment pipeline in one picture
 
 ![Deployment path from upload to startup](../../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
+
+*Deployment path from upload to startup*
 Read deployment incidents through these four stages.
 
 1. artifact upload failed
@@ -102,6 +104,8 @@ turns it into deployment metadata,
 and feeds it into the deployment flow.
 
 ![ZipDeploy request entering the deployment flow](../../../assets/azure-app-service-deep-dive/04/04-02-what-zipdeploy-actually-means.en.png)
+
+*ZipDeploy request entering the deployment flow*
 ZipDeploy is not always the same as “unzip and run.”
 Build automation,
 startup behavior,
@@ -144,6 +148,8 @@ that means:
 - Oryx can also generate runtime startup behavior
 
 ![Oryx entering the Linux code app path](../../../assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.en.png)
+
+*Oryx entering the Linux code app path*
 That is why “deployment succeeded but startup failed” on Linux App Service is often a joint Kudu-plus-Oryx problem rather than a pure Kudu problem.
 
 ---
@@ -172,6 +178,8 @@ The run-from-package documentation states the critical fact very clearly.
 **The ZIP contents are not copied into `wwwroot`; the ZIP package itself is mounted as the read-only `wwwroot`.**
 
 ![ZIP package mounted as read-only wwwroot](../../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.en.png)
+
+*ZIP package mounted as read-only wwwroot*
 The benefits are real.
 
 - fewer file-lock conflicts
@@ -191,6 +199,8 @@ But the meaning of the runtime filesystem changes.
 Slots keep deployment off the production URL until the new version is already running.
 
 ![Production routing flips after staging warm-up](../../../assets/azure-app-service-deep-dive/04/04-05-why-slot-deployment-feels-safer.en.png)
+
+*Production routing flips after staging warm-up*
 The key is routing,
 not just file copy.
 If the new code is already running on staging workers,

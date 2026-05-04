@@ -33,6 +33,8 @@ LLM API를 운영 경로에 붙이면 실패는 예외가 아니라 일상입니
 핵심은 단순합니다. **재시도는 친절한 무한 반복이 아니라, 오류 분류를 전제로 한 제한된 복구 전략입니다.**
 
 ![재시도와 오류 처리: 안정적인 API 호출 만들기](../../../assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.ko.png)
+
+*재시도와 오류 처리: 안정적인 API 호출 만들기*
 ---
 
 ## 이 글에서 답할 질문
@@ -59,6 +61,8 @@ export GROQ_API_KEY="여기에-발급받은-키"
 ## 왜 모든 실패를 같은 예외로 다루면 안 되는가
 
 ![재시도 가능 오류와 영구 오류의 분기 비교](../../../assets/llm-api-production-101/05/05-01-why-all-failures-should-not-share-one-re.ko.png)
+
+*재시도 가능 오류와 영구 오류의 분기 비교*
 재시도는 일시적 실패를 흡수할 때만 가치가 있습니다. 예를 들어 잠깐의 네트워크 흔들림, 순간적인 read timeout, 짧은 5xx 응답은 몇 초 뒤 다시 성공할 수 있습니다. 반대로 아래 경우는 재시도로 해결되지 않을 가능성이 큽니다.
 
 - API 키가 잘못된 인증 오류
@@ -94,6 +98,8 @@ def flaky_operation() -> str:
 ## 오류 분류용 예외 계층 만들기
 
 ![공급자 예외를 앱 예외로 감싸는 구조](../../../assets/llm-api-production-101/05/05-02-creating-an-error-hierarchy-for-retry-de.ko.png)
+
+*공급자 예외를 앱 예외로 감싸는 구조*
 가장 다루기 쉬운 패턴은 애플리케이션 안에서 오류를 다시 분류하는 것입니다. 아래처럼 일시적 오류와 영구 오류를 나눌 수 있습니다.
 
 ```python
@@ -111,6 +117,8 @@ class NonRetryableLLMError(Exception):
 ## 지수 백오프 재시도 붙이기
 
 ![지수 백오프가 반복되는 재시도 흐름](../../../assets/llm-api-production-101/05/05-03-adding-exponential-backoff-to-a-groq-cal.ko.png)
+
+*지수 백오프가 반복되는 재시도 흐름*
 이제 Groq 호출을 감싸 보겠습니다. 아래 예제는 일시적 공급자 오류만 재시도 대상으로 올리고, 그 외는 즉시 실패시킵니다. 한 가지 운영 포인트가 더 있습니다. Groq 클라이언트 자체에도 기본 재시도 동작이 있을 수 있으므로, `tenacity` 예제를 보여 줄 때는 SDK 재시도를 꺼 두는 편이 정책을 읽기 쉽습니다.
 
 ```python
@@ -190,6 +198,8 @@ except RetryableLLMError as exc:
 ## 재시도 가능한 오류와 불가능한 오류를 어떻게 나눌까
 
 ![오류 유형별 처리 정책 결정 흐름](../../../assets/llm-api-production-101/05/05-04-which-failures-are-retryable.ko.png)
+
+*오류 유형별 처리 정책 결정 흐름*
 현장에서 자주 쓰는 기준은 아래 정도입니다.
 
 ### 재시도 가능
@@ -256,6 +266,8 @@ except Exception as exc:
 ## 최종 실패를 어떻게 사용자에게 드러낼 것인가
 
 ![최종 실패 뒤 사용자와 로그로 나뉘는 경로](../../../assets/llm-api-production-101/05/05-05-what-the-user-should-see-after-final-fai.ko.png)
+
+*최종 실패 뒤 사용자와 로그로 나뉘는 경로*
 재시도는 실패를 없애는 기술이 아닙니다. 최종 실패를 더 낫게 다루는 기술입니다. 모든 시도가 끝난 뒤에는 애플리케이션이 아래 정도를 분명히 해야 합니다.
 
 - 사용자에게 보여 줄 메시지

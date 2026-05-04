@@ -37,6 +37,8 @@ This post focuses on the concept and intuition behind embeddings. Code is minima
 - where embeddings fall short and what to watch for
 
 ![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
+
+*Keyword search and embedding search contrast*
 <!-- ebook-only:start -->
 
 **The key idea**: an embedding compresses text into a high-dimensional vector. Sentences with similar meaning land close together in that space.
@@ -60,6 +62,8 @@ After this chapter, the next one moves on to **HuggingFace embeddings in practic
 ## The ceiling of keyword search
 
 ![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
+
+*Keyword search and embedding search contrast*
 Traditional search ranks results by term frequency and position. TF-IDF and BM25 are the canonical examples. These methods are fast, interpretable, and accurate when the query shares vocabulary with the document.
 
 The problem is that language does not stay still. The same concept surfaces in many forms.
@@ -77,6 +81,8 @@ Embeddings reframe the problem. Instead of asking "does this document contain th
 ## Vector space intuition
 
 ![Text entering vector space flow](../../../assets/vector-search-101/01/01-02-vector-space-intuition.en.png)
+
+*Text entering vector space flow*
 An embedding model converts text into a fixed-length array of floating-point numbers. With `sentence-transformers/all-MiniLM-L6-v2`, every input — regardless of length — becomes a 384-dimensional vector. Models with 768 or 1536 dimensions are also common.
 
 ```
@@ -100,6 +106,8 @@ The value ranges from -1 to 1. Closer to 1 means more similar; 0 means unrelated
 ## How embedding models learn
 
 ![Positive and negative pair training structure](../../../assets/vector-search-101/01/01-03-how-embedding-models-learn.en.png)
+
+*Positive and negative pair training structure*
 An embedding model is trained to place semantically similar sentence pairs close together and unrelated pairs far apart. The dominant training paradigm is contrastive learning.
 
 Training data is typically structured like this:
@@ -116,6 +124,8 @@ The model updates its parameters to reduce the vector distance between positive 
 ## Creating your first vectors
 
 ![Three sentence encoding execution path](../../../assets/vector-search-101/01/01-04-creating-your-first-vectors.en.png)
+
+*Three sentence encoding execution path*
 Running the code once is faster than re-reading the theory. Install `sentence-transformers` and encode three sentences.
 
 ```bash
@@ -202,6 +212,8 @@ Expected output:
 ## Where embeddings fall short
 
 ![Limits with exact strings and long documents](../../../assets/vector-search-101/01/01-05-where-embeddings-fall-short.en.png)
+
+*Limits with exact strings and long documents*
 Embeddings are not a universal replacement for keyword search. Several situations favor the older approach.
 
 **Exact identifiers and codes.** Searching for `ERR_CONNECTION_REFUSED` or `CVE-2024-12345` works better with keyword search. Embedding models abstract meaning, and in doing so they can blur precise symbolic information.

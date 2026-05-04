@@ -30,6 +30,8 @@ seo_description: A chatbot is not a model with memory; it is an application loop
 > A chatbot is not a model with memory; it is an application loop that keeps replaying the accumulated messages list.
 
 ![Questions this post answers](../../../assets/ai-app-patterns-101/01/01-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 > AI App Patterns 101 (1/6)
 
 Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/01-chatbot-pattern)
@@ -52,6 +54,8 @@ Topics:
 ### Stateless call with replayed history
 
 ![Stateless call with replayed history](../../../assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png)
+
+*Stateless call with replayed history*
 The simplest approach: accumulate messages in a list and send the full list with every request.
 
 ```python
@@ -90,6 +94,8 @@ As history accumulates, the context window fills up. `llama-3.1-8b-instant` has 
 ### Sliding window message retention
 
 ![Sliding window message retention](../../../assets/ai-app-patterns-101/01/01-02-sliding-window-message-retention.en.png)
+
+*Sliding window message retention*
 Drop old messages and retain only the most recent N. This keeps context length predictable.
 
 ```python
@@ -150,6 +156,8 @@ for turn in turns:
 ### Summary memory with recent turns
 
 ![Summary memory with recent turns](../../../assets/ai-app-patterns-101/01/01-03-summary-memory-with-recent-turns.en.png)
+
+*Summary memory with recent turns*
 A window simply discards old messages. Summarization compresses them.
 
 ```python
@@ -237,6 +245,8 @@ for msg in conversations:
 ### Session-scoped conversation state
 
 ![Session-scoped conversation state](../../../assets/ai-app-patterns-101/01/01-04-session-scoped-conversation-state.en.png)
+
+*Session-scoped conversation state*
 Apps with multiple users need conversation state keyed by session ID.
 
 ```python
@@ -307,6 +317,8 @@ print(f"session A history length: {len(sessions[session_a])}")
 ### Branching from full history to compression
 
 ![Branching from full history to compression](../../../assets/ai-app-patterns-101/01/01-05-branching-from-full-history-to-compressi.en.png)
+
+*Branching from full history to compression*
 - Persisting chat history does not give the model durable memory; it only replays prior turns on every request.
 - Session identity and user identity are related but not identical. One user can have multiple concurrent sessions.
 - As history grows, cost and latency often break first, long before the chatbot stops working.

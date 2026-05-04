@@ -62,6 +62,8 @@ venv를 처음부터 습관으로 만들면, 앞으로 만날 의존성 충돌, 
 - 프로젝트가 10개면 venv도 10개가 됩니다. 서로 영향을 주지 않습니다.
 
 ![Mental Model](../../../assets/python-101/01/01-01-mental-model.ko.png)
+
+*Mental Model*
 system Python은 OS의 영역, 각 venv는 프로젝트의 영역입니다. 개발자는 venv만 활성화해서 그 안에서 작업합니다.
 
 ## 핵심 개념

@@ -26,6 +26,8 @@ seo_description: 'A single training step decomposes into six stages:'
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - What is the minimum you must set in `TrainingArguments` for a single training step to run?
 - Why do `labels` and a data collator matter even in tiny experiments?
 - When debugging a training loop, which output should you read first?
@@ -90,9 +92,13 @@ The absolute loss value (8.74) is meaningless. What matters is (1) the run compl
 
 ![Comparison of shrinkable and must-keep components](../../../assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
 
+*Comparison of shrinkable and must-keep components*
+
 Sample count and step count can be cut down. But **tokenized inputs, labels, optimizer step, and loss computation** cannot be removed — drop any of them and you no longer have a training validation, just an inference test. That is why even the smallest example in this article keeps every training-related component intact.
 
 ![What you can shrink and what you cannot](../../../assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png)
+
+*What you can shrink and what you cannot*
 
 ## Step-by-step practice
 
@@ -161,6 +167,8 @@ The two configurations have the same effective batch size, so the loss output sh
 
 ![Relationship between batch size and gradient accumulation](../../../assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png)
 
+*Relationship between batch size and gradient accumulation*
+
 - `labels = input_ids.copy()` is the minimum setup needed for next-token prediction loss in causal LM.
 - Even with `max_steps=1`, the backward pass and optimizer step actually execute.
 - For this example, checking `training_loss` and `global_step` is enough. Whether the loop finishes matters more than the number itself.
@@ -169,6 +177,8 @@ The two configurations have the same effective batch size, so the loss output sh
 ## Common mistakes
 
 ![Decision flow for training debug output priority](../../../assets/llm-finetuning-101/04/04-04-where-engineers-get-confused.en.png)
+
+*Decision flow for training debug output priority*
 
 - **Skipping the collator because samples are few** — once variable-length samples mix in, the run breaks immediately without a collator. Use `DataCollatorForLanguageModeling` even in tiny experiments.
 - **Trusting the absolute loss value** — for a tiny model with 1 step, loss values of 8 to 10 are normal. Watch the trend and the NaN status, not the absolute number.

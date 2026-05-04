@@ -52,6 +52,8 @@ This chapter introduces the simplest tools for building that bundle: the `class`
 The diagram below shows the path from a class definition to a method call on an instance.
 
 ![Mental model](../../../assets/python-101/09/09-01-mental-model.en.png)
+
+*Mental model*
 Three ideas hold this together.
 
 - **A class is a template for objects.** The `class User:` statement creates a class object named `User`, and calling `User(...)` produces an instance from that template.

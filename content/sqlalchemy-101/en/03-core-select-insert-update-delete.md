@@ -33,6 +33,8 @@ In post 2 we modeled our schema as Python objects with `MetaData` and `Table`. N
 This post walks through SQLAlchemy 2.x style `select()`, `insert()`, `update()`, `delete()`, and the `Result`/`Row` objects you use to read the results. The Engine from post 1 and the schema from post 2 finally come together as a small but complete working manual.
 
 ![SQLAlchemy core - select, insert, update, delete in 2.x style](../../../assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.en.png)
+
+*SQLAlchemy core - select, insert, update, delete in 2.x style*
 ## What you will learn
 
 - The unified 2.x `select()` shape: `select(...)`, `where()`, `order_by()`, `limit()`, `offset()`, `group_by()`, `having()`
@@ -56,6 +58,8 @@ This post walks through SQLAlchemy 2.x style `select()`, `insert()`, `update()`,
 ## Why this matters
 
 ![Why this matters](../../../assets/sqlalchemy-101/03/03-02-why-this-matters.en.png)
+
+*Why this matters*
 Working with raw SQL strings adds three kinds of cost over time. First, every column rename forces a project-wide grep. Second, the same SQL gets copied with subtle differences in many places, leading to subtle behavioral drift. Third, you handle dialect differences yourself.
 
 Core SQL expressions reduce the first two costs to almost zero. A column rename in the schema affects every expression at import time. You can wrap a `select` in a function and reuse it. Dialect differences are handled by SQLAlchemy's compiler.
@@ -65,6 +69,8 @@ Core SQL expressions also don't go away once the ORM enters from post 4. The ORM
 ## Mental Model
 
 ![Mental model](../../../assets/sqlalchemy-101/03/03-03-mental-model.en.png)
+
+*Mental model*
 In 2.x style, building SQL means stacking clauses through method chaining. You start with `select(...)`, call `where`, `order_by`, `limit`, etc., each call returning a new statement object. Finally, a Connection executes it and gives you a `Result`.
 
 > A 2.x `select` is an immutable statement object. Each method call returns a new statement; the original doesn't mutate. A `Result` is a one-shot stream; the shape you pull out of it (`Row`, scalar, or mapping) is decided at the Result level.
@@ -91,6 +97,8 @@ Once this mental model clicks, INSERT/UPDATE/DELETE follow the same shape. Only 
 ## Core concepts
 
 ![Core concepts](../../../assets/sqlalchemy-101/03/03-04-core-concepts.en.png)
+
+*Core concepts*
 ### select basics
 
 ```python
@@ -341,6 +349,8 @@ Now column-name typos are caught at the schema layer, and `LIMIT` values are han
 ## Step-by-step practice
 
 ![Step-by-step practice](../../../assets/sqlalchemy-101/03/03-05-step-by-step-practice.en.png)
+
+*Step-by-step practice*
 ### Step 1: Seed data
 
 ```python

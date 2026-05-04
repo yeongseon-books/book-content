@@ -62,6 +62,8 @@ The discipline is to always know "which layer does this signal come from?"
 
 ![Where logs and traces converge](../../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
 
+*Where logs and traces converge*
+
 ## Core concepts
 
 ### 1. Two platform log tables

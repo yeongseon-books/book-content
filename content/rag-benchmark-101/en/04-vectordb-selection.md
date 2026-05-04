@@ -26,6 +26,8 @@ seo_description: 'The skeleton of a VectorDB comparison:'
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)
 
+*Questions this post answers*
+
 - How do you compare a FAISS flat index against an IVF index fairly?
 - What do you have to record alongside accuracy to talk about a real trade-off?
 - How do you surface the trade-offs of approximate nearest neighbor (ANN) search even on a small example?
@@ -109,6 +111,8 @@ dimension = doc_vectors.shape[1]
 
 ![same vectors compared across flat and IVF indexes](../../../assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
 
+*same vectors compared across flat and IVF indexes*
+
 The runnable code lives in `rag-benchmark-101/en/04-vectordb-selection/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
@@ -140,6 +144,8 @@ ivf_index.nprobe = 4
 
 ![Boundary between embedding and search time](../../../assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png)
 
+*Boundary between embedding and search time*
+
 ```python
 def search_only(index, query_vec, k=5, repeats=20):
     times = []
@@ -167,6 +173,8 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 ![nprobe trade-off between speed and accuracy](../../../assets/rag-benchmark-101/04/04-03-nprobe-trade-off-between-speed-and-accur.en.png)
 
+*nprobe trade-off between speed and accuracy*
+
 Vary `nprobe` across 1, 2, 4, 8, 16 and plot recall and latency. There is almost always a visible sweet spot.
 
 ## Common mistakes
@@ -180,6 +188,8 @@ Vary `nprobe` across 1, 2, 4, 8, 16 and plot recall and latency. There is almost
 ## In production
 
 ![Index decision axes for real workloads](../../../assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.en.png)
+
+*Index decision axes for real workloads*
 
 - **VectorDB candidate comparison**: FAISS (library), Chroma (embedded + REST), pgvector (Postgres extension), Qdrant/Weaviate (standalone server). Send the same queries and put latency, recall, and operational cost (install, backup, scaling) in one table.
 - **Recall target**: 0.95 is enough for most RAG. Domains where missing a result is costly (legal, medical) need 0.99+.

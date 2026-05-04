@@ -27,9 +27,13 @@ Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful 
 
 ---
 ![Designing Rubric-Based scoring](../../../assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)
+
+*Designing Rubric-Based scoring*
 ## The Limits of Single Scores
 
 ![The limits of single scores](../../../assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.en.png)
+
+*The limits of single scores*
 Ep4 covered single scoring: one number from 1 to 5. But what does "3" actually mean? It could be 3 because the facts are wrong, or 3 because the tone is off. **A single score does not tell you what is broken.**
 
 Rubric-based scoring breaks each response into multiple dimensions and grades each separately. For an LLM chatbot, you might use:
@@ -48,6 +52,8 @@ Now you can pinpoint weakness: "Correctness 5, Tone 2."
 ## Defining Rubric Dimensions — A Four-Step Process
 
 ![Defining rubric dimensions - A Four-Step process](../../../assets/ai-evaluation-101/05/05-03-defining-rubric-dimensions-a-four-step-p.en.png)
+
+*Defining rubric dimensions - A Four-Step process*
 A good rubric is not improvised. Use these four steps.
 
 ### Step 1: Derive dimensions from user value
@@ -108,6 +114,8 @@ Beyond 10 dimensions the judge cannot grade consistently. **Stick to 3-5 core on
 ## Putting the Rubric Into the Judge Prompt
 
 ![Putting the rubric into the judge prompt](../../../assets/ai-evaluation-101/05/05-04-putting-the-rubric-into-the-judge-prompt.en.png)
+
+*Putting the rubric into the judge prompt*
 Extend the Ep4 single-score prompt with the rubric.
 
 ```python
@@ -165,6 +173,8 @@ Forcing `response_format={"type": "json_object"}` almost eliminates parse failur
 ## Aggregating Scores — The Mean Is Not the Answer
 
 ![Aggregating scores - the mean is not the answer](../../../assets/ai-evaluation-101/05/05-05-aggregating-scores-the-mean-is-not-the-a.en.png)
+
+*Aggregating scores - the mean is not the answer*
 How do you collapse per-dimension scores into one number? The common mistake is **plain averaging**, which hides weakness.
 
 | Response | Correct | Complete | Clarity | Tone | Mean | Reality |

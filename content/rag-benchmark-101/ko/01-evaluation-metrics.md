@@ -33,6 +33,8 @@ seo_description: retrieval 지표는 두 개의 집합을 비교하는 작업입
 
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/01/01-01-questions-this-post-answers.ko.png)
 
+*이 글에서 답할 질문*
+
 ## 이 글에서 답할 질문
 
 - Precision@k, Recall@k, MRR는 각각 무엇을 측정하고, 어떤 질문에 답하는가?
@@ -81,6 +83,8 @@ Q3은 **Precision은 완벽하지만 Recall은 낮습니다.** 정답 5개 중 3
 이 둘을 함께 보지 않으면 잘못된 결론에 도달합니다.
 
 ![상위 k 결과와 정답 집합의 교집합 계산 흐름](../../../assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.ko.png)
+
+*상위 k 결과와 정답 집합의 교집합 계산 흐름*
 
 ### 2. MRR (Mean Reciprocal Rank)
 
@@ -183,6 +187,8 @@ python3 main.py
 
 ![Precision@k와 Recall@k가 갈리는 판단 축](../../../assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.ko.png)
 
+*Precision@k와 Recall@k가 갈리는 판단 축*
+
 ## 자주 하는 실수
 
 - **평균만 보고 끝냄** — 평균 P@3 = 0.6이라도, 어떤 쿼리는 0.0이고 어떤 쿼리는 1.0일 수 있습니다. 항상 per-query 출력을 함께 봐야 합니다.
@@ -192,6 +198,8 @@ python3 main.py
 - **정답 집합을 너무 좁게 정의** — "이 문서만 정답"이라고 하면 의미상 동등한 다른 문서를 retriever가 찾아도 점수가 깎입니다.
 
 ![첫 관련 문서 위치가 MRR을 바꾸는 순위 차이](../../../assets/rag-benchmark-101/01/01-04-rank-position-changes-the-mrr-signal.ko.png)
+
+*첫 관련 문서 위치가 MRR을 바꾸는 순위 차이*
 
 ## 실무에서
 
@@ -219,6 +227,8 @@ production RAG 평가의 현실적 가이드:
 3. RAG가 LLM에게 정확히 3청크를 prompt로 넣습니다. 가장 중요하게 봐야 할 지표 두 개는 무엇입니까?
 
 ![쿼리별 점수와 평균 점수를 함께 읽는 리포트 구조](../../../assets/rag-benchmark-101/01/01-05-per-query-and-average-report-reading-flo.ko.png)
+
+*쿼리별 점수와 평균 점수를 함께 읽는 리포트 구조*
 
 ## 정리·다음 글
 

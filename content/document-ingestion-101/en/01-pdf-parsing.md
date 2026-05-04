@@ -32,6 +32,8 @@ seo_description: The first goal of PDF parsing is to turn a visual document into
 Example code: `/root/Github/document-ingestion-101/en/01-pdf-parsing/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/01/01-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
 The first practical problem in a PDF parsing tutorial is usually the sample file. If readers cannot reproduce the example from scratch, the pipeline story starts with friction.
 
 This example generates its own PDF with `reportlab`, then reads it back with `pypdf` and prints page-level text summaries. That is exactly the shape you want for the first ingestion step.
@@ -39,11 +41,15 @@ This example generates its own PDF with `reportlab`, then reads it back with `py
 ## PDF parsing flow
 
 ![PDF generation and extraction flow](../../../assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png)
+
+*PDF generation and extraction flow*
 Keeping generation and extraction in one script makes the demo reproducible and the output easy to verify.
 
 ## Page structure and extraction points
 
 ![Page structure and table detection path](../../../assets/document-ingestion-101/01/01-02-page-structure-and-extraction-points.en.png)
+
+*Page structure and table detection path*
 A real PDF often mixes plain text, tables, and images, so extraction quality depends on which branch each page element takes.
 
 ## Runnable example
@@ -150,6 +156,8 @@ page=2 chars=173 preview=Page 2 Operational checks ...
 ### How page metadata carries forward
 
 ![Page metadata fields per document](../../../assets/document-ingestion-101/01/01-01-how-page-metadata-carries-forward.en.png)
+
+*Page metadata fields per document*
 Once page number and character count are preserved together, later chunking and debugging steps stay much easier to reason about.
 
 - `create_sample_pdf()` creates the input data, so the example has no hidden file dependency.
@@ -161,6 +169,8 @@ Once page number and character count are preserved together, later chunking and 
 ### When OCR becomes the fallback
 
 ![Text-layer check and OCR fallback flow](../../../assets/document-ingestion-101/01/01-02-when-ocr-becomes-the-fallback.en.png)
+
+*Text-layer check and OCR fallback flow*
 OCR is safer as a fallback path after a text-layer check, not as the default path for every PDF.
 
 - PDF parsing is not the same as OCR. If the PDF already has a text layer, verify plain extraction first.
