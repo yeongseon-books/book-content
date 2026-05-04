@@ -33,6 +33,14 @@ last_reviewed: '2026-05-03'
 - 어떤 워크로드가 ACA에 적합하고, 어떤 워크로드는 다른 서비스를 골라야 하는지
 - 이 시리즈 7편이 어떤 순서로 ACA의 각 부분을 확장해나갈지
 
+## 이 글에서 답할 질문
+
+- Azure에는 이미 App Service, AKS, Functions가 있는데 왜 또 ACA가 필요한가?
+- ACA에서 Environment, Container App, Revision은 각각 어떤 단위인가?
+- ACA가 "Kubernetes 없이"라고 말할 때 실제로 사라지는 운영 책임은 무엇인가?
+- 어떤 워크로드는 ACA에 잘 맞고, 어떤 워크로드는 AKS나 Functions를 골라야 하는가?
+- 이 시리즈 7편은 어떤 순서로 ACA의 각 부분을 설명하는가?
+
 ## 왜 중요한가
 
 컨테이너는 만들 수 있습니다. 로컬에서도 잘 뜹니다. 문제는 그 다음입니다.

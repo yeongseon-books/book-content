@@ -30,6 +30,14 @@ last_reviewed: '2026-04-29'
 - Log Analytics에서 Revision 단위로 로그를 조회하는 KQL 쿼리를 작성할 수 있습니다.
 - Application Insights를 FastAPI 앱에 OpenTelemetry로 연결할 수 있습니다.
 
+## 이 글에서 답할 질문
+
+- ACA의 관측성은 어떤 세 계층으로 나뉘고, 각 계층은 무엇이 책임지는가?
+- `ContainerAppConsoleLogs_CL`과 `ContainerAppSystemLogs_CL`은 어떤 이벤트를 각각 담는가?
+- Revision 단위로 로그를 그룹핑하는 KQL 쿼리는 어떻게 작성하는가?
+- Application Insights를 FastAPI에 OpenTelemetry로 연결하는 가장 짧은 경로는 무엇인가?
+- ACA가 자동으로 주는 관측성과 직접 계측해야 하는 부분의 경계는 어디인가?
+
 ## 왜 중요한가
 
 production에서 ACA 앱이 5xx를 뱉기 시작했다고 가정해 봅시다.

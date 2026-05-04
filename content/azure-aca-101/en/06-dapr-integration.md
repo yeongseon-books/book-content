@@ -30,6 +30,14 @@ last_reviewed: '2026-04-29'
 - The role of the four core building blocks: Service invocation, Pub/Sub, State store, Secret store.
 - How to configure a real Dapr integration with `--enable-dapr` and component YAML.
 
+## Questions this chapter answers
+
+- Where exactly does the Dapr sidecar attach inside an ACA pod, and what endpoint does the app call?
+- Why are App-level `--enable-dapr` settings separated from Environment-level components?
+- What problems do Service invocation, Pub/Sub, State store, and Secret store each solve?
+- What is the decisive difference between running Dapr on AKS versus on ACA?
+- Why is "enabling Dapr from day one" often cited as an anti-pattern?
+
 ## Why this matters
 
 Microservices keep posing the same problems.

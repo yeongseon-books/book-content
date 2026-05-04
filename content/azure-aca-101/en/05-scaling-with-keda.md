@@ -30,6 +30,14 @@ last_reviewed: '2026-04-29'
 - When `min-replicas 0` (scale-to-zero) is safe and when it is dangerous.
 - How to configure both an HTTP API and a Service Bus queue worker using `az containerapp` commands.
 
+## Questions this chapter answers
+
+- What signals does Azure Container Apps use to decide replica counts, and where is the decision made?
+- When should you reach for built-in HTTP/TCP rules versus custom KEDA scalers?
+- When is `min-replicas 0` (scale-to-zero) safe, and when is it dangerous?
+- Why must Service Bus queue workers be scaled with KEDA scalers rather than HTTP rules?
+- How do you measure and accept the cold-start trade-off against your SLO?
+
 ## Why this matters
 
 The core ACA value proposition is "running containers without the weight of Kubernetes."

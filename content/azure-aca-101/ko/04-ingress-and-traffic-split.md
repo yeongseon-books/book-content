@@ -33,6 +33,14 @@ last_reviewed: '2026-05-03'
 - Single mode와 Multiple mode가 traffic 분배에 미치는 영향
 - Canary와 Blue-Green을 Revision weight로 구현하고 즉시 rollback하는 패턴
 
+## 이 글에서 답할 질문
+
+- ACA의 관리형 Ingress는 TLS·routing 외에 무엇을 "안 해주는가"?
+- `external`, `internal`, `disabled` 세 가지 ingress 모드는 어떤 시나리오에 각각 맞는가?
+- Single mode와 Multiple mode는 traffic split 동작이 어떻게 달라지는가?
+- Revision weight를 활용한 canary와 blue-green을 어떻게 한 줄 명령으로 구성하는가?
+- `target-port` 불일치, mode 혼동 같은 ingress incident는 어떻게 빠르게 진단하는가?
+
 ## 왜 중요한가
 
 ACA의 가장 강력한 production feature 하나가 바로 Revision 기반 traffic split입니다. 그런데 이걸 제대로 쓰려면 ingress 설정이 먼저 맞아야 합니다.

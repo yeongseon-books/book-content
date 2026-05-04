@@ -33,6 +33,14 @@ last_reviewed: '2026-05-03'
 - Single Revision mode와 Multiple Revision mode의 차이와 각각의 적합한 상황
 - Canary, Blue-Green, 즉시 rollback을 Revision 단위로 어떻게 운영하는지
 
+## 이 글에서 답할 질문
+
+- Environment, Container App, Revision은 각각 어떤 수명을 가지고 어떤 변경에 반응하는가?
+- 어떤 변경이 새 Revision을 만들고, 어떤 변경은 기존 Revision 안에서 반영되는가?
+- Single Revision mode와 Multiple Revision mode는 트래픽 처리가 어떻게 달라지는가?
+- 한 Environment에 여러 Container App을 묶어야 할까, 서비스마다 따로 만들어야 할까?
+- Revision 기반 rollback은 일반적인 Kubernetes rollback과 무엇이 다른가?
+
 ## 왜 중요한가
 
 ACA를 처음 만지면 portal과 CLI에 같은 단어가 반복해서 등장합니다. Environment, Container App, Revision. 이름만 보면 비슷해 보이지만 실제로 셋은 **수명, 가변성, 책임**이 모두 다릅니다.

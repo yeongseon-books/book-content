@@ -30,6 +30,14 @@ last_reviewed: '2026-04-29'
 - How to write KQL queries that group logs by Revision in Log Analytics.
 - How to wire Application Insights into a FastAPI app via OpenTelemetry.
 
+## Questions this chapter answers
+
+- What three layers does ACA observability split into, and what does each layer own?
+- What events does `ContainerAppConsoleLogs_CL` capture compared to `ContainerAppSystemLogs_CL`?
+- How do you write a KQL query that groups logs by Revision in Log Analytics?
+- What is the shortest path to wire Application Insights into a FastAPI app via OpenTelemetry?
+- Where is the boundary between observability ACA gives you for free and what you must instrument yourself?
+
 ## Why this matters
 
 Imagine your production ACA app starts emitting 5xx errors.

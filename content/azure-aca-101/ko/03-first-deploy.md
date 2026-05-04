@@ -33,6 +33,14 @@ last_reviewed: '2026-05-03'
 - ACR(Azure Container Registry) → ACA Environment → Container App → Revision의 4단계 의존성
 - 첫 배포가 잘 끝났는지 portal이 아니라 **CLI로** 확인하는 법
 
+## 이 글에서 답할 질문
+
+- ACA 자체는 image build를 책임지지 않는다 — 그러면 build는 누가, 어디서 하는가?
+- ACR(Azure Container Registry) → Environment → Container App → Revision의 4단계는 왜 이 순서로 의존하는가?
+- 첫 배포에서 비용이 정확히 언제부터 발생하기 시작하는가?
+- 배포가 "성공"했다는 신호를 portal이 아니라 CLI로 어떻게 확인하는가?
+- FastAPI 앱을 ACA에 올릴 때 Dockerfile에서 흔히 하는 실수는 무엇인가?
+
 ## 왜 중요한가
 
 "hello world를 한 번 띄웠다"는 경험은 ACA를 머리로 이해하는 것과 손으로 이해하는 것 사이를 가로지르는 경계입니다. 첫 배포 한 번이면 다음과 같은 질문에 자기 답이 생깁니다.

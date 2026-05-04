@@ -30,6 +30,14 @@ last_reviewed: '2026-04-29'
 - `min-replicas 0` (scale-to-zero)이 어떤 시나리오에서 안전하고 어떤 경우 위험한지 판단할 수 있습니다.
 - Service Bus queue worker와 HTTP API 두 가지 패턴을 `az containerapp` 명령으로 직접 구성할 수 있습니다.
 
+## 이 글에서 답할 질문
+
+- ACA는 어떤 신호를 보고 replica 수를 결정하며, 그 결정은 어디에서 일어나는가?
+- 내장 HTTP·TCP scale rule과 KEDA custom scaler는 언제 어느 쪽을 골라야 하는가?
+- `min-replicas 0`(scale-to-zero)은 어떤 워크로드에서 안전하고, 어떤 경우에 위험한가?
+- Service Bus queue worker는 왜 HTTP rule이 아니라 KEDA scaler로 묶어야 하는가?
+- cold start trade-off는 SLO 관점에서 어떻게 측정하고 절충해야 하는가?
+
 ## 왜 중요한가
 
 ACA의 핵심 가치 제안은 "Kubernetes의 무게 없이 컨테이너를 운영한다"입니다.

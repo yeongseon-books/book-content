@@ -30,6 +30,14 @@ last_reviewed: '2026-04-29'
 - Service invocation, Pub/Sub, State store, Secret store 네 가지 building block의 역할을 설명할 수 있습니다.
 - `--enable-dapr` 플래그와 component YAML로 실제 Dapr 통합을 구성할 수 있습니다.
 
+## 이 글에서 답할 질문
+
+- Dapr 사이드카는 ACA pod 안 어디에 붙고, 앱은 어떤 endpoint로 호출하는가?
+- App-level `--enable-dapr` 설정과 Environment-level component는 왜 분리되어 있는가?
+- Service invocation, Pub/Sub, State store, Secret store는 각각 어떤 문제를 해결하는가?
+- AKS에서 Dapr를 운영하는 것과 ACA에서 쓰는 것의 결정적 차이는 무엇인가?
+- Dapr를 "처음부터 켜는 것"이 왜 안티패턴으로 자주 지적되는가?
+
 ## 왜 중요한가
 
 마이크로서비스를 만들면 똑같은 문제가 반복됩니다.
