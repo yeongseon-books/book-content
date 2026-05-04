@@ -34,6 +34,14 @@ The main idea is simple: **an LLM cache is not a box for prompt outputs, it is a
 ![Caching strategies: reducing cost and latency](../../../assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)
 ---
 
+## Questions this chapter answers
+
+- How is caching an LLM response fundamentally different from caching an HTTP response?
+- Where do provider-side prompt caches and application caches divide responsibility?
+- How do you incorporate the system prompt, user input, and model version into the cache key?
+- When should you reach for a semantic cache (embedding similarity), and what are the risks?
+- How do you measure the tradeoff between hit rate and response freshness?
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later and the official `groq` SDK.
@@ -329,6 +337,14 @@ Once the prompt policy or response contract changes, bumping `cache_version` cle
 In this post, we built the smallest practical LLM cache: a request-hash key, an in-memory TTL store, and a completion wrapper that returns cached data when the request contract matches. The core rules are simple: include the whole meaningful request in the key, make freshness explicit with TTL, and exclude paths where caching would violate correctness or privacy.
 
 The earlier posts focused on response shape and execution flow. Caching adds a new layer: repeated work should not be paid for twice. The next topic handles the opposite problem. When a request does fail, how do you retry it without turning temporary problems into noisy instability?
+
+## Operational checklist
+
+- [ ] Folded determinism settings (temperature, seed) into the cache key
+- [ ] Defined an automatic invalidation policy when the model version rolls
+- [ ] Pinned the system prompt at the front for prompt-cache-aware models
+- [ ] Set thresholds and a fallback path before enabling semantic caching
+- [ ] Tracked hit rate, saved tokens, and miss latency as production metrics
 
 <!-- toc:begin -->
 ## In this series

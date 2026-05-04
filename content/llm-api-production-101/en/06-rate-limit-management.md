@@ -34,6 +34,14 @@ The main idea is simple: **rate-limit handling is not apologizing after a 429, i
 ![Rate limit management: patterns for staying within limits](../../../assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
 ---
 
+## Questions this chapter answers
+
+- What do RPM, TPM, and concurrency limits each mean, and where do they conflict?
+- How should the `Retry-After` header on 429 responses combine with your own backoff?
+- When does pooling across multiple models or accounts actually help?
+- Should you reach for token bucket or leaky bucket for LLM API limits?
+- Which metrics let you detect approaching limits and queue before failure?
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later and the official `groq` SDK.
@@ -391,6 +399,14 @@ Those are not reasons to ignore the pattern. They are reasons to treat this as t
 In this final post, we implemented a token bucket and a sliding-window limiter, then used a local gate in front of a Groq API call to control flow before the provider had to reject it. The practical lesson is simple: rate limits are easier to live with when your application manages them deliberately instead of discovering them through avoidable 429s.
 
 That closes the series. Structured output fixed the response contract. Tool calling connected the model to functions. Streaming changed how partial output is consumed. Caching reduced repeated cost. Retries handled temporary failure. Rate-limit control shaped the outer traffic boundary. Together, those pieces form a workable baseline for production LLM API integrations.
+
+## Operational checklist
+
+- [ ] Documented RPM/TPM/concurrency limits per model in a single table
+- [ ] Built a client that honors `Retry-After` first on 429 responses
+- [ ] Added a proactive token-bucket limiter that blocks calls before the wall
+- [ ] Defined routing rules and failure isolation when pooling keys/accounts
+- [ ] Set alarm thresholds for token usage and limit-proximity events
 
 <!-- toc:begin -->
 ## In this series

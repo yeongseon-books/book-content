@@ -36,6 +36,14 @@ The main idea is straightforward: **tool calling is not model autonomy, it is an
 ![Tool calling: connecting functions to the model](../../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
 ---
 
+## Questions this chapter answers
+
+- How is tool calling different from function calling, and does the LLM actually run functions?
+- How should you write tool definitions (name, description, parameters) so the model picks the right one?
+- How do you reduce wrong-tool selection when many tools are exposed?
+- How do you build a multi-turn loop that feeds tool results back to the model?
+- How do you recover the response when a tool call fails or times out?
+
 ## Runtime setup
 
 If you want to run the examples end to end, start with Python 3.10 or later and install the required packages first.
@@ -384,6 +392,14 @@ Fourth, **log every tool request and result in a traceable form**. When a user s
 In this post, we used the `tools` parameter to expose a controlled function interface, parsed `tool_calls` from the model response, and completed the full execution loop that runs a Python function and feeds the result back into the conversation. The important design point is that the model chooses from a toolbox, but the application still owns validation, permissions, and execution.
 
 Structured output gave us a contract for data. Tool calling extends that contract to function requests. The next topic applies the same production mindset to streamed responses, where the result arrives in pieces and error handling must account for partial output instead of one final string.
+
+## Operational checklist
+
+- [ ] Wrote each tool's `description` so the trigger condition is explicit
+- [ ] Specified type, enum, and required flags on every parameter
+- [ ] Implemented the loop that posts tool output back as a `role: tool` message
+- [ ] Standardized error payloads so the model can explain failures to the user
+- [ ] Added a guard (max call count) against repeated or infinite tool calls
 
 <!-- toc:begin -->
 ## In this series

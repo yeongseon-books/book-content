@@ -34,6 +34,14 @@ The goal is not a clever UI effect. The goal is a streaming consumer that can ex
 ![Streaming in depth: chunk handling and error recovery](../../../assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.en.png)
 ---
 
+## Questions this chapter answers
+
+- What does streaming change at the HTTP layer compared to a regular response?
+- How do Server-Sent Events (SSE) differ from chunked transfer, and which do LLM APIs actually use?
+- How do you safely accumulate and persist a partial response if the stream drops mid-flight?
+- When should you buffer token-level chunks into word-level units before rendering?
+- Where does usage data come from on a streaming response, and how do you aggregate it?
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later and the official `groq` SDK.
@@ -321,6 +329,14 @@ else:
 In this post, we treated streaming as a protocol with partial state rather than a cosmetic output mode. The practical rules are simple: treat empty chunks as normal, enforce read timeouts outside the blocking loop, preserve accumulated text on failure, and check whether the stream ended in a plausible way instead of assuming every interruption is the same.
 
 Structured output and tool calling made the response boundary more explicit. Streaming stretches that same boundary across time. The next topic stays on the operational side and asks a different question: when similar requests keep arriving, how do you avoid paying the full latency and token cost every time?
+
+## Operational checklist
+
+- [ ] Validated an async client that consumes SSE/chunked responses correctly
+- [ ] Defined a resume strategy that preserves partial output on disconnect
+- [ ] Handled token whitespace and newlines so the UI renders stable text
+- [ ] Captured usage data at stream close and fed it into cost metrics
+- [ ] Branched separately on mid-stream tool calls and error chunks
 
 <!-- toc:begin -->
 ## In this series

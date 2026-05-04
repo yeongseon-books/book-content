@@ -36,6 +36,14 @@ The main idea is simple: **structured output in production is a contract design 
 ![Structured output: JSON mode and response schemas](../../../assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
 ---
 
+## Questions this chapter answers
+
+- Why does free-form text output break in production?
+- When should you reach for JSON Schema versus Pydantic?
+- How does OpenAI `response_format` differ from tool-calling-based structured output?
+- When should you retry on schema violation versus fall back to a default?
+- How does schema length trade off against token cost and accuracy?
+
 ## Runtime setup
 
 To run the examples as written, start with Python 3.10 or later and install the two packages used in this article.
@@ -334,6 +342,14 @@ Trying to extract too many fields at once increases both model error surface and
 In this first production-focused post, we turned model output into an application contract. `response_format={"type": "json_object"}` narrows the response shape to machine-readable JSON. Pydantic adds typed validation on top of that shape. Together they move you away from brittle string parsing and toward explicit, observable boundaries.
 
 If the earlier series taught the basic request and response loop, this is the point where that loop becomes safe to automate. The next step is to put function execution on top of the same contract and let the model choose tools without letting the surrounding system become ambiguous.
+
+## Operational checklist
+
+- [ ] Declared output shape with a Pydantic model or JSON Schema
+- [ ] Wired one retry plus a log path for schema violations
+- [ ] Wrote field descriptions detailed enough for the model to interpret
+- [ ] Marked required vs. optional fields and added enum/range constraints
+- [ ] Automated regression tests (sample input -> schema validation) for schema changes
 
 <!-- toc:begin -->
 ## In this series

@@ -34,6 +34,14 @@ The main idea is simple: **a retry is not a friendly loop, it is a bounded recov
 ![Retry and error handling: making API calls reliable](../../../assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)
 ---
 
+## Questions this chapter answers
+
+- Which LLM API errors are safe to retry, and which must never be retried?
+- Why must exponential backoff and jitter always travel together?
+- What is the right retry unit when a streaming response errors mid-flight?
+- How do you cap retries so they don't explode token spend?
+- How do you prevent duplicate calls when an LLM API has no idempotency key?
+
 ## Runtime setup
 
 The examples assume Python 3.10 or later with `groq` and `tenacity` installed.
@@ -270,6 +278,14 @@ In practice, that often means logging fields such as `retryable`, `attempt_count
 In this post, we used `tenacity`, exponential backoff, and a small error hierarchy to build a more reliable LLM call path. The central lesson is that retry policy starts with classification, not with a loop. Decide what deserves another attempt first. Only then decide how many attempts and how much delay are acceptable.
 
 Caching reduced repeated work. Retries smooth over temporary failure. The final post steps even further out and looks at the outer constraint around all of this: how to keep request flow inside the provider’s rate limits without turning traffic spikes into outages.
+
+## Operational checklist
+
+- [ ] Documented which HTTP status codes are retryable in a single table
+- [ ] Enforced exponential backoff plus jitter and a max retry count in code
+- [ ] Retried streaming failures at the call level, not at the chunk level
+- [ ] Added a guard that caps token spend across retry attempts
+- [ ] Propagated a correlation ID across every retry of the same request
 
 <!-- toc:begin -->
 ## In this series
