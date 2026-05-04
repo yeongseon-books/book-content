@@ -40,6 +40,14 @@ Cluster Autoscaler is operated by Microsoft as part of the AKS managed control p
 
 ---
 
+## Questions this chapter answers
+
+- From what metric sources does HPA read on what cadence, and how does it decide?
+- What signals tell the Cluster Autoscaler that new nodes are required?
+- When HPA and CA move at the same time, how does the race appear and how do you tame it?
+- Why must scale-up be fast and scale-down slow, and where do you set the ratio?
+- Which workload shapes make it safe to combine VPA and HPA?
+
 ## Put both loops in one diagram
 
 ![Two loops for Pod and node scaling](../../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
@@ -91,6 +99,24 @@ Part 4 explained scheduling decisions; this part explains the two control loops 
 - unschedulable Pods remain Pending
 - Cluster Autoscaler detects them and asks AKS to add a node
 - new node becomes Ready and scheduler binds the Pending Pods
+
+### Inspect HPA and CA state
+
+```bash
+kubectl get hpa -A
+kubectl describe hpa my-app -n my-ns | tail -30
+
+kubectl -n kube-system logs -l component=cluster-autoscaler --tail=80
+kubectl get nodes -L agentpool,kubernetes.azure.com/scalesetpriority
+```
+
+## Operational checklist
+
+- [ ] Recorded ADR for each workload's HPA metric and threshold rationale
+- [ ] Tuned CA scale-down delay and unneeded time against cost vs latency
+- [ ] Load-tested the HPA-CA race scenario
+- [ ] Specified graceful drain policy for spot node pools
+- [ ] Classified workloads into VPA-eligible vs VPA-forbidden
 
 <!-- toc:begin -->
 ## In this series

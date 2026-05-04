@@ -45,6 +45,14 @@ containerd가 sandbox와 container를 만들고,
 
 ---
 
+## 이 글에서 답할 질문
+
+- kubelet은 정확히 어떤 주기로 무엇을 폴링하고, 그 주기는 어떻게 튜닝되는가?
+- containerd로의 전환 이후 docker 명령은 왜 사라졌고, 디버깅은 어떻게 바뀌었는가?
+- image pull은 노드 단위로 캐시되는가, 풀시 누가 인증하는가?
+- PodSpec의 resources.requests와 limits는 kubelet eviction 결정과 어떻게 만나는가?
+- kubelet이 unhealthy로 빠지는 가장 흔한 원인 세 가지는 무엇이고, 어떤 메트릭에서 보이는가?
+
 ## 한 장으로 보는 실행 경로
 
 ![API server에서 runc까지 이어지는 실행 경로](../../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.ko.png)
@@ -162,6 +170,27 @@ containerd가 OCI runtime 계층으로 내려가면서 `runc`를 사용합니다
 - containerd → `containerd-shim`
 - `containerd-shim` → `runc`
 - `runc` → container process
+
+### kubelet/containerd 상태 진단 (노드 디버그 컨테이너)
+
+```bash
+kubectl debug node/aks-nodepool1-12345 -it \
+  --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- chroot /host
+
+# inside the node
+systemctl status kubelet
+journalctl -u kubelet --since '15 min ago' | tail -50
+crictl ps -a | head
+crictl images | grep my-app
+```
+
+## 운영 체크리스트
+
+- [ ] node-level disk pressure / memory pressure 알림을 켰다
+- [ ] kubelet의 image GC 정책과 disk quota를 노드 SKU에 맞춰 설정했다
+- [ ] private registry 인증 방식(MI vs imagePullSecret)을 결정했다
+- [ ] containerd snapshotter 변경의 영향도를 검토했다
+- [ ] 노드 디버깅을 위한 kubectl debug 권한과 ephemeral container 정책을 정리했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

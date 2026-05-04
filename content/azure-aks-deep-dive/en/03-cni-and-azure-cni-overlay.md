@@ -38,6 +38,14 @@ and Azure CNI Overlay keeps Pod IPs on a separate overlay CIDR while the VNet mo
 
 ---
 
+## Questions this chapter answers
+
+- How do kubenet, Azure CNI, and Azure CNI Overlay differ in IP consumption and routing?
+- What operational limits emerge when Pod IPs consume real VNet IPs directly?
+- In Overlay mode, what is the SNAT path for outbound traffic?
+- Where in the data plane does a NetworkPolicy (Azure NPM, Cilium) actually drop packets?
+- What is the first signal of subnet IP exhaustion, and what is the recovery playbook?
+
 ## Put the three models side by side
 
 ![Comparison of three AKS network models](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
@@ -93,6 +101,24 @@ Part 2 followed the node-local execution path; this part explains how CNI attach
 - CNI plugin → interface creation, IPAM allocation, routes/rules programming
 - Pod sandbox becomes network-ready with Pod IP attached
 - Pod traffic exits either through VNet-routable pod subnets or through overlay-to-node SNAT depending on the mode
+
+### Inspect CNI mode and Pod CIDR
+
+```bash
+az aks show -n my-cluster -g my-rg \
+  --query "{network:networkProfile.networkPlugin, mode:networkProfile.networkPluginMode, pod:networkProfile.podCidr, service:networkProfile.serviceCidr}"
+
+kubectl get nodes -o wide
+kubectl get pods -A -o wide | head -20
+```
+
+## Operational checklist
+
+- [ ] Computed subnet sizing and service-CIDR headroom against the projected Pod count
+- [ ] Validated Overlay choice against external systems (firewalls, peering)
+- [ ] Decided on default-deny NetworkPolicy adoption with a staged rollout plan
+- [ ] Monitor SNAT-port exhaustion and decided whether to use NAT Gateway
+- [ ] Reviewed DNS traffic path (CoreDNS, upstream) and caching policy
 
 <!-- toc:begin -->
 ## In this series

@@ -45,6 +45,14 @@ and why the only control-plane surface most users ever see is the API server end
 
 ---
 
+## Questions this chapter answers
+
+- What components make up the AKS control plane, and who exactly notices when each one fails?
+- How far does the 'managed control plane' promise extend — etcd backup, upgrades, multi-zone availability?
+- Which scenarios surface API-server throttling first, and where does your workload create the pressure?
+- When the control plane goes down, how long do worker-node workloads keep running?
+- Where do audit logs and diagnostic settings land, at what cost, and what does the security team want shipped?
+
 ## The big picture — AKS control vs data plane
 
 This diagram is the map for the whole series.
@@ -161,6 +169,24 @@ If AKS 101 explained the split between the control plane and node pools for firs
 - controller loops in `kube-controller-manager` reconcile desired vs actual state
 - `kube-scheduler` writes a `Pod → Node` binding
 - kubelet and node-side runtime execute the work on the chosen node
+
+### Inspect control-plane state and diagnostic settings
+
+```bash
+az aks show -n my-cluster -g my-rg \
+  --query "{kubernetes:kubernetesVersion, sku:sku, apiServer:apiServerAccessProfile, autoUpgrade:autoUpgradeProfile}"
+
+az monitor diagnostic-settings list \
+  --resource $(az aks show -n my-cluster -g my-rg --query id -o tsv) -o table
+```
+
+## Operational checklist
+
+- [ ] Recorded the rationale for choosing 99.9 vs 99.95 SLA against the cost delta
+- [ ] Added API-server throttling metrics to the default dashboard
+- [ ] Documented data-plane isolation behaviour during control-plane outage in the runbook
+- [ ] Agreed audit-log retention and analysis queries with security
+- [ ] Decided whether to use API-server private endpoint and what the bypass path is
 
 <!-- toc:begin -->
 ## In this series

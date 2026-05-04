@@ -43,6 +43,14 @@ and records a Binding.
 
 ---
 
+## Questions this chapter answers
+
+- Through which stages does kube-scheduler narrow down nodes for a single Pod?
+- What intent originally drove nodeSelector, affinity, taints/tolerations, and topologySpreadConstraints?
+- PriorityClass and preemption protect the SLO — who pays the side-effect bill?
+- When a Pod is unschedulable, what are the first three debugging steps?
+- How should placement policies differ between stateful and stateless workloads?
+
 ## The three steps
 
 ![Scheduling stages from pending Pod to Binding](../../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png)
@@ -87,6 +95,23 @@ Parts 2 and 3 covered node execution and networking; this part explains the earl
 - Score plugins rank feasible nodes
 - scheduler writes Binding through the API server
 - kubelet on the chosen node starts the node-local execution path
+
+### Diagnose placement failures of a pending Pod
+
+```bash
+kubectl get pods -A --field-selector status.phase=Pending
+kubectl describe pod my-pod -n my-ns | tail -30
+kubectl get events --sort-by=.lastTimestamp -n my-ns | tail -20
+kubectl get nodes -L topology.kubernetes.io/zone,agentpool
+```
+
+## Operational checklist
+
+- [ ] Specified affinity/anti-affinity and zone spread for key workloads
+- [ ] Classified workloads by PriorityClass policy and preemption tolerance
+- [ ] Assigned an owner to every node taint and toleration
+- [ ] Prepared alerts and an auto-diagnostic script for Pending Pods
+- [ ] Aligned PVC zone-affinity with node zones for stateful workloads
 
 <!-- toc:begin -->
 ## In this series

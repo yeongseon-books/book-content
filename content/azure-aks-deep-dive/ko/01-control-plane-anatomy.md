@@ -45,6 +45,14 @@ data plane은 어디서 시작되며,
 
 ---
 
+## 이 글에서 답할 질문
+
+- AKS control plane은 정확히 어떤 컴포넌트로 구성되며, 누가 그것의 장애를 본다고 말할 수 있는가?
+- managed control plane이라는 약속은 etcd 백업, 업그레이드, 멀티존 가용성 중 어디까지를 포함하는가?
+- API server throttling은 어떤 상황에서 가장 먼저 보이고, 우리 워크로드는 어디서 압력을 만들어내는가?
+- control plane 장애가 났을 때 워커 노드의 워크로드는 ‘얼마나 오래’ 살아남는가?
+- audit log와 diagnostic settings는 어디에 어떤 비용으로 저장되며, 보안팀은 무엇을 받기를 원하는가?
+
 ## 전체 그림 — AKS 클러스터의 control vs data plane
 
 이 그림이 시리즈 전체의 기준점입니다.
@@ -338,6 +346,24 @@ AKS 101이 control plane과 node pool의 역할 분담을 입문자 관점에서
 - `kube-controller-manager`의 컨트롤 루프가 desired state와 actual state를 수렴
 - `kube-scheduler`가 `Pod → Node` binding 기록
 - 선택된 노드에서 kubelet과 runtime이 실제 실행 수행
+
+### control plane 상태와 진단 설정 확인
+
+```bash
+az aks show -n my-cluster -g my-rg \
+  --query "{kubernetes:kubernetesVersion, sku:sku, apiServer:apiServerAccessProfile, autoUpgrade:autoUpgradeProfile}"
+
+az monitor diagnostic-settings list \
+  --resource $(az aks show -n my-cluster -g my-rg --query id -o tsv) -o table
+```
+
+## 운영 체크리스트
+
+- [ ] control plane SLA(99.9 vs 99.95)와 비용을 비교해 결정 근거를 남겼다
+- [ ] API server throttling 메트릭을 기본 대시보드에 추가했다
+- [ ] control plane 장애 시 데이터 플레인 격리 동작을 RUNBOOK에 명시했다
+- [ ] audit log 보존 기간과 분석 쿼리를 보안팀과 합의했다
+- [ ] API server private endpoint 사용 여부와 우회 경로를 결정했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

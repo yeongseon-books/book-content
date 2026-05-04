@@ -39,6 +39,14 @@ KEDA installs two main components: the **operator**, which watches `ScaledObject
 
 ---
 
+## Questions this chapter answers
+
+- How does KEDA synthesize HPA external metrics, and where does the adapter's responsibility end?
+- What is the decisive difference between triggers that scale to zero and those that cannot?
+- How do ScaledObject and ScaledJob differ in intent, and who picks which?
+- When several triggers attach to one ScaledObject, how is max-metric chosen?
+- How far is workload impact contained when the KEDA operator itself fails?
+
 ## The KEDA structure
 
 ![KEDA structure linking event sources to HPA](../../../assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png)
@@ -95,6 +103,24 @@ Because part 5 separated HPA from Cluster Autoscaler first, this episode can pla
 - KEDA metrics adapter → scaler implementation
 - scaler returns activity + metric values
 - KEDA directly manages the `0 ↔ 1` boundary through `/scale`
+
+### Debug KEDA state and ScaledObjects
+
+```bash
+kubectl get scaledobjects -A
+kubectl describe scaledobject my-app -n my-ns | tail -40
+
+kubectl -n kube-system logs -l app=keda-operator --tail=80
+kubectl get hpa -n my-ns | grep keda
+```
+
+## Operational checklist
+
+- [ ] Tuned per-trigger polling interval and cooldown to workload spike shape
+- [ ] Defined fallback behaviour and alerts for KEDA operator failure
+- [ ] Wrote a guide for choosing between ScaledJob and ScaledObject
+- [ ] Set policy for external-scaler auth (managed identity, secrets)
+- [ ] Enabled monitoring on consistency between KEDA metrics and actual replica counts
 
 <!-- toc:begin -->
 ## In this series

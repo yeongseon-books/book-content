@@ -45,6 +45,14 @@ and `runc` finally spawns the real process.
 
 ---
 
+## Questions this chapter answers
+
+- On exactly what interval does the kubelet poll what, and how do you tune that interval?
+- Once containerd replaced dockershim, why did docker commands vanish, and how did debugging shift?
+- Are image pulls cached per node, and who authenticates the pull?
+- How do PodSpec.resources.requests and limits meet the kubelet's eviction decision?
+- What are the three most common causes of an unhealthy kubelet, and which metrics expose them?
+
 ## The execution path in one picture
 
 ![Execution path from API server to runc](../../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
@@ -130,6 +138,27 @@ Part 1 fixed the managed control-plane boundary; this part follows the exact opp
 - containerd → `containerd-shim`
 - `containerd-shim` → `runc`
 - `runc` → container process
+
+### Diagnose kubelet/containerd state via a node debug container
+
+```bash
+kubectl debug node/aks-nodepool1-12345 -it \
+  --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- chroot /host
+
+# inside the node
+systemctl status kubelet
+journalctl -u kubelet --since '15 min ago' | tail -50
+crictl ps -a | head
+crictl images | grep my-app
+```
+
+## Operational checklist
+
+- [ ] Enabled alerts on node-level disk and memory pressure
+- [ ] Tuned kubelet image GC and disk quota to match the node SKU
+- [ ] Decided on private-registry auth (managed identity vs imagePullSecret)
+- [ ] Reviewed the impact of changing the containerd snapshotter
+- [ ] Tightened kubectl-debug permissions and ephemeral-container policy
 
 <!-- toc:begin -->
 ## In this series

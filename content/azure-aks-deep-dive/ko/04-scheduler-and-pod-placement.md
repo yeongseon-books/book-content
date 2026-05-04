@@ -43,6 +43,14 @@ Binding을 기록합니다.
 
 ---
 
+## 이 글에서 답할 질문
+
+- kube-scheduler는 한 Pod에 대해 어떤 단계로 노드를 줄여 나가는가?
+- nodeSelector, affinity, taints/tolerations, topologySpreadConstraints는 각각 어떤 의도로 만들어졌는가?
+- PriorityClass와 preemption은 SLO를 지키는데, 그 부작용은 누가 받는가?
+- Pod이 ‘스케줄되지 않음’ 상태일 때, 디버깅의 첫 세 단계는 무엇인가?
+- stateful 워크로드와 stateless 워크로드의 placement 정책은 어떻게 달라야 하는가?
+
 ## 스케줄링의 세 단계
 
 ![대기 Pod가 Binding까지 가는 스케줄링 단계](../../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.ko.png)
@@ -86,6 +94,23 @@ binding cycle은 선택한 노드를 API server에 기록하는 단계입니다.
 - Score plugin이 feasible node 순위화
 - scheduler가 API server에 Binding 기록
 - 선택된 노드의 kubelet이 후속 실행 경로 시작
+
+### Pending Pod의 placement 실패 원인 진단
+
+```bash
+kubectl get pods -A --field-selector status.phase=Pending
+kubectl describe pod my-pod -n my-ns | tail -30
+kubectl get events --sort-by=.lastTimestamp -n my-ns | tail -20
+kubectl get nodes -L topology.kubernetes.io/zone,agentpool
+```
+
+## 운영 체크리스트
+
+- [ ] 주요 워크로드의 affinity/anti-affinity와 zone spread를 명시했다
+- [ ] PriorityClass 사용 정책과 preemption이 가능한 워크로드를 분류했다
+- [ ] node taint와 toleration의 owner를 명시했다
+- [ ] Pending Pod 알림과 자동 진단 스크립트를 준비했다
+- [ ] stateful 워크로드의 PVC zone-affinity와 노드 zone을 일치시켰다
 
 <!-- toc:begin -->
 ## 시리즈 목차
