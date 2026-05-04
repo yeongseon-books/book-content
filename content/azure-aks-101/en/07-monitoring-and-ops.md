@@ -248,6 +248,14 @@ This is the final part of the Azure Kubernetes Service 101 series. The earlier p
 
 ---
 
+## Operational checklist
+
+- [ ] Decided between Container Insights, Managed Prometheus, or both
+- [ ] Estimated Log Analytics workspace retention and cost
+- [ ] Defined the core alerts (node NotReady, Pod CrashLoop, OOM)
+- [ ] Set the policy for audit logs and API-server logs
+- [ ] Wrote a runbook for the incidents that actually recur
+
 <!-- toc:begin -->
 ## In this series
 

@@ -28,6 +28,14 @@ AKS is Azure's answer to that cost. This first post is about understanding AKS m
 
 ---
 
+## Questions this chapter answers
+
+- What does AKS take off your plate compared to self-managed Kubernetes, and what stays your job?
+- Is the AKS control plane really free, and what SLA does it carry?
+- What is a node pool, and how do you split system and user pools?
+- How does AKS bind to surrounding Azure resources (VNet, Load Balancer, Storage)?
+- When should you reach for AKS instead of Azure Container Apps or App Service?
+
 ## The big picture — one AKS cluster at a glance
 
 This is the map for the whole series.
@@ -183,6 +191,22 @@ Once that clicks, the rest of the series becomes much more concrete. Pods and De
 This is part 1 of the Azure Kubernetes Service 101 series. This post set the responsibility boundary; part 2 turns that boundary into the concrete cluster shape of control plane and node pools. After that, the series moves through your first deployment, the workload primitives, networking, scaling, and day-2 operations.
 
 ---
+
+## Quick check
+
+```bash
+az aks show \
+  --resource-group $RG --name $CLUSTER \
+  --query '{kubernetesVersion:kubernetesVersion, fqdn:fqdn, nodeResourceGroup:nodeResourceGroup}'
+```
+
+## Operational checklist
+
+- [ ] Made sure the team shares the AKS responsibility model
+- [ ] Estimated control-plane SLA and node-SKU cost up front
+- [ ] Decided how system node pools and user node pools split
+- [ ] Diagrammed the dependencies on VNet, ACR, and Key Vault
+- [ ] Documented why AKS beats ACA/App Service for this specific workload
 
 <!-- toc:begin -->
 ## In this series

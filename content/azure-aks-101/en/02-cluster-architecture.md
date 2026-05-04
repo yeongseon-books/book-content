@@ -27,6 +27,14 @@ This post is about reading that boundary. We'll look at what the control plane d
 
 ---
 
+## Questions this chapter answers
+
+- What does each control-plane component (API server, scheduler, controller manager, etcd) actually do?
+- How does the kubelet, kube-proxy, and container runtime path on a node fit together?
+- Where do AKS managed identity and RBAC plug into the authn/authz flow?
+- Which resources land in the managed `MC_` resource group, and why?
+- What is the blast radius of a node upgrade versus a control-plane upgrade?
+
 ## Cut the cluster in half
 
 ![Responsibility boundary between control plane and node pools](../../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
@@ -219,6 +227,21 @@ Those questions are more useful than a generic architecture diagram because they
 This is part 2 of the Azure Kubernetes Service 101 series. Part 1 defined the managed-Kubernetes boundary; this post turned that boundary into a concrete cluster shape. The next step is to turn that shape into a running cluster and a small FastAPI deployment.
 
 ---
+
+## Quick check
+
+```bash
+kubectl get nodes -o wide
+kubectl get pods -n kube-system
+```
+
+## Operational checklist
+
+- [ ] Can articulate the role of each control-plane component
+- [ ] Mapped the kubelet/kube-proxy/runtime path on a node
+- [ ] Marked where managed identity and RBAC sit in authn/authz
+- [ ] Inventoried what AKS creates in the managed `MC_` resource group
+- [ ] Estimated blast radius of node and control-plane upgrades
 
 <!-- toc:begin -->
 ## In this series

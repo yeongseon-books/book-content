@@ -27,6 +27,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- 최소한의 AKS 클러스터를 만들 때 반드시 결정해야 할 파라미터는 무엇인가?
+- `az aks create`와 Bicep/Terraform 중 첫 클러스터는 어떤 도구로 만드는 것이 좋은가?
+- ACR(Azure Container Registry)와 AKS는 어떤 권한 모델로 연결되는가?
+- 첫 배포에서 자주 깨지는 부분(이미지 풀, 권한, 네트워크)은 무엇인가?
+- kubectl context는 어떻게 안전하게 가져오고 검증하는가?
+
 ## 오늘 할 일의 순서
 
 ![클러스터 생성부터 배포까지의 흐름](../../../assets/azure-aks-101/03/03-01-today-s-flow.ko.png)
@@ -365,6 +373,14 @@ kubectl describe service fastapi-hello
 이 글은 Azure Kubernetes Service 101 시리즈의 3화입니다. 앞의 두 화에서 AKS와 클러스터 구조를 봤다면, 이번 화는 그 구조 위에 FastAPI 앱을 실제로 올리는 단계였습니다. 이제 남은 일은 오늘 매니페스트에 등장한 Pod, Deployment, Service를 각각 왜 따로 두는지 더 또렷하게 이해하는 것입니다.
 
 ---
+
+## 운영 체크리스트
+
+- [ ] 리전, 노드 SKU, Kubernetes 버전을 사전에 결정했다
+- [ ] ACR와 AKS를 managed identity로 연결했다
+- [ ] `kubectl get nodes`로 클러스터 접속을 검증했다
+- [ ] 첫 Deployment의 readinessProbe와 livenessProbe를 정의했다
+- [ ] Service의 노출 방식(ClusterIP/LoadBalancer)을 의도에 맞게 선택했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -27,6 +27,14 @@ They are related, but they are not the same. This post separates them by input s
 
 ---
 
+## Questions this chapter answers
+
+- What does each of HPA, Cluster Autoscaler, and KEDA observe and scale?
+- When does CPU/memory-based HPA fall short, and how does KEDA fill that gap?
+- Under what conditions can Cluster Autoscaler safely reschedule Pods when scaling nodes down?
+- Which workloads can scale to zero, and which fundamentally cannot?
+- What guards prevent autoscaling from blowing up your bill?
+
 ## One diagram first
 
 ![Relationship among HPA, CA, and KEDA](../../../assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
@@ -284,6 +292,14 @@ That takes us to part 7: Container Insights, logs, kube-state-metrics, and alert
 This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the series focused on cluster shape, workload objects, and traffic flow. This post added the feedback loops that change capacity over time. Part 7 closes the series by showing how to observe and operate those loops in a real AKS environment.
 
 ---
+
+## Operational checklist
+
+- [ ] Picked HPA metrics and thresholds from measurements, not guesses
+- [ ] Aligned Cluster Autoscaler min/max node counts with cost ceilings
+- [ ] Documented your KEDA scalers and auth path (Workload Identity)
+- [ ] Protected availability during scale-down with PodDisruptionBudgets
+- [ ] Tracked autoscaling events on alarms and dashboards
 
 <!-- toc:begin -->
 ## In this series

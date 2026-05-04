@@ -27,6 +27,14 @@ This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling 
 
 ---
 
+## Questions this chapter answers
+
+- How do Pod, ReplicaSet, and Deployment split responsibilities?
+- How does a Service hide Pod IP churn and route traffic underneath?
+- How do rolling and blue/green deploys express themselves in a Deployment?
+- When a Pod dies, which controller restores it and in what order?
+- Which options control packing pods onto one node versus spreading them?
+
 ## One picture first
 
 ![Relationship between Pod, Deployment, and Service](../../../assets/azure-aks-101/04/04-01-one-picture-first.en.png)
@@ -249,6 +257,14 @@ you are ready for the next layer: Ingress and cluster networking.
 This is part 4 of the Azure Kubernetes Service 101 series. Part 3 used Pod, Deployment, and Service in a real FastAPI deployment; this post separated their responsibilities so the model is explicit. Part 5 adds networking and Ingress in front of those Services and explains how traffic moves into and through the cluster.
 
 ---
+
+## Operational checklist
+
+- [ ] Set resource requests and limits on every container
+- [ ] Pinned the rolling-update strategy with explicit maxSurge/maxUnavailable
+- [ ] Confirmed the Service selector matches Pod labels exactly
+- [ ] Guaranteed an availability floor with a PodDisruptionBudget
+- [ ] Spread pods across nodes with topologySpreadConstraints or anti-affinity
 
 <!-- toc:begin -->
 ## In this series

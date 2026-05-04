@@ -251,6 +251,14 @@ IPAM 방식은 나중에 바꾸기 싫은 축입니다. 클러스터 수, 노드
 
 ---
 
+## 운영 체크리스트
+
+- [ ] kubenet vs. Azure CNI 중 네트워크 모델을 의도적으로 선택했다
+- [ ] ingress controller(NGINX, AGIC 등) 선택 이유를 문서화했다
+- [ ] TLS 인증서 발급/갱신 경로(cert-manager, Key Vault)를 정의했다
+- [ ] NetworkPolicy로 Pod 간 트래픽을 의도한 대로 제한했다
+- [ ] 외부 LoadBalancer의 정적 IP/DNS를 IaC로 관리했다
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

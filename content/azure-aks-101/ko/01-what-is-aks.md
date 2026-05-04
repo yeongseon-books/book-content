@@ -27,6 +27,14 @@ AKS는 그 부담을 줄이기 위해 나온 Azure의 관리형 Kubernetes입니
 
 ---
 
+## 이 글에서 답할 질문
+
+- AKS는 자체 관리(self-managed) Kubernetes와 비교해 무엇을 대신 해주고, 무엇은 여전히 사용자가 책임지는가?
+- AKS의 control plane은 정말 무료인가, 그리고 어떤 SLA로 제공되는가?
+- 노드 풀(node pool)은 무엇이고, system 풀과 user 풀은 어떻게 나누는가?
+- AKS는 Azure VNet, Load Balancer, Storage 같은 주변 리소스와 어떻게 묶여서 동작하는가?
+- AKS와 Azure Container Apps, Azure App Service 중 언제 AKS를 골라야 하는가?
+
 ## 전체 그림 — AKS 클러스터 한 장면
 
 이 그림이 이번 시리즈 전체의 지도입니다.
@@ -183,6 +191,22 @@ AKS는 이 셋 중에서 가장 Kubernetes에 가깝습니다. 대신 그만큼 
 이 글은 Azure Kubernetes Service 101 시리즈의 1화입니다. 이번 화에서 AKS의 책임 경계를 먼저 잡았고, 2화에서는 클러스터 내부를 구성하는 Control Plane과 Node Pool을 더 구체적으로 봅니다. 그 뒤에는 첫 배포, 워크로드 표현 방식, 네트워킹, 스케일링, 운영 순서로 연결됩니다.
 
 ---
+
+## 빠르게 확인하기
+
+```bash
+az aks show \
+  --resource-group $RG --name $CLUSTER \
+  --query '{kubernetesVersion:kubernetesVersion, fqdn:fqdn, nodeResourceGroup:nodeResourceGroup}'
+```
+
+## 운영 체크리스트
+
+- [ ] AKS의 책임 분담(공유 책임 모델)을 팀이 같이 이해했다
+- [ ] control plane 가용성과 노드 SKU별 비용을 견적했다
+- [ ] system 노드 풀과 user 노드 풀 분리 정책을 정했다
+- [ ] AKS 외부 리소스(VNet, ACR, Key Vault) 의존성을 도식화했다
+- [ ] 워크로드 특성에 비춰 AKS가 ACA/App Service보다 적합한 이유를 문서화했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -27,6 +27,14 @@ This post creates a small AKS cluster, adds a user node pool, and deploys a mini
 
 ---
 
+## Questions this chapter answers
+
+- What parameters absolutely must be decided when creating a minimal AKS cluster?
+- Should you reach for `az aks create` or Bicep/Terraform for your first cluster?
+- What permission model wires ACR (Azure Container Registry) to AKS?
+- What breaks most often on the first deploy (image pull, permissions, networking)?
+- How do you fetch and verify the kubectl context safely?
+
 ## Today's flow
 
 ![Cluster creation and deployment flow](../../../assets/azure-aks-101/03/03-01-today-s-flow.en.png)
@@ -362,6 +370,14 @@ The three workload primitives you just used—Pod, Deployment, and Service—are
 This is part 3 of the Azure Kubernetes Service 101 series. The first two posts set the platform boundary and the cluster shape; this one turned that model into a real deployment with a small FastAPI app. The next step is to unpack the exact role of Pod, Deployment, and Service in the manifest you just applied.
 
 ---
+
+## Operational checklist
+
+- [ ] Pinned region, node SKU, and Kubernetes version up front
+- [ ] Connected ACR to AKS via managed identity
+- [ ] Verified cluster access with `kubectl get nodes`
+- [ ] Set readiness and liveness probes on the first Deployment
+- [ ] Picked the right Service exposure (ClusterIP/LoadBalancer) for intent
 
 <!-- toc:begin -->
 ## In this series

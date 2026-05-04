@@ -27,6 +27,14 @@ They get easier once you separate two layers: how pod IPs are assigned, and how 
 
 ---
 
+## Questions this chapter answers
+
+- How does pod IP assignment differ from external HTTP routing, and why keep them separate?
+- When does kubenet beat Azure CNI, and when does Azure CNI Overlay sidestep both tradeoffs?
+- What does an Ingress controller add that a plain Service cannot?
+- Where should TLS termination happen, and why does that choice ripple through observability?
+- Which networking mistakes show up first when an AKS cluster scales beyond a single team?
+
 ## Start with the request path
 
 ![External request flow through Ingress](../../../assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png)
@@ -242,6 +250,14 @@ That is the handoff to part 6: HPA, Cluster Autoscaler, and KEDA.
 This is part 5 of the Azure Kubernetes Service 101 series. The previous post focused on the internal workload primitives; this one connected those primitives to cluster networking and external traffic. Part 6 picks up from here and explains how AKS reacts when that traffic and workload demand change over time.
 
 ---
+
+## Operational checklist
+
+- [ ] Chose kubenet vs. Azure CNI deliberately, not by default
+- [ ] Documented why you picked your ingress controller (NGINX, AGIC, etc.)
+- [ ] Defined the TLS issuance/renewal path (cert-manager, Key Vault)
+- [ ] Restricted pod-to-pod traffic with NetworkPolicy as intended
+- [ ] Managed the external LoadBalancer's static IP/DNS through IaC
 
 <!-- toc:begin -->
 ## In this series
