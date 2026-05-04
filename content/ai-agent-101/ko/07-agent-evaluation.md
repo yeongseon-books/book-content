@@ -90,7 +90,6 @@ def evaluate_success_rate(
         "failed_cases": [r for r in results if not r.success]
     }
 
-
 # 사용 예시
 test_cases = [
     TestCase(
@@ -179,7 +178,6 @@ def measure_latency():
 
 def record_step(metrics: dict, step_name: str, duration: float):
     metrics["steps"].append({"name": step_name, "seconds": duration})
-
 
 # 사용 예시
 with measure_latency() as m:
@@ -285,7 +283,6 @@ def evaluate_trajectory_efficiency(traj: Trajectory) -> dict:
             if traj.steps else 0
     }
 
-
 # 효율성 비교
 traj_a = recorder_a.finalize("답변 A", True)
 traj_b = recorder_b.finalize("답변 B", True)
@@ -335,7 +332,6 @@ def evaluate_tool_call(
             result["args_correct"] = False
 
     return result
-
 
 # 사용 예시
 expected = ToolCallExpectation(
@@ -397,7 +393,6 @@ class E2ETestSuite:
             import re
             return bool(re.search(assertion["pattern"], response))
         return False
-
 
 # 시나리오 정의
 scenario = {
@@ -603,7 +598,7 @@ else:
 - 단일 실행이 아닌 5-10회 반복 후 평균으로 평가해야 신뢰할 수 있습니다
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -615,6 +610,7 @@ else:
 - 에러 처리와 안정성 (예정)
 - 운영 (예정)
 - 첫 Agent 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -631,4 +627,4 @@ else:
 4. **OpenAI Evals Framework** - https://github.com/openai/evals  
    OpenAI의 모델 평가 프레임워크. Agent를 포함한 다양한 LLM 시스템에 적용 가능합니다.
 
-Tags: AI Agent, Evaluation, Testing, Metrics
+Tags: AI Agent, LLM, Tool Use, Python

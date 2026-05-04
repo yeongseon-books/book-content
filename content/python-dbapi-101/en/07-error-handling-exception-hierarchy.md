@@ -46,7 +46,6 @@ A second reason: `sqlite3` exception messages are English sentences, so it is te
 
 > An exception class is a signal about how to react in production. Retry, 4xx, or fail-loud should be encoded by the class itself.
 
-
 Reread the PEP 249 hierarchy with operations in mind:
 
 ```
@@ -327,6 +326,22 @@ Do not write a custom handler for `ProgrammingError` or `InterfaceError`. Let th
 
 The next post moves from errors to connections themselves: SQLite's thread-safety modes, `check_same_thread`, per-thread vs shared connections, and connection management in FastAPI.
 
+<!-- toc:begin -->
+## In this series
+
+- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- **PEP 249 Exception Hierarchy and SQLite Error Handling (current)**
+- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Asynchronous SQLite with aiosqlite (upcoming)
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [PEP 249 — Python Database API 2.0](https://peps.python.org/pep-0249/)
@@ -335,4 +350,4 @@ The next post moves from errors to connections themselves: SQLite's thread-safet
 - [SQLite: File Locking and Concurrency](https://www.sqlite.org/lockingv3.html)
 - [What's New in Python 3.11 — sqlite3](https://docs.python.org/3/whatsnew/3.11.html#sqlite3)
 
-Tags: Python, SQLite, Error Handling, Exception, Retry, PEP 249
+Tags: Python, DB-API, PEP 249, Database

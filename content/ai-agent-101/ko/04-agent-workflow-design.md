@@ -31,7 +31,6 @@ last_reviewed: '2026-05-02'
 
 ## 주요 Workflow 패턴
 
-
 Agent가 복잡한 작업을 수행하려면 체계적인 Workflow가 필요합니다. 대표적인 패턴을 살펴봅니다.
 
 ### ReAct (Reasoning + Acting)
@@ -499,8 +498,6 @@ REUSABLE_STEPS = {
 
 올바른 작업 분해는 Agent의 성공률과 유지보수성을 크게 향상시킵니다.
 
-
-
 Workflow 실행 중 Agent는 현재 어디까지 진행했는지, 다음에 무엇을 해야 하는지 추적해야 합니다.
 
 ### 상태 정의
@@ -792,7 +789,6 @@ Pending Steps ({len(state.pending_steps)}):
 
 올바른 상태 관리는 Agent의 안정성과 디버깅 가능성을 크게 향상시킵니다.
 
-
 효과적인 Workflow를 설계하려면 여러 요소를 고려해야 합니다.
 
 ### 확장성 (Scalability)
@@ -1063,12 +1059,9 @@ Workflow 설계 시 다음 질문에 답할 수 있어야 합니다:
 
 이러한 요소들을 고려하여 설계하면 프로덕션 환경에서 안정적으로 동작하는 Workflow를 구축할 수 있습니다.
 
-
-
 ## 핵심 요약
 
 ## 흔한 실수
-
 
 Workflow 설계 시 자주 발생하는 실수들을 살펴봅니다.
 
@@ -1286,21 +1279,29 @@ else:
 
 **교훈**: 프로덕션 배포 전에 단위 테스트, 통합 테스트, 시뮬레이션을 거쳐야 합니다.
 
+## 핵심 요약
 
 - Workflow는 Agent가 복잡한 작업을 체계적으로 수행하도록 설계하는 것입니다.
 - ReAct, Plan-and-Execute, Reflexion 등 다양한 패턴이 있으며, 작업 특성에 맞게 선택해야 합니다.
 - 작업 분해와 상태 관리가 Workflow 설계의 핵심입니다.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
-- AI Agent란 무엇인가? (예정)
-- 컨텍스트 엔지니어링 (예정)
-- Tool Use 기초 (예정)
+- [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
+- [컨텍스트 엔지니어링](./02-context-engineering.md)
+- [Tool Use 기초](./03-tool-use-fundamentals.md)
 - **Agent Workflow 설계 (현재 글)**
 - Memory와 State (예정)
+- Multi-Agent 시스템 (예정)
+- Agent 평가 (예정)
+- 에러 처리와 안정성 (예정)
+- 운영 (예정)
+- 첫 Agent 만들기 (예정)
+
+<!-- toc:end -->
+
+## 참고 자료
 
 1. **ReAct: Synergizing Reasoning and Acting in Language Models** - https://arxiv.org/abs/2210.03629  
    Yao et al.의 ReAct 패턴 논문. 추론과 행동을 번갈아 수행하는 방식의 이론적 배경과 실험 결과를 제시합니다.
@@ -1309,7 +1310,9 @@ else:
    LangChain의 Workflow 구축 프레임워크. 상태 관리, 그래프 기반 Workflow 설계 방법을 다룹니다.
 
 3. **Reflexion: Language Agents with Verbal Reinforcement Learning** - https://arxiv.org/abs/2303.11366  
+   자기 반성을 통한 Agent 성능 향상. 실패에서 학습하는 메커니즘을 설명합니다.
 
 4. **AutoGPT Architecture** - https://github.com/Significant-Gravitas/AutoGPT  
    Plan-and-Execute 패턴의 실제 구현 예시. 자율 Agent의 작업 분해 및 실행 전략을 보여줍니다.
 
+Tags: AI Agent, LLM, Tool Use, Python

@@ -3,7 +3,7 @@ title: SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질
 series: sqlalchemy-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -383,6 +383,22 @@ def engine():
 
 다음 글에서는 한 단계 위로 올라가 **MetaData, Table, Column, type system**을 다룹니다. raw SQL 문자열 대신 Python 객체로 schema를 선언하는 Core의 진짜 매력이 본격적으로 등장합니다. ORM 이전 단계인 Core SQL expression이 어떤 모양인지를 이해하면, 4편 이후의 ORM이 훨씬 쉽게 읽힙니다.
 
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질 (현재 글)**
+- SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기 (예정)
+- SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (예정)
+- ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
+- Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
+- ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- production 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [SQLAlchemy 2.x Tutorial - Establishing Connectivity](https://docs.sqlalchemy.org/en/20/tutorial/engine.html)
@@ -391,4 +407,4 @@ def engine():
 - [SQLite URL forms](https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#connect-strings)
 - [PEP 249 - Python Database API Specification 2.0](https://peps.python.org/pep-0249/)
 
-Tags: Python, SQLAlchemy, Engine, Connection, SQLite, DBAPI
+Tags: Python, SQLAlchemy, ORM, Database

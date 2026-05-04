@@ -46,7 +46,6 @@ title: PEP 249 예외 계층과 SQLite 에러 처리
 
 > 예외 클래스는 운영 의사결정의 신호다. retry할지, 4xx로 돌려줄지, 즉시 fail할지를 클래스 하나로 표현할 수 있어야 한다.
 
-
 PEP 249의 예외 계층을 운영 관점으로 다시 그리면 다음과 같습니다.
 
 ```
@@ -329,6 +328,22 @@ def post_user(payload: UserCreate, conn=Depends(get_conn)):
 
 다음 글에서는 connection 자체를 다룹니다. SQLite의 thread-safety 모드, `check_same_thread`, per-thread vs shared connection, 그리고 FastAPI에서의 connection 관리 패턴을 살펴보겠습니다.
 
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- **PEP 249 예외 계층과 SQLite 에러 처리 (현재 글)**
+- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- aiosqlite로 비동기 SQLite 다루기 (예정)
+- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [PEP 249 — Python Database API 2.0](https://peps.python.org/pep-0249/)
@@ -337,4 +352,4 @@ def post_user(payload: UserCreate, conn=Depends(get_conn)):
 - [SQLite: File Locking and Concurrency](https://www.sqlite.org/lockingv3.html)
 - [What's New in Python 3.11 — sqlite3](https://docs.python.org/3/whatsnew/3.11.html#sqlite3)
 
-Tags: Python, SQLite, Error Handling, Exception, Retry, PEP 249
+Tags: Python, DB-API, PEP 249, Database

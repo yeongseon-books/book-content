@@ -333,6 +333,22 @@ If none of those apply, `def` + `sqlite3` is simpler and often faster. Adopt `ai
 
 The next post (Episode 10, the series finale) consolidates production patterns: retry plus timeout plus observability, slow-query logging, OpenTelemetry instrumentation, and a backup strategy.
 
+<!-- toc:begin -->
+## In this series
+
+- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
+- [SQLite Connection Management: thread-safety, check_same_thread, and Pooling](./08-connection-pooling.md)
+- **Asynchronous SQLite with aiosqlite (current)**
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [aiosqlite — Documentation](https://aiosqlite.omnilib.dev/)
@@ -341,4 +357,4 @@ The next post (Episode 10, the series finale) consolidates production patterns: 
 - [Python asyncio — Streams and synchronization primitives](https://docs.python.org/3/library/asyncio.html)
 - [SQLite — Write-Ahead Logging](https://www.sqlite.org/wal.html)
 
-Tags: Python, SQLite, asyncio, aiosqlite, Async, PEP 249
+Tags: Python, DB-API, PEP 249, Database

@@ -199,22 +199,23 @@ def build_refund_agent() -> HarnessStack:
 
 이 시리즈의 마지막 글입니다. Harness Engineering 101에서 다룬 9가지 harness와 production layer를 조합하면, "그럴듯하게 보이지만 production에서 무너지는 데모"가 아니라 "사용자에게 신뢰받는 에이전트"를 만들 수 있습니다.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 시리즈
+## 시리즈 목차
 
-- [Harness Engineering이란?](./01-what-is-harness-engineering.md)
-- [Task Harness](./02-task-harness.md)
-- [Context Harness](./03-context-harness.md)
-- [Constraint Harness](./04-constraint-harness.md)
-- [Tool Harness](./05-tool-harness.md)
-- [Test Harness](./06-test-harness.md)
-- [Feedback Loop](./07-feedback-loop.md)
-- [Approval Gate](./08-approval-gate.md)
-- [Observability](./09-observability.md)
-- **Production Harness (현재 글)**
+- [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
+- [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
+- [Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
+- [Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
+- [Tool Harness — Agent가 사용할 도구를 안전하게 설계하기](./05-tool-harness.md)
+- [Test Harness — 완료 조건을 테스트로 고정하기](./06-test-harness.md)
+- [Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
+- [Approval Gate — 사람 승인이 필요한 지점 설계하기](./08-approval-gate.md)
+- [Observability — Agent 작업을 추적하고 재현하기](./09-observability.md)
+- **Production Harness — 운영 가능한 Agent 작업 환경 만들기 (현재 글)**
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -223,4 +224,4 @@ def build_refund_agent() -> HarnessStack:
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [PagerDuty — Incident response documentation](https://response.pagerduty.com/)
 
-Tags: AI Agent, Harness, Production, Deployment
+Tags: AI Agent, Harness, Production, Reliability

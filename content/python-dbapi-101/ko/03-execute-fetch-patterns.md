@@ -188,22 +188,23 @@ def export_notes(db_path, csv_path, chunk=500):
 
 다음 글에서는 parameter binding과 SQL injection 방어를 다룹니다.
 
----
-
 <!-- toc:begin -->
-## Python DB-API 101 시리즈
+## 시리즈 목차
 
 - [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
 - [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
 - **execute, executemany, fetch 패턴 (현재 글)**
-- Parameter binding과 SQL injection 방어 (예정)
-- Transaction과 isolation level (예정)
-- Row factory와 type adapter/converter (예정)
-- Error handling과 exception 계층 (예정)
-- Connection pooling 패턴 (예정)
-- aiosqlite로 async DB-API 다루기 (예정)
-- Production 패턴 - migration, retry, observability (예정)
+- Parameter binding과 SQL injection 방어 (sqlite3, PEP 249) (예정)
+- Transaction과 isolation level (sqlite3, PEP 249) (예정)
+- Row factory와 type adapter (sqlite3, PEP 249) (예정)
+- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- aiosqlite로 비동기 SQLite 다루기 (예정)
+- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -212,4 +213,4 @@ def export_notes(db_path, csv_path, chunk=500):
 - [psycopg 3 - Server-side cursors](https://www.psycopg.org/psycopg3/docs/advanced/cursors.html)
 - [SQLite - Optimizing INSERT performance](https://www.sqlite.org/faq.html#q19)
 
-Tags: Python, execute, executemany, fetchone, fetchall, Streaming Iteration
+Tags: Python, DB-API, PEP 249, Database

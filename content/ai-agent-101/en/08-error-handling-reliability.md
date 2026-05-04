@@ -60,7 +60,6 @@ def parse_llm_json(response_text: str) -> dict:
     except json.JSONDecodeError as e:
         raise LLMResponseError(f"JSON parse failed: {e}\nraw: {response_text[:200]}")
 
-
 # Example usage
 response = '```json\n{"action": "search", "query": "Python"}\n```'
 try:
@@ -162,7 +161,6 @@ def retry_with_backoff(
 
     raise last_exception
 
-
 # Example usage
 def call_flaky_api():
     response = requests.get("https://api.example.com/data", timeout=5)
@@ -202,7 +200,6 @@ class FallbackChain:
             except Exception as e:
                 errors.append({"handler": name, "error": str(e)})
         raise RuntimeError(f"all handlers failed: {errors}")
-
 
 # Example usage
 def primary_search(query):
@@ -287,7 +284,6 @@ class CircuitBreaker:
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitState.OPEN
 
-
 # Example usage
 breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=30)
 
@@ -323,7 +319,6 @@ def time_limit(seconds: int):
         yield
     finally:
         signal.alarm(0)
-
 
 def run_tool_with_limits(tool_fn, *args, timeout: int = 30, **kwargs):
     """Run a tool with timeout and exception handling."""
@@ -440,7 +435,7 @@ Show users a friendly message; manage internal trace IDs separately.
 - Don't swallow errors silently — surface them through logs and metrics
 
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
 - [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
 - [Context Engineering](./02-context-engineering.md)
@@ -452,6 +447,7 @@ Show users a friendly message; manage internal trace IDs separately.
 - **Error Handling and Reliability (current)**
 - Production Operations (upcoming)
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -468,4 +464,4 @@ Show users a friendly message; manage internal trace IDs separately.
 4. **Hystrix: Latency and Fault Tolerance** - https://github.com/Netflix/Hystrix/wiki  
    Netflix's circuit breaker library docs. Provides core concepts and operational case studies.
 
-Tags: AI Agent, Reliability, Error Handling, Resilience
+Tags: AI Agent, LLM, Tool Use, Python

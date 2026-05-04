@@ -48,13 +48,11 @@ Similar to traditional software testing, with non-determinism added.
 import pytest
 from dataclasses import dataclass
 
-
 # 1. Unit test — tool schema
 def test_create_user_input_validation():
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
         CreateUserInput(email="invalid", name="A", role="admin")
-
 
 # 2. Integration test — task flow
 def test_report_generation_flow(mock_llm):
@@ -63,7 +61,6 @@ def test_report_generation_flow(mock_llm):
     result = agent.run(task=ReportTaskSpec(date="2026-05-03"))
     assert result.status == "completed"
     assert all(call.tool == "read_db" for call in result.tool_calls)
-
 
 # 3. Eval test — qualitative quality
 def test_summary_quality(eval_dataset):
@@ -99,7 +96,6 @@ class EvalExample:
     category: str  # "happy_path" | "edge" | "adversarial"
     source: str  # "production" | "synthetic" | "manual"
 
-
 def build_eval_dataset() -> list[EvalExample]:
     """Balance the dataset across categories."""
     examples = []
@@ -129,7 +125,6 @@ Three scoring approaches.
 ```python
 from typing import Callable
 
-
 @dataclass
 class Rubric:
     """A bundle of scoring criteria."""
@@ -137,14 +132,12 @@ class Rubric:
     weight: float
     check: Callable[[dict, dict], float]  # (output, expected) -> 0.0..1.0
 
-
 def has_required_sections(output: dict, expected: dict) -> float:
     required = expected.get("required_sections", [])
     if not required:
         return 1.0
     present = sum(1 for s in required if s in output.get("text", ""))
     return present / len(required)
-
 
 def numbers_match(output: dict, expected: dict) -> float:
     e_nums = expected.get("numbers", {})
@@ -154,18 +147,15 @@ def numbers_match(output: dict, expected: dict) -> float:
     correct = sum(1 for k, v in e_nums.items() if abs(o_nums.get(k, 0) - v) < 0.01)
     return correct / len(e_nums)
 
-
 def llm_judge_helpfulness(output: dict, expected: dict) -> float:
     """Have an LLM rate helpfulness from 0 to 1."""
     return 0.85  # actual: call judge LLM
-
 
 RUBRICS = [
     Rubric("structure", weight=0.3, check=has_required_sections),
     Rubric("accuracy", weight=0.5, check=numbers_match),
     Rubric("helpfulness", weight=0.2, check=llm_judge_helpfulness),
 ]
-
 
 def rubric_score(output: dict, expected: dict, rubrics=RUBRICS) -> float:
     return sum(r.check(output, expected) * r.weight for r in rubrics)
@@ -210,7 +200,6 @@ jobs:
       - run: python scripts/run_eval.py --dataset eval/v1 --threshold 0.85
 """
 
-
 def run_eval_suite(dataset_path: str, threshold: float) -> bool:
     """Run the full eval and compare to threshold."""
     examples = load_dataset(dataset_path)
@@ -241,7 +230,6 @@ import json
 from pathlib import Path
 import hashlib
 
-
 def assert_snapshot(name: str, actual: dict, snapshot_dir: Path = Path("tests/snapshots")):
     """Compare against a saved snapshot."""
     snapshot_dir.mkdir(parents=True, exist_ok=True)
@@ -263,7 +251,6 @@ def assert_snapshot(name: str, actual: dict, snapshot_dir: Path = Path("tests/sn
             f"  expected: {expected_hash}\n"
             f"  actual:   {actual_hash}\n"
         )
-
 
 def test_classification_snapshot(deterministic_agent):
     """The classification task's output does not change."""
@@ -302,22 +289,23 @@ Tests run manually only sometimes soon become tests run never. Auto-run on every
 - Score with exact match, heuristics, and LLM-as-judge in combination, calibrating the judge against humans.
 - Wire all tests into CI for every PR. Manual tests soon become unrun tests.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
 - [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What to Show and Hide from the Agent](./03-context-harness.md)
+- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
 - [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
 - [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- **Test Harness — Pinning Completion Criteria with Tests (current)**
-- Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)
-- Approval Gate — Designing Where Human Approval Is Required (upcoming)
-- Observability — Tracing and Reproducing Agent Work (upcoming)
-- Production Harness — Building an Operable Agent Work Environment (upcoming)
+- **Test Harness — Turning Completion Criteria into Tests (current)**
+- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -326,4 +314,4 @@ Tests run manually only sometimes soon become tests run never. Auto-run on every
 - [LangSmith — LLM Evaluation](https://docs.smith.langchain.com/evaluation)
 - [Eugene Yan — Evaluating LLM-Based Applications](https://eugeneyan.com/writing/evals/)
 
-Tags: AI Agent, Harness, Testing, Eval
+Tags: AI Agent, Harness, Production, Reliability

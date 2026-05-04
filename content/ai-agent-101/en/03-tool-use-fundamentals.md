@@ -227,8 +227,6 @@ print(answer)
 
 This four-step flow is the foundation of all AI agent systems. Master this pattern, and you'll understand how agents interact with the world.
 
-
-
 For agents to use tools correctly, they must understand what each tool does and what inputs it expects. This is where tool schemas come in.
 
 ### Essential Schema Elements
@@ -417,7 +415,6 @@ response = openai.chat.completions.create(
 ```
 
 The clearer your schema, the higher the probability the LLM will use the tool correctly.
-
 
 Tool calls can fail at any time. Network errors, invalid parameters, API rate limits—there are many causes. Robust agents anticipate and handle errors appropriately.
 
@@ -610,8 +607,6 @@ except TimeoutError:
 ```
 
 Proper error handling significantly improves agent stability and reliability.
-
-
 
 When agents have multiple tools available, they need a strategy to decide which tool to use.
 
@@ -853,7 +848,6 @@ The right tool selection strategy significantly impacts agent efficiency and cos
 
 ## Tool Selection Strategies
 
-
 Let's examine common mistakes when using tools and how to fix them.
 
 ### Mistake 1: Unclear Tool Descriptions
@@ -1087,13 +1081,11 @@ if result["success"]:
 - Tool schemas must be clear and specific for models to call them correctly.
 - Error handling and tool selection strategies determine agent reliability.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
-- What is an AI Agent? (upcoming)
-- Context Engineering (upcoming)
+- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [Context Engineering](./02-context-engineering.md)
 - **Tool Use Fundamentals (current)**
 - Agent Workflow Design (upcoming)
 - Memory and State (upcoming)
@@ -1102,12 +1094,12 @@ if result["success"]:
 - Error Handling and Reliability (upcoming)
 - Production Operations (upcoming)
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
 
+---
+
 ## References
-
-
-Tags: AI Agent, Tool Use, Function Calling, Integration
 
 1. **OpenAI Function Calling Guide** - https://platform.openai.com/docs/guides/function-calling  
    Official OpenAI Function Calling documentation. Covers tool schema design, tool_choice parameter, and practical examples.
@@ -1121,4 +1113,4 @@ Tags: AI Agent, Tool Use, Function Calling, Integration
 4. **Anthropic Tool Use Best Practices** - https://docs.anthropic.com/claude/docs/tool-use  
    Claude API tool use guide. Explains error handling, retry strategies, and security considerations.
 
-Tags: AI Agent, Tool Use, Function Calling, Integration
+Tags: AI Agent, LLM, Tool Use, Python

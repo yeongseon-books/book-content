@@ -53,14 +53,12 @@ from openai import OpenAI
 
 client = OpenAI()
 
-
 def run_agent(user_message: str) -> str:
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": user_message}],
     )
     return response.choices[0].message.content or ""
-
 
 # Usage
 answer = run_agent("Build a sales report for our company")
@@ -75,13 +73,11 @@ With a harness applied, the same task becomes:
 from typing import Any
 from pydantic import BaseModel
 
-
 class TaskSpec(BaseModel):
     """Task Harness: clear inputs and completion criteria."""
     goal: str
     inputs: dict[str, Any]
     completion_criteria: list[str]
-
 
 class AgentContext(BaseModel):
     """Context Harness: what to show and what to hide."""
@@ -89,13 +85,11 @@ class AgentContext(BaseModel):
     allowed_data_sources: list[str]
     forbidden_topics: list[str]
 
-
 class ToolPolicy(BaseModel):
     """Constraint + Tool Harness: allowed and forbidden actions."""
     allowed_tools: list[str]
     require_approval: list[str]
     max_iterations: int = 5
-
 
 def run_agent_with_harness(task: TaskSpec, ctx: AgentContext, policy: ToolPolicy) -> dict[str, Any]:
     """Agent execution with harnesses applied."""
@@ -216,19 +210,16 @@ With a harness applied:
 from enum import Enum
 from pydantic import BaseModel, Field
 
-
 class Priority(str, Enum):
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
-
 
 class ClassificationResult(BaseModel):
     """Test Harness: schema pins down completion criteria."""
     priority: Priority
     reason: str = Field(..., min_length=10)
     confidence: float = Field(..., ge=0.0, le=1.0)
-
 
 SYSTEM_PROMPT = """You are an email priority classifier.
 
@@ -242,7 +233,6 @@ Rules (Constraint Harness):
 - Reason must be a single sentence explaining the basis for the label.
 - Confidence must be a number between 0.0 and 1.0.
 - Do not infer information not present in the email body."""
-
 
 def classify_email_with_harness(email_body: str) -> ClassificationResult:
     response = client.chat.completions.create(
@@ -294,10 +284,8 @@ Adopting LangGraph does not give you harnesses for free. Frameworks are tools. H
 - Harness Engineering is a design discipline, not a framework. Use frameworks like LangGraph as tools to implement your harness design.
 - Non-deterministic behavior, undebuggable runs, automated risky actions, runaway costs, and "is it done?" ambiguity are signals that you need to start designing harnesses.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - **What Is Harness Engineering? (current)**
 - Task Harness — Turning Vague Work into Executable Tasks (upcoming)
@@ -309,7 +297,10 @@ Adopting LangGraph does not give you harnesses for free. Frameworks are tools. H
 - Approval Gates — Designing Where Humans Must Approve (upcoming)
 - Observability — Tracing and Replaying Agent Work (upcoming)
 - Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -318,4 +309,4 @@ Adopting LangGraph does not give you harnesses for free. Frameworks are tools. H
 - [The Rise of Agent Engineering](https://www.langchain.com/blog)
 - [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
 
-Tags: AI Agent, Harness, Reliability, Production
+Tags: AI Agent, Harness, Production, Reliability

@@ -213,22 +213,23 @@ Drivers with `threadsafety=1` cannot share a connection between threads. sqlite3
 
 The next episode digs into the connection and cursor lifecycle and the context-manager patterns that make them safe.
 
----
-
 <!-- toc:begin -->
-## Python DB-API 101 series
+## In this series
 
 - **Why DB-API 2.0 - The Problem PEP 249 Solved (current)**
 - Connection and Cursor Lifecycle (upcoming)
 - execute, executemany, and Fetch Patterns (upcoming)
-- Parameter Binding and SQL Injection Defense (upcoming)
-- Transactions and Isolation Levels (upcoming)
-- Row Factories and Type Adapters/Converters (upcoming)
-- Error Handling and the Exception Hierarchy (upcoming)
-- Connection Pooling Patterns (upcoming)
-- Async DB-API with aiosqlite (upcoming)
-- Production Patterns - Migration, Retry, Observability (upcoming)
+- Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
+- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Asynchronous SQLite with aiosqlite (upcoming)
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -237,4 +238,4 @@ The next episode digs into the connection and cursor lifecycle and the context-m
 - [SQLite official documentation](https://www.sqlite.org/docs.html)
 - [psycopg 3 documentation - DB-API 2.0 compliance](https://www.psycopg.org/psycopg3/docs/)
 
-Tags: Python, DB-API, PEP 249, SQLite, Database Driver, Standardization
+Tags: Python, DB-API, PEP 249, Database

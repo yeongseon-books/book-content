@@ -665,12 +665,10 @@ for case in test_cases:
 - 명확한 역할 정의와 행동 규칙이 Agent의 신뢰성을 높입니다.
 - 컨텍스트 엔지니어링은 Agent 설계의 가장 중요한 단계입니다.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
-- AI Agent란 무엇인가? (예정)
+- [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - **컨텍스트 엔지니어링 (현재 글)**
 - Tool Use 기초 (예정)
 - Agent Workflow 설계 (예정)
@@ -680,7 +678,10 @@ for case in test_cases:
 - 에러 처리와 안정성 (예정)
 - 운영 (예정)
 - 첫 Agent 만들기 (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -689,4 +690,4 @@ for case in test_cases:
 - [LangChain System Messages](https://python.langchain.com/docs/how_to/chatbots_memory/) - Agent 컨텍스트 관리 패턴
 - [Prompt Injection Attacks](https://simonwillison.net/2023/Apr/14/worst-that-can-happen/) - System prompt 보안 고려사항
 
-Tags: AI Agent, Context, Prompt Engineering, System Prompt
+Tags: AI Agent, LLM, Tool Use, Python

@@ -70,17 +70,14 @@ from typing import Any
 from pydantic import BaseModel, Field
 import json
 
-
 class SearchInput(BaseModel):
     """검색 도구 입력 스키마."""
     query: str = Field(..., description="검색어")
     top_k: int = Field(3, description="반환할 결과 수")
 
-
 class CalculatorInput(BaseModel):
     """계산 도구 입력 스키마."""
     expression: str = Field(..., description="Python 산술식")
-
 
 def tool_search(query: str, top_k: int = 3) -> list[dict[str, str]]:
     """가짜 검색 도구. 실제로는 외부 API를 호출합니다."""
@@ -90,7 +87,6 @@ def tool_search(query: str, top_k: int = 3) -> list[dict[str, str]]:
         {"title": "FastAPI vs Flask", "snippet": "FastAPI는 비동기 지원과 자동 문서화에서 Flask보다 우위입니다."},
     ]
     return fake_db[:top_k]
-
 
 def tool_calculator(expression: str) -> float:
     """안전한 산술 계산. eval은 위험하므로 제한된 환경을 사용합니다."""
@@ -115,7 +111,6 @@ TOOLS = {
         "description": "산술식을 계산합니다.",
     },
 }
-
 
 def tools_to_openai_format() -> list[dict[str, Any]]:
     """OpenAI Function Calling 형식으로 변환합니다."""
@@ -175,12 +170,10 @@ from dotenv import load_dotenv
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-
 SYSTEM_PROMPT = """당신은 리서치 어시스턴트입니다.
 사용자 질문에 답하기 위해 search와 calculator 도구를 사용할 수 있습니다.
 도구 결과를 종합해서 정확하고 간결한 답변을 제공하세요.
 모르는 것은 모른다고 답하세요."""
-
 
 class ResearchAgent:
     """리서치 어시스턴트 Agent."""
@@ -304,7 +297,6 @@ GOLD_CASES = [
     },
 ]
 
-
 def run_eval() -> dict[str, Any]:
     """골드 데이터셋으로 평가를 실행합니다."""
     passed = 0
@@ -322,7 +314,6 @@ def run_eval() -> dict[str, Any]:
         "pass_rate": passed / len(GOLD_CASES),
         "failures": failures,
     }
-
 
 if __name__ == "__main__" and os.getenv("RUN_EVAL"):
     result = run_eval()
@@ -353,11 +344,9 @@ LangGraph 예시는 다음과 같습니다.
 from langgraph.graph import StateGraph, END
 from typing import TypedDict
 
-
 class AgentState(TypedDict):
     messages: list[dict[str, Any]]
     iterations: int
-
 
 def call_model(state: AgentState) -> AgentState:
     response = client.chat.completions.create(
@@ -370,13 +359,11 @@ def call_model(state: AgentState) -> AgentState:
     state["iterations"] += 1
     return state
 
-
 def should_continue(state: AgentState) -> str:
     last = state["messages"][-1]
     if not last.get("tool_calls") or state["iterations"] >= 5:
         return END
     return "tools"
-
 
 graph = StateGraph(AgentState)
 graph.add_node("agent", call_model)
@@ -438,14 +425,11 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-
 class ChatRequest(BaseModel):
     session_id: str
     message: str
 
-
 SESSIONS: dict[str, ResearchAgent] = {}
-
 
 @app.post("/chat")
 def chat(req: ChatRequest) -> dict[str, str]:
@@ -519,10 +503,8 @@ LangGraph나 CrewAI는 강력하지만 학습 비용이 있습니다. 먼저 직
 - 평가 자동화는 작은 골드 데이터셋만으로도 충분히 시작할 수 있습니다.
 - 직접 구현으로 원리를 익힌 다음 LangGraph나 CrewAI 같은 프레임워크로 확장하세요.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -534,7 +516,10 @@ LangGraph나 CrewAI는 강력하지만 학습 비용이 있습니다. 먼저 직
 - [에러 처리와 안정성](./08-error-handling-reliability.md)
 - [운영](./09-production-operations.md)
 - **첫 Agent 만들기 (현재 글)**
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -543,4 +528,4 @@ LangGraph나 CrewAI는 강력하지만 학습 비용이 있습니다. 먼저 직
 - [CrewAI Documentation](https://docs.crewai.com/)
 - [Building Effective Agents — Anthropic](https://www.anthropic.com/research/building-effective-agents)
 
-Tags: AI Agent, Tutorial, Python, Hands-on
+Tags: AI Agent, LLM, Tool Use, Python

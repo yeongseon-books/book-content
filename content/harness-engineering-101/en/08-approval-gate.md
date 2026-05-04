@@ -183,22 +183,23 @@ The log must answer five questions:
 
 The next post covers Observability — how to record, trace, and replay agent runs.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness](./02-task-harness.md)
-- [Context Harness](./03-context-harness.md)
-- [Constraint Harness](./04-constraint-harness.md)
-- [Tool Harness](./05-tool-harness.md)
-- [Test Harness](./06-test-harness.md)
-- [Feedback Loop](./07-feedback-loop.md)
-- **Approval Gates (current)**
-- Observability (upcoming)
-- Production Harness (upcoming)
+- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- [Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
+- [Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
+- **Approval Gates — Designing Where Humans Must Approve (current)**
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -207,4 +208,4 @@ The next post covers Observability — how to record, trace, and replay agent ru
 - [Google SRE — Postmortem culture](https://sre.google/sre-book/postmortem-culture/)
 - [LangChain — Human-in-the-loop](https://python.langchain.com/docs/concepts/human_in_the_loop/)
 
-Tags: AI Agent, Harness, Approval, Human-in-the-loop
+Tags: AI Agent, Harness, Production, Reliability

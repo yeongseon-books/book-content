@@ -49,7 +49,6 @@ Each component owns a token budget. In a 200k window you might pre-allocate 2k f
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class ContextBudget:
     """Token budget allocation for the context window."""
@@ -71,7 +70,6 @@ class ContextBudget:
             + self.response_buffer
         )
         return self.total_tokens - used
-
 
 budget = ContextBudget()
 assert budget.remaining() > 0, "Budget exceeds the window"
@@ -95,13 +93,11 @@ History is the fastest-growing component. Three strategies, often combined.
 from typing import Literal
 from dataclasses import dataclass
 
-
 @dataclass
 class Message:
     role: Literal["user", "assistant", "tool"]
     content: str
     tokens: int
-
 
 class HistoryManager:
     """Manages conversation history within a token budget."""
@@ -160,18 +156,14 @@ Three stages improve precision.
 ```python
 from typing import Protocol
 
-
 class Retriever(Protocol):
     def search(self, query: str, top_k: int) -> list[dict]: ...
-
 
 class Reranker(Protocol):
     def rerank(self, query: str, docs: list[dict]) -> list[dict]: ...
 
-
 class Compressor(Protocol):
     def compress(self, query: str, doc: dict) -> str: ...
-
 
 def build_retrieved_context(
     query: str,
@@ -208,7 +200,6 @@ Some information must not enter context. Context Harness designs what to hide as
 ```python
 import re
 
-
 def mask_secrets(text: str) -> str:
     """Mask API keys and PII."""
     text = re.sub(r"sk-[a-zA-Z0-9]{20,}", "[REDACTED_API_KEY]", text)
@@ -217,11 +208,9 @@ def mask_secrets(text: str) -> str:
     text = re.sub(r"\b\d{3}-\d{2}-\d{4}\b", "[REDACTED_SSN]", text)
     return text
 
-
 def filter_tools_for_task(all_tools: list[dict], task_tags: set[str]) -> list[dict]:
     """Expose only tools whose tags match the task."""
     return [t for t in all_tools if set(t.get("tags", [])) & task_tags]
-
 
 def trim_tool_history(history: list[dict], keep_last: int = 3) -> list[dict]:
     """Keep only the most recent N tool outputs."""
@@ -248,7 +237,6 @@ import json
 from datetime import datetime
 from dataclasses import dataclass, field
 
-
 @dataclass
 class ContextSnapshot:
     """Complete snapshot of context just before inference."""
@@ -266,7 +254,6 @@ class ContextSnapshot:
             sort_keys=True,
         )
         self.snapshot_hash = hashlib.sha256(payload.encode()).hexdigest()[:16]
-
 
 def capture_snapshot(task_id: str, messages: list[dict], tools: list[dict], model: str) -> ContextSnapshot:
     return ContextSnapshot(
@@ -310,22 +297,23 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 - Context Harness designs what to hide as carefully as what to show. Deliberately remove secrets, irrelevant tools, and stale outputs.
 - Context snapshots are the foundation of reproducibility and debugging in production agents.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
 - [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- **Context Harness — Designing What to Show and Hide from the Agent (current)**
+- **Context Harness — Designing What the Agent Should Know and Not Know (current)**
 - Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
 - Tool Harness — Designing Safe Tools for Agents (upcoming)
-- Test Harness — Pinning Completion Criteria with Tests (upcoming)
-- Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)
-- Approval Gate — Designing Where Human Approval Is Required (upcoming)
-- Observability — Tracing and Reproducing Agent Work (upcoming)
-- Production Harness — Building an Operable Agent Work Environment (upcoming)
+- Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -334,4 +322,4 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 - [LangChain — Contextual Compression Retriever](https://python.langchain.com/docs/how_to/contextual_compression/)
 - [OpenAI — Retrieval-Augmented Generation Best Practices](https://cookbook.openai.com/examples/question_answering_using_embeddings)
 
-Tags: AI Agent, Harness, Context, RAG
+Tags: AI Agent, Harness, Production, Reliability

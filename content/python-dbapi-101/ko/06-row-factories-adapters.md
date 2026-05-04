@@ -411,16 +411,16 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [PEP 249가 왜 필요한가 — Python DB-API 2.0 개요](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor lifecycle](./02-connection-cursor-lifecycle.md)
+- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
 - [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어](./04-parameter-binding-sql-injection.md)
-- [Transaction과 isolation level](./05-transactions-isolation.md)
-- **Row factory와 type adapter (현재 글)**
-- Error handling과 exception hierarchy (예정)
-- Connection pooling (예정)
-- async DB-API와 aiosqlite (예정)
-- Production 패턴 — retry, timeout, observability (예정)
+- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- **Row factory와 type adapter (sqlite3, PEP 249) (현재 글)**
+- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- aiosqlite로 비동기 SQLite 다루기 (예정)
+- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -434,4 +434,4 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
 - [SQLite — Datatypes In SQLite](https://www.sqlite.org/datatype3.html)
 - [Pydantic — Models](https://docs.pydantic.dev/latest/concepts/models/)
 
-Tags: Python, SQLite, Row Factory, Type Adapter, Pydantic, PEP 249
+Tags: Python, DB-API, PEP 249, Database

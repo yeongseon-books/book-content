@@ -314,6 +314,22 @@ threading.Thread(target=writer_worker, daemon=True).start()
 
 다음 글에서는 동기 모델을 떠나 `aiosqlite`로 비동기 SQLite를 다룹니다. asyncio 컨텍스트에서 connection과 트랜잭션을 어떻게 쥐는지, 그리고 FastAPI의 async path와 어떻게 어우러지는지 살펴봅니다.
 
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
+- **SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (현재 글)**
+- aiosqlite로 비동기 SQLite 다루기 (예정)
+- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [Python `sqlite3` — Threadsafety](https://docs.python.org/3/library/sqlite3.html#sqlite3.threadsafety)
@@ -322,4 +338,4 @@ threading.Thread(target=writer_worker, daemon=True).start()
 - [SQLite URI filenames](https://www.sqlite.org/uri.html)
 - [FastAPI — Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
 
-Tags: Python, SQLite, Connection Pool, Concurrency, Threading, PEP 249
+Tags: Python, DB-API, PEP 249, Database

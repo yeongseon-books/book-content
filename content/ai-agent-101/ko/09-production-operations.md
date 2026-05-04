@@ -68,7 +68,6 @@ class StructuredLogger:
     def error(self, event: str, **fields):
         self.log("ERROR", event, **fields)
 
-
 # 사용 예시
 logger = StructuredLogger("agent")
 logger.info(
@@ -128,7 +127,6 @@ class TraceContext:
                 "error": error,
                 "attributes": attributes
             })
-
 
 # 사용 예시
 trace = TraceContext()
@@ -192,7 +190,6 @@ class MetricsCollector:
                 }
             }
 
-
 # 사용 예시 — 추적해야 할 핵심 메트릭
 metrics = MetricsCollector()
 metrics.increment("agent.requests", status="success")
@@ -255,7 +252,6 @@ class BudgetEnforcer:
 
         usage["spent_usd"] += cost
         return True
-
 
 # 사용 예시
 budget = BudgetEnforcer()
@@ -347,7 +343,6 @@ class RateLimiter:
         while not self.acquire():
             time.sleep(0.1)
 
-
 # 사용 예시
 limiter = RateLimiter(max_requests=60, window_seconds=60)  # 분당 60회
 limiter.wait_and_acquire()
@@ -419,7 +414,6 @@ class CanaryRouter:
     def adjust_canary(self, percentage: float):
         self.canary_percentage = max(0.0, min(1.0, percentage))
 
-
 # 사용 예시
 router = CanaryRouter(canary_percentage=0.05)  # 5%만 canary
 router.register("stable", agent_v1)
@@ -446,7 +440,6 @@ class FeatureFlags:
 
     def is_enabled(self, name: str, user_id: Optional[str] = None) -> bool:
         return self._flags.get(name, False)
-
 
 # 사용 예시
 flags = FeatureFlags()
@@ -564,7 +557,7 @@ GDPR/CCPA 위반과 보안 사고의 주요 원인입니다.
 - PII는 로깅하지 말고 해시/마스킹합니다
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -576,6 +569,7 @@ GDPR/CCPA 위반과 보안 사고의 주요 원인입니다.
 - [에러 처리와 안정성](./08-error-handling-reliability.md)
 - **운영 (현재 글)**
 - 첫 Agent 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -592,4 +586,4 @@ GDPR/CCPA 위반과 보안 사고의 주요 원인입니다.
 4. **OpenAI: Production Best Practices** - https://platform.openai.com/docs/guides/production-best-practices  
    OpenAI 공식 운영 가이드. Rate limit, 모니터링, 비용 관리 모범 사례를 제공합니다.
 
-Tags: AI Agent, Operations, Monitoring, Observability
+Tags: AI Agent, LLM, Tool Use, Python

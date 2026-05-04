@@ -45,6 +45,10 @@ SERIES_TAGS: dict[str, list[str]] = {
     "rag-benchmark-101": ["RAG", "VectorDB", "Benchmarking", "LLM"],
     "langgraph-101": ["LangGraph", "Agent", "Python", "LLM"],
     "llm-finetuning-101": ["Fine-tuning", "LoRA", "LLM", "Python"],
+    "python-dbapi-101": ["Python", "DB-API", "PEP 249", "Database"],
+    "sqlalchemy-101": ["Python", "SQLAlchemy", "ORM", "Database"],
+    "ai-agent-101": ["AI Agent", "LLM", "Tool Use", "Python"],
+    "harness-engineering-101": ["AI Agent", "Harness", "Production", "Reliability"],
 }
 
 REFERENCES_HEADINGS_ANY = ("## References", "## 참고 자료", "## 참고문헌", "## 참고")

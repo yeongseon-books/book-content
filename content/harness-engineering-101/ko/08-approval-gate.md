@@ -183,22 +183,23 @@ class ApprovalLog:
 
 다음 글에서는 Observability를 다룹니다. 에이전트 실행을 어떻게 기록하고, 추적하고, 재현하는지 살펴봅니다.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 시리즈
+## 시리즈 목차
 
-- [Harness Engineering이란?](./01-what-is-harness-engineering.md)
-- [Task Harness](./02-task-harness.md)
-- [Context Harness](./03-context-harness.md)
-- [Constraint Harness](./04-constraint-harness.md)
-- [Tool Harness](./05-tool-harness.md)
-- [Test Harness](./06-test-harness.md)
-- [Feedback Loop](./07-feedback-loop.md)
-- **Approval Gate (현재 글)**
-- Observability (예정)
-- Production Harness (예정)
+- [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
+- [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
+- [Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
+- [Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
+- [Tool Harness — Agent가 사용할 도구를 안전하게 설계하기](./05-tool-harness.md)
+- [Test Harness — 완료 조건을 테스트로 고정하기](./06-test-harness.md)
+- [Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
+- **Approval Gate — 사람 승인이 필요한 지점 설계하기 (현재 글)**
+- Observability — Agent 작업을 추적하고 재현하기 (예정)
+- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -207,4 +208,4 @@ class ApprovalLog:
 - [Google SRE — Postmortem culture](https://sre.google/sre-book/postmortem-culture/)
 - [LangChain — Human-in-the-loop](https://python.langchain.com/docs/concepts/human_in_the_loop/)
 
-Tags: AI Agent, Harness, Approval, Human-in-the-loop
+Tags: AI Agent, Harness, Production, Reliability

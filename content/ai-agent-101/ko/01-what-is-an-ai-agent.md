@@ -203,10 +203,8 @@ production에서 Agent 도입을 결정할 때는 다음 질문을 먼저 던집
 
 다음 글에서는 Agent의 결정 품질을 좌우하는 **context engineering** - 무엇을 prompt에 넣고, 무엇을 빼야 할지를 다룹니다.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - **AI Agent란 무엇인가? (현재 글)**
 - 컨텍스트 엔지니어링 (예정)
@@ -218,7 +216,10 @@ production에서 Agent 도입을 결정할 때는 다음 질문을 먼저 던집
 - 에러 처리와 안정성 (예정)
 - 운영 (예정)
 - 첫 Agent 만들기 (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -227,4 +228,4 @@ production에서 Agent 도입을 결정할 때는 다음 질문을 먼저 던집
 - [LangChain Agents - conceptual guide](https://python.langchain.com/docs/concepts/agents/)
 - [OpenAI - Function calling guide](https://platform.openai.com/docs/guides/function-calling)
 
-Tags: AI Agent, LLM, Tool Use, Autonomy, ReAct, Automation
+Tags: AI Agent, LLM, Tool Use, Python

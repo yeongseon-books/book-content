@@ -267,6 +267,22 @@ production에서는 보통 다음처럼 분배합니다.
 
 다음 글에서는 동기 패턴을 그대로 비동기로 옮기는 방법을 다룹니다. `aiosqlite` 드라이버와 `AsyncSession`, 그리고 비동기에서 lazy loading이 왜 더 위험한지 같이 살펴봅니다.
 
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](./03-core-select-insert-update-delete.md)
+- [ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](./04-orm-declarative-mapped-column.md)
+- [Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리](./05-session-unit-of-work-identity-map.md)
+- [ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기](./06-relationships-back-populates.md)
+- [로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가](./07-loading-strategies-n-plus-one.md)
+- **이벤트, hybrid_property, 그리고 커스텀 타입 (현재 글)**
+- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- production 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - SQLAlchemy: Events — https://docs.sqlalchemy.org/en/20/core/event.html
@@ -274,7 +290,4 @@ production에서는 보통 다음처럼 분배합니다.
 - SQLAlchemy: Hybrid Attributes — https://docs.sqlalchemy.org/en/20/orm/extensions/hybrid.html
 - SQLAlchemy: TypeDecorator — https://docs.sqlalchemy.org/en/20/core/custom_types.html
 
-<!-- toc:begin -->
-<!-- toc:end -->
-
-Tags: Python, SQLAlchemy, ORM, event, hybrid_property, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

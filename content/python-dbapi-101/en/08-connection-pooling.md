@@ -314,6 +314,22 @@ Reads stay on per-request connections. Thanks to WAL, readers do not wait on the
 
 The next post leaves the synchronous world and moves to `aiosqlite`. We will look at how to hold connections and transactions inside asyncio, and how this composes with FastAPI's async paths.
 
+<!-- toc:begin -->
+## In this series
+
+- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
+- **SQLite Connection Management: thread-safety, check_same_thread, and Pooling (current)**
+- Asynchronous SQLite with aiosqlite (upcoming)
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [Python `sqlite3` — Threadsafety](https://docs.python.org/3/library/sqlite3.html#sqlite3.threadsafety)
@@ -322,4 +338,4 @@ The next post leaves the synchronous world and moves to `aiosqlite`. We will loo
 - [SQLite URI filenames](https://www.sqlite.org/uri.html)
 - [FastAPI — Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
 
-Tags: Python, SQLite, Connection Pool, Concurrency, Threading, PEP 249
+Tags: Python, DB-API, PEP 249, Database

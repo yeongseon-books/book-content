@@ -272,6 +272,22 @@ The event system, `hybrid_property`, and `TypeDecorator` are SQLAlchemy's offici
 
 The next episode moves the same patterns to async. We will use the `aiosqlite` driver with `AsyncSession`, and explain why lazy loading is even more dangerous in async code.
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- [ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
+- [Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin](./07-loading-strategies-n-plus-one.md)
+- **Events, hybrid_property, and custom types (current)**
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - SQLAlchemy: Events — https://docs.sqlalchemy.org/en/20/core/event.html
@@ -279,7 +295,4 @@ The next episode moves the same patterns to async. We will use the `aiosqlite` d
 - SQLAlchemy: Hybrid Attributes — https://docs.sqlalchemy.org/en/20/orm/extensions/hybrid.html
 - SQLAlchemy: TypeDecorator — https://docs.sqlalchemy.org/en/20/core/custom_types.html
 
-<!-- toc:begin -->
-<!-- toc:end -->
-
-Tags: Python, SQLAlchemy, ORM, event, hybrid_property, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

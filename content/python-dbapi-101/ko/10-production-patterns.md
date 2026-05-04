@@ -342,6 +342,22 @@ production에서 흔히 쓰는 SLO 항목과 측정 방법:
 
 읽어 주셔서 감사합니다.
 
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Row factory와 type adapter (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [PEP 249 예외 계층과 SQLite 에러 처리](./07-error-handling-exception-hierarchy.md)
+- [SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링](./08-connection-pooling.md)
+- [aiosqlite로 비동기 SQLite 다루기](./09-async-aiosqlite.md)
+- **SQLite Production 패턴: retry, timeout, 관측성, 백업 (현재 글)**
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [Python `sqlite3.Connection.backup`](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.backup)
@@ -350,4 +366,4 @@ production에서 흔히 쓰는 SLO 항목과 측정 방법:
 - [OpenTelemetry — Semantic Conventions for Database Calls](https://opentelemetry.io/docs/specs/semconv/database/database-spans/)
 - [SQLite — VACUUM INTO](https://www.sqlite.org/lang_vacuum.html#vacuuminto)
 
-Tags: Python, SQLite, Production, Observability, OpenTelemetry, Retry
+Tags: Python, DB-API, PEP 249, Database

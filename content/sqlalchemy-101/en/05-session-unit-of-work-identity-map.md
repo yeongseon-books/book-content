@@ -3,7 +3,7 @@ title: "Session in Depth: How Unit of Work and Identity Map Actually Work"
 series: sqlalchemy-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -295,6 +295,22 @@ If the same PK 1 user comes from two different sessions, `u1 is u2` is `False`. 
 2. Compare two sessions: one with `expire_on_commit=False`, the other with the default `True`. After commit, read attributes and count the SQL emitted via `echo=True`. What is the difference?
 3. Open two different sessions on the same DB. In session A, fetch user PK 1, change email, commit. In session B (already opened, holding the same user), read the email. What value do you see, and at what moment do you see the new value?
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- **Session in Depth: How Unit of Work and Identity Map Actually Work (current)**
+- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- Events, hybrid_property, and custom types (upcoming)
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [SQLAlchemy 2.x ORM Session basics](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
@@ -306,4 +322,4 @@ If the same PK 1 user comes from two different sessions, `u1 is u2` is `False`. 
 
 A `Session` is not just a connection wrapper. It is the context that combines a working scratch pad (Unit of Work) and a per-PK cache (Identity Map). `add` registers something as pending, `flush` actually emits SQL, and `commit` ends the transaction. `expire_on_commit` is convenient but can trigger extra SELECTs; sharing a Session as a module global is asking for concurrency bugs. Next, we layer relationships on top of this Session - defining `relationship` and using `back_populates` to make bidirectional navigation safe.
 
-Tags: Python, SQLAlchemy, ORM, Session, Unit of Work, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

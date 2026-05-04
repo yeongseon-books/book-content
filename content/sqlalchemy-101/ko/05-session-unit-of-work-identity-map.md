@@ -3,7 +3,7 @@ title: "Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리"
 series: sqlalchemy-101
 episode: 5
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -295,6 +295,22 @@ with Session(engine) as session:
 2. `expire_on_commit=False`로 Session을 만든 뒤 commit 후 객체 속성에 접근해 보고, `True`인 경우와 echo로 찍히는 SQL 횟수를 비교해 보세요.
 3. 같은 PK를 두 개의 다른 Session에서 가져와 한쪽에서 email을 변경하고 commit한 다음, 다른 쪽 Session에서 그 객체의 email을 읽으면 어떤 값이 나옵니까? 어떤 시점에 새 값을 보게 됩니까?
 
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](./03-core-select-insert-update-delete.md)
+- [ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](./04-orm-declarative-mapped-column.md)
+- **Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (현재 글)**
+- ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- production 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [SQLAlchemy 2.x ORM Session basics](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
@@ -306,4 +322,4 @@ with Session(engine) as session:
 
 `Session`은 단순한 커넥션 래퍼가 아니라, 변경을 모아 두는 작업 메모지(Unit of Work)와 같은 PK를 같은 객체로 묶어 주는 캐시(Identity Map)를 함께 들고 있는 컨텍스트입니다. `add`는 pending 등록이고, 실제 SQL은 flush 시점에 발사되며, commit은 트랜잭션을 종료합니다. `expire_on_commit`은 편리하지만 commit 직후 추가 SELECT를 유발할 수 있고, 모듈 전역 Session 공유는 동시성 문제를 만들기 쉽습니다. 다음 글에서는 이 Session 위에서 관계(`relationship`)를 정의하고, `back_populates`로 양방향 탐색을 안전하게 잇는 법을 다룹니다.
 
-Tags: Python, SQLAlchemy, ORM, Session, Unit of Work, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

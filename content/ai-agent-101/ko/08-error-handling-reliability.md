@@ -60,7 +60,6 @@ def parse_llm_json(response_text: str) -> dict:
     except json.JSONDecodeError as e:
         raise LLMResponseError(f"JSON 파싱 실패: {e}\n원본: {response_text[:200]}")
 
-
 # 사용 예시
 response = '```json\n{"action": "search", "query": "Python"}\n```'
 try:
@@ -162,7 +161,6 @@ def retry_with_backoff(
 
     raise last_exception
 
-
 # 사용 예시
 def call_flaky_api():
     response = requests.get("https://api.example.com/data", timeout=5)
@@ -202,7 +200,6 @@ class FallbackChain:
             except Exception as e:
                 errors.append({"handler": name, "error": str(e)})
         raise RuntimeError(f"모든 핸들러 실패: {errors}")
-
 
 # 사용 예시
 def primary_search(query):
@@ -287,7 +284,6 @@ class CircuitBreaker:
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitState.OPEN
 
-
 # 사용 예시
 breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=30)
 
@@ -323,7 +319,6 @@ def time_limit(seconds: int):
         yield
     finally:
         signal.alarm(0)
-
 
 def run_tool_with_limits(tool_fn, *args, timeout: int = 30, **kwargs):
     """타임아웃과 예외 처리를 포함한 도구 실행."""
@@ -440,7 +435,7 @@ return {
 - 에러는 조용히 삼키지 말고 로그·메트릭으로 가시화합니다
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -452,6 +447,7 @@ return {
 - **에러 처리와 안정성 (현재 글)**
 - 운영 (예정)
 - 첫 Agent 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -468,4 +464,4 @@ return {
 4. **Hystrix: Latency and Fault Tolerance** - https://github.com/Netflix/Hystrix/wiki  
    Netflix의 circuit breaker 라이브러리 문서. 패턴의 핵심 개념과 운영 사례를 제공합니다.
 
-Tags: AI Agent, Reliability, Error Handling, Resilience
+Tags: AI Agent, LLM, Tool Use, Python

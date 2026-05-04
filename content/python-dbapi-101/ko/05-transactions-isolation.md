@@ -365,16 +365,16 @@ sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [PEP 249가 왜 필요한가 — Python DB-API 2.0 개요](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor lifecycle](./02-connection-cursor-lifecycle.md)
+- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
 - [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어](./04-parameter-binding-sql-injection.md)
-- **Transaction과 isolation level (현재 글)**
-- Row factory와 type adapter (예정)
-- Error handling과 exception hierarchy (예정)
-- Connection pooling (예정)
-- async DB-API와 aiosqlite (예정)
-- Production 패턴 — retry, timeout, observability (예정)
+- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- **Transaction과 isolation level (sqlite3, PEP 249) (현재 글)**
+- Row factory와 type adapter (sqlite3, PEP 249) (예정)
+- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- aiosqlite로 비동기 SQLite 다루기 (예정)
+- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 
@@ -389,4 +389,4 @@ sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그
 - [SQLite — PRAGMA journal_mode](https://www.sqlite.org/pragma.html#pragma_journal_mode)
 - [Python 3.12 sqlite3 autocommit](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.autocommit)
 
-Tags: Python, SQLite, Transaction, Isolation, WAL, PEP 249
+Tags: Python, DB-API, PEP 249, Database

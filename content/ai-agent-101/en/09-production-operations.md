@@ -68,7 +68,6 @@ class StructuredLogger:
     def error(self, event: str, **fields):
         self.log("ERROR", event, **fields)
 
-
 # Example usage
 logger = StructuredLogger("agent")
 logger.info(
@@ -128,7 +127,6 @@ class TraceContext:
                 "error": error,
                 "attributes": attributes
             })
-
 
 # Example usage
 trace = TraceContext()
@@ -192,7 +190,6 @@ class MetricsCollector:
                 }
             }
 
-
 # Example usage — core metrics to track
 metrics = MetricsCollector()
 metrics.increment("agent.requests", status="success")
@@ -255,7 +252,6 @@ class BudgetEnforcer:
 
         usage["spent_usd"] += cost
         return True
-
 
 # Example usage
 budget = BudgetEnforcer()
@@ -347,7 +343,6 @@ class RateLimiter:
         while not self.acquire():
             time.sleep(0.1)
 
-
 # Example usage
 limiter = RateLimiter(max_requests=60, window_seconds=60)  # 60/minute
 limiter.wait_and_acquire()
@@ -419,7 +414,6 @@ class CanaryRouter:
     def adjust_canary(self, percentage: float):
         self.canary_percentage = max(0.0, min(1.0, percentage))
 
-
 # Example usage
 router = CanaryRouter(canary_percentage=0.05)  # 5% canary
 router.register("stable", agent_v1)
@@ -446,7 +440,6 @@ class FeatureFlags:
 
     def is_enabled(self, name: str, user_id: Optional[str] = None) -> bool:
         return self._flags.get(name, False)
-
 
 # Example usage
 flags = FeatureFlags()
@@ -564,7 +557,7 @@ A leading cause of GDPR/CCPA violations and security incidents.
 - Never log PII; hash or mask it instead
 
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
 - [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
 - [Context Engineering](./02-context-engineering.md)
@@ -576,6 +569,7 @@ A leading cause of GDPR/CCPA violations and security incidents.
 - [Error Handling and Reliability](./08-error-handling-reliability.md)
 - **Production Operations (current)**
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -592,4 +586,4 @@ A leading cause of GDPR/CCPA violations and security incidents.
 4. **OpenAI: Production Best Practices** - https://platform.openai.com/docs/guides/production-best-practices  
    OpenAI's official operations guide. Covers rate limits, monitoring, and cost management.
 
-Tags: AI Agent, Operations, Monitoring, Observability
+Tags: AI Agent, LLM, Tool Use, Python

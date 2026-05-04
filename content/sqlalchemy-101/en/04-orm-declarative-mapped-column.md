@@ -3,7 +3,7 @@ title: "ORM Basics: Defining Models with DeclarativeBase and mapped_column"
 series: sqlalchemy-101
 episode: 4
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -317,6 +317,22 @@ If you define a `User` ORM class and also create `Table("users", metadata, ...)`
 2. Add a unique constraint on `(name, price)` to the model from exercise 1. Place a `UniqueConstraint` inside `__table_args__` and INSERT the same `(name, price)` twice. What happens?
 3. Take a column declared as `Mapped[str]` and try to INSERT `None`. What error appears? Copy the message verbatim and decide whether the error originates in Python or in the database engine.
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- **ORM Basics: Defining Models with DeclarativeBase and mapped_column (current)**
+- Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
+- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- Events, hybrid_property, and custom types (upcoming)
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [SQLAlchemy 2.x ORM Quick Start](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
@@ -328,4 +344,4 @@ If you define a `User` ORM class and also create `Table("users", metadata, ...)`
 
 The ORM's starting point is small. `DeclarativeBase` is a holder for `MetaData`. `Mapped[T]` declares the SQL type and nullability in one stroke. `mapped_column(...)` is Core's `Column(...)` paired with a type hint. Models built with these three become a SQLite schema the moment you call `Base.metadata.create_all(engine)`. In the next post we look at the `Session` itself - how it tracks object changes, and how the Unit of Work and Identity Map batch SQL on your behalf.
 
-Tags: Python, SQLAlchemy, ORM, DeclarativeBase, mapped_column, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

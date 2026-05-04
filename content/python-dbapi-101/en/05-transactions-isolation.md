@@ -365,16 +365,16 @@ The next post covers **row factories and type adapters** — returning rows as d
 <!-- toc:begin -->
 ## In this series
 
-- [Why PEP 249 — Python DB-API 2.0 overview](./01-why-db-api-pep-249.md)
-- [Connection and cursor lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and fetch patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense](./04-parameter-binding-sql-injection.md)
-- **Transactions and isolation levels (current)**
-- Row factories and type adapters (upcoming)
-- Error handling and exception hierarchy (upcoming)
-- Connection pooling (upcoming)
-- async DB-API with aiosqlite (upcoming)
-- Production patterns — retry, timeout, observability (upcoming)
+- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- **Transactions and isolation levels (sqlite3, PEP 249) (current)**
+- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Asynchronous SQLite with aiosqlite (upcoming)
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 
@@ -389,4 +389,4 @@ The next post covers **row factories and type adapters** — returning rows as d
 - [SQLite — PRAGMA journal_mode](https://www.sqlite.org/pragma.html#pragma_journal_mode)
 - [Python 3.12 sqlite3 autocommit](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.autocommit)
 
-Tags: Python, SQLite, Transaction, Isolation, WAL, PEP 249
+Tags: Python, DB-API, PEP 249, Database

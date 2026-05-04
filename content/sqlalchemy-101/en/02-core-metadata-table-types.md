@@ -3,7 +3,7 @@ title: SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table,
 series: sqlalchemy-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -456,6 +456,22 @@ In this post we met SQLAlchemy Core's schema layer. `MetaData` is the catalog of
 
 Next post we use these schema objects to build SQL for real. We'll cover 2.x style `select()`, `insert()`, `update()`, `delete()`, and how to work with `Result` and `Row`. From post 4 onward, the ORM enters; the `mapped_column` you'll see there is essentially the same `Column` object from this post.
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- **SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (current)**
+- SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)
+- ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)
+- Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
+- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- Events, hybrid_property, and custom types (upcoming)
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [SQLAlchemy 2.x - Working with Database Metadata](https://docs.sqlalchemy.org/en/20/tutorial/metadata.html)
@@ -464,4 +480,4 @@ Next post we use these schema objects to build SQL for real. We'll cover 2.x sty
 - [SQLAlchemy 2.x - Reflecting Database Objects](https://docs.sqlalchemy.org/en/20/core/reflection.html)
 - [SQLite Datatypes In SQLite Version 3](https://www.sqlite.org/datatype3.html)
 
-Tags: Python, SQLAlchemy, Core, MetaData, Schema, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

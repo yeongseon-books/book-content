@@ -208,6 +208,22 @@ Production decisions converge on three axes: pool, observability, and migration 
 
 This series ends here. The next series, **alembic-101**, turns the migration policy in this article into concrete commands and workflows: `autogenerate`, branches and merges, data migrations, and a usable downgrade strategy.
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- [ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
+- [Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin](./07-loading-strategies-n-plus-one.md)
+- [Events, hybrid_property, and custom types](./08-events-hybrid-types.md)
+- [Async SQLAlchemy with aiosqlite and AsyncSession](./09-async-aiosqlite.md)
+- **Production patterns: pools, observability, migrations, and deploys (current)**
+
+<!-- toc:end -->
+
 ## References
 
 - SQLAlchemy: Connection Pooling — https://docs.sqlalchemy.org/en/20/core/pooling.html
@@ -215,7 +231,4 @@ This series ends here. The next series, **alembic-101**, turns the migration pol
 - OpenTelemetry SQLAlchemy instrumentation — https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/sqlalchemy/sqlalchemy.html
 - Tenacity — https://tenacity.readthedocs.io/
 
-<!-- toc:begin -->
-<!-- toc:end -->
-
-Tags: Python, SQLAlchemy, Production, pool, Observability, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

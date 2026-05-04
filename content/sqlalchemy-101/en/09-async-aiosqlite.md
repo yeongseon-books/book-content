@@ -245,6 +245,22 @@ Async SQLAlchemy is the awaitable version of the sync API, but it requires a rea
 
 The next episode covers production patterns: pool sizing, pre-ping, observability, slow-query logging, and how migrations and deploys should be sequenced.
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- [ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
+- [Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin](./07-loading-strategies-n-plus-one.md)
+- [Events, hybrid_property, and custom types](./08-events-hybrid-types.md)
+- **Async SQLAlchemy with aiosqlite and AsyncSession (current)**
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - SQLAlchemy: Asynchronous I/O — https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
@@ -252,7 +268,4 @@ The next episode covers production patterns: pool sizing, pre-ping, observabilit
 - SQLAlchemy: AsyncSession API — https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncSession
 - FastAPI: SQL (Relational) Databases — https://fastapi.tiangolo.com/tutorial/sql-databases/
 
-<!-- toc:begin -->
-<!-- toc:end -->
-
-Tags: Python, SQLAlchemy, async, aiosqlite, AsyncSession, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

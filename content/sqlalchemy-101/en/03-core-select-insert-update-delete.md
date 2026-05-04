@@ -3,7 +3,7 @@ title: SQLAlchemy Core - select, insert, update, delete in 2.x Style
 series: sqlalchemy-101
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -496,6 +496,22 @@ In this post we treated SQLAlchemy Core's SQL expressions as a small working man
 
 The ORM enters in the next post. Post 4 covers `DeclarativeBase` and `mapped_column`, mapping Python classes to database rows. The `users.c.name` from this post becomes `User.name` in ORM, and `select(users)` becomes `select(User)`. Understanding Core first lets you debug the ORM's "magic" when something goes sideways.
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- **SQLAlchemy Core - select, insert, update, delete in 2.x Style (current)**
+- ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)
+- Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
+- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- Events, hybrid_property, and custom types (upcoming)
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [SQLAlchemy 2.x - Using SELECT Statements](https://docs.sqlalchemy.org/en/20/tutorial/data_select.html)
@@ -504,4 +520,4 @@ The ORM enters in the next post. Post 4 covers `DeclarativeBase` and `mapped_col
 - [SQLAlchemy 2.x - Result Set API](https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.Result)
 - [SQLite RETURNING clause](https://www.sqlite.org/lang_returning.html)
 
-Tags: Python, SQLAlchemy, Core, SQL Expression, Result, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

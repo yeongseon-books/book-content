@@ -52,12 +52,10 @@ Five rules to follow when designing a tool.
 from pydantic import BaseModel, Field
 from typing import Literal
 
-
 # Bad — too many responsibilities
 def manage_user(action: str, user_id: str, **kwargs):
     """Manage a user."""
     ...
-
 
 # Good — single responsibility, explicit schema
 class CreateUserInput(BaseModel):
@@ -65,12 +63,10 @@ class CreateUserInput(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     role: Literal["admin", "user", "guest"]
 
-
 class CreateUserOutput(BaseModel):
     user_id: str
     created_at: str
     status: Literal["created", "already_exists"]
-
 
 def create_user(input: CreateUserInput) -> CreateUserOutput:
     """Create a new user. Returns already_exists if the email already exists."""
@@ -96,7 +92,6 @@ Three things must be explicit.
 ```python
 from pydantic import BaseModel, Field, model_validator
 from typing import Literal
-
 
 class SendNotificationInput(BaseModel):
     """Send a notification."""
@@ -134,7 +129,6 @@ The fix is the idempotency key. The agent sends a unique key per call, and the s
 import hashlib
 from dataclasses import dataclass
 
-
 @dataclass
 class IdempotencyStore:
     """Stores results per idempotency key."""
@@ -150,7 +144,6 @@ class IdempotencyStore:
         self._cache[key] = result
         return result
 
-
 def create_charge(amount: int, currency: str, idempotency_key: str, store: IdempotencyStore) -> dict:
     """Create a charge. Same idempotency_key runs only once."""
     def _do_charge():
@@ -159,7 +152,6 @@ def create_charge(amount: int, currency: str, idempotency_key: str, store: Idemp
             "amount": amount,
         }
     return store.get_or_run(idempotency_key, _do_charge)
-
 
 # The agent uses a key unique per task
 store = IdempotencyStore()
@@ -187,14 +179,12 @@ A good error includes three parts.
 from enum import Enum
 from dataclasses import dataclass
 
-
 class ErrorCode(Enum):
     INVALID_INPUT = "invalid_input"
     NOT_FOUND = "not_found"
     PERMISSION_DENIED = "permission_denied"
     RATE_LIMITED = "rate_limited"
     UPSTREAM_TIMEOUT = "upstream_timeout"
-
 
 @dataclass
 class ToolError(Exception):
@@ -211,7 +201,6 @@ What: {self.what}
 Why: {self.why}
 How to fix: {self.how}
 Retryable: {self.retryable}"""
-
 
 def get_user(user_id: str) -> dict:
     if not user_id.startswith("usr_"):
@@ -249,7 +238,6 @@ Three isolation techniques.
 import subprocess
 import tempfile
 from pathlib import Path
-
 
 def execute_python_safely(code: str, timeout: float = 5.0) -> dict:
     """Execute Python code in an isolated environment."""
@@ -311,22 +299,23 @@ Shell execution, file writes, and unbounded HTTP calls cause production incident
 - Errors must include What/Why/How, with a retryable flag to guide the agent's next action.
 - Dangerous tools like code execution and file/network access require process, filesystem, and network isolation together.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
 - [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What to Show and Hide from the Agent](./03-context-harness.md)
+- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
 - [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
 - **Tool Harness — Designing Safe Tools for Agents (current)**
-- Test Harness — Pinning Completion Criteria with Tests (upcoming)
-- Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)
-- Approval Gate — Designing Where Human Approval Is Required (upcoming)
-- Observability — Tracing and Reproducing Agent Work (upcoming)
-- Production Harness — Building an Operable Agent Work Environment (upcoming)
+- Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -335,4 +324,4 @@ Shell execution, file writes, and unbounded HTTP calls cause production incident
 - [Stripe — Idempotent Requests](https://docs.stripe.com/api/idempotent_requests)
 - [gVisor — Sandboxed Container Runtime](https://gvisor.dev/docs/)
 
-Tags: AI Agent, Harness, Tool Design, Sandboxing
+Tags: AI Agent, Harness, Production, Reliability

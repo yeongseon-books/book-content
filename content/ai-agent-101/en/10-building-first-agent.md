@@ -70,17 +70,14 @@ from typing import Any
 from pydantic import BaseModel, Field
 import json
 
-
 class SearchInput(BaseModel):
     """Input schema for the search tool."""
     query: str = Field(..., description="Search query")
     top_k: int = Field(3, description="Number of results to return")
 
-
 class CalculatorInput(BaseModel):
     """Input schema for the calculator tool."""
     expression: str = Field(..., description="Python arithmetic expression")
-
 
 def tool_search(query: str, top_k: int = 3) -> list[dict[str, str]]:
     """Fake search tool. In production this would call an external API."""
@@ -90,7 +87,6 @@ def tool_search(query: str, top_k: int = 3) -> list[dict[str, str]]:
         {"title": "FastAPI vs Flask", "snippet": "FastAPI beats Flask in async support and automatic documentation."},
     ]
     return fake_db[:top_k]
-
 
 def tool_calculator(expression: str) -> float:
     """Safe arithmetic. Plain eval is dangerous, so we use a restricted environment."""
@@ -115,7 +111,6 @@ TOOLS = {
         "description": "Evaluate an arithmetic expression.",
     },
 }
-
 
 def tools_to_openai_format() -> list[dict[str, Any]]:
     """Convert the registry to OpenAI Function Calling format."""
@@ -175,12 +170,10 @@ from dotenv import load_dotenv
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-
 SYSTEM_PROMPT = """You are a research assistant.
 Use the search and calculator tools to answer user questions.
 Synthesize tool results into accurate, concise answers.
 Say you do not know when you do not."""
-
 
 class ResearchAgent:
     """Research assistant agent."""
@@ -304,7 +297,6 @@ GOLD_CASES = [
     },
 ]
 
-
 def run_eval() -> dict[str, Any]:
     """Run evaluation against the golden dataset."""
     passed = 0
@@ -322,7 +314,6 @@ def run_eval() -> dict[str, Any]:
         "pass_rate": passed / len(GOLD_CASES),
         "failures": failures,
     }
-
 
 if __name__ == "__main__" and os.getenv("RUN_EVAL"):
     result = run_eval()
@@ -353,11 +344,9 @@ LangGraph example:
 from langgraph.graph import StateGraph, END
 from typing import TypedDict
 
-
 class AgentState(TypedDict):
     messages: list[dict[str, Any]]
     iterations: int
-
 
 def call_model(state: AgentState) -> AgentState:
     response = client.chat.completions.create(
@@ -370,13 +359,11 @@ def call_model(state: AgentState) -> AgentState:
     state["iterations"] += 1
     return state
 
-
 def should_continue(state: AgentState) -> str:
     last = state["messages"][-1]
     if not last.get("tool_calls") or state["iterations"] >= 5:
         return END
     return "tools"
-
 
 graph = StateGraph(AgentState)
 graph.add_node("agent", call_model)
@@ -438,14 +425,11 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-
 class ChatRequest(BaseModel):
     session_id: str
     message: str
 
-
 SESSIONS: dict[str, ResearchAgent] = {}
-
 
 @app.post("/chat")
 def chat(req: ChatRequest) -> dict[str, str]:
@@ -519,10 +503,8 @@ This series is the starting point of agent development. Begin with small agents 
 - Evaluation can start with a small golden dataset and still catch real regressions.
 - Build from scratch first to internalize the principles, then scale with frameworks like LangGraph or CrewAI.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
 - [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
 - [Context Engineering](./02-context-engineering.md)
@@ -534,7 +516,10 @@ This series is the starting point of agent development. Begin with small agents 
 - [Error Handling and Reliability](./08-error-handling-reliability.md)
 - [Production Operations](./09-production-operations.md)
 - **Building Your First Agent (current)**
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -543,4 +528,4 @@ This series is the starting point of agent development. Begin with small agents 
 - [CrewAI Documentation](https://docs.crewai.com/)
 - [Building Effective Agents — Anthropic](https://www.anthropic.com/research/building-effective-agents)
 
-Tags: AI Agent, Tutorial, Python, Hands-on
+Tags: AI Agent, LLM, Tool Use, Python

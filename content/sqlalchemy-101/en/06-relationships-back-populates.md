@@ -3,7 +3,7 @@ title: "ORM Relationships: Connecting Both Sides Safely with relationship and ba
 series: sqlalchemy-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -316,6 +316,22 @@ A plain association table only fits clean many-to-many mappings. The moment you 
 2. Define a `Post`-`Tag` many-to-many with an association table, then introduce a "tagged_at" column. Migrate to the association object pattern. How big is the diff?
 3. Add `order_by=Order.amount.desc()` to `User.orders`. With `echo=True`, confirm that the SELECT now carries an ORDER BY clause.
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- **ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (current)**
+- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- Events, hybrid_property, and custom types (upcoming)
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [SQLAlchemy 2.x Relationship Configuration](https://docs.sqlalchemy.org/en/20/orm/relationship_api.html)
@@ -327,4 +343,4 @@ A plain association table only fits clean many-to-many mappings. The moment you 
 
 `relationship()` handles object-level navigation and pairs with `ForeignKey` at the SQL level. `back_populates` is the recommended way to wire both ends of a bidirectional link explicitly. One-to-many is the most common shape; many-to-many uses an association table for simple cases and an association object when you need extra columns. Cascade is the safety net for parent-child models, and on SQLite you need the foreign-key PRAGMA in lockstep. Next we examine when relationships, by being lazy, create the N+1 problem - and how joined or selectin loading prefetches related rows efficiently.
 
-Tags: Python, SQLAlchemy, ORM, relationship, back_populates, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

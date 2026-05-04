@@ -199,22 +199,23 @@ Register this stack with `HarnessRouter`, deploy it 1% → 100% through `CanaryD
 
 This is the final post in the series. Combining the nine harnesses from Harness Engineering 101 with this production layer is what turns "a demo that looks good but breaks in production" into "an agent users trust."
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness](./02-task-harness.md)
-- [Context Harness](./03-context-harness.md)
-- [Constraint Harness](./04-constraint-harness.md)
-- [Tool Harness](./05-tool-harness.md)
-- [Test Harness](./06-test-harness.md)
-- [Feedback Loop](./07-feedback-loop.md)
-- [Approval Gates](./08-approval-gate.md)
-- [Observability](./09-observability.md)
-- **Production Harness (current)**
+- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- [Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
+- [Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
+- [Approval Gates — Designing Where Humans Must Approve](./08-approval-gate.md)
+- [Observability — Tracing and Replaying Agent Work](./09-observability.md)
+- **Production Harness — Building Operational Environments for Agents (current)**
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -223,4 +224,4 @@ This is the final post in the series. Combining the nine harnesses from Harness 
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [PagerDuty — Incident response documentation](https://response.pagerduty.com/)
 
-Tags: AI Agent, Harness, Production, Deployment
+Tags: AI Agent, Harness, Production, Reliability

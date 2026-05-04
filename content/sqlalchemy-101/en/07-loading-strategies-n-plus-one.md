@@ -3,7 +3,7 @@ title: "Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or se
 series: sqlalchemy-101
 episode: 7
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -290,6 +290,22 @@ Manual inspection through `echo` regresses easily. In tests, switch on `raiseloa
 2. Apply `joinedload` to `User.orders` and intentionally skip `unique()`. What happens to the result list? Which data is duplicated and how?
 3. Apply `raiseload` to every relationship and exercise a typical handler. Which lines blow up? Which N+1 candidates do those failures expose?
 
+<!-- toc:begin -->
+## In this series
+
+- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- [ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
+- **Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (current)**
+- Events, hybrid_property, and custom types (upcoming)
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [SQLAlchemy 2.x Loading Relationships](https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html)
@@ -301,4 +317,4 @@ Manual inspection through `echo` regresses easily. In tests, switch on `raiseloa
 
 Default lazy loading reads well, but left alone it produces N+1. The standard recipe is `selectinload` for one-to-many and many-to-many, and `joinedload` for many-to-one and one-to-one. Don't forget `unique()` after joinedload. `raiseload` is the hammer that turns lazy access into an immediate error - paired with query-count assertions, it stops N+1 from ever regressing. Next we look at the event system, hybrid properties, and custom types to see how the ORM grows beyond data mapping into a domain modeling tool.
 
-Tags: Python, SQLAlchemy, ORM, N+1, selectinload, SQLite
+Tags: Python, SQLAlchemy, ORM, Database

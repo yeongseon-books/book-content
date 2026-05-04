@@ -52,13 +52,11 @@ Each kind is enforced by a different mechanism. Capability at the tool exposure 
 from dataclasses import dataclass, field
 from enum import Enum
 
-
 class ConstraintType(Enum):
     CAPABILITY = "capability"
     RESOURCE = "resource"
     BEHAVIORAL = "behavioral"
     SCOPE = "scope"
-
 
 @dataclass
 class Constraint:
@@ -68,7 +66,6 @@ class Constraint:
     rule: str  # Human-readable rule
     enforcer: str  # Identifier of the enforcement mechanism
 
-
 @dataclass
 class ConstraintPolicy:
     """The set of constraints applied to a task."""
@@ -77,7 +74,6 @@ class ConstraintPolicy:
 
     def by_type(self, t: ConstraintType) -> list[Constraint]:
         return [c for c in self.constraints if c.type == t]
-
 
 policy = ConstraintPolicy(
     task_id="generate-report",
@@ -104,14 +100,12 @@ The core principle is whitelisting. Not "this tool is forbidden" but "only this 
 from typing import Callable
 from dataclasses import dataclass
 
-
 @dataclass
 class Tool:
     name: str
     description: str
     handler: Callable
     danger_level: int  # 0 (safe) to 5 (destructive)
-
 
 class ToolRegistry:
     """Registers all tools and filters them per task."""
@@ -128,7 +122,6 @@ class ToolRegistry:
             t for name, t in self._tools.items()
             if name in allowed_names and t.danger_level <= max_danger
         ]
-
 
 registry = ToolRegistry()
 registry.register(Tool("read_db", "Query DB", lambda q: ..., danger_level=0))
@@ -158,7 +151,6 @@ Three measurements.
 import time
 from dataclasses import dataclass, field
 
-
 @dataclass
 class ResourceMeter:
     """Tracks resource use and enforces caps."""
@@ -185,7 +177,6 @@ class ResourceMeter:
         if elapsed > self.max_wall_seconds:
             raise ResourceExhausted(f"wall clock exceeded: {elapsed:.1f}s")
 
-
 class ResourceExhausted(Exception):
     pass
 ```
@@ -208,12 +199,10 @@ Enforce in two stages.
 import re
 from typing import Protocol
 
-
 class OutputPolicy(Protocol):
     def check(self, output: str) -> tuple[bool, str]:
         """Returns (passed, reason)."""
         ...
-
 
 class NoSecrets:
     """Checks output contains no secrets."""
@@ -223,7 +212,6 @@ class NoSecrets:
         if re.search(r"\b\d{3}-\d{2}-\d{4}\b", output):
             return False, "SSN detected"
         return True, ""
-
 
 class ApprovedTone:
     """Allows only approved tone."""
@@ -236,13 +224,11 @@ class ApprovedTone:
                 return False, f"banned phrase: {phrase}"
         return True, ""
 
-
 def enforce_policies(output: str, policies: list[OutputPolicy]) -> None:
     for p in policies:
         ok, reason = p.check(output)
         if not ok:
             raise PolicyViolation(reason)
-
 
 class PolicyViolation(Exception):
     pass
@@ -260,7 +246,6 @@ Implement this with row-level security or view-based access. Do not give the age
 
 ```python
 from dataclasses import dataclass
-
 
 @dataclass
 class ScopedDataAccess:
@@ -289,7 +274,6 @@ class ScopedDataAccess:
 
     def _execute(self, sql: str) -> list[dict]:
         return []
-
 
 class ScopeViolation(Exception):
     pass
@@ -326,22 +310,23 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 - Resource constraints cap tokens, tool calls, and wall clock to prevent cost incidents.
 - Scope constraints are strongest when enforced at the data layer; application-layer validation is bypassable.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
 - [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What to Show and Hide from the Agent](./03-context-harness.md)
+- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
 - **Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (current)**
 - Tool Harness — Designing Safe Tools for Agents (upcoming)
-- Test Harness — Pinning Completion Criteria with Tests (upcoming)
-- Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)
-- Approval Gate — Designing Where Human Approval Is Required (upcoming)
-- Observability — Tracing and Reproducing Agent Work (upcoming)
-- Production Harness — Building an Operable Agent Work Environment (upcoming)
+- Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -350,4 +335,4 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 - [PostgreSQL — Row Security Policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 - [Open Policy Agent — Policy Language](https://www.openpolicyagent.org/docs/latest/policy-language/)
 
-Tags: AI Agent, Harness, Security, Policy
+Tags: AI Agent, Harness, Production, Reliability

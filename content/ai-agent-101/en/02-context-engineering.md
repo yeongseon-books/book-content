@@ -659,19 +659,16 @@ for case in test_cases:
     assert case["expected"] in response, f"Failed: {case['input']}"
 ```
 
-
 ## Key Takeaways
 
 - Agent behavior is determined by context (system prompt + conversation history + tool descriptions + state).
 - Clear role definition and behavior rules improve agent reliability.
 - Context engineering is the most important step in agent design.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
-- What is an AI Agent? (upcoming)
+- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
 - **Context Engineering (current)**
 - Tool Use Fundamentals (upcoming)
 - Agent Workflow Design (upcoming)
@@ -681,7 +678,10 @@ for case in test_cases:
 - Error Handling and Reliability (upcoming)
 - Production Operations (upcoming)
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -690,4 +690,4 @@ for case in test_cases:
 - [LangChain System Messages](https://python.langchain.com/docs/how_to/chatbots_memory/) - Agent context management patterns
 - [Prompt Injection Attacks](https://simonwillison.net/2023/Apr/14/worst-that-can-happen/) - System prompt security considerations
 
-Tags: AI Agent, Context, Prompt Engineering, System Prompt
+Tags: AI Agent, LLM, Tool Use, Python

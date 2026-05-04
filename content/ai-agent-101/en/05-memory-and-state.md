@@ -509,7 +509,6 @@ In practice, these strategies are combined:
 - Remove low-importance messages when exceeding N (importance-based).
 - Periodically summarize old messages (summarization).
 
-
 ## Context Window Management
 ## Context Window Management
 
@@ -1277,22 +1276,23 @@ def save_conversation(user_id, messages):
 - Context window limitations require selectively maintaining only important information.
 - When long-term memory is needed, leverage external storage (vector DB, general DB).
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
-- What is an AI Agent? (upcoming)
-- Context Engineering (upcoming)
-- Tool Use Fundamentals (upcoming)
-- Agent Workflow Design (upcoming)
+- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [Context Engineering](./02-context-engineering.md)
+- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [Agent Workflow Design](./04-agent-workflow-design.md)
 - **Memory and State (current)**
 - Multi-Agent Systems (upcoming)
 - Agent Evaluation (upcoming)
 - Error Handling and Reliability (upcoming)
 - Production Operations (upcoming)
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -1308,4 +1308,4 @@ def save_conversation(user_id, messages):
 4. **Building LLM Applications: Memory Systems** - https://www.pinecone.io/learn/series/langchain/langchain-conversational-memory/  
    Pinecone's guide on conversational agent memory systems. Explains vector DB utilization patterns.
 
-Tags: AI Agent, Memory, State Management, Context Window
+Tags: AI Agent, LLM, Tool Use, Python

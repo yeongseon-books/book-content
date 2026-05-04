@@ -48,19 +48,16 @@ The two are different tools. Reflecting on a problem that needed retry blows up 
 from dataclasses import dataclass
 from enum import Enum
 
-
 class FailureMode(Enum):
     TRANSIENT = "transient"
     DETERMINISTIC = "deterministic"
     REASONING = "reasoning"
-
 
 @dataclass
 class FailureClassification:
     mode: FailureMode
     feedback: str
     retry_after: float = 0.0
-
 
 def classify_failure(error: Exception) -> FailureClassification:
     if isinstance(error, TimeoutError):
@@ -102,7 +99,6 @@ Constraint for next attempt: {self.constraint}
 
 Now produce a new attempt that satisfies the constraint."""
 
-
 msg = ReflectMessage(
     attempt_number=2,
     failed_action="Called create_user with email='alice'",
@@ -127,7 +123,6 @@ Reflect loops can run forever. The agent might repeat the same mistake or oscill
 ```python
 from collections import Counter
 from dataclasses import dataclass, field
-
 
 @dataclass
 class FeedbackLoop:
@@ -157,7 +152,6 @@ class FeedbackLoop:
             "failure_history": [{"mode": f.mode.value, "feedback": f.feedback[:200]} for f in self.failure_history],
             "recommended_action": "human_review",
         }
-
 
 def run_with_feedback(agent, task, loop: FeedbackLoop) -> dict:
     while True:
@@ -206,7 +200,6 @@ Respond in JSON:
     parsed = parse_json(response)
     return parsed["passes_all"], parsed.get("suggested_fix", "")
 
-
 def generate_with_critique(agent, prompt: str, criteria: list[str], max_rounds: int = 3) -> str:
     draft = agent.complete(prompt)
     for _ in range(max_rounds):
@@ -230,7 +223,6 @@ from datetime import datetime
 import json
 from pathlib import Path
 
-
 @dataclass
 class FailureRecord:
     task_type: str
@@ -238,7 +230,6 @@ class FailureRecord:
     failure_reason: str
     timestamp: str
     fixed_in_next_attempt: bool
-
 
 class FailureMemory:
     """Accumulates failure records per task type."""
@@ -293,22 +284,23 @@ An agent that meets the same mistakes fresh every time does not improve. Failure
 - Prevent infinite loops with max attempts, cost limit, and repetition detection.
 - Failure memory injected into the first-attempt prompt makes the system improve over time.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
 - [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What to Show and Hide from the Agent](./03-context-harness.md)
+- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
 - [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
 - [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- [Test Harness — Pinning Completion Criteria with Tests](./06-test-harness.md)
-- **Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (current)**
-- Approval Gate — Designing Where Human Approval Is Required (upcoming)
-- Observability — Tracing and Reproducing Agent Work (upcoming)
-- Production Harness — Building an Operable Agent Work Environment (upcoming)
+- [Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
+- **Feedback Loops — Building Structures That Let Agents Recover from Failure (current)**
+- Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -317,4 +309,4 @@ An agent that meets the same mistakes fresh every time does not improve. Failure
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [LangGraph — Reflection Patterns](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/)
 
-Tags: AI Agent, Harness, Feedback, Reflection
+Tags: AI Agent, Harness, Production, Reliability

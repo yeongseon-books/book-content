@@ -163,7 +163,7 @@ series:
   languages:
   - ko
   - en
-  status: draft
+  status: content-ready
   path: content/sqlalchemy-101
 
 - id: alembic-101

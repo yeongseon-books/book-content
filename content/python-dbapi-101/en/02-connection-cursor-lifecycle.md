@@ -209,22 +209,23 @@ With server-side cursors, drain the previous result or call `cur.close()` before
 
 The next episode walks through `execute()`, `executemany()`, and the `fetchone()` / `fetchall()` / `fetchmany()` patterns.
 
----
-
 <!-- toc:begin -->
-## Python DB-API 101 series
+## In this series
 
 - [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
 - **Connection and Cursor Lifecycle (current)**
 - execute, executemany, and Fetch Patterns (upcoming)
-- Parameter Binding and SQL Injection Defense (upcoming)
-- Transactions and Isolation Levels (upcoming)
-- Row Factories and Type Adapters/Converters (upcoming)
-- Error Handling and the Exception Hierarchy (upcoming)
-- Connection Pooling Patterns (upcoming)
-- Async DB-API with aiosqlite (upcoming)
-- Production Patterns - Migration, Retry, Observability (upcoming)
+- Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
+- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Asynchronous SQLite with aiosqlite (upcoming)
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -233,4 +234,4 @@ The next episode walks through `execute()`, `executemany()`, and the `fetchone()
 - [psycopg 3 - Connection lifecycle](https://www.psycopg.org/psycopg3/docs/basic/usage.html)
 - [SQLite - File locking and concurrency](https://www.sqlite.org/lockingv3.html)
 
-Tags: Python, Connection, Cursor, Context Manager, Resource Management, SQLite
+Tags: Python, DB-API, PEP 249, Database

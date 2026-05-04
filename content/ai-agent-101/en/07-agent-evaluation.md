@@ -90,7 +90,6 @@ def evaluate_success_rate(
         "failed_cases": [r for r in results if not r.success]
     }
 
-
 # Example usage
 test_cases = [
     TestCase(
@@ -179,7 +178,6 @@ def measure_latency():
 
 def record_step(metrics: dict, step_name: str, duration: float):
     metrics["steps"].append({"name": step_name, "seconds": duration})
-
 
 # Example usage
 with measure_latency() as m:
@@ -285,7 +283,6 @@ def evaluate_trajectory_efficiency(traj: Trajectory) -> dict:
             if traj.steps else 0
     }
 
-
 # Compare efficiency
 traj_a = recorder_a.finalize("answer A", True)
 traj_b = recorder_b.finalize("answer B", True)
@@ -335,7 +332,6 @@ def evaluate_tool_call(
             result["args_correct"] = False
 
     return result
-
 
 # Example usage
 expected = ToolCallExpectation(
@@ -397,7 +393,6 @@ class E2ETestSuite:
             import re
             return bool(re.search(assertion["pattern"], response))
         return False
-
 
 # Define a scenario
 scenario = {
@@ -603,7 +598,7 @@ Pre-deploy regression testing is mandatory.
 - Evaluate by averaging 5-10 runs, not a single execution
 
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
 - [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
 - [Context Engineering](./02-context-engineering.md)
@@ -615,6 +610,7 @@ Pre-deploy regression testing is mandatory.
 - Error Handling and Reliability (upcoming)
 - Production Operations (upcoming)
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -631,4 +627,4 @@ Pre-deploy regression testing is mandatory.
 4. **OpenAI Evals Framework** - https://github.com/openai/evals  
    OpenAI's model evaluation framework. Applicable to a wide range of LLM systems including agents.
 
-Tags: AI Agent, Evaluation, Testing, Metrics
+Tags: AI Agent, LLM, Tool Use, Python

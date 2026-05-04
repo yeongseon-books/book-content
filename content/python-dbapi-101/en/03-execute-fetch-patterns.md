@@ -188,22 +188,23 @@ Memory stays flat regardless of row count.
 
 The next episode covers parameter binding and SQL injection defense.
 
----
-
 <!-- toc:begin -->
-## Python DB-API 101 series
+## In this series
 
 - [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
 - [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
 - **execute, executemany, and Fetch Patterns (current)**
-- Parameter Binding and SQL Injection Defense (upcoming)
-- Transactions and Isolation Levels (upcoming)
-- Row Factories and Type Adapters/Converters (upcoming)
-- Error Handling and the Exception Hierarchy (upcoming)
-- Connection Pooling Patterns (upcoming)
-- Async DB-API with aiosqlite (upcoming)
-- Production Patterns - Migration, Retry, Observability (upcoming)
+- Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
+- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Asynchronous SQLite with aiosqlite (upcoming)
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -212,4 +213,4 @@ The next episode covers parameter binding and SQL injection defense.
 - [psycopg 3 - Server-side cursors](https://www.psycopg.org/psycopg3/docs/advanced/cursors.html)
 - [SQLite - Optimizing INSERT performance](https://www.sqlite.org/faq.html#q19)
 
-Tags: Python, execute, executemany, fetchone, fetchall, Streaming Iteration
+Tags: Python, DB-API, PEP 249, Database

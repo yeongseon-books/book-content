@@ -3,7 +3,7 @@ title: Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified
 series: sqlalchemy-101
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -383,6 +383,22 @@ In this post we looked at SQLAlchemy from the bottom up. The Engine is a lazy fa
 
 Next, we move one layer up to **MetaData, Table, Column, and the type system**. That's where Core stops being "raw SQL with extra plumbing" and starts becoming a proper Python representation of your schema. Once Core SQL expressions click, the ORM in post 4 onwards reads almost like English.
 
+<!-- toc:begin -->
+## In this series
+
+- **Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified (current)**
+- SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (upcoming)
+- SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)
+- ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)
+- Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
+- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- Events, hybrid_property, and custom types (upcoming)
+- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- Production patterns: pools, observability, migrations, and deploys (upcoming)
+
+<!-- toc:end -->
+
 ## References
 
 - [SQLAlchemy 2.x Tutorial - Establishing Connectivity](https://docs.sqlalchemy.org/en/20/tutorial/engine.html)
@@ -391,4 +407,4 @@ Next, we move one layer up to **MetaData, Table, Column, and the type system**. 
 - [SQLite URL forms in SQLAlchemy](https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#connect-strings)
 - [PEP 249 - Python Database API Specification 2.0](https://peps.python.org/pep-0249/)
 
-Tags: Python, SQLAlchemy, Engine, Connection, SQLite, DBAPI
+Tags: Python, SQLAlchemy, ORM, Database

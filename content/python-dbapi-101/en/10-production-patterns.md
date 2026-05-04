@@ -340,6 +340,22 @@ You now have the tools to build a small but operable SQLite-backed service. The 
 
 Thanks for reading.
 
+<!-- toc:begin -->
+## In this series
+
+- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
+- [SQLite Connection Management: thread-safety, check_same_thread, and Pooling](./08-connection-pooling.md)
+- [Asynchronous SQLite with aiosqlite](./09-async-aiosqlite.md)
+- **SQLite Production Patterns: retry, timeout, observability, backup (current)**
+
+<!-- toc:end -->
+
 ## References
 
 - [Python `sqlite3.Connection.backup`](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.backup)
@@ -348,4 +364,4 @@ Thanks for reading.
 - [OpenTelemetry — Semantic Conventions for Database Calls](https://opentelemetry.io/docs/specs/semconv/database/database-spans/)
 - [SQLite — VACUUM INTO](https://www.sqlite.org/lang_vacuum.html#vacuuminto)
 
-Tags: Python, SQLite, Production, Observability, OpenTelemetry, Retry
+Tags: Python, DB-API, PEP 249, Database

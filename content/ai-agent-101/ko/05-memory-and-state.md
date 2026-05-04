@@ -508,7 +508,6 @@ print(f"유지된 메시지 수: {len(context) - 1}")  # system 제외
 - N개를 넘으면 중요도 낮은 메시지 제거 (중요도 기반).
 - 주기적으로 오래된 메시지 요약 (요약 기반).
 
-
 ## 컨텍스트 윈도우 관리
 ## 컨텍스트 윈도우 관리
 
@@ -762,7 +761,6 @@ print(f"Cost: ${cost:.4f}")
 - 컨텍스트 윈도우는 유한한 자원입니다.
 - 토큰 수를 추적하고 제한을 사전에 체크합니다.
 - 긴 입력은 청크로 나누어 처리합니다.
-
 
 ## 외부 메모리 저장소
 ## 외부 메모리 저장소
@@ -1118,8 +1116,6 @@ recent_summaries = structured_store.get_recent_summaries(
 - 민감한 정보(비밀번호, 카드번호)는 저장하지 않습니다.
 - 데이터 삭제 요청 시 완전히 제거합니다.
 
-
-
 ---
 
 ## 흔한 실수 5가지
@@ -1276,22 +1272,23 @@ def save_conversation(user_id, messages):
 - 컨텍스트 윈도우 제한 때문에 중요한 정보만 선택해서 유지해야 합니다.
 - 장기 메모리가 필요한 경우 외부 저장소(벡터 DB, 일반 DB)를 활용합니다.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
-- AI Agent란 무엇인가? (예정)
-- 컨텍스트 엔지니어링 (예정)
-- Tool Use 기초 (예정)
-- Agent Workflow 설계 (예정)
+- [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
+- [컨텍스트 엔지니어링](./02-context-engineering.md)
+- [Tool Use 기초](./03-tool-use-fundamentals.md)
+- [Agent Workflow 설계](./04-agent-workflow-design.md)
 - **Memory와 State (현재 글)**
 - Multi-Agent 시스템 (예정)
 - Agent 평가 (예정)
 - 에러 처리와 안정성 (예정)
 - 운영 (예정)
 - 첫 Agent 만들기 (예정)
+
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 
@@ -1307,4 +1304,4 @@ def save_conversation(user_id, messages):
 4. **Building LLM Applications: Memory Systems** - https://www.pinecone.io/learn/series/langchain/langchain-conversational-memory/  
    Pinecone의 대화형 Agent 메모리 시스템 가이드. 벡터 DB 활용 패턴을 설명합니다.
 
-Tags: AI Agent, Memory, State Management, Context Window
+Tags: AI Agent, LLM, Tool Use, Python

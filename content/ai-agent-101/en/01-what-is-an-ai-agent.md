@@ -203,10 +203,8 @@ Two or more "yes" answers means it is time to seriously evaluate Agents.
 
 The next episode covers **context engineering** - the discipline of deciding what enters and what leaves the prompt, which determines Agent decision quality.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 series
+## In this series
 
 - **What Is an AI Agent? (current)**
 - Context Engineering (upcoming)
@@ -218,7 +216,10 @@ The next episode covers **context engineering** - the discipline of deciding wha
 - Error Handling and Reliability (upcoming)
 - Production Operations (upcoming)
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -227,4 +228,4 @@ The next episode covers **context engineering** - the discipline of deciding wha
 - [LangChain Agents - conceptual guide](https://python.langchain.com/docs/concepts/agents/)
 - [OpenAI - Function calling guide](https://platform.openai.com/docs/guides/function-calling)
 
-Tags: AI Agent, LLM, Tool Use, Autonomy, ReAct, Automation
+Tags: AI Agent, LLM, Tool Use, Python

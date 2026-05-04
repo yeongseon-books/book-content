@@ -353,16 +353,16 @@ The next post covers **transactions and isolation levels** — the precise meani
 <!-- toc:begin -->
 ## In this series
 
-- [Why PEP 249 — Python DB-API 2.0 overview](./01-why-db-api-pep-249.md)
-- [Connection and cursor lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and fetch patterns](./03-execute-fetch-patterns.md)
-- **Parameter binding and SQL injection defense (current)**
-- Transactions and isolation levels (upcoming)
-- Row factories and type adapters (upcoming)
-- Error handling and exception hierarchy (upcoming)
-- Connection pooling (upcoming)
-- async DB-API with aiosqlite (upcoming)
-- Production patterns — retry, timeout, observability (upcoming)
+- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- **Parameter binding and SQL injection defense (sqlite3, PEP 249) (current)**
+- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Asynchronous SQLite with aiosqlite (upcoming)
+- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 
@@ -376,4 +376,4 @@ The next post covers **transactions and isolation levels** — the precise meani
 - [Bandit — B608 hardcoded_sql_expressions](https://bandit.readthedocs.io/en/latest/plugins/b608_hardcoded_sql_expressions.html)
 - [SQLite SQL parameters](https://www.sqlite.org/lang_expr.html#varparam)
 
-Tags: Python, SQLite, SQL Injection, Parameter Binding, PEP 249, Security
+Tags: Python, DB-API, PEP 249, Database

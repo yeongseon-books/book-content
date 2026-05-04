@@ -61,7 +61,6 @@ class WorkerAgent:
         )
         return response.choices[0].message.content
 
-
 class OrchestratorAgent:
     """An orchestrator agent that coordinates workers."""
 
@@ -110,7 +109,6 @@ Respond in JSON format:
             if worker_name in self.workers:
                 results[worker_name] = self.workers[worker_name].execute(task)
         return results
-
 
 # Example usage
 orchestrator = OrchestratorAgent(api_key="your-key")
@@ -218,7 +216,6 @@ Respond appropriately. If you need help from another peer, mention it."""
             temperature=0.7
         )
         return response.choices[0].message.content
-
 
 # Example usage
 writer = PeerAgent("Writer", "technical writer", "your-key")
@@ -332,7 +329,6 @@ Synthesize the results into a coherent final answer."""
         )
         return response.choices[0].message.content
 
-
 # Example usage
 # Top Manager
 ceo = HierarchicalAgent("CEO", "executive director", 0, "your-key")
@@ -417,7 +413,6 @@ class Message:
             metadata=data.get("metadata", {})
         )
 
-
 # Example usage
 msg = Message(
     sender="AgentA",
@@ -496,7 +491,6 @@ class MessageBroker:
                             )
                             self.queues[message.sender].append(error_msg)
             time.sleep(0.01)
-
 
 # Example usage
 broker = MessageBroker()
@@ -594,7 +588,6 @@ class SharedMemory:
                 return [log for log in self.access_log if log.get("key") == key]
             return list(self.access_log)
 
-
 # Example usage
 shared_mem = SharedMemory()
 
@@ -664,7 +657,6 @@ class RoleBasedDelegator:
         )
         return matches / len(requirements)
 
-
 # Example usage
 delegator = RoleBasedDelegator()
 delegator.register("DocWriter", ["documentation"], {"language": "ko", "format": "markdown"})
@@ -719,7 +711,6 @@ class CapabilityRegistry:
                     best_agent = agent
 
         return best_agent
-
 
 # Example usage
 registry = CapabilityRegistry()
@@ -781,7 +772,6 @@ class LoadBalancingDelegator:
         with self.lock:
             if agent_name in self.agent_loads and self.agent_loads[agent_name] > 0:
                 self.agent_loads[agent_name] -= 1
-
 
 # Example usage
 balancer = LoadBalancingDelegator()
@@ -1003,18 +993,19 @@ Handling individual agent failures explicitly increases system reliability.
 - Standard message formats, infinite-loop prevention, and failure handling are mandatory in production
 
 <!-- toc:begin -->
-## AI Agent 101 Series
+## In this series
 
-- What Is an AI Agent? (upcoming)
-- Context Engineering (upcoming)
-- Tool Use Fundamentals (upcoming)
-- Agent Workflow Design (upcoming)
-- Memory and State (upcoming)
+- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [Context Engineering](./02-context-engineering.md)
+- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [Agent Workflow Design](./04-agent-workflow-design.md)
+- [Memory and State](./05-memory-and-state.md)
 - **Multi-Agent Systems (current)**
 - Agent Evaluation (upcoming)
 - Error Handling and Reliability (upcoming)
 - Production Operations (upcoming)
 - Building Your First Agent (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -1031,4 +1022,4 @@ Handling individual agent failures explicitly increases system reliability.
 4. **Microsoft Semantic Kernel: Agent Orchestration** - https://learn.microsoft.com/en-us/semantic-kernel/agents/  
    Microsoft's guide to agent orchestration. Presents how to design hierarchical agent systems.
 
-Tags: AI Agent, Multi-Agent, Coordination, Delegation
+Tags: AI Agent, LLM, Tool Use, Python

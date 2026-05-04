@@ -49,7 +49,6 @@ When all four are explicit, the task is executable. If any is missing, the agent
 from pydantic import BaseModel, Field
 from typing import Any
 
-
 class TaskSpec(BaseModel):
     """Specification for an executable task."""
     goal: str = Field(..., description="Goal to achieve (one sentence)")
@@ -68,7 +67,6 @@ class TaskSpec(BaseModel):
             and self.outputs
             and self.completion_criteria
         )
-
 
 # Example: a clear task
 task = TaskSpec(
@@ -153,7 +151,6 @@ Not every task is good. Three properties separate good tasks from bad.
 ```python
 from typing import Callable
 
-
 class VerifiableTask(TaskSpec):
     """Task with executable completion criteria."""
     verifier: Callable[[Any], bool] = Field(..., exclude=True)
@@ -161,7 +158,6 @@ class VerifiableTask(TaskSpec):
     def verify(self, output: Any) -> bool:
         """Verify the output."""
         return self.verifier(output)
-
 
 def verify_report(output: dict) -> bool:
     """Verifier for the daily summary report."""
@@ -171,7 +167,6 @@ def verify_report(output: dict) -> bool:
         and isinstance(output.get("metrics"), dict)
         and len(output.get("anomalies", [])) >= 0
     )
-
 
 task = VerifiableTask(
     goal="Generate the daily summary report",
@@ -223,7 +218,6 @@ class TaskCandidate(BaseModel):
             return None
         return TaskSpec(**filled)
 
-
 def request_to_tasks(request: str) -> list[TaskCandidate]:
     """Convert a vague request into task candidates."""
     # In production this is built with LLM + templates.
@@ -237,7 +231,6 @@ def request_to_tasks(request: str) -> list[TaskCandidate]:
             missing_fields=["chart_type", "time_range"],
         ),
     ]
-
 
 # Workflow
 candidates = request_to_tasks("Do something about productivity")
@@ -281,7 +274,6 @@ Available inputs:
 Verify each criterion before reporting completion.
 """
 
-
 def task_to_eval_dataset(task: TaskSpec, n: int = 10) -> list[dict]:
     """Generate eval cases from a TaskSpec."""
     # Vary inputs to create test cases
@@ -322,22 +314,23 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 - Completion criteria must be objective, automatically verifiable, and measurable. Rewrite natural-language statements into code expressions.
 - A single TaskSpec produces the system prompt, the verifier, and the eval dataset. The Task is the single source of truth.
 
----
-
 <!-- toc:begin -->
-## Harness Engineering 101 Series
+## In this series
 
 - [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
 - **Task Harness — Turning Vague Work into Executable Tasks (current)**
-- Context Harness — Designing What to Show and Hide from the Agent (upcoming)
+- Context Harness — Designing What the Agent Should Know and Not Know (upcoming)
 - Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
 - Tool Harness — Designing Safe Tools for Agents (upcoming)
-- Test Harness — Pinning Completion Criteria with Tests (upcoming)
-- Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)
-- Approval Gate — Designing Where Human Approval Is Required (upcoming)
-- Observability — Tracing and Reproducing Agent Work (upcoming)
-- Production Harness — Building an Operable Agent Work Environment (upcoming)
+- Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Observability — Tracing and Replaying Agent Work (upcoming)
+- Production Harness — Building Operational Environments for Agents (upcoming)
+
 <!-- toc:end -->
+
+---
 
 ## References
 
@@ -346,4 +339,4 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 - [Pydantic Documentation — Models](https://docs.pydantic.dev/latest/concepts/models/)
 - [Google — Agent Design Patterns](https://cloud.google.com/architecture/ai-agent-patterns)
 
-Tags: AI Agent, Harness, Reliability, Production
+Tags: AI Agent, Harness, Production, Reliability

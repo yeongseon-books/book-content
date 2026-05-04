@@ -368,7 +368,6 @@ response = openai.chat.completions.create(
 
 스키마를 명확하게 작성할수록 LLM이 도구를 올바르게 사용할 확률이 높아집니다.
 
-
 도구 호출은 언제든지 실패할 수 있습니다. 네트워크 오류, 잘못된 파라미터, API 제한 초과 등 다양한 원인이 있습니다. 견고한 에이전트는 에러를 예상하고 적절히 처리합니다.
 
 ### 기본 에러 처리 패턴
@@ -560,8 +559,6 @@ except TimeoutError:
 ```
 
 에러 처리를 잘 구현하면 에이전트의 안정성과 신뢰성이 크게 향상됩니다.
-
-
 
 에이전트가 여러 도구를 사용할 수 있을 때, 어떤 도구를 선택할지 결정하는 전략이 필요합니다.
 
@@ -803,7 +800,6 @@ def select_tool_by_cost(
 
 ## 도구 선택 전략
 
-
 도구 사용 시 자주 발생하는 실수들과 올바른 해결 방법을 살펴봅니다.
 
 ### 실수 1: 불명확한 도구 설명
@@ -1037,13 +1033,11 @@ if result["success"]:
 - 도구 스키마는 명확하고 구체적으로 작성해야 모델이 올바르게 호출합니다.
 - 에러 처리와 도구 선택 전략이 Agent의 신뢰성을 결정합니다.
 
----
-
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
-- AI Agent란 무엇인가? (예정)
-- 컨텍스트 엔지니어링 (예정)
+- [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
+- [컨텍스트 엔지니어링](./02-context-engineering.md)
 - **Tool Use 기초 (현재 글)**
 - Agent Workflow 설계 (예정)
 - Memory와 State (예정)
@@ -1052,12 +1046,12 @@ if result["success"]:
 - 에러 처리와 안정성 (예정)
 - 운영 (예정)
 - 첫 Agent 만들기 (예정)
+
 <!-- toc:end -->
 
+---
+
 ## 참고 자료
-
-
-Tags: AI Agent, Tool Use, Function Calling, Integration
 
 1. **OpenAI Function Calling Guide** - https://platform.openai.com/docs/guides/function-calling  
    OpenAI의 공식 Function Calling 문서. 도구 스키마 작성법, tool_choice 파라미터, 실전 예제를 제공합니다.
@@ -1071,4 +1065,4 @@ Tags: AI Agent, Tool Use, Function Calling, Integration
 4. **Anthropic Tool Use Best Practices** - https://docs.anthropic.com/claude/docs/tool-use  
    Claude API의 도구 사용 가이드. 에러 처리, 재시도 전략, 보안 고려사항을 설명합니다.
 
-Tags: AI Agent, Tool Use, Function Calling, Integration
+Tags: AI Agent, LLM, Tool Use, Python

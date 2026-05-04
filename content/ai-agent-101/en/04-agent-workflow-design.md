@@ -30,7 +30,6 @@ This article covers major workflow patterns, task decomposition strategies, stat
 
 ---
 
-## Major Workflow Patterns
 ## Key Workflow Patterns
 
 Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.
@@ -1291,7 +1290,27 @@ else:
 
 **Lesson**: Go through unit tests, integration tests, and simulation before production deployment.
 
----
+## Key Takeaways
+
+- Workflows are about designing agents to systematically perform complex tasks.
+- Various patterns like ReAct, Plan-and-Execute, and Reflexion exist, and you must choose based on task characteristics.
+- Task decomposition and state management are the core of workflow design.
+
+<!-- toc:begin -->
+## In this series
+
+- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [Context Engineering](./02-context-engineering.md)
+- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- **Agent Workflow Design (current)**
+- Memory and State (upcoming)
+- Multi-Agent Systems (upcoming)
+- Agent Evaluation (upcoming)
+- Error Handling and Reliability (upcoming)
+- Production Operations (upcoming)
+- Building Your First Agent (upcoming)
+
+<!-- toc:end -->
 
 ## References
 
@@ -1307,28 +1326,4 @@ else:
 4. **AutoGPT Architecture** - https://github.com/Significant-Gravitas/AutoGPT  
    Real implementation example of Plan-and-Execute pattern. Shows autonomous agent task decomposition and execution strategies.
 
-
-## Key Takeaways
-
-- Workflows are about designing agents to systematically perform complex tasks.
-- Various patterns like ReAct, Plan-and-Execute, and Reflexion exist, and you must choose based on task characteristics.
-- Task decomposition and state management are the core of workflow design.
-
----
-
-<!-- toc:begin -->
-## AI Agent 101 Series
-
-- What is an AI Agent? (upcoming)
-- Context Engineering (upcoming)
-- Tool Use Fundamentals (upcoming)
-- **Agent Workflow Design (current)**
-- Memory and State (upcoming)
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
-<!-- toc:end -->
-
-Tags: AI Agent, Workflow, Planning, Task Decomposition
+Tags: AI Agent, LLM, Tool Use, Python
