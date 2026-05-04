@@ -3,7 +3,7 @@ title: 정수에서 벡터로, 그리고 위치
 series: llm-from-scratch-101
 episode: 2
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ last_reviewed: '2026-04-29'
 오늘 멘탈 모델은 이 문장 하나면 충분합니다. **토큰 입력 벡터는 token embedding과 positional embedding의 합입니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- nn.Embedding은 사실 어떤 연산을 수행할까요?
+- 토큰 임베딩만으로는 왜 부족할까요?
+- sinusoidal과 learned positional embedding은 무엇이 다를까요?
+- 토큰과 위치는 왜 더해서 하나의 벡터로 다룰까요?
+
+<!-- a-grade-intro:end -->
 
 ## nn.Embedding은 사실 그냥 룩업 테이블
 
@@ -159,6 +170,17 @@ print(y[0])
 ## 다음 글 예고
 
 다음 글에서는 어텐션으로 넘어갑니다. 각 토큰이 어떤 다른 토큰을 얼마나 참고할지 스스로 점수 매기게 만들겠습니다. 드디어 `Q`, `K`, `V`가 등장합니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] nn.Embedding이 lookup table임을 5줄 코드로 직접 재현했다.
+- [ ] TinyShakespeare 미니배치를 만들어 embedding 출력 shape를 찍었다.
+- [ ] sinusoidal과 learned 두 방식의 출력 차이를 비교했다.
+- [ ] token_emb + pos_emb의 결과 벡터 의미를 설명할 수 있다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

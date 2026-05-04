@@ -3,7 +3,7 @@ title: 샘플링 — 학습된 모델에서 글 뽑아내기
 series: llm-from-scratch-101
 episode: 7
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ last_reviewed: '2026-04-29'
 오늘 멘탈 모델은 간단합니다. **생성은 다음 토큰 분포에서 하나를 고르고, 그 결과를 다시 입력으로 되먹이는 자기회귀 루프입니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- 자기회귀 생성 루프는 어떤 단계의 반복일까요?
+- temperature·top-k·top-p는 logits를 각각 어떻게 다룰까요?
+- greedy 디코딩이 단조로운 결과를 내는 이유는 무엇일까요?
+- context window를 넘어서면 모델은 어떻게 입력을 처리해야 할까요?
+
+<!-- a-grade-intro:end -->
 
 ## 자기회귀 생성 — 한 토큰 뽑고 다시 입력
 
@@ -127,6 +138,17 @@ Thee no more of men.
 ## 다음 글 예고
 
 다음 글에서는 여기에 작은 instruction 데이터셋을 얹어 SFT를 해보겠습니다. 질문과 답변 형식이 출력 습관을 얼마나 바꾸는지 보겠습니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] greedy / top-k / top-p / temperature를 바꿔 결과 차이를 관찰했다.
+- [ ] generate.py를 CLI로 실행해 셰익스피어 풍 출력을 받았다.
+- [ ] context window 슬라이딩 코드의 인덱싱을 손으로 따라가 봤다.
+- [ ] 같은 prompt로 temperature 0.5 / 1.0 / 1.5 결과를 비교했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

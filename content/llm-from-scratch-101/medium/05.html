@@ -62,6 +62,17 @@
 <p>Details matter, of course. Without practical mechanisms like input length validation, loss reshaping, and weight tying, the code can quickly become messy. Today, we'll organize those parts.</p>
 <p>The mental model for today is this: <strong>GPT is an autoregressive model that stacks blocks on top of embeddings and converts the final hidden states into the next token distribution.</strong></p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>In what order does the GPT class call its components?</li>
+<li>Why does weight tying shrink parameters without hurting quality?</li>
+<li>Why does cross-entropy loss fit on one line?</li>
+<li>What do you gain by managing hyperparameters in a config dataclass?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>The Forward Pass at a Glance</h2>
 <p>The input is a tensor of token IDs with shape <code>(B, T)</code>. We add token and position embeddings, then pass them through six blocks sequentially. After a final <code>ln_f</code> layer, we project to the vocab dimension via <code>lm_head</code> to produce logits of shape <code>(B, T, vocab_size)</code>.</p>
 <p><img alt="Full GPT forward-pass structure" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png"><br>
@@ -154,6 +165,17 @@ print(loss.item())
 <p>The default settings for this series are conservative. <code>n_layer=6</code>, <code>n_head=4</code>, <code>n_embd=128</code>, and <code>block_size=64</code> are small enough to run TinyShakespeare on a CPU or a modest GPU. While the numbers are small, the architecture is identical to GPT. At this stage, a traceable model is a better teacher than a massive one.</p>
 <h2>What's next</h2>
 <p>The model core is finished. In the next post, we'll implement the training loop—pulling mini-batches and running the <code>forward -&gt; loss -&gt; backward -&gt; optimizer.step()</code> cycle. You'll see the TinyShakespeare loss drop from 4.17 down to the 1.0 range.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Traced the forward pass of the 80-line GPT class.</li>
+<li>[ ] Printed parameter counts with and without weight tying.</li>
+<li>[ ] Ran one forward + loss as a pre-training sanity check.</li>
+<li>[ ] Can explain every field of GPTConfig.</li>
+</ul>
+<!-- a-grade-example:end -->
+
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>

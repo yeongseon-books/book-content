@@ -62,6 +62,17 @@
 <p>In this series, we're building a small GPT model from scratch using TinyShakespeare. We'll set aside the heavy frameworks for a moment and go all the way with just PyTorch 2.x and a few Python files.</p>
 <p>Today's mental model is simple: <strong>The model doesn't read text. It reads integer sequences created by the tokenizer.</strong></p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Why do models take integers instead of raw text?</li>
+<li>What are the trade-offs between character, word, and subword tokenization?</li>
+<li>How does BPE actually build a vocabulary step by step?</li>
+<li>Why did this series pick character-level tokenization?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Why Can't We Just Input Text?</h2>
 <p>Neural networks process tensors. You can't perform addition or matrix multiplication on a string. To process a line like "To be, or not to be," we first have to convert it into numbers. These numbers are called Token IDs.</p>
 <p>There's one crucial point to keep in mind: Token IDs don't carry inherent meaning. They're just indices. There's no guarantee that token 5 is semantically close to token 6, and they aren't alphabetically ordered in a meaningful way. We just map them to integers for now, and later, during the embedding stage, we'll assign vector meanings to those integers.</p>
@@ -158,6 +169,17 @@ print(decode(train_ids[:80].tolist()))
 <p>Once you run this script, you'll be able to pull batches from the integer sequences for the next posts. I always keep the <code>decode()</code> function handy because debugging a model often involves turning numbers back into human-readable text.</p>
 <h2>What's next</h2>
 <p>We have our integer sequences ready. In the next post, we'll assign vector meanings to these cold ID arrays. By combining token embeddings and positional embeddings, we'll create the first input tensor the model will actually read.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Encoded TinyShakespeare into an integer sequence.</li>
+<li>[ ] Inspected vocabulary size against token count.</li>
+<li>[ ] Compared the same sentence under tiktoken's BPE.</li>
+<li>[ ] Can state the trade-off of character-level in one sentence.</li>
+</ul>
+<!-- a-grade-example:end -->
+
 <h2>In this series</h2>
 <ul>
 <li><strong>Turning Text into Numbers (current)</strong></li>

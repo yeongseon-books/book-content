@@ -3,7 +3,7 @@ title: 기울기로 배우기
 series: llm-from-scratch-101
 episode: 6
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ last_reviewed: '2026-04-29'
 오늘 멘탈 모델은 이렇습니다. **학습은 좋은 배치를 반복해서 보여 주고, 틀린 만큼 기울기를 흘려 보내고, 그 기울기만큼 가중치를 조금 고치는 일입니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- 학습 루프의 5줄 핵심은 어떤 동작들로 이루어질까요?
+- AdamW는 왜 transformer에서 SGD보다 잘 통할까요?
+- warmup + cosine 학습률은 학습 안정성에 어떤 영향을 줄까요?
+- gradient clipping 한 줄이 어떻게 폭발을 막을까요?
+
+<!-- a-grade-intro:end -->
 
 ## 학습 루프 5줄의 구조
 
@@ -188,6 +199,17 @@ torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
 ## 다음 글 예고
 
 이제 가중치는 학습됐습니다. 다음 글에서는 `ckpt.pt`를 불러와 자기회귀 생성 루프를 붙이겠습니다. `ROMEO:` 같은 프롬프트 하나로 TinyShakespeare 모델이 다음 문자를 어떻게 뽑는지 직접 보게 됩니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] 5줄 학습 루프를 자기 손으로 작성했다.
+- [ ] warmup·cosine 곡선을 그려 step별 학습률을 확인했다.
+- [ ] eval_interval로 train·val loss를 같은 그래프에 찍었다.
+- [ ] 학습된 ckpt.pt를 저장하고 다시 로드해 봤다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

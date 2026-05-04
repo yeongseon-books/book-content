@@ -3,7 +3,7 @@ title: 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
 series: llm-from-scratch-101
 episode: 9
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ last_reviewed: '2026-04-29'
 오늘 멘탈 모델은 이렇습니다. **챗봇은 모델 하나로 끝나지 않고, 대화 히스토리와 스트리밍 입출력을 함께 묶은 작은 시스템입니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- 챗봇은 모델 외에 어떤 구성요소가 있어야 동작할까요?
+- multi-turn 프롬프트 형식은 왜 직접 설계해야 할까요?
+- FastAPI lifespan으로 모델을 한 번만 로드하면 어떤 이점이 있을까요?
+- SSE 스트리밍은 단순 응답보다 UX에 어떤 차이를 줄까요?
+
+<!-- a-grade-intro:end -->
 
 ## 챗봇 = 모델 + 대화 히스토리 + 스트리밍 + UI
 
@@ -172,6 +183,17 @@ source.onmessage=e=>out.textContent+=e.data;source.onerror=()=>source.close();};
 이 모델은 추론기보다 셰익스피어 풍 리듬 생성기에 가깝습니다.
 
 다음 단계로는 LoRA, vLLM, RoPE, RLHF, BPE, mixed precision을 권합니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] FastAPI 앱을 띄우고 /chat 엔드포인트를 호출해 봤다.
+- [ ] multi-turn 히스토리를 한 prompt 문자열로 직접 정리했다.
+- [ ] SSE 스트림으로 토큰이 한 글자씩 떨어지는 모습을 봤다.
+- [ ] 단일 페이지 HTML 클라이언트로 대화창을 띄웠다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

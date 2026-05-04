@@ -3,7 +3,7 @@ title: Deciding Which Tokens to Focus On
 series: llm-from-scratch-101
 episode: 3
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ Today, we're adding `CausalSelfAttention` to `model.py`. We'll skip shortcuts li
 Today's mental model is this: **Each token asks a question with its Query, provides a score with its Key, and pulls the information it needs from the Value.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- Why do Q, K, V come from the same input but play different roles?
+- Why divide attention scores by sqrt(d)?
+- What breaks during training without the causal mask?
+- Why does multi-head have more capacity than a single head?
+
+<!-- a-grade-intro:end -->
 
 ## QKV are Just Three Linear Transformations
 
@@ -170,6 +181,17 @@ When training behaves unexpectedly, the cause is often a minor tensor manipulati
 ## What's next
 
 Now that our tokens can "see" each other, we'll move on to the next post. We'll add FeedForward, Residual connections, and LayerNorm to complete a full Transformer block—the fundamental unit of depth in our model.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Walked through the scale → softmax → weighted V flow by hand.
+- [ ] Printed a single head's attention weights to see the pattern.
+- [ ] Understood how multi-head outputs are reshaped and concatenated.
+- [ ] Compared logits before and after mask application.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

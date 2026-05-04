@@ -3,7 +3,7 @@ title: Turning Text into Numbers
 series: llm-from-scratch-101
 episode: 1
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ In this series, we're building a small GPT model from scratch using TinyShakespe
 Today's mental model is simple: **The model doesn't read text. It reads integer sequences created by the tokenizer.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- Why do models take integers instead of raw text?
+- What are the trade-offs between character, word, and subword tokenization?
+- How does BPE actually build a vocabulary step by step?
+- Why did this series pick character-level tokenization?
+
+<!-- a-grade-intro:end -->
 
 ## Why Can't We Just Input Text?
 
@@ -157,6 +168,17 @@ Once you run this script, you'll be able to pull batches from the integer sequen
 ## What's next
 
 We have our integer sequences ready. In the next post, we'll assign vector meanings to these cold ID arrays. By combining token embeddings and positional embeddings, we'll create the first input tensor the model will actually read.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Encoded TinyShakespeare into an integer sequence.
+- [ ] Inspected vocabulary size against token count.
+- [ ] Compared the same sentence under tiktoken's BPE.
+- [ ] Can state the trade-off of character-level in one sentence.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

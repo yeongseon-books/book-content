@@ -3,7 +3,7 @@ title: 글자를 숫자로 바꾸기
 series: llm-from-scratch-101
 episode: 1
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ last_reviewed: '2026-04-29'
 오늘 멘탈 모델은 간단합니다. **모델은 텍스트를 읽지 않고, 토크나이저가 만든 정수 시퀀스를 읽습니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- 왜 모델은 텍스트 대신 정수를 입력으로 받을까요?
+- 문자 단위·단어 단위·서브워드 단위 토크나이저는 어떤 trade-off를 가질까요?
+- BPE는 실제로 어떻게 vocabulary를 만들어 갈까요?
+- 이 시리즈가 character-level 토크나이저를 고른 이유는 무엇일까요?
+
+<!-- a-grade-intro:end -->
 
 ## 텍스트는 왜 직접 못 넣나
 
@@ -157,6 +168,17 @@ print(decode(train_ids[:80].tolist()))
 ## 다음 글 예고
 
 이제 정수 시퀀스는 준비됐습니다. 다음 글에서는 이 차가운 ID 배열에 벡터 의미를 입힙니다. 토큰 임베딩과 위치 임베딩을 더해서, 모델이 읽을 첫 입력 텐서를 만들겠습니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] TinyShakespeare를 다운로드해 정수 시퀀스로 인코딩했다.
+- [ ] vocabulary 크기와 토큰 수의 관계를 직접 출력해 확인했다.
+- [ ] tiktoken으로 같은 문장을 BPE로 토큰화해 결과를 비교했다.
+- [ ] character-level의 한계와 장점을 한 문장으로 요약할 수 있다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

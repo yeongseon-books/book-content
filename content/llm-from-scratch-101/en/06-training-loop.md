@@ -3,7 +3,7 @@ title: Learning via Gradients
 series: llm-from-scratch-101
 episode: 6
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ In this post, we'll implement `train.py`. We'll include AdamW, warmup, cosine de
 Today's mental model is this: **Training is about repeatedly showing the model quality batches, flowing gradients back based on its errors, and adjusting weights slightly in the direction of those gradients.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What are the 5 lines that drive the training loop?
+- Why does AdamW work better than SGD for transformers?
+- How does warmup + cosine LR affect training stability?
+- How does one line of gradient clipping prevent explosion?
+
+<!-- a-grade-intro:end -->
 
 ## The 5-line Core of the Training Loop
 
@@ -188,6 +199,17 @@ The line `torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'c
 ## What's next
 
 The weights are now trained. In the next post, we'll load `ckpt.pt` and implement the autoregressive generation loop. We'll use a prompt like `ROMEO:` to see how our TinyShakespeare model predicts the next characters.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Wrote the 5-line training loop by hand.
+- [ ] Plotted the warmup + cosine curve to see lr per step.
+- [ ] Plotted train and val loss together using eval_interval.
+- [ ] Saved ckpt.pt and reloaded it successfully.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

@@ -61,6 +61,17 @@
 <p>The primary effect of Supervised Fine-Tuning (SFT) is a change in format rather than a massive gain in knowledge. By using even a tiny dataset of 50 examples, we can observe how the model's output habits shift toward a conversational structure.</p>
 <p>Today's mental model is this: <strong>Fine-tuning isn't about discarding the base model. It's about painting over its output habits using a small, specialized dataset.</strong></p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What separates pre-training, fine-tuning, and RLHF?</li>
+<li>What fields make up a single instruction-data row?</li>
+<li>Why does loss masking exclude the instruction portion from training?</li>
+<li>Why does even 50 rows shift output habits?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Pre-training vs Fine-tuning vs RLHF — A Quick Summary</h2>
 <p>Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.</p>
 <p><img alt="Roles of pre-training, SFT, and RLHF" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png"></p>
@@ -132,6 +143,17 @@ A: My lord, I serve thee with a faithful heart.
 <p>While it's far from a polished chatbot, the shift in format is unmistakable.</p>
 <h2>What's next</h2>
 <p>In the final post, we'll wrap this model in a FastAPI server so you can talk to it directly through a browser. We'll implement multi-turn prompts and SSE streaming to complete the series.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Built an instruction/response mini dataset by hand.</li>
+<li>[ ] Printed where loss masking applies to verify the boundary.</li>
+<li>[ ] Layered finetune.py onto train.py in 30 extra lines.</li>
+<li>[ ] Compared pre- and post-fine-tune outputs for the same prompt.</li>
+</ul>
+<!-- a-grade-example:end -->
+
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>

@@ -3,7 +3,7 @@ title: From Integers to Vectors and Positions
 series: llm-from-scratch-101
 episode: 2
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ Today, we're starting `model.py`. We won't build the Transformer blocks yet, but
 Today's mental model is this: **The input vector for a token is the sum of its token embedding and its positional embedding.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What operation does nn.Embedding actually perform?
+- Why isn't token embedding alone enough?
+- How do sinusoidal and learned positional embeddings differ?
+- Why combine token and position into a single vector?
+
+<!-- a-grade-intro:end -->
 
 ## nn.Embedding is Just a Lookup Table
 
@@ -159,6 +170,17 @@ For those new to this, it's worth noting why we need both `x` and `y`. `x` is th
 ## What's next
 
 In the next post, we'll move on to Attention. We'll enable each token to score and decide how much it should focus on other tokens in the sequence. This is where `Q`, `K`, and `V` finally make their appearance.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Reimplemented nn.Embedding as a lookup in 5 lines.
+- [ ] Built the first TinyShakespeare mini-batch and printed embedding shapes.
+- [ ] Compared the output of sinusoidal vs learned positional embedding.
+- [ ] Can explain what token_emb + pos_emb represents.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

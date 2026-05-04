@@ -62,6 +62,17 @@
 <p>Today, we're starting <code>model.py</code>. We won't build the Transformer blocks yet, but we'll create the entrance that converts token IDs into <code>(B, T, C)</code> tensors. It's a small step, but it's the first gate every GPT model must pass through.</p>
 <p>Today's mental model is this: <strong>The input vector for a token is the sum of its token embedding and its positional embedding.</strong></p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What operation does nn.Embedding actually perform?</li>
+<li>Why isn't token embedding alone enough?</li>
+<li>How do sinusoidal and learned positional embeddings differ?</li>
+<li>Why combine token and position into a single vector?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>nn.Embedding is Just a Lookup Table</h2>
 <p><code>nn.Embedding(vocab_size, n_embd)</code> is essentially a large table with dimensions <code>(vocab_size, n_embd)</code>. When a token ID comes in, it simply pulls the corresponding row. That's it. It might look complex through the lens of linear algebra, but the operation itself is just indexing.</p>
 <p>The key is that the values in this table are learned. They start as random numbers, but after thousands of backpropagation steps, tokens appearing in similar contexts start moving in similar directions. The meaning isn't in the integer ID, but in the learned vector row.</p>
@@ -161,6 +172,17 @@ print(y[0])
 <p>For those new to this, it's worth noting why we need both <code>x</code> and <code>y</code>. <code>x</code> is the current context, and <code>y</code> is the target (the same data shifted one position to the right). The model learns to predict the next character at every position in <code>x</code>. this one-position shift is the fundamental rhythm of language model training.</p>
 <h2>What's next</h2>
 <p>In the next post, we'll move on to Attention. We'll enable each token to score and decide how much it should focus on other tokens in the sequence. This is where <code>Q</code>, <code>K</code>, and <code>V</code> finally make their appearance.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Reimplemented nn.Embedding as a lookup in 5 lines.</li>
+<li>[ ] Built the first TinyShakespeare mini-batch and printed embedding shapes.</li>
+<li>[ ] Compared the output of sinusoidal vs learned positional embedding.</li>
+<li>[ ] Can explain what token_emb + pos_emb represents.</li>
+</ul>
+<!-- a-grade-example:end -->
+
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>

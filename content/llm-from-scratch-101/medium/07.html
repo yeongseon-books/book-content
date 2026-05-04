@@ -61,6 +61,17 @@
 <p>The process is straightforward: pick a character, append it to the sequence, and feed it back into the model. Repeating this loop generates text. While the result might resemble Shakespearian nonsense at this stage, it demonstrates the fundamental mechanics of text generation.</p>
 <p>Today's mental model is simple. <strong>Generation is an autoregressive loop where you pick one token from the next-token distribution and feed that result back as input.</strong></p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What does the autoregressive generation loop iterate over?</li>
+<li>How do temperature, top-k, and top-p each manipulate the logits?</li>
+<li>Why does greedy decoding produce monotonous text?</li>
+<li>How should the model handle text longer than its context window?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Autoregressive Generation — One Token at a Time</h2>
 <p>We input the current context <code>idx</code>, extract only the last step's logits, and then append the sampled token to the sequence.</p>
 <p><img alt="Autoregressive loop with token-by-token appends" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png"></p>
@@ -132,6 +143,17 @@ Thee no more of men.
 <p>The meaning might be garbled, but the rhythm of the training data remains.</p>
 <h2>What's next</h2>
 <p>In the next post, we'll perform Supervised Fine-Tuning (SFT) by layering a small instruction dataset on top of this base model. We'll see how a simple Q&amp;A format can drastically change the model's output habits.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Varied greedy / top-k / top-p / temperature and saw the difference.</li>
+<li>[ ] Ran generate.py from the CLI for Shakespeare-style output.</li>
+<li>[ ] Walked through the context-window sliding indexing by hand.</li>
+<li>[ ] Compared the same prompt at temperatures 0.5 / 1.0 / 1.5.</li>
+</ul>
+<!-- a-grade-example:end -->
+
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>

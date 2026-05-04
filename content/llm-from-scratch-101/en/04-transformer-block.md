@@ -3,7 +3,7 @@ title: 'The Transformer Block: A Unit of Depth'
 series: llm-from-scratch-101
 episode: 4
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ In GPT models, these blocks often seem like standard components. Writing them by
 The mental model for today is simple: **Attention mixes information across tokens, FeedForward transforms it within each token, and Residual connections wrap them both for stability.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- Why is a 2-layer MLP enough for FeedForward?
+- How do residual connections rescue training?
+- What's the practical difference between pre-norm and post-norm?
+- Where do most of a block's parameters live?
+
+<!-- a-grade-intro:end -->
 
 ## FeedForward is Just a 2-layer MLP
 
@@ -113,6 +124,17 @@ With our setting of `C=128`, one block uses about 66k parameters for attention a
 ## What's next
 
 The building blocks are ready. In the next post, we will wrap embeddings, `N` blocks, the final LayerNorm, and the LM head into a single `GPT(nn.Module)` class. We'll finish the model so it can produce both logits and loss in a single forward pass.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Implemented one block in 25 lines and verified forward shapes.
+- [ ] Can draw the pre-norm data flow as a diagram.
+- [ ] Calculated how parameters grow when stacking N blocks.
+- [ ] Compared the parameter share between FeedForward and attention.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

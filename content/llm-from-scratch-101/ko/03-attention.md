@@ -3,7 +3,7 @@ title: 어떤 토큰을 얼마나 볼지 스스로 정하기
 series: llm-from-scratch-101
 episode: 3
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ last_reviewed: '2026-04-29'
 오늘 멘탈 모델은 이렇습니다. **각 토큰은 Query로 질문하고, Key로 점수를 매기고, Value에서 필요한 정보를 가져옵니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- Q, K, V는 왜 같은 입력에서 만들어지면서 서로 다른 역할을 할까요?
+- attention score를 sqrt(d)로 나누는 이유는 무엇일까요?
+- causal mask가 없으면 학습은 어떻게 망가질까요?
+- multi-head는 왜 단일 head보다 표현력이 클까요?
+
+<!-- a-grade-intro:end -->
 
 ## QKV는 그냥 세 개의 선형 변환
 
@@ -170,6 +181,17 @@ print(attn.last_attn.shape)
 ## 다음 글 예고
 
 이제 토큰끼리 서로를 보는 눈은 생겼습니다. 다음 글에서는 여기에 FeedForward, Residual, LayerNorm을 더해 트랜스포머 블록 하나를 완성하겠습니다. 깊이를 쌓는 최소 단위가 등장합니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] scale → softmax → V 가중합 흐름을 손으로 따라 그려 봤다.
+- [ ] 단일 head의 attention weight 분포를 출력해 패턴을 확인했다.
+- [ ] multi-head 출력을 reshape으로 합치는 코드 흐름을 이해했다.
+- [ ] mask 적용 전후의 logits 차이를 비교했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

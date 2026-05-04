@@ -3,7 +3,7 @@ title: Sampling — Generating Text from a Trained Model
 series: llm-from-scratch-101
 episode: 7
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ The process is straightforward: pick a character, append it to the sequence, and
 Today's mental model is simple. **Generation is an autoregressive loop where you pick one token from the next-token distribution and feed that result back as input.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What does the autoregressive generation loop iterate over?
+- How do temperature, top-k, and top-p each manipulate the logits?
+- Why does greedy decoding produce monotonous text?
+- How should the model handle text longer than its context window?
+
+<!-- a-grade-intro:end -->
 
 ## Autoregressive Generation — One Token at a Time
 
@@ -125,6 +136,17 @@ The meaning might be garbled, but the rhythm of the training data remains.
 ## What's next
 
 In the next post, we'll perform Supervised Fine-Tuning (SFT) by layering a small instruction dataset on top of this base model. We'll see how a simple Q&A format can drastically change the model's output habits.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Varied greedy / top-k / top-p / temperature and saw the difference.
+- [ ] Ran generate.py from the CLI for Shakespeare-style output.
+- [ ] Walked through the context-window sliding indexing by hand.
+- [ ] Compared the same prompt at temperatures 0.5 / 1.0 / 1.5.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

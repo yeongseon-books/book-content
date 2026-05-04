@@ -886,7 +886,7 @@ series:
         title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
         status: needs-update
 - id: llm-from-scratch-101
-  status: code-checked
+  status: content-ready
   category: ai
   title:
     ko: LLM from Scratch 101
@@ -912,77 +912,77 @@ series:
       - idx: 1
         slug: 01-tokenizer
         title: 글자를 숫자로 바꾸기
-        status: code-checked
+        status: publish-ready
       - idx: 2
         slug: 02-embedding
         title: 정수에서 벡터로, 그리고 위치
-        status: code-checked
+        status: publish-ready
       - idx: 3
         slug: 03-attention
         title: 어떤 토큰을 얼마나 볼지 스스로 정하기
-        status: code-checked
+        status: publish-ready
       - idx: 4
         slug: 04-transformer-block
         title: 블록 하나, 깊이의 단위
-        status: code-checked
+        status: publish-ready
       - idx: 5
         slug: 05-gpt-model
         title: '조립: GPT 모델 클래스 완성'
-        status: code-checked
+        status: publish-ready
       - idx: 6
         slug: 06-training-loop
         title: 기울기로 배우기
-        status: code-checked
+        status: publish-ready
       - idx: 7
         slug: 07-inference
         title: 샘플링 — 학습된 모델에서 글 뽑아내기
-        status: code-checked
+        status: publish-ready
       - idx: 8
         slug: 08-finetuning
         title: 베이스 모델을 우리 작업에 맞추기
-        status: code-checked
+        status: publish-ready
       - idx: 9
         slug: 09-chatbot-wrapper
         title: 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
-        status: code-checked
+        status: publish-ready
     en:
       articles:
       - idx: 1
         slug: 01-tokenizer
         title: Turning Text into Numbers
-        status: code-checked
+        status: publish-ready
       - idx: 2
         slug: 02-embedding
         title: From Integers to Vectors and Positions
-        status: code-checked
+        status: publish-ready
       - idx: 3
         slug: 03-attention
         title: Deciding Which Tokens to Focus On
-        status: code-checked
+        status: publish-ready
       - idx: 4
         slug: 04-transformer-block
         title: 'The Transformer Block: A Unit of Depth'
-        status: code-checked
+        status: publish-ready
       - idx: 5
         slug: 05-gpt-model
         title: 'Assembly: Completing the GPT Model Class'
-        status: code-checked
+        status: publish-ready
       - idx: 6
         slug: 06-training-loop
         title: Learning via Gradients
-        status: code-checked
+        status: publish-ready
       - idx: 7
         slug: 07-inference
         title: Sampling — Generating Text from a Trained Model
-        status: code-checked
+        status: publish-ready
       - idx: 8
         slug: 08-finetuning
         title: Adapting the Base Model to Specific Tasks
-        status: code-checked
+        status: publish-ready
       - idx: 9
         slug: 09-chatbot-wrapper
         title: Turning Your LLM into a Chatbot — FastAPI + Streaming
-        status: code-checked
+        status: publish-ready
   track: ebook
   stage: education
 - id: rag-deep-dive

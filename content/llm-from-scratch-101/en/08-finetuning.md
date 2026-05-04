@@ -3,7 +3,7 @@ title: Adapting the Base Model to Specific Tasks
 series: llm-from-scratch-101
 episode: 8
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ The primary effect of Supervised Fine-Tuning (SFT) is a change in format rather 
 Today's mental model is this: **Fine-tuning isn't about discarding the base model. It's about painting over its output habits using a small, specialized dataset.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What separates pre-training, fine-tuning, and RLHF?
+- What fields make up a single instruction-data row?
+- Why does loss masking exclude the instruction portion from training?
+- Why does even 50 rows shift output habits?
+
+<!-- a-grade-intro:end -->
 
 ## Pre-training vs Fine-tuning vs RLHF — A Quick Summary
 
@@ -122,6 +133,17 @@ While it's far from a polished chatbot, the shift in format is unmistakable.
 ## What's next
 
 In the final post, we'll wrap this model in a FastAPI server so you can talk to it directly through a browser. We'll implement multi-turn prompts and SSE streaming to complete the series.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Built an instruction/response mini dataset by hand.
+- [ ] Printed where loss masking applies to verify the boundary.
+- [ ] Layered finetune.py onto train.py in 30 extra lines.
+- [ ] Compared pre- and post-fine-tune outputs for the same prompt.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

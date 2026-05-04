@@ -3,7 +3,7 @@ title: 베이스 모델을 우리 작업에 맞추기
 series: llm-from-scratch-101
 episode: 8
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ SFT의 첫 효과는 지식보다 형식 변화입니다.
 오늘 멘탈 모델은 이렇습니다. **파인튜닝은 베이스 모델을 버리는 일이 아니라, 작은 데이터셋으로 출력 습관을 덧칠하는 일입니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- pre-training, fine-tuning, RLHF는 어떤 점이 다를까요?
+- instruction 데이터 한 행은 어떤 필드들로 구성될까요?
+- loss masking은 왜 instruction 부분을 학습 대상에서 뺄까요?
+- 50행짜리 작은 데이터셋만으로도 출력 습관이 바뀌는 이유는 무엇일까요?
+
+<!-- a-grade-intro:end -->
 
 ## Pre-training vs Fine-tuning vs RLHF — 1분 정리
 
@@ -124,6 +135,17 @@ A: My lord, I serve thee with a faithful heart.
 ## 다음 글 예고
 
 다음 글에서는 FastAPI를 씌워 브라우저에서 바로 말을 걸 수 있게 만들겠습니다. 멀티턴 프롬프트와 SSE 스트리밍까지 붙여 시리즈를 마무리하겠습니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] instruction / response 형식의 미니 데이터셋을 직접 만들었다.
+- [ ] loss masking이 적용된 위치를 출력해 확인했다.
+- [ ] finetune.py를 train.py 위에 30줄로 얹어 실행했다.
+- [ ] 같은 prompt에 fine-tune 전·후 출력을 비교했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

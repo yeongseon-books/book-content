@@ -3,7 +3,7 @@ title: Turning Your LLM into a Chatbot — FastAPI + Streaming
 series: llm-from-scratch-101
 episode: 9
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ The model we've built is a char-level GPT with 1.2 million parameters. It's smal
 Today's mental model is this: **A chatbot isn't just a model. It's a small system that integrates conversation history, streaming I/O, and a user interface.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What does a chatbot need beyond the model itself?
+- Why design the multi-turn prompt format yourself?
+- What do you gain by loading the model once via FastAPI lifespan?
+- How does SSE streaming change the UX compared to a plain response?
+
+<!-- a-grade-intro:end -->
 
 ## Chatbot = Model + History + Streaming + UI
 
@@ -170,6 +181,17 @@ Over the course of nine posts, we've built a small GPT from scratch using roughl
 While this model functions more as a Shakespearian rhythm generator than a general-purpose assistant, it demystifies the entire pipeline.
 
 For your next steps, I recommend exploring LoRA, vLLM, RoPE, RLHF, BPE tokenization, and mixed-precision training.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Started the FastAPI app and called /chat.
+- [ ] Composed multi-turn history into a single prompt string.
+- [ ] Watched tokens drop one-by-one over SSE.
+- [ ] Loaded the single-page HTML client and held a conversation.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

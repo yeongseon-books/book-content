@@ -62,6 +62,17 @@
 <p>In GPT models, these blocks often seem like standard components. Writing them by hand makes their purpose obvious. For effective training, you must ensure that information can both flow through the transformations and survive via the original input path.</p>
 <p>The mental model for today is simple: <strong>Attention mixes information across tokens, FeedForward transforms it within each token, and Residual connections wrap them both for stability.</strong></p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Why is a 2-layer MLP enough for FeedForward?</li>
+<li>How do residual connections rescue training?</li>
+<li>What's the practical difference between pre-norm and post-norm?</li>
+<li>Where do most of a block's parameters live?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>FeedForward is Just a 2-layer MLP</h2>
 <p>Stacking only attention layers allows tokens to reference each other extensively, but the representational power doesn't grow as expected. Each position lacks sufficient non-linear transformation. To fix this, we add an MLP with the structure <code>Linear(C, 4C) -&gt; GELU -&gt; Linear(4C, C)</code> to every block.</p>
 <p>Expanding the intermediate dimension by four is a practical choice. This brief expansion allows the token to form richer combinations before projecting back to the original dimension in the final linear layer. Even in small models, the FeedForward network handles a significant portion of the heavy lifting.</p>
@@ -119,6 +130,17 @@ for block in self.blocks:
 <p>With our setting of <code>C=128</code>, one block uses about 66k parameters for attention and 131k for FeedForward. Adding two LayerNorms brings the total for one block to roughly 198k. Six layers mean about 1.18M parameters are concentrated in the blocks. Working with a small GPT makes you realize that the FeedForward layers consume most of the model's capacity.</p>
 <h2>What's next</h2>
 <p>The building blocks are ready. In the next post, we will wrap embeddings, <code>N</code> blocks, the final LayerNorm, and the LM head into a single <code>GPT(nn.Module)</code> class. We'll finish the model so it can produce both logits and loss in a single forward pass.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Implemented one block in 25 lines and verified forward shapes.</li>
+<li>[ ] Can draw the pre-norm data flow as a diagram.</li>
+<li>[ ] Calculated how parameters grow when stacking N blocks.</li>
+<li>[ ] Compared the parameter share between FeedForward and attention.</li>
+</ul>
+<!-- a-grade-example:end -->
+
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>

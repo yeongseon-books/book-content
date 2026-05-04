@@ -3,7 +3,7 @@ title: 'Assembly: Completing the GPT Model Class'
 series: llm-from-scratch-101
 episode: 5
 language: en
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ Details matter, of course. Without practical mechanisms like input length valida
 The mental model for today is this: **GPT is an autoregressive model that stacks blocks on top of embeddings and converts the final hidden states into the next token distribution.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- In what order does the GPT class call its components?
+- Why does weight tying shrink parameters without hurting quality?
+- Why does cross-entropy loss fit on one line?
+- What do you gain by managing hyperparameters in a config dataclass?
+
+<!-- a-grade-intro:end -->
 
 ## The Forward Pass at a Glance
 
@@ -151,6 +162,17 @@ The default settings for this series are conservative. `n_layer=6`, `n_head=4`, 
 ## What's next
 
 The model core is finished. In the next post, we'll implement the training loop—pulling mini-batches and running the `forward -> loss -> backward -> optimizer.step()` cycle. You'll see the TinyShakespeare loss drop from 4.17 down to the 1.0 range.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Traced the forward pass of the 80-line GPT class.
+- [ ] Printed parameter counts with and without weight tying.
+- [ ] Ran one forward + loss as a pre-training sanity check.
+- [ ] Can explain every field of GPTConfig.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

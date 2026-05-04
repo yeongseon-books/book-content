@@ -3,7 +3,7 @@ title: 블록 하나, 깊이의 단위
 series: llm-from-scratch-101
 episode: 4
 language: ko
-status: code-checked
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -30,6 +30,17 @@ GPT 계열 모델을 읽다 보면 블록이 당연한 부품처럼 보이지만
 오늘 멘탈 모델은 이렇습니다. **어텐션이 토큰끼리 섞고, FFN이 토큰 안에서 바꾸고, 잔차가 둘을 안전하게 감쌉니다.**
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- FeedForward는 왜 단순한 2-layer MLP로 충분할까요?
+- residual connection이 학습을 어떻게 살릴까요?
+- pre-norm과 post-norm의 실전 차이는 무엇일까요?
+- 블록 하나의 파라미터는 어디에 가장 많이 모일까요?
+
+<!-- a-grade-intro:end -->
 
 ## FeedForward는 그냥 2-layer MLP
 
@@ -113,6 +124,17 @@ for block in self.blocks:
 ## 다음 글 예고
 
 이제 블록이라는 벽돌은 준비됐습니다. 다음 글에서는 임베딩, `N`개 블록, 마지막 LayerNorm, LM head를 한 클래스에 묶어 `GPT(nn.Module)`를 완성하겠습니다. forward 한 번에 logits와 loss까지 나오도록 마무리할 차례입니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] 블록 한 개를 25줄로 구현하고 forward shape를 검증했다.
+- [ ] pre-norm 구조의 데이터 흐름을 다이어그램으로 그릴 수 있다.
+- [ ] N개 블록을 쌓을 때 파라미터 수가 어떻게 늘어나는지 계산했다.
+- [ ] FeedForward와 attention의 파라미터 비중을 비교했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

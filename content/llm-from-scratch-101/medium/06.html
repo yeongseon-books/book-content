@@ -62,6 +62,17 @@
 <p>In this post, we'll implement <code>train.py</code>. We'll include AdamW, warmup, cosine decay, gradient clipping, periodic evaluation, and checkpointing, while keeping the code compact.</p>
 <p>Today's mental model is this: <strong>Training is about repeatedly showing the model quality batches, flowing gradients back based on its errors, and adjusting weights slightly in the direction of those gradients.</strong></p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What are the 5 lines that drive the training loop?</li>
+<li>Why does AdamW work better than SGD for transformers?</li>
+<li>How does warmup + cosine LR affect training stability?</li>
+<li>How does one line of gradient clipping prevent explosion?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>The 5-line Core of the Training Loop</h2>
 <p>The heart of the training loop consists of just five lines: <code>zero_grad()</code>, <code>forward</code>, <code>backward()</code>, <code>clip_grad_norm_</code>, and <code>step()</code>. Everything else is operational code—handling evaluation intervals, logging, and learning rate scheduling.</p>
 <p><img alt="Core training loop from forward to update" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png"><br>
@@ -193,6 +204,17 @@ torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
 <p>The line <code>torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')</code> is all you need. I prefer saving the context length and dimensions together so that information isn't lost when opening the file later. This becomes invaluable as you accumulate multiple experiments.</p>
 <h2>What's next</h2>
 <p>The weights are now trained. In the next post, we'll load <code>ckpt.pt</code> and implement the autoregressive generation loop. We'll use a prompt like <code>ROMEO:</code> to see how our TinyShakespeare model predicts the next characters.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Wrote the 5-line training loop by hand.</li>
+<li>[ ] Plotted the warmup + cosine curve to see lr per step.</li>
+<li>[ ] Plotted train and val loss together using eval_interval.</li>
+<li>[ ] Saved ckpt.pt and reloaded it successfully.</li>
+</ul>
+<!-- a-grade-example:end -->
+
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
