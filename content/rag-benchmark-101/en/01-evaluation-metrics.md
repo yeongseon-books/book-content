@@ -32,6 +32,14 @@ last_reviewed: '2026-05-01'
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/01/01-01-questions-this-post-answers.en.png)
 
+## Questions this post answers
+
+- What does Precision@k, Recall@k, and MRR each measure, and what question does each answer?
+- Why must retrieval quality be measured independently before adding LLM evaluation on top?
+- Why is it dangerous to look only at average scores instead of per-query scores?
+- How should you choose k, and how do the three metrics shift as k changes?
+- What is the minimal Python file that computes all three metrics end to end?
+
 ## Why this matters
 
 When a RAG system returns a wrong answer, the cause is one of two layers: **the retriever fetched the wrong document, or the LLM mishandled the right one.**
