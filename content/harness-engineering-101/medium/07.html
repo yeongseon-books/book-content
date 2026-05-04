@@ -59,13 +59,15 @@
 </blockquote>
 <p>Agents rarely succeed on the first try. A Feedback Loop is the structure that hands failure back to the agent so it can fix its own work.</p>
 <hr>
+<p><img alt="Feedback loops - building structures that let agents recover from failure" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png"></p>
 <h2>No Agent Succeeds on the First Try</h2>
 <p>Agents fail often on the first attempt. They call the wrong tool, pass wrong arguments, produce malformed output. How you handle that failure decides production quality.</p>
 <p>The worst pattern is returning the failure to the user as is. The second worst is retrying the same call unchanged. The good pattern is feeding the failure cause back to the agent so the next attempt improves.</p>
 <p>Feedback Loop is the structure that converts failure into a learning signal. This article covers retry vs reflect, the composition of feedback, and infinite-loop prevention.</p>
 <hr>
 <h2>Retry vs Reflect</h2>
-<p>Two responses to failure.</p>
+<p><img alt="Retry vs reflect" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-02-retry-vs-reflect.en.png"><br>
+Two responses to failure.</p>
 <p><strong>Retry</strong>: try the same input again. Suited to transient errors (network, timeout, rate limit).</p>
 <p><strong>Reflect</strong>: tell the agent why it failed and have it produce a new attempt. Suited to reasoning errors (wrong arguments, format violations).</p>
 <p>The two are different tools. Reflecting on a problem that needed retry blows up cost. Retrying a problem that needs reflect fails forever.</p>
@@ -128,7 +130,8 @@ msg = ReflectMessage(
 <p>Feedback that says only "try again" makes the agent repeat the same mistake. Specific constraints change behavior.</p>
 <hr>
 <h2>Preventing Infinite Loops</h2>
-<p>Reflect loops can run forever. The agent might repeat the same mistake or oscillate between two errors. Three safeties.</p>
+<p><img alt="Preventing infinite loops" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-03-preventing-infinite-loops.en.png"><br>
+Reflect loops can run forever. The agent might repeat the same mistake or oscillate between two errors. Three safeties.</p>
 <p><strong>1. Max attempts</strong>: cap on attempts, typically 3–5.<br>
 <strong>2. Cumulative cost limit</strong>: cap on tokens/cost (reuse the ResourceMeter from Constraint Harness).<br>
 <strong>3. Repetition detection</strong>: stop if the same kind of failure repeats N times.</p>
@@ -217,7 +220,8 @@ def generate_with_critique(agent, prompt: str, criteria: list[str], max_rounds: 
 <p>Self-critique has two risks. (1) The agent misses its own mistakes (false positive). (2) Cost roughly doubles per turn. Where external validation is possible, prefer external validation.</p>
 <hr>
 <h2>Failure Memory</h2>
-<p>When the same task type runs many times, remembering past failures cuts repeated mistakes. Failure memory accumulates which approaches failed per task.</p>
+<p><img alt="Failure memory" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-04-failure-memory.en.png"><br>
+When the same task type runs many times, remembering past failures cuts repeated mistakes. Failure memory accumulates which approaches failed per task.</p>
 <pre><code class="language-python">from datetime import datetime
 import json
 from pathlib import Path

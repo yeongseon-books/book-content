@@ -59,8 +59,10 @@
 </blockquote>
 <p>Some actions must never run automatically. Payments, deploys, deletes, and outbound messages need human approval. An Approval Gate makes the place where a human must stop and review explicit.</p>
 <hr>
+<p><img alt="Approval gates - designing where humans must approve" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png"></p>
 <h2>What Is an Approval Gate?</h2>
-<p>An Approval Gate is a point where the agent must request human approval before executing a specific action. Automated flow pauses, decision authority hands off to a human, and the agent resumes only after receiving the response.</p>
+<p><img alt="What is an approval Gate" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-02-what-is-an-approval-gate.en.png"><br>
+An Approval Gate is a point where the agent must request human approval before executing a specific action. Automated flow pauses, decision authority hands off to a human, and the agent resumes only after receiving the response.</p>
 <pre><code class="language-python">from dataclasses import dataclass
 from typing import Literal
 
@@ -99,7 +101,8 @@ class ApprovalDecision:
 </code></pre>
 <p>This function is a checkpoint the agent must pass before invoking a tool. Plug it into the ToolRegistry from the Tool Harness (Ep5), right before the call site.</p>
 <h2>Designing the Approval Workflow</h2>
-<p>The workflow has four stages.</p>
+<p><img alt="Designing the approval workflow" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-03-designing-the-approval-workflow.en.png"><br>
+The workflow has four stages.</p>
 <pre><code class="language-python">import uuid
 from datetime import datetime, timezone
 
@@ -141,7 +144,8 @@ class ApprovalWorkflow:
 <li><strong>log</strong>: every step gets recorded (Observability — covered in Ep9).</li>
 </ol>
 <h2>Separating Dry-run from Commit</h2>
-<p>If you include a preview of "what would actually happen" in the approval request, the human can decide far more accurately. A dry-run computes the result without producing side effects.</p>
+<p><img alt="Separating Dry-run from commit" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-04-separating-dry-run-from-commit.en.png"><br>
+If you include a preview of "what would actually happen" in the approval request, the human can decide far more accurately. A dry-run computes the result without producing side effects.</p>
 <pre><code class="language-python">class RefundTool:
     def dry_run(self, payload: dict) -&gt; dict:
         return {

@@ -26,6 +26,8 @@ seo_description: When an agent says "done", only tests can confirm whether the w
 When an agent says "done", only tests can confirm whether the work is actually done. The Test Harness pins completion criteria into automated checks the agent must pass.
 
 ---
+
+![Test harness - turning completion criteria into tests](../../../assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
 ## "It Works" Is Not Evidence
 
 Build an agent and demo it — it works. Open it to real users and within a week it breaks. The difference is input diversity. A demo runs on five well-shaped inputs; production faces thousands of unexpected ones.
@@ -38,6 +40,7 @@ This article covers the kinds of tests for agents, building eval datasets, and a
 
 ## Three Tiers of Agent Tests
 
+![Three tiers of agent tests](../../../assets/harness-engineering-101/06/06-02-three-tiers-of-agent-tests.en.png)
 Similar to traditional software testing, with non-determinism added.
 
 **1. Unit tests**: each tool behaves per its schema. Deterministic and fast.
@@ -80,6 +83,7 @@ All three are needed. Without unit tests, debugging is impossible. Without eval 
 
 ## Building an Eval Dataset
 
+![Building an eval dataset](../../../assets/harness-engineering-101/06/06-03-building-an-eval-dataset.en.png)
 Without an eval dataset, quality is unmeasurable. Datasets come from three sources.
 
 **1. Production logs**: sample real user requests. Most realistic but requires PII handling.
@@ -169,6 +173,7 @@ LLM-as-judge is powerful but risky. The judge model's bias flows directly into t
 
 ## Automating Regression Prevention
 
+![Automating regression prevention](../../../assets/harness-engineering-101/06/06-04-automating-regression-prevention.en.png)
 Tests that exist but don't run are worthless. Wire them into CI/CD to run on every change.
 
 Three tiers.

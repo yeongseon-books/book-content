@@ -59,8 +59,10 @@
 </blockquote>
 <p>Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score. This post covers defining evaluation dimensions, writing anchors for each, and aggregating scores.</p>
 <hr>
+<p><img alt="Designing Rubric-Based scoring" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png"></p>
 <h2>The Limits of Single Scores</h2>
-<p>Ep4 covered single scoring: one number from 1 to 5. But what does "3" actually mean? It could be 3 because the facts are wrong, or 3 because the tone is off. <strong>A single score does not tell you what is broken.</strong></p>
+<p><img alt="The limits of single scores" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.en.png"><br>
+Ep4 covered single scoring: one number from 1 to 5. But what does "3" actually mean? It could be 3 because the facts are wrong, or 3 because the tone is off. <strong>A single score does not tell you what is broken.</strong></p>
 <p>Rubric-based scoring breaks each response into multiple dimensions and grades each separately. For an LLM chatbot, you might use:</p>
 <p><strong>Correctness</strong><br>
 - Meaning: Are the facts right<br>
@@ -77,7 +79,8 @@
 <p>Now you can pinpoint weakness: "Correctness 5, Tone 2."</p>
 <hr>
 <h2>Defining Rubric Dimensions — A Four-Step Process</h2>
-<p>A good rubric is not improvised. Use these four steps.</p>
+<p><img alt="Defining rubric dimensions - A Four-Step process" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-03-defining-rubric-dimensions-a-four-step-p.en.png"><br>
+A good rubric is not improvised. Use these four steps.</p>
 <p><strong>Step 1: Derive dimensions from user value</strong></p>
 <p>Write what "a good response" means from the user's view. For a customer support bot:</p>
 <ul>
@@ -120,7 +123,8 @@ print(df.corr())
 <p>Beyond 10 dimensions the judge cannot grade consistently. <strong>Stick to 3-5 core ones.</strong></p>
 <hr>
 <h2>Putting the Rubric Into the Judge Prompt</h2>
-<p>Extend the Ep4 single-score prompt with the rubric.</p>
+<p><img alt="Putting the rubric into the judge prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-04-putting-the-rubric-into-the-judge-prompt.en.png"><br>
+Extend the Ep4 single-score prompt with the rubric.</p>
 <pre><code class="language-python"># rubric/judge_rubric.py
 from openai import OpenAI
 import json
@@ -170,7 +174,8 @@ if __name__ == &quot;__main__&quot;:
 <p>Forcing <code>response_format={"type": "json_object"}</code> almost eliminates parse failures.</p>
 <hr>
 <h2>Aggregating Scores — The Mean Is Not the Answer</h2>
-<p>How do you collapse per-dimension scores into one number? The common mistake is <strong>plain averaging</strong>, which hides weakness.</p>
+<p><img alt="Aggregating scores - the mean is not the answer" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-05-aggregating-scores-the-mean-is-not-the-a.en.png"><br>
+How do you collapse per-dimension scores into one number? The common mistake is <strong>plain averaging</strong>, which hides weakness.</p>
 <!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
 <table>
 <thead>

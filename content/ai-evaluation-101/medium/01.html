@@ -59,8 +59,10 @@
 </blockquote>
 <p>LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today. This post covers why LLM evaluation differs from regular software testing and what to measure.</p>
 <hr>
+<p><img alt="Why evaluate LLM applications" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png"></p>
 <h2>Why Is LLM Evaluation Different from Regular Testing?</h2>
-<p>Traditional unit tests are deterministic: <code>assert add(2, 3) == 5</code>. The same input produces the same output, and there is exactly one right answer.</p>
+<p><img alt="Why is LLM evaluation different from regular Testing" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-02-why-is-llm-evaluation-different-from-reg.en.png"><br>
+Traditional unit tests are deterministic: <code>assert add(2, 3) == 5</code>. The same input produces the same output, and there is exactly one right answer.</p>
 <p>LLMs are different.</p>
 <pre><code class="language-python">from openai import OpenAI
 
@@ -75,7 +77,8 @@ def summarize(text: str) -&gt; str:
 </code></pre>
 <p>Send the same <code>text</code> twice and the two responses will not match exactly. Several answers can reasonably be called "correct," and many are hard to call "wrong" with confidence. <code>==</code> comparison alone cannot evaluate this.</p>
 <h2>What Breaks if You Run Without Evaluation?</h2>
-<p>Three things break at once.</p>
+<p><img alt="What breaks if you run without Evaluation" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-03-what-breaks-if-you-run-without-evaluatio.en.png"><br>
+Three things break at once.</p>
 <ol>
 <li><strong>You cannot detect regressions.</strong> You change one line of a prompt, another case breaks, and without evals you only learn from a user complaint.</li>
 <li><strong>You become afraid to upgrade models.</strong> You want to move from gpt-4o-mini to gpt-4.1, but with no way to measure "is it better?" you simply do not move.</li>
@@ -87,7 +90,8 @@ def summarize(text: str) -&gt; str:
 # -&gt; You have no idea which cases got better and which got worse.
 </code></pre>
 <h2>What Should You Measure?</h2>
-<p>LLM responses have at least four dimensions, and each needs a different measurement approach.</p>
+<p><img alt="What should you Measure" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-04-what-should-you-measure.en.png"><br>
+LLM responses have at least four dimensions, and each needs a different measurement approach.</p>
 <pre><code class="language-python">from dataclasses import dataclass
 
 @dataclass
@@ -105,7 +109,8 @@ class EvalResult:
 </ol>
 <p>Later posts in this series cover which metrics fit each dimension, one at a time.</p>
 <h2>The Four Stages of an Evaluation Pipeline</h2>
-<p>Whatever tool you use, an LLM evaluation system has the same four stages.</p>
+<p><img alt="The four stages of an evaluation pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-05-the-four-stages-of-an-evaluation-pipelin.en.png"><br>
+Whatever tool you use, an LLM evaluation system has the same four stages.</p>
 <pre><code class="language-python">def run_evaluation(eval_set: list[dict], system_under_test) -&gt; dict:
     # 1. Generate — feed inputs to the system under test, collect responses
     predictions = [system_under_test(ex[&quot;input&quot;]) for ex in eval_set]

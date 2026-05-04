@@ -25,8 +25,10 @@ seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를
 좋은 평가 데이터셋은 production 트래픽의 분포를 닮으면서도 edge case를 충분히 포함해야 합니다. 이 글은 50-200건 규모의 입문용 eval set을 설계하는 원칙과 데이터를 모으는 방법을 다룹니다.
 
 ---
+![평가 데이터셋 설계하기](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)
 ## 좋은 평가 데이터셋이란 무엇인가요?
 
+![좋은 평가 데이터셋이란 무엇인가요](../../../assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.ko.png)
 좋은 eval set은 두 가지를 동시에 만족합니다.
 
 1. **Production 트래픽의 분포를 닮습니다**: 사용자가 실제로 보내는 질문의 비율과 비슷해야 합니다.
@@ -50,6 +52,7 @@ class EvalExample:
 
 ## 어디서 데이터를 가져오나요?
 
+![어디서 데이터를 가져오나요](../../../assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.ko.png)
 3가지 출처를 조합합니다.
 
 ### 1. Production trace에서 샘플링
@@ -86,6 +89,7 @@ def add_failure_case(eval_set: list[dict], failed_input: dict, expected: dict, s
 
 ## 몇 건이 필요한가요?
 
+![몇 건이 필요한가요](../../../assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.ko.png)
 크기는 목적에 따라 다릅니다.
 
 | 목적 | 권장 크기 | 비고 |
@@ -99,6 +103,7 @@ def add_failure_case(eval_set: list[dict], failed_input: dict, expected: dict, s
 
 ## 라벨링 — `expected`를 어떻게 채우나요?
 
+![라벨링 - expected 값 채우기](../../../assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.ko.png)
 라벨링 방식은 3가지가 있고, 케이스마다 다른 방식을 쓸 수 있습니다.
 
 ```python

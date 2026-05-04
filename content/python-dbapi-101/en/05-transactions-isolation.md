@@ -23,6 +23,7 @@ seo_description: 'Two operational data incidents dominate in production:'
 
 # Transactions and isolation levels (sqlite3, PEP 249)
 
+![Transactions and isolation levels (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
 ## Questions this post answers
 
 - Why does sqlite3 issue an implicit BEGIN by default?
@@ -65,6 +66,7 @@ This post compares the five modes through code and lock scenarios. Once you have
 
 ## Mental Model — connection is the transaction scope
 
+![Mental model - connection is the transaction scope](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
 ```
 Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
@@ -91,6 +93,7 @@ Two essentials:
 
 ## Core concepts
 
+![Core concepts](../../../assets/python-dbapi-101/05/05-03-core-concepts.en.png)
 ### The five `isolation_level` values
 
 | Value | BEGIN variant | autocommit? | Implicit BEGIN issued |
@@ -166,6 +169,7 @@ with sqlite3.connect('shop.db') as con:
 
 ## Step-by-step walkthrough
 
+![Step-by-step walkthrough](../../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png)
 ### Step 1 — observe default behaviour
 
 ```python

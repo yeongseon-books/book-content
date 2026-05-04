@@ -59,8 +59,10 @@
 </blockquote>
 <p>RAG requires evaluating both retrieval and generation stages. This post covers RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.</p>
 <hr>
+<p><img alt="Evaluating RAG systems" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png"></p>
 <h2>RAG Is a Pipeline, Not a Single Model</h2>
-<p>A RAG (Retrieval-Augmented Generation) system runs in two stages.</p>
+<p><img alt="RAG is a Pipeline, not a single model" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.en.png"><br>
+A RAG (Retrieval-Augmented Generation) system runs in two stages.</p>
 <pre><code>question → [1. Retriever]  → top-K documents → [2. Generator (LLM)] → answer
             (vector DB)                          (uses context)
 </code></pre>
@@ -72,7 +74,8 @@
 <p>So RAG evaluation must measure <strong>each stage separately</strong>. A single number like "70% answer accuracy" does not tell you which stage to fix.</p>
 <hr>
 <h2>The Four Core RAG Metrics</h2>
-<p>The industry standard, used by RAGAS and TruLens:</p>
+<p><img alt="The four core RAG metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.en.png"><br>
+The industry standard, used by RAGAS and TruLens:</p>
 <p><strong>Retrieval</strong><br>
 - Metric: <strong>Context Recall</strong><br>
 - What It Asks: Are the facts needed for the answer present in the retrieved context</p>
@@ -88,7 +91,8 @@
 <p>Let's look at each.</p>
 <hr>
 <h2>Evaluating Retrieval</h2>
-<p><strong>Context Recall — Did we retrieve what we need</strong></p>
+<p><img alt="Evaluating retrieval" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-04-evaluating-retrieval.en.png"><br>
+<strong>Context Recall — Did we retrieve what we need</strong></p>
 <p>For each fact (claim) required to produce the reference answer, check whether it appears in the retrieved context.</p>
 <pre><code class="language-python"># rag/context_recall.py
 from openai import OpenAI
@@ -160,7 +164,8 @@ def context_precision(question: str, chunks: list[str]) -&gt; float:
 <p><strong>Reading</strong>: low precision means the LLM is being drowned in noise and is more likely to produce a wrong answer.</p>
 <hr>
 <h2>Evaluating Generation</h2>
-<p><strong>Faithfulness — Hallucination Detection</strong></p>
+<p><img alt="Evaluating generation" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-05-evaluating-generation.en.png"><br>
+<strong>Faithfulness — Hallucination Detection</strong></p>
 <p>Decompose the answer into atomic claims and check whether each is <strong>supported</strong> by the retrieved context. Anything not in the context is a hallucination.</p>
 <pre><code class="language-python"># rag/faithfulness.py
 FAITHFULNESS_PROMPT = &quot;&quot;&quot;Decompose the answer into atomic claims and check whether each is supported by the context.

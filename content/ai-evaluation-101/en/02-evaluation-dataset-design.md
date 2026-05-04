@@ -26,8 +26,10 @@ seo_description: A good evaluation dataset mirrors production traffic distributi
 A good evaluation dataset mirrors production traffic distribution while including enough edge cases. This post covers the principles for designing a starter eval set of 50-200 examples and how to collect the data.
 
 ---
+![Designing evaluation datasets](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
 ## What Makes a Good Evaluation Dataset?
 
+![What makes a good evaluation Dataset](../../../assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png)
 A good eval set satisfies two things at once.
 
 1. **It mirrors production traffic distribution.** The mix of cases should look like what users actually send.
@@ -51,6 +53,7 @@ Adding `category` explicitly lets you "look at edge case scores separately." Loo
 
 ## Where Do You Source the Data?
 
+![Where do you source the Data](../../../assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.en.png)
 Combine three sources.
 
 ### 1. Sample from production traces
@@ -87,6 +90,7 @@ A domain expert hand-writes cases they suspect will break — prompt injection, 
 
 ## How Many Cases Do You Need?
 
+![How many cases do you Need](../../../assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.en.png)
 The size depends on the purpose.
 
 | Purpose | Recommended size | Notes |
@@ -100,6 +104,7 @@ Start at 10-30, add 5-10 from production each week, and you reach 200 within thr
 
 ## Labeling — How Do You Fill `expected`?
 
+![Labeling - how do you fill expected](../../../assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.en.png)
 There are three labeling styles, and you can use different ones per case.
 
 ```python

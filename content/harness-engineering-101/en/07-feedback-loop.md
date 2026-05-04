@@ -26,6 +26,8 @@ seo_description: Agents rarely succeed on the first try. A Feedback Loop is the 
 Agents rarely succeed on the first try. A Feedback Loop is the structure that hands failure back to the agent so it can fix its own work.
 
 ---
+
+![Feedback loops - building structures that let agents recover from failure](../../../assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
 ## No Agent Succeeds on the First Try
 
 Agents fail often on the first attempt. They call the wrong tool, pass wrong arguments, produce malformed output. How you handle that failure decides production quality.
@@ -38,6 +40,7 @@ Feedback Loop is the structure that converts failure into a learning signal. Thi
 
 ## Retry vs Reflect
 
+![Retry vs reflect](../../../assets/harness-engineering-101/07/07-02-retry-vs-reflect.en.png)
 Two responses to failure.
 
 **Retry**: try the same input again. Suited to transient errors (network, timeout, rate limit).
@@ -116,6 +119,7 @@ Feedback that says only "try again" makes the agent repeat the same mistake. Spe
 
 ## Preventing Infinite Loops
 
+![Preventing infinite loops](../../../assets/harness-engineering-101/07/07-03-preventing-infinite-loops.en.png)
 Reflect loops can run forever. The agent might repeat the same mistake or oscillate between two errors. Three safeties.
 
 **1. Max attempts**: cap on attempts, typically 3–5.
@@ -218,6 +222,7 @@ Self-critique has two risks. (1) The agent misses its own mistakes (false positi
 
 ## Failure Memory
 
+![Failure memory](../../../assets/harness-engineering-101/07/07-04-failure-memory.en.png)
 When the same task type runs many times, remembering past failures cuts repeated mistakes. Failure memory accumulates which approaches failed per task.
 
 ```python

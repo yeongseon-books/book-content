@@ -26,6 +26,8 @@ seo_description: Give an agent freedom and you get creativity along with risk. T
 Give an agent freedom and you get creativity along with risk. The Constraint Harness is the rule system that declares what actions are allowed and what actions are forbidden.
 
 ---
+
+![Constraint harness - defining Rules, Boundaries, and forbidden actions](../../../assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
 ## Agents Try Everything They Are Allowed To
 
 Give an agent tools and permissions, and it will try them all. If a "analyze customer data" task has database write access, the agent may modify data while analyzing. If "draft an email" has the send tool exposed, it may send the draft as is.
@@ -38,6 +40,7 @@ Constraint Harness defines, in code-expressed rules, what an agent may and may n
 
 ## Four Kinds of Constraints
 
+![Four kinds of constraints](../../../assets/harness-engineering-101/04/04-02-four-kinds-of-constraints.en.png)
 Constraints on an agent fall into four categories.
 
 **1. Capability constraints**: which tools may be used. Defined as a whitelist.
@@ -94,6 +97,7 @@ Without this four-way classification, vague demands like "the agent should behav
 
 ## Capability Constraints — Tool Whitelisting
 
+![Capability constraints - tool whitelisting](../../../assets/harness-engineering-101/04/04-03-capability-constraints-tool-whitelisting.en.png)
 The simplest and most effective constraint is restricting tool exposure. An agent cannot call a tool it never received.
 
 The core principle is whitelisting. Not "this tool is forbidden" but "only this tool is allowed." A blacklist must be updated each time a new tool is added; a whitelist blocks anything not explicitly added.
@@ -242,6 +246,7 @@ When a violation is detected, request the agent to regenerate. Not a flat block 
 
 ## Scope Constraints — Permissions at the Data Layer
 
+![Scope constraints - permissions at the data layer](../../../assets/harness-engineering-101/04/04-04-scope-constraints-permissions-at-the-dat.en.png)
 The strongest constraints come from the data layer. No matter how badly the agent's query is formed, if the database refuses to return out-of-scope rows, you are safe.
 
 Implement this with row-level security or view-based access. Do not give the agent direct table access — expose task-scoped views or filtered queries.

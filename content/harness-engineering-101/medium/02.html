@@ -59,13 +59,15 @@
 </blockquote>
 <p>Give an agent a vague instruction and you get a vague result. The Task Harness turns vague work into executable tasks with clear inputs, outputs, and completion criteria.</p>
 <hr>
+<p><img alt="Task harness - turning vague work into executable tasks" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png"></p>
 <h2>Vague Work Cannot Be Executed</h2>
 <p>Hand "tidy up our team report" to an agent and the result is not guaranteed. Which report? Where do you fetch it from? Does "tidy up" mean summarize, restructure, or convert format? A human would ask back. An agent does not. It guesses. And it guesses wrong.</p>
 <p>Task Harness is the design that converts vague work into an executable task with explicit inputs, outputs, and completion criteria. Without this conversion, every other harness loses its meaning. Context, Constraint, and Test all start from "what task is this for?"</p>
 <p>This article covers the components of a Task, how to write a Task Spec, and how to decompose vague requests into executable tasks.</p>
 <hr>
 <h2>The Four Components of a Task</h2>
-<p>An executable task has four parts.</p>
+<p><img alt="The four components of a task" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-02-the-four-components-of-a-task.en.png"><br>
+An executable task has four parts.</p>
 <ol>
 <li><strong>Goal</strong>: What must be achieved. Write it in one sentence.</li>
 <li><strong>Inputs</strong>: Information and resources the agent may use. Data sources, parameters, preconditions.</li>
@@ -196,7 +198,8 @@ assert task.verify(result)
 <p>Without <code>verify()</code>, you cannot decide whether to retry. Without that decision, the harness does not exist.</p>
 <hr>
 <h2>Decomposing Vague Requests Into Tasks</h2>
-<p>Real users do not deliver TaskSpecs. They say things like "do something about it." Task Harness must convert this into an executable task.</p>
+<p><img alt="Decomposing vague requests into tasks" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-03-decomposing-vague-requests-into-tasks.en.png"><br>
+Real users do not deliver TaskSpecs. They say things like "do something about it." Task Harness must convert this into an executable task.</p>
 <p>A three-step procedure works.</p>
 <p><strong>Step 1: Restate the request as a Goal.</strong><br>
 "Do something about it" → "I want our team's productivity to improve."</p>
@@ -241,7 +244,8 @@ for c in candidates:
 <p>Asking back is part of Task Harness. An agent that does not ask back is not collaborating — it is gambling.</p>
 <hr>
 <h2>Task Spec As Single Source of Truth</h2>
-<p>Once a TaskSpec exists, everything else is derived from it.</p>
+<p><img alt="Task spec as single source of truth" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-04-task-spec-as-single-source-of-truth.en.png"><br>
+Once a TaskSpec exists, everything else is derived from it.</p>
 <ul>
 <li><strong>System prompt</strong>: generated from <code>goal</code> and <code>completion_criteria</code></li>
 <li><strong>Allowed tools</strong>: filtered from <code>inputs</code></li>

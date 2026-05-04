@@ -54,6 +54,7 @@
 </head>
 <body>
 <h1>Transactions and isolation levels (sqlite3, PEP 249)</h1>
+<p><img alt="Transactions and isolation levels (sqlite3, PEP 249)" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png"></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>Why does sqlite3 issue an implicit BEGIN by default?</li>
@@ -88,6 +89,7 @@
 <p>This post compares the five modes through code and lock scenarios. Once you have it laid out, roughly 80% of transaction-related production issues stop happening.</p>
 <hr>
 <h2>Mental Model — connection is the transaction scope</h2>
+<p><img alt="Mental model - connection is the transaction scope" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png"></p>
 <pre><code>Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
   open
@@ -110,7 +112,8 @@
 </ul>
 <hr>
 <h2>Core concepts</h2>
-<p><strong>The five <code>isolation_level</code> values</strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-03-core-concepts.en.png"><br>
+<strong>The five <code>isolation_level</code> values</strong></p>
 <!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
 <table>
 <thead>
@@ -197,7 +200,8 @@ print(con2.execute('SELECT COUNT(*) FROM orders').fetchone())
 <p><code>with con:</code> is a context manager on the connection that <strong>terminates the transaction</strong>. It does not close the connection — close it separately or with <code>contextlib.closing</code>.</p>
 <hr>
 <h2>Step-by-step walkthrough</h2>
-<p><strong>Step 1 — observe default behaviour</strong></p>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png"><br>
+<strong>Step 1 — observe default behaviour</strong></p>
 <pre><code class="language-python">import sqlite3
 
 con = sqlite3.connect(':memory:')

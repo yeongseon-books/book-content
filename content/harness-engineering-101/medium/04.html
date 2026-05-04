@@ -59,13 +59,15 @@
 </blockquote>
 <p>Give an agent freedom and you get creativity along with risk. The Constraint Harness is the rule system that declares what actions are allowed and what actions are forbidden.</p>
 <hr>
+<p><img alt="Constraint harness - defining Rules, Boundaries, and forbidden actions" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png"></p>
 <h2>Agents Try Everything They Are Allowed To</h2>
 <p>Give an agent tools and permissions, and it will try them all. If a "analyze customer data" task has database write access, the agent may modify data while analyzing. If "draft an email" has the send tool exposed, it may send the draft as is.</p>
 <p>LLMs assume any action not explicitly forbidden is safe. Humans build boundaries from social norms and common sense. Agents have neither. Explicit constraints are the safety.</p>
 <p>Constraint Harness defines, in code-expressed rules, what an agent may and may not do. This article covers the kinds of constraints, policy engine design, and how to detect violations.</p>
 <hr>
 <h2>Four Kinds of Constraints</h2>
-<p>Constraints on an agent fall into four categories.</p>
+<p><img alt="Four kinds of constraints" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-02-four-kinds-of-constraints.en.png"><br>
+Constraints on an agent fall into four categories.</p>
 <p><strong>1. Capability constraints</strong>: which tools may be used. Defined as a whitelist.</p>
 <p><strong>2. Resource constraints</strong>: how much may be used. Caps on tokens, API calls, time, cost.</p>
 <p><strong>3. Behavioral constraints</strong>: how the agent must behave. Forbidden output patterns, required formats, priorities.</p>
@@ -110,7 +112,8 @@ policy = ConstraintPolicy(
 <p>Without this four-way classification, vague demands like "the agent should behave safely" cannot be enforced.</p>
 <hr>
 <h2>Capability Constraints — Tool Whitelisting</h2>
-<p>The simplest and most effective constraint is restricting tool exposure. An agent cannot call a tool it never received.</p>
+<p><img alt="Capability constraints - tool whitelisting" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-03-capability-constraints-tool-whitelisting.en.png"><br>
+The simplest and most effective constraint is restricting tool exposure. An agent cannot call a tool it never received.</p>
 <p>The core principle is whitelisting. Not "this tool is forbidden" but "only this tool is allowed." A blacklist must be updated each time a new tool is added; a whitelist blocks anything not explicitly added.</p>
 <pre><code class="language-python">from typing import Callable
 from dataclasses import dataclass
@@ -234,7 +237,8 @@ class PolicyViolation(Exception):
 <p>When a violation is detected, request the agent to regenerate. Not a flat block — feedback ("rejected for this reason, retry") is the key idea, covered in the next article on Feedback Loop.</p>
 <hr>
 <h2>Scope Constraints — Permissions at the Data Layer</h2>
-<p>The strongest constraints come from the data layer. No matter how badly the agent's query is formed, if the database refuses to return out-of-scope rows, you are safe.</p>
+<p><img alt="Scope constraints - permissions at the data layer" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-04-scope-constraints-permissions-at-the-dat.en.png"><br>
+The strongest constraints come from the data layer. No matter how badly the agent's query is formed, if the database refuses to return out-of-scope rows, you are safe.</p>
 <p>Implement this with row-level security or view-based access. Do not give the agent direct table access — expose task-scoped views or filtered queries.</p>
 <pre><code class="language-python">from dataclasses import dataclass
 

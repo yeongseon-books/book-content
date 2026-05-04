@@ -59,8 +59,10 @@
 </blockquote>
 <p>How do you decide which of two prompts is better? This post covers paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.</p>
 <hr>
+<p><img alt="A/B testing LLMs - which prompt is Better" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png"></p>
 <h2>"Looks Better" Is Not Evidence</h2>
-<p>When a new prompt or model rolls in, the typical evaluation goes:</p>
+<p><img alt="&quot;Looks Better&quot; is not evidence" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-looks-better-is-not-evidence.en.png"><br>
+When a new prompt or model rolls in, the typical evaluation goes:</p>
 <blockquote>
 <p>"GPT-4o feels more natural. Let's ship it."</p>
 </blockquote>
@@ -74,7 +76,8 @@
 </ul>
 <hr>
 <h2>Pairwise Comparison and Win Rate</h2>
-<p>Reuse the pairwise judge from Ep4. For each input, get a response from model A and model B, and ask the judge which is better.</p>
+<p><img alt="Pairwise comparison and win rate" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-03-pairwise-comparison-and-win-rate.en.png"><br>
+Reuse the pairwise judge from Ep4. For each input, get a response from model A and model B, and ask the judge which is better.</p>
 <pre><code class="language-python"># ab/pairwise_winrate.py
 from openai import OpenAI
 import json
@@ -128,7 +131,8 @@ def ab_test(questions: list[str], model_a: str, model_b: str) -&gt; dict:
 - But <strong>is it statistically significant?</strong> That is the next question.</p>
 <hr>
 <h2>Sample Size — How Many to Evaluate</h2>
-<p>10 samples at 60% vs 40% could easily be chance. 1000 samples at the same ratio is decisive. The required sample size depends on the <strong>effect size</strong> you want to detect.</p>
+<p><img alt="Sample size - how many to evaluate" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-04-sample-size-how-many-to-evaluate.en.png"><br>
+10 samples at 60% vs 40% could easily be chance. 1000 samples at the same ratio is decisive. The required sample size depends on the <strong>effect size</strong> you want to detect.</p>
 <pre><code class="language-python"># ab/sample_size.py
 import statsmodels.stats.power as smp
 
@@ -160,7 +164,8 @@ print(required_sample_size(0.7, 0.5))  # ~93
 <p>When you build the eval dataset, decide your <strong>target effect size first</strong> and size the dataset accordingly.</p>
 <hr>
 <h2>Statistical Significance — Two-Proportion Z-Test</h2>
-<p>To compare win rates, use a <strong>two-proportion z-test</strong>. The null hypothesis is that the two models win at the same rate; check the p-value.</p>
+<p><img alt="Statistical significance - Two-Proportion Z-Test" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-05-statistical-significance-two-proportion.en.png"><br>
+To compare win rates, use a <strong>two-proportion z-test</strong>. The null hypothesis is that the two models win at the same rate; check the p-value.</p>
 <pre><code class="language-python"># ab/significance.py
 from statsmodels.stats.proportion import proportions_ztest
 

@@ -55,6 +55,7 @@
 <body>
 <h1>ORM Basics: Defining Models with DeclarativeBase and mapped_column</h1>
 <p>In Core we worked directly with <code>Table</code> and <code>select()</code> to compose SQL expressions. The ORM lays one more layer on top: it maps rows to Python objects, tracks attribute changes, and emits SQL at the right moment. SQLAlchemy 2.x's ORM lets you express almost any model with three tools - <code>DeclarativeBase</code>, <code>Mapped[T]</code>, and <code>mapped_column(...)</code>. This article focuses on those three and shows, in concrete terms, how an ORM model is wired to a Core <code>Table</code>.</p>
+<p><img alt="ORM Basics: defining models with DeclarativeBase and mapped_column" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-01-orm-basics-defining-models-with-declarat.en.png"></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>What is <code>DeclarativeBase</code>, and how does it relate to Core's <code>MetaData</code>?</li>
@@ -65,7 +66,8 @@
 <li>When do you reach for the ORM, and when is plain Core a better fit?</li>
 </ul>
 <h2>Why it matters</h2>
-<p>Core alone is enough to talk to a database. But as an application grows, several costs add up quickly.</p>
+<p><img alt="Why it matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-02-why-it-matters.en.png"><br>
+Core alone is enough to talk to a database. But as an application grows, several costs add up quickly.</p>
 <ul>
 <li>Hand-rolling row dicts gets painful. <code>user.email</code> is safer and easier to read than <code>row["email"]</code>.</li>
 <li>Domain rules need a home. ORM models are both data mappings and domain objects, so methods on the class can carry behavior next to the data.</li>
@@ -74,6 +76,7 @@
 </ul>
 <p>The ORM is not magic; it is a thin layer above Core that absorbs these costs. Defining models is the first step.</p>
 <h2>Mental Model</h2>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-03-mental-model.en.png"></p>
 <blockquote>
 <p>An ORM model class is the marriage of "a Python class plus a Core <code>Table</code>." <code>DeclarativeBase</code> is the container (a <code>MetaData</code>) for those bindings, and <code>mapped_column</code> is the helper that derives a <code>Column</code> from a type hint.</p>
 </blockquote>
@@ -87,7 +90,8 @@
 </code></pre>
 <p>The moment you define an ORM class, a Core <code>Table</code> object is created and registered in <code>Base.metadata</code>. That is why you can reuse Ep2's <code>metadata.create_all(engine)</code> to build the schema from ORM definitions. The ORM is not a separate world; it lives on top of the same Core machinery.</p>
 <h2>Core concepts</h2>
-<p><strong>1) DeclarativeBase</strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-04-core-concepts.en.png"><br>
+<strong>1) DeclarativeBase</strong></p>
 <p>In 2.x, the ORM base class fits in one declaration:</p>
 <pre><code class="language-python">from sqlalchemy.orm import DeclarativeBase
 
@@ -205,7 +209,8 @@ with Session(engine) as session:
 </code></pre>
 <p>Two things changed. First, the elements of <code>users_list</code> are <code>User</code> instances rather than dict-like Rows. Second, you do not write SQL at insert time; you register objects with <code>add_all()</code> and <code>commit()</code> flushes them in one go. Those two shifts are the heart of what the ORM gives you.</p>
 <h2>Step-by-step walkthrough</h2>
-<p>All you need is SQLite and SQLAlchemy 2.x. Save the following as a single file and run it; the flow becomes muscle memory quickly.</p>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-05-step-by-step-walkthrough.en.png"><br>
+All you need is SQLite and SQLAlchemy 2.x. Save the following as a single file and run it; the flow becomes muscle memory quickly.</p>
 <pre><code class="language-python">from sqlalchemy import String, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 

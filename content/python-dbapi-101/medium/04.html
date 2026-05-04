@@ -54,6 +54,7 @@
 </head>
 <body>
 <h1>Parameter binding and SQL injection defense (sqlite3, PEP 249)</h1>
+<p><img alt="Parameter binding and SQL injection defense (sqlite3, PEP 249)" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.en.png"></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>Why is building SQL with f-strings dangerous?</li>
@@ -83,6 +84,7 @@
 <p>This post reproduces the attack with sqlite3 and contrasts it with the binding fix line by line. Once you have seen it work, you stop writing f-string SQL forever.</p>
 <hr>
 <h2>Mental Model — keep query string and values separate</h2>
+<p><img alt="Mental model - keep query string and values separate" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png"></p>
 <pre><code>[ User input ] ─┐
                 │
                 ▼
@@ -104,7 +106,8 @@
 <p>The key point: SQL tokenization happens <strong>before</strong> binding. <code>?</code> tells the parser "a single value goes here." Whatever value arrives is never re-parsed as SQL. The string <code>' OR 1=1 --</code> is treated as a 12-character text value, nothing more.</p>
 <hr>
 <h2>Core concepts</h2>
-<p><strong>qmark style (<code>?</code>)</strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-03-core-concepts.en.png"><br>
+<strong>qmark style (<code>?</code>)</strong></p>
 <p>The sqlite3 default. Position-based, so order matters.</p>
 <pre><code class="language-python">cur.execute('SELECT * FROM users WHERE name = ? AND age &gt;= ?', ('Alice', 18))
 </code></pre>
@@ -144,7 +147,8 @@
 <p>For these positions, validate against a whitelist and inject as a string.</p>
 <hr>
 <h2>Before / After</h2>
-<p><strong>Before — vulnerable code</strong></p>
+<p><img alt="Before / after" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-04-before-after.en.png"><br>
+<strong>Before — vulnerable code</strong></p>
 <pre><code class="language-python">import sqlite3
 
 con = sqlite3.connect(':memory:')

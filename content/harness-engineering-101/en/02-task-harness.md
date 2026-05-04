@@ -26,6 +26,8 @@ seo_description: Give an agent a vague instruction and you get a vague result. T
 Give an agent a vague instruction and you get a vague result. The Task Harness turns vague work into executable tasks with clear inputs, outputs, and completion criteria.
 
 ---
+
+![Task harness - turning vague work into executable tasks](../../../assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
 ## Vague Work Cannot Be Executed
 
 Hand "tidy up our team report" to an agent and the result is not guaranteed. Which report? Where do you fetch it from? Does "tidy up" mean summarize, restructure, or convert format? A human would ask back. An agent does not. It guesses. And it guesses wrong.
@@ -38,6 +40,7 @@ This article covers the components of a Task, how to write a Task Spec, and how 
 
 ## The Four Components of a Task
 
+![The four components of a task](../../../assets/harness-engineering-101/02/02-02-the-four-components-of-a-task.en.png)
 An executable task has four parts.
 
 1. **Goal**: What must be achieved. Write it in one sentence.
@@ -193,6 +196,7 @@ Without `verify()`, you cannot decide whether to retry. Without that decision, t
 
 ## Decomposing Vague Requests Into Tasks
 
+![Decomposing vague requests into tasks](../../../assets/harness-engineering-101/02/02-03-decomposing-vague-requests-into-tasks.en.png)
 Real users do not deliver TaskSpecs. They say things like "do something about it." Task Harness must convert this into an executable task.
 
 A three-step procedure works.
@@ -248,6 +252,7 @@ Asking back is part of Task Harness. An agent that does not ask back is not coll
 
 ## Task Spec As Single Source of Truth
 
+![Task spec as single source of truth](../../../assets/harness-engineering-101/02/02-04-task-spec-as-single-source-of-truth.en.png)
 Once a TaskSpec exists, everything else is derived from it.
 
 - **System prompt**: generated from `goal` and `completion_criteria`

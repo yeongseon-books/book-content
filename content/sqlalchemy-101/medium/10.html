@@ -54,6 +54,7 @@
 </head>
 <body>
 <h1>Production patterns: pools, observability, migrations, and deploys</h1>
+<p><img alt="Production patterns: pools, observability, migrations, and deploys" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-01-production-patterns-pools-observability.en.png"></p>
 <h2>What you will learn</h2>
 <ul>
 <li>The core connection pool options (<code>pool_size</code>, <code>max_overflow</code>, <code>pool_pre_ping</code>, <code>pool_recycle</code>)</li>
@@ -64,15 +65,18 @@
 <li>The boundary for retrying transient errors</li>
 </ul>
 <h2>Why this matters</h2>
-<p>Everything so far has been about whether the code is correct. Production adds another layer. The same code falls apart under load if the pool is wrong, you cannot tell what is slow without observability, and a single deploy becomes an incident if the migration order is bad.</p>
+<p><img alt="Why this matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-02-why-this-matters.en.png"><br>
+Everything so far has been about whether the code is correct. Production adds another layer. The same code falls apart under load if the pool is wrong, you cannot tell what is slow without observability, and a single deploy becomes an incident if the migration order is bad.</p>
 <p>This article is about that layer. The examples use SQLite, but most of the patterns apply equally to PostgreSQL and MySQL.</p>
 <h2>Mental model</h2>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-03-mental-model.en.png"></p>
 <blockquote>
 <p>Production SQLAlchemy has three knobs. The <strong>pool</strong> sets concurrency and tail latency. <strong>Observability</strong> tells you where slow is. The <strong>migration policy</strong> defines the safety line for deploys. Leave any one of them empty and the other two lose most of their value.</p>
 </blockquote>
 <p>A pool that is too small queues requests; too large blows past the DB-side connection limit. Without observability you cannot even tell that the pool is wrong. And without a migration policy, "the five minutes after deploy" becomes a recurring outage window.</p>
 <h2>Core concepts</h2>
-<p><strong>Pool options</strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-04-core-concepts.en.png"><br>
+<strong>Pool options</strong></p>
 <p><strong><code>pool_size</code></strong><br>
 - Meaning: connections kept open at steady state<br>
 - Sensible start: 5–20 (depends on service size)</p>
@@ -133,7 +137,8 @@ def _t1(conn, cursor, stmt, params, ctx, many):
 </code></pre>
 <p>The "after" version (1) recovers automatically from a dead connection on the next request via <code>pool_pre_ping</code>, (2) drops connections older than 30 minutes via <code>pool_recycle</code>, and (3) logs any query above 200ms to a dedicated logger.</p>
 <h2>Step-by-step walkthrough</h2>
-<p><strong>Step 1: Sizing the pool</strong></p>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-05-step-by-step-walkthrough.en.png"><br>
+<strong>Step 1: Sizing the pool</strong></p>
 <p>A reasonable starting heuristic is <code>(average concurrent requests) × (avg time a request holds a connection / total request time)</code>. For a typical web process, 5–20 is enough. If that is not enough, add worker processes rather than enlarging <code>pool_size</code>.</p>
 <p><strong>Step 2: pre-ping and recycle</strong></p>
 <p>Set <code>pool_recycle</code> shorter than the DB idle timeout (PostgreSQL 8h, MySQL 8h, load balancer often 5 min). <code>pool_pre_ping=True</code> should be on almost always.</p>

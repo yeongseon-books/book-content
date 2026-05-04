@@ -61,6 +61,7 @@
 <p>The two core DB-API objects are connection and cursor. Their names are plain, but mishandling their lifecycle leads to connection leaks, locks, and race conditions. This episode covers how each is created, used, and closed; the context-manager patterns that keep them safe; and the lifecycle pitfalls that bite most often.</p>
 <!-- a-grade-intro:begin -->
 
+<p><img alt="Connection and cursor lifecycle" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-01-connection-and-cursor-lifecycle.en.png"></p>
 <h2>Key Questions</h2>
 <ul>
 <li>What are the distinct responsibilities of Connection vs Cursor?</li>
@@ -71,7 +72,8 @@
 <!-- a-grade-intro:end -->
 
 <h2>1. What a Connection Is</h2>
-<p>A connection is a single communication channel between the application and the database. It wraps a TCP socket (PostgreSQL, MySQL) or a file handle (SQLite), and one connection holds one transaction context.</p>
+<p><img alt="What a connection is" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-02-1-what-a-connection-is.en.png"><br>
+A connection is a single communication channel between the application and the database. It wraps a TCP socket (PostgreSQL, MySQL) or a file handle (SQLite), and one connection holds one transaction context.</p>
 <pre><code class="language-python">import sqlite3
 conn = sqlite3.connect(&quot;notes.db&quot;)
 print(type(conn))           # &lt;class 'sqlite3.Connection'&gt;
@@ -95,7 +97,8 @@ print(cur.rowcount)     # number of affected rows
 </code></pre>
 <p>In SQLite (single file), a cursor is essentially a thin wrapper. In PostgreSQL, especially named cursors created with <code>cursor("name")</code>, it carries server-side state. That makes cleanup important.</p>
 <h2>3. Safe Use with Context Managers</h2>
-<p>Manual close is easy to forget. Python's <code>with</code> statement is the safer route.</p>
+<p><img alt="Safe use with context managers" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-03-3-safe-use-with-context-managers.en.png"><br>
+Manual close is easy to forget. Python's <code>with</code> statement is the safer route.</p>
 <pre><code class="language-python">import sqlite3
 
 with sqlite3.connect(&quot;notes.db&quot;) as conn:
@@ -141,7 +144,8 @@ cur2.execute(&quot;SELECT id FROM orders&quot;)
 # Both result sets are alive at the same time.
 </code></pre>
 <h2>5. Reusing vs Reopening a Connection</h2>
-<p>Opening a fresh connection per query reads cleanly but is expensive.</p>
+<p><img alt="Reusing vs reopening a connection" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-04-5-reusing-vs-reopening-a-connection.en.png"><br>
+Opening a fresh connection per query reads cleanly but is expensive.</p>
 <pre><code class="language-python"># Inefficient — connect/close on every call
 def get_note(note_id):
     with sqlite3.connect(&quot;notes.db&quot;) as conn:

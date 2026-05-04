@@ -26,6 +26,8 @@ seo_description: If you cannot see what the agent did, you cannot debug it or im
 If you cannot see what the agent did, you cannot debug it or improve it. Observability is the practice of making every step of the agent traceable, recordable, and replayable.
 
 ---
+
+![Observability - tracing and replaying agent work](../../../assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
 ## What Is Observability?
 
 Observability is the ability to reconstruct, from the outside, what an agent did, why it did it, and how. It is not just "leave logs around" — when an incident happens, you must be able to trace and reproduce the decision made at that moment.
@@ -53,6 +55,7 @@ A `Span` is one unit of work in the agent. One tool call, one LLM call, one refl
 
 ## What Should You Record?
 
+![What should you Record](../../../assets/harness-engineering-101/09/09-02-what-should-you-record.en.png)
 You need three layers of information to make traces useful.
 
 1. **What did the agent do?** tool name, input, output
@@ -83,6 +86,7 @@ Note that prompt and response go into events, not attributes. Attributes are sho
 
 ## Trace Model — Following One Run End to End
 
+![Trace model - following one run end to end](../../../assets/harness-engineering-101/09/09-03-trace-model-following-one-run-end-to-end.en.png)
 A single agent run produces a trace shaped like this tree:
 
 ```python
@@ -125,6 +129,7 @@ With this tree alone you can answer "where was it slow?", "where did the cost sp
 
 ## Replay — Reproducing a Run from Logs
 
+![Replay - reproducing a run from logs](../../../assets/harness-engineering-101/09/09-04-replay-reproducing-a-run-from-logs.en.png)
 A good trace is reproducible. You should be able to run the same step with the same input again and verify the same output comes back.
 
 ```python

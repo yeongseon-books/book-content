@@ -59,8 +59,10 @@
 </blockquote>
 <p>A good evaluation dataset mirrors production traffic distribution while including enough edge cases. This post covers the principles for designing a starter eval set of 50-200 examples and how to collect the data.</p>
 <hr>
+<p><img alt="Designing evaluation datasets" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png"></p>
 <h2>What Makes a Good Evaluation Dataset?</h2>
-<p>A good eval set satisfies two things at once.</p>
+<p><img alt="What makes a good evaluation Dataset" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png"><br>
+A good eval set satisfies two things at once.</p>
 <ol>
 <li><strong>It mirrors production traffic distribution.</strong> The mix of cases should look like what users actually send.</li>
 <li><strong>It includes enough edge cases.</strong> Cases that are rare in normal traffic but cause major incidents when they break — collect those deliberately.</li>
@@ -78,7 +80,8 @@ class EvalExample:
 </code></pre>
 <p>Adding <code>category</code> explicitly lets you "look at edge case scores separately." Looking only at the average lets the bulk of cases hide the problems.</p>
 <h2>Where Do You Source the Data?</h2>
-<p>Combine three sources.</p>
+<p><img alt="Where do you source the Data" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.en.png"><br>
+Combine three sources.</p>
 <p><strong>1. Sample from production traces</strong></p>
 <p>The best source is real user input. Each week, randomly draw 50 cases from production logs as eval candidates.</p>
 <pre><code class="language-python">import random
@@ -101,7 +104,8 @@ def sample_from_production(traces: list[dict], n: int = 50) -&gt; list[dict]:
 <p><strong>3. Deliberately authored adversarial cases</strong></p>
 <p>A domain expert hand-writes cases they suspect will break — prompt injection, ambiguous questions, questions with no answer.</p>
 <h2>How Many Cases Do You Need?</h2>
-<p>The size depends on the purpose.</p>
+<p><img alt="How many cases do you Need" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.en.png"><br>
+The size depends on the purpose.</p>
 <p><strong>Smoke test (every CI run)</strong><br>
 - Recommended size: 10-30<br>
 - Notes: Runs fast, catches obvious regressions</p>
@@ -116,7 +120,8 @@ def sample_from_production(traces: list[dict], n: int = 50) -&gt; list[dict]:
 - Notes: Required for generalization claims</p>
 <p>Start at 10-30, add 5-10 from production each week, and you reach 200 within three months.</p>
 <h2>Labeling — How Do You Fill <code>expected</code>?</h2>
-<p>There are three labeling styles, and you can use different ones per case.</p>
+<p><img alt="Labeling - how do you fill expected" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.en.png"><br>
+There are three labeling styles, and you can use different ones per case.</p>
 <pre><code class="language-python">@dataclass
 class Label:
     style: str  # &quot;exact&quot;, &quot;keywords&quot;, &quot;rubric&quot;

@@ -59,8 +59,10 @@
 </blockquote>
 <p>Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.' This post covers trajectory-level evaluation.</p>
 <hr>
+<p><img alt="Evaluating agents - Trajectories, not single responses" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png"></p>
 <h2>Why Agent Evaluation Is Different</h2>
-<p>Through Ep1-Ep6 we evaluated <strong>single responses</strong>: one question paired with one answer.</p>
+<p><img alt="Why agent evaluation is different" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-02-why-agent-evaluation-is-different.en.png"><br>
+Through Ep1-Ep6 we evaluated <strong>single responses</strong>: one question paired with one answer.</p>
 <p>Agents are different. An agent goes through multiple steps to complete a task.</p>
 <pre><code>User: &quot;Email me a summary of this week's schedule&quot;
   ↓
@@ -82,7 +84,8 @@ Final reply: &quot;Done, I sent the email.&quot;
 <p>Let's go through each.</p>
 <hr>
 <h2>Two Levels of Evaluation — End-to-End vs Step-Level</h2>
-<p>Agent evaluation has two perspectives.</p>
+<p><img alt="Two levels of evaluation - End-to-End vs Step-Level" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-03-two-levels-of-evaluation-end-to-end-vs-s.en.png"><br>
+Agent evaluation has two perspectives.</p>
 <p><strong>End-to-end (final outcome)</strong></p>
 <p>Look only at the result. "Was the email actually sent?"</p>
 <pre><code class="language-python"># agent_eval/end_to_end.py
@@ -116,7 +119,8 @@ def step_match_score(actual: list[dict], expected: list[dict]) -&gt; float:
 <p><strong>Practical recommendation</strong>: use end-to-end for the headline number, drop into step-level only for failure analysis.</p>
 <hr>
 <h2>Tool Selection — Confusion Matrix</h2>
-<p>Agents pick the wrong tool more often than you would think — calling <code>draft_email</code> instead of <code>send_email</code>. Treat tool selection as a classification problem.</p>
+<p><img alt="Tool selection - confusion matrix" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-04-tool-selection-confusion-matrix.en.png"><br>
+Agents pick the wrong tool more often than you would think — calling <code>draft_email</code> instead of <code>send_email</code>. Treat tool selection as a classification problem.</p>
 <pre><code class="language-python"># agent_eval/tool_confusion.py
 from sklearn.metrics import classification_report
 
@@ -133,7 +137,8 @@ print(classification_report(expected_tools, actual_tools))
 <p><strong>Reading</strong>: send_email recall of 0.70 means 30% of cases the agent called draft instead. <strong>Add an explicit example to the prompt</strong>: "Use send, not draft."</p>
 <hr>
 <h2>Trajectory Efficiency — Step Count</h2>
-<p>An agent that finishes in 4 steps is not the same as one that finishes in 12. Twelve steps means 3x tokens, 3x latency, and 3x failure surface.</p>
+<p><img alt="Trajectory efficiency - step count" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-05-trajectory-efficiency-step-count.en.png"><br>
+An agent that finishes in 4 steps is not the same as one that finishes in 12. Twelve steps means 3x tokens, 3x latency, and 3x failure surface.</p>
 <pre><code class="language-python"># agent_eval/efficiency.py
 def trajectory_metrics(agent_run: dict, expected_steps: int) -&gt; dict:
     actual_steps = len(agent_run[&quot;steps&quot;])

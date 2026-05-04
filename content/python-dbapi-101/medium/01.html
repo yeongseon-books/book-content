@@ -62,6 +62,7 @@
 <p>This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.</p>
 <!-- a-grade-intro:begin -->
 
+<p><img alt="Why DB-API 2.0 - the problem PEP 249 solved" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png"></p>
 <h2>Key Questions</h2>
 <ul>
 <li>How was database access done in Python before PEP 249?</li>
@@ -72,7 +73,8 @@
 <!-- a-grade-intro:end -->
 
 <h2>1. The Chaos Before DB-API</h2>
-<p>Before the standard, every database library had its own API.</p>
+<p><img alt="The chaos before DB-API" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png"><br>
+Before the standard, every database library had its own API.</p>
 <pre><code class="language-python"># Imagined old oracle module
 conn = oracle.open(&quot;dsn&quot;, &quot;user&quot;, &quot;pass&quot;)
 result = oracle.run_sql(conn, &quot;SELECT * FROM users&quot;)
@@ -85,7 +87,8 @@ data = db.receive_rows()
 </code></pre>
 <p>Function names, argument order, and return types were all different. Even within a single team, Oracle code and MySQL code looked completely different, and swapping databases meant rewriting the codebase.</p>
 <h2>2. Five Things PEP 249 Standardized</h2>
-<p>DB-API 2.0 defines a minimal contract every driver must satisfy.</p>
+<p><img alt="Five things PEP 249 standardized" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png"><br>
+DB-API 2.0 defines a minimal contract every driver must satisfy.</p>
 <ol>
 <li><strong>Module-level constants</strong>: <code>apilevel</code>, <code>threadsafety</code>, <code>paramstyle</code></li>
 <li><strong>Connection objects</strong>: <code>connect()</code>, <code>close()</code>, <code>commit()</code>, <code>rollback()</code>, <code>cursor()</code></li>
@@ -133,7 +136,8 @@ conn.close()
 </code></pre>
 <p>These seven steps are nearly identical for PostgreSQL and MySQL. The differences are limited to <code>connect()</code> arguments and <code>paramstyle</code>.</p>
 <h2>4. Only paramstyle Really Differs</h2>
-<p>PEP 249 allows five paramstyles.</p>
+<p><img alt="Only paramstyle really differs" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png"><br>
+PEP 249 allows five paramstyles.</p>
 <p><strong><code>qmark</code></strong><br>
 - Example: <code>WHERE id = ?</code><br>
 - Drivers: sqlite3</p>

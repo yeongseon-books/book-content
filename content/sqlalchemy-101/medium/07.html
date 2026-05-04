@@ -55,6 +55,7 @@
 <body>
 <h1>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</h1>
 <p>The most common complaint about ORMs always lands in the same place: "Why am I seeing 100 SELECTs?" The answer is usually the N+1 query pattern. The <code>relationship()</code> we built in Ep6 defaults to lazy loading, so accessing a child attribute on each of N parent objects fires N additional SELECTs. This article shows how N+1 actually arises (with <code>echo=True</code> logs you can read line by line), and how to prevent or expose it with <code>joinedload</code>, <code>selectinload</code>, and <code>raiseload</code>.</p>
+<p><img alt="Loading strategies and the N+1 Problem: when to pick lazy, joined, or selectin" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-01-loading-strategies-and-the-n-1-problem-w.en.png"></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>What code, exactly, produces an N+1 query pattern?</li>
@@ -65,7 +66,8 @@
 <li>When is <code>lazy="raise"</code> a good idea, and what are its trade-offs?</li>
 </ul>
 <h2>Why it matters</h2>
-<p>Lazy loading makes ORM code readable. You write <code>user.orders</code> and SELECTs happen behind the scenes. That convenience often turns into a 50-100x SELECT explosion in production:</p>
+<p><img alt="Why it matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-02-why-it-matters.en.png"><br>
+Lazy loading makes ORM code readable. You write <code>user.orders</code> and SELECTs happen behind the scenes. That convenience often turns into a 50-100x SELECT explosion in production:</p>
 <ul>
 <li>A handler that fetches 100 users and prints each user's most recent order time: 1 + 100 = 101 SELECTs.</li>
 <li>A response listing 50 posts and each post's tags: 1 + 50 = 51 SELECTs.</li>
@@ -73,6 +75,7 @@
 </ul>
 <p>These costs add up: disk IO, network round-trips, lock contention. A 5 ms query becomes 800 ms because of the round-trip count. Even on a single-file engine like SQLite, the lock contention and longer transactions add up; you can't ignore N+1 just because development is local.</p>
 <h2>Mental Model</h2>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-03-mental-model.en.png"></p>
 <blockquote>
 <p>"Touching a relationship attribute for the first time fires one SELECT." That single sentence is all of lazy loading. N+1 happens when that sentence repeats N times. <code>joinedload</code> glues a LEFT JOIN onto the parent SELECT to fetch everything in one shot; <code>selectinload</code> fetches the parents first, then loads all children with a single <code>IN(...)</code> query.</p>
 </blockquote>
@@ -88,7 +91,8 @@ joinedload:        SELECT users LEFT OUTER JOIN orders ...      (1)
 </code></pre>
 <p>By query count alone, joinedload looks like the universal winner. But on collection sides (one-to-many), it can multiply rows by parent×child, blowing up traffic. That's why we usually recommend <code>selectinload</code> for collections.</p>
 <h2>Core concepts</h2>
-<p><strong>1) Default lazy loading and the N+1 it creates</strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-04-core-concepts.en.png"><br>
+<strong>1) Default lazy loading and the N+1 it creates</strong></p>
 <pre><code class="language-python">with Session(engine) as session:
     users = session.scalars(select(User)).all()      # SELECT users
     for u in users:
@@ -166,6 +170,7 @@ for u in users:
 </code></pre>
 <p>A single <code>options(selectinload(...))</code> cuts 51 → 2 SELECTs. That difference shows up as a 5x to 50x improvement in production response time.</p>
 <h2>Step-by-step walkthrough</h2>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-05-step-by-step-walkthrough.en.png"></p>
 <pre><code class="language-python">from sqlalchemy import ForeignKey, String, create_engine, select
 from sqlalchemy.orm import (
     DeclarativeBase, Mapped, Session,

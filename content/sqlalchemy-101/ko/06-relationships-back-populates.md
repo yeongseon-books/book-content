@@ -25,6 +25,7 @@ seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객
 
 데이터베이스에서 가장 많이 다루는 작업 중 하나는 "관련된 행을 함께 가져오는 것"입니다. 사용자 한 명의 주문 목록, 게시글 한 건의 댓글, 태그가 여러 개 달린 글. SQL에서는 JOIN으로 처리하지만, ORM에서는 객체의 속성 접근(`user.orders`)으로 자연스럽게 표현됩니다. 그 다리를 놓는 도구가 `relationship()`이고, 양방향 탐색을 모순 없이 잇는 장치가 `back_populates`입니다. 이번 글에서는 일대다, 다대일, 다대다 관계를 차례로 정의하고, 양쪽이 같은 데이터를 가리키도록 안전하게 동기화하는 패턴을 정리합니다.
 
+![ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기](../../../assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.ko.png)
 ## 이 글에서 답할 질문
 
 - `relationship()`은 정확히 무엇을 합니까? Foreign Key와 어떤 관계입니까?
@@ -36,6 +37,7 @@ seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객
 
 ## 왜 중요한가
 
+![핵심 개념](../../../assets/sqlalchemy-101/06/06-02-why-it-matters.ko.png)
 관계 정의가 어긋나면 다음과 같은 문제가 자주 생깁니다.
 
 - "한쪽에서 객체를 추가했는데 다른 쪽 컬렉션에는 보이지 않습니다." → `back_populates`가 빠졌거나 양쪽 정의가 일치하지 않습니다.
@@ -47,6 +49,7 @@ seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객
 
 ## Mental Model
 
+![Mental model](../../../assets/sqlalchemy-101/06/06-03-mental-model.ko.png)
 > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다. `back_populates`는 양방향 통로의 두 끝을 연결해 "한쪽에서 바뀐 컬렉션이 다른 쪽에서도 즉시 반영"되게 만드는 장치입니다.
 
 ```
@@ -63,6 +66,7 @@ orders: list[Order]   ←──┐         ┌─→  user: User
 
 ## 핵심 개념
 
+![핵심 개념](../../../assets/sqlalchemy-101/06/06-04-core-concepts.ko.png)
 ### 1) ForeignKey와 relationship은 한 쌍
 
 먼저 SQL 레벨의 외래키를 정의해야 객체 레벨의 관계가 의미를 갖습니다.
@@ -209,6 +213,7 @@ def get_user_orders(session, user_id):
 
 ## 단계별 실습
 
+![단계별 실습](../../../assets/sqlalchemy-101/06/06-05-step-by-step-walkthrough.ko.png)
 ```python
 from sqlalchemy import ForeignKey, String, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship

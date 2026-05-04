@@ -26,6 +26,8 @@ seo_description: The context an agent receives shapes its output. Too little and
 The context an agent receives shapes its output. Too little and it guesses. Too much and it loses focus. The Context Harness is about deciding what to give the agent and what to withhold.
 
 ---
+
+![Context harness - designing what the agent should know and not know](../../../assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
 ## Context Is a Resource
 
 An agent's context window is not infinite. GPT-4o has 128k tokens, Claude Sonnet 4 has 200k, Gemini 2.5 Pro has 1M. Big numbers, but in practice never enough. System prompt, conversation history, retrieved documents, tool schemas, and recent tool outputs all compete for the same space.
@@ -38,6 +40,7 @@ Context Harness is the explicit design of what information the agent receives, w
 
 ## The Five Components of Context
 
+![The five components of context](../../../assets/harness-engineering-101/03/03-02-the-five-components-of-context.en.png)
 The context an agent sees in a single inference splits into five parts.
 
 1. **System prompt**: the agent's role, rules, and goals. Rarely changes.
@@ -145,6 +148,7 @@ The right strategy depends on the task. Short conversations need only sliding. L
 
 ## Precision in Retrieved Context
 
+![Precision in retrieved context](../../../assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.en.png)
 RAG-retrieved documents take up a large fraction of context. The precision of what you retrieve matters more than the volume.
 
 Pasting in 10 raw documents leaves 90% of them irrelevant to the task. Irrelevant text is not a benign waste — it perturbs reasoning. The model assumes every input is "relevant" and lets unrelated text pull conclusions in the wrong direction.
@@ -229,6 +233,7 @@ Hiding is as much a design decision as showing.
 
 ## Context Snapshots for Reproducibility
 
+![Context snapshots for reproducibility](../../../assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.en.png)
 A production agent must produce the same output for the same input. But context is assembled through many stages, which makes reproduction hard. Context snapshots solve this.
 
 Save the final context exactly as it goes into each inference. Feeding the same context back to the model later (with temperature 0) produces the same output. This is the foundation of debugging and reproduction tests.

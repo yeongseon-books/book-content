@@ -32,6 +32,7 @@ Every query in DB-API ultimately reduces to five cursor methods: `execute()`, `e
 
 <!-- a-grade-intro:begin -->
 
+![execute, executemany, and fetch patterns](../../../assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.en.png)
 ## Key Questions
 
 - When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?
@@ -43,6 +44,7 @@ Every query in DB-API ultimately reduces to five cursor methods: `execute()`, `e
 
 ## 1. execute - one statement at a time
 
+![execute - one statement at a time](../../../assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
 `cursor.execute(operation, parameters=None)` runs a single SQL statement. SELECT, INSERT, UPDATE, DELETE, and DDL all use the same method.
 
 ```python
@@ -60,6 +62,7 @@ print(cur.rowcount)    # 1
 
 ## 2. executemany - bulk write
 
+![executemany - bulk write](../../../assets/python-dbapi-101/03/03-03-2-executemany-bulk-write.en.png)
 When the same statement runs against many parameter sets, use `executemany()`.
 
 ```python
@@ -113,6 +116,7 @@ For small result sets (a few hundred rows) it is the most convenient and the fas
 
 ## 5. fetchmany - in chunks
 
+![fetchmany - in chunks](../../../assets/python-dbapi-101/03/03-04-5-fetchmany-in-chunks.en.png)
 `fetchmany(size=cursor.arraysize)` returns a fixed number of rows.
 
 ```python

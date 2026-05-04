@@ -28,6 +28,7 @@ The previous nine posts covered nearly every behavior of SQLite and PEP 249. Thi
 
 This post does not introduce many new ideas. It composes the patterns from earlier posts into a single production-ready shape that you can copy into a service.
 
+![SQLite production Patterns: retry, timeout, observability, backup](../../../assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.en.png)
 ## Questions this post answers
 
 - How should retry, timeout, and `busy_timeout` be configured together?
@@ -44,6 +45,7 @@ The goal here is to remove luck from the picture. Retries become measurable than
 
 ## Mental Model: SQLite is still a DBMS
 
+![SQLite is still a DBMS](../../../assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png)
 > SQLite being a single file simplifies operations, but treating it as "just a file" is dangerous. Copying a file mid-transaction yields a corrupted backup. SQLite is light, but it is a DBMS.
 
 Four production axes:
@@ -55,6 +57,7 @@ Four production axes:
 
 ## Core Concepts
 
+![Core concepts](../../../assets/python-dbapi-101/10/10-03-core-concepts.en.png)
 ### timeout vs busy_timeout vs retry
 
 Three knobs that look similar live at different layers:
@@ -170,6 +173,7 @@ A connection factory with WAL+busy_timeout, a retry decorator scoped to BUSY/LOC
 
 ## Step by Step
 
+![Step by step](../../../assets/python-dbapi-101/10/10-04-step-by-step.en.png)
 ### Step 1. OpenTelemetry SQL spans
 
 ```python

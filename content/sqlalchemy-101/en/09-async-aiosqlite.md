@@ -24,6 +24,7 @@ seo_description: Async SQLAlchemy is a thin awaitable wrapper around the existin
 
 # Async SQLAlchemy with aiosqlite and AsyncSession
 
+![Async SQLAlchemy with aiosqlite and AsyncSession](../../../assets/sqlalchemy-101/09/09-01-async-sqlalchemy-with-aiosqlite-and-asyn.en.png)
 ## What you will learn
 
 - The shape of SQLAlchemy 2.x's async stack: `create_async_engine`, `AsyncEngine`, `AsyncSession`
@@ -34,12 +35,14 @@ seo_description: Async SQLAlchemy is a thin awaitable wrapper around the existin
 
 ## Why this matters
 
+![Why this matters](../../../assets/sqlalchemy-101/09/09-02-why-this-matters.en.png)
 Using sync SQLAlchemy from FastAPI, Starlette, or aiohttp blocks the event loop. SQLAlchemy 2.x ships an async API that has been stable since 1.4, and SQLite supports the same patterns through the `aiosqlite` driver.
 
 Async, however, has a few sharp edges that the sync API hides. Lazy loading in particular: in sync code it is just one extra SELECT, but in async it tries to call sync IO from an async context and raises immediately. This article makes those differences explicit.
 
 ## Mental model
 
+![Mental model](../../../assets/sqlalchemy-101/09/09-03-mental-model.en.png)
 > Async SQLAlchemy is a **thin awaitable wrapper around the existing ORM**. Internally it does not run the sync ORM on a thread pool; it uses a greenlet-based adapter that exposes sync calls across an async boundary. That is why the API looks almost identical, but every place where IO could happen now requires an explicit `await`.
 
 Two rules cover most of it:
@@ -49,6 +52,7 @@ Two rules cover most of it:
 
 ## Core concepts
 
+![Core concepts](../../../assets/sqlalchemy-101/09/09-04-core-concepts.en.png)
 ### `create_async_engine` and `AsyncEngine`
 
 `from sqlalchemy.ext.asyncio import create_async_engine` builds an `AsyncEngine`. It mirrors the sync `Engine` except `connect` and `begin` are async context managers.
@@ -113,6 +117,7 @@ The deltas are:
 
 ## Step-by-step walkthrough
 
+![Step-by-step walkthrough](../../../assets/sqlalchemy-101/09/09-05-step-by-step-walkthrough.en.png)
 ### Step 1: Install
 
 ```bash

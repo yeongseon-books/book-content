@@ -55,6 +55,7 @@
 <body>
 <h1>Session in Depth: How Unit of Work and Identity Map Actually Work</h1>
 <p>The ORM models from Ep4 do nothing on their own. To push instances back to the database and to read rows back as objects, you need a <code>Session</code>. SQLAlchemy's <code>Session</code> is more than a connection wrapper - it is a Unit of Work manager that tracks which objects are new, which were modified, and which are scheduled for deletion. It also maintains an Identity Map so that, within a single session, the same primary key always corresponds to the same Python object. This article walks through both mechanisms with real code.</p>
+<p><img alt="Session in Depth: how unit of work and identity map actually work" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-01-session-in-depth-how-unit-of-work-and-id.en.png"></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>How does a <code>Session</code> relate to connections and transactions?</li>
@@ -66,7 +67,8 @@
 <li>How do ORM objects move between transient/pending/persistent/detached states?</li>
 </ul>
 <h2>Why it matters</h2>
-<p>If you use the ORM without understanding the Session, you bump into mysterious behavior often:</p>
+<p><img alt="Why it matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.en.png"><br>
+If you use the ORM without understanding the Session, you bump into mysterious behavior often:</p>
 <ul>
 <li>"I committed, but reading an attribute on the same object in another function fires another SELECT." That's <code>expire_on_commit</code>.</li>
 <li>"I fetched a user with <code>select</code> here, and another <code>select</code> over there - they came back as different objects." Different sessions, or the same session that was already closed.</li>
@@ -75,6 +77,7 @@
 </ul>
 <p>Every one of these reduces to a single question: "What objects does the Session hold, and when does it emit SQL?" Answering it requires a clear picture of Unit of Work and Identity Map.</p>
 <h2>Mental Model</h2>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-03-mental-model.en.png"></p>
 <blockquote>
 <p>A <code>Session</code> is a notebook that bundles a working scratch pad (Unit of Work) and a cache page (Identity Map) into one cover. While the notebook is open, the same PK is the same object; when you close it (<code>commit</code>), all changes are flushed to SQL at once.</p>
 </blockquote>
@@ -91,7 +94,8 @@
 <li>"Does the row this object points to exist in the database?" is decided only after SQL has actually run.</li>
 </ul>
 <h2>Core concepts</h2>
-<p><strong>1) Session is a transactional context</strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-04-core-concepts.en.png"><br>
+<strong>1) Session is a transactional context</strong></p>
 <p>A <code>Session</code> holds a transaction internally; <code>commit()</code> or <code>rollback()</code> ends it.</p>
 <pre><code class="language-python">from sqlalchemy.orm import Session
 
@@ -171,7 +175,8 @@ with Session(engine) as session:
 </code></pre>
 <p>The Session tracks attribute changes and, on flush, emits an UPDATE that touches only what actually changed. If nothing changed, no UPDATE is emitted at all.</p>
 <h2>Step-by-step walkthrough</h2>
-<p>Save the snippet below and run it; you can watch the SQL and the Identity Map at work.</p>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-05-step-by-step-walkthrough.en.png"><br>
+Save the snippet below and run it; you can watch the SQL and the Identity Map at work.</p>
 <pre><code class="language-python">from sqlalchemy import String, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 

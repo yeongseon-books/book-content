@@ -24,6 +24,7 @@ seo_description: Production SQLAlchemy has three knobs. The pool sets concurrenc
 
 # Production patterns: pools, observability, migrations, and deploys
 
+![Production patterns: pools, observability, migrations, and deploys](../../../assets/sqlalchemy-101/10/10-01-production-patterns-pools-observability.en.png)
 ## What you will learn
 
 - The core connection pool options (`pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`)
@@ -35,18 +36,21 @@ seo_description: Production SQLAlchemy has three knobs. The pool sets concurrenc
 
 ## Why this matters
 
+![Why this matters](../../../assets/sqlalchemy-101/10/10-02-why-this-matters.en.png)
 Everything so far has been about whether the code is correct. Production adds another layer. The same code falls apart under load if the pool is wrong, you cannot tell what is slow without observability, and a single deploy becomes an incident if the migration order is bad.
 
 This article is about that layer. The examples use SQLite, but most of the patterns apply equally to PostgreSQL and MySQL.
 
 ## Mental model
 
+![Mental model](../../../assets/sqlalchemy-101/10/10-03-mental-model.en.png)
 > Production SQLAlchemy has three knobs. The **pool** sets concurrency and tail latency. **Observability** tells you where slow is. The **migration policy** defines the safety line for deploys. Leave any one of them empty and the other two lose most of their value.
 
 A pool that is too small queues requests; too large blows past the DB-side connection limit. Without observability you cannot even tell that the pool is wrong. And without a migration policy, "the five minutes after deploy" becomes a recurring outage window.
 
 ## Core concepts
 
+![Core concepts](../../../assets/sqlalchemy-101/10/10-04-core-concepts.en.png)
 ### Pool options
 
 | Option | Meaning | Sensible start |
@@ -113,6 +117,7 @@ The "after" version (1) recovers automatically from a dead connection on the nex
 
 ## Step-by-step walkthrough
 
+![Step-by-step walkthrough](../../../assets/sqlalchemy-101/10/10-05-step-by-step-walkthrough.en.png)
 ### Step 1: Sizing the pool
 
 A reasonable starting heuristic is `(average concurrent requests) × (avg time a request holds a connection / total request time)`. For a typical web process, 5–20 is enough. If that is not enough, add worker processes rather than enlarging `pool_size`.

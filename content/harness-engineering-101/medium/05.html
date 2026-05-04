@@ -59,13 +59,15 @@
 </blockquote>
 <p>Tools are the hands and feet of an agent. Poorly designed tools can corrupt data or blow up costs. The Tool Harness is about designing tools that are safe, predictable, and easy for the agent to use correctly.</p>
 <hr>
+<p><img alt="Tool harness - designing safe tools for agents" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png"></p>
 <h2>Tools Are an Agent's Hands and Feet</h2>
 <p>Tools determine what an agent can do. Without tools, an agent is just a text-generating model. DB queries, file writes, API calls, code execution — all are tools. The agent's range of action is exactly the range of its tools.</p>
 <p>The problem is that poorly designed tools destabilize every action the agent takes. An ambiguous tool schema produces wrong arguments. An overly powerful tool can wreck a system in one call. Unhelpful error messages cause the agent to repeat the same mistake.</p>
 <p>Tool Harness is the principle of designing tools that are safe and predictable for agents. This article covers five tool design principles, safe schema design, and how to make tool errors something the agent can act on.</p>
 <hr>
 <h2>Five Principles of a Good Tool</h2>
-<p>Five rules to follow when designing a tool.</p>
+<p><img alt="Five principles of a good tool" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-02-five-principles-of-a-good-tool.en.png"><br>
+Five rules to follow when designing a tool.</p>
 <p><strong>1. Single responsibility</strong>: one tool does one thing. Not <code>manage_user</code>, but <code>create_user</code>, <code>delete_user</code>, <code>update_user_email</code>.</p>
 <p><strong>2. Idempotent when possible</strong>: calling with the same input multiple times produces the same result. Agents retry frequently. Non-idempotent tools cause incidents.</p>
 <p><strong>3. Explicit side effects</strong>: if there is a side effect, name and describe it. Don't hide that <code>send_email</code> actually sends.</p>
@@ -129,7 +131,8 @@ class SendNotificationInput(BaseModel):
 <p>Schemas like this have two effects. First, the agent is less likely to construct invalid arguments before calling. Second, invalid calls are rejected immediately, preventing side effects.</p>
 <hr>
 <h2>The Idempotency Key Pattern</h2>
-<p>Agents retry often — network errors, timeouts, "couldn't confirm" cases all lead to repeating the same tool call. Non-idempotent tools then run twice and cause incidents.</p>
+<p><img alt="The idempotency key pattern" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-03-the-idempotency-key-pattern.en.png"><br>
+Agents retry often — network errors, timeouts, "couldn't confirm" cases all lead to repeating the same tool call. Non-idempotent tools then run twice and cause incidents.</p>
 <p>The fix is the idempotency key. The agent sends a unique key per call, and the server refuses to execute the same key twice.</p>
 <pre><code class="language-python">import hashlib
 from dataclasses import dataclass
@@ -219,7 +222,8 @@ def get_user(user_id: str) -&gt; dict:
 <p>The <code>retryable</code> flag matters. On <code>retryable=False</code>, the agent immediately tries a different approach. On <code>retryable=True</code>, it retries after backoff.</p>
 <hr>
 <h2>Sandboxing Dangerous Tools</h2>
-<p>Code execution, filesystem access, and arbitrary shell commands are extremely powerful and extremely dangerous. These tools must not be exposed without sandboxing.</p>
+<p><img alt="Sandboxing dangerous tools" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-04-sandboxing-dangerous-tools.en.png"><br>
+Code execution, filesystem access, and arbitrary shell commands are extremely powerful and extremely dangerous. These tools must not be exposed without sandboxing.</p>
 <p>Three isolation techniques.</p>
 <p><strong>1. Process isolation</strong>: run in a separate process with resource limits.<br>
 <strong>2. Filesystem isolation</strong>: only operate inside an isolated temp directory.<br>

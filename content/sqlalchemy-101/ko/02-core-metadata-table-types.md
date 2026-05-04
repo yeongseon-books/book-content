@@ -32,6 +32,7 @@ seo_description: MetaData는 schema의 카탈로그입니다. application이 알
 
 이 글은 SQLAlchemy Core의 핵심인 `MetaData`, `Table`, `Column`, 그리고 type system을 다룹니다. 여기서 만들어 둔 schema 객체는 3편의 select/insert/update/delete의 재료가 되고, 4편 이후 ORM의 `mapped_column`으로 자연스럽게 이어집니다. ORM만 쓸 사람이라도 이 layer를 이해해야 migration이나 reflection 같은 도구를 다룰 수 있습니다.
 
+![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](../../../assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
 ## 이 글에서 배울 것
 
 - `MetaData` 객체가 무엇이고 왜 schema의 단일 출처(single source of truth)가 되는지
@@ -53,6 +54,7 @@ seo_description: MetaData는 schema의 카탈로그입니다. application이 알
 
 ## 왜 중요한가
 
+![핵심 개념](../../../assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
 raw SQL로 schema를 관리하면 한 가지 큰 문제가 생깁니다. application code 안의 INSERT/SELECT 문에 적힌 컬럼 이름이 실제 schema와 어긋나도 컴파일 시점에 알 수 없습니다. 운영 중에 갑자기 `no such column` 같은 오류가 발생하고, IDE는 컬럼 이름 자동완성도 해주지 못합니다.
 
 SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체를 통해 SQL을 빌드할 수 있습니다. 컬럼 이름이 typo라면 import 시점에 `AttributeError`로 잡히고, IDE는 `users.c.name`을 자동완성합니다. 같은 정의가 Alembic의 autogenerate, Pandas의 `read_sql`, FastAPI의 SQL 빌딩에 그대로 재사용됩니다.
@@ -63,6 +65,7 @@ SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체
 
 ## Mental Model
 
+![Mental model](../../../assets/sqlalchemy-101/02/02-03-mental-model.ko.png)
 `MetaData`는 schema의 **카탈로그**입니다. application이 알고 있는 모든 `Table` 정의를 담아 두는 컨테이너이고, 그 컨테이너를 통째로 Engine에 던지면 schema가 만들어지거나 비교됩니다.
 
 > MetaData는 application의 schema 명세서다. Table은 그 명세서의 한 페이지이고, Column은 페이지 안의 한 줄이다. Engine이 없으면 MetaData는 그저 in-memory 명세서일 뿐이고, MetaData가 없으면 Engine은 무엇을 만들어야 할지 알지 못한다.
@@ -95,6 +98,7 @@ Core 단계에서는 다음 흐름이 핵심입니다.
 
 ## 핵심 개념
 
+![핵심 개념](../../../assets/sqlalchemy-101/02/02-04-core-concepts.ko.png)
 ### MetaData
 
 ```python
@@ -303,6 +307,7 @@ with engine.begin() as conn:
 
 ## 단계별 실습
 
+![단계별 실습](../../../assets/sqlalchemy-101/02/02-05-step-by-step-practice.ko.png)
 ### 1단계: schema 모듈 만들기
 
 `schema.py`:

@@ -26,6 +26,7 @@ seo_description: '"Touching a relationship attribute for the first time fires on
 
 The most common complaint about ORMs always lands in the same place: "Why am I seeing 100 SELECTs?" The answer is usually the N+1 query pattern. The `relationship()` we built in Ep6 defaults to lazy loading, so accessing a child attribute on each of N parent objects fires N additional SELECTs. This article shows how N+1 actually arises (with `echo=True` logs you can read line by line), and how to prevent or expose it with `joinedload`, `selectinload`, and `raiseload`.
 
+![Loading strategies and the N+1 Problem: when to pick lazy, joined, or selectin](../../../assets/sqlalchemy-101/07/07-01-loading-strategies-and-the-n-1-problem-w.en.png)
 ## Questions this post answers
 
 - What code, exactly, produces an N+1 query pattern?
@@ -37,6 +38,7 @@ The most common complaint about ORMs always lands in the same place: "Why am I s
 
 ## Why it matters
 
+![Why it matters](../../../assets/sqlalchemy-101/07/07-02-why-it-matters.en.png)
 Lazy loading makes ORM code readable. You write `user.orders` and SELECTs happen behind the scenes. That convenience often turns into a 50-100x SELECT explosion in production:
 
 - A handler that fetches 100 users and prints each user's most recent order time: 1 + 100 = 101 SELECTs.
@@ -47,6 +49,7 @@ These costs add up: disk IO, network round-trips, lock contention. A 5 ms query 
 
 ## Mental Model
 
+![Mental model](../../../assets/sqlalchemy-101/07/07-03-mental-model.en.png)
 > "Touching a relationship attribute for the first time fires one SELECT." That single sentence is all of lazy loading. N+1 happens when that sentence repeats N times. `joinedload` glues a LEFT JOIN onto the parent SELECT to fetch everything in one shot; `selectinload` fetches the parents first, then loads all children with a single `IN(...)` query.
 
 ```
@@ -65,6 +68,7 @@ By query count alone, joinedload looks like the universal winner. But on collect
 
 ## Core concepts
 
+![Core concepts](../../../assets/sqlalchemy-101/07/07-04-core-concepts.en.png)
 ### 1) Default lazy loading and the N+1 it creates
 
 ```python
@@ -172,6 +176,7 @@ A single `options(selectinload(...))` cuts 51 → 2 SELECTs. That difference sho
 
 ## Step-by-step walkthrough
 
+![Step-by-step walkthrough](../../../assets/sqlalchemy-101/07/07-05-step-by-step-walkthrough.en.png)
 ```python
 from sqlalchemy import ForeignKey, String, create_engine, select
 from sqlalchemy.orm import (

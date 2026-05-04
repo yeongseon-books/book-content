@@ -59,13 +59,15 @@
 </blockquote>
 <p>The context an agent receives shapes its output. Too little and it guesses. Too much and it loses focus. The Context Harness is about deciding what to give the agent and what to withhold.</p>
 <hr>
+<p><img alt="Context harness - designing what the agent should know and not know" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png"></p>
 <h2>Context Is a Resource</h2>
 <p>An agent's context window is not infinite. GPT-4o has 128k tokens, Claude Sonnet 4 has 200k, Gemini 2.5 Pro has 1M. Big numbers, but in practice never enough. System prompt, conversation history, retrieved documents, tool schemas, and recent tool outputs all compete for the same space.</p>
 <p>A bigger context also makes the model slower, more expensive, and less accurate. Information in the middle is easily ignored ("lost in the middle"), and irrelevant content perturbs reasoning. Context is a resource. Not something to pour in without limit, but something to design.</p>
 <p>Context Harness is the explicit design of what information the agent receives, when, and what it does not receive. This article covers the components of context, selection strategies, and information you should deliberately hide.</p>
 <hr>
 <h2>The Five Components of Context</h2>
-<p>The context an agent sees in a single inference splits into five parts.</p>
+<p><img alt="The five components of context" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-02-the-five-components-of-context.en.png"><br>
+The context an agent sees in a single inference splits into five parts.</p>
 <ol>
 <li><strong>System prompt</strong>: the agent's role, rules, and goals. Rarely changes.</li>
 <li><strong>Task spec</strong>: the current task's Goal, Inputs, and Completion criteria. Changes per task.</li>
@@ -157,7 +159,8 @@ class HistoryManager:
 <p>The right strategy depends on the task. Short conversations need only sliding. Long collaborative tasks need summarization. Tasks that must reference past decisions exactly use selective recall.</p>
 <hr>
 <h2>Precision in Retrieved Context</h2>
-<p>RAG-retrieved documents take up a large fraction of context. The precision of what you retrieve matters more than the volume.</p>
+<p><img alt="Precision in retrieved context" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.en.png"><br>
+RAG-retrieved documents take up a large fraction of context. The precision of what you retrieve matters more than the volume.</p>
 <p>Pasting in 10 raw documents leaves 90% of them irrelevant to the task. Irrelevant text is not a benign waste — it perturbs reasoning. The model assumes every input is "relevant" and lets unrelated text pull conclusions in the wrong direction.</p>
 <p>Three stages improve precision.</p>
 <p><strong>1. Retrieval</strong>: fetch 20–50 candidates. Recall first.<br>
@@ -221,7 +224,8 @@ def trim_tool_history(history: list[dict], keep_last: int = 3) -&gt; list[dict]:
 <p>Hiding is as much a design decision as showing.</p>
 <hr>
 <h2>Context Snapshots for Reproducibility</h2>
-<p>A production agent must produce the same output for the same input. But context is assembled through many stages, which makes reproduction hard. Context snapshots solve this.</p>
+<p><img alt="Context snapshots for reproducibility" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.en.png"><br>
+A production agent must produce the same output for the same input. But context is assembled through many stages, which makes reproduction hard. Context snapshots solve this.</p>
 <p>Save the final context exactly as it goes into each inference. Feeding the same context back to the model later (with temperature 0) produces the same output. This is the foundation of debugging and reproduction tests.</p>
 <pre><code class="language-python">import hashlib
 import json

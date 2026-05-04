@@ -54,6 +54,7 @@
 </head>
 <body>
 <h1>Async SQLAlchemy with aiosqlite and AsyncSession</h1>
+<p><img alt="Async SQLAlchemy with aiosqlite and AsyncSession" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-01-async-sqlalchemy-with-aiosqlite-and-asyn.en.png"></p>
 <h2>What you will learn</h2>
 <ul>
 <li>The shape of SQLAlchemy 2.x's async stack: <code>create_async_engine</code>, <code>AsyncEngine</code>, <code>AsyncSession</code></li>
@@ -63,9 +64,11 @@
 <li>Session lifecycle in async web frameworks like FastAPI</li>
 </ul>
 <h2>Why this matters</h2>
-<p>Using sync SQLAlchemy from FastAPI, Starlette, or aiohttp blocks the event loop. SQLAlchemy 2.x ships an async API that has been stable since 1.4, and SQLite supports the same patterns through the <code>aiosqlite</code> driver.</p>
+<p><img alt="Why this matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-02-why-this-matters.en.png"><br>
+Using sync SQLAlchemy from FastAPI, Starlette, or aiohttp blocks the event loop. SQLAlchemy 2.x ships an async API that has been stable since 1.4, and SQLite supports the same patterns through the <code>aiosqlite</code> driver.</p>
 <p>Async, however, has a few sharp edges that the sync API hides. Lazy loading in particular: in sync code it is just one extra SELECT, but in async it tries to call sync IO from an async context and raises immediately. This article makes those differences explicit.</p>
 <h2>Mental model</h2>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-03-mental-model.en.png"></p>
 <blockquote>
 <p>Async SQLAlchemy is a <strong>thin awaitable wrapper around the existing ORM</strong>. Internally it does not run the sync ORM on a thread pool; it uses a greenlet-based adapter that exposes sync calls across an async boundary. That is why the API looks almost identical, but every place where IO could happen now requires an explicit <code>await</code>.</p>
 </blockquote>
@@ -75,7 +78,8 @@
 <li><strong>Implicit IO is forbidden</strong>: anything that would secretly run SQL behind your back, such as a lazy load, becomes an error in async. That is why eager loading strategies become the default rather than an option.</li>
 </ul>
 <h2>Core concepts</h2>
-<p><strong><code>create_async_engine</code> and <code>AsyncEngine</code></strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-04-core-concepts.en.png"><br>
+<strong><code>create_async_engine</code> and <code>AsyncEngine</code></strong></p>
 <p><code>from sqlalchemy.ext.asyncio import create_async_engine</code> builds an <code>AsyncEngine</code>. It mirrors the sync <code>Engine</code> except <code>connect</code> and <code>begin</code> are async context managers.</p>
 <p><strong>URL and driver</strong></p>
 <p><strong>SQLite</strong><br>
@@ -124,7 +128,8 @@ async def list_users():
 <li><code>session.execute(...)</code> → <code>await session.execute(...)</code></li>
 </ul>
 <h2>Step-by-step walkthrough</h2>
-<p><strong>Step 1: Install</strong></p>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-05-step-by-step-walkthrough.en.png"><br>
+<strong>Step 1: Install</strong></p>
 <pre><code class="language-bash">pip install &quot;sqlalchemy&gt;=2.0&quot; aiosqlite
 </code></pre>
 <p><strong>Step 2: Engine and session factory</strong></p>

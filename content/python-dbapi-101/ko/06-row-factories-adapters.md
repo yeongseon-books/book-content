@@ -25,6 +25,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 # Row factory와 type adapter (sqlite3, PEP 249)
 
+![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 ## 이 글에서 답할 질문
 
 - 기본 tuple 결과를 dict, dataclass, Pydantic 모델로 받으려면 어떻게 하나요?
@@ -63,6 +64,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 ## Mental Model — 두 단계 변환
 
+![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 ```
 Database row             Python value
 ─────────────             ────────────
@@ -87,6 +89,7 @@ SQLite TEXT  ◄─────────────  Decimal('19.95')
 
 ## 핵심 개념
 
+![핵심 개념](../../../assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
 ### `sqlite3.Row`
 
 가장 가벼운 row factory. tuple처럼 인덱스로도, dict처럼 이름으로도 접근됩니다.
@@ -216,6 +219,7 @@ print(p.price * Decimal('1.1'))
 
 ## 단계별 실습
 
+![단계별 실습](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
 ### 단계 1 — `sqlite3.Row`
 
 ```python

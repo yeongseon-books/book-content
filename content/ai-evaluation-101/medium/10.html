@@ -59,8 +59,10 @@
 </blockquote>
 <p>Evaluation is not a one-shot pre-deploy check; it must run continuously in production. This post covers sampling evaluation cases from production traces, monitoring online metrics, and detecting drift.</p>
 <hr>
+<p><img alt="Continuous evaluation in production" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png"></p>
 <h2>Deployment Is Where It Starts</h2>
-<p>Pre-deployment evaluation is a controlled simulation. Real users send unexpected inputs, model providers silently update their models, and data distributions drift over time. When evaluation stops at deployment, quality regressions go unnoticed.</p>
+<p><img alt="Deployment is where it starts" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-02-deployment-is-where-it-starts.en.png"><br>
+Pre-deployment evaluation is a controlled simulation. Real users send unexpected inputs, model providers silently update their models, and data distributions drift over time. When evaluation stops at deployment, quality regressions go unnoticed.</p>
 <p>This post covers:</p>
 <ul>
 <li>Production trace sampling strategies</li>
@@ -73,7 +75,8 @@
 <p>This is the final episode, connecting the previous nine into a continuous operational cycle.</p>
 <hr>
 <h2>Section 1 — Production Trace Sampling</h2>
-<p>Evaluating every production request is prohibitively expensive. You need to sample, but without bias.</p>
+<p><img alt="Section 1 - production trace sampling" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-03-section-1-production-trace-sampling.en.png"><br>
+Evaluating every production request is prohibitively expensive. You need to sample, but without bias.</p>
 <p><strong>Uniform sampling</strong></p>
 <pre><code class="language-python">import random
 
@@ -112,7 +115,8 @@ def stratified_sample(traces: list[dict], per_category: int = 50) -&gt; list[dic
 </code></pre>
 <hr>
 <h2>Section 2 — Online Metric Collection</h2>
-<p>Heavy LLM-as-judge evaluation runs daily. Lightweight online signals run in real time.</p>
+<p><img alt="Section 2 - online metric collection" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-04-section-2-online-metric-collection.en.png"><br>
+Heavy LLM-as-judge evaluation runs daily. Lightweight online signals run in real time.</p>
 <p><strong>Thumbs up/down rate</strong><br>
 - Meaning: Direct user feedback<br>
 - How to measure: UI button click logging</p>
@@ -154,7 +158,8 @@ def daily_summary(metrics: list[TraceMetric]) -&gt; dict:
 <p>Online metrics are an <strong>early warning system</strong>. Judge evaluations run daily because they are expensive; online metrics run by the minute.</p>
 <hr>
 <h2>Section 3 — Drift Detection</h2>
-<p>When the input distribution changes (user behavior shift, new traffic source), your existing evaluation set no longer reflects production quality.</p>
+<p><img alt="Section 3 - drift detection" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-05-section-3-drift-detection.en.png"><br>
+When the input distribution changes (user behavior shift, new traffic source), your existing evaluation set no longer reflects production quality.</p>
 <p><strong>Input distribution comparison — KL divergence</strong></p>
 <pre><code class="language-python">import math
 from collections import Counter

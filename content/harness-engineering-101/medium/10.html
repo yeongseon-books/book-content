@@ -59,6 +59,7 @@
 </blockquote>
 <p>This episode integrates every harness covered so far into a production-ready agent environment. The Production Harness assembles task, context, constraint, tool, test, feedback, approval, and observability into a single working system.</p>
 <hr>
+<p><img alt="Production harness - building operational environments for agents" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png"></p>
 <h2>What Is the Production Harness?</h2>
 <p>The Production Harness is the final layer that binds the nine harnesses we have covered into one operable system. No matter how well each individual harness is built, without deployment, rollback, and on-call flow it cannot reach real users safely.</p>
 <pre><code class="language-python">from dataclasses import dataclass
@@ -76,7 +77,8 @@ class HarnessStack:
 </code></pre>
 <p>The Production Harness takes this stack and packages it into "something deployable."</p>
 <h2>How the Nine Harnesses Fit Together</h2>
-<p>When a request arrives, it flows in this order:</p>
+<p><img alt="How the nine harnesses fit together" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-02-how-the-nine-harnesses-fit-together.en.png"><br>
+When a request arrives, it flows in this order:</p>
 <pre><code class="language-python">def handle_request(stack: HarnessStack, user_input: str) -&gt; dict:
     with stack.observability.trace(&quot;agent.run&quot;) as trace:
         spec = stack.task.parse(user_input)
@@ -99,7 +101,8 @@ def _execute_step(stack: HarnessStack, step, trace):
 </code></pre>
 <p>Each harness owns exactly one responsibility, and the interface to the next harness must be clear. When responsibilities blur, you stop knowing where to fix things.</p>
 <h2>Deployment Pattern — Gradual Rollout</h2>
-<p>A new prompt or tool never goes to 100% of users in one shot.</p>
+<p><img alt="Deployment pattern - gradual rollout" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-03-deployment-pattern-gradual-rollout.en.png"><br>
+A new prompt or tool never goes to 100% of users in one shot.</p>
 <pre><code class="language-python">class CanaryDeployer:
     def __init__(self, baseline, candidate):
         self.baseline = baseline
@@ -120,7 +123,8 @@ def _execute_step(stack: HarnessStack, step, trace):
 </code></pre>
 <p>The standard ramp is 1% → 10% → 50% → 100%, comparing candidate against baseline for at least one hour at each step. If <code>should_promote</code> returns False at any step, you roll back to 0% immediately.</p>
 <h2>Rollback — A Deploy Is Only a Deploy if You Can Undo It</h2>
-<p>If you cannot return to the previous version within 30 seconds of a deploy, that is not a deploy — it is an incident.</p>
+<p><img alt="Rollback - A deploy is only a deploy if you can undo it" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-04-rollback-a-deploy-is-only-a-deploy-if-yo.en.png"><br>
+If you cannot return to the previous version within 30 seconds of a deploy, that is not a deploy — it is an incident.</p>
 <pre><code class="language-python">class HarnessVersion:
     def __init__(self, version_id: str, stack: HarnessStack):
         self.version_id = version_id

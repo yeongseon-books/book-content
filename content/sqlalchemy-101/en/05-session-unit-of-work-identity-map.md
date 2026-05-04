@@ -26,6 +26,7 @@ seo_description: A Session is a notebook that bundles a working scratch pad (Uni
 
 The ORM models from Ep4 do nothing on their own. To push instances back to the database and to read rows back as objects, you need a `Session`. SQLAlchemy's `Session` is more than a connection wrapper - it is a Unit of Work manager that tracks which objects are new, which were modified, and which are scheduled for deletion. It also maintains an Identity Map so that, within a single session, the same primary key always corresponds to the same Python object. This article walks through both mechanisms with real code.
 
+![Session in Depth: how unit of work and identity map actually work](../../../assets/sqlalchemy-101/05/05-01-session-in-depth-how-unit-of-work-and-id.en.png)
 ## Questions this post answers
 
 - How does a `Session` relate to connections and transactions?
@@ -38,6 +39,7 @@ The ORM models from Ep4 do nothing on their own. To push instances back to the d
 
 ## Why it matters
 
+![Why it matters](../../../assets/sqlalchemy-101/05/05-02-why-it-matters.en.png)
 If you use the ORM without understanding the Session, you bump into mysterious behavior often:
 
 - "I committed, but reading an attribute on the same object in another function fires another SELECT." That's `expire_on_commit`.
@@ -49,6 +51,7 @@ Every one of these reduces to a single question: "What objects does the Session 
 
 ## Mental Model
 
+![Mental model](../../../assets/sqlalchemy-101/05/05-03-mental-model.en.png)
 > A `Session` is a notebook that bundles a working scratch pad (Unit of Work) and a cache page (Identity Map) into one cover. While the notebook is open, the same PK is the same object; when you close it (`commit`), all changes are flushed to SQL at once.
 
 Object state transitions look like this:
@@ -68,6 +71,7 @@ Two things matter most:
 
 ## Core concepts
 
+![Core concepts](../../../assets/sqlalchemy-101/05/05-04-core-concepts.en.png)
 ### 1) Session is a transactional context
 
 A `Session` holds a transaction internally; `commit()` or `rollback()` ends it.
@@ -174,6 +178,7 @@ The Session tracks attribute changes and, on flush, emits an UPDATE that touches
 
 ## Step-by-step walkthrough
 
+![Step-by-step walkthrough](../../../assets/sqlalchemy-101/05/05-05-step-by-step-walkthrough.en.png)
 Save the snippet below and run it; you can watch the SQL and the Identity Map at work.
 
 ```python

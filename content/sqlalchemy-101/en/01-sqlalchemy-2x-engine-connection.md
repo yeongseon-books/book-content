@@ -32,6 +32,7 @@ When you `pip install sqlalchemy` and write your first lines of code, the most c
 
 This series walks through SQLAlchemy 2.x using SQLite, end to end. The first post tackles the lowest layer: what `Engine` and `Connection` are, and why they were designed this way. ORM and Session show up later in the series. For now, we focus on a very concrete question: how does a single line of SQL travel from your Python code to a SQLite file on disk?
 
+![Getting started with SQLAlchemy 2.x - engine and connection demystified](../../../assets/sqlalchemy-101/01/01-01-getting-started-with-sqlalchemy-2-x-engi.en.png)
 ## What you will learn
 
 - That SQLAlchemy is split into two layers, Core and ORM, and that Engine and Connection are the entry points to Core
@@ -52,6 +53,7 @@ This series walks through SQLAlchemy 2.x using SQLite, end to end. The first pos
 
 ## Why this matters
 
+![Why this matters](../../../assets/sqlalchemy-101/01/01-02-why-this-matters.en.png)
 Many SQLAlchemy tutorials begin with `Base = declarative_base()` from the ORM. As a result, when something breaks outside the ORM, say a connection drops or a transaction commits unexpectedly, beginners have no idea where to look. Engine and Connection are the foundation that supports the ORM Session, and when something goes wrong inside a Session, you ultimately have to debug at the Connection level.
 
 In production, the most common SQLAlchemy headaches start at the Engine layer. SQLite's `database is locked` errors, `Lost connection` retries, connection pool exhaustion, autocommit mode confusion: all of these are configured on the Engine. Without a clear mental model, you end up tweaking `pool_size`, `pool_recycle`, and `connect_args` by guesswork.
@@ -60,6 +62,7 @@ Finally, the 1.x-to-2.x transition is not just a syntax change, it's a usage-mod
 
 ## Mental Model
 
+![Mental model](../../../assets/sqlalchemy-101/01/01-03-mental-model.en.png)
 The Engine in SQLAlchemy is "the ability to talk to a database, made into an object." A Connection is the actual communication channel; an Engine is the factory that holds the configuration and capability to manufacture those channels.
 
 > The Engine is not a connection. The Engine is the object that **knows how to make** connections, holding a dialect and a pool. SQL actually flows through a Connection, and a Connection always lives inside a transaction context.
@@ -91,6 +94,7 @@ Three things matter. First, the Engine bundles a dialect (which database family)
 
 ## Core concepts
 
+![Core concepts](../../../assets/sqlalchemy-101/01/01-04-core-concepts.en.png)
 ### Two layers: Core and ORM
 
 SQLAlchemy is split into two large layers. **Core** lets you build SQL as Python expressions and execute it through Engine and Connection. **ORM** sits on top of Core and adds mapped Python classes plus a Session for object-relational mapping. They are separate but complementary, and you can always drop down to Core from inside the ORM when needed.
@@ -205,6 +209,7 @@ Now you get:
 
 ## Step-by-step practice
 
+![Step-by-step practice](../../../assets/sqlalchemy-101/01/01-05-step-by-step-practice.en.png)
 This section walks from an empty directory to a working SQLAlchemy 2.x program.
 
 ### Step 1: Set up the environment

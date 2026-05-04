@@ -59,8 +59,10 @@
 </blockquote>
 <p>Changing one line of a prompt can break other cases. This post covers a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.</p>
 <hr>
+<p><img alt="Regression testing - Don't let Yesterday's wins break today" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png"></p>
 <h2>Evaluate Every Time, Not Just Once</h2>
-<p>Ep1-Ep7 covered evaluation methods. But <strong>when</strong> do you run them? The common pattern:</p>
+<p><img alt="Evaluate every Time, not just once" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-02-evaluate-every-time-not-just-once.en.png"><br>
+Ep1-Ep7 covered evaluation methods. But <strong>when</strong> do you run them? The common pattern:</p>
 <ul>
 <li>Run once after a big prompt change</li>
 <li>Run once when switching models</li>
@@ -76,7 +78,8 @@
 </ul>
 <hr>
 <h2>Golden Dataset — The Tests That Should Never Move</h2>
-<p>A regression dataset is different from your production eval dataset (Ep2).</p>
+<p><img alt="Golden dataset - the tests that should never move" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-03-golden-dataset-the-tests-that-should-nev.en.png"><br>
+A regression dataset is different from your production eval dataset (Ep2).</p>
 <p><strong>Size</strong><br>
 - Production eval (Ep2): 100-1000<br>
 - Regression (Ep8): 20-50</p>
@@ -120,7 +123,8 @@ with open(&quot;regression/golden.jsonl&quot;, &quot;w&quot;) as f:
 <p><strong>Rule</strong>: keep Golden at <strong>20-50 items</strong>. Larger sets make every PR slow and expensive.</p>
 <hr>
 <h2>Thresholds and Fail Policy</h2>
-<p>A score is not enough. You must define <strong>what counts as fail</strong>.</p>
+<p><img alt="Thresholds and fail policy" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-04-thresholds-and-fail-policy.en.png"><br>
+A score is not enough. You must define <strong>what counts as fail</strong>.</p>
 <pre><code class="language-python"># regression/thresholds.py
 THRESHOLDS = {
     &quot;exact_match&quot;:  0.80,   # Ep3
@@ -167,7 +171,8 @@ FAIL_POLICY = &quot;any&quot;  # &quot;any&quot; | &quot;majority&quot; | &quot;
 <p><strong>Recommendation</strong>: start with <code>any</code>. If false positives are noisy, move to <code>weighted</code>.</p>
 <hr>
 <h2>CI Integration — GitHub Actions</h2>
-<p>A workflow that runs evaluation on every PR:</p>
+<p><img alt="CI integration - GitHub actions" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-05-ci-integration-github-actions.en.png"><br>
+A workflow that runs evaluation on every PR:</p>
 <pre><code class="language-yaml"># .github/workflows/eval.yml
 name: Regression Eval
 on:

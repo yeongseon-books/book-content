@@ -24,6 +24,7 @@ seo_description: Think of SQLAlchemy extension points as three layers. The type 
 
 # Events, hybrid_property, and custom types
 
+![Events, hybrid_property, and custom types](../../../assets/sqlalchemy-101/08/08-01-events-hybrid-property-and-custom-types.en.png)
 ## What you will learn
 
 - How to attach lifecycle hooks at the model, session, and engine levels using the SQLAlchemy event system
@@ -34,12 +35,14 @@ seo_description: Think of SQLAlchemy extension points as three layers. The type 
 
 ## Why this matters
 
+![Why this matters](../../../assets/sqlalchemy-101/08/08-02-why-this-matters.en.png)
 When you first reach for an ORM, a model is just a table. Once the domain grows, you need email normalization, password hashing, audit columns, derived attributes, and encrypted fields. If every handler does this work itself, the same code is scattered everywhere and tests become painful.
 
 SQLAlchemy's event system, `hybrid_property`, and `TypeDecorator` are the official extension points that let domain rules live close to the model. Used well, the rules collect in one place. Used carelessly, your codebase becomes a mystery: nobody can tell where data is being transformed. This article draws the lines.
 
 ## Mental model
 
+![Mental model](../../../assets/sqlalchemy-101/08/08-03-mental-model.en.png)
 > Think of SQLAlchemy extension points as three layers. The **type layer** transforms values as they cross the column boundary; the **attribute layer** defines a single name that works in Python and in SQL; the **event layer** hooks into the lifecycle of objects, sessions, and the engine.
 
 The same behaviour can live in different layers, and the choice changes its blast radius. Suppose you want to store every email in lowercase. There are three options:
@@ -52,6 +55,7 @@ The decision depends on how general the rule is and when it must take effect.
 
 ## Core concepts
 
+![Core concepts](../../../assets/sqlalchemy-101/08/08-04-core-concepts.en.png)
 ### The event system
 
 SQLAlchemy exposes hooks on almost every object via `event.listen` and `@event.listens_for`. The three common targets:
@@ -125,6 +129,7 @@ The "after" version applies the same rules no matter where users are created. Te
 
 ## Step-by-step walkthrough
 
+![Step-by-step walkthrough](../../../assets/sqlalchemy-101/08/08-05-step-by-step-walkthrough.en.png)
 ### Step 1: Set up
 
 Install with `pip install "sqlalchemy>=2.0"` and reuse the SQLite `Base`, `engine`, and `Session` from earlier episodes.

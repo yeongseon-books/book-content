@@ -61,6 +61,7 @@
 <p>Every query in DB-API ultimately reduces to five cursor methods: <code>execute()</code>, <code>executemany()</code>, and <code>fetchone()</code>/<code>fetchall()</code>/<code>fetchmany()</code>. The API surface is tiny, but choosing the wrong fetch method decides whether your service streams gracefully or OOMs at 3 AM. This article walks through each method and the rules for picking one.</p>
 <!-- a-grade-intro:begin -->
 
+<p><img alt="execute, executemany, and fetch patterns" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.en.png"></p>
 <h2>Key Questions</h2>
 <ul>
 <li>When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?</li>
@@ -71,7 +72,8 @@
 <!-- a-grade-intro:end -->
 
 <h2>1. execute - one statement at a time</h2>
-<p><code>cursor.execute(operation, parameters=None)</code> runs a single SQL statement. SELECT, INSERT, UPDATE, DELETE, and DDL all use the same method.</p>
+<p><img alt="execute - one statement at a time" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png"><br>
+<code>cursor.execute(operation, parameters=None)</code> runs a single SQL statement. SELECT, INSERT, UPDATE, DELETE, and DDL all use the same method.</p>
 <pre><code class="language-python">import sqlite3
 conn = sqlite3.connect(&quot;:memory:&quot;)
 cur = conn.cursor()
@@ -83,7 +85,8 @@ print(cur.rowcount)    # 1
 </code></pre>
 <p><code>execute()</code> returns the cursor itself so chaining is technically possible, but production code keeps one call per line for readability.</p>
 <h2>2. executemany - bulk write</h2>
-<p>When the same statement runs against many parameter sets, use <code>executemany()</code>.</p>
+<p><img alt="executemany - bulk write" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-03-2-executemany-bulk-write.en.png"><br>
+When the same statement runs against many parameter sets, use <code>executemany()</code>.</p>
 <pre><code class="language-python">rows = [(&quot;first&quot;,), (&quot;second&quot;,), (&quot;third&quot;,)]
 cur.executemany(&quot;INSERT INTO notes (body) VALUES (?)&quot;, rows)
 print(cur.rowcount)   # 3
@@ -118,7 +121,8 @@ print(rows)   # [(1, 'hello'), (2, 'first'), (3, 'second'), (4, 'third')]
 </code></pre>
 <p>For small result sets (a few hundred rows) it is the most convenient and the fastest option. For tens of thousands of rows, RAM balloons in one shot - a classic OOM cause. Reserve <code>fetchall()</code> for test fixtures and lookup tables; never use it for queries whose row count depends on user input.</p>
 <h2>5. fetchmany - in chunks</h2>
-<p><code>fetchmany(size=cursor.arraysize)</code> returns a fixed number of rows.</p>
+<p><img alt="fetchmany - in chunks" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-04-5-fetchmany-in-chunks.en.png"><br>
+<code>fetchmany(size=cursor.arraysize)</code> returns a fixed number of rows.</p>
 <pre><code class="language-python">cur.execute(&quot;SELECT id, body FROM notes&quot;)
 while True:
     chunk = cur.fetchmany(1000)

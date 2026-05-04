@@ -26,8 +26,10 @@ seo_description: Agents reach answers through multiple steps. You need to evalua
 Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.' This post covers trajectory-level evaluation.
 
 ---
+![Evaluating agents - Trajectories, not single responses](../../../assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)
 ## Why Agent Evaluation Is Different
 
+![Why agent evaluation is different](../../../assets/ai-evaluation-101/07/07-02-why-agent-evaluation-is-different.en.png)
 Through Ep1-Ep6 we evaluated **single responses**: one question paired with one answer.
 
 Agents are different. An agent goes through multiple steps to complete a task.
@@ -57,6 +59,7 @@ Let's go through each.
 
 ## Two Levels of Evaluation — End-to-End vs Step-Level
 
+![Two levels of evaluation - End-to-End vs Step-Level](../../../assets/ai-evaluation-101/07/07-03-two-levels-of-evaluation-end-to-end-vs-s.en.png)
 Agent evaluation has two perspectives.
 
 ### End-to-end (final outcome)
@@ -105,6 +108,7 @@ def step_match_score(actual: list[dict], expected: list[dict]) -> float:
 
 ## Tool Selection — Confusion Matrix
 
+![Tool selection - confusion matrix](../../../assets/ai-evaluation-101/07/07-04-tool-selection-confusion-matrix.en.png)
 Agents pick the wrong tool more often than you would think — calling `draft_email` instead of `send_email`. Treat tool selection as a classification problem.
 
 ```python
@@ -128,6 +132,7 @@ print(classification_report(expected_tools, actual_tools))
 
 ## Trajectory Efficiency — Step Count
 
+![Trajectory efficiency - step count](../../../assets/ai-evaluation-101/07/07-05-trajectory-efficiency-step-count.en.png)
 An agent that finishes in 4 steps is not the same as one that finishes in 12. Twelve steps means 3x tokens, 3x latency, and 3x failure surface.
 
 ```python

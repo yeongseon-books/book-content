@@ -26,8 +26,10 @@ seo_description: RAG requires evaluating both retrieval and generation stages. T
 RAG requires evaluating both retrieval and generation stages. This post covers RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
 
 ---
+![Evaluating RAG systems](../../../assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
 ## RAG Is a Pipeline, Not a Single Model
 
+![RAG is a Pipeline, not a single model](../../../assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.en.png)
 A RAG (Retrieval-Augmented Generation) system runs in two stages.
 
 ```
@@ -46,6 +48,7 @@ So RAG evaluation must measure **each stage separately**. A single number like "
 
 ## The Four Core RAG Metrics
 
+![The four core RAG metrics](../../../assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.en.png)
 The industry standard, used by RAGAS and TruLens:
 
 | Stage | Metric | What It Asks |
@@ -61,6 +64,7 @@ Let's look at each.
 
 ## Evaluating Retrieval
 
+![Evaluating retrieval](../../../assets/ai-evaluation-101/06/06-04-evaluating-retrieval.en.png)
 ### Context Recall — Did we retrieve what we need
 
 For each fact (claim) required to produce the reference answer, check whether it appears in the retrieved context.
@@ -145,6 +149,7 @@ def context_precision(question: str, chunks: list[str]) -> float:
 
 ## Evaluating Generation
 
+![Evaluating generation](../../../assets/ai-evaluation-101/06/06-05-evaluating-generation.en.png)
 ### Faithfulness — Hallucination Detection
 
 Decompose the answer into atomic claims and check whether each is **supported** by the retrieved context. Anything not in the context is a hallucination.

@@ -55,6 +55,7 @@
 <body>
 <h1>ORM Relationships: Connecting Both Sides Safely with relationship and back_populates</h1>
 <p>One of the most common database tasks is "fetch the related rows together": a user's orders, a post's comments, a post tagged with several labels. SQL handles this with JOINs, but in the ORM you express it as attribute access (<code>user.orders</code>). The bridge that makes that work is <code>relationship()</code>, and <code>back_populates</code> is the device that keeps both sides of a bidirectional link consistent. This article walks through one-to-many, many-to-one, and many-to-many in turn, and lays down the patterns that keep both sides synchronized.</p>
+<p><img alt="ORM Relationships: connecting both sides safely with relationship and back_populates" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.en.png"></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>What does <code>relationship()</code> actually do, and how does it relate to <code>ForeignKey</code>?</li>
@@ -65,7 +66,8 @@
 <li>When does walking a relationship trigger an extra SELECT?</li>
 </ul>
 <h2>Why it matters</h2>
-<p>Misconfigured relationships create a familiar set of bugs:</p>
+<p><img alt="Why it matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-02-why-it-matters.en.png"><br>
+Misconfigured relationships create a familiar set of bugs:</p>
 <ul>
 <li>"I added an object on one side but the other side's collection doesn't see it." A missing <code>back_populates</code> or mismatched names.</li>
 <li>"Deleting the parent left orphan children behind." No cascade policy declared.</li>
@@ -74,6 +76,7 @@
 </ul>
 <p>Relationships are the skeleton of your domain model. Setting them up cleanly the first time pays off in SELECT optimization (Ep7), migrations, and test fixtures.</p>
 <h2>Mental Model</h2>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-03-mental-model.en.png"></p>
 <blockquote>
 <p><code>ForeignKey</code> is the SQL-level reference; <code>relationship()</code> is the object-level navigation channel. <code>back_populates</code> ties both ends of that channel together so a change made on one side is immediately reflected on the other.</p>
 </blockquote>
@@ -87,7 +90,8 @@ orders: list[Order]   ←──┐         ┌─→  user: User
 </code></pre>
 <p><code>user.orders.append(order)</code> (object level) and <code>order.user_id = user.id</code> (SQL level) are two ways of stating the same fact at different times. The ORM keeps the two views consistent automatically - but only if both <code>relationship</code> declarations are paired with <code>back_populates</code>.</p>
 <h2>Core concepts</h2>
-<p><strong>1) ForeignKey and relationship are a pair</strong></p>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-04-core-concepts.en.png"><br>
+<strong>1) ForeignKey and relationship are a pair</strong></p>
 <p>You first need the SQL-level foreign key. Only then does the object-level relationship make sense.</p>
 <pre><code class="language-python">from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -195,6 +199,7 @@ class Tag(Base):
 </code></pre>
 <p><code>user.orders</code> fires a SELECT the first time you touch it (lazy loading), and within the same Session subsequent reads use the cached collection. The next post (Ep7) walks through how that lazy loading turns into the N+1 problem and how joined/selectin loading prefetches the related rows.</p>
 <h2>Step-by-step walkthrough</h2>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-05-step-by-step-walkthrough.en.png"></p>
 <pre><code class="language-python">from sqlalchemy import ForeignKey, String, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship
 

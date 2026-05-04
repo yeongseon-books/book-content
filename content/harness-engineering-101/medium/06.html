@@ -59,13 +59,15 @@
 </blockquote>
 <p>When an agent says "done", only tests can confirm whether the work is actually done. The Test Harness pins completion criteria into automated checks the agent must pass.</p>
 <hr>
+<p><img alt="Test harness - turning completion criteria into tests" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png"></p>
 <h2>"It Works" Is Not Evidence</h2>
 <p>Build an agent and demo it — it works. Open it to real users and within a week it breaks. The difference is input diversity. A demo runs on five well-shaped inputs; production faces thousands of unexpected ones.</p>
 <p>Test Harness closes that gap. Express the agent's completion criteria as automatically runnable tests rather than natural language, and run those tests on every change. The evidence is not "it works" but "these 50 tests pass."</p>
 <p>This article covers the kinds of tests for agents, building eval datasets, and automating regression prevention.</p>
 <hr>
 <h2>Three Tiers of Agent Tests</h2>
-<p>Similar to traditional software testing, with non-determinism added.</p>
+<p><img alt="Three tiers of agent tests" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-02-three-tiers-of-agent-tests.en.png"><br>
+Similar to traditional software testing, with non-determinism added.</p>
 <p><strong>1. Unit tests</strong>: each tool behaves per its schema. Deterministic and fast.</p>
 <p><strong>2. Integration tests</strong>: tool combinations work in task scenarios. Use real or mock LLMs.</p>
 <p><strong>3. Eval tests</strong>: qualitative quality measured against an eval dataset. Non-deterministic but statistically stable.</p>
@@ -98,7 +100,8 @@ def test_summary_quality(eval_dataset):
 <p>All three are needed. Without unit tests, debugging is impossible. Without eval tests, production quality is not guaranteed.</p>
 <hr>
 <h2>Building an Eval Dataset</h2>
-<p>Without an eval dataset, quality is unmeasurable. Datasets come from three sources.</p>
+<p><img alt="Building an eval dataset" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-03-building-an-eval-dataset.en.png"><br>
+Without an eval dataset, quality is unmeasurable. Datasets come from three sources.</p>
 <p><strong>1. Production logs</strong>: sample real user requests. Most realistic but requires PII handling.</p>
 <p><strong>2. Synthetic generation</strong>: have an LLM produce variations. Fast but may diverge from real distribution.</p>
 <p><strong>3. Adversarial examples</strong>: deliberately hard inputs. Edge cases and prompt injection attempts.</p>
@@ -168,7 +171,8 @@ def rubric_score(output: dict, expected: dict, rubrics=RUBRICS) -&gt; float:
 <p>LLM-as-judge is powerful but risky. The judge model's bias flows directly into the scores. Calibrate against human evaluation regularly.</p>
 <hr>
 <h2>Automating Regression Prevention</h2>
-<p>Tests that exist but don't run are worthless. Wire them into CI/CD to run on every change.</p>
+<p><img alt="Automating regression prevention" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-04-automating-regression-prevention.en.png"><br>
+Tests that exist but don't run are worthless. Wire them into CI/CD to run on every change.</p>
 <p>Three tiers.</p>
 <p><strong>1. Fast unit tests</strong>: every PR. Under 1 minute.<br>
 <strong>2. Integration tests</strong>: every PR with mock LLM. Under 5 minutes.<br>

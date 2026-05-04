@@ -59,6 +59,7 @@
 </blockquote>
 <p>Good agents are not made by good models alone. You must design the environment, constraints, tools, and verification loops the model works inside. Harness Engineering is the discipline of designing that environment so the agent can work reliably.</p>
 <hr>
+<p><img alt="What is harness Engineering" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png"></p>
 <h2>A Good Model Alone Is Not Enough</h2>
 <p>Every time a new frontier model lands — GPT-4, Claude 3.5, Gemini 1.5 — the same hope follows: "now real agents are finally possible." But with the same model, one team builds a reliable automation system and another team gets different results on every run. The difference is rarely the model. It is <strong>the environment around the model</strong>.</p>
 <p>Even a skilled person produces poor work at a messy desk with broken tools. Agents work the same way. Without a clear task definition, clean context, safe tools, explicit completion criteria, a loop that recovers from failure, an approval flow for risky actions, and observability into what was done, even a capable model looks incompetent.</p>
@@ -70,7 +71,8 @@
 <p>The word is already familiar in software engineering. A test harness provides the environment a function runs inside (setup, teardown, fixtures). A cable harness in embedded systems connects multiple parts in a fixed pattern. An AI agent harness follows the same idea. You set up the environment in advance, and the model works within it.</p>
 <hr>
 <h2>Agents Without and With a Harness</h2>
-<p>Without a harness, an agent often looks like this:</p>
+<p><img alt="Agents without and with a harness" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-02-agents-without-and-with-a-harness.en.png"><br>
+Without a harness, an agent often looks like this:</p>
 <pre><code class="language-python">from openai import OpenAI
 
 client = OpenAI()
@@ -141,7 +143,8 @@ def run_agent_with_harness(task: TaskSpec, ctx: AgentContext, policy: ToolPolicy
 <p>Same model, completely different system.</p>
 <hr>
 <h2>The Eight Harnesses</h2>
-<p>This series covers eight harnesses. Each one designs a different aspect of the agent.</p>
+<p><img alt="The eight harnesses" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-03-the-eight-harnesses.en.png"><br>
+This series covers eight harnesses. Each one designs a different aspect of the agent.</p>
 <p><strong>Task</strong><br>
 - Question it answers: "What should the agent do?"<br>
 - Episode: 2</p>
@@ -201,7 +204,8 @@ Without a Test Harness, "I am done" from the agent means nothing.</p>
 <p>If you see any one of these, switching models will not save you. You need to design harnesses.</p>
 <hr>
 <h2>A Small Example: Email Classification Agent</h2>
-<p>Enough abstraction. Consider a small task: "classify incoming emails by priority." Without a harness:</p>
+<p><img alt="A small Example: email classification agent" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-04-a-small-example-email-classification-age.en.png"><br>
+Enough abstraction. Consider a small task: "classify incoming emails by priority." Without a harness:</p>
 <pre><code class="language-python">def classify_email(email_body: str) -&gt; str:
     response = client.chat.completions.create(
         model=&quot;gpt-4o-mini&quot;,

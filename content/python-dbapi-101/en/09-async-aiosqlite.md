@@ -28,6 +28,7 @@ What happens if you call `sqlite3.connect()` directly inside `asyncio` code? The
 
 `aiosqlite` solves this. But it is important to understand what "solve" means here. The library does not make SQLite truly asynchronous. It is an **adapter that runs each sqlite3 call in a background thread per connection and returns a Future to the event loop**. The loop stays unblocked, but SQLite's single-writer constraint is unchanged.
 
+![Asynchronous SQLite with aiosqlite](../../../assets/python-dbapi-101/09/09-01-asynchronous-sqlite-with-aiosqlite.en.png)
 ## Questions this post answers
 
 - How does `aiosqlite` work under the hood? Is it real async I/O?
@@ -46,6 +47,7 @@ The honest pitch: this post is about what `aiosqlite` actually does and does not
 
 ## Mental Model: aiosqlite is sqlite3 + thread + Future
 
+![Mental Model: aiosqlite is sqlite3 + thread + future](../../../assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.en.png)
 > `aiosqlite` does not make SQLite asynchronous. It spawns a background thread per connection, queues the awaited method calls onto that thread, and returns a Future the event loop can await.
 
 Implications:
@@ -59,6 +61,7 @@ So the real value of `aiosqlite` is **event-loop protection**, not "concurrency 
 
 ## Core Concepts
 
+![Core concepts](../../../assets/python-dbapi-101/09/09-03-core-concepts.en.png)
 ### Install and basic use
 
 ```bash
@@ -166,6 +169,7 @@ The event loop is protected and transaction boundaries align with requests. The 
 
 ## Step by Step: a lightweight connection pool
 
+![Step by Step: a lightweight connection pool](../../../assets/python-dbapi-101/09/09-04-step-by-step-a-lightweight-connection-po.en.png)
 `aiosqlite` does not ship a pool. Building one is straightforward.
 
 ### Step 1. Pool interface

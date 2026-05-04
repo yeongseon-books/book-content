@@ -59,8 +59,10 @@
 </blockquote>
 <p>When humans cannot grade every response, you can delegate scoring to a strong LLM. This post covers writing judge prompts, controlling bias, and measuring agreement with human evaluators.</p>
 <hr>
+<p><img alt="LLM-as-Judge - evaluating models with models" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png"></p>
 <h2>Why LLM-as-Judge</h2>
-<p>The deterministic metrics from Ep3 (BLEU, ROUGE, Exact Match) work well only when the answer is short and unambiguous. Real LLM outputs are often the opposite:</p>
+<p><img alt="Why LLM-as-Judge" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-02-why-llm-as-judge.en.png"><br>
+The deterministic metrics from Ep3 (BLEU, ROUGE, Exact Match) work well only when the answer is short and unambiguous. Real LLM outputs are often the opposite:</p>
 <ul>
 <li>Free-form answers with many valid responses (e.g. "Explain this code")</li>
 <li>Subjective qualities like tone, clarity, helpfulness</li>
@@ -104,7 +106,8 @@
 </table>
 <hr>
 <h2>Judge Prompt Design — Three Patterns</h2>
-<p><strong>Pattern 1: Single scoring (1-5 scale)</strong></p>
+<p><img alt="Judge prompt design - three patterns" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.en.png"><br>
+<strong>Pattern 1: Single scoring (1-5 scale)</strong></p>
 <p>The simplest approach. Show the judge one response and ask for a score.</p>
 <pre><code class="language-python"># eval/judge_single.py
 from openai import OpenAI
@@ -192,7 +195,8 @@ Write a one-sentence reasoning, then output only 'Result: PASS' or 'Result: FAIL
 <strong>Cons</strong>: You must build the reference set up front.</p>
 <hr>
 <h2>Three Biases and How to Control Them</h2>
-<p>LLM judges are biased differently from humans. You must understand these three.</p>
+<p><img alt="Three biases and how to control them" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.en.png"><br>
+LLM judges are biased differently from humans. You must understand these three.</p>
 <p><strong>Bias 1: Position bias</strong></p>
 <p>In pairwise evaluation, the judge tends to <strong>prefer the first answer</strong> (about 60% A-preference for GPT-4). Control by <strong>swapping the order and judging twice</strong>.</p>
 <pre><code class="language-python"># eval/debias_position.py
@@ -222,7 +226,8 @@ def judge_pairwise_debiased(question: str, ans_a: str, ans_b: str) -&gt; str:
 </ul>
 <hr>
 <h2>Measuring Agreement With Humans — Cohen's Kappa</h2>
-<p>How do you know the judge is trustworthy? <strong>Compare 50-100 human-graded samples to the judge scores</strong> and measure agreement. Plain accuracy (percentage agreement) does not correct for chance, so use <strong>Cohen's kappa</strong>.</p>
+<p><img alt="Measuring agreement with humans - Cohen's kappa" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.en.png"><br>
+How do you know the judge is trustworthy? <strong>Compare 50-100 human-graded samples to the judge scores</strong> and measure agreement. Plain accuracy (percentage agreement) does not correct for chance, so use <strong>Cohen's kappa</strong>.</p>
 <pre><code class="language-python"># eval/agreement.py
 from sklearn.metrics import cohen_kappa_score
 

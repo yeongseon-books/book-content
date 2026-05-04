@@ -25,8 +25,10 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 결정적 지표는 빠르고 재현 가능하지만, 의미가 같아도 표현이 다르면 점수가 깎입니다. 이 글은 Exact Match, F1, BLEU, ROUGE를 언제 써야 하고 언제 쓰면 안 되는지를 다룹니다.
 
 ---
+![결정적 지표 - Exact Match, BLEU, ROUGE](../../../assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)
 ## 결정적 지표가 무엇인가요?
 
+![결정적 지표가 무엇인가요](../../../assets/ai-evaluation-101/03/03-02-what-are-deterministic-metrics.ko.png)
 결정적 지표는 같은 입력과 같은 답이 주어지면 항상 같은 점수를 내는 지표입니다. LLM 호출 없이 문자열·토큰만 비교해서 계산하므로 빠르고 재현 가능합니다.
 
 ```python
@@ -41,6 +43,7 @@ assert exact_match("Seoul.", "Seoul") == 0  # 점 하나 차이로 0점
 
 ## Exact Match — 가장 단순한 지표
 
+![Exact Match - 가장 단순한 지표](../../../assets/ai-evaluation-101/03/03-03-exact-match-the-simplest-metric.ko.png)
 질문: "한국의 수도는?"
 정답: "서울"
 모델 응답: "한국의 수도는 서울입니다."
@@ -58,6 +61,7 @@ Normalization을 추가하면 조금 나아지지만, 본질적으로는 "정답
 
 ## Token-level F1 — Exact Match보다 유연한 비교
 
+![Token-level F1 - Exact Match보다 유연한 비교](../../../assets/ai-evaluation-101/03/03-04-token-level-f1-more-forgiving-than-exact.ko.png)
 F1은 예측과 정답을 토큰 집합으로 보고 정밀도(precision)와 재현율(recall)의 조화 평균을 계산합니다.
 
 ```python
@@ -82,6 +86,7 @@ print(token_f1("Seoul", "Seoul"))                  # 1.0
 
 ## BLEU — 기계 번역에서 온 n-gram 중첩 지표
 
+![BLEU - 기계 번역에서 온 n-gram 중첩 지표](../../../assets/ai-evaluation-101/03/03-05-bleu-n-gram-overlap-from-machine-transla.ko.png)
 BLEU는 1-gram, 2-gram, 3-gram, 4-gram의 중첩 비율을 계산합니다. 기계 번역 평가에서 표준이지만, LLM 자유 형식 응답에는 한계가 큽니다.
 
 ```python

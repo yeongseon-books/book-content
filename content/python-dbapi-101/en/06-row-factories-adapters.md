@@ -24,6 +24,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 # Row factories and type adapters (sqlite3, PEP 249)
 
+![Row factories and type adapters (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
 ## Questions this post answers
 
 - How do you receive default tuple results as dict, dataclass, or Pydantic models?
@@ -62,6 +63,7 @@ This post unifies row factories and type adapters so your repository layer survi
 
 ## Mental Model — two-step conversion
 
+![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
 ```
 Database row             Python value
 ─────────────             ────────────
@@ -86,6 +88,7 @@ Separating these two concerns naturally separates where they live in code.
 
 ## Core concepts
 
+![Core concepts](../../../assets/python-dbapi-101/06/06-03-core-concepts.en.png)
 ### `sqlite3.Row`
 
 The lightest row factory. Accessible by index like a tuple AND by name like a dict.
@@ -215,6 +218,7 @@ Order-independent and precise.
 
 ## Step-by-step walkthrough
 
+![Step-by-step walkthrough](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png)
 ### Step 1 — `sqlite3.Row`
 
 ```python

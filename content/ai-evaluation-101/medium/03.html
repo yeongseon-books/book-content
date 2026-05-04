@@ -59,8 +59,10 @@
 </blockquote>
 <p>Deterministic metrics are fast and reproducible, but they penalize different wording even when the meaning matches. This post covers when to use Exact Match, F1, BLEU, and ROUGE — and when not to.</p>
 <hr>
+<p><img alt="Deterministic metrics - exact Match, BLEU, ROUGE" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.en.png"></p>
 <h2>What Are Deterministic Metrics?</h2>
-<p>A deterministic metric always returns the same score for the same input and answer. It uses string and token comparison only — no LLM call — so it is fast and reproducible.</p>
+<p><img alt="What are deterministic Metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-02-what-are-deterministic-metrics.en.png"><br>
+A deterministic metric always returns the same score for the same input and answer. It uses string and token comparison only — no LLM call — so it is fast and reproducible.</p>
 <pre><code class="language-python">def exact_match(pred: str, expected: str) -&gt; int:
     return int(pred.strip() == expected.strip())
 
@@ -69,7 +71,8 @@ assert exact_match(&quot;Seoul.&quot;, &quot;Seoul&quot;) == 0  # one period awa
 </code></pre>
 <p>Behind the speed lies a serious weakness: any answer with the same meaning but different wording scores zero. This post covers four deterministic metrics and explains when each is useful — and when it is not.</p>
 <h2>Exact Match — The Simplest Metric</h2>
-<p>Question: "What is the capital of Korea?"<br>
+<p><img alt="Exact match - the simplest metric" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-03-exact-match-the-simplest-metric.en.png"><br>
+Question: "What is the capital of Korea?"<br>
 Reference: "Seoul"<br>
 Model output: "The capital of Korea is Seoul."</p>
 <p>Exact match scores zero. It is meaningful only when the answer is fixed to a single word or token.</p>
@@ -80,7 +83,8 @@ Model output: "The capital of Korea is Seoul."</p>
 </code></pre>
 <p>Adding normalization helps a little, but at heart it is reliable only for "QA where the answer is locked to 1-2 tokens." It fits short-answer extraction tasks like SQuAD.</p>
 <h2>Token-level F1 — More Forgiving than Exact Match</h2>
-<p>F1 treats prediction and reference as token sets and computes the harmonic mean of precision and recall.</p>
+<p><img alt="Token-level F1 - more forgiving than exact match" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-04-token-level-f1-more-forgiving-than-exact.en.png"><br>
+F1 treats prediction and reference as token sets and computes the harmonic mean of precision and recall.</p>
 <pre><code class="language-python">from collections import Counter
 
 def token_f1(pred: str, expected: str) -&gt; float:
@@ -99,7 +103,8 @@ print(token_f1(&quot;Seoul&quot;, &quot;Seoul&quot;))                  # 1.0
 </code></pre>
 <p>It awards partial credit on cases like "the capital is Seoul" vs "Seoul." But it ignores word order: "Seoul is the capital" and "the capital is Seoul" get the same score.</p>
 <h2>BLEU — N-gram Overlap from Machine Translation</h2>
-<p>BLEU computes overlap of 1-grams, 2-grams, 3-grams, and 4-grams. It is standard for machine translation evaluation, but the limits are real for free-form LLM output.</p>
+<p><img alt="BLEU - N-gram overlap from machine translation" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-05-bleu-n-gram-overlap-from-machine-transla.en.png"><br>
+BLEU computes overlap of 1-grams, 2-grams, 3-grams, and 4-grams. It is standard for machine translation evaluation, but the limits are real for free-form LLM output.</p>
 <pre><code class="language-python"># pip install nltk
 from nltk.translate.bleu_score import sentence_bleu
 

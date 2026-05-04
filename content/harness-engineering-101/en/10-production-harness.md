@@ -26,6 +26,8 @@ seo_description: The Production Harness is the final layer that binds the nine h
 This episode integrates every harness covered so far into a production-ready agent environment. The Production Harness assembles task, context, constraint, tool, test, feedback, approval, and observability into a single working system.
 
 ---
+
+![Production harness - building operational environments for agents](../../../assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png)
 ## What Is the Production Harness?
 
 The Production Harness is the final layer that binds the nine harnesses we have covered into one operable system. No matter how well each individual harness is built, without deployment, rollback, and on-call flow it cannot reach real users safely.
@@ -49,6 +51,7 @@ The Production Harness takes this stack and packages it into "something deployab
 
 ## How the Nine Harnesses Fit Together
 
+![How the nine harnesses fit together](../../../assets/harness-engineering-101/10/10-02-how-the-nine-harnesses-fit-together.en.png)
 When a request arrives, it flows in this order:
 
 ```python
@@ -77,6 +80,7 @@ Each harness owns exactly one responsibility, and the interface to the next harn
 
 ## Deployment Pattern — Gradual Rollout
 
+![Deployment pattern - gradual rollout](../../../assets/harness-engineering-101/10/10-03-deployment-pattern-gradual-rollout.en.png)
 A new prompt or tool never goes to 100% of users in one shot.
 
 ```python
@@ -103,6 +107,7 @@ The standard ramp is 1% → 10% → 50% → 100%, comparing candidate against ba
 
 ## Rollback — A Deploy Is Only a Deploy if You Can Undo It
 
+![Rollback - A deploy is only a deploy if you can undo it](../../../assets/harness-engineering-101/10/10-04-rollback-a-deploy-is-only-a-deploy-if-yo.en.png)
 If you cannot return to the previous version within 30 seconds of a deploy, that is not a deploy — it is an incident.
 
 ```python
