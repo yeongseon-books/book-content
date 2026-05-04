@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Production Harness — Building Operational Environments for Agents</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Production Harness — Building Operational Environments for Agents</h1>
+<blockquote>
+<p>Harness Engineering 101 Series (10/10)</p>
+</blockquote>
+<p>This episode integrates every harness covered so far into a production-ready agent environment. The Production Harness assembles task, context, constraint, tool, test, feedback, approval, and observability into a single working system.</p>
+<hr>
+<h2>What Is the Production Harness?</h2>
+<p>The Production Harness is the final layer that binds the nine harnesses we have covered into one operable system. No matter how well each individual harness is built, without deployment, rollback, and on-call flow it cannot reach real users safely.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class HarnessStack:
+    task: object          # Ep2 — TaskSpec
+    context: object       # Ep3 — ContextBudget
+    constraint: object    # Ep4 — ConstraintPolicy
+    tools: object         # Ep5 — ToolRegistry
+    tests: object         # Ep6 — eval suite
+    feedback: object      # Ep7 — FeedbackLoop
+    approval: object      # Ep8 — ApprovalWorkflow
+    observability: object # Ep9 — Tracer
+</code></pre>
+<p>The Production Harness takes this stack and packages it into "something deployable."</p>
+<h2>How the Nine Harnesses Fit Together</h2>
+<p>When a request arrives, it flows in this order:</p>
+<pre><code class="language-python">def handle_request(stack: HarnessStack, user_input: str) -&gt; dict:
+    with stack.observability.trace(&quot;agent.run&quot;) as trace:
+        spec = stack.task.parse(user_input)
+        ctx = stack.context.assemble(spec)
+        plan = stack.feedback.run_until_done(
+            spec=spec,
+            context=ctx,
+            execute_step=lambda step: _execute_step(stack, step, trace),
+        )
+        return plan.result
+
+def _execute_step(stack: HarnessStack, step, trace):
+    stack.constraint.check(step)
+    if stack.approval.needs_approval(step):
+        decision = stack.approval.request_and_wait(step)
+        if decision.decision == &quot;reject&quot;:
+            return {&quot;status&quot;: &quot;rejected&quot;}
+    with trace.child(f&quot;tool.{step.tool}&quot;):
+        return stack.tools.invoke(step.tool, step.input)
+</code></pre>
+<p>Each harness owns exactly one responsibility, and the interface to the next harness must be clear. When responsibilities blur, you stop knowing where to fix things.</p>
+<h2>Deployment Pattern — Gradual Rollout</h2>
+<p>A new prompt or tool never goes to 100% of users in one shot.</p>
+<pre><code class="language-python">class CanaryDeployer:
+    def __init__(self, baseline, candidate):
+        self.baseline = baseline
+        self.candidate = candidate
+
+    def route(self, request, traffic_percent: int) -&gt; str:
+        bucket = hash(request.user_id) % 100
+        return &quot;candidate&quot; if bucket &lt; traffic_percent else &quot;baseline&quot;
+
+    def should_promote(self, baseline_metrics, candidate_metrics) -&gt; bool:
+        if candidate_metrics.error_rate &gt; baseline_metrics.error_rate * 1.1:
+            return False
+        if candidate_metrics.p95_latency_ms &gt; baseline_metrics.p95_latency_ms * 1.2:
+            return False
+        if candidate_metrics.avg_cost_usd &gt; baseline_metrics.avg_cost_usd * 1.5:
+            return False
+        return True
+</code></pre>
+<p>The standard ramp is 1% → 10% → 50% → 100%, comparing candidate against baseline for at least one hour at each step. If <code>should_promote</code> returns False at any step, you roll back to 0% immediately.</p>
+<h2>Rollback — A Deploy Is Only a Deploy if You Can Undo It</h2>
+<p>If you cannot return to the previous version within 30 seconds of a deploy, that is not a deploy — it is an incident.</p>
+<pre><code class="language-python">class HarnessVersion:
+    def __init__(self, version_id: str, stack: HarnessStack):
+        self.version_id = version_id
+        self.stack = stack
+
+class HarnessRouter:
+    def __init__(self):
+        self.versions: dict[str, HarnessVersion] = {}
+        self.active_id: str | None = None
+        self.previous_id: str | None = None
+
+    def deploy(self, version: HarnessVersion):
+        self.versions[version.version_id] = version
+        self.previous_id = self.active_id
+        self.active_id = version.version_id
+
+    def rollback(self) -&gt; str:
+        if self.previous_id is None:
+            raise RuntimeError(&quot;no previous version to roll back to&quot;)
+        self.active_id, self.previous_id = self.previous_id, self.active_id
+        return self.active_id
+</code></pre>
+<p>Prompt, tool definition, and eval dataset all share a version_id and roll back together. If you roll back the prompt but leave the tools, you end up with an unknown combination.</p>
+<h2>On-call Runbook — Woken Up at 3 AM</h2>
+<p>When an alert fires, the on-call engineer needs the runbook to spell out what to look at and what to decide.</p>
+<pre><code class="language-text">ALERT: agent.error_rate &gt; 10% for 5 min
+
+1. Check traces
+   - Open the most recent 50 traces in the observability dashboard
+   - Find what the failing spans have in common (model? tool? step?)
+
+2. First-pass decision (within 5 min)
+   - External dependency outage? → disable that tool + check status page
+   - Right after a deploy? → run rollback() immediately
+   - Specific user/input pattern? → quarantine that pattern
+
+3. Second-pass action (within 30 min)
+   - Open a postmortem ticket (include trace_id)
+   - Add the failing case to the eval suite
+   - Verify the same pattern is auto-blocked next time
+</code></pre>
+<p>The runbook lives next to the code, is version-controlled, and gets exercised every quarter with a fire drill.</p>
+<h2>Capstone Example — Refund-Processing Agent</h2>
+<p>The minimal example with all nine harnesses applied:</p>
+<pre><code class="language-python">def build_refund_agent() -&gt; HarnessStack:
+    return HarnessStack(
+        task=TaskParser(allowed_intents={&quot;refund&quot;, &quot;status&quot;}),
+        context=ContextBudget(max_tokens=4000, retrieval=OrderHistoryRAG()),
+        constraint=ConstraintPolicy(
+            max_amount_usd=10000,
+            max_calls_per_run=5,
+            allowed_tools={&quot;lookup_order&quot;, &quot;calc_refund&quot;, &quot;issue_refund&quot;},
+        ),
+        tools=ToolRegistry([LookupOrderTool(), CalcRefundTool(), IssueRefundTool()]),
+        tests=EvalSuite.load(&quot;evals/refund/v3.jsonl&quot;),
+        feedback=FeedbackLoop(max_retries=2, max_reflects=1),
+        approval=ApprovalWorkflow(
+            store=PostgresApprovalStore(),
+            notifier=SlackNotifier(channel=&quot;#refunds-approval&quot;),
+            rule=lambda step: step.tool == &quot;issue_refund&quot; and step.input[&quot;amount&quot;] &gt;= 100,
+        ),
+        observability=Tracer(exporter=OtelExporter(endpoint=&quot;https://otel.internal&quot;)),
+    )
+</code></pre>
+<p>Register this stack with <code>HarnessRouter</code>, deploy it 1% → 100% through <code>CanaryDeployer</code>, and you have a production-ready agent.</p>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Adopting all harnesses at once.</strong> The operational burden lands all at once and no harness gets used properly. Start with Approval and Observability.</li>
+<li><strong>Not testing rollback.</strong> You only learn rollback is broken when you need it during an incident. Run an actual rollback fire drill every quarter.</li>
+<li><strong>Deploying to 100% without canary.</strong> Ten thousand users get broken responses simultaneously. Always start at 1%.</li>
+<li><strong>Keeping the on-call runbook outside the code.</strong> A wiki-only runbook goes stale fast. Keep it in the repo and update it via PR.</li>
+<li><strong>Versioning eval suite separately from the prompt.</strong> A new prompt passes the old eval, ships, and breaks for real users. Bind them to the same version_id.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>The Production Harness is the final layer that wraps the nine harnesses into a deployable unit.</li>
+<li>Each harness owns one responsibility with a clear interface to the next.</li>
+<li>Canary deploy (1% → 10% → 50% → 100%) and 30-second rollback are the minimum production bar.</li>
+<li>The on-call runbook lives in the repo and is exercised quarterly via fire drill.</li>
+<li>Prompts, tools, and eval datasets share the same version_id and roll back together.</li>
+</ul>
+<p>This is the final post in the series. Combining the nine harnesses from Harness Engineering 101 with this production layer is what turns "a demo that looks good but breaks in production" into "an agent users trust."</p>
+<hr>
+<h2>Harness Engineering 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Tool Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Test Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Feedback Loop</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/08-approval-gate.md">Approval Gates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/09-observability.md">Observability</a></li>
+<li><strong>Production Harness (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/release-engineering/">Google SRE — Release engineering</a></li>
+<li><a href="https://martinfowler.com/bliki/CanaryRelease.html">Martin Fowler — CanaryRelease</a></li>
+<li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic — Building Effective Agents</a></li>
+<li><a href="https://response.pagerduty.com/">PagerDuty — Incident response documentation</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, Harness, Production, Deployment</p>
+</body>
+</html>

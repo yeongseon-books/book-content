@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Memory and State</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Memory and State</h1>
+<blockquote>
+<p>AI Agent 101 Series (5/10)</p>
+</blockquote>
+<p>For agents to perform multi-step tasks, they must remember what they did in previous steps. This is memory. Short-term memory persists during the current conversation session, while long-term memory persists beyond sessions.</p>
+<p>However, model context windows are limited. You can't keep including all conversation history, so you must selectively maintain important information or leverage external storage (vector DB, general DB).</p>
+<p>This article covers the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.</p>
+<hr>
+<h2>Short-term Memory vs Long-term Memory</h2>
+<h2>Short-term Memory vs Long-term Memory</h2>
+<p>Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.</p>
+<p><strong>Short-term Memory</strong></p>
+<p>Short-term memory is information retained only within the current execution session. It holds the context from conversation start to end.</p>
+<p><strong>Characteristics:</strong><br>
+- Disappears when the session ends.<br>
+- Contained within the model's context window.<br>
+- Includes system prompt, conversation history, and tool call results.</p>
+<pre><code class="language-python">from typing import List, Dict
+
+class ShortTermMemory:
+    &quot;&quot;&quot;Short-term memory: retained only during current session&quot;&quot;&quot;
+
+    def __init__(self, system_prompt: str):
+        self.messages: List[Dict[str, str]] = [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt}
+        ]
+
+    def add_user_message(self, content: str):
+        &quot;&quot;&quot;Add user message&quot;&quot;&quot;
+        self.messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: content})
+
+    def add_assistant_message(self, content: str):
+        &quot;&quot;&quot;Add agent response&quot;&quot;&quot;
+        self.messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: content})
+
+    def get_context(self) -&gt; List[Dict[str, str]]:
+        &quot;&quot;&quot;Return current context&quot;&quot;&quot;
+        return self.messages
+
+    def clear(self):
+        &quot;&quot;&quot;Clear memory on session end&quot;&quot;&quot;
+        system_msg = self.messages[0]
+        self.messages = [system_msg]
+
+# Usage example
+memory = ShortTermMemory(system_prompt=&quot;You are a helpful assistant.&quot;)
+
+memory.add_user_message(&quot;What's the weather today?&quot;)
+memory.add_assistant_message(&quot;Today's weather in Seoul is sunny.&quot;)
+
+memory.add_user_message(&quot;How about tomorrow?&quot;)
+# Agent remembers previous conversation (&quot;weather today&quot;) and understands &quot;tomorrow&quot; refers to weather
+
+print(f&quot;Message count: {len(memory.get_context())}&quot;)  # 4 (system + user + assistant + user)
+</code></pre>
+<p><strong>Pros:</strong><br>
+- Simple implementation (just append to message list).<br>
+- Can be passed directly to LLM API.</p>
+<p><strong>Cons:</strong><br>
+- Continuously consumes context window.<br>
+- Token cost increases as session grows.<br>
+- Information disappears after session ends.</p>
+<hr>
+<p><strong>Long-term Memory</strong></p>
+<p>Long-term memory is information persisted beyond session end. It stores user preferences, past conversation summaries, and accumulated knowledge.</p>
+<p><strong>Characteristics:</strong><br>
+- Persists after session end.<br>
+- Stored in external storage (DB, files, vector DB).<br>
+- Retrieved and injected into context only when needed.</p>
+<pre><code class="language-python">import json
+from datetime import datetime
+from typing import List, Dict, Optional
+
+class LongTermMemory:
+    &quot;&quot;&quot;Long-term memory: permanently stored in external storage&quot;&quot;&quot;
+
+    def __init__(self, storage_path: str = &quot;memory.json&quot;):
+        self.storage_path = storage_path
+        self.memories: Dict[str, List[Dict]] = self._load()
+
+    def _load(self) -&gt; Dict[str, List[Dict]]:
+        &quot;&quot;&quot;Load memory from storage&quot;&quot;&quot;
+        try:
+            with open(self.storage_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+
+    def _save(self):
+        &quot;&quot;&quot;Save memory to storage&quot;&quot;&quot;
+        with open(self.storage_path, 'w', encoding='utf-8') as f:
+            json.dump(self.memories, f, ensure_ascii=False, indent=2)
+
+    def add_memory(self, user_id: str, key: str, value: str):
+        &quot;&quot;&quot;Add information to user's memory&quot;&quot;&quot;
+        if user_id not in self.memories:
+            self.memories[user_id] = []
+
+        self.memories[user_id].append({
+            &quot;key&quot;: key,
+            &quot;value&quot;: value,
+            &quot;timestamp&quot;: datetime.now().isoformat()
+        })
+        self._save()
+
+    def retrieve_memory(self, user_id: str, key: Optional[str] = None) -&gt; List[Dict]:
+        &quot;&quot;&quot;Retrieve user's memory&quot;&quot;&quot;
+        if user_id not in self.memories:
+            return []
+
+        memories = self.memories[user_id]
+
+        if key:
+            # Return only memories matching the key
+            return [m for m in memories if m[&quot;key&quot;] == key]
+
+        return memories
+
+# Usage example
+long_memory = LongTermMemory()
+
+# Session 1: Save user preferences
+long_memory.add_memory(
+    user_id=&quot;user123&quot;,
+    key=&quot;language_preference&quot;,
+    value=&quot;Korean&quot;
+)
+long_memory.add_memory(
+    user_id=&quot;user123&quot;,
+    key=&quot;topic_interest&quot;,
+    value=&quot;AI Agent&quot;
+)
+
+# Session 2 (later reconnection): Retrieve previous information
+preferences = long_memory.retrieve_memory(user_id=&quot;user123&quot;)
+print(f&quot;User preferences: {preferences}&quot;)
+# [{'key': 'language_preference', 'value': 'Korean', 'timestamp': '...'}, ...]
+
+# Retrieve specific key only
+lang_pref = long_memory.retrieve_memory(user_id=&quot;user123&quot;, key=&quot;language_preference&quot;)
+if lang_pref:
+    print(f&quot;Preferred language: {lang_pref[0]['value']}&quot;)  # Korean
+</code></pre>
+<p><strong>Pros:</strong><br>
+- Information persists after session ends.<br>
+- Saves context window (load only when needed).<br>
+- Enables personalized user experience.</p>
+<p><strong>Cons:</strong><br>
+- Requires external storage management.<br>
+- Adds search logic complexity.<br>
+- Search speed may slow with large information sets.</p>
+<hr>
+<p><strong>Combining Short-term + Long-term Memory</strong></p>
+<p>Real agents use both together.</p>
+<pre><code class="language-python">class HybridMemory:
+    &quot;&quot;&quot;Short-term memory + long-term memory combined&quot;&quot;&quot;
+
+    def __init__(self, user_id: str, system_prompt: str):
+        self.user_id = user_id
+        self.short_term = ShortTermMemory(system_prompt)
+        self.long_term = LongTermMemory()
+
+    def start_session(self):
+        &quot;&quot;&quot;Load relevant information from long-term memory on session start&quot;&quot;&quot;
+        memories = self.long_term.retrieve_memory(self.user_id)
+
+        if memories:
+            # Add long-term memory content to system prompt
+            context = &quot;Previous user preferences:\n&quot;
+            for mem in memories:
+                context += f&quot;- {mem['key']}: {mem['value']}\n&quot;
+
+            self.short_term.messages[0][&quot;content&quot;] += f&quot;\n\n{context}&quot;
+
+    def add_user_message(self, content: str):
+        &quot;&quot;&quot;Add user message&quot;&quot;&quot;
+        self.short_term.add_user_message(content)
+
+    def add_assistant_message(self, content: str):
+        &quot;&quot;&quot;Add agent response&quot;&quot;&quot;
+        self.short_term.add_assistant_message(content)
+
+    def save_important_info(self, key: str, value: str):
+        &quot;&quot;&quot;Save important information to long-term memory&quot;&quot;&quot;
+        self.long_term.add_memory(self.user_id, key, value)
+
+    def get_context(self) -&gt; List[Dict[str, str]]:
+        &quot;&quot;&quot;Return current context&quot;&quot;&quot;
+        return self.short_term.get_context()
+
+    def end_session(self):
+        &quot;&quot;&quot;Session end: clear short-term memory&quot;&quot;&quot;
+        self.short_term.clear()
+
+# Usage example
+memory = HybridMemory(user_id=&quot;user123&quot;, system_prompt=&quot;You are a helpful assistant.&quot;)
+
+# Start session: Load previous information from long-term memory
+memory.start_session()
+
+# Conversation
+memory.add_user_message(&quot;Tell me about AI Agents&quot;)
+memory.add_assistant_message(&quot;AI Agents are systems that autonomously perform tasks using LLMs.&quot;)
+
+# Save important information to long-term memory
+memory.save_important_info(&quot;last_topic&quot;, &quot;AI Agent&quot;)
+
+# End session
+memory.end_session()
+
+# Next session will automatically load &quot;last_topic: AI Agent&quot;
+</code></pre>
+<p><strong>Core Principle:</strong><br>
+- Short-term memory: Maintains current conversation flow.<br>
+- Long-term memory: Stores important information beyond sessions.<br>
+- Agent searches long-term memory for relevant information on session start and injects it into short-term memory.</p>
+<h2>Conversation History Management</h2>
+<h2>Conversation History Management</h2>
+<p>As conversations grow longer, they exceed the context window. Since you can't keep all messages indefinitely, you must remove old messages or summarize them.</p>
+<p><strong>Strategy 1: Sliding Window</strong></p>
+<p>Keep only the most recent N messages and remove older ones.</p>
+<pre><code class="language-python">from typing import List, Dict
+
+class SlidingWindowMemory:
+    &quot;&quot;&quot;Sliding window: retain only recent N messages&quot;&quot;&quot;
+
+    def __init__(self, system_prompt: str, max_messages: int = 10):
+        self.system_prompt = system_prompt
+        self.max_messages = max_messages  # excluding system prompt
+        self.messages: List[Dict[str, str]] = [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt}
+        ]
+
+    def add_message(self, role: str, content: str):
+        &quot;&quot;&quot;Add message&quot;&quot;&quot;
+        self.messages.append({&quot;role&quot;: role, &quot;content&quot;: content})
+
+        # Keep only recent N messages (excluding system prompt)
+        if len(self.messages) - 1 &gt; self.max_messages:
+            # Keep system prompt, remove oldest 2 messages (user + assistant pair)
+            self.messages = [self.messages[0]] + self.messages[3:]
+
+    def get_context(self) -&gt; List[Dict[str, str]]:
+        &quot;&quot;&quot;Return current context&quot;&quot;&quot;
+        return self.messages
+
+# Usage example
+memory = SlidingWindowMemory(system_prompt=&quot;You are a helpful assistant.&quot;, max_messages=4)
+
+memory.add_message(&quot;user&quot;, &quot;Question 1&quot;)
+memory.add_message(&quot;assistant&quot;, &quot;Answer 1&quot;)
+memory.add_message(&quot;user&quot;, &quot;Question 2&quot;)
+memory.add_message(&quot;assistant&quot;, &quot;Answer 2&quot;)
+memory.add_message(&quot;user&quot;, &quot;Question 3&quot;)  # Question 1, Answer 1 removed
+
+print(f&quot;Message count: {len(memory.get_context())}&quot;)  # 5 (system + recent 4)
+</code></pre>
+<p><strong>Pros:</strong><br>
+- Simple implementation.<br>
+- Constant context window usage.</p>
+<p><strong>Cons:</strong><br>
+- Important early information may be lost.<br>
+- Conversation context may break.</p>
+<hr>
+<p><strong>Strategy 2: Summarization-based Compression</strong></p>
+<p>Summarize old conversations with LLM and include the summary in context.</p>
+<pre><code class="language-python">from openai import OpenAI
+from typing import List, Dict
+
+class SummarizationMemory:
+    &quot;&quot;&quot;Summarization-based memory: summarize old conversations&quot;&quot;&quot;
+
+    def __init__(self, system_prompt: str, api_key: str, max_messages: int = 10):
+        self.system_prompt = system_prompt
+        self.max_messages = max_messages
+        self.client = OpenAI(api_key=api_key)
+        self.messages: List[Dict[str, str]] = [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt}
+        ]
+        self.summary: str = &quot;&quot;
+
+    def _summarize(self, messages: List[Dict[str, str]]) -&gt; str:
+        &quot;&quot;&quot;Summarize conversation content&quot;&quot;&quot;
+        conversation = &quot;\n&quot;.join([
+            f&quot;{msg['role']}: {msg['content']}&quot; for msg in messages if msg['role'] != 'system'
+        ])
+
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4o-mini&quot;,
+            messages=[
+                {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Summarize the following conversation in 2-3 sentences.&quot;},
+                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: conversation}
+            ],
+            temperature=0
+        )
+
+        return response.choices[0].message.content
+
+    def add_message(self, role: str, content: str):
+        &quot;&quot;&quot;Add message&quot;&quot;&quot;
+        self.messages.append({&quot;role&quot;: role, &quot;content&quot;: content})
+
+        # Summarize when messages grow too large
+        if len(self.messages) - 1 &gt; self.max_messages:
+            # Summarize first half (excluding system prompt)
+            to_summarize = self.messages[1:self.max_messages//2 + 1]
+            new_summary = self._summarize(to_summarize)
+
+            # Combine with existing summary
+            if self.summary:
+                self.summary += f&quot;\n\n{new_summary}&quot;
+            else:
+                self.summary = new_summary
+
+            # Remove summarized portion
+            self.messages = [self.messages[0]] + self.messages[self.max_messages//2 + 1:]
+
+    def get_context(self) -&gt; List[Dict[str, str]]:
+        &quot;&quot;&quot;Return current context (including summary)&quot;&quot;&quot;
+        system_content = self.system_prompt
+
+        if self.summary:
+            system_content += f&quot;\n\nPrevious conversation summary:\n{self.summary}&quot;
+
+        return [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_content}
+        ] + self.messages[1:]
+
+# Usage example
+memory = SummarizationMemory(
+    system_prompt=&quot;You are a helpful assistant.&quot;,
+    api_key=&quot;your-api-key&quot;,
+    max_messages=6
+)
+
+memory.add_message(&quot;user&quot;, &quot;How to do web scraping in Python?&quot;)
+memory.add_message(&quot;assistant&quot;, &quot;Use requests and BeautifulSoup libraries...&quot;)
+memory.add_message(&quot;user&quot;, &quot;Show me example code&quot;)
+memory.add_message(&quot;assistant&quot;, &quot;Here's an example: import requests...&quot;)
+memory.add_message(&quot;user&quot;, &quot;How about error handling?&quot;)
+memory.add_message(&quot;assistant&quot;, &quot;Handle with try-except...&quot;)
+memory.add_message(&quot;user&quot;, &quot;Different question: How to use FastAPI?&quot;)  
+# At this point, web scraping conversation gets summarized, only recent conversation retained
+
+context = memory.get_context()
+print(f&quot;Summary: {memory.summary[:100]}...&quot;)  # &quot;User asked about web scraping in Python...&quot;
+</code></pre>
+<p><strong>Pros:</strong><br>
+- Important information is compressed and retained.<br>
+- Conversation context doesn't completely disappear.</p>
+<p><strong>Cons:</strong><br>
+- Summary API call costs.<br>
+- Detail loss during summarization.</p>
+<hr>
+<p><strong>Strategy 3: Importance-based Selection</strong></p>
+<p>Score each message by importance and keep only important messages.</p>
+<pre><code class="language-python">from typing import List, Dict, Tuple
+
+class ImportanceBasedMemory:
+    &quot;&quot;&quot;Importance-based memory: retain only important messages&quot;&quot;&quot;
+
+    def __init__(self, system_prompt: str, max_messages: int = 10):
+        self.system_prompt = system_prompt
+        self.max_messages = max_messages
+        self.messages: List[Tuple[Dict[str, str], float]] = []  # (message, importance_score)
+
+    def _calculate_importance(self, content: str) -&gt; float:
+        &quot;&quot;&quot;Calculate message importance (simple heuristic)&quot;&quot;&quot;
+        importance = 0.5  # base score
+
+        # Tool call results are important
+        if &quot;tool_calls&quot; in content or &quot;function_call&quot; in content:
+            importance += 0.3
+
+        # Questions are important
+        if &quot;?&quot; in content or &quot;how&quot; in content.lower() or &quot;what&quot; in content.lower():
+            importance += 0.2
+
+        # Short messages are less important
+        if len(content) &lt; 20:
+            importance -= 0.1
+
+        return min(1.0, max(0.0, importance))
+
+    def add_message(self, role: str, content: str):
+        &quot;&quot;&quot;Add message (calculate importance score)&quot;&quot;&quot;
+        message = {&quot;role&quot;: role, &quot;content&quot;: content}
+        importance = self._calculate_importance(content)
+
+        self.messages.append((message, importance))
+
+        # Remove low-importance messages when too many
+        if len(self.messages) &gt; self.max_messages:
+            # Sort by importance
+            self.messages.sort(key=lambda x: x[1], reverse=True)
+            # Keep top max_messages only
+            self.messages = self.messages[:self.max_messages]
+            # Re-sort by time (maintain conversation flow)
+            self.messages.sort(key=lambda x: self.messages.index(x))
+
+    def get_context(self) -&gt; List[Dict[str, str]]:
+        &quot;&quot;&quot;Return current context&quot;&quot;&quot;
+        return [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: self.system_prompt}
+        ] + [msg for msg, _ in self.messages]
+
+# Usage example
+memory = ImportanceBasedMemory(system_prompt=&quot;You are a helpful assistant.&quot;, max_messages=5)
+
+memory.add_message(&quot;user&quot;, &quot;Hi&quot;)  # Low importance (short)
+memory.add_message(&quot;assistant&quot;, &quot;Hello!&quot;)  # Low importance
+memory.add_message(&quot;user&quot;, &quot;How to call APIs in Python?&quot;)  # High importance (question)
+memory.add_message(&quot;assistant&quot;, &quot;Use requests library: import requests...&quot;)  # Medium importance
+memory.add_message(&quot;user&quot;, &quot;tool_calls: search_api&quot;)  # High importance (tool call)
+memory.add_message(&quot;assistant&quot;, &quot;Search results: ...&quot;)  # Medium importance
+memory.add_message(&quot;user&quot;, &quot;Thanks&quot;)  # Low importance (short) → likely to be removed
+
+context = memory.get_context()
+print(f&quot;Retained messages: {len(context) - 1}&quot;)  # excluding system
+</code></pre>
+<p><strong>Pros:</strong><br>
+- Important information is prioritized.<br>
+- Tool call history and key information preserved.</p>
+<p><strong>Cons:</strong><br>
+- Importance calculation logic can be complex.<br>
+- Time order mixing can make conversation flow awkward.</p>
+<hr>
+<p><strong>Strategy Comparison</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Implementation Complexity</th>
+<th>Cost</th>
+<th>Information Retention</th>
+<th>Suitable For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sliding Window</td>
+<td>Low</td>
+<td>None</td>
+<td>Low (recent only)</td>
+<td>Short conversations, simple agents</td>
+</tr>
+<tr>
+<td>Summarization</td>
+<td>Medium</td>
+<td>High (summary API)</td>
+<td>Medium (compression loss)</td>
+<td>Long conversations, context needed</td>
+</tr>
+<tr>
+<td>Importance-based</td>
+<td>High</td>
+<td>None</td>
+<td>High (selective retention)</td>
+<td>Tool-using agents, complex tasks</td>
+</tr>
+</tbody>
+</table>
+<p>In practice, these strategies are combined:<br>
+- Keep recent N messages as-is (sliding window).<br>
+- Remove low-importance messages when exceeding N (importance-based).<br>
+- Periodically summarize old messages (summarization).</p>
+<h2>Context Window Management</h2>
+<h2>Context Window Management</h2>
+<p>The context window is the limit on the number of tokens a model can process at once. For GPT-4, this varies by model: 8K, 32K, 128K, etc.</p>
+<p>Agents performing long conversations or many tool calls can exceed the context window. Let's examine strategies to manage this.</p>
+<p><strong>Token Counting</strong></p>
+<p>Calculate the current context's token count before API calls.</p>
+<pre><code class="language-python">import tiktoken
+from typing import List, Dict
+
+class TokenAwareMemory:
+    &quot;&quot;&quot;Token-tracking memory&quot;&quot;&quot;
+
+    def __init__(self, system_prompt: str, model: str = &quot;gpt-4&quot;, max_tokens: int = 8000):
+        self.model = model
+        self.max_tokens = max_tokens
+        self.encoding = tiktoken.encoding_for_model(model)
+        self.messages: List[Dict[str, str]] = [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt}
+        ]
+
+    def count_tokens(self, text: str) -&gt; int:
+        &quot;&quot;&quot;Calculate text token count&quot;&quot;&quot;
+        return len(self.encoding.encode(text))
+
+    def get_total_tokens(self) -&gt; int:
+        &quot;&quot;&quot;Get total token count of current context&quot;&quot;&quot;
+        total = 0
+        for msg in self.messages:
+            total += self.count_tokens(msg[&quot;content&quot;])
+            total += 4  # message structure overhead (role, content separators, etc.)
+        return total
+
+    def can_add_message(self, content: str) -&gt; bool:
+        &quot;&quot;&quot;Check if message can be added&quot;&quot;&quot;
+        new_tokens = self.count_tokens(content) + 4
+        return self.get_total_tokens() + new_tokens &lt;= self.max_tokens
+
+    def add_message(self, role: str, content: str):
+        &quot;&quot;&quot;Add message (check token limit)&quot;&quot;&quot;
+        if not self.can_add_message(content):
+            # Remove old messages when exceeding token limit
+            self._trim_messages()
+
+        self.messages.append({&quot;role&quot;: role, &quot;content&quot;: content})
+
+    def _trim_messages(self):
+        &quot;&quot;&quot;Remove old messages (keep system prompt)&quot;&quot;&quot;
+        if len(self.messages) &gt; 1:
+            # Remove oldest user-assistant pair
+            self.messages = [self.messages[0]] + self.messages[3:]
+
+    def get_context(self) -&gt; List[Dict[str, str]]:
+        &quot;&quot;&quot;Return current context&quot;&quot;&quot;
+        return self.messages
+
+# Usage example
+memory = TokenAwareMemory(
+    system_prompt=&quot;You are a helpful assistant.&quot;,
+    model=&quot;gpt-4&quot;,
+    max_tokens=8000
+)
+
+memory.add_message(&quot;user&quot;, &quot;long question&quot; * 1000)  # very long message
+print(f&quot;Total tokens: {memory.get_total_tokens()}&quot;)
+
+# Check token limit
+if memory.can_add_message(&quot;next question&quot;):
+    memory.add_message(&quot;user&quot;, &quot;next question&quot;)
+else:
+    print(&quot;Token limit exceeded, old messages will be removed.&quot;)
+</code></pre>
+<p><strong>Core:</strong><br>
+- Use <code>tiktoken</code> library for accurate token counting.<br>
+- Check token limit before adding messages.<br>
+- Remove old messages when exceeding limit.</p>
+<hr>
+<p><strong>Response Length Limiting</strong></p>
+<p>Model responses also consume the context window. Limit response length to preserve space.</p>
+<pre><code class="language-python">from openai import OpenAI
+
+class LengthControlledAgent:
+    &quot;&quot;&quot;Agent with response length control&quot;&quot;&quot;
+
+    def __init__(self, api_key: str, max_context_tokens: int = 6000, max_response_tokens: int = 1000):
+        self.client = OpenAI(api_key=api_key)
+        self.max_context_tokens = max_context_tokens
+        self.max_response_tokens = max_response_tokens
+        self.memory = TokenAwareMemory(
+            system_prompt=&quot;You are a helpful assistant. Keep responses concise.&quot;,
+            model=&quot;gpt-4&quot;,
+            max_tokens=max_context_tokens
+        )
+
+    def run(self, user_message: str) -&gt; str:
+        &quot;&quot;&quot;Run agent (with response length limit)&quot;&quot;&quot;
+        self.memory.add_message(&quot;user&quot;, user_message)
+
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=self.memory.get_context(),
+            max_tokens=self.max_response_tokens,  # Response length limit
+            temperature=0.7
+        )
+
+        assistant_message = response.choices[0].message.content
+        self.memory.add_message(&quot;assistant&quot;, assistant_message)
+
+        return assistant_message
+
+# Usage example
+agent = LengthControlledAgent(
+    api_key=&quot;your-api-key&quot;,
+    max_context_tokens=6000,  # 6000 tokens for context
+    max_response_tokens=1000  # 1000 tokens for response
+)
+
+response = agent.run(&quot;Explain Python's advantages in detail&quot;)
+# Response won't exceed 1000 tokens
+</code></pre>
+<p><strong>Strategy:</strong><br>
+- Use <code>max_tokens</code> parameter to limit response length.<br>
+- Adjust so context + response doesn't exceed model's window size.<br>
+- Add instructions like "Keep responses concise" to system prompt.</p>
+<hr>
+<p><strong>Chunk-based Processing</strong></p>
+<p>When input is too large, split into chunks for processing.</p>
+<pre><code class="language-python">from typing import List
+
+class ChunkedProcessor:
+    &quot;&quot;&quot;Process long input by splitting into chunks&quot;&quot;&quot;
+
+    def __init__(self, api_key: str, chunk_size: int = 3000):
+        self.client = OpenAI(api_key=api_key)
+        self.chunk_size = chunk_size
+        self.encoding = tiktoken.encoding_for_model(&quot;gpt-4&quot;)
+
+    def split_into_chunks(self, text: str) -&gt; List[str]:
+        &quot;&quot;&quot;Split text into chunks by token count&quot;&quot;&quot;
+        tokens = self.encoding.encode(text)
+        chunks = []
+
+        for i in range(0, len(tokens), self.chunk_size):
+            chunk_tokens = tokens[i:i + self.chunk_size]
+            chunk_text = self.encoding.decode(chunk_tokens)
+            chunks.append(chunk_text)
+
+        return chunks
+
+    def process_long_document(self, document: str, query: str) -&gt; str:
+        &quot;&quot;&quot;Process long document chunk-by-chunk and combine results&quot;&quot;&quot;
+        chunks = self.split_into_chunks(document)
+        results = []
+
+        for i, chunk in enumerate(chunks):
+            response = self.client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[
+                    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Answer the query based on the given text chunk.&quot;},
+                    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: f&quot;Query: {query}\n\nChunk {i+1}/{len(chunks)}:\n{chunk}&quot;}
+                ],
+                temperature=0
+            )
+
+            results.append(response.choices[0].message.content)
+
+        # Combine final results
+        final_response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[
+                {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Combine the following answers into a coherent response.&quot;},
+                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;\n\n&quot;.join(results)}
+            ],
+            temperature=0
+        )
+
+        return final_response.choices[0].message.content
+
+# Usage example
+processor = ChunkedProcessor(api_key=&quot;your-api-key&quot;, chunk_size=3000)
+
+long_document = &quot;very long document content...&quot; * 5000  # 100K+ tokens
+query = &quot;What's the key summary of this document?&quot;
+
+answer = processor.process_long_document(long_document, query)
+print(answer)
+</code></pre>
+<p><strong>Principle:</strong><br>
+1. Split long document into chunks by token count.<br>
+2. Call LLM individually for each chunk.<br>
+3. Combine chunk results to generate final answer.</p>
+<p><strong>Use Cases:</strong><br>
+- Long PDF document analysis<br>
+- Large log file summarization<br>
+- Multiple webpage content synthesis</p>
+<hr>
+<p><strong>Context Window Management Checklist</strong></p>
+<p><strong>Before Execution:</strong><br>
+- [ ] Check current context token count.<br>
+- [ ] Check token limit when adding new messages.<br>
+- [ ] Set response length limit (<code>max_tokens</code>).</p>
+<p><strong>During Execution:</strong><br>
+- [ ] Remove or summarize old messages when exceeding tokens.<br>
+- [ ] Always maintain important information (system prompt, tool schema).</p>
+<p><strong>After Execution:</strong><br>
+- [ ] Log actual token usage (<code>usage.total_tokens</code>).<br>
+- [ ] Monitor token usage for cost tracking.</p>
+<pre><code class="language-python"># Token usage logging example
+response = client.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=messages
+)
+
+usage = response.usage
+print(f&quot;Prompt tokens: {usage.prompt_tokens}&quot;)
+print(f&quot;Completion tokens: {usage.completion_tokens}&quot;)
+print(f&quot;Total tokens: {usage.total_tokens}&quot;)
+
+# Cost calculation (GPT-4: $0.03/1K prompt tokens, $0.06/1K completion tokens)
+cost = (usage.prompt_tokens / 1000 * 0.03) + (usage.completion_tokens / 1000 * 0.06)
+print(f&quot;Cost: ${cost:.4f}&quot;)
+</code></pre>
+<p><strong>Core:</strong><br>
+- Context window is a finite resource.<br>
+- Track token count and check limits proactively.<br>
+- Split long inputs into chunks for processing.</p>
+<hr>
+<h2>External Memory Storage</h2>
+<p>Information exceeding the context window is stored in external storage and retrieved when needed.</p>
+<p><strong>Vector DB for Semantic Search</strong></p>
+<p>Convert conversation history or knowledge to vectors, store them, and retrieve related information via similarity search.</p>
+<pre><code class="language-python">from openai import OpenAI
+from typing import List, Dict
+import numpy as np
+from datetime import datetime
+
+class VectorMemoryStore:
+    &quot;&quot;&quot;Vector DB-based long-term memory&quot;&quot;&quot;
+
+    def __init__(self, api_key: str):
+        self.client = OpenAI(api_key=api_key)
+        self.memories: List[Dict] = []  # Use Pinecone, Weaviate, etc. in practice
+
+    def _get_embedding(self, text: str) -&gt; List[float]:
+        &quot;&quot;&quot;Convert text to embedding vector&quot;&quot;&quot;
+        response = self.client.embeddings.create(
+            model=&quot;text-embedding-3-small&quot;,
+            input=text
+        )
+        return response.data[0].embedding
+
+    def add_memory(self, user_id: str, content: str, metadata: Dict = None):
+        &quot;&quot;&quot;Add memory (convert to vector and store)&quot;&quot;&quot;
+        embedding = self._get_embedding(content)
+
+        memory = {
+            &quot;user_id&quot;: user_id,
+            &quot;content&quot;: content,
+            &quot;embedding&quot;: embedding,
+            &quot;metadata&quot;: metadata or {},
+            &quot;timestamp&quot;: datetime.now().isoformat()
+        }
+
+        self.memories.append(memory)
+
+    def search_memory(self, user_id: str, query: str, top_k: int = 3) -&gt; List[Dict]:
+        &quot;&quot;&quot;Similarity-based memory search&quot;&quot;&quot;
+        query_embedding = self._get_embedding(query)
+
+        # Filter to user's memories only
+        user_memories = [m for m in self.memories if m[&quot;user_id&quot;] == user_id]
+
+        if not user_memories:
+            return []
+
+        # Calculate cosine similarity
+        similarities = []
+        for memory in user_memories:
+            similarity = self._cosine_similarity(query_embedding, memory[&quot;embedding&quot;])
+            similarities.append((memory, similarity))
+
+        # Sort by similarity (descending)
+        similarities.sort(key=lambda x: x[1], reverse=True)
+
+        # Return top k
+        return [{&quot;content&quot;: m[&quot;content&quot;], &quot;similarity&quot;: sim} for m, sim in similarities[:top_k]]
+
+    def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -&gt; float:
+        &quot;&quot;&quot;Calculate cosine similarity&quot;&quot;&quot;
+        vec1 = np.array(vec1)
+        vec2 = np.array(vec2)
+        return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+
+# Usage example
+memory_store = VectorMemoryStore(api_key=&quot;your-api-key&quot;)
+
+# Store past conversations
+memory_store.add_memory(
+    user_id=&quot;user123&quot;,
+    content=&quot;User asked about web scraping in Python, recommended BeautifulSoup.&quot;,
+    metadata={&quot;topic&quot;: &quot;web_scraping&quot;}
+)
+memory_store.add_memory(
+    user_id=&quot;user123&quot;,
+    content=&quot;User asked about building REST API with FastAPI.&quot;,
+    metadata={&quot;topic&quot;: &quot;fastapi&quot;}
+)
+
+# Search for past information related to current question
+query = &quot;Tell me about Python web crawling&quot;
+relevant_memories = memory_store.search_memory(user_id=&quot;user123&quot;, query=query, top_k=2)
+
+print(&quot;Related past conversations:&quot;)
+for mem in relevant_memories:
+    print(f&quot;- {mem['content']} (similarity: {mem['similarity']:.2f})&quot;)
+
+# &quot;web scraping&quot; conversation retrieved with high similarity
+</code></pre>
+<p><strong>Pros:</strong><br>
+- Can find semantically related information.<br>
+- Works even when keywords don't match exactly.</p>
+<p><strong>Cons:</strong><br>
+- Embedding generation costs.<br>
+- Requires vector DB infrastructure.</p>
+<hr>
+<p><strong>General DB for Structured Storage</strong></p>
+<p>Store structured information (user profiles, settings, etc.) in general DB.</p>
+<pre><code class="language-python">import sqlite3
+from typing import Optional, List, Dict
+from datetime import datetime
+
+class StructuredMemoryStore:
+    &quot;&quot;&quot;General DB-based structured memory&quot;&quot;&quot;
+
+    def __init__(self, db_path: str = &quot;memory.db&quot;):
+        self.conn = sqlite3.connect(db_path)
+        self._init_db()
+
+    def _init_db(self):
+        &quot;&quot;&quot;Create tables&quot;&quot;&quot;
+        cursor = self.conn.cursor()
+        cursor.execute(&quot;&quot;&quot;
+            CREATE TABLE IF NOT EXISTS user_preferences (
+                user_id TEXT,
+                key TEXT,
+                value TEXT,
+                updated_at TEXT,
+                PRIMARY KEY (user_id, key)
+            )
+        &quot;&quot;&quot;)
+        cursor.execute(&quot;&quot;&quot;
+            CREATE TABLE IF NOT EXISTS conversation_summary (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT,
+                session_id TEXT,
+                summary TEXT,
+                created_at TEXT
+            )
+        &quot;&quot;&quot;)
+        self.conn.commit()
+
+    def set_preference(self, user_id: str, key: str, value: str):
+        &quot;&quot;&quot;Save user preference&quot;&quot;&quot;
+        cursor = self.conn.cursor()
+        cursor.execute(&quot;&quot;&quot;
+            INSERT OR REPLACE INTO user_preferences (user_id, key, value, updated_at)
+            VALUES (?, ?, ?, ?)
+        &quot;&quot;&quot;, (user_id, key, value, datetime.now().isoformat()))
+        self.conn.commit()
+
+    def get_preference(self, user_id: str, key: str) -&gt; Optional[str]:
+        &quot;&quot;&quot;Retrieve user preference&quot;&quot;&quot;
+        cursor = self.conn.cursor()
+        cursor.execute(&quot;&quot;&quot;
+            SELECT value FROM user_preferences
+            WHERE user_id = ? AND key = ?
+        &quot;&quot;&quot;, (user_id, key))
+
+        result = cursor.fetchone()
+        return result[0] if result else None
+
+    def get_all_preferences(self, user_id: str) -&gt; Dict[str, str]:
+        &quot;&quot;&quot;Retrieve all user preferences&quot;&quot;&quot;
+        cursor = self.conn.cursor()
+        cursor.execute(&quot;&quot;&quot;
+            SELECT key, value FROM user_preferences
+            WHERE user_id = ?
+        &quot;&quot;&quot;, (user_id,))
+
+        return {row[0]: row[1] for row in cursor.fetchall()}
+
+    def save_session_summary(self, user_id: str, session_id: str, summary: str):
+        &quot;&quot;&quot;Save session summary&quot;&quot;&quot;
+        cursor = self.conn.cursor()
+        cursor.execute(&quot;&quot;&quot;
+            INSERT INTO conversation_summary (user_id, session_id, summary, created_at)
+            VALUES (?, ?, ?, ?)
+        &quot;&quot;&quot;, (user_id, session_id, summary, datetime.now().isoformat()))
+        self.conn.commit()
+
+    def get_recent_summaries(self, user_id: str, limit: int = 5) -&gt; List[Dict]:
+        &quot;&quot;&quot;Retrieve recent session summaries&quot;&quot;&quot;
+        cursor = self.conn.cursor()
+        cursor.execute(&quot;&quot;&quot;
+            SELECT session_id, summary, created_at
+            FROM conversation_summary
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+        &quot;&quot;&quot;, (user_id, limit))
+
+        return [
+            {&quot;session_id&quot;: row[0], &quot;summary&quot;: row[1], &quot;created_at&quot;: row[2]}
+            for row in cursor.fetchall()
+        ]
+
+# Usage example
+db_store = StructuredMemoryStore()
+
+# Save user preferences
+db_store.set_preference(&quot;user123&quot;, &quot;language&quot;, &quot;Korean&quot;)
+db_store.set_preference(&quot;user123&quot;, &quot;notification&quot;, &quot;enabled&quot;)
+
+# Retrieve
+lang = db_store.get_preference(&quot;user123&quot;, &quot;language&quot;)
+print(f&quot;Preferred language: {lang}&quot;)  # Korean
+
+all_prefs = db_store.get_all_preferences(&quot;user123&quot;)
+print(f&quot;All settings: {all_prefs}&quot;)
+
+# Save session summary
+db_store.save_session_summary(
+    user_id=&quot;user123&quot;,
+    session_id=&quot;sess_001&quot;,
+    summary=&quot;User asked about Python web scraping and was guided on BeautifulSoup usage.&quot;
+)
+
+# Retrieve recent conversation summaries
+recent = db_store.get_recent_summaries(&quot;user123&quot;, limit=3)
+print(f&quot;Recent conversations: {recent}&quot;)
+</code></pre>
+<p><strong>Pros:</strong><br>
+- Structured queries possible (WHERE, ORDER BY, JOIN, etc.).<br>
+- Transaction support ensures data consistency.<br>
+- Fast search using indexes.</p>
+<p><strong>Cons:</strong><br>
+- Semantic search impossible (keyword-based).<br>
+- Schema design required.</p>
+<hr>
+<p><strong>Hybrid Storage Pattern</strong></p>
+<p>Combine vector DB and general DB.</p>
+<pre><code class="language-python">class HybridMemorySystem:
+    &quot;&quot;&quot;Vector DB + general DB combined&quot;&quot;&quot;
+
+    def __init__(self, api_key: str, db_path: str = &quot;memory.db&quot;):
+        self.vector_store = VectorMemoryStore(api_key=api_key)
+        self.structured_store = StructuredMemoryStore(db_path=db_path)
+
+    def initialize_user_context(self, user_id: str, query: str) -&gt; str:
+        &quot;&quot;&quot;Initialize user context (load long-term memory)&quot;&quot;&quot;
+        context_parts = []
+
+        # 1. Load structured preferences
+        preferences = self.structured_store.get_all_preferences(user_id)
+        if preferences:
+            context_parts.append(&quot;User Preferences:&quot;)
+            for key, value in preferences.items():
+                context_parts.append(f&quot;- {key}: {value}&quot;)
+
+        # 2. Load recent session summaries
+        recent_summaries = self.structured_store.get_recent_summaries(user_id, limit=3)
+        if recent_summaries:
+            context_parts.append(&quot;\nRecent Conversations:&quot;)
+            for summary in recent_summaries:
+                context_parts.append(f&quot;- {summary['summary']}&quot;)
+
+        # 3. Search past conversations related to current question
+        relevant_memories = self.vector_store.search_memory(user_id, query, top_k=2)
+        if relevant_memories:
+            context_parts.append(&quot;\nRelevant Past Discussions:&quot;)
+            for mem in relevant_memories:
+                context_parts.append(f&quot;- {mem['content']}&quot;)
+
+        return &quot;\n&quot;.join(context_parts)
+
+    def save_conversation(self, user_id: str, session_id: str, messages: List[Dict]):
+        &quot;&quot;&quot;Save on conversation end&quot;&quot;&quot;
+        # 1. Generate conversation summary (use LLM in practice)
+        summary = f&quot;Discussed {len(messages)} topics&quot;
+        self.structured_store.save_session_summary(user_id, session_id, summary)
+
+        # 2. Save important conversations to vector DB
+        for msg in messages:
+            if msg[&quot;role&quot;] == &quot;user&quot; and len(msg[&quot;content&quot;]) &gt; 50:
+                self.vector_store.add_memory(
+                    user_id=user_id,
+                    content=msg[&quot;content&quot;],
+                    metadata={&quot;session_id&quot;: session_id}
+                )
+
+# Usage example
+hybrid_system = HybridMemorySystem(api_key=&quot;your-api-key&quot;)
+
+# Session start: Load long-term memory
+user_context = hybrid_system.initialize_user_context(
+    user_id=&quot;user123&quot;,
+    query=&quot;Tell me about Python data analysis&quot;
+)
+
+print(&quot;User Context:&quot;)
+print(user_context)
+# Output:
+# User Preferences:
+# - language: Korean
+# Recent Conversations:
+# - User asked about Python web scraping...
+# Relevant Past Discussions:
+# - Data analysis using Python pandas...
+
+# Add this context to system prompt and pass to agent
+</code></pre>
+<p><strong>Core Principle:</strong><br>
+- <strong>Structured information</strong> (preferences, settings) → general DB<br>
+- <strong>Information needing semantic search</strong> (conversation history, knowledge) → vector DB<br>
+- Agent searches both stores for relevant information on session start and injects into context.</p>
+<hr>
+<p><strong>External Memory Considerations</strong></p>
+<p><strong>Search Timing:</strong><br>
+- Session start: Load user profile, recent conversation summary<br>
+- Per question: Search past information related to current question<br>
+- Before tool execution: Search tool usage history</p>
+<p><strong>Search Scope Limits:</strong></p>
+<pre><code class="language-python"># Fetching too much information exceeds context window
+relevant_memories = vector_store.search_memory(
+    user_id=&quot;user123&quot;,
+    query=query,
+    top_k=3  # Top 3 only
+)
+
+# Time range limit
+recent_summaries = structured_store.get_recent_summaries(
+    user_id=&quot;user123&quot;,
+    limit=5  # Recent 5 sessions only
+)
+</code></pre>
+<p><strong>Cost Management:</strong><br>
+- Embedding generation costs, so vectorize only important messages.<br>
+- Use caching to avoid repeated searches for identical queries.</p>
+<p><strong>Privacy Protection:</strong><br>
+- Don't store conversation content long-term without user consent.<br>
+- Don't store sensitive information (passwords, card numbers).<br>
+- Completely remove data when deletion requested.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Not Pre-checking Context Window Limits</strong></p>
+<p><strong>Bad:</strong></p>
+<pre><code class="language-python"># Add messages without checking token count
+messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})
+response = client.chat.completions.create(model=&quot;gpt-4&quot;, messages=messages)
+# Error when context window exceeded
+</code></pre>
+<p><strong>Good:</strong></p>
+<pre><code class="language-python">import tiktoken
+
+encoding = tiktoken.encoding_for_model(&quot;gpt-4&quot;)
+
+def count_tokens(messages):
+    total = sum(len(encoding.encode(msg[&quot;content&quot;])) for msg in messages)
+    return total
+
+# Check token count before adding message
+if count_tokens(messages) + len(encoding.encode(user_input)) &lt; 7000:
+    messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})
+else:
+    # Remove old messages
+    messages = [messages[0]] + messages[-5:]
+    messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_input})
+</code></pre>
+<p><strong>Lesson</strong>: Pre-check token limits to prevent errors.</p>
+<hr>
+<p><strong>Mistake 2: Unconditionally Keeping All Conversation History</strong></p>
+<p><strong>Bad:</strong></p>
+<pre><code class="language-python"># Continuously accumulate even as conversation grows
+class MemoryNoLimit:
+    def __init__(self):
+        self.messages = []
+
+    def add_message(self, role, content):
+        self.messages.append({&quot;role&quot;: role, &quot;content&quot;: content})
+        # Token overflow or cost explosion after dozens of exchanges
+</code></pre>
+<p><strong>Good:</strong></p>
+<pre><code class="language-python">class MemoryWithLimit:
+    def __init__(self, max_messages=10):
+        self.messages = []
+        self.max_messages = max_messages
+
+    def add_message(self, role, content):
+        self.messages.append({&quot;role&quot;: role, &quot;content&quot;: content})
+
+        # Apply sliding window when exceeding limit
+        if len(self.messages) &gt; self.max_messages:
+            self.messages = self.messages[-self.max_messages:]
+</code></pre>
+<p><strong>Lesson</strong>: Set clear limits on conversation history.</p>
+<hr>
+<p><strong>Mistake 3: Including System Prompt in Memory Management</strong></p>
+<p><strong>Bad:</strong></p>
+<pre><code class="language-python"># Remove system prompt along with others
+def trim_messages(messages):
+    return messages[-5:]  # System prompt may disappear
+</code></pre>
+<p><strong>Good:</strong></p>
+<pre><code class="language-python">def trim_messages(messages):
+    # Always keep system prompt
+    system_msg = messages[0]
+    recent_msgs = messages[-5:]
+
+    if system_msg not in recent_msgs:
+        return [system_msg] + recent_msgs
+    return recent_msgs
+</code></pre>
+<p><strong>Lesson</strong>: Always maintain system prompt as it contains agent role and instructions.</p>
+<hr>
+<p><strong>Mistake 4: Re-searching Long-term Memory Every Session</strong></p>
+<p><strong>Bad:</strong></p>
+<pre><code class="language-python"># Search long-term memory every message
+def run_agent(user_message):
+    preferences = long_term_memory.retrieve(user_id)  # Repeated DB queries
+    context = build_context(preferences, user_message)
+    response = llm.generate(context)
+    return response
+</code></pre>
+<p><strong>Good:</strong></p>
+<pre><code class="language-python">class Agent:
+    def __init__(self, user_id):
+        self.user_id = user_id
+        # Load once on session start
+        self.preferences = long_term_memory.retrieve(user_id)
+
+    def run(self, user_message):
+        # Use already-loaded preferences
+        context = build_context(self.preferences, user_message)
+        response = llm.generate(context)
+        return response
+</code></pre>
+<p><strong>Lesson</strong>: Load long-term memory once on session start and cache.</p>
+<hr>
+<p><strong>Mistake 5: Not Distinguishing Important from Unnecessary Information</strong></p>
+<p><strong>Bad:</strong></p>
+<pre><code class="language-python"># Save all conversations to long-term memory
+def save_conversation(user_id, messages):
+    for msg in messages:
+        long_term_memory.add(user_id, msg[&quot;content&quot;])
+# Greetings like &quot;Hi&quot;, &quot;Thanks&quot; all saved
+</code></pre>
+<p><strong>Good:</strong></p>
+<pre><code class="language-python">def save_conversation(user_id, messages):
+    for msg in messages:
+        # Save only important information (by length, keywords)
+        if len(msg[&quot;content&quot;]) &gt; 50 and msg[&quot;role&quot;] == &quot;user&quot;:
+            # Save only questions or requests
+            if any(keyword in msg[&quot;content&quot;] for keyword in [&quot;?&quot;, &quot;how&quot;, &quot;what&quot;, &quot;tell me&quot;, &quot;method&quot;]):
+                long_term_memory.add(user_id, msg[&quot;content&quot;])
+</code></pre>
+<p><strong>Lesson</strong>: Selectively save only important information to long-term memory.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Agents use memory to remember previous actions and results and decide next actions.</li>
+<li>Context window limitations require selectively maintaining only important information.</li>
+<li>When long-term memory is needed, leverage external storage (vector DB, general DB).</li>
+</ul>
+<hr>
+<h2>AI Agent 101 Series</h2>
+<ul>
+<li>What is an AI Agent? (upcoming)</li>
+<li>Context Engineering (upcoming)</li>
+<li>Tool Use Fundamentals (upcoming)</li>
+<li>Agent Workflow Design (upcoming)</li>
+<li><strong>Memory and State (current)</strong></li>
+<li>Multi-Agent Systems (upcoming)</li>
+<li>Agent Evaluation (upcoming)</li>
+<li>Error Handling and Reliability (upcoming)</li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ol>
+<li>
+<p><strong>LangChain Memory Documentation</strong> - https://python.langchain.com/docs/modules/memory/<br>
+   LangChain's various memory pattern implementations. Covers sliding window, summarization-based, and vector store utilization methods.</p>
+</li>
+<li>
+<p><strong>OpenAI Embeddings API</strong> - https://platform.openai.com/docs/guides/embeddings<br>
+   Embedding API documentation for converting text to vectors. Essential for implementing semantic search-based memory.</p>
+</li>
+<li>
+<p><strong>tiktoken</strong> - https://github.com/openai/tiktoken<br>
+   OpenAI's official token counting library. Essential for context window management.</p>
+</li>
+<li>
+<p><strong>Building LLM Applications: Memory Systems</strong> - https://www.pinecone.io/learn/series/langchain/langchain-conversational-memory/<br>
+   Pinecone's guide on conversational agent memory systems. Explains vector DB utilization patterns.</p>
+</li>
+</ol>
+<p class="tags-line">Tags: AI Agent, Memory, State Management, Context Window</p>
+</body>
+</html>

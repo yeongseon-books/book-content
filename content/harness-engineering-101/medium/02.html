@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Task Harness — Turning Vague Work into Executable Tasks</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Task Harness — Turning Vague Work into Executable Tasks</h1>
+<blockquote>
+<p>Harness Engineering 101 Series (2/10)</p>
+</blockquote>
+<p>Give an agent a vague instruction and you get a vague result. The Task Harness turns vague work into executable tasks with clear inputs, outputs, and completion criteria.</p>
+<hr>
+<h2>Vague Work Cannot Be Executed</h2>
+<p>Hand "tidy up our team report" to an agent and the result is not guaranteed. Which report? Where do you fetch it from? Does "tidy up" mean summarize, restructure, or convert format? A human would ask back. An agent does not. It guesses. And it guesses wrong.</p>
+<p>Task Harness is the design that converts vague work into an executable task with explicit inputs, outputs, and completion criteria. Without this conversion, every other harness loses its meaning. Context, Constraint, and Test all start from "what task is this for?"</p>
+<p>This article covers the components of a Task, how to write a Task Spec, and how to decompose vague requests into executable tasks.</p>
+<hr>
+<h2>The Four Components of a Task</h2>
+<p>An executable task has four parts.</p>
+<ol>
+<li><strong>Goal</strong>: What must be achieved. Write it in one sentence.</li>
+<li><strong>Inputs</strong>: Information and resources the agent may use. Data sources, parameters, preconditions.</li>
+<li><strong>Outputs</strong>: The format and location of the deliverable.</li>
+<li><strong>Completion criteria</strong>: How you decide the task is done. Must be automatically verifiable.</li>
+</ol>
+<p>When all four are explicit, the task is executable. If any is missing, the agent guesses.</p>
+<pre><code class="language-python">from pydantic import BaseModel, Field
+from typing import Any
+
+class TaskSpec(BaseModel):
+    &quot;&quot;&quot;Specification for an executable task.&quot;&quot;&quot;
+    goal: str = Field(..., description=&quot;Goal to achieve (one sentence)&quot;)
+    inputs: dict[str, Any] = Field(..., description=&quot;Input data and resources&quot;)
+    outputs: dict[str, Any] = Field(..., description=&quot;Output format and location&quot;)
+    completion_criteria: list[str] = Field(
+        ...,
+        description=&quot;Conditions to verify completion (automatable)&quot;,
+    )
+
+    def is_executable(self) -&gt; bool:
+        &quot;&quot;&quot;Check whether the task is executable.&quot;&quot;&quot;
+        return bool(
+            self.goal
+            and self.inputs
+            and self.outputs
+            and self.completion_criteria
+        )
+
+# Example: a clear task
+task = TaskSpec(
+    goal=&quot;Generate a daily summary report from sales data for the past 7 days&quot;,
+    inputs={
+        &quot;data_source&quot;: &quot;postgres://reports/sales&quot;,
+        &quot;date_range&quot;: {&quot;start&quot;: &quot;2026-04-26&quot;, &quot;end&quot;: &quot;2026-05-02&quot;},
+        &quot;filters&quot;: {&quot;region&quot;: &quot;APAC&quot;},
+    },
+    outputs={
+        &quot;format&quot;: &quot;markdown&quot;,
+        &quot;destination&quot;: &quot;s3://reports/daily/2026-05-03.md&quot;,
+        &quot;schema&quot;: &quot;ReportSchema&quot;,
+    },
+    completion_criteria=[
+        &quot;All required sections are present&quot;,
+        &quot;All numeric figures match the source data&quot;,
+        &quot;File is uploaded to the destination&quot;,
+    ],
+)
+
+assert task.is_executable()
+</code></pre>
+<p>The four-part TaskSpec is the minimum. Without this structure, you cannot write a system prompt, a verification function, or a test for the task.</p>
+<hr>
+<h2>Goal Versus Task</h2>
+<p>Goal and Task are different. Confusing them is the most common cause of harness failure.</p>
+<p>A <strong>Goal</strong> is what the business wants. "Improve customer support quality." "Reduce onboarding friction." Goals are abstract, long-term, and not directly executable.</p>
+<p>A <strong>Task</strong> is what the agent will execute right now. "Reply to the 12 unanswered tickets in the support inbox in Korean using template T-04." Tasks are concrete, short-term, and have completion criteria.</p>
+<p>One Goal usually decomposes into many Tasks. The job of Task Harness is the decomposition.</p>
+<pre><code class="language-python">def decompose_goal(goal: str) -&gt; list[TaskSpec]:
+    &quot;&quot;&quot;Decompose a Goal into executable Tasks.&quot;&quot;&quot;
+    # Goal: &quot;Improve customer support quality&quot;
+    # → Tasks:
+    return [
+        TaskSpec(
+            goal=&quot;Answer the 12 unanswered tickets from the past 24 hours&quot;,
+            inputs={&quot;queue&quot;: &quot;support&quot;, &quot;status&quot;: &quot;unanswered&quot;, &quot;max_age_hours&quot;: 24},
+            outputs={&quot;format&quot;: &quot;ticket_reply&quot;, &quot;destination&quot;: &quot;zendesk&quot;},
+            completion_criteria=[
+                &quot;All 12 tickets have a reply&quot;,
+                &quot;Each reply uses an approved template&quot;,
+                &quot;Each reply links to a knowledge base article&quot;,
+            ],
+        ),
+        TaskSpec(
+            goal=&quot;Group last week's tickets by topic and produce statistics&quot;,
+            inputs={&quot;date_range&quot;: &quot;last_week&quot;, &quot;queue&quot;: &quot;support&quot;},
+            outputs={&quot;format&quot;: &quot;json&quot;, &quot;destination&quot;: &quot;reports/topics.json&quot;},
+            completion_criteria=[
+                &quot;All tickets are assigned to a topic&quot;,
+                &quot;Each topic has count and percentage&quot;,
+                &quot;Top 5 topics include sample ticket IDs&quot;,
+            ],
+        ),
+    ]
+</code></pre>
+<p>Give the agent the Task. The Goal is the human's job.</p>
+<hr>
+<h2>Properties of a Good Task</h2>
+<p>Not every task is good. Three properties separate good tasks from bad.</p>
+<p><strong>1. Single deliverable.</strong> A task should produce one deliverable. "Reply to tickets and update the CRM" is two tasks. Split them. Single deliverable means single completion criteria, single retry unit, single rollback unit.</p>
+<p><strong>2. Bounded tool calls.</strong> A good task finishes in fewer than five tool calls. Beyond that, decompose. This is not a hard rule but a heuristic — long tool sequences amplify error compounding.</p>
+<p><strong>3. Auto-verifiable completion criteria.</strong> Criteria a human must read and judge cannot be tested, cannot be evaluated automatically, and cannot trigger retry decisions. Criteria must be expressible as code.</p>
+<pre><code class="language-python">from typing import Callable
+
+class VerifiableTask(TaskSpec):
+    &quot;&quot;&quot;Task with executable completion criteria.&quot;&quot;&quot;
+    verifier: Callable[[Any], bool] = Field(..., exclude=True)
+
+    def verify(self, output: Any) -&gt; bool:
+        &quot;&quot;&quot;Verify the output.&quot;&quot;&quot;
+        return self.verifier(output)
+
+def verify_report(output: dict) -&gt; bool:
+    &quot;&quot;&quot;Verifier for the daily summary report.&quot;&quot;&quot;
+    required_sections = [&quot;summary&quot;, &quot;metrics&quot;, &quot;anomalies&quot;, &quot;next_actions&quot;]
+    return (
+        all(section in output for section in required_sections)
+        and isinstance(output.get(&quot;metrics&quot;), dict)
+        and len(output.get(&quot;anomalies&quot;, [])) &gt;= 0
+    )
+
+task = VerifiableTask(
+    goal=&quot;Generate the daily summary report&quot;,
+    inputs={&quot;date&quot;: &quot;2026-05-03&quot;},
+    outputs={&quot;format&quot;: &quot;json&quot;},
+    completion_criteria=[
+        &quot;Required sections are present&quot;,
+        &quot;metrics is a dict&quot;,
+        &quot;anomalies field exists&quot;,
+    ],
+    verifier=verify_report,
+)
+
+# Verify the agent's output
+result = {&quot;summary&quot;: &quot;...&quot;, &quot;metrics&quot;: {}, &quot;anomalies&quot;: [], &quot;next_actions&quot;: []}
+assert task.verify(result)
+</code></pre>
+<p>Without <code>verify()</code>, you cannot decide whether to retry. Without that decision, the harness does not exist.</p>
+<hr>
+<h2>Decomposing Vague Requests Into Tasks</h2>
+<p>Real users do not deliver TaskSpecs. They say things like "do something about it." Task Harness must convert this into an executable task.</p>
+<p>A three-step procedure works.</p>
+<p><strong>Step 1: Restate the request as a Goal.</strong><br>
+"Do something about it" → "I want our team's productivity to improve."</p>
+<p><strong>Step 2: Identify candidate Tasks for the Goal.</strong><br>
+- Send a weekly retrospective summary<br>
+- Visualize the meeting load<br>
+- Detect blockers and notify the manager</p>
+<p><strong>Step 3: Convert each candidate into a TaskSpec.</strong><br>
+For each candidate, fill in Goal, Inputs, Outputs, and Completion criteria. Anything that cannot be filled in becomes a clarifying question for the human.</p>
+<pre><code class="language-python">class TaskCandidate(BaseModel):
+    &quot;&quot;&quot;Candidate task — incomplete spec.&quot;&quot;&quot;
+    description: str
+    missing_fields: list[str] = []
+
+    def to_spec(self, **filled) -&gt; TaskSpec | None:
+        &quot;&quot;&quot;Convert to a TaskSpec. Returns None if fields are missing.&quot;&quot;&quot;
+        if self.missing_fields:
+            return None
+        return TaskSpec(**filled)
+
+def request_to_tasks(request: str) -&gt; list[TaskCandidate]:
+    &quot;&quot;&quot;Convert a vague request into task candidates.&quot;&quot;&quot;
+    # In production this is built with LLM + templates.
+    return [
+        TaskCandidate(
+            description=&quot;Send a weekly retrospective summary&quot;,
+            missing_fields=[&quot;recipient&quot;, &quot;data_source&quot;],
+        ),
+        TaskCandidate(
+            description=&quot;Visualize the meeting load&quot;,
+            missing_fields=[&quot;chart_type&quot;, &quot;time_range&quot;],
+        ),
+    ]
+
+# Workflow
+candidates = request_to_tasks(&quot;Do something about productivity&quot;)
+for c in candidates:
+    if c.missing_fields:
+        print(f&quot;Need clarification: {c.description}&quot;)
+        print(f&quot;  Missing fields: {c.missing_fields}&quot;)
+</code></pre>
+<p>Asking back is part of Task Harness. An agent that does not ask back is not collaborating — it is gambling.</p>
+<hr>
+<h2>Task Spec As Single Source of Truth</h2>
+<p>Once a TaskSpec exists, everything else is derived from it.</p>
+<ul>
+<li><strong>System prompt</strong>: generated from <code>goal</code> and <code>completion_criteria</code></li>
+<li><strong>Allowed tools</strong>: filtered from <code>inputs</code></li>
+<li><strong>Verifier</strong>: derived from <code>completion_criteria</code></li>
+<li><strong>Retry policy</strong>: derived from <code>completion_criteria</code> violation type</li>
+<li><strong>Eval dataset</strong>: generated from variations of TaskSpec</li>
+</ul>
+<pre><code class="language-python">def task_to_system_prompt(task: TaskSpec) -&gt; str:
+    &quot;&quot;&quot;Generate a system prompt from a TaskSpec.&quot;&quot;&quot;
+    criteria = &quot;\n&quot;.join(f&quot;- {c}&quot; for c in task.completion_criteria)
+    return f&quot;&quot;&quot;You are an AI agent.
+
+Goal: {task.goal}
+
+Completion criteria (all required):
+{criteria}
+
+Output format: {task.outputs.get('format')}
+Output destination: {task.outputs.get('destination')}
+
+Available inputs:
+{task.inputs}
+
+Verify each criterion before reporting completion.
+&quot;&quot;&quot;
+
+def task_to_eval_dataset(task: TaskSpec, n: int = 10) -&gt; list[dict]:
+    &quot;&quot;&quot;Generate eval cases from a TaskSpec.&quot;&quot;&quot;
+    # Vary inputs to create test cases
+    return [
+        {&quot;task&quot;: task.model_dump(), &quot;variation&quot;: i, &quot;expected_pass&quot;: True}
+        for i in range(n)
+    ]
+</code></pre>
+<p>When the TaskSpec is the single source of truth, prompt, verifier, and evals stay in sync. When they live in separate places, the prompt evolves and verifier and evals drift behind.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>1. Using the Goal as the Task directly.</strong><br>
+Throwing "handle customer support well" straight at the agent. An undecomposed Goal is not executable. Convert to a clear TaskSpec first.</p>
+<p><strong>2. Writing completion criteria only in natural language.</strong><br>
+"The report must be accurate" cannot be auto-verified. Rewrite into a code-expressible form.</p>
+<p><strong>3. Making tasks too large.</strong><br>
+"Migrate the whole system" cannot be done in one agent run. Split into 5–10 smaller tasks.</p>
+<p><strong>4. Not specifying inputs and letting the agent find its own.</strong><br>
+"Get the data you need and do the work" gives the agent free search. That leads to cost blowups and wrong sources. Specify the available inputs.</p>
+<p><strong>5. Describing output format only in natural language without a schema.</strong><br>
+"Output as JSON" gives a different structure every time. Pin the format with a schema like Pydantic.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Task Harness converts vague work into executable tasks with explicit Goal, Inputs, Outputs, and Completion Criteria.</li>
+<li>A good task produces one deliverable, finishes in fewer than five tool calls, and has auto-verifiable completion criteria.</li>
+<li>Goal and Task are different. Goal is the business objective; Task is the execution unit. Give the agent the Task.</li>
+<li>Completion criteria must be objective, automatically verifiable, and measurable. Rewrite natural-language statements into code expressions.</li>
+<li>A single TaskSpec produces the system prompt, the verifier, and the eval dataset. The Task is the single source of truth.</li>
+</ul>
+<hr>
+<h2>Harness Engineering 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
+<li><strong>Task Harness — Turning Vague Work into Executable Tasks (current)</strong></li>
+<li>Context Harness — Designing What to Show and Hide from the Agent (upcoming)</li>
+<li>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)</li>
+<li>Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
+<li>Test Harness — Pinning Completion Criteria with Tests (upcoming)</li>
+<li>Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)</li>
+<li>Approval Gate — Designing Where Human Approval Is Required (upcoming)</li>
+<li>Observability — Tracing and Reproducing Agent Work (upcoming)</li>
+<li>Production Harness — Building an Operable Agent Work Environment (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic — Building Effective Agents</a></li>
+<li><a href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf">OpenAI — A Practical Guide to Building Agents</a></li>
+<li><a href="https://docs.pydantic.dev/latest/concepts/models/">Pydantic Documentation — Models</a></li>
+<li><a href="https://cloud.google.com/architecture/ai-agent-patterns">Google — Agent Design Patterns</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, Harness, Reliability, Production</p>
+</body>
+</html>

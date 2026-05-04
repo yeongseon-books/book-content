@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</h1>
+<blockquote>
+<p>Harness Engineering 101 Series (4/10)</p>
+</blockquote>
+<p>Give an agent freedom and you get creativity along with risk. The Constraint Harness is the rule system that declares what actions are allowed and what actions are forbidden.</p>
+<hr>
+<h2>Agents Try Everything They Are Allowed To</h2>
+<p>Give an agent tools and permissions, and it will try them all. If a "analyze customer data" task has database write access, the agent may modify data while analyzing. If "draft an email" has the send tool exposed, it may send the draft as is.</p>
+<p>LLMs assume any action not explicitly forbidden is safe. Humans build boundaries from social norms and common sense. Agents have neither. Explicit constraints are the safety.</p>
+<p>Constraint Harness defines, in code-expressed rules, what an agent may and may not do. This article covers the kinds of constraints, policy engine design, and how to detect violations.</p>
+<hr>
+<h2>Four Kinds of Constraints</h2>
+<p>Constraints on an agent fall into four categories.</p>
+<p><strong>1. Capability constraints</strong>: which tools may be used. Defined as a whitelist.</p>
+<p><strong>2. Resource constraints</strong>: how much may be used. Caps on tokens, API calls, time, cost.</p>
+<p><strong>3. Behavioral constraints</strong>: how the agent must behave. Forbidden output patterns, required formats, priorities.</p>
+<p><strong>4. Scope constraints</strong>: how far the impact may reach. The set of accessible data and modifiable resources.</p>
+<p>Each kind is enforced by a different mechanism. Capability at the tool exposure layer, Resource via runtime metering, Behavioral via output validation, Scope via data-layer permissions.</p>
+<pre><code class="language-python">from dataclasses import dataclass, field
+from enum import Enum
+
+class ConstraintType(Enum):
+    CAPABILITY = &quot;capability&quot;
+    RESOURCE = &quot;resource&quot;
+    BEHAVIORAL = &quot;behavioral&quot;
+    SCOPE = &quot;scope&quot;
+
+@dataclass
+class Constraint:
+    &quot;&quot;&quot;A single constraint definition.&quot;&quot;&quot;
+    name: str
+    type: ConstraintType
+    rule: str  # Human-readable rule
+    enforcer: str  # Identifier of the enforcement mechanism
+
+@dataclass
+class ConstraintPolicy:
+    &quot;&quot;&quot;The set of constraints applied to a task.&quot;&quot;&quot;
+    task_id: str
+    constraints: list[Constraint] = field(default_factory=list)
+
+    def by_type(self, t: ConstraintType) -&gt; list[Constraint]:
+        return [c for c in self.constraints if c.type == t]
+
+policy = ConstraintPolicy(
+    task_id=&quot;generate-report&quot;,
+    constraints=[
+        Constraint(&quot;read-only&quot;, ConstraintType.CAPABILITY, &quot;Read-only DB access&quot;, &quot;tool-filter&quot;),
+        Constraint(&quot;max-cost&quot;, ConstraintType.RESOURCE, &quot;Max 0.5 USD&quot;, &quot;cost-meter&quot;),
+        Constraint(&quot;no-pii&quot;, ConstraintType.BEHAVIORAL, &quot;No PII in output&quot;, &quot;output-validator&quot;),
+        Constraint(&quot;apac-only&quot;, ConstraintType.SCOPE, &quot;APAC region only&quot;, &quot;row-filter&quot;),
+    ],
+)
+</code></pre>
+<p>Without this four-way classification, vague demands like "the agent should behave safely" cannot be enforced.</p>
+<hr>
+<h2>Capability Constraints — Tool Whitelisting</h2>
+<p>The simplest and most effective constraint is restricting tool exposure. An agent cannot call a tool it never received.</p>
+<p>The core principle is whitelisting. Not "this tool is forbidden" but "only this tool is allowed." A blacklist must be updated each time a new tool is added; a whitelist blocks anything not explicitly added.</p>
+<pre><code class="language-python">from typing import Callable
+from dataclasses import dataclass
+
+@dataclass
+class Tool:
+    name: str
+    description: str
+    handler: Callable
+    danger_level: int  # 0 (safe) to 5 (destructive)
+
+class ToolRegistry:
+    &quot;&quot;&quot;Registers all tools and filters them per task.&quot;&quot;&quot;
+
+    def __init__(self):
+        self._tools: dict[str, Tool] = {}
+
+    def register(self, tool: Tool) -&gt; None:
+        self._tools[tool.name] = tool
+
+    def expose(self, allowed_names: set[str], max_danger: int = 2) -&gt; list[Tool]:
+        &quot;&quot;&quot;Expose only allowed tools within the danger threshold.&quot;&quot;&quot;
+        return [
+            t for name, t in self._tools.items()
+            if name in allowed_names and t.danger_level &lt;= max_danger
+        ]
+
+registry = ToolRegistry()
+registry.register(Tool(&quot;read_db&quot;, &quot;Query DB&quot;, lambda q: ..., danger_level=0))
+registry.register(Tool(&quot;write_db&quot;, &quot;Modify DB&quot;, lambda r: ..., danger_level=4))
+registry.register(Tool(&quot;send_email&quot;, &quot;Send email&quot;, lambda m: ..., danger_level=3))
+
+# Task: produce an analytical report — read only
+exposed = registry.expose(allowed_names={&quot;read_db&quot;}, max_danger=2)
+assert all(t.name == &quot;read_db&quot; for t in exposed)
+</code></pre>
+<p>The danger_level acts as a second guard. If a dangerous tool ever slips into the whitelist by mistake, the threshold blocks it.</p>
+<hr>
+<h2>Resource Constraints — Caps on Cost and Time</h2>
+<p>Agents can fall into infinite loops. They might repeat a wrong tool call 100 times or run 30 more searches. Resource constraints stop these accidents at the cost layer.</p>
+<p>Three measurements.</p>
+<p><strong>1. Token budget</strong>: cap on cumulative input + output tokens.<br>
+<strong>2. Tool call budget</strong>: maximum tool calls per task.<br>
+<strong>3. Wall clock budget</strong>: cap on total execution time.</p>
+<pre><code class="language-python">import time
+from dataclasses import dataclass, field
+
+@dataclass
+class ResourceMeter:
+    &quot;&quot;&quot;Tracks resource use and enforces caps.&quot;&quot;&quot;
+    max_tokens: int = 50_000
+    max_tool_calls: int = 20
+    max_wall_seconds: float = 60.0
+
+    used_tokens: int = 0
+    used_tool_calls: int = 0
+    started_at: float = field(default_factory=time.time)
+
+    def record_tokens(self, n: int) -&gt; None:
+        self.used_tokens += n
+        if self.used_tokens &gt; self.max_tokens:
+            raise ResourceExhausted(f&quot;token budget exceeded: {self.used_tokens}/{self.max_tokens}&quot;)
+
+    def record_tool_call(self) -&gt; None:
+        self.used_tool_calls += 1
+        if self.used_tool_calls &gt; self.max_tool_calls:
+            raise ResourceExhausted(f&quot;tool call budget exceeded: {self.used_tool_calls}/{self.max_tool_calls}&quot;)
+
+    def check_wall_clock(self) -&gt; None:
+        elapsed = time.time() - self.started_at
+        if elapsed &gt; self.max_wall_seconds:
+            raise ResourceExhausted(f&quot;wall clock exceeded: {elapsed:.1f}s&quot;)
+
+class ResourceExhausted(Exception):
+    pass
+</code></pre>
+<p>Agents without caps cause cost incidents in production. Real reports describe single misbehaving tasks burning thousands of dollars. The ResourceMeter is insurance.</p>
+<hr>
+<h2>Behavioral Constraints — Output Policy</h2>
+<p>The agent's outputs need rules too. No PII allowed, must follow a specific format, must not use a forbidden tone.</p>
+<p>Enforce in two stages.</p>
+<p><strong>1. Pre-output validation</strong>: check schema and policy just before output. On violation, request regeneration.</p>
+<p><strong>2. Post-output filtering</strong>: apply a final filter before sending to the user. PII masking, banned-word substitution.</p>
+<pre><code class="language-python">import re
+from typing import Protocol
+
+class OutputPolicy(Protocol):
+    def check(self, output: str) -&gt; tuple[bool, str]:
+        &quot;&quot;&quot;Returns (passed, reason).&quot;&quot;&quot;
+        ...
+
+class NoSecrets:
+    &quot;&quot;&quot;Checks output contains no secrets.&quot;&quot;&quot;
+    def check(self, output: str) -&gt; tuple[bool, str]:
+        if re.search(r&quot;sk-[a-zA-Z0-9]{20,}&quot;, output):
+            return False, &quot;API key detected&quot;
+        if re.search(r&quot;\b\d{3}-\d{2}-\d{4}\b&quot;, output):
+            return False, &quot;SSN detected&quot;
+        return True, &quot;&quot;
+
+class ApprovedTone:
+    &quot;&quot;&quot;Allows only approved tone.&quot;&quot;&quot;
+    BANNED_PHRASES = {&quot;absolutely guaranteed&quot;, &quot;100% safe&quot;, &quot;no risk&quot;}
+
+    def check(self, output: str) -&gt; tuple[bool, str]:
+        lower = output.lower()
+        for phrase in self.BANNED_PHRASES:
+            if phrase in lower:
+                return False, f&quot;banned phrase: {phrase}&quot;
+        return True, &quot;&quot;
+
+def enforce_policies(output: str, policies: list[OutputPolicy]) -&gt; None:
+    for p in policies:
+        ok, reason = p.check(output)
+        if not ok:
+            raise PolicyViolation(reason)
+
+class PolicyViolation(Exception):
+    pass
+</code></pre>
+<p>When a violation is detected, request the agent to regenerate. Not a flat block — feedback ("rejected for this reason, retry") is the key idea, covered in the next article on Feedback Loop.</p>
+<hr>
+<h2>Scope Constraints — Permissions at the Data Layer</h2>
+<p>The strongest constraints come from the data layer. No matter how badly the agent's query is formed, if the database refuses to return out-of-scope rows, you are safe.</p>
+<p>Implement this with row-level security or view-based access. Do not give the agent direct table access — expose task-scoped views or filtered queries.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class ScopedDataAccess:
+    &quot;&quot;&quot;Restricts data access to the task's scope.&quot;&quot;&quot;
+    user_id: str
+    region: str
+    allowed_tables: set[str]
+
+    def query(self, sql: str) -&gt; list[dict]:
+        &quot;&quot;&quot;Validates SQL and enforces scope.&quot;&quot;&quot;
+        self._validate_tables(sql)
+        scoped_sql = self._inject_filters(sql)
+        return self._execute(scoped_sql)
+
+    def _validate_tables(self, sql: str) -&gt; None:
+        # Naive check — use a real SQL parser in production
+        for table in [&quot;users&quot;, &quot;orders&quot;, &quot;payments&quot;]:
+            if table in sql.lower() and table not in self.allowed_tables:
+                raise ScopeViolation(f&quot;table not allowed: {table}&quot;)
+
+    def _inject_filters(self, sql: str) -&gt; str:
+        # Inject region filter into WHERE clause
+        if &quot;where&quot; in sql.lower():
+            return sql + f&quot; AND region = '{self.region}'&quot;
+        return sql + f&quot; WHERE region = '{self.region}'&quot;
+
+    def _execute(self, sql: str) -&gt; list[dict]:
+        return []
+
+class ScopeViolation(Exception):
+    pass
+</code></pre>
+<p>Data-layer constraints contain the blast radius of any agent misbehavior. They are harder to bypass than application-layer checks, and their audit logs are more trustworthy.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>1. Constraining only via the system prompt.</strong><br>
+Writing "do not modify the DB" in the prompt is not enough. LLMs may ignore instructions. Either do not expose the tool, or block it at the data layer.</p>
+<p><strong>2. Managing tools by blacklist.</strong><br>
+A "forbidden tools" list breaks every time a new tool is added. Use a whitelist only.</p>
+<p><strong>3. Not setting resource limits.</strong><br>
+Without caps on tokens, tool calls, and wall clock, a misbehaving task generates unbounded cost. Apply caps to every task.</p>
+<p><strong>4. Delegating output validation to humans.</strong><br>
+"A human will review the output" leads to skipped reviews leaking through to production. Automated validation is mandatory.</p>
+<p><strong>5. Checking permissions only at the application layer.</strong><br>
+Validating the agent's SQL inside the application is bypassable. Use database row-level security or views.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>LLMs assume any unforbidden action is safe. Constraints must be code-expressed rules.</li>
+<li>Constraints split into Capability, Resource, Behavioral, and Scope, each enforced by a different mechanism.</li>
+<li>Capability constraints expose tools by whitelist and double-protect with a danger level.</li>
+<li>Resource constraints cap tokens, tool calls, and wall clock to prevent cost incidents.</li>
+<li>Scope constraints are strongest when enforced at the data layer; application-layer validation is bypassable.</li>
+</ul>
+<hr>
+<h2>Harness Engineering 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness — Designing What to Show and Hide from the Agent</a></li>
+<li><strong>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (current)</strong></li>
+<li>Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
+<li>Test Harness — Pinning Completion Criteria with Tests (upcoming)</li>
+<li>Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)</li>
+<li>Approval Gate — Designing Where Human Approval Is Required (upcoming)</li>
+<li>Observability — Tracing and Reproducing Agent Work (upcoming)</li>
+<li>Production Harness — Building an Operable Agent Work Environment (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic — Building Effective Agents</a></li>
+<li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP — Top 10 for LLM Applications</a></li>
+<li><a href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html">PostgreSQL — Row Security Policies</a></li>
+<li><a href="https://www.openpolicyagent.org/docs/latest/policy-language/">Open Policy Agent — Policy Language</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, Harness, Security, Policy</p>
+</body>
+</html>

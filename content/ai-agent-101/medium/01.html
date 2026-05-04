@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is an AI Agent?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is an AI Agent?</h1>
+<blockquote>
+<p>AI Agent 101 series (1/10)</p>
+</blockquote>
+<hr>
+<h2>What you will learn</h2>
+<ul>
+<li>The essential difference between a chatbot like ChatGPT and an AI Agent</li>
+<li>The core observe → think → act → check loop and why it matters</li>
+<li>A four-question test for deciding whether your use case actually needs an Agent</li>
+<li>A pen-and-paper exercise that mimics an Agent without any framework</li>
+</ul>
+<h2>Why it matters</h2>
+<p>When people first meet LLMs, they usually frame them as "models that answer questions." The ChatGPT chat box becomes a stand-in for the entire field. That mental model breaks the moment you push LLMs into production.</p>
+<blockquote>
+<p>"Triage 1,000 customer tickets, route each to the right team, and draft a reply for every one."</p>
+</blockquote>
+<p>This sentence is impossible for a chatbot. The model has to call external systems, observe the results, decide what to do next, and retry on failure. That is exactly where chatbots end and Agents begin. Understanding Agents expands LLMs from "conversation partners" to "automatable workers."</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A chatbot is a dictionary that gives you an answer. An Agent is an intern you hand a task to and walk away from.</p>
+</blockquote>
+<p>A dictionary opens, hands you a definition, and closes. An intern is different. They do not know the answer up front. They look around (observe), decide what to try (think), do something (act), and check whether the result is good (check). If not, they try again. That loop is the essence of an Agent.</p>
+<h2>Concept 1 - Chatbot vs Agent</h2>
+<p><strong>Input</strong><br>
+- Chatbot: User message<br>
+- Agent: Goal</p>
+<p><strong>Output</strong><br>
+- Chatbot: Text reply<br>
+- Agent: Task done or artifact produced</p>
+<p><strong>External interaction</strong><br>
+- Chatbot: None<br>
+- Agent: Tool calls, file/API access</p>
+<p><strong>Iteration</strong><br>
+- Chatbot: One turn<br>
+- Agent: N turns until goal is met</p>
+<p><strong>State</strong><br>
+- Chatbot: Conversation history<br>
+- Agent: Task state plus memory</p>
+<p>Technically, an Agent is also "an LLM call" under the hood. The difference is whether <strong>a human reads the LLM output, or a system consumes it and triggers the next action</strong>.</p>
+<h2>Concept 2 - The Observe → Think → Act → Check loop</h2>
+<p>Every Agent action is a repetition of this four-step loop.</p>
+<pre><code class="language-text">goal: &quot;Tell me whether I need an umbrella in Tokyo today&quot;
+
+[loop 1]
+  observe: known info = (only the goal)
+  think:   &quot;I need today's weather; call the weather API&quot;
+  act:     get_weather(city=&quot;Tokyo&quot;)
+  check:   result = {temp: 18, condition: &quot;rain&quot;}
+
+[loop 2]
+  observe: rain is forecast
+  think:   &quot;Rain means yes, an umbrella is needed&quot;
+  act:     final_answer(&quot;Yes, rain is forecast in Tokyo today&quot;)
+  check:   goal achieved → stop
+</code></pre>
+<p>This loop, implemented as repeated LLM calls, is the ReAct (Reason + Act) pattern, and almost every Agent framework is a variation on it.</p>
+<h2>Before / After</h2>
+<p><strong>Before (chatbot style)</strong></p>
+<pre><code class="language-python">response = llm.chat(&quot;What's the weather in Tokyo?&quot;)
+# → &quot;I'm sorry, I don't have access to real-time information.&quot;
+</code></pre>
+<p><strong>After (Agent style)</strong></p>
+<pre><code class="language-python">goal = &quot;Tell me whether I need an umbrella in Tokyo today&quot;
+agent = Agent(tools=[get_weather], llm=llm)
+result = agent.run(goal)
+# → &quot;Yes, rain is forecast in Tokyo today (18°C, rain)&quot;
+</code></pre>
+<p>The single key difference is <code>tools=[get_weather]</code>. Once the Agent knows a tool exists, the LLM decides on its own when to invoke it.</p>
+<h2>Step-by-step exercise - faking an Agent by hand</h2>
+<p>You can grasp how Agents work without any framework. Two small Python pieces are enough.</p>
+<p><strong>Step 1. Define a tool</strong></p>
+<pre><code class="language-python">def get_weather(city: str) -&gt; dict:
+    # In production this calls a real API. Mock here.
+    fake = {&quot;Tokyo&quot;: {&quot;temp&quot;: 18, &quot;condition&quot;: &quot;rain&quot;},
+            &quot;Seoul&quot;: {&quot;temp&quot;: 22, &quot;condition&quot;: &quot;clear&quot;}}
+    return fake.get(city, {&quot;error&quot;: &quot;unknown city&quot;})
+</code></pre>
+<p><strong>Step 2. Run one loop manually</strong></p>
+<p>You play the role of the LLM.</p>
+<pre><code class="language-python">goal = &quot;Tell me whether I need an umbrella in Tokyo today&quot;
+
+# observe
+context = {&quot;goal&quot;: goal, &quot;history&quot;: []}
+
+# think (you decide)
+next_action = (&quot;get_weather&quot;, {&quot;city&quot;: &quot;Tokyo&quot;})
+
+# act
+result = get_weather(**next_action[1])
+context[&quot;history&quot;].append((next_action, result))
+
+# check
+print(context)
+# {'goal': '...', 'history': [(('get_weather', {'city': 'Tokyo'}),
+#                              {'temp': 18, 'condition': 'rain'})]}
+</code></pre>
+<p><strong>Step 3. Hand <code>think</code> to an LLM</strong></p>
+<p>Hand the current context to an LLM and ask it to reply with the next tool to call as JSON. That is the simplest possible Agent. The next episode covers the actual ReAct prompt.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1. Assuming "smarter LLMs will answer in one shot"</strong></p>
+<p>The essence of Agents is not model size but <strong>interaction with external systems</strong>. Even GPT-5 does not know real-time weather without a weather API. There is no such thing as a tool-free Agent.</p>
+<p><strong>Mistake 2. Using Agents for everything</strong></p>
+<p>Summarization, translation, and simple Q&amp;A are fine on a chatbot. Agents make 5-20x more LLM calls, which inflates cost and latency. Without external action, there is no reason to pay the Agent tax.</p>
+<p><strong>Mistake 3. Skipping result verification</strong></p>
+<p>A common bug is an Agent that proceeds as if a failed API call had succeeded, because the LLM "felt" the call worked. Make the check step explicit and define retry or fallback paths on failure.</p>
+<p><strong>Mistake 4. Ignoring infinite loops</strong></p>
+<p>A confused LLM will call the same tool forever. Always cap maximum steps (for example 10) and force-stop on overflow.</p>
+<p><strong>Mistake 5. Letting context grow unbounded</strong></p>
+<p>Every loop appends to history, which lands in the prompt, which blows up tokens. You need memory compression, summarization, or a sliding window (covered in Ep5).</p>
+<h2>How practitioners think about this</h2>
+<p>Before adopting Agents in production, ask these questions.</p>
+<ul>
+<li><strong>Do you need external action?</strong> If not, a chatbot or RAG is enough.</li>
+<li><strong>Do you need multi-step reasoning?</strong> Search → compare → conclude is where Agents shine.</li>
+<li><strong>Can you absorb the failure modes?</strong> Agents fail more ways than chatbots. High-stakes flows like financial transactions require human-in-the-loop.</li>
+<li><strong>Does the cost pencil out?</strong> Expect 5-15 LLM calls per task, so your unit economics shift significantly.</li>
+</ul>
+<p>Two or more "yes" answers means it is time to seriously evaluate Agents.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can state the chatbot vs Agent difference in one sentence</li>
+<li>[ ] I can draw the observe → think → act → check loop</li>
+<li>[ ] I can apply the four-question test to my use case</li>
+<li>[ ] I understand the infinite-loop and context-bloat risks</li>
+</ul>
+<h2>Practice</h2>
+<ol>
+<li>Classify each task as "needs Agent" or "chatbot is enough":<br>
+   - "Summarize today's meeting notes"<br>
+   - "Triage GitHub issues by label and assign owners"<br>
+   - "Review this Python code"<br>
+   - "Reply 'ack' to every Slack message that mentioned me today"</li>
+<li>Add a <code>send_email</code> tool alongside <code>get_weather</code>. Invent one new use case the Agent now enables.</li>
+</ol>
+<h2>Summary</h2>
+<ul>
+<li>An AI Agent is an LLM-driven system that takes a goal and repeats the observe → think → act → check loop until done.</li>
+<li>The difference from a chatbot is external tool use plus multi-turn autonomous decisions.</li>
+<li>Agents are not always the answer; their value peaks when external action and multi-step judgment combine.</li>
+<li>Infinite loops, context bloat, and tool failures are the first risks to design for.</li>
+<li>Drawing the loop by hand once shows that every Agent framework is the same shape.</li>
+</ul>
+<h2>Next</h2>
+<p>The next episode covers <strong>context engineering</strong> - the discipline of deciding what enters and what leaves the prompt, which determines Agent decision quality.</p>
+<hr>
+<h2>AI Agent 101 series</h2>
+<ul>
+<li><strong>What Is an AI Agent? (current)</strong></li>
+<li>Context Engineering (upcoming)</li>
+<li>Tool Use Fundamentals (upcoming)</li>
+<li>Agent Workflow Design (upcoming)</li>
+<li>Memory and State (upcoming)</li>
+<li>Multi-Agent Systems (upcoming)</li>
+<li>Agent Evaluation (upcoming)</li>
+<li>Error Handling and Reliability (upcoming)</li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2210.03629">ReAct: Synergizing Reasoning and Acting in Language Models</a></li>
+<li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic - Building effective agents</a></li>
+<li><a href="https://python.langchain.com/docs/concepts/agents/">LangChain Agents - conceptual guide</a></li>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI - Function calling guide</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Autonomy, ReAct, Automation</p>
+</body>
+</html>

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Multi-Agent Systems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Multi-Agent Systems</h1>
+<blockquote>
+<p>AI Agent 101 Series (6/10)</p>
+</blockquote>
+<p>Sometimes it's difficult to handle all tasks with a single agent. This happens when tasks span multiple domains, require different expertise at each step, or need parallel processing. In such cases, coordinating multiple agents creates a multi-agent system.</p>
+<p>The core of multi-agent systems is coordination and delegation. Patterns include the Orchestrator pattern where one agent coordinates everything, the Peer-to-Peer pattern where multiple agents cooperate as equals, and the Hierarchical pattern that divides work hierarchically.</p>
+<p>This article covers multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.</p>
+<hr>
+<h2>Multi-Agent Patterns</h2>
+<p>There are several patterns for handling complex tasks through cooperation among multiple agents.</p>
+<p><strong>Orchestrator Pattern (Centralized Coordination)</strong></p>
+<p>A single Orchestrator agent coordinates everything and delegates work to specialized Worker agents.</p>
+<pre><code class="language-python">from typing import List, Dict
+from openai import OpenAI
+
+class WorkerAgent:
+    &quot;&quot;&quot;A specialized worker agent.&quot;&quot;&quot;
+
+    def __init__(self, name: str, role: str, api_key: str):
+        self.name = name
+        self.role = role
+        self.client = OpenAI(api_key=api_key)
+
+    def execute(self, task: str) -&gt; str:
+        &quot;&quot;&quot;Execute a task.&quot;&quot;&quot;
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[
+                {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: f&quot;You are a {self.role}.&quot;},
+                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}
+            ],
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+
+class OrchestratorAgent:
+    &quot;&quot;&quot;An orchestrator agent that coordinates workers.&quot;&quot;&quot;
+
+    def __init__(self, api_key: str):
+        self.client = OpenAI(api_key=api_key)
+        self.workers: Dict[str, WorkerAgent] = {}
+
+    def register_worker(self, worker: WorkerAgent) -&gt; None:
+        &quot;&quot;&quot;Register a worker.&quot;&quot;&quot;
+        self.workers[worker.name] = worker
+
+    def plan(self, request: str) -&gt; List[Dict]:
+        &quot;&quot;&quot;Decompose the request into subtasks.&quot;&quot;&quot;
+        worker_list = &quot;\n&quot;.join([
+            f&quot;- {name}: {w.role}&quot;
+            for name, w in self.workers.items()
+        ])
+        prompt = f&quot;&quot;&quot;Break down the following request into subtasks and assign each to the appropriate worker.
+
+Available workers:
+{worker_list}
+
+Request: {request}
+
+Respond in JSON format:
+[
+  {{&quot;worker&quot;: &quot;worker_name&quot;, &quot;task&quot;: &quot;task description&quot;}},
+  ...
+]
+&quot;&quot;&quot;
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.3
+        )
+        import json
+        return json.loads(response.choices[0].message.content)
+
+    def handle(self, request: str) -&gt; Dict:
+        &quot;&quot;&quot;Handle the request.&quot;&quot;&quot;
+        subtasks = self.plan(request)
+        results = {}
+        for subtask in subtasks:
+            worker_name = subtask[&quot;worker&quot;]
+            task = subtask[&quot;task&quot;]
+            if worker_name in self.workers:
+                results[worker_name] = self.workers[worker_name].execute(task)
+        return results
+
+# Example usage
+orchestrator = OrchestratorAgent(api_key=&quot;your-key&quot;)
+
+# Register workers
+researcher = WorkerAgent(&quot;researcher&quot;, &quot;research analyst&quot;, &quot;your-key&quot;)
+writer = WorkerAgent(&quot;writer&quot;, &quot;technical writer&quot;, &quot;your-key&quot;)
+reviewer = WorkerAgent(&quot;reviewer&quot;, &quot;content reviewer&quot;, &quot;your-key&quot;)
+
+orchestrator.register_worker(researcher)
+orchestrator.register_worker(writer)
+orchestrator.register_worker(reviewer)
+
+# Handle a request
+result = orchestrator.handle(&quot;Write a blog post about Python async programming&quot;)
+</code></pre>
+<p>The Orchestrator pattern fits cases where tasks have clear stages and central control is needed. The downside is that the Orchestrator becomes a single point of failure.</p>
+<p><strong>Peer-to-Peer Pattern (Equal Collaboration)</strong></p>
+<p>Multiple agents cooperate as equals without a central coordinator. Each agent communicates directly with others.</p>
+<pre><code class="language-python">from typing import List, Optional
+
+class PeerAgent:
+    &quot;&quot;&quot;A peer agent.&quot;&quot;&quot;
+
+    def __init__(self, name: str, role: str, api_key: str):
+        self.name = name
+        self.role = role
+        self.client = OpenAI(api_key=api_key)
+        self.peers: List[&quot;PeerAgent&quot;] = []
+        self.message_history: List[Dict] = []
+
+    def add_peer(self, peer: &quot;PeerAgent&quot;) -&gt; None:
+        &quot;&quot;&quot;Add a peer.&quot;&quot;&quot;
+        if peer not in self.peers:
+            self.peers.append(peer)
+
+    def send_message(self, recipient: &quot;PeerAgent&quot;, message: str) -&gt; str:
+        &quot;&quot;&quot;Send a message to a peer.&quot;&quot;&quot;
+        msg = {
+            &quot;from&quot;: self.name,
+            &quot;to&quot;: recipient.name,
+            &quot;content&quot;: message
+        }
+        self.message_history.append(msg)
+        return recipient.receive_message(self, message)
+
+    def receive_message(self, sender: &quot;PeerAgent&quot;, message: str) -&gt; str:
+        &quot;&quot;&quot;Receive a message and respond.&quot;&quot;&quot;
+        prompt = f&quot;&quot;&quot;You are {self.name}, a {self.role}.
+Message from {sender.name}: {message}
+
+Respond appropriately. If you need help from another peer, mention it.&quot;&quot;&quot;
+
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.7
+        )
+        reply = response.choices[0].message.content
+
+        self.message_history.append({
+            &quot;from&quot;: sender.name,
+            &quot;to&quot;: self.name,
+            &quot;content&quot;: message,
+            &quot;reply&quot;: reply
+        })
+        return reply
+
+    def collaborate(self, task: str) -&gt; str:
+        &quot;&quot;&quot;Collaborate with peers on a task.&quot;&quot;&quot;
+        # Find a peer that can help
+        for peer in self.peers:
+            if self._needs_help_from(peer, task):
+                return self.send_message(peer, task)
+        # Handle alone if no help is needed
+        return self._handle_alone(task)
+
+    def _needs_help_from(self, peer: &quot;PeerAgent&quot;, task: str) -&gt; bool:
+        &quot;&quot;&quot;Determine whether help from this peer is needed.&quot;&quot;&quot;
+        # Simplified judgment logic
+        keywords = {
+            &quot;writer&quot;: [&quot;write&quot;, &quot;draft&quot;, &quot;compose&quot;],
+            &quot;reviewer&quot;: [&quot;review&quot;, &quot;check&quot;, &quot;feedback&quot;],
+            &quot;researcher&quot;: [&quot;research&quot;, &quot;find&quot;, &quot;investigate&quot;]
+        }
+        for role, kws in keywords.items():
+            if role in peer.role.lower():
+                if any(kw in task.lower() for kw in kws):
+                    return True
+        return False
+
+    def _handle_alone(self, task: str) -&gt; str:
+        &quot;&quot;&quot;Handle the task alone.&quot;&quot;&quot;
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[
+                {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: f&quot;You are {self.name}, a {self.role}.&quot;},
+                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}
+            ],
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+
+# Example usage
+writer = PeerAgent(&quot;Writer&quot;, &quot;technical writer&quot;, &quot;your-key&quot;)
+reviewer = PeerAgent(&quot;Reviewer&quot;, &quot;content reviewer&quot;, &quot;your-key&quot;)
+
+# Register each other as peers
+writer.add_peer(reviewer)
+reviewer.add_peer(writer)
+
+# Start collaboration
+result = writer.collaborate(&quot;Write and review a blog post about REST APIs&quot;)
+# Writer drafts and hands off to Reviewer
+# Reviewer gives feedback and Writer revises
+</code></pre>
+<p>The Peer-to-Peer pattern fits creative collaboration or peer-review style tasks. The downside is that without protocol design, it can lead to infinite loops or inconsistent outputs.</p>
+<p><strong>Hierarchical Pattern (Tree-shaped Structure)</strong></p>
+<p>Agents are arranged in a tree, where parents delegate to children and children report back to parents. Suitable for handling complex tasks across multiple levels.</p>
+<pre><code class="language-python">from typing import List, Optional
+
+class HierarchicalAgent:
+    &quot;&quot;&quot;A hierarchical agent.&quot;&quot;&quot;
+
+    def __init__(self, name: str, role: str, level: int, api_key: str):
+        self.name = name
+        self.role = role
+        self.level = level  # 0 = top, increases downward
+        self.client = OpenAI(api_key=api_key)
+        self.parent: Optional[&quot;HierarchicalAgent&quot;] = None
+        self.children: List[&quot;HierarchicalAgent&quot;] = []
+
+    def add_child(self, child: &quot;HierarchicalAgent&quot;) -&gt; None:
+        &quot;&quot;&quot;Add a child agent.&quot;&quot;&quot;
+        child.parent = self
+        self.children.append(child)
+
+    def execute(self, task: str) -&gt; str:
+        &quot;&quot;&quot;Execute a task.&quot;&quot;&quot;
+        if not self.children:
+            # Leaf node: execute directly
+            return self._do_work(task)
+
+        # Internal node: split and delegate to children
+        subtasks = self._split_task(task)
+        results = []
+        for child, subtask in zip(self.children, subtasks):
+            result = child.execute(subtask)
+            results.append(result)
+
+        # Aggregate results
+        return self._aggregate_results(task, results)
+
+    def _split_task(self, task: str) -&gt; List[str]:
+        &quot;&quot;&quot;Split the task into subtasks for each child.&quot;&quot;&quot;
+        children_info = &quot;\n&quot;.join([
+            f&quot;- {child.name}: {child.role}&quot;
+            for child in self.children
+        ])
+        prompt = f&quot;&quot;&quot;Split the following task into subtasks for each child agent.
+
+Task: {task}
+
+Child agents:
+{children_info}
+
+Respond with one subtask per line, in the same order as the child agents.&quot;&quot;&quot;
+
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.3
+        )
+        lines = response.choices[0].message.content.strip().split(&quot;\n&quot;)
+        # Pad with empty strings if fewer lines than children
+        while len(lines) &lt; len(self.children):
+            lines.append(&quot;&quot;)
+        return lines[:len(self.children)]
+
+    def _do_work(self, task: str) -&gt; str:
+        &quot;&quot;&quot;Execute the task directly (leaf nodes).&quot;&quot;&quot;
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[
+                {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: f&quot;You are {self.name}, a {self.role}.&quot;},
+                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}
+            ],
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+
+    def _aggregate_results(self, task: str, results: List[str]) -&gt; str:
+        &quot;&quot;&quot;Aggregate child results.&quot;&quot;&quot;
+        results_text = &quot;\n\n&quot;.join([
+            f&quot;Result {i+1}: {r}&quot; for i, r in enumerate(results)
+        ])
+        prompt = f&quot;&quot;&quot;Original task: {task}
+
+Subtask results:
+{results_text}
+
+Synthesize the results into a coherent final answer.&quot;&quot;&quot;
+
+        response = self.client.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.5
+        )
+        return response.choices[0].message.content
+
+# Example usage
+# Top Manager
+ceo = HierarchicalAgent(&quot;CEO&quot;, &quot;executive director&quot;, 0, &quot;your-key&quot;)
+
+# Mid-level Managers
+eng_manager = HierarchicalAgent(&quot;EngManager&quot;, &quot;engineering manager&quot;, 1, &quot;your-key&quot;)
+product_manager = HierarchicalAgent(&quot;ProductManager&quot;, &quot;product manager&quot;, 1, &quot;your-key&quot;)
+
+# Workers
+backend_dev = HierarchicalAgent(&quot;BackendDev&quot;, &quot;backend developer&quot;, 2, &quot;your-key&quot;)
+frontend_dev = HierarchicalAgent(&quot;FrontendDev&quot;, &quot;frontend developer&quot;, 2, &quot;your-key&quot;)
+designer = HierarchicalAgent(&quot;Designer&quot;, &quot;ux designer&quot;, 2, &quot;your-key&quot;)
+
+# Build the hierarchy
+ceo.add_child(eng_manager)
+ceo.add_child(product_manager)
+eng_manager.add_child(backend_dev)
+eng_manager.add_child(frontend_dev)
+product_manager.add_child(designer)
+
+# Run a task
+result = ceo.execute(&quot;Plan a new user dashboard feature&quot;)
+</code></pre>
+<p>The Hierarchical pattern fits large projects or organizations with clear chains of responsibility. The downside is high communication overhead and slow response times.</p>
+<h2>Inter-Agent Communication Protocols</h2>
+<p>Standardized communication is essential for agents to cooperate. Three protocols are common.</p>
+<p><strong>Message-based Communication</strong></p>
+<p>Agents exchange information through structured messages. Each message has a sender, receiver, type, and content.</p>
+<pre><code class="language-python">from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, Optional
+import uuid
+
+class MessageType(Enum):
+    &quot;&quot;&quot;Message types.&quot;&quot;&quot;
+    REQUEST = &quot;request&quot;
+    RESPONSE = &quot;response&quot;
+    NOTIFICATION = &quot;notification&quot;
+    ERROR = &quot;error&quot;
+
+@dataclass
+class Message:
+    &quot;&quot;&quot;Standard message format.&quot;&quot;&quot;
+    sender: str
+    receiver: str
+    message_type: MessageType
+    content: Any
+    correlation_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: datetime = field(default_factory=datetime.now)
+    metadata: Dict = field(default_factory=dict)
+
+    def to_dict(self) -&gt; Dict:
+        &quot;&quot;&quot;Convert to dictionary.&quot;&quot;&quot;
+        return {
+            &quot;sender&quot;: self.sender,
+            &quot;receiver&quot;: self.receiver,
+            &quot;type&quot;: self.message_type.value,
+            &quot;content&quot;: self.content,
+            &quot;correlation_id&quot;: self.correlation_id,
+            &quot;timestamp&quot;: self.timestamp.isoformat(),
+            &quot;metadata&quot;: self.metadata
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -&gt; &quot;Message&quot;:
+        &quot;&quot;&quot;Create from a dictionary.&quot;&quot;&quot;
+        return cls(
+            sender=data[&quot;sender&quot;],
+            receiver=data[&quot;receiver&quot;],
+            message_type=MessageType(data[&quot;type&quot;]),
+            content=data[&quot;content&quot;],
+            correlation_id=data[&quot;correlation_id&quot;],
+            timestamp=datetime.fromisoformat(data[&quot;timestamp&quot;]),
+            metadata=data.get(&quot;metadata&quot;, {})
+        )
+
+# Example usage
+msg = Message(
+    sender=&quot;AgentA&quot;,
+    receiver=&quot;AgentB&quot;,
+    message_type=MessageType.REQUEST,
+    content={&quot;action&quot;: &quot;analyze&quot;, &quot;data&quot;: &quot;sample.csv&quot;},
+    metadata={&quot;priority&quot;: &quot;high&quot;}
+)
+
+# JSON serialization (for network transport)
+import json
+serialized = json.dumps(msg.to_dict())
+
+# Deserialize on the receiving end
+received = Message.from_dict(json.loads(serialized))
+</code></pre>
+<p>A standard message format makes inter-agent communication consistent and tracking easier with <code>correlation_id</code>.</p>
+<p><strong>Message Broker Pattern</strong></p>
+<p>A central broker handles message routing. Senders only send messages to the broker, and the broker forwards them to recipients.</p>
+<pre><code class="language-python">from collections import defaultdict, deque
+from typing import Callable, Dict, List
+import threading
+
+class MessageBroker:
+    &quot;&quot;&quot;A message broker.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.queues: Dict[str, deque] = defaultdict(deque)
+        self.handlers: Dict[str, Callable] = {}
+        self.lock = threading.Lock()
+        self.running = False
+
+    def register_agent(self, agent_name: str, handler: Callable) -&gt; None:
+        &quot;&quot;&quot;Register an agent and its message handler.&quot;&quot;&quot;
+        with self.lock:
+            self.handlers[agent_name] = handler
+            if agent_name not in self.queues:
+                self.queues[agent_name] = deque()
+
+    def send(self, message: Message) -&gt; None:
+        &quot;&quot;&quot;Send a message.&quot;&quot;&quot;
+        with self.lock:
+            self.queues[message.receiver].append(message)
+
+    def start(self) -&gt; None:
+        &quot;&quot;&quot;Start the broker.&quot;&quot;&quot;
+        self.running = True
+        threading.Thread(target=self._dispatch_loop, daemon=True).start()
+
+    def stop(self) -&gt; None:
+        &quot;&quot;&quot;Stop the broker.&quot;&quot;&quot;
+        self.running = False
+
+    def _dispatch_loop(self) -&gt; None:
+        &quot;&quot;&quot;Message dispatch loop.&quot;&quot;&quot;
+        import time
+        while self.running:
+            with self.lock:
+                for agent_name, queue in self.queues.items():
+                    if queue and agent_name in self.handlers:
+                        message = queue.popleft()
+                        try:
+                            self.handlers[agent_name](message)
+                        except Exception as e:
+                            error_msg = Message(
+                                sender=&quot;broker&quot;,
+                                receiver=message.sender,
+                                message_type=MessageType.ERROR,
+                                content=str(e),
+                                correlation_id=message.correlation_id
+                            )
+                            self.queues[message.sender].append(error_msg)
+            time.sleep(0.01)
+
+# Example usage
+broker = MessageBroker()
+
+def agent_a_handler(msg: Message):
+    print(f&quot;AgentA received: {msg.content}&quot;)
+
+def agent_b_handler(msg: Message):
+    print(f&quot;AgentB received: {msg.content}&quot;)
+
+# Register agents
+broker.register_agent(&quot;AgentA&quot;, agent_a_handler)
+broker.register_agent(&quot;AgentB&quot;, agent_b_handler)
+
+# Start broker
+broker.start()
+
+# Send messages
+broker.send(Message(
+    sender=&quot;AgentA&quot;,
+    receiver=&quot;AgentB&quot;,
+    message_type=MessageType.REQUEST,
+    content=&quot;Please analyze this data&quot;
+))
+
+# Wait for processing
+import time
+time.sleep(1)
+broker.stop()
+</code></pre>
+<p>The broker pattern decouples agents and supports asynchronous communication. It's also easier to add new agents.</p>
+<p><strong>Shared Memory Communication</strong></p>
+<p>Agents share information through shared state. Suitable when many agents need to access the same data.</p>
+<pre><code class="language-python">from threading import RLock
+from typing import Any, Dict, List
+
+class SharedMemory:
+    &quot;&quot;&quot;Shared memory.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.data: Dict[str, Any] = {}
+        self.lock = RLock()
+        self.access_log: List[Dict] = []
+
+    def write(self, key: str, value: Any, agent_name: str) -&gt; None:
+        &quot;&quot;&quot;Write data.&quot;&quot;&quot;
+        with self.lock:
+            old_value = self.data.get(key)
+            self.data[key] = value
+            self.access_log.append({
+                &quot;agent&quot;: agent_name,
+                &quot;operation&quot;: &quot;write&quot;,
+                &quot;key&quot;: key,
+                &quot;old_value&quot;: old_value,
+                &quot;new_value&quot;: value,
+                &quot;timestamp&quot;: datetime.now().isoformat()
+            })
+
+    def read(self, key: str, agent_name: str) -&gt; Any:
+        &quot;&quot;&quot;Read data.&quot;&quot;&quot;
+        with self.lock:
+            value = self.data.get(key)
+            self.access_log.append({
+                &quot;agent&quot;: agent_name,
+                &quot;operation&quot;: &quot;read&quot;,
+                &quot;key&quot;: key,
+                &quot;value&quot;: value,
+                &quot;timestamp&quot;: datetime.now().isoformat()
+            })
+            return value
+
+    def delete(self, key: str, agent_name: str) -&gt; None:
+        &quot;&quot;&quot;Delete data.&quot;&quot;&quot;
+        with self.lock:
+            if key in self.data:
+                old_value = self.data[key]
+                del self.data[key]
+                self.access_log.append({
+                    &quot;agent&quot;: agent_name,
+                    &quot;operation&quot;: &quot;delete&quot;,
+                    &quot;key&quot;: key,
+                    &quot;old_value&quot;: old_value,
+                    &quot;timestamp&quot;: datetime.now().isoformat()
+                })
+
+    def get_history(self, key: str = None) -&gt; List[Dict]:
+        &quot;&quot;&quot;View access history.&quot;&quot;&quot;
+        with self.lock:
+            if key:
+                return [log for log in self.access_log if log.get(&quot;key&quot;) == key]
+            return list(self.access_log)
+
+# Example usage
+shared_mem = SharedMemory()
+
+# AgentA executes a task
+shared_mem.write(&quot;task_result&quot;, {&quot;status&quot;: &quot;completed&quot;}, &quot;AgentA&quot;)
+
+# AgentB reads AgentA's result and continues work
+result = shared_mem.read(&quot;task_result&quot;, &quot;AgentB&quot;)
+print(f&quot;AgentB read: {result}&quot;)
+
+# View memory access history
+history = shared_mem.get_history(&quot;task_result&quot;)
+for log in history:
+    print(log)
+</code></pre>
+<p>Shared memory is useful but requires synchronization. Without proper locking, it can lead to race conditions or inconsistent state.</p>
+<h2>Delegation Strategies</h2>
+<p>How an agent delegates work to other agents heavily impacts overall system performance.</p>
+<p><strong>Role-based Delegation</strong></p>
+<p>Each agent has a clear role, and tasks are delegated based on role matching.</p>
+<pre><code class="language-python">class RoleBasedDelegator:
+    &quot;&quot;&quot;Role-based delegator.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.agents_by_role: Dict[str, List[str]] = defaultdict(list)
+        self.agent_capabilities: Dict[str, Dict] = {}
+
+    def register(self, agent_name: str, roles: List[str], capabilities: Dict) -&gt; None:
+        &quot;&quot;&quot;Register an agent.&quot;&quot;&quot;
+        for role in roles:
+            self.agents_by_role[role].append(agent_name)
+        self.agent_capabilities[agent_name] = capabilities
+
+    def find_agent_for_task(self, task: Dict) -&gt; Optional[str]:
+        &quot;&quot;&quot;Find an appropriate agent for the task.&quot;&quot;&quot;
+        required_role = task.get(&quot;required_role&quot;)
+        if required_role and required_role in self.agents_by_role:
+            candidates = self.agents_by_role[required_role]
+            # Pick the agent with best capability match
+            best_agent = None
+            best_score = -1
+            for agent in candidates:
+                score = self._calculate_match_score(
+                    self.agent_capabilities[agent],
+                    task.get(&quot;requirements&quot;, {})
+                )
+                if score &gt; best_score:
+                    best_score = score
+                    best_agent = agent
+            return best_agent
+        return None
+
+    def _calculate_match_score(self, capabilities: Dict, requirements: Dict) -&gt; float:
+        &quot;&quot;&quot;Calculate the capability match score.&quot;&quot;&quot;
+        if not requirements:
+            return 1.0
+        matches = sum(
+            1 for k, v in requirements.items()
+            if capabilities.get(k) == v
+        )
+        return matches / len(requirements)
+
+# Example usage
+delegator = RoleBasedDelegator()
+delegator.register(&quot;DocWriter&quot;, [&quot;documentation&quot;], {&quot;language&quot;: &quot;ko&quot;, &quot;format&quot;: &quot;markdown&quot;})
+delegator.register(&quot;CodeWriter&quot;, [&quot;coding&quot;], {&quot;language&quot;: &quot;python&quot;, &quot;framework&quot;: &quot;fastapi&quot;})
+
+task = {
+    &quot;required_role&quot;: &quot;documentation&quot;,
+    &quot;requirements&quot;: {&quot;language&quot;: &quot;ko&quot;, &quot;format&quot;: &quot;markdown&quot;}
+}
+selected = delegator.find_agent_for_task(task)
+# Identifies &quot;documentation&quot; role → delegates to DocWriter
+</code></pre>
+<p>Role-based delegation is intuitive and easy to manage. The downside is that as roles fragment, management overhead grows.</p>
+<p><strong>Capability-based Delegation</strong></p>
+<p>Tasks are delegated based on each agent's specific capabilities (skills) rather than roles.</p>
+<pre><code class="language-python">from typing import Set
+
+class CapabilityRegistry:
+    &quot;&quot;&quot;Capability registry.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.agent_capabilities: Dict[str, Dict[str, float]] = {}
+
+    def register(self, agent_name: str, capabilities: Dict[str, float]) -&gt; None:
+        &quot;&quot;&quot;Register an agent's capabilities (capability name → proficiency 0.0-1.0).&quot;&quot;&quot;
+        self.agent_capabilities[agent_name] = capabilities
+
+    def find_best_agent(
+        self,
+        required_capabilities: Set[str],
+        min_proficiency: float = 0.5
+    ) -&gt; Optional[str]:
+        &quot;&quot;&quot;Find the agent best matching the required capabilities.&quot;&quot;&quot;
+        best_agent = None
+        best_score = 0.0
+
+        for agent, caps in self.agent_capabilities.items():
+            # Calculate average proficiency on required capabilities
+            scores = [
+                caps.get(cap, 0.0) for cap in required_capabilities
+                if caps.get(cap, 0.0) &gt;= min_proficiency
+            ]
+            if len(scores) == len(required_capabilities):
+                avg_score = sum(scores) / len(scores)
+                if avg_score &gt; best_score:
+                    best_score = avg_score
+                    best_agent = agent
+
+        return best_agent
+
+# Example usage
+registry = CapabilityRegistry()
+registry.register(&quot;AgentA&quot;, {
+    &quot;python&quot;: 0.9,
+    &quot;machine_learning&quot;: 0.7,
+    &quot;data_analysis&quot;: 0.8
+})
+registry.register(&quot;AgentB&quot;, {
+    &quot;python&quot;: 0.95,
+    &quot;machine_learning&quot;: 0.9,
+    &quot;deep_learning&quot;: 0.85
+})
+
+required = {&quot;python&quot;, &quot;machine_learning&quot;}
+best = registry.find_best_agent(required)
+# Picks AgentB (python: 0.95, machine_learning: 0.9)
+</code></pre>
+<p>Capability-based delegation enables fine-grained task assignment. The downside is the cost of designing and maintaining the capability model.</p>
+<p><strong>Load-based Delegation</strong></p>
+<p>Tasks are distributed based on each agent's current workload.</p>
+<pre><code class="language-python">import time
+
+class LoadBalancingDelegator:
+    &quot;&quot;&quot;Load-based delegator.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.agent_loads: Dict[str, int] = {}
+        self.agent_max_capacity: Dict[str, int] = {}
+        self.lock = threading.Lock()
+
+    def register(self, agent_name: str, max_capacity: int = 10) -&gt; None:
+        &quot;&quot;&quot;Register an agent.&quot;&quot;&quot;
+        with self.lock:
+            self.agent_loads[agent_name] = 0
+            self.agent_max_capacity[agent_name] = max_capacity
+
+    def assign_task(self, task_id: str) -&gt; Optional[str]:
+        &quot;&quot;&quot;Assign a task to the agent with the lightest load.&quot;&quot;&quot;
+        with self.lock:
+            available_agents = [
+                (name, load) for name, load in self.agent_loads.items()
+                if load &lt; self.agent_max_capacity[name]
+            ]
+            if not available_agents:
+                return None
+            # Pick the agent with the lowest load
+            selected = min(available_agents, key=lambda x: x[1])[0]
+            self.agent_loads[selected] += 1
+            return selected
+
+    def complete_task(self, agent_name: str) -&gt; None:
+        &quot;&quot;&quot;Mark a task as completed.&quot;&quot;&quot;
+        with self.lock:
+            if agent_name in self.agent_loads and self.agent_loads[agent_name] &gt; 0:
+                self.agent_loads[agent_name] -= 1
+
+# Example usage
+balancer = LoadBalancingDelegator()
+balancer.register(&quot;AgentA&quot;, max_capacity=5)
+balancer.register(&quot;AgentB&quot;, max_capacity=5)
+balancer.register(&quot;AgentC&quot;, max_capacity=5)
+
+# Process several tasks concurrently
+for i in range(10):
+    agent = balancer.assign_task(f&quot;task_{i}&quot;)
+    print(f&quot;Task {i} assigned to {agent}&quot;)
+    # ... actually run the task ...
+    # balancer.complete_task(agent)
+</code></pre>
+<p>Load-based delegation maximizes overall system throughput. The downside is harder optimization when agents have different capabilities.</p>
+<h2>When to Use Multi-Agent Systems</h2>
+<p>Multi-agent systems aren't always the right answer. Consider them in the following situations.</p>
+<p><strong>When Different Expertise Is Needed at Each Stage</strong></p>
+<p>Use multi-agent when a single task spans several specialty areas.</p>
+<pre><code class="language-python"># Example: writing a project proposal
+# - Market research (ResearchAgent)
+# - Tech-stack recommendation (TechAgent)
+# - Cost estimation (FinanceAgent)
+# - Document writing (WriterAgent)
+</code></pre>
+<p>A single agent struggles to deliver expertise in all these areas at once. Specialized agents working together produce a better outcome.</p>
+<p><strong>When Parallel Processing Yields Big Gains</strong></p>
+<p>Use multi-agent when independent tasks can run in parallel.</p>
+<pre><code class="language-python"># Example: crawl multiple websites simultaneously
+# - Agent1: crawls site1.com
+# - Agent2: crawls site2.com
+# - Agent3: crawls site3.com
+# - Orchestrator: merges results
+</code></pre>
+<p>Multi-agent systems shine when each agent processes independent tasks in parallel.</p>
+<p><strong>When Mutual Validation Improves Quality</strong></p>
+<p>Use multi-agent when one agent's output needs to be reviewed by another.</p>
+<pre><code class="language-python"># Example: a content production pipeline
+# 1. Writer: drafts the post
+# 2. Reviewer: provides feedback
+# 3. Writer: revises
+# 4. Editor: final edit
+</code></pre>
+<p>Cross-checks among agents help catch errors and improve quality.</p>
+<p><strong>When Continuous Operation Is Required</strong></p>
+<p>Use multi-agent when the system must operate 24/7.</p>
+<pre><code class="language-python"># Example: a continuous monitoring system
+# - MonitorAgent: watches system health 24/7
+# - AlertAgent: notifies on issues
+# - AnalysisAgent: analyzes logs and generates reports
+</code></pre>
+<p>When agents are split by responsibility, even if one agent fails, the others can keep the system running.</p>
+<p><strong>When NOT to Use Multi-Agent</strong></p>
+<p>In the following cases, a single agent is better:</p>
+<ul>
+<li>Simple tasks (e.g., FAQ answering, simple translation)</li>
+<li>When low latency matters most (overhead is high)</li>
+<li>When debugging difficulty matters more (multi-agent issues are hard to track)</li>
+<li>When cost is critical (multiple LLM calls increase cost)</li>
+</ul>
+<p>A reasonable approach: start with a single agent and switch to multi-agent only when the limits become clear.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Using Multi-Agent Where Not Needed</strong></p>
+<p>Some teams introduce multi-agent for trivial tasks, leading to overengineering.</p>
+<pre><code class="language-python"># Bad example
+# Using 3 agents for a simple document summary
+agent1 = Agent(&quot;Reader&quot;)     # Reads the doc
+agent2 = Agent(&quot;Summarizer&quot;) # Summarizes
+agent3 = Agent(&quot;Formatter&quot;)  # Formats output
+# Overengineered: a single agent is sufficient
+
+# Good example
+# A single agent handles it
+agent = Agent(&quot;DocProcessor&quot;)
+result = agent.process_document(doc)
+</code></pre>
+<p>Multi-agent should only be introduced when truly necessary.</p>
+<p><strong>Mistake 2: Lack of Communication Protocol</strong></p>
+<p>When agents communicate without standardized messages, the system becomes hard to maintain.</p>
+<pre><code class="language-python"># Bad example
+# Each agent passes free-form messages
+agent_a.send(&quot;Hey, can you check this?&quot;)
+agent_b.send({&quot;task&quot;: &quot;review&quot;, &quot;content&quot;: &quot;...&quot;})
+agent_c.send(&quot;REVIEW_NEEDED:doc123&quot;)
+# Inconsistent formats make tracking and debugging hard
+
+# Good example
+# Use a standard message format
+message = Message(
+    sender=&quot;AgentA&quot;,
+    receiver=&quot;AgentB&quot;,
+    message_type=MessageType.REQUEST,
+    content={&quot;action&quot;: &quot;review&quot;, &quot;data&quot;: &quot;doc123&quot;}
+)
+broker.send(message)
+</code></pre>
+<p>Standardized messages improve communication consistency and observability.</p>
+<p><strong>Mistake 3: No Infinite-Loop Prevention</strong></p>
+<p>Without termination conditions, agents can endlessly exchange messages.</p>
+<pre><code class="language-python"># Bad example
+# AgentA and AgentB keep sending messages to each other
+# AgentA: &quot;I need help&quot; → AgentB
+# AgentB: &quot;I need more info&quot; → AgentA
+# AgentA: &quot;What info?&quot; → AgentB
+# AgentB: &quot;I don't know&quot; → AgentA
+# Infinite loop
+
+# Good example
+# Limit max iterations and message depth
+class LoopProtectedAgent:
+    MAX_DEPTH = 5
+
+    def communicate(self, message, depth=0):
+        if depth &gt;= self.MAX_DEPTH:
+            return &quot;Max depth reached. Terminating.&quot;
+        # ... handle message ...
+</code></pre>
+<p>Always design termination conditions and depth limits.</p>
+<p><strong>Mistake 4: Mixing Roles and Responsibilities</strong></p>
+<p>When agent roles overlap, work is duplicated and conflicts arise.</p>
+<pre><code class="language-python"># Bad example
+# Orchestrator manages even Worker internals
+orchestrator.assign_task(code_agent, &quot;Write a function&quot;)
+orchestrator.review_code(code_agent.result)  # Should be Reviewer's job
+orchestrator.refactor(code_agent.result)     # Removes Worker autonomy
+
+# Good example
+# Each agent has clear responsibilities
+orchestrator.delegate(&quot;write_code&quot;, code_agent)  # Orchestrator only says &quot;what&quot; to do
+# code_agent decides &quot;how&quot; to do it
+review_agent.review(code_agent.result)
+refactor_agent.refactor(code_agent.result)
+</code></pre>
+<p>Define each agent's responsibilities clearly and respect their autonomy.</p>
+<p><strong>Mistake 5: Missing Failure Handling</strong></p>
+<p>When the system halts upon any agent's failure, reliability collapses.</p>
+<pre><code class="language-python"># Bad example
+# Whole system stops if any agent fails
+def run_pipeline():
+    result1 = agent1.execute(task)  # Failure here halts everything
+    result2 = agent2.execute(result1)
+    return result2
+
+# Good example
+# Add retry, fallback, and graceful-degradation logic
+def run_pipeline():
+    try:
+        result1 = agent1.execute(task)
+    except AgentError:
+        result1 = fallback_agent.execute(task)  # Alternative agent
+
+    try:
+        result2 = agent2.execute(result1)
+    except AgentError:
+        result2 = result1  # Fall back to previous step's result
+
+    return result2
+</code></pre>
+<p>Handling individual agent failures explicitly increases system reliability.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Multi-agent systems exist to solve complex tasks via cooperation; choose patterns based on the situation</li>
+<li>The Orchestrator pattern fits central coordination, Peer-to-Peer fits equal collaboration, and Hierarchical fits tree-shaped task decomposition</li>
+<li>Standardized messages and protocols are essential for stable inter-agent communication</li>
+<li>Pick the delegation strategy (role-based, capability-based, load-based) that fits your task</li>
+<li>Use multi-agent only when truly necessary; a single agent often suffices for simple tasks</li>
+<li>Standard message formats, infinite-loop prevention, and failure handling are mandatory in production</li>
+</ul>
+<h2>AI Agent 101 Series</h2>
+<ul>
+<li>What Is an AI Agent? (upcoming)</li>
+<li>Context Engineering (upcoming)</li>
+<li>Tool Use Fundamentals (upcoming)</li>
+<li>Agent Workflow Design (upcoming)</li>
+<li>Memory and State (upcoming)</li>
+<li><strong>Multi-Agent Systems (current)</strong></li>
+<li>Agent Evaluation (upcoming)</li>
+<li>Error Handling and Reliability (upcoming)</li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ol>
+<li>
+<p><strong>AutoGPT Multi-Agent Architecture</strong> - https://github.com/Significant-Gravitas/AutoGPT<br>
+   An autonomous system that demonstrates cooperation among multiple agents. Showcases the Orchestrator and Worker patterns.</p>
+</li>
+<li>
+<p><strong>LangGraph Multi-Agent Systems</strong> - https://langchain-ai.github.io/langgraph/tutorials/multi_agent/<br>
+   LangGraph's multi-agent tutorial. Covers message routing and shared state.</p>
+</li>
+<li>
+<p><strong>CrewAI Documentation</strong> - https://docs.crewai.com/<br>
+   A role-based multi-agent framework. Explains agent collaboration patterns and delegation strategies.</p>
+</li>
+<li>
+<p><strong>Microsoft Semantic Kernel: Agent Orchestration</strong> - https://learn.microsoft.com/en-us/semantic-kernel/agents/<br>
+   Microsoft's guide to agent orchestration. Presents how to design hierarchical agent systems.</p>
+</li>
+</ol>
+<p class="tags-line">Tags: AI Agent, Multi-Agent, Coordination, Delegation</p>
+</body>
+</html>

@@ -9,6 +9,7 @@ meta:
   license: all-rights-reserved
 series:
 - id: ai-agent-101
+  status: draft
   category: ai
   title:
     ko: AI Agent 101
@@ -29,6 +30,7 @@ series:
   lifecycle: active
   path: content/ai-agent-101
 - id: harness-engineering-101
+  status: content-ready
   category: ai
   title:
     ko: Harness Engineering 101
@@ -207,6 +209,7 @@ series:
   status: draft
   path: content/git-github-101
 - id: azure-app-service-101
+  status: content-ready
   category: azure
   title:
     ko: Azure App Service 101
@@ -288,6 +291,7 @@ series:
         title: 'Scaling 101: When to Scale Up vs Scale Out?'
         status: publish-ready
 - id: azure-app-service-deep-dive
+  status: content-ready
   category: azure
   title:
     ko: Azure App Service Deep Dive
@@ -361,6 +365,7 @@ series:
         title: Cold start and warmup — why the first request is expensive
         status: publish-ready
 - id: azure-functions-101
+  status: content-ready
   category: azure
   title:
     ko: Azure Functions 101
@@ -442,6 +447,7 @@ series:
         title: Monitoring and Operations Fundamentals
         status: publish-ready
 - id: azure-functions-deep-dive
+  status: content-ready
   category: azure
   title:
     ko: Azure Functions Deep Dive
@@ -515,6 +521,7 @@ series:
         title: Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
         status: publish-ready
 - id: azure-aks-101
+  status: content-ready
   category: azure
   title:
     ko: Azure Kubernetes Service 101
@@ -596,6 +603,7 @@ series:
         title: Monitoring and ops — Container Insights, logs, alerts
         status: publish-ready
 - id: azure-aks-deep-dive
+  status: content-ready
   category: azure
   title:
     ko: Azure Kubernetes Service Deep Dive
@@ -669,6 +677,7 @@ series:
         title: KEDA internals — how a ScaledObject builds an HPA
         status: publish-ready
 - id: azure-aca-101
+  status: content-ready
   category: azure
   title:
     ko: Azure Container Apps 101
@@ -750,6 +759,7 @@ series:
         title: Monitoring and ops — Log Analytics and Application Insights
         status: publish-ready
 - id: azure-aca-deep-dive
+  status: content-ready
   category: azure
   title:
     ko: Azure Container Apps Deep Dive
@@ -823,6 +833,7 @@ series:
         title: The Envoy ingress path — how the first request reaches your container
         status: publish-ready
 - id: ai-web-dev-101
+  status: needs-update
   category: ai
   title:
     ko: AI 웹 개발 입문
@@ -875,6 +886,7 @@ series:
         title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
         status: needs-update
 - id: llm-from-scratch-101
+  status: code-checked
   category: ai
   title:
     ko: LLM from Scratch 101
@@ -974,6 +986,7 @@ series:
   track: ebook
   stage: education
 - id: rag-deep-dive
+  status: content-ready
   category: ai
   title:
     ko: RAG Deep Dive
@@ -1049,6 +1062,7 @@ series:
   track: authority
   stage: internals
 - id: llm-app-foundations-101
+  status: content-ready
   category: ai
   title:
     ko: LLM 앱 기초
@@ -1124,6 +1138,7 @@ series:
   track: traffic
   stage: foundation
 - id: llm-api-production-101
+  status: content-ready
   category: ai
   title:
     ko: LLM API 프로덕션 101
@@ -1199,6 +1214,7 @@ series:
   track: traffic
   stage: production
 - id: vector-search-101
+  status: content-ready
   category: ai
   title:
     ko: 벡터 검색 101
@@ -1274,6 +1290,7 @@ series:
   track: traffic
   stage: search
 - id: langchain-101
+  status: content-ready
   category: ai
   title:
     ko: LangChain 101
@@ -1349,6 +1366,7 @@ series:
   track: authority
   stage: foundation
 - id: ai-app-patterns-101
+  status: content-ready
   category: ai
   title:
     ko: AI 앱 패턴 101
@@ -1424,6 +1442,7 @@ series:
   track: ebook
   stage: patterns
 - id: korean-ai-stack-101
+  status: content-ready
   category: ai
   title:
     ko: 한국어 AI 스택 101
@@ -1499,6 +1518,7 @@ series:
   track: traffic
   stage: korean
 - id: document-ingestion-101
+  status: content-ready
   category: ai
   title:
     ko: 문서 수집과 인덱싱 101
@@ -1574,6 +1594,7 @@ series:
   track: ebook
   stage: rag
 - id: llm-apps-ops-101
+  status: content-ready
   category: ai
   title:
     ko: LLM 앱 운영 101
@@ -1649,6 +1670,7 @@ series:
   track: authority
   stage: ops
 - id: rag-benchmark-101
+  status: content-ready
   category: ai
   title:
     ko: RAG 평가와 벤치마크 101
@@ -1724,6 +1746,7 @@ series:
   track: traffic
   stage: rag
 - id: langgraph-101
+  status: content-ready
   category: ai
   title:
     ko: LangGraph 101
@@ -1799,6 +1822,7 @@ series:
   track: authority
   stage: patterns
 - id: llm-finetuning-101
+  status: content-ready
   category: ai
   title:
     ko: LLM 파인튜닝 101
@@ -1874,6 +1898,7 @@ series:
   track: authority
   stage: education
 - id: ax-practical-guide
+  status: planned
   category: ax
   title:
     ko: AX 실전 가이드
@@ -1894,6 +1919,7 @@ series:
   lifecycle: active
   path: content/ax-practical-guide
 - id: technical-writing
+  status: planned
   category: writing
   title:
     ko: 엔지니어를 위한 기술 글쓰기

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tool Harness — Designing Safe Tools for Agents</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tool Harness — Designing Safe Tools for Agents</h1>
+<blockquote>
+<p>Harness Engineering 101 Series (5/10)</p>
+</blockquote>
+<p>Tools are the hands and feet of an agent. Poorly designed tools can corrupt data or blow up costs. The Tool Harness is about designing tools that are safe, predictable, and easy for the agent to use correctly.</p>
+<hr>
+<h2>Tools Are an Agent's Hands and Feet</h2>
+<p>Tools determine what an agent can do. Without tools, an agent is just a text-generating model. DB queries, file writes, API calls, code execution — all are tools. The agent's range of action is exactly the range of its tools.</p>
+<p>The problem is that poorly designed tools destabilize every action the agent takes. An ambiguous tool schema produces wrong arguments. An overly powerful tool can wreck a system in one call. Unhelpful error messages cause the agent to repeat the same mistake.</p>
+<p>Tool Harness is the principle of designing tools that are safe and predictable for agents. This article covers five tool design principles, safe schema design, and how to make tool errors something the agent can act on.</p>
+<hr>
+<h2>Five Principles of a Good Tool</h2>
+<p>Five rules to follow when designing a tool.</p>
+<p><strong>1. Single responsibility</strong>: one tool does one thing. Not <code>manage_user</code>, but <code>create_user</code>, <code>delete_user</code>, <code>update_user_email</code>.</p>
+<p><strong>2. Idempotent when possible</strong>: calling with the same input multiple times produces the same result. Agents retry frequently. Non-idempotent tools cause incidents.</p>
+<p><strong>3. Explicit side effects</strong>: if there is a side effect, name and describe it. Don't hide that <code>send_email</code> actually sends.</p>
+<p><strong>4. Structured output</strong>: return results as a schema, not free text. Easier for the agent to parse and validate.</p>
+<p><strong>5. Actionable errors</strong>: when failing, return errors the agent can act on. Not "error" but "which error, why, how to fix it."</p>
+<pre><code class="language-python">from pydantic import BaseModel, Field
+from typing import Literal
+
+# Bad — too many responsibilities
+def manage_user(action: str, user_id: str, **kwargs):
+    &quot;&quot;&quot;Manage a user.&quot;&quot;&quot;
+    ...
+
+# Good — single responsibility, explicit schema
+class CreateUserInput(BaseModel):
+    email: str = Field(..., description=&quot;A valid email address&quot;)
+    name: str = Field(..., min_length=1, max_length=100)
+    role: Literal[&quot;admin&quot;, &quot;user&quot;, &quot;guest&quot;]
+
+class CreateUserOutput(BaseModel):
+    user_id: str
+    created_at: str
+    status: Literal[&quot;created&quot;, &quot;already_exists&quot;]
+
+def create_user(input: CreateUserInput) -&gt; CreateUserOutput:
+    &quot;&quot;&quot;Create a new user. Returns already_exists if the email already exists.&quot;&quot;&quot;
+    ...
+</code></pre>
+<p>If even one of the five principles is missing, the agent's behavior becomes unpredictable.</p>
+<hr>
+<h2>Precision in Schema Design</h2>
+<p>A tool's input schema is the user manual for the agent. Ambiguous schemas produce ambiguous calls.</p>
+<p>Three things must be explicit.</p>
+<p><strong>1. Meaning of each field</strong>: write a <code>description</code>. Instead of "user id", write "the user's UUID, retrievable via get_user."</p>
+<p><strong>2. Constraints</strong>: express length, range, allowed values in the schema. Do not defer validation to the application layer.</p>
+<p><strong>3. Dependencies</strong>: conditions like "this field is required only when type is X" go in the schema, not in a separate document.</p>
+<pre><code class="language-python">from pydantic import BaseModel, Field, model_validator
+from typing import Literal
+
+class SendNotificationInput(BaseModel):
+    &quot;&quot;&quot;Send a notification.&quot;&quot;&quot;
+    channel: Literal[&quot;email&quot;, &quot;sms&quot;, &quot;push&quot;] = Field(
+        ...,
+        description=&quot;Send channel. email needs an email address; sms needs a phone number.&quot;,
+    )
+    recipient: str = Field(..., description=&quot;Recipient identifier (varies by channel)&quot;)
+    template_id: str = Field(..., pattern=r&quot;^TPL-\d{4}$&quot;, description=&quot;Format: TPL-0001&quot;)
+    variables: dict[str, str] = Field(
+        default_factory=dict,
+        description=&quot;Template variables. Example: {'name': 'Alice', 'order_id': '12345'}&quot;,
+    )
+
+    @model_validator(mode=&quot;after&quot;)
+    def validate_recipient_format(self):
+        if self.channel == &quot;email&quot; and &quot;@&quot; not in self.recipient:
+            raise ValueError(f&quot;channel=email requires email address, got: {self.recipient}&quot;)
+        if self.channel == &quot;sms&quot; and not self.recipient.startswith(&quot;+&quot;):
+            raise ValueError(f&quot;channel=sms requires E.164 phone (+countrycode), got: {self.recipient}&quot;)
+        return self
+</code></pre>
+<p>Schemas like this have two effects. First, the agent is less likely to construct invalid arguments before calling. Second, invalid calls are rejected immediately, preventing side effects.</p>
+<hr>
+<h2>The Idempotency Key Pattern</h2>
+<p>Agents retry often — network errors, timeouts, "couldn't confirm" cases all lead to repeating the same tool call. Non-idempotent tools then run twice and cause incidents.</p>
+<p>The fix is the idempotency key. The agent sends a unique key per call, and the server refuses to execute the same key twice.</p>
+<pre><code class="language-python">import hashlib
+from dataclasses import dataclass
+
+@dataclass
+class IdempotencyStore:
+    &quot;&quot;&quot;Stores results per idempotency key.&quot;&quot;&quot;
+    _cache: dict[str, dict] = None
+
+    def __post_init__(self):
+        self._cache = self._cache or {}
+
+    def get_or_run(self, key: str, fn, *args, **kwargs) -&gt; dict:
+        if key in self._cache:
+            return self._cache[key]
+        result = fn(*args, **kwargs)
+        self._cache[key] = result
+        return result
+
+def create_charge(amount: int, currency: str, idempotency_key: str, store: IdempotencyStore) -&gt; dict:
+    &quot;&quot;&quot;Create a charge. Same idempotency_key runs only once.&quot;&quot;&quot;
+    def _do_charge():
+        return {
+            &quot;charge_id&quot;: &quot;ch_&quot; + hashlib.sha256(idempotency_key.encode()).hexdigest()[:12],
+            &quot;amount&quot;: amount,
+        }
+    return store.get_or_run(idempotency_key, _do_charge)
+
+# The agent uses a key unique per task
+store = IdempotencyStore()
+key = &quot;task-abc123-charge-001&quot;
+r1 = create_charge(1000, &quot;USD&quot;, key, store)
+r2 = create_charge(1000, &quot;USD&quot;, key, store)
+assert r1 == r2  # Same result, executed once
+</code></pre>
+<p>The idempotency key applies not only at the tool call level but at the task level too. The same task running twice should produce the same result.</p>
+<hr>
+<h2>Designing Actionable Errors</h2>
+<p>When a tool call fails, the agent must decide what to do next. If the error is "Internal Server Error," the agent retries the same call. If the message is clear, the agent fixes the arguments and tries again.</p>
+<p>A good error includes three parts.</p>
+<p><strong>1. What</strong>: what failed, specifically.<br>
+<strong>2. Why</strong>: why it failed, the cause.<br>
+<strong>3. How</strong>: how to fix it, the next action for the agent.</p>
+<pre><code class="language-python">from enum import Enum
+from dataclasses import dataclass
+
+class ErrorCode(Enum):
+    INVALID_INPUT = &quot;invalid_input&quot;
+    NOT_FOUND = &quot;not_found&quot;
+    PERMISSION_DENIED = &quot;permission_denied&quot;
+    RATE_LIMITED = &quot;rate_limited&quot;
+    UPSTREAM_TIMEOUT = &quot;upstream_timeout&quot;
+
+@dataclass
+class ToolError(Exception):
+    code: ErrorCode
+    what: str
+    why: str
+    how: str
+    retryable: bool
+
+    def to_agent_message(self) -&gt; str:
+        return f&quot;&quot;&quot;Tool call failed.
+Code: {self.code.value}
+What: {self.what}
+Why: {self.why}
+How to fix: {self.how}
+Retryable: {self.retryable}&quot;&quot;&quot;
+
+def get_user(user_id: str) -&gt; dict:
+    if not user_id.startswith(&quot;usr_&quot;):
+        raise ToolError(
+            code=ErrorCode.INVALID_INPUT,
+            what=&quot;user_id format is invalid&quot;,
+            why=f&quot;user_id must start with 'usr_', got: {user_id}&quot;,
+            how=&quot;Call list_users to find a valid user_id, or check the format.&quot;,
+            retryable=False,
+        )
+    raise ToolError(
+        code=ErrorCode.NOT_FOUND,
+        what=f&quot;user not found: {user_id}&quot;,
+        why=&quot;No user with this id exists in the database.&quot;,
+        how=&quot;Verify the id with list_users, or create_user if intended.&quot;,
+        retryable=False,
+    )
+</code></pre>
+<p>The <code>retryable</code> flag matters. On <code>retryable=False</code>, the agent immediately tries a different approach. On <code>retryable=True</code>, it retries after backoff.</p>
+<hr>
+<h2>Sandboxing Dangerous Tools</h2>
+<p>Code execution, filesystem access, and arbitrary shell commands are extremely powerful and extremely dangerous. These tools must not be exposed without sandboxing.</p>
+<p>Three isolation techniques.</p>
+<p><strong>1. Process isolation</strong>: run in a separate process with resource limits.<br>
+<strong>2. Filesystem isolation</strong>: only operate inside an isolated temp directory.<br>
+<strong>3. Network isolation</strong>: block external network access or whitelist it.</p>
+<pre><code class="language-python">import subprocess
+import tempfile
+from pathlib import Path
+
+def execute_python_safely(code: str, timeout: float = 5.0) -&gt; dict:
+    &quot;&quot;&quot;Execute Python code in an isolated environment.&quot;&quot;&quot;
+    with tempfile.TemporaryDirectory() as tmpdir:
+        script_path = Path(tmpdir) / &quot;script.py&quot;
+        script_path.write_text(code)
+        try:
+            result = subprocess.run(
+                [&quot;python3&quot;, str(script_path)],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=tmpdir,  # Isolated working directory
+                env={&quot;PATH&quot;: &quot;/usr/bin:/bin&quot;},  # Minimal env
+            )
+            return {
+                &quot;stdout&quot;: result.stdout[:10_000],  # Cap output size
+                &quot;stderr&quot;: result.stderr[:10_000],
+                &quot;exit_code&quot;: result.returncode,
+            }
+        except subprocess.TimeoutExpired:
+            raise ToolError(
+                code=ErrorCode.UPSTREAM_TIMEOUT,
+                what=&quot;code execution exceeded timeout&quot;,
+                why=f&quot;Execution did not complete in {timeout}s.&quot;,
+                how=&quot;Reduce the work done in code, or split into multiple calls.&quot;,
+                retryable=False,
+            )
+</code></pre>
+<p>Stronger isolation uses containers (gVisor, Firecracker) or WebAssembly runtimes. If a production agent exposes arbitrary code execution, container-grade isolation is the minimum.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>1. Tool names hide their behavior.</strong><br>
+If <code>process_order</code> also charges payment, the name should reveal that. <code>charge_and_fulfill_order</code> is honest.</p>
+<p><strong>2. Stuffing too many options into one tool.</strong><br>
+Dispatcher tools like <code>manage_user(action="create"|"delete"|"update", ...)</code> weaken the schema and let the agent build invalid combinations. Split them.</p>
+<p><strong>3. Ignoring idempotency.</strong><br>
+In environments where retries are common, non-idempotent tools cause duplicate charges, duplicate emails, duplicate notifications.</p>
+<p><strong>4. Error messages too short.</strong><br>
+"Bad request" gives the agent zero information. Always include What/Why/How.</p>
+<p><strong>5. Exposing dangerous tools raw.</strong><br>
+Shell execution, file writes, and unbounded HTTP calls cause production incidents without sandboxing.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Good tools follow five principles: single responsibility, idempotency, explicit side effects, structured output, actionable errors.</li>
+<li>Schemas must express not just types but meaning, constraints, and dependencies for the agent to call them correctly.</li>
+<li>The idempotency key pattern prevents duplicate execution on retry.</li>
+<li>Errors must include What/Why/How, with a retryable flag to guide the agent's next action.</li>
+<li>Dangerous tools like code execution and file/network access require process, filesystem, and network isolation together.</li>
+</ul>
+<hr>
+<h2>Harness Engineering 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness — Designing What to Show and Hide from the Agent</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
+<li><strong>Tool Harness — Designing Safe Tools for Agents (current)</strong></li>
+<li>Test Harness — Pinning Completion Criteria with Tests (upcoming)</li>
+<li>Feedback Loop — A Repeating Structure That Forces Failures to Be Fixed (upcoming)</li>
+<li>Approval Gate — Designing Where Human Approval Is Required (upcoming)</li>
+<li>Observability — Tracing and Reproducing Agent Work (upcoming)</li>
+<li>Production Harness — Building an Operable Agent Work Environment (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use">Anthropic — Tool Use Best Practices</a></li>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI — Function Calling Guide</a></li>
+<li><a href="https://docs.stripe.com/api/idempotent_requests">Stripe — Idempotent Requests</a></li>
+<li><a href="https://gvisor.dev/docs/">gVisor — Sandboxed Container Runtime</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, Harness, Tool Design, Sandboxing</p>
+</body>
+</html>

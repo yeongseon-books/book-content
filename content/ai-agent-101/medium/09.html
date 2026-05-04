@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Production Operations</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Production Operations</h1>
+<blockquote>
+<p>AI Agent 101 Series (9/10)</p>
+</blockquote>
+<p>When you deploy agents to production, new problems arise. You need to monitor how much it costs, how long responses take, where it fails, and which tools are called most frequently.</p>
+<p>The core of agent operations is observability. You must track all agent steps, measure cost and latency, and detect anomalies. Scaling strategies and cost optimization are also important.</p>
+<p>This article covers agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.</p>
+<hr>
+<h2>Observability</h2>
+<p>Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.</p>
+<p><strong>Structured Logging</strong></p>
+<p>Plaintext logs are hard to parse and query. JSON-structured logs are the standard.</p>
+<pre><code class="language-python">import logging
+import json
+from datetime import datetime
+from typing import Any
+
+class StructuredLogger:
+    &quot;&quot;&quot;Structured logger.&quot;&quot;&quot;
+
+    def __init__(self, name: str):
+        self.logger = logging.getLogger(name)
+        self.logger.setLevel(logging.INFO)
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter(&quot;%(message)s&quot;))
+        self.logger.addHandler(handler)
+
+    def log(self, level: str, event: str, **fields):
+        record = {
+            &quot;timestamp&quot;: datetime.utcnow().isoformat(),
+            &quot;level&quot;: level,
+            &quot;event&quot;: event,
+            **fields
+        }
+        self.logger.info(json.dumps(record, default=str))
+
+    def info(self, event: str, **fields):
+        self.log(&quot;INFO&quot;, event, **fields)
+
+    def error(self, event: str, **fields):
+        self.log(&quot;ERROR&quot;, event, **fields)
+
+# Example usage
+logger = StructuredLogger(&quot;agent&quot;)
+logger.info(
+    &quot;tool_call_completed&quot;,
+    request_id=&quot;req_123&quot;,
+    tool=&quot;get_weather&quot;,
+    args={&quot;city&quot;: &quot;Seoul&quot;},
+    duration_ms=234,
+    success=True
+)
+</code></pre>
+<p>Structured logs query directly in ELK, Datadog, and CloudWatch.</p>
+<p><strong>Distributed Tracing</strong></p>
+<p>A single agent request spans many LLM and tool calls. Traces visualize the full path.</p>
+<pre><code class="language-python">from contextlib import contextmanager
+import uuid
+import time
+
+class TraceContext:
+    &quot;&quot;&quot;Simple distributed tracing.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.trace_id = str(uuid.uuid4())
+        self.spans = []
+        self._current_parent = None
+
+    @contextmanager
+    def span(self, name: str, **attributes):
+        span_id = str(uuid.uuid4())
+        parent_id = self._current_parent
+        start = time.time()
+
+        self._current_parent = span_id
+        try:
+            yield span_id
+            status = &quot;ok&quot;
+            error = None
+        except Exception as e:
+            status = &quot;error&quot;
+            error = str(e)
+            raise
+        finally:
+            self._current_parent = parent_id
+            self.spans.append({
+                &quot;span_id&quot;: span_id,
+                &quot;parent_id&quot;: parent_id,
+                &quot;trace_id&quot;: self.trace_id,
+                &quot;name&quot;: name,
+                &quot;start&quot;: start,
+                &quot;duration_ms&quot;: (time.time() - start) * 1000,
+                &quot;status&quot;: status,
+                &quot;error&quot;: error,
+                &quot;attributes&quot;: attributes
+            })
+
+# Example usage
+trace = TraceContext()
+
+with trace.span(&quot;agent_request&quot;, user_id=&quot;u_456&quot;):
+    with trace.span(&quot;llm_planning&quot;, model=&quot;gpt-4&quot;):
+        plan = call_llm(user_input)
+
+    with trace.span(&quot;tool_execution&quot;, tool=&quot;search&quot;):
+        result = search_tool(plan[&quot;query&quot;])
+
+    with trace.span(&quot;llm_synthesis&quot;, model=&quot;gpt-4&quot;):
+        answer = call_llm(result)
+
+# Send trace.spans to OpenTelemetry, Jaeger, etc.
+</code></pre>
+<p>Using OpenTelemetry standards keeps you compatible with LangSmith and Datadog APM.</p>
+<p><strong>Core Metrics</strong></p>
+<pre><code class="language-python">from collections import defaultdict
+import threading
+
+class MetricsCollector:
+    &quot;&quot;&quot;Metrics collector.&quot;&quot;&quot;
+
+    def __init__(self):
+        self._counters = defaultdict(int)
+        self._timers = defaultdict(list)
+        self._lock = threading.Lock()
+
+    def increment(self, name: str, value: int = 1, **tags):
+        key = self._make_key(name, tags)
+        with self._lock:
+            self._counters[key] += value
+
+    def timing(self, name: str, value_ms: float, **tags):
+        key = self._make_key(name, tags)
+        with self._lock:
+            self._timers[key].append(value_ms)
+
+    def _make_key(self, name: str, tags: dict) -&gt; str:
+        if not tags:
+            return name
+        tag_str = &quot;,&quot;.join(f&quot;{k}={v}&quot; for k, v in sorted(tags.items()))
+        return f&quot;{name}[{tag_str}]&quot;
+
+    def report(self) -&gt; dict:
+        with self._lock:
+            return {
+                &quot;counters&quot;: dict(self._counters),
+                &quot;timers&quot;: {
+                    k: {
+                        &quot;count&quot;: len(v),
+                        &quot;avg_ms&quot;: sum(v) / len(v),
+                        &quot;p95_ms&quot;: sorted(v)[int(len(v) * 0.95)] if v else 0
+                    }
+                    for k, v in self._timers.items()
+                }
+            }
+
+# Example usage — core metrics to track
+metrics = MetricsCollector()
+metrics.increment(&quot;agent.requests&quot;, status=&quot;success&quot;)
+metrics.increment(&quot;agent.tool_calls&quot;, tool=&quot;search&quot;)
+metrics.increment(&quot;agent.errors&quot;, type=&quot;timeout&quot;)
+metrics.timing(&quot;agent.request.duration&quot;, 1234, model=&quot;gpt-4&quot;)
+metrics.timing(&quot;agent.tool.duration&quot;, 234, tool=&quot;search&quot;)
+</code></pre>
+<p>Core metrics: request count, success/failure rate, latency p50/p95/p99, token usage, cost.</p>
+<h2>Cost Tracking and Limits</h2>
+<p>LLM cost is the biggest variable in operations. Set per-user/org limits.</p>
+<pre><code class="language-python">from datetime import datetime, timedelta
+
+class BudgetEnforcer:
+    &quot;&quot;&quot;Budget enforcement.&quot;&quot;&quot;
+
+    PRICING = {
+        &quot;gpt-4&quot;: {&quot;prompt&quot;: 0.03 / 1000, &quot;completion&quot;: 0.06 / 1000},
+        &quot;gpt-3.5-turbo&quot;: {&quot;prompt&quot;: 0.0015 / 1000, &quot;completion&quot;: 0.002 / 1000}
+    }
+
+    def __init__(self):
+        # Per-user daily usage
+        self._usage = defaultdict(lambda: {&quot;date&quot;: None, &quot;spent_usd&quot;: 0.0})
+        self._limits = {}  # user_id -&gt; daily_limit_usd
+
+    def set_limit(self, user_id: str, daily_limit_usd: float):
+        self._limits[user_id] = daily_limit_usd
+
+    def check_and_record(
+        self,
+        user_id: str,
+        model: str,
+        prompt_tokens: int,
+        completion_tokens: int
+    ) -&gt; bool:
+        &quot;&quot;&quot;Check budget and record usage. False = block.&quot;&quot;&quot;
+        today = datetime.utcnow().date()
+        usage = self._usage[user_id]
+
+        # Reset on date change
+        if usage[&quot;date&quot;] != today:
+            usage[&quot;date&quot;] = today
+            usage[&quot;spent_usd&quot;] = 0.0
+
+        # Estimated cost
+        cost = (
+            prompt_tokens * self.PRICING[model][&quot;prompt&quot;] +
+            completion_tokens * self.PRICING[model][&quot;completion&quot;]
+        )
+
+        limit = self._limits.get(user_id, float(&quot;inf&quot;))
+        if usage[&quot;spent_usd&quot;] + cost &gt; limit:
+            return False
+
+        usage[&quot;spent_usd&quot;] += cost
+        return True
+
+# Example usage
+budget = BudgetEnforcer()
+budget.set_limit(&quot;user_123&quot;, daily_limit_usd=5.0)
+
+if not budget.check_and_record(&quot;user_123&quot;, &quot;gpt-4&quot;, 1500, 500):
+    raise RuntimeError(&quot;daily budget exceeded&quot;)
+</code></pre>
+<p>Without cost limits, one user can drain the entire budget.</p>
+<h2>Scaling Strategies</h2>
+<p>Most agent load comes from LLM API calls. Optimizing those calls is the core of scaling.</p>
+<p><strong>Caching</strong></p>
+<p>Same input, same output can be cached.</p>
+<pre><code class="language-python">import hashlib
+import json
+from typing import Optional
+
+class ResponseCache:
+    &quot;&quot;&quot;LLM response cache.&quot;&quot;&quot;
+
+    def __init__(self, ttl_seconds: int = 3600):
+        self._cache = {}
+        self._ttl = ttl_seconds
+
+    def _key(self, model: str, messages: list, temperature: float) -&gt; str:
+        payload = json.dumps({
+            &quot;model&quot;: model,
+            &quot;messages&quot;: messages,
+            &quot;temperature&quot;: temperature
+        }, sort_keys=True)
+        return hashlib.sha256(payload.encode()).hexdigest()
+
+    def get(self, model: str, messages: list, temperature: float) -&gt; Optional[str]:
+        # temperature &gt; 0 is unsafe to cache
+        if temperature &gt; 0:
+            return None
+        key = self._key(model, messages, temperature)
+        entry = self._cache.get(key)
+        if entry and time.time() - entry[&quot;timestamp&quot;] &lt; self._ttl:
+            return entry[&quot;response&quot;]
+        return None
+
+    def set(self, model: str, messages: list, temperature: float, response: str):
+        if temperature &gt; 0:
+            return
+        key = self._key(model, messages, temperature)
+        self._cache[key] = {&quot;response&quot;: response, &quot;timestamp&quot;: time.time()}
+</code></pre>
+<p>Caching only <code>temperature=0</code> calls is safe.</p>
+<p><strong>Rate Limiting and Queuing</strong></p>
+<p>LLM APIs have rate limits, so the agent must throttle calls too.</p>
+<pre><code class="language-python">from collections import deque
+
+class RateLimiter:
+    &quot;&quot;&quot;Sliding-window rate limiter.&quot;&quot;&quot;
+
+    def __init__(self, max_requests: int, window_seconds: int):
+        self.max_requests = max_requests
+        self.window = window_seconds
+        self.timestamps = deque()
+        self.lock = threading.Lock()
+
+    def acquire(self) -&gt; bool:
+        with self.lock:
+            now = time.time()
+            # Drop timestamps outside the window
+            while self.timestamps and self.timestamps[0] &lt; now - self.window:
+                self.timestamps.popleft()
+
+            if len(self.timestamps) &gt;= self.max_requests:
+                return False
+
+            self.timestamps.append(now)
+            return True
+
+    def wait_and_acquire(self):
+        while not self.acquire():
+            time.sleep(0.1)
+
+# Example usage
+limiter = RateLimiter(max_requests=60, window_seconds=60)  # 60/minute
+limiter.wait_and_acquire()
+response = call_llm_api()
+</code></pre>
+<p><strong>Asynchronous Processing</strong></p>
+<p>Put long-running tasks on a queue and process asynchronously.</p>
+<pre><code class="language-python">import asyncio
+from asyncio import Queue
+
+class AgentTaskQueue:
+    &quot;&quot;&quot;Async task queue.&quot;&quot;&quot;
+
+    def __init__(self, num_workers: int = 5):
+        self.queue: Queue = Queue()
+        self.num_workers = num_workers
+        self.workers = []
+
+    async def submit(self, task: dict) -&gt; str:
+        task_id = str(uuid.uuid4())
+        await self.queue.put({&quot;id&quot;: task_id, **task})
+        return task_id
+
+    async def _worker(self, worker_id: int):
+        while True:
+            task = await self.queue.get()
+            try:
+                # Real agent execution
+                await process_task(task)
+            except Exception as e:
+                logger.error(&quot;task_failed&quot;, task_id=task[&quot;id&quot;], error=str(e))
+            finally:
+                self.queue.task_done()
+
+    async def start(self):
+        for i in range(self.num_workers):
+            self.workers.append(asyncio.create_task(self._worker(i)))
+</code></pre>
+<h2>Deployment and Rollback</h2>
+<p>Agents fuse LLMs, prompts, and tool definitions, making change impact hard to predict.</p>
+<p><strong>Canary Deployment</strong></p>
+<pre><code class="language-python">import random
+
+class CanaryRouter:
+    &quot;&quot;&quot;Route a fraction of traffic to a new version.&quot;&quot;&quot;
+
+    def __init__(self, canary_percentage: float = 0.05):
+        self.canary_percentage = canary_percentage
+        self.versions = {&quot;stable&quot;: None, &quot;canary&quot;: None}
+
+    def register(self, version: str, agent):
+        self.versions[version] = agent
+
+    def route(self, request) -&gt; tuple:
+        if (self.versions[&quot;canary&quot;] and
+            random.random() &lt; self.canary_percentage):
+            return self.versions[&quot;canary&quot;], &quot;canary&quot;
+        return self.versions[&quot;stable&quot;], &quot;stable&quot;
+
+    def adjust_canary(self, percentage: float):
+        self.canary_percentage = max(0.0, min(1.0, percentage))
+
+# Example usage
+router = CanaryRouter(canary_percentage=0.05)  # 5% canary
+router.register(&quot;stable&quot;, agent_v1)
+router.register(&quot;canary&quot;, agent_v2)
+
+agent, version = router.route(user_request)
+result = agent.run(user_request)
+metrics.increment(&quot;agent.requests&quot;, version=version)
+</code></pre>
+<p>When issues are detected, you must be able to roll back to 0% instantly.</p>
+<p><strong>Feature Flags</strong></p>
+<pre><code class="language-python">class FeatureFlags:
+    &quot;&quot;&quot;Feature flags.&quot;&quot;&quot;
+
+    def __init__(self):
+        self._flags = {}
+
+    def set(self, name: str, enabled: bool):
+        self._flags[name] = enabled
+
+    def is_enabled(self, name: str, user_id: Optional[str] = None) -&gt; bool:
+        return self._flags.get(name, False)
+
+# Example usage
+flags = FeatureFlags()
+flags.set(&quot;use_new_planning&quot;, False)
+
+def plan_task(task):
+    if flags.is_enabled(&quot;use_new_planning&quot;):
+        return new_planner(task)
+    return legacy_planner(task)
+</code></pre>
+<p>Toggling at runtime enables instant response to incidents.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Deploying Without Logs/Metrics</strong></p>
+<p>When something breaks, there's no way to trace the cause.</p>
+<pre><code class="language-python"># Bad
+def handle_request(req):
+    return agent.run(req)  # zero logging, zero metrics
+
+# Good
+def handle_request(req):
+    req_id = str(uuid.uuid4())
+    logger.info(&quot;request_received&quot;, request_id=req_id, user=req[&quot;user&quot;])
+    start = time.time()
+    try:
+        result = agent.run(req)
+        metrics.timing(&quot;agent.duration&quot;, (time.time() - start) * 1000)
+        metrics.increment(&quot;agent.success&quot;)
+        return result
+    except Exception as e:
+        logger.error(&quot;request_failed&quot;, request_id=req_id, error=str(e))
+        metrics.increment(&quot;agent.error&quot;)
+        raise
+</code></pre>
+<p><strong>Mistake 2: No Cost Monitoring</strong></p>
+<pre><code class="language-python"># Bad
+response = openai.ChatCompletion.create(...)  # zero cost tracking
+return response
+
+# Good
+response = openai.ChatCompletion.create(...)
+budget.record(
+    user_id=current_user,
+    model=response.model,
+    prompt_tokens=response.usage.prompt_tokens,
+    completion_tokens=response.usage.completion_tokens
+)
+</code></pre>
+<p>To avoid invoice shock at month-end, real-time tracking is mandatory.</p>
+<p><strong>Mistake 3: 100% Deploy at Once</strong></p>
+<pre><code class="language-python"># Bad
+def deploy_v2():
+    global agent
+    agent = AgentV2()  # all traffic switches instantly
+
+# Good
+def deploy_v2():
+    router.register(&quot;canary&quot;, AgentV2())
+    router.adjust_canary(0.05)  # start at 5%
+    # monitor and ramp up gradually
+</code></pre>
+<p>LLM-based systems regress easily; canary is required.</p>
+<p><strong>Mistake 4: Ignoring Rate Limits</strong></p>
+<pre><code class="language-python"># Bad
+for item in items:  # 10,000 items
+    response = openai.ChatCompletion.create(...)  # exceeds API quota
+
+# Good
+limiter = RateLimiter(60, 60)
+for item in items:
+    limiter.wait_and_acquire()
+    response = openai.ChatCompletion.create(...)
+</code></pre>
+<p>Bulk processing must always consider rate limits.</p>
+<p><strong>Mistake 5: Logging PII</strong></p>
+<pre><code class="language-python"># Bad
+logger.info(&quot;request&quot;, user_message=req.message)  # raw personal data
+
+# Good
+logger.info(&quot;request&quot;,
+    user_id=hash_user_id(req.user_id),  # hashed
+    message_length=len(req.message),    # length only
+    message_hash=hash(req.message)      # don't store contents
+)
+</code></pre>
+<p>A leading cause of GDPR/CCPA violations and security incidents.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Production agents must be observable through logs, metrics, and traces</li>
+<li>Per-user cost limits and real-time tracking are mandatory</li>
+<li>Optimize LLM calls with caching, rate limiting, and async processing</li>
+<li>Use canary deployment and feature flags to apply changes safely</li>
+<li>Never log PII; hash or mask it instead</li>
+</ul>
+<h2>AI Agent 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/04-agent-workflow-design.md">Agent Workflow Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/05-memory-and-state.md">Memory and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/06-multi-agent-systems.md">Multi-Agent Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/07-agent-evaluation.md">Agent Evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/08-error-handling-reliability.md">Error Handling and Reliability</a></li>
+<li><strong>Production Operations (current)</strong></li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ol>
+<li>
+<p><strong>OpenTelemetry: LLM Observability</strong> - https://opentelemetry.io/docs/specs/semconv/gen-ai/<br>
+   OpenTelemetry semantic conventions for LLM/agent observability. Defines standard trace attributes.</p>
+</li>
+<li>
+<p><strong>LangSmith Production Monitoring</strong> - https://docs.smith.langchain.com/observability<br>
+   LangChain's operations monitoring tool. Integrates traces, metrics, and evaluation.</p>
+</li>
+<li>
+<p><strong>Google SRE Book: Monitoring Distributed Systems</strong> - https://sre.google/sre-book/monitoring-distributed-systems/<br>
+   Google's SRE monitoring principles. The Four Golden Signals apply to agents too.</p>
+</li>
+<li>
+<p><strong>OpenAI: Production Best Practices</strong> - https://platform.openai.com/docs/guides/production-best-practices<br>
+   OpenAI's official operations guide. Covers rate limits, monitoring, and cost management.</p>
+</li>
+</ol>
+<p class="tags-line">Tags: AI Agent, Operations, Monitoring, Observability</p>
+</body>
+</html>

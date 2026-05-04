@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Observability — Tracing and Replaying Agent Work</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Observability — Tracing and Replaying Agent Work</h1>
+<blockquote>
+<p>Harness Engineering 101 Series (9/10)</p>
+</blockquote>
+<p>If you cannot see what the agent did, you cannot debug it or improve it. Observability is the practice of making every step of the agent traceable, recordable, and replayable.</p>
+<hr>
+<h2>What Is Observability?</h2>
+<p>Observability is the ability to reconstruct, from the outside, what an agent did, why it did it, and how. It is not just "leave logs around" — when an incident happens, you must be able to trace and reproduce the decision made at that moment.</p>
+<pre><code class="language-python">from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Any
+import uuid
+
+@dataclass
+class Span:
+    span_id: str
+    trace_id: str
+    parent_id: str | None
+    name: str
+    started_at: datetime
+    ended_at: datetime | None = None
+    attributes: dict[str, Any] = field(default_factory=dict)
+    events: list[dict] = field(default_factory=list)
+    status: str = &quot;ok&quot;
+</code></pre>
+<p>A <code>Span</code> is one unit of work in the agent. One tool call, one LLM call, one reflection step — each becomes its own span. Spans that share the same trace_id form one execution flow.</p>
+<h2>What Should You Record?</h2>
+<p>You need three layers of information to make traces useful.</p>
+<ol>
+<li><strong>What did the agent do?</strong> tool name, input, output</li>
+<li><strong>Why did it decide that?</strong> prompt, model, temperature, retrieved context</li>
+<li><strong>How long did it take and how much did it cost?</strong> latency, token count, cost in dollars</li>
+</ol>
+<pre><code class="language-python">def record_llm_call(span: Span, prompt: str, model: str, response: str, usage: dict):
+    span.attributes.update({
+        &quot;llm.model&quot;: model,
+        &quot;llm.prompt_tokens&quot;: usage[&quot;prompt_tokens&quot;],
+        &quot;llm.completion_tokens&quot;: usage[&quot;completion_tokens&quot;],
+        &quot;llm.cost_usd&quot;: _calculate_cost(model, usage),
+    })
+    span.events.append({
+        &quot;name&quot;: &quot;llm.prompt&quot;,
+        &quot;timestamp&quot;: datetime.now(timezone.utc).isoformat(),
+        &quot;body&quot;: prompt,
+    })
+    span.events.append({
+        &quot;name&quot;: &quot;llm.response&quot;,
+        &quot;timestamp&quot;: datetime.now(timezone.utc).isoformat(),
+        &quot;body&quot;: response,
+    })
+</code></pre>
+<p>Note that prompt and response go into events, not attributes. Attributes are short metadata for search and filtering; events are payloads ordered by time.</p>
+<h2>Trace Model — Following One Run End to End</h2>
+<p>A single agent run produces a trace shaped like this tree:</p>
+<pre><code class="language-python">class Tracer:
+    def __init__(self, exporter):
+        self.exporter = exporter
+        self._stack: list[Span] = []
+
+    def start(self, name: str, **attrs) -&gt; Span:
+        parent_id = self._stack[-1].span_id if self._stack else None
+        trace_id = self._stack[0].trace_id if self._stack else str(uuid.uuid4())
+        span = Span(
+            span_id=str(uuid.uuid4()),
+            trace_id=trace_id,
+            parent_id=parent_id,
+            name=name,
+            started_at=datetime.now(timezone.utc),
+            attributes=dict(attrs),
+        )
+        self._stack.append(span)
+        return span
+
+    def end(self, status: str = &quot;ok&quot;):
+        span = self._stack.pop()
+        span.ended_at = datetime.now(timezone.utc)
+        span.status = status
+        self.exporter.export(span)
+</code></pre>
+<pre><code class="language-text">trace 7a3f...
+├── span: agent.run           (12.3s, $0.04)
+│   ├── span: llm.plan        (1.2s, $0.01)
+│   ├── span: tool.search     (0.8s)
+│   ├── span: llm.synthesize  (2.1s, $0.02)
+│   └── span: tool.send_email (0.3s)
+</code></pre>
+<p>With this tree alone you can answer "where was it slow?", "where did the cost spike?", and "which tool failed?" instantly.</p>
+<h2>Replay — Reproducing a Run from Logs</h2>
+<p>A good trace is reproducible. You should be able to run the same step with the same input again and verify the same output comes back.</p>
+<pre><code class="language-python">def replay_trace(trace_id: str, store) -&gt; list[dict]:
+    spans = store.load_spans(trace_id)
+    results = []
+    for span in spans:
+        if span.name.startswith(&quot;tool.&quot;):
+            tool_name = span.attributes[&quot;tool.name&quot;]
+            tool_input = span.attributes[&quot;tool.input&quot;]
+            actual = invoke_tool(tool_name, tool_input)
+            expected = span.attributes[&quot;tool.output&quot;]
+            results.append({
+                &quot;span&quot;: span.name,
+                &quot;matches&quot;: actual == expected,
+                &quot;expected&quot;: expected,
+                &quot;actual&quot;: actual,
+            })
+    return results
+</code></pre>
+<p>For replay to work, every input — prompts, retrieved context, tool inputs — must be in the span. "Just record the result" makes replay impossible.</p>
+<h2>Cost and Latency Dashboards</h2>
+<p>Production agents see sudden spikes in cost and response time. The dashboard should surface these four metrics in real time:</p>
+<pre><code class="language-python">@dataclass
+class AgentMetrics:
+    total_runs: int
+    avg_latency_ms: float
+    p95_latency_ms: float
+    avg_cost_usd: float
+    error_rate: float
+
+def aggregate(spans: list[Span]) -&gt; AgentMetrics:
+    runs = [s for s in spans if s.name == &quot;agent.run&quot;]
+    latencies = [(s.ended_at - s.started_at).total_seconds() * 1000 for s in runs]
+    costs = [s.attributes.get(&quot;total.cost_usd&quot;, 0) for s in runs]
+    errors = [s for s in runs if s.status != &quot;ok&quot;]
+    latencies_sorted = sorted(latencies)
+    p95_idx = int(len(latencies_sorted) * 0.95)
+    return AgentMetrics(
+        total_runs=len(runs),
+        avg_latency_ms=sum(latencies) / len(latencies) if latencies else 0,
+        p95_latency_ms=latencies_sorted[p95_idx] if latencies_sorted else 0,
+        avg_cost_usd=sum(costs) / len(costs) if costs else 0,
+        error_rate=len(errors) / len(runs) if runs else 0,
+    )
+</code></pre>
+<p>P95 latency matters far more than the average. The average can look fine while five percent of users wait 30 seconds.</p>
+<h2>Alerting — When to Wake Someone Up</h2>
+<p>Alert on every anomaly and you get alert fatigue. Wake people up only on these three conditions:</p>
+<pre><code class="language-python">def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -&gt; str | None:
+    if metrics.error_rate &gt; baseline.error_rate * 2 and metrics.error_rate &gt; 0.05:
+        return f&quot;Error rate spike: {metrics.error_rate:.1%}&quot;
+    if metrics.p95_latency_ms &gt; baseline.p95_latency_ms * 3:
+        return f&quot;P95 latency spike: {metrics.p95_latency_ms:.0f}ms&quot;
+    if metrics.avg_cost_usd &gt; baseline.avg_cost_usd * 5:
+        return f&quot;Cost spike: ${metrics.avg_cost_usd:.4f}/run&quot;
+    return None
+</code></pre>
+<ol>
+<li><strong>Error rate spike</strong>: more than 2x baseline AND above 5% absolute</li>
+<li><strong>P95 latency spike</strong>: more than 3x baseline</li>
+<li><strong>Per-run cost spike</strong>: more than 5x baseline</li>
+</ol>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Logging only outputs, not inputs.</strong> Replay becomes impossible and you cannot trace incident causes. Always record prompts and retrieved context.</li>
+<li><strong>Logging PII verbatim.</strong> User emails, card numbers and similar end up raw in spans. Mask or hash before recording.</li>
+<li><strong>Losing trace_id across boundaries.</strong> Async calls drop the context and the trace breaks. Use an async-aware tracer or pass it explicitly.</li>
+<li><strong>Watching averages and ignoring P95.</strong> The mean looks fine while 5% wait 30s. Always look at percentiles.</li>
+<li><strong>Alerting on every anomaly.</strong> Alert fatigue makes you miss real alerts. Combine baseline-relative ratios with absolute thresholds.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Observability lets you trace and reproduce decisions after the fact.</li>
+<li>Spans are units of work; traces are the tree of one run.</li>
+<li>Record all three layers: What, Why, and Cost.</li>
+<li>Replay only works if prompts and retrieved context are stored.</li>
+<li>Watch p95 (not average) latency and alert on baseline-relative spikes.</li>
+</ul>
+<p>The next post is Production Harness — combining the nine harnesses into a deployment pattern for real production environments.</p>
+<hr>
+<h2>Harness Engineering 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Tool Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Test Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Feedback Loop</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/08-approval-gate.md">Approval Gates</a></li>
+<li><strong>Observability (current)</strong></li>
+<li>Production Harness (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry — Tracing concepts</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Monitoring distributed systems</a></li>
+<li><a href="https://docs.smith.langchain.com/observability">LangSmith — Tracing for LLM applications</a></li>
+<li><a href="https://www.honeycomb.io/blog/what-is-observability">Honeycomb — Observability engineering</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, Harness, Observability, Tracing</p>
+</body>
+</html>

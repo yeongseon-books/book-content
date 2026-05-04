@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Evaluation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Agent Evaluation</h1>
+<blockquote>
+<p>AI Agent 101 Series (7/10)</p>
+</blockquote>
+<p>What's harder than building an agent is evaluating "whether this agent works properly." Simple LLMs only need response quality evaluation, but agents require multiple metrics: tool calling accuracy, task completion rate, unnecessary step count, cost efficiency, etc.</p>
+<p>Agent evaluation is divided into three levels. Individual tool call accuracy (Tool Use Accuracy), task path efficiency (Trajectory Evaluation), and final result accuracy (End-to-End Success Rate).</p>
+<p>This article covers agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.</p>
+<hr>
+<h2>Agent Evaluation Metrics</h2>
+<p>Agent evaluation must look beyond "did it answer well" to multiple dimensions. The core metrics are below.</p>
+<p><strong>Task Success Rate</strong></p>
+<p>The percentage of user requests the agent completes successfully.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+from typing import List, Callable
+
+@dataclass
+class TestCase:
+    &quot;&quot;&quot;A test case.&quot;&quot;&quot;
+    task_id: str
+    user_input: str
+    expected_outcome: dict
+    success_criteria: Callable[[dict], bool]
+
+@dataclass
+class EvaluationResult:
+    &quot;&quot;&quot;An evaluation result.&quot;&quot;&quot;
+    task_id: str
+    success: bool
+    actual_outcome: dict
+    error: str = &quot;&quot;
+
+def evaluate_success_rate(
+    agent,
+    test_cases: List[TestCase]
+) -&gt; dict:
+    &quot;&quot;&quot;Measure task success rate.&quot;&quot;&quot;
+    results: List[EvaluationResult] = []
+
+    for test in test_cases:
+        try:
+            outcome = agent.run(test.user_input)
+            success = test.success_criteria(outcome)
+            results.append(EvaluationResult(
+                task_id=test.task_id,
+                success=success,
+                actual_outcome=outcome
+            ))
+        except Exception as e:
+            results.append(EvaluationResult(
+                task_id=test.task_id,
+                success=False,
+                actual_outcome={},
+                error=str(e)
+            ))
+
+    total = len(results)
+    succeeded = sum(1 for r in results if r.success)
+    return {
+        &quot;success_rate&quot;: succeeded / total if total else 0.0,
+        &quot;total&quot;: total,
+        &quot;succeeded&quot;: succeeded,
+        &quot;failed_cases&quot;: [r for r in results if not r.success]
+    }
+
+# Example usage
+test_cases = [
+    TestCase(
+        task_id=&quot;weather_seoul&quot;,
+        user_input=&quot;What's the weather in Seoul?&quot;,
+        expected_outcome={&quot;city&quot;: &quot;Seoul&quot;, &quot;has_temp&quot;: True},
+        success_criteria=lambda o: &quot;temperature&quot; in o.get(&quot;response&quot;, &quot;&quot;)
+    ),
+    TestCase(
+        task_id=&quot;calc_simple&quot;,
+        user_input=&quot;What is 3 times 4?&quot;,
+        expected_outcome={&quot;answer&quot;: 12},
+        success_criteria=lambda o: &quot;12&quot; in o.get(&quot;response&quot;, &quot;&quot;)
+    )
+]
+metrics = evaluate_success_rate(my_agent, test_cases)
+print(f&quot;Success rate: {metrics['success_rate']:.1%}&quot;)
+</code></pre>
+<p>Success rate is the most intuitive metric, but it doesn't show <em>how</em> the agent succeeded or failed.</p>
+<p><strong>Cost per Task</strong></p>
+<p>The token cost and number of API calls required to complete a single task.</p>
+<pre><code class="language-python">@dataclass
+class CostMetrics:
+    &quot;&quot;&quot;Cost metrics.&quot;&quot;&quot;
+    total_tokens: int
+    prompt_tokens: int
+    completion_tokens: int
+    api_calls: int
+    estimated_usd: float
+
+class CostTracker:
+    &quot;&quot;&quot;Tracks API call cost.&quot;&quot;&quot;
+
+    PRICING = {
+        &quot;gpt-4&quot;: {&quot;prompt&quot;: 0.03 / 1000, &quot;completion&quot;: 0.06 / 1000},
+        &quot;gpt-3.5-turbo&quot;: {&quot;prompt&quot;: 0.0015 / 1000, &quot;completion&quot;: 0.002 / 1000}
+    }
+
+    def __init__(self):
+        self.metrics = CostMetrics(0, 0, 0, 0, 0.0)
+
+    def record(self, model: str, prompt_tokens: int, completion_tokens: int):
+        &quot;&quot;&quot;Record an API call.&quot;&quot;&quot;
+        self.metrics.api_calls += 1
+        self.metrics.prompt_tokens += prompt_tokens
+        self.metrics.completion_tokens += completion_tokens
+        self.metrics.total_tokens += prompt_tokens + completion_tokens
+
+        if model in self.PRICING:
+            cost = (
+                prompt_tokens * self.PRICING[model][&quot;prompt&quot;] +
+                completion_tokens * self.PRICING[model][&quot;completion&quot;]
+            )
+            self.metrics.estimated_usd += cost
+
+    def report(self) -&gt; dict:
+        return {
+            &quot;api_calls&quot;: self.metrics.api_calls,
+            &quot;total_tokens&quot;: self.metrics.total_tokens,
+            &quot;estimated_usd&quot;: round(self.metrics.estimated_usd, 4)
+        }
+</code></pre>
+<p>Cost metrics are critical in production. Even with high accuracy, if each task costs over $1, the business won't work.</p>
+<p><strong>Latency</strong></p>
+<p>The time from user request to final response. Agents traverse multiple steps, so total latency tends to grow.</p>
+<pre><code class="language-python">import time
+from contextlib import contextmanager
+
+@contextmanager
+def measure_latency():
+    &quot;&quot;&quot;Latency-measuring context manager.&quot;&quot;&quot;
+    start = time.time()
+    metrics = {&quot;steps&quot;: []}
+    yield metrics
+    metrics[&quot;total_seconds&quot;] = time.time() - start
+
+def record_step(metrics: dict, step_name: str, duration: float):
+    metrics[&quot;steps&quot;].append({&quot;name&quot;: step_name, &quot;seconds&quot;: duration})
+
+# Example usage
+with measure_latency() as m:
+    t0 = time.time()
+    plan = agent.plan(user_input)
+    record_step(m, &quot;planning&quot;, time.time() - t0)
+
+    t0 = time.time()
+    tools_result = agent.execute_tools(plan)
+    record_step(m, &quot;tool_calls&quot;, time.time() - t0)
+
+    t0 = time.time()
+    final = agent.synthesize(tools_result)
+    record_step(m, &quot;synthesis&quot;, time.time() - t0)
+
+print(f&quot;total {m['total_seconds']:.2f}s, per-step: {m['steps']}&quot;)
+</code></pre>
+<p>Per-step latency reveals where the bottleneck is.</p>
+<h2>Trajectory Evaluation</h2>
+<p>A trajectory is the path the agent takes from start to goal. For the same outcome, a shorter, more efficient trajectory is better.</p>
+<p><strong>Recording Trajectories</strong></p>
+<p>Recording every step enables post-hoc analysis.</p>
+<pre><code class="language-python">from datetime import datetime
+from typing import Any
+
+@dataclass
+class TrajectoryStep:
+    &quot;&quot;&quot;A single step in a trajectory.&quot;&quot;&quot;
+    step_number: int
+    action: str           # &quot;think&quot;, &quot;tool_call&quot;, &quot;respond&quot;
+    input: Any
+    output: Any
+    timestamp: datetime
+    duration_ms: int
+
+@dataclass
+class Trajectory:
+    &quot;&quot;&quot;The full path.&quot;&quot;&quot;
+    task_id: str
+    steps: List[TrajectoryStep]
+    final_answer: str
+    success: bool
+
+class TrajectoryRecorder:
+    &quot;&quot;&quot;Records trajectories.&quot;&quot;&quot;
+
+    def __init__(self, task_id: str):
+        self.task_id = task_id
+        self.steps: List[TrajectoryStep] = []
+        self._step_counter = 0
+
+    def record(self, action: str, input_data: Any, output_data: Any, duration_ms: int):
+        self._step_counter += 1
+        self.steps.append(TrajectoryStep(
+            step_number=self._step_counter,
+            action=action,
+            input=input_data,
+            output=output_data,
+            timestamp=datetime.now(),
+            duration_ms=duration_ms
+        ))
+
+    def finalize(self, final_answer: str, success: bool) -&gt; Trajectory:
+        return Trajectory(
+            task_id=self.task_id,
+            steps=self.steps,
+            final_answer=final_answer,
+            success=success
+        )
+</code></pre>
+<p><strong>Trajectory Efficiency</strong></p>
+<p>Use the recorded trajectory to evaluate efficiency.</p>
+<pre><code class="language-python">def evaluate_trajectory_efficiency(traj: Trajectory) -&gt; dict:
+    &quot;&quot;&quot;Analyze trajectory efficiency.&quot;&quot;&quot;
+    tool_calls = [s for s in traj.steps if s.action == &quot;tool_call&quot;]
+    thinks = [s for s in traj.steps if s.action == &quot;think&quot;]
+
+    # Detect duplicate tool calls
+    tool_signatures = [
+        (s.input.get(&quot;tool&quot;), str(s.input.get(&quot;args&quot;)))
+        for s in tool_calls
+    ]
+    duplicate_calls = len(tool_signatures) - len(set(tool_signatures))
+
+    return {
+        &quot;total_steps&quot;: len(traj.steps),
+        &quot;tool_calls&quot;: len(tool_calls),
+        &quot;thinking_steps&quot;: len(thinks),
+        &quot;duplicate_tool_calls&quot;: duplicate_calls,
+        &quot;total_duration_ms&quot;: sum(s.duration_ms for s in traj.steps),
+        &quot;avg_step_ms&quot;: sum(s.duration_ms for s in traj.steps) / len(traj.steps)
+            if traj.steps else 0
+    }
+
+# Compare efficiency
+traj_a = recorder_a.finalize(&quot;answer A&quot;, True)
+traj_b = recorder_b.finalize(&quot;answer B&quot;, True)
+
+eff_a = evaluate_trajectory_efficiency(traj_a)
+eff_b = evaluate_trajectory_efficiency(traj_b)
+# Same answer; fewer steps means more efficient
+</code></pre>
+<p>The core question of trajectory evaluation is "did we reach the same result in fewer steps?"</p>
+<h2>Tool Call Accuracy</h2>
+<p>Agent tool calls split into two parts: (1) Did it pick the right tool, (2) Did it call it with the right arguments?</p>
+<pre><code class="language-python">@dataclass
+class ToolCallExpectation:
+    &quot;&quot;&quot;Expected tool call.&quot;&quot;&quot;
+    tool_name: str
+    required_args: dict
+    optional_args: dict = None
+
+def evaluate_tool_call(
+    actual_tool: str,
+    actual_args: dict,
+    expected: ToolCallExpectation
+) -&gt; dict:
+    &quot;&quot;&quot;Evaluate a single tool call.&quot;&quot;&quot;
+    result = {
+        &quot;tool_correct&quot;: actual_tool == expected.tool_name,
+        &quot;args_correct&quot;: True,
+        &quot;missing_args&quot;: [],
+        &quot;wrong_args&quot;: []
+    }
+
+    for key, expected_val in expected.required_args.items():
+        if key not in actual_args:
+            result[&quot;missing_args&quot;].append(key)
+            result[&quot;args_correct&quot;] = False
+        elif actual_args[key] != expected_val:
+            result[&quot;wrong_args&quot;].append({
+                &quot;key&quot;: key,
+                &quot;expected&quot;: expected_val,
+                &quot;actual&quot;: actual_args[key]
+            })
+            result[&quot;args_correct&quot;] = False
+
+    return result
+
+# Example usage
+expected = ToolCallExpectation(
+    tool_name=&quot;get_weather&quot;,
+    required_args={&quot;city&quot;: &quot;Seoul&quot;}
+)
+actual_tool = &quot;get_weather&quot;
+actual_args = {&quot;city&quot;: &quot;Seoul&quot;, &quot;unit&quot;: &quot;celsius&quot;}
+print(evaluate_tool_call(actual_tool, actual_args, expected))
+# {'tool_correct': True, 'args_correct': True, ...}
+</code></pre>
+<p>Aggregating tool-call accuracy across the whole test set surfaces agent weaknesses.</p>
+<h2>End-to-End Testing</h2>
+<p>Unit tests aren't enough. An agent is the result of multiple components interacting, so end-to-end scenario tests are required.</p>
+<pre><code class="language-python">class E2ETestSuite:
+    &quot;&quot;&quot;End-to-end test suite.&quot;&quot;&quot;
+
+    def __init__(self, agent):
+        self.agent = agent
+        self.results = []
+
+    def run_scenario(self, scenario: dict) -&gt; dict:
+        &quot;&quot;&quot;Run a single scenario.&quot;&quot;&quot;
+        recorder = TrajectoryRecorder(scenario[&quot;id&quot;])
+
+        try:
+            # Run multi-turn conversation
+            for turn in scenario[&quot;turns&quot;]:
+                response = self.agent.chat(turn[&quot;user&quot;])
+
+            # Final assertions
+            assertions_passed = all(
+                self._check_assertion(response, a)
+                for a in scenario[&quot;assertions&quot;]
+            )
+            return {
+                &quot;scenario_id&quot;: scenario[&quot;id&quot;],
+                &quot;passed&quot;: assertions_passed,
+                &quot;trajectory&quot;: recorder.finalize(response, assertions_passed)
+            }
+        except Exception as e:
+            return {
+                &quot;scenario_id&quot;: scenario[&quot;id&quot;],
+                &quot;passed&quot;: False,
+                &quot;error&quot;: str(e)
+            }
+
+    def _check_assertion(self, response: str, assertion: dict) -&gt; bool:
+        if assertion[&quot;type&quot;] == &quot;contains&quot;:
+            return assertion[&quot;value&quot;] in response
+        if assertion[&quot;type&quot;] == &quot;not_contains&quot;:
+            return assertion[&quot;value&quot;] not in response
+        if assertion[&quot;type&quot;] == &quot;regex&quot;:
+            import re
+            return bool(re.search(assertion[&quot;pattern&quot;], response))
+        return False
+
+# Define a scenario
+scenario = {
+    &quot;id&quot;: &quot;booking_flow&quot;,
+    &quot;turns&quot;: [
+        {&quot;user&quot;: &quot;Find me a KTX from Seoul to Busan tomorrow&quot;},
+        {&quot;user&quot;: &quot;Show me morning departures&quot;},
+        {&quot;user&quot;: &quot;Book the first one&quot;}
+    ],
+    &quot;assertions&quot;: [
+        {&quot;type&quot;: &quot;contains&quot;, &quot;value&quot;: &quot;booking confirmed&quot;},
+        {&quot;type&quot;: &quot;contains&quot;, &quot;value&quot;: &quot;KTX&quot;}
+    ]
+}
+</code></pre>
+<p>End-to-end tests validate multi-turn dialogue, state retention, and tool chains all at once.</p>
+<h2>Benchmarking</h2>
+<p>Standard benchmarks let you compare your agent against other systems.</p>
+<p><strong>Public Agent Benchmarks</strong></p>
+<ul>
+<li><strong>AgentBench</strong> — Measures agent reasoning and tool use across 8 environments</li>
+<li><strong>WebArena</strong> — Measures task completion on real websites</li>
+<li><strong>GAIA</strong> — Evaluates general AI assistants on real problem solving</li>
+<li><strong>SWE-bench</strong> — Measures GitHub issue resolution (for code agents)</li>
+</ul>
+<p><strong>Building Your Own Benchmark</strong></p>
+<p>Domain-specific agents need their own benchmarks.</p>
+<pre><code class="language-python">class AgentBenchmark:
+    &quot;&quot;&quot;Benchmark runner.&quot;&quot;&quot;
+
+    def __init__(self, name: str):
+        self.name = name
+        self.test_cases: List[TestCase] = []
+        self.cost_tracker = CostTracker()
+
+    def add_case(self, case: TestCase):
+        self.test_cases.append(case)
+
+    def run(self, agent, repeat: int = 3) -&gt; dict:
+        &quot;&quot;&quot;Run the benchmark, repeating to reduce noise.&quot;&quot;&quot;
+        all_results = []
+
+        for run_idx in range(repeat):
+            for case in self.test_cases:
+                start = time.time()
+                outcome = agent.run(case.user_input)
+                duration = time.time() - start
+
+                all_results.append({
+                    &quot;run&quot;: run_idx,
+                    &quot;case_id&quot;: case.task_id,
+                    &quot;success&quot;: case.success_criteria(outcome),
+                    &quot;duration_seconds&quot;: duration
+                })
+
+        # Aggregate
+        cases = {c.task_id for c in self.test_cases}
+        per_case = {}
+        for case_id in cases:
+            case_runs = [r for r in all_results if r[&quot;case_id&quot;] == case_id]
+            per_case[case_id] = {
+                &quot;success_rate&quot;: sum(1 for r in case_runs if r[&quot;success&quot;]) / len(case_runs),
+                &quot;avg_duration&quot;: sum(r[&quot;duration_seconds&quot;] for r in case_runs) / len(case_runs)
+            }
+
+        return {
+            &quot;benchmark&quot;: self.name,
+            &quot;agent&quot;: agent.__class__.__name__,
+            &quot;total_runs&quot;: len(all_results),
+            &quot;overall_success_rate&quot;: sum(1 for r in all_results if r[&quot;success&quot;]) / len(all_results),
+            &quot;per_case&quot;: per_case,
+            &quot;cost&quot;: self.cost_tracker.report()
+        }
+</code></pre>
+<p>Benchmark results become the baseline for regression testing on every agent improvement.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Judging by Success Rate Alone</strong></p>
+<p>Even at 90% success, $5 per task makes operations untenable.</p>
+<pre><code class="language-python"># Bad
+if benchmark[&quot;success_rate&quot;] &gt; 0.9:
+    deploy_to_production()  # Ignores cost and latency
+
+# Good
+if (benchmark[&quot;success_rate&quot;] &gt; 0.9 and
+    benchmark[&quot;cost&quot;][&quot;estimated_usd&quot;] / benchmark[&quot;total_runs&quot;] &lt; 0.10 and
+    benchmark[&quot;avg_latency_seconds&quot;] &lt; 5.0):
+    deploy_to_production()
+</code></pre>
+<p>Success rate, cost, and latency must be weighed together.</p>
+<p><strong>Mistake 2: Single-Run Evaluation</strong></p>
+<p>LLMs are non-deterministic. A single run can't be trusted.</p>
+<pre><code class="language-python"># Bad
+result = agent.run(test_input)
+if result == expected:
+    print(&quot;Pass&quot;)
+
+# Good
+results = [agent.run(test_input) for _ in range(10)]
+pass_rate = sum(1 for r in results if r == expected) / 10
+print(f&quot;Pass rate: {pass_rate:.0%}&quot;)
+</code></pre>
+<p>Run 5-10 times minimum and average.</p>
+<p><strong>Mistake 3: Test Cases Too Similar to Training Data</strong></p>
+<p>The LLM may have already seen similar data. Include out-of-distribution cases on purpose.</p>
+<pre><code class="language-python"># Bad
+test_cases = [
+    &quot;What is the capital of France?&quot;,  # Pattern the LLM has seen countless times
+    &quot;Who wrote Hamlet?&quot;
+]
+
+# Good
+test_cases = [
+    &quot;What's the next milestone for the user's just-created 'Project Atlas'?&quot;,  # Real domain
+    &quot;Cancel order ID 7842 and issue a refund&quot;  # Real operational scenario
+]
+</code></pre>
+<p>Tests reflecting real usage patterns are meaningful.</p>
+<p><strong>Mistake 4: Ignoring Trajectory, Evaluating Only Outcome</strong></p>
+<p>Two agents reaching the same answer with 10 vs. 2 tool calls are not equivalent.</p>
+<pre><code class="language-python"># Bad
+def evaluate(agent, task):
+    result = agent.run(task)
+    return result == expected_answer
+
+# Good
+def evaluate(agent, task):
+    recorder = TrajectoryRecorder(task[&quot;id&quot;])
+    result = agent.run(task, recorder=recorder)
+    traj = recorder.finalize(result, result == expected_answer)
+    eff = evaluate_trajectory_efficiency(traj)
+    return {
+        &quot;correct&quot;: result == expected_answer,
+        &quot;efficient&quot;: eff[&quot;tool_calls&quot;] &lt;= task[&quot;max_tool_calls&quot;],
+        &quot;no_duplicates&quot;: eff[&quot;duplicate_tool_calls&quot;] == 0
+    }
+</code></pre>
+<p>Evaluate correctness <em>and</em> path efficiency together.</p>
+<p><strong>Mistake 5: No Regression Testing Before Deploy</strong></p>
+<p>You think you've improved, but other cases regressed.</p>
+<pre><code class="language-python"># Bad
+# Test only the few new cases right before v2 ships
+new_cases = [test1, test2]
+if all(agent_v2.run(c) for c in new_cases):
+    deploy_v2()  # Existing cases may have broken
+
+# Good
+# Run the full benchmark for regression
+v1_results = benchmark.run(agent_v1)
+v2_results = benchmark.run(agent_v2)
+regressions = [
+    case_id for case_id in v1_results[&quot;per_case&quot;]
+    if v1_results[&quot;per_case&quot;][case_id][&quot;success_rate&quot;] &gt;
+       v2_results[&quot;per_case&quot;][case_id][&quot;success_rate&quot;]
+]
+if not regressions:
+    deploy_v2()
+else:
+    print(f&quot;Regressions found: {regressions}&quot;)
+</code></pre>
+<p>Pre-deploy regression testing is mandatory.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Agent evaluation must consider Success Rate, Cost per Task, and Latency together</li>
+<li>Trajectory evaluation measures whether the same result was reached in fewer steps</li>
+<li>Tool-call accuracy splits into tool selection and argument correctness</li>
+<li>End-to-end scenario tests validate multi-turn dialogue, state, and tool chains together</li>
+<li>Use both standard and custom benchmarks to catch regressions</li>
+<li>Evaluate by averaging 5-10 runs, not a single execution</li>
+</ul>
+<h2>AI Agent 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/04-agent-workflow-design.md">Agent Workflow Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/05-memory-and-state.md">Memory and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/06-multi-agent-systems.md">Multi-Agent Systems</a></li>
+<li><strong>Agent Evaluation (current)</strong></li>
+<li>Error Handling and Reliability (upcoming)</li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ol>
+<li>
+<p><strong>AgentBench: Evaluating LLMs as Agents</strong> - https://arxiv.org/abs/2308.03688<br>
+   Comprehensive Tsinghua/Stanford agent benchmark paper. Evaluates LLM agent reasoning and tool use across 8 environments.</p>
+</li>
+<li>
+<p><strong>GAIA: A Benchmark for General AI Assistants</strong> - https://arxiv.org/abs/2311.12983<br>
+   Meta's general AI assistant benchmark. A 466-question set measuring real problem-solving capability.</p>
+</li>
+<li>
+<p><strong>LangSmith: Agent Evaluation</strong> - https://docs.smith.langchain.com/evaluation<br>
+   LangChain's agent evaluation tooling docs. Provides trajectory recording and an automated evaluation pipeline.</p>
+</li>
+<li>
+<p><strong>OpenAI Evals Framework</strong> - https://github.com/openai/evals<br>
+   OpenAI's model evaluation framework. Applicable to a wide range of LLM systems including agents.</p>
+</li>
+</ol>
+<p class="tags-line">Tags: AI Agent, Evaluation, Testing, Metrics</p>
+</body>
+</html>

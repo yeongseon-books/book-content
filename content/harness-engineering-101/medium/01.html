@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Harness Engineering?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Harness Engineering?</h1>
+<blockquote>
+<p>Harness Engineering 101 Series (1/10)</p>
+</blockquote>
+<p>Good agents are not made by good models alone. You must design the environment, constraints, tools, and verification loops the model works inside. Harness Engineering is the discipline of designing that environment so the agent can work reliably.</p>
+<hr>
+<h2>A Good Model Alone Is Not Enough</h2>
+<p>Every time a new frontier model lands — GPT-4, Claude 3.5, Gemini 1.5 — the same hope follows: "now real agents are finally possible." But with the same model, one team builds a reliable automation system and another team gets different results on every run. The difference is rarely the model. It is <strong>the environment around the model</strong>.</p>
+<p>Even a skilled person produces poor work at a messy desk with broken tools. Agents work the same way. Without a clear task definition, clean context, safe tools, explicit completion criteria, a loop that recovers from failure, an approval flow for risky actions, and observability into what was done, even a capable model looks incompetent.</p>
+<p>Harness Engineering is the practice of designing that environment. Building a good agent is not about picking a good model. It is about constructing a system the model can work inside.</p>
+<hr>
+<h2>What Is a Harness?</h2>
+<p>The English word "harness" originally describes the equipment fitted onto a horse or working animal. It is not a restraint. It is the device that channels the animal's strength in a useful direction. Without a harness, a horse's power scatters and stays uncontrolled. With a harness, the same horse pulls a carriage, plows a field, or carries a rider safely.</p>
+<p>The harness in Harness Engineering means the same thing. It is the device that channels an AI model's capability in the direction you want. You do not change the model itself. You design the environment, inputs, constraints, tools, and verification around the model so that it works reliably.</p>
+<p>The word is already familiar in software engineering. A test harness provides the environment a function runs inside (setup, teardown, fixtures). A cable harness in embedded systems connects multiple parts in a fixed pattern. An AI agent harness follows the same idea. You set up the environment in advance, and the model works within it.</p>
+<hr>
+<h2>Agents Without and With a Harness</h2>
+<p>Without a harness, an agent often looks like this:</p>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def run_agent(user_message: str) -&gt; str:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_message}],
+    )
+    return response.choices[0].message.content or &quot;&quot;
+
+# Usage
+answer = run_agent(&quot;Build a sales report for our company&quot;)
+print(answer)
+</code></pre>
+<p>This agent answers once and stops. There are no tools, no memory, and no verification. There is no way to judge whether the result is good, and the same question yields different answers on different runs. It cannot ship to production.</p>
+<p>With a harness applied, the same task becomes:</p>
+<pre><code class="language-python">from typing import Any
+from pydantic import BaseModel
+
+class TaskSpec(BaseModel):
+    &quot;&quot;&quot;Task Harness: clear inputs and completion criteria.&quot;&quot;&quot;
+    goal: str
+    inputs: dict[str, Any]
+    completion_criteria: list[str]
+
+class AgentContext(BaseModel):
+    &quot;&quot;&quot;Context Harness: what to show and what to hide.&quot;&quot;&quot;
+    system_prompt: str
+    allowed_data_sources: list[str]
+    forbidden_topics: list[str]
+
+class ToolPolicy(BaseModel):
+    &quot;&quot;&quot;Constraint + Tool Harness: allowed and forbidden actions.&quot;&quot;&quot;
+    allowed_tools: list[str]
+    require_approval: list[str]
+    max_iterations: int = 5
+
+def run_agent_with_harness(task: TaskSpec, ctx: AgentContext, policy: ToolPolicy) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Agent execution with harnesses applied.&quot;&quot;&quot;
+    trace = []  # Observability Harness: record every step
+
+    for iteration in range(policy.max_iterations):
+        decision = think_with_context(task, ctx, trace)
+        trace.append({&quot;iteration&quot;: iteration, &quot;decision&quot;: decision})
+
+        if decision[&quot;action&quot;] in policy.require_approval:
+            if not request_human_approval(decision):
+                trace.append({&quot;approval&quot;: &quot;denied&quot;})
+                break
+
+        result = execute_tool(decision, policy.allowed_tools)
+        trace.append({&quot;result&quot;: result})
+
+        if check_completion(result, task.completion_criteria):
+            return {&quot;status&quot;: &quot;success&quot;, &quot;trace&quot;: trace, &quot;result&quot;: result}
+
+    return {&quot;status&quot;: &quot;incomplete&quot;, &quot;trace&quot;: trace}
+</code></pre>
+<p>The code is longer, but the agent now guarantees:</p>
+<ul>
+<li>The task is well defined (Task Harness).</li>
+<li>The information it sees is scoped (Context Harness).</li>
+<li>Allowed tools and approval-required actions are explicit (Constraint Harness).</li>
+<li>Loops cannot run forever (Tool Harness).</li>
+<li>Every decision is recorded (Observability).</li>
+</ul>
+<p>Same model, completely different system.</p>
+<hr>
+<h2>The Eight Harnesses</h2>
+<p>This series covers eight harnesses. Each one designs a different aspect of the agent.</p>
+<p><strong>Task</strong><br>
+- Question it answers: "What should the agent do?"<br>
+- Episode: 2</p>
+<p><strong>Context</strong><br>
+- Question it answers: "What should the agent see?"<br>
+- Episode: 3</p>
+<p><strong>Constraint</strong><br>
+- Question it answers: "What must the agent not do?"<br>
+- Episode: 4</p>
+<p><strong>Tool</strong><br>
+- Question it answers: "What can the agent use?"<br>
+- Episode: 5</p>
+<p><strong>Test</strong><br>
+- Question it answers: "How do we know it is done?"<br>
+- Episode: 6</p>
+<p><strong>Feedback</strong><br>
+- Question it answers: "How does it recover from failure?"<br>
+- Episode: 7</p>
+<p><strong>Approval</strong><br>
+- Question it answers: "Where must a human stop it?"<br>
+- Episode: 8</p>
+<p><strong>Observability</strong><br>
+- Question it answers: "How do we trace what it did?"<br>
+- Episode: 9</p>
+<p>Episode 10 integrates all of them into a Production Harness.</p>
+<p>These harnesses are not independent. The Tool Harness is defined inside the Constraint Harness. The Approval Gate intercepts specific actions inside the Tool Harness. Observability records the state of every other harness. They have to be designed together to form a coherent system.</p>
+<hr>
+<h2>Harness vs Framework</h2>
+<p>People often ask how Harness Engineering relates to frameworks like LangChain, LangGraph, or CrewAI. They live at different layers.</p>
+<p><strong>What it is</strong><br>
+- Framework: A code library<br>
+- Harness Engineering: A set of design principles and patterns</p>
+<p><strong>What it provides</strong><br>
+- Framework: APIs, abstractions, utilities<br>
+- Harness Engineering: Decisions about what environment to build</p>
+<p><strong>Example</strong><br>
+- Framework: A LangGraph node and edge<br>
+- Harness Engineering: A Task Harness definition</p>
+<p><strong>When you choose it</strong><br>
+- Framework: Picked once<br>
+- Harness Engineering: Designed for every agent</p>
+<p>Frameworks are tools. Harness Engineering is how you think about what to build with those tools. You can build an agent without a harness using LangGraph, and you can build a well-harnessed agent using only the standard library.</p>
+<p>In practice the two combine. Use Harness Engineering first to decide what task, context, constraint, tool, test, feedback, approval, and observability your agent needs. Then use a framework like LangGraph or CrewAI to express that design in code. Design first, framework second.</p>
+<hr>
+<h2>When You Need Harness Engineering</h2>
+<p>Not every LLM use needs a full harness. Look for these signals.</p>
+<p><strong>1. The same input produces different results.</strong><br>
+Non-deterministic behavior signals weak Task and Context Harnesses. Your inputs and the scope of context are not pinned down.</p>
+<p><strong>2. You cannot explain what the agent did.</strong><br>
+When a user asks "why did it answer that way?" and you cannot answer, you have no Observability Harness. Every decision and tool call must be recorded.</p>
+<p><strong>3. The agent performs risky actions automatically.</strong><br>
+If the agent deletes data, sends emails, or makes payments without human confirmation, you need an Approval Gate.</p>
+<p><strong>4. Tool call costs explode.</strong><br>
+If the agent repeats the same search 100 times or loops forever, your Constraint and Tool Harnesses are missing.</p>
+<p><strong>5. You cannot tell when the agent is done.</strong><br>
+Without a Test Harness, "I am done" from the agent means nothing.</p>
+<p>If you see any one of these, switching models will not save you. You need to design harnesses.</p>
+<hr>
+<h2>A Small Example: Email Classification Agent</h2>
+<p>Enough abstraction. Consider a small task: "classify incoming emails by priority." Without a harness:</p>
+<pre><code class="language-python">def classify_email(email_body: str) -&gt; str:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;Classify the email as high, medium, or low.&quot;},
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: email_body},
+        ],
+    )
+    return response.choices[0].message.content or &quot;&quot;
+</code></pre>
+<p>There are many problems. Output format is not guaranteed. The same email yields different labels. Classification criteria are vague. There is no way to detect a wrong label.</p>
+<p>With a harness applied:</p>
+<pre><code class="language-python">from enum import Enum
+from pydantic import BaseModel, Field
+
+class Priority(str, Enum):
+    HIGH = &quot;high&quot;
+    MEDIUM = &quot;medium&quot;
+    LOW = &quot;low&quot;
+
+class ClassificationResult(BaseModel):
+    &quot;&quot;&quot;Test Harness: schema pins down completion criteria.&quot;&quot;&quot;
+    priority: Priority
+    reason: str = Field(..., min_length=10)
+    confidence: float = Field(..., ge=0.0, le=1.0)
+
+SYSTEM_PROMPT = &quot;&quot;&quot;You are an email priority classifier.
+
+Classification criteria (Context Harness):
+- high: response required within 24 hours. Customer complaints, payment failures, security issues.
+- medium: response required within 3 business days. General inquiries, feature requests.
+- low: response optional. Marketing, notifications, automated emails.
+
+Rules (Constraint Harness):
+- Use only one of the three categories above.
+- Reason must be a single sentence explaining the basis for the label.
+- Confidence must be a number between 0.0 and 1.0.
+- Do not infer information not present in the email body.&quot;&quot;&quot;
+
+def classify_email_with_harness(email_body: str) -&gt; ClassificationResult:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM_PROMPT},
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: email_body},
+        ],
+        response_format=ClassificationResult,  # Test Harness
+    )
+    return ClassificationResult.model_validate_json(response.choices[0].message.content)
+</code></pre>
+<p>The function now guarantees:</p>
+<ul>
+<li>Output always follows <code>ClassificationResult</code> schema (Test Harness).</li>
+<li>Classification criteria are spelled out in the system prompt (Context Harness).</li>
+<li>Disallowed categories cannot appear (Constraint Harness).</li>
+<li>Low <code>confidence</code> can be detected and routed for human review (Approval link).</li>
+</ul>
+<p>Same model, same task, but the harnessed version is something you can actually run in production.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>1. Believing a model swap will fix everything.</strong><br>
+Teams expect that switching to GPT-4o makes things accurate, or to Claude 3.5 makes them smarter. Models do differ, but without a harness no model becomes a reliable system.</p>
+<p><strong>2. Trying to build all eight harnesses at once.</strong><br>
+Attempting to design every harness up front blocks you from starting. Begin with Task and Context Harnesses, then add the others where pain appears.</p>
+<p><strong>3. Confusing harnesses with frameworks.</strong><br>
+Adopting LangGraph does not give you harnesses for free. Frameworks are tools. Harnesses are designs. You can have one without the other.</p>
+<p><strong>4. Adding observability last.</strong><br>
+"First make it work, then add logs" is a common postponement. Without observability you cannot debug, so you end up rewriting from scratch. Record every decision and tool call from day one.</p>
+<p><strong>5. Automating risky actions without an Approval Gate.</strong><br>
+"It is just a test environment" leads to automated deletes, sends, and payments that eventually hit production data. Risky actions must pass an Approval Gate from the start, regardless of environment.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>A good agent is not built from a good model alone. The environment (the harness) the model works inside must be designed too.</li>
+<li>A harness channels model capability in the direction you want. You design the surroundings, not the model itself.</li>
+<li>This series covers eight harnesses: Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability.</li>
+<li>Harness Engineering is a design discipline, not a framework. Use frameworks like LangGraph as tools to implement your harness design.</li>
+<li>Non-deterministic behavior, undebuggable runs, automated risky actions, runaway costs, and "is it done?" ambiguity are signals that you need to start designing harnesses.</li>
+</ul>
+<hr>
+<h2>Harness Engineering 101 Series</h2>
+<ul>
+<li><strong>What Is Harness Engineering? (current)</strong></li>
+<li>Task Harness — Turning Vague Work into Executable Tasks (upcoming)</li>
+<li>Context Harness — Designing What the Agent Should Know and Not Know (upcoming)</li>
+<li>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)</li>
+<li>Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
+<li>Test Harness — Turning Completion Criteria into Tests (upcoming)</li>
+<li>Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)</li>
+<li>Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
+<li>Observability — Tracing and Replaying Agent Work (upcoming)</li>
+<li>Production Harness — Building Operational Environments for Agents (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.anthropic.com/research/building-effective-agents">Building Effective Agents — Anthropic</a></li>
+<li><a href="https://lilianweng.github.io/posts/2023-06-23-agent/">LLM Powered Autonomous Agents — Lilian Weng</a></li>
+<li><a href="https://www.langchain.com/blog">The Rise of Agent Engineering</a></li>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling Guide</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, Harness, Reliability, Production</p>
+</body>
+</html>

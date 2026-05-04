@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Approval Gates — Designing Where Humans Must Approve</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Approval Gates — Designing Where Humans Must Approve</h1>
+<blockquote>
+<p>Harness Engineering 101 Series (8/10)</p>
+</blockquote>
+<p>Some actions must never run automatically. Payments, deploys, deletes, and outbound messages need human approval. An Approval Gate makes the place where a human must stop and review explicit.</p>
+<hr>
+<h2>What Is an Approval Gate?</h2>
+<p>An Approval Gate is a point where the agent must request human approval before executing a specific action. Automated flow pauses, decision authority hands off to a human, and the agent resumes only after receiving the response.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+from typing import Literal
+
+@dataclass
+class ApprovalRequest:
+    action_id: str
+    action_type: str
+    summary: str
+    risk_level: Literal[&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;]
+    payload: dict
+
+@dataclass
+class ApprovalDecision:
+    action_id: str
+    decision: Literal[&quot;approve&quot;, &quot;reject&quot;]
+    approver: str
+    reason: str
+</code></pre>
+<p><code>ApprovalRequest</code> carries the minimum information a human needs to decide. It must show what the agent intends to do, why it is risky, and what input the action runs against — at a glance.</p>
+<h2>Where Should an Approval Gate Sit?</h2>
+<p>If you put a human in front of every action, automation loses its value; if you skip the gate everywhere, you get incidents. Consider an Approval Gate when any of the following apply:</p>
+<ol>
+<li><strong>Irreversible actions</strong>: payments, deploys, deletes, outbound messages</li>
+<li><strong>Actions above an amount or scope threshold</strong>: refunds over $1,000, bulk emails to more than 1,000 recipients</li>
+<li><strong>Actions with legal or contractual liability</strong>: signing contracts, sending personal data outside the org</li>
+<li><strong>Actions where model confidence is low</strong>: self-evaluation score below threshold, first-time use of a new tool</li>
+</ol>
+<pre><code class="language-python">def needs_approval(action_type: str, payload: dict, confidence: float) -&gt; bool:
+    if action_type in {&quot;payment&quot;, &quot;deploy&quot;, &quot;delete&quot;, &quot;send_email&quot;}:
+        return True
+    if action_type == &quot;refund&quot; and payload.get(&quot;amount&quot;, 0) &gt;= 1000:
+        return True
+    if confidence &lt; 0.7:
+        return True
+    return False
+</code></pre>
+<p>This function is a checkpoint the agent must pass before invoking a tool. Plug it into the ToolRegistry from the Tool Harness (Ep5), right before the call site.</p>
+<h2>Designing the Approval Workflow</h2>
+<p>The workflow has four stages.</p>
+<pre><code class="language-python">import uuid
+from datetime import datetime, timezone
+
+class ApprovalWorkflow:
+    def __init__(self, store, notifier):
+        self.store = store
+        self.notifier = notifier
+
+    def request(self, action_type: str, summary: str, payload: dict, risk: str) -&gt; str:
+        action_id = str(uuid.uuid4())
+        req = ApprovalRequest(
+            action_id=action_id,
+            action_type=action_type,
+            summary=summary,
+            risk_level=risk,
+            payload=payload,
+        )
+        self.store.save_request(req, created_at=datetime.now(timezone.utc))
+        self.notifier.notify(req)
+        return action_id
+
+    def wait(self, action_id: str, timeout_sec: int = 600) -&gt; ApprovalDecision | None:
+        return self.store.wait_for_decision(action_id, timeout_sec)
+
+    def execute_if_approved(self, action_id: str, executor):
+        decision = self.store.get_decision(action_id)
+        if decision is None:
+            return {&quot;status&quot;: &quot;pending&quot;}
+        if decision.decision == &quot;reject&quot;:
+            return {&quot;status&quot;: &quot;rejected&quot;, &quot;reason&quot;: decision.reason}
+        result = executor()
+        self.store.mark_executed(action_id, result)
+        return {&quot;status&quot;: &quot;executed&quot;, &quot;result&quot;: result}
+</code></pre>
+<ol>
+<li><strong>request</strong>: the agent creates the approval request and notifies a human.</li>
+<li><strong>wait</strong>: the system waits for a decision. No response within the window counts as a timeout.</li>
+<li><strong>execute_if_approved</strong>: the action runs only if approved.</li>
+<li><strong>log</strong>: every step gets recorded (Observability — covered in Ep9).</li>
+</ol>
+<h2>Separating Dry-run from Commit</h2>
+<p>If you include a preview of "what would actually happen" in the approval request, the human can decide far more accurately. A dry-run computes the result without producing side effects.</p>
+<pre><code class="language-python">class RefundTool:
+    def dry_run(self, payload: dict) -&gt; dict:
+        return {
+            &quot;would_refund&quot;: payload[&quot;amount&quot;],
+            &quot;to_account&quot;: payload[&quot;account_id&quot;],
+            &quot;remaining_balance&quot;: self._balance(payload[&quot;account_id&quot;]) - payload[&quot;amount&quot;],
+            &quot;affects_records&quot;: [&quot;transactions&quot;, &quot;ledger&quot;, &quot;audit_log&quot;],
+        }
+
+    def commit(self, payload: dict) -&gt; dict:
+        return self._execute_refund(payload)
+</code></pre>
+<p>The Approval Gate must include the <code>dry_run</code> result inside <code>ApprovalRequest.summary</code>. Only then can the human see "approving this refund will leave the balance at -$500" up front and reject it.</p>
+<h2>Decision Logging — Who, When, and Why</h2>
+<p>The record of an approval matters more than the approval itself. When an incident hits, if you cannot trace "why this decision was made," the same incident will repeat.</p>
+<pre><code class="language-python">@dataclass
+class ApprovalLog:
+    action_id: str
+    action_type: str
+    payload: dict
+    dry_run_preview: dict
+    requested_at: datetime
+    decided_at: datetime
+    approver: str
+    decision: str
+    reason: str
+    executed_at: datetime | None
+    result: dict | None
+</code></pre>
+<p>The log must answer five questions:</p>
+<ol>
+<li><strong>What was the agent trying to do?</strong> action_type, payload</li>
+<li><strong>What information was available at decision time?</strong> dry_run_preview</li>
+<li><strong>Who decided?</strong> approver</li>
+<li><strong>Why this decision?</strong> reason (required field)</li>
+<li><strong>What actually executed?</strong> result</li>
+</ol>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Requiring approval for everything.</strong> You lose the value of automation, and humans stop reading the requests carefully. Set explicit risk thresholds.</li>
+<li><strong>Approval requests without enough context.</strong> "Approve this refund?" forces the human to reject by default. Always include a dry-run preview.</li>
+<li><strong>No timeout policy.</strong> If no one responds, the agent stalls forever. Auto-rejecting on timeout is the safer default.</li>
+<li><strong>Not requiring a rejection reason.</strong> A bare reject without a reason invites the same request again. Treat rejection reasons as a learning signal.</li>
+<li><strong>No delegation of approval authority.</strong> If only one person can approve, the system halts when they go on vacation. Design an authority matrix.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>An Approval Gate is the point where a human decides before an irreversible or liability-bearing action runs.</li>
+<li>Use explicit rules like <code>needs_approval</code> to decide where gates belong.</li>
+<li>The workflow is four stages: request, wait, execute, log.</li>
+<li>Include a dry-run preview in the request so humans see consequences before deciding.</li>
+<li>An ApprovalLog must answer the 5W1H so post-incident review can succeed.</li>
+</ul>
+<p>The next post covers Observability — how to record, trace, and replay agent runs.</p>
+<hr>
+<h2>Harness Engineering 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Tool Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Test Harness</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Feedback Loop</a></li>
+<li><strong>Approval Gates (current)</strong></li>
+<li>Observability (upcoming)</li>
+<li>Production Harness (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic — Building Effective Agents</a></li>
+<li><a href="https://platform.openai.com/docs/guides/safety-best-practices">OpenAI — Best practices for safety in agent systems</a></li>
+<li><a href="https://sre.google/sre-book/postmortem-culture/">Google SRE — Postmortem culture</a></li>
+<li><a href="https://python.langchain.com/docs/concepts/human_in_the_loop/">LangChain — Human-in-the-loop</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, Harness, Approval, Human-in-the-loop</p>
+</body>
+</html>
