@@ -1,0 +1,54 @@
+id: linux-cli-101
+category: programming
+title:
+  ko: Linux CLI 101
+  en: Linux CLI 101
+description:
+  ko: 파일 탐색, 권한, 프로세스, grep, pipe, shell script, SSH 등 개발자가 반드시 알아야 할 Linux CLI 기본기를 다루는 시리즈.
+  en: A beginner series covering essential Linux CLI skills for developers — file navigation, permissions, processes, grep, pipes, shell scripting, and SSH.
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: content-ready
+tags:
+  - Linux
+  - CLI
+  - Shell
+  - Terminal
+articles:
+  - idx: 1
+    slug: 01-what-is-cli-and-shell
+    status: content-ready
+  - idx: 2
+    slug: 02-files-and-directories
+    status: content-ready
+  - idx: 3
+    slug: 03-permissions-and-ownership
+    status: content-ready
+  - idx: 4
+    slug: 04-viewing-files
+    status: content-ready
+  - idx: 5
+    slug: 05-grep-find-xargs
+    status: content-ready
+  - idx: 6
+    slug: 06-pipe-and-redirection
+    status: content-ready
+  - idx: 7
+    slug: 07-process-management
+    status: content-ready
+  - idx: 8
+    slug: 08-environment-variables
+    status: content-ready
+  - idx: 9
+    slug: 09-shell-script-basics
+    status: content-ready
+  - idx: 10
+    slug: 10-ssh-and-remote
+    status: content-ready

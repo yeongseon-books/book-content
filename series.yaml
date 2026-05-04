@@ -206,8 +206,22 @@ series:
   languages:
   - ko
   - en
-  status: draft
+  status: content-ready
   path: content/git-github-101
+
+- id: linux-cli-101
+  category: programming
+  title:
+    ko: Linux CLI 101
+    en: Linux CLI 101
+  description:
+    ko: 파일 탐색, 권한, 프로세스, grep, pipe, shell script, SSH 등 개발자가 반드시 알아야 할 Linux CLI 기본기를 다루는 시리즈.
+    en: A beginner series covering essential Linux CLI skills for developers — file navigation, permissions, processes, grep, pipes, shell scripting, and SSH.
+  languages:
+  - ko
+  - en
+  status: content-ready
+  path: content/linux-cli-101
 - id: azure-app-service-101
   status: content-ready
   category: azure
