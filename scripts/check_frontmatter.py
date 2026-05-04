@@ -29,12 +29,13 @@ CONTENT_DIR = REPO_ROOT / "content"
 SERIES_YAML = REPO_ROOT / "series.yaml"
 
 REQUIRED_FIELDS = {"title", "series", "episode", "language", "status", "targets", "tags", "last_reviewed"}
-OPTIONAL_FIELDS = {"seo_title", "hashnode_title", "medium_title", "ebook_title", "published", "code_required"}
+OPTIONAL_FIELDS = {"seo_title", "hashnode_title", "medium_title", "ebook_title", "published", "published_to", "code_required"}
 VALID_STATUS = {"draft", "content-ready", "code-checked", "publish-ready", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 TARGET_KEYS = {"tistory", "medium", "mkdocs", "ebook"}
 OPTIONAL_TARGET_KEYS = {"hashnode"}
 PUBLISHED_KEYS = {"tistory_url", "hashnode_url", "medium_url", "mkdocs_url"}
+PUBLISHED_TO_CHANNELS = {"tistory", "hashnode", "medium", "mkdocs"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PREFIX_RE = re.compile(r"^(\d+)")
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
@@ -115,6 +116,29 @@ def validate_article(path: Path, catalog: dict[str, dict]) -> tuple[list[str], l
             for k, v in published.items():
                 if not isinstance(v, str):
                     errors.append(f"published.{k} must be string URL, got {type(v).__name__}")
+
+    published_to = fm.get("published_to")
+    if published_to is not None:
+        if not isinstance(published_to, dict):
+            errors.append(f"published_to must be a mapping, got {type(published_to).__name__}")
+        else:
+            unknown_ch = set(published_to.keys()) - PUBLISHED_TO_CHANNELS
+            if unknown_ch:
+                errors.append(f"published_to has unknown channels: {sorted(unknown_ch)} (allowed: {sorted(PUBLISHED_TO_CHANNELS)})")
+            for ch, entry in published_to.items():
+                if not isinstance(entry, dict):
+                    errors.append(f"published_to.{ch} must be a mapping with url + published_at, got {type(entry).__name__}")
+                    continue
+                allowed_keys = {"url", "published_at"}
+                unknown_keys = set(entry.keys()) - allowed_keys
+                if unknown_keys:
+                    errors.append(f"published_to.{ch} has unknown keys: {sorted(unknown_keys)} (allowed: {sorted(allowed_keys)})")
+                url = entry.get("url")
+                if url is None or not isinstance(url, str):
+                    errors.append(f"published_to.{ch}.url must be a string URL")
+                pub_at = entry.get("published_at")
+                if pub_at is not None and not (isinstance(pub_at, str) and DATE_RE.match(pub_at)):
+                    errors.append(f"published_to.{ch}.published_at must be YYYY-MM-DD string, got {pub_at!r}")
 
     tags = fm.get("tags")
     if tags is not None and not (isinstance(tags, list) and all(isinstance(t, str) for t in tags)):
