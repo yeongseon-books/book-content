@@ -61,6 +61,17 @@
 <p>Context engineering is the process of clearly telling the agent "who you are, what you should do, how you should behave, and what you shouldn't do." It's not just about writing good prompts—it's about designing the entire environment in which the agent operates.</p>
 <p>This article covers context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What pieces make up an agent's context?</li>
+<li>What is the single most important rule for writing a system prompt?</li>
+<li>How do you separate role, rules, and knowledge boundaries in one prompt?</li>
+<li>Which context-injection pattern fits which situation?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Context Components</h2>
 <p>An agent's context refers to all information the LLM considers when making decisions. Context consists of four main components.</p>
 <p><strong>System Prompt</strong></p>
@@ -567,10 +578,20 @@ for case in test_cases:
 <li>Clear role definition and behavior rules improve agent reliability.</li>
 <li>Context engineering is the most important step in agent design.</li>
 </ul>
-<hr>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
 <ul>
-<li>What is an AI Agent? (upcoming)</li>
+<li>[ ] Drew an agent's context broken down into system / user / tool outputs.</li>
+<li>[ ] Wrote one system prompt with explicit role, rules, and knowledge boundaries.</li>
+<li>[ ] Reproduced one hallucination caused by a missing knowledge boundary.</li>
+<li>[ ] Picked the right context-injection pattern (RAG / function-calling / few-shot).</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
 <li><strong>Context Engineering (current)</strong></li>
 <li>Tool Use Fundamentals (upcoming)</li>
 <li>Agent Workflow Design (upcoming)</li>
@@ -581,6 +602,7 @@ for case in test_cases:
 <li>Production Operations (upcoming)</li>
 <li>Building Your First Agent (upcoming)</li>
 </ul>
+<hr>
 <h2>References</h2>
 <ul>
 <li><a href="https://platform.openai.com/docs/guides/prompt-engineering">OpenAI Prompt Engineering Guide</a> - Official OpenAI prompt engineering guide</li>
@@ -588,6 +610,6 @@ for case in test_cases:
 <li><a href="https://python.langchain.com/docs/how_to/chatbots_memory/">LangChain System Messages</a> - Agent context management patterns</li>
 <li><a href="https://simonwillison.net/2023/Apr/14/worst-that-can-happen/">Prompt Injection Attacks</a> - System prompt security considerations</li>
 </ul>
-<p class="tags-line">Tags: AI Agent, Context, Prompt Engineering, System Prompt</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

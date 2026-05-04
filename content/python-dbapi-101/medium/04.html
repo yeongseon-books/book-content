@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parameter binding and SQL injection defense (sqlite3, PEP 249)</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Parameter binding and SQL injection defense (sqlite3, PEP 249)</h1>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Why is building SQL with f-strings dangerous?</li>
+<li>When do you use <code>?</code> versus <code>:name</code> placeholders?</li>
+<li>How does binding work with <code>executemany</code> for bulk inserts?</li>
+<li>Why can't you bind table or column names?</li>
+<li>What does it mean that <code>paramstyle</code> differs by driver?</li>
+</ul>
+<blockquote>
+<p>SQL injection happens at the moment the query string and user input meet. PEP 249's parameter binding keeps the two separate end-to-end.</p>
+<p>Python DB-API 101 (4/10)</p>
+</blockquote>
+<hr>
+<h2>What you will learn</h2>
+<p>This post covers PEP 249 parameter binding in depth using <code>sqlite3</code>. Specifically:</p>
+<ol>
+<li><strong>Two placeholder styles</strong> — <code>?</code> (qmark) and <code>:name</code> (named), both supported by sqlite3.</li>
+<li><strong><code>executemany</code> and binding</strong> — list-of-tuples versus list-of-dicts inputs.</li>
+<li><strong>Driver-specific paramstyles</strong> — why PEP 249 defines five (<code>qmark</code>, <code>format</code>, <code>named</code>, <code>pyformat</code>, <code>numeric</code>).</li>
+<li><strong>Where binding does not work</strong> — table names, column names, ORDER BY direction, and how to handle them safely.</li>
+<li><strong>Reproduce a real attack</strong> — write deliberately vulnerable code, watch SQL injection succeed, then fix it with binding.</li>
+</ol>
+<hr>
+<h2>Why this matters</h2>
+<p>SQL injection has stayed in the OWASP Top 10 for nearly two decades for one reason: <strong>developers assemble SQL strings by hand</strong>. A single <code>f"SELECT * FROM users WHERE name = '{name}'"</code> lets <code>name = "' OR 1=1 --"</code> return every row in the table.</p>
+<p>PEP 249 standardises a defence at the driver layer. <code>cursor.execute(sql, params)</code> separates SQL parsing from value binding into <strong>distinct stages</strong>, so user input cannot be reinterpreted as SQL tokens.</p>
+<p>This post reproduces the attack with sqlite3 and contrasts it with the binding fix line by line. Once you have seen it work, you stop writing f-string SQL forever.</p>
+<hr>
+<h2>Mental Model — keep query string and values separate</h2>
+<pre><code>[ User input ] ─┐
+                │
+                ▼
+        [ cursor.execute(SQL, params) ]
+                │
+       ┌────────┴─────────┐
+       ▼                  ▼
+  [ SQL parser ]    [ value binder ]
+   (parses ?, :name)   (sqlite3 type-checks
+                        and escapes safely)
+       │                  │
+       └────────┬─────────┘
+                ▼
+        [ prepared statement ]
+                │
+                ▼
+        [ SQLite executes ]
+</code></pre>
+<p>The key point: SQL tokenization happens <strong>before</strong> binding. <code>?</code> tells the parser "a single value goes here." Whatever value arrives is never re-parsed as SQL. The string <code>' OR 1=1 --</code> is treated as a 12-character text value, nothing more.</p>
+<hr>
+<h2>Core concepts</h2>
+<p><strong>qmark style (<code>?</code>)</strong></p>
+<p>The sqlite3 default. Position-based, so order matters.</p>
+<pre><code class="language-python">cur.execute('SELECT * FROM users WHERE name = ? AND age &gt;= ?', ('Alice', 18))
+</code></pre>
+<p><strong>named style (<code>:name</code>)</strong></p>
+<p>Native to sqlite3. Bind with a dict, no order dependency, and the same value can appear multiple times.</p>
+<pre><code class="language-python">cur.execute(
+    'SELECT * FROM users WHERE name = :name AND created_by = :name',
+    {'name': 'Alice'},
+)
+</code></pre>
+<p><strong>paramstyle</strong></p>
+<p>PEP 249 requires every driver to expose its placeholder style as <code>module.paramstyle</code>.</p>
+<p><strong><code>qmark</code></strong><br>
+- Example: <code>WHERE id = ?</code><br>
+- Drivers: sqlite3</p>
+<p><strong><code>numeric</code></strong><br>
+- Example: <code>WHERE id = :1</code><br>
+- Drivers: (rare)</p>
+<p><strong><code>named</code></strong><br>
+- Example: <code>WHERE id = :id</code><br>
+- Drivers: sqlite3, oracledb</p>
+<p><strong><code>format</code></strong><br>
+- Example: <code>WHERE id = %s</code><br>
+- Drivers: mysql-connector</p>
+<p><strong><code>pyformat</code></strong><br>
+- Example: <code>WHERE id = %(id)s</code><br>
+- Drivers: psycopg, pymysql</p>
+<p>sqlite3 supports both <code>qmark</code> and <code>named</code>. <code>import sqlite3; print(sqlite3.paramstyle)</code> → <code>'qmark'</code>. For portable code, either match the target driver's <code>paramstyle</code> or use an abstraction such as SQLAlchemy Core.</p>
+<p><strong>Where binding does not apply</strong></p>
+<p>Placeholders only fill <strong>value</strong> positions. The following are NOT bindable.</p>
+<ul>
+<li>table names (<code>FROM ?</code> ❌)</li>
+<li>column names (<code>SELECT ? FROM users</code> ❌)</li>
+<li>ORDER BY direction (<code>ORDER BY age ?</code> ❌)</li>
+<li>LIMIT/OFFSET (sqlite3 supports binding here, but many drivers do not)</li>
+</ul>
+<p>For these positions, validate against a whitelist and inject as a string.</p>
+<hr>
+<h2>Before / After</h2>
+<p><strong>Before — vulnerable code</strong></p>
+<pre><code class="language-python">import sqlite3
+
+con = sqlite3.connect(':memory:')
+con.executescript('''
+    CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT, secret TEXT);
+    INSERT INTO users(name, secret) VALUES ('Alice', 'A-token');
+    INSERT INTO users(name, secret) VALUES ('Bob',   'B-token');
+''')
+
+def find_user_BAD(name: str):
+    sql = f&quot;SELECT id, name, secret FROM users WHERE name = '{name}'&quot;
+    return con.execute(sql).fetchall()
+
+# Normal call
+print(find_user_BAD('Alice'))
+# → [(1, 'Alice', 'A-token')]
+
+# Attack
+print(find_user_BAD(&quot;Alice' OR 1=1 --&quot;))
+# → [(1, 'Alice', 'A-token'), (2, 'Bob', 'B-token')]   ← all rows leaked
+</code></pre>
+<p><strong>After — parameter binding</strong></p>
+<pre><code class="language-python">def find_user_OK(name: str):
+    sql = 'SELECT id, name, secret FROM users WHERE name = ?'
+    return con.execute(sql, (name,)).fetchall()
+
+print(find_user_OK(&quot;Alice' OR 1=1 --&quot;))
+# → []   ← no user with that name, so empty
+</code></pre>
+<p>The diff is a single line. The security outcome is the opposite.</p>
+<hr>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1 — set up</strong></p>
+<pre><code class="language-python">import sqlite3
+
+con = sqlite3.connect(':memory:')
+con.executescript('''
+    CREATE TABLE products(
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        price INTEGER NOT NULL,
+        category TEXT NOT NULL
+    );
+''')
+</code></pre>
+<p><strong>Step 2 — single-row insert with <code>?</code></strong></p>
+<pre><code class="language-python">con.execute(
+    'INSERT INTO products(name, price, category) VALUES (?, ?, ?)',
+    ('Notebook', 12000, 'stationery'),
+)
+con.commit()
+</code></pre>
+<p>Always pass values as a <strong>tuple or list</strong>. For a single value, do not forget the trailing comma: <code>(value,)</code>.</p>
+<p><strong>Step 3 — <code>:name</code> placeholders</strong></p>
+<pre><code class="language-python">con.execute(
+    '''INSERT INTO products(name, price, category)
+       VALUES (:name, :price, :category)''',
+    {'name': 'Pen', 'price': 1500, 'category': 'stationery'},
+)
+con.commit()
+</code></pre>
+<p>Dict keys must match placeholder names exactly.</p>
+<p><strong>Step 4 — bulk insert with <code>executemany</code></strong></p>
+<pre><code class="language-python">rows = [
+    ('Eraser', 800,  'stationery'),
+    ('Mug',    9000, 'kitchen'),
+    ('Lamp',   25000,'home'),
+]
+con.executemany(
+    'INSERT INTO products(name, price, category) VALUES (?, ?, ?)',
+    rows,
+)
+con.commit()
+</code></pre>
+<p>Dict-style:</p>
+<pre><code class="language-python">rows = [
+    {'name': 'Bowl', 'price': 4000, 'category': 'kitchen'},
+    {'name': 'Vase', 'price': 18000,'category': 'home'},
+]
+con.executemany(
+    'INSERT INTO products(name, price, category) VALUES (:name, :price, :category)',
+    rows,
+)
+con.commit()
+</code></pre>
+<p><strong>Step 5 — handling <code>IN (...)</code></strong></p>
+<p>A placeholder represents a single value, so <code>IN (?)</code> cannot take a list directly. Generate placeholders dynamically.</p>
+<pre><code class="language-python">ids = [1, 3, 5]
+placeholders = ','.join('?' * len(ids))
+sql = f'SELECT * FROM products WHERE id IN ({placeholders})'
+print(con.execute(sql, ids).fetchall())
+</code></pre>
+<p>The <code>placeholders</code> variable contains only SQL tokens (commas and <code>?</code>), so it is safe. The actual values still travel through binding.</p>
+<p><strong>Step 6 — safe dynamic ORDER BY</strong></p>
+<pre><code class="language-python">ALLOWED = {'name', 'price', 'category'}
+ALLOWED_DIR = {'ASC', 'DESC'}
+
+def list_products(order_by: str, direction: str):
+    if order_by not in ALLOWED or direction.upper() not in ALLOWED_DIR:
+        raise ValueError('invalid sort')
+    sql = f'SELECT * FROM products ORDER BY {order_by} {direction.upper()}'
+    return con.execute(sql).fetchall()
+</code></pre>
+<p>The mechanism is <strong>whitelist validation</strong>. User input does end up in the SQL string, but only if it appears in the allowed set, so injection is impossible.</p>
+<hr>
+<h2>Common mistakes</h2>
+<ol>
+<li><strong>Building SQL with f-strings.</strong> The most common and most dangerous pattern. Treat it as a hard rule in code review.</li>
+<li><strong>Quoting the placeholder.</strong> <code>WHERE name = '?'</code> is not a placeholder — it is a literal question mark. The driver fails to recognise it and either errors out or returns wrong results.</li>
+<li><strong>Missing trailing comma.</strong> <code>con.execute(sql, ('Alice'))</code> treats the string as an iterable of five characters. Use <code>('Alice',)</code>.</li>
+<li><strong>Trying to bind table or column names.</strong> <code>cursor.execute('SELECT ? FROM ?', ('id', 'users'))</code> is a syntax error. Use a whitelist plus f-string for these positions.</li>
+<li><strong>Using <code>%</code> to "escape".</strong> <code>sql % values</code> is Python string formatting, not binding. Injection passes through untouched.</li>
+<li><strong>Passing a single dict to <code>executemany</code>.</strong> <code>executemany(sql, {'a': 1})</code> iterates the dict's keys and misbehaves. Pass a list of dicts: <code>[{'a': 1}, {'a': 2}]</code>.</li>
+<li><strong>Assuming a paramstyle.</strong> Code written for sqlite3's <code>?</code> will not work on psycopg as-is. Check <code>module.paramstyle</code> first when adopting a new driver, or move to SQLAlchemy.</li>
+</ol>
+<hr>
+<h2>Production application</h2>
+<p><strong>Static analysis in CI</strong></p>
+<p><code>bandit</code> rule <code>B608</code> flags SQL string formatting.</p>
+<pre><code class="language-bash">pip install bandit
+bandit -r src/ -ll
+</code></pre>
+<p>Wire this into CI to block merges.</p>
+<p><strong>Mask values in query logs</strong></p>
+<p>If your operational logs print SQL with raw values, PII can leak. With binding, mask values in your log adapter.</p>
+<pre><code class="language-python">def log_sql(sql, params):
+    masked = tuple('***' if isinstance(p, str) and len(p) &gt; 0 else p for p in params)
+    logger.info('sql=%s params=%s', sql, masked)
+</code></pre>
+<p><strong>Prepared-statement caching</strong></p>
+<p>Drivers cache prepared statements keyed by the SQL string. Therefore <strong>keep the SQL string constant and pass values via binding</strong> — that is also faster. Building a different f-string each call invalidates the cache.</p>
+<p><strong>Driver migration</strong></p>
+<p>When moving from sqlite3 to PostgreSQL, the most common breakage is paramstyle. Adopting SQLAlchemy Core (<code>text(':name')</code> + <code>bindparam</code>) or the ORM from the start dramatically reduces driver-swap cost — covered in the upcoming <code>sqlalchemy-101</code> series.</p>
+<hr>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] All SQL goes through <code>cursor.execute(sql, params)</code>.</li>
+<li>[ ] f-strings, <code>%</code>, and <code>+</code> for value concatenation into SQL are blocked in code review.</li>
+<li>[ ] Single-value bindings always use <code>(value,)</code> with the trailing comma.</li>
+<li>[ ] Non-bindable positions (table/column names) are validated against a whitelist.</li>
+<li>[ ] <code>IN (...)</code> generates placeholders dynamically and binds the values.</li>
+<li>[ ] Static analysis such as <code>bandit B608</code> runs in CI.</li>
+<li>[ ] Bound values are masked in logs.</li>
+<li>[ ] When introducing a new driver, <code>module.paramstyle</code> is checked first.</li>
+</ul>
+<hr>
+<h2>Exercises</h2>
+<ol>
+<li><strong>Reproduce the attack.</strong> Run <code>find_user_BAD</code> above and confirm every row is returned, then verify the binding version returns an empty result.</li>
+<li><strong><code>UPDATE</code> injection.</strong> Try <code>UPDATE users SET name = '{new_name}' WHERE id = {id}</code> with <code>new_name = "x', secret='leaked"</code>. Then switch to <code>?</code> and try again.</li>
+<li><strong>Dict-style executemany.</strong> Read a CSV into dicts and insert 1000 rows using <code>:name</code> placeholders. Compare wall time against the tuple version.</li>
+<li><strong>Whitelist sort.</strong> Call <code>list_products(direction='DROP TABLE products; --')</code> and confirm <code>ValueError</code> is raised.</li>
+<li><strong>Inspect paramstyle.</strong> Install <code>psycopg2</code> (or <code>psycopg</code>) and <code>mysql-connector-python</code> and print each module's <code>paramstyle</code>.</li>
+</ol>
+<hr>
+<h2>Summary and next post</h2>
+<p>PEP 249 parameter binding is the simplest yet strongest tool for blocking SQL injection. The principle is to keep values and SQL syntax separate end-to-end; for positions where that separation breaks (such as table names), compensate with whitelist validation.</p>
+<p>The next post covers <strong>transactions and isolation levels</strong> — the precise meaning of <code>commit</code>/<code>rollback</code>, sqlite3's <code>isolation_level=None</code> autocommit mode, and the BEGIN variants (DEFERRED, IMMEDIATE, EXCLUSIVE) with their lock behaviour, all illustrated with code.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
+<li><strong>Parameter binding and SQL injection defense (sqlite3, PEP 249) (current)</strong></li>
+<li>Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
+<li>Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
+<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0249/">PEP 249 – Python Database API Specification v2.0</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3-placeholders">Python sqlite3 — placeholders</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html">OWASP — SQL Injection Prevention Cheat Sheet</a></li>
+<li><a href="https://bandit.readthedocs.io/en/latest/plugins/b608_hardcoded_sql_expressions.html">Bandit — B608 hardcoded_sql_expressions</a></li>
+<li><a href="https://www.sqlite.org/lang_expr.html#varparam">SQLite SQL parameters</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

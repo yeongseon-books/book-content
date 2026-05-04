@@ -61,6 +61,17 @@
 <p>The core of agent operations is observability. You must track all agent steps, measure cost and latency, and detect anomalies. Scaling strategies and cost optimization are also important.</p>
 <p>This article covers agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What is the first observability signal you put in place for an agent?</li>
+<li>What is the simplest way to track cost and enforce a ceiling?</li>
+<li>When you scale an agent, where does the bottleneck appear: LLM or tools?</li>
+<li>How do you design a safe deploy and rollback?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Observability</h2>
 <p>Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.</p>
 <p><strong>Structured Logging</strong></p>
@@ -521,7 +532,18 @@ logger.info(&quot;request&quot;,
 <li>Use canary deployment and feature flags to apply changes safely</li>
 <li>Never log PII; hash or mask it instead</li>
 </ul>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Split observability into latency / cost / quality / safety.</li>
+<li>[ ] Logged token and dollar cost per agent run.</li>
+<li>[ ] Ramped concurrency and identified whether LLM or tools choke first.</li>
+<li>[ ] Wrote down a canary-deploy and instant-rollback procedure.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
@@ -553,6 +575,6 @@ logger.info(&quot;request&quot;,
    OpenAI's official operations guide. Covers rate limits, monitoring, and cost management.</p>
 </li>
 </ol>
-<p class="tags-line">Tags: AI Agent, Operations, Monitoring, Observability</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

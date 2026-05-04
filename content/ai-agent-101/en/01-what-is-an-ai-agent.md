@@ -3,7 +3,7 @@ title: What Is an AI Agent?
 series: ai-agent-101
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -25,6 +25,17 @@ last_reviewed: '2026-05-03'
 > AI Agent 101 series (1/10)
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What essentially separates a chatbot from an agent?
+- Why is the Observe → Think → Act → Check loop necessary?
+- What is the minimum bar for calling something an agent?
+- What scope of agents does this series cover?
+
+<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -202,6 +213,17 @@ Two or more "yes" answers means it is time to seriously evaluate Agents.
 ## Next
 
 The next episode covers **context engineering** - the discipline of deciding what enters and what leaves the prompt, which determines Agent decision quality.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Can state the chatbot vs agent distinction in one sentence.
+- [ ] Walked through one full Observe→Think→Act→Check loop by hand.
+- [ ] Can rate an agent's autonomy on a simple scale.
+- [ ] Wrote down what this series covers and what it does not.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

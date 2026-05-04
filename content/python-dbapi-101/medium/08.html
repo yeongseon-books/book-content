@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SQLite Connection Management: thread-safety, check_same_thread, and Pooling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SQLite Connection Management: thread-safety, check_same_thread, and Pooling</h1>
+<p>Unlike most databases, SQLite has no separate server process. A connection is just a file handle, and transaction locks are expressed in the filesystem. That simplicity is why SQLite shows up everywhere from embedded apps to mid-sized web services, but it also pushes connection-management decisions back onto the application developer.</p>
+<p>"Can I share one connection across all threads?" "Should I open a new one per thread?" "How do I hold a connection in an async framework like FastAPI?" This post answers those questions in order.</p>
+<h2>Questions this post answers</h2>
+<ul>
+<li>What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?</li>
+<li>What does <code>sqlite3.connect(check_same_thread=True)</code> actually protect against, and what becomes risky when you flip it to False?</li>
+<li>When is per-thread vs shared connection appropriate?</li>
+<li>Why does a large connection pool (PostgreSQL-style) not fit SQLite well?</li>
+<li>How should you hold a SQLite connection in FastAPI?</li>
+</ul>
+<h2>Why this matters</h2>
+<p>A typical SQLite adoption falls into one of two traps. First, "one global connection" shared across all threads. It works at low traffic, then <code>ProgrammingError: SQLite objects created in a thread can only be used in that same thread</code> floods the logs the moment concurrency rises. Second, the team flips <code>check_same_thread=False</code> to silence the error and moves on. There may be no immediate corruption, but transaction boundaries become impossible to reason about.</p>
+<p>The right answer is to verify the thread-safety mode your build offers and pick a connection strategy explicitly. SQLite gives you a lot of freedom; without an explicit policy in code, every developer eventually assumes a different one.</p>
+<h2>Mental Model: a connection is a file handle</h2>
+<blockquote>
+<p>A SQLite connection is not the client/server connection you know from PostgreSQL or MySQL. There is no separate process. The lock is a filesystem lock, and the connection object is essentially a file handle plus cache plus transaction state.</p>
+</blockquote>
+<p>This model decides several things:</p>
+<ul>
+<li>Opening a new connection is cheap relative to PostgreSQL. There is no handshake.</li>
+<li>But the connection object still owns transaction state and a prepared-statement cache, so "session" still has meaning.</li>
+<li>Multiple connections can open the same file simultaneously, but only one writer is allowed at a time, even in WAL mode.</li>
+<li>Thread-safety depends on how the SQLite C library was compiled.</li>
+</ul>
+<p>Once you internalize this, "pool connections to save handshake cost" becomes a secondary goal in SQLite. The primary goal is to give every thread or request a clear transaction boundary.</p>
+<h2>Core Concepts</h2>
+<p><strong>SQLite's three thread-safety modes</strong></p>
+<p>The SQLite C library is compiled in one of three modes:</p>
+<ul>
+<li><strong>Single-thread (0)</strong>: no thread concurrency at all. Embedded only.</li>
+<li><strong>Multi-thread (1)</strong>: separate connections in separate threads is fine. Sharing one connection between threads is not.</li>
+<li><strong>Serialized (2)</strong>: even one connection can be shared across threads safely; an internal mutex serializes calls.</li>
+</ul>
+<p>Python's <code>sqlite3</code> exposes the active mode:</p>
+<pre><code class="language-python">import sqlite3
+print(sqlite3.threadsafety)  # 0, 1, 2, or 3
+</code></pre>
+<p>Most distros report <code>1</code> or <code>3</code>. In Python 3.11+, <code>3</code> means <code>serialized</code> and you can share a connection across threads safely.</p>
+<p><strong>What <code>check_same_thread</code> actually does</strong></p>
+<p><code>sqlite3.connect()</code> defaults to <code>check_same_thread=True</code>. This is a <strong>Python-level guard</strong>, separate from the SQLite C library's thread-safety mode. If you try to use the connection from a thread other than the one that created it, the <code>sqlite3</code> module raises <code>ProgrammingError</code>.</p>
+<pre><code class="language-python">import sqlite3, threading
+
+conn = sqlite3.connect(&quot;app.db&quot;)  # check_same_thread=True (default)
+
+def worker():
+    conn.execute(&quot;SELECT 1&quot;)  # ProgrammingError
+
+threading.Thread(target=worker).start()
+</code></pre>
+<p>Setting <code>check_same_thread=False</code> removes the Python guard. From that point on safety depends entirely on which thread-safety mode the underlying SQLite C library was compiled with. So <code>check_same_thread=False</code> alone is <strong>not</strong> enough. You need <code>sqlite3.threadsafety &gt;= 1</code> and you must guarantee at the code level that only one thread uses a given connection at a time.</p>
+<p><strong>Per-thread vs shared</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>Fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New connection per request</td>
+<td>Simplest. Boundary aligns with request.</td>
+<td>Connection churn (cheap in SQLite, but not zero)</td>
+<td>Short requests, low concurrency</td>
+</tr>
+<tr>
+<td>Per-thread connection (<code>threading.local</code>)</td>
+<td>Reused within a thread. Keeps the <code>check_same_thread</code> guard.</td>
+<td>Connection count grows with thread pool</td>
+<td>Traditional WSGI/Flask</td>
+</tr>
+<tr>
+<td>Single shared connection</td>
+<td>Smallest footprint</td>
+<td>Requires <code>serialized</code> mode + <code>check_same_thread=False</code>; writes serialize anyway</td>
+<td>Embedded, single worker</td>
+</tr>
+<tr>
+<td>External async pool (<code>aiosqlite</code>)</td>
+<td>Plays nicely with coroutines</td>
+<td>Single-writer model still applies</td>
+<td>FastAPI/aiohttp</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why a big connection pool does not fit SQLite</strong></p>
+<p>PostgreSQL pools exist to (1) avoid handshake cost and (2) protect the server's max-connection limit. SQLite has neither (no handshake, no server). What SQLite does have is the <strong>single-writer</strong> rule. Thirty connections in a pool will not increase write throughput; they only increase writer contention and BUSY rate.</p>
+<p>So instead of a "big pool", consider a "small pool by role": many readers + one writer.</p>
+<h2>Before / After</h2>
+<p><strong>Before: a global connection used everywhere</strong></p>
+<pre><code class="language-python"># app.py
+import sqlite3
+conn = sqlite3.connect(&quot;app.db&quot;, check_same_thread=False)
+
+def get_user(user_id: int):
+    return conn.execute(&quot;SELECT * FROM users WHERE id=?&quot;, (user_id,)).fetchone()
+</code></pre>
+<p>When two threads call <code>execute()</code> simultaneously, even in serialized mode the cursor state and transaction boundaries can interleave. One thread's <code>BEGIN</code> may be silently committed by another thread's call.</p>
+<p><strong>After: per-request connection + WAL</strong></p>
+<pre><code class="language-python">import sqlite3
+from contextlib import contextmanager
+
+DB_PATH = &quot;app.db&quot;
+
+def open_conn() -&gt; sqlite3.Connection:
+    conn = sqlite3.connect(DB_PATH, isolation_level=None, timeout=5.0)
+    conn.execute(&quot;PRAGMA journal_mode=WAL&quot;)
+    conn.execute(&quot;PRAGMA synchronous=NORMAL&quot;)
+    conn.execute(&quot;PRAGMA foreign_keys=ON&quot;)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@contextmanager
+def db_session():
+    conn = open_conn()
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+def get_user(user_id: int):
+    with db_session() as conn:
+        return conn.execute(
+            &quot;SELECT * FROM users WHERE id=?&quot;, (user_id,)
+        ).fetchone()
+</code></pre>
+<p>A new connection per request, WAL so readers do not block writers, and <code>busy_timeout</code> so concurrent writes wait briefly instead of failing immediately. This is enough for most web apps because connection creation is cheap.</p>
+<h2>Step by Step: holding SQLite safely in FastAPI</h2>
+<p><strong>Step 1. Inspect the environment</strong></p>
+<pre><code class="language-python">import sqlite3
+print(&quot;sqlite3 version:&quot;, sqlite3.sqlite_version)
+print(&quot;threadsafety:&quot;, sqlite3.threadsafety)
+</code></pre>
+<p>If <code>threadsafety</code> is below 1, you cannot share connections between threads. It is usually 1 or 3.</p>
+<p><strong>Step 2. A connection factory</strong></p>
+<pre><code class="language-python">import sqlite3
+
+DB_PATH = &quot;app.db&quot;
+
+def open_conn(*, readonly: bool = False) -&gt; sqlite3.Connection:
+    uri = f&quot;file:{DB_PATH}?mode={'ro' if readonly else 'rwc'}&quot;
+    conn = sqlite3.connect(
+        uri,
+        uri=True,
+        isolation_level=None,
+        timeout=5.0,
+        check_same_thread=True,
+    )
+    conn.execute(&quot;PRAGMA journal_mode=WAL&quot;)
+    conn.execute(&quot;PRAGMA synchronous=NORMAL&quot;)
+    conn.execute(&quot;PRAGMA foreign_keys=ON&quot;)
+    if readonly:
+        conn.execute(&quot;PRAGMA query_only=ON&quot;)
+    conn.row_factory = sqlite3.Row
+    return conn
+</code></pre>
+<p>The factory can open read-only connections explicitly so that read-heavy paths declare intent.</p>
+<p><strong>Step 3. A FastAPI dependency</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI, Depends
+import sqlite3
+
+app = FastAPI()
+
+def get_db() -&gt; sqlite3.Connection:
+    conn = open_conn()
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+@app.get(&quot;/users/{user_id}&quot;)
+def read_user(user_id: int, db: sqlite3.Connection = Depends(get_db)):
+    row = db.execute(
+        &quot;SELECT id, email FROM users WHERE id=?&quot;, (user_id,)
+    ).fetchone()
+    return dict(row) if row else {&quot;error&quot;: &quot;not found&quot;}
+</code></pre>
+<p>FastAPI calls the generator per dependency injection, so each request gets its own connection that is closed on response.</p>
+<p><strong>Step 4. Separate the write path</strong></p>
+<pre><code class="language-python">@app.post(&quot;/users&quot;, status_code=201)
+def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
+    with db:  # context manager handles BEGIN/COMMIT
+        cur = db.execute(
+            &quot;INSERT INTO users(email) VALUES (?)&quot;, (payload.email,)
+        )
+    return {&quot;id&quot;: cur.lastrowid}
+</code></pre>
+<p><code>with db:</code> defines the transaction boundary. Exceptions roll it back; success commits. With <code>isolation_level=None</code> you keep the freedom to issue <code>BEGIN IMMEDIATE</code> explicitly when you want a writer lock up front.</p>
+<p><strong>Step 5. Simulate concurrent writes</strong></p>
+<pre><code class="language-python">import concurrent.futures, sqlite3
+
+def writer(i):
+    with open_conn() as conn:
+        conn.execute(&quot;INSERT INTO log(msg) VALUES (?)&quot;, (f&quot;msg-{i}&quot;,))
+
+with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
+    list(ex.map(writer, range(200)))
+</code></pre>
+<p>Verify that this finishes without BUSY errors thanks to <code>timeout=5.0</code> and WAL. If BUSY shows up often, reduce worker count or serialize writes through a single queue (see Practice section).</p>
+<h2>Common Mistakes</h2>
+<p><strong>Just flipping <code>check_same_thread=False</code> and stopping there.</strong> That removes the guard without proving safety. Check <code>sqlite3.threadsafety</code> and clarify whether concurrent writes are even allowed.</p>
+<p><strong>Hand-tuning a connection pool per WSGI worker.</strong> Over-engineering for SQLite. Per-request open/close is simpler and safer.</p>
+<p><strong>Calling writes from many threads at once.</strong> Even WAL allows only one writer. Either separate reads or serialize writes through a queue.</p>
+<p><strong>Running <code>PRAGMA journal_mode=WAL</code> inside a transaction.</strong> WAL switching must happen outside any transaction, ideally right after opening the connection.</p>
+<p><strong>Module-level singleton connection in FastAPI.</strong> Async contexts will mix transaction boundaries across requests. Use a dependency-injected per-request connection.</p>
+<p><strong>Leaving <code>timeout</code> at the default without measuring.</strong> The default 5.0 may be too long or too short for your workload. Measure p99 lock-wait time before deciding.</p>
+<h2>In Practice: read/write split with a single-writer queue</h2>
+<p>When write throughput is your bottleneck, consider:</p>
+<pre><code class="language-python">import queue, threading, sqlite3
+
+write_queue: queue.Queue = queue.Queue()
+
+def writer_worker():
+    conn = open_conn()
+    while True:
+        job = write_queue.get()
+        if job is None:
+            break
+        sql, params = job
+        with conn:
+            conn.execute(sql, params)
+
+threading.Thread(target=writer_worker, daemon=True).start()
+</code></pre>
+<p>Request handlers only enqueue. A single writer thread serializes the work. This eliminates BUSY entirely and lets you batch transactions for higher throughput. The downside is you cannot return the write result synchronously, so this fits "fire-and-forget" paths (logs, event streams).</p>
+<p>Reads stay on per-request connections. Thanks to WAL, readers do not wait on the writer.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Did you inspect <code>sqlite3.threadsafety</code>?</li>
+<li>[ ] Did you choose ONE connection strategy (per-request / per-thread / single / queue)?</li>
+<li>[ ] Are <code>journal_mode=WAL</code>, <code>synchronous=NORMAL</code>, <code>foreign_keys=ON</code> set right after opening?</li>
+<li>[ ] Is <code>timeout</code> (or <code>busy_timeout</code>) set deliberately?</li>
+<li>[ ] Is there any code path where multiple threads write through the same writer connection at once?</li>
+<li>[ ] In FastAPI, is <code>Depends(get_db)</code> injecting a per-request connection?</li>
+<li>[ ] Are transaction boundaries explicit via <code>with conn:</code>?</li>
+<li>[ ] Are read-only paths using <code>mode=ro</code> or <code>query_only=ON</code>?</li>
+<li>[ ] Did you load-test concurrent writes and measure BUSY rate?</li>
+<li>[ ] Did you confirm there are no leaked connections (OS handles or <code>PRAGMA database_list</code>)?</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li><strong>Inspect.</strong> Print <code>sqlite3.threadsafety</code>, <code>sqlite3.sqlite_version</code>, and the default <code>journal_mode</code> in your environment.</li>
+<li><strong>Reproduce.</strong> Trigger <code>ProgrammingError</code> by using a <code>check_same_thread=True</code> connection from another thread. Then flip to False, start two simultaneous transactions, and observe what happens.</li>
+<li><strong>Measure.</strong> Run 200 concurrent writes under WAL mode and under <code>journal_mode=DELETE</code>. Compare BUSY counts.</li>
+<li><strong>Design.</strong> Sketch a connection strategy for a system where user requests are read-only and a back-office batch handles all writes.</li>
+</ol>
+<h2>Wrap-up and Next</h2>
+<ul>
+<li>A SQLite connection is closer to a file handle than to a TCP session. A small role-based set of connections fits better than a large pool.</li>
+<li><code>sqlite3.threadsafety</code> and <code>check_same_thread</code> are independent guards; understand both.</li>
+<li>For most web apps, "per-request open/close + WAL + busy_timeout" is the simplest safe default.</li>
+<li>If writes bottleneck, separate read and write, or serialize writes through a queue.</li>
+</ul>
+<p>The next post leaves the synchronous world and moves to <code>aiosqlite</code>. We will look at how to hold connections and transactions inside asyncio, and how this composes with FastAPI's async paths.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/05-transactions-isolation.md">Transactions and isolation levels (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/06-row-factories-adapters.md">Row factories and type adapters (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/07-error-handling-exception-hierarchy.md">PEP 249 Exception Hierarchy and SQLite Error Handling</a></li>
+<li><strong>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (current)</strong></li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3.threadsafety">Python <code>sqlite3</code> — Threadsafety</a></li>
+<li><a href="https://www.sqlite.org/threadsafe.html">SQLite And Multiple Threads</a></li>
+<li><a href="https://www.sqlite.org/wal.html">Write-Ahead Logging</a></li>
+<li><a href="https://www.sqlite.org/uri.html">SQLite URI filenames</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/dependencies/">FastAPI — Dependencies</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

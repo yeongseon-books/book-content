@@ -9,7 +9,7 @@ meta:
   license: all-rights-reserved
 series:
 - id: ai-agent-101
-  status: draft
+  status: content-ready
   category: ai
   title:
     ko: AI Agent 101

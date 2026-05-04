@@ -3,7 +3,7 @@ title: Tool Use Fundamentals
 series: ai-agent-101
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ The core of tool use is function calling. When the model determines "I need to c
 This article covers the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What does function calling actually look like from the model's side?
+- What failures show up when a tool schema is poorly written?
+- How does the model pick a tool when several are available?
+- What do you need to watch when feeding tool output back into the model?
+
+<!-- a-grade-intro:end -->
 
 ## Function Calling Basic Flow
 
@@ -1080,6 +1091,17 @@ if result["success"]:
 - Tool use is the core feature that makes agents practical automation tools.
 - Tool schemas must be clear and specific for models to call them correctly.
 - Error handling and tool selection strategies determine agent reliability.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Defined one tool with the OpenAI function-calling spec and exercised it.
+- [ ] Observed how a bad schema confuses the model.
+- [ ] Logged which tool the model picks when given 2-3 candidates.
+- [ ] Closed the loop: tool output back into the model for the final answer.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

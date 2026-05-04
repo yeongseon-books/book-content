@@ -3,7 +3,7 @@ title: Context Engineering
 series: ai-agent-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ Context engineering is the process of clearly telling the agent "who you are, wh
 This article covers context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What pieces make up an agent's context?
+- What is the single most important rule for writing a system prompt?
+- How do you separate role, rules, and knowledge boundaries in one prompt?
+- Which context-injection pattern fits which situation?
+
+<!-- a-grade-intro:end -->
 
 ## Context Components
 
@@ -664,6 +675,17 @@ for case in test_cases:
 - Agent behavior is determined by context (system prompt + conversation history + tool descriptions + state).
 - Clear role definition and behavior rules improve agent reliability.
 - Context engineering is the most important step in agent design.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Drew an agent's context broken down into system / user / tool outputs.
+- [ ] Wrote one system prompt with explicit role, rules, and knowledge boundaries.
+- [ ] Reproduced one hallucination caused by a missing knowledge boundary.
+- [ ] Picked the right context-injection pattern (RAG / function-calling / few-shot).
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

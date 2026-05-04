@@ -61,6 +61,17 @@
 <p>To build reliable agents, you must anticipate and respond to these failures. Retry strategies, fallback patterns, timeout handling, and graceful degradation are key.</p>
 <p>This article covers common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How do you classify the errors an agent throws?</li>
+<li>When do you reach for Retry vs Fallback vs Circuit Breaker?</li>
+<li>What guards do you need to run tools safely?</li>
+<li>What does good graceful degradation look like to the user?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Error Types in Agents</h2>
 <p>Agents tangle together LLMs, tools, external APIs, and user input, so error sources are diverse.</p>
 <p><strong>LLM Response Errors</strong></p>
@@ -408,7 +419,18 @@ return {
 <li>Tool execution always needs timeouts and resource limits</li>
 <li>Don't swallow errors silently — surface them through logs and metrics</li>
 </ul>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Sorted agent errors into transient / permanent / model-level.</li>
+<li>[ ] Implemented exponential-backoff retry to absorb transient failures.</li>
+<li>[ ] Sketched the circuit-breaker open/half-open/closed transitions.</li>
+<li>[ ] Wrapped a tool call with timeout + sandbox.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
@@ -440,6 +462,6 @@ return {
    Netflix's circuit breaker library docs. Provides core concepts and operational case studies.</p>
 </li>
 </ol>
-<p class="tags-line">Tags: AI Agent, Reliability, Error Handling, Resilience</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

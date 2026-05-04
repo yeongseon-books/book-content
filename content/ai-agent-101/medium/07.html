@@ -61,6 +61,17 @@
 <p>Agent evaluation is divided into three levels. Individual tool call accuracy (Tool Use Accuracy), task path efficiency (Trajectory Evaluation), and final result accuracy (End-to-End Success Rate).</p>
 <p>This article covers agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What makes agent evaluation fundamentally different from ML model evaluation?</li>
+<li>What do you look at to call a trajectory success or failure?</li>
+<li>How do you measure tool-call accuracy?</li>
+<li>Where do end-to-end tests and benchmarks pull in different directions?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Agent Evaluation Metrics</h2>
 <p>Agent evaluation must look beyond "did it answer well" to multiple dimensions. The core metrics are below.</p>
 <p><strong>Task Success Rate</strong></p>
@@ -558,7 +569,18 @@ else:
 <li>Use both standard and custom benchmarks to catch regressions</li>
 <li>Evaluate by averaging 5-10 runs, not a single execution</li>
 </ul>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Split agent metrics into task / step / tool levels.</li>
+<li>[ ] Hand-scored a single trajectory step by step.</li>
+<li>[ ] Wrote a small script that auto-measures tool-call accuracy.</li>
+<li>[ ] Compared E2E and benchmark scores on the same task.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
@@ -590,6 +612,6 @@ else:
    OpenAI's model evaluation framework. Applicable to a wide range of LLM systems including agents.</p>
 </li>
 </ol>
-<p class="tags-line">Tags: AI Agent, Evaluation, Testing, Metrics</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

@@ -3,7 +3,7 @@ title: Memory and State
 series: ai-agent-101
 episode: 5
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ However, model context windows are limited. You can't keep including all convers
 This article covers the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- How do short-term and long-term memory differ, and when do you need each?
+- What is the safest strategy for truncating conversation history?
+- How do you cope when the context window is too small?
+- On what basis do you pick an external memory backend (Vector DB vs KV)?
+
+<!-- a-grade-intro:end -->
 
 ## Short-term Memory vs Long-term Memory
 
@@ -1275,6 +1286,17 @@ def save_conversation(user_id, messages):
 - Agents use memory to remember previous actions and results and decide next actions.
 - Context window limitations require selectively maintaining only important information.
 - When long-term memory is needed, leverage external storage (vector DB, general DB).
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Can explain short vs long memory in one sentence.
+- [ ] Compared sliding-window vs summarization truncation.
+- [ ] Wrote code that auto-summarizes near the token limit.
+- [ ] Built a one-table guide on when to pick Vector vs KV.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

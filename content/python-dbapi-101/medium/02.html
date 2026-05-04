@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Connection and Cursor Lifecycle</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Connection and Cursor Lifecycle</h1>
+<blockquote>
+<p>Python DB-API 101 series (2/10)</p>
+</blockquote>
+<hr>
+<p>The two core DB-API objects are connection and cursor. Their names are plain, but mishandling their lifecycle leads to connection leaks, locks, and race conditions. This episode covers how each is created, used, and closed; the context-manager patterns that keep them safe; and the lifecycle pitfalls that bite most often.</p>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What are the distinct responsibilities of Connection vs Cursor?</li>
+<li>How does the <code>with</code> context manager protect connection and cursor resources?</li>
+<li>What is the trade-off between opening a new connection per call vs reusing one?</li>
+<li>What symptoms appear when you forget to close?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
+<h2>1. What a Connection Is</h2>
+<p>A connection is a single communication channel between the application and the database. It wraps a TCP socket (PostgreSQL, MySQL) or a file handle (SQLite), and one connection holds one transaction context.</p>
+<pre><code class="language-python">import sqlite3
+conn = sqlite3.connect(&quot;notes.db&quot;)
+print(type(conn))           # &lt;class 'sqlite3.Connection'&gt;
+print(conn.in_transaction)  # False (no query yet)
+</code></pre>
+<p>Looking at a few <code>sqlite3.connect()</code> arguments makes the lifecycle clearer:</p>
+<pre><code class="language-python">conn = sqlite3.connect(
+    &quot;notes.db&quot;,
+    timeout=5.0,                  # how long to wait for a lock
+    isolation_level=&quot;DEFERRED&quot;,   # transaction-begin strategy (None == autocommit)
+    check_same_thread=True,       # disallow cross-thread use
+    cached_statements=128,        # statement cache size
+)
+</code></pre>
+<h2>2. What a Cursor Is</h2>
+<p>A cursor is the unit of single-query execution. A connection can spawn multiple cursors, each holding its own result set.</p>
+<pre><code class="language-python">cur = conn.cursor()
+cur.execute(&quot;SELECT 1&quot;)
+print(cur.description)  # column metadata of the last query
+print(cur.rowcount)     # number of affected rows
+</code></pre>
+<p>In SQLite (single file), a cursor is essentially a thin wrapper. In PostgreSQL, especially named cursors created with <code>cursor("name")</code>, it carries server-side state. That makes cleanup important.</p>
+<h2>3. Safe Use with Context Managers</h2>
+<p>Manual close is easy to forget. Python's <code>with</code> statement is the safer route.</p>
+<pre><code class="language-python">import sqlite3
+
+with sqlite3.connect(&quot;notes.db&quot;) as conn:
+    cur = conn.cursor()
+    cur.execute(&quot;INSERT INTO notes (title) VALUES (?)&quot;, (&quot;hello&quot;,))
+    # On block exit, SQLite auto-commits or rolls back the transaction.
+</code></pre>
+<p>Caveat: SQLite's <code>Connection</code> used inside <code>with</code> does not close the connection. It only commits or rolls back the transaction. To also close, call <code>conn.close()</code> explicitly or wrap it.</p>
+<pre><code class="language-python">from contextlib import contextmanager
+
+@contextmanager
+def open_db(path):
+    conn = sqlite3.connect(path)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+with open_db(&quot;notes.db&quot;) as conn:
+    conn.execute(&quot;INSERT INTO notes (title) VALUES (?)&quot;, (&quot;hi&quot;,))
+</code></pre>
+<p>This pattern is the de facto standard in production code: rollback on exception, commit on success, close in either case.</p>
+<h2>4. Cursor Lifecycle Details</h2>
+<pre><code class="language-python">with sqlite3.connect(&quot;notes.db&quot;) as conn:
+    cur = conn.cursor()
+    cur.execute(&quot;SELECT id, title FROM notes&quot;)
+    while True:
+        row = cur.fetchone()
+        if row is None:
+            break
+        print(row)
+    cur.close()
+</code></pre>
+<p>A cursor holds at most one active query. Calling <code>execute()</code> on the same cursor discards the previous result set. To keep two result sets alive simultaneously, create two cursors.</p>
+<pre><code class="language-python">cur1 = conn.cursor()
+cur2 = conn.cursor()
+cur1.execute(&quot;SELECT id FROM users&quot;)
+cur2.execute(&quot;SELECT id FROM orders&quot;)
+# Both result sets are alive at the same time.
+</code></pre>
+<h2>5. Reusing vs Reopening a Connection</h2>
+<p>Opening a fresh connection per query reads cleanly but is expensive.</p>
+<pre><code class="language-python"># Inefficient — connect/close on every call
+def get_note(note_id):
+    with sqlite3.connect(&quot;notes.db&quot;) as conn:
+        return conn.execute(&quot;SELECT * FROM notes WHERE id = ?&quot;, (note_id,)).fetchone()
+</code></pre>
+<p>A SQLite file connection takes 1-2ms; a PostgreSQL TCP + auth handshake takes tens of ms. So:</p>
+<ul>
+<li>single-user CLI: per-call open is fine</li>
+<li>multi-request server: connection pool (episode 8)</li>
+<li>long-running script: open once and reuse</li>
+</ul>
+<pre><code class="language-python"># For long-running processes
+class NoteRepo:
+    def __init__(self, path):
+        self.conn = sqlite3.connect(path)
+
+    def get(self, note_id):
+        return self.conn.execute(
+            &quot;SELECT * FROM notes WHERE id = ?&quot;, (note_id,)
+        ).fetchone()
+
+    def close(self):
+        self.conn.close()
+</code></pre>
+<h2>6. What Missing Close Looks Like</h2>
+<p>If a connection is not closed:</p>
+<ul>
+<li>SQLite: file-handle leaks; eventually <code>Too many open files</code></li>
+<li>PostgreSQL: zombie connections in <code>pg_stat_activity</code>; once <code>max_connections</code> is hit, new logins are refused</li>
+<li>MySQL: sleeping connections in <code>SHOW PROCESSLIST</code>; eventually killed by server timeout</li>
+</ul>
+<p>The first step in diagnosing a production connection leak is always: are there old idle connections hanging around?</p>
+<h2>Five Common Pitfalls</h2>
+<p><strong>1. Misreading SQLite's <code>with conn</code></strong></p>
+<p><code>with sqlite3.connect(path) as conn:</code> does not close the connection. It only commits or rolls back the transaction. Use a wrapper like <code>open_db</code> above to also close.</p>
+<p><strong>2. Passing a cursor as a function argument</strong></p>
+<pre><code class="language-python">def query(cur):
+    cur.execute(...)
+    return cur.fetchall()
+</code></pre>
+<p>Exposing a cursor pushes lifecycle responsibility onto the caller. Cleaner: take a connection, create the cursor inside, close it inside.</p>
+<p><strong>3. Idle timeout on long-lived connections</strong></p>
+<p>PostgreSQL and MySQL kill idle connections after a server-defined timeout. The application, unaware, fires the next query and gets <code>OperationalError: server closed the connection</code>. Fix with a connection-pool health check (<code>SELECT 1</code> ping) or <code>pool_pre_ping=True</code> (SQLAlchemy).</p>
+<p><strong>4. Sharing a connection across processes after fork</strong></p>
+<p>After <code>fork()</code>, a child process that uses the parent's connection has both ends writing to the same socket. The result is a corrupted protocol. Create a fresh connection in the child, or open one right after <code>multiprocessing.Process</code> starts.</p>
+<p><strong>5. Starting a new query before draining the cursor</strong></p>
+<pre><code class="language-python">cur.execute(&quot;SELECT * FROM big_table&quot;)
+cur.execute(&quot;SELECT 1&quot;)  # PostgreSQL: errors or discards the previous result
+</code></pre>
+<p>With server-side cursors, drain the previous result or call <code>cur.close()</code> before issuing another query.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>A connection is a communication channel and transaction context; a cursor is a single-query execution unit.</li>
+<li><code>with</code> is the standard for lifecycle management, but SQLite's <code>with conn</code> only handles commit/rollback, not close.</li>
+<li>Production code wraps try/commit/except/rollback/finally/close into a context manager.</li>
+<li>For concurrent result sets, use multiple cursors. Connections are expensive, so reuse them or pool them.</li>
+<li>Connection leaks, idle timeouts, fork sharing, and undrained cursors are the most common lifecycle bugs.</li>
+</ul>
+<p>The next episode walks through <code>execute()</code>, <code>executemany()</code>, and the <code>fetchone()</code> / <code>fetchall()</code> / <code>fetchmany()</code> patterns.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Used <code>with sqlite3.connect(...) as conn:</code> to run queries without resource leaks.</li>
+<li>[ ] Opened multiple cursors on one connection and observed concurrent reads.</li>
+<li>[ ] Measured the perf gap between per-call connect and reused connect.</li>
+<li>[ ] Reproduced the warnings or locks that appear when close is skipped.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><strong>Connection and Cursor Lifecycle (current)</strong></li>
+<li>execute, executemany, and Fetch Patterns (upcoming)</li>
+<li>Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)</li>
+<li>Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
+<li>Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
+<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0249/#connection-objects">PEP 249 - Connection and Cursor objects</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection">Python sqlite3 - Connection class</a></li>
+<li><a href="https://www.psycopg.org/psycopg3/docs/basic/usage.html">psycopg 3 - Connection lifecycle</a></li>
+<li><a href="https://www.sqlite.org/lockingv3.html">SQLite - File locking and concurrency</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

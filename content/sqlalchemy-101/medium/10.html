@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Production patterns: pools, observability, migrations, and deploys</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Production patterns: pools, observability, migrations, and deploys</h1>
+<h2>What you will learn</h2>
+<ul>
+<li>The core connection pool options (<code>pool_size</code>, <code>max_overflow</code>, <code>pool_pre_ping</code>, <code>pool_recycle</code>)</li>
+<li>How to choose between <code>QueuePool</code>, <code>NullPool</code>, and <code>StaticPool</code>, especially for SQLite</li>
+<li>How to wire SQL queries into traces with OpenTelemetry</li>
+<li>How to catch slow queries and N+1 in production</li>
+<li>How to sequence migrations and code deploys safely (blue/green rules)</li>
+<li>The boundary for retrying transient errors</li>
+</ul>
+<h2>Why this matters</h2>
+<p>Everything so far has been about whether the code is correct. Production adds another layer. The same code falls apart under load if the pool is wrong, you cannot tell what is slow without observability, and a single deploy becomes an incident if the migration order is bad.</p>
+<p>This article is about that layer. The examples use SQLite, but most of the patterns apply equally to PostgreSQL and MySQL.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>Production SQLAlchemy has three knobs. The <strong>pool</strong> sets concurrency and tail latency. <strong>Observability</strong> tells you where slow is. The <strong>migration policy</strong> defines the safety line for deploys. Leave any one of them empty and the other two lose most of their value.</p>
+</blockquote>
+<p>A pool that is too small queues requests; too large blows past the DB-side connection limit. Without observability you cannot even tell that the pool is wrong. And without a migration policy, "the five minutes after deploy" becomes a recurring outage window.</p>
+<h2>Core concepts</h2>
+<p><strong>Pool options</strong></p>
+<p><strong><code>pool_size</code></strong><br>
+- Meaning: connections kept open at steady state<br>
+- Sensible start: 5–20 (depends on service size)</p>
+<p><strong><code>max_overflow</code></strong><br>
+- Meaning: extra connections allowed during bursts<br>
+- Sensible start: same as <code>pool_size</code></p>
+<p><strong><code>pool_pre_ping</code></strong><br>
+- Meaning: run SELECT 1 before checkout to detect dead connections<br>
+- Sensible start: True</p>
+<p><strong><code>pool_recycle</code></strong><br>
+- Meaning: drop connections older than N seconds before reuse<br>
+- Sensible start: 1800 (shorter than the DB idle timeout)</p>
+<p><strong><code>pool_timeout</code></strong><br>
+- Meaning: max seconds to wait for a checkout<br>
+- Sensible start: 10–30</p>
+<p><strong>Pool classes</strong></p>
+<ul>
+<li><strong><code>QueuePool</code></strong> (default): standard sync web servers.</li>
+<li><strong><code>NullPool</code></strong>: short-lived scripts, lambdas. New connection every time.</li>
+<li><strong><code>StaticPool</code></strong>: a single connection shared across callers. Common for SQLite + multi-thread tests.</li>
+</ul>
+<p><strong>SQLite specifics</strong></p>
+<p>SQLite is a single-writer database. Concurrent writers serialize on a file lock, so a big pool buys nothing. Typical setup is <code>StaticPool</code> plus <code>check_same_thread=False</code>, or in async, the default <code>aiosqlite</code> pool.</p>
+<p><strong>Observability</strong></p>
+<p>You can time queries directly with <code>event.listens_for(engine, "before_cursor_execute" / "after_cursor_execute")</code>, or use OpenTelemetry's <code>SQLAlchemyInstrumentor</code> to attach SQL spans to existing traces automatically.</p>
+<h2>Before / after</h2>
+<pre><code class="language-python"># Before: an engine built with defaults
+engine = create_engine(DATABASE_URL)
+# pool, pre-ping, recycle, observability all default → 5xx at 3am from stale connections
+</code></pre>
+<pre><code class="language-python"># After: production basics
+from sqlalchemy import create_engine, event
+import time, logging
+
+log = logging.getLogger(&quot;db.slow&quot;)
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=10,
+    max_overflow=10,
+    pool_pre_ping=True,
+    pool_recycle=1800,
+    pool_timeout=30,
+    future=True,
+)
+
+SLOW_MS = 200
+
+@event.listens_for(engine, &quot;before_cursor_execute&quot;)
+def _t0(conn, cursor, stmt, params, ctx, many):
+    ctx._t0 = time.perf_counter()
+
+@event.listens_for(engine, &quot;after_cursor_execute&quot;)
+def _t1(conn, cursor, stmt, params, ctx, many):
+    ms = (time.perf_counter() - ctx._t0) * 1000
+    if ms &gt;= SLOW_MS:
+        log.warning(&quot;slow %.1fms %s&quot;, ms, stmt[:200])
+</code></pre>
+<p>The "after" version (1) recovers automatically from a dead connection on the next request via <code>pool_pre_ping</code>, (2) drops connections older than 30 minutes via <code>pool_recycle</code>, and (3) logs any query above 200ms to a dedicated logger.</p>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1: Sizing the pool</strong></p>
+<p>A reasonable starting heuristic is <code>(average concurrent requests) × (avg time a request holds a connection / total request time)</code>. For a typical web process, 5–20 is enough. If that is not enough, add worker processes rather than enlarging <code>pool_size</code>.</p>
+<p><strong>Step 2: pre-ping and recycle</strong></p>
+<p>Set <code>pool_recycle</code> shorter than the DB idle timeout (PostgreSQL 8h, MySQL 8h, load balancer often 5 min). <code>pool_pre_ping=True</code> should be on almost always.</p>
+<p><strong>Step 3: A query counter to block N+1 regressions</strong></p>
+<p>Take the <code>before_cursor_execute</code> counter from Episode 8 and turn it into a test:</p>
+<pre><code class="language-python">def test_no_n_plus_one(session):
+    counter[&quot;n&quot;] = 0
+    result = list_users_with_posts(session)  # uses selectinload
+    assert counter[&quot;n&quot;] &lt;= 2  # users SELECT + posts IN-SELECT
+</code></pre>
+<p>Drop the <code>selectinload</code> and the counter immediately exposes the regression.</p>
+<p><strong>Step 4: Wire SQL into OpenTelemetry traces</strong></p>
+<pre><code class="language-python">from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+
+SQLAlchemyInstrumentor().instrument(engine=engine)
+</code></pre>
+<p>Now every SQL statement attaches as a child span of the active trace. You can answer "which SQL ran in this request and how long did it take" directly.</p>
+<p><strong>Step 5: Retry transient errors</strong></p>
+<pre><code class="language-python">import tenacity
+
+@tenacity.retry(
+    retry=tenacity.retry_if_exception_type(OperationalError),
+    wait=tenacity.wait_exponential(multiplier=0.1, max=2),
+    stop=tenacity.stop_after_attempt(3),
+)
+def write_with_retry(session, obj):
+    session.add(obj)
+    session.commit()
+</code></pre>
+<p>Use this only for errors that are obviously safe to retry: a remote DB blip, <code>SQLITE_BUSY</code>. Never wrap business errors in retry.</p>
+<p><strong>Step 6: Migration and deploy ordering</strong></p>
+<p>The default rule: <strong>migrations first, code second.</strong> For column adds and removes:</p>
+<ul>
+<li><strong>Adding a column</strong>: (1) migration that adds it as nullable → (2) deploy code that uses the new column → (3) optionally a follow-up migration to NOT NULL.</li>
+<li><strong>Removing a column</strong>: (1) deploy code that no longer references the column → (2) drop column in a later migration. Never both in the same deploy.</li>
+</ul>
+<p>The next series, alembic-101, makes this concrete with commands.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Cranking <code>pool_size</code> only.</strong> If you ignore the DB-side max_connections, the database starts refusing.</li>
+<li><strong>Disabling <code>pool_pre_ping</code> and getting 3am 5xx from stale connections.</strong> There is rarely a good reason to turn it off.</li>
+<li><strong>Retrying every exception.</strong> Integrity errors and validation errors will fail the same way again. Use an explicit allow-list.</li>
+<li><strong>Bundling migration and code in one deploy step.</strong> That kills the rollback path.</li>
+<li><strong>Setting the slow-query threshold too low.</strong> Start at 200ms as a meaningful signal and tighten toward 50ms over time.</li>
+<li><strong>Using <code>QueuePool</code> for production SQLite.</strong> SQLite is single-writer; a big pool only creates a false sense of concurrency.</li>
+</ul>
+<h2>Production patterns</h2>
+<ul>
+<li><strong>One engine per process.</strong> Build it at module import, call <code>dispose()</code> on shutdown.</li>
+<li><strong>Session per request or per task.</strong> Enforce with a dependency or a context manager.</li>
+<li><strong>Keep transactions short.</strong> External HTTP calls and heavy CPU work belong outside transactions.</li>
+<li><strong>Healthchecks</strong>: <code>SELECT 1</code> with a tight timeout, wired straight into Kubernetes liveness/readiness.</li>
+<li><strong>Separate IAM/account for schema migrations.</strong> Application accounts should not be allowed to run DDL — that prevents many accidents.</li>
+<li><strong>Slow query log + APM trace + alerts</strong>: those three together catch most regressions before users do.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>pool_size</code>, <code>max_overflow</code>, <code>pool_pre_ping</code>, <code>pool_recycle</code>, <code>pool_timeout</code> are all explicit</li>
+<li>[ ] Total pool capacity stays under the DB's max_connections</li>
+<li>[ ] A slow query logger exists, with a starting threshold like 200ms</li>
+<li>[ ] SQL statements appear in OpenTelemetry (or equivalent) traces</li>
+<li>[ ] Retry is limited to transient errors (<code>OperationalError</code>, <code>SQLITE_BUSY</code>) with a max of 3 attempts</li>
+<li>[ ] Migrations and code deploys never share the same step</li>
+<li>[ ] One engine per process; <code>dispose()</code> is called on shutdown</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Set <code>pool_size=2</code> and <code>max_overflow=0</code>, then send 5 concurrent requests and observe <code>pool_timeout</code> in action.</li>
+<li>Tighten the slow query threshold from 200ms to 50ms and record which queries become signal.</li>
+<li>Trigger <code>SQLITE_BUSY</code> by writing from two threads simultaneously and verify that the retry decorator recovers.</li>
+</ol>
+<h2>Wrap-up and what is next</h2>
+<p>Production decisions converge on three axes: pool, observability, and migration policy. Decide them early and you get a system you can debug. Decide them late and you patch them with after-hours deploys.</p>
+<p>This series ends here. The next series, <strong>alembic-101</strong>, turns the migration policy in this article into concrete commands and workflows: <code>autogenerate</code>, branches and merges, data migrations, and a usable downgrade strategy.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/05-session-unit-of-work-identity-map.md">Session in Depth: How Unit of Work and Identity Map Actually Work</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/06-relationships-back-populates.md">ORM Relationships: Connecting Both Sides Safely with relationship and back_populates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/07-loading-strategies-n-plus-one.md">Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/08-events-hybrid-types.md">Events, hybrid_property, and custom types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/09-async-aiosqlite.md">Async SQLAlchemy with aiosqlite and AsyncSession</a></li>
+<li><strong>Production patterns: pools, observability, migrations, and deploys (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>SQLAlchemy: Connection Pooling — https://docs.sqlalchemy.org/en/20/core/pooling.html</li>
+<li>SQLAlchemy: Engine Configuration — https://docs.sqlalchemy.org/en/20/core/engines.html</li>
+<li>OpenTelemetry SQLAlchemy instrumentation — https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/sqlalchemy/sqlalchemy.html</li>
+<li>Tenacity — https://tenacity.readthedocs.io/</li>
+</ul>
+<p class="tags-line">Tags: Python, SQLAlchemy, ORM, Database</p>
+</body>
+</html>

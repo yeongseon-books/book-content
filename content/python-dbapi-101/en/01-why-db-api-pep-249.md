@@ -3,7 +3,7 @@ title: Why DB-API 2.0 - The Problem PEP 249 Solved
 series: python-dbapi-101
 episode: 1
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -29,6 +29,17 @@ last_reviewed: '2026-05-03'
 If you have used Python with a database, you have probably touched `sqlite3`, `psycopg`, `pymysql`, or `oracledb`. Their APIs feel oddly similar: `connect()` to open a connection, `cursor()` to get a cursor, `execute()` to run a query, `fetchone()` / `fetchall()` to read results. That uniformity is not a coincidence. It comes from a 1996 standard called **PEP 249 — Python Database API Specification v2.0** (DB-API 2.0 for short).
 
 This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- How was database access done in Python before PEP 249?
+- What five things did DB-API 2.0 actually standardize?
+- Why does paramstyle differ across drivers, and how do you protect your code?
+- Where does DB-API stop and other layers begin?
+
+<!-- a-grade-intro:end -->
 
 ## 1. The Chaos Before DB-API
 
@@ -212,6 +223,17 @@ Drivers with `threadsafety=1` cannot share a connection between threads. sqlite3
 - Autocommit, cursor cleanup, fetchall memory, SQL injection, and thread safety are the most common early pitfalls.
 
 The next episode digs into the connection and cursor lifecycle and the context-manager patterns that make them safe.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Ran a full connect → cursor → execute → fetch → close cycle with sqlite3.
+- [ ] Identified what changes when porting the same code to PostgreSQL (psycopg).
+- [ ] Can explain paramstyle differences in one sentence.
+- [ ] Can name three things DB-API does NOT cover (pooling, ORM, migration).
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

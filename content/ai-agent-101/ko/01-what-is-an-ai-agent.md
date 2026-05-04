@@ -3,7 +3,7 @@ title: AI Agent란 무엇인가?
 series: ai-agent-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -25,6 +25,17 @@ last_reviewed: '2026-05-03'
 > AI Agent 101 시리즈 (1/10)
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- Chatbot과 Agent를 구분 짓는 본질적 차이는 무엇일까요?
+- Observe → Think → Act → Check 루프는 왜 필요할까요?
+- Agent라고 부르려면 최소한 어떤 조건을 충족해야 할까요?
+- 이 시리즈에서 다룰 Agent는 어디까지를 범위로 잡을까요?
+
+<!-- a-grade-intro:end -->
 
 ## 이 글에서 배울 것
 
@@ -202,6 +213,17 @@ production에서 Agent 도입을 결정할 때는 다음 질문을 먼저 던집
 ## 다음 글
 
 다음 글에서는 Agent의 결정 품질을 좌우하는 **context engineering** - 무엇을 prompt에 넣고, 무엇을 빼야 할지를 다룹니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] Chatbot과 Agent의 차이를 한 문장으로 설명할 수 있다.
+- [ ] Observe→Think→Act→Check 루프를 손으로 한 사이클 흉내 냈다.
+- [ ] Agent의 자율성 수준을 분류 기준으로 평가할 수 있다.
+- [ ] 이 시리즈가 다루는 범위와 다루지 않는 범위를 적었다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -3,7 +3,7 @@ title: Multi-Agent 시스템
 series: ai-agent-101
 episode: 6
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ Multi-Agent 시스템의 핵심은 조정(coordination)과 위임(delegation)입
 이번 글에서는 Multi-Agent 패턴, Agent 간 통신 프로토콜, 위임 전략, 그리고 Multi-Agent 시스템을 언제 사용해야 하는지 다룹니다.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- 단일 Agent로 충분한 작업과 Multi-Agent가 필요한 작업은 어떻게 구분할까요?
+- Multi-Agent 패턴(Supervisor, Hierarchical, Swarm)은 각각 어떤 모양일까요?
+- Agent 간 통신 프로토콜에서 가장 흔한 실패는 무엇일까요?
+- 위임(delegation) 전략을 잘못 짜면 어떤 비용이 폭증할까요?
+
+<!-- a-grade-intro:end -->
 
 ## Multi-Agent 패턴
 
@@ -1065,6 +1076,17 @@ except Exception as e:
 - 복잡한 작업이나 다중 도메인 작업에는 Multi-Agent 시스템이 효과적입니다.
 - Orchestrator, Peer-to-Peer, Hierarchical 등 다양한 조정 패턴이 있습니다.
 - Agent 간 명확한 통신 프로토콜과 책임 분담이 성공의 열쇠입니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] 단일 Agent로 풀 수 있는 일과 Multi-Agent가 필요한 일을 분류 기준으로 나눴다.
+- [ ] Supervisor 패턴 예제를 한 번 구현하거나 의사코드로 작성했다.
+- [ ] Agent 간 메시지 포맷을 명시적 schema로 정의했다.
+- [ ] Multi-Agent 호출 횟수를 추적해 비용 폭증을 한 번 재현/예방했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

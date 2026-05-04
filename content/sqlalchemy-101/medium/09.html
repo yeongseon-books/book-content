@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Async SQLAlchemy with aiosqlite and AsyncSession</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Async SQLAlchemy with aiosqlite and AsyncSession</h1>
+<h2>What you will learn</h2>
+<ul>
+<li>The shape of SQLAlchemy 2.x's async stack: <code>create_async_engine</code>, <code>AsyncEngine</code>, <code>AsyncSession</code></li>
+<li>How to wire the <code>aiosqlite</code> driver to use SQLite from async code</li>
+<li>A one-to-one mapping from sync patterns to async (<code>session.execute</code>, <code>session.scalars</code>)</li>
+<li>Why lazy loading is more dangerous in async, and how to avoid it</li>
+<li>Session lifecycle in async web frameworks like FastAPI</li>
+</ul>
+<h2>Why this matters</h2>
+<p>Using sync SQLAlchemy from FastAPI, Starlette, or aiohttp blocks the event loop. SQLAlchemy 2.x ships an async API that has been stable since 1.4, and SQLite supports the same patterns through the <code>aiosqlite</code> driver.</p>
+<p>Async, however, has a few sharp edges that the sync API hides. Lazy loading in particular: in sync code it is just one extra SELECT, but in async it tries to call sync IO from an async context and raises immediately. This article makes those differences explicit.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>Async SQLAlchemy is a <strong>thin awaitable wrapper around the existing ORM</strong>. Internally it does not run the sync ORM on a thread pool; it uses a greenlet-based adapter that exposes sync calls across an async boundary. That is why the API looks almost identical, but every place where IO could happen now requires an explicit <code>await</code>.</p>
+</blockquote>
+<p>Two rules cover most of it:</p>
+<ul>
+<li><strong>Explicit IO</strong>: <code>select</code>, <code>insert</code>, <code>update</code>, <code>delete</code> all go through <code>await session.execute(...)</code> or <code>await session.scalars(...)</code>.</li>
+<li><strong>Implicit IO is forbidden</strong>: anything that would secretly run SQL behind your back, such as a lazy load, becomes an error in async. That is why eager loading strategies become the default rather than an option.</li>
+</ul>
+<h2>Core concepts</h2>
+<p><strong><code>create_async_engine</code> and <code>AsyncEngine</code></strong></p>
+<p><code>from sqlalchemy.ext.asyncio import create_async_engine</code> builds an <code>AsyncEngine</code>. It mirrors the sync <code>Engine</code> except <code>connect</code> and <code>begin</code> are async context managers.</p>
+<p><strong>URL and driver</strong></p>
+<p><strong>SQLite</strong><br>
+- URL: <code>sqlite+aiosqlite:///./app.db</code></p>
+<p><strong>PostgreSQL</strong><br>
+- URL: <code>postgresql+asyncpg://user:pass@host/db</code></p>
+<p><strong>MySQL</strong><br>
+- URL: <code>mysql+aiomysql://user:pass@host/db</code></p>
+<p>This article uses SQLite via <code>pip install "sqlalchemy&gt;=2.0" aiosqlite</code>.</p>
+<p><strong><code>AsyncSession</code> and <code>async_sessionmaker</code></strong></p>
+<p><code>AsyncSession</code> is the awaitable version of the sync <code>Session</code>. Build a factory with <code>async_sessionmaker</code> and use it inside an <code>async with</code> block. <strong><code>expire_on_commit=False</code> is effectively required</strong> in async; the reason is below.</p>
+<p><strong>No implicit IO</strong></p>
+<p>In async, accessing <code>obj.posts</code> would issue sync SQL, so SQLAlchemy raises <code>MissingGreenlet</code> (or similar). Episode 7's <code>selectinload</code> and <code>joinedload</code> stop being optional and become the default strategy.</p>
+<h2>Before / after</h2>
+<p>A one-to-one mapping from sync to async:</p>
+<pre><code class="language-python"># Before: sync
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine(&quot;sqlite:///./app.db&quot;)
+SessionLocal = sessionmaker(engine, expire_on_commit=False)
+
+def list_users():
+    with SessionLocal() as session:
+        result = session.execute(select(User))
+        return result.scalars().all()
+</code></pre>
+<pre><code class="language-python"># After: async
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy import select
+
+engine = create_async_engine(&quot;sqlite+aiosqlite:///./app.db&quot;)
+SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+
+async def list_users():
+    async with SessionLocal() as session:
+        result = await session.execute(select(User))
+        return result.scalars().all()
+</code></pre>
+<p>The deltas are:</p>
+<ul>
+<li><code>create_engine</code> → <code>create_async_engine</code></li>
+<li>URL driver: <code>sqlite:///</code> → <code>sqlite+aiosqlite:///</code></li>
+<li><code>sessionmaker</code> → <code>async_sessionmaker(class_=AsyncSession)</code></li>
+<li><code>with SessionLocal()</code> → <code>async with SessionLocal()</code></li>
+<li><code>session.execute(...)</code> → <code>await session.execute(...)</code></li>
+</ul>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1: Install</strong></p>
+<pre><code class="language-bash">pip install &quot;sqlalchemy&gt;=2.0&quot; aiosqlite
+</code></pre>
+<p><strong>Step 2: Engine and session factory</strong></p>
+<pre><code class="language-python">import asyncio
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+
+engine = create_async_engine(&quot;sqlite+aiosqlite:///./app.db&quot;, echo=False)
+SessionLocal = async_sessionmaker(
+    engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+)
+</code></pre>
+<p><strong>Step 3: Create tables</strong></p>
+<pre><code class="language-python">from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+class Base(DeclarativeBase): ...
+
+class User(Base):
+    __tablename__ = &quot;users&quot;
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str]
+    name: Mapped[str]
+
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+</code></pre>
+<p><code>engine.begin()</code> is an async context manager. DDL methods like <code>create_all</code> are sync, so wrap them in <code>conn.run_sync(...)</code>.</p>
+<p><strong>Step 4: Basic CRUD</strong></p>
+<pre><code class="language-python">async def create_user(email: str, name: str) -&gt; User:
+    async with SessionLocal() as session:
+        async with session.begin():
+            user = User(email=email, name=name)
+            session.add(user)
+        await session.refresh(user)
+        return user
+
+async def get_user(user_id: int) -&gt; User | None:
+    async with SessionLocal() as session:
+        return await session.get(User, user_id)
+
+async def list_users() -&gt; list[User]:
+    async with SessionLocal() as session:
+        result = await session.scalars(select(User).order_by(User.id))
+        return list(result)
+</code></pre>
+<p><code>session.begin()</code> is also an async context manager that commits on exit, rolls back on exception.</p>
+<p><strong>Step 5: Relationships and eager loading</strong></p>
+<pre><code class="language-python">from sqlalchemy.orm import selectinload
+
+async def list_users_with_posts():
+    async with SessionLocal() as session:
+        stmt = select(User).options(selectinload(User.posts))
+        result = await session.scalars(stmt)
+        return list(result)
+</code></pre>
+<p>Drop the <code>selectinload</code> and the handler will raise <code>MissingGreenlet</code> the first time it touches <code>user.posts</code>. In async, <strong>eager loading is the default strategy</strong>.</p>
+<p><strong>Step 6: FastAPI integration</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI, Depends
+
+app = FastAPI()
+
+async def get_session():
+    async with SessionLocal() as session:
+        yield session
+
+@app.get(&quot;/users&quot;)
+async def list_users(session: AsyncSession = Depends(get_session)):
+    result = await session.scalars(select(User).options(selectinload(User.posts)))
+    return [{&quot;id&quot;: u.id, &quot;email&quot;: u.email, &quot;posts&quot;: len(u.posts)} for u in result]
+</code></pre>
+<p>A new session opens and closes per request, and the handler only worries about <code>await</code>.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Leaving <code>expire_on_commit=True</code>.</strong> Reading attributes after commit triggers a lazy refresh, which becomes an immediate error in async. <code>False</code> is the de facto default.</li>
+<li><strong>Using lazy relationships.</strong> In sync this is just an extra SELECT; in async it raises <code>MissingGreenlet</code>. Always use <code>selectinload</code> or <code>joinedload</code> explicitly.</li>
+<li><strong>Using a sync driver URL.</strong> <code>sqlite:///</code> cannot build an async engine. The driver must be explicit, e.g. <code>sqlite+aiosqlite:///</code>.</li>
+<li><strong>Forgetting <code>run_sync</code> for DDL.</strong> <code>create_all</code> is sync, so it must be called as <code>await conn.run_sync(Base.metadata.create_all)</code>.</li>
+<li><strong>Sharing a session across requests.</strong> <code>AsyncSession</code> is not thread- or coroutine-safe. Build a new one per request.</li>
+</ul>
+<h2>Production patterns</h2>
+<ul>
+<li><strong>Per-request session lifecycle.</strong> Use a FastAPI dependency or Starlette middleware so sessions open and close around each request.</li>
+<li><strong>Per-handler eager loading policy.</strong> Let the query function describe which relationships it uses. That stops N+1 regressions before they ship.</li>
+<li><strong>Transactions via <code>async with session.begin()</code>.</strong> A context manager is safer than explicit begin/commit pairs.</li>
+<li><strong>SQLite caveat.</strong> SQLite allows only one writer. Even with async, multiple coroutines writing concurrently will hit <code>SQLITE_BUSY</code>. For write-heavy workloads, PostgreSQL with asyncpg is a better fit.</li>
+<li><strong>Tests.</strong> Use <code>pytest-asyncio</code>. Build the engine and session factory in fixtures, and call <code>await engine.dispose()</code> at fixture teardown.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] URL spells out the async driver (<code>sqlite+aiosqlite://</code>)</li>
+<li>[ ] Factory is <code>async_sessionmaker(..., class_=AsyncSession, expire_on_commit=False)</code></li>
+<li>[ ] Every SQL call is <code>await session.execute / scalars / get</code></li>
+<li>[ ] Relationships are pre-loaded with <code>selectinload</code> or <code>joinedload</code></li>
+<li>[ ] DDL is wrapped in <code>await conn.run_sync(...)</code></li>
+<li>[ ] Sessions are created per request and closed at the boundary</li>
+<li>[ ] <code>await engine.dispose()</code> is called on shutdown</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Port the sync CRUD above to async and verify equivalence with unit tests.</li>
+<li>Drop the <code>selectinload</code> and reproduce the <code>MissingGreenlet</code> error to see exactly when it fires.</li>
+<li>Build a FastAPI <code>/users/{id}</code> endpoint that uses an async session dependency and eager loading together.</li>
+</ol>
+<h2>Wrap-up and what is next</h2>
+<p>Async SQLAlchemy is the awaitable version of the sync API, but it requires a real shift in mental model because implicit IO disappears. Switch the driver, add <code>await</code>, and make eager loading the default — those three moves cover most of the migration.</p>
+<p>The next episode covers production patterns: pool sizing, pre-ping, observability, slow-query logging, and how migrations and deploys should be sequenced.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/05-session-unit-of-work-identity-map.md">Session in Depth: How Unit of Work and Identity Map Actually Work</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/06-relationships-back-populates.md">ORM Relationships: Connecting Both Sides Safely with relationship and back_populates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/07-loading-strategies-n-plus-one.md">Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/08-events-hybrid-types.md">Events, hybrid_property, and custom types</a></li>
+<li><strong>Async SQLAlchemy with aiosqlite and AsyncSession (current)</strong></li>
+<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>SQLAlchemy: Asynchronous I/O — https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html</li>
+<li>aiosqlite — https://github.com/omnilib/aiosqlite</li>
+<li>SQLAlchemy: AsyncSession API — https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncSession</li>
+<li>FastAPI: SQL (Relational) Databases — https://fastapi.tiangolo.com/tutorial/sql-databases/</li>
+</ul>
+<p class="tags-line">Tags: Python, SQLAlchemy, ORM, Database</p>
+</body>
+</html>

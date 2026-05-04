@@ -24,13 +24,13 @@ tags:
 articles:
 - idx: 1
   slug: 01-why-db-api-pep-249
-  status: draft
+  status: publish-ready
 - idx: 2
   slug: 02-connection-cursor-lifecycle
-  status: draft
+  status: publish-ready
 - idx: 3
   slug: 03-execute-fetch-patterns
-  status: draft
+  status: publish-ready
 - idx: 4
   slug: 04-parameter-binding-sql-injection
   status: draft

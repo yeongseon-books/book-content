@@ -61,6 +61,17 @@
 <p>However, model context windows are limited. You can't keep including all conversation history, so you must selectively maintain important information or leverage external storage (vector DB, general DB).</p>
 <p>This article covers the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How do short-term and long-term memory differ, and when do you need each?</li>
+<li>What is the safest strategy for truncating conversation history?</li>
+<li>How do you cope when the context window is too small?</li>
+<li>On what basis do you pick an external memory backend (Vector DB vs KV)?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Short-term Memory vs Long-term Memory</h2>
 <h2>Short-term Memory vs Long-term Memory</h2>
 <p>Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.</p>
@@ -1192,13 +1203,23 @@ def save_conversation(user_id, messages):
 <li>Context window limitations require selectively maintaining only important information.</li>
 <li>When long-term memory is needed, leverage external storage (vector DB, general DB).</li>
 </ul>
-<hr>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
 <ul>
-<li>What is an AI Agent? (upcoming)</li>
-<li>Context Engineering (upcoming)</li>
-<li>Tool Use Fundamentals (upcoming)</li>
-<li>Agent Workflow Design (upcoming)</li>
+<li>[ ] Can explain short vs long memory in one sentence.</li>
+<li>[ ] Compared sliding-window vs summarization truncation.</li>
+<li>[ ] Wrote code that auto-summarizes near the token limit.</li>
+<li>[ ] Built a one-table guide on when to pick Vector vs KV.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/04-agent-workflow-design.md">Agent Workflow Design</a></li>
 <li><strong>Memory and State (current)</strong></li>
 <li>Multi-Agent Systems (upcoming)</li>
 <li>Agent Evaluation (upcoming)</li>
@@ -1206,6 +1227,7 @@ def save_conversation(user_id, messages):
 <li>Production Operations (upcoming)</li>
 <li>Building Your First Agent (upcoming)</li>
 </ul>
+<hr>
 <h2>References</h2>
 <ol>
 <li>
@@ -1225,6 +1247,6 @@ def save_conversation(user_id, messages):
    Pinecone's guide on conversational agent memory systems. Explains vector DB utilization patterns.</p>
 </li>
 </ol>
-<p class="tags-line">Tags: AI Agent, Memory, State Management, Context Window</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

@@ -24,31 +24,31 @@ tags:
 articles:
 - idx: 1
   slug: 01-what-is-an-ai-agent
-  status: draft
+  status: publish-ready
 - idx: 2
   slug: 02-context-engineering
-  status: draft
+  status: publish-ready
 - idx: 3
   slug: 03-tool-use-fundamentals
-  status: draft
+  status: publish-ready
 - idx: 4
   slug: 04-agent-workflow-design
-  status: draft
+  status: publish-ready
 - idx: 5
   slug: 05-memory-and-state
-  status: draft
+  status: publish-ready
 - idx: 6
   slug: 06-multi-agent-systems
-  status: draft
+  status: publish-ready
 - idx: 7
   slug: 07-agent-evaluation
-  status: draft
+  status: publish-ready
 - idx: 8
   slug: 08-error-handling-reliability
-  status: draft
+  status: publish-ready
 - idx: 9
   slug: 09-production-operations
-  status: draft
+  status: publish-ready
 - idx: 10
   slug: 10-building-first-agent
-  status: draft
+  status: publish-ready

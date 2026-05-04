@@ -3,7 +3,7 @@ title: Production Operations
 series: ai-agent-101
 episode: 9
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ The core of agent operations is observability. You must track all agent steps, m
 This article covers agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.
 
 ---
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What is the first observability signal you put in place for an agent?
+- What is the simplest way to track cost and enforce a ceiling?
+- When you scale an agent, where does the bottleneck appear: LLM or tools?
+- How do you design a safe deploy and rollback?
+
+<!-- a-grade-intro:end -->
+
 ## Observability
 
 Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.
@@ -555,6 +566,17 @@ A leading cause of GDPR/CCPA violations and security incidents.
 - Optimize LLM calls with caching, rate limiting, and async processing
 - Use canary deployment and feature flags to apply changes safely
 - Never log PII; hash or mask it instead
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Split observability into latency / cost / quality / safety.
+- [ ] Logged token and dollar cost per agent run.
+- [ ] Ramped concurrency and identified whether LLM or tools choke first.
+- [ ] Wrote down a canary-deploy and instant-rollback procedure.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

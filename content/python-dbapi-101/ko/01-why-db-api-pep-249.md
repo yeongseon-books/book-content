@@ -3,7 +3,7 @@ title: 왜 DB-API 2.0인가 - PEP 249가 푼 문제
 series: python-dbapi-101
 episode: 1
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -29,6 +29,17 @@ last_reviewed: '2026-05-03'
 Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`, `pymysql`, `oracledb` 같은 패키지를 한 번쯤 써봤을 겁니다. 그리고 신기하게도 그 사용법이 묘하게 비슷합니다. `connect()`로 연결을 만들고 `cursor()`로 cursor를 받고 `execute()`로 쿼리를 던지고 `fetchone()`/`fetchall()`로 결과를 꺼냅니다. 이 통일성은 우연이 아니라 1996년에 합의된 표준, **PEP 249 — Python Database API Specification v2.0** (줄여서 DB-API 2.0) 덕분입니다.
 
 이번 첫 글에서는 DB-API 2.0이 왜 필요했는지, 어떤 문제를 해결했는지, 시리즈 전반에서 SQLite로 실습하는 이유와 다른 driver(PostgreSQL, MySQL 등)에 그대로 옮기는 방법을 살펴봅니다.
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- PEP 249가 등장하기 전에는 Python에서 DB를 어떻게 다뤘을까요?
+- DB-API 2.0이 표준화한 5가지 핵심은 무엇일까요?
+- paramstyle이 드라이버마다 다른 이유는 무엇이고, 코드를 어떻게 보호해야 할까요?
+- DB-API가 다루지 않는 영역은 어디까지일까요?
+
+<!-- a-grade-intro:end -->
 
 ## 1. DB-API 이전의 혼돈
 
@@ -212,6 +223,17 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 - autocommit, cursor 정리, fetchall 메모리, SQL injection, thread safety는 첫 도입 시 자주 부딪히는 함정입니다.
 
 다음 글에서는 connection과 cursor의 lifecycle을 더 깊이 들여다보고, context manager로 안전하게 다루는 패턴을 정리합니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] sqlite3로 connect → cursor → execute → fetch → close 사이클을 한 번 돌렸다.
+- [ ] 같은 코드를 PostgreSQL(psycopg) 드라이버로 옮길 때 무엇이 달라지는지 확인했다.
+- [ ] paramstyle 차이를 한 줄로 설명할 수 있다.
+- [ ] DB-API가 제공하지 않는 기능(connection pool, ORM, migration)을 구분할 수 있다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

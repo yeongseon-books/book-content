@@ -61,6 +61,17 @@
 <p>Recommended frameworks are LangGraph and Crew AI. Both simplify agent construction but have different approaches. LangGraph is strong in graph-based workflows, while Crew AI is strong in multi-agent collaboration.</p>
 <p>This article covers end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Where do you draw the line on what the Research Assistant agent owns?</li>
+<li>In what order should you build tools, memory, and the loop?</li>
+<li>On what basis do you pick raw code vs LangGraph vs CrewAI?</li>
+<li>How do you wire your first agent into automated eval?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>What We Are Building: A Research Assistant</h2>
 <p>In this episode, you build a small research assistant agent end to end. The user asks a question and the agent goes through these steps.</p>
 <ol>
@@ -497,8 +508,18 @@ LangGraph and CrewAI are powerful but carry learning costs. Build from scratch f
 <li>Evaluation can start with a small golden dataset and still catch real regressions.</li>
 <li>Build from scratch first to internalize the principles, then scale with frameworks like LangGraph or CrewAI.</li>
 </ul>
-<hr>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Wrote a one-paragraph spec of inputs, outputs, and scope.</li>
+<li>[ ] Built tool → memory → loop in that order.</li>
+<li>[ ] Made a comparison table: hand-rolled vs LangGraph vs CrewAI.</li>
+<li>[ ] Ran the Step 5 auto-eval loop at least once and inspected results.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
@@ -511,6 +532,7 @@ LangGraph and CrewAI are powerful but carry learning costs. Build from scratch f
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/09-production-operations.md">Production Operations</a></li>
 <li><strong>Building Your First Agent (current)</strong></li>
 </ul>
+<hr>
 <h2>References</h2>
 <ul>
 <li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling Guide</a></li>
@@ -518,6 +540,6 @@ LangGraph and CrewAI are powerful but carry learning costs. Build from scratch f
 <li><a href="https://docs.crewai.com/">CrewAI Documentation</a></li>
 <li><a href="https://www.anthropic.com/research/building-effective-agents">Building Effective Agents — Anthropic</a></li>
 </ul>
-<p class="tags-line">Tags: AI Agent, Tutorial, Python, Hands-on</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

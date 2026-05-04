@@ -61,6 +61,17 @@
 <p>The core of multi-agent systems is coordination and delegation. Patterns include the Orchestrator pattern where one agent coordinates everything, the Peer-to-Peer pattern where multiple agents cooperate as equals, and the Hierarchical pattern that divides work hierarchically.</p>
 <p>This article covers multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How do you tell a single-agent task from a real multi-agent task?</li>
+<li>What do Supervisor, Hierarchical, and Swarm patterns actually look like?</li>
+<li>What is the most common failure mode in agent-to-agent protocols?</li>
+<li>Which delegation mistakes blow up cost the fastest?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Multi-Agent Patterns</h2>
 <p>There are several patterns for handling complex tasks through cooperation among multiple agents.</p>
 <p><strong>Orchestrator Pattern (Centralized Coordination)</strong></p>
@@ -923,13 +934,24 @@ def run_pipeline():
 <li>Use multi-agent only when truly necessary; a single agent often suffices for simple tasks</li>
 <li>Standard message formats, infinite-loop prevention, and failure handling are mandatory in production</li>
 </ul>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
 <ul>
-<li>What Is an AI Agent? (upcoming)</li>
-<li>Context Engineering (upcoming)</li>
-<li>Tool Use Fundamentals (upcoming)</li>
-<li>Agent Workflow Design (upcoming)</li>
-<li>Memory and State (upcoming)</li>
+<li>[ ] Sorted tasks into single-agent vs multi-agent buckets with explicit criteria.</li>
+<li>[ ] Implemented or sketched a Supervisor-pattern example.</li>
+<li>[ ] Defined an explicit message schema between agents.</li>
+<li>[ ] Tracked agent-to-agent calls and either reproduced or avoided a cost blowup.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/04-agent-workflow-design.md">Agent Workflow Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/05-memory-and-state.md">Memory and State</a></li>
 <li><strong>Multi-Agent Systems (current)</strong></li>
 <li>Agent Evaluation (upcoming)</li>
 <li>Error Handling and Reliability (upcoming)</li>
@@ -955,6 +977,6 @@ def run_pipeline():
    Microsoft's guide to agent orchestration. Presents how to design hierarchical agent systems.</p>
 </li>
 </ol>
-<p class="tags-line">Tags: AI Agent, Multi-Agent, Coordination, Delegation</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

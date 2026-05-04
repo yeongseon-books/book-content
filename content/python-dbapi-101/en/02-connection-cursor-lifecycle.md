@@ -3,7 +3,7 @@ title: Connection and Cursor Lifecycle
 series: python-dbapi-101
 episode: 2
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -27,6 +27,17 @@ last_reviewed: '2026-05-03'
 ---
 
 The two core DB-API objects are connection and cursor. Their names are plain, but mishandling their lifecycle leads to connection leaks, locks, and race conditions. This episode covers how each is created, used, and closed; the context-manager patterns that keep them safe; and the lifecycle pitfalls that bite most often.
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What are the distinct responsibilities of Connection vs Cursor?
+- How does the `with` context manager protect connection and cursor resources?
+- What is the trade-off between opening a new connection per call vs reusing one?
+- What symptoms appear when you forget to close?
+
+<!-- a-grade-intro:end -->
 
 ## 1. What a Connection Is
 
@@ -208,6 +219,17 @@ With server-side cursors, drain the previous result or call `cur.close()` before
 - Connection leaks, idle timeouts, fork sharing, and undrained cursors are the most common lifecycle bugs.
 
 The next episode walks through `execute()`, `executemany()`, and the `fetchone()` / `fetchall()` / `fetchmany()` patterns.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Used `with sqlite3.connect(...) as conn:` to run queries without resource leaks.
+- [ ] Opened multiple cursors on one connection and observed concurrent reads.
+- [ ] Measured the perf gap between per-call connect and reused connect.
+- [ ] Reproduced the warnings or locks that appear when close is skipped.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

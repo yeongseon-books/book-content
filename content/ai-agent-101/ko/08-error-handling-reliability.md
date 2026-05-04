@@ -3,7 +3,7 @@ title: 에러 처리와 안정성
 series: ai-agent-101
 episode: 8
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ Agent는 외부 도구를 호출하고, 네트워크를 거치고, 모델의 불
 이번 글에서는 Agent의 일반적인 실패 모드, Retry 전략, Fallback 패턴, Timeout 처리 방법, 그리고 Graceful Degradation을 다룹니다.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- Agent에서 발생하는 에러는 어떤 유형으로 분류할 수 있을까요?
+- Retry, Fallback, Circuit Breaker는 각각 어떤 상황에 써야 할까요?
+- 도구 실행을 안전하게 격리하려면 어떤 장치가 필요할까요?
+- 사용자에게 보여줄 graceful degradation은 어떤 모양이어야 할까요?
+
+<!-- a-grade-intro:end -->
 
 ## Agent에서의 에러 유형
 
@@ -433,6 +444,17 @@ return {
 - Circuit breaker는 반복 실패하는 외부 의존성으로부터 시스템을 보호합니다
 - 도구 실행에는 항상 타임아웃과 리소스 제한을 둡니다
 - 에러는 조용히 삼키지 말고 로그·메트릭으로 가시화합니다
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] Agent 에러를 transient / permanent / model-level로 분류했다.
+- [ ] Exponential backoff retry를 직접 구현해 transient 에러를 흡수했다.
+- [ ] Circuit breaker open/half-open/closed 상태 전이를 그려 봤다.
+- [ ] 도구 실행을 timeout + sandbox로 감싼 예제를 작성했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

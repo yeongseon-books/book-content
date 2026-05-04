@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>execute, executemany, and Fetch Patterns</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>execute, executemany, and Fetch Patterns</h1>
+<blockquote>
+<p>Python DB-API 101 series (3/10)</p>
+</blockquote>
+<hr>
+<p>Every query in DB-API ultimately reduces to five cursor methods: <code>execute()</code>, <code>executemany()</code>, and <code>fetchone()</code>/<code>fetchall()</code>/<code>fetchmany()</code>. The API surface is tiny, but choosing the wrong fetch method decides whether your service streams gracefully or OOMs at 3 AM. This article walks through each method and the rules for picking one.</p>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?</li>
+<li>How do you process large result sets without blowing up memory?</li>
+<li>What metadata does cursor.description expose?</li>
+<li>What are the key ingredients of a streaming + transformation pipeline?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
+<h2>1. execute - one statement at a time</h2>
+<p><code>cursor.execute(operation, parameters=None)</code> runs a single SQL statement. SELECT, INSERT, UPDATE, DELETE, and DDL all use the same method.</p>
+<pre><code class="language-python">import sqlite3
+conn = sqlite3.connect(&quot;:memory:&quot;)
+cur = conn.cursor()
+
+cur.execute(&quot;CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT)&quot;)
+cur.execute(&quot;INSERT INTO notes (body) VALUES (?)&quot;, (&quot;hello&quot;,))
+print(cur.lastrowid)   # 1
+print(cur.rowcount)    # 1
+</code></pre>
+<p><code>execute()</code> returns the cursor itself so chaining is technically possible, but production code keeps one call per line for readability.</p>
+<h2>2. executemany - bulk write</h2>
+<p>When the same statement runs against many parameter sets, use <code>executemany()</code>.</p>
+<pre><code class="language-python">rows = [(&quot;first&quot;,), (&quot;second&quot;,), (&quot;third&quot;,)]
+cur.executemany(&quot;INSERT INTO notes (body) VALUES (?)&quot;, rows)
+print(cur.rowcount)   # 3
+conn.commit()
+</code></pre>
+<p><code>executemany()</code> is logically equivalent to a Python loop over <code>execute()</code>, but drivers apply batch optimizations - typically 2-10x faster. The implementation differs by driver:</p>
+<ul>
+<li>sqlite3: internal loop with prepared-statement reuse, saving parse cost</li>
+<li>psycopg 2/3: <code>execute_batch()</code> or <code>execute_values()</code> is often faster still</li>
+<li>mysql.connector: rewrites into a multi-row INSERT automatically</li>
+</ul>
+<p>A common trap is calling <code>executemany()</code> for SELECT. PEP 249 does not define behavior in that case, so the result is driver-specific. Always use plain <code>execute()</code> for SELECT.</p>
+<h2>3. fetchone - one row at a time</h2>
+<p><code>fetchone()</code> returns the next row as a tuple, or <code>None</code> when exhausted.</p>
+<pre><code class="language-python">cur.execute(&quot;SELECT id, body FROM notes ORDER BY id&quot;)
+row = cur.fetchone()
+while row is not None:
+    print(row)         # (1, 'hello')
+    row = cur.fetchone()
+</code></pre>
+<p>This is memory-safe but verbose. Cursors are iterable, so the idiomatic form is shorter.</p>
+<pre><code class="language-python">cur.execute(&quot;SELECT id, body FROM notes ORDER BY id&quot;)
+for row in cur:
+    print(row)
+</code></pre>
+<p><code>for row in cur</code> calls <code>fetchone()</code> under the hood and never materializes the full result set.</p>
+<h2>4. fetchall - everything at once</h2>
+<p><code>fetchall()</code> returns the remaining rows as a list.</p>
+<pre><code class="language-python">cur.execute(&quot;SELECT id, body FROM notes&quot;)
+rows = cur.fetchall()
+print(rows)   # [(1, 'hello'), (2, 'first'), (3, 'second'), (4, 'third')]
+</code></pre>
+<p>For small result sets (a few hundred rows) it is the most convenient and the fastest option. For tens of thousands of rows, RAM balloons in one shot - a classic OOM cause. Reserve <code>fetchall()</code> for test fixtures and lookup tables; never use it for queries whose row count depends on user input.</p>
+<h2>5. fetchmany - in chunks</h2>
+<p><code>fetchmany(size=cursor.arraysize)</code> returns a fixed number of rows.</p>
+<pre><code class="language-python">cur.execute(&quot;SELECT id, body FROM notes&quot;)
+while True:
+    chunk = cur.fetchmany(1000)
+    if not chunk:
+        break
+    process(chunk)
+</code></pre>
+<p><code>arraysize</code> is a cursor attribute that defaults to 1. Increasing it lets drivers prefetch rows from the server, cutting round-trips.</p>
+<pre><code class="language-python">cur.arraysize = 500
+for row in cur:        # prefetched in batches of 500
+    process(row)
+</code></pre>
+<p><code>fetchmany</code> is the right tool when an ETL pipeline needs both streaming and batch processing.</p>
+<h2>6. Choosing the right method</h2>
+<p><strong>Single row (PK lookup)</strong><br>
+- Pick: <code>fetchone()</code></p>
+<p><strong>Small result (&lt;= 1000 rows)</strong><br>
+- Pick: <code>fetchall()</code></p>
+<p><strong>Large result, row by row</strong><br>
+- Pick: <code>for row in cur</code></p>
+<p><strong>Large result, batched</strong><br>
+- Pick: <code>fetchmany(N)</code></p>
+<p><strong>Bulk INSERT/UPDATE</strong><br>
+- Pick: <code>executemany()</code></p>
+<p><strong>Single statement</strong><br>
+- Pick: <code>execute()</code></p>
+<h2>7. Result metadata</h2>
+<p><code>cursor.description</code> returns a list of 7-tuples describing the columns of the last SELECT.</p>
+<pre><code class="language-python">cur.execute(&quot;SELECT id, body FROM notes LIMIT 1&quot;)
+cur.fetchone()
+for col in cur.description:
+    print(col[0], col[1])   # name, type_code
+</code></pre>
+<p>To receive rows as dicts, either consume <code>description</code> directly or set a row factory (covered in a later episode).</p>
+<p><code>cursor.rowcount</code> reports affected rows for INSERT/UPDATE/DELETE. For SELECT it is driver-dependent and frequently -1, so do not trust it.</p>
+<h2>8. Streaming + transformation in practice</h2>
+<p>Here is an ETL that exports rows to CSV with constant memory usage.</p>
+<pre><code class="language-python">import csv, sqlite3
+def export_notes(db_path, csv_path, chunk=500):
+    with sqlite3.connect(db_path) as conn:
+        cur = conn.cursor()
+        cur.arraysize = chunk
+        cur.execute(&quot;SELECT id, body FROM notes ORDER BY id&quot;)
+        with open(csv_path, &quot;w&quot;, newline=&quot;&quot;) as f:
+            writer = csv.writer(f)
+            writer.writerow([&quot;id&quot;, &quot;body&quot;])
+            while True:
+                rows = cur.fetchmany(chunk)
+                if not rows:
+                    break
+                writer.writerows(rows)
+</code></pre>
+<p>Memory stays flat regardless of row count.</p>
+<h2>9. Common Mistakes</h2>
+<ol>
+<li><strong>Calling <code>fetchall()</code> on a large result set</strong> - one million rows means one OOM. Default to streaming patterns and never assume the result fits in memory.</li>
+<li><strong>Using <code>executemany()</code> for SELECT</strong> - PEP 249 does not define this. Behavior varies by driver and produces silent bugs. Use plain <code>execute()</code> for SELECT.</li>
+<li><strong>Trusting <code>rowcount</code> after SELECT</strong> - most drivers return -1 or only set it after a full fetch. Run <code>SELECT COUNT(*)</code> separately when you need a count.</li>
+<li><strong>Leaving <code>arraysize</code> at the default of 1</strong> - on drivers with server-side cursors, you pay a network round-trip per row. Tune to 100-1000 for ETL workloads.</li>
+<li><strong>Reusing the same cursor mid-iteration</strong> - executing a new statement on a cursor invalidates its current result set. Use a second cursor or materialize the rows first.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li><code>execute()</code> runs a single statement; <code>executemany()</code> is the bulk-write variant of the same statement.</li>
+<li>Pick <code>fetchone</code>/<code>fetchall</code>/<code>fetchmany</code>/<code>for row in cur</code> based on result size, not habit.</li>
+<li><code>for row in cursor</code> is the streaming default and prevents OOM on large results.</li>
+<li>Tuning <code>arraysize</code> enables driver-side prefetching and cuts round-trips.</li>
+<li>Trust <code>rowcount</code> only for INSERT/UPDATE/DELETE.</li>
+</ul>
+<p>The next episode covers parameter binding and SQL injection defense.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Bulk-inserted rows with executemany in a single call.</li>
+<li>[ ] Used fetchmany to read in chunks and bound memory usage.</li>
+<li>[ ] Built a dict-row helper from cursor.description.</li>
+<li>[ ] Combined a generator with fetchmany for a streaming pipeline.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><strong>execute, executemany, and Fetch Patterns (current)</strong></li>
+<li>Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)</li>
+<li>Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
+<li>Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
+<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0249/#cursor-methods">PEP 249 - Cursor methods</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.executemany">Python sqlite3 - Cursor.executemany</a></li>
+<li><a href="https://www.psycopg.org/psycopg3/docs/advanced/cursors.html">psycopg 3 - Server-side cursors</a></li>
+<li><a href="https://www.sqlite.org/faq.html#q19">SQLite - Optimizing INSERT performance</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

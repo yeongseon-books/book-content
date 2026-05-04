@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</h1>
+<blockquote>
+<p>SQLAlchemy 101 series (2/10)</p>
+</blockquote>
+<hr>
+<p>In post 1 we looked at what an Engine and a Connection are, and how to execute raw SQL with <code>text()</code>. But if you only ever use raw SQL, you've thrown away half the value of SQLAlchemy. The real power shows up when your schema itself becomes a Python object you can build SQL from, and the same definition supports multiple databases.</p>
+<p>This post covers the heart of SQLAlchemy Core: <code>MetaData</code>, <code>Table</code>, <code>Column</code>, and the type system. The schema objects you build here become the raw material for the select/insert/update/delete in post 3, and they evolve naturally into the ORM's <code>mapped_column</code> from post 4 onward. Even if you only plan to use the ORM, you need this layer to understand migrations and reflection.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>What a <code>MetaData</code> object is and why it becomes the single source of truth for your schema</li>
+<li>How to declare a <code>Table</code> in Python, and the key <code>Column</code> options (primary_key, nullable, unique, index, default, server_default)</li>
+<li>How SQLAlchemy's generic types (<code>Integer</code>, <code>String</code>, <code>Text</code>, <code>Boolean</code>, <code>DateTime</code>, <code>Numeric</code>, <code>JSON</code>) map to SQLite affinities</li>
+<li>How to bootstrap and tear down schema with <code>metadata.create_all(engine)</code> / <code>drop_all(engine)</code></li>
+<li><code>ForeignKey</code> and <code>ForeignKeyConstraint</code>, plus what it takes to make <code>ON DELETE CASCADE</code> actually work on SQLite</li>
+<li>How to express composite keys, named constraints, and <code>Index</code> in Python</li>
+<li>How to pull a schema from an existing database via reflection (<code>Table(..., autoload_with=engine)</code>)</li>
+</ul>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Is schema modeling worthwhile if I only use Core, no ORM?</li>
+<li>Should there be exactly one <code>MetaData</code> per app, or can I have several?</li>
+<li>What's the practical difference between <code>String</code> and <code>Text</code> on SQLite?</li>
+<li>When should I use <code>default</code> vs <code>server_default</code>?</li>
+<li>Why does <code>ON DELETE CASCADE</code> silently not work on SQLite?</li>
+<li>How do I read the schema of an existing database into SQLAlchemy?</li>
+</ul>
+<h2>Why this matters</h2>
+<p>Managing schema with raw SQL has one big problem: when the column names in your INSERT/SELECT statements drift from the actual schema, you don't find out until runtime. A <code>no such column</code> error suddenly appears in production, and your IDE can't even autocomplete column names.</p>
+<p>SQLAlchemy Core keeps the schema as Python objects, so you can build SQL through those objects. A typo in a column name turns into an <code>AttributeError</code> at import time, your IDE autocompletes <code>users.c.name</code>, and the same definition is reused by Alembic's autogenerate, Pandas' <code>read_sql</code>, FastAPI's SQL building, and more.</p>
+<p>To handle types consistently across SQLite and other dialects, you also need a generic type system. When you write <code>String(255)</code>, it expands to <code>VARCHAR(255)</code> on PostgreSQL and to <code>VARCHAR(255)</code> (TEXT affinity in practice) on SQLite. That's the layer that lets the same code run on SQLite locally and PostgreSQL in production.</p>
+<p>Finally, the <code>MetaData</code> becomes Alembic's <code>target_metadata</code>, the basis for autogenerated migrations. The schema you define in this post is also the starting point for the alembic-101 series.</p>
+<h2>Mental Model</h2>
+<p><code>MetaData</code> is a <strong>catalog</strong> of your schema. It's a container that holds every <code>Table</code> definition your application knows about, and you hand the entire container to an Engine to create or compare the schema in one go.</p>
+<blockquote>
+<p>MetaData is your application's schema specification. A Table is a page in that spec, and a Column is one line on a page. Without an Engine, MetaData is just an in-memory document. Without MetaData, an Engine has nothing to build.</p>
+</blockquote>
+<pre><code>                    MetaData (in-memory catalog)
+                         │
+        ┌────────────────┼────────────────┐
+        ▼                ▼                ▼
+    Table(&quot;users&quot;)  Table(&quot;posts&quot;)  Table(&quot;tags&quot;)
+        │
+   ┌────┼────┐
+   ▼    ▼    ▼
+  Col  Col  Col
+ (id, name, email)
+        │
+        ▼
+  metadata.create_all(engine)
+        │
+        ▼
+   Issues CREATE TABLE against SQLite file
+</code></pre>
+<p>The Core flow is:</p>
+<ol>
+<li><code>metadata = MetaData()</code> creates the catalog.</li>
+<li><code>users = Table("users", metadata, Column(...), ...)</code> registers a page (it auto-attaches to metadata at construction time).</li>
+<li><code>metadata.create_all(engine)</code> materializes the tables in the SQLite file.</li>
+<li>From then on, you reference <code>users.c.name</code>, <code>users.insert()</code>, <code>select(users)</code> to build SQL.</li>
+</ol>
+<h2>Core concepts</h2>
+<p><strong>MetaData</strong></p>
+<pre><code class="language-python">from sqlalchemy import MetaData
+
+metadata = MetaData()
+</code></pre>
+<p><code>MetaData()</code> creates an empty catalog. Most apps keep one of these as a module-level global, typically in something like <code>db.py</code>. Multiple instances are useful when you want to namespace schemas explicitly (multi-tenant, plugin systems).</p>
+<p>The <code>naming_convention</code> argument controls how SQLAlchemy generates names for constraints.</p>
+<pre><code class="language-python">metadata = MetaData(
+    naming_convention={
+        &quot;ix&quot;: &quot;ix_%(table_name)s_%(column_0_name)s&quot;,
+        &quot;uq&quot;: &quot;uq_%(table_name)s_%(column_0_name)s&quot;,
+        &quot;fk&quot;: &quot;fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s&quot;,
+        &quot;pk&quot;: &quot;pk_%(table_name)s&quot;,
+        &quot;ck&quot;: &quot;ck_%(table_name)s_%(constraint_name)s&quot;,
+    }
+)
+</code></pre>
+<p>A naming convention is critical when Alembic generates ALTER TABLE statements. Without consistent names, <code>DROP CONSTRAINT</code> may not work.</p>
+<p><strong>Table and Column</strong></p>
+<pre><code class="language-python">from sqlalchemy import Table, Column, Integer, String, DateTime
+from datetime import datetime, timezone
+
+users = Table(
+    &quot;users&quot;,
+    metadata,
+    Column(&quot;id&quot;, Integer, primary_key=True, autoincrement=True),
+    Column(&quot;name&quot;, String(100), nullable=False),
+    Column(&quot;email&quot;, String(255), nullable=False, unique=True),
+    Column(&quot;created_at&quot;, DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)),
+)
+</code></pre>
+<p>The <code>Table</code> constructor takes the table name, the <code>MetaData</code>, then a varargs sequence of <code>Column</code> and constraint objects. Common <code>Column</code> options:</p>
+<p><strong><code>primary_key=True</code></strong><br>
+- Meaning: Member of the PK</p>
+<p><strong><code>nullable=False</code></strong><br>
+- Meaning: NOT NULL</p>
+<p><strong><code>unique=True</code></strong><br>
+- Meaning: Auto-create UNIQUE constraint</p>
+<p><strong><code>index=True</code></strong><br>
+- Meaning: Auto-create single-column INDEX</p>
+<p><strong><code>default=value_or_callable</code></strong><br>
+- Meaning: Python-side default</p>
+<p><strong><code>server_default=text("...")</code></strong><br>
+- Meaning: DB-side DEFAULT clause</p>
+<p><strong><code>onupdate=value_or_callable</code></strong><br>
+- Meaning: Auto-applied on UPDATE</p>
+<p><code>default</code> vs <code>server_default</code> is a frequent source of confusion. <code>default</code> is filled in by SQLAlchemy when Python issues the INSERT. <code>server_default</code> is emitted as the database's <code>DEFAULT</code> clause and works even when raw SQL inserts the row. You almost never want both, so pick one per column.</p>
+<p><strong>Type system and SQLite affinities</strong></p>
+<p>SQLAlchemy expands generic types into dialect-specific types. Common mappings:</p>
+<p><strong><code>Integer</code></strong><br>
+- SQLite resolution: <code>INTEGER</code><br>
+- Notes: 64-bit</p>
+<p><strong><code>String(n)</code></strong><br>
+- SQLite resolution: <code>VARCHAR(n)</code> (TEXT affinity)<br>
+- Notes: SQLite does not enforce length</p>
+<p><strong><code>Text</code></strong><br>
+- SQLite resolution: <code>TEXT</code><br>
+- Notes: Explicitly unbounded</p>
+<p><strong><code>Boolean</code></strong><br>
+- SQLite resolution: <code>BOOLEAN</code> (NUMERIC affinity)<br>
+- Notes: Stored as 0/1</p>
+<p><strong><code>DateTime</code></strong><br>
+- SQLite resolution: <code>DATETIME</code> (TEXT affinity)<br>
+- Notes: ISO-8601 string</p>
+<p><strong><code>Numeric(precision, scale)</code></strong><br>
+- SQLite resolution: <code>NUMERIC</code><br>
+- Notes: Avoids floating point</p>
+<p><strong><code>JSON</code></strong><br>
+- SQLite resolution: <code>JSON</code> (native since 1.x)<br>
+- Notes: Use <code>json_extract()</code></p>
+<p><strong><code>LargeBinary</code></strong><br>
+- SQLite resolution: <code>BLOB</code><br>
+- Notes: bytes</p>
+<p>SQLite uses type affinity, which means a column type is more of a hint than a hard contract. So <code>String(100)</code> won't actually reject a 200-character string; if you need length enforcement, validate it in your application or with a <code>CHECK</code> constraint.</p>
+<p><code>DateTime</code> is stored as an ISO-8601 string in SQLite. To handle timezone-aware datetimes safely, always store them with explicit timezone, e.g., <code>datetime.now(timezone.utc)</code>.</p>
+<p><strong>create_all and drop_all</strong></p>
+<pre><code class="language-python">metadata.create_all(engine)   # Issues CREATE TABLE IF NOT EXISTS for each table
+metadata.drop_all(engine)     # Drops in dependency order
+</code></pre>
+<p><code>create_all</code> is idempotent (thanks to <code>IF NOT EXISTS</code>). However, it does <strong>not</strong> issue ALTER TABLE for schema changes. ALTER belongs to migrations, which we'll cover in the alembic-101 series.</p>
+<p>A common test pattern:</p>
+<pre><code class="language-python">@pytest.fixture
+def engine():
+    eng = create_engine(&quot;sqlite:///:memory:&quot;)
+    metadata.create_all(eng)
+    yield eng
+    eng.dispose()
+</code></pre>
+<p><strong>ForeignKey and the SQLite trap</strong></p>
+<pre><code class="language-python">from sqlalchemy import ForeignKey
+
+posts = Table(
+    &quot;posts&quot;,
+    metadata,
+    Column(&quot;id&quot;, Integer, primary_key=True),
+    Column(&quot;user_id&quot;, Integer, ForeignKey(&quot;users.id&quot;, ondelete=&quot;CASCADE&quot;), nullable=False),
+    Column(&quot;title&quot;, String(200), nullable=False),
+)
+</code></pre>
+<p>Trap: SQLite does not enforce foreign key constraints by default. Even with <code>ondelete="CASCADE"</code>, nothing will happen unless you turn on <code>PRAGMA foreign_keys = ON</code> (from post 1). The PRAGMA is connection-scoped, so apply it in a connect event.</p>
+<pre><code class="language-python">from sqlalchemy import event
+
+@event.listens_for(engine, &quot;connect&quot;)
+def _enable_fk(dbapi_conn, _):
+    cur = dbapi_conn.cursor()
+    cur.execute(&quot;PRAGMA foreign_keys = ON&quot;)
+    cur.close()
+</code></pre>
+<p><strong>Composite constraints and Index</strong></p>
+<p>Multi-column constraints are declared explicitly with <code>PrimaryKeyConstraint</code>, <code>UniqueConstraint</code>, <code>ForeignKeyConstraint</code>, and <code>Index</code>.</p>
+<pre><code class="language-python">from sqlalchemy import UniqueConstraint, Index
+
+memberships = Table(
+    &quot;memberships&quot;,
+    metadata,
+    Column(&quot;user_id&quot;, Integer, ForeignKey(&quot;users.id&quot;), nullable=False),
+    Column(&quot;group_id&quot;, Integer, ForeignKey(&quot;groups.id&quot;), nullable=False),
+    Column(&quot;role&quot;, String(20), nullable=False),
+    UniqueConstraint(&quot;user_id&quot;, &quot;group_id&quot;, name=&quot;uq_membership_user_group&quot;),
+    Index(&quot;ix_membership_role&quot;, &quot;role&quot;),
+)
+</code></pre>
+<p>For a composite primary key, mark both columns with <code>primary_key=True</code>.</p>
+<p><strong>Reflection</strong></p>
+<p>When tables already exist in a SQLite file and you want SQLAlchemy to learn the schema:</p>
+<pre><code class="language-python">from sqlalchemy import Table, MetaData, create_engine
+
+engine = create_engine(&quot;sqlite:///legacy.db&quot;)
+metadata = MetaData()
+users = Table(&quot;users&quot;, metadata, autoload_with=engine)
+print([c.name for c in users.columns])
+</code></pre>
+<p>To reflect everything at once, use <code>metadata.reflect(bind=engine)</code>. This is invaluable when migrating a legacy database into SQLAlchemy gradually.</p>
+<h2>Before-After</h2>
+<p><strong>Before: schema as raw SQL strings</strong></p>
+<pre><code class="language-python">DDL = &quot;&quot;&quot;
+CREATE TABLE IF NOT EXISTS users(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL
+);
+&quot;&quot;&quot;
+
+with engine.begin() as conn:
+    conn.execute(text(DDL))
+
+# Elsewhere, an INSERT
+conn.execute(text(&quot;INSERT INTO users(name, emai, created_at) VALUES (:n, :e, :c)&quot;),
+             {&quot;n&quot;: &quot;Alice&quot;, &quot;e&quot;: &quot;alice@example.com&quot;, &quot;c&quot;: &quot;...&quot;})
+# typo (emai) only surfaces as OperationalError at runtime.
+</code></pre>
+<p><strong>After: MetaData + Table</strong></p>
+<pre><code class="language-python">from sqlalchemy import MetaData, Table, Column, Integer, String, DateTime, insert
+from datetime import datetime, timezone
+
+metadata = MetaData()
+
+users = Table(
+    &quot;users&quot;,
+    metadata,
+    Column(&quot;id&quot;, Integer, primary_key=True, autoincrement=True),
+    Column(&quot;name&quot;, String(100), nullable=False),
+    Column(&quot;email&quot;, String(255), nullable=False, unique=True),
+    Column(&quot;created_at&quot;, DateTime, nullable=False,
+           default=lambda: datetime.now(timezone.utc)),
+)
+
+metadata.create_all(engine)
+
+with engine.begin() as conn:
+    conn.execute(insert(users).values(name=&quot;Alice&quot;, email=&quot;alice@example.com&quot;))
+    # users.c.emai → AttributeError raised by IDE/runtime immediately
+</code></pre>
+<p>Now column-name typos are caught at schema definition time or via IDE autocompletion. You reference columns through <code>users.c.name</code>, and reuse the same schema object across select/insert/update.</p>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1: A schema module</strong></p>
+<p><code>schema.py</code>:</p>
+<pre><code class="language-python">from sqlalchemy import (
+    MetaData, Table, Column, Integer, String, Text, DateTime, ForeignKey,
+    UniqueConstraint, Index,
+)
+from datetime import datetime, timezone
+
+metadata = MetaData(
+    naming_convention={
+        &quot;ix&quot;: &quot;ix_%(table_name)s_%(column_0_name)s&quot;,
+        &quot;uq&quot;: &quot;uq_%(table_name)s_%(column_0_name)s&quot;,
+        &quot;fk&quot;: &quot;fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s&quot;,
+        &quot;pk&quot;: &quot;pk_%(table_name)s&quot;,
+    }
+)
+
+users = Table(
+    &quot;users&quot;, metadata,
+    Column(&quot;id&quot;, Integer, primary_key=True, autoincrement=True),
+    Column(&quot;name&quot;, String(100), nullable=False),
+    Column(&quot;email&quot;, String(255), nullable=False, unique=True),
+    Column(&quot;created_at&quot;, DateTime, nullable=False,
+           default=lambda: datetime.now(timezone.utc)),
+)
+
+posts = Table(
+    &quot;posts&quot;, metadata,
+    Column(&quot;id&quot;, Integer, primary_key=True, autoincrement=True),
+    Column(&quot;user_id&quot;, Integer,
+           ForeignKey(&quot;users.id&quot;, ondelete=&quot;CASCADE&quot;), nullable=False),
+    Column(&quot;title&quot;, String(200), nullable=False),
+    Column(&quot;body&quot;, Text, nullable=False),
+    Column(&quot;created_at&quot;, DateTime, nullable=False,
+           default=lambda: datetime.now(timezone.utc)),
+    Index(&quot;ix_posts_user_id_created&quot;, &quot;user_id&quot;, &quot;created_at&quot;),
+)
+</code></pre>
+<p><strong>Step 2: Apply the schema</strong></p>
+<pre><code class="language-python">from sqlalchemy import create_engine, event
+from schema import metadata
+
+engine = create_engine(&quot;sqlite:///app.db&quot;, echo=True)
+
+@event.listens_for(engine, &quot;connect&quot;)
+def _enable_fk(dbapi_conn, _):
+    cur = dbapi_conn.cursor(); cur.execute(&quot;PRAGMA foreign_keys = ON&quot;); cur.close()
+
+metadata.create_all(engine)
+</code></pre>
+<p>With <code>echo=True</code>, you can watch the actual CREATE TABLE / CREATE INDEX statements that SQLAlchemy emits.</p>
+<p><strong>Step 3: Inspect SQLite type affinity</strong></p>
+<pre><code class="language-python">with engine.connect() as conn:
+    rows = conn.execute(text(&quot;SELECT name, type FROM pragma_table_info('users')&quot;)).all()
+    for r in rows:
+        print(r.name, r.type)
+</code></pre>
+<p><code>String(100)</code> shows up as <code>VARCHAR(100)</code>, <code>DateTime</code> as <code>DATETIME</code>. But remember, SQLite's affinity model means <code>VARCHAR(100)</code> won't enforce the length.</p>
+<p><strong>Step 4: Verify ON DELETE CASCADE</strong></p>
+<pre><code class="language-python">from sqlalchemy import insert, delete, select
+
+with engine.begin() as conn:
+    uid = conn.execute(insert(users).values(name=&quot;Alice&quot;, email=&quot;a@example.com&quot;)).inserted_primary_key[0]
+    conn.execute(insert(posts).values(user_id=uid, title=&quot;hi&quot;, body=&quot;hello&quot;))
+    conn.execute(delete(users).where(users.c.id == uid))
+    remaining = conn.execute(select(posts)).all()
+    assert remaining == []
+</code></pre>
+<p>Run the same code with an Engine that doesn't enable <code>PRAGMA foreign_keys = ON</code> and the final <code>assert</code> fails. That single line of difference captures the SQLite trap.</p>
+<p><strong>Step 5: Reflection</strong></p>
+<pre><code class="language-python">from sqlalchemy import MetaData, Table
+
+reflected = MetaData()
+users_r = Table(&quot;users&quot;, reflected, autoload_with=engine)
+print([c.name for c in users_r.columns])
+print([(c.name, c.type) for c in users_r.columns])
+</code></pre>
+<p>You can pull an existing schema and use it for SQL building immediately.</p>
+<h2>Common mistakes</h2>
+<p><strong>1. Creating a fresh <code>MetaData</code> inside a function.</strong> Like the Engine, it should be a module-level singleton. Multiple catalogs scatter your table definitions and confuse reflection and migration tools.</p>
+<p><strong>2. Starting without <code>naming_convention</code>.</strong> It hurts a lot the day you adopt Alembic. The disciplined choice is to set a naming convention from day one.</p>
+<p><strong>3. Writing <code>ON DELETE CASCADE</code> on SQLite without enabling the PRAGMA.</strong> It becomes a silent bug. Always pair it with the connect event from post 1.</p>
+<p><strong>4. Using both <code>default</code> and <code>server_default</code>.</strong> When values come from two places, you can't easily tell which one filled in a row. Pick one per column.</p>
+<p><strong>5. Trusting <code>String(n)</code> length enforcement on SQLite.</strong> SQLite won't reject longer strings. Validate length in the application or via a <code>CHECK</code> constraint.</p>
+<p><strong>6. Leaving every <code>Column</code> as <code>nullable=True</code>.</strong> The default is <code>nullable=True</code>. If you don't actually want NULLs, write <code>nullable=False</code> explicitly.</p>
+<h2>Real-world application</h2>
+<p>In real apps, <code>MetaData</code> lives in a single module and <code>Table</code> definitions are split by domain.</p>
+<pre><code>app/
+  db/
+    __init__.py        # metadata, engine, get_conn
+    users.py           # users Table
+    posts.py           # posts Table
+    schema.py          # imports the above so they auto-register on metadata
+</code></pre>
+<p>Once <code>schema.py</code> does <code>from . import users, posts</code>, the <code>Table</code> objects auto-attach to <code>metadata</code> at import time. Anywhere else, <code>from app.db.schema import metadata</code> gives you the entire schema.</p>
+<p>Another common pattern is sharing the same <code>metadata</code> between Core <code>Table</code> and ORM declarative base. When the ORM's declarative base uses the same <code>metadata</code> object, a single <code>metadata.create_all(engine)</code> call materializes both layers. We dive into that in the ORM posts.</p>
+<p>In production, prefer Alembic migrations over <code>metadata.create_all</code>. But for test fixtures, local dev DB initialization, and demos, <code>create_all</code> is still the fastest bootstrap.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>MetaData</code> is a module-level singleton</li>
+<li>[ ] You configured <code>naming_convention</code> from the very start</li>
+<li>[ ] Every <code>Column</code> has an explicit <code>nullable</code> choice</li>
+<li>[ ] You have a rule for choosing <code>String(n)</code> vs <code>Text</code> (bounded vs unbounded)</li>
+<li>[ ] You use only one of <code>default</code> / <code>server_default</code> per column</li>
+<li>[ ] When using <code>ForeignKey(ondelete=...)</code> on SQLite, you also enable <code>PRAGMA foreign_keys = ON</code></li>
+<li>[ ] Composite constraints are declared with explicit <code>UniqueConstraint</code>/<code>Index</code></li>
+<li>[ ] You know reflection is available via <code>autoload_with=engine</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>MetaData</code> and define <code>users(id, name, email)</code> and <code>posts(id, user_id FK→users.id, title, body)</code>. Materialize via <code>metadata.create_all(engine)</code>, then print column names and types using <code>pragma_table_info</code>.</li>
+<li>Apply <code>ondelete="CASCADE"</code> on <code>posts.user_id</code>. Run a DELETE on the parent against two Engines: one with the <code>foreign_keys</code> PRAGMA enabled, one without. Compare child-row outcomes.</li>
+<li>Build the same schema with and without <code>naming_convention</code>. Inspect the <code>sqlite_master</code> table to compare the auto-generated names of indexes and unique constraints.</li>
+<li>Pre-create a <code>legacy(id INTEGER PRIMARY KEY, payload TEXT)</code> table via raw SQL on a SQLite file. Then use <code>Table("legacy", metadata, autoload_with=engine)</code> to reflect it, and use the reflected <code>Table</code> to INSERT and SELECT rows.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<p>In this post we met SQLAlchemy Core's schema layer. <code>MetaData</code> is the catalog of your application's schema, <code>Table</code>/<code>Column</code> are its entries, and the generic type system rides on top of SQLite's affinity model. <code>create_all</code>/<code>drop_all</code> are quick ways to bootstrap, and reflection lets you import an existing database into SQLAlchemy.</p>
+<p>Next post we use these schema objects to build SQL for real. We'll cover 2.x style <code>select()</code>, <code>insert()</code>, <code>update()</code>, <code>delete()</code>, and how to work with <code>Result</code> and <code>Row</code>. From post 4 onward, the ORM enters; the <code>mapped_column</code> you'll see there is essentially the same <code>Column</code> object from this post.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><strong>SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (current)</strong></li>
+<li>SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)</li>
+<li>ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)</li>
+<li>Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)</li>
+<li>ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)</li>
+<li>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)</li>
+<li>Events, hybrid_property, and custom types (upcoming)</li>
+<li>Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
+<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.sqlalchemy.org/en/20/tutorial/metadata.html">SQLAlchemy 2.x - Working with Database Metadata</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/core/types.html">SQLAlchemy 2.x - Column and Data Types</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/core/constraints.html">SQLAlchemy 2.x - Constraints and Indexes</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/core/reflection.html">SQLAlchemy 2.x - Reflecting Database Objects</a></li>
+<li><a href="https://www.sqlite.org/datatype3.html">SQLite Datatypes In SQLite Version 3</a></li>
+</ul>
+<p class="tags-line">Tags: Python, SQLAlchemy, ORM, Database</p>
+</body>
+</html>

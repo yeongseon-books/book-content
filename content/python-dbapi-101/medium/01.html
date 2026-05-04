@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Why DB-API 2.0 - The Problem PEP 249 Solved</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Why DB-API 2.0 - The Problem PEP 249 Solved</h1>
+<blockquote>
+<p>Python DB-API 101 series (1/10)</p>
+</blockquote>
+<hr>
+<p>If you have used Python with a database, you have probably touched <code>sqlite3</code>, <code>psycopg</code>, <code>pymysql</code>, or <code>oracledb</code>. Their APIs feel oddly similar: <code>connect()</code> to open a connection, <code>cursor()</code> to get a cursor, <code>execute()</code> to run a query, <code>fetchone()</code> / <code>fetchall()</code> to read results. That uniformity is not a coincidence. It comes from a 1996 standard called <strong>PEP 249 — Python Database API Specification v2.0</strong> (DB-API 2.0 for short).</p>
+<p>This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.</p>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How was database access done in Python before PEP 249?</li>
+<li>What five things did DB-API 2.0 actually standardize?</li>
+<li>Why does paramstyle differ across drivers, and how do you protect your code?</li>
+<li>Where does DB-API stop and other layers begin?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
+<h2>1. The Chaos Before DB-API</h2>
+<p>Before the standard, every database library had its own API.</p>
+<pre><code class="language-python"># Imagined old oracle module
+conn = oracle.open(&quot;dsn&quot;, &quot;user&quot;, &quot;pass&quot;)
+result = oracle.run_sql(conn, &quot;SELECT * FROM users&quot;)
+rows = oracle.read_all(result)
+
+# Imagined old mysql module
+db = mysql.connect(&quot;server&quot;)
+db.send(&quot;SELECT * FROM users&quot;)
+data = db.receive_rows()
+</code></pre>
+<p>Function names, argument order, and return types were all different. Even within a single team, Oracle code and MySQL code looked completely different, and swapping databases meant rewriting the codebase.</p>
+<h2>2. Five Things PEP 249 Standardized</h2>
+<p>DB-API 2.0 defines a minimal contract every driver must satisfy.</p>
+<ol>
+<li><strong>Module-level constants</strong>: <code>apilevel</code>, <code>threadsafety</code>, <code>paramstyle</code></li>
+<li><strong>Connection objects</strong>: <code>connect()</code>, <code>close()</code>, <code>commit()</code>, <code>rollback()</code>, <code>cursor()</code></li>
+<li><strong>Cursor objects</strong>: <code>execute()</code>, <code>executemany()</code>, <code>fetchone()</code>, <code>fetchall()</code>, <code>fetchmany()</code>, <code>rowcount</code>, <code>description</code></li>
+<li><strong>Type objects</strong>: <code>Date</code>, <code>Time</code>, <code>Timestamp</code>, <code>Binary</code>, <code>STRING</code>, <code>NUMBER</code>, <code>DATETIME</code>, <code>ROWID</code></li>
+<li><strong>Exception hierarchy</strong>: <code>Error</code> -&gt; <code>InterfaceError</code>, <code>DatabaseError</code> -&gt; <code>DataError</code>, <code>OperationalError</code>, <code>IntegrityError</code>, <code>InternalError</code>, <code>ProgrammingError</code>, <code>NotSupportedError</code></li>
+</ol>
+<p>Even at this minimum, application code becomes much more flexible across drivers.</p>
+<h2>3. Your First DB-API Code with SQLite</h2>
+<p>This series uses SQLite for every example. SQLite ships with the Python standard library (<code>sqlite3</code>), so there is nothing to install, and a database is just one file. Setup time is essentially zero.</p>
+<pre><code class="language-python">import sqlite3
+
+# 1. Open a connection — the file is auto-created if missing
+conn = sqlite3.connect(&quot;notes.db&quot;)
+
+# 2. Acquire a cursor
+cur = conn.cursor()
+
+# 3. Prepare schema
+cur.execute(&quot;&quot;&quot;
+    CREATE TABLE IF NOT EXISTS notes (
+        id INTEGER PRIMARY KEY,
+        title TEXT NOT NULL,
+        body TEXT
+    )
+&quot;&quot;&quot;)
+
+# 4. INSERT with parameter binding
+cur.execute(
+    &quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;,
+    (&quot;Starting DB-API&quot;, &quot;First PEP 249 example&quot;),
+)
+
+# 5. Commit the transaction
+conn.commit()
+
+# 6. SELECT
+cur.execute(&quot;SELECT id, title FROM notes&quot;)
+for row in cur.fetchall():
+    print(row)
+
+# 7. Cleanup
+cur.close()
+conn.close()
+</code></pre>
+<p>These seven steps are nearly identical for PostgreSQL and MySQL. The differences are limited to <code>connect()</code> arguments and <code>paramstyle</code>.</p>
+<h2>4. Only paramstyle Really Differs</h2>
+<p>PEP 249 allows five paramstyles.</p>
+<p><strong><code>qmark</code></strong><br>
+- Example: <code>WHERE id = ?</code><br>
+- Drivers: sqlite3</p>
+<p><strong><code>numeric</code></strong><br>
+- Example: <code>WHERE id = :1</code><br>
+- Drivers: oracledb</p>
+<p><strong><code>named</code></strong><br>
+- Example: <code>WHERE id = :id</code><br>
+- Drivers: sqlite3, oracledb</p>
+<p><strong><code>format</code></strong><br>
+- Example: <code>WHERE id = %s</code><br>
+- Drivers: psycopg2 (legacy), pymysql</p>
+<p><strong><code>pyformat</code></strong><br>
+- Example: <code>WHERE id = %(id)s</code><br>
+- Drivers: psycopg2</p>
+<p>Read <code>module.paramstyle</code> after import to see which one a driver uses.</p>
+<pre><code class="language-python">import sqlite3
+print(sqlite3.paramstyle)  # 'qmark'
+</code></pre>
+<p>Abstracting away this single difference is most of what makes driver swaps painless. Libraries like SQLAlchemy automatically absorb it (we will cover SQLAlchemy in the next series).</p>
+<h2>5. Porting the Same Code to PostgreSQL</h2>
+<p>The SQLite example above moves to psycopg (PostgreSQL driver) with almost no changes.</p>
+<pre><code class="language-python">import psycopg
+
+conn = psycopg.connect(&quot;dbname=notes user=postgres password=secret&quot;)
+cur = conn.cursor()
+
+cur.execute(&quot;&quot;&quot;
+    CREATE TABLE IF NOT EXISTS notes (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        body TEXT
+    )
+&quot;&quot;&quot;)
+
+cur.execute(
+    &quot;INSERT INTO notes (title, body) VALUES (%s, %s)&quot;,  # qmark -&gt; format
+    (&quot;Starting DB-API&quot;, &quot;First PEP 249 example&quot;),
+)
+conn.commit()
+
+cur.execute(&quot;SELECT id, title FROM notes&quot;)
+for row in cur.fetchall():
+    print(row)
+
+cur.close()
+conn.close()
+</code></pre>
+<p>Three things changed: the <code>import</code> line, the <code>connect()</code> arguments, and the parameter style (<code>?</code> -&gt; <code>%s</code>). All application logic (execute, fetchall, commit, rollback) keeps working as-is.</p>
+<h2>6. What DB-API Does Not Cover</h2>
+<p>A standard does not standardize everything. PEP 249 deliberately leaves several areas untouched.</p>
+<ul>
+<li><strong>Connection pooling</strong>: up to the driver or library (sqlite3 prefers a single connection; psycopg ships <code>psycopg_pool</code> separately)</li>
+<li><strong>Async API</strong>: PEP 249 itself is sync; async lives in <code>aiosqlite</code>, <code>asyncpg</code>, <code>aiomysql</code></li>
+<li><strong>ORM features</strong>: SQLAlchemy, Django ORM, Tortoise ORM are separate abstractions</li>
+<li><strong>Schema migrations</strong>: Alembic and Django migrations live above DB-API</li>
+<li><strong>Server-side cursor details</strong>: only partially standardized; mostly driver extensions</li>
+</ul>
+<p>Filling these gaps is exactly why higher-level libraries like SQLAlchemy, Alembic, and FastAPI + databases exist.</p>
+<h2>Five Common Pitfalls</h2>
+<p><strong>1. Autocommit varies by driver</strong></p>
+<p>PEP 249 assumes explicit transactions. SQLite defaults to "implicit transaction begin", while PostgreSQL and MySQL default to autocommit OFF. Forgetting <code>conn.commit()</code> produces driver-dependent behavior.</p>
+<p><strong>2. Forgetting to close the cursor</strong></p>
+<p>Skipping <code>cur.close()</code> works because GC eventually cleans up, but PostgreSQL with server-side cursors can look like a connection leak. Use <code>with conn.cursor() as cur:</code> (when the driver supports it) as a habit.</p>
+<p><strong>3. fetchall() on large results</strong></p>
+<p><code>fetchall()</code> materializes every row in memory. A million rows is OOM territory. For large results use <code>fetchmany(size=1000)</code> or the cursor's own iterator.</p>
+<pre><code class="language-python">cur.execute(&quot;SELECT * FROM big_table&quot;)
+for row in cur:  # streaming iteration
+    process(row)
+</code></pre>
+<p><strong>4. Building execute() with string concatenation</strong></p>
+<pre><code class="language-python"># Never do this — SQL injection
+cur.execute(f&quot;SELECT * FROM users WHERE name = '{name}'&quot;)
+</code></pre>
+<p>Always use parameter binding. Episode 4 covers this in detail.</p>
+<p><strong>5. Sharing one connection across threads</strong></p>
+<p>Drivers with <code>threadsafety=1</code> cannot share a connection between threads. sqlite3 defaults to <code>check_same_thread=True</code>, raising an error if used from another thread. In multi-threaded apps, create a connection per thread or use a connection pool.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>DB-API 2.0 (PEP 249) is the minimum contract every Python database driver follows.</li>
+<li>The seven steps connect → cursor → execute → fetch → commit → close are identical across sqlite3, psycopg, and pymysql.</li>
+<li>The biggest driver-to-driver difference is <code>paramstyle</code>; the rest of the application code stays the same.</li>
+<li>DB-API intentionally leaves connection pooling, async, ORM, and migrations to higher-level libraries.</li>
+<li>Autocommit, cursor cleanup, fetchall memory, SQL injection, and thread safety are the most common early pitfalls.</li>
+</ul>
+<p>The next episode digs into the connection and cursor lifecycle and the context-manager patterns that make them safe.</p>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Ran a full connect → cursor → execute → fetch → close cycle with sqlite3.</li>
+<li>[ ] Identified what changes when porting the same code to PostgreSQL (psycopg).</li>
+<li>[ ] Can explain paramstyle differences in one sentence.</li>
+<li>[ ] Can name three things DB-API does NOT cover (pooling, ORM, migration).</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><strong>Why DB-API 2.0 - The Problem PEP 249 Solved (current)</strong></li>
+<li>Connection and Cursor Lifecycle (upcoming)</li>
+<li>execute, executemany, and Fetch Patterns (upcoming)</li>
+<li>Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)</li>
+<li>Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
+<li>Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
+<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0249/">PEP 249 - Python Database API Specification v2.0</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html">Python sqlite3 module documentation</a></li>
+<li><a href="https://www.sqlite.org/docs.html">SQLite official documentation</a></li>
+<li><a href="https://www.psycopg.org/psycopg3/docs/">psycopg 3 documentation - DB-API 2.0 compliance</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

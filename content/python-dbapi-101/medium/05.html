@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Transactions and isolation levels (sqlite3, PEP 249)</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Transactions and isolation levels (sqlite3, PEP 249)</h1>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Why does sqlite3 issue an implicit BEGIN by default?</li>
+<li>What does <code>isolation_level=None</code> actually mean?</li>
+<li>How do <code>BEGIN DEFERRED</code>, <code>IMMEDIATE</code>, and <code>EXCLUSIVE</code> differ in lock behaviour?</li>
+<li>How does WAL mode change transaction semantics?</li>
+<li>How does Python 3.12's new <code>autocommit</code> parameter differ from the legacy <code>isolation_level</code>?</li>
+</ul>
+<blockquote>
+<p>A transaction is not "calling commit/rollback" — it is "deciding what runs as one unit." Because sqlite3 picks that unit for you automatically, you must understand the auto-behaviour to avoid surprise locks and data loss.</p>
+<p>Python DB-API 101 (5/10)</p>
+</blockquote>
+<hr>
+<h2>What you will learn</h2>
+<p>This post covers sqlite3 transaction semantics through a PEP 249 lens. Specifically:</p>
+<ol>
+<li><strong>PEP 249's transaction model</strong> — connection is the transaction scope; <code>commit()</code>/<code>rollback()</code> are the terminators.</li>
+<li><strong>sqlite3's implicit BEGIN</strong> — the driver issues <code>BEGIN</code> automatically before the first DML statement.</li>
+<li><strong>The five <code>isolation_level</code> values</strong> — <code>''</code> (default deferred), <code>'DEFERRED'</code>, <code>'IMMEDIATE'</code>, <code>'EXCLUSIVE'</code>, and <code>None</code> (autocommit).</li>
+<li><strong>WAL versus rollback journal</strong> — concurrent reader/writer behaviour.</li>
+<li><strong>Nested transactions via SAVEPOINT</strong> — what <code>with con:</code> actually does.</li>
+<li><strong>Python 3.12's <code>autocommit</code> parameter</strong> — the new explicit model.</li>
+</ol>
+<hr>
+<h2>Why this matters</h2>
+<p>Two operational data incidents dominate in production:</p>
+<ol>
+<li><strong>Forgot <code>commit()</code></strong> — INSERTs live only in memory and disappear when the process exits.</li>
+<li><strong>Unexpected <code>BEGIN IMMEDIATE</code> blocks other connections</strong> — surfaces as a 5-second timeout error to the user.</li>
+</ol>
+<p>The sqlite3 driver hides BEGIN management for convenience, and that very convenience produces both incidents above when developers do not know how it works. PEP 249 lets you control this driver behaviour explicitly via <code>isolation_level</code> (sqlite3) or the newer <code>autocommit</code> attribute.</p>
+<p>This post compares the five modes through code and lock scenarios. Once you have it laid out, roughly 80% of transaction-related production issues stop happening.</p>
+<hr>
+<h2>Mental Model — connection is the transaction scope</h2>
+<pre><code>Connection lifecycle (sqlite3 default)
+─────────────────────────────────────────
+  open
+    │
+    │  cur.execute('SELECT ...')   ← no transaction
+    │  cur.execute('INSERT ...')   ← driver issues implicit BEGIN
+    │  cur.execute('UPDATE ...')   ← same transaction
+    │
+    │  con.commit()                ← transaction ends, durable
+    │
+    │  cur.execute('INSERT ...')   ← new implicit BEGIN
+    │  con.rollback()              ← changes discarded
+    │
+  close
+</code></pre>
+<p>Two essentials:</p>
+<ul>
+<li><strong>PEP 249 assumes every connection is in a transaction</strong> — i.e., <code>autocommit=False</code> is the default.</li>
+<li><strong>sqlite3's default behaviour is "auto BEGIN before DML"</strong> — pure SELECT workloads do not open a transaction and need no commit.</li>
+</ul>
+<hr>
+<h2>Core concepts</h2>
+<p><strong>The five <code>isolation_level</code> values</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>BEGIN variant</th>
+<th>autocommit?</th>
+<th>Implicit BEGIN issued</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>''</code> (default)</td>
+<td><code>BEGIN</code> (= DEFERRED)</td>
+<td>No</td>
+<td>Before first DML</td>
+</tr>
+<tr>
+<td><code>'DEFERRED'</code></td>
+<td><code>BEGIN DEFERRED</code></td>
+<td>No</td>
+<td>Same</td>
+</tr>
+<tr>
+<td><code>'IMMEDIATE'</code></td>
+<td><code>BEGIN IMMEDIATE</code></td>
+<td>No</td>
+<td>Same — acquires RESERVED lock immediately</td>
+</tr>
+<tr>
+<td><code>'EXCLUSIVE'</code></td>
+<td><code>BEGIN EXCLUSIVE</code></td>
+<td>No</td>
+<td>Same — acquires EXCLUSIVE lock immediately</td>
+</tr>
+<tr>
+<td><code>None</code></td>
+<td>(no BEGIN)</td>
+<td><strong>Yes</strong></td>
+<td>Each statement commits immediately</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lock behaviour per BEGIN mode</strong></p>
+<p>SQLite controls concurrent access with a four-level lock: UNLOCKED → SHARED → RESERVED → PENDING → EXCLUSIVE.</p>
+<ul>
+<li><strong>DEFERRED</strong> — only <code>BEGIN</code> is issued; SHARED is taken on first read, RESERVED on first write. Other readers may proceed concurrently.</li>
+<li><strong>IMMEDIATE</strong> — RESERVED is acquired at <code>BEGIN</code> time. Other writers are blocked immediately; readers continue.</li>
+<li><strong>EXCLUSIVE</strong> — EXCLUSIVE is acquired at <code>BEGIN</code> time. All other readers and writers are blocked.</li>
+</ul>
+<p>In the default rollback journal (non-WAL), one writer and many readers may coexist; the writer briefly takes EXCLUSIVE at commit.</p>
+<p><strong>WAL mode</strong></p>
+<pre><code class="language-python">con.execute('PRAGMA journal_mode=WAL')
+</code></pre>
+<p>WAL (Write-Ahead Logging) writes changes to a sidecar <code>.wal</code> file, so <strong>readers and writers truly run concurrently</strong>. WAL is almost always recommended for production. Caveats: it creates <code>.wal</code> and <code>.shm</code> files next to the database, and it is not safe on network filesystems.</p>
+<p><strong>Python 3.12 <code>autocommit</code> parameter</strong></p>
+<pre><code class="language-python">con = sqlite3.connect(path, autocommit=False)  # PEP 249 compliant
+con = sqlite3.connect(path, autocommit=True)   # commit after every statement
+con = sqlite3.connect(path, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)  # legacy isolation_level behaviour
+</code></pre>
+<p>Since 3.12, <code>autocommit</code> is explicit and recommended. For backward compatibility, <code>LEGACY_TRANSACTION_CONTROL</code> is the default.</p>
+<hr>
+<h2>Before / After</h2>
+<p><strong>Before — missing commit</strong></p>
+<pre><code class="language-python">import sqlite3
+
+con = sqlite3.connect('shop.db')
+con.execute('CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY, total INTEGER)')
+con.execute('INSERT INTO orders(total) VALUES (10000)')
+# con.commit()  ← forgotten
+con.close()
+
+# In a new process
+con2 = sqlite3.connect('shop.db')
+print(con2.execute('SELECT COUNT(*) FROM orders').fetchone())
+# → (0,)   ← INSERT was discarded
+</code></pre>
+<p><code>con.close()</code> does NOT commit. A missing commit silently loses the changes.</p>
+<p><strong>After — context manager</strong></p>
+<pre><code class="language-python">with sqlite3.connect('shop.db') as con:
+    con.execute('INSERT INTO orders(total) VALUES (10000)')
+# Commit on normal exit, rollback on exception
+</code></pre>
+<p><code>with con:</code> is a context manager on the connection that <strong>terminates the transaction</strong>. It does not close the connection — close it separately or with <code>contextlib.closing</code>.</p>
+<hr>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1 — observe default behaviour</strong></p>
+<pre><code class="language-python">import sqlite3
+
+con = sqlite3.connect(':memory:')
+con.execute('CREATE TABLE t(v INTEGER)')
+
+# SELECT alone does not open a transaction
+con.execute('SELECT * FROM t').fetchall()
+print(con.in_transaction)   # → False
+
+# Implicit BEGIN before DML
+con.execute('INSERT INTO t(v) VALUES (1)')
+print(con.in_transaction)   # → True
+
+con.commit()
+print(con.in_transaction)   # → False
+</code></pre>
+<p><strong>Step 2 — autocommit (<code>isolation_level=None</code>)</strong></p>
+<pre><code class="language-python">con = sqlite3.connect(':memory:', isolation_level=None)
+con.execute('CREATE TABLE t(v INTEGER)')
+con.execute('INSERT INTO t(v) VALUES (1)')
+# Already durable, no commit needed
+print(con.in_transaction)   # → False
+</code></pre>
+<p>Not appropriate for batch inserts: every statement triggers an fsync, which is very slow.</p>
+<p><strong>Step 3 — IMMEDIATE to avoid lock surprises</strong></p>
+<p>In long transactions doing read → modify → write, default DEFERRED can hit SQLITE_BUSY late in the cycle. When write intent is clear, take the lock up-front with IMMEDIATE.</p>
+<pre><code class="language-python">con = sqlite3.connect('shop.db', isolation_level='IMMEDIATE')
+
+with con:
+    balance = con.execute('SELECT balance FROM accounts WHERE id=1').fetchone()[0]
+    new_balance = balance - 1000
+    con.execute('UPDATE accounts SET balance=? WHERE id=1', (new_balance,))
+</code></pre>
+<p>Other writers are blocked immediately at IMMEDIATE, so no lost-update can sneak in mid-transaction.</p>
+<p><strong>Step 4 — enable WAL</strong></p>
+<pre><code class="language-python">con = sqlite3.connect('shop.db')
+con.execute('PRAGMA journal_mode=WAL')
+con.execute('PRAGMA synchronous=NORMAL')   # safe + fast under WAL
+</code></pre>
+<p><code>journal_mode</code> is persisted at the database file level, so set it once.</p>
+<p><strong>Step 5 — nested transactions with SAVEPOINT</strong></p>
+<p>PEP 249 does not define nested transactions, but SQLite emulates them via <code>SAVEPOINT</code>.</p>
+<pre><code class="language-python">con.execute('SAVEPOINT sp1')
+try:
+    con.execute(&quot;INSERT INTO orders(total) VALUES (5000)&quot;)
+    con.execute(&quot;INSERT INTO order_items VALUES (?, ?)&quot;, (1, 'item-A'))
+    con.execute('RELEASE SAVEPOINT sp1')
+except Exception:
+    con.execute('ROLLBACK TO SAVEPOINT sp1')
+    con.execute('RELEASE SAVEPOINT sp1')
+    raise
+</code></pre>
+<p>The outer transaction stays open; only the inner savepoint partially rolls back.</p>
+<p><strong>Step 6 — explicit autocommit on Python 3.12+</strong></p>
+<pre><code class="language-python">import sqlite3
+assert sqlite3.sqlite_version_info &gt;= (3, 24)   # SAVEPOINT stable
+
+con = sqlite3.connect('shop.db', autocommit=False)
+con.execute('BEGIN IMMEDIATE')
+try:
+    con.execute('UPDATE accounts SET balance = balance - 1000 WHERE id = 1')
+    con.execute('UPDATE accounts SET balance = balance + 1000 WHERE id = 2')
+    con.commit()
+except Exception:
+    con.rollback()
+    raise
+</code></pre>
+<p>With <code>autocommit=False</code>, you write BEGIN explicitly and the driver does not interfere.</p>
+<hr>
+<h2>Common mistakes</h2>
+<ol>
+<li><strong>Assuming <code>con.close()</code> commits.</strong> It does not. Changes are lost.</li>
+<li><strong>Mistaking <code>with sqlite3.connect(...) as con:</code> for close.</strong> That context manager only terminates the transaction; the connection stays open. Close it separately or use <code>contextlib.closing</code>.</li>
+<li><strong>Default DEFERRED for long reads.</strong> A concurrent writer that commits mid-read can trigger SQLITE_BUSY. For pure reads, do not begin a transaction; for read-then-write, prefer <code>BEGIN IMMEDIATE</code>.</li>
+<li><strong>Using <code>isolation_level=None</code> for batch inserts.</strong> Per-statement fsync makes it 100–1000× slower.</li>
+<li><strong>Setting WAL on NFS/SMB.</strong> Locking semantics break and may corrupt the database. Use local disk only.</li>
+<li><strong>Assuming multiple connections share a transaction.</strong> Each connection has its own transaction context. To share, use the same connection.</li>
+<li><strong>Calling <code>PRAGMA journal_mode=WAL</code> inside a transaction.</strong> It needs an external lock and fails. Set it right after opening the connection.</li>
+<li><strong>Mixing <code>isolation_level</code> with <code>autocommit</code> on 3.12+.</strong> <code>autocommit</code> wins. New code should use <code>autocommit</code> only.</li>
+</ol>
+<hr>
+<h2>Production application</h2>
+<p><strong>Recommended baseline configuration</strong></p>
+<pre><code class="language-python">con = sqlite3.connect('app.db', timeout=5.0, isolation_level='IMMEDIATE')
+con.execute('PRAGMA journal_mode=WAL')
+con.execute('PRAGMA synchronous=NORMAL')
+con.execute('PRAGMA foreign_keys=ON')
+con.execute('PRAGMA busy_timeout=5000')
+</code></pre>
+<ul>
+<li><code>timeout=5.0</code> (Python) + <code>busy_timeout=5000</code> (SQLite) — auto-retry on lock contention for up to five seconds.</li>
+<li><code>IMMEDIATE</code> — declares write intent up-front and surfaces SQLITE_BUSY early.</li>
+<li><code>WAL</code> + <code>synchronous=NORMAL</code> — balanced concurrency and performance.</li>
+</ul>
+<p><strong>Transaction-per-request pattern (FastAPI example)</strong></p>
+<pre><code class="language-python">from contextlib import contextmanager
+
+@contextmanager
+def tx():
+    con = sqlite3.connect('app.db', isolation_level='IMMEDIATE')
+    try:
+        yield con
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+# Usage
+with tx() as con:
+    con.execute('INSERT INTO orders(total) VALUES (?)', (10000,))
+</code></pre>
+<p>One request = one transaction = one connection. Simple and easy to debug.</p>
+<p><strong>Monitoring</strong></p>
+<p>Two metrics catch most issues:</p>
+<ul>
+<li><code>SQLITE_BUSY</code> count — rising contention means too many IMMEDIATE holds or transactions running too long.</li>
+<li>Average transaction duration (ms) — once it crosses ~100 ms, it is time to split read-modify-write phases.</li>
+</ul>
+<p><strong>Backups</strong></p>
+<p>Under WAL, <code>.backup()</code> is safe.</p>
+<pre><code class="language-python">src = sqlite3.connect('app.db')
+dst = sqlite3.connect('backup.db')
+with dst:
+    src.backup(dst)
+</code></pre>
+<hr>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Always end with <code>con.commit()</code> or <code>with con:</code> before <code>con.close()</code>.</li>
+<li>[ ] Functions that write start with <code>isolation_level='IMMEDIATE'</code>.</li>
+<li>[ ] Production databases default to WAL + <code>synchronous=NORMAL</code> + <code>busy_timeout=5000</code>.</li>
+<li>[ ] Read-only queries use a separate connection or do not begin a transaction explicitly.</li>
+<li>[ ] <code>autocommit=None</code> (legacy) is never used for batch inserts.</li>
+<li>[ ] Nested behaviour uses explicit <code>SAVEPOINT</code>.</li>
+<li>[ ] New code on Python 3.12+ uses <code>autocommit=False</code> plus explicit BEGIN.</li>
+</ul>
+<hr>
+<h2>Exercises</h2>
+<ol>
+<li><strong>Missing-commit experiment.</strong> INSERT and close without <code>with con:</code>, then read from a new process and confirm zero rows. Add <code>with con:</code> and verify the change persists.</li>
+<li><strong>DEFERRED vs IMMEDIATE.</strong> Start two Python processes that both INSERT concurrently. Compare when SQLITE_BUSY appears under DEFERRED versus IMMEDIATE.</li>
+<li><strong>WAL impact.</strong> Compare throughput of five readers + one writer with <code>journal_mode=DELETE</code> (default) versus <code>WAL</code>.</li>
+<li><strong>SAVEPOINT.</strong> In a single transaction, INSERT 3 rows → SAVEPOINT → INSERT 2 more → ROLLBACK TO. Verify the row count.</li>
+<li><strong>Compare autocommit modes.</strong> On Python 3.12+, exercise <code>autocommit=True/False/LEGACY_TRANSACTION_CONTROL</code> and compare <code>con.in_transaction</code> under the same scenario.</li>
+</ol>
+<hr>
+<h2>Summary and next post</h2>
+<p>sqlite3's transaction handling is conveniently automatic, but that very automation maps directly to lock and data-loss incidents in production when you do not know the rules. Internalising the five <code>isolation_level</code> values, the BEGIN variants, and WAL mode makes most transaction-related issues diagnosable.</p>
+<p>The next post covers <strong>row factories and type adapters</strong> — returning rows as dicts, dataclasses, or Pydantic models; <code>detect_types</code> with custom adapters/converters; and safely mapping new types such as <code>Decimal</code> or <code>Enum</code>.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
+<li><strong>Transactions and isolation levels (sqlite3, PEP 249) (current)</strong></li>
+<li>Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
+<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0249/">PEP 249 – Python Database API Specification v2.0</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3-controlling-transactions">Python sqlite3 — transaction control</a></li>
+<li><a href="https://www.sqlite.org/lockingv3.html">SQLite — File Locking and Concurrency</a></li>
+<li><a href="https://www.sqlite.org/wal.html">SQLite — Write-Ahead Logging</a></li>
+<li><a href="https://www.sqlite.org/pragma.html#pragma_journal_mode">SQLite — PRAGMA journal_mode</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.autocommit">Python 3.12 sqlite3 autocommit</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

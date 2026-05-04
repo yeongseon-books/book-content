@@ -3,7 +3,7 @@ title: 컨텍스트 엔지니어링
 series: ai-agent-101
 episode: 2
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ Agent의 행동은 컨텍스트에 의해 결정됩니다. System prompt, 대화
 이번 글에서는 컨텍스트의 구성 요소, System prompt 작성 원칙, 역할 정의 방법, 지식 경계 설정, 그리고 컨텍스트 주입 패턴을 다룹니다.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- Agent의 컨텍스트는 어떤 요소들로 구성될까요?
+- System prompt를 작성할 때 가장 중요한 원칙은 무엇일까요?
+- 역할 정의·행동 규칙·지식 경계를 어떻게 분리해 적어야 할까요?
+- 컨텍스트 주입 패턴 중 어떤 상황에 어떤 패턴을 골라야 할까요?
+
+<!-- a-grade-intro:end -->
 
 ## 컨텍스트의 구성 요소
 
@@ -664,6 +675,17 @@ for case in test_cases:
 - Agent의 행동은 컨텍스트(System prompt + 대화 기록 + 도구 설명 + 상태)에 의해 결정됩니다.
 - 명확한 역할 정의와 행동 규칙이 Agent의 신뢰성을 높입니다.
 - 컨텍스트 엔지니어링은 Agent 설계의 가장 중요한 단계입니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] Agent의 컨텍스트를 system / user / tool 결과로 분해해 그렸다.
+- [ ] 역할·행동 규칙·지식 경계가 명시된 system prompt 한 개를 직접 작성했다.
+- [ ] 지식 경계 위반(hallucination 유도) 케이스를 한 번 재현했다.
+- [ ] RAG / function-calling / few-shot 중 적절한 컨텍스트 주입 패턴을 선택했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

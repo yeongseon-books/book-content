@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SQLAlchemy Core - select, insert, update, delete in 2.x Style</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SQLAlchemy Core - select, insert, update, delete in 2.x Style</h1>
+<blockquote>
+<p>SQLAlchemy 101 series (3/10)</p>
+</blockquote>
+<hr>
+<p>In post 2 we modeled our schema as Python objects with <code>MetaData</code> and <code>Table</code>. Now we're ready to build SQL using those objects. You can already execute SQL with raw <code>text()</code>, but the real value of Core SQL expressions is composing SQL out of Python while catching typos and type errors at compile time, and not getting tripped up by dialect differences.</p>
+<p>This post walks through SQLAlchemy 2.x style <code>select()</code>, <code>insert()</code>, <code>update()</code>, <code>delete()</code>, and the <code>Result</code>/<code>Row</code> objects you use to read the results. The Engine from post 1 and the schema from post 2 finally come together as a small but complete working manual.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The unified 2.x <code>select()</code> shape: <code>select(...)</code>, <code>where()</code>, <code>order_by()</code>, <code>limit()</code>, <code>offset()</code>, <code>group_by()</code>, <code>having()</code></li>
+<li>The <code>Result</code> object and the meaning of <code>.all()</code>, <code>.first()</code>, <code>.one()</code>, <code>.one_or_none()</code>, <code>.scalars()</code>, <code>.mappings()</code></li>
+<li><code>insert(table).values(...)</code> and the <code>executemany</code>-style list-of-dicts form</li>
+<li>Receiving new PKs via <code>inserted_primary_key</code> and composing INSERT-SELECT with <code>Insert.from_select()</code></li>
+<li><code>update(table).where(...).values(...)</code> and using RETURNING (SQLite 3.35+)</li>
+<li>Safe patterns for <code>delete(table).where(...)</code> and the danger of "delete everything"</li>
+<li>Two ways to express JOIN: <code>select.join()</code> and <code>select(...).select_from(a.join(b))</code></li>
+<li>Subqueries, CTEs (<code>select.cte()</code>), and basic use of <code>func.*</code> aggregate functions</li>
+</ul>
+<h2>Questions this post answers</h2>
+<ul>
+<li>How does 1.x <code>select([users])</code> differ from 2.x <code>select(users)</code>?</li>
+<li>Does <code>Result.all()</code> return <code>list[Row]</code> or <code>list[tuple]</code>?</li>
+<li>Where does the new ID go after an INSERT?</li>
+<li>What's the SQLite-friendly way to UPDATE with a LIMIT?</li>
+<li>What happens if I leave the WHERE off a DELETE?</li>
+<li>What's the most concise 2.x way to write a JOIN?</li>
+</ul>
+<h2>Why this matters</h2>
+<p>Working with raw SQL strings adds three kinds of cost over time. First, every column rename forces a project-wide grep. Second, the same SQL gets copied with subtle differences in many places, leading to subtle behavioral drift. Third, you handle dialect differences yourself.</p>
+<p>Core SQL expressions reduce the first two costs to almost zero. A column rename in the schema affects every expression at import time. You can wrap a <code>select</code> in a function and reuse it. Dialect differences are handled by SQLAlchemy's compiler.</p>
+<p>Core SQL expressions also don't go away once the ORM enters from post 4. The ORM's <code>select()</code> is the same object as Core's <code>select()</code>, and complex queries always come back down to Core. This post lays the groundwork.</p>
+<h2>Mental Model</h2>
+<p>In 2.x style, building SQL means stacking clauses through method chaining. You start with <code>select(...)</code>, call <code>where</code>, <code>order_by</code>, <code>limit</code>, etc., each call returning a new statement object. Finally, a Connection executes it and gives you a <code>Result</code>.</p>
+<blockquote>
+<p>A 2.x <code>select</code> is an immutable statement object. Each method call returns a new statement; the original doesn't mutate. A <code>Result</code> is a one-shot stream; the shape you pull out of it (<code>Row</code>, scalar, or mapping) is decided at the Result level.</p>
+</blockquote>
+<pre><code>select(users.c.id, users.c.name)        # statement 1
+   .where(users.c.email == &quot;a@x.com&quot;)   # statement 2
+   .order_by(users.c.id)                 # statement 3
+   .limit(10)                            # statement 4
+                  │
+                  ▼
+       conn.execute(stmt) → Result
+                  │
+       ┌──────────┼─────────────┐
+       ▼          ▼             ▼
+   .all()    .scalars()    .mappings()
+   list[Row] ScalarResult  MappingResult
+              .all() →     .all() →
+              list[T]      list[dict]
+</code></pre>
+<p>Once this mental model clicks, INSERT/UPDATE/DELETE follow the same shape. Only the starting function changes: <code>insert/update/delete</code>.</p>
+<h2>Core concepts</h2>
+<p><strong>select basics</strong></p>
+<pre><code class="language-python">from sqlalchemy import select
+from schema import users
+
+stmt = (
+    select(users.c.id, users.c.name)
+    .where(users.c.email == &quot;alice@example.com&quot;)
+    .order_by(users.c.id.desc())
+    .limit(5)
+)
+
+with engine.connect() as conn:
+    rows = conn.execute(stmt).all()
+    for row in rows:
+        print(row.id, row.name)
+</code></pre>
+<p><code>select(*cols_or_tables)</code> takes columns or whole tables to SELECT. Passing a table like <code>select(users)</code> selects every column. WHERE clauses use Python comparisons (<code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>.in_(...)</code>, <code>.like(...)</code>, <code>.is_(None)</code>) directly. Multiple conditions combine via comma (AND) or with <code>or_()</code>/<code>and_()</code>.</p>
+<pre><code class="language-python">from sqlalchemy import or_, and_
+
+stmt = select(users).where(
+    or_(users.c.name == &quot;Alice&quot;, users.c.name == &quot;Bob&quot;),
+    users.c.email.like(&quot;%@example.com&quot;),
+)
+</code></pre>
+<p><strong>Working with Result</strong></p>
+<p><code>conn.execute(stmt)</code> returns a <code>Result</code> object, and you pull data out of it in several shapes.</p>
+<p><strong><code>.all()</code></strong><br>
+- Returns: <code>list[Row]</code></p>
+<p><strong><code>.first()</code></strong><br>
+- Returns: `Row</p>
+<p><strong><code>.one()</code></strong><br>
+- Returns: <code>Row</code> (raises if zero or more than one)</p>
+<p><strong><code>.one_or_none()</code></strong><br>
+- Returns: `Row</p>
+<p><strong><code>.scalar()</code></strong><br>
+- Returns: A single column from a single row</p>
+<p><strong><code>.scalar_one()</code></strong><br>
+- Returns: Same as <code>.scalar()</code>, raises if zero or many</p>
+<p><strong><code>.scalars().all()</code></strong><br>
+- Returns: The first column collected into a <code>list</code></p>
+<p><strong><code>.mappings().all()</code></strong><br>
+- Returns: A <code>list[dict]</code>-like result</p>
+<p><code>Row</code> behaves like a named tuple. You can do <code>row.name</code>, <code>row[1]</code>, or <code>row._mapping["name"]</code>. The same interface is used in both Core and ORM.</p>
+<p><code>.scalars()</code> is most often paired with selects that return a single object (like <code>select(users)</code>). It's everywhere in the ORM but it's just as valid in Core.</p>
+<p><strong>insert</strong></p>
+<pre><code class="language-python">from sqlalchemy import insert
+
+with engine.begin() as conn:
+    result = conn.execute(
+        insert(users).values(name=&quot;Alice&quot;, email=&quot;alice@example.com&quot;)
+    )
+    print(result.inserted_primary_key)   # (1,)
+</code></pre>
+<p>To insert many rows in one call, pass a list of dicts as the second argument.</p>
+<pre><code class="language-python">with engine.begin() as conn:
+    conn.execute(
+        insert(users),
+        [
+            {&quot;name&quot;: &quot;Alice&quot;, &quot;email&quot;: &quot;alice@example.com&quot;},
+            {&quot;name&quot;: &quot;Bob&quot;,   &quot;email&quot;: &quot;bob@example.com&quot;},
+        ],
+    )
+</code></pre>
+<p>This form maps to <code>executemany</code> on the dialect and is usually the fastest bulk insert path.</p>
+<p><strong>INSERT-SELECT</strong></p>
+<p>When you want to copy data from one table into another:</p>
+<pre><code class="language-python">from sqlalchemy import insert, select
+
+stmt = insert(archive_users).from_select(
+    [&quot;id&quot;, &quot;name&quot;, &quot;email&quot;],
+    select(users.c.id, users.c.name, users.c.email).where(users.c.active.is_(False)),
+)
+with engine.begin() as conn:
+    conn.execute(stmt)
+</code></pre>
+<p><strong>RETURNING (SQLite 3.35+)</strong></p>
+<p>SQLite 3.35 and newer support RETURNING on INSERT/UPDATE/DELETE.</p>
+<pre><code class="language-python">from sqlalchemy import insert
+
+stmt = insert(users).values(name=&quot;Alice&quot;, email=&quot;a@x.com&quot;).returning(users.c.id, users.c.created_at)
+with engine.begin() as conn:
+    new_id, created_at = conn.execute(stmt).one()
+</code></pre>
+<p>Older SQLite (&lt;= 3.34) won't run this; check your environment.</p>
+<p><strong>update</strong></p>
+<pre><code class="language-python">from sqlalchemy import update
+
+stmt = (
+    update(users)
+    .where(users.c.email == &quot;alice@example.com&quot;)
+    .values(name=&quot;Alice Liddell&quot;)
+)
+with engine.begin() as conn:
+    result = conn.execute(stmt)
+    print(result.rowcount)   # number of affected rows
+</code></pre>
+<p>Update also supports RETURNING (SQLite 3.35+):</p>
+<pre><code class="language-python">stmt = update(users).where(users.c.id == 1).values(name=&quot;Alice&quot;).returning(users.c.id, users.c.name)
+</code></pre>
+<p><strong>A note on UPDATE-LIMIT</strong></p>
+<p>SQLite by default does not support <code>UPDATE ... LIMIT</code> (depends on build options). The portable approach is to pick target PKs in a subquery.</p>
+<pre><code class="language-python">sub = select(users.c.id).where(users.c.active.is_(False)).limit(100).scalar_subquery()
+stmt = update(users).where(users.c.id.in_(sub)).values(active=True)
+</code></pre>
+<p><strong>delete</strong></p>
+<pre><code class="language-python">from sqlalchemy import delete
+
+stmt = delete(users).where(users.c.id == 42)
+with engine.begin() as conn:
+    conn.execute(stmt)
+</code></pre>
+<p>A bare <code>delete(users)</code> deletes the entire table. To prevent accidents, it's safer to wrap deletes in a helper that explicitly forbids missing WHERE.</p>
+<pre><code class="language-python">def safe_delete(conn, table, condition):
+    if condition is None:
+        raise ValueError(&quot;WHERE-less delete is forbidden&quot;)
+    return conn.execute(delete(table).where(condition))
+</code></pre>
+<p><strong>JOIN</strong></p>
+<p>There are two ways to write a JOIN:</p>
+<pre><code class="language-python"># A: select(...).join(...)
+stmt = (
+    select(users.c.name, posts.c.title)
+    .join(posts, posts.c.user_id == users.c.id)
+    .order_by(posts.c.created_at.desc())
+)
+
+# B: select(...).select_from(a.join(b, ...))
+joined = users.join(posts, posts.c.user_id == users.c.id)
+stmt = select(users.c.name, posts.c.title).select_from(joined)
+</code></pre>
+<p>Form A is shorter and most common. Form B is clearer when several tables join in complex ways. When a foreign key already declares the relationship, you can omit the ON clause: <code>select(...).join(posts)</code> is enough.</p>
+<p>LEFT OUTER JOIN uses <code>outerjoin()</code>:</p>
+<pre><code class="language-python">stmt = select(users.c.name, posts.c.title).outerjoin(posts, posts.c.user_id == users.c.id)
+</code></pre>
+<p><strong>Subquery and CTE</strong></p>
+<pre><code class="language-python">sub = select(posts.c.user_id).where(posts.c.title.like(&quot;%news%&quot;)).subquery()
+stmt = select(users).join(sub, sub.c.user_id == users.c.id)
+</code></pre>
+<p>CTEs use <code>select.cte("name")</code>:</p>
+<pre><code class="language-python">recent = (
+    select(posts.c.user_id, posts.c.title)
+    .where(posts.c.created_at &gt; &quot;2026-01-01&quot;)
+    .cte(&quot;recent&quot;)
+)
+stmt = select(recent.c.user_id, recent.c.title)
+</code></pre>
+<p><strong>Aggregate functions</strong></p>
+<p>Use the <code>func</code> namespace to call SQL functions.</p>
+<pre><code class="language-python">from sqlalchemy import func
+
+stmt = select(users.c.id, func.count(posts.c.id).label(&quot;post_count&quot;)).join(posts).group_by(users.c.id)
+</code></pre>
+<p><code>label()</code> creates an alias so you can read it as <code>row.post_count</code>.</p>
+<h2>Before-After</h2>
+<p><strong>Before: text-based dynamic queries</strong></p>
+<pre><code class="language-python">def find_users(active=None, email_like=None, limit=10):
+    sql = &quot;SELECT id, name, email FROM users WHERE 1=1&quot;
+    params = {}
+    if active is not None:
+        sql += &quot; AND active = :active&quot;; params[&quot;active&quot;] = active
+    if email_like:
+        sql += &quot; AND email LIKE :email&quot;; params[&quot;email&quot;] = email_like
+    sql += f&quot; LIMIT {limit}&quot;   # risky: no int cast
+    with engine.connect() as conn:
+        return conn.execute(text(sql), params).all()
+</code></pre>
+<p>Problems: string assembly is fragile, and unbindable parts like <code>LIMIT</code> open the door to type errors and SQL injection.</p>
+<p><strong>After: select-based dynamic queries</strong></p>
+<pre><code class="language-python">from sqlalchemy import select
+from schema import users
+
+def find_users(active=None, email_like=None, limit=10):
+    stmt = select(users.c.id, users.c.name, users.c.email)
+    if active is not None:
+        stmt = stmt.where(users.c.active.is_(active))
+    if email_like:
+        stmt = stmt.where(users.c.email.like(email_like))
+    stmt = stmt.limit(int(limit))
+    with engine.connect() as conn:
+        return conn.execute(stmt).all()
+</code></pre>
+<p>Now column-name typos are caught at the schema layer, and <code>LIMIT</code> values are handled safely by the compiler. Because <code>stmt</code> is immutable, accumulating <code>where</code>/<code>limit</code> calls produces fresh statements with no race conditions.</p>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1: Seed data</strong></p>
+<pre><code class="language-python">from sqlalchemy import create_engine, insert
+from schema import metadata, users, posts
+
+engine = create_engine(&quot;sqlite:///app.db&quot;)
+metadata.create_all(engine)
+
+with engine.begin() as conn:
+    conn.execute(insert(users), [
+        {&quot;name&quot;: &quot;Alice&quot;, &quot;email&quot;: &quot;alice@example.com&quot;},
+        {&quot;name&quot;: &quot;Bob&quot;,   &quot;email&quot;: &quot;bob@example.com&quot;},
+    ])
+    conn.execute(insert(posts), [
+        {&quot;user_id&quot;: 1, &quot;title&quot;: &quot;hello&quot;,      &quot;body&quot;: &quot;first post&quot;},
+        {&quot;user_id&quot;: 1, &quot;title&quot;: &quot;news today&quot;, &quot;body&quot;: &quot;second post&quot;},
+        {&quot;user_id&quot;: 2, &quot;title&quot;: &quot;intro&quot;,      &quot;body&quot;: &quot;bob's first&quot;},
+    ])
+</code></pre>
+<p><strong>Step 2: Variations on select</strong></p>
+<pre><code class="language-python">from sqlalchemy import select, func
+from schema import users, posts
+
+with engine.connect() as conn:
+    # 1) plain select
+    rows = conn.execute(select(users)).all()
+
+    # 2) where + order_by
+    rows = conn.execute(
+        select(users.c.id, users.c.name)
+        .where(users.c.email.like(&quot;%@example.com&quot;))
+        .order_by(users.c.id.desc())
+    ).all()
+
+    # 3) JOIN + aggregate
+    rows = conn.execute(
+        select(users.c.name, func.count(posts.c.id).label(&quot;post_count&quot;))
+        .join(posts, posts.c.user_id == users.c.id)
+        .group_by(users.c.name)
+    ).all()
+    for row in rows:
+        print(row.name, row.post_count)
+
+    # 4) scalar
+    n = conn.execute(select(func.count()).select_from(users)).scalar_one()
+    print(f&quot;users={n}&quot;)
+</code></pre>
+<p><strong>Step 3: insert / update / delete inside a transaction</strong></p>
+<pre><code class="language-python">from sqlalchemy import insert, update, delete
+
+with engine.begin() as conn:
+    # insert + RETURNING
+    result = conn.execute(
+        insert(users).values(name=&quot;Carol&quot;, email=&quot;carol@example.com&quot;).returning(users.c.id)
+    )
+    cid = result.scalar_one()
+
+    # update
+    conn.execute(update(users).where(users.c.id == cid).values(name=&quot;Carol C&quot;))
+
+    # delete (safe pattern)
+    conn.execute(delete(posts).where(posts.c.user_id == cid))
+</code></pre>
+<p><strong>Step 4: subquery and CTE</strong></p>
+<pre><code class="language-python">from sqlalchemy import select
+
+sub = select(posts.c.user_id).where(posts.c.title.like(&quot;%news%&quot;)).subquery()
+stmt = select(users).join(sub, sub.c.user_id == users.c.id)
+print(conn.execute(stmt).all())
+
+cte = select(posts.c.user_id, func.count().label(&quot;n&quot;)).group_by(posts.c.user_id).cte(&quot;c&quot;)
+stmt = select(users.c.name, cte.c.n).join(cte, cte.c.user_id == users.c.id)
+</code></pre>
+<h2>Common mistakes</h2>
+<p><strong>1. Sticking to 1.x style.</strong> <code>select([users])</code> (passing a list), <code>engine.execute(stmt)</code> (executing without a Connection), and <code>stmt.execute()</code> (executing on the statement) are all gone in 2.x.</p>
+<p><strong>2. Iterating a <code>Result</code> twice.</strong> A <code>Result</code> is single-use. Materialize once with <code>.all()</code> and reuse the resulting list.</p>
+<p><strong>3. Reaching for <code>.one()</code> blindly.</strong> It raises if there's zero or more than one row. Use <code>.one_or_none()</code> when zero is possible, <code>.first()</code> when many are possible.</p>
+<p><strong>4. Forgetting WHERE on update/delete.</strong> The whole table is affected. Forbid it via a helper or catch it at code review.</p>
+<p><strong>5. Producing accidental cross joins.</strong> <code>select(users, posts)</code> produces a cross join. Always specify a join condition: <code>.join(posts, posts.c.user_id == users.c.id)</code>.</p>
+<p><strong>6. Trusting f-string interpolation in <code>text()</code>.</strong> Core expressions auto-bind, but <code>text(f"SELECT * FROM users WHERE name = '{name}'")</code> is still injectable. To benefit from binding, use <code>:name</code> placeholders inside <code>text(...)</code> and pass a dict.</p>
+<h2>Real-world application</h2>
+<p>In real code, selects are usually wrapped in functions for reuse.</p>
+<pre><code class="language-python"># repos/user_repo.py
+from sqlalchemy import select, insert, update
+from schema import users
+
+def get_user_by_email(conn, email: str):
+    return conn.execute(select(users).where(users.c.email == email)).first()
+
+def create_user(conn, name: str, email: str) -&gt; int:
+    return conn.execute(
+        insert(users).values(name=name, email=email).returning(users.c.id)
+    ).scalar_one()
+
+def deactivate_user(conn, user_id: int) -&gt; int:
+    return conn.execute(
+        update(users).where(users.c.id == user_id).values(active=False)
+    ).rowcount
+</code></pre>
+<p>The key is that each function takes a <code>Connection</code> as a parameter. Transaction boundaries belong to the caller, so the same function can run inside a transaction with other functions. ORM Sessions follow the same principle (covered in post 5).</p>
+<p>When read functions return a list, <code>.scalars().all()</code> or <code>.mappings().all()</code> is often more convenient than raw <code>.all()</code>. For JSON serialization, <code>.mappings().all()</code> is the most natural fit.</p>
+<pre><code class="language-python">def list_users_as_dict(conn) -&gt; list[dict]:
+    return [dict(m) for m in conn.execute(select(users)).mappings().all()]
+</code></pre>
+<p>For performance, avoid loading enormous result sets into memory at once by using streaming iteration.</p>
+<pre><code class="language-python">with engine.connect().execution_options(stream_results=True) as conn:
+    for row in conn.execute(select(users)):
+        process(row)
+</code></pre>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can write <code>select</code>, <code>insert</code>, <code>update</code>, <code>delete</code> in 2.x style</li>
+<li>[ ] You understand the difference between <code>Row</code>, <code>.scalar()</code>, <code>.scalars()</code>, <code>.mappings()</code></li>
+<li>[ ] You choose <code>.first()</code>, <code>.one()</code>, <code>.one_or_none()</code> based on cardinality</li>
+<li>[ ] WHERE-less update/delete is blocked at the application layer</li>
+<li>[ ] JOINs always specify an ON condition (no accidental cross joins)</li>
+<li>[ ] You know the SQLite RETURNING version requirement (3.35+)</li>
+<li>[ ] You can build subqueries and CTEs</li>
+<li>[ ] Domain logic is wrapped in functions that take a <code>Connection</code> as input</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Given <code>users(id, name, email, active)</code> and <code>posts(id, user_id, title, created_at)</code>, write a Core expression that returns "active users who wrote at least 5 posts in the last 30 days." The result should have two columns: <code>name</code> and <code>post_count</code>.</li>
+<li>Write a function that creates a new user using RETURNING and reads back both the PK and <code>created_at</code>. Add a fallback path for SQLite 3.34 or older that uses <code>inserted_primary_key</code>.</li>
+<li>Write SQLite-compatible code that activates 100 inactive users at once, using the subquery approach because <code>UPDATE ... LIMIT</code> isn't supported.</li>
+<li>Build a function that returns select results as a <code>list[dict]</code> via <code>.mappings()</code>, then create a second version that uses <code>stream_results=True</code> to handle large result sets in streaming fashion. Compare them.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<p>In this post we treated SQLAlchemy Core's SQL expressions as a small working manual. <code>select</code>/<code>insert</code>/<code>update</code>/<code>delete</code> are immutable statement objects, and <code>Result</code> lets you extract <code>Row</code>, scalars, or mappings freely. JOIN, subquery, CTE, and aggregate functions all combine schema objects with the <code>func</code> namespace. Dialect-specific features like RETURNING and streaming are exposed through SQLAlchemy's unified interface.</p>
+<p>The ORM enters in the next post. Post 4 covers <code>DeclarativeBase</code> and <code>mapped_column</code>, mapping Python classes to database rows. The <code>users.c.name</code> from this post becomes <code>User.name</code> in ORM, and <code>select(users)</code> becomes <code>select(User)</code>. Understanding Core first lets you debug the ORM's "magic" when something goes sideways.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
+<li><strong>SQLAlchemy Core - select, insert, update, delete in 2.x Style (current)</strong></li>
+<li>ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)</li>
+<li>Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)</li>
+<li>ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)</li>
+<li>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)</li>
+<li>Events, hybrid_property, and custom types (upcoming)</li>
+<li>Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
+<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.sqlalchemy.org/en/20/tutorial/data_select.html">SQLAlchemy 2.x - Using SELECT Statements</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/tutorial/data_insert.html">SQLAlchemy 2.x - Inserting Rows with Core</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/tutorial/data_update.html">SQLAlchemy 2.x - Updating and Deleting Rows</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.Result">SQLAlchemy 2.x - Result Set API</a></li>
+<li><a href="https://www.sqlite.org/lang_returning.html">SQLite RETURNING clause</a></li>
+</ul>
+<p class="tags-line">Tags: Python, SQLAlchemy, ORM, Database</p>
+</body>
+</html>

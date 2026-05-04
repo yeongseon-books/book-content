@@ -3,7 +3,7 @@ title: 첫 Agent 만들기
 series: ai-agent-101
 episode: 10
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ last_reviewed: '2026-05-02'
 이번 글에서는 엔드투엔드 구현 예제, LangGraph와 Crew AI 비교, 배포 방법, 그리고 다음 단계 학습 경로를 다룹니다.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- Research Assistant Agent의 책임은 어디까지로 정해야 할까요?
+- 도구·메모리·루프 중 어떤 순서로 구현하는 것이 안전할까요?
+- 직접 구현·LangGraph·CrewAI 중 어떤 기준으로 골라야 할까요?
+- 처음 만든 Agent를 어떻게 자동 평가에 연결할까요?
+
+<!-- a-grade-intro:end -->
 
 ## 만들 Agent: Research Assistant
 
@@ -502,6 +513,17 @@ LangGraph나 CrewAI는 강력하지만 학습 비용이 있습니다. 먼저 직
 - 도구는 Pydantic 스키마로 입력을 검증하고 결정적으로 동작해야 합니다.
 - 평가 자동화는 작은 골드 데이터셋만으로도 충분히 시작할 수 있습니다.
 - 직접 구현으로 원리를 익힌 다음 LangGraph나 CrewAI 같은 프레임워크로 확장하세요.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] Research Assistant의 입력·출력·범위를 한 단락으로 적었다.
+- [ ] 도구 → 메모리 → 루프 순서로 직접 코드를 짜 보았다.
+- [ ] 직접 구현 vs LangGraph vs CrewAI 비교 표를 만들었다.
+- [ ] Step 5의 자동 평가 루프를 1회 이상 실행해 결과를 봤다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

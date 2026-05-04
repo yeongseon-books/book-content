@@ -3,7 +3,7 @@ title: execute, executemany, and Fetch Patterns
 series: python-dbapi-101
 episode: 3
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -27,6 +27,17 @@ last_reviewed: '2026-05-03'
 ---
 
 Every query in DB-API ultimately reduces to five cursor methods: `execute()`, `executemany()`, and `fetchone()`/`fetchall()`/`fetchmany()`. The API surface is tiny, but choosing the wrong fetch method decides whether your service streams gracefully or OOMs at 3 AM. This article walks through each method and the rules for picking one.
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?
+- How do you process large result sets without blowing up memory?
+- What metadata does cursor.description expose?
+- What are the key ingredients of a streaming + transformation pipeline?
+
+<!-- a-grade-intro:end -->
 
 ## 1. execute - one statement at a time
 
@@ -187,6 +198,17 @@ Memory stays flat regardless of row count.
 - Trust `rowcount` only for INSERT/UPDATE/DELETE.
 
 The next episode covers parameter binding and SQL injection defense.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Bulk-inserted rows with executemany in a single call.
+- [ ] Used fetchmany to read in chunks and bound memory usage.
+- [ ] Built a dict-row helper from cursor.description.
+- [ ] Combined a generator with fetchmany for a streaming pipeline.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

@@ -3,7 +3,7 @@ title: Building Your First Agent
 series: ai-agent-101
 episode: 10
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ Recommended frameworks are LangGraph and Crew AI. Both simplify agent constructi
 This article covers end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.
 
 ---
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- Where do you draw the line on what the Research Assistant agent owns?
+- In what order should you build tools, memory, and the loop?
+- On what basis do you pick raw code vs LangGraph vs CrewAI?
+- How do you wire your first agent into automated eval?
+
+<!-- a-grade-intro:end -->
+
 ## What We Are Building: A Research Assistant
 
 In this episode, you build a small research assistant agent end to end. The user asks a question and the agent goes through these steps.
@@ -502,6 +513,17 @@ This series is the starting point of agent development. Begin with small agents 
 - Tools should validate inputs with Pydantic schemas and behave deterministically.
 - Evaluation can start with a small golden dataset and still catch real regressions.
 - Build from scratch first to internalize the principles, then scale with frameworks like LangGraph or CrewAI.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Wrote a one-paragraph spec of inputs, outputs, and scope.
+- [ ] Built tool → memory → loop in that order.
+- [ ] Made a comparison table: hand-rolled vs LangGraph vs CrewAI.
+- [ ] Ran the Step 5 auto-eval loop at least once and inspected results.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

@@ -3,7 +3,7 @@ title: Agent Workflow Design
 series: ai-agent-101
 episode: 4
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Ex
 This article covers major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- When does each of ReAct, Plan-and-Execute, and Reflexion shine?
+- How do you decide the right granularity of decomposed steps?
+- Where should state live inside a workflow?
+- What validation must happen before pushing a workflow to production?
+
+<!-- a-grade-intro:end -->
 
 ## Key Workflow Patterns
 
@@ -1295,6 +1306,17 @@ else:
 - Workflows are about designing agents to systematically perform complex tasks.
 - Various patterns like ReAct, Plan-and-Execute, and Reflexion exist, and you must choose based on task characteristics.
 - Task decomposition and state management are the core of workflow design.
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Built a one-page comparison of ReAct vs Plan-and-Execute vs Reflexion.
+- [ ] Compared two versions of a task split too small vs too large.
+- [ ] Wrote a workflow that keeps state in an external store.
+- [ ] Applied at least two of: unit tests, simulation, canary rollout.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

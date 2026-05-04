@@ -61,6 +61,17 @@
 <p>The core of tool use is function calling. When the model determines "I need to check the weather now," it returns a function call request matching a predefined tool schema. The application interprets this request, calls the actual API, and passes the result back to the model.</p>
 <p>This article covers the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.</p>
 <hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What does function calling actually look like from the model's side?</li>
+<li>What failures show up when a tool schema is poorly written?</li>
+<li>How does the model pick a tool when several are available?</li>
+<li>What do you need to watch when feeding tool output back into the model?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Function Calling Basic Flow</h2>
 <p>The core mechanism that enables AI agents to interact with external systems is Function Calling (or Tool Use). Let's explore how this works step-by-step.</p>
 <p><strong>The Four-Step Flow</strong></p>
@@ -969,11 +980,21 @@ if result[&quot;success&quot;]:
 <li>Tool schemas must be clear and specific for models to call them correctly.</li>
 <li>Error handling and tool selection strategies determine agent reliability.</li>
 </ul>
-<hr>
-<h2>AI Agent 101 Series</h2>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
 <ul>
-<li>What is an AI Agent? (upcoming)</li>
-<li>Context Engineering (upcoming)</li>
+<li>[ ] Defined one tool with the OpenAI function-calling spec and exercised it.</li>
+<li>[ ] Observed how a bad schema confuses the model.</li>
+<li>[ ] Logged which tool the model picks when given 2-3 candidates.</li>
+<li>[ ] Closed the loop: tool output back into the model for the final answer.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
 <li><strong>Tool Use Fundamentals (current)</strong></li>
 <li>Agent Workflow Design (upcoming)</li>
 <li>Memory and State (upcoming)</li>
@@ -983,6 +1004,7 @@ if result[&quot;success&quot;]:
 <li>Production Operations (upcoming)</li>
 <li>Building Your First Agent (upcoming)</li>
 </ul>
+<hr>
 <h2>References</h2>
 <ol>
 <li>
@@ -1002,6 +1024,6 @@ if result[&quot;success&quot;]:
    Claude API tool use guide. Explains error handling, retry strategies, and security considerations.</p>
 </li>
 </ol>
-<p class="tags-line">Tags: AI Agent, Tool Use, Function Calling, Integration</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

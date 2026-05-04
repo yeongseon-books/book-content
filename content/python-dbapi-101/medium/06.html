@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Row factories and type adapters (sqlite3, PEP 249)</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Row factories and type adapters (sqlite3, PEP 249)</h1>
+<h2>Questions this post answers</h2>
+<ul>
+<li>How do you receive default tuple results as dict, dataclass, or Pydantic models?</li>
+<li>What is <code>sqlite3.Row</code> and when is it enough?</li>
+<li>What does <code>detect_types</code> actually detect?</li>
+<li>How do you safely map custom types such as <code>Decimal</code>, <code>datetime</code>, <code>Enum</code>, or JSON?</li>
+<li>How do adapters and converters fit into the PEP 249 model?</li>
+</ul>
+<blockquote>
+<p>Raw tuples returned by the database are fast but dangerous: you must remember column order, and SQLite has only five storage classes (NULL, INTEGER, REAL, TEXT, BLOB). Row factories and type adapters consolidate every conversion in one place.</p>
+<p>Python DB-API 101 (6/10)</p>
+</blockquote>
+<hr>
+<h2>What you will learn</h2>
+<p>This post separates how sqlite3 moves data between SQL and Python into two axes.</p>
+<ol>
+<li><strong>Row factory</strong> — the <strong>shape</strong> of <code>cursor.fetch*()</code> results (tuple → Row → dict → dataclass → Pydantic).</li>
+<li><strong>Type adapter / converter</strong> — the <strong>type of a single value</strong> (Python <code>Decimal</code> ↔ SQLite TEXT).</li>
+<li><strong><code>detect_types</code></strong> — selects automatic conversion based on declared column type or <code>[type-name]</code> column aliases.</li>
+<li><strong>Registering custom types</strong> — <code>register_adapter</code> / <code>register_converter</code> for <code>Decimal</code>, <code>Enum</code>, JSON dicts.</li>
+<li><strong>Type-safe repository layer</strong> — using Pydantic or dataclass as the result model.</li>
+</ol>
+<hr>
+<h2>Why this matters</h2>
+<p>Code like <code>row[3]</code> shatters silently the moment the schema changes. <code>row['name']</code> (or <code>row.name</code> from a dataclass) turns schema changes into immediate import errors.</p>
+<p>The same applies to type conversion. Storing money as <code>REAL</code> (float) in SQLite leads to precision incidents like <code>0.1 + 0.2 = 0.30000000000000004</code>. Registering <code>Decimal</code> and storing as <code>TEXT</code> keeps full precision.</p>
+<p>This post unifies row factories and type adapters so your repository layer survives schema and type changes.</p>
+<hr>
+<h2>Mental Model — two-step conversion</h2>
+<pre><code>Database row             Python value
+─────────────             ────────────
+                converter
+SQLite TEXT  ─────────────►  Decimal('19.95')
+                (value step)
+                 adapter
+SQLite TEXT  ◄─────────────  Decimal('19.95')
+
+[col1, col2, col3]   row_factory
+        │       ─────────────►   {'id': 1, 'name': 'Alice'}
+        ▼                          or dataclass / Pydantic
+   tuple shape                    (row step)
+</code></pre>
+<ul>
+<li><strong>adapter / converter</strong> = type conversion of a <strong>single value</strong> (Python ↔ SQLite storage class).</li>
+<li><strong>row_factory</strong> = shape conversion of an <strong>entire row</strong> (tuple → desired form).</li>
+</ul>
+<p>Separating these two concerns naturally separates where they live in code.</p>
+<hr>
+<h2>Core concepts</h2>
+<p><strong><code>sqlite3.Row</code></strong></p>
+<p>The lightest row factory. Accessible by index like a tuple AND by name like a dict.</p>
+<pre><code class="language-python">con.row_factory = sqlite3.Row
+row = con.execute('SELECT id, name FROM users WHERE id=?', (1,)).fetchone()
+print(row[0], row['name'], row.keys())
+</code></pre>
+<p>It is not a real dict, but it covers ~80% of cases.</p>
+<p><strong>dict factory</strong></p>
+<p>For a true dict:</p>
+<pre><code class="language-python">def dict_factory(cursor, row):
+    return {col[0]: value for col, value in zip(cursor.description, row)}
+
+con.row_factory = dict_factory
+</code></pre>
+<p><strong>dataclass factory</strong></p>
+<p>For type safety and IDE autocomplete:</p>
+<pre><code class="language-python">from dataclasses import dataclass, fields
+
+@dataclass
+class User:
+    id: int
+    name: str
+    email: str
+
+def dataclass_factory(cls):
+    field_names = [f.name for f in fields(cls)]
+    def factory(cursor, row):
+        cols = [c[0] for c in cursor.description]
+        return cls(**{k: v for k, v in zip(cols, row) if k in field_names})
+    return factory
+
+con.row_factory = dataclass_factory(User)
+</code></pre>
+<p><strong>Pydantic factory</strong></p>
+<p>For combined validation and serialisation:</p>
+<pre><code class="language-python">from pydantic import BaseModel
+
+class UserModel(BaseModel):
+    id: int
+    name: str
+    email: str
+
+def pydantic_factory(cls):
+    def factory(cursor, row):
+        cols = [c[0] for c in cursor.description]
+        return cls.model_validate({k: v for k, v in zip(cols, row)})
+    return factory
+
+con.row_factory = pydantic_factory(UserModel)
+</code></pre>
+<p><strong><code>detect_types</code></strong></p>
+<pre><code class="language-python">con = sqlite3.connect(
+    'app.db',
+    detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+)
+</code></pre>
+<ul>
+<li><code>PARSE_DECLTYPES</code> — looks at the column's declared type from <code>CREATE TABLE</code> (e.g., <code>created_at TIMESTAMP</code>) and dispatches the registered converter.</li>
+<li><code>PARSE_COLNAMES</code> — forces conversion via aliases like <code>SELECT created_at AS "ts [timestamp]"</code>.</li>
+</ul>
+<hr>
+<h2>Before / After</h2>
+<p><strong>Before — raw tuple + column index</strong></p>
+<pre><code class="language-python">con = sqlite3.connect('shop.db')
+row = con.execute('SELECT id, name, price FROM products WHERE id=1').fetchone()
+print(row[2] * 1.1)   # apply VAT to price
+</code></pre>
+<p>If the SELECT column order changes, you suddenly multiply the name string.</p>
+<p><strong>After — Pydantic + Decimal converter</strong></p>
+<pre><code class="language-python">import sqlite3
+from decimal import Decimal
+from pydantic import BaseModel
+
+sqlite3.register_adapter(Decimal, lambda d: str(d))
+sqlite3.register_converter('decimal', lambda b: Decimal(b.decode()))
+
+con = sqlite3.connect('shop.db', detect_types=sqlite3.PARSE_DECLTYPES)
+con.execute('''CREATE TABLE IF NOT EXISTS products(
+    id INTEGER PRIMARY KEY, name TEXT, price decimal
+)''')
+
+class Product(BaseModel):
+    id: int
+    name: str
+    price: Decimal
+
+def factory(cursor, row):
+    return Product.model_validate(
+        {c[0]: v for c, v in zip(cursor.description, row)}
+    )
+
+con.row_factory = factory
+p = con.execute('SELECT id, name, price FROM products WHERE id=1').fetchone()
+print(p.price * Decimal('1.1'))
+</code></pre>
+<p>Order-independent and precise.</p>
+<hr>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1 — <code>sqlite3.Row</code></strong></p>
+<pre><code class="language-python">import sqlite3
+
+con = sqlite3.connect(':memory:')
+con.row_factory = sqlite3.Row
+con.execute('CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT, email TEXT)')
+con.execute('INSERT INTO users(name, email) VALUES (?, ?)', ('Alice', 'a@x.io'))
+
+row = con.execute('SELECT * FROM users WHERE id=1').fetchone()
+print(dict(row))   # {'id': 1, 'name': 'Alice', 'email': 'a@x.io'}
+</code></pre>
+<p><strong>Step 2 — <code>Decimal</code> adapter / converter</strong></p>
+<pre><code class="language-python">from decimal import Decimal
+
+def adapt_decimal(d: Decimal) -&gt; str:
+    return str(d)
+
+def convert_decimal(b: bytes) -&gt; Decimal:
+    return Decimal(b.decode())
+
+sqlite3.register_adapter(Decimal, adapt_decimal)
+sqlite3.register_converter('decimal', convert_decimal)
+
+con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
+con.execute('CREATE TABLE prices(value decimal)')
+con.execute('INSERT INTO prices VALUES (?)', (Decimal('19.95'),))
+row = con.execute('SELECT value FROM prices').fetchone()
+print(row[0], type(row[0]))   # → 19.95 &lt;class 'decimal.Decimal'&gt;
+</code></pre>
+<p><strong>Step 3 — <code>Enum</code> adapter</strong></p>
+<pre><code class="language-python">from enum import Enum
+
+class Status(str, Enum):
+    PENDING = 'pending'
+    PAID = 'paid'
+    CANCELLED = 'cancelled'
+
+sqlite3.register_adapter(Status, lambda s: s.value)
+sqlite3.register_converter('order_status', lambda b: Status(b.decode()))
+
+con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
+con.execute('CREATE TABLE orders(id INTEGER, status order_status)')
+con.execute('INSERT INTO orders VALUES (?, ?)', (1, Status.PAID))
+row = con.execute('SELECT status FROM orders').fetchone()
+print(row[0])   # → Status.PAID
+</code></pre>
+<p><strong>Step 4 — JSON adapter</strong></p>
+<pre><code class="language-python">import json
+
+sqlite3.register_adapter(dict, lambda d: json.dumps(d))
+sqlite3.register_converter('json', lambda b: json.loads(b.decode()))
+
+con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
+con.execute('CREATE TABLE events(id INTEGER, payload json)')
+con.execute('INSERT INTO events VALUES (?, ?)', (1, {'k': 'v', 'n': 42}))
+row = con.execute('SELECT payload FROM events').fetchone()
+print(row[0])   # → {'k': 'v', 'n': 42}
+</code></pre>
+<p><strong>Step 5 — <code>[type-name]</code> column aliases</strong></p>
+<p>For views or computed columns where declared type is unavailable, force conversion via aliases.</p>
+<pre><code class="language-python">con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_COLNAMES)
+sqlite3.register_converter('decimal', lambda b: Decimal(b.decode()))
+
+con.execute('CREATE TABLE t(s TEXT)')
+con.execute('INSERT INTO t VALUES (?)', ('19.95',))
+row = con.execute('SELECT s AS &quot;v [decimal]&quot; FROM t').fetchone()
+print(row[0])   # → Decimal('19.95')
+</code></pre>
+<p><strong>Step 6 — Pydantic + adapters together</strong></p>
+<pre><code class="language-python">from datetime import datetime
+from pydantic import BaseModel
+
+# datetime is registered by default in sqlite3 for 'TIMESTAMP' columns under PARSE_DECLTYPES
+
+class Order(BaseModel):
+    id: int
+    status: Status
+    total: Decimal
+    created_at: datetime
+
+def order_factory(cursor, row):
+    cols = [c[0] for c in cursor.description]
+    return Order.model_validate(dict(zip(cols, row)))
+
+con.row_factory = order_factory
+</code></pre>
+<p>The repository now deals only in <code>Order</code> objects; SQLite storage classes never leak outward.</p>
+<hr>
+<h2>Common mistakes</h2>
+<ol>
+<li><strong>Direct column-index access.</strong> <code>row[0]</code>, <code>row[2]</code> are fragile across schema changes. Start with at least <code>sqlite3.Row</code>.</li>
+<li><strong>Storing money as <code>REAL</code>.</strong> Float precision incidents follow. Always use <code>Decimal</code> + <code>TEXT</code>, or <code>INTEGER</code> (cents).</li>
+<li><strong>Forgetting <code>detect_types</code>.</strong> You register the adapter, but the converter never fires — and you wonder why bytes come back. Enable <code>PARSE_DECLTYPES</code>.</li>
+<li><strong>Converters always receive <code>bytes</code>, not <code>str</code>.</strong> Do not forget <code>b.decode()</code>.</li>
+<li><strong>Adapter must return one of SQLite's five storage classes</strong> — <code>int</code>, <code>float</code>, <code>str</code>, <code>bytes</code>, or <code>None</code>. Returning a custom object raises.</li>
+<li><strong>Timestamp clashes.</strong> Python 3.12 deprecated the default timestamp converter. Be explicit with your own converter.</li>
+<li><strong>Assuming <code>dict_factory</code> is fast.</strong> Each row builds a dict via comprehension. For million-row workloads, <code>sqlite3.Row</code> (C-implemented) is much faster.</li>
+<li><strong>Setting <code>row_factory</code> only on the cursor, not the connection.</strong> Set it on the connection — every cursor inherits.</li>
+</ol>
+<hr>
+<h2>Production application</h2>
+<p><strong>Repository layer pattern</strong></p>
+<pre><code class="language-python">class UserRepo:
+    def __init__(self, con: sqlite3.Connection):
+        con.row_factory = pydantic_factory(UserModel)
+        self.con = con
+
+    def get(self, user_id: int) -&gt; UserModel | None:
+        return self.con.execute(
+            'SELECT id, name, email FROM users WHERE id=?', (user_id,)
+        ).fetchone()
+
+    def list_active(self) -&gt; list[UserModel]:
+        return self.con.execute(
+            &quot;SELECT id, name, email FROM users WHERE status='active'&quot;
+        ).fetchall()
+</code></pre>
+<p>Callers no longer need to remember dict keys or column order.</p>
+<p><strong>Migration and types</strong></p>
+<p>Adopting <code>Decimal</code> requires migrating <code>REAL</code> columns to <code>TEXT</code>. Wrap it in <code>BEGIN IMMEDIATE → ALTER TABLE → data conversion → COMMIT</code> together with the transaction patterns from the previous post.</p>
+<p><strong>Handling views with column aliases</strong></p>
+<p>Views and join results lose declared types. The <code>[type-name]</code> alias pattern is widely used in production.</p>
+<pre><code class="language-sql">SELECT u.id, u.name, SUM(o.total) AS &quot;total [decimal]&quot;
+FROM users u JOIN orders o ON o.user_id = u.id
+GROUP BY u.id;
+</code></pre>
+<p><strong>Performance vs safety trade-off</strong></p>
+<ul>
+<li>Reports / batch: <code>sqlite3.Row</code> is enough (C-implemented, fast).</li>
+<li>API handlers: dataclass / Pydantic (combined validation + serialisation).</li>
+<li>Hot loops: tuple + explicit unpack <code>for id, name in cur:</code> is also legitimate — but limit it to one or two functions.</li>
+</ul>
+<hr>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>row_factory</code> is set explicitly when the connection is created.</li>
+<li>[ ] Index-based column access lives only in hot paths.</li>
+<li>[ ] Money and precise numerics use <code>Decimal</code> adapter + <code>TEXT</code>, or <code>INTEGER</code> (cents).</li>
+<li>[ ] <code>detect_types=PARSE_DECLTYPES</code> is on whenever adapters/converters are used.</li>
+<li>[ ] Views and joins force converters via <code>SELECT col AS "x [type]"</code> aliases.</li>
+<li>[ ] Domain types (<code>Enum</code>, <code>JSON</code>, <code>Decimal</code>, <code>datetime</code>) are registered once at module import.</li>
+<li>[ ] The repository layer never leaks SQLite storage classes outside.</li>
+</ul>
+<hr>
+<h2>Exercises</h2>
+<ol>
+<li><strong>Compare factories.</strong> Run the same SELECT against (a) plain tuple, (b) <code>sqlite3.Row</code>, (c) <code>dict_factory</code>, (d) Pydantic factory and time 10 000 rows.</li>
+<li><strong><code>Decimal</code> precision.</strong> Compare <code>0.1 + 0.2</code> stored as <code>REAL</code> versus stored via the <code>Decimal</code> adapter.</li>
+<li><strong><code>Enum</code> round-trip.</strong> INSERT <code>Status.PAID</code> and verify the SELECT result is a <code>Status</code>. What happens with <code>PARSE_DECLTYPES</code> disabled?</li>
+<li><strong>JSON column search.</strong> Store JSON in <code>payload</code> and query with SQLite's <code>json_extract(payload, '$.k')</code>.</li>
+<li><strong>Your own type.</strong> Register adapter/converter for <code>IPv4Address</code> (<code>ipaddress.IPv4Address</code>) and round-trip it.</li>
+</ol>
+<hr>
+<h2>Summary and next post</h2>
+<p>Separate <strong>shape</strong> (row factory) from <strong>value</strong> (adapter/converter) and sqlite3's data conversion becomes simple. Layering a Pydantic model on top of the repository turns schema changes into import errors and lets domain types like <code>Decimal</code>, <code>Enum</code>, and JSON flow safely.</p>
+<p>The next post covers <strong>error handling and the exception hierarchy</strong> — the eight exception classes defined by PEP 249, sqlite3's mapping (IntegrityError, OperationalError, ProgrammingError, etc.), the difference between <code>BUSY</code> and <code>LOCKED</code>, and concrete retry strategies.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/05-transactions-isolation.md">Transactions and isolation levels (sqlite3, PEP 249)</a></li>
+<li><strong>Row factories and type adapters (sqlite3, PEP 249) (current)</strong></li>
+<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0249/">PEP 249 – Python Database API Specification v2.0</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#row-objects">Python sqlite3 — Row objects</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3-adapter-converter-recipes">Python sqlite3 — Adapters and converters</a></li>
+<li><a href="https://www.sqlite.org/datatype3.html">SQLite — Datatypes In SQLite</a></li>
+<li><a href="https://docs.pydantic.dev/latest/concepts/models/">Pydantic — Models</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

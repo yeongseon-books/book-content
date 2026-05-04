@@ -3,7 +3,7 @@ title: Error Handling and Reliability
 series: ai-agent-101
 episode: 8
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ To build reliable agents, you must anticipate and respond to these failures. Ret
 This article covers common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.
 
 ---
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- How do you classify the errors an agent throws?
+- When do you reach for Retry vs Fallback vs Circuit Breaker?
+- What guards do you need to run tools safely?
+- What does good graceful degradation look like to the user?
+
+<!-- a-grade-intro:end -->
+
 ## Error Types in Agents
 
 Agents tangle together LLMs, tools, external APIs, and user input, so error sources are diverse.
@@ -433,6 +444,17 @@ Show users a friendly message; manage internal trace IDs separately.
 - Circuit breakers protect the system from repeatedly failing external dependencies
 - Tool execution always needs timeouts and resource limits
 - Don't swallow errors silently — surface them through logs and metrics
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Sorted agent errors into transient / permanent / model-level.
+- [ ] Implemented exponential-backoff retry to absorb transient failures.
+- [ ] Sketched the circuit-breaker open/half-open/closed transitions.
+- [ ] Wrapped a tool call with timeout + sandbox.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

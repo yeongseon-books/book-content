@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</h1>
+<blockquote>
+<p>SQLAlchemy 101 series (1/10)</p>
+</blockquote>
+<hr>
+<p>When you <code>pip install sqlalchemy</code> and write your first lines of code, the most common misconception is that "SQLAlchemy replaces standard drivers like <code>sqlite3</code>." The opposite is true. SQLAlchemy sits <strong>on top of</strong> PEP 249 DB-API drivers. The moment you write <code>create_engine("sqlite:///app.db")</code>, SQLAlchemy is still doing <code>import sqlite3</code> under the hood. Internalizing this single fact makes nearly every SQLAlchemy behavior fall into place.</p>
+<p>This series walks through SQLAlchemy 2.x using SQLite, end to end. The first post tackles the lowest layer: what <code>Engine</code> and <code>Connection</code> are, and why they were designed this way. ORM and Session show up later in the series. For now, we focus on a very concrete question: how does a single line of SQL travel from your Python code to a SQLite file on disk?</p>
+<h2>What you will learn</h2>
+<ul>
+<li>That SQLAlchemy is split into two layers, Core and ORM, and that Engine and Connection are the entry points to Core</li>
+<li>That <code>create_engine()</code> returns a factory bundling a dialect, the DB-API driver, a connection pool, and a parsed URL</li>
+<li>How the 1.x to 2.x transition changed defaults: <code>future=True</code> everywhere, unified <code>select()</code>, <code>Mapped[]</code> typing, native async</li>
+<li>The difference between <code>engine.connect()</code> and <code>engine.begin()</code>, and how 2.x makes transactions explicit</li>
+<li>How to run raw SQL safely with <code>text()</code> and named parameter binding</li>
+<li>SQLite URL conventions (<code>sqlite:///</code>, <code>sqlite:////</code>, <code>:memory:</code>) and how to apply PRAGMA via events</li>
+</ul>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Do I still need to import <code>sqlite3</code> when I use SQLAlchemy?</li>
+<li>Does <code>create_engine()</code> open a SQLite file immediately, or is it lazy?</li>
+<li>Why was <code>engine.execute("SELECT 1")</code> removed in 2.x?</li>
+<li>How does a Connection differ from an ORM Session?</li>
+<li>Should I default to <code>with engine.connect()</code> or <code>with engine.begin()</code>?</li>
+<li>Where do I enable SQLite's <code>foreign_keys</code> PRAGMA in SQLAlchemy?</li>
+</ul>
+<h2>Why this matters</h2>
+<p>Many SQLAlchemy tutorials begin with <code>Base = declarative_base()</code> from the ORM. As a result, when something breaks outside the ORM, say a connection drops or a transaction commits unexpectedly, beginners have no idea where to look. Engine and Connection are the foundation that supports the ORM Session, and when something goes wrong inside a Session, you ultimately have to debug at the Connection level.</p>
+<p>In production, the most common SQLAlchemy headaches start at the Engine layer. SQLite's <code>database is locked</code> errors, <code>Lost connection</code> retries, connection pool exhaustion, autocommit mode confusion: all of these are configured on the Engine. Without a clear mental model, you end up tweaking <code>pool_size</code>, <code>pool_recycle</code>, and <code>connect_args</code> by guesswork.</p>
+<p>Finally, the 1.x-to-2.x transition is not just a syntax change, it's a usage-model change. 2.x enforces the rule that "execute belongs to a Connection, and every Connection use happens inside a transaction." If you don't know that rule, code written in 2.x style can silently misbehave because of 1.x thinking.</p>
+<h2>Mental Model</h2>
+<p>The Engine in SQLAlchemy is "the ability to talk to a database, made into an object." A Connection is the actual communication channel; an Engine is the factory that holds the configuration and capability to manufacture those channels.</p>
+<blockquote>
+<p>The Engine is not a connection. The Engine is the object that <strong>knows how to make</strong> connections, holding a dialect and a pool. SQL actually flows through a Connection, and a Connection always lives inside a transaction context.</p>
+</blockquote>
+<p>Visually:</p>
+<pre><code>Application code
+      │
+      ▼
+   Engine ── (Dialect: sqlite) ── (URL: sqlite:///app.db)
+      │
+      ├── ConnectionPool (lazy)
+      │       └── DBAPI connection (sqlite3.Connection) × N
+      │
+      └── connect() / begin()
+              │
+              ▼
+          Connection (SQLAlchemy wrapper)
+              │
+              ▼
+          execute(text(&quot;SELECT 1&quot;))
+              │
+              ▼
+          DBAPI cursor → SQLite file
+</code></pre>
+<p>Three things matter. First, the Engine bundles a dialect (which database family), a URL (where it lives), and a pool (how many connections to keep and reuse). Second, a Connection wraps a PEP 249 DB-API connection one layer thicker, and all SQL execution flows through Connection methods. Third, in 2.x transactions are explicit. <code>connect()</code> starts an implicit transaction but you must commit it yourself, while <code>begin()</code> auto-commits or rolls back when its block exits.</p>
+<h2>Core concepts</h2>
+<p><strong>Two layers: Core and ORM</strong></p>
+<p>SQLAlchemy is split into two large layers. <strong>Core</strong> lets you build SQL as Python expressions and execute it through Engine and Connection. <strong>ORM</strong> sits on top of Core and adds mapped Python classes plus a Session for object-relational mapping. They are separate but complementary, and you can always drop down to Core from inside the ORM when needed.</p>
+<p>This series spends posts 1 through 3 on Core and starts ORM in post 4. Even if you only use the ORM, you need Core to debug production issues.</p>
+<p><strong>The Engine is a lazy factory</strong></p>
+<p><code>create_engine()</code> does not connect to the database when you call it. It imports the dialect, parses the URL, and prepares the pool, nothing more. The first connect attempt is when SQLite actually opens or creates the file.</p>
+<pre><code class="language-python">from sqlalchemy import create_engine
+
+engine = create_engine(&quot;sqlite:///app.db&quot;, echo=True)
+# At this point, app.db is not opened yet.
+
+with engine.connect() as conn:
+    # This is when sqlite3.connect(&quot;app.db&quot;) actually runs.
+    ...
+</code></pre>
+<p>Because of this laziness, it's safe to define <code>engine</code> as a module-level global at application import time. No file lock or network call happens just because your module was imported.</p>
+<p><strong>URLs and dialects</strong></p>
+<p>SQLAlchemy URLs follow <code>dialect+driver://user:pass@host:port/database</code>, but for SQLite the host and user portions are empty.</p>
+<p><strong><code>sqlite:///app.db</code></strong><br>
+- Meaning: Relative path from current working directory</p>
+<p><strong><code>sqlite:////var/data/app.db</code></strong><br>
+- Meaning: Absolute path (<code>///</code> plus an extra <code>/</code>)</p>
+<p><strong><code>sqlite://</code></strong><br>
+- Meaning: In-memory DB (same as <code>:memory:</code>)</p>
+<p><strong><code>sqlite:///:memory:</code></strong><br>
+- Meaning: Same in-memory DB</p>
+<p><code>echo=True</code> logs every SQL statement SQLAlchemy executes to stderr. During learning it's almost always worth keeping on.</p>
+<p><strong>Connection vs Session</strong></p>
+<p><strong>Layer</strong><br>
+- Connection (Core): Core<br>
+- Session (ORM): ORM</p>
+<p><strong>Holds</strong><br>
+- Connection (Core): One DBAPI connection<br>
+- Session (ORM): Identity map, unit of work, plus a Connection</p>
+<p><strong>Operates on</strong><br>
+- Connection (Core): Rows, Result<br>
+- Session (ORM): Mapped objects</p>
+<p><strong>Transaction</strong><br>
+- Connection (Core): Explicit (<code>begin()</code>)<br>
+- Session (ORM): Explicit (<code>begin()</code> or <code>commit()</code>)</p>
+<p>This series stays with Connection for now, and Session takes over in post 5.</p>
+<p><strong>2.x style: explicit transactions</strong></p>
+<p>The 1.x-era <code>engine.execute("SELECT 1")</code> shortcut was removed in 2.x. In 2.x every SQL execution must go through a Connection, and a Connection lives inside a transaction. The 2.x style boils down to three patterns:</p>
+<pre><code class="language-python"># Pattern A: read-only (no commit needed)
+with engine.connect() as conn:
+    rows = conn.execute(text(&quot;SELECT * FROM users&quot;)).all()
+
+# Pattern B: write with explicit commit
+with engine.connect() as conn:
+    conn.execute(text(&quot;INSERT INTO users(name) VALUES (:n)&quot;), {&quot;n&quot;: &quot;Alice&quot;})
+    conn.commit()
+
+# Pattern C: auto-commit/rollback (most recommended)
+with engine.begin() as conn:
+    conn.execute(text(&quot;INSERT INTO users(name) VALUES (:n)&quot;), {&quot;n&quot;: &quot;Bob&quot;})
+# On normal exit: commit. On exception: rollback.
+</code></pre>
+<p>Default to Pattern C (<code>engine.begin()</code>) when writes are involved, and only use Pattern A (<code>engine.connect()</code>) for pure reads.</p>
+<h2>Before-After</h2>
+<p><strong>Before: 1.x style and raw sqlite3</strong></p>
+<pre><code class="language-python"># 1.x or earlier mindset: imprecise lifecycle, fuzzy transaction boundary
+import sqlite3
+conn = sqlite3.connect(&quot;app.db&quot;)
+cur = conn.cursor()
+cur.execute(&quot;INSERT INTO users(name) VALUES (?)&quot;, (&quot;Alice&quot;,))
+conn.commit()
+conn.close()
+
+# Or SQLAlchemy 1.x:
+from sqlalchemy import create_engine
+engine = create_engine(&quot;sqlite:///app.db&quot;)
+engine.execute(&quot;INSERT INTO users(name) VALUES ('Alice')&quot;)  # gone in 2.x
+</code></pre>
+<p>Problems: connection lifecycle is manual, transaction scope is unclear, and parameter binding style varies by driver (<code>?</code>, <code>%s</code>, <code>:name</code>, etc.).</p>
+<p><strong>After: 2.x style with explicit transactions</strong></p>
+<pre><code class="language-python">from sqlalchemy import create_engine, text
+
+engine = create_engine(&quot;sqlite:///app.db&quot;, echo=False, future=True)
+
+def add_user(name: str) -&gt; None:
+    with engine.begin() as conn:  # auto commit/rollback
+        conn.execute(
+            text(&quot;INSERT INTO users(name) VALUES (:name)&quot;),
+            {&quot;name&quot;: name},
+        )
+</code></pre>
+<p>Now you get:</p>
+<ul>
+<li>Connections are returned to the pool automatically when the block exits.</li>
+<li>Exceptions trigger automatic rollback.</li>
+<li>Parameter binding is always <code>:name</code> style, regardless of dialect.</li>
+<li>The DB-API is still <code>sqlite3</code>, but you no longer have to import it directly.</li>
+</ul>
+<h2>Step-by-step practice</h2>
+<p>This section walks from an empty directory to a working SQLAlchemy 2.x program.</p>
+<p><strong>Step 1: Set up the environment</strong></p>
+<pre><code class="language-bash">mkdir sqlalchemy-101-ep1 &amp;&amp; cd sqlalchemy-101-ep1
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install &quot;sqlalchemy&gt;=2.0&quot;
+python -c &quot;import sqlalchemy; print(sqlalchemy.__version__)&quot;
+</code></pre>
+<p>You should see a 2.x version. If you see 1.4, run <code>pip install --upgrade "sqlalchemy&gt;=2.0"</code>.</p>
+<p><strong>Step 2: Create an Engine and connect</strong></p>
+<p><code>step2.py</code>:</p>
+<pre><code class="language-python">from sqlalchemy import create_engine, text
+
+engine = create_engine(&quot;sqlite:///app.db&quot;, echo=True)
+
+with engine.connect() as conn:
+    result = conn.execute(text(&quot;SELECT sqlite_version()&quot;))
+    print(result.scalar())
+</code></pre>
+<p>Run it and you'll see SQLAlchemy's SQL log along with the SQLite version. This is also when <code>app.db</code> gets created on disk.</p>
+<p><strong>Step 3: Create a table and insert rows</strong></p>
+<p><code>step3.py</code>:</p>
+<pre><code class="language-python">from sqlalchemy import create_engine, text
+
+engine = create_engine(&quot;sqlite:///app.db&quot;, echo=False)
+
+with engine.begin() as conn:
+    conn.execute(text(&quot;&quot;&quot;
+        CREATE TABLE IF NOT EXISTS users(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE
+        )
+    &quot;&quot;&quot;))
+    conn.execute(
+        text(&quot;INSERT INTO users(name, email) VALUES (:n, :e)&quot;),
+        [
+            {&quot;n&quot;: &quot;Alice&quot;, &quot;e&quot;: &quot;alice@example.com&quot;},
+            {&quot;n&quot;: &quot;Bob&quot;, &quot;e&quot;: &quot;bob@example.com&quot;},
+        ],
+    )
+</code></pre>
+<p>The form <code>execute(stmt, list_of_dicts)</code> behaves like <code>executemany</code>. Named binding (<code>:n</code>, <code>:e</code>) works the same regardless of dialect.</p>
+<p><strong>Step 4: Work with the Result</strong></p>
+<p><code>step4.py</code>:</p>
+<pre><code class="language-python">from sqlalchemy import create_engine, text
+
+engine = create_engine(&quot;sqlite:///app.db&quot;)
+
+with engine.connect() as conn:
+    result = conn.execute(text(&quot;SELECT id, name, email FROM users ORDER BY id&quot;))
+
+    for row in result:
+        # row is named-tuple-like
+        print(row.id, row.name, row.email)
+
+    # To re-iterate, you need a fresh execute (Result is single-pass)
+    rows = conn.execute(text(&quot;SELECT * FROM users&quot;)).all()
+    print(f&quot;total: {len(rows)}&quot;)
+</code></pre>
+<p><strong>Step 5: Apply SQLite-specific PRAGMAs</strong></p>
+<p>SQLite does not enforce foreign key constraints by default. To apply this on every connection automatically, hook into the <code>connect</code> event.</p>
+<pre><code class="language-python">from sqlalchemy import create_engine, event
+
+engine = create_engine(&quot;sqlite:///app.db&quot;)
+
+@event.listens_for(engine, &quot;connect&quot;)
+def _enable_fk(dbapi_conn, connection_record):
+    cur = dbapi_conn.cursor()
+    cur.execute(&quot;PRAGMA foreign_keys = ON&quot;)
+    cur.close()
+</code></pre>
+<p>This is the canonical way to apply dialect-specific configuration uniformly across an application.</p>
+<h2>Common mistakes</h2>
+<p><strong>1. Calling <code>create_engine(...)</code> inside a function.</strong> The Engine should be created once at the application level and shared as a module-level global. Calling it repeatedly recreates the connection pool every time, which defeats its purpose.</p>
+<p><strong>2. Forgetting to commit inside <code>with engine.connect()</code>.</strong> In 2.x, <code>connect()</code> starts a transaction implicitly but does not commit it for you. If you ran INSERT/UPDATE and the data seems to vanish, this is almost always why. Use <code>begin()</code> when writes are involved.</p>
+<p><strong>3. Holding a Connection as a long-lived global instead of passing it as an argument.</strong> A Connection is a short-lived resource. Use it inside a context manager and let it return to the pool.</p>
+<p><strong>4. Building raw SQL with string formatting.</strong> Code like <code>f"SELECT * FROM users WHERE name = '{name}'"</code> creates a SQL injection vector. Always combine <code>text("... WHERE name = :name")</code> with <code>{"name": name}</code>.</p>
+<p><strong>5. Confusing slash counts in SQLite URLs.</strong> After <code>sqlite:///</code>, the path is relative; absolute paths need an additional slash, giving <code>sqlite:////var/data/app.db</code>. Mixing these up creates database files in unexpected locations.</p>
+<p><strong>6. Leaving <code>echo=True</code> on in production.</strong> It's a learning aid, not a production setting. In production, configure SQLAlchemy's logger directly.</p>
+<h2>Real-world application</h2>
+<p>In real applications, the Engine is normally a single global instance. Frameworks like FastAPI or Flask typically wire it up like this:</p>
+<pre><code class="language-python"># db.py
+from sqlalchemy import create_engine, event
+import os
+
+DATABASE_URL = os.getenv(&quot;DATABASE_URL&quot;, &quot;sqlite:///./app.db&quot;)
+
+engine = create_engine(
+    DATABASE_URL,
+    echo=False,
+    pool_pre_ping=True,
+    connect_args={&quot;check_same_thread&quot;: False} if DATABASE_URL.startswith(&quot;sqlite&quot;) else {},
+)
+
+@event.listens_for(engine, &quot;connect&quot;)
+def _sqlite_pragmas(dbapi_conn, _):
+    if DATABASE_URL.startswith(&quot;sqlite&quot;):
+        cur = dbapi_conn.cursor()
+        cur.execute(&quot;PRAGMA foreign_keys = ON&quot;)
+        cur.execute(&quot;PRAGMA journal_mode = WAL&quot;)
+        cur.close()
+</code></pre>
+<p>A few options here are meaningful in production. <code>pool_pre_ping=True</code> runs a tiny query when a connection is checked out from the pool, weeding out stale connections automatically. <code>check_same_thread=False</code> lets SQLite share a connection across threads in multi-threaded servers like FastAPI workers (we cover the details in post 8). <code>journal_mode = WAL</code> greatly improves concurrent reader and writer throughput on SQLite.</p>
+<p>For tests, <code>sqlite:///:memory:</code> or a temporary file gives you isolated fixtures.</p>
+<pre><code class="language-python">import pytest
+from sqlalchemy import create_engine, text
+
+@pytest.fixture
+def engine():
+    eng = create_engine(&quot;sqlite:///:memory:&quot;)
+    with eng.begin() as conn:
+        conn.execute(text(&quot;CREATE TABLE t(id INTEGER PRIMARY KEY)&quot;))
+    yield eng
+    eng.dispose()
+</code></pre>
+<p><code>engine.dispose()</code> closes every connection in the pool. It's the canonical way to prevent leaks at test teardown.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] SQLAlchemy 2.x is installed and <code>sqlalchemy.__version__</code> returns 2.0 or higher</li>
+<li>[ ] You can explain that <code>create_engine()</code> is a lazy factory</li>
+<li>[ ] You can describe the difference between <code>engine.connect()</code> and <code>engine.begin()</code> in one sentence</li>
+<li>[ ] You know why <code>engine.execute(...)</code> was removed in 2.x</li>
+<li>[ ] You used <code>text()</code> with named parameter binding</li>
+<li>[ ] You know the SQLite URL slash rule (<code>sqlite:///</code> relative, <code>sqlite:////</code> absolute)</li>
+<li>[ ] You applied a PRAGMA via <code>event.listens_for(engine, "connect")</code></li>
+<li>[ ] Application code keeps the Engine as a single module-level instance</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create an Engine for <code>sqlite:///./test.db</code>, create a <code>users(id, name)</code> table, insert two rows, and confirm <code>SELECT COUNT(*)</code> returns 2. Every SQL execution must happen inside an <code>engine.begin()</code> or <code>engine.connect()</code> context.</li>
+<li>Take the same code and replace <code>engine.begin()</code> with <code>engine.connect()</code>, but do not call commit. Run it twice and observe whether the data persists. Explain why.</li>
+<li>Create one Engine that applies <code>PRAGMA foreign_keys = ON</code> via <code>event.listens_for(engine, "connect")</code> and another that does not. Insert a child row whose parent does not exist, and compare the behavior.</li>
+<li>Create two <code>sqlite:///:memory:</code> Engines. Create a table on one and check whether it's visible from the other. Use the result to explain the isolation scope of an in-memory DB.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<p>In this post we looked at SQLAlchemy from the bottom up. The Engine is a lazy factory holding a dialect and a pool, a Connection is a short-lived wrapper around a PEP 249 DB-API connection, and 2.x style insists that every execution lives inside an explicit transaction. For SQLite specifically, you also need URL conventions, in-memory DBs, and PRAGMAs like <code>foreign_keys</code> to behave like a grown-up database.</p>
+<p>Next, we move one layer up to <strong>MetaData, Table, Column, and the type system</strong>. That's where Core stops being "raw SQL with extra plumbing" and starts becoming a proper Python representation of your schema. Once Core SQL expressions click, the ORM in post 4 onwards reads almost like English.</p>
+<h2>In this series</h2>
+<ul>
+<li><strong>Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified (current)</strong></li>
+<li>SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (upcoming)</li>
+<li>SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)</li>
+<li>ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)</li>
+<li>Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)</li>
+<li>ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)</li>
+<li>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)</li>
+<li>Events, hybrid_property, and custom types (upcoming)</li>
+<li>Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
+<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.sqlalchemy.org/en/20/tutorial/engine.html">SQLAlchemy 2.x Tutorial - Establishing Connectivity</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/core/connections.html">SQLAlchemy 2.x - Working with Engines and Connections</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/changelog/migration_20.html">SQLAlchemy 2.0 Migration Guide</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#connect-strings">SQLite URL forms in SQLAlchemy</a></li>
+<li><a href="https://peps.python.org/pep-0249/">PEP 249 - Python Database API Specification 2.0</a></li>
+</ul>
+<p class="tags-line">Tags: Python, SQLAlchemy, ORM, Database</p>
+</body>
+</html>

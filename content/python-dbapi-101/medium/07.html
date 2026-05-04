@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PEP 249 Exception Hierarchy and SQLite Error Handling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>PEP 249 Exception Hierarchy and SQLite Error Handling</h1>
+<p>The most common line in database code is <code>try/except Exception</code>. Catching everything in one place feels short and convenient, but in production it forces you to treat "irreversible data corruption" and "a lock that will release in 30 ms" with the same weight. PEP 249 introduced eight standard exception classes precisely to solve this, and <code>sqlite3</code> maps the error codes that the SQLite engine returns onto that hierarchy.</p>
+<p>This post is not about memorizing the mapping table. It is about turning the exception hierarchy into an operational decision tree: "Should I retry this?", "Should I roll back the transaction or leave it open?", "Is this a user input problem or a code bug?" Each PEP 249 class encodes one of those answers.</p>
+<h2>Questions this post answers</h2>
+<ul>
+<li>What do the eight PEP 249 exceptions mean and how are they related?</li>
+<li>How does <code>sqlite3</code> map SQLite error codes (SQLITE_BUSY, SQLITE_CONSTRAINT, ...) to PEP 249 classes?</li>
+<li>Which of <code>OperationalError</code>, <code>IntegrityError</code>, <code>ProgrammingError</code> is safe to retry and which one is a bug?</li>
+<li>What is the difference between BUSY and LOCKED, and how should each be handled?</li>
+<li>What problem do <code>sqlite3.Error.sqlite_errorcode</code> and <code>sqlite_errorname</code> (Python 3.11+) actually solve?</li>
+</ul>
+<h2>Why this matters</h2>
+<p>A common reaction to seeing <code>OperationalError: database is locked</code> in production is one of two extremes: (1) wrap every SQL call in <code>try/except</code> and retry forever, or (2) propagate every error to the user. Both are wrong.</p>
+<p>Option (1) keeps retrying <code>IntegrityError</code>, which never resolves on its own, and locks the worker for minutes. Option (2) turns a 30 ms lock contention into a failed request. The right answer is to react differently per exception class, and that requires the hierarchy to be visible in the code rather than buried in a generic handler.</p>
+<p>A second reason: <code>sqlite3</code> exception messages are English sentences, so it is tempting to branch on <code>if "locked" in str(e)</code>. That code breaks the moment SQLite changes its message wording. Branching on classes and on <code>sqlite_errorcode</code> is the only stable strategy.</p>
+<h2>Mental Model: An exception is a signal about how to react</h2>
+<blockquote>
+<p>An exception class is a signal about how to react in production. Retry, 4xx, or fail-loud should be encoded by the class itself.</p>
+</blockquote>
+<p>Reread the PEP 249 hierarchy with operations in mind:</p>
+<pre><code>Exception
+└── Warning             (warning - usually safe to ignore)
+└── Error               (root of all DB errors)
+    ├── InterfaceError  (driver itself misused - code bug)
+    └── DatabaseError   (engine returned an error)
+        ├── DataError           (data type/range - validate input)
+        ├── OperationalError    (transient or environmental - retry candidate)
+        ├── IntegrityError      (UNIQUE/FK/CHECK violation - never retry)
+        ├── InternalError       (driver internal state corrupted - drop connection)
+        ├── ProgrammingError    (bad SQL or params - code bug)
+        └── NotSupportedError   (feature not supported - code change)
+</code></pre>
+<p>Group the leaves into three operational buckets and decisions become easy:</p>
+<p><strong>Code or schema bug</strong><br>
+- Includes: <code>ProgrammingError</code>, <code>InterfaceError</code>, <code>NotSupportedError</code>, <code>DataError</code><br>
+- Reaction: Fail immediately. Page the team. Never retry.</p>
+<p><strong>Business rule violation</strong><br>
+- Includes: <code>IntegrityError</code><br>
+- Reaction: Translate to a 4xx for the user. Never retry.</p>
+<p><strong>Transient environment</strong><br>
+- Includes: <code>OperationalError</code> (BUSY, LOCKED, partial IO)<br>
+- Reaction: Backoff retry, with a cap.</p>
+<p><code>InternalError</code> is rare but real: when it appears, drop that connection and create a new one rather than reusing it.</p>
+<h2>Core Concept: SQLite error codes and the PEP 249 mapping</h2>
+<p>SQLite defines result codes in two layers. <strong>Primary result codes</strong> like <code>SQLITE_BUSY</code> and <code>SQLITE_CONSTRAINT</code>, and <strong>extended result codes</strong> like <code>SQLITE_BUSY_RECOVERY</code> and <code>SQLITE_CONSTRAINT_UNIQUE</code>. The <code>sqlite3</code> module looks at the primary code to choose a PEP 249 class.</p>
+<p>The mappings you will hit most often:</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>SQLite code</th>
+<th>PEP 249 class</th>
+<th>Meaning</th>
+<th>Reaction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SQLITE_CONSTRAINT_UNIQUE</code></td>
+<td><code>IntegrityError</code></td>
+<td>UNIQUE violation</td>
+<td>Reject the input</td>
+</tr>
+<tr>
+<td><code>SQLITE_CONSTRAINT_FOREIGNKEY</code></td>
+<td><code>IntegrityError</code></td>
+<td>FK violation</td>
+<td>Validate references</td>
+</tr>
+<tr>
+<td><code>SQLITE_CONSTRAINT_CHECK</code></td>
+<td><code>IntegrityError</code></td>
+<td>CHECK violation</td>
+<td>Surface the rule</td>
+</tr>
+<tr>
+<td><code>SQLITE_BUSY</code></td>
+<td><code>OperationalError</code></td>
+<td>Another connection holds the lock</td>
+<td>Backoff retry</td>
+</tr>
+<tr>
+<td><code>SQLITE_LOCKED</code></td>
+<td><code>OperationalError</code></td>
+<td>Same-connection internal lock conflict</td>
+<td>Usually a code structure issue</td>
+</tr>
+<tr>
+<td><code>SQLITE_READONLY</code></td>
+<td><code>OperationalError</code></td>
+<td>DB file is read-only</td>
+<td>Check permissions</td>
+</tr>
+<tr>
+<td><code>SQLITE_CORRUPT</code></td>
+<td><code>DatabaseError</code></td>
+<td>DB file corrupt</td>
+<td>Do NOT retry, restore backup</td>
+</tr>
+<tr>
+<td><code>SQLITE_FULL</code></td>
+<td><code>OperationalError</code></td>
+<td>Disk full</td>
+<td>Free disk</td>
+</tr>
+<tr>
+<td><code>SQLITE_MISUSE</code></td>
+<td><code>ProgrammingError</code></td>
+<td>API misuse</td>
+<td>Code bug</td>
+</tr>
+</tbody>
+</table>
+<p>Notice that <code>OperationalError</code> covers both BUSY (retry forever) and CORRUPT (never retry). The class alone is not enough; you also need the code. From Python 3.11 onward, <code>sqlite3.Error</code> exposes <code>sqlite_errorcode</code> (an integer) and <code>sqlite_errorname</code> (a string such as <code>"SQLITE_BUSY_TIMEOUT"</code>):</p>
+<pre><code class="language-python">import sqlite3
+
+try:
+    conn.execute(&quot;INSERT INTO users(email) VALUES (?)&quot;, (&quot;a@example.com&quot;,))
+except sqlite3.Error as exc:
+    print(type(exc).__name__, exc.sqlite_errorcode, exc.sqlite_errorname)
+</code></pre>
+<p>Pre-3.11 you only have <code>exc.args[0]</code> (a string). Production code should target 3.11+ so the branching can be stable.</p>
+<h2>Before / After: anti-pattern vs principled handling</h2>
+<p><strong>Before: one handler for everything</strong></p>
+<pre><code class="language-python">def create_user(conn, email: str) -&gt; int:
+    try:
+        cur = conn.execute(
+            &quot;INSERT INTO users(email) VALUES (?)&quot;, (email,)
+        )
+        conn.commit()
+        return cur.lastrowid
+    except Exception as exc:
+        logging.error(&quot;insert failed: %s&quot;, exc)
+        return -1
+</code></pre>
+<p>Three problems. UNIQUE violation and a full disk produce the same log line. The caller only sees <code>-1</code> and cannot decide on a status code. A <code>BUSY</code> raised from <code>commit()</code> itself disappears into the same bucket.</p>
+<p><strong>After: branch on class, expose intent via domain exceptions</strong></p>
+<pre><code class="language-python">import sqlite3
+from typing import NewType
+
+UserId = NewType(&quot;UserId&quot;, int)
+
+class DuplicateEmail(Exception): ...
+class TransientDBError(Exception): ...
+
+def create_user(conn: sqlite3.Connection, email: str) -&gt; UserId:
+    try:
+        cur = conn.execute(
+            &quot;INSERT INTO users(email) VALUES (?)&quot;, (email,)
+        )
+        conn.commit()
+        return UserId(cur.lastrowid)
+    except sqlite3.IntegrityError as exc:
+        if exc.sqlite_errorname == &quot;SQLITE_CONSTRAINT_UNIQUE&quot;:
+            raise DuplicateEmail(email) from exc
+        raise
+    except sqlite3.OperationalError as exc:
+        if exc.sqlite_errorname in {
+            &quot;SQLITE_BUSY&quot;, &quot;SQLITE_BUSY_TIMEOUT&quot;, &quot;SQLITE_LOCKED&quot;
+        }:
+            raise TransientDBError(str(exc)) from exc
+        raise
+</code></pre>
+<p>Domain exceptions (<code>DuplicateEmail</code>, <code>TransientDBError</code>) let the caller decide policy: 4xx, retry, or 5xx. Anything that is not classified explicitly bubbles up so it cannot be silently swallowed.</p>
+<h2>Step by Step: building a safe retry decorator</h2>
+<p><strong>Step 1. Classify exceptions</strong></p>
+<pre><code class="language-python">import sqlite3
+
+RETRYABLE_NAMES = {
+    &quot;SQLITE_BUSY&quot;,
+    &quot;SQLITE_BUSY_RECOVERY&quot;,
+    &quot;SQLITE_BUSY_SNAPSHOT&quot;,
+    &quot;SQLITE_BUSY_TIMEOUT&quot;,
+    &quot;SQLITE_LOCKED&quot;,
+    &quot;SQLITE_LOCKED_SHAREDCACHE&quot;,
+}
+
+def is_retryable(exc: BaseException) -&gt; bool:
+    if not isinstance(exc, sqlite3.OperationalError):
+        return False
+    name = getattr(exc, &quot;sqlite_errorname&quot;, &quot;&quot;)
+    return name in RETRYABLE_NAMES
+</code></pre>
+<p><code>IntegrityError</code>, <code>ProgrammingError</code>, and <code>SQLITE_CORRUPT</code> all return False.</p>
+<p><strong>Step 2. Exponential backoff with jitter</strong></p>
+<pre><code class="language-python">import functools
+import random
+import time
+from typing import Callable, TypeVar, ParamSpec
+
+P = ParamSpec(&quot;P&quot;)
+R = TypeVar(&quot;R&quot;)
+
+def retry_on_transient(
+    *, max_attempts: int = 5, base_delay: float = 0.05, max_delay: float = 1.0
+) -&gt; Callable[[Callable[P, R]], Callable[P, R]]:
+    def decorator(fn: Callable[P, R]) -&gt; Callable[P, R]:
+        @functools.wraps(fn)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -&gt; R:
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return fn(*args, **kwargs)
+                except Exception as exc:
+                    if attempt == max_attempts or not is_retryable(exc):
+                        raise
+                    delay = min(max_delay, base_delay * (2 ** (attempt - 1)))
+                    delay += random.uniform(0, delay * 0.1)  # jitter
+                    time.sleep(delay)
+            raise RuntimeError(&quot;unreachable&quot;)
+        return wrapper
+    return decorator
+</code></pre>
+<p>Two points matter. <code>is_retryable</code> checks both class and code precisely, and the backoff includes jitter to avoid a thundering herd of workers waking up simultaneously.</p>
+<p><strong>Step 3. Put the entire transaction inside the retried function</strong></p>
+<pre><code class="language-python">@retry_on_transient(max_attempts=5)
+def transfer(conn: sqlite3.Connection, src: int, dst: int, amount: int) -&gt; None:
+    with conn:  # context manager handles commit/rollback
+        conn.execute(
+            &quot;UPDATE accounts SET balance = balance - ? WHERE id = ?&quot;, (amount, src)
+        )
+        conn.execute(
+            &quot;UPDATE accounts SET balance = balance + ? WHERE id = ?&quot;, (amount, dst)
+        )
+</code></pre>
+<p>The <code>with conn:</code> block must live inside the function, so a retry restarts the transaction from scratch. Re-running only <code>commit()</code> after a partial transaction breaks atomicity guarantees.</p>
+<p><strong>Step 4. Make retries observable</strong></p>
+<pre><code class="language-python">import logging
+
+log = logging.getLogger(&quot;db&quot;)
+
+def is_retryable(exc: BaseException) -&gt; bool:
+    if not isinstance(exc, sqlite3.OperationalError):
+        return False
+    name = getattr(exc, &quot;sqlite_errorname&quot;, &quot;&quot;)
+    code = getattr(exc, &quot;sqlite_errorcode&quot;, -1)
+    retryable = name in RETRYABLE_NAMES
+    log.info(
+        &quot;db error name=%s code=%s retryable=%s msg=%s&quot;,
+        name, code, retryable, exc
+    )
+    return retryable
+</code></pre>
+<p>Retry counts, the final outcome, and the last exception code should all flow into your dashboard. A growing retry rate is an early warning of lock contention or disk pressure.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Branching on string content.</strong> <code>if "UNIQUE constraint" in str(exc):</code> breaks the day SQLite changes its wording. Use <code>sqlite_errorname == "SQLITE_CONSTRAINT_UNIQUE"</code>.</p>
+<p><strong>Retrying <code>IntegrityError</code>.</strong> A UNIQUE violation will not become not-a-violation by waiting. Five inserts of the same email will fail five times.</p>
+<p><strong>Retrying outside <code>with conn:</code>.</strong> Restarting only the failing statement after a transaction has begun gives you partial commits. Retry the entire transactional unit.</p>
+<p><strong>Catching <code>BaseException</code>.</strong> That swallows <code>KeyboardInterrupt</code> and <code>SystemExit</code>. Catch <code>Exception</code> or narrower.</p>
+<p><strong>Unbounded retries.</strong> A truly stuck external lock will pin a worker forever. Always set <code>max_attempts</code> and <code>max_delay</code>.</p>
+<p><strong>Reusing a connection after <code>InternalError</code>.</strong> Some <code>InternalError</code> and <code>OperationalError(SQLITE_CORRUPT)</code> cases leave the connection in a bad state. Drop it and open a new one.</p>
+<h2>In Practice: integrating with FastAPI</h2>
+<p>Translating domain exceptions into HTTP status codes:</p>
+<pre><code class="language-python">from fastapi import FastAPI, HTTPException, status
+
+app = FastAPI()
+
+@app.exception_handler(DuplicateEmail)
+async def handle_duplicate_email(_, exc: DuplicateEmail):
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail=f&quot;email already exists: {exc.args[0]}&quot;,
+    )
+
+@app.exception_handler(TransientDBError)
+async def handle_transient(_, exc: TransientDBError):
+    # The retry decorator already exhausted max_attempts.
+    # Tell the client to back off; do not loop again here.
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=&quot;database temporarily unavailable&quot;,
+    )
+
+@app.post(&quot;/users&quot;, status_code=201)
+def post_user(payload: UserCreate, conn=Depends(get_conn)):
+    user_id = create_user(conn, payload.email)
+    return {&quot;id&quot;: user_id}
+</code></pre>
+<p>Do not write a custom handler for <code>ProgrammingError</code> or <code>InterfaceError</code>. Let them become 500s and route them to your alerting channel (e.g., Sentry). They are bugs, not user-facing situations, and they need a code fix rather than a softer message.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Replaced <code>except Exception</code> with narrower classes?</li>
+<li>[ ] Retries scoped to <code>OperationalError</code> of the BUSY/LOCKED family only?</li>
+<li>[ ] Branching on <code>sqlite_errorname</code> / <code>sqlite_errorcode</code> (Python 3.11+)?</li>
+<li>[ ] <code>IntegrityError</code> translated to a 4xx response, not a 5xx?</li>
+<li>[ ] Retry decorator caps both <code>max_attempts</code> and <code>max_delay</code>?</li>
+<li>[ ] Backoff includes jitter?</li>
+<li>[ ] The full transaction lives inside the retried function?</li>
+<li>[ ] A path exists to drop a connection on <code>InternalError</code>?</li>
+<li>[ ] Retry counts and final outcomes flow into logs/metrics?</li>
+<li>[ ] <code>ProgrammingError</code> triggers an alert, not just a log line?</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li><strong>Classify.</strong> Sort the following into retry / 4xx / 5xx: (a) <code>IntegrityError(SQLITE_CONSTRAINT_FOREIGNKEY)</code>, (b) <code>OperationalError(SQLITE_BUSY)</code>, (c) <code>OperationalError(SQLITE_CORRUPT)</code>, (d) <code>ProgrammingError(SQLITE_MISUSE)</code>, (e) <code>DataError</code>.</li>
+<li><strong>Reproduce.</strong> Open two connections. Hold a <code>BEGIN IMMEDIATE</code> on one. From the other, with a short <code>busy_timeout</code> (e.g., 100 ms), attempt an INSERT to reproduce <code>SQLITE_BUSY</code>. Then apply <code>retry_on_transient</code> and observe success.</li>
+<li><strong>Bug it.</strong> Modify <code>is_retryable</code> to return True for <code>IntegrityError</code> and observe what happens when you insert a duplicate (count attempts, total delay).</li>
+<li><strong>Generalize.</strong> Refactor the decorator to accept a classification function, so you can plug in a PostgreSQL classifier without rewriting the loop.</li>
+</ol>
+<h2>Wrap-up and Next</h2>
+<ul>
+<li>Re-grouping PEP 249 into "code bug / business rule / transient environment" makes the right reaction obvious for each exception.</li>
+<li><code>sqlite3</code> maps SQLite codes to PEP 249 classes, but <code>OperationalError</code> mixes retry-safe and retry-unsafe cases, so always inspect <code>sqlite_errorname</code>.</li>
+<li>Retry only BUSY/LOCKED; translate <code>IntegrityError</code> into a domain exception and a 4xx.</li>
+<li>Retry the entire transactional block, cap attempts, add jitter, and log codes.</li>
+</ul>
+<p>The next post moves from errors to connections themselves: SQLite's thread-safety modes, <code>check_same_thread</code>, per-thread vs shared connections, and connection management in FastAPI.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/05-transactions-isolation.md">Transactions and isolation levels (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/06-row-factories-adapters.md">Row factories and type adapters (sqlite3, PEP 249)</a></li>
+<li><strong>PEP 249 Exception Hierarchy and SQLite Error Handling (current)</strong></li>
+<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0249/">PEP 249 — Python Database API 2.0</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html"><code>sqlite3</code> — DB-API 2.0 interface for SQLite</a></li>
+<li><a href="https://www.sqlite.org/rescode.html">SQLite Result and Error Codes</a></li>
+<li><a href="https://www.sqlite.org/lockingv3.html">SQLite: File Locking and Concurrency</a></li>
+<li><a href="https://docs.python.org/3/whatsnew/3.11.html#sqlite3">What's New in Python 3.11 — sqlite3</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

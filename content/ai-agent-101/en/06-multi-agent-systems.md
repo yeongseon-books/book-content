@@ -3,7 +3,7 @@ title: Multi-Agent Systems
 series: ai-agent-101
 episode: 6
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ The core of multi-agent systems is coordination and delegation. Patterns include
 This article covers multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
 
 ---
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- How do you tell a single-agent task from a real multi-agent task?
+- What do Supervisor, Hierarchical, and Swarm patterns actually look like?
+- What is the most common failure mode in agent-to-agent protocols?
+- Which delegation mistakes blow up cost the fastest?
+
+<!-- a-grade-intro:end -->
+
 ## Multi-Agent Patterns
 
 There are several patterns for handling complex tasks through cooperation among multiple agents.
@@ -991,6 +1002,17 @@ Handling individual agent failures explicitly increases system reliability.
 - Pick the delegation strategy (role-based, capability-based, load-based) that fits your task
 - Use multi-agent only when truly necessary; a single agent often suffices for simple tasks
 - Standard message formats, infinite-loop prevention, and failure handling are mandatory in production
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Sorted tasks into single-agent vs multi-agent buckets with explicit criteria.
+- [ ] Implemented or sketched a Supervisor-pattern example.
+- [ ] Defined an explicit message schema between agents.
+- [ ] Tracked agent-to-agent calls and either reproduced or avoided a cost blowup.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

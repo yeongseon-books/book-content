@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SQLite Production Patterns: retry, timeout, observability, backup</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SQLite Production Patterns: retry, timeout, observability, backup</h1>
+<p>The previous nine posts covered nearly every behavior of SQLite and PEP 249. This finale is about wiring those behaviors into a production-grade application. SQLite is light, but lightness is not an excuse to drop operational visibility. Retries should be measured, slow queries should be flagged automatically, traces should reach the SQL layer, and backups should be verified.</p>
+<p>This post does not introduce many new ideas. It composes the patterns from earlier posts into a single production-ready shape that you can copy into a service.</p>
+<h2>Questions this post answers</h2>
+<ul>
+<li>How should retry, timeout, and <code>busy_timeout</code> be configured together?</li>
+<li>How do you automate slow-query logging, and how do you pick the threshold?</li>
+<li>How do you instrument SQLite calls with OpenTelemetry?</li>
+<li>What is the difference between the three backup methods (file copy, <code>.backup</code>, online backup API)?</li>
+<li>What absolutely belongs on a SQLite production checklist?</li>
+</ul>
+<h2>Why this matters</h2>
+<p>When a SQLite-backed service misbehaves in production, the most common reactions are: (1) "I don't know, restart it", or (2) "Just <code>cp</code> the DB file". Both work some of the time, but they bet your data integrity and your SLO on luck.</p>
+<p>The goal here is to remove luck from the picture. Retries become measurable thanks to backoff and jitter, timeouts become deliberate, observability is a one-decorator concern, and backups are transactionally consistent and routinely verified.</p>
+<h2>Mental Model: SQLite is still a DBMS</h2>
+<blockquote>
+<p>SQLite being a single file simplifies operations, but treating it as "just a file" is dangerous. Copying a file mid-transaction yields a corrupted backup. SQLite is light, but it is a DBMS.</p>
+</blockquote>
+<p>Four production axes:</p>
+<ul>
+<li><strong>Resilience</strong>: absorb BUSY/LOCKED via retries; never retry forever.</li>
+<li><strong>Bounded latency</strong>: timeout + max_attempts together cap response time.</li>
+<li><strong>Observability</strong>: every SQL call leaves a trace in metrics, traces, and logs.</li>
+<li><strong>Recoverability</strong>: backups are transactionally consistent and recovery is verified periodically.</li>
+</ul>
+<h2>Core Concepts</h2>
+<p><strong>timeout vs busy_timeout vs retry</strong></p>
+<p>Three knobs that look similar live at different layers:</p>
+<p><strong><code>sqlite3.connect(timeout=5.0)</code></strong><br>
+- Where: Python<br>
+- Meaning: Convenience setter for <code>busy_timeout</code> (5000 ms)</p>
+<p><strong><code>PRAGMA busy_timeout=5000</code></strong><br>
+- Where: SQLite engine<br>
+- Meaning: Max time to wait for a lock during one call</p>
+<p><strong>Application retry</strong><br>
+- Where: Code<br>
+- Meaning: Re-attempt OperationalError(BUSY/LOCKED)</p>
+<p><code>busy_timeout</code> is the wait inside <strong>one</strong> call; retry is a policy across <strong>multiple</strong> calls. You need both. A long busy_timeout alone makes one call hang too long; retry alone misses brief lock-hold windows.</p>
+<p>A reasonable starting point: <code>busy_timeout=2000-5000 ms</code> plus <code>max_attempts=3-5</code>.</p>
+<p><strong>Picking a slow-query threshold</strong></p>
+<p>"Slow" is not an absolute number. Take 2-3x your p95 latency, log SQL text and a trimmed parameter slice (PII masked), and alert when the rate exceeds a target. Too low a threshold floods logs; too high a threshold lets gradual regressions slip past.</p>
+<p><strong>Three backup methods</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Consistent?</th>
+<th>Downtime</th>
+<th>Fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cp app.db backup.db</code></td>
+<td>No</td>
+<td>None</td>
+<td>Never use</td>
+</tr>
+<tr>
+<td>sqlite3 shell <code>.backup</code></td>
+<td>Yes</td>
+<td>Negligible</td>
+<td>Recommended for ops</td>
+</tr>
+<tr>
+<td>Python <code>Connection.backup()</code></td>
+<td>Yes</td>
+<td>Negligible</td>
+<td>Code integration</td>
+</tr>
+<tr>
+<td><code>VACUUM INTO 'backup.db'</code></td>
+<td>Yes</td>
+<td>Can be long</td>
+<td>When you also want compaction</td>
+</tr>
+</tbody>
+</table>
+<p><code>Connection.backup()</code> calls SQLite's online backup API. It is safe while transactions are in progress and works under WAL.</p>
+<h2>Before / After: a single production-ready module</h2>
+<p><strong>Before: scattered handling</strong></p>
+<pre><code class="language-python">import sqlite3, logging
+
+def get_user(user_id):
+    conn = sqlite3.connect(&quot;app.db&quot;)
+    try:
+        return conn.execute(&quot;SELECT * FROM users WHERE id=?&quot;, (user_id,)).fetchone()
+    except Exception as e:
+        logging.error(e)
+        return None
+</code></pre>
+<p>No retry, no timeout, no slow-query measurement, no tracing. A single BUSY in production fails the request outright.</p>
+<p><strong>After: a single module that owns the patterns</strong></p>
+<pre><code class="language-python"># db.py
+from __future__ import annotations
+import sqlite3
+import time
+import random
+import logging
+import functools
+from contextlib import contextmanager
+from typing import Callable, Iterator, ParamSpec, TypeVar
+
+log = logging.getLogger(&quot;db&quot;)
+SLOW_QUERY_THRESHOLD_MS = 200.0
+
+P = ParamSpec(&quot;P&quot;)
+R = TypeVar(&quot;R&quot;)
+
+RETRYABLE = {&quot;SQLITE_BUSY&quot;, &quot;SQLITE_BUSY_TIMEOUT&quot;, &quot;SQLITE_LOCKED&quot;}
+
+def open_conn(path: str) -&gt; sqlite3.Connection:
+    conn = sqlite3.connect(path, isolation_level=None, timeout=5.0)
+    conn.execute(&quot;PRAGMA journal_mode=WAL&quot;)
+    conn.execute(&quot;PRAGMA synchronous=NORMAL&quot;)
+    conn.execute(&quot;PRAGMA foreign_keys=ON&quot;)
+    conn.execute(&quot;PRAGMA busy_timeout=5000&quot;)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def is_retryable(exc: BaseException) -&gt; bool:
+    if not isinstance(exc, sqlite3.OperationalError):
+        return False
+    return getattr(exc, &quot;sqlite_errorname&quot;, &quot;&quot;) in RETRYABLE
+
+def retry(*, max_attempts: int = 5, base_delay: float = 0.05, max_delay: float = 1.0):
+    def deco(fn: Callable[P, R]) -&gt; Callable[P, R]:
+        @functools.wraps(fn)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -&gt; R:
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return fn(*args, **kwargs)
+                except Exception as exc:
+                    if attempt == max_attempts or not is_retryable(exc):
+                        raise
+                    delay = min(max_delay, base_delay * (2 ** (attempt - 1)))
+                    delay += random.uniform(0, delay * 0.1)
+                    log.info(&quot;db retry attempt=%d delay=%.3fs exc=%s&quot;, attempt, delay, exc)
+                    time.sleep(delay)
+            raise RuntimeError(&quot;unreachable&quot;)
+        return wrapper
+    return deco
+
+@contextmanager
+def timed_query(label: str) -&gt; Iterator[None]:
+    t0 = time.perf_counter()
+    try:
+        yield
+    finally:
+        elapsed_ms = (time.perf_counter() - t0) * 1000
+        if elapsed_ms &gt;= SLOW_QUERY_THRESHOLD_MS:
+            log.warning(&quot;slow query label=%s elapsed_ms=%.1f&quot;, label, elapsed_ms)
+</code></pre>
+<p>A connection factory with WAL+busy_timeout, a retry decorator scoped to BUSY/LOCKED, and a slow-query timer in one place. The next steps add OpenTelemetry and backups.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1. OpenTelemetry SQL spans</strong></p>
+<pre><code class="language-python"># tracing.py
+from opentelemetry import trace
+
+tracer = trace.get_tracer(&quot;app.db&quot;)
+
+def trace_query(label: str):
+    def deco(fn):
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            with tracer.start_as_current_span(f&quot;db.{label}&quot;) as span:
+                span.set_attribute(&quot;db.system&quot;, &quot;sqlite&quot;)
+                t0 = time.perf_counter()
+                try:
+                    return fn(*args, **kwargs)
+                finally:
+                    span.set_attribute(&quot;db.duration_ms&quot;, (time.perf_counter()-t0)*1000)
+        return wrapper
+    return deco
+</code></pre>
+<p>You may be tempted to set <code>db.statement</code> to the raw SQL. Don't, because of PII risk. Use a label or a normalized SQL form.</p>
+<p><strong>Step 2. Compose decorators</strong></p>
+<pre><code class="language-python">@trace_query(&quot;get_user&quot;)
+@retry(max_attempts=5)
+def get_user(conn, user_id: int):
+    with timed_query(&quot;get_user&quot;):
+        cur = conn.execute(&quot;SELECT id, email FROM users WHERE id=?&quot;, (user_id,))
+        row = cur.fetchone()
+    return dict(row) if row else None
+</code></pre>
+<p>Order matters. <code>@retry</code> should be the inner decorator and <code>@trace_query</code> the outer one, so all retries appear inside a single span.</p>
+<p><strong>Step 3. Online backup</strong></p>
+<pre><code class="language-python"># backup.py
+import sqlite3
+from pathlib import Path
+
+def backup_db(src_path: str, dst_path: str, *, pages: int = 1000) -&gt; None:
+    src = sqlite3.connect(src_path)
+    dst = sqlite3.connect(dst_path)
+    try:
+        src.backup(dst, pages=pages, progress=lambda status, remaining, total: None)
+    finally:
+        src.close()
+        dst.close()
+</code></pre>
+<p><code>pages</code> is the number of pages to copy per step. The default (<code>-1</code>) copies everything in one go; for larger DBs, set it to ~1000 and throttle inside the progress callback (e.g., <code>time.sleep(0.01)</code>) to limit the impact on writers.</p>
+<p><strong>Step 4. Scheduled backup</strong></p>
+<pre><code class="language-python"># scripts/backup.py
+import sys, time, gzip, shutil
+from pathlib import Path
+from app.backup import backup_db
+
+def main():
+    src = Path(&quot;app.db&quot;)
+    today = time.strftime(&quot;%Y%m%d-%H%M%S&quot;)
+    dst = Path(f&quot;backups/app-{today}.db&quot;)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    backup_db(str(src), str(dst))
+    with open(dst, &quot;rb&quot;) as f, gzip.open(f&quot;{dst}.gz&quot;, &quot;wb&quot;) as gz:
+        shutil.copyfileobj(f, gz)
+    dst.unlink()
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Run from cron or a systemd timer. Pair with a retention policy (e.g., daily + weekly + monthly).</p>
+<p><strong>Step 5. Restore verification</strong></p>
+<p>A backup proves itself only by being restored. Periodically restore to a tempdir and run an integrity check.</p>
+<pre><code class="language-python"># scripts/restore_check.py
+import sqlite3, gzip, shutil, sys, tempfile
+from pathlib import Path
+
+def restore_check(gz_path: str) -&gt; None:
+    with tempfile.TemporaryDirectory() as td:
+        plain = Path(td) / &quot;restored.db&quot;
+        with gzip.open(gz_path, &quot;rb&quot;) as gz, open(plain, &quot;wb&quot;) as f:
+            shutil.copyfileobj(gz, f)
+        conn = sqlite3.connect(plain)
+        result = conn.execute(&quot;PRAGMA integrity_check&quot;).fetchone()[0]
+        if result != &quot;ok&quot;:
+            sys.exit(f&quot;integrity_check failed: {result}&quot;)
+        rows = conn.execute(&quot;SELECT count(*) FROM users&quot;).fetchone()[0]
+        print(f&quot;restored OK; users={rows}&quot;)
+</code></pre>
+<p>Run weekly in CI. This catches silent breakage of the backup pipeline before you actually need to restore.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Backing up with <code>cp</code>.</strong> Mid-transaction copies are corrupted. Always use <code>Connection.backup()</code> or <code>.backup</code>.</p>
+<p><strong>Setting only timeout or only retry.</strong> <code>busy_timeout</code> caps wait inside a call; retry is the policy across calls. You need both for a real response-time bound.</p>
+<p><strong>No slow-query threshold.</strong> Without a definition of "slow", every postmortem invents one. Encode "2-3x p95" in code so it is hard to argue.</p>
+<p><strong>Sending raw SQL to traces.</strong> PII risk. Use a label or normalized SQL.</p>
+<p><strong>Skipping restore verification.</strong> Daily backups that nobody restores will be broken on the day they are needed.</p>
+<p><strong>Ignoring <code>-wal</code> and <code>-shm</code> files.</strong> Under WAL, SQLite creates <code>app.db-wal</code> and <code>app.db-shm</code> next to <code>app.db</code>. Either include them in physical copies or use <code>Connection.backup()</code> to fold everything into a single file.</p>
+<h2>In Practice: an SLO-driven runbook</h2>
+<p>Common SLO items and how to measure them:</p>
+<p><strong>Query p95</strong><br>
+- Source: OpenTelemetry span duration</p>
+<p><strong>BUSY rate</strong><br>
+- Source: Retry decorator's "attempt &gt;= 2" ratio</p>
+<p><strong>Slow-query rate</strong><br>
+- Source: Count of <code>slow query</code> log lines / total queries</p>
+<p><strong>Backup success rate</strong><br>
+- Source: Backup script exit code, restore verification result</p>
+<p><strong>Disk usage</strong><br>
+- Source: <code>ls -l app.db*</code> and <code>PRAGMA page_count * page_size</code></p>
+<p>Reasonable alert thresholds: BUSY rate &gt; 1%, slow-query rate &gt; 5%, any backup failure. Tune both ways: too sensitive causes alert fatigue, too permissive misses real degradations.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Connection factory sets WAL, foreign_keys, and busy_timeout?</li>
+<li>[ ] Retry scoped to BUSY/LOCKED only, with bounded <code>max_attempts</code> and jitter?</li>
+<li>[ ] Slow-query threshold defined in code or config?</li>
+<li>[ ] OpenTelemetry spans carry <code>db.system=sqlite</code> and a label?</li>
+<li>[ ] PII masked in SQL/parameter logs and span attributes?</li>
+<li>[ ] Backups use <code>Connection.backup()</code> or <code>.backup</code>?</li>
+<li>[ ] Retention policy (daily/weekly/monthly) defined?</li>
+<li>[ ] Restore verification scheduled?</li>
+<li>[ ] BUSY rate and slow-query rate exposed as metrics?</li>
+<li>[ ] Disk usage including WAL files monitored?</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li><strong>Compose.</strong> Add OpenTelemetry instrumentation to the <code>db.py</code> above and write a unit test that asserts: 5 retries, 200 ms threshold, single span.</li>
+<li><strong>Load.</strong> Write a script that simulates 1000 RPS and measure p50/p95/p99 latency, BUSY rate, retry rate.</li>
+<li><strong>Backup comparison.</strong> On a 1 GB database compare (a) <code>cp</code>, (b) <code>.backup</code>, (c) <code>Connection.backup(pages=1000)</code> for elapsed time and resulting size. Method (a) is forbidden in production, but seeing the difference is instructive.</li>
+<li><strong>Alerting.</strong> Document on a single page how you would reduce false positives and false negatives for an alert defined as "BUSY rate &gt; 1% sustained for 5 minutes".</li>
+</ol>
+<h2>Wrap-up: series finale</h2>
+<p>Ten posts covered:</p>
+<ul>
+<li>The DB-API 2.0 interface (PEP 249) and how <code>sqlite3</code> maps onto it</li>
+<li>Connection, cursor, paramstyle, executemany</li>
+<li>Parameter binding and SQL-injection prevention</li>
+<li>Transactions and isolation, WAL, autocommit</li>
+<li>Row factories and type adapter/converter</li>
+<li>The PEP 249 exception hierarchy and retry policy</li>
+<li>Thread-safety, check_same_thread, and connection strategy</li>
+<li>aiosqlite and async patterns</li>
+<li>Production patterns: retry, timeout, observability, backup</li>
+</ul>
+<p>You now have the tools to build a small but operable SQLite-backed service. The next series puts SQLAlchemy on top of this foundation to move into ORM and session-management patterns. You do not need prior SQLAlchemy knowledge; the transaction and connection concepts from this series translate directly.</p>
+<p>Thanks for reading.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/05-transactions-isolation.md">Transactions and isolation levels (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/06-row-factories-adapters.md">Row factories and type adapters (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/07-error-handling-exception-hierarchy.md">PEP 249 Exception Hierarchy and SQLite Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/08-connection-pooling.md">SQLite Connection Management: thread-safety, check_same_thread, and Pooling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/09-async-aiosqlite.md">Asynchronous SQLite with aiosqlite</a></li>
+<li><strong>SQLite Production Patterns: retry, timeout, observability, backup (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.backup">Python <code>sqlite3.Connection.backup</code></a></li>
+<li><a href="https://www.sqlite.org/backup.html">SQLite Online Backup API</a></li>
+<li><a href="https://www.sqlite.org/pragma.html#pragma_busy_timeout">SQLite PRAGMA busy_timeout</a></li>
+<li><a href="https://opentelemetry.io/docs/specs/semconv/database/database-spans/">OpenTelemetry — Semantic Conventions for Database Calls</a></li>
+<li><a href="https://www.sqlite.org/lang_vacuum.html#vacuuminto">SQLite — VACUUM INTO</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

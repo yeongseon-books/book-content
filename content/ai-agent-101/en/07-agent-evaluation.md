@@ -3,7 +3,7 @@ title: Agent Evaluation
 series: ai-agent-101
 episode: 7
 language: en
-status: draft
+status: publish-ready
 targets:
   tistory: false
   hashnode: true
@@ -29,6 +29,17 @@ Agent evaluation is divided into three levels. Individual tool call accuracy (To
 This article covers agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
 
 ---
+<!-- a-grade-intro:begin -->
+
+## Key Questions
+
+- What makes agent evaluation fundamentally different from ML model evaluation?
+- What do you look at to call a trajectory success or failure?
+- How do you measure tool-call accuracy?
+- Where do end-to-end tests and benchmarks pull in different directions?
+
+<!-- a-grade-intro:end -->
+
 ## Agent Evaluation Metrics
 
 Agent evaluation must look beyond "did it answer well" to multiple dimensions. The core metrics are below.
@@ -596,6 +607,17 @@ Pre-deploy regression testing is mandatory.
 - End-to-end scenario tests validate multi-turn dialogue, state, and tool chains together
 - Use both standard and custom benchmarks to catch regressions
 - Evaluate by averaging 5-10 runs, not a single execution
+
+<!-- a-grade-example:begin -->
+
+## Checklist
+
+- [ ] Split agent metrics into task / step / tool levels.
+- [ ] Hand-scored a single trajectory step by step.
+- [ ] Wrote a small script that auto-measures tool-call accuracy.
+- [ ] Compared E2E and benchmark scores on the same task.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## In this series

@@ -61,7 +61,17 @@
 <p>Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Execute, and Reflexion. Each pattern has pros and cons depending on task characteristics, and agent designers must choose patterns that match the task type.</p>
 <p>This article covers major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.</p>
 <hr>
-<h2>Major Workflow Patterns</h2>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>When does each of ReAct, Plan-and-Execute, and Reflexion shine?</li>
+<li>How do you decide the right granularity of decomposed steps?</li>
+<li>Where should state live inside a workflow?</li>
+<li>What validation must happen before pushing a workflow to production?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
 <h2>Key Workflow Patterns</h2>
 <p>Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.</p>
 <p><strong>ReAct (Reasoning + Acting)</strong></p>
@@ -1190,7 +1200,36 @@ else:
     result = old_workflow.execute(data)
 </code></pre>
 <p><strong>Lesson</strong>: Go through unit tests, integration tests, and simulation before production deployment.</p>
-<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Workflows are about designing agents to systematically perform complex tasks.</li>
+<li>Various patterns like ReAct, Plan-and-Execute, and Reflexion exist, and you must choose based on task characteristics.</li>
+<li>Task decomposition and state management are the core of workflow design.</li>
+</ul>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Built a one-page comparison of ReAct vs Plan-and-Execute vs Reflexion.</li>
+<li>[ ] Compared two versions of a task split too small vs too large.</li>
+<li>[ ] Wrote a workflow that keeps state in an external store.</li>
+<li>[ ] Applied at least two of: unit tests, simulation, canary rollout.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><strong>Agent Workflow Design (current)</strong></li>
+<li>Memory and State (upcoming)</li>
+<li>Multi-Agent Systems (upcoming)</li>
+<li>Agent Evaluation (upcoming)</li>
+<li>Error Handling and Reliability (upcoming)</li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ol>
 <li>
@@ -1210,26 +1249,6 @@ else:
    Real implementation example of Plan-and-Execute pattern. Shows autonomous agent task decomposition and execution strategies.</p>
 </li>
 </ol>
-<h2>Key Takeaways</h2>
-<ul>
-<li>Workflows are about designing agents to systematically perform complex tasks.</li>
-<li>Various patterns like ReAct, Plan-and-Execute, and Reflexion exist, and you must choose based on task characteristics.</li>
-<li>Task decomposition and state management are the core of workflow design.</li>
-</ul>
-<hr>
-<h2>AI Agent 101 Series</h2>
-<ul>
-<li>What is an AI Agent? (upcoming)</li>
-<li>Context Engineering (upcoming)</li>
-<li>Tool Use Fundamentals (upcoming)</li>
-<li><strong>Agent Workflow Design (current)</strong></li>
-<li>Memory and State (upcoming)</li>
-<li>Multi-Agent Systems (upcoming)</li>
-<li>Agent Evaluation (upcoming)</li>
-<li>Error Handling and Reliability (upcoming)</li>
-<li>Production Operations (upcoming)</li>
-<li>Building Your First Agent (upcoming)</li>
-</ul>
-<p class="tags-line">Tags: AI Agent, Workflow, Planning, Task Decomposition</p>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

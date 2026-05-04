@@ -3,7 +3,7 @@ title: Tool Use 기초
 series: ai-agent-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ Tool Use의 핵심은 Function Calling입니다. 모델이 "지금 날씨를 확
 이번 글에서는 Function Calling의 기본 흐름, 도구 스키마 설계 원칙, 에러 처리 패턴, 도구 선택 전략을 다룹니다.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- Function calling은 모델 입장에서 실제로 어떤 일을 할까요?
+- 도구 스키마를 잘못 정의하면 어떤 실패가 발생할까요?
+- 도구가 여러 개일 때 모델이 도구를 고르는 기준은 무엇일까요?
+- 도구 호출 결과를 다시 모델에 돌려줄 때 주의할 점은 무엇일까요?
+
+<!-- a-grade-intro:end -->
 
 ## Function Calling 기본 흐름
 
@@ -1032,6 +1043,17 @@ if result["success"]:
 - Tool Use는 Agent를 실용적인 자동화 도구로 만드는 핵심 기능입니다.
 - 도구 스키마는 명확하고 구체적으로 작성해야 모델이 올바르게 호출합니다.
 - 에러 처리와 도구 선택 전략이 Agent의 신뢰성을 결정합니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] OpenAI function-calling 스펙으로 도구 1개를 정의해 호출시켰다.
+- [ ] 잘못된 schema가 모델을 어떻게 헷갈리게 하는지 직접 관찰했다.
+- [ ] 도구 2~3개를 후보로 두고 모델이 어떤 것을 고르는지 로깅했다.
+- [ ] 도구 결과를 모델에 다시 넣어 최종 응답을 만드는 사이클을 완성했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Asynchronous SQLite with aiosqlite</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Asynchronous SQLite with aiosqlite</h1>
+<p>What happens if you call <code>sqlite3.connect()</code> directly inside <code>asyncio</code> code? The code runs, but every <code>execute()</code> is a synchronous call that blocks the event loop for its duration. A 1-second query starves every other request the worker is trying to serve.</p>
+<p><code>aiosqlite</code> solves this. But it is important to understand what "solve" means here. The library does not make SQLite truly asynchronous. It is an <strong>adapter that runs each sqlite3 call in a background thread per connection and returns a Future to the event loop</strong>. The loop stays unblocked, but SQLite's single-writer constraint is unchanged.</p>
+<h2>Questions this post answers</h2>
+<ul>
+<li>How does <code>aiosqlite</code> work under the hood? Is it real async I/O?</li>
+<li>How should you hold connections and transactions in an async path?</li>
+<li>What does the <code>async with</code> syntax guarantee, and what does it not?</li>
+<li>Is it worth building a connection pool on top of <code>aiosqlite</code>?</li>
+<li>How does it compose with FastAPI's async endpoints?</li>
+</ul>
+<h2>Why this matters</h2>
+<p>In an async framework (FastAPI, aiohttp, Starlette), calling synchronous SQLite directly halts the worker for the duration of every query. If a single worker handles 100 concurrent requests and an average query takes 50 ms, p99 latency for the other 99 requests collapses.</p>
+<p>There are two fixes: (1) push synchronous sqlite3 to a separate thread pool (<code>run_in_executor</code>, FastAPI's <code>def</code> handler), or (2) use <code>aiosqlite</code> for an async-shaped interface. They are the same mechanism underneath, but <code>aiosqlite</code> encapsulates the per-connection thread and gives you <code>async with</code> syntax that fits naturally.</p>
+<p>The honest pitch: this post is about what <code>aiosqlite</code> actually does and does not do. If the word "async" makes you expect higher write throughput, you will be disappointed.</p>
+<h2>Mental Model: aiosqlite is sqlite3 + thread + Future</h2>
+<blockquote>
+<p><code>aiosqlite</code> does not make SQLite asynchronous. It spawns a background thread per connection, queues the awaited method calls onto that thread, and returns a Future the event loop can await.</p>
+</blockquote>
+<p>Implications:</p>
+<ul>
+<li>The event loop is no longer blocked. Other coroutines can progress.</li>
+<li>Calls on the same connection are still serialized. Two coroutines cannot use one connection at once.</li>
+<li>One connection means one extra thread. Many connections means many threads.</li>
+<li>SQLite's single-writer constraint is unchanged. A hundred <code>aiosqlite</code> connections still serialize at the writer.</li>
+</ul>
+<p>So the real value of <code>aiosqlite</code> is <strong>event-loop protection</strong>, not "concurrency win". Treat it as an adapter that lets you stay in async code without blocking, not as a way to make SQLite faster.</p>
+<h2>Core Concepts</h2>
+<p><strong>Install and basic use</strong></p>
+<pre><code class="language-bash">pip install aiosqlite
+</code></pre>
+<pre><code class="language-python">import asyncio
+import aiosqlite
+
+async def main():
+    async with aiosqlite.connect(&quot;app.db&quot;) as db:
+        await db.execute(&quot;CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY, body TEXT)&quot;)
+        await db.execute(&quot;INSERT INTO notes(body) VALUES (?)&quot;, (&quot;hello&quot;,))
+        await db.commit()
+        async with db.execute(&quot;SELECT id, body FROM notes&quot;) as cur:
+            async for row in cur:
+                print(row)
+
+asyncio.run(main())
+</code></pre>
+<p>The interface mirrors <code>sqlite3</code> closely; you mostly add <code>await</code> and switch to <code>async with</code> / <code>async for</code>.</p>
+<p><strong>Sync vs async, side by side</strong></p>
+<pre><code class="language-python"># Sync
+import sqlite3
+conn = sqlite3.connect(&quot;app.db&quot;)
+cur = conn.execute(&quot;SELECT 1&quot;)
+row = cur.fetchone()
+
+# Async
+import aiosqlite
+async with aiosqlite.connect(&quot;app.db&quot;) as conn:
+    async with conn.execute(&quot;SELECT 1&quot;) as cur:
+        row = await cur.fetchone()
+</code></pre>
+<p>Almost a 1:1 mapping. The main rule is that every method that talks to SQLite is now a coroutine.</p>
+<p><strong>Transactions</strong></p>
+<p><code>aiosqlite</code> keeps the <code>isolation_level</code> argument from <code>sqlite3</code>. The default <code>""</code> (empty string) replicates the implicit-BEGIN behavior. For explicit control, use <code>isolation_level=None</code> and issue your own <code>BEGIN</code>:</p>
+<pre><code class="language-python">async with aiosqlite.connect(&quot;app.db&quot;, isolation_level=None) as db:
+    await db.execute(&quot;BEGIN IMMEDIATE&quot;)
+    try:
+        await db.execute(&quot;UPDATE accounts SET balance=balance-? WHERE id=?&quot;, (10, 1))
+        await db.execute(&quot;UPDATE accounts SET balance=balance+? WHERE id=?&quot;, (10, 2))
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        raise
+</code></pre>
+<p>Note that <code>async with db:</code> does not behave like the synchronous <code>with conn:</code>. The connection's <code>__aexit__</code> closes the connection rather than committing the transaction.</p>
+<h2>Before / After: a FastAPI handler</h2>
+<p><strong>Before: synchronous sqlite3 inside an async path</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI
+import sqlite3
+
+app = FastAPI()
+conn = sqlite3.connect(&quot;app.db&quot;, check_same_thread=False)
+
+@app.get(&quot;/notes/{note_id}&quot;)
+async def read_note(note_id: int):
+    cur = conn.execute(&quot;SELECT body FROM notes WHERE id=?&quot;, (note_id,))
+    row = cur.fetchone()
+    return {&quot;body&quot;: row[0] if row else None}
+</code></pre>
+<p>Two problems: (1) <code>execute()</code> blocks the event loop, and (2) a global shared connection means transaction boundaries leak across requests.</p>
+<p><strong>After: aiosqlite + per-request connection</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI, Depends
+import aiosqlite
+
+app = FastAPI()
+DB_PATH = &quot;app.db&quot;
+
+async def get_db():
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(&quot;PRAGMA journal_mode=WAL&quot;)
+        await db.execute(&quot;PRAGMA foreign_keys=ON&quot;)
+        db.row_factory = aiosqlite.Row
+        yield db
+
+@app.get(&quot;/notes/{note_id}&quot;)
+async def read_note(note_id: int, db: aiosqlite.Connection = Depends(get_db)):
+    async with db.execute(&quot;SELECT body FROM notes WHERE id=?&quot;, (note_id,)) as cur:
+        row = await cur.fetchone()
+    return {&quot;body&quot;: row[&quot;body&quot;] if row else None}
+</code></pre>
+<p>The event loop is protected and transaction boundaries align with requests. The cost is one new connection-with-thread per request, which leads us to consider a pool.</p>
+<h2>Step by Step: a lightweight connection pool</h2>
+<p><code>aiosqlite</code> does not ship a pool. Building one is straightforward.</p>
+<p><strong>Step 1. Pool interface</strong></p>
+<pre><code class="language-python">import asyncio
+import aiosqlite
+from contextlib import asynccontextmanager
+
+class SQLitePool:
+    def __init__(self, path: str, *, size: int = 5):
+        self._path = path
+        self._size = size
+        self._queue: asyncio.Queue[aiosqlite.Connection] = asyncio.Queue(maxsize=size)
+        self._initialized = False
+        self._lock = asyncio.Lock()
+
+    async def _init(self) -&gt; None:
+        for _ in range(self._size):
+            conn = await aiosqlite.connect(self._path)
+            await conn.execute(&quot;PRAGMA journal_mode=WAL&quot;)
+            await conn.execute(&quot;PRAGMA foreign_keys=ON&quot;)
+            conn.row_factory = aiosqlite.Row
+            await self._queue.put(conn)
+        self._initialized = True
+
+    async def initialize(self) -&gt; None:
+        async with self._lock:
+            if not self._initialized:
+                await self._init()
+
+    @asynccontextmanager
+    async def acquire(self):
+        conn = await self._queue.get()
+        try:
+            yield conn
+        finally:
+            await self._queue.put(conn)
+
+    async def close(self) -&gt; None:
+        while not self._queue.empty():
+            conn = self._queue.get_nowait()
+            await conn.close()
+</code></pre>
+<p>The core is a plain <code>asyncio.Queue</code>. Acquire pulls a connection out, release pushes it back.</p>
+<p><strong>Step 2. Initialize in FastAPI lifespan</strong></p>
+<pre><code class="language-python">from contextlib import asynccontextmanager
+from fastapi import FastAPI
+
+pool = SQLitePool(&quot;app.db&quot;, size=5)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await pool.initialize()
+    yield
+    await pool.close()
+
+app = FastAPI(lifespan=lifespan)
+
+async def get_db():
+    async with pool.acquire() as conn:
+        yield conn
+</code></pre>
+<p>Connections return to the pool when the request finishes; the next request reuses them. A pool size of 1-2x your worker count is a sensible starting point.</p>
+<p><strong>Step 3. Transaction helper</strong></p>
+<pre><code class="language-python">@asynccontextmanager
+async def transactional(conn: aiosqlite.Connection):
+    await conn.execute(&quot;BEGIN IMMEDIATE&quot;)
+    try:
+        yield conn
+        await conn.commit()
+    except Exception:
+        await conn.rollback()
+        raise
+
+@app.post(&quot;/notes&quot;, status_code=201)
+async def create_note(payload: NoteCreate, db = Depends(get_db)):
+    async with transactional(db):
+        cur = await db.execute(
+            &quot;INSERT INTO notes(body) VALUES (?)&quot;, (payload.body,)
+        )
+    return {&quot;id&quot;: cur.lastrowid}
+</code></pre>
+<p><code>transactional</code> owns commit/rollback so handlers stay readable.</p>
+<p><strong>Step 4. Measure under load</strong></p>
+<pre><code class="language-python">import asyncio, aiosqlite, time
+
+async def reader(pool, i):
+    async with pool.acquire() as conn:
+        await conn.execute(&quot;SELECT 1&quot;)
+
+async def main():
+    pool = SQLitePool(&quot;app.db&quot;, size=10)
+    await pool.initialize()
+    t0 = time.perf_counter()
+    await asyncio.gather(*(reader(pool, i) for i in range(1000)))
+    print(f&quot;{time.perf_counter()-t0:.3f}s&quot;)
+    await pool.close()
+
+asyncio.run(main())
+</code></pre>
+<p>Compare against a baseline that opens and closes a fresh connection per call. A pool that is too small causes queue waits; one that is too large just adds threads and memory.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Sharing one connection across coroutines.</strong> <code>aiosqlite</code> connections are serialized internally, but "concurrent use" is undefined. Treat one connection as held by one coroutine at a time.</p>
+<p><strong>Expecting <code>async with db:</code> to handle transactions.</strong> It closes the connection. Use explicit <code>BEGIN</code>/<code>commit</code>/<code>rollback</code> or the <code>transactional</code> helper above.</p>
+<p><strong>Expecting higher write throughput from <code>aiosqlite</code>.</strong> SQLite's single-writer rule is unchanged. <code>aiosqlite</code> protects the event loop; it does not parallelize writers.</p>
+<p><strong>Oversized pools.</strong> Each connection carries a thread. A pool of 100 means 100 background threads. Start at 1-2x your worker count and tune based on measurements.</p>
+<p><strong>Module-level <code>connect</code> outside lifespan.</strong> Without a running event loop at import time, this raises. Initialize in <code>lifespan</code> or a startup hook.</p>
+<p><strong>Building <code>aiosqlite</code> resources in one <code>asyncio.run(...)</code> and reusing them in another.</strong> Different event loops; this will not work. Create and close within the same loop.</p>
+<h2>In Practice: when async is actually worth it on SQLite</h2>
+<p>FastAPI runs <code>def</code> handlers in a thread pool automatically. That makes synchronous <code>sqlite3</code> perfectly safe in many cases. Switch to <code>async def</code> (and <code>aiosqlite</code>) only when at least one of these is true:</p>
+<ul>
+<li>The handler awaits other I/O (e.g., outbound HTTP).</li>
+<li>The endpoint protocol requires async (WebSocket, SSE).</li>
+<li>You want to interleave multiple SQLite calls with other awaitables in one request.</li>
+</ul>
+<p>If none of those apply, <code>def</code> + <code>sqlite3</code> is simpler and often faster. Adopt <code>aiosqlite</code> when the async path itself is the requirement, not as a default.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] No async handler calls synchronous sqlite3 directly?</li>
+<li>[ ] No two coroutines share a single connection at the same time?</li>
+<li>[ ] Transactions handled explicitly with <code>BEGIN</code>/<code>commit</code>/<code>rollback</code> or via a helper?</li>
+<li>[ ] If using a pool, is it initialized and closed in lifespan?</li>
+<li>[ ] Pool size derived from measurement (start at 1-2x workers)?</li>
+<li>[ ] PRAGMAs (WAL, foreign_keys, etc.) applied right after each connection opens?</li>
+<li>[ ] <code>busy_timeout</code> (or SQLite-side timeout) configured intentionally?</li>
+<li>[ ] You verified an actual async need before adopting <code>aiosqlite</code>?</li>
+<li>[ ] Concurrent-write load tested for BUSY rate?</li>
+<li>[ ] Pool-leak monitoring in place (e.g., <code>_queue.qsize()</code>)?</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li><strong>Measure blocking.</strong> Inside an async handler, call synchronous <code>sqlite3.connect().execute("...")</code>. Then issue concurrent requests and measure how the latency of others changes.</li>
+<li><strong>Pool size sweep.</strong> Run 1000 concurrent SELECTs through <code>SQLitePool</code> with size 1, 5, and 20. Compare total time and per-call latency.</li>
+<li><strong>Single-writer check.</strong> Run 1000 concurrent INSERTs through a pool of size 10; measure BUSY rate and compare against a single-writer-queue version.</li>
+<li><strong>Decide.</strong> Audit one FastAPI app and list the real reasons each <code>async def</code> handler must be async. If none apply, simplify to <code>def</code> + sqlite3.</li>
+</ol>
+<h2>Wrap-up and Next</h2>
+<ul>
+<li><code>aiosqlite</code> does not make SQLite truly async. It is an adapter that protects your event loop.</li>
+<li>Write throughput will not increase. SQLite's single-writer rule still applies.</li>
+<li>Adopt <code>aiosqlite</code> only when async is genuinely required by the path.</li>
+<li>A small <code>asyncio.Queue</code> based pool initialized in lifespan is enough.</li>
+</ul>
+<p>The next post (Episode 10, the series finale) consolidates production patterns: retry plus timeout plus observability, slow-query logging, OpenTelemetry instrumentation, and a backup strategy.</p>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/05-transactions-isolation.md">Transactions and isolation levels (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/06-row-factories-adapters.md">Row factories and type adapters (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/07-error-handling-exception-hierarchy.md">PEP 249 Exception Hierarchy and SQLite Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/08-connection-pooling.md">SQLite Connection Management: thread-safety, check_same_thread, and Pooling</a></li>
+<li><strong>Asynchronous SQLite with aiosqlite (current)</strong></li>
+<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://aiosqlite.omnilib.dev/">aiosqlite — Documentation</a></li>
+<li><a href="https://github.com/omnilib/aiosqlite">aiosqlite — GitHub</a></li>
+<li><a href="https://fastapi.tiangolo.com/async/">FastAPI — Concurrency and async/await</a></li>
+<li><a href="https://docs.python.org/3/library/asyncio.html">Python asyncio — Streams and synchronization primitives</a></li>
+<li><a href="https://www.sqlite.org/wal.html">SQLite — Write-Ahead Logging</a></li>
+</ul>
+<p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
+</body>
+</html>

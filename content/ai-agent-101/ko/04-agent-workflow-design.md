@@ -3,7 +3,7 @@ title: Agent Workflow 설계
 series: ai-agent-101
 episode: 4
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -28,6 +28,17 @@ last_reviewed: '2026-05-02'
 이번 글에서는 주요 Workflow 패턴, 작업 분해 전략, 상태 관리 방법, 그리고 Workflow 설계 시 고려해야 할 요소를 다룹니다.
 
 ---
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- ReAct, Plan-and-Execute, Reflexion은 각각 언제 빛을 발할까요?
+- 작업 분해 단계의 크기는 어떤 기준으로 정해야 할까요?
+- Workflow 안에서 상태(state)는 어디에 보관해야 할까요?
+- Workflow를 운영에 올리기 전에 반드시 거쳐야 할 검증 단계는 무엇일까요?
+
+<!-- a-grade-intro:end -->
 
 ## 주요 Workflow 패턴
 
@@ -1284,6 +1295,17 @@ else:
 - Workflow는 Agent가 복잡한 작업을 체계적으로 수행하도록 설계하는 것입니다.
 - ReAct, Plan-and-Execute, Reflexion 등 다양한 패턴이 있으며, 작업 특성에 맞게 선택해야 합니다.
 - 작업 분해와 상태 관리가 Workflow 설계의 핵심입니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] ReAct vs Plan-and-Execute vs Reflexion을 한 표로 정리할 수 있다.
+- [ ] 한 작업을 너무 잘게/너무 크게 쪼갠 두 버전을 비교했다.
+- [ ] Workflow state를 외부 저장소에 분리한 예제를 작성했다.
+- [ ] 단위 테스트, 시뮬레이션, 카나리 배포 중 두 가지 이상을 적용했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

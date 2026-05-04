@@ -3,7 +3,7 @@ title: execute, executemany, fetch 패턴
 series: python-dbapi-101
 episode: 3
 language: ko
-status: draft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -27,6 +27,17 @@ last_reviewed: '2026-05-03'
 ---
 
 DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`와 `fetchone()`, `fetchall()`, `fetchmany()` 다섯 메서드로 압축됩니다. 단순해 보이지만, 어떤 fetch 메서드를 언제 쓰느냐가 메모리 사용량, latency, 그리고 production에서 OOM이 터지는지 여부를 결정합니다. 이 글에서는 다섯 메서드의 동작과 실전 선택 기준을 정리합니다.
+
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- execute, executemany, fetchone, fetchall, fetchmany는 각각 언제 써야 할까요?
+- 큰 결과 집합을 메모리 폭주 없이 처리하려면 어떻게 해야 할까요?
+- cursor.description은 어떤 메타데이터를 알려주나요?
+- streaming + transformation 파이프라인의 핵심 요소는 무엇일까요?
+
+<!-- a-grade-intro:end -->
 
 ## 1. execute - 한 번의 query
 
@@ -187,6 +198,17 @@ def export_notes(db_path, csv_path, chunk=500):
 - `rowcount`는 INSERT/UPDATE/DELETE에서만 신뢰합니다.
 
 다음 글에서는 parameter binding과 SQL injection 방어를 다룹니다.
+
+<!-- a-grade-example:begin -->
+
+## 체크리스트
+
+- [ ] executemany로 다중 INSERT를 단일 호출로 처리했다.
+- [ ] fetchmany로 chunk 단위로 결과를 받아 메모리 사용을 통제했다.
+- [ ] cursor.description으로 컬럼 메타데이터를 추출해 dict로 변환했다.
+- [ ] Streaming pipeline에서 generator + fetchmany 조합을 사용해 봤다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차
