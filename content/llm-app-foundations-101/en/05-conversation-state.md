@@ -44,6 +44,14 @@ The main idea is simple: **conversation memory lives in your application layer, 
 
 ---
 
+## Questions this chapter answers
+
+- Given that LLM calls are stateless, what constraints does that put on multi-turn design?
+- When does full-history, sliding-window, or summary compression each fit best?
+- What is the safest way to detect context overflow before the call fails?
+- How do you instruct the model on what to keep vs. drop during summary compression?
+- What is the minimum set of pieces needed to build a one-file CLI chatbot end to end?
+
 ## Why LLM calls are stateless
 
 ![Stateless calls with and without replayed history](../../../assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.en.png)
@@ -456,6 +464,14 @@ When you design memory for a chatbot, three questions matter more than anything 
 - how will you recover if the summary becomes wrong
 
 If you can answer those clearly, conversation memory stops being magic and becomes an ordinary engineering component.
+
+## Operational checklist
+
+- [ ] Each turn's assistant reply is appended back into `messages` for the next call
+- [ ] You have implemented both a sliding-window mode and a full-history mode
+- [ ] Summary-compression prompts spell out tone, length, and what to preserve
+- [ ] Cumulative tokens are checked before each call, with a warning at ~80% of the limit
+- [ ] The CLI loop supports `/exit` and `/reset` (clear history) commands
 
 <!-- toc:begin -->
 ## In this series

@@ -44,6 +44,14 @@ The main idea is simple: **good prompts start as structured message roles, not a
 
 ---
 
+## Questions this chapter answers
+
+- How does the model treat `system`, `user`, and `assistant` differently?
+- What single experiment shows how a one-line system message changes the answer?
+- When is hand-writing assistant messages into history the right pattern?
+- How do you decide which constraint belongs in `system` vs `user` vs few-shot examples?
+- Where does the output quality gap between with/without `system` show up most clearly?
+
 ## Why prompt engineering is more than wording
 
 In Post 01, one `user` message was enough to make the first API call. Real applications move beyond that quickly. They need stable behavior across users, consistent output shape, and memory of earlier turns. Once those requirements appear, one free-form user string stops being enough.
@@ -516,6 +524,14 @@ A prompt is not validated because it worked once. Test it against different ques
 The starting point of prompt engineering is not elegant phrasing. It is role-aware structure. Use `system` for persistent policy, `user` for the current request, and `assistant` for the history you want the next turn to see. Add careful parameter choices on top of that, and the same model becomes much more predictable.
 
 The next post goes deeper into few-shot prompting and chain-of-thought.
+
+## Operational checklist
+
+- [ ] Your code always orders `messages` as `system` → `user` → `assistant`
+- [ ] You have compared one user input answered with vs. without a system message
+- [ ] Hardcoded system prompts are extracted to a constant or config file
+- [ ] You have a test that synthesizes a multi-turn history with hand-crafted assistant messages
+- [ ] Format requirements (JSON, table, max length) are written into the system message explicitly
 
 <!-- toc:begin -->
 ## In this series

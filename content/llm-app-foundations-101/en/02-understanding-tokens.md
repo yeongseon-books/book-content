@@ -44,6 +44,14 @@ The central idea is simple: **LLM applications run on token budgets, not on raw 
 
 ---
 
+## Questions this chapter answers
+
+- What is a token (not a character, not a word), and why do different models tokenize differently?
+- What does each of `prompt_tokens`, `completion_tokens`, and `total_tokens` cost you?
+- What is the shortest `tiktoken` snippet that counts tokens before you call?
+- What error appears when you exceed the context window, and how do you prevent it?
+- When trimming long input, do you cut from the front, the back, or the middle?
+
 ## What a token actually is
 
 ![Text split into model token pieces](../../../assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.en.png)
@@ -439,6 +447,14 @@ Early in LLM development, prompt phrasing feels like the main craft. In producti
 This post covered the reason tokens sit at the center of LLM application work. Tokens are not just another way to say words. They are the unit the model uses for reading, generation, billing, speed, and limits. Once you build the habit of reading `usage`, estimating size with `tiktoken`, and watching `max_tokens` together with `finish_reason`, the rest of the stack becomes easier to reason about.
 
 In the next post, we will stay with the same chat API and focus on message roles. Once `system`, `user`, and `assistant` are clearly separated, it becomes much easier to produce stable behavior from the same model.
+
+## Operational checklist
+
+- [ ] You have inspected the three `usage` fields from a real call
+- [ ] You have tokenized an input ahead of the call with `tiktoken.encoding_for_model()` or `get_encoding()`
+- [ ] You confirmed your model's context window limit in the official docs
+- [ ] You computed the dollar cost of one call as price × token count
+- [ ] Your code checks input length before requests that risk exceeding the window
 
 <!-- toc:begin -->
 ## In this series

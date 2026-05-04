@@ -44,6 +44,14 @@ The operating idea is simple: better prompts are often less about clever wording
 
 ---
 
+## Questions this chapter answers
+
+- How does few-shot prompting actually "teach" inside a single chat call?
+- When does adding more examples improve output, and when does it just burn tokens?
+- How does chain-of-thought differ from "explain your answer" prompting?
+- When do zero-shot CoT and few-shot CoT each fit best?
+- When do these techniques stop helping, and what should you reach for instead?
+
 ## Few-shot prompting teaches by example inside the messages array
 
 ![Example pairs steering the final answer](../../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png)
@@ -595,6 +603,14 @@ Few-shot prompting teaches by example. Chain-of-thought prompting teaches by dec
 The practical lesson is still conservative. More examples do not automatically mean better results. “Let's think step by step” does not create knowledge the model never had. Most of the time, the best outcomes come from short clean examples, explicit output rules, low temperature for structured tasks, and careful token budgeting.
 
 The next post moves from static prompt design to dynamic conversation state. Few-shot examples are fixed context. Multi-turn chat memory is changing context, and that is where chatbot architecture starts to feel like application engineering instead of prompt tinkering.
+
+## Operational checklist
+
+- [ ] Few-shot examples include the desired output shape, not just the input
+- [ ] You compared output stability and token cost at 1, 3, and 5 examples
+- [ ] You audited examples for ones that would steer the model wrong
+- [ ] Multi-step reasoning tasks include an explicit "think step by step" instruction
+- [ ] Combined few-shot + CoT calls fit inside the model's context window
 
 <!-- toc:begin -->
 ## In this series

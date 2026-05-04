@@ -46,6 +46,14 @@ The main idea is simple: **streaming does not make the model smarter or faster, 
 
 ---
 
+## Questions this chapter answers
+
+- What is the real mechanism by which streaming reduces perceived latency?
+- What is the smallest Groq SDK call that opens a streaming response?
+- What is the safe pattern to pull only text tokens out of each chunk?
+- Where do synchronous and asynchronous streaming diverge in practice?
+- When piping a stream through FastAPI, how do you handle headers and backpressure?
+
 ## Why streaming matters
 
 From a backend point of view, blocking calls are attractive. The implementation is easy to explain. Send the request, wait for completion, read the final text, return the result. That is perfectly fine for small scripts and offline jobs.
@@ -437,6 +445,14 @@ That is also why the best teams evaluate streaming with metrics, not taste. Time
 ## Wrapping up
 
 In this post, we covered why blocking LLM calls create avoidable UX friction, how Groq streaming works with `stream=True`, how to read incremental text from `chunk.choices[0].delta.content`, how synchronous and asynchronous streaming differ, how to inspect final usage through `x_groq` or separate server-side aggregation, and how to route streamed output into files, downstream consumers, and a FastAPI `StreamingResponse`. Looking back across the full series, we started with the shape of a single LLM API call, then built up through tokens and costs, prompt roles, few-shot steering, conversation state, and finally real-time output handling. That foundation is enough to build small but credible LLM applications. The next step is to make them more production-ready. In `llm-api-production-101`, we will move into structured output, tool calling, deeper streaming patterns, caching, and the reliability concerns that turn a working demo into a predictable service.
+
+## Operational checklist
+
+- [ ] You verified that `stream=True` returns a different object type than the default
+- [ ] Your chunk handler safely treats `choices[0].delta.content` as possibly `None`
+- [ ] You confirmed that concatenated stream output equals the non-stream result
+- [ ] You wrote both synchronous and `async for` versions of the stream consumer
+- [ ] Your FastAPI route uses `StreamingResponse` with explicit `media_type` and termination
 
 <!-- toc:begin -->
 ## In this series

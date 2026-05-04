@@ -46,6 +46,14 @@ The main idea is simple: **an LLM app begins with request and response structure
 
 ---
 
+## Questions this chapter answers
+
+- What request-response shape is an LLM API call, underneath the SDK?
+- How do you provision a Groq API key and keep it out of source code?
+- How do you extract the body, token usage, and model name from `client.chat.completions.create()`?
+- How do synchronous and asynchronous patterns differ in code shape and use case?
+- When the first call fails, do you suspect authentication, the model id, or the message format first?
+
 ## What an LLM API is
 
 ![JSON request and response flow](../../../assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.en.png)
@@ -531,6 +539,14 @@ That is enough to say you have completed the first real milestone of LLM app dev
 The program we wrote today is short, but it already contains the core loop of an LLM application: load the key from the environment, build a client, send messages to a model, and read text plus metadata from the response.
 
 In the next post, we will stay close to the same API call and zoom in on token accounting. Once prompts get longer, token count becomes the thing that shapes cost, limits, and response behavior. That is the next foundation to put in place.
+
+## Operational checklist
+
+- [ ] `GROQ_API_KEY` is set as an environment variable; no key string appears in source
+- [ ] `pip install groq` succeeded and `import groq` runs without error
+- [ ] `client.chat.completions.create(model=..., messages=[...])` returns a 200 response
+- [ ] You printed `choices[0].message.content`, `usage.total_tokens`, and `model` from the response
+- [ ] You ran the same call once synchronously and once asynchronously
 
 <!-- toc:begin -->
 ## In this series
