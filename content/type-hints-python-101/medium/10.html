@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type Hint Best Practices</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Type Hint Best Practices</h1>
+<blockquote>
+<p>Type Hints in Python 101 Series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Where, how much, and at what level should you apply type hints to maximize return on investment?</p>
+<blockquote>
+<p>Annotating every variable makes code verbose. Annotating nothing makes large projects unmaintainable. The sweet spot is somewhere in between, and it depends on your project size, team experience, and code lifespan. This final article establishes practical guidelines for applying type hints effectively — where to focus, what to avoid, and how to scale type safety across a team.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Gradual typing principles and strategy</li>
+<li>Where to prioritize type hint investment</li>
+<li>Team-level guidelines and configuration</li>
+<li>Anti-patterns to avoid</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Type hints are a tool, and tools require strategy. Blindly applying strict mode to a legacy codebase creates hundreds of errors and demoralizes the team. Applying no type hints at all wastes the opportunity to catch bugs early. A balanced approach — focused on high-value locations with gradual expansion — delivers the most benefit with the least friction.</p>
+<blockquote>
+<p>Type hints = code contracts. The scope of the contract depends on the situation.</p>
+</blockquote>
+<p>Gradual typing is a core philosophy of Python's type system.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Type hint investment flows from the outside in: public APIs first, then core logic, then internal helpers.</p>
+</blockquote>
+<pre><code class="language-text">Public API (function signatures)     ← Priority 1
+     │
+Core business logic                  ← Priority 2
+     │
+Internal utilities / helpers         ← Priority 3
+     │
+Test code                            ← Optional
+     │
+Scripts / one-off code               ← Not needed
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Gradual typing</strong><br>
+- Description: Adopting type hints incrementally, expanding coverage over time</p>
+<p><strong>Public API</strong><br>
+- Description: Functions, classes, and methods called by external code</p>
+<p><strong>Return type</strong><br>
+- Description: The type annotation on a function's return value</p>
+<p><strong>Type narrowing</strong><br>
+- Description: Using checks like <code>isinstance</code> to refine a Union to a specific type</p>
+<p><strong>Any</strong><br>
+- Description: Compatible with every type — effectively disables type checking</p>
+<h2>Before / After</h2>
+<p><strong>Before — Undisciplined type hints:</strong></p>
+<pre><code class="language-python">from typing import Any
+
+def process(data: Any) -&gt; Any:
+    result: Any = data.get(&quot;value&quot;)
+    items: list[Any] = result.split(&quot;,&quot;)
+    count: int = len(items)
+    return count
+</code></pre>
+<p><strong>After — Purposeful type hints:</strong></p>
+<pre><code class="language-python">def process(data: dict[str, str]) -&gt; int:
+    result = data.get(&quot;value&quot;, &quot;&quot;)
+    items = result.split(&quot;,&quot;)
+    return len(items)
+</code></pre>
+<p>Precise types on the signature, inferred types for locals.</p>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Start with Function Signatures</strong></p>
+<pre><code class="language-python"># Priority 1: Public function parameters and return types
+def calculate_total(prices: list[int], tax_rate: float) -&gt; int:
+    subtotal = sum(prices)  # local — let type checker infer
+    tax = int(subtotal * tax_rate)
+    return subtotal + tax
+
+# Public methods too
+class OrderService:
+    def create_order(self, items: list[str], customer_id: int) -&gt; dict[str, object]:
+        ...
+
+    def _validate_items(self, items):
+        # Private methods are lower priority
+        ...
+</code></pre>
+<p>Function signatures deliver the highest ROI. They tell callers what to pass and what to expect.</p>
+<p><strong>Step 2: Always Annotate Return Types</strong></p>
+<pre><code class="language-python"># Good: return type is explicit
+def find_user(user_id: int) -&gt; User | None:
+    ...
+
+# Bad: caller must read the implementation to know the return type
+def find_user(user_id: int):
+    ...
+</code></pre>
+<p>Return types matter more than parameter types. Callers know what they are passing but not what they are getting back.</p>
+<p><strong>Step 3: Minimize Any</strong></p>
+<pre><code class="language-python">from typing import Any
+
+# Bad: Any propagates and disables type checking
+def get_config() -&gt; Any:
+    ...
+
+value = get_config()  # value: Any — everything downstream loses type info
+
+# Good: specific types
+def get_config() -&gt; dict[str, str | int | bool]:
+    ...
+</code></pre>
+<p><code>Any</code> is a declaration of surrender. Use <code>object</code> or specific types instead. Reserve <code>Any</code> for genuinely unavoidable cases.</p>
+<p><strong>Step 4: Use Type Narrowing</strong></p>
+<pre><code class="language-python">def process(value: str | int | None) -&gt; str:
+    if value is None:
+        return &quot;default&quot;
+
+    if isinstance(value, int):
+        return str(value)
+
+    # value is narrowed to str
+    return value.upper()
+</code></pre>
+<p>Union types require narrowing. <code>isinstance</code> and <code>is None</code> are the standard patterns that mypy and pyright recognize.</p>
+<p><strong>Step 5: Establish Team Guidelines</strong></p>
+<pre><code class="language-toml"># pyproject.toml — team standard
+[tool.mypy]
+python_version = &quot;3.11&quot;
+
+# New code standards
+disallow_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+
+# Legacy code tolerance
+[[tool.mypy.overrides]]
+module = &quot;legacy.*&quot;
+ignore_errors = true
+
+# Test code relaxation
+[[tool.mypy.overrides]]
+module = &quot;tests.*&quot;
+disallow_untyped_defs = false
+</code></pre>
+<p>Core team guidelines:</p>
+<ul>
+<li>New code requires type hints — no exceptions</li>
+<li>Existing code gets type hints when modified (boy scout rule)</li>
+<li>Test code has relaxed rules</li>
+<li><code>type: ignore</code> requires a comment explaining why in PR reviews</li>
+</ul>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Function signatures (parameters + return) are the top priority</li>
+<li>Local variables rely on type inference — do not annotate them</li>
+<li>Any disables type checking propagatively — minimize its use</li>
+<li>Team config uses per-module overrides for gradual adoption</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Annotating every local variable</strong><br>
+- Problem: Verbose code with no added safety<br>
+- Fix: Let the type checker infer locals</p>
+<p><strong>Any as a quick fix</strong><br>
+- Problem: Type safety disappears downstream<br>
+- Fix: Use specific types or <code>object</code></p>
+<p><strong>Refactoring without type hints</strong><br>
+- Problem: Cannot track call-site impact<br>
+- Fix: Add signatures before refactoring</p>
+<p><strong>Strict mode all at once</strong><br>
+- Problem: Hundreds of errors demoralize the team<br>
+- Fix: Adopt per-module gradually</p>
+<p><strong>Type hints as documentation substitute</strong><br>
+- Problem: Types cannot express intent<br>
+- Fix: Use type hints and docstrings together</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>New projects with mypy strict mode in CI from day one</li>
+<li>Legacy projects with "boy scout rule" — type every file you touch</li>
+<li>API boundaries with Pydantic models as contracts</li>
+<li>Library public APIs with py.typed marker and complete annotations</li>
+<li>Code reviews with type hint coverage as a checklist item</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Senior engineers apply type hints where they catch real bugs: public APIs, complex data flows, areas where teammates frequently make mistakes. They trust type inference for straightforward local variables and avoid over-annotating obvious code.</p>
+<p>The type system is a practical safety net, not a pursuit of perfection. 100% coverage matters less than accurate types on critical paths. The goal is to make the team more productive, not to create bureaucratic overhead. When type hints start feeling like a burden rather than a benefit, the strategy needs adjustment.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Annotated public function parameters and return types</li>
+<li>[ ] Minimized Any usage throughout the codebase</li>
+<li>[ ] Removed unnecessary type annotations on local variables</li>
+<li>[ ] Configured team mypy/pyright settings in pyproject.toml</li>
+<li>[ ] Established a gradual adoption plan</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p>Pick an existing Python file and add type hints only to public function signatures. Run mypy and fix any errors. Do not annotate local variables.</p>
+</li>
+<li>
+<p>Find three uses of <code>Any</code> in a codebase and replace them with specific types. Verify that mypy errors decrease.</p>
+</li>
+<li>
+<p>Write a team mypy config in <code>pyproject.toml</code> with three tiers: strict for <code>src/</code>, relaxed for <code>tests/</code>, and ignored for <code>legacy/</code>.</p>
+</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Type hints deliver the most value on function signatures, especially return types. Minimize <code>Any</code>, trust type inference for locals, and adopt strict mode gradually with per-module configuration. Team guidelines in <code>pyproject.toml</code> enforce consistency without creating friction.</p>
+<p>This series covered the full landscape of Python type hints: basic types, Optional, Union, Callable, TypedDict, dataclass, Protocol, Generic, mypy, pyright, and Pydantic. With these tools, your code becomes safer to refactor, faster to review, and easier to maintain.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
+<li><strong>Type Hint Best Practices (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html">Python docs — typing</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/existing_code.html">mypy docs — Using mypy with an existing codebase</a></li>
+<li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a></li>
+<li><a href="https://google.github.io/styleguide/pyguide.html#319-type-annotations">Google Python Style Guide — Type Annotations</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, Best Practices, Gradual Typing, Code Quality, Team Guidelines</p>
+</body>
+</html>

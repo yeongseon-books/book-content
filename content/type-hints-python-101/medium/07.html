@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding Generics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding Generics</h1>
+<blockquote>
+<p>Type Hints in Python 101 Series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can a function accept multiple types while preserving the relationship between input and output types?</p>
+<blockquote>
+<p>Consider a function that returns the first element of a list. If you pass <code>list[int]</code>, you want <code>int</code> back. If you pass <code>list[str]</code>, you want <code>str</code> back. Using <code>Any</code> erases type information. Writing separate functions duplicates code. Generics solve this by letting you parameterize types — "the return type is the same as the element type of the input." This article covers TypeVar, Generic classes, bounds, constraints, and the Python 3.12 syntax.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>TypeVar definition and usage</li>
+<li>Generic class construction</li>
+<li>Bounds and constraints for limiting type variables</li>
+<li>Python 3.12 type parameter syntax</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Libraries and utility functions often need to work with multiple types. <code>Any</code> disables type checking entirely, and Union broadens the return type. Generic preserves the exact type relationship: "if you put in X, you get out X." This is how FastAPI's <code>Response[T]</code>, SQLAlchemy's <code>Mapped[T]</code>, and standard library containers like <code>list[T]</code> maintain type safety.</p>
+<blockquote>
+<p>Generic = parameterize types so the type checker can track them.</p>
+</blockquote>
+<p>The same concept exists in Java, TypeScript, Rust, and Go.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Generic declares a type variable and uses it in function or class signatures. The concrete type is determined at the call site.</p>
+</blockquote>
+<pre><code class="language-text">TypeVar(&quot;T&quot;) ──&gt; function signature uses T
+                     │
+              call: f([1, 2, 3])
+                     │
+              T = int (resolved)
+                     │
+              return type = int
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>TypeVar</strong><br>
+- Description: Declares a type variable for generic functions and classes</p>
+<p><strong>Generic</strong><br>
+- Description: Base class for classes parameterized by type variables</p>
+<p><strong>bound</strong><br>
+- Description: Upper bound — TypeVar must be a subtype of the bound</p>
+<p><strong>constraint</strong><br>
+- Description: TypeVar must be exactly one of the listed types</p>
+<p><strong>ParamSpec</strong><br>
+- Description: Captures an entire function signature as a type variable</p>
+<h2>Before / After</h2>
+<p><strong>Before — Using Any:</strong></p>
+<pre><code class="language-python">from typing import Any
+
+def first(items: list[Any]) -&gt; Any:
+    return items[0]
+
+value = first([1, 2, 3])
+# value: Any — type information lost
+</code></pre>
+<p><strong>After — Using Generic:</strong></p>
+<pre><code class="language-python">from typing import TypeVar
+
+T = TypeVar(&quot;T&quot;)
+
+def first(items: list[T]) -&gt; T:
+    return items[0]
+
+value = first([1, 2, 3])
+# value: int — exact type preserved
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: TypeVar Basics</strong></p>
+<pre><code class="language-python">from typing import TypeVar
+
+T = TypeVar(&quot;T&quot;)
+
+def identity(value: T) -&gt; T:
+    &quot;&quot;&quot;Returns the value unchanged.&quot;&quot;&quot;
+    return value
+
+text = identity(&quot;hello&quot;)   # str
+number = identity(42)       # int
+</code></pre>
+<p>The string argument to <code>TypeVar</code> must match the variable name: <code>T = TypeVar("T")</code>.</p>
+<p><strong>Step 2: Generic Classes</strong></p>
+<pre><code class="language-python">from typing import Generic, TypeVar
+
+T = TypeVar(&quot;T&quot;)
+
+class Stack(Generic[T]):
+    &quot;&quot;&quot;A type-safe stack data structure.&quot;&quot;&quot;
+
+    def __init__(self) -&gt; None:
+        self._items: list[T] = []
+
+    def push(self, item: T) -&gt; None:
+        self._items.append(item)
+
+    def pop(self) -&gt; T:
+        return self._items.pop()
+
+    def is_empty(self) -&gt; bool:
+        return len(self._items) == 0
+
+int_stack: Stack[int] = Stack()
+int_stack.push(1)
+int_stack.push(2)
+value = int_stack.pop()  # int
+</code></pre>
+<p><strong>Step 3: Bounds</strong></p>
+<pre><code class="language-python">from typing import TypeVar
+
+class Comparable:
+    def __lt__(self, other: object) -&gt; bool:
+        return NotImplemented
+
+C = TypeVar(&quot;C&quot;, bound=Comparable)
+
+def find_min(items: list[C]) -&gt; C:
+    &quot;&quot;&quot;Only accepts types that are subtypes of Comparable.&quot;&quot;&quot;
+    result = items[0]
+    for item in items[1:]:
+        if item &lt; result:
+            result = item
+    return result
+</code></pre>
+<p><code>bound=Comparable</code> means <code>C</code> must be a subtype of <code>Comparable</code>.</p>
+<p><strong>Step 4: Constraints</strong></p>
+<pre><code class="language-python">from typing import TypeVar
+
+Number = TypeVar(&quot;Number&quot;, int, float)
+
+def add(a: Number, b: Number) -&gt; Number:
+    &quot;&quot;&quot;Only accepts int or float.&quot;&quot;&quot;
+    return a + b
+
+add(1, 2)       # OK — int
+add(1.0, 2.5)   # OK — float
+# add(&quot;a&quot;, &quot;b&quot;) # Error — str not allowed
+</code></pre>
+<p>Constraints list the exact allowed types. Unlike bounds, subtype relationships do not apply.</p>
+<p><strong>Step 5: Python 3.12 Type Parameter Syntax</strong></p>
+<pre><code class="language-python"># Python 3.12+
+def first[T](items: list[T]) -&gt; T:
+    return items[0]
+
+class Stack[T]:
+    def __init__(self) -&gt; None:
+        self._items: list[T] = []
+
+    def push(self, item: T) -&gt; None:
+        self._items.append(item)
+
+    def pop(self) -&gt; T:
+        return self._items.pop()
+</code></pre>
+<p>Python 3.12 eliminates the need to declare <code>TypeVar</code> explicitly. The <code>[T]</code> syntax declares the type parameter inline.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>TypeVar resolves to the same concrete type within a single function call</li>
+<li>Generic classes are parameterized at instantiation: <code>Stack[int]</code></li>
+<li>Bounds use inheritance relationships; constraints use exact type matching</li>
+<li>Python 3.12 syntax removes the need for explicit TypeVar declarations</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>TypeVar name mismatch</strong><br>
+- Problem: <code>T = TypeVar("U")</code> causes confusion<br>
+- Fix: Match the variable name and string</p>
+<p><strong>Declaring TypeVar inside functions</strong><br>
+- Problem: Creates a new TypeVar per call<br>
+- Fix: Declare at module level</p>
+<p><strong>Confusing bound and constraint</strong><br>
+- Problem: Different semantics — inheritance vs. exact match<br>
+- Fix: bound = upper limit, constraint = allowed list</p>
+<p><strong>Not inheriting from Generic</strong><br>
+- Problem: Type parameters are ignored<br>
+- Fix: Use <code>class MyClass(Generic[T]):</code></p>
+<p><strong>Overusing Generics</strong><br>
+- Problem: Unnecessary complexity<br>
+- Fix: Use Generics only when input-output type relationships exist</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>FastAPI <code>Response[T]</code>: type-safe API response wrappers</li>
+<li>SQLAlchemy <code>Mapped[T]</code>: ORM column types expressed as Generics</li>
+<li>Pydantic Generic subclasses: pagination wrappers like <code>Page[T]</code></li>
+<li>Cache decorators using <code>ParamSpec</code> to preserve wrapped function signatures</li>
+<li>Repository pattern: <code>Repository[T]</code> for type-safe CRUD across entities</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Senior engineers use Generics where there is a clear type relationship between inputs and outputs. Not every function needs a TypeVar — only those where "the return type depends on the input type." Utility functions, container classes, and wrapper patterns are the sweet spot.</p>
+<p>They avoid over-abstraction. A <code>Repository[T]</code> is useful. A <code>GenericProcessor[T, U, V, W]</code> with four type parameters probably needs a simpler design. Generics should make code clearer, not more obscure. If adding a TypeVar does not help the type checker catch real errors, it is not worth the complexity.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Declared TypeVar at module level with matching name</li>
+<li>[ ] Inherited from <code>Generic[T]</code> for generic classes</li>
+<li>[ ] Used bound for subtype constraints, constraint for exact type lists</li>
+<li>[ ] Considered Python 3.12 syntax for new projects</li>
+<li>[ ] Avoided unnecessary Generics on simple functions</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p>Write a <code>Pair[K, V]</code> class using <code>TypeVar</code> and <code>Generic</code> with <code>first: K</code> and <code>second: V</code> properties.</p>
+</li>
+<li>
+<p>Create a <code>longest(a: T, b: T) -&gt; T</code> function with <code>bound=Sized</code> that returns the longer of two objects.</p>
+</li>
+<li>
+<p>Rewrite a Generic Queue class using Python 3.12 <code>[T]</code> syntax with <code>enqueue</code>, <code>dequeue</code>, and <code>peek</code> methods.</p>
+</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Generics parameterize types so a single function or class works across multiple types while preserving type relationships. TypeVar declares type variables, Generic provides the base class, and bounds/constraints limit the allowed types. Python 3.12 simplifies the syntax further.</p>
+<p>In the next article, we will cover mypy and pyright — the tools that actually verify all these type hints.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
+<li><strong>Understanding Generics (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.TypeVar">Python docs — typing.TypeVar</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Generic">Python docs — typing.Generic</a></li>
+<li><a href="https://peps.python.org/pep-0695/">PEP 695 — Type Parameter Syntax</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/generics.html">mypy docs — Generics</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, Generic, TypeVar, Type Parameters, Generic Programming</p>
+</body>
+</html>

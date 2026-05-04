@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Are Python Type Hints?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Are Python Type Hints?</h1>
+<blockquote>
+<p>Type Hints in Python 101 Series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can Python code be both dynamically typed and statically verified at the same time?</p>
+<blockquote>
+<p>Python is dynamically typed — variables can hold any value, and types are checked at runtime. This flexibility is powerful but makes it harder to catch bugs early. Type hints, introduced in PEP 484, let you annotate expected types without changing how Python runs. Static analysis tools then verify these annotations before your code ever executes. This article introduces what type hints are, why they matter, and how to start using them.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What type hints are and how they differ from static typing</li>
+<li>The history and motivation behind PEP 484</li>
+<li>Basic syntax for annotating variables, parameters, and return types</li>
+<li>How type hints improve code quality without affecting runtime</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>As Python projects grow beyond a few hundred lines, the lack of explicit types becomes a liability. A function that accepts "data" could receive a dict, a list, a string, or None — and the only way to know is to read the implementation. Type hints make the contract explicit: what goes in, what comes out.</p>
+<blockquote>
+<p>Type hints = executable documentation that tools can verify.</p>
+</blockquote>
+<p>IDEs use type hints for better autocomplete. CI pipelines use them to catch bugs before code review. New team members read them to understand APIs faster.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Type hints are optional annotations that describe expected types. Python ignores them at runtime, but static analysis tools use them to find errors.</p>
+</blockquote>
+<pre><code class="language-text">def greet(name: str) -&gt; str:
+         ^^^^  ^^^     ^^^
+         param type    return type
+              │              │
+         Python ignores both at runtime
+              │              │
+         mypy/pyright verify both statically
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Type hint</strong><br>
+- Description: An annotation indicating the expected type of a variable or expression</p>
+<p><strong>PEP 484</strong><br>
+- Description: The Python Enhancement Proposal that introduced type hints (2014)</p>
+<p><strong>Static analysis</strong><br>
+- Description: Checking code for errors without executing it</p>
+<p><strong>Dynamic typing</strong><br>
+- Description: Types are checked at runtime, not at compile time</p>
+<p><strong>Gradual typing</strong><br>
+- Description: Adding type hints incrementally to an existing codebase</p>
+<h2>Before / After</h2>
+<p><strong>Before — No type hints:</strong></p>
+<pre><code class="language-python">def calculate_total(prices, tax_rate):
+    subtotal = sum(prices)
+    return int(subtotal * (1 + tax_rate))
+
+# What type is prices? list? tuple? What about tax_rate?
+</code></pre>
+<p><strong>After — With type hints:</strong></p>
+<pre><code class="language-python">def calculate_total(prices: list[int], tax_rate: float) -&gt; int:
+    subtotal = sum(prices)
+    return int(subtotal * (1 + tax_rate))
+
+# Clear: prices is list[int], tax_rate is float, returns int
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Annotate Function Parameters</strong></p>
+<pre><code class="language-python">def greet(name: str) -&gt; str:
+    return f&quot;Hello, {name}!&quot;
+
+result = greet(&quot;Alice&quot;)  # OK
+# greet(42)  # mypy error: Argument 1 has incompatible type &quot;int&quot;
+</code></pre>
+<p>The syntax is <code>parameter: Type</code> for inputs and <code>-&gt; Type</code> for the return value. Python does not enforce these at runtime.</p>
+<p><strong>Step 2: Annotate Variables</strong></p>
+<pre><code class="language-python">count: int = 0
+name: str = &quot;Alice&quot;
+prices: list[int] = [1000, 2000, 3000]
+config: dict[str, str] = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: &quot;8080&quot;}
+</code></pre>
+<p>Variable annotations use the same <code>name: Type = value</code> syntax. In most cases, the type checker can infer the type from the assigned value, so explicit variable annotations are optional.</p>
+<p><strong>Step 3: Use Built-in Generic Types</strong></p>
+<pre><code class="language-python"># Python 3.9+ — use built-in types directly
+names: list[str] = [&quot;Alice&quot;, &quot;Bob&quot;]
+scores: dict[str, int] = {&quot;Alice&quot;: 95, &quot;Bob&quot;: 87}
+coordinates: tuple[float, float] = (37.5, 127.0)
+unique_ids: set[int] = {1, 2, 3}
+</code></pre>
+<p>Since Python 3.9, you can use <code>list[str]</code> instead of <code>typing.List[str]</code>. Built-in types support subscript notation directly.</p>
+<p><strong>Step 4: Annotate a Class</strong></p>
+<pre><code class="language-python">class User:
+    def __init__(self, name: str, age: int) -&gt; None:
+        self.name = name
+        self.age = age
+
+    def greet(self) -&gt; str:
+        return f&quot;Hi, I'm {self.name}.&quot;
+
+user = User(&quot;Alice&quot;, 30)
+print(user.greet())
+</code></pre>
+<p><code>__init__</code> always returns <code>None</code>. Annotate <code>self</code> is not required — type checkers infer it automatically.</p>
+<p><strong>Step 5: Run a Type Checker</strong></p>
+<pre><code class="language-bash">pip install mypy
+mypy app.py
+</code></pre>
+<pre><code class="language-python"># app.py
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+add(&quot;hello&quot;, &quot;world&quot;)  # mypy: Argument 1 has incompatible type &quot;str&quot;
+</code></pre>
+<p>mypy reads your type hints and reports errors without running the code.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Type hints use the colon syntax for parameters and <code>-&gt;</code> for return types</li>
+<li>Python ignores type hints at runtime — they are metadata only</li>
+<li>Type checkers (mypy, pyright) use hints to find bugs before execution</li>
+<li>Variable annotations are optional when the type is obvious from the assignment</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Thinking type hints are enforced at runtime</strong><br>
+- Problem: Code runs even with wrong types<br>
+- Fix: Use mypy or pyright to verify</p>
+<p><strong>Using <code>typing.List</code> on Python 3.9+</strong><br>
+- Problem: Unnecessary import<br>
+- Fix: Use <code>list[str]</code> directly</p>
+<p><strong>Annotating every local variable</strong><br>
+- Problem: Code becomes verbose<br>
+- Fix: Let the type checker infer local types</p>
+<p><strong>Forgetting <code>-&gt; None</code> on <code>__init__</code></strong><br>
+- Problem: Incomplete signature<br>
+- Fix: Always add <code>-&gt; None</code> to <code>__init__</code></p>
+<p><strong>Mixing type hints with runtime validation</strong><br>
+- Problem: Type hints do not validate data<br>
+- Fix: Use Pydantic for runtime validation</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>FastAPI uses type hints to auto-generate API documentation and validate requests</li>
+<li>VS Code + Pylance provides intelligent autocomplete based on type annotations</li>
+<li>Large codebases at Dropbox, Instagram, and Google use mypy for early bug detection</li>
+<li>CI pipelines run type checks alongside tests to catch regressions</li>
+<li>Library authors ship <code>.pyi</code> stub files so users get type-aware IDE support</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Senior engineers treat type hints as a communication tool, not a bureaucratic requirement. The primary audience is the next developer who reads the code — including yourself six months from now. A well-typed function signature is worth more than a paragraph of docstring explaining what types it accepts.</p>
+<p>The key insight is that type hints pay compound interest. The initial investment is small — a few annotations per function — but the returns grow as the codebase scales. Refactoring becomes safer, code review becomes faster, and onboarding becomes smoother. The earlier you start, the more you benefit.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Annotated function parameters with types</li>
+<li>[ ] Added return type annotations to all functions</li>
+<li>[ ] Used built-in generic types (Python 3.9+) instead of typing imports</li>
+<li>[ ] Ran mypy or pyright to verify annotations</li>
+<li>[ ] Avoided annotating obvious local variables</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p>Take a Python file you have written before and add type hints to all function signatures. Run <code>mypy</code> and fix any errors it reports.</p>
+</li>
+<li>
+<p>Write a <code>Rectangle</code> class with <code>width: float</code>, <code>height: float</code>, and an <code>area() -&gt; float</code> method. Verify it with mypy.</p>
+</li>
+<li>
+<p>Intentionally introduce three type errors (wrong argument type, wrong return type, missing annotation) and observe how mypy reports each one.</p>
+</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Type hints are optional annotations that describe expected types in Python code. They do not affect runtime behavior but enable static analysis tools to catch bugs before execution. Starting with function signatures gives the highest return on investment.</p>
+<p>In the next article, we will explore basic types and collection types in detail, including <code>list</code>, <code>dict</code>, <code>tuple</code>, and <code>set</code> with their type parameters.</p>
+<ul>
+<li><strong>What Are Python Type Hints? (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html">Python docs — typing module</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/">mypy documentation</a></li>
+<li><a href="https://realpython.com/python-type-checking/">Real Python — Python Type Checking</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, Static Typing, PEP 484, Code Quality, Developer Productivity</p>
+</body>
+</html>

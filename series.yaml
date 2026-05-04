@@ -2253,3 +2253,25 @@ series:
   level: 101
   lifecycle: active
   path: content/functional-programming-101
+
+- id: type-hints-python-101
+  status: content-ready
+  category: programming-foundations
+  title:
+    ko: Type Hints in Python 101
+    en: Type Hints in Python 101
+  description:
+    ko: Python type hint, Optional, Union, TypedDict, Protocol, Generic, mypy, Pydantic까지 타입 힌트 활용을 배우는 시리즈.
+    en: A beginner series on Python type hints covering basic annotations, Optional, Union, TypedDict, Protocol, Generic, mypy, and Pydantic.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/type-hints-python-101
