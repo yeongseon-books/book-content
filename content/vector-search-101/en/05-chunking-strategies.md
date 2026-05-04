@@ -49,6 +49,14 @@ After this chapter, the next one moves on to **Vector search pipeline — from d
 
 ---
 
+## Questions this chapter answers
+
+- Why is embedding a long document as a single chunk a bad idea?
+- When does fixed-size, sentence-based, or semantic chunking each shine or fall apart?
+- Why introduce overlap between chunks, and how do you pick the ratio?
+- How do you chunk documents that mix code, tables, and markdown headings without losing recall?
+- What does storing metadata (section title, source) on each chunk actually buy you?
+
 ## Chunk size and overlap
 
 ![Chunk size and overlap structure](../../../assets/vector-search-101/05/05-01-chunk-size-and-overlap.en.png)
@@ -308,6 +316,14 @@ Start with a reasonable default, measure retrieval quality on your actual data, 
 Chunking is often the biggest lever for retrieval quality in a vector search system. The embedding model and index type matter, but poor chunking limits what any model can do with the input.
 
 The final post assembles everything — document loading, chunking, embedding, indexing, and querying — into one end-to-end pipeline.
+
+## Operational checklist
+
+- [ ] Sized chunks and overlap based on the embedding model's token limit
+- [ ] Preserved structural info (heading, page) in chunk metadata
+- [ ] Applied separate chunking rules to code and tables versus prose
+- [ ] Deduplicated near-identical chunks from the same document
+- [ ] Tracked document ID and offset so citations remain reachable
 
 <!-- toc:begin -->
 ## In this series

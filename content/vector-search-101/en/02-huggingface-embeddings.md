@@ -49,6 +49,14 @@ After this chapter, the next one moves on to **Cosine similarity and vector sear
 
 ---
 
+## Questions this chapter answers
+
+- What are the real tradeoffs between Hugging Face `sentence-transformers` and the OpenAI Embeddings API?
+- What performance traps appear when you run a local embedding model without a GPU?
+- How do multilingual versus English-only models split on Korean search quality?
+- How do you balance memory, batch size, and token limits when embedding in batch?
+- How do you migrate an existing index when the embedding model version moves?
+
 ## Installation
 
 Three packages are needed.
@@ -325,6 +333,14 @@ Floating-point rounding aside, the results are the same. Use `HuggingFaceEmbeddi
 You can now produce, save, and reload embeddings with a few lines of code. The batch encoding pattern and module-level initialization are production-ready habits worth keeping from the start.
 
 The next post moves to similarity computation. We will look at when cosine similarity, dot product, and Euclidean distance each make sense, why normalization changes the arithmetic, and how to build a brute-force nearest-neighbor search from scratch.
+
+## Operational checklist
+
+- [ ] Reviewed the model card (license, training data, dimensionality)
+- [ ] Tuned batch size and tokenizer options for your CPU/GPU environment
+- [ ] Validated Korean inputs against a multilingual or Korean-specialized model
+- [ ] Aligned the result dimension and dtype with your index schema
+- [ ] Stored the model version alongside any embedding kept long-term
 
 <!-- toc:begin -->
 ## In this series

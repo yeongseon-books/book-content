@@ -48,6 +48,14 @@ The previous chapter covered **Chunking strategies — how to split long documen
 
 ---
 
+## Questions this chapter answers
+
+- How do you cleanly separate ingest, embedding, indexing, and search stages?
+- What event should trigger an automatic reindex?
+- How do you combine lexical search (like BM25) with vector search when vectors alone fall short?
+- When does it become necessary to add a reranker before passing results to the LLM?
+- How do you compute and track production search quality metrics (recall@k, MRR, nDCG)?
+
 ## Pipeline structure
 
 ![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-pipeline-structure.en.png)
@@ -306,6 +314,14 @@ def hybrid_search(
 This post assembled the full vector search pipeline: load documents, chunk them with `RecursiveCharacterTextSplitter`, embed with `HuggingFaceEmbeddings`, index with FAISS, persist to disk, and retrieve with natural-language queries.
 
 The natural next step is connecting this pipeline to an LLM to build a RAG system. The langchain-101 series covers LCEL, Retriever, and Chain composition.
+
+## Operational checklist
+
+- [ ] Separated ingest, embed, index, and search into independently deployable stages
+- [ ] Automated reindex triggers tied to embedding-model and index version
+- [ ] Defined how lexical and vector scores fuse (weighted sum, RRF, etc.)
+- [ ] Maintained an eval set and an automated quality script in production
+- [ ] Surfaced latency, recall, and cost on the same dashboard
 
 <!-- toc:begin -->
 ## In this series

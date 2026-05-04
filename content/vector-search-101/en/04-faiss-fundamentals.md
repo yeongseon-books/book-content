@@ -49,6 +49,14 @@ After this chapter, the next one moves on to **Chunking strategies — how to sp
 
 ---
 
+## Questions this chapter answers
+
+- When is each of FAISS IndexFlat, IVF, and HNSW the right pick?
+- What is the accuracy/latency tradeoff between exact search and ANN?
+- Which index types need training, and how do you train them?
+- What gotchas appear when persisting and reloading a FAISS index?
+- For which workloads does GPU FAISS beat CPU FAISS, and vice versa?
+
 ## Installation
 
 CPU-only version:
@@ -365,6 +373,14 @@ Start with `IndexFlatIP`. When search latency becomes a problem, move to `IndexI
 You can now build a FAISS index, run queries against it, and persist it to disk. The combination of `IndexFlatIP` with normalized vectors is the baseline for text retrieval.
 
 The next post covers chunking. We will look at how chunk size, overlap, and split strategy affect retrieval quality — and why getting this wrong causes more problems than choosing the wrong embedding model.
+
+## Operational checklist
+
+- [ ] Picked an index type that matches your data scale and latency budget
+- [ ] Trained IVF/PQ-style indexes on a representative sample
+- [ ] Persisted the index and reproduced it on the same environment
+- [ ] Tuned nprobe/ef from measurements, not from defaults
+- [ ] Added metrics for vector count, dimension, and memory footprint
 
 <!-- toc:begin -->
 ## In this series

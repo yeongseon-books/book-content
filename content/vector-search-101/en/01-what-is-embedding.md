@@ -48,6 +48,14 @@ After this chapter, the next one moves on to **HuggingFace embeddings in practic
 
 ---
 
+## Questions this chapter answers
+
+- What is an embedding mathematically, and why convert text into a numeric vector at all?
+- How do word, sentence, and document embeddings actually differ?
+- How do accuracy and cost shift as embedding dimensionality grows?
+- Why does the same text produce different vectors across models?
+- How do you measure whether your embeddings are any good?
+
 ## The ceiling of keyword search
 
 ![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
@@ -226,6 +234,14 @@ This series uses `all-MiniLM-L6-v2` throughout for consistency.
 Embeddings convert text into numeric vectors where semantic similarity becomes spatial proximity. Cosine similarity measures that proximity and makes keyword-free retrieval possible. The intuition is simple: similar meaning, smaller distance.
 
 The next post moves from concept to practice. We will use `HuggingFaceEmbeddings` to produce, save, and reload embeddings, and speed up the encoding step with batch processing.
+
+## Operational checklist
+
+- [ ] Recorded the model's dimensionality and token limit in your docs
+- [ ] Decided on normalization once and applied it to every vector
+- [ ] Keyed the embedding cache on model, version, and input hash
+- [ ] Sanity-checked quality by computing similarity on a few hand-picked pairs
+- [ ] Wrote a reindex procedure for when the embedding model changes
 
 <!-- toc:begin -->
 ## In this series

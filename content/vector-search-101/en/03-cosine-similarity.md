@@ -47,6 +47,14 @@ After this chapter, the next one moves on to **FAISS fundamentals — fast appro
 
 ---
 
+## Questions this chapter answers
+
+- Do cosine similarity, dot product, and Euclidean distance produce the same ranking or different ones?
+- How does pre-normalizing vectors collapse cosine and dot product into the same computation?
+- What data should you actually look at when picking a similarity threshold?
+- High similarity does not always mean the same meaning - what are the traps?
+- How should negative similarity (opposite meaning) be handled in search results?
+
 ## Three distance metrics
 
 ![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
@@ -339,6 +347,14 @@ For text search, cosine similarity is the safe default. With normalized vectors,
 All three distance metrics are now implemented and compared. The normalization effect is visible: dot product matches cosine similarity only when vectors have unit magnitude. The brute-force search works correctly for small corpora but does not scale.
 
 The next post introduces FAISS. We will look at index types, how to build and persist an index, and how approximate search trades a small accuracy cost for a large speed gain.
+
+## Operational checklist
+
+- [ ] Aligned similarity function with the model's recommended distance
+- [ ] Either pre-normalized every vector or wrote down why you didn't
+- [ ] Calibrated the threshold against a sample query distribution
+- [ ] Decided how many candidates to pass to a reranker after scoring
+- [ ] Captured false-positive examples as regression cases
 
 <!-- toc:begin -->
 ## In this series
