@@ -22,6 +22,13 @@ seo_description: LoRA 어댑터는 다음 그림으로 요약됩니다.
 
 # LoRA 어댑터 구성
 
+## 이 글에서 배울 것
+
+- `LoraConfig`의 핵심 필드(`r`, `lora_alpha`, `target_modules`)의 의미를 이해합니다.
+- 모델별로 `target_modules` 이름이 다른 이유와 확인 방법을 익힙니다.
+- `print_trainable_parameters()`로 어댑터 부착을 검증하는 습관을 들입니다.
+- 저랭크 분해 구조(`y = Wx + (α/r)·B·A·x`)를 직관적으로 이해합니다.
+
 ## 이 글에서 답할 질문
 
 ![이 글에서 답할 질문](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.ko.png)
@@ -185,6 +192,12 @@ for name, param in peft_model.named_parameters():
 - **`r=8` → `r=16` 비교 실험**: 동일 데이터로 두 번 돌려 손실 곡선과 평가 지표를 비교합니다. 큰 차이가 없다면 r=8로 머무릅니다.
 - **어댑터를 베이스에 합치기(`merge_and_unload`)**: 추론 지연이 중요한 환경에서는 학습 후 어댑터를 베이스에 합쳐 한 모델로 배포합니다. 합친 모델은 LoRA가 아니라 일반 모델로 동작합니다.
 - **어댑터만 저장**: `peft_model.save_pretrained("adapter/")`로 수 MB짜리 가중치만 저장합니다. 베이스 모델은 별도 캐시에서 가져옵니다.
+
+## 실무에서는 이렇게 생각한다
+
+LoRA는 파라미터 효율성이 돋보이지만, 실무에서는 "어느 레이어에 붙일 것인가"가 훨씬 더 중요한 결정입니다. attention QKV에만 붙여도 충분한 경우가 대부분이고, MLP까지 포함하면 학습 파라미터가 두세 배로 뛰어 실험 속도가 느려집니다. 또 rank를 키우는 것과 데이터를 늘리는 것 중 어느 쪽이 비용 대비 효과가 더 큰지는 데이터셋 크기에 따라 달라집니다.
+
+팀에서 LoRA를 도입할 때 가장 먼저 할 일은 모델별 `target_modules` 매핑 표를 위키에 박아 두는 것입니다. 이것만으로도 신규 팀원이 `trainable params: 0` 실수를 반복하는 일을 방지할 수 있습니다. 어댑터를 base에 합칠지(`merge_and_unload`) 분리해서 배포할지는 서빙 환경의 latency 요구와 multi-tenancy 필요성에 따라 결정합니다.
 
 ## 체크리스트
 

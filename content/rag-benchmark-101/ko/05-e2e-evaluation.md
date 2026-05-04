@@ -22,6 +22,13 @@ seo_description: 종단 간 평가의 데이터 흐름은 다음과 같습니다
 
 # 종단 간 RAG 파이프라인 평가
 
+## 이 글에서 배울 것
+
+- retrieval 지표와 generation 지표를 분리해서 보는 것이 왜 중요한지 이해합니다.
+- LLM 기반 평가(faithfulness, relevance)와 문자열 지표(BLEU, ROUGE)의 차이를 구분합니다.
+- 종단 간 평가 파이프라인을 Python으로 구성하는 실습을 합니다.
+- 평가 결과를 해석해서 retrieval과 generation 중 어디를 개선해야 하는지 판단할 수 있습니다.
+
 ## 이 글에서 답할 질문
 
 ![이 글에서 답할 질문](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.ko.png)
@@ -195,6 +202,12 @@ python3 main.py
 - **평가 LLM 선택**: 평가용 LLM을 **생성 LLM과 다른** 모델로 두면 self-bias를 줄일 수 있습니다(예: 생성은 Llama-3.1, 평가는 GPT-4o-mini).
 - **결과 저장**: 점수만 저장하지 말고 (question, answer, contexts, score, reasoning)를 함께 남깁니다. 회귀 디버깅의 출발점입니다.
 - **CI 게이트**: faithfulness가 기준치 아래로 떨어지면 PR 차단. answer_relevancy는 처음에는 경고만으로 시작합니다.
+
+## 실무에서는 이렇게 생각한다
+
+E2E 평가에서 가장 자주 나오는 실수는 generation 품질이 낮을 때 무조건 프롬프트를 손보는 것입니다. 하지만 대부분의 나쁜 응답은 retrieval이 잘못된 문서를 가져와서 생기는 것입니다. retrieval 지표를 먼저 분리해서 보지 않으면 프롬프트만 돌리다 시간을 낭비하게 됩니다.
+
+LLM 기반 평가(LLM-as-a-judge)는 편리하지만 비용과 일관성 문제가 있습니다. 같은 응답을 두 번 평가하면 점수가 달라질 수 있습니다. 그래서 실무에서는 LLM 평가를 스크리닝 도구로 쓰고, 최종 판단은 도메인 전문가의 샘플 리뷰로 보완하는 방식이 현실적입니다.
 
 ## 체크리스트
 

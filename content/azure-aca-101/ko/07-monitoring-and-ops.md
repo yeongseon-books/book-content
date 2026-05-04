@@ -224,6 +224,14 @@ production checklist:
 - **Cost 관리** — Application Insights는 ingestion 양으로 과금됩니다. sampling rate 조정 필수.
 - **OpenTelemetry 표준** — Azure Monitor 전용 SDK보다 OTel SDK + Azure Monitor exporter가 vendor lock-in을 줄입니다.
 
+## 실무에서는 이렇게 생각한다
+
+관측성 도구를 도입할 때 가장 위험한 함정은 "모든 것을 수집하면 문제가 보일 것"이라는 망상입니다. 실제로는 수집하는 데이터가 많을수록 노이즈도 많아집니다. 초기에는 세 가지만 보는 것이 효과적입니다. 에러율(5xx), 응답 시간(p95), 컨테이너 재시작 횟수. 이 세 가지가 정상이면 대부분의 운영 문제는 감지할 수 있습니다.
+
+Alert fatigue는 모니터링의 가장 큰 적입니다. 경고가 하루에 50건씩 오면 팀은 전부 무시하게 됩니다. 실무에서는 "이 경고가 올 때 누가 무엇을 해야 하는가"를 답할 수 없는 경고는 만들지 않는 것이 원칙입니다. action item이 없는 경고는 대시보드 차트로 내리고, 경고는 즉시 대응이 필요한 항목만 남겼습니다.
+
+Log Analytics 비용은 예상보다 빠르게 늘어납니다. 특히 모든 컨테이너의 stdout를 수집하면 GB 단위 비용이 발생합니다. 프로덕션에서는 로그 레벨을 WARNING 이상으로 올리고, DEBUG 로그는 샘플링하거나 아예 끄는 것이 일반적입니다. 분석이 필요한 때만 일시적으로 레벨을 내리는 운영 패턴을 미리 마련해두는 것이 좋습니다.
+
 ## 체크리스트
 
 - [ ] ACA Environment에 Log Analytics workspace가 연결되어 있는가?

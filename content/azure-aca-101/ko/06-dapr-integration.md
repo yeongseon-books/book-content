@@ -213,6 +213,14 @@ requests.post(
 
 ACA의 Dapr 버전은 플랫폼이 관리하므로, breaking change가 있는 major upgrade는 release notes를 확인해야 합니다.
 
+## 실무에서는 이렇게 생각한다
+
+Dapr를 도입할지 말지는 "마이크로서비스가 몇 개냐"로 판단하는 것이 가장 빠릅니다. 앱이 2–3개이고 통신 패턴이 단순 HTTP라면, Dapr 사이드카가 추가하는 복잡도가 이점보다 큽니다. 반면 앱이 5개 이상이고 pub/sub, state store, secret 관리가 모두 필요한 환경이라면, 각 앱에서 별도 SDK를 붙이는 것보다 Dapr building block으로 통일하는 편이 운영 부담을 줄입니다.
+
+Dapr component YAML은 ACA Environment 단위로 관리되므로, 여러 앱이 같은 state store를 공유할 때 편리합니다. 하지만 이것이 양날의 검이 될 수 있습니다. 한 팀이 component YAML을 변경하면 같은 Environment의 모든 앱에 영향을 줍니다. Environment를 팀 또는 도메인 단위로 분리할지, 하나로 묶을지는 초기에 결정해두는 것이 좋습니다.
+
+마이그레이션 관점에서 Dapr는 "점진적 도입"이 가능합니다. 모든 앱을 한꺿번에 Dapr로 전환할 필요 없이, 새로 추가하는 앱부터 Dapr를 켜고 기존 앱은 그대로 둘 수 있습니다. 다만 하이브리드 구성에서는 Dapr 앱과 비-Dapr 앱 간 통신 방식이 달라지므로, 호출 경로를 문서화해두지 않으면 혼란이 옵니다.
+
 ## 체크리스트
 
 - [ ] `--enable-dapr true`와 `--dapr-app-id`, `--dapr-app-port`를 모두 설정했는가?

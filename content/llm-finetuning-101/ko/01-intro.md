@@ -22,6 +22,13 @@ seo_description: 파인튜닝은 다음 세 가지 변수를 어떻게 쪼갤지
 
 # LLM 파인튜닝 입문
 
+## 이 글에서 배울 것
+
+- fine-tuning이 prompt engineering이나 RAG와 어떻게 다른지, 언제 각각을 선택해야 하는지 판단할 수 있습니다.
+- full fine-tuning과 parameter-efficient fine-tuning(LoRA)의 차이를 이해합니다.
+- fine-tuning 프로젝트의 전체 흐름(데이터 → 학습 → 평가 → 서빙)을 개관합니다.
+- 이 시리즈 6편이 어떤 순서로 fine-tuning의 각 단계를 다루는지 파악합니다.
+
 ## 이 글에서 답할 질문
 
 ![이 글에서 답할 질문](../../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.ko.png)
@@ -177,6 +184,12 @@ print(f"ratio = {lora_params / base_linear_params:.4%}")
 - **첫 실험은 작은 베이스로**: GPT-2 small이나 Phi-2처럼 작은 모델로 학습 파이프라인을 검증한 뒤, Llama-3-8B로 옮기면 비용 사고를 줄일 수 있습니다.
 - **어댑터 가중치 버전 관리**: 베이스 모델 hash와 어댑터 hash를 함께 기록합니다. 6편에서 어댑터만 swap해 가며 A/B 테스트할 때 필수입니다.
 - **rank 스윕은 작게**: r ∈ {4, 8, 16}처럼 좁은 범위로 시작합니다. 30분짜리 실험 3개가 3시간짜리 실험 1개보다 정보가 많습니다.
+
+## 실무에서는 이렇게 생각한다
+
+fine-tuning을 시작하기 전에 "정말 fine-tuning이 필요한가"를 먼저 묻는 것이 실무의 첫 단계입니다. prompt engineering으로 충분한 작업이 많고, RAG로 해결되는 경우도 많습니다. fine-tuning은 데이터 준비, GPU 비용, 모델 관리까지 운영 부담이 크므로, ROI가 명확한 경우에만 선택하는 것이 현실적입니다.
+
+fine-tuning이 필요한 대표적 신호는 "프롬프트로 품질은 나오지만 비용이 너무 높다", "응답 형식이나 톤이 일관되지 않는다", "도메인 지식이 모델에 내재화되어야 한다"입니다.
 
 ## 체크리스트
 

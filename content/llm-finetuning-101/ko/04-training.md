@@ -22,6 +22,13 @@ seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 
 # 학습 루프와 하이퍼파라미터
 
+## 이 글에서 배울 것
+
+- `TrainingArguments`의 필수 필드를 이해하고 1 step 학습을 실행할 수 있습니다.
+- `labels`와 data collator가 왜 필요한지 설명할 수 있습니다.
+- effective batch size 공식(`per_device × accum × devices`)을 이해합니다.
+- 학습 루프 디버깅 시 먼저 확인해야 할 출력값을 파악합니다.
+
 ## 이 글에서 답할 질문
 
 ![이 글에서 답할 질문](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.ko.png)
@@ -195,6 +202,12 @@ args.max_steps = 1
 - **eval은 스텝 단위**: `eval_steps=50, evaluation_strategy="steps"`로 두면 epoch 끝까지 기다리지 않고도 회귀를 일찍 잡을 수 있습니다.
 - **체크포인트 정책**: `save_total_limit=2`로 디스크를 보호하고, `load_best_model_at_end=True`로 5편 평가에서 가장 좋은 모델을 자동으로 선택합니다.
 - **wandb 연결**: 실험을 두 개 이상 비교할 때부터는 `report_to=["wandb"]`로 켭니다. 손실 곡선과 lr 스케줄이 한 화면에 겹치는 순간 직관이 빠르게 좋아집니다.
+
+## 실무에서는 이렇게 생각한다
+
+학습 루프의 핸심은 "얼마나 많이 돌리느냐"가 아니라 "한 번이라도 끝까지 도는지"입니다. 실무에서 파인튜닝 파이프라인을 처음 구축할 때는 3-step smoke test를 PR 게이트로 거는 것을 권합니다. loss가 숫자인지, NaN이 아닌지, global_step이 증가하는지만 확인하면 됩니다.
+
+하이퍼파라미터 조정은 한 번에 하나만 바꾸는 원칙을 지켜야 합니다. learning rate와 batch size를 동시에 바꾸면 어느 변화가 결과에 영향을 줬는지 추적할 수 없기 때문입니다. GPU 메모리가 부족하다면 batch size를 줄이고 gradient accumulation으로 보상하는 것이 맞지, learning rate를 낮추는 것은 다른 문제입니다.
 
 ## 체크리스트
 
