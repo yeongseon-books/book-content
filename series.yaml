@@ -2187,3 +2187,25 @@ series:
   level: 101
   lifecycle: active
   path: content/data-structures-python-101
+
+- id: algorithms-python-101
+  status: content-ready
+  category: python
+  title:
+    ko: Algorithms with Python 101
+    en: Algorithms with Python 101
+  description:
+    ko: Python 기반으로 시간 복잡도, 탐색, 정렬, DP, BFS/DFS, 그리디 등 알고리즘 기본기를 다지는 시리즈.
+    en: A beginner series on algorithm fundamentals in Python covering time complexity, searching, sorting, recursion, dynamic programming, and greedy algorithms.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/algorithms-python-101

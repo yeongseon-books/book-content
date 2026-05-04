@@ -1,0 +1,62 @@
+id: algorithms-python-101
+title:
+  ko: Algorithms with Python 101
+  en: Algorithms with Python 101
+description:
+  ko: Python 기반으로 시간 복잡도, 탐색, 정렬, DP, BFS/DFS, 그리디 등 알고리즘 기본기를 다지는 시리즈.
+  en: A beginner series on algorithm fundamentals in Python covering time complexity, searching, sorting, recursion, dynamic programming, and greedy algorithms.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - idx: 1
+    slug: 01-what-are-algorithms
+    title:
+      ko: 알고리즘이란 무엇인가?
+      en: What Are Algorithms?
+  - idx: 2
+    slug: 02-time-complexity-and-big-o
+    title:
+      ko: 시간 복잡도와 Big-O
+      en: Time Complexity and Big-O
+  - idx: 3
+    slug: 03-linear-and-binary-search
+    title:
+      ko: 선형 탐색과 이진 탐색
+      en: Linear Search and Binary Search
+  - idx: 4
+    slug: 04-sorting-algorithms
+    title:
+      ko: 정렬 알고리즘
+      en: Sorting Algorithms
+  - idx: 5
+    slug: 05-recursion-and-divide-and-conquer
+    title:
+      ko: 재귀와 분할 정복
+      en: Recursion and Divide and Conquer
+  - idx: 6
+    slug: 06-dynamic-programming-basics
+    title:
+      ko: 동적 계획법 기초
+      en: Dynamic Programming Basics
+  - idx: 7
+    slug: 07-graph-traversal-bfs-dfs
+    title:
+      ko: 그래프 탐색 — BFS와 DFS
+      en: Graph Traversal — BFS and DFS
+  - idx: 8
+    slug: 08-shortest-path-basics
+    title:
+      ko: 최단 경로 기초
+      en: Shortest Path Basics
+  - idx: 9
+    slug: 09-greedy-algorithms
+    title:
+      ko: 그리디 알고리즘
+      en: Greedy Algorithms
+  - idx: 10
+    slug: 10-coding-test-strategies
+    title:
+      ko: 코딩 테스트 문제 접근법
+      en: Coding Test Problem-Solving Strategies

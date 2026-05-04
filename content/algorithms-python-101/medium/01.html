@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Are Algorithms?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Are Algorithms?</h1>
+<blockquote>
+<p>Algorithms with Python 101 Series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Why does one piece of code finish in 1 second while another takes 10 minutes for the same problem?</p>
+<blockquote>
+<p>An algorithm is a step-by-step procedure for solving a problem. A good algorithm is correct, efficient, and clear. This article covers the definition and properties of algorithms, how to represent them, and how to write your first algorithm in Python.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and five key properties of algorithms</li>
+<li>How to represent algorithms with pseudocode</li>
+<li>How to implement simple algorithms in Python</li>
+<li>The difference between correctness and efficiency</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Programming is problem solving. For the same problem, one algorithm can be thousands of times faster than another. Understanding algorithms lets you write faster, more correct code.</p>
+<blockquote>
+<p>An algorithm is a clear, finite set of steps that takes input and produces the desired output.</p>
+</blockquote>
+<p>Algorithmic thinking is a core skill across coding interviews, performance optimization, and system design.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Algorithm = a finite procedure that transforms input into the desired output</p>
+</blockquote>
+<pre><code>[Problem] → [Algorithm] → [Solution]
+
+Example: Find the maximum value in a list
+Input:  [3, 7, 2, 9, 4]
+Algorithm:
+  1. Set the first value as the maximum
+  2. Compare each remaining value
+  3. Update maximum when a larger value is found
+Output: 9
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Algorithm</strong><br>
+- Description: A clear, finite set of steps to solve a problem</p>
+<p><strong>Input</strong><br>
+- Description: The data provided to an algorithm</p>
+<p><strong>Output</strong><br>
+- Description: The result produced by an algorithm</p>
+<p><strong>Correctness</strong><br>
+- Description: The property of producing the right output for every valid input</p>
+<p><strong>Efficiency</strong><br>
+- Description: How sparingly an algorithm uses time and memory</p>
+<h2>Before / After</h2>
+<p>Two approaches to finding the maximum value in a list.</p>
+<pre><code class="language-python"># before: sort the list then take the last element — O(n log n)
+data = [3, 7, 2, 9, 4]
+sorted_data = sorted(data)
+maximum = sorted_data[-1]
+</code></pre>
+<pre><code class="language-python"># after: single pass through the list — O(n)
+data = [3, 7, 2, 9, 4]
+maximum = data[0]
+for x in data[1:]:
+    if x &gt; maximum:
+        maximum = x
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Find the Maximum Value</strong></p>
+<pre><code class="language-python">def find_max(numbers: list[int]) -&gt; int:
+    &quot;&quot;&quot;Find the maximum value in a list.&quot;&quot;&quot;
+    if not numbers:
+        raise ValueError(&quot;Cannot find maximum of an empty list&quot;)
+    maximum = numbers[0]
+    for num in numbers[1:]:
+        if num &gt; maximum:
+            maximum = num
+    return maximum
+
+data = [3, 7, 2, 9, 4]
+print(f&quot;Maximum: {find_max(data)}&quot;)  # Maximum: 9
+</code></pre>
+<p><strong>Step 2: Compute Basic Statistics</strong></p>
+<pre><code class="language-python">def compute_stats(numbers: list[int]) -&gt; dict:
+    &quot;&quot;&quot;Compute sum, average, min, and max of a list.&quot;&quot;&quot;
+    if not numbers:
+        raise ValueError(&quot;Empty list&quot;)
+    total = 0
+    minimum = numbers[0]
+    maximum = numbers[0]
+    for num in numbers:
+        total += num
+        if num &lt; minimum:
+            minimum = num
+        if num &gt; maximum:
+            maximum = num
+    return {
+        &quot;sum&quot;: total,
+        &quot;average&quot;: total / len(numbers),
+        &quot;min&quot;: minimum,
+        &quot;max&quot;: maximum,
+    }
+
+stats = compute_stats([10, 20, 30, 40, 50])
+print(stats)
+# {'sum': 150, 'average': 30.0, 'min': 10, 'max': 50}
+</code></pre>
+<p><strong>Step 3: Reverse a String</strong></p>
+<pre><code class="language-python">def reverse_string(text: str) -&gt; str:
+    &quot;&quot;&quot;Reverse a string without slicing.&quot;&quot;&quot;
+    result = []
+    for i in range(len(text) - 1, -1, -1):
+        result.append(text[i])
+    return &quot;&quot;.join(result)
+
+print(reverse_string(&quot;algorithm&quot;))  # mhtirogla
+print(reverse_string(&quot;Python&quot;))    # nohtyP
+
+# Compare with Python built-in
+print(&quot;algorithm&quot;[::-1])  # mhtirogla
+</code></pre>
+<p><strong>Step 4: Compare Two Algorithms</strong></p>
+<pre><code class="language-python">import time
+
+def has_duplicate_brute(data: list[int]) -&gt; bool:
+    &quot;&quot;&quot;Check for duplicates — brute force O(n^2).&quot;&quot;&quot;
+    for i in range(len(data)):
+        for j in range(i + 1, len(data)):
+            if data[i] == data[j]:
+                return True
+    return False
+
+def has_duplicate_set(data: list[int]) -&gt; bool:
+    &quot;&quot;&quot;Check for duplicates — set-based O(n).&quot;&quot;&quot;
+    return len(data) != len(set(data))
+
+test_data = list(range(10_000))
+
+start = time.perf_counter()
+has_duplicate_brute(test_data)
+brute_time = time.perf_counter() - start
+
+start = time.perf_counter()
+has_duplicate_set(test_data)
+set_time = time.perf_counter() - start
+
+print(f&quot;Brute force: {brute_time:.4f}s&quot;)
+print(f&quot;Set-based:   {set_time:.6f}s&quot;)
+</code></pre>
+<p><strong>Step 5: Verify the Five Properties</strong></p>
+<pre><code class="language-python">def is_palindrome(text: str) -&gt; bool:
+    &quot;&quot;&quot;Check whether a string is a palindrome.
+
+    Demonstrates the five properties of an algorithm:
+    1. Input: string text
+    2. Output: True or False
+    3. Definiteness: every step is unambiguous
+    4. Finiteness: the loop runs at most len(text)/2 times
+    5. Effectiveness: uses only basic comparisons
+    &quot;&quot;&quot;
+    cleaned = text.lower().replace(&quot; &quot;, &quot;&quot;)
+    left = 0
+    right = len(cleaned) - 1
+    while left &lt; right:
+        if cleaned[left] != cleaned[right]:
+            return False
+        left += 1
+        right -= 1
+    return True
+
+print(is_palindrome(&quot;racecar&quot;))  # True
+print(is_palindrome(&quot;hello&quot;))    # False
+print(is_palindrome(&quot;A man a plan a canal Panama&quot;))  # True
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same problem can have vastly different performance depending on the algorithm (O(n^2) vs O(n))</li>
+<li>An algorithm has five properties: input, output, definiteness, finiteness, and effectiveness</li>
+<li>Python built-in functions like <code>max</code> and <code>sorted</code> are algorithms — implementing them manually helps you understand the principles</li>
+<li>Handling edge cases (empty list, empty string) is a hallmark of a well-designed algorithm</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Skipping edge cases</strong><br>
+- Why It's a Problem: Crashes on empty input<br>
+- How to Fix It: Always validate input first</p>
+<p><strong>Infinite loops</strong><br>
+- Why It's a Problem: Missing or wrong termination condition<br>
+- How to Fix It: Verify loop variable converges to exit</p>
+<p><strong>Off-by-one errors</strong><br>
+- Why It's a Problem: Index off by 1<br>
+- How to Fix It: Test boundary values carefully</p>
+<p><strong>Choosing an inefficient algorithm</strong><br>
+- Why It's a Problem: Runtime explodes with larger data<br>
+- How to Fix It: Analyze time complexity first</p>
+<p><strong>Not verifying correctness</strong><br>
+- Why It's a Problem: Works for some inputs but not all<br>
+- How to Fix It: Test with diverse cases</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Search engines return results from billions of pages in milliseconds</li>
+<li>Recommendation systems analyze user preferences to suggest content</li>
+<li>Navigation apps compute optimal routes in real time</li>
+<li>Compression algorithms reduce file sizes to save storage</li>
+<li>Encryption algorithms protect data in transit and at rest</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In day-to-day work, you rarely implement algorithms from scratch. Libraries and frameworks provide optimized implementations. But algorithmic thinking is essential for analyzing problems and choosing the right tool.</p>
+<p>Answering "Why is this code slow?" or "Is there a better approach?" requires a solid grasp of algorithm fundamentals.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Explain the definition and five properties of an algorithm</li>
+<li>[ ] Compare the efficiency of two algorithms that solve the same problem</li>
+<li>[ ] Implement simple algorithms (find max, palindrome check) in Python</li>
+<li>[ ] Write algorithms that handle edge cases</li>
+<li>[ ] Measure the performance difference between brute force and optimized approaches</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write an algorithm that finds the second-largest value in a list in a single pass.</li>
+<li>Write an algorithm that finds the most frequent character in a string.</li>
+<li>Implement three ways to compute the sum from 1 to N (loop, math formula, recursion) and compare their performance.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>An algorithm is a clear procedure for solving a problem, and efficiency is the key criterion for choosing one. In the next article, we cover the tool for objectively measuring efficiency: time complexity and Big-O notation.</p>
+<ul>
+<li><strong>What Are Algorithms? (current)</strong></li>
+<li>Time Complexity and Big-O (upcoming)</li>
+<li>Linear Search and Binary Search (upcoming)</li>
+<li>Sorting Algorithms (upcoming)</li>
+<li>Recursion and Divide and Conquer (upcoming)</li>
+<li>Dynamic Programming Basics (upcoming)</li>
+<li>Graph Traversal — BFS and DFS (upcoming)</li>
+<li>Shortest Path Basics (upcoming)</li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Coding Test Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">Introduction to Algorithms (CLRS) — MIT Press</a></li>
+<li><a href="https://realpython.com/sorting-algorithms-python/">Real Python — Sorting Algorithms in Python</a></li>
+<li><a href="https://www.geeksforgeeks.org/fundamentals-of-algorithms/">GeeksforGeeks — Fundamentals of Algorithms</a></li>
+<li><a href="https://www.khanacademy.org/computing/computer-science/algorithms">Khan Academy — Algorithms</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Algorithms, Problem Solving, Programming Basics, Time Complexity</p>
+</body>
+</html>

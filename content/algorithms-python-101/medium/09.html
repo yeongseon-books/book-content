@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Greedy Algorithms</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Greedy Algorithms</h1>
+<blockquote>
+<p>Algorithms with Python 101 Series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can always choosing the best option at each step guarantee the overall best outcome?</p>
+<blockquote>
+<p>A greedy algorithm makes the locally optimal choice at each step, aiming for the globally optimal solution. It does not always work, but when certain conditions are met, it is faster and simpler than DP. This article covers when greedy applies and solves classic problems.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The conditions under which greedy algorithms produce optimal solutions</li>
+<li>Coin change, activity selection, and fractional knapsack problems</li>
+<li>How greedy compares with dynamic programming</li>
+<li>How to verify greedy correctness with counterexamples</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Greedy algorithms are concise and fast. Many problems reduce to sort + single pass at O(n log n), far more efficient than DP's typical O(n^2).</p>
+<blockquote>
+<p>Greedy selects the local optimum at each step, hoping to reach the global optimum.</p>
+</blockquote>
+<p>However, greedy does not always yield the optimal answer. Both the "greedy choice property" and "optimal substructure" must hold.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Greedy choice property = the locally optimal choice is part of the globally optimal solution</p>
+</blockquote>
+<pre><code>Coin change (denominations: 500, 100, 50, 10):
+Make change for 1,260:
+→ 500 × 2 = 1,000 (remaining: 260)
+→ 100 × 2 = 200   (remaining: 60)
+→  50 × 1 = 50    (remaining: 10)
+→  10 × 1 = 10    (remaining: 0)
+Total: 6 coins — optimal via greedy
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Greedy choice property</strong><br>
+- Description: The local optimum is part of the global optimum</p>
+<p><strong>Optimal substructure</strong><br>
+- Description: The optimal solution is composed of optimal sub-solutions</p>
+<p><strong>Activity selection</strong><br>
+- Description: Choose the maximum number of non-overlapping activities</p>
+<p><strong>Fractional knapsack</strong><br>
+- Description: A knapsack problem where items can be split — solvable by greedy</p>
+<p><strong>Counterexample</strong><br>
+- Description: An input where greedy fails to produce the optimal answer</p>
+<h2>Before / After</h2>
+<p>Two ways to find the maximum number of non-overlapping activities.</p>
+<pre><code class="language-python"># before: brute-force all combinations — O(2^n)
+from itertools import combinations
+
+def max_activities(activities):
+    best = 0
+    for r in range(len(activities), 0, -1):
+        for combo in combinations(activities, r):
+            if not overlapping(combo):
+                return r
+    return best
+</code></pre>
+<pre><code class="language-python"># after: greedy — O(n log n)
+def max_activities(activities):
+    activities.sort(key=lambda x: x[1])  # sort by end time
+    count, last_end = 0, 0
+    for start, end in activities:
+        if start &gt;= last_end:
+            count += 1
+            last_end = end
+    return count
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Coin Change (Greedy)</strong></p>
+<pre><code class="language-python">def coin_change_greedy(amount: int, coins: list[int] | None = None) -&gt; dict[int, int]:
+    &quot;&quot;&quot;Greedy coin change — use the largest coins first.&quot;&quot;&quot;
+    if coins is None:
+        coins = [500, 100, 50, 10]
+    result: dict[int, int] = {}
+
+    for coin in sorted(coins, reverse=True):
+        if amount &gt;= coin:
+            count = amount // coin
+            result[coin] = count
+            amount -= coin * count
+
+    return result
+
+change = coin_change_greedy(1260)
+total = sum(change.values())
+print(f&quot;Change: {change}&quot;)  # {500: 2, 100: 2, 50: 1, 10: 1}
+print(f&quot;Coins used: {total}&quot;)  # 6
+</code></pre>
+<p><strong>Step 2: Activity Selection</strong></p>
+<pre><code class="language-python">def activity_selection(
+    activities: list[tuple[int, int]],
+) -&gt; list[tuple[int, int]]:
+    &quot;&quot;&quot;Select the maximum number of non-overlapping activities — O(n log n).&quot;&quot;&quot;
+    sorted_acts = sorted(activities, key=lambda x: x[1])
+    selected: list[tuple[int, int]] = []
+    last_end = 0
+
+    for start, end in sorted_acts:
+        if start &gt;= last_end:
+            selected.append((start, end))
+            last_end = end
+
+    return selected
+
+activities = [(1, 4), (3, 5), (0, 6), (5, 7), (3, 9), (5, 9),
+              (6, 10), (8, 11), (8, 12), (2, 14), (12, 16)]
+result = activity_selection(activities)
+print(f&quot;Selected: {result}&quot;)
+# [(1, 4), (5, 7), (8, 11), (12, 16)]
+print(f&quot;Maximum activities: {len(result)}&quot;)  # 4
+</code></pre>
+<p><strong>Step 3: Fractional Knapsack</strong></p>
+<pre><code class="language-python">def fractional_knapsack(
+    items: list[tuple[int, int]], capacity: int
+) -&gt; float:
+    &quot;&quot;&quot;Fractional knapsack — O(n log n).&quot;&quot;&quot;
+    sorted_items = sorted(
+        items, key=lambda x: x[1] / x[0], reverse=True
+    )
+    total_value = 0.0
+
+    for weight, value in sorted_items:
+        if capacity &gt;= weight:
+            total_value += value
+            capacity -= weight
+        else:
+            fraction = capacity / weight
+            total_value += value * fraction
+            break
+
+    return total_value
+
+items = [(10, 60), (20, 100), (30, 120)]  # (weight, value)
+print(fractional_knapsack(items, 50))  # 240.0
+</code></pre>
+<p><strong>Step 4: Meeting Rooms and Interval Scheduling</strong></p>
+<pre><code class="language-python">def min_meeting_rooms(meetings: list[tuple[int, int]]) -&gt; int:
+    &quot;&quot;&quot;Minimum meeting rooms required — O(n log n).&quot;&quot;&quot;
+    events: list[tuple[int, int]] = []
+    for start, end in meetings:
+        events.append((start, 1))
+        events.append((end, -1))
+
+    events.sort()
+    max_rooms = 0
+    current = 0
+    for _, delta in events:
+        current += delta
+        max_rooms = max(max_rooms, current)
+
+    return max_rooms
+
+meetings = [(0, 30), (5, 10), (15, 20)]
+print(f&quot;Minimum rooms: {min_meeting_rooms(meetings)}&quot;)  # 2
+</code></pre>
+<p><strong>Step 5: Greedy vs DP</strong></p>
+<pre><code class="language-python"># Greedy fails with non-standard coin denominations
+# Coins: [1, 3, 4], amount: 6
+# Greedy: 4+1+1 = 3 coins
+# Optimal: 3+3 = 2 coins
+
+def coin_change_greedy_count(coins: list[int], amount: int) -&gt; int:
+    count = 0
+    for coin in sorted(coins, reverse=True):
+        count += amount // coin
+        amount %= coin
+    return count
+
+def coin_change_dp(coins: list[int], amount: int) -&gt; int:
+    dp = [float(&quot;inf&quot;)] * (amount + 1)
+    dp[0] = 0
+    for i in range(1, amount + 1):
+        for coin in coins:
+            if coin &lt;= i and dp[i - coin] + 1 &lt; dp[i]:
+                dp[i] = dp[i - coin] + 1
+    return dp[amount]
+
+coins = [1, 3, 4]
+amount = 6
+print(f&quot;Greedy: {coin_change_greedy_count(coins, amount)} coins&quot;)  # 3 (4+1+1)
+print(f&quot;DP:     {coin_change_dp(coins, amount)} coins&quot;)            # 2 (3+3)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Greedy hinges on sorting: sort by the right criterion and a single pass solves the problem</li>
+<li>Activity selection sorts by end time — this is what makes the greedy choice optimal</li>
+<li>Fractional knapsack sorts by value-to-weight ratio; greedy works because items can be split</li>
+<li>The non-standard coin example shows why counterexamples matter</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Not verifying greedy correctness</strong><br>
+- Why It's a Problem: Returns suboptimal results<br>
+- How to Fix It: Find a counterexample or prove the greedy choice property</p>
+<p><strong>Wrong sort criterion</strong><br>
+- Why It's a Problem: Selects in the wrong order<br>
+- How to Fix It: Verify the sort key matches the problem's optimal strategy</p>
+<p><strong>Applying greedy to 0-1 knapsack</strong><br>
+- Why It's a Problem: Items cannot be split, so greedy is suboptimal<br>
+- How to Fix It: Use DP for 0-1 knapsack</p>
+<p><strong>Always using greedy for coin change</strong><br>
+- Why It's a Problem: Fails with non-standard denominations<br>
+- How to Fix It: Check whether denominations form a divisibility chain</p>
+<p><strong>Using greedy where DP is needed</strong><br>
+- Why It's a Problem: Local optimum is not global optimum<br>
+- How to Fix It: Verify the greedy choice property</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Huffman coding builds an optimal compression tree with a greedy strategy</li>
+<li>Job scheduling assigns tasks with deadlines to maximize profit</li>
+<li>Minimum spanning trees (Kruskal, Prim) use greedy edge selection</li>
+<li>Cache replacement policies (LRU) are grounded in greedy heuristics</li>
+<li>API rate-limit optimization batches requests greedily</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Greedy is not a "try it and see" algorithm. Without verifying correctness, you get code that passes most inputs but fails on specific edge cases.</p>
+<p>In a coding interview, if you propose a greedy solution, you should be able to explain in one sentence why greedy is optimal. If you cannot, consider DP instead.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Explain the conditions under which greedy produces optimal solutions</li>
+<li>[ ] Solve the activity selection problem with greedy</li>
+<li>[ ] Explain the difference between fractional knapsack and 0-1 knapsack</li>
+<li>[ ] Find a counterexample where greedy fails</li>
+<li>[ ] Distinguish when to use greedy vs DP</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Build a Huffman coding tree from character frequencies.</li>
+<li>Given a list of jobs with deadlines and profits, find the maximum-profit schedule.</li>
+<li>Gas station problem: find the minimum number of refueling stops to travel across N cities.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Greedy algorithms make the locally optimal choice at each step. They are efficient — often sort + single pass — but do not always guarantee the optimal solution. In the final article, we wrap up the series with a practical guide to coding test problem-solving strategies.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Dynamic Programming Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Graph Traversal — BFS and DFS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/08-shortest-path-basics.md">Shortest Path Basics</a></li>
+<li><strong>Greedy Algorithms (current)</strong></li>
+<li>Coding Test Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Greedy_algorithm">Wikipedia — Greedy Algorithm</a></li>
+<li><a href="https://www.geeksforgeeks.org/greedy-algorithms/">GeeksforGeeks — Greedy Algorithms</a></li>
+<li><a href="https://realpython.com/python-greedy-algorithm/">Real Python — Greedy Algorithms in Python</a></li>
+<li><a href="https://leetcode.com/tag/greedy/">LeetCode — Greedy Problems</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Algorithms, Greedy, Optimization, Activity Selection</p>
+</body>
+</html>
