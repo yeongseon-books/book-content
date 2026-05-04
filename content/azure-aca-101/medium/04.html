@@ -57,42 +57,198 @@
 <blockquote>
 <p>Azure Container Apps 101 series (4/7)</p>
 </blockquote>
-<p>This post connects ingress with revision-based rollout control. The goal is not proxy internals. The goal is to understand which ACA knobs change public exposure, which knobs keep old revisions alive, and how weighted traffic lets you turn revisions into a safe rollout tool.</p>
 <hr>
+<h2>What you will learn</h2>
+<ul>
+<li>What ACA's managed Ingress owns (TLS, external/internal exposure, Revision routing) and what it does not</li>
+<li>The exact difference between <code>external</code>, <code>internal</code>, and <code>disabled</code> ingress modes</li>
+<li>How Single mode and Multiple mode change traffic distribution behavior</li>
+<li>How to implement canary and Blue-Green via Revision weights, and roll back instantly</li>
+</ul>
+<h2>Why this matters</h2>
+<p>One of ACA's most powerful production features is revision-based traffic split. Using it correctly first requires getting ingress right.</p>
+<p>Common incidents:</p>
+<ul>
+<li>"External ingress is on but I cannot reach it from the internet" → <code>target-port</code> mismatch</li>
+<li>"I tried to send 10% to canary but 100% went to the new version" → was on Single mode</li>
+<li>"I heard rollback takes minutes like a redeploy" → it is a weight change, completes in seconds</li>
+<li>"I built it with internal ingress but the internet can reach it" → ingress mode misread</li>
+</ul>
+<p>This post ties ingress and traffic split into one flow and removes the root causes of those incidents.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Ingress is ACA's "front door"; traffic weight is the "elevator dispatch ratio."</p>
+</blockquote>
+<p>The front door (Ingress) decides whether external visitors get in (<code>external</code>), only same-building people get in (<code>internal</code>), or it stays closed (<code>disabled</code>). Once past the door, the elevator (traffic split rule) decides which office (Revision) each visitor reaches based on the configured ratio.</p>
+<p>These two stages are separate, so you can manage "external exposure" and "version distribution" independently.</p>
 <h2>The request path</h2>
-<p>ACA's managed ingress layer acts as the public entry point and routes traffic to active revisions.</p>
-<h2><img alt="Ingress routing path to active revisions" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.en.png"></h2>
-<h2>What ingress owns</h2>
-<ul>
-<li>TLS termination</li>
-<li>external or internal exposure</li>
-<li>traffic distribution across revisions</li>
-</ul>
-<hr>
-<h2>Single and multiple mode</h2>
-<p>Single deactivates the previous revision after the new one is ready.<br>
-Multiple keeps more than one revision active.</p>
-<hr>
-<h2>Traffic commands</h2>
-<pre><code class="language-bash">az containerapp revision set-mode   --name $APP_NAME   --resource-group $RG   --mode multiple
-
-az containerapp ingress traffic set   --name $APP_NAME   --resource-group $RG   --revision-weight myapp--rev-a=80 myapp--rev-b=20
+<p>ACA's managed Ingress layer plays the front door, then dispatches traffic to active Revisions according to weights.</p>
+<p><img alt="Ingress routing requests to active Revisions" src="data:image/png;base64,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"></p>
+<p>Key steps:</p>
+<ol>
+<li>Client hits <code>https://&lt;app&gt;.&lt;env-id&gt;.&lt;region&gt;.azurecontainerapps.io</code></li>
+<li>ACA's managed envoy proxy terminates TLS</li>
+<li>The weight table for the Container App's Revisions is consulted</li>
+<li>Traffic is routed to one replica of one Revision based on the ratio</li>
+<li>The replica responds; logs flow to Log Analytics</li>
+</ol>
+<h2>Core concept 1 — three ingress modes</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Exposure</th>
+<th>URL</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>external</code></td>
+<td>Public internet</td>
+<td><code>https://&lt;app&gt;.&lt;env-id&gt;.&lt;region&gt;.azurecontainerapps.io</code></td>
+<td>Public APIs, web frontends</td>
+</tr>
+<tr>
+<td><code>internal</code></td>
+<td>Same Environment only</td>
+<td><code>https://&lt;app&gt;.internal.&lt;env-id&gt;.&lt;region&gt;.azurecontainerapps.io</code></td>
+<td>Microservice-to-microservice calls</td>
+</tr>
+<tr>
+<td><code>disabled</code></td>
+<td>Not exposed</td>
+<td>(none)</td>
+<td>Workers, batch jobs, message consumers</td>
+</tr>
+</tbody>
+</table>
+<p>CLI example:</p>
+<pre><code class="language-bash">az containerapp ingress enable \
+  --name myapi --resource-group $RG \
+  --type external --target-port 8000 --transport auto
 </code></pre>
-<hr>
-<h2>Canary and blue-green</h2>
+<p><code>--transport</code> is one of <code>auto</code> (recommended), <code>http</code>, <code>http2</code>, <code>tcp</code>.</p>
+<h2>Core concept 2 — Single vs Multiple revision mode</h2>
+<p><strong>Active Revisions</strong><br>
+- Single mode: Always 1<br>
+- Multiple mode: N concurrently active</p>
+<p><strong>New Revision deploy</strong><br>
+- Single mode: 100% traffic flips immediately<br>
+- Multiple mode: Weights stay as configured</p>
+<p><strong>Canary</strong><br>
+- Single mode: Not possible<br>
+- Multiple mode: Possible</p>
+<p><strong>Blue-Green</strong><br>
+- Single mode: Not possible<br>
+- Multiple mode: Possible</p>
+<p><strong>Best for</strong><br>
+- Single mode: Simple services, dev<br>
+- Multiple mode: Production APIs</p>
+<p>The default is Single. <strong>Production should be Multiple.</strong></p>
+<pre><code class="language-bash">az containerapp revision set-mode \
+  --name $APP_NAME --resource-group $RG \
+  --mode multiple
+</code></pre>
+<h2>Before / After</h2>
+<p><strong>Before — trying canary in Single mode</strong></p>
+<pre><code class="language-bash"># Single mode is the default
+az containerapp update --name myapi --image myregistry.azurecr.io/myapi:v2
+# → New Revision is created and 100% of traffic moves to v2 instantly
+# The exact opposite of &quot;send only some users.&quot;
+</code></pre>
+<p><strong>After — Multiple mode + weight split</strong></p>
+<pre><code class="language-bash"># 1. Switch to Multiple mode
+az containerapp revision set-mode --name myapi --resource-group $RG --mode multiple
+
+# 2. Deploy the new Revision (traffic still 0%)
+az containerapp update --name myapi --image myregistry.azurecr.io/myapi:v2 --revision-suffix v2
+
+# 3. Adjust weights gradually
+az containerapp ingress traffic set --name myapi --resource-group $RG \
+  --revision-weight myapi--v1=90 myapi--v2=10
+</code></pre>
+<p>The difference is whether you can flow traffic at the <strong>ratio you actually intended</strong>.</p>
+<h2>Hands-on — 90/10 canary and instant rollback</h2>
+<p><strong>Step 1. Switch to Multiple mode</strong></p>
+<pre><code class="language-bash">RG=rg-aca-demo
+APP=myapi
+
+az containerapp revision set-mode --name $APP --resource-group $RG --mode multiple
+</code></pre>
+<p><strong>Step 2. Deploy v1 (a single Revision at 100%)</strong></p>
+<pre><code class="language-bash">az containerapp update --name $APP --resource-group $RG \
+  --image myregistry.azurecr.io/myapi:v1 --revision-suffix v1
+</code></pre>
+<p><strong>Step 3. Deploy v2 starting at 0% traffic</strong></p>
+<pre><code class="language-bash">az containerapp update --name $APP --resource-group $RG \
+  --image myregistry.azurecr.io/myapi:v2 --revision-suffix v2
+
+# Pin v1=100, v2=0 first
+az containerapp ingress traffic set --name $APP --resource-group $RG \
+  --revision-weight $APP--v1=100 $APP--v2=0
+</code></pre>
+<p><strong>Step 4. Start the 90/10 canary</strong></p>
+<pre><code class="language-bash">az containerapp ingress traffic set --name $APP --resource-group $RG \
+  --revision-weight $APP--v1=90 $APP--v2=10
+</code></pre>
+<p>Now compare error rate and latency in Log Analytics by <code>RevisionName</code>.</p>
+<p><strong>Step 5a. If healthy, proceed 50/50 → 0/100</strong></p>
+<pre><code class="language-bash">az containerapp ingress traffic set --name $APP --resource-group $RG \
+  --revision-weight $APP--v1=50 $APP--v2=50
+# After more monitoring
+az containerapp ingress traffic set --name $APP --resource-group $RG \
+  --revision-weight $APP--v1=0 $APP--v2=100
+</code></pre>
+<p><strong>Step 5b. If problems appear, roll back instantly</strong></p>
+<pre><code class="language-bash">az containerapp ingress traffic set --name $APP --resource-group $RG \
+  --revision-weight $APP--v1=100 $APP--v2=0
+</code></pre>
+<p>v2 traffic is at zero within seconds.</p>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Confusing <code>target-port</code> with the ingress port</strong></p>
+<p><code>--target-port</code> is the <strong>container's</strong> listening port. The externally exposed port is always 443 (HTTPS); ACA handles the mapping.</p>
+<p><strong>Mistake 2. Assuming <code>internal</code> is safe because of NSGs</strong></p>
+<p><code>internal</code> only routes within the same Environment. If the Environment was created without VNet integration, internal endpoints can only be called by other Container Apps in the same ACA region. To call from on-prem or another VNet, you need a VNet-integrated Environment.</p>
+<p><strong>Mistake 3. Starting canary with v2's <code>min-replicas</code> at 0</strong></p>
+<p>Even at 10% traffic, the first hit on v2 will pay a cold start cost. Set v2's <code>--min-replicas 1</code> during canary so latency measurements stay clean.</p>
+<p><strong>Mistake 4. Looking at metrics immediately after weight changes</strong></p>
+<p>Ingress weight changes apply instantly, but Log Analytics queries lag by 1-3 minutes. Wait 5-10 minutes before drawing conclusions.</p>
+<p><strong>Mistake 5. Expecting label-based routing (header, cookie)</strong></p>
+<p>ACA traffic split is <strong>percentage-based</strong>. Routing like "only this user-agent to v2" is not supported. For that, put Application Gateway or Front Door in front.</p>
+<h2>How seasoned teams think about it</h2>
+<p>Production canary playbook:</p>
 <ul>
-<li>start with a small percentage</li>
-<li>compare logs and latency</li>
-<li>move traffic back if needed</li>
+<li><strong>Start weight 1-10%</strong> — too small loses statistical signal, too large widens blast radius</li>
+<li><strong>Wait at least 10-15 minutes between steps</strong> — accommodates log delay and traffic variety</li>
+<li><strong>Pre-agree rollback triggers</strong> — for example 5xx &gt; 1%, p95 latency +20%</li>
+<li><strong>Equal <code>min-replicas</code> on both Revisions</strong> — avoids cold-start measurement bias</li>
+<li><strong>Use meaningful Revision suffixes</strong> — prefer <code>v2-fix-bug-1234</code> over plain <code>v2</code></li>
 </ul>
-<hr>
-<h2>What matters operationally</h2>
+<h2>Checklist</h2>
 <ul>
-<li>Single revision mode optimizes for simplicity.</li>
-<li>Multiple revision mode optimizes for controlled rollout and rollback.</li>
-<li>Traffic weights only help if you compare revisions with logs, latency, and error rate rather than moving percentages blindly.</li>
+<li>[ ] I can describe the difference between external/internal/disabled ingress modes</li>
+<li>[ ] I know how Single vs Multiple mode affects whether canary is possible</li>
+<li>[ ] I have memorized the CLI command to set traffic weights</li>
+<li>[ ] I confirmed that rollback completes within seconds via weight change</li>
+<li>[ ] I know that header/cookie-based routing is not part of ACA traffic split</li>
 </ul>
-<hr>
+<h2>Exercises</h2>
+<ol>
+<li>Follow Steps 1-5a to drive v1 → v2 100% via 90/10 → 50/50 → 0/100. At each step, query Log Analytics for request count by <code>RevisionName</code> and compare intended vs actual ratio.</li>
+<li>Inject an intentional 500 error in v2, start a 90/10 canary, then run the rollback command and measure how long until v2 traffic reaches zero.</li>
+</ol>
+<h2>Summary</h2>
+<ul>
+<li>ACA Ingress owns TLS, external/internal exposure, and Revision routing.</li>
+<li>Picking among <code>external</code> / <code>internal</code> / <code>disabled</code> is the first decision.</li>
+<li>Production should be in Multiple revision mode to enable canary and instant rollback.</li>
+<li>Traffic split is percentage-based — header/cookie routing is not supported.</li>
+<li>Rollback is a weight change, not a new deploy — it completes in seconds.</li>
+</ul>
+<h2>Next up</h2>
+<p>The next post covers KEDA-based scaling. We will configure 0-to-N scaling driven not just by HTTP traffic but also by queue length, CPU, and custom metrics.</p>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">What is Azure Container Apps? — running containers without Kubernetes</a></li>

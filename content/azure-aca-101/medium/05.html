@@ -57,40 +57,180 @@
 <blockquote>
 <p>Azure Container Apps 101 series (5/7)</p>
 </blockquote>
-<p>This post explains the KEDA-based scaling path.<br>
-It separates built-in HTTP and TCP rules.<br>
-And custom KEDA rules such as Service Bus, CPU, and memory.</p>
-<hr>
-<h2>The scaling path</h2>
-<p>Scaling remains declarative.<br>
-You choose the signal and the replica bounds.</p>
-<h2><img alt="Scale signals changing replica counts" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.en.png"></h2>
-<h2>Three rule categories</h2>
+<h2>What you'll learn</h2>
 <ul>
-<li><strong>HTTP scale rule</strong> — the built-in rule used for ingress-enabled HTTP apps, based on concurrent requests.</li>
-<li><strong>TCP scale rule</strong> — the built-in rule used for TCP apps, based on concurrent connections.</li>
-<li><strong>Custom scale rules</strong> — any KEDA scaler you attach, including Service Bus, Event Hubs, Kafka, Redis, and resource-based scalers such as CPU and memory.</li>
+<li>How Azure Container Apps decides replica counts based on declarative scaling signals.</li>
+<li>The difference between built-in HTTP/TCP rules and custom KEDA scalers.</li>
+<li>When <code>min-replicas 0</code> (scale-to-zero) is safe and when it is dangerous.</li>
+<li>How to configure both an HTTP API and a Service Bus queue worker using <code>az containerapp</code> commands.</li>
 </ul>
-<hr>
-<h2>Scale-to-zero</h2>
-<p>HTTP and TCP rules can scale to zero.<br>
-Many custom event-driven KEDA rules can also scale to zero.<br>
-CPU and memory live under the custom-rule bucket, but they still do not scale to zero according to Microsoft Learn.</p>
-<hr>
-<h2>HTTP example</h2>
-<pre><code class="language-bash">az containerapp create   --name $APP_NAME   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --ingress external   --target-port 8000   --min-replicas 0   --max-replicas 5   --scale-rule-name http-rule   --scale-rule-type http   --scale-rule-http-concurrency 100
-</code></pre>
-<hr>
-<h2>Service Bus example</h2>
-<pre><code class="language-bash">az containerapp create   --name queue-worker   --resource-group $RG   --environment $ACA_ENV   --image $IMAGE   --min-replicas 0   --max-replicas 10   --secrets &quot;sb-connection=&lt;SERVICE_BUS_CONNECTION_STRING&gt;&quot;   --scale-rule-name servicebus-rule   --scale-rule-type azure-servicebus   --scale-rule-metadata &quot;queueName=orders&quot; &quot;namespace=mybus.servicebus.windows.net&quot; &quot;messageCount=5&quot;   --scale-rule-auth &quot;connection=sb-connection&quot;
-</code></pre>
-<hr>
-<h2>What matters operationally</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>Pick the trigger family first: HTTP, TCP, or custom.</li>
-<li>Treat min replicas as an availability and latency decision, not just a cost knob.</li>
-<li>Read every scaling discussion together with the workload's queue depth, request shape, and cold-start tolerance.</li>
+<li>What signals does Azure Container Apps use to decide replica counts, and where is the decision made?</li>
+<li>When should you reach for built-in HTTP/TCP rules versus custom KEDA scalers?</li>
+<li>When is <code>min-replicas 0</code> (scale-to-zero) safe, and when is it dangerous?</li>
+<li>Why must Service Bus queue workers be scaled with KEDA scalers rather than HTTP rules?</li>
+<li>How do you measure and accept the cold-start trade-off against your SLO?</li>
 </ul>
+<h2>Why this matters</h2>
+<p>The core ACA value proposition is "running containers without the weight of Kubernetes."<br>
+Scaling is where that promise becomes most visible.<br>
+You don't install HPA (Horizontal Pod Autoscaler) or KEDA yourself — the same KEDA scalers run inside the ACA control plane.</p>
+<p>Misunderstanding scaling costs you in two ways.<br>
+First, <strong>money</strong>: leaving <code>min-replicas</code> above zero means you pay for idle replicas indefinitely.<br>
+Second, <strong>reliability</strong>: pinning a queue worker to an HTTP rule means messages pile up while replicas never grow.<br>
+Scaling rules are simultaneously a cost policy and an SLO policy.</p>
+<h2>Mental Model</h2>
+<p>Think of scaling as a three-stage declarative pipeline:</p>
+<ol>
+<li><strong>Signal</strong> — what to observe: HTTP concurrent requests, TCP connections, Service Bus queue depth, CPU usage, etc.</li>
+<li><strong>Rule</strong> — how to interpret the signal: <code>--scale-rule-type http</code>, <code>azure-servicebus</code>, <code>cpu</code>, etc.</li>
+<li><strong>Bounds</strong> — KEDA picks a replica count between <code>--min-replicas</code> and <code>--max-replicas</code>.</li>
+</ol>
+<p>Signal → Rule → Bounds. Once those three are set, ACA does the rest.<br>
+You don't write YAML or imperative scaling code — you declare "if this signal arrives, scale up to N."</p>
+<p><img alt="Scale signals changing replica counts" src="data:image/png;base64,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"></p>
+<h2>Core concepts</h2>
+<p><strong>1. Three rule categories</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Trigger</th>
+<th>Scale-to-zero</th>
+<th>Common use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP rule</td>
+<td>Concurrent HTTP requests</td>
+<td>Yes</td>
+<td>Web APIs, REST services</td>
+</tr>
+<tr>
+<td>TCP rule</td>
+<td>Concurrent TCP connections</td>
+<td>Yes</td>
+<td>gRPC, custom TCP servers</td>
+</tr>
+<tr>
+<td>Custom KEDA rules</td>
+<td>Service Bus, Event Hubs, Kafka, Redis, CPU, memory, etc.</td>
+<td>Depends on scaler</td>
+<td>Queue workers, batch processors</td>
+</tr>
+</tbody>
+</table>
+<p>HTTP and TCP are measured by the ACA ingress layer, so no extra auth is required.<br>
+Custom rules touch external resources (such as a Service Bus namespace), so you connect a secret via <code>--scale-rule-auth</code>.</p>
+<p><strong>2. What scale-to-zero actually means</strong></p>
+<p><code>--min-replicas 0</code> says "drop replicas to zero when there is no traffic."<br>
+The next request triggers a cold start as ACA spins up a new replica.<br>
+HTTP rules and most event-driven KEDA scalers (Service Bus, Event Hubs, Kafka, etc.) can scale to zero.<br>
+<strong>CPU and memory scalers belong to the custom category but do not scale to zero</strong> — there must be a replica to measure CPU or memory against.</p>
+<p><strong>3. The cold-start trade-off</strong></p>
+<p>Scale-to-zero pushes idle cost to nearly zero, but the first request waits for the container to start.<br>
+Python/FastAPI typically takes 1–3 seconds; heavy model loading can stretch to 10+ seconds.<br>
+For user-facing synchronous APIs, prefer <code>min-replicas 1</code>. For async workers and nightly batches, <code>min-replicas 0</code> is appropriate.</p>
+<h2>Before-After</h2>
+<p><strong>Before (no explicit scale rule)</strong></p>
+<pre><code class="language-bash">az containerapp create \
+  --name my-api --resource-group $RG --environment $ACA_ENV \
+  --image $IMAGE --ingress external --target-port 8000
+</code></pre>
+<p>Without explicit rules, ACA applies a default HTTP scale rule (concurrency 10).<br>
+<code>min-replicas</code> defaults to 0, so idle is free but the first request hits a cold start.<br>
+Under load, it can scale up to 100 replicas — an unexpected cost ceiling.</p>
+<p><strong>After (explicit HTTP rule)</strong></p>
+<pre><code class="language-bash">az containerapp create \
+  --name my-api --resource-group $RG --environment $ACA_ENV \
+  --image $IMAGE --ingress external --target-port 8000 \
+  --min-replicas 1 --max-replicas 10 \
+  --scale-rule-name http-rule \
+  --scale-rule-type http \
+  --scale-rule-http-concurrency 50
+</code></pre>
+<p><code>min-replicas 1</code> removes the cold start. <code>max-replicas 10</code> caps cost.<br>
+Replicas grow at 50 concurrent requests, keeping latency stable through traffic spikes.</p>
+<h2>Step-by-step</h2>
+<p><strong>Step 1: Apply scaling to an HTTP API</strong></p>
+<p>Assume your FastAPI app is already pushed to ACR.</p>
+<pre><code class="language-bash">RG=rg-aca-demo
+ACA_ENV=aca-env-demo
+IMAGE=myacr.azurecr.io/my-api:latest
+
+az containerapp create \
+  --name my-api --resource-group $RG --environment $ACA_ENV \
+  --image $IMAGE --ingress external --target-port 8000 \
+  --min-replicas 0 --max-replicas 5 \
+  --scale-rule-name http-rule \
+  --scale-rule-type http \
+  --scale-rule-http-concurrency 100
+</code></pre>
+<p><strong>Step 2: Build a Service Bus queue worker</strong></p>
+<pre><code class="language-bash">az containerapp create \
+  --name queue-worker --resource-group $RG --environment $ACA_ENV \
+  --image $IMAGE \
+  --min-replicas 0 --max-replicas 10 \
+  --secrets &quot;sb-connection=&lt;SERVICE_BUS_CONNECTION_STRING&gt;&quot; \
+  --scale-rule-name servicebus-rule \
+  --scale-rule-type azure-servicebus \
+  --scale-rule-metadata \
+      &quot;queueName=orders&quot; \
+      &quot;namespace=mybus.servicebus.windows.net&quot; \
+      &quot;messageCount=5&quot; \
+  --scale-rule-auth &quot;connection=sb-connection&quot;
+</code></pre>
+<p><code>messageCount=5</code> means "one replica per five queued messages."<br>
+Empty queue scales to zero; 50 queued messages scale to 10 replicas (the max).</p>
+<p><strong>Step 3: Verify behavior</strong></p>
+<pre><code class="language-bash">az containerapp replica list --name queue-worker --resource-group $RG -o table
+</code></pre>
+<p>After enqueueing messages, replica count should change within 30–60 seconds.</p>
+<h2>Common pitfalls</h2>
+<ul>
+<li><strong>Using <code>min-replicas 0</code> on a latency-sensitive API</strong> — every cold path pays the cold-start tax. Pin user-facing APIs to at least 1.</li>
+<li><strong>Not setting <code>max-replicas</code></strong> — a traffic spike or misconfigured rule turns into a cost incident.</li>
+<li><strong>HTTP rule on a queue worker</strong> — messages pile up while replicas stay flat. Always use an event-driven scaler.</li>
+<li><strong>Configuring a Service Bus scaler without auth</strong> — without <code>--scale-rule-auth</code>, KEDA cannot poll the queue and scaling never triggers.</li>
+<li><strong>Expecting <code>min-replicas 0</code> on CPU scalers</strong> — CPU and memory scalers need a replica to measure, so they never go to zero.</li>
+</ul>
+<h2>In production</h2>
+<p>Recommended settings by scenario:</p>
+<ul>
+<li><strong>Public REST API</strong> — <code>min=1, max=10</code>, HTTP rule, concurrency 50–100. Prioritize cold-start removal.</li>
+<li><strong>Internal admin API</strong> — <code>min=0, max=3</code>, HTTP rule. Prioritize cost.</li>
+<li><strong>Order processing worker</strong> — <code>min=0, max=20</code>, Service Bus rule, <code>messageCount=10</code>. Prioritize burst handling.</li>
+<li><strong>Real-time inference API</strong> — <code>min=2, max=20</code>, HTTP rule, concurrency 20. Latency SLO matters most.</li>
+<li><strong>Nightly batch</strong> — <code>min=0, max=5</code>, scheduled or manual trigger.</li>
+</ul>
+<p>KEDA scaler types are listed in the <a href="https://keda.sh/docs/scalers/">official docs</a>, and Microsoft Learn enumerates which scalers ACA supports.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Did I pick the trigger category (HTTP / TCP / custom) that matches my workload?</li>
+<li>[ ] Does <code>min-replicas</code> match my cold-start tolerance?</li>
+<li>[ ] Did I cap cost with <code>max-replicas</code>?</li>
+<li>[ ] Did I attach <code>--scale-rule-auth</code> and a secret for any custom scaler?</li>
+<li>[ ] Does my queue worker use an event-driven scaler?</li>
+<li>[ ] Am I monitoring replica counts in Application Insights or Log Analytics?</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>For a REST API with average concurrency 30 and peak 200, what <code>min</code>, <code>max</code>, and <code>http-concurrency</code> would you choose? Justify each.</li>
+<li>A Service Bus queue has 1000 messages, but only 10 worker replicas are running. List three plausible causes.</li>
+<li>What happens if you set <code>min-replicas 0</code> on a CPU-based scaler? Why?</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<p>Key takeaways:</p>
+<ul>
+<li>ACA scaling follows a declarative Signal → Rule → Bounds pipeline.</li>
+<li>HTTP and TCP are built-in rules; everything else is a custom KEDA scaler.</li>
+<li>Scale-to-zero drives idle cost to almost nothing but introduces cold starts.</li>
+<li><code>min-replicas</code> and <code>max-replicas</code> are simultaneously cost and SLO policies.</li>
+</ul>
+<p>Next post covers <strong>Dapr integration</strong> — how a sidecar gives you distributed-system building blocks like service invocation, pub/sub, and state store without library lock-in.</p>
 <hr>
 <h2>In this series</h2>
 <ul>
@@ -107,7 +247,8 @@ CPU and memory live under the custom-rule bucket, but they still do not scale to
 <p><strong>Official Docs</strong><br>
 - <a href="https://learn.microsoft.com/en-us/azure/container-apps/scale-app">Scaling in Azure Container Apps — Microsoft Learn</a><br>
 - <a href="https://learn.microsoft.com/en-us/azure/container-apps/overview">Azure Container Apps overview — Microsoft Learn</a><br>
-- <a href="https://keda.sh/docs/scalers/">KEDA scalers documentation</a></p>
+- <a href="https://keda.sh/docs/scalers/">KEDA scalers documentation</a><br>
+- <a href="https://keda.sh/docs/scalers/azure-service-bus/">Azure Service Bus scaler — KEDA</a></p>
 <p><strong>Related Series</strong><br>
 - <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-101/en/01-what-is-app-service.md">Azure App Service 101</a><br>
 - <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/01-what-is-aks.md">Azure AKS 101</a><br>
