@@ -1,0 +1,71 @@
+id: functional-programming-101
+title:
+  ko: Functional Programming 101
+  en: Functional Programming 101
+description:
+  ko: 순수 함수, 불변 데이터, 고차 함수, 클로저, 함수 합성까지 함수형 프로그래밍의 핵심을 Python으로 배우는 시리즈.
+  en: A beginner series on functional programming essentials in Python covering pure functions, immutability, higher-order functions, closures, and function composition.
+status: content-ready
+category: programming-foundations
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  medium: true
+  hashnode: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-fp
+    title:
+      ko: 함수형 프로그래밍이란 무엇인가?
+      en: What Is Functional Programming?
+  - number: 2
+    slug: pure-functions
+    title:
+      ko: 순수 함수와 부수효과
+      en: Pure Functions and Side Effects
+  - number: 3
+    slug: immutable-data
+    title:
+      ko: immutable 데이터
+      en: Immutable Data
+  - number: 4
+    slug: higher-order-functions
+    title:
+      ko: 고차 함수
+      en: Higher-Order Functions
+  - number: 5
+    slug: map-filter-reduce
+    title:
+      ko: map, filter, reduce
+      en: map, filter, reduce
+  - number: 6
+    slug: closure-and-partial
+    title:
+      ko: 클로저와 partial
+      en: Closures and Partial Application
+  - number: 7
+    slug: recursion
+    title:
+      ko: 재귀와 꼬리 호출
+      en: Recursion and Tail Calls
+  - number: 8
+    slug: lazy-evaluation
+    title:
+      ko: 지연 평가와 제너레이터
+      en: Lazy Evaluation and Generators
+  - number: 9
+    slug: function-composition
+    title:
+      ko: 함수 합성과 파이프라인
+      en: Function Composition and Pipelines
+  - number: 10
+    slug: oop-and-fp-balance
+    title:
+      ko: 객체지향과 함수형의 균형
+      en: Balancing OOP and Functional Programming

@@ -2231,3 +2231,25 @@ series:
   level: 101
   lifecycle: active
   path: content/oop-101
+
+- id: functional-programming-101
+  status: content-ready
+  category: programming-foundations
+  title:
+    ko: Functional Programming 101
+    en: Functional Programming 101
+  description:
+    ko: 순수 함수, 불변 데이터, 고차 함수, 클로저, 함수 합성까지 함수형 프로그래밍의 핵심을 Python으로 배우는 시리즈.
+    en: A beginner series on functional programming essentials in Python covering pure functions, immutability, higher-order functions, closures, and function composition.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/functional-programming-101

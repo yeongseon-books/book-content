@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recursion and Tail Calls</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Recursion and Tail Calls</h1>
+<blockquote>
+<p>Functional Programming 101 Series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can you solve problems by having a function call itself, without using loops?</p>
+<blockquote>
+<p>Recursion is a technique where a function calls itself to break a problem into smaller subproblems. In functional programming, it is the core tool for expressing repetition without state changes. This article covers recursion principles, tail call optimization, and practical Python usage.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The basic structure and mechanics of recursion</li>
+<li>The importance of base cases and preventing stack overflow</li>
+<li>Tail recursion and Python's limitations</li>
+<li>Patterns for converting recursion to iteration</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Tree traversal, divide and conquer, and mathematical definitions are naturally expressed as recursion. Understanding recursion lets you implement algorithms for complex structures intuitively.</p>
+<blockquote>
+<p>Recursion = decomposing a problem into smaller versions of itself</p>
+</blockquote>
+<p>Python does not support tail call optimization, so in practice you must be aware of recursion depth and convert to iteration when needed.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Flow of a Recursive Call</p>
+</blockquote>
+<pre><code>factorial(4)
+  -&gt; 4 * factorial(3)
+       -&gt; 3 * factorial(2)
+            -&gt; 2 * factorial(1)
+                 -&gt; 1  (base case)
+            &lt;- 2 * 1 = 2
+       &lt;- 3 * 2 = 6
+  &lt;- 4 * 6 = 24
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Recursion</strong><br>
+- Description: A technique where a function calls itself</p>
+<p><strong>Base case</strong><br>
+- Description: The condition that stops the recursion</p>
+<p><strong>Tail recursion</strong><br>
+- Description: A form where the recursive call is the last operation in the function</p>
+<p><strong>Stack overflow</strong><br>
+- Description: An error that occurs when recursion depth exceeds the limit</p>
+<p><strong>Divide and conquer</strong><br>
+- Description: A strategy of splitting a problem into smaller subproblems</p>
+<h2>Before / After</h2>
+<p>Express a loop as recursion.</p>
+<pre><code class="language-python"># before: iterative sum
+def sum_iterative(numbers: list[int]) -&gt; int:
+    total = 0
+    for n in numbers:
+        total += n
+    return total
+
+print(sum_iterative([1, 2, 3, 4, 5]))  # 15
+</code></pre>
+<pre><code class="language-python"># after: recursive sum
+def sum_recursive(numbers: list[int]) -&gt; int:
+    if not numbers:  # base case
+        return 0
+    return numbers[0] + sum_recursive(numbers[1:])
+
+print(sum_recursive([1, 2, 3, 4, 5]))  # 15
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Basic Recursion — Factorial</strong></p>
+<pre><code class="language-python">def factorial(n: int) -&gt; int:
+    &quot;&quot;&quot;n! = n * (n-1) * ... * 1&quot;&quot;&quot;
+    if n &lt;= 1:  # base case
+        return 1
+    return n * factorial(n - 1)
+
+print(factorial(5))   # 120
+print(factorial(10))  # 3628800
+
+# visualize the call stack
+def factorial_verbose(n: int, depth: int = 0) -&gt; int:
+    indent = &quot;  &quot; * depth
+    print(f&quot;{indent}factorial({n})&quot;)
+    if n &lt;= 1:
+        print(f&quot;{indent}-&gt; 1&quot;)
+        return 1
+    result = n * factorial_verbose(n - 1, depth + 1)
+    print(f&quot;{indent}-&gt; {result}&quot;)
+    return result
+
+factorial_verbose(4)
+# factorial(4)
+#   factorial(3)
+#     factorial(2)
+#       factorial(1)
+#       -&gt; 1
+#     -&gt; 2
+#   -&gt; 6
+# -&gt; 24
+</code></pre>
+<p><strong>Step 2: Fibonacci and Memoization</strong></p>
+<pre><code class="language-python">from functools import lru_cache
+
+# naive recursion: O(2^n) — very slow
+def fib_naive(n: int) -&gt; int:
+    if n &lt;= 1:
+        return n
+    return fib_naive(n - 1) + fib_naive(n - 2)
+
+# memoization: O(n) — eliminates duplicate computation
+@lru_cache(maxsize=None)
+def fib_memo(n: int) -&gt; int:
+    if n &lt;= 1:
+        return n
+    return fib_memo(n - 1) + fib_memo(n - 2)
+
+print(fib_naive(10))  # 55 (slow)
+print(fib_memo(100))  # 354224848179261915075 (fast)
+
+# check cache statistics
+print(fib_memo.cache_info())
+# CacheInfo(hits=98, misses=101, maxsize=None, currsize=101)
+</code></pre>
+<p><strong>Step 3: Tail Recursion and Python's Limitations</strong></p>
+<pre><code class="language-python">import sys
+
+# normal recursion — stack frames accumulate
+def factorial_normal(n: int) -&gt; int:
+    if n &lt;= 1:
+        return 1
+    return n * factorial_normal(n - 1)  # multiplication is pending
+
+# tail recursion — result passed as argument
+def factorial_tail(n: int, acc: int = 1) -&gt; int:
+    if n &lt;= 1:
+        return acc
+    return factorial_tail(n - 1, n * acc)  # last operation is the recursive call
+
+# Python does NOT support tail call optimization (TCO)
+print(sys.getrecursionlimit())  # default 1000
+print(factorial_tail(900))  # works but...
+# factorial_tail(1500)  # RecursionError!
+
+# solution: convert to iteration
+def factorial_iterative(n: int) -&gt; int:
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+print(factorial_iterative(10000))  # no problem
+</code></pre>
+<p><strong>Step 4: Tree Traversal — A Natural Fit for Recursion</strong></p>
+<pre><code class="language-python">from typing import Any
+
+# traverse nested dicts (tree structure)
+def flatten_dict(
+    d: dict,
+    parent_key: str = &quot;&quot;,
+    sep: str = &quot;.&quot;,
+) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Flattens a nested dictionary.&quot;&quot;&quot;
+    items: list[tuple[str, Any]] = []
+    for k, v in d.items():
+        new_key = f&quot;{parent_key}{sep}{k}&quot; if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
+
+config = {
+    &quot;database&quot;: {
+        &quot;host&quot;: &quot;localhost&quot;,
+        &quot;port&quot;: 5432,
+        &quot;credentials&quot;: {
+            &quot;user&quot;: &quot;admin&quot;,
+            &quot;password&quot;: &quot;secret&quot;,
+        },
+    },
+    &quot;debug&quot;: True,
+}
+
+flat = flatten_dict(config)
+for k, v in flat.items():
+    print(f&quot;  {k}: {v}&quot;)
+# database.host: localhost
+# database.port: 5432
+# database.credentials.user: admin
+# database.credentials.password: secret
+# debug: True
+</code></pre>
+<p><strong>Step 5: Converting Recursion to Iteration</strong></p>
+<pre><code class="language-python"># recursive version: total size of a simulated file tree
+def total_size_recursive(tree: dict) -&gt; int:
+    &quot;&quot;&quot;Total size of a file tree represented as nested dicts.&quot;&quot;&quot;
+    total = 0
+    for name, value in tree.items():
+        if isinstance(value, dict):
+            total += total_size_recursive(value)
+        else:
+            total += value
+    return total
+
+# iterative version: explicit stack management
+def total_size_iterative(tree: dict) -&gt; int:
+    total = 0
+    stack = [tree]
+    while stack:
+        current = stack.pop()
+        for name, value in current.items():
+            if isinstance(value, dict):
+                stack.append(value)
+            else:
+                total += value
+    return total
+
+file_tree = {
+    &quot;src&quot;: {
+        &quot;main.py&quot;: 1200,
+        &quot;utils&quot;: {
+            &quot;helpers.py&quot;: 800,
+            &quot;config.py&quot;: 400,
+        },
+    },
+    &quot;README.md&quot;: 300,
+    &quot;tests&quot;: {
+        &quot;test_main.py&quot;: 600,
+    },
+}
+
+print(total_size_recursive(file_tree))  # 3300
+print(total_size_iterative(file_tree))  # 3300
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Every recursion requires a base case</li>
+<li><code>@lru_cache</code> eliminates duplicate calls and dramatically improves recursive performance</li>
+<li>Python lacks tail call optimization, so deep recursion should be converted to iteration</li>
+<li>Tree structure traversal is the most natural use case for recursion</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Missing base case</strong><br>
+- Why It Is a Problem: Infinite recursion leads to stack overflow<br>
+- Fix: Write the base case first</p>
+<p><strong>Deep recursion</strong><br>
+- Why It Is a Problem: Python's default limit is 1000<br>
+- Fix: Convert to iteration for deep cases</p>
+<p><strong>Missing memoization</strong><br>
+- Why It Is a Problem: Exponential time complexity<br>
+- Fix: Apply <code>@lru_cache</code></p>
+<p><strong>Slicing lists every call</strong><br>
+- Why It Is a Problem: O(n) copy at every invocation<br>
+- Fix: Pass an index as an argument instead</p>
+<p><strong>Relying on tail recursion</strong><br>
+- Why It Is a Problem: Python does not optimize it<br>
+- Fix: Use a loop instead</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Traverse nested structures in parsed JSON with recursion</li>
+<li>Use recursion for file system tree traversal</li>
+<li>Apply divide and conquer algorithms (quicksort, mergesort)</li>
+<li>AST (abstract syntax tree) processing requires recursive patterns</li>
+<li>Convert to explicit stacks when depth is bounded</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Recursion is the most natural tool for trees, graphs, and nested structures. However, in Python you must always be aware of the recursion limit (default 1000). In practice, recursion with uncertain depth should be converted to iteration for safety.</p>
+<p>"Recursion vs iteration" is a trade-off between readability and safety. Use recursion for shallow depths (tens of levels) where the structure is inherently recursive; use iteration when depth is deep or uncertain.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can set correct base cases for recursive functions</li>
+<li>[ ] I understand how stack frames accumulate during recursive calls</li>
+<li>[ ] I can improve recursive performance with <code>@lru_cache</code></li>
+<li>[ ] I can convert recursion to iteration using an explicit stack</li>
+<li>[ ] I can explain the criteria for choosing between recursion and iteration</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Implement binary search in both recursive and iterative versions.</li>
+<li>Write a recursive function to flatten a nested list <code>[1, [2, [3, 4], 5], 6]</code>.</li>
+<li>Implement memoization manually with a dictionary instead of <code>@lru_cache</code>.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Recursion decomposes a problem into smaller versions of itself. Python lacks tail call optimization, so you must be aware of depth limits and convert to iteration when needed. The next article covers computing values only when needed: <strong>lazy evaluation and generators</strong>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
+<li><strong>Recursion and Tail Calls (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/sys.html#sys.setrecursionlimit">Python Official Docs — sys.setrecursionlimit</a></li>
+<li><a href="https://realpython.com/python-recursion/">Real Python — Recursion in Python</a></li>
+<li><a href="https://docs.python.org/3/library/functools.html#functools.lru_cache">Python Official Docs — functools.lru_cache</a></li>
+<li><a href="https://mitpress.mit.edu/9780262560993/the-little-schemer/">The Little Schemer — Daniel P. Friedman</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Functional Programming, Recursion, Tail Calls, Stack</p>
+</body>
+</html>

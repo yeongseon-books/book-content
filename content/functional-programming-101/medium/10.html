@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Balancing OOP and Functional Programming</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Balancing OOP and Functional Programming</h1>
+<blockquote>
+<p>Functional Programming 101 Series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Do you have to choose between OOP and functional programming, or can you use both together?</p>
+<blockquote>
+<p>Python is a multi-paradigm language. OOP and functional programming are not opposites — they complement each other. This article covers practical guidelines for choosing the right paradigm for each situation and combining their strengths.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Comparing the strengths and weaknesses of OOP and FP</li>
+<li>Patterns for mixing both paradigms</li>
+<li>Situation-specific design selection criteria</li>
+<li>Practical hybrid design in Python</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>"Use only OOP" or "use only FP" is unrealistic. Production code has parts that need state management (OOP) and parts that need data transformation (FP). Combining both paradigms well is the essence of good design.</p>
+<blockquote>
+<p>Good design = choosing the right paradigm for the problem</p>
+</blockquote>
+<p>Python's standard library ships both <code>pathlib</code> (OOP) and <code>itertools</code> (FP). Using every tool the language provides is Pythonic.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>OOP vs FP — strength comparison</p>
+</blockquote>
+<pre><code>OOP Fits Best                  FP Fits Best
+─────────────────             ─────────────────
+State + behavior together     Stateless data transformation
+Managing multiple instances   Pipeline data processing
+Framework integration         Concurrency / parallelism
+Complex domain models         Mathematical / declarative logic
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Multi-paradigm</strong><br>
+- Description: A language that supports multiple programming styles</p>
+<p><strong>Hybrid design</strong><br>
+- Description: A design approach that combines OOP and FP based on purpose</p>
+<p><strong>Functional Core, Imperative Shell</strong><br>
+- Description: An architecture with pure function core and side-effect boundary</p>
+<p><strong>Value object</strong><br>
+- Description: An immutable object compared by equality rather than identity</p>
+<p><strong>Service function</strong><br>
+- Description: A stateless function that implements business logic</p>
+<h2>Before / After</h2>
+<p>Convert pure OOP into a hybrid approach.</p>
+<pre><code class="language-python"># before: everything in a class
+class OrderProcessor:
+    def __init__(self, tax_rate: float) -&gt; None:
+        self.tax_rate = tax_rate
+
+    def calculate_total(self, items: list[dict]) -&gt; float:
+        subtotal = sum(i[&quot;price&quot;] * i[&quot;qty&quot;] for i in items)
+        return subtotal * (1 + self.tax_rate)
+
+    def format_receipt(self, items: list[dict]) -&gt; str:
+        total = self.calculate_total(items)
+        return f&quot;Total: ${total:,.2f}&quot;
+
+processor = OrderProcessor(0.1)
+print(processor.format_receipt([{&quot;price&quot;: 25.00, &quot;qty&quot;: 2}]))
+</code></pre>
+<pre><code class="language-python"># after: value objects (OOP) + pure functions (FP)
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class OrderItem:
+    name: str
+    price: float
+    qty: int
+
+def calculate_total(items: list[OrderItem], tax_rate: float) -&gt; float:
+    subtotal = sum(i.price * i.qty for i in items)
+    return subtotal * (1 + tax_rate)
+
+def format_receipt(items: list[OrderItem], tax_rate: float) -&gt; str:
+    total = calculate_total(items, tax_rate)
+    return f&quot;Total: ${total:,.2f}&quot;
+
+items = [OrderItem(&quot;Coffee&quot;, 25.00, 2)]
+print(format_receipt(items, 0.1))
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Value Objects + Pure Functions</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass, replace
+from typing import NamedTuple
+
+# value objects: immutable, equality-based
+@dataclass(frozen=True)
+class Money:
+    amount: int
+    currency: str = &quot;USD&quot;
+
+class Percentage(NamedTuple):
+    value: float
+
+# pure functions: transform value objects
+def apply_discount(price: Money, discount: Percentage) -&gt; Money:
+    discounted = int(price.amount * (1 - discount.value))
+    return replace(price, amount=discounted)
+
+def add_tax(price: Money, tax: Percentage) -&gt; Money:
+    taxed = int(price.amount * (1 + tax.value))
+    return replace(price, amount=taxed)
+
+def format_money(money: Money) -&gt; str:
+    return f&quot;{money.amount:,} {money.currency}&quot;
+
+price = Money(50000)
+discounted = apply_discount(price, Percentage(0.1))
+final = add_tax(discounted, Percentage(0.1))
+
+print(f&quot;Original: {format_money(price)}&quot;)       # Original: 50,000 USD
+print(f&quot;After discount: {format_money(discounted)}&quot;)  # After discount: 45,000 USD
+print(f&quot;After tax: {format_money(final)}&quot;)       # After tax: 49,500 USD
+</code></pre>
+<p><strong>Step 2: Functional Core, Imperative Shell</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+# === Functional Core (pure functions) ===
+@dataclass(frozen=True)
+class User:
+    name: str
+    email: str
+    active: bool = True
+
+def validate_email(email: str) -&gt; list[str]:
+    &quot;&quot;&quot;Email validation — pure function.&quot;&quot;&quot;
+    errors = []
+    if &quot;@&quot; not in email:
+        errors.append(&quot;@ symbol is required&quot;)
+    if &quot;.&quot; not in email.split(&quot;@&quot;)[-1]:
+        errors.append(&quot;Domain must contain a dot&quot;)
+    return errors
+
+def create_user_data(name: str, email: str) -&gt; User | list[str]:
+    &quot;&quot;&quot;User creation validation — pure function.&quot;&quot;&quot;
+    errors = validate_email(email)
+    if not name.strip():
+        errors.append(&quot;Name is empty&quot;)
+    if errors:
+        return errors
+    return User(name=name.strip(), email=email.lower())
+
+# === Imperative Shell (side effects) ===
+def handle_registration(name: str, email: str) -&gt; None:
+    &quot;&quot;&quot;Registration handler — contains side effects.&quot;&quot;&quot;
+    result = create_user_data(name, email)
+    if isinstance(result, list):
+        for error in result:
+            print(f&quot;  Error: {error}&quot;)
+    else:
+        print(f&quot;  Registered: {result}&quot;)
+        # In production: save to DB, send email, etc.
+
+handle_registration(&quot;Alice&quot;, &quot;alice@example.com&quot;)
+# Registered: User(name='Alice', email='alice@example.com', active=True)
+
+handle_registration(&quot;&quot;, &quot;invalid-email&quot;)
+# Error: @ symbol is required
+# Error: Name is empty
+</code></pre>
+<p><strong>Step 3: Classes + Functional Methods</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
+from typing import Callable, Iterator
+
+@dataclass
+class DataPipeline:
+    &quot;&quot;&quot;A class that composes a pipeline where each stage is a pure function.&quot;&quot;&quot;
+    steps: list[Callable] = None
+
+    def __post_init__(self) -&gt; None:
+        if self.steps is None:
+            self.steps = []
+
+    def add_step(self, func: Callable) -&gt; &quot;DataPipeline&quot;:
+        &quot;&quot;&quot;Returns a new pipeline with the added step (immutable).&quot;&quot;&quot;
+        return DataPipeline(steps=[*self.steps, func])
+
+    def run(self, data):
+        &quot;&quot;&quot;Executes the pipeline.&quot;&quot;&quot;
+        result = data
+        for step in self.steps:
+            result = step(result)
+        return result
+
+# pure function stages
+def normalize(records: list[dict]) -&gt; list[dict]:
+    return [{**r, &quot;name&quot;: r[&quot;name&quot;].strip().title()} for r in records]
+
+def enrich(records: list[dict]) -&gt; list[dict]:
+    return [{**r, &quot;name_len&quot;: len(r[&quot;name&quot;])} for r in records]
+
+def filter_valid(records: list[dict]) -&gt; list[dict]:
+    return [r for r in records if r.get(&quot;score&quot;, 0) &gt; 0]
+
+# assemble the pipeline (OOP interface + FP execution)
+pipeline = (
+    DataPipeline()
+    .add_step(normalize)
+    .add_step(filter_valid)
+    .add_step(enrich)
+)
+
+data = [
+    {&quot;name&quot;: &quot;  alice  &quot;, &quot;score&quot;: 85},
+    {&quot;name&quot;: &quot;  bob  &quot;, &quot;score&quot;: 0},
+    {&quot;name&quot;: &quot;  charlie  &quot;, &quot;score&quot;: 92},
+]
+
+result = pipeline.run(data)
+for r in result:
+    print(r)
+# {'name': 'Alice', 'score': 85, 'name_len': 5}
+# {'name': 'Charlie', 'score': 92, 'name_len': 7}
+</code></pre>
+<p><strong>Step 4: Paradigm Selection Guide</strong></p>
+<pre><code class="language-python"># Situation 1: state management -&gt; OOP
+class ShoppingCart:
+    def __init__(self) -&gt; None:
+        self._items: list[dict] = []
+
+    def add(self, item: str, price: int) -&gt; None:
+        self._items.append({&quot;item&quot;: item, &quot;price&quot;: price})
+
+    @property
+    def total(self) -&gt; int:
+        return sum(i[&quot;price&quot;] for i in self._items)
+
+# Situation 2: data transformation -&gt; FP
+def transform_prices(
+    items: list[dict],
+    rate: float,
+) -&gt; list[dict]:
+    return [{**i, &quot;price&quot;: int(i[&quot;price&quot;] * rate)} for i in items]
+
+# Situation 3: framework integration -&gt; OOP (framework requires it)
+class UserSerializer:
+    def to_dict(self, user) -&gt; dict:
+        return {&quot;name&quot;: user.name, &quot;email&quot;: user.email}
+
+# Situation 4: utility -&gt; FP
+def slugify(text: str) -&gt; str:
+    return text.lower().strip().replace(&quot; &quot;, &quot;-&quot;)
+
+# mixed usage
+cart = ShoppingCart()
+cart.add(&quot;Coffee&quot;, 450)
+cart.add(&quot;Cake&quot;, 600)
+
+# transform OOP object data with FP
+discounted = transform_prices(cart._items, 0.9)
+print(f&quot;Before discount: {cart.total:,}&quot;)
+print(f&quot;After discount: {sum(i['price'] for i in discounted):,}&quot;)
+# Before discount: 1,050
+# After discount: 945
+</code></pre>
+<p><strong>Step 5: Design Decision Checklist</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+Paradigm selection checklist:
+
+1. Does state change together with behavior?
+   -&gt; Yes: class (OOP)
+   -&gt; No: function (FP)
+
+2. Do you need multiple instances?
+   -&gt; Yes: class (OOP)
+   -&gt; No: module-level function (FP)
+
+3. Is data transformation the main goal?
+   -&gt; Yes: pure function pipeline (FP)
+   -&gt; No: judge by context
+
+4. Does the framework require classes?
+   -&gt; Yes: class (OOP) + internal logic as FP
+   -&gt; No: choose freely
+
+5. Is testability a priority?
+   -&gt; Yes: pure functions first (FP)
+   -&gt; State testing needed: class (OOP)
+&quot;&quot;&quot;
+
+# practical hybrid pattern: immutable value objects + pure functions + thin class shell
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Config:
+    host: str
+    port: int
+    debug: bool
+
+def validate_config(config: Config) -&gt; list[str]:
+    errors = []
+    if not config.host:
+        errors.append(&quot;host is required&quot;)
+    if config.port &lt; 1 or config.port &gt; 65535:
+        errors.append(&quot;port must be 1-65535&quot;)
+    return errors
+
+config = Config(host=&quot;localhost&quot;, port=8080, debug=True)
+errors = validate_config(config)
+if not errors:
+    print(f&quot;Config valid: {config}&quot;)
+# Config valid: Config(host='localhost', port=8080, debug=True)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Value objects (frozen dataclasses) combine OOP structure with FP immutability</li>
+<li>"Functional Core, Imperative Shell" creates a testable core architecture</li>
+<li>Using OOP for the public interface and FP for internal logic is an effective hybrid</li>
+<li>The selection criterion is "Does this need state management?"</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Paradigm purism</strong><br>
+- Why It Is a Problem: Adds unnecessary complexity<br>
+- Fix: Choose the right tool for the problem</p>
+<p><strong>Wrapping everything in classes</strong><br>
+- Why It Is a Problem: Functions suffice in many cases<br>
+- Fix: Ask "Do I need state?" first</p>
+<p><strong>Avoiding state at all costs with FP</strong><br>
+- Why It Is a Problem: Inefficient where state management is needed<br>
+- Fix: Use classes when state is required</p>
+<p><strong>Inconsistent style within a team</strong><br>
+- Why It Is a Problem: Code review and collaboration suffer<br>
+- Fix: Agree on team guidelines</p>
+<p><strong>Over-abstraction</strong><br>
+- Why It Is a Problem: Simple code is often better<br>
+- Fix: Apply the YAGNI principle</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Django/FastAPI: class-based views combined with pure function business logic</li>
+<li>Data pipelines: functional transformations combined with OOP connectors</li>
+<li>Testing: unit tests for pure functions, integration tests for classes</li>
+<li>Configuration: frozen dataclasses (OOP) combined with validation functions (FP)</li>
+<li>Event handling: event objects (OOP) combined with handler functions (FP)</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>"OOP vs FP" is a false dichotomy. Python's strength is the freedom to combine both paradigms. Data models as dataclasses, business logic as pure functions, framework integration as classes — that is practical Python.</p>
+<p>"Which paradigm do you use?" matters less than "Is the code easy to test?", "Is it easy to change?", "Is it easy to read?" The pure functions, immutable data, higher-order functions, closures, generators, and composition covered in this series are new tools in your toolbox.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can compare the strengths and weaknesses of OOP and FP</li>
+<li>[ ] I can explain the "Functional Core, Imperative Shell" pattern</li>
+<li>[ ] I can design with value objects and pure functions combined</li>
+<li>[ ] I can apply situation-specific paradigm selection criteria</li>
+<li>[ ] I can apply hybrid design patterns in production code</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Design a shopping cart using OOP (Cart class) + FP (pure discount and tax calculation functions) as a hybrid.</li>
+<li>Implement a file-based configuration loader using the "Functional Core, Imperative Shell" pattern.</li>
+<li>Identify parts of existing OOP code that can be extracted as pure functions and refactor them.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>OOP and functional programming are not opposites — they complement each other. In Python, the most practical approach is immutable value objects (OOP) + pure functions (FP) + thin class shells. The pure functions, immutable data, higher-order functions, closures, generators, and composition covered in this series will help you write cleaner, more testable code.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
+<li><strong>Balancing OOP and Functional Programming (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell">Functional Core, Imperative Shell — Gary Bernhardt</a></li>
+<li><a href="https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/">Clean Architecture — Robert C. Martin</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 7: Functions as First-Class Objects</a></li>
+<li><a href="https://docs.python.org/3/faq/programming.html">Python Official Docs — Programming FAQ</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Functional Programming, OOP, Multi-Paradigm, Design Decisions</p>
+</body>
+</html>
