@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - multi-head 상태에서의 `upgrade`/`downgrade` 동작
 - 팀에서 branch 사고를 줄이는 운영 규칙
 
+## 이 글에서 답할 질문
+
+- alembic의 revision 그래프는 어떤 상황에서 branch로 갈라지는가?
+- `branch_labels`와 `depends_on`은 각각 어떤 문제를 풀기 위해 존재하는가?
+- `alembic merge`로 두 head를 합칠 때 실제 마이그레이션 파일은 어떻게 만들어지는가?
+- multi-head 상태에서 `upgrade head`를 그냥 돌리면 왜 실패하는가?
+- 팀 단위로 branch 사고를 줄이는 PR/리뷰 규칙은 어떻게 설계하는가?
+
 ## 왜 중요한가
 
 여러 사람이 동시에 PR을 만드는 팀에서는 alembic branch가 거의 매주 발생합니다. branch 자체는 정상 동작이지만, 처음 만나면 `Multiple head revisions are present` 에러로 배포가 멈추는 일이 흔합니다. 이 글은 그 상황을 두려워하지 않고 차분히 머지하기 위한 가이드입니다.

@@ -39,6 +39,7 @@ When the loop becomes muscle memory, accidents drop. Force-pushing over a teamma
 
 ## Mental model
 
+> A realistic workflow is one repeating cycle: an issue defines the work, a branch carries the change, a Pull Request invites review, a merge brings it into the shared state, a tag marks the point, and the issue is closed.
 A GitHub Flow cycle looks like this.
 
 ```mermaid

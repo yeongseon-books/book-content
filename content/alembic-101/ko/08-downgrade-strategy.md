@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - "downgrade 금지" 정책을 코드 차원에서 명시하는 방법
 - 사고 시 forward-fix와 downgrade 중 어느 쪽을 선택할지의 기준
 
+## 이 글에서 답할 질문
+
+- production에서 downgrade가 사실상 불가능해지는 변경은 어떤 것들인가?
+- 비가역(irreversible) 변경을 만났을 때 코드와 데이터를 어떻게 분리해 다루는가?
+- expand-contract 패턴은 downgrade 가능성을 어떻게 회복시키는가?
+- "downgrade 금지" 정책을 코드와 CI 차원에서 어떻게 명시할 수 있는가?
+- 사고 시 forward-fix와 downgrade 중 어느 쪽을 선택해야 하는지 판단 기준은 무엇인가?
+
 ## 왜 중요한가
 
 downgrade는 alembic을 처음 배울 때는 당연한 기본 기능처럼 보이지만, 실제 production에서는 거의 사용되지 않거나 위험합니다. 그렇다고 빈 함수로 두는 것도 답이 아닙니다. "downgrade를 어떻게 다룰 것인가"는 운영 정책의 영역이고, 그 정책이 코드에 명시적으로 표현되어야 합니다.

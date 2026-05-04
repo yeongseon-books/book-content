@@ -31,6 +31,15 @@ last_reviewed: '2026-05-03'
 - 마이그레이션과 코드 배포의 순서, blue/green 안전 규칙
 - transient 에러를 retry할 때의 경계
 
+## 이 글에서 답할 질문
+
+- `pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`은 각각 어떤 장애를 방지하는가?
+- `QueuePool`, `NullPool`, SQLite용 `StaticPool`은 각각 어떤 환경에서 선택하는가?
+- OpenTelemetry로 SQL 쿼리를 trace에 연결하면 무엇이 가능해지는가?
+- production에서 slow query와 N+1을 사후가 아니라 사전에 잡는 패턴은 무엇인가?
+- 마이그레이션과 코드 배포의 순서를 blue/green 환경에서 어떻게 정렬해야 안전한가?
+- transient 에러에 retry를 적용할 때 "여기까지는 재시도, 여기부터는 실패로 인정"의 경계는 어떻게 정하는가?
+
 ## 왜 중요한가
 
 지금까지 다룬 내용은 모두 "코드가 정확히 동작하는가"였습니다. production은 한 단계 더 나갑니다. 같은 코드라도 풀 사이즈가 잘못되면 동시성에서 무너지고, 관측이 없으면 어디가 느린지 모르고, 마이그레이션 순서를 잘못 잡으면 배포 한 번이 장애가 됩니다.

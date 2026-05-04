@@ -45,6 +45,7 @@ Modules and packages are among Python's main tools for solving this. You break c
 
 ## Mental model
 
+> A module in Python is "a namespace that is loaded once and cached"; a package is "a directory grouped by `__init__.py` that holds modules". Hold those two definitions and most import behavior collapses into one diagram.
 A module is "a `.py` file that runs once and produces a namespace." A package is "a directory that holds such modules." `import` is the act of attaching that namespace to your current code.
 
 ```mermaid

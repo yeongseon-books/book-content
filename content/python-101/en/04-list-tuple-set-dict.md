@@ -52,6 +52,7 @@ This chapter consolidates the four collections onto a single page so the next ch
 
 ## Mental model
 
+> The four collections differ along four axes: mutability, order, duplicates allowed, and hashability. Choosing a collection is choosing which guarantees on those four axes you accept and which you give up.
 Group the four collections along three axes — mutability, order, and hashability — and they sit cleanly in memory.
 
 ```mermaid

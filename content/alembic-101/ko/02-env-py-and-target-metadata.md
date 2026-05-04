@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - online 모드와 offline 모드의 차이와 각각의 쓰임
 - SQLite + alembic 조합에서 거의 항상 필요한 두세 가지 옵션
 
+## 이 글에서 답할 질문
+
+- `env.py`는 alembic 명령 흐름의 어느 시점에 어떤 컨텍스트로 실행되는가?
+- `target_metadata`를 비워 두면 autogenerate가 왜 의미를 잃는가?
+- DB URL을 코드에 박지 않고 환경 변수에서 안전하게 읽으려면 어떻게 구성하는가?
+- online 모드와 offline 모드는 각각 언제 쓰는 것이 맞는가?
+- SQLite + alembic 조합에서 거의 항상 켜 두어야 하는 옵션은 무엇이며 왜 그런가?
+
 ## 왜 중요한가
 
 1편의 `alembic init`은 모든 파일을 만들어 줬지만, 그 상태로는 모델을 모릅니다. `alembic revision --autogenerate`를 돌려도 빈 파일만 나옵니다. `env.py`에서 모델 metadata를 알려 주는 한 줄을 빠뜨리면 alembic은 "DB와 모델 차이"를 계산할 근거 자체가 없기 때문입니다.

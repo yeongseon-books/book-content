@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - revision 그래프(`down_revision`)가 만들어지는 원리
 - SQLite에서 batch 모드를 명시적으로 쓰는 패턴
 
+## 이 글에서 답할 질문
+
+- `alembic revision`으로 만든 파일의 `upgrade()`와 `downgrade()`는 어떤 대칭 규칙을 지켜야 하는가?
+- `op.create_table`, `op.add_column`, `op.execute`는 각각 어떤 상황에서 선택하는가?
+- `down_revision` 값이 만들어 내는 revision 그래프는 어떻게 해석해야 하는가?
+- SQLite에서 `batch_alter_table`을 명시적으로 써야 하는 변경은 어떤 것인가?
+- downgrade를 한 번이라도 직접 돌려 봐야 하는 이유는 무엇인가?
+
 ## 왜 중요한가
 
 autogenerate가 아무리 좋아도 결국 만들어 주는 것은 같은 op 호출의 조합입니다. 손으로 한 번 작성해 본 사람과 그렇지 않은 사람의 차이는 큽니다. 자동 생성된 파일을 읽고 "이 부분은 의도와 다르다"라고 잡아낼 수 있느냐의 차이이기 때문입니다.

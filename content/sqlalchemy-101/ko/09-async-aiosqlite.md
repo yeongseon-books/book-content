@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - async에서 lazy loading이 더 위험한 이유와 회피 전략
 - async + FastAPI 같은 web framework에서의 세션 라이프사이클
 
+## 이 글에서 답할 질문
+
+- SQLAlchemy 2.x의 `create_async_engine`, `AsyncEngine`, `AsyncSession`은 동기 스택과 어떻게 매핑되는가?
+- SQLite를 async로 쓰기 위해 `aiosqlite` 드라이버는 어떻게 설치·설정하는가?
+- 동기 코드의 `session.execute` / `session.scalars`를 async로 옮길 때의 1대1 변환 규칙은 무엇인가?
+- async 환경에서 lazy loading이 더 위험한 이유는 무엇이며 어떻게 회피하는가?
+- FastAPI 같은 async web framework에서 `AsyncSession`의 라이프사이클은 어떻게 잡는 것이 안전한가?
+
 ## 왜 중요한가
 
 FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy를 그대로 쓰면 이벤트 루프가 블록됩니다. SQLAlchemy 2.x의 async API는 1.4부터 정식 도입돼 안정화됐고, SQLite도 `aiosqlite` 드라이버로 같은 패턴을 쓸 수 있습니다.

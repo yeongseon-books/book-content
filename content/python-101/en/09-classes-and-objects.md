@@ -46,6 +46,7 @@ This chapter introduces the simplest tools for building that bundle: the `class`
 
 ## Mental model
 
+> A class is not a mold for data; it is the definition of behavior shared by objects of the same kind. An instance is an individual object that follows that definition. With that one line in mind, `self`, class attributes, and dunder methods all find their place.
 The diagram below shows the path from a class definition to a method call on an instance.
 
 ```mermaid

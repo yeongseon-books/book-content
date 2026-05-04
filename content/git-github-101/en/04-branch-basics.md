@@ -44,6 +44,7 @@ This article stops just before merging. We focus on **creating, switching, and c
 
 ## Mental Model
 
+> A branch is not a folder copy; it is a movable pointer to a specific commit. `HEAD` is another pointer that marks which of those branch pointers you are currently working on.
 A branch is a **pointer** to a commit. When you make a new commit, the current branch pointer moves one step forward.
 
 ```mermaid

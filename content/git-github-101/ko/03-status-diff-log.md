@@ -30,6 +30,14 @@ title: 변경 사항 확인하기 - status, diff, log로 읽기
 - 두 commit 사이의 변경을 `git diff <a> <b>`로 비교하는 방법
 - `git log`의 자주 쓰는 옵션(`--oneline`, `--graph`, `--stat`, `--patch`)을 한자리에서 익히는 방법
 
+## 이 글에서 답할 질문
+
+- `git status` 출력의 각 줄은 어떤 영역(working/staging/HEAD)을 가리키는가?
+- `git status -s`의 짧은 형식은 두 글자 마커로 무엇을 표현하는가?
+- `git diff`, `git diff --cached`, `git diff HEAD`는 각각 어느 두 영역을 비교하는가?
+- 두 commit 사이의 변경을 `git diff <a> <b>`로 비교하면 어느 방향의 diff가 나오는가?
+- `git log`의 `--oneline`, `--graph`, `--stat`, `--patch`는 각각 어떤 질문에 대답하는가?
+
 ## 왜 중요한가
 
 지난 글에서 첫 commit까지 한 사이클을 돌려 봤습니다. 이제부터는 "변경이 어디에 있는지"뿐 아니라 "변경의 내용이 정확히 무엇인지"를 읽을 수 있어야 협업이 시작됩니다.
@@ -44,6 +52,7 @@ title: 변경 사항 확인하기 - status, diff, log로 읽기
 
 ## Mental Model
 
+> `status`·`diff`·`log` 세 명령은 각각 "지금 어디에 있나", "무엇이 어떻게 다르나", "여기까지 어떻게 왔나"라는 세 질문에 대응하는 읽기 전용 창입니다.
 각 명령이 보는 영역을 그림으로 정리해 봅니다.
 
 ```mermaid

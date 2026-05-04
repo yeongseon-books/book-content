@@ -44,6 +44,7 @@ Many teams and open-source projects treat Git as a standard tool. Learning it is
 
 ## Mental model
 
+> Git's core model is "a tool that keeps snapshots of your files in time order", and each snapshot is produced through three areas: the working directory, the staging area, and the repository.
 In one sentence, Git is "a tool that stores snapshots of your files in time order." Each commit is a photograph of the tracked files at that moment.
 
 ```mermaid

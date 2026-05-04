@@ -42,6 +42,7 @@ This article does not cover the entire standard library. It picks five modules t
 
 ## Mental model
 
+> The standard library is a toolbox of routines so you do not write the same thing twice. Each module sticks to one domain — time, paths, serialization, aggregation, iteration — and exposes a small focused vocabulary.
 The standard library is organized by purpose. `datetime` covers time, `pathlib` covers file paths, `json` covers serialization, `collections` adds richer data structures, and `itertools` covers iteration patterns.
 
 ```mermaid

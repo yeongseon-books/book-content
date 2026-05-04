@@ -32,6 +32,14 @@ title: Pull Request로 협업하기 - branch에서 review를 거쳐 main까지
 
 이 글이 끝나면 `feature/release-notes` 같은 branch에서 시작해 GitHub PR을 열고 review와 merge를 마친 뒤 로컬을 정돈하는 한 사이클을 혼자 돌릴 수 있습니다.
 
+## 이 글에서 답할 질문
+
+- Pull Request는 단순한 `git merge`와 동작·과정 측면에서 어떻게 다른가?
+- feature branch에서 PR을 여는 표준 순서는 어떤 명령들로 구성되는가?
+- review comment에 추가 commit으로 답한다는 것은 PR에서 어떻게 보이는가?
+- PR을 merge한 직후 로컬 `main`에서 해야 할 정리 작업은 무엇인가?
+- "PR이 너무 크다"라는 피드백을 피하려면 어떤 기준으로 변경을 잘라야 하는가?
+
 ## 왜 중요한가
 
 혼자 작업하면 `git merge feature/x`로 끝나는 일이, 둘 이상이 모이면 갑자기 어려워집니다. 누가 무엇을 바꿨는지, 그 변경이 왜 필요한지, 누가 동의했는지를 기록할 자리가 사라지기 때문입니다.
@@ -46,6 +54,7 @@ PR이 익숙해지면 다음 세 가지가 자연스럽게 따라옵니다.
 
 ## Mental Model
 
+> Pull Request는 단순한 merge가 아니라 "내 branch의 변경을 main에 합치자고 동료에게 제안하고, 그 제안을 두고 검토와 토론을 남기는 자리"입니다.
 PR은 "branch라는 제안서를 main에 받아 달라고 요청하는 신청서"입니다. 신청서에는 제목, 설명, 변경된 파일, 그리고 동료의 의견이 함께 붙습니다.
 
 ```mermaid

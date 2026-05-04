@@ -33,6 +33,16 @@ title: Creating a GitHub repository - remote, push, and pull in one go
 
 Up through Episode 5, each command ran inside one machine. Starting now, the local repository becomes something other people can see and other machines can keep working on.
 
+## Questions this chapter answers
+
+- What exactly is a `remote`, and why is the first one conventionally called `origin`?
+- Which commands, in what order, connect an empty GitHub repository to your local one?
+- What two things does `git push -u origin main` do in a single shot?
+- How does `git fetch` differ from `git pull` in behavior?
+- Beyond the working tree, what else does `git clone` actually download?
+- Which signal should drive the choice between HTTPS and SSH for a remote?
+
+
 ## Why it matters
 
 A repository that lives only on your laptop is, for collaboration purposes, not very different from a personal notebook. To share code with teammates, or to survive a stolen laptop without losing history, the repository has to exist somewhere else as well. GitHub is the most common "somewhere else."
@@ -49,6 +59,7 @@ Keeping these three apart is what makes "how do I safely incorporate someone els
 
 ## Mental Model
 
+> A GitHub repository is just "another Git repository that lives across the network", and a `remote` is the nickname you give to such a repository. `push` and `pull` are synchronization moves that exchange commits between the two.
 A GitHub repository is just another Git repository. The only differences are that it lives on GitHub's servers and that anyone with access can reach it. Local and remote act as mirrors of each other, and push/fetch/pull are the commands that keep them aligned.
 
 ```mermaid

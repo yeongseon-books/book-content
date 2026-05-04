@@ -30,6 +30,14 @@ title: merge와 conflict 해결하기 - 두 줄기를 다시 합치기
 - conflict 도중에 `git status`가 무엇을 알려 주는지
 - `git merge --abort`로 안전하게 되돌리는 방법
 
+## 이 글에서 답할 질문
+
+- fast-forward merge와 three-way merge는 각각 어떤 상황에서 일어나는가?
+- merge commit이 부모를 두 개 가지는 이유는 무엇인가?
+- `<<<<<<<`, `=======`, `>>>>>>>` conflict marker는 어느 쪽이 어느 branch의 내용인가?
+- conflict 도중 `git status`는 평소와 다르게 어떤 정보를 알려 주는가?
+- `git merge --abort`는 어느 시점까지의 작업을 안전하게 되돌려 주는가?
+
 ## 왜 중요한가
 
 이전 글까지 우리는 branch를 만들고 옮겨 가며 작업을 분리했습니다. 그런데 작업이 끝나면 결국 **다시 합쳐야** 합니다. PR을 머지할 때, 동료 변경을 내 branch로 가져올 때, 장시간 작업한 기능을 main으로 올릴 때 모두 merge가 일어납니다.

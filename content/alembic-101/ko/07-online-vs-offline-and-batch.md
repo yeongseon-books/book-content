@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - SQLite의 ALTER 한계와 `batch_alter_table`이 내부적으로 하는 일
 - offline 모드에서 동작하지 않는 op 패턴 피하기
 
+## 이 글에서 답할 질문
+
+- alembic의 online 모드와 offline 모드는 각각 어떤 환경을 가정하는가?
+- `--sql` 옵션으로 SQL을 미리 보고 DBA 검토를 받는 워크플로우는 어떻게 짜는가?
+- SQLite의 ALTER 한계 때문에 `batch_alter_table`이 내부적으로 어떤 일을 대신 해 주는가?
+- offline 모드에서 동작하지 않는 op 패턴에는 어떤 것이 있는가?
+- online과 offline을 같은 revision으로 안전하게 운용하려면 무엇을 피해야 하는가?
+
 ## 왜 중요한가
 
 production 배포 전에 "이 마이그레이션이 어떤 SQL을 실행할지"를 보고 싶을 때가 있습니다. 외부 DBA의 검토를 받아야 하거나, 변경 영향이 너무 커서 PR review만으로는 안심이 안 될 때입니다. 이때 사용하는 도구가 alembic의 offline 모드입니다.

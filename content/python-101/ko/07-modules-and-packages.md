@@ -33,6 +33,14 @@ last_reviewed: '2026-05-03'
 - 같은 패키지 안에서 `from .sibling import ...`처럼 relative import를 쓸 수 있습니다.
 - `sys.path`와 `PYTHONPATH`가 import 경로 탐색에 어떻게 관여하는지 한 줄로 설명할 수 있습니다.
 
+## 이 글에서 답할 질문
+
+- `.py` 파일을 모듈로 다룬다는 것과 디렉터리를 패키지로 만드는 것은 무엇이 다른가?
+- `import x`, `from x import y`, `import x as alias` 세 형태는 각각 언제 자연스러운가?
+- `if __name__ == "__main__":` 가드는 어떤 시점에 어떤 차이를 만드는가?
+- 같은 패키지 안에서 `from .sibling import ...` 같은 relative import는 언제 쓸 수 없는가?
+- `sys.path`와 `PYTHONPATH`는 import 경로 탐색에 각각 어떻게 관여하는가?
+
 ## 왜 중요한가
 
 함수를 익히고 나면 코드가 길어집니다. 한 파일에 수백 줄이 쌓이면 다음 문제가 생깁니다.
@@ -45,6 +53,7 @@ last_reviewed: '2026-05-03'
 
 ## Mental Model
 
+> Python에서 모듈은 "한 번 실행되면 캐시되는 namespace"이고, 패키지는 "`__init__.py`가 있는 디렉터리로 묶인 모듈의 묶음"이라는 두 정의만 잡아 두면 import 동작 대부분이 같은 그림으로 설명됩니다.
 모듈은 "한 번 실행되어 namespace를 만드는 `.py` 파일"입니다. 패키지는 "그런 모듈들을 담는 디렉터리"입니다. `import`는 그 namespace를 현재 코드에 연결하는 동작입니다.
 
 ```mermaid

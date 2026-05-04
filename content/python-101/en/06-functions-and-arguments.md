@@ -43,6 +43,7 @@ There is one more reason: the mutable default argument trap is one of the most c
 
 ## Mental model
 
+> A function signature is a contract: what the caller must supply and what the function returns. The five argument forms and the `/` and `*` markers tune how strict that contract is.
 Lay the function signature out on a page, and the call-time rules line up in your head.
 
 ```mermaid

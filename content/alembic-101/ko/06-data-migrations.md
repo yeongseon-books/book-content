@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - schema-only revision과 data-only revision을 분리해야 하는 이유
 - 멱등성과 재실행 안전성 확보 방법
 
+## 이 글에서 답할 질문
+
+- 데이터 마이그레이션은 schema 마이그레이션과 무엇이 본질적으로 다른가?
+- `op.execute`와 SQLAlchemy core 두 작성 스타일은 각각 언제 더 유리한가?
+- 수백만 행을 한 트랜잭션에 모두 담으면 어떤 문제가 생기며 어떻게 batch로 자르는가?
+- schema 변경과 데이터 변경을 한 revision에 섞으면 어떤 위험이 생기는가?
+- 데이터 마이그레이션이 도중에 실패해도 다시 돌릴 수 있게 하려면 무엇을 보장해야 하는가?
+
 ## 왜 중요한가
 
 `ALTER TABLE`만 마이그레이션이 아닙니다. column rename, enum 값 변경, JSON 구조 변환 같은 작업은 schema와 함께 데이터도 변경해야 합니다. 데이터 마이그레이션을 schema와 같은 revision에 섞으면 큰 데이터셋에서 lock 문제와 timeout이 발생하고, downgrade가 사실상 불가능해집니다.

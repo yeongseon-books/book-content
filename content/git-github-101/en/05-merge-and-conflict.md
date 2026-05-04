@@ -30,6 +30,15 @@ title: Merge and Conflict Resolution - Bringing Two Lines Back Together
 - What `git status` tells you in the middle of a conflict
 - How `git merge --abort` rolls back safely
 
+## Questions this chapter answers
+
+- When does a fast-forward merge happen, and when does Git create a three-way merge instead?
+- Why does a merge commit have two parents?
+- Which side of a conflict marker (`<<<<<<<` / `=======` / `>>>>>>>`) belongs to which branch?
+- What extra information does `git status` show while a conflict is in progress?
+- How far back does `git merge --abort` roll your work, and when is it safe to use?
+
+
 ## Why It Matters
 
 In the previous chapters we created branches and moved between them to keep work separate. Eventually that work has to come back together. Merging happens when a PR lands, when you pull a teammate's changes into your branch, or when a long-running feature finally ships to `main`.

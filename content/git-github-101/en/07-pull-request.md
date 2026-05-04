@@ -46,6 +46,7 @@ Once PRs become routine, three habits follow naturally:
 
 ## Mental model
 
+> A Pull Request is not a plain merge; it is a place to "propose merging your branch into main and host the review and discussion that surrounds that proposal".
 A PR is a request: "Please accept my branch as a proposal against `main`." The request has a title, a description, a list of changed files, and a comment thread.
 
 ```mermaid

@@ -29,6 +29,14 @@ last_reviewed: '2026-05-03'
 - `alembic init`로 프로젝트 구조를 만드는 방법
 - SQLite 기준 alembic 환경에서 처음 마주치는 함정 두세 가지
 
+## 이 글에서 답할 질문
+
+- 왜 `Base.metadata.create_all`만으로는 production 스키마 운영이 안 되는가?
+- Alembic의 revision, head, version table은 각각 어떤 역할을 하는가?
+- `alembic init` 직후 만들어지는 디렉터리 구조에서 무엇을 먼저 손봐야 하는가?
+- SQLite 환경에서 alembic을 처음 돌릴 때 자주 마주치는 함정은 무엇인가?
+- 팀이 도구 없이 손으로 SQL을 돌릴 때 잃게 되는 것은 정확히 무엇인가?
+
 ## 왜 중요한가
 
 스키마 변경은 모든 production 사고의 단골 원인입니다. 코드는 git으로, 인프라는 Terraform으로 관리하면서, "DB 스키마는 누가 어떤 SQL을 언제 돌렸는가"를 손으로 관리하는 팀이 의외로 많습니다. 그 결과 staging은 프로덕션과 미묘하게 달라지고, 롤백할 때는 누구도 자신 있게 "스키마를 어디까지 되돌려야 하는지" 답하지 못합니다.

@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - 운영 중 schema drift를 감지하는 monitoring 패턴
 - migration 사고가 났을 때의 forward-fix 절차
 
+## 이 글에서 답할 질문
+
+- 한 PR에 한 revision 원칙은 어떤 사고를 줄이기 위한 규칙인가?
+- alembic 기반 PR 템플릿과 CI 체크 항목에는 무엇을 넣는 것이 합리적인가?
+- dev=SQLite, staging+prod=PostgreSQL 같은 다중 환경에서 alembic 설정은 어떻게 분기하는가?
+- 운영 중 발생하는 schema drift는 어떤 신호로 감지하고 어떻게 추적하는가?
+- migration 사고가 났을 때 따라야 하는 forward-fix 절차의 핵심 단계는 무엇인가?
+
 ## 왜 중요한가
 
 지금까지 9편에서 다룬 내용은 한 명이 자기 환경에서 실수 없이 적용하는 방법이었습니다. 팀이 동시에 schema를 바꾸기 시작하면 다른 차원의 문제가 생깁니다. 두 사람이 동시에 새 revision을 만들면 multi-head가 발생하고, 누군가가 downgrade를 테스트하지 않으면 rollback이 깨지고, 운영 중에 schema가 어긋나기 시작하면 어디부터 손대야 할지 모릅니다. 운영의 안정성은 코드 품질이 아니라 워크플로우 품질에서 옵니다.

@@ -34,6 +34,15 @@ By the end of this chapter you will be able to explain and code the following yo
 
 This chapter targets Python 3.12. Blocks shown as REPL sessions (with the `>>>` prompt) run line by line in an activated venv. Short snippets without the prompt are illustrative excerpts and assume surrounding names are defined.
 
+## Questions this chapter answers
+
+- Why is a Python variable a name tag attached to an object rather than a box that holds a value?
+- What does each of the five primitive types — `int`, `float`, `str`, `bool`, `None` — actually guarantee?
+- Where does dynamic typing meet type hints, and how do hints make that freedom safer?
+- When do `is` and `==` agree, and when do they disagree?
+- Which floating-point comparisons surprise beginners, and how do you avoid them?
+
+
 ## Why it matters
 
 Variables and types are the skeleton of every program you'll ever write. It's tempting to dismiss `x = 1` as trivial, but here are the bugs you keep hitting if the model is fuzzy.
@@ -47,6 +56,7 @@ The common root is one of two confusions: not knowing exactly what a variable po
 
 ## Mental model
 
+> In Python, a variable is not a box that holds a value but a name tag attached to an object. Holding only that picture in your head explains almost every assignment, comparison, and copying trap with the same diagram.
 In Python, a variable is not a box that holds a value. It's a **name tag attached to an object**. One object can have many name tags, and a name tag can be moved to a different object at any time.
 
 ```mermaid

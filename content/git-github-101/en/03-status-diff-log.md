@@ -44,6 +44,7 @@ Used together, they let you self-review what your next commit will contain. That
 
 ## Mental model
 
+> `status`, `diff`, and `log` are three read-only windows that answer three different questions: where am I right now, what is different and how, and how did I get here.
 Each command compares a different pair of areas.
 
 ```mermaid

@@ -43,6 +43,7 @@ The `with` statement and narrow `except` clauses are the simplest tools for avoi
 
 ## Mental model
 
+> A file is a three-step resource: open, read or write, close. Exceptions are labels that classify which step failed and how. Separating those two models makes the shape of `with` and `try` blocks fall out naturally.
 The diagram below shows the flow that runs whenever you open a file and do work with it.
 
 ```mermaid

@@ -46,6 +46,7 @@ Even on a solo repository, issues earn their keep. Writing down the next thing t
 
 ## Mental model
 
+> Issues record "what is to be done", Pull Requests record "how it was actually done", and Projects record "where the work currently sits" — three complementary views of the same work.
 Here is how issues, PRs, and projects interlock.
 
 ```mermaid

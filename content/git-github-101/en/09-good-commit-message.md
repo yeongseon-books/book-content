@@ -39,6 +39,7 @@ The benefit shows up in code review too. Even when a PR description is thin, wel
 
 ## Mental model
 
+> A good commit message is a small document that lets you and your teammate, six months later, see in one read what changed and why. The subject, body, and footer each carry one face of that document.
 A solid commit message has a fixed skeleton.
 
 ```mermaid

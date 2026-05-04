@@ -30,6 +30,14 @@ last_reviewed: '2026-05-03'
 - table/column rename을 안전하게 처리하는 패턴
 - 자동 생성 결과를 사람 눈으로 다시 한 번 손봐야 하는 이유
 
+## 이 글에서 답할 질문
+
+- `alembic revision --autogenerate`는 내부적으로 무엇과 무엇을 비교하여 diff를 만드는가?
+- autogenerate가 잘 잡지 못하는 변경에는 어떤 것들이 있는가?
+- `compare_type`, `compare_server_default`, `include_object`, `include_name`은 각각 무엇을 제어하는가?
+- table 또는 column rename을 autogenerate에 맡기면 위험한 이유는 무엇인가?
+- 자동 생성된 revision을 사람이 다시 손볼 때 어떤 항목을 가장 먼저 검토해야 하는가?
+
 ## 왜 중요한가
 
 autogenerate는 alembic의 가장 강력한 기능이지만, "버튼 한 번 누르면 끝나는" 도구로 다루는 순간 production 사고가 납니다. 자동 생성된 파일을 그대로 commit하다가 column rename이 drop+create로 풀려 데이터가 사라지는 사례는 실제로 자주 발생합니다.

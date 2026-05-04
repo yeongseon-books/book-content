@@ -29,6 +29,14 @@ title: '좋은 commit message 쓰기: Conventional Commits와 좋은 본문'
 - Conventional Commits 규칙(`feat`, `fix`, `docs` 등)을 사용해 변경 종류를 한눈에 드러내는 법을 익힙니다.
 - 이미 쓴 message를 `git commit --amend`와 `git rebase`로 다듬는 방법을 배웁니다.
 
+## 이 글에서 답할 질문
+
+- 좋은 commit message가 왜 코드만큼 자산으로 작동하는가?
+- subject, body, footer 세 부분은 각각 어떤 정보를 담아야 하는가?
+- Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 변경 종류를 어떻게 한 줄로 드러내 주는가?
+- `git commit --amend`는 어떤 상황에서만 안전하게 쓸 수 있는가?
+- `git rebase -i`로 이미 쓴 message를 다듬을 때의 절차는 어떻게 되는가?
+
 ## 왜 중요한가
 
 `git log`는 미래의 자신과 동료에게 보내는 편지입니다. 6개월 뒤에 `git blame`으로 어떤 줄을 살펴봤을 때, "왜 이 줄을 이렇게 바꿨는지"가 한 줄에 적혀 있으면 5초 만에 맥락이 살아납니다. 반대로 message가 `fix bug`, `update`, `wip`로만 채워져 있으면 그 시점의 PR을 다시 열어 commit 전체 diff를 읽어야 합니다.
@@ -39,6 +47,7 @@ Code review에서도 차이가 납니다. PR 제목·본문이 비어 있어도 
 
 ## Mental Model
 
+> 좋은 commit message는 "이 변경을 6개월 뒤의 자신과 동료가 다시 읽었을 때 무엇을 왜 바꿨는지 한 번에 알게 해 주는 문서"이며, subject·body·footer 세 부분이 각각 그 역할의 한 면을 맡습니다.
 좋은 commit message는 정해진 골격을 가집니다.
 
 ```mermaid
