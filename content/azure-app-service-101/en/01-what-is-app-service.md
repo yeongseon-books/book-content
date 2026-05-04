@@ -25,6 +25,16 @@ In this post, we'll explore how the platform works, focusing on the **3-Plane Ar
 
 ---
 
+> App Service is one extra layer on top of PaaS that lets you operate per-app, not per-VM.
+
+## Questions this chapter answers
+
+- Where does App Service sit within the PaaS spectrum?
+- Linux and Windows hosting are not priced the same - what actually differs?
+- How do App Service Plan and App form a 1:N relationship, and who gets billed?
+- How do code deployment, container deployment, and WebJobs coexist on the same App Service?
+- Which workloads are signs that App Service is the wrong fit?
+
 ## What is App Service?
 
 Azure App Service is a **fully managed platform** for hosting web apps, REST APIs, and mobile backends.

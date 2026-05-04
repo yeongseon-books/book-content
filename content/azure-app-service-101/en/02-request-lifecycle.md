@@ -25,6 +25,16 @@ To answer these questions, you need to understand the **complete journey of a re
 
 ---
 
+> The request lifecycle in App Service is a chain of stable hops; latency lives in the warm-up step in the middle.
+
+## Questions this chapter answers
+
+- Which Azure components (Front End, ARR, Worker) does a request traverse before reaching your app?
+- What does the ARR Affinity cookie buy you, and when is it right to turn it off?
+- What latency does the warm-up step impose when a Worker wakes from idle?
+- What signals trigger Worker shutdown/restart, and how does that hit user requests?
+- How does sticky routing collide with horizontal scaling?
+
 ## Overall Request Flow
 
 A user's HTTP request passes through these layers before reaching your app:
@@ -346,6 +356,14 @@ Understanding each stage of the Request Lifecycle helps you:
 - **Apply the correct solutions**
 
 ---
+
+## Operational checklist
+
+- [ ] Diagrammed the Front End -> ARR -> Worker path with timing budgets
+- [ ] Documented when to keep ARR Affinity on versus when to turn it off
+- [ ] Measured cold-start versus warm-instance latency on a representative app
+- [ ] Wired alerts on Worker recycle events
+- [ ] Made the scale impact of stickiness explicit in capacity plans
 
 <!-- toc:begin -->
 ## In this series

@@ -29,6 +29,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- 코드 배포, 컨테이너 배포, custom container는 같은 App Service 위에서 어떤 차이를 만드는가?
+- Linux App Service에서 Docker 이미지를 쓸 때 startup 명령은 어떻게 결정되는가?
+- Windows 컨테이너는 왜 별도 SKU에서만 동작하는가?
+- ZIP 배포와 컨테이너 배포의 롤백 전략은 어떻게 다른가?
+- 동일 앱을 여러 호스팅 모델로 운영하는 것이 가치 있을 때는 언제인가?
+
 ## 먼저 결론: 대부분의 첫 선택은 이 조합이다
 
 대부분의 팀에게 첫 App Service 조합은 아래에서 크게 벗어나지 않습니다.
@@ -464,6 +472,22 @@ App Service 호스팅 모델은 복잡해 보이지만, 실제 판단 기준은 
 이번 글은 App Service의 OS, 배포 모델, 플랜 티어를 어떤 기준으로 고를지 정리하는 의사결정 편입니다. 여기서 고른 Linux Code 기반 구성을 실제 배포와 운영 절차로 연결할 수 있어야 선택이 비로소 검증됩니다.
 
 ---
+
+## 컨테이너 배포 예시
+
+```bash
+az webapp create \
+  --resource-group $RG --plan $PLAN --name $APP \
+  --deployment-container-image-name $REGISTRY.azurecr.io/myapp:v1
+```
+
+## 운영 체크리스트
+
+- [ ] 코드/컨테이너/custom container 중 호스팅 모델을 선택한 근거를 적었다
+- [ ] startup 명령과 환경 변수의 단일 출처(IaC)를 정했다
+- [ ] 이미지 레지스트리 인증(Managed Identity)을 구성했다
+- [ ] 롤백 절차를 모델별로 작성하고 한 번 시연했다
+- [ ] 호스팅 모델 변경 시 영향을 받는 모니터링 항목을 정리했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

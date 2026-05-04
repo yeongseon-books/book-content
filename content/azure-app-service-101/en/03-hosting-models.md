@@ -27,6 +27,14 @@ In this post, we'll cover the **key criteria for choosing your Hosting Model**.
 
 ---
 
+## Questions this chapter answers
+
+- How do code deploys, built-in containers, and custom containers differ on the same App Service?
+- How is the startup command resolved when you run a Docker image on Linux App Service?
+- Why do Windows containers only run on specific SKUs?
+- How do rollback strategies diverge between ZIP deploy and container deploy?
+- When is it actually worth running the same app under multiple hosting models?
+
 ## Decision Flowchart
 
 The flow for deciding your App Service hosting strategy:
@@ -305,6 +313,14 @@ Key points for Hosting Model selection:
 - **Plan Strategy**: Dedicated for critical apps, shared for the rest
 
 ---
+
+## Operational checklist
+
+- [ ] Wrote down why you picked the chosen hosting model
+- [ ] Pinned a single source of truth (IaC) for startup command and env vars
+- [ ] Configured registry auth via Managed Identity
+- [ ] Documented and rehearsed rollback per hosting model
+- [ ] Listed which monitoring fields change when hosting model changes
 
 <!-- toc:begin -->
 ## In this series

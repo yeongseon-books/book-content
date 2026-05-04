@@ -25,6 +25,14 @@ To answer these questions, **logging and monitoring** are essential. In this pos
 
 ---
 
+## Questions this chapter answers
+
+- Where do App Service diagnostic logs (HTTP, application, container) actually land?
+- How do Application Insights, Log Analytics, and Diagnostic Settings split responsibilities?
+- When does live tail or log streaming help, and where does it hit its limits?
+- What thresholds make memory, HTTP 5xx, and response-time alerts useful?
+- Which signals warn you about disk-quota or dependency failures first?
+
 ## Where Do Logs Go?
 
 Understanding the log flow in App Service is the first step.
@@ -467,6 +475,14 @@ Logging and monitoring essentials:
 - **KQL**: Powerful query language
 
 ---
+
+## Operational checklist
+
+- [ ] Centralized App Service diagnostic logs in Log Analytics
+- [ ] Enabled Application Insights and decided on a sampling policy
+- [ ] Set thresholds for memory, 5xx, and latency alerts
+- [ ] Wired alerts on disk quota and dependency failures
+- [ ] Documented the first-five-minutes actions in the incident runbook
 
 <!-- toc:begin -->
 ## In this series

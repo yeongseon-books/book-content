@@ -25,6 +25,14 @@ Different environments need different connection strings, API keys, and log leve
 
 ---
 
+## Questions this chapter answers
+
+- How are app settings, connection strings, and env vars exposed at runtime?
+- Where do slot-sticky settings actually help?
+- What makes a Key Vault reference different from a plain app setting, and how does permission flow?
+- Which configuration changes auto-restart the app, and which do not?
+- Why must true secrets never live in app settings even if app settings are encrypted at rest?
+
 ## Why Configuration Matters
 
 ### The Twelve-Factor App Principle

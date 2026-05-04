@@ -25,6 +25,16 @@ last_reviewed: '2026-04-29'
 
 ---
 
+> Scale rules without cost ceilings are how a single bad release becomes a five-figure invoice.
+
+## Questions this chapter answers
+
+- What signals and costs differ between vertical scale (scale up) and horizontal scale (scale out)?
+- Which metrics (CPU, queue, custom) drive auto-scale rules?
+- What happens to ARR Affinity sessions when an instance scales in?
+- How much cold start does Premium's always-ready erase?
+- How do you guard both the scale ceiling and the cost ceiling at once?
+
 ## Two Directions of Scaling
 
 ```
@@ -415,6 +425,14 @@ Scaling strategy essentials:
 This closing post ties the rest of the series together by turning deployment, configuration, and telemetry into scaling decisions. Read back through the sequence and the through-line is clear: App Service works best when you treat it as an operating platform, not just a place to push code.
 
 ---
+
+## Operational checklist
+
+- [ ] Decided vertical-vs-horizontal scaling criteria per workload
+- [ ] Calibrated auto-scale metrics and thresholds against measurements
+- [ ] Verified the scale-in impact on sticky sessions
+- [ ] Decided the always-ready instance count vs. cost tradeoff
+- [ ] Capped runaway cost with max-instance count and alerts
 
 <!-- toc:begin -->
 ## In this series

@@ -27,6 +27,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- App settings, connection strings, environment variables는 런타임에서 어떻게 노출되는가?
+- 슬롯별 설정(slot-sticky)은 어떤 시나리오에서 유용한가?
+- Key Vault reference는 일반 app setting과 무엇이 다르고, 권한이 어떻게 흐르는가?
+- configuration 변경 후 앱이 자동 재시작되는 조건은 무엇인가?
+- 비밀(secret)을 절대로 app settings에 두면 안 되는 이유는?
+
 ## 왜 설정이 배포보다 더 오래 문제를 만들까?
 
 처음 배포할 때는 앱이 뜨는지만 봅니다. 그런데 운영에서는 다음 문제가 더 자주 터집니다.
@@ -471,6 +479,14 @@ logger.info("Configuration loaded", extra={
 이번 글은 배포 뒤에 더 오래 남는 문제인 설정, 민감 정보, 슬롯별 값 관리를 다룹니다. `LOG_LEVEL`, Application Insights 연결 문자열, 구조화된 로그 필드처럼 여기서 정한 기준이 이후의 로그·메트릭·추적 품질을 직접 좌우합니다.
 
 ---
+
+## 운영 체크리스트
+
+- [ ] 비밀은 모두 Key Vault reference 또는 Managed Identity 경유로 주입했다
+- [ ] slot-sticky 설정 항목을 명시적으로 표시했다
+- [ ] configuration drift 감지를 IaC로 자동화했다
+- [ ] 설정 변경 후 자동 재시작 영향 범위를 문서화했다
+- [ ] 환경별 설정 차이(dev/stage/prod)를 단일 매트릭스로 정리했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

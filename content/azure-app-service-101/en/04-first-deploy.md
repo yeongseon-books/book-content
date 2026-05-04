@@ -25,6 +25,14 @@ This post covers the entire process from local development environment setup to 
 
 ---
 
+## Questions this chapter answers
+
+- Which parameters must absolutely be settled before the first App Service deploy?
+- How is run-from-package different from content deploy?
+- Where should you start with deployment-slot strategy across dev/stage/prod?
+- What do you turn on so health checks run automatically after the first deploy?
+- Which auth/permission failures hit you most often on the first deploy?
+
 ## Goals
 
 By the end, you will have a Flask app running locally, an App Service app in Azure, and a repeatable deployment path you can verify with logs and a health endpoint.
@@ -403,6 +411,14 @@ What you learned in this tutorial:
 4. **Verification**: Status check via Health endpoint and logs
 
 ---
+
+## Operational checklist
+
+- [ ] Pinned region, SKU, and runtime version up front
+- [ ] Picked the deploy method (zip, ACR, GitHub Actions) explicitly
+- [ ] Configured Managed Identity and Key Vault access
+- [ ] Set the health-check path and timeout thresholds
+- [ ] Rehearsed slot-swap rollback once before going live
 
 <!-- toc:begin -->
 ## In this series
