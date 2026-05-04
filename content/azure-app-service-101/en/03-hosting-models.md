@@ -15,6 +15,8 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: 'When starting with App Service, the first question you face: "Which
+  plan should I choose?"'
 ---
 
 # Hosting Models: Which Plan Should You Choose?

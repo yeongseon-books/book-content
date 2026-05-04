@@ -1,5 +1,5 @@
 ---
-title: 'Multi-format document pipeline'
+title: Multi-format document pipeline
 series: document-ingestion-101
 episode: 5
 language: en
@@ -15,6 +15,8 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: The essence of a multi-format pipeline is forcing varied inputs into
+  one shared Document contract.
 ---
 
 # Multi-format document pipeline

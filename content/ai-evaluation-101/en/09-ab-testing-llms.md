@@ -15,6 +15,8 @@ tags:
 - Statistics
 - Win Rate
 last_reviewed: '2026-05-03'
+seo_description: How do you decide which of two prompts is better? This post covers
+  paired comparison, win rate, statistical significance, and sample size…
 ---
 
 # A/B Testing LLMs — Which Prompt Is Better?

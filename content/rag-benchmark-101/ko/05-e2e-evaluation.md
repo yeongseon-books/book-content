@@ -1,5 +1,5 @@
 ---
-title: '종단 간 RAG 파이프라인 평가'
+title: 종단 간 RAG 파이프라인 평가
 series: rag-benchmark-101
 episode: 5
 language: ko
@@ -17,6 +17,7 @@ tags:
 - LLM
 - Evaluation
 last_reviewed: '2026-05-01'
+seo_description: 종단 간 평가의 데이터 흐름은 다음과 같습니다.
 ---
 
 # 종단 간 RAG 파이프라인 평가

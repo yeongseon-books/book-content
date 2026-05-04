@@ -18,6 +18,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 'SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링'
+seo_description: SQLite connection은 다른 DB의 client/server connection과 다르다.
 ---
 
 # SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링

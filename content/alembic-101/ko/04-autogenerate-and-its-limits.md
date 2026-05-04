@@ -1,5 +1,5 @@
 ---
-title: "autogenerate: 잡는 것과 못 잡는 것의 경계"
+title: 'autogenerate: 잡는 것과 못 잡는 것의 경계'
 series: alembic-101
 episode: 4
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - autogenerate
-  - compare_type
-  - MetaData
-  - SQLite
+- Python
+- Alembic
+- autogenerate
+- compare_type
+- MetaData
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: autogenerate는 현재 DB(ground truth)와 target_metadata(desired state)의
+  diff를 만들어…
 ---
 
 # autogenerate: 잡는 것과 못 잡는 것의 경계

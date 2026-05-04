@@ -1,5 +1,5 @@
 ---
-title: '상태 관리와 체크포인트'
+title: 상태 관리와 체크포인트
 series: langgraph-101
 episode: 2
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 체크포인터는 노드 실행 결과를 스냅샷으로 저장해 다음 호출이 같은 상태 흐름 위에서 다시 시작되게 해줍니다.
 ---
 
 # 상태 관리와 체크포인트

@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
+seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 ---
 
 # 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지

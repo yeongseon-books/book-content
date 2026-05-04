@@ -15,6 +15,8 @@ tags:
 - Reliability
 - Production
 last_reviewed: '2026-05-03'
+seo_description: 좋은 Agent는 좋은 모델만으로 만들어지지 않습니다. 모델이 일할 수 있는 환경, 제약, 도구, 검증 루프를 함께
+  설계해야 합니다.
 ---
 
 # Harness Engineering이란 무엇인가?

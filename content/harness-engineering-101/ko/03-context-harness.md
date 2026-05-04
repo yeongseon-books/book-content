@@ -15,6 +15,7 @@ tags:
 - Context
 - RAG
 last_reviewed: '2026-05-03'
+seo_description: Agent가 받는 컨텍스트는 결과를 결정합니다. 너무 적으면 추측하고, 너무 많으면 길을 잃습니다.
 ---
 
 # Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기

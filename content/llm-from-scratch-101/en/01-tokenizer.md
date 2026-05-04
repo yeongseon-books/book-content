@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: The most jarring thing I noticed when first digging into LLM internals
+  was that the model can't read at all.
 ---
 
 # Turning Text into Numbers

@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: 'SQLite Connection Management: thread-safety, check_same_thread, and Pooling'
+seo_description: A SQLite connection is not the client/server connection you know
+  from PostgreSQL or MySQL. There is no separate process.
 ---
 
 # SQLite Connection Management: thread-safety, check_same_thread, and Pooling

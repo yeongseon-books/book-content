@@ -1,5 +1,5 @@
 ---
-title: '데이터셋 준비와 전처리'
+title: 데이터셋 준비와 전처리
 series: llm-finetuning-101
 episode: 2
 language: ko
@@ -17,6 +17,7 @@ tags:
 - HuggingFace
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 데이터셋은 세 층으로 분리해서 다룹니다.
 ---
 
 # 데이터셋 준비와 전처리

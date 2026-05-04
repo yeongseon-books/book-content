@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 여기까지 “Functions의 구조”를 설명했습니다. 여기서 중요한 실무 포인트는, 로컬 실행과 Azure 배포가 결국
+  이…
 ---
 
 # Host와 Worker — 함수는 누가 실행하는가

@@ -1,5 +1,5 @@
 ---
-title: "Control flow: if, for, while, comprehension"
+title: 'Control flow: if, for, while, comprehension'
 series: python-101
 episode: 5
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - control-flow
-  - if-statement
-  - for-loop
-  - while-loop
-  - comprehensions
-  - enumerate-zip
+- control-flow
+- if-statement
+- for-loop
+- while-loop
+- comprehensions
+- enumerate-zip
 last_reviewed: '2026-05-03'
+seo_description: 'When wiring up control flow, split each branch and loop into two
+  questions: "what truthy/falsy decision does this make" and "what is the termination…'
 ---
 
 # Control flow: if, for, while, comprehension

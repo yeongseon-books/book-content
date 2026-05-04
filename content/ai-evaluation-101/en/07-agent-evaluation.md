@@ -15,6 +15,8 @@ tags:
 - Trajectory
 - Tool Use
 last_reviewed: '2026-05-03'
+seo_description: Agents reach answers through multiple steps. You need to evaluate
+  not just the final response but 'which tools, in what order, how many times.' This…
 ---
 
 # Evaluating Agents — Trajectories, Not Single Responses

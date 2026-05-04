@@ -1,5 +1,5 @@
 ---
-title: 'LLM cost tracking and optimization'
+title: LLM cost tracking and optimization
 series: llm-apps-ops-101
 episode: 2
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Cost tracking is not bookkeeping for its own sake. It is the feedback
+  loop that makes caching, prompt compression, and routing decisions measurable.
 ---
 
 # LLM cost tracking and optimization

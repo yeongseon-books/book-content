@@ -18,6 +18,7 @@ tags:
 - Resource Management
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: DB-API의 두 핵심 객체는 connection과 cursor입니다.
 ---
 
 # Connection과 Cursor Lifecycle

@@ -17,6 +17,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 합성 데이터 생성 — Self-Instruct부터 Distillation까지
+seo_description: production LLM fine-tuning에서 가장 흔한 병목은 labeled data 부족입니다.
 ---
 
 # 합성 데이터 생성 — Self-Instruct부터 Distillation까지

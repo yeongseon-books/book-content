@@ -15,6 +15,7 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이는 단계가 남습니다. 학습입니다.
 ---
 
 # 기울기로 배우기

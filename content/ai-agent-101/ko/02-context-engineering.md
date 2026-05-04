@@ -15,6 +15,8 @@ tags:
 - Prompt Engineering
 - System Prompt
 last_reviewed: '2026-05-02'
+seo_description: Agent의 행동은 컨텍스트에 의해 결정됩니다. System prompt, 대화 기록, 도구 설명, 현재 상태 정보가
+  모두 컨텍스트를…
 ---
 
 # 컨텍스트 엔지니어링

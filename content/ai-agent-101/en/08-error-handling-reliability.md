@@ -16,6 +16,8 @@ tags:
 - Reliability
 - Retry Logic
 last_reviewed: '2026-05-02'
+seo_description: Agents can fail because they call external tools, go through networks,
+  and depend on uncertain model judgments.
 ---
 
 # Error Handling and Reliability

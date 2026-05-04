@@ -15,6 +15,8 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: This is where the series turns into a real deployment. We will deploy
+  a Flask app to Azure App Service and verify the full runtime path.
 ---
 
 # First Deployment: From Local to Azure (Python/Flask)

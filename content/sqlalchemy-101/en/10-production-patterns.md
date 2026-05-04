@@ -1,5 +1,5 @@
 ---
-title: "Production patterns: pools, observability, migrations, and deploys"
+title: 'Production patterns: pools, observability, migrations, and deploys'
 series: sqlalchemy-101
 episode: 10
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - SQLAlchemy
-  - Production
-  - pool
-  - Observability
-  - SQLite
+- Python
+- SQLAlchemy
+- Production
+- pool
+- Observability
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: Production SQLAlchemy has three knobs. The pool sets concurrency
+  and tail latency. Observability tells you where slow is.
 ---
 
 # Production patterns: pools, observability, migrations, and deploys

@@ -15,6 +15,7 @@ tags:
 - Dapr
 - Envoy
 last_reviewed: '2026-04-29'
+seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
 ---
 
 # Environment 내부 — 네트워크·관측·Dapr 스코프의 경계

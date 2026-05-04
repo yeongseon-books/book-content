@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: kube-state-metrics는 이름 그대로 Kubernetes 오브젝트의 상태를 메트릭으로 드러냅니다.
 ---
 
 # 모니터링과 운영 — Container Insights, 로그, 알람

@@ -15,6 +15,8 @@ tags:
 - Deduplication
 - MinHash
 last_reviewed: '2026-05-03'
+seo_description: 'Anyone who has worked on The Pile, C4, or RedPajama will tell you
+  the same thing: the dedup stage delivers the biggest single quality improvement.'
 ---
 
 # Cleaning and Deduplication

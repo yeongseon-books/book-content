@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
+seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 ---
 
 # HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기

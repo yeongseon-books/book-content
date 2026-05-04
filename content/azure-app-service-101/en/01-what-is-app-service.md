@@ -15,6 +15,8 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: The most important concept for understanding App Service is the three
+  Planes.
 ---
 
 # What is Azure App Service? - Understanding the Platform Architecture

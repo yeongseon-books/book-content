@@ -1,5 +1,5 @@
 ---
-title: 'BGE-M3 multilingual embedding in practice'
+title: BGE-M3 multilingual embedding in practice
 series: korean-ai-stack-101
 episode: 3
 language: en
@@ -17,6 +17,7 @@ tags:
 - Embeddings
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Multilingual dense retrieval decomposes into four steps.
 ---
 
 # BGE-M3 multilingual embedding in practice

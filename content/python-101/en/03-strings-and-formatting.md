@@ -1,5 +1,5 @@
 ---
-title: "Strings and formatting"
+title: Strings and formatting
 series: python-101
 episode: 3
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - strings
-  - f-string
-  - format-spec
-  - unicode
-  - string-methods
-  - bytes-and-str
+- strings
+- f-string
+- format-spec
+- unicode
+- string-methods
+- bytes-and-str
 last_reviewed: '2026-05-03'
+seo_description: In Python 3, str is an immutable sequence of Unicode code points
+  and bytes is an immutable sequence of bytes.
 ---
 
 # Strings and formatting

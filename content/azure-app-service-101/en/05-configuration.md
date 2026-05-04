@@ -15,6 +15,8 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: Your app is deployed. Now, how do you manage environment-specific
+  settings?
 ---
 
 # Mastering Configuration: App Settings & Environment Variables

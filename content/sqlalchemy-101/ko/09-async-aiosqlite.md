@@ -1,5 +1,5 @@
 ---
-title: "비동기 SQLAlchemy: aiosqlite와 AsyncSession"
+title: '비동기 SQLAlchemy: aiosqlite와 AsyncSession'
 series: sqlalchemy-101
 episode: 9
 language: ko
@@ -11,13 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - SQLAlchemy
-  - async
-  - aiosqlite
-  - AsyncSession
-  - SQLite
+- Python
+- SQLAlchemy
+- async
+- aiosqlite
+- AsyncSession
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: async SQLAlchemy는 기존 ORM의 얇은 awaitable wrapper입니다.
 ---
 
 # 비동기 SQLAlchemy: aiosqlite와 AsyncSession

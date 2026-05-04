@@ -15,6 +15,8 @@ tags:
 - Coordination
 - Delegation
 last_reviewed: '2026-05-02'
+seo_description: 하나의 Agent로 모든 작업을 처리하기 어려울 때가 있습니다. 작업이 여러 도메인에 걸쳐 있거나, 각 단계에서 다른
+  전문성이 필요하거나…
 ---
 
 # Multi-Agent 시스템

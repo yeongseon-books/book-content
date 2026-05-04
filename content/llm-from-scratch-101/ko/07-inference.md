@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 지난 글에서 ckpt.pt를 저장하고 나면 바로 말을 시켜 보고 싶어집니다. 그런데 model.eval()만으로는 문장이
+  나오지 않습니다.
 ---
 
 # 샘플링 — 학습된 모델에서 글 뽑아내기

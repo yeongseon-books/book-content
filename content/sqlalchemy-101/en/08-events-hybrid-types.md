@@ -1,5 +1,5 @@
 ---
-title: "Events, hybrid_property, and custom types"
+title: Events, hybrid_property, and custom types
 series: sqlalchemy-101
 episode: 8
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - SQLAlchemy
-  - ORM
-  - event
-  - hybrid_property
-  - SQLite
+- Python
+- SQLAlchemy
+- ORM
+- event
+- hybrid_property
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: Think of SQLAlchemy extension points as three layers. The type layer
+  transforms values as they cross the column boundary; the attribute layer…
 ---
 
 # Events, hybrid_property, and custom types

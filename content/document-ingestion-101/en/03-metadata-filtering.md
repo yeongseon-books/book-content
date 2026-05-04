@@ -1,5 +1,5 @@
 ---
-title: 'Metadata design and filtering'
+title: Metadata design and filtering
 series: document-ingestion-101
 episode: 3
 language: en
@@ -15,6 +15,8 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Metadata is not decoration around the text; it is the first index
+  that shrinks the candidate set.
 ---
 
 # Metadata design and filtering

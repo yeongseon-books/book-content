@@ -15,6 +15,8 @@ tags:
 - Threat Model
 - LLM Security
 last_reviewed: '2026-05-03'
+seo_description: 처음 LLM 앱을 만들 때는 단순합니다. 사용자 입력을 받아 모델에 전달하고, 응답을 그대로 보여줍니다. 데모는 잘
+  동작합니다.
 ---
 
 # AI Safety가 왜 중요한가

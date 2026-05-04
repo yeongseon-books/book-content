@@ -1,5 +1,5 @@
 ---
-title: 'Korean embedding models compared — KoSimCSE, BGE-M3, Solar'
+title: Korean embedding models compared — KoSimCSE, BGE-M3, Solar
 series: korean-ai-stack-101
 episode: 1
 language: en
@@ -15,6 +15,8 @@ tags:
 - Embeddings
 - OCR
 last_reviewed: '2026-05-01'
+seo_description: Comparing embedding models is less about headline scores and more
+  about how consistently they pull similar sentences together while pushing…
 ---
 
 # Korean embedding models compared — KoSimCSE, BGE-M3, Solar

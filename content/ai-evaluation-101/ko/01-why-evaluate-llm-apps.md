@@ -15,6 +15,7 @@ tags:
 - Testing
 - Quality
 last_reviewed: '2026-05-03'
+seo_description: LLM은 같은 입력에도 다른 답을 내놓습니다. 평가 없이 운영하면 어제 잘 되던 기능이 오늘 망가지는 것을 알 수 없습니다.
 ---
 
 # 왜 LLM 애플리케이션을 평가해야 하는가

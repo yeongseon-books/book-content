@@ -1,5 +1,5 @@
 ---
-title: 'Chunking strategies — optimizing by document type'
+title: Chunking strategies — optimizing by document type
 series: document-ingestion-101
 episode: 2
 language: en
@@ -15,6 +15,8 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Chunking is not just cutting text smaller; it is designing the smallest
+  context unit retrieval can still trust.
 ---
 
 # Chunking strategies — optimizing by document type

@@ -15,6 +15,8 @@ tags:
 - Context
 - RAG
 last_reviewed: '2026-05-03'
+seo_description: The context an agent receives shapes its output. Too little and it
+  guesses. Too much and it loses focus.
 ---
 
 # Context Harness — Designing What the Agent Should Know and Not Know

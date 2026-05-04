@@ -15,6 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: '"The app is slow." "There''s an error." "When did this start?"'
 ---
 
 # Logging and Monitoring Basics

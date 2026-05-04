@@ -1,5 +1,5 @@
 ---
-title: "env.py와 target_metadata: 모델과 마이그레이션 연결"
+title: 'env.py와 target_metadata: 모델과 마이그레이션 연결'
 series: alembic-101
 episode: 2
 language: ko
@@ -11,13 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - env.py
-  - target_metadata
-  - Configuration
-  - SQLite
+- Python
+- Alembic
+- env.py
+- target_metadata
+- Configuration
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: env.py는 alembic이 명령마다 실행하는 부트 스크립트입니다.
 ---
 
 # env.py와 target_metadata: 모델과 마이그레이션 연결

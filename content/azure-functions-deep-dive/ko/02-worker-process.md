@@ -15,6 +15,7 @@ tags:
 - Distributed Systems
 - gRPC
 last_reviewed: '2026-04-29'
+seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
 # Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법

@@ -1,5 +1,5 @@
 ---
-title: 'Building sentence similarity search with KoSimCSE'
+title: Building sentence similarity search with KoSimCSE
 series: korean-ai-stack-101
 episode: 2
 language: en
@@ -17,6 +17,7 @@ tags:
 - Embeddings
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Sentence similarity search decomposes into four steps.
 ---
 
 # Building sentence similarity search with KoSimCSE

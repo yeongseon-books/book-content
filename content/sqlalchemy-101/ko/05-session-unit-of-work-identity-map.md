@@ -1,5 +1,5 @@
 ---
-title: "Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리"
+title: 'Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리'
 series: sqlalchemy-101
 episode: 5
 language: ko
@@ -18,6 +18,8 @@ tags:
 - Unit of Work
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: Session은 작업 메모지(Unit of Work)와 캐시 노트(Identity Map)를 한 권의 노트로 묶어 둔
+  것입니다.
 ---
 
 # Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리

@@ -1,5 +1,5 @@
 ---
-title: "데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기"
+title: '데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기'
 series: alembic-101
 episode: 6
 language: ko
@@ -11,13 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - data-migration
-  - op.execute
-  - batch
-  - SQLite
+- Python
+- Alembic
+- data-migration
+- op.execute
+- batch
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: 데이터 마이그레이션은 "schema는 그대로 두고 row를 변환하는 revision"입니다.
 ---
 
 # 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기

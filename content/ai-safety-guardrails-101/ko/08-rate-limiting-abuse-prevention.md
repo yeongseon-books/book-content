@@ -15,6 +15,7 @@ tags:
 - Abuse Prevention
 - Anomaly Detection
 last_reviewed: '2026-05-03'
+seo_description: 전통적인 API 남용은 "초당 요청 수" 위주였습니다. LLM API는 두 가지 차원이 추가됩니다.
 ---
 
 # Rate Limiting과 남용 방지

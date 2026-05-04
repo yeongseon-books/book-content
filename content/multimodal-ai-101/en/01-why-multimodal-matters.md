@@ -17,6 +17,8 @@ tags:
 - Vision Language
 - Modality Fusion
 last_reviewed: '2026-05-03'
+seo_description: 'After ChatGPT shipped in late 2022, a quiet assumption took hold:
+  a single text LLM could solve almost any problem worth solving.'
 ---
 
 # Why Multimodal AI Matters

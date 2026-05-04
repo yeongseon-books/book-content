@@ -1,5 +1,5 @@
 ---
-title: 'BGE-M3 다국어 임베딩 실전'
+title: BGE-M3 다국어 임베딩 실전
 series: korean-ai-stack-101
 episode: 3
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Embeddings
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 다국어 dense 검색은 다음 4단계로 분해됩니다.
 ---
 
 # BGE-M3 다국어 임베딩 실전

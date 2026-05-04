@@ -1,5 +1,5 @@
 ---
-title: 'LLM 출력 품질 평가'
+title: LLM 출력 품질 평가
 series: llm-apps-ops-101
 episode: 3
 language: ko
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 평가 자동화의 첫 단계는 의미를 완벽히 이해하는 심판을 만드는 것이 아니라, 명확하게 실패한 응답을 빠르게 걸러내는
+  체를 만드는 것입니다.
 ---
 
 # LLM 출력 품질 평가

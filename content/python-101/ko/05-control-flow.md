@@ -1,5 +1,5 @@
 ---
-title: "제어 흐름: if, for, while, comprehension"
+title: '제어 흐름: if, for, while, comprehension'
 series: python-101
 episode: 5
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - control-flow
-  - if-statement
-  - for-loop
-  - while-loop
-  - comprehensions
-  - enumerate-zip
+- control-flow
+- if-statement
+- for-loop
+- while-loop
+- comprehensions
+- enumerate-zip
 last_reviewed: '2026-05-03'
+seo_description: 제어 흐름을 짤 때는 "이 분기·반복이 무엇을 결정하느냐"를 truthy/falsy 한 단계와 종료 조건 한 단계로
+  분리해 두면…
 ---
 
 # 제어 흐름: if, for, while, comprehension

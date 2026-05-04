@@ -1,5 +1,5 @@
 ---
-title: "Production과 team workflow: PR, CI, 모니터링, 그리고 incident response"
+title: 'Production과 team workflow: PR, CI, 모니터링, 그리고 incident response'
 series: alembic-101
 episode: 10
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - Production
-  - CI
-  - workflow
-  - SQLite
+- Python
+- Alembic
+- Production
+- CI
+- workflow
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: migration은 "가장 비가역적인 코드 변경"입니다. 일반 코드는 revert 한 번으로 되돌리지만, schema
+  변경은 데이터를…
 ---
 
 # Production과 team workflow: PR, CI, 모니터링, 그리고 incident response

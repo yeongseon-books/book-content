@@ -1,5 +1,5 @@
 ---
-title: 'LLM 앱 배포 전략'
+title: LLM 앱 배포 전략
 series: llm-apps-ops-101
 episode: 5
 language: ko
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 배포 가능한 예제의 기준은 코드가 예쁘게 보이는지가 아니라, 서버를 띄우고 헬스체크와 실제 채팅 요청을 같은 스크립트에서
+  검증할 수…
 ---
 
 # LLM 앱 배포 전략

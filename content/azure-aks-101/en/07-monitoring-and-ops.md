@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: Azure Kubernetes Service 101 series (7/7)
 ---
 
 # Monitoring and ops — Container Insights, logs, alerts

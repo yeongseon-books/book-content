@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: Once the app is deployed, the questions change. You stop asking whether
+  the function runs at all and start asking why failure rate jumped, why…
 ---
 
 # Monitoring and Operations Fundamentals

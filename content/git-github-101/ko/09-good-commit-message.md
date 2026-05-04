@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: '좋은 commit message 쓰기: Conventional Commits와 좋은 본문'
+seo_description: 좋은 commit message는 "이 변경을 6개월 뒤의 자신과 동료가 다시 읽었을 때 무엇을 왜 바꿨는지 한 번에
+  알게 해 주는…
 ---
 
 # 좋은 commit message 쓰기: Conventional Commits와 좋은 본문

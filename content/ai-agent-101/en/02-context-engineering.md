@@ -16,6 +16,8 @@ tags:
 - Prompt Engineering
 - System Prompt
 last_reviewed: '2026-05-02'
+seo_description: Agent behavior is determined by context. System prompts, conversation
+  history, tool descriptions, and current state information all constitute…
 ---
 
 # Context Engineering

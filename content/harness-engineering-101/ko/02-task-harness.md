@@ -15,6 +15,8 @@ tags:
 - Reliability
 - Production
 last_reviewed: '2026-05-03'
+seo_description: Agent에게 모호한 지시를 던지면 모호한 결과가 돌아옵니다. Task Harness는 모호한 일을 명확한 입력, 출력,
+  완료 조건이 있는…
 ---
 
 # Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기

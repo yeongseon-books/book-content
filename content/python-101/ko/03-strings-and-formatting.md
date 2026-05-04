@@ -1,5 +1,5 @@
 ---
-title: "문자열과 포매팅"
+title: 문자열과 포매팅
 series: python-101
 episode: 3
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - strings
-  - f-string
-  - format-spec
-  - unicode
-  - string-methods
-  - bytes-and-str
+- strings
+- f-string
+- format-spec
+- unicode
+- string-methods
+- bytes-and-str
 last_reviewed: '2026-05-03'
+seo_description: Python 3에서 str은 "Unicode 코드포인트의 불변 시퀀스"이고 bytes는 "바이트의 불변 시퀀스"라는
+  두 층을 분리해 두면…
 ---
 
 # 문자열과 포매팅

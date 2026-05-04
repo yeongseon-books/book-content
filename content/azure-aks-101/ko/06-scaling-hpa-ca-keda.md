@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: AKS에서 스케일링이 헷갈리는 이유는 “늘린다”는 말이 두 가지를 동시에 가리키기 때문입니다.
 ---
 
 # 스케일링 — HPA, Cluster Autoscaler, KEDA

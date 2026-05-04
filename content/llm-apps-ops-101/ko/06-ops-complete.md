@@ -1,5 +1,5 @@
 ---
-title: 'LLM 앱 운영 완성'
+title: LLM 앱 운영 완성
 series: llm-apps-ops-101
 episode: 6
 language: ko
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 운영 완성의 핵심은 기능을 많이 넣는 것이 아니라, 한 요청이 남기는 로그·비용·품질 신호가 서로 연결되도록 만드는
+  것입니다.
 ---
 
 # LLM 앱 운영 완성

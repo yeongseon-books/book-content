@@ -1,5 +1,5 @@
 ---
-title: 'Document text extraction with CLOVA OCR API'
+title: Document text extraction with CLOVA OCR API
 series: korean-ai-stack-101
 episode: 4
 language: en
@@ -17,6 +17,7 @@ tags:
 - DocumentAI
 - Python
 last_reviewed: '2026-05-01'
+seo_description: The OCR pipeline has four stages.
 ---
 
 # Document text extraction with CLOVA OCR API

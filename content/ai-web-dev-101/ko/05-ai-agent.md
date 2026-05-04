@@ -16,6 +16,8 @@ tags:
 - Python
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 지금까지 만든 AI는 텍스트만 주고받았습니다. 질문을 던지면 학습한 데이터를 바탕으로 그럴싸한 답변을 내놓는 식이었죠.
+  그런데 만약 AI가…
 ---
 
 # AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기

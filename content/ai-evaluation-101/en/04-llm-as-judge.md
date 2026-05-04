@@ -15,6 +15,8 @@ tags:
 - Bias
 - Cohen Kappa
 last_reviewed: '2026-05-03'
+seo_description: When humans cannot grade every response, you can delegate scoring
+  to a strong LLM.
 ---
 
 # LLM-as-Judge — Evaluating Models with Models

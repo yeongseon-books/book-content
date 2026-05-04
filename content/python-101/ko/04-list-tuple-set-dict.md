@@ -1,5 +1,5 @@
 ---
-title: "list, tuple, set, dict"
+title: list, tuple, set, dict
 series: python-101
 episode: 4
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - list-and-tuple
-  - dict
-  - set
-  - mutability
-  - comprehensions
-  - hashable
+- list-and-tuple
+- dict
+- set
+- mutability
+- comprehensions
+- hashable
 last_reviewed: '2026-05-03'
+seo_description: 네 자료구조는 "가변성, 순서, 중복 허용, 해시 가능성"이라는 네 축의 조합으로 구분되며, 자료구조를 고른다는 것은
+  이 네 축에서 어떤…
 ---
 
 # list, tuple, set, dict

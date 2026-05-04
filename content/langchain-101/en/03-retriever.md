@@ -1,5 +1,5 @@
 ---
-title: 'Retriever — document search and context injection'
+title: Retriever — document search and context injection
 series: langchain-101
 episode: 3
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: A Retriever does not store knowledge by itself; it turns a question
+  into the subset of documents worth showing the model.
 ---
 
 # Retriever — document search and context injection

@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 컨테이너를 몇 개 띄우는 일은 이제 어렵지 않습니다. 어려운 쪽은 그 다음입니다.
 ---
 
 # Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes

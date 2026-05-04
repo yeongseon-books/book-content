@@ -1,5 +1,5 @@
 ---
-title: 'Dataset Preparation and Preprocessing'
+title: Dataset Preparation and Preprocessing
 series: llm-finetuning-101
 episode: 2
 language: en
@@ -17,6 +17,7 @@ tags:
 - HuggingFace
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 'Treat the dataset as three layers:'
 ---
 
 # Dataset Preparation and Preprocessing

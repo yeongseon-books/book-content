@@ -1,5 +1,5 @@
 ---
-title: "Git이란 무엇인가? 버전 관리의 시작"
+title: Git이란 무엇인가? 버전 관리의 시작
 series: git-github-101
 episode: 1
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - git-basics
-  - version-control
-  - distributed-vcs
-  - snapshot-model
-  - git-install
-  - git-config
+- git-basics
+- version-control
+- distributed-vcs
+- snapshot-model
+- git-install
+- git-config
 last_reviewed: '2026-05-03'
+seo_description: Git의 핵심 모델은 "파일들의 스냅샷을 시간 순서대로 보관하는 도구"이고, 그 스냅샷은 working directory,
+  staging…
 ---
 
 # Git이란 무엇인가? 버전 관리의 시작

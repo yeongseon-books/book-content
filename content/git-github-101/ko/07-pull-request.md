@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Pull Request로 협업하기 - branch에서 review를 거쳐 main까지
+seo_description: Pull Request는 단순한 merge가 아니라 "내 branch의 변경을 main에 합치자고 동료에게 제안하고,
+  그 제안을 두고 검토와…
 ---
 
 # Pull Request로 협업하기 - branch에서 review를 거쳐 main까지

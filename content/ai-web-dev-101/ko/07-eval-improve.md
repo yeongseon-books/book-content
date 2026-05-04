@@ -16,6 +16,7 @@ tags:
 - Python
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: AI 앱은 배포하면 끝이 아닙니다. '이 답변이 정말 좋은 건가?'를 측정하고, 더 좋게 만드는 과정이 진짜 실력입니다.
 ---
 
 # AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법

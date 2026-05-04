@@ -17,6 +17,7 @@ tags:
 - Vision Language
 - Modality Fusion
 last_reviewed: '2026-05-03'
+seo_description: ChatGPT가 등장한 2022년 말 이후, "LLM 하나면 거의 모든 문제가 풀린다"는 인식이 잠깐 자리잡았습니다.
 ---
 
 # Multimodal AI가 중요한 이유

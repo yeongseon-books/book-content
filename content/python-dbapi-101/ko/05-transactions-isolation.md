@@ -1,5 +1,5 @@
 ---
-title: 'Transaction과 isolation level (sqlite3, PEP 249)'
+title: Transaction과 isolation level (sqlite3, PEP 249)
 series: python-dbapi-101
 episode: 5
 language: ko
@@ -18,6 +18,9 @@ tags:
 - WAL
 - PEP 249
 last_reviewed: '2026-05-03'
+seo_title: Transaction과 isolation level
+seo_description: sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이 동작을 모르면 위 두 사고가
+  동시에 발생하기…
 ---
 
 # Transaction과 isolation level (sqlite3, PEP 249)

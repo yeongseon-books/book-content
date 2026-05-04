@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
+seo_description: '!정규화 전후 점수 해석 차이 정규화를 켜지 않으면 코사인 유사도와 내적이 달라집니다.'
 ---
 
 # 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기

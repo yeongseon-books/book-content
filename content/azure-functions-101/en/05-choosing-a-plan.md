@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: The deployment chapter created the app on Flex Consumption because
+  that is the current default candidate for new serverless work.
 ---
 
 # Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated

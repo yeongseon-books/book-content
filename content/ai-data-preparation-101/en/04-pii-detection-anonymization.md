@@ -15,6 +15,8 @@ tags:
 - Anonymization
 - Privacy
 last_reviewed: '2026-05-03'
+seo_description: LLMs leaking email addresses or phone numbers that came from training
+  data is no longer hypothetical. Carlini et al.
 ---
 
 # PII Detection and Anonymization for Training Data

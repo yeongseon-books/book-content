@@ -1,5 +1,5 @@
 ---
-title: "online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기"
+title: 'online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기'
 series: alembic-101
 episode: 7
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - online
-  - offline
-  - batch
-  - SQLite
+- Python
+- Alembic
+- online
+- offline
+- batch
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: alembic은 두 가지 모드로 실행됩니다. online은 DB에 직접 연결해 SQL을 실행하고, offline은 DB
+  없이 SQL 텍스트만…
 ---
 
 # online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기

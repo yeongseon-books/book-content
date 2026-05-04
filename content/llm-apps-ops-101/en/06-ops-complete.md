@@ -1,5 +1,5 @@
 ---
-title: 'Completing the LLM ops pipeline'
+title: Completing the LLM ops pipeline
 series: llm-apps-ops-101
 episode: 6
 language: en
@@ -15,6 +15,9 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Operational maturity is not about stacking features. It is about
+  making one request produce connected signals for validation, cost, quality, and
+  logs.
 ---
 
 # Completing the LLM ops pipeline

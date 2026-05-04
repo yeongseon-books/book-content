@@ -1,5 +1,5 @@
 ---
-title: "함수와 인자: def, args, kwargs, default, lambda"
+title: '함수와 인자: def, args, kwargs, default, lambda'
 series: python-101
 episode: 6
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - function-definition
-  - default-arguments
-  - args-kwargs
-  - keyword-only
-  - lambda
-  - type-hints
+- function-definition
+- default-arguments
+- args-kwargs
+- keyword-only
+- lambda
+- type-hints
 last_reviewed: '2026-05-03'
+seo_description: 함수 시그니처는 "호출자가 무엇을 줘야 하고, 함수가 무엇을 돌려주는가"의 계약이며, 다섯 인자 형태와 /·* 구분자는
+  그 계약의 강도를…
 ---
 
 # 함수와 인자: def, args, kwargs, default, lambda

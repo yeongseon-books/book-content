@@ -1,5 +1,5 @@
 ---
-title: '문서 어시스턴트 — 요약, 추출, 분류'
+title: 문서 어시스턴트 — 요약, 추출, 분류
 series: ai-app-patterns-101
 episode: 3
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 문서 어시스턴트는 대화를 이어가는 시스템이 아니라, 긴 입력을 잘게 나눠 목적에 맞는 짧은 출력으로 바꾸는 변환기입니다.
 ---
 
 # 문서 어시스턴트 — 요약, 추출, 분류

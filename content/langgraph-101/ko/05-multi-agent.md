@@ -1,5 +1,5 @@
 ---
-title: '멀티 에이전트 시스템'
+title: 멀티 에이전트 시스템
 series: langgraph-101
 episode: 5
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 멀티 에이전트 그래프는 여러 LLM을 늘어놓는 구조가 아니라 누가 어떤 작업을 맡는지 상태와 엣지로 명시하는 구조입니다.
 ---
 
 # 멀티 에이전트 시스템

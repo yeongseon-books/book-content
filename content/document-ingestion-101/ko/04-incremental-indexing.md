@@ -1,5 +1,5 @@
 ---
-title: '증분 인덱싱 — 변경된 문서만 업데이트'
+title: 증분 인덱싱 — 변경된 문서만 업데이트
 series: document-ingestion-101
 episode: 4
 language: ko
@@ -15,6 +15,7 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 증분 인덱싱은 벡터 DB 기술이라기보다 파일 상태를 기억하는 운영 자동화 문제입니다.
 ---
 
 # 증분 인덱싱 — 변경된 문서만 업데이트

@@ -1,5 +1,5 @@
 ---
-title: "Standard library tour: datetime, pathlib, json, collections, itertools"
+title: 'Standard library tour: datetime, pathlib, json, collections, itertools'
 series: python-101
 episode: 10
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - standard-library
-  - datetime-module
-  - pathlib-module
-  - json-module
-  - collections-module
-  - itertools-module
+- standard-library
+- datetime-module
+- pathlib-module
+- json-module
+- collections-module
+- itertools-module
 last_reviewed: '2026-05-03'
+seo_description: The standard library is a toolbox of routines so you do not write
+  the same thing twice.
 ---
 
 # Standard library tour: datetime, pathlib, json, collections, itertools

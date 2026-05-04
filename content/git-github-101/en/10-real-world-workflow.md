@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: 'Building a real-world Git workflow: from issue to release in one cycle'
+seo_description: 'A realistic workflow is one repeating cycle: an issue defines the
+  work, a branch carries the change, a Pull Request invites review, a merge brings…'
 ---
 
 # Building a real-world Git workflow: from issue to release in one cycle

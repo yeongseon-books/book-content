@@ -1,5 +1,5 @@
 ---
-title: "Async SQLAlchemy with aiosqlite and AsyncSession"
+title: Async SQLAlchemy with aiosqlite and AsyncSession
 series: sqlalchemy-101
 episode: 9
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - SQLAlchemy
-  - async
-  - aiosqlite
-  - AsyncSession
-  - SQLite
+- Python
+- SQLAlchemy
+- async
+- aiosqlite
+- AsyncSession
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: Async SQLAlchemy is a thin awaitable wrapper around the existing
+  ORM. Internally it does not run the sync ORM on a thread pool; it uses a…
 ---
 
 # Async SQLAlchemy with aiosqlite and AsyncSession

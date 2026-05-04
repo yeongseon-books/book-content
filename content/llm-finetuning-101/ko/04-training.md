@@ -1,5 +1,5 @@
 ---
-title: '학습 루프와 하이퍼파라미터'
+title: 학습 루프와 하이퍼파라미터
 series: llm-finetuning-101
 episode: 4
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Optimizer
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 ---
 
 # 학습 루프와 하이퍼파라미터

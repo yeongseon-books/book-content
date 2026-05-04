@@ -1,5 +1,5 @@
 ---
-title: 'HyperCLOVA X와 Solar API 사용하기'
+title: HyperCLOVA X와 Solar API 사용하기
 series: korean-ai-stack-101
 episode: 5
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Naver
 - Upstage
 last_reviewed: '2026-05-01'
+seo_description: 생성 API 호출은 4겹 계약으로 분해됩니다.
 ---
 
 # HyperCLOVA X와 Solar API 사용하기

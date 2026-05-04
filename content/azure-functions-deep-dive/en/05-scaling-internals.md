@@ -16,6 +16,8 @@ tags:
 - Distributed Systems
 - gRPC
 last_reviewed: '2026-04-29'
+seo_description: All code citations in this post are based on Azure/azure-functions-host
+  @ 5e59423.
 ---
 
 # Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans

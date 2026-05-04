@@ -1,5 +1,5 @@
 ---
-title: 'Retriever — 문서 검색과 컨텍스트 주입'
+title: Retriever — 문서 검색과 컨텍스트 주입
 series: langchain-101
 episode: 3
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Retriever는 문서를 저장하는 컴포넌트가 아니라 질문을 검색 가능한 컨텍스트로 바꾸는 진입점입니다.
 ---
 
 # Retriever — 문서 검색과 컨텍스트 주입

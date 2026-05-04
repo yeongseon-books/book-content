@@ -1,5 +1,5 @@
 ---
-title: '한국어 RAG 파이프라인 조합하기'
+title: 한국어 RAG 파이프라인 조합하기
 series: korean-ai-stack-101
 episode: 6
 language: ko
@@ -17,6 +17,7 @@ tags:
 - LLM
 - Python
 last_reviewed: '2026-05-03'
+seo_description: '!핵심 흐름'
 ---
 
 # 한국어 RAG 파이프라인 조합하기

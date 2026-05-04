@@ -15,6 +15,7 @@ tags:
 - Multi-Dimensional
 - JSON Output
 last_reviewed: '2026-05-03'
+seo_description: 단순 1-5 점수보다 '정확성', '안전성', '문체' 같은 차원별 rubric이 훨씬 유용합니다.
 ---
 
 # Rubric 기반 채점 설계

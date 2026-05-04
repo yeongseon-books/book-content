@@ -1,5 +1,5 @@
 ---
-title: 'Streaming — 실시간 출력 처리'
+title: Streaming — 실시간 출력 처리
 series: langchain-101
 episode: 5
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Streaming은 응답이 끝난 뒤 받는 방식이 아니라 생성 중간 상태를 그대로 소비하는 실행 모드입니다.
 ---
 
 # Streaming — 실시간 출력 처리

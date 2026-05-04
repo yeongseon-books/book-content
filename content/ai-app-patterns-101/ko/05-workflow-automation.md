@@ -1,5 +1,5 @@
 ---
-title: '워크플로 자동화 — 다단계 체인 설계'
+title: 워크플로 자동화 — 다단계 체인 설계
 series: ai-app-patterns-101
 episode: 5
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 워크플로 자동화는 모델에게 선택권을 주는 대신, 사람이 정한 단계와 데이터 계약을 따라가게 만드는 파이프라인입니다.
 ---
 
 # 워크플로 자동화 — 다단계 체인 설계

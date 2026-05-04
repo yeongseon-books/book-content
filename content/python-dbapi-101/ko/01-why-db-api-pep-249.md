@@ -18,6 +18,8 @@ tags:
 - Database Driver
 - Standardization
 last_reviewed: '2026-05-03'
+seo_description: Python으로 데이터베이스를 다룬 적이 있다면 sqlite3, psycopg, pymysql, oracledb 같은
+  패키지를 한 번쯤…
 ---
 
 # 왜 DB-API 2.0인가 - PEP 249가 푼 문제

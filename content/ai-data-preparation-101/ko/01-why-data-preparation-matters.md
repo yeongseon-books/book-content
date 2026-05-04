@@ -15,6 +15,8 @@ tags:
 - Data Quality
 - Pipelines
 last_reviewed: '2026-05-03'
+seo_description: ML 입문자가 가장 많이 던지는 질문입니다. Kaggle에서 데이터셋을 받고, pandas.read_csv()로 읽고,
+  모델에 넣으면 끝나는…
 ---
 
 # 데이터 준비가 모델 품질을 결정하는 이유

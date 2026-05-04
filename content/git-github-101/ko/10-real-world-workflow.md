@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: '실전 Git workflow 만들기: issue부터 release까지 한 흐름으로'
+seo_description: 실무 흐름은 "issue로 작업을 정의하고, branch에서 변경을 만들고, PR로 검토를 받고, merge로 공유
+  상태에 반영한 뒤…
 ---
 
 # 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로

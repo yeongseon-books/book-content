@@ -15,6 +15,8 @@ tags:
 - Faithfulness
 - Retrieval
 last_reviewed: '2026-05-03'
+seo_description: RAG requires evaluating both retrieval and generation stages. This
+  post covers RAG-specific metrics like retrieval recall, context precision…
 ---
 
 # Evaluating RAG Systems

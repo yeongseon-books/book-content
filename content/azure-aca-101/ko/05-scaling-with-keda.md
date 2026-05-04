@@ -17,6 +17,7 @@ tags:
 - Scale-to-Zero
 - Serverless
 last_reviewed: '2026-04-29'
+seo_description: 스케일링은 세 단계의 선언적 흐름으로 보면 단순해집니다.
 ---
 
 # 스케일링 — KEDA scaler와 0-to-N

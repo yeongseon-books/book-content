@@ -15,6 +15,8 @@ tags:
 - Feedback
 - Reflection
 last_reviewed: '2026-05-03'
+seo_description: Agents rarely succeed on the first try. A Feedback Loop is the structure
+  that hands failure back to the agent so it can fix its own work.
 ---
 
 # Feedback Loops — Building Structures That Let Agents Recover from Failure

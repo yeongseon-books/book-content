@@ -1,5 +1,5 @@
 ---
-title: '메타데이터 설계와 필터링'
+title: 메타데이터 설계와 필터링
 series: document-ingestion-101
 episode: 3
 language: ko
@@ -15,6 +15,7 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 메타데이터는 본문을 설명하는 부가 정보라기보다 검색 후보군을 줄이는 첫 번째 인덱스입니다.
 ---
 
 # 메타데이터 설계와 필터링

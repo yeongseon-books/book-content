@@ -1,5 +1,5 @@
 ---
-title: 'Agent and tool pattern — autonomous tool selection'
+title: Agent and tool pattern — autonomous tool selection
 series: ai-app-patterns-101
 episode: 4
 language: en
@@ -15,6 +15,8 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: An agent is a controller that lets the model choose tool-call paths
+  at runtime instead of hardcoding every step ahead of time.
 ---
 
 # Agent and tool pattern — autonomous tool selection

@@ -17,6 +17,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 데이터 증강 기법 — EDA부터 Back-Translation까지
+seo_description: 지난 편의 synthetic data generation은 LLM을 호출해 새 sample을 "처음부터" 만들었습니다.
 ---
 
 # 데이터 증강 기법 — EDA부터 Back-Translation까지

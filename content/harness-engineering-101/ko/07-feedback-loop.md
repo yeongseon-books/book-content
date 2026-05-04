@@ -15,6 +15,8 @@ tags:
 - Feedback
 - Reflection
 last_reviewed: '2026-05-03'
+seo_description: Agent는 한 번에 성공하지 못합니다. Feedback Loop는 실패한 결과를 다시 Agent에게 돌려주어 스스로
+  고치게 만드는 반복…
 ---
 
 # Feedback Loop — 실패를 고치게 만드는 반복 구조

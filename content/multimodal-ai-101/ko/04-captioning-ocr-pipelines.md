@@ -1,5 +1,5 @@
 ---
-title: "Image Captioning과 OCR 파이프라인"
+title: Image Captioning과 OCR 파이프라인
 series: multimodal-ai-101
 episode: 4
 language: ko
@@ -17,6 +17,7 @@ tags:
 - PaddleOCR
 - Document AI
 last_reviewed: '2026-05-03'
+seo_description: production multimodal 시스템에서 가장 자주 나오는 질문 두 가지가 있습니다.
 ---
 
 # Image Captioning과 OCR 파이프라인

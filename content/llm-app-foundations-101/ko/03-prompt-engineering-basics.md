@@ -15,6 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
+seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # 프롬프트 엔지니어링 기초 — System·User·Assistant 역할

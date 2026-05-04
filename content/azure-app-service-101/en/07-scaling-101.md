@@ -15,6 +15,8 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: '"Traffic increased and the app is slow." "Want to reduce costs but
+  maintain performance."'
 ---
 
 # Scaling 101: When to Scale Up vs Scale Out?

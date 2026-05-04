@@ -18,6 +18,7 @@ tags:
 - Blue-Green
 - Canary
 last_reviewed: '2026-05-03'
+seo_description: Environment는 "건물", Container App은 "사무실", Revision은 "그날의 자리 배치"입니다.
 ---
 
 # Environment·Container App·Revision — 세 단어로 보는 ACA

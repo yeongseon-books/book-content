@@ -15,6 +15,8 @@ tags:
 - Python
 - Hands-on
 last_reviewed: '2026-05-02'
+seo_description: 이제 배운 내용을 종합해서 실제 Agent를 만들어 봅니다. 이번 글에서는 간단하면서도 실용적인 Agent를 처음부터
+  끝까지 구현합니다.
 ---
 
 # 첫 Agent 만들기

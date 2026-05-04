@@ -18,6 +18,8 @@ tags:
 - Blue-Green
 - Traffic Split
 last_reviewed: '2026-05-03'
+seo_description: Ingress is ACA's "front door"; traffic weight is the "elevator dispatch
+  ratio."
 ---
 
 # Ingress and traffic splitting — revision-based deployment strategies

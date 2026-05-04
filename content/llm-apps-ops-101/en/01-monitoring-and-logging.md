@@ -1,5 +1,5 @@
 ---
-title: 'Monitoring and logging for LLM apps'
+title: Monitoring and logging for LLM apps
 series: llm-apps-ops-101
 episode: 1
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Treat one log line as the operating contract for one LLM call, and
+  cost, latency, and debugging questions stop fragmenting across separate systems.
 ---
 
 # Monitoring and logging for LLM apps

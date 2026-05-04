@@ -1,5 +1,5 @@
 ---
-title: "ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기"
+title: 'ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기'
 series: sqlalchemy-101
 episode: 6
 language: ko
@@ -18,6 +18,7 @@ tags:
 - back_populates
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객체 레벨의 탐색 통로입니다.
 ---
 
 # ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기

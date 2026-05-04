@@ -1,5 +1,5 @@
 ---
-title: 'Multi-agent systems'
+title: Multi-agent systems
 series: langgraph-101
 episode: 5
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: A multi-agent graph is not just “more LLM calls.” It is a delegation
+  structure where roles, handoffs, and state boundaries stay explicit.
 ---
 
 # Multi-agent systems

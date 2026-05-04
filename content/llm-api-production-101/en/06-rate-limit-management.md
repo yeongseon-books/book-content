@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Rate limit management — patterns for staying within limits
+seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # Rate limit management — patterns for staying within limits

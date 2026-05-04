@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Chunking strategies — how to split long documents
+seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 ---
 
 # Chunking strategies — how to split long documents

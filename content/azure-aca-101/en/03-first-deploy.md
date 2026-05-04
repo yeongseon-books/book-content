@@ -18,6 +18,8 @@ tags:
 - Dockerfile
 - az containerapp
 last_reviewed: '2026-05-03'
+seo_description: A first deploy on ACA is like calling a taxi — you need an origin
+  before the taxi can leave.
 ---
 
 # Your first deploy — Python/FastAPI

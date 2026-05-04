@@ -15,6 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-04-29'
+seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
 ---
 
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지

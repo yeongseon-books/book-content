@@ -15,6 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-04-29'
+seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
 ---
 
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가

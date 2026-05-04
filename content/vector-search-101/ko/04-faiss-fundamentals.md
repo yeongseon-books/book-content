@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: FAISS 입문 — 고속 근사 최근접 이웃 검색
+seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 ---
 
 # FAISS 입문 — 고속 근사 최근접 이웃 검색

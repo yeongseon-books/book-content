@@ -15,6 +15,7 @@ tags:
 - Compliance
 - GDPR
 last_reviewed: '2026-05-03'
+seo_description: LLM 시스템에서 audit log는 단순 디버깅이 아니라 컴플라이언스, 사고 조사, 모델 개선의 기준 자료입니다.
 ---
 
 # 감사 로깅과 컴플라이언스

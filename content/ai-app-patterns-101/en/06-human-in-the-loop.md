@@ -1,5 +1,5 @@
 ---
-title: 'Human-in-the-loop — designing for human intervention'
+title: Human-in-the-loop — designing for human intervention
 series: ai-app-patterns-101
 episode: 6
 language: en
@@ -15,6 +15,8 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Human-in-the-loop does not abandon automation; it inserts human judgment
+  only at the points where automation is risky.
 ---
 
 # Human-in-the-loop — designing for human intervention

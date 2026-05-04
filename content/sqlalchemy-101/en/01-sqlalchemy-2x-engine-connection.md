@@ -18,6 +18,8 @@ tags:
 - SQLite
 - DBAPI
 last_reviewed: '2026-05-03'
+seo_description: The Engine in SQLAlchemy is "the ability to talk to a database, made
+  into an object." A Connection is the actual communication channel; an Engine is…
 ---
 
 # Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified

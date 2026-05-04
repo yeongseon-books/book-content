@@ -15,6 +15,8 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: '"Why is my app returning a 502 error?" "Response times suddenly
+  increased—what''s the cause?"'
 ---
 
 # Request Lifecycle: How Requests Reach Your App

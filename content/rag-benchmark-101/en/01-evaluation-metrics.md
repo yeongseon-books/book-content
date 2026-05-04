@@ -1,5 +1,5 @@
 ---
-title: 'Understanding RAG evaluation metrics'
+title: Understanding RAG evaluation metrics
 series: rag-benchmark-101
 episode: 1
 language: en
@@ -17,6 +17,7 @@ tags:
 - Recall
 - MRR
 last_reviewed: '2026-05-01'
+seo_description: 'Retrieval metrics compare two sets:'
 ---
 
 # Understanding RAG evaluation metrics

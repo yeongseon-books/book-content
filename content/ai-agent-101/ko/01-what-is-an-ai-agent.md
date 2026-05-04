@@ -18,6 +18,7 @@ tags:
 - ReAct
 - Automation
 last_reviewed: '2026-05-03'
+seo_description: Chatbot은 "질문에 답하는 사전"이라면, Agent는 "할 일을 받고 알아서 끝내고 오는 인턴"입니다.
 ---
 
 # AI Agent란 무엇인가?

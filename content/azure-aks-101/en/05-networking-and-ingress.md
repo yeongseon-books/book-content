@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: Azure Kubernetes Service 101 series (5/7)
 ---
 
 # Networking and Ingress — the path in and out of the cluster

@@ -1,5 +1,5 @@
 ---
-title: 'LLM 비용 추적과 최적화'
+title: LLM 비용 추적과 최적화
 series: llm-apps-ops-101
 episode: 2
 language: ko
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 비용 추적은 회계가 아니라 피드백 루프입니다. 호출 한 건이 얼마였는지 알아야 캐시, 프롬프트 압축, 모델 라우팅이
+  의미를 가집니다.
 ---
 
 # LLM 비용 추적과 최적화

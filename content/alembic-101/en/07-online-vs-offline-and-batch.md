@@ -1,5 +1,5 @@
 ---
-title: "Online and offline modes: previewing DDL with --sql and handling SQLite batch"
+title: 'Online and offline modes: previewing DDL with --sql and handling SQLite batch'
 series: alembic-101
 episode: 7
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - online
-  - offline
-  - batch
-  - SQLite
+- Python
+- Alembic
+- online
+- offline
+- batch
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: Alembic runs in two modes. Online connects to the database and runs
+  SQL directly.
 ---
 
 # Online and offline modes: previewing DDL with --sql and handling SQLite batch

@@ -17,6 +17,7 @@ tags:
 - Observability
 - Monitoring
 last_reviewed: '2026-04-29'
+seo_description: 'ACA observability splits into three independent layers:'
 ---
 
 # Monitoring and ops — Log Analytics and Application Insights

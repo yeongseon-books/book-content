@@ -1,5 +1,5 @@
 ---
-title: 'LangGraph 소개와 그래프 기초'
+title: LangGraph 소개와 그래프 기초
 series: langgraph-101
 episode: 1
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: StateGraph는 노드 함수들을 상태 전이 규칙으로 엮어 실행 가능한 워크플로로 바꾸는 설계도입니다.
 ---
 
 # LangGraph 소개와 그래프 기초

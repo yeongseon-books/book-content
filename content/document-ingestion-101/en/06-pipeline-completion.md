@@ -1,5 +1,5 @@
 ---
-title: 'Completing the document ingestion pipeline'
+title: Completing the document ingestion pipeline
 series: document-ingestion-101
 episode: 6
 language: en
@@ -15,6 +15,8 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: A complete ingestion pipeline is not defined by how many stages exist
+  but by whether each stage hands off cleanly to the next.
 ---
 
 # Completing the document ingestion pipeline

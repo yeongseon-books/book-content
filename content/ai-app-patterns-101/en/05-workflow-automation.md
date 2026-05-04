@@ -1,5 +1,5 @@
 ---
-title: 'Workflow automation — designing multi-step chains'
+title: Workflow automation — designing multi-step chains
 series: ai-app-patterns-101
 episode: 5
 language: en
@@ -15,6 +15,8 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Workflow automation removes model choice and replaces it with a pipeline
+  that follows human-defined stages and data contracts.
 ---
 
 # Workflow automation — designing multi-step chains

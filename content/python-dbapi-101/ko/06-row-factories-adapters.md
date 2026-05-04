@@ -1,5 +1,5 @@
 ---
-title: 'Row factory와 type adapter (sqlite3, PEP 249)'
+title: Row factory와 type adapter (sqlite3, PEP 249)
 series: python-dbapi-101
 episode: 6
 language: ko
@@ -18,6 +18,9 @@ tags:
 - Pydantic
 - PEP 249
 last_reviewed: '2026-05-03'
+seo_title: Row factory와 type adapter
+seo_description: '[col1, col2, col3] row_factory │ ─────────────► {''id'': 1, ''name'':
+  ''Alice''} ▼…'
 ---
 
 # Row factory와 type adapter (sqlite3, PEP 249)

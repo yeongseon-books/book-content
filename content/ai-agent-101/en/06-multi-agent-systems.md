@@ -16,6 +16,8 @@ tags:
 - Coordination
 - Delegation
 last_reviewed: '2026-05-02'
+seo_description: Sometimes it's difficult to handle all tasks with a single agent.
+  This happens when tasks span multiple domains, require different expertise at each…
 ---
 
 # Multi-Agent Systems

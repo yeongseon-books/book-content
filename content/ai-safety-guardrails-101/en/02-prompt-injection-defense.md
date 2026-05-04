@@ -15,6 +15,7 @@ tags:
 - Guardrails
 - Red Team
 last_reviewed: '2026-05-03'
+seo_description: AI Safety & Guardrails 101 Series (2/10)
 ---
 
 # Prompt Injection Defense

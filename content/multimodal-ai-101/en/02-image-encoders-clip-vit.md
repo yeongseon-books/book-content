@@ -1,5 +1,5 @@
 ---
-title: "Image Encoders: CLIP and ViT"
+title: 'Image Encoders: CLIP and ViT'
 series: multimodal-ai-101
 episode: 2
 language: en
@@ -17,6 +17,8 @@ tags:
 - OpenAI
 - Vision Transformer
 last_reviewed: '2026-05-03'
+seo_description: The quality of any multimodal system ultimately rides on the quality
+  of the representation produced by the image encoder.
 ---
 
 # Image Encoders: CLIP and ViT

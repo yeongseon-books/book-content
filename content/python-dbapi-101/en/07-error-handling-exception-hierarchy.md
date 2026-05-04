@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: PEP 249 Exception Hierarchy and SQLite Error Handling
+seo_description: An exception class is a signal about how to react in production.
+  Retry, 4xx, or fail-loud should be encoded by the class itself.
 ---
 
 # PEP 249 Exception Hierarchy and SQLite Error Handling

@@ -1,5 +1,5 @@
 ---
-title: "파일 I/O와 예외 처리"
+title: 파일 I/O와 예외 처리
 series: python-101
 episode: 8
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - file-io
-  - context-manager
-  - text-vs-binary
-  - exception-handling
-  - try-except-finally
-  - pathlib
+- file-io
+- context-manager
+- text-vs-binary
+- exception-handling
+- try-except-finally
+- pathlib
 last_reviewed: '2026-05-03'
+seo_description: 파일은 "열고 → 쓰고/읽고 → 닫는다"는 세 단계의 자원이고, 예외는 "이 단계 중 어디에서 어떤 종류의 실패가 났는지"를
+  분류하는…
 ---
 
 # 파일 I/O와 예외 처리

@@ -1,5 +1,5 @@
 ---
-title: 'RAG 평가 지표 이해'
+title: RAG 평가 지표 이해
 series: rag-benchmark-101
 episode: 1
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Recall
 - MRR
 last_reviewed: '2026-05-01'
+seo_description: retrieval 지표는 두 개의 집합을 비교하는 작업입니다.
 ---
 
 # RAG 평가 지표 이해

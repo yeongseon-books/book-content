@@ -15,6 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
+seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기

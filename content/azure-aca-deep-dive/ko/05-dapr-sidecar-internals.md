@@ -15,6 +15,7 @@ tags:
 - Dapr
 - Envoy
 last_reviewed: '2026-04-29'
+seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
 ---
 
 # Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스

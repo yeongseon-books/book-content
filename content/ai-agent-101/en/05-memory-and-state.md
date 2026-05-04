@@ -16,6 +16,8 @@ tags:
 - State Management
 - Context Window
 last_reviewed: '2026-05-02'
+seo_description: For agents to perform multi-step tasks, they must remember what they
+  did in previous steps. This is memory.
 ---
 
 # Memory and State

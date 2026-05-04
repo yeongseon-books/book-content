@@ -1,5 +1,5 @@
 ---
-title: 'RAG Q&A 패턴 — 문서 기반 질의응답'
+title: RAG Q&A 패턴 — 문서 기반 질의응답
 series: ai-app-patterns-101
 episode: 2
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: RAG는 모델이 답을 외우는 구조가 아니라, 검색된 문서를 프롬프트에 주입해 답하게 만드는 조립식 파이프라인입니다.
 ---
 
 # RAG Q&A 패턴 — 문서 기반 질의응답

@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: GitHub repository 만들기 - remote, push, pull 한 번에 익히기
+seo_description: GitHub 저장소는 "네트워크 너머에 있는 또 하나의 Git 저장소"이고, remote는 그 원격 저장소를 부르는
+  별명입니다.
 ---
 
 # GitHub repository 만들기 - remote, push, pull 한 번에 익히기

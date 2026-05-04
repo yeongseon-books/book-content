@@ -1,5 +1,5 @@
 ---
-title: "Image Captioning and OCR Pipelines"
+title: Image Captioning and OCR Pipelines
 series: multimodal-ai-101
 episode: 4
 language: en
@@ -17,6 +17,7 @@ tags:
 - PaddleOCR
 - Document AI
 last_reviewed: '2026-05-03'
+seo_description: 'Two requests show up constantly in production multimodal systems:'
 ---
 
 # Image Captioning and OCR Pipelines

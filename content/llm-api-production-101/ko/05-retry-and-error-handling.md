@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 재시도와 오류 처리 — 안정적인 API 호출 만들기
+seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # 재시도와 오류 처리 — 안정적인 API 호출 만들기

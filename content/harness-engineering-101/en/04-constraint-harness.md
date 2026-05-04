@@ -15,6 +15,8 @@ tags:
 - Security
 - Policy
 last_reviewed: '2026-05-03'
+seo_description: Give an agent freedom and you get creativity along with risk. The
+  Constraint Harness is the rule system that declares what actions are allowed and…
 ---
 
 # Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions

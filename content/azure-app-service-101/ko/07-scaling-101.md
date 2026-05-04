@@ -15,6 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: 마케팅 팀이 방금 연락했습니다. “오늘 저녁 8시에 플래시 세일 나갑니다. 평소보다 트래픽이 10배는 들어올 거예요.”
 ---
 
 # Scaling 101: 언제 Scale Up vs Scale Out?

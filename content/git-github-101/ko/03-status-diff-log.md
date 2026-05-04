@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: 변경 사항 확인하기 - status, diff, log로 읽기
+seo_description: status·diff·log 세 명령은 각각 "지금 어디에 있나", "무엇이 어떻게 다르나", "여기까지 어떻게 왔나"라는
+  세 질문에…
 ---
 
 # 변경 사항 확인하기 - status, diff, log로 읽기

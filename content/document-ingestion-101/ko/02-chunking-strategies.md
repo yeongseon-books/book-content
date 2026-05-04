@@ -1,5 +1,5 @@
 ---
-title: '청킹 전략 — 문서 유형별 최적화'
+title: 청킹 전략 — 문서 유형별 최적화
 series: document-ingestion-101
 episode: 2
 language: ko
@@ -15,6 +15,7 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 청킹은 텍스트를 잘게 자르는 작업이 아니라 검색이 버틸 수 있는 문맥 단위를 설계하는 작업입니다.
 ---
 
 # 청킹 전략 — 문서 유형별 최적화

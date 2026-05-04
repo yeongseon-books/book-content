@@ -17,6 +17,8 @@ targets:
   mkdocs: true
   tistory: true
 title: 학습/평가/테스트 분할과 Contamination 통제
+seo_description: train_test_split(data, test_size=0.2)로 끝낸 모델이 production에서 무너지는 패턴은
+  매년 반복됩니다.
 ---
 
 # 학습/평가/테스트 분할과 Contamination 통제

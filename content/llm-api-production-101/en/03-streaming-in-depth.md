@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Streaming in depth — chunk handling and error recovery
+seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # Streaming in depth — chunk handling and error recovery

@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: After finishing the tokenizer, you might feel like you're done. You
+  have numbers as input, so everything should be fine, right?
 ---
 
 # From Integers to Vectors and Positions

@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
+seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 ---
 
 # HuggingFace embeddings in practice — creating your first vectors with sentence-transformers

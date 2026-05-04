@@ -1,5 +1,5 @@
 ---
-title: "Your first revision: writing upgrade and downgrade by hand"
+title: 'Your first revision: writing upgrade and downgrade by hand'
 series: alembic-101
 episode: 3
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - revision
-  - upgrade
-  - downgrade
-  - SQLite
+- Python
+- Alembic
+- revision
+- upgrade
+- downgrade
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: 'A revision file is a pair of functions: upgrade(): N → N+1 and downgrade():
+  N+1 → N.'
 ---
 
 # Your first revision: writing upgrade and downgrade by hand

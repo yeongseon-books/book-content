@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 스트리밍 심화 — 청크 처리와 오류 복구
+seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # 스트리밍 심화 — 청크 처리와 오류 복구

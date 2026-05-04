@@ -15,6 +15,8 @@ tags:
 - Metrics
 - BLEU
 last_reviewed: '2026-05-03'
+seo_description: Deterministic metrics are fast and reproducible, but they penalize
+  different wording even when the meaning matches.
 ---
 
 # Deterministic Metrics — Exact Match, BLEU, ROUGE

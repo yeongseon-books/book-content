@@ -17,6 +17,7 @@ tags:
 - VideoMAE
 - Action Recognition
 last_reviewed: '2026-05-03'
+seo_description: 이미지는 단일 frame이지만, video는 시간 축이 추가된 frame sequence입니다.
 ---
 
 # Video 이해 - Frame Sampling에서 Video-LLaVA까지

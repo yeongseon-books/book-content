@@ -15,6 +15,7 @@ tags:
 - Testing
 - Eval
 last_reviewed: '2026-05-03'
+seo_description: Agent가 "끝났습니다"라고 말해도 정말 끝났는지는 테스트가 결정합니다.
 ---
 
 # Test Harness — 완료 조건을 테스트로 고정하기

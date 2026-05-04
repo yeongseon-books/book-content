@@ -17,6 +17,7 @@ tags:
 - pandera
 - MLOps
 last_reviewed: '2026-05-03'
+seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunking, quality…
 ---
 
 # 프로덕션 데이터 파이프라인 구축

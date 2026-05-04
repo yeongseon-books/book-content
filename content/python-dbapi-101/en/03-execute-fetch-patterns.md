@@ -18,6 +18,8 @@ tags:
 - fetchall
 - Streaming Iteration
 last_reviewed: '2026-05-03'
+seo_description: 'Every query in DB-API ultimately reduces to five cursor methods:
+  execute(), executemany(), and fetchone()/fetchall()/fetchmany().'
 ---
 
 # execute, executemany, and Fetch Patterns

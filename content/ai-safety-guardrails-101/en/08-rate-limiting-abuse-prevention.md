@@ -15,6 +15,7 @@ tags:
 - Abuse Prevention
 - Anomaly Detection
 last_reviewed: '2026-05-03'
+seo_description: AI Safety & Guardrails 101 Series (8/10)
 ---
 
 # Rate Limiting and Abuse Prevention

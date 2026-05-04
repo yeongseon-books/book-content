@@ -15,6 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 ---
 
 # Retriever 설계 — VectorStoreRetriever와 MMR

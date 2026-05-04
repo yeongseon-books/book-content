@@ -16,6 +16,8 @@ tags:
 - Python
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 로컬에서 만든 AI 챗봇을 친구에게 보여주려면 URL이 필요합니다. 이번 글에서 로컬 프로젝트를 인터넷에 올리는 과정을
+  함께 해봅시다.
 ---
 
 # AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기

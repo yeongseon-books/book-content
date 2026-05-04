@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 개념을 오래 붙들고 있으면 Kubernetes는 필요 이상으로 추상적으로 느껴집니다.
 ---
 
 # 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI

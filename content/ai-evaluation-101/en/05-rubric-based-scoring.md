@@ -15,6 +15,8 @@ tags:
 - Multi-Dimensional
 - JSON Output
 last_reviewed: '2026-05-03'
+seo_description: Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far
+  more useful than a single 1-5 score.
 ---
 
 # Designing Rubric-Based Scoring

@@ -1,5 +1,5 @@
 ---
-title: 'LLM 앱 모니터링과 로깅'
+title: LLM 앱 모니터링과 로깅
 series: llm-apps-ops-101
 episode: 1
 language: ko
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 로그 한 줄이 곧 호출 한 건의 운영 계약서라고 생각하면, 나중에 비용·장애·품질 문제를 같은 레코드에서 추적할 수
+  있습니다.
 ---
 
 # LLM 앱 모니터링과 로깅

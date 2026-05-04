@@ -1,5 +1,5 @@
 ---
-title: "Audio Processing and Whisper STT"
+title: Audio Processing and Whisper STT
 series: multimodal-ai-101
 episode: 6
 language: en
@@ -17,6 +17,8 @@ tags:
 - OpenAI
 - faster-whisper
 last_reviewed: '2026-05-03'
+seo_description: Before OpenAI Whisper landed in September 2022, production STT meant
+  Google Speech, AWS Transcribe, or Azure Speech.
 ---
 
 # Audio Processing and Whisper STT

@@ -16,6 +16,8 @@ tags:
 - Testing
 - Metrics
 last_reviewed: '2026-05-02'
+seo_description: What's harder than building an agent is evaluating "whether this
+  agent works properly." Simple LLMs only need response quality evaluation, but…
 ---
 
 # Agent Evaluation

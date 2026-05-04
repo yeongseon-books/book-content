@@ -1,5 +1,5 @@
 ---
-title: 'VectorDB selection criteria'
+title: VectorDB selection criteria
 series: rag-benchmark-101
 episode: 4
 language: en
@@ -17,6 +17,7 @@ tags:
 - Recall
 - ANN
 last_reviewed: '2026-05-01'
+seo_description: 'The skeleton of a VectorDB comparison:'
 ---
 
 # VectorDB selection criteria

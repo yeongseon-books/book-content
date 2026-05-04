@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 'The opening mental model established two key ideas: every function
+  is wired to exactly one trigger, and bindings are a declarative way to connect…'
 ---
 
 # Triggers and Bindings — Everything About Function I/O

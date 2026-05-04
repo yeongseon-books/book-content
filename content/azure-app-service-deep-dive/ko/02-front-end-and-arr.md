@@ -15,6 +15,8 @@ tags:
 - Distributed Systems
 - Platform Engineering
 last_reviewed: '2026-04-29'
+seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
+  않았습니다.
 ---
 
 # Front-End과 ARR — 요청은 어떻게 워커에 도달하는가

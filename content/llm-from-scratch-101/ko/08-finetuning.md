@@ -15,6 +15,7 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도 질문에 답하지는 못합니다.
 ---
 
 # 베이스 모델을 우리 작업에 맞추기

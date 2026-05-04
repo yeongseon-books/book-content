@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Branch basics - create, switch, and compare
+seo_description: A branch is not a folder copy; it is a movable pointer to a specific
+  commit.
 ---
 
 # Branch basics - create, switch, and compare

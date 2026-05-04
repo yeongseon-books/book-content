@@ -1,5 +1,5 @@
 ---
-title: '검색 성능 측정'
+title: 검색 성능 측정
 series: rag-benchmark-101
 episode: 2
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Latency
 - MRR
 last_reviewed: '2026-05-01'
+seo_description: 검색 벤치마크는 다음 네 가지 입력을 한 번에 묶어서 다룹니다.
 ---
 
 # 검색 성능 측정

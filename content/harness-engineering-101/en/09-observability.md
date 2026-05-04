@@ -15,6 +15,8 @@ tags:
 - Observability
 - Tracing
 last_reviewed: '2026-05-03'
+seo_description: If you cannot see what the agent did, you cannot debug it or improve
+  it.
 ---
 
 # Observability — Tracing and Replaying Agent Work

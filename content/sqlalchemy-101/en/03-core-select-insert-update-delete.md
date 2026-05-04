@@ -18,6 +18,8 @@ tags:
 - Result
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: In 2.x style, building SQL means stacking clauses through method
+  chaining.
 ---
 
 # SQLAlchemy Core - select, insert, update, delete in 2.x Style

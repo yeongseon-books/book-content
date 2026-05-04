@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 'The opening chapters set up the mental model. This chapter is about
+  execution: create a function locally, deploy it to Azure, and get back a real…'
 ---
 
 # Deploy a Function App — From Localhost to Azure

@@ -15,6 +15,8 @@ tags:
 - RAG
 - Grounding
 last_reviewed: '2026-05-03'
+seo_description: LLM이 "사실이 아닌 내용을 자신 있게 말하는" 현상을 hallucination이라고 부르지만, 운영에서 다루려면
+  더 좁은 정의가 필요합니다.
 ---
 
 # Hallucination Guardrail — Grounding 검증

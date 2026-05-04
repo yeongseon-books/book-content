@@ -15,6 +15,8 @@ tags:
 - Testing
 - Quality
 last_reviewed: '2026-05-03'
+seo_description: LLMs return different answers for the same input. Without evaluation,
+  you cannot tell that a feature working yesterday is broken today.
 ---
 
 # Why Evaluate LLM Applications

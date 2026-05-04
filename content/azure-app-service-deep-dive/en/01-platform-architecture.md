@@ -15,6 +15,8 @@ tags:
 - Distributed Systems
 - Platform Engineering
 last_reviewed: '2026-04-29'
+seo_description: Microsoft doesn't publicly document the full implementation details
+  of the App Service Front-End, Worker, and File Server layers.
 ---
 
 # App Service platform architecture — Front-End, Worker, File Server

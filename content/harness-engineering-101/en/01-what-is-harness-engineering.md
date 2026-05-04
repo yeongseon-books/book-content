@@ -15,6 +15,8 @@ tags:
 - Reliability
 - Production
 last_reviewed: '2026-05-03'
+seo_description: Good agents are not made by good models alone. You must design the
+  environment, constraints, tools, and verification loops the model works inside.
 ---
 
 # What Is Harness Engineering?

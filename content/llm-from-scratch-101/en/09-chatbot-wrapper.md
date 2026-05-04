@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: While generate.py works, it feels more like a developer tool than
+  a finished product. Adding a web interface and streaming makes the model feel alive.
 ---
 
 # Turning Your LLM into a Chatbot — FastAPI + Streaming

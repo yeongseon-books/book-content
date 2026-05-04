@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
+seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 ---
 
 # 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기

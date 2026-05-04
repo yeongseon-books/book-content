@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 캐싱 전략 — 비용과 지연 시간 줄이기
+seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # 캐싱 전략 — 비용과 지연 시간 줄이기

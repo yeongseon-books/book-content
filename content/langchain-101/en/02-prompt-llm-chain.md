@@ -1,5 +1,5 @@
 ---
-title: 'Prompt and LLM chain — assembling your first chain'
+title: Prompt and LLM chain — assembling your first chain
 series: langchain-101
 episode: 2
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: A prompt chain is not string concatenation with extra steps; it is
+  a typed conversion from app inputs into model-ready messages.
 ---
 
 # Prompt and LLM chain — assembling your first chain

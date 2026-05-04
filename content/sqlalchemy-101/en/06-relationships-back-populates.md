@@ -1,5 +1,5 @@
 ---
-title: "ORM Relationships: Connecting Both Sides Safely with relationship and back_populates"
+title: 'ORM Relationships: Connecting Both Sides Safely with relationship and back_populates'
 series: sqlalchemy-101
 episode: 6
 language: en
@@ -18,6 +18,8 @@ tags:
 - back_populates
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: ForeignKey is the SQL-level reference; relationship() is the object-level
+  navigation channel.
 ---
 
 # ORM Relationships: Connecting Both Sides Safely with relationship and back_populates

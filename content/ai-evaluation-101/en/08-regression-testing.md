@@ -15,6 +15,8 @@ tags:
 - CI
 - GitHub Actions
 last_reviewed: '2026-05-03'
+seo_description: Changing one line of a prompt can break other cases. This post covers
+  a CI-integrated LLM regression test suite, golden datasets, and…
 ---
 
 # Regression Testing — Don't Let Yesterday's Wins Break Today

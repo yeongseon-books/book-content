@@ -17,6 +17,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Tokenization과 Chunking 전략
+seo_description: LLM에서 tokenization은 단순한 전처리가 아닙니다. tokenizer가 정해지는 순간, 모델이 볼 수 있는
+  단위와 context…
 ---
 
 # Tokenization과 Chunking 전략

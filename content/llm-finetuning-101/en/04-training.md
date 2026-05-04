@@ -1,5 +1,5 @@
 ---
-title: 'Training Loop and Hyperparameters'
+title: Training Loop and Hyperparameters
 series: llm-finetuning-101
 episode: 4
 language: en
@@ -17,6 +17,7 @@ tags:
 - Optimizer
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 'A single training step decomposes into six stages:'
 ---
 
 # Training Loop and Hyperparameters

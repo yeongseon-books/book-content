@@ -18,6 +18,7 @@ tags:
 - Result
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다.
 ---
 
 # SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기

@@ -17,6 +17,7 @@ tags:
 - Observability
 - Monitoring
 last_reviewed: '2026-04-29'
+seo_description: ACA 관측성은 세 개의 독립된 계층으로 나뉩니다.
 ---
 
 # 모니터링과 운영 — Log Analytics와 Application Insights

@@ -1,5 +1,5 @@
 ---
-title: "Data migrations: separating schema changes from data changes"
+title: 'Data migrations: separating schema changes from data changes'
 series: alembic-101
 episode: 6
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - data-migration
-  - op.execute
-  - batch
-  - SQLite
+- Python
+- Alembic
+- data-migration
+- op.execute
+- batch
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: A data migration is a revision that leaves the schema alone and transforms
+  rows.
 ---
 
 # Data migrations: separating schema changes from data changes

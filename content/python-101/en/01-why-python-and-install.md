@@ -1,5 +1,5 @@
 ---
-title: "Why Python, and how to install and use venv"
+title: Why Python, and how to install and use venv
 series: python-101
 episode: 1
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - virtual-environments
-  - environment-isolation
-  - python-installation
-  - package-management
-  - developer-setup
+- Python
+- virtual-environments
+- environment-isolation
+- python-installation
+- package-management
+- developer-setup
 last_reviewed: '2026-05-03'
+seo_description: One computer can host many Pythons at once, and every project gets
+  its own.
 ---
 
 # Why Python, and how to install and use venv

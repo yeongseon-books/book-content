@@ -1,5 +1,5 @@
 ---
-title: "Multimodal RAG: Searching Images and Text Together"
+title: 'Multimodal RAG: Searching Images and Text Together'
 series: multimodal-ai-101
 episode: 5
 language: en
@@ -17,6 +17,8 @@ tags:
 - LangChain
 - Vector Search
 last_reviewed: '2026-05-03'
+seo_description: A typical RAG system splits documents into chunks, embeds them into
+  a vector DB, and retrieves the nearest chunks for a query embedding.
 ---
 
 # Multimodal RAG: Searching Images and Text Together

@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Tool calling — connecting functions to the model
+seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # Tool calling — connecting functions to the model

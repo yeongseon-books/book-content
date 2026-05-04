@@ -15,6 +15,7 @@ tags:
 - Threat Model
 - LLM Security
 last_reviewed: '2026-05-03'
+seo_description: AI Safety & Guardrails 101 Series (1/10)
 ---
 
 # Why AI Safety Matters

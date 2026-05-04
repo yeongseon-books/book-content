@@ -17,6 +17,8 @@ tags:
 - Image Generation
 - ControlNet
 last_reviewed: '2026-05-03'
+seo_description: From 2014 to around 2020, GANs were the default for image generation.
+  StyleGAN produced eerily realistic faces, but it had two persistent…
 ---
 
 # Text-to-Image with Diffusion

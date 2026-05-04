@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: What is an embedding — converting text into vectors
+seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 ---
 
 # What is an embedding — converting text into vectors

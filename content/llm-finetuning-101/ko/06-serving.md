@@ -1,5 +1,5 @@
 ---
-title: '모델 서빙'
+title: 모델 서빙
 series: llm-finetuning-101
 episode: 6
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Adapter
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 서빙 시스템은 4개 계층으로 분해할 수 있습니다.
 ---
 
 # 모델 서빙

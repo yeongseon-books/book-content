@@ -15,6 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
 ---
 
 # Embeddings and the Vector Index — Inside FAISS IndexFlatL2

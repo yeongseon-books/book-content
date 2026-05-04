@@ -15,6 +15,7 @@ tags:
 - RAG
 - Grounding
 last_reviewed: '2026-05-03'
+seo_description: AI Safety & Guardrails 101 Series (7/10)
 ---
 
 # Hallucination Guardrails — Grounding Checks

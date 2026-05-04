@@ -1,5 +1,6 @@
 ---
-title: "Deploy ordering and blue/green: synchronizing schema and application code safely"
+title: 'Deploy ordering and blue/green: synchronizing schema and application code
+  safely'
 series: alembic-101
 episode: 9
 language: en
@@ -11,13 +12,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - deploy
-  - blue-green
-  - ordering
-  - SQLite
+- Python
+- Alembic
+- deploy
+- blue-green
+- ordering
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: A migration always ships "before the code, and with broader compatibility
+  than the code".
 ---
 
 # Deploy ordering and blue/green: synchronizing schema and application code safely

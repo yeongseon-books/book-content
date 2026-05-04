@@ -1,5 +1,5 @@
 ---
-title: 'KoSimCSE로 문장 유사도 구현하기'
+title: KoSimCSE로 문장 유사도 구현하기
 series: korean-ai-stack-101
 episode: 2
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Embeddings
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 문장 유사도 검색은 4단계로 분해됩니다.
 ---
 
 # KoSimCSE로 문장 유사도 구현하기

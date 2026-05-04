@@ -1,5 +1,5 @@
 ---
-title: 'Chatbot pattern — managing conversation history and state'
+title: Chatbot pattern — managing conversation history and state
 series: ai-app-patterns-101
 episode: 1
 language: en
@@ -15,6 +15,8 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: A chatbot is not a model with memory; it is an application loop that
+  keeps replaying the accumulated messages list.
 ---
 
 # Chatbot pattern — managing conversation history and state

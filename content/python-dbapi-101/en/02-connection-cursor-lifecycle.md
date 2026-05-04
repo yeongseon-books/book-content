@@ -18,6 +18,8 @@ tags:
 - Resource Management
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: The two core DB-API objects are connection and cursor. Their names
+  are plain, but mishandling their lifecycle leads to connection leaks, locks, and…
 ---
 
 # Connection and Cursor Lifecycle

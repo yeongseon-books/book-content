@@ -15,6 +15,7 @@ tags:
 - Dataset
 - Quality
 last_reviewed: '2026-05-03'
+seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를 닮으면서도 edge case를 충분히 포함해야 합니다.
 ---
 
 # 평가 데이터셋 설계하기

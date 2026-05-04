@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Reading change history - status, diff, log
+seo_description: 'status, diff, and log are three read-only windows that answer three
+  different questions: where am I right now, what is different and how, and how…'
 ---
 
 # Reading change history - status, diff, log

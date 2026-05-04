@@ -1,5 +1,5 @@
 ---
-title: 'Document assistant — summarization, extraction, classification'
+title: Document assistant — summarization, extraction, classification
 series: ai-app-patterns-101
 episode: 3
 language: en
@@ -15,6 +15,8 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: A document assistant is not a conversational system; it is a transformer
+  that turns long input into short, task-shaped output.
 ---
 
 # Document assistant — summarization, extraction, classification

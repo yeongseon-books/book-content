@@ -1,5 +1,5 @@
 ---
-title: 'LangGraph 완성'
+title: LangGraph 완성
 series: langgraph-101
 episode: 6
 language: ko
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 완성형 LangGraph 에이전트는 하나의 거대한 프롬프트가 아니라 supervisor, tool agent, checkpoint가
+  함께…
 ---
 
 # LangGraph 완성

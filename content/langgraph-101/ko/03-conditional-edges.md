@@ -1,5 +1,5 @@
 ---
-title: '조건부 엣지와 분기 흐름'
+title: 조건부 엣지와 분기 흐름
 series: langgraph-101
 episode: 3
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 조건부 엣지는 상태를 계산한 뒤 다음 노드 이름을 반환해 그래프의 흐름을 런타임에 결정합니다.
 ---
 
 # 조건부 엣지와 분기 흐름

@@ -1,5 +1,5 @@
 ---
-title: 'Prompt와 LLM Chain — 체인 첫 번째 구성'
+title: Prompt와 LLM Chain — 체인 첫 번째 구성
 series: langchain-101
 episode: 2
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Prompt chain은 문자열을 만드는 코드가 아니라 입력 구조를 메시지 구조로 바꾸는 작은 변환 파이프입니다.
 ---
 
 # Prompt와 LLM Chain — 체인 첫 번째 구성

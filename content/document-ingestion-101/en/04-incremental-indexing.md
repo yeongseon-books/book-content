@@ -1,5 +1,5 @@
 ---
-title: 'Incremental indexing — updating only changed documents'
+title: Incremental indexing — updating only changed documents
 series: document-ingestion-101
 episode: 4
 language: en
@@ -15,6 +15,8 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Incremental indexing is less a vector-store trick and more an operational
+  memory problem.
 ---
 
 # Incremental indexing — updating only changed documents

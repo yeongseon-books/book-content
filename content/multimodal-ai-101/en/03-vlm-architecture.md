@@ -1,5 +1,5 @@
 ---
-title: "Vision-Language Model Architecture"
+title: Vision-Language Model Architecture
 series: multimodal-ai-101
 episode: 3
 language: en
@@ -17,6 +17,8 @@ tags:
 - BLIP-2
 - Multimodal Fusion
 last_reviewed: '2026-05-03'
+seo_description: Episode 2 covered CLIP, which aligns image and text in the same space.
+  To do the kind of reasoning GPT-4V or LLaVA does ("describe this image and…
 ---
 
 # Vision-Language Model Architecture

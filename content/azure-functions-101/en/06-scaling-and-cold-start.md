@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 'Serverless is usually sold with one sentence: it scales automatically,
+  and you only pay for what you use. True, but incomplete.'
 ---
 
 # Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t

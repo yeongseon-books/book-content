@@ -18,6 +18,7 @@ tags:
 - Dapr
 - Containers
 last_reviewed: '2026-05-03'
+seo_description: ACA는 "컨테이너용 App Service"입니다.
 ---
 
 # Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기

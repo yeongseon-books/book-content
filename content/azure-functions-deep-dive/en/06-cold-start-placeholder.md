@@ -15,6 +15,8 @@ tags:
 - Distributed Systems
 - gRPC
 last_reviewed: '2026-04-29'
+seo_description: This part closes out the Azure Functions Deep Dive series. Part 1
+  covered host bootstrap, Part 2 the worker process, Parts 3–4 the gRPC channel and…
 ---
 
 # Cold Start and Placeholder Mode — What Happens When a New Instance Is Born

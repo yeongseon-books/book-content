@@ -15,6 +15,7 @@ tags:
 - Bias
 - Cohen Kappa
 last_reviewed: '2026-05-03'
+seo_description: 사람이 모든 응답을 평가할 수 없을 때, 강력한 LLM에게 채점을 맡기는 방법이 LLM-as-judge입니다.
 ---
 
 # LLM-as-Judge — 모델로 모델을 평가하기

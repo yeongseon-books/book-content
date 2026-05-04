@@ -1,5 +1,5 @@
 ---
-title: "모듈과 패키지: import, __init__, __name__"
+title: '모듈과 패키지: import, __init__, __name__'
 series: python-101
 episode: 7
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - import-system
-  - module-vs-package
-  - init-py
-  - name-main-guard
-  - relative-imports
-  - namespace-packages
+- import-system
+- module-vs-package
+- init-py
+- name-main-guard
+- relative-imports
+- namespace-packages
 last_reviewed: '2026-05-03'
+seo_description: Python에서 모듈은 "한 번 실행되면 캐시되는 namespace"이고, 패키지는 "__init__.py가 있는 디렉터리로
+  묶인 모듈의…
 ---
 
 # 모듈과 패키지: import, __init__, __name__

@@ -1,5 +1,5 @@
 ---
-title: 'LangChain introduction — LCEL and the Runnable interface'
+title: LangChain introduction — LCEL and the Runnable interface
 series: langchain-101
 episode: 1
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: In LangChain, most components become interchangeable once their input
+  and output shapes line up.
 ---
 
 # LangChain introduction — LCEL and the Runnable interface

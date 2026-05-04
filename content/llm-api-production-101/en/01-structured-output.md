@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Structured output — JSON mode and response schemas
+seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # Structured output — JSON mode and response schemas

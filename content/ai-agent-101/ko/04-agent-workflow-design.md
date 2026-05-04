@@ -15,6 +15,7 @@ tags:
 - Planning
 - Task Decomposition
 last_reviewed: '2026-05-02'
+seo_description: 복잡한 작업을 수행하려면 Agent는 작업을 단계로 나누고, 각 단계를 순서대로 실행하며, 결과를 검증해야 합니다.
 ---
 
 # Agent Workflow 설계

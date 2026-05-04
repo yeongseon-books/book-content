@@ -17,6 +17,7 @@ tags:
 - Scale-to-Zero
 - Serverless
 last_reviewed: '2026-04-29'
+seo_description: 'Think of scaling as a three-stage declarative pipeline:'
 ---
 
 # Scaling — KEDA scalers and zero-to-N

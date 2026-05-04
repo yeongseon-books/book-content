@@ -1,5 +1,5 @@
 ---
-title: 'LoRA 어댑터 구성'
+title: LoRA 어댑터 구성
 series: llm-finetuning-101
 episode: 3
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Transformers
 - Python
 last_reviewed: '2026-05-01'
+seo_description: LoRA 어댑터는 다음 그림으로 요약됩니다.
 ---
 
 # LoRA 어댑터 구성

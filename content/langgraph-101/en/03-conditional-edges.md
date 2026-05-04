@@ -1,5 +1,5 @@
 ---
-title: 'Conditional edges and branching'
+title: Conditional edges and branching
 series: langgraph-101
 episode: 3
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: A conditional edge inspects state and returns the name of the next
+  node, so routing becomes an explicit runtime decision instead of hidden control…
 ---
 
 # Conditional edges and branching

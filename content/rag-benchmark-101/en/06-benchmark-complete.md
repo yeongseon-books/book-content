@@ -1,5 +1,5 @@
 ---
-title: 'Completing the RAG Benchmark'
+title: Completing the RAG Benchmark
 series: rag-benchmark-101
 episode: 6
 language: en
@@ -17,6 +17,7 @@ tags:
 - Reproducibility
 - Reporting
 last_reviewed: '2026-05-01'
+seo_description: 'A finished benchmark is a single function:'
 ---
 
 # Completing the RAG Benchmark

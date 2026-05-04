@@ -1,5 +1,5 @@
 ---
-title: "Image Encoder: CLIP과 ViT"
+title: 'Image Encoder: CLIP과 ViT'
 series: multimodal-ai-101
 episode: 2
 language: ko
@@ -17,6 +17,8 @@ tags:
 - OpenAI
 - Vision Transformer
 last_reviewed: '2026-05-03'
+seo_description: multimodal 시스템의 품질은 결국 image encoder가 만들어내는 representation의 품질에서
+  출발합니다.
 ---
 
 # Image Encoder: CLIP과 ViT

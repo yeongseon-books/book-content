@@ -1,5 +1,5 @@
 ---
-title: "autogenerate: the line between what it catches and what it misses"
+title: 'autogenerate: the line between what it catches and what it misses'
 series: alembic-101
 episode: 4
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - autogenerate
-  - compare_type
-  - MetaData
-  - SQLite
+- Python
+- Alembic
+- autogenerate
+- compare_type
+- MetaData
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: Autogenerate is a tool that diffs the live database (ground truth)
+  against target_metadata (desired state) and serializes that diff into op calls.
 ---
 
 # autogenerate: the line between what it catches and what it misses

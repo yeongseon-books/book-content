@@ -18,6 +18,8 @@ tags:
 - ReAct
 - Automation
 last_reviewed: '2026-05-03'
+seo_description: A chatbot is a dictionary that gives you an answer. An Agent is an
+  intern you hand a task to and walk away from.
 ---
 
 # What Is an AI Agent?

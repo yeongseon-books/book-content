@@ -1,5 +1,5 @@
 ---
-title: 'LLM 파인튜닝 입문'
+title: LLM 파인튜닝 입문
 series: llm-finetuning-101
 episode: 1
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Python
 - GPT-2
 last_reviewed: '2026-05-01'
+seo_description: 파인튜닝은 다음 세 가지 변수를 어떻게 쪼갤지에 대한 결정입니다.
 ---
 
 # LLM 파인튜닝 입문

@@ -1,5 +1,5 @@
 ---
-title: "배포 순서와 blue/green: schema와 application code의 안전한 동기화"
+title: '배포 순서와 blue/green: schema와 application code의 안전한 동기화'
 series: alembic-101
 episode: 9
 language: ko
@@ -11,13 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - deploy
-  - blue-green
-  - ordering
-  - SQLite
+- Python
+- Alembic
+- deploy
+- blue-green
+- ordering
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: migration은 항상 "코드보다 먼저, 그리고 코드보다 호환성이 넓게"입니다.
 ---
 
 # 배포 순서와 blue/green: schema와 application code의 안전한 동기화

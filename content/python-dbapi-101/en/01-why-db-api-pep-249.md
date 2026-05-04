@@ -18,6 +18,8 @@ tags:
 - Database Driver
 - Standardization
 last_reviewed: '2026-05-03'
+seo_description: If you have used Python with a database, you have probably touched
+  sqlite3, psycopg, pymysql, or oracledb.
 ---
 
 # Why DB-API 2.0 - The Problem PEP 249 Solved

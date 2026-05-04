@@ -1,5 +1,5 @@
 ---
-title: "Classes and objects: bundling data with behavior"
+title: 'Classes and objects: bundling data with behavior'
 series: python-101
 episode: 9
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - class-and-instance
-  - init-method
-  - self-parameter
-  - dunder-methods
-  - inheritance
-  - dataclass
+- class-and-instance
+- init-method
+- self-parameter
+- dunder-methods
+- inheritance
+- dataclass
 last_reviewed: '2026-05-03'
+seo_description: A class is not a mold for data; it is the definition of behavior
+  shared by objects of the same kind.
 ---
 
 # Classes and objects: bundling data with behavior

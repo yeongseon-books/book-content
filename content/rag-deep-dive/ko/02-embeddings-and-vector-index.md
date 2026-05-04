@@ -15,6 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 ---
 
 # 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리

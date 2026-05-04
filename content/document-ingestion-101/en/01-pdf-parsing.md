@@ -1,5 +1,5 @@
 ---
-title: 'PDF parsing and text extraction'
+title: PDF parsing and text extraction
 series: document-ingestion-101
 episode: 1
 language: en
@@ -15,6 +15,8 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: The first goal of PDF parsing is to turn a visual document into a
+  verifiable list of strings.
 ---
 
 # PDF parsing and text extraction

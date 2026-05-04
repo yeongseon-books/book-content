@@ -15,6 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: 애플리케이션은 바로 다음 질문을 던집니다. 데이터베이스 연결 문자열은 어디에 둘까? 외부 API 키는?
 ---
 
 # Configuration 마스터하기: App Settings & 환경변수

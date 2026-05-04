@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: aiosqlite로 비동기 SQLite 다루기
+seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connection마다 백그라운드 스레드를 띄우고, await되는
+  메서드 호출을…
 ---
 
 # aiosqlite로 비동기 SQLite 다루기

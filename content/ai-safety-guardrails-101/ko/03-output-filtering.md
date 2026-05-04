@@ -15,6 +15,8 @@ tags:
 - Output Filtering
 - Llama Guard
 last_reviewed: '2026-05-03'
+seo_description: OpenAI나 Anthropic 같은 공급사는 RLHF와 자체 가드레일로 모델을 훈련시킵니다. 그래도 다음과 같은 일이
+  일어납니다.
 ---
 
 # 출력 필터링과 콘텐츠 모더레이션

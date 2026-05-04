@@ -15,6 +15,7 @@ tags:
 - Drift Detection
 - Monitoring
 last_reviewed: '2026-05-03'
+seo_description: Eval은 배포 전 한 번이 아니라 운영 중에도 계속 돌아야 합니다.
 ---
 
 # 운영 환경에서의 지속적 평가

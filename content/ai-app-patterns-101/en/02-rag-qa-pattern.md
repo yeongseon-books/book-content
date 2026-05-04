@@ -1,5 +1,5 @@
 ---
-title: 'RAG Q&A pattern — document-based question answering'
+title: RAG Q&A pattern — document-based question answering
 series: ai-app-patterns-101
 episode: 2
 language: en
@@ -15,6 +15,8 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: RAG is not a model that memorizes answers; it is a pipeline that
+  injects retrieved documents into the prompt before generation.
 ---
 
 # RAG Q&A pattern — document-based question answering

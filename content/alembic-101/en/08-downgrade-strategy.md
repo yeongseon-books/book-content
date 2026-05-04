@@ -1,5 +1,5 @@
 ---
-title: "Downgrade strategy: when to write it for real and when to forbid it"
+title: 'Downgrade strategy: when to write it for real and when to forbid it'
 series: alembic-101
 episode: 8
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - downgrade
-  - expand-contract
-  - rollback
-  - SQLite
+- Python
+- Alembic
+- downgrade
+- expand-contract
+- rollback
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: 'Downgrade splits into two kinds. (1) Reversible changes: a precise
+  inverse exists with no data loss (e.g., adding a nullable column).'
 ---
 
 # Downgrade strategy: when to write it for real and when to forbid it

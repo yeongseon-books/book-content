@@ -1,5 +1,5 @@
 ---
-title: 'LangGraph introduction and graph basics'
+title: LangGraph introduction and graph basics
 series: langgraph-101
 episode: 1
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: StateGraph is a blueprint that turns node functions plus transition
+  rules into an executable workflow over shared state.
 ---
 
 # LangGraph introduction and graph basics

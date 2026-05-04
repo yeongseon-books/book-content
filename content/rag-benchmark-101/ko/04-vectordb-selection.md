@@ -1,5 +1,5 @@
 ---
-title: 'VectorDB 선택 기준'
+title: VectorDB 선택 기준
 series: rag-benchmark-101
 episode: 4
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Recall
 - ANN
 last_reviewed: '2026-05-01'
+seo_description: VectorDB 비교의 골격은 다음과 같습니다.
 ---
 
 # VectorDB 선택 기준

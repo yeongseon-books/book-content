@@ -1,5 +1,5 @@
 ---
-title: 'Putting it together — a complete chain in one file'
+title: Putting it together — a complete chain in one file
 series: langchain-101
 episode: 6
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: The integrated chain is not a new abstraction; it is the same Runnables
+  from earlier posts lined up in input-output order.
 ---
 
 # Putting it together — a complete chain in one file

@@ -1,5 +1,5 @@
 ---
-title: 'Tool-calling agents'
+title: Tool-calling agents
 series: langgraph-101
 episode: 4
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 'A tool-calling agent is a loop: the model decides whether it needs
+  a tool, ToolNode executes the call, and the model reads the result before…'
 ---
 
 # Tool-calling agents

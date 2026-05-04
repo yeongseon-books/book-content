@@ -1,5 +1,5 @@
 ---
-title: "ORM Basics: Defining Models with DeclarativeBase and mapped_column"
+title: 'ORM Basics: Defining Models with DeclarativeBase and mapped_column'
 series: sqlalchemy-101
 episode: 4
 language: en
@@ -18,6 +18,8 @@ tags:
 - mapped_column
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: An ORM model class is the marriage of "a Python class plus a Core
+  Table." DeclarativeBase is the container (a MetaData) for those bindings, and…
 ---
 
 # ORM Basics: Defining Models with DeclarativeBase and mapped_column

@@ -1,5 +1,5 @@
 ---
-title: "Modules and packages: import, __init__, __name__"
+title: 'Modules and packages: import, __init__, __name__'
 series: python-101
 episode: 7
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - import-system
-  - module-vs-package
-  - init-py
-  - name-main-guard
-  - relative-imports
-  - namespace-packages
+- import-system
+- module-vs-package
+- init-py
+- name-main-guard
+- relative-imports
+- namespace-packages
 last_reviewed: '2026-05-03'
+seo_description: A module in Python is "a namespace that is loaded once and cached";
+  a package is "a directory grouped by __init__.py that holds modules".
 ---
 
 # Modules and packages: import, __init__, __name__

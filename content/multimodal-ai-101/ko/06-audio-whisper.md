@@ -1,5 +1,5 @@
 ---
-title: "오디오 처리와 Whisper STT"
+title: 오디오 처리와 Whisper STT
 series: multimodal-ai-101
 episode: 6
 language: ko
@@ -17,6 +17,8 @@ tags:
 - OpenAI
 - faster-whisper
 last_reviewed: '2026-05-03'
+seo_description: OpenAI Whisper가 2022년 9월 공개되기 전까지, production STT는 Google Speech,
+  AWS…
 ---
 
 # 오디오 처리와 Whisper STT

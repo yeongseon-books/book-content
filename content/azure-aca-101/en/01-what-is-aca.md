@@ -18,6 +18,7 @@ tags:
 - Dapr
 - Containers
 last_reviewed: '2026-05-03'
+seo_description: ACA is "App Service for containers."
 ---
 
 # What is Azure Container Apps? — running containers without Kubernetes

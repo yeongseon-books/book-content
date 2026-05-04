@@ -1,5 +1,5 @@
 ---
-title: "Multimodal RAG: 이미지와 텍스트를 함께 검색하기"
+title: 'Multimodal RAG: 이미지와 텍스트를 함께 검색하기'
 series: multimodal-ai-101
 episode: 5
 language: ko
@@ -17,6 +17,7 @@ tags:
 - LangChain
 - Vector Search
 last_reviewed: '2026-05-03'
+seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, embedding을 vector DB에 넣고, query…
 ---
 
 # Multimodal RAG: 이미지와 텍스트를 함께 검색하기

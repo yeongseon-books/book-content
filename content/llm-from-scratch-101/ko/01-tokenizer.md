@@ -15,6 +15,7 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 처음 LLM 코드를 뜯어볼 때 가장 낯설었던 장면은 모델이 문장을 전혀 읽지 못한다는 사실이었습니다.
 ---
 
 # 글자를 숫자로 바꾸기

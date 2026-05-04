@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: 'SQLite Production Patterns: retry, timeout, observability, backup'
+seo_description: SQLite being a single file simplifies operations, but treating it
+  as "just a file" is dangerous.
 ---
 
 # SQLite Production Patterns: retry, timeout, observability, backup

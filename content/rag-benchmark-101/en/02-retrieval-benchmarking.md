@@ -1,5 +1,5 @@
 ---
-title: 'Measuring retrieval performance'
+title: Measuring retrieval performance
 series: rag-benchmark-101
 episode: 2
 language: en
@@ -17,6 +17,7 @@ tags:
 - Latency
 - MRR
 last_reviewed: '2026-05-01'
+seo_description: 'A retrieval benchmark binds four things together:'
 ---
 
 # Measuring retrieval performance

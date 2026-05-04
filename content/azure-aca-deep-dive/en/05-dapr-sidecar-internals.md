@@ -15,6 +15,8 @@ tags:
 - Dapr
 - Envoy
 last_reviewed: '2026-04-29'
+seo_description: 'External references in this post are pinned to these upstream baselines:
+  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
 ---
 
 # Dapr sidecar internals — the Go process that lives next to your container

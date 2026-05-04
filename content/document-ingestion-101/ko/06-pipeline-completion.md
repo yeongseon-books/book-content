@@ -1,5 +1,5 @@
 ---
-title: '문서 수집 파이프라인 완성'
+title: 문서 수집 파이프라인 완성
 series: document-ingestion-101
 episode: 6
 language: ko
@@ -15,6 +15,7 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 완성된 수집 파이프라인은 각 단계를 더 많이 붙이는 구조가 아니라 각 단계의 입출력이 이어지는 구조입니다.
 ---
 
 # 문서 수집 파이프라인 완성

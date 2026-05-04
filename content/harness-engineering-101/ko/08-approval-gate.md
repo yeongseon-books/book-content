@@ -15,6 +15,7 @@ tags:
 - Approval
 - Human-in-the-loop
 last_reviewed: '2026-05-03'
+seo_description: 어떤 행동은 자동으로 실행되어서는 안 됩니다. 결제, 배포, 삭제, 발송은 사람의 승인이 필요합니다.
 ---
 
 # Approval Gate — 사람 승인이 필요한 지점 설계하기

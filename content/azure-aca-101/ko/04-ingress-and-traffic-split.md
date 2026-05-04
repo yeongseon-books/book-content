@@ -18,6 +18,7 @@ tags:
 - Blue-Green
 - Traffic Split
 last_reviewed: '2026-05-03'
+seo_description: Ingress는 ACA의 "건물 정문"이고, traffic weight는 "엘리베이터 호출 비율"입니다.
 ---
 
 # Ingress와 트래픽 분할 — Revision 기반 배포 전략

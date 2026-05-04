@@ -1,5 +1,5 @@
 ---
-title: 'Model Evaluation'
+title: Model Evaluation
 series: llm-finetuning-101
 episode: 5
 language: en
@@ -17,6 +17,8 @@ tags:
 - Metrics
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Evaluation works best when you separate "internal model signals"
+  from "user-facing quality."
 ---
 
 # Model Evaluation

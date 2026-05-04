@@ -18,6 +18,8 @@ tags:
 - FAISS
 - Multimodal Index
 last_reviewed: '2026-05-03'
+seo_description: 'Episode 5 covered the big picture of multimodal RAG. This episode
+  goes deeper into the heart of that system: the multimodal embedding.'
 ---
 
 # Multimodal Embeddings and Cross-modal Search

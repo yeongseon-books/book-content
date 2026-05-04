@@ -15,6 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-04-29'
+seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
 ---
 
 # HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프

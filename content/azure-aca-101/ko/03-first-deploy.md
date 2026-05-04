@@ -18,6 +18,7 @@ tags:
 - Dockerfile
 - az containerapp
 last_reviewed: '2026-05-03'
+seo_description: ACA의 첫 배포는 "택시를 부르기 전에 출발지가 있어야 한다"와 같습니다.
 ---
 
 # 첫 앱 배포하기 — Python/FastAPI

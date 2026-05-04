@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 'Over the last two posts, we built up a mental model: triggers wake
+  your function, and bindings wire up its inputs and outputs.'
 ---
 
 # Host and Worker — Who Actually Runs Your Functions?

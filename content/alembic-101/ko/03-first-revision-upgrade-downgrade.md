@@ -1,5 +1,5 @@
 ---
-title: "첫 revision: upgrade와 downgrade를 손으로 작성"
+title: '첫 revision: upgrade와 downgrade를 손으로 작성'
 series: alembic-101
 episode: 3
 language: ko
@@ -11,13 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - revision
-  - upgrade
-  - downgrade
-  - SQLite
+- Python
+- Alembic
+- revision
+- upgrade
+- downgrade
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: 'revision 파일은 upgrade(): N → N+1과 downgrade(): N+1 → N이라는 함수 쌍입니다.'
 ---
 
 # 첫 revision: upgrade와 downgrade를 손으로 작성

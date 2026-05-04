@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Caching strategies — reducing cost and latency
+seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # Caching strategies — reducing cost and latency

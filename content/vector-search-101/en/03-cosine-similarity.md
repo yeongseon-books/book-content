@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Cosine similarity and vector search — computing sentence distances
+seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 ---
 
 # Cosine similarity and vector search — computing sentence distances

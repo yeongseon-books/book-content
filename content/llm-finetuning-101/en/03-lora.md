@@ -1,5 +1,5 @@
 ---
-title: 'Configuring LoRA Adapters'
+title: Configuring LoRA Adapters
 series: llm-finetuning-101
 episode: 3
 language: en
@@ -17,6 +17,7 @@ tags:
 - Transformers
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 'A LoRA adapter is summarized by:'
 ---
 
 # Configuring LoRA Adapters

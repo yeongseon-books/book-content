@@ -1,5 +1,5 @@
 ---
-title: 'Parameter binding and SQL injection defense (sqlite3, PEP 249)'
+title: Parameter binding and SQL injection defense (sqlite3, PEP 249)
 series: python-dbapi-101
 episode: 4
 language: en
@@ -18,6 +18,10 @@ tags:
 - PEP 249
 - Security
 last_reviewed: '2026-05-03'
+seo_title: Parameter binding and SQL injection defense
+seo_description: 'The key point: SQL tokenization happens before binding. ? tells
+  the parser "a single value goes here." Whatever value arrives is never re-parsed
+  as…'
 ---
 
 # Parameter binding and SQL injection defense (sqlite3, PEP 249)

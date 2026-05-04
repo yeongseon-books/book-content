@@ -1,5 +1,5 @@
 ---
-title: 'PDF 파싱과 텍스트 추출'
+title: PDF 파싱과 텍스트 추출
 series: document-ingestion-101
 episode: 1
 language: ko
@@ -15,6 +15,7 @@ tags:
 - LangChain
 - Python
 last_reviewed: '2026-05-01'
+seo_description: PDF 파싱의 첫 목표는 “보이는 문서”를 “검증 가능한 문자열 목록”으로 바꾸는 것입니다.
 ---
 
 # PDF 파싱과 텍스트 추출

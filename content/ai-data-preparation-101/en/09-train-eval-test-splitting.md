@@ -17,6 +17,8 @@ tags:
 - Temporal Split
 - scikit-learn
 last_reviewed: '2026-05-03'
+seo_description: 'The pattern of train_test_split(data, test_size=0.2) failing in
+  production repeats every year. Two reasons:'
 ---
 
 # Train/Eval/Test Splitting and Contamination Control

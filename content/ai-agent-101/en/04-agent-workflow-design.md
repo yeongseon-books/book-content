@@ -16,6 +16,8 @@ tags:
 - Planning
 - Task Decomposition
 last_reviewed: '2026-05-02'
+seo_description: To perform complex tasks, agents must break work into steps, execute
+  each step in order, and verify results. This process is called a workflow.
 ---
 
 # Agent Workflow Design

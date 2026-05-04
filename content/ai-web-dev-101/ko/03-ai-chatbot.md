@@ -16,6 +16,7 @@ tags:
 - Python
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 지금까지 터미널에서만 AI를 불렀는데, 이제 브라우저에서 사용자가 직접 대화할 수 있는 UI를 만들어 봅시다.
 ---
 
 # AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현

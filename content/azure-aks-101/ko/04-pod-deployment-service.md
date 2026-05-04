@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 처음 Kubernetes YAML을 보면 비슷해 보이는 객체가 많습니다.
 ---
 
 # Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식

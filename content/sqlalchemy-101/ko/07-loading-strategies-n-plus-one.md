@@ -1,5 +1,5 @@
 ---
-title: "로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가"
+title: '로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가'
 series: sqlalchemy-101
 episode: 7
 language: ko
@@ -18,6 +18,7 @@ tags:
 - selectinload
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: '"관계 속성에 처음 접근하면 SELECT가 한 번 발사된다." 이 한 문장이 lazy 로딩의 전부입니다.'
 ---
 
 # 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가

@@ -1,5 +1,5 @@
 ---
-title: 'Tool calling — connecting external tools'
+title: Tool calling — connecting external tools
 series: langchain-101
 episode: 4
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Tool calling works when the model stops pretending to do the work
+  itself and starts choosing which real function should do it.
 ---
 
 # Tool calling — connecting external tools

@@ -15,6 +15,8 @@ tags:
 - Reliability
 - Production
 last_reviewed: '2026-05-03'
+seo_description: Give an agent a vague instruction and you get a vague result. The
+  Task Harness turns vague work into executable tasks with clear inputs, outputs…
 ---
 
 # Task Harness — Turning Vague Work into Executable Tasks

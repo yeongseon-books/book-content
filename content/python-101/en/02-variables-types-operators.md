@@ -1,5 +1,5 @@
 ---
-title: "Variables, types, and operators"
+title: Variables, types, and operators
 series: python-101
 episode: 2
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - variables
-  - python-types
-  - equality-vs-identity
-  - floating-point
-  - decimal
-  - type-hints
+- variables
+- python-types
+- equality-vs-identity
+- floating-point
+- decimal
+- type-hints
 last_reviewed: '2026-05-03'
+seo_description: In Python, a variable is not a box that holds a value but a name
+  tag attached to an object.
 ---
 
 # Variables, types, and operators

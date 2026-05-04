@@ -15,6 +15,7 @@ tags:
 - Distributed Systems
 - gRPC
 last_reviewed: '2026-04-29'
+seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
 # gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가

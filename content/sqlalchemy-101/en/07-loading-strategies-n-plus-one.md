@@ -1,5 +1,5 @@
 ---
-title: "Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin"
+title: 'Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin'
 series: sqlalchemy-101
 episode: 7
 language: en
@@ -18,6 +18,8 @@ tags:
 - selectinload
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: '"Touching a relationship attribute for the first time fires one
+  SELECT." That single sentence is all of lazy loading.'
 ---
 
 # Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin

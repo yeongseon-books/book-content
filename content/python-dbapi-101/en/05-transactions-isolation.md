@@ -1,5 +1,5 @@
 ---
-title: 'Transactions and isolation levels (sqlite3, PEP 249)'
+title: Transactions and isolation levels (sqlite3, PEP 249)
 series: python-dbapi-101
 episode: 5
 language: en
@@ -18,6 +18,7 @@ tags:
 - WAL
 - PEP 249
 last_reviewed: '2026-05-03'
+seo_description: 'Two operational data incidents dominate in production:'
 ---
 
 # Transactions and isolation levels (sqlite3, PEP 249)

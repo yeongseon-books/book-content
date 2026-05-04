@@ -15,6 +15,8 @@ tags:
 - Approval
 - Human-in-the-loop
 last_reviewed: '2026-05-03'
+seo_description: Some actions must never run automatically. Payments, deploys, deletes,
+  and outbound messages need human approval.
 ---
 
 # Approval Gates — Designing Where Humans Must Approve

@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 앞선 세 장은 개념을 정리하는 단계였습니다. 여기서는 로컬에서 함수를 만들고, Azure에 배포하고, 실제 호출 가능한
+  URL을 받기까지의…
 ---
 
 # 함수 하나 배포하기 — 로컬에서 Azure까지

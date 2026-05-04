@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Creating a GitHub repository - remote, push, and pull in one go
+seo_description: A GitHub repository is just "another Git repository that lives across
+  the network", and a remote is the nickname you give to such a repository.
 ---
 
 # Creating a GitHub repository - remote, push, and pull in one go

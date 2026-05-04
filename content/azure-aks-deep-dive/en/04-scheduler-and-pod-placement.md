@@ -15,6 +15,8 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-04-29'
+seo_description: AKS control plane is managed by Microsoft, so the upstream code here
+  is a behavioral comparison baseline, not a statement about the exact binaries…
 ---
 
 # Scheduler and Pod placement — who decides which node

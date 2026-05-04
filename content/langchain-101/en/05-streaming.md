@@ -1,5 +1,5 @@
 ---
-title: 'Streaming — handling real-time output'
+title: Streaming — handling real-time output
 series: langchain-101
 episode: 5
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Streaming is not a different chain design; it is a different way
+  of consuming the chain while the model is still generating.
 ---
 
 # Streaming — handling real-time output

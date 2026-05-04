@@ -15,6 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: 처음 App Service를 만들 때 헷갈리는 이유는, 선택지가 많아서가 아니라 선택 기준이 안 보이기 때문입니다.
 ---
 
 # Hosting Models: 어떤 플랜을 선택해야 할까?

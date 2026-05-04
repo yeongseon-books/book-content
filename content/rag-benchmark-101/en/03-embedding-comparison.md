@@ -1,5 +1,5 @@
 ---
-title: 'Comparing embedding models'
+title: Comparing embedding models
 series: rag-benchmark-101
 episode: 3
 language: en
@@ -17,6 +17,7 @@ tags:
 - MTEB
 - Latency
 last_reviewed: '2026-05-01'
+seo_description: Embedding comparison rests on the one-variable-at-a-time principle.
 ---
 
 # Comparing embedding models

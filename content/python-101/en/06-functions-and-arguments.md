@@ -1,5 +1,5 @@
 ---
-title: "Functions and arguments: def, args, kwargs, default, lambda"
+title: 'Functions and arguments: def, args, kwargs, default, lambda'
 series: python-101
 episode: 6
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - function-definition
-  - default-arguments
-  - args-kwargs
-  - keyword-only
-  - lambda
-  - type-hints
+- function-definition
+- default-arguments
+- args-kwargs
+- keyword-only
+- lambda
+- type-hints
 last_reviewed: '2026-05-03'
+seo_description: 'A function signature is a contract: what the caller must supply
+  and what the function returns.'
 ---
 
 # Functions and arguments: def, args, kwargs, default, lambda

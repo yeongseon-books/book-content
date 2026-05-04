@@ -1,5 +1,5 @@
 ---
-title: 'Tool Calling — 외부 도구 연결하기'
+title: Tool Calling — 외부 도구 연결하기
 series: langchain-101
 episode: 4
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: Tool Calling의 핵심은 모델이 계산을 직접 하는 것이 아니라 계산을 맡길 함수를 고르게 만드는 데 있습니다.
 ---
 
 # Tool Calling — 외부 도구 연결하기

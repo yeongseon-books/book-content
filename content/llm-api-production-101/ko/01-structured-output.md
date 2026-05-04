@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 구조화 출력 — JSON 모드와 응답 스키마
+seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # 구조화 출력 — JSON 모드와 응답 스키마

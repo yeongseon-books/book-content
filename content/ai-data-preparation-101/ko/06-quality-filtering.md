@@ -17,6 +17,8 @@ targets:
   mkdocs: true
   tistory: true
 title: 데이터 품질 필터링 — Heuristic과 Classifier
+seo_description: 원본 corpus는 거의 항상 절반 이상이 쓰레기입니다. 광고, 자동 생성 spam, 깨진 인코딩, 의미 없는 boilerplate가
+  섞여…
 ---
 
 # 데이터 품질 필터링 — Heuristic과 Classifier

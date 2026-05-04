@@ -1,5 +1,5 @@
 ---
-title: "Session in Depth: How Unit of Work and Identity Map Actually Work"
+title: 'Session in Depth: How Unit of Work and Identity Map Actually Work'
 series: sqlalchemy-101
 episode: 5
 language: en
@@ -18,6 +18,8 @@ tags:
 - Unit of Work
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: A Session is a notebook that bundles a working scratch pad (Unit
+  of Work) and a cache page (Identity Map) into one cover.
 ---
 
 # Session in Depth: How Unit of Work and Identity Map Actually Work

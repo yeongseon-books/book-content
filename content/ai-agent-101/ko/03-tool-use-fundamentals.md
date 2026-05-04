@@ -15,6 +15,7 @@ tags:
 - Function Calling
 - Integration
 last_reviewed: '2026-05-02'
+seo_description: Agent가 단순 대화 모델과 다른 이유는 도구를 사용할 수 있기 때문입니다.
 ---
 
 # Tool Use 기초

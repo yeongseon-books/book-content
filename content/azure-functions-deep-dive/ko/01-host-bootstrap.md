@@ -15,6 +15,7 @@ tags:
 - Distributed Systems
 - gRPC
 last_reviewed: '2026-04-29'
+seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
 # 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기

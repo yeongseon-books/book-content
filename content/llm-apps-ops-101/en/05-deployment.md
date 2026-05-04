@@ -1,5 +1,5 @@
 ---
-title: 'LLM app deployment strategies'
+title: LLM app deployment strategies
 series: llm-apps-ops-101
 episode: 5
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: A deployable example is not defined by nice-looking server code.
+  It is defined by whether the same script can start the server, hit health, and…
 ---
 
 # LLM app deployment strategies

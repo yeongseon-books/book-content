@@ -15,6 +15,8 @@ tags:
 - Data Quality
 - Pipelines
 last_reviewed: '2026-05-03'
+seo_description: This is the question every ML beginner asks. You download a Kaggle
+  dataset, run pandas.read_csv(), and shove it into a model. Done, right?
 ---
 
 # Why Data Preparation Determines Model Quality

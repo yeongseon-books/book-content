@@ -15,6 +15,7 @@ tags:
 - Testing
 - Metrics
 last_reviewed: '2026-05-02'
+seo_description: Agent를 만드는 것보다 어려운 것이 "이 Agent가 제대로 작동하는지" 평가하는 것입니다.
 ---
 
 # Agent 평가

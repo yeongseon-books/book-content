@@ -1,5 +1,5 @@
 ---
-title: 'Using HyperCLOVA X and Solar API'
+title: Using HyperCLOVA X and Solar API
 series: korean-ai-stack-101
 episode: 5
 language: en
@@ -17,6 +17,7 @@ tags:
 - Naver
 - Upstage
 last_reviewed: '2026-05-01'
+seo_description: Generation API calls factor into a 4-layer contract.
 ---
 
 # Using HyperCLOVA X and Solar API

@@ -1,5 +1,5 @@
 ---
-title: 'State management and checkpoints'
+title: State management and checkpoints
 series: langgraph-101
 episode: 2
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: A checkpointer snapshots graph state so the next invocation can continue
+  from the same conversation timeline instead of starting from zero.
 ---
 
 # State management and checkpoints

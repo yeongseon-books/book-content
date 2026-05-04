@@ -1,5 +1,5 @@
 ---
-title: 'LangChain 소개 — LCEL과 Runnable 기본'
+title: LangChain 소개 — LCEL과 Runnable 기본
 series: langchain-101
 episode: 1
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: LangChain에서는 입력과 출력 타입만 맞으면 거의 모든 컴포넌트를 같은 파이프 규칙으로 연결할 수 있습니다.
 ---
 
 # LangChain 소개 — LCEL과 Runnable 기본

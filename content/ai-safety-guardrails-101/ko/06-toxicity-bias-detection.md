@@ -15,6 +15,7 @@ tags:
 - Bias
 - Fairness
 last_reviewed: '2026-05-03'
+seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audit로 나누어 설계합니다.
 ---
 
 # 독성과 편향 탐지

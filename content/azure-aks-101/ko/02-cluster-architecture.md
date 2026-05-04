@@ -15,6 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: AKS를 이해할 때 가장 먼저 분리해야 하는 것은 “클러스터의 두뇌”와 “실제로 컨테이너가 돌아가는 자리”입니다.
 ---
 
 # 클러스터 아키텍처 — Control Plane과 Node Pool

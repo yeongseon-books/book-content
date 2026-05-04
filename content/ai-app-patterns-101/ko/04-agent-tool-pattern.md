@@ -1,5 +1,5 @@
 ---
-title: 'Agent + Tool 패턴 — 자율 도구 선택'
+title: Agent + Tool 패턴 — 자율 도구 선택
 series: ai-app-patterns-101
 episode: 4
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 에이전트는 단계를 직접 하드코딩하는 대신, 모델이 도구 호출 경로를 런타임에 고르게 만드는 제어기입니다.
 ---
 
 # Agent + Tool 패턴 — 자율 도구 선택

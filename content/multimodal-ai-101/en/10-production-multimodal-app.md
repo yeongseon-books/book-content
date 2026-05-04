@@ -18,6 +18,8 @@ tags:
 - Cost Optimization
 - Caching
 last_reviewed: '2026-05-03'
+seo_description: The first nine episodes covered image encoders, VLM architecture,
+  captioning, multimodal RAG, audio, diffusion, embeddings, and video.
 ---
 
 # Building a Production Multimodal Application

@@ -1,5 +1,5 @@
 ---
-title: 'RAG 벤치마크 완성'
+title: RAG 벤치마크 완성
 series: rag-benchmark-101
 episode: 6
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Reproducibility
 - Reporting
 last_reviewed: '2026-05-01'
+seo_description: config에 모든 변수(임베딩 모델, top-k, LLM 모델, dataset 경로)를 명시합니다.
 ---
 
 # RAG 벤치마크 완성

@@ -1,5 +1,5 @@
 ---
-title: "왜 Alembic인가, 그리고 init까지"
+title: 왜 Alembic인가, 그리고 init까지
 series: alembic-101
 episode: 1
 language: ko
@@ -11,12 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - SQLAlchemy
-  - Migration
-  - SQLite
+- Python
+- Alembic
+- SQLAlchemy
+- Migration
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: Alembic은 DB 스키마를 위한 git입니다. 각 마이그레이션 파일은 commit이고, alembic_version
+  테이블은 현재…
 ---
 
 # 왜 Alembic인가, 그리고 init까지

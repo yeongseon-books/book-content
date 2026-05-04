@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 속도 제한 관리 — Rate Limit 대응 패턴
+seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # 속도 제한 관리 — Rate Limit 대응 패턴

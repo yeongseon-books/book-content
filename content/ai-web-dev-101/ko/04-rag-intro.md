@@ -16,6 +16,7 @@ tags:
 - Python
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: ChatGPT에게 우리 회사 매뉴얼이나 어제 나온 뉴스를 물어보면 "잘 모르겠습니다"라고 답합니다. 당연합니다.
 ---
 
 # RAG 입문 — 내 데이터로 답하는 AI 만들기

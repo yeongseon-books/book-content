@@ -18,6 +18,7 @@ targets:
   mkdocs: true
   tistory: true
 title: merge와 conflict 해결하기 - 두 줄기를 다시 합치기
+seo_description: merge는 "두 commit을 하나로 합치는 새 commit"을 만드는 작업입니다.
 ---
 
 # merge와 conflict 해결하기 - 두 줄기를 다시 합치기

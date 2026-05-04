@@ -1,5 +1,5 @@
 ---
-title: 'End-to-end RAG pipeline evaluation'
+title: End-to-end RAG pipeline evaluation
 series: rag-benchmark-101
 episode: 5
 language: en
@@ -17,6 +17,7 @@ tags:
 - LLM
 - Evaluation
 last_reviewed: '2026-05-01'
+seo_description: 'The data flow of an end-to-end evaluation:'
 ---
 
 # End-to-end RAG pipeline evaluation

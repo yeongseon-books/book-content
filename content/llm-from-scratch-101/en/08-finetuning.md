@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: The model from the previous post can mimic Shakespearian rhythms,
+  but it can't answer questions.
 ---
 
 # Adapting the Base Model to Specific Tasks

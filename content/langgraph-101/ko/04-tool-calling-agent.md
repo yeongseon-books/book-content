@@ -1,5 +1,5 @@
 ---
-title: '도구 호출 에이전트'
+title: 도구 호출 에이전트
 series: langgraph-101
 episode: 4
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: 도구 호출 에이전트는 LLM이 도구 필요 여부를 판단하고, ToolNode가 실행하고, 다시 LLM이 결과를 읽는 루프입니다.
 ---
 
 # 도구 호출 에이전트

@@ -1,5 +1,5 @@
 ---
-title: "list, tuple, set, dict"
+title: list, tuple, set, dict
 series: python-101
 episode: 4
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - list-and-tuple
-  - dict
-  - set
-  - mutability
-  - comprehensions
-  - hashable
+- list-and-tuple
+- dict
+- set
+- mutability
+- comprehensions
+- hashable
 last_reviewed: '2026-05-03'
+seo_description: 'The four collections differ along four axes: mutability, order,
+  duplicates allowed, and hashability.'
 ---
 
 # list, tuple, set, dict

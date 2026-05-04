@@ -15,6 +15,7 @@ tags:
 - Cataloging
 - Provenance
 last_reviewed: '2026-05-03'
+seo_description: 3개월 전에 학습시킨 모델을 다시 돌려야 한다는 요청이 옵니다. 데이터셋을 찾으니 디렉터리에는 dataset_v2_final_real.csv…
 ---
 
 # 원본 데이터 수집과 카탈로깅

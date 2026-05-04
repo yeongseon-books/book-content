@@ -15,6 +15,8 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 배포 장에서는 함수를 Flex Consumption에 올렸습니다. 그 경로가 현재 새 서버리스 앱의 기본 후보에 가장
+  가깝기 때문입니다.
 ---
 
 # 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated

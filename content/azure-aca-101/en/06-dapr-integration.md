@@ -17,6 +17,7 @@ tags:
 - Pub-Sub
 - Service Invocation
 last_reviewed: '2026-04-29'
+seo_description: 'Think of Dapr at two levels:'
 ---
 
 # Dapr integration — what you get from a sidecar

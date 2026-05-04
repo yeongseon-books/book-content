@@ -1,5 +1,5 @@
 ---
-title: 'LLM 앱 보안'
+title: LLM 앱 보안
 series: llm-apps-ops-101
 episode: 4
 language: ko
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: LLM 보안은 완벽한 차단보다 실패 지점을 앞당기는 작업입니다. 위험 입력을 모델 앞에서 끊고, 위험 출력을 사용자
+  앞에서 한 번 더 끊어야…
 ---
 
 # LLM 앱 보안

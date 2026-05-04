@@ -15,6 +15,7 @@ tags:
 - Metrics
 - BLEU
 last_reviewed: '2026-05-03'
+seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가 같아도 표현이 다르면 점수가 깎입니다.
 ---
 
 # 결정적 지표 — Exact Match, BLEU, ROUGE

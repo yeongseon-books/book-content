@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Collaborating with Pull Requests - From Branch to Review to Main
+seo_description: A Pull Request is not a plain merge; it is a place to "propose merging
+  your branch into main and host the review and discussion that surrounds that…
 ---
 
 # Collaborating with Pull Requests - From Branch to Review to Main

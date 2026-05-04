@@ -15,6 +15,8 @@ tags:
 - Dataset
 - Quality
 last_reviewed: '2026-05-03'
+seo_description: A good evaluation dataset mirrors production traffic distribution
+  while including enough edge cases.
 ---
 
 # Designing Evaluation Datasets

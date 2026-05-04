@@ -15,6 +15,8 @@ tags:
 - Red Team
 - Detection
 last_reviewed: '2026-05-03'
+seo_description: Jailbreak은 모델이 학습 단계에서 거부하도록 정렬된(aligned) 지시를 우회해, 정책에 어긋나는 응답을 끌어내는
+  공격입니다.
 ---
 
 # Jailbreak 탐지

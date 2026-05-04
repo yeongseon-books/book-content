@@ -1,5 +1,5 @@
 ---
-title: 'Completing LangGraph'
+title: Completing LangGraph
 series: langgraph-101
 episode: 6
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: A complete LangGraph agent is not one giant prompt. It is a state
+  machine where supervisor logic, tool execution, and checkpointing cooperate…
 ---
 
 # Completing LangGraph

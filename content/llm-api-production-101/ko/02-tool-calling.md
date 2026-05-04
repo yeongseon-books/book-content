@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 툴 호출 — 함수를 모델에 연결하기
+seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # 툴 호출 — 함수를 모델에 연결하기

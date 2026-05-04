@@ -1,5 +1,5 @@
 ---
-title: 'Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)'
+title: Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)
 series: python-dbapi-101
 episode: 4
 language: ko
@@ -18,6 +18,8 @@ tags:
 - PEP 249
 - Security
 last_reviewed: '2026-05-03'
+seo_title: Parameter binding과 SQL injection 방어
+seo_description: 핵심은 SQL 토큰화(tokenization)가 binding보다 먼저 끝난다는 점입니다. ?
 ---
 
 # Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)

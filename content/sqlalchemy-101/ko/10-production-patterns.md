@@ -1,5 +1,5 @@
 ---
-title: "production 패턴: 풀, 관측, 마이그레이션, 배포"
+title: 'production 패턴: 풀, 관측, 마이그레이션, 배포'
 series: sqlalchemy-101
 episode: 10
 language: ko
@@ -11,13 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - SQLAlchemy
-  - Production
-  - pool
-  - Observability
-  - SQLite
+- Python
+- SQLAlchemy
+- Production
+- pool
+- Observability
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: production SQLAlchemy는 세 개의 손잡이로 조율합니다.
 ---
 
 # production 패턴: 풀, 관측, 마이그레이션, 배포

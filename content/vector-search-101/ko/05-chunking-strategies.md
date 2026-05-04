@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 청크 전략 — 긴 문서를 어떻게 나눌 것인가
+seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 ---
 
 # 청크 전략 — 긴 문서를 어떻게 나눌 것인가

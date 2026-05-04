@@ -1,5 +1,5 @@
 ---
-title: "What is Git? Version control fundamentals"
+title: What is Git? Version control fundamentals
 series: git-github-101
 episode: 1
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - git-basics
-  - version-control
-  - distributed-vcs
-  - snapshot-model
-  - git-install
-  - git-config
+- git-basics
+- version-control
+- distributed-vcs
+- snapshot-model
+- git-install
+- git-config
 last_reviewed: '2026-05-03'
+seo_description: 'Git''s core model is "a tool that keeps snapshots of your files
+  in time order", and each snapshot is produced through three areas: the working…'
 ---
 
 # What is Git? Version control fundamentals

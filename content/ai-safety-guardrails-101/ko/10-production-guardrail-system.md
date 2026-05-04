@@ -15,6 +15,7 @@ tags:
 - Production
 - Architecture
 last_reviewed: '2026-05-03'
+seo_description: 지금까지 Ep1~9에서 다룬 guardrail은 모두 독립된 부품입니다.
 ---
 
 # 운영 가드레일 시스템 구축

@@ -1,5 +1,5 @@
 ---
-title: "branch와 merge: 동시에 만든 revision을 합치는 법"
+title: 'branch와 merge: 동시에 만든 revision을 합치는 법'
 series: alembic-101
 episode: 5
 language: ko
@@ -11,13 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - branch
-  - merge
-  - depends_on
-  - SQLite
+- Python
+- Alembic
+- branch
+- merge
+- depends_on
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(directed acyclic graph)입니다.
 ---
 
 # branch와 merge: 동시에 만든 revision을 합치는 법

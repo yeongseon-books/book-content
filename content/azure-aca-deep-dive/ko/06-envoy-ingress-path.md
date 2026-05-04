@@ -15,6 +15,7 @@ tags:
 - Dapr
 - Envoy
 last_reviewed: '2026-04-29'
+seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
 ---
 
 # Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지

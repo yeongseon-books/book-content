@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: PEP 249 예외 계층과 SQLite 에러 처리
+seo_description: 예외 클래스는 운영 의사결정의 신호다. retry할지, 4xx로 돌려줄지, 즉시 fail할지를 클래스 하나로 표현할
+  수 있어야 한다.
 ---
 
 # PEP 249 예외 계층과 SQLite 에러 처리

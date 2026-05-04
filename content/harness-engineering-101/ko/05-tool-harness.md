@@ -15,6 +15,7 @@ tags:
 - Tool Design
 - Sandboxing
 last_reviewed: '2026-05-03'
+seo_description: 도구는 Agent의 손과 발입니다. 잘못 설계한 도구는 데이터를 망가뜨리거나 비용을 폭발시킵니다.
 ---
 
 # Tool Harness — Agent가 사용할 도구를 안전하게 설계하기

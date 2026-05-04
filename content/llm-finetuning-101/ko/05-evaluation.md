@@ -1,5 +1,5 @@
 ---
-title: '모델 평가'
+title: 모델 평가
 series: llm-finetuning-101
 episode: 5
 language: ko
@@ -17,6 +17,7 @@ tags:
 - Metrics
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 평가는 "모델 내부 신호"와 "사용자 관점 품질"을 분리해서 보는 것이 핵심입니다.
 ---
 
 # 모델 평가

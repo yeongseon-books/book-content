@@ -15,6 +15,8 @@ tags:
 - Cataloging
 - Provenance
 last_reviewed: '2026-05-03'
+seo_description: 'A request lands: re-train the model from three months ago. You open
+  the directory and find files like dataset_v2_final_real.csv with no record of…'
 ---
 
 # Source Data Collection and Cataloging

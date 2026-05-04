@@ -16,6 +16,8 @@ tags:
 - Python
 - Hands-on
 last_reviewed: '2026-05-02'
+seo_description: Now let's synthesize what we've learned and build a real agent. This
+  article implements a simple yet practical agent from start to finish.
 ---
 
 # Building Your First Agent

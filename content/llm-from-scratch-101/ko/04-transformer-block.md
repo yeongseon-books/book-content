@@ -15,6 +15,7 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 지난 글에서 CausalSelfAttention까지 만들고 나면 한숨 돌리게 됩니다.
 ---
 
 # 블록 하나, 깊이의 단위

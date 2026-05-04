@@ -15,6 +15,9 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 'When developers first hear the word "serverless," the reaction is
+  usually one of two things: "What do you mean there''s no server?" or "The cloud
+  is…'
 ---
 
 # What Is Azure Functions? — A World Where Events Call Your Code

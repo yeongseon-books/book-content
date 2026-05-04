@@ -1,5 +1,5 @@
 ---
-title: 'Assembling a Korean RAG pipeline'
+title: Assembling a Korean RAG pipeline
 series: korean-ai-stack-101
 episode: 6
 language: en
@@ -17,6 +17,7 @@ tags:
 - LLM
 - Python
 last_reviewed: '2026-05-03'
+seo_description: '!Core flow'
 ---
 
 # Assembling a Korean RAG pipeline

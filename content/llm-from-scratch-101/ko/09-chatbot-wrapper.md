@@ -15,6 +15,7 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: generate.py까지 오면 모델은 돌아가지만 아직은 개발자 도구에 가깝습니다.
 ---
 
 # 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍

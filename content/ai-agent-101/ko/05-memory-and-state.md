@@ -15,6 +15,7 @@ tags:
 - State Management
 - Context Window
 last_reviewed: '2026-05-02'
+seo_description: Agent가 여러 단계를 거쳐 작업을 수행하려면 이전 단계에서 무엇을 했는지 기억해야 합니다. 이것이 Memory입니다.
 ---
 
 # Memory와 State

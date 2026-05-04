@@ -17,6 +17,8 @@ tags:
 - RAG
 - tiktoken
 last_reviewed: '2026-05-03'
+seo_description: Entities and references cut at chunk boundaries lose information.
+  Overlap shares some tokens with adjacent chunks.
 ---
 
 # Tokenization and Chunking Strategies

@@ -15,6 +15,7 @@ tags:
 - Presidio
 - GDPR
 last_reviewed: '2026-05-03'
+seo_description: AI Safety & Guardrails 101 Series (4/10)
 ---
 
 # PII Detection and Redaction

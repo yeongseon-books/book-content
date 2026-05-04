@@ -18,6 +18,8 @@ tags:
 - VideoMAE
 - Action Recognition
 last_reviewed: '2026-05-03'
+seo_description: An image is a single frame; a video is a frame sequence with a time
+  axis.
 ---
 
 # Video Understanding - From Frame Sampling to Video-LLaVA

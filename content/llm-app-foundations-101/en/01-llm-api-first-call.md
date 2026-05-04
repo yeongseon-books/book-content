@@ -15,6 +15,8 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
+seo_description: '!Authentication rate limit and retry branches The SDK handles authentication
+  headers, JSON serialization, response parsing, and typed errors.'
 ---
 
 # LLM API first call — sending your first request

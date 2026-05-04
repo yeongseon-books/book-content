@@ -15,6 +15,7 @@ tags:
 - Reliability
 - Retry Logic
 last_reviewed: '2026-05-02'
+seo_description: Agent는 외부 도구를 호출하고, 네트워크를 거치고, 모델의 불확실한 판단에 의존하기 때문에 실패할 수 있습니다.
 ---
 
 # 에러 처리와 안정성

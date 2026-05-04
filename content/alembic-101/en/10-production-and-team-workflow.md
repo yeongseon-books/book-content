@@ -1,5 +1,5 @@
 ---
-title: "Production and team workflow: PR, CI, monitoring, and incident response"
+title: 'Production and team workflow: PR, CI, monitoring, and incident response'
 series: alembic-101
 episode: 10
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - Production
-  - CI
-  - workflow
-  - SQLite
+- Python
+- Alembic
+- Production
+- CI
+- workflow
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: A migration is "the most irreversible kind of code change". Ordinary
+  code can be reverted with a single click; a schema change carries data with it…
 ---
 
 # Production and team workflow: PR, CI, monitoring, and incident response

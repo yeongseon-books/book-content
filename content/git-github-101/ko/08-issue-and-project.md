@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법
+seo_description: issue는 "무엇을 할지"를, PR은 "실제로 어떻게 했는지"를, Project는 "지금 어디까지 왔는지"를 기록하는
+  세 개의 보완적인…
 ---
 
 # Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법

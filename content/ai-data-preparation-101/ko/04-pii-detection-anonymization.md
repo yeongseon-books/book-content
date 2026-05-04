@@ -15,6 +15,7 @@ tags:
 - Anonymization
 - Privacy
 last_reviewed: '2026-05-03'
+seo_description: LLM이 학습 데이터에 있던 이메일 주소나 전화번호를 그대로 출력해 버리는 사고는 이미 여러 사례로 보고됐습니다.
 ---
 
 # 학습 데이터 PII 탐지와 익명화

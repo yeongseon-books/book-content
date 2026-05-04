@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: Implementing CausalSelfAttention provides a momentary sense of relief.
+  Tokens can finally look at each other, and you've verified the weight matrices.
 ---
 
 # The Transformer Block: A Unit of Depth

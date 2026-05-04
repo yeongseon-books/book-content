@@ -15,6 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
+seo_description: 앞선 글에서 App Service가 어떤 플랫폼인지, 어떤 플랜을 골라야 하는지 감을 잡았다면 이제 남은 건 하나입니다.
 ---
 
 # 첫 번째 배포: 로컬에서 Azure까지 (Python/Flask)

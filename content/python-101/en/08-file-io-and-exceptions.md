@@ -1,5 +1,5 @@
 ---
-title: "File I/O and exception handling"
+title: File I/O and exception handling
 series: python-101
 episode: 8
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - file-io
-  - context-manager
-  - text-vs-binary
-  - exception-handling
-  - try-except-finally
-  - pathlib
+- file-io
+- context-manager
+- text-vs-binary
+- exception-handling
+- try-except-finally
+- pathlib
 last_reviewed: '2026-05-03'
+seo_description: 'A file is a three-step resource: open, read or write, close. Exceptions
+  are labels that classify which step failed and how.'
 ---
 
 # File I/O and exception handling

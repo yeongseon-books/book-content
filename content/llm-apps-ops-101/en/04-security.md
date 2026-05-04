@@ -1,5 +1,5 @@
 ---
-title: 'LLM app security'
+title: LLM app security
 series: llm-apps-ops-101
 episode: 4
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: LLM security is about moving failure earlier. Block risky input before
+  the model sees it, then block risky output before the user sees it.
 ---
 
 # LLM app security

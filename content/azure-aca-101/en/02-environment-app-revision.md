@@ -18,6 +18,8 @@ tags:
 - Blue-Green
 - Canary
 last_reviewed: '2026-05-03'
+seo_description: Environment is "the building," Container App is "the office," Revision
+  is "today's seating arrangement."
 ---
 
 # Environment, Container App, Revision — ACA in three words

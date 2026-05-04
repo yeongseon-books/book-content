@@ -1,5 +1,5 @@
 ---
-title: 'Evaluating LLM output quality'
+title: Evaluating LLM output quality
 series: llm-apps-ops-101
 episode: 3
 language: en
@@ -15,6 +15,8 @@ tags:
 - Python
 - LLM
 last_reviewed: '2026-05-01'
+seo_description: The first useful evaluation layer is not a perfect semantic judge.
+  It is a cheap filter that catches obviously bad answers quickly and consistently.
 ---
 
 # Evaluating LLM output quality

@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 'Once the model class is complete, you''re left with what seems like
+  the most daunting phase: training.'
 ---
 
 # Learning via Gradients

@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: Humans don't read every word in a sentence with the same intensity.
+  When you read "He threw it," your eyes instinctively scan back to earlier words…
 ---
 
 # Deciding Which Tokens to Focus On

@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: 첫 commit 만들기 - init, status, add, commit
+seo_description: 첫 commit은 "working directory의 변경을 staging에 모아서 repository로 한 장의 스냅샷으로
+  옮기는…
 ---
 
 # 첫 commit 만들기 - init, status, add, commit

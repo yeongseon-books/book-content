@@ -1,7 +1,8 @@
 ---
 title: Azure Functions란? — 이벤트가 함수를 호출하는 세상
-seo_title: Azure Functions란? Trigger, Binding, Host, Function App 구조 한 번에 이해하기
-medium_title: Azure Functions Is Not Just "Serverless" — It's an Event-Driven Mental Model
+seo_title: "Azure Functions\ub780? \ud575\uc2ec \uad6c\uc870 \ud55c \ub208\uc5d0 \uc774\ud574\ud558\uae30"
+medium_title: Azure Functions Is Not Just "Serverless" — It's an Event-Driven Mental
+  Model
 ebook_title: 이벤트가 함수를 호출하는 세상
 series: azure-functions-101
 episode: 1
@@ -18,6 +19,7 @@ tags:
 - Serverless
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: 서버리스라는 말을 처음 들었을 때 가장 흔한 반응은 둘 중 하나입니다. “서버가 없다는 게 무슨 뜻이야?
 ---
 
 # Azure Functions란? — 이벤트가 함수를 호출하는 세상

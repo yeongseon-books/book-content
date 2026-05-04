@@ -1,5 +1,5 @@
 ---
-title: "downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가"
+title: 'downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가'
 series: alembic-101
 episode: 8
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - downgrade
-  - expand-contract
-  - rollback
-  - SQLite
+- Python
+- Alembic
+- downgrade
+- expand-contract
+- rollback
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: 'downgrade는 두 종류로 나뉩니다. (1) 가역 변경: 정확한 역연산이 가능하고 데이터 손실이 없다 (예: nullable
+  컬럼…'
 ---
 
 # downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가

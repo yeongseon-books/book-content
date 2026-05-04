@@ -1,5 +1,5 @@
 ---
-title: 'Human-in-the-loop — 사람 개입 설계 패턴'
+title: Human-in-the-loop — 사람 개입 설계 패턴
 series: ai-app-patterns-101
 episode: 6
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: Human-in-the-loop는 자동화를 포기하는 패턴이 아니라, 위험한 지점에서만 사람 판단을 끼워 넣는 제어 장치입니다.
 ---
 
 # Human-in-the-loop — 사람 개입 설계 패턴

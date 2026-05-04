@@ -15,6 +15,8 @@ tags:
 - Testing
 - Eval
 last_reviewed: '2026-05-03'
+seo_description: When an agent says "done", only tests can confirm whether the work
+  is actually done.
 ---
 
 # Test Harness — Turning Completion Criteria into Tests

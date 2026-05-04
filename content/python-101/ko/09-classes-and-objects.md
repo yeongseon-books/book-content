@@ -1,5 +1,5 @@
 ---
-title: "클래스와 객체: 데이터와 동작을 함께 묶기"
+title: '클래스와 객체: 데이터와 동작을 함께 묶기'
 series: python-101
 episode: 9
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - class-and-instance
-  - init-method
-  - self-parameter
-  - dunder-methods
-  - inheritance
-  - dataclass
+- class-and-instance
+- init-method
+- self-parameter
+- dunder-methods
+- inheritance
+- dataclass
 last_reviewed: '2026-05-03'
+seo_description: 클래스는 "데이터를 담는 형틀"이 아니라 "같은 종류의 객체가 공유하는 행동의 정의"이며, 인스턴스는 그 정의를 따르는
+  개별 객체입니다.
 ---
 
 # 클래스와 객체: 데이터와 동작을 함께 묶기

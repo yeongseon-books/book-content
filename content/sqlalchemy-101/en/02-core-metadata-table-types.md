@@ -1,5 +1,6 @@
 ---
-title: SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column
+title: SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and
+  Column
 series: sqlalchemy-101
 episode: 2
 language: en
@@ -18,6 +19,8 @@ tags:
 - Schema
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: MetaData is a catalog of your schema. It's a container that holds
+  every Table definition your application knows about, and you hand the entire…
 ---
 
 # SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column

@@ -15,6 +15,8 @@ tags:
 - Security
 - Policy
 last_reviewed: '2026-05-03'
+seo_description: Agent에게 자유를 주면 창의적이지만 위험합니다. Constraint Harness는 어떤 행동이 허용되고 어떤 행동이
+  금지되는지 명시하는…
 ---
 
 # Constraint Harness — 규칙, 경계, 금지 행동 정의하기

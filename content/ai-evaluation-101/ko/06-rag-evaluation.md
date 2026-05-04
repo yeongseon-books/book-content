@@ -15,6 +15,7 @@ tags:
 - Faithfulness
 - Retrieval
 last_reviewed: '2026-05-03'
+seo_description: RAG는 retrieval과 generation 두 단계 모두를 평가해야 합니다.
 ---
 
 # RAG 시스템 평가하기

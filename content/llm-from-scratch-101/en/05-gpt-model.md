@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: We've built the input stage and attention mechanism, and in the last
+  post, we established the core transformer block.
 ---
 
 # Assembly: Completing the GPT Model Class

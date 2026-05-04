@@ -17,6 +17,7 @@ tags:
 - Image Generation
 - ControlNet
 last_reviewed: '2026-05-03'
+seo_description: 2014~2020년 image generation의 default는 GAN이었습니다.
 ---
 
 # Diffusion으로 Text-to-Image 생성

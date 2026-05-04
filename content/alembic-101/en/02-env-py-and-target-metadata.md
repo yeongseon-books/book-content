@@ -1,5 +1,5 @@
 ---
-title: "env.py and target_metadata: wiring models to migrations"
+title: 'env.py and target_metadata: wiring models to migrations'
 series: alembic-101
 episode: 2
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - env.py
-  - target_metadata
-  - Configuration
-  - SQLite
+- Python
+- Alembic
+- env.py
+- target_metadata
+- Configuration
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: env.py is a boot script Alembic runs on every command. For each invocation
+  (upgrade, revision --autogenerate, etc.) Alembic (1) reads alembic.ini…
 ---
 
 # env.py and target_metadata: wiring models to migrations

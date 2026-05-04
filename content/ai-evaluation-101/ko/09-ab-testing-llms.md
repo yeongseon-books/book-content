@@ -15,6 +15,7 @@ tags:
 - Statistics
 - Win Rate
 last_reviewed: '2026-05-03'
+seo_description: 두 prompt 중 어느 쪽이 더 나은지 어떻게 결정할까요? 이 글은 paired comparison, win rate…
 ---
 
 # LLM A/B 테스팅 — 어느 prompt가 더 나은가

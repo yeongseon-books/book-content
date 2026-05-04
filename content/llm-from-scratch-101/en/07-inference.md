@@ -15,6 +15,8 @@ tags:
 - Transformer
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: Once you've saved ckpt.pt, the immediate urge is to make the model
+  talk. However, simply calling model.eval() won't magically produce sentences.
 ---
 
 # Sampling — Generating Text from a Trained Model

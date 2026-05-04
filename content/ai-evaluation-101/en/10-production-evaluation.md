@@ -15,6 +15,8 @@ tags:
 - Drift Detection
 - Monitoring
 last_reviewed: '2026-05-03'
+seo_description: Evaluation is not a one-shot pre-deploy check; it must run continuously
+  in production.
 ---
 
 # Continuous Evaluation in Production

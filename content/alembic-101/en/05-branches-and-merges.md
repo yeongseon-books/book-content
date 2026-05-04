@@ -1,5 +1,5 @@
 ---
-title: "branches and merges: combining revisions made in parallel"
+title: 'branches and merges: combining revisions made in parallel'
 series: alembic-101
 episode: 5
 language: en
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - branch
-  - merge
-  - depends_on
-  - SQLite
+- Python
+- Alembic
+- branch
+- merge
+- depends_on
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: An alembic revision graph is a directed acyclic graph (DAG), just
+  like git.
 ---
 
 # branches and merges: combining revisions made in parallel

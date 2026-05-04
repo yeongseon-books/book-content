@@ -1,5 +1,5 @@
 ---
-title: "ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기"
+title: 'ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기'
 series: sqlalchemy-101
 episode: 4
 language: ko
@@ -18,6 +18,7 @@ tags:
 - mapped_column
 - SQLite
 last_reviewed: '2026-05-03'
+seo_description: ORM 모델 클래스는 "파이썬 클래스 + Core Table"의 결합입니다.
 ---
 
 # ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기

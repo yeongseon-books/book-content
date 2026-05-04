@@ -15,6 +15,8 @@ tags:
 - Tool Design
 - Sandboxing
 last_reviewed: '2026-05-03'
+seo_description: Tools are the hands and feet of an agent. Poorly designed tools can
+  corrupt data or blow up costs.
 ---
 
 # Tool Harness — Designing Safe Tools for Agents

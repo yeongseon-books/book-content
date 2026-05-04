@@ -1,5 +1,5 @@
 ---
-title: "Why Alembic, and getting to alembic init"
+title: Why Alembic, and getting to alembic init
 series: alembic-101
 episode: 1
 language: en
@@ -11,12 +11,14 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - Alembic
-  - SQLAlchemy
-  - Migration
-  - SQLite
+- Python
+- Alembic
+- SQLAlchemy
+- Migration
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: Alembic is git for your database schema. Each migration file is a
+  commit, the alembic_version table is the current HEAD pointer, upgrade head is…
 ---
 
 # Why Alembic, and getting to alembic init

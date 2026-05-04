@@ -17,6 +17,8 @@ tags:
 - FAISS
 - Multimodal Index
 last_reviewed: '2026-05-03'
+seo_description: 5편에서 multimodal RAG의 큰 그림을 살펴봤다면, 이번 글에서는 그 심장에 해당하는 multimodal embedding을
+  더…
 ---
 
 # Multimodal Embedding과 Cross-modal 검색

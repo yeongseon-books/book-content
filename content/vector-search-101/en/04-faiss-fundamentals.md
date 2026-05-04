@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: FAISS fundamentals — fast approximate nearest-neighbor search
+seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 ---
 
 # FAISS fundamentals — fast approximate nearest-neighbor search

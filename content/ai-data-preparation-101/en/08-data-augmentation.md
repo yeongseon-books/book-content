@@ -17,6 +17,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Data Augmentation - From EDA to Back-Translation
+seo_description: The previous episode generated samples "from scratch" by calling
+  an LLM.
 ---
 
 # Data Augmentation - From EDA to Back-Translation

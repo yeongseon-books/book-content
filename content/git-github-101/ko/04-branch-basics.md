@@ -18,6 +18,8 @@ targets:
   mkdocs: true
   tistory: true
 title: branch 기초 - 만들고 옮기고 비교하기
+seo_description: branch는 폴더 복사가 아니라 "특정 commit을 가리키는 움직이는 포인터"이며, HEAD는 그 포인터들 중 "지금
+  작업하고 있는…
 ---
 
 # branch 기초 - 만들고 옮기고 비교하기

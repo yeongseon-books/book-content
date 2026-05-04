@@ -1,5 +1,5 @@
 ---
-title: "왜 Python인가, 그리고 설치와 venv"
+title: 왜 Python인가, 그리고 설치와 venv
 series: python-101
 episode: 1
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - virtual-environments
-  - environment-isolation
-  - python-installation
-  - package-management
-  - developer-setup
+- Python
+- virtual-environments
+- environment-isolation
+- python-installation
+- package-management
+- developer-setup
 last_reviewed: '2026-05-03'
+seo_description: Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 각 프로젝트는 자기만의 Python을 하나씩 들고
+  있어야 합니다.
 ---
 
 # 왜 Python인가, 그리고 설치와 venv

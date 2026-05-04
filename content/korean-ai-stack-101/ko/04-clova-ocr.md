@@ -1,5 +1,5 @@
 ---
-title: 'CLOVA OCR API로 문서 텍스트 추출'
+title: CLOVA OCR API로 문서 텍스트 추출
 series: korean-ai-stack-101
 episode: 4
 language: ko
@@ -17,6 +17,7 @@ tags:
 - DocumentAI
 - Python
 last_reviewed: '2026-05-01'
+seo_description: OCR 파이프라인은 4단계로 분해됩니다.
 ---
 
 # CLOVA OCR API로 문서 텍스트 추출

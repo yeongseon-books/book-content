@@ -1,5 +1,5 @@
 ---
-title: "Vision-Language Model 아키텍처"
+title: Vision-Language Model 아키텍처
 series: multimodal-ai-101
 episode: 3
 language: ko
@@ -17,6 +17,7 @@ tags:
 - BLIP-2
 - Multimodal Fusion
 last_reviewed: '2026-05-03'
+seo_description: 2편에서 본 CLIP은 image와 text를 같은 공간에 정렬하는 데까지 갔습니다.
 ---
 
 # Vision-Language Model 아키텍처

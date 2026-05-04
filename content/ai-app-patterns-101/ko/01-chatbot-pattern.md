@@ -1,5 +1,5 @@
 ---
-title: '챗봇 패턴 — 대화 이력 관리와 상태'
+title: 챗봇 패턴 — 대화 이력 관리와 상태
 series: ai-app-patterns-101
 episode: 1
 language: ko
@@ -15,6 +15,7 @@ tags:
 - Agent
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 챗봇은 모델이 기억하는 시스템이 아니라, 앱이 messages 리스트를 계속 다시 보내는 재생 루프입니다.
 ---
 
 # 챗봇 패턴 — 대화 이력 관리와 상태

@@ -15,6 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Retry and error handling — making API calls reliable
+seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
 ---
 
 # Retry and error handling — making API calls reliable

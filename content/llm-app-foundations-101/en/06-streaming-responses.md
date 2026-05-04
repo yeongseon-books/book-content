@@ -15,6 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
+seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # Handling streaming responses — real-time output

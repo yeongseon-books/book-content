@@ -15,6 +15,8 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
+seo_description: AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 왜 되는데 외부에서 안 붙는지, Service는 있는데
+  도메인 라우팅은 왜 안…
 ---
 
 # 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길

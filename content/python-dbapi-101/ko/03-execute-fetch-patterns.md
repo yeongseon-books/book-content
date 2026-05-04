@@ -18,6 +18,7 @@ tags:
 - fetchall
 - Streaming Iteration
 last_reviewed: '2026-05-03'
+seo_description: DB-API의 모든 query 실행은 결국 cursor의 execute(), executemany()와 fetchone()…
 ---
 
 # execute, executemany, fetch 패턴

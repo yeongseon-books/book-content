@@ -1,5 +1,5 @@
 ---
-title: "이벤트, hybrid_property, 그리고 커스텀 타입"
+title: 이벤트, hybrid_property, 그리고 커스텀 타입
 series: sqlalchemy-101
 episode: 8
 language: ko
@@ -11,13 +11,15 @@ targets:
   mkdocs: true
   ebook: true
 tags:
-  - Python
-  - SQLAlchemy
-  - ORM
-  - event
-  - hybrid_property
-  - SQLite
+- Python
+- SQLAlchemy
+- ORM
+- event
+- hybrid_property
+- SQLite
 last_reviewed: '2026-05-03'
+seo_description: SQLAlchemy 확장점은 세 층으로 나눠 생각합니다. 타입 층은 컬럼 값을 DB로 들고 날 때 변환하고, 속성 층은
+  Python 객체와…
 ---
 
 # 이벤트, hybrid_property, 그리고 커스텀 타입

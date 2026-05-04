@@ -17,6 +17,8 @@ targets:
   mkdocs: true
   tistory: true
 title: Quality Filtering - Heuristics and Classifiers
+seo_description: A raw corpus is almost always more than half garbage. Ads, auto-generated
+  spam, broken encodings, and meaningless boilerplate are mixed in.
 ---
 
 # Quality Filtering - Heuristics and Classifiers

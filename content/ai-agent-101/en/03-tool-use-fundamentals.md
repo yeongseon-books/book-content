@@ -16,6 +16,8 @@ tags:
 - Function Calling
 - Integration
 last_reviewed: '2026-05-02'
+seo_description: Agents differ from simple conversational models because they can
+  use tools. They can call weather APIs, query databases, read and write files.
 ---
 
 # Tool Use Fundamentals

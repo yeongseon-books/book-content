@@ -18,6 +18,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 'SQLite Production 패턴: retry, timeout, 관측성, 백업'
+seo_description: SQLite가 파일이라는 사실은 운영을 단순하게 만들지만, "그냥 파일"이라는 생각은 위험하다.
 ---
 
 # SQLite Production 패턴: retry, timeout, 관측성, 백업

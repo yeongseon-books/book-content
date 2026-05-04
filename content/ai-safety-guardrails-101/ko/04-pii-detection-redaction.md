@@ -15,6 +15,7 @@ tags:
 - Presidio
 - GDPR
 last_reviewed: '2026-05-03'
+seo_description: 법무팀이 가장 자주 묻는 질문입니다. LLM 애플리케이션은 두 방향에서 PII를 다룹니다.
 ---
 
 # PII 감지와 마스킹

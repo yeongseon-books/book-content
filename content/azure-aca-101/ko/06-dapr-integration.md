@@ -17,6 +17,7 @@ tags:
 - Pub-Sub
 - Service Invocation
 last_reviewed: '2026-04-29'
+seo_description: Dapr를 두 개의 "수준"으로 보면 단순해집니다.
 ---
 
 # Dapr 통합 — 사이드카로 얻는 것

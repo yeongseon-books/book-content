@@ -1,5 +1,5 @@
 ---
-title: '임베딩 모델 비교'
+title: 임베딩 모델 비교
 series: rag-benchmark-101
 episode: 3
 language: ko
@@ -17,6 +17,7 @@ tags:
 - MTEB
 - Latency
 last_reviewed: '2026-05-01'
+seo_description: 임베딩 비교는 "하나만 바꾼다(one-variable-at-a-time)" 원칙 위에서 동작합니다.
 ---
 
 # 임베딩 모델 비교

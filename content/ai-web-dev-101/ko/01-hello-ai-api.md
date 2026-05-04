@@ -16,6 +16,7 @@ tags:
 - Python
 - Tutorial
 last_reviewed: '2026-04-29'
+seo_description: 최근 ChatGPT 같은 서비스 덕분에 인공지능이 우리 곁에 훌쩍 다가왔습니다.
 ---
 
 # AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기

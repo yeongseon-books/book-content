@@ -1,5 +1,5 @@
 ---
-title: 'LLM Fine-tuning Primer'
+title: LLM Fine-tuning Primer
 series: llm-finetuning-101
 episode: 1
 language: en
@@ -17,6 +17,8 @@ tags:
 - Python
 - GPT-2
 last_reviewed: '2026-05-01'
+seo_description: 'A fine-tuning experiment is a decision about how to slice three
+  variables:'
 ---
 
 # LLM Fine-tuning Primer

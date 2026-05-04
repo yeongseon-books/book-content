@@ -15,6 +15,7 @@ tags:
 - Guardrails
 - Red Team
 last_reviewed: '2026-05-03'
+seo_description: Ep1에서 본 가장 단순한 prompt injection은 다음과 같았습니다.
 ---
 
 # Prompt Injection 방어
