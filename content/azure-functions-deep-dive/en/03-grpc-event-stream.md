@@ -35,6 +35,14 @@ That channel is a single **bidirectional gRPC stream**. In this post, we'll walk
 
 ---
 
+## Questions this chapter answers
+
+- What kinds of messages does the host-to-worker gRPC stream carry, and how?
+- When the stream drops, what does the host assume, and what does the worker assume?
+- How do large payloads flow over the stream, and where are the hard limits?
+- Where does backpressure in the gRPC flow become visible?
+- Is this channel debuggable, or effectively a black box?
+
 ## The big picture — one single stream
 
 Let's start with the punchline. Host-worker communication in Azure Functions is **one gRPC service, one RPC**.
@@ -287,6 +295,14 @@ This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at proces
 - `WorkerChannel.SendFunctionLoadRequest()` / `SendFunctionLoadRequestCollection()` → worker load ack → per-worker invocation path becomes ready
 
 ---
+
+## Operational checklist
+
+- [ ] Defined a chunking/streaming policy for functions with large payloads
+- [ ] Verified worker-disconnect alerts and automatic recovery
+- [ ] Surfaced gRPC channel metrics (latency, error) on the dashboard
+- [ ] Reviewed idempotency guarantees against external dependencies on stream drop
+- [ ] Set a trace correlation-ID propagation policy for debuggability
 
 <!-- toc:begin -->
 ## In this series

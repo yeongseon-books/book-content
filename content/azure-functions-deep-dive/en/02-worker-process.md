@@ -31,6 +31,14 @@ The reference commit is the same as in part 1: `5e59423`.
 
 ---
 
+## Questions this chapter answers
+
+- How does the worker process differ across languages, and what does that mean operationally?
+- Is the worker stateless? How far is in-process state safe?
+- When a worker OOMs or hangs, by what signal does the host detect it?
+- How do worker pool size and the function execution model (in-process, out-of-process) meet?
+- Where do worker logs and function logs separate visually?
+
 ## Starting point — `worker.config.json`
 
 The answer is straightforward. The Host does not hard-code how to launch each language runtime. It reads **a `worker.config.json` file that ships with each language worker package** and follows that description. Adding a new language is therefore closer to adding a worker package than patching the Host.
@@ -157,6 +165,14 @@ This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host boot
 - `GrpcWorkerChannel.StartWorkerProcessAsync()` → `IWorkerProcess.StartProcessAsync()` → `RpcWorkerProcess.CreateWorkerProcess()` → `_processFactory.CreateWorkerProcess(workerContext)` → `Process.Start()`
 
 ---
+
+## Operational checklist
+
+- [ ] Recorded the rationale for worker language/model choice (in-proc vs isolated) in an ADR
+- [ ] Audited code that assumes in-process state and externalised it
+- [ ] Run separate alerts on per-worker memory and CPU
+- [ ] Verified automatic recovery behaviour on worker hang
+- [ ] Split worker logs and business logs into distinct categories
 
 <!-- toc:begin -->
 ## In this series

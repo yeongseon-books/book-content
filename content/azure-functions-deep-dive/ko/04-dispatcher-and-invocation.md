@@ -37,6 +37,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- Dispatcher는 한 번의 invocation을 어떤 단계로 분해하는가?
+- invocation context는 어디서 만들어지고 누구에 의해 죽는가?
+- concurrency 제어(maxConcurrentRequests, batchSize)는 dispatcher 어디에서 효과를 발휘하는가?
+- invocation 실패와 retry는 dispatcher와 trigger 중 어디에서 결정되는가?
+- invocation duration이 timeout을 넘기면 정확히 어떤 일이 일어나는가?
+
 ## 큰 그림 — 트리거에서 워커까지
 
 먼저 한 호출의 전체 경로를 한 화면에 그리고 시작하겠습니다.
@@ -274,6 +282,14 @@ gRPC stream
 - worker `InvocationResponse` → worker-specific inbound channel → invocation ID lookup in `WorkerChannel` → `TaskCompletionSource<ScriptInvocationResult>` 완료
 
 ---
+
+## 운영 체크리스트
+
+- [ ] 함수별 maxConcurrentRequests / batchSize 값을 워크로드에 맞춰 튜닝했다
+- [ ] invocation timeout과 외부 호출 timeout의 관계를 정렬했다
+- [ ] retry 정책과 poison queue 경로를 trigger 별로 정리했다
+- [ ] invocation 실패 분류(transient vs permanent)에 대한 알림 정책을 정했다
+- [ ] long-running invocation을 Durable Functions로 옮길 후보를 식별했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

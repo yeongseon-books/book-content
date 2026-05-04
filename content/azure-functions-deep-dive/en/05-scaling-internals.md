@@ -44,6 +44,14 @@ This installment has three goals:
 
 ---
 
+## Questions this chapter answers
+
+- Do the Consumption, Premium, and Dedicated plan scalers share the same decision tree?
+- What signal makes the Scale Controller decide to add another instance?
+- Where does scale-out latency pile up most in burst traffic?
+- How do concurrency throttling and scaling cooperate, and how do they collide?
+- On scale-in, how are in-flight invocations protected?
+
 ## The big picture — where scaling decisions are made
 
 Before we touch any code, here's the whole thing in one diagram.
@@ -318,6 +326,14 @@ The model in this post stops at the boundary where an external component has alr
 - `WorkerConcurrencyManager` timer loop → `WorkerStatus.LatencyHistory` evaluation → add worker inside the current instance when needed
 
 ---
+
+## Operational checklist
+
+- [ ] Tabulated cost vs latency trade-offs for plan selection
+- [ ] Have load-test runs and recorded results for burst scenarios
+- [ ] Validated concurrency settings against downstream quotas
+- [ ] Verified graceful-shutdown behaviour on scale-in
+- [ ] Decided Premium-plan minimum instances and cold-start protection strategy
 
 <!-- toc:begin -->
 ## In this series

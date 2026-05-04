@@ -37,6 +37,14 @@ Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher
 
 ---
 
+## Questions this chapter answers
+
+- Through what stages does the dispatcher split a single invocation?
+- Where is the invocation context born, and who tears it down?
+- Where in the dispatcher do concurrency controls (maxConcurrentRequests, batchSize) take effect?
+- Where is invocation failure-and-retry decided — dispatcher or trigger?
+- When invocation duration exceeds the timeout, what exactly happens?
+
 ## The big picture — from trigger to worker
 
 Let's start by drawing the entire path of a single invocation in one diagram.
@@ -274,6 +282,14 @@ This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established th
 - worker `InvocationResponse` → worker-specific inbound channel → invocation ID lookup in `WorkerChannel` → `TaskCompletionSource<ScriptInvocationResult>` completion
 
 ---
+
+## Operational checklist
+
+- [ ] Tuned per-function maxConcurrentRequests / batchSize against the workload
+- [ ] Aligned invocation timeout with external-call timeouts
+- [ ] Catalogued retry policy and poison-queue path per trigger
+- [ ] Set an alert policy that classifies invocation failure (transient vs permanent)
+- [ ] Identified long-running invocations as Durable Functions candidates
 
 <!-- toc:begin -->
 ## In this series

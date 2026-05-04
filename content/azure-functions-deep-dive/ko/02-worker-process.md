@@ -31,6 +31,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- Worker 프로세스는 언어별로 어떻게 다르고, 그 차이는 운영에 어떤 의미를 갖는가?
+- Worker는 stateless인가? in-process state는 어디까지 안전한가?
+- Worker가 OOM이나 hang에 빠질 때 호스트는 어떤 신호로 감지하는가?
+- Worker pool 크기와 함수의 실행 모델(in-process, out-of-process)은 어떻게 만나는가?
+- Worker 로그와 함수 로그는 어디에서 분리되어 보이는가?
+
 ## 출발점 — `worker.config.json`
 
 여러 언어 런타임을 어떻게 같이 띄우는지의 답은 단순합니다. Host는 “어떤 언어를 어떻게 띄울지”를 직접 하드코딩하지 않습니다. 대신 **각 언어 워커 패키지에 들어 있는 `worker.config.json`**을 읽고 그 설명을 따릅니다. 새 언어를 붙이는 일은 Host 코드를 뜯어고치는 작업이 아니라, 해당 언어 워커 패키지를 추가하는 작업에 가깝습니다.
@@ -157,6 +165,14 @@ OS 프로세스가 떠 있다고 해서 Worker가 “준비 완료”인 건 아
 - `GrpcWorkerChannel.StartWorkerProcessAsync()` → `IWorkerProcess.StartProcessAsync()` → `RpcWorkerProcess.CreateWorkerProcess()` → `_processFactory.CreateWorkerProcess(workerContext)` → `Process.Start()`
 
 ---
+
+## 운영 체크리스트
+
+- [ ] Worker 언어/모델 선택의 근거(in-proc vs isolated)를 ADR로 남겼다
+- [ ] in-process state를 가정한 코드를 검토하고 외부화했다
+- [ ] Worker 프로세스 단위 메모리/CPU 알림을 분리해서 운영한다
+- [ ] Worker hang 발생 시 자동 회복 동작을 검증했다
+- [ ] Worker 로그와 비즈니스 로그를 별도 카테고리로 분리했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

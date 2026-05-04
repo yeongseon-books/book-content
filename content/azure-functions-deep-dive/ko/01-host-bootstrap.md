@@ -31,6 +31,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- Functions Host는 정확히 어떤 프로세스이고, 어떤 순서로 부트스트랩되는가?
+- host.json은 단순 설정 파일인가, 아니면 호스트의 행동을 바꾸는 ‘런타임 컨피그’인가?
+- Host 시작 실패는 어디에 어떻게 기록되며, 우리는 어디부터 보아야 하는가?
+- Functions runtime version은 어떤 단위로 고정되어야 안전한가?
+- Host와 Worker는 같은 컨테이너인가, 다른 프로세스인가, 다른 머신인가?
+
 ## 전체 그림 — Azure Functions 호스트 한 인스턴스
 
 이 그림이 이번 심화 시리즈 전체의 지도입니다.
@@ -163,6 +171,23 @@ last_reviewed: '2026-04-29'
 - `WebJobsScriptHostService` health timer → `OnHostHealthCheckTimer(...)` → `HostPerformanceManager`
 
 ---
+
+### Host bootstrap 로그와 host.json 점검
+
+```bash
+az functionapp config appsettings list -n my-func -g my-rg \
+  --query "[?starts_with(name, 'FUNCTIONS_') || starts_with(name, 'WEBSITE_')]" -o table
+
+az functionapp log tail -n my-func -g my-rg
+```
+
+## 운영 체크리스트
+
+- [ ] FUNCTIONS_EXTENSION_VERSION과 워커 런타임 버전을 명시적으로 고정했다
+- [ ] host.json 변경의 회귀 테스트 흐름을 정의했다
+- [ ] Host 시작 실패 알림과 첫 진단 절차를 RUNBOOK에 넣었다
+- [ ] Host와 Worker 분리 모델이 우리 코드에 미치는 영향을 검토했다
+- [ ] 런타임 업그레이드 정책(자동 vs 수동)을 결정했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

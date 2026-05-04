@@ -35,6 +35,14 @@ The answer to that question is **Placeholder Mode**. This part follows the code 
 
 ---
 
+## Questions this chapter answers
+
+- Of host bootstrap, worker start, and JIT, which is the most expensive part of a Functions cold start?
+- What exactly does the Placeholder instance prepare in advance?
+- How does a Premium-plan always-ready instance differ from a placeholder?
+- What are the code-level rules to reduce cold start?
+- How will you express cold-start metric in the SLO?
+
 ## Why Cold Start Is Expensive — Decomposing the Bootstrap Cost
 
 Let's first lay out the steps a single new instance has to traverse before it's ready to run a function from scratch.
@@ -403,6 +411,14 @@ This part closes out the Azure Functions Deep Dive series. Part 1 covered host b
 - `SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel()` → `SendFunctionEnvironmentReloadRequest()` → `RestartHostAsync()`
 
 ---
+
+## Operational checklist
+
+- [ ] Measured cold-start cost broken down by stage
+- [ ] Decided Premium always-ready instance count per workload
+- [ ] Specified lazy vs eager initialisation policy for connections, etc.
+- [ ] Pinned cold-start latency in the SLO document
+- [ ] Load-tested the scenario where scale-out exposes cold-start to users
 
 <!-- toc:begin -->
 ## In this series

@@ -35,6 +35,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- Host와 Worker 사이의 gRPC stream은 어떤 종류의 메시지를 어떻게 주고받는가?
+- 이 stream이 끊기면 호스트는 무엇을 가정하고, Worker는 무엇을 가정하는가?
+- 큰 payload는 stream 위에서 어떻게 흘러가는가, 한계는 어디인가?
+- gRPC 흐름의 backpressure는 어디에서 가시화되는가?
+- 이 채널은 디버깅 가능한 채널인가, 아니면 블랙박스인가?
+
 ## 큰 그림 — 단 하나의 스트림
 
 먼저 결론. Azure Functions의 호스트-워커 통신은 **gRPC 서비스 하나, RPC 하나**로 구성됩니다.
@@ -287,6 +295,14 @@ message FunctionLoadRequest {
 - `WorkerChannel.SendFunctionLoadRequest()` / `SendFunctionLoadRequestCollection()` → worker load ack → per-worker invocation path becomes ready
 
 ---
+
+## 운영 체크리스트
+
+- [ ] 큰 payload 함수의 분할/스트리밍 정책을 정했다
+- [ ] Worker disconnect 알림과 자동 복구 동작을 검증했다
+- [ ] gRPC 채널 메트릭(latency, error)을 대시보드에 노출했다
+- [ ] stream 끊김 시 외부 의존성에 대한 idempotency 보장을 검토했다
+- [ ] 디버깅을 위한 trace correlation ID 전파 정책을 정했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

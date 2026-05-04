@@ -43,6 +43,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- Consumption, Premium, Dedicated 플랜의 스케일러는 같은 결정 트리를 쓰는가?
+- Scale Controller가 ‘인스턴스를 더 만든다’를 결정하는 신호는 무엇인가?
+- burst 트래픽에서 scale-out 지연은 어디에서 가장 크게 누적되는가?
+- concurrency throttle과 scale은 어떻게 함께 동작하며 어떻게 충돌하는가?
+- scale-in 시 진행 중 invocation은 어떻게 보호되는가?
+
 ## 큰 그림 — 스케일링은 어디에서 결정되는가
 
 코드를 보기 전에 한 장의 그림으로 정리하겠습니다.
@@ -317,6 +325,14 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 - `WorkerConcurrencyManager` timer loop → `WorkerStatus.LatencyHistory` 평가 → 필요 시 인스턴스 내부 worker 추가
 
 ---
+
+## 운영 체크리스트
+
+- [ ] 플랜 선택의 비용/지연 trade-off를 매트릭스로 정리했다
+- [ ] burst 시나리오에 대한 부하 테스트와 결과 기록이 있다
+- [ ] concurrency 설정과 다운스트림 quota를 함께 검증했다
+- [ ] scale-in 시 graceful shutdown 동작을 검증했다
+- [ ] Premium plan의 minimum instances와 cold-start 보호 전략을 결정했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

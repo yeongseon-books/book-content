@@ -35,6 +35,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- Functions의 cold-start는 host bootstrap, worker start, JIT 중 어디가 가장 비싼가?
+- Placeholder 인스턴스는 정확히 무엇을 미리 만들어 두는가?
+- Premium plan의 always-ready instance와 placeholder는 어떻게 다른가?
+- cold-start를 줄이기 위한 코드 수준의 룰은 무엇인가?
+- cold-start metric을 SLO에 어떻게 명시할 것인가?
+
 ## 콜드 스타트가 왜 비싼가 — 부트스트랩 비용의 분해
 
 먼저 새 인스턴스 하나가 처음부터 함수를 실행할 준비가 될 때까지 어떤 단계들을 거치는지 정리하겠습니다.
@@ -403,6 +411,14 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 - `SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel()` → `SendFunctionEnvironmentReloadRequest()` → `RestartHostAsync()`
 
 ---
+
+## 운영 체크리스트
+
+- [ ] cold-start의 단계별 비용을 측정해 두었다
+- [ ] Premium always-ready instance 수를 워크로드에 맞춰 결정했다
+- [ ] 함수 초기화 코드(connection 등)의 lazy/eager 정책을 명시했다
+- [ ] cold-start latency를 SLO 문서에 명시했다
+- [ ] 스케일 아웃 시 cold-start 노출 시나리오를 부하 테스트했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

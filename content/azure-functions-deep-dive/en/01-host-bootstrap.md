@@ -31,6 +31,14 @@ This post focuses on one question: **what happens the moment a Function App inst
 
 ---
 
+## Questions this chapter answers
+
+- What process is the Functions Host exactly, and in what order does it bootstrap?
+- Is host.json just a config file, or a runtime configuration that changes host behaviour?
+- Where do host startup failures get logged, and where do you start looking?
+- What unit must the Functions runtime version be pinned at to stay safe?
+- Are Host and Worker the same container, separate processes, or separate machines?
+
 ## The big picture — one Azure Functions host instance
 
 This is the map for the rest of the series.
@@ -163,6 +171,23 @@ This is part 1 of the Azure Functions Deep Dive series. It isolates the host-boo
 - `WebJobsScriptHostService` health timer → `OnHostHealthCheckTimer(...)` → `HostPerformanceManager`
 
 ---
+
+### Inspect host bootstrap logs and host.json
+
+```bash
+az functionapp config appsettings list -n my-func -g my-rg \
+  --query "[?starts_with(name, 'FUNCTIONS_') || starts_with(name, 'WEBSITE_')]" -o table
+
+az functionapp log tail -n my-func -g my-rg
+```
+
+## Operational checklist
+
+- [ ] Explicitly pinned FUNCTIONS_EXTENSION_VERSION and the worker runtime version
+- [ ] Defined a regression-test flow for host.json changes
+- [ ] Added host-startup-failure alerts and the first diagnostic step to the runbook
+- [ ] Reviewed how the host/worker split affects your code
+- [ ] Decided runtime-upgrade policy (automatic vs manual)
 
 <!-- toc:begin -->
 ## In this series
