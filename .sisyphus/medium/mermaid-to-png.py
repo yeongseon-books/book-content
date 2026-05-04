@@ -32,7 +32,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PUPPETEER_CFG = REPO_ROOT / ".sisyphus/medium/puppeteer.json"
 MERMAID_CFG = REPO_ROOT / ".sisyphus/medium/mermaid-config.json"
-MMDC = shutil.which("mmdc") or "mmdc"
+MMDC = shutil.which("mmdc") or str(REPO_ROOT / ".sisyphus/medium/node_modules/.bin/mmdc")
 
 MERMAID_BLOCK_RE = re.compile(r"^```mermaid\s*\n(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
