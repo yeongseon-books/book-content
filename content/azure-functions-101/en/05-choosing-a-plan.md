@@ -27,6 +27,14 @@ The goal is simple: **understand what each plan gives you, what it constrains, a
 
 ---
 
+## Questions this chapter answers
+
+- What does each plan (Consumption, Premium, Dedicated) bill against?
+- When should cold-start tolerance drive the plan choice instead of price?
+- Which platform features (VNet integration, always-ready instances) lock you into Premium or Dedicated?
+- What is each plan's scale ceiling, and where does that hit your peak load?
+- How do you build a monthly cost simulation that does not lie?
+
 ## One-line definitions
 
 | Plan | One-line definition |
@@ -193,6 +201,23 @@ Once the plan is chosen, the next question follows naturally: **how do instances
 The deployment chapter showed the path end to end; this chapter decides what hosting target that deployment should land on. The scaling chapter picks up from here and explains how those plan choices turn into real scaling behavior and cold-start trade-offs.
 
 ---
+
+## Plan change example
+
+```bash
+az functionapp plan create \
+  --resource-group $RG --name $PLAN \
+  --location koreacentral \
+  --sku EP1 --is-linux
+```
+
+## Operational checklist
+
+- [ ] Documented the billing unit for each plan in a single table
+- [ ] Agreed that cold-start tolerance is the first plan-decision criterion
+- [ ] Folded platform-feature requirements (VNet, etc.) into the comparison
+- [ ] Compared per-plan scale ceilings against your workload peak
+- [ ] Simulated monthly cost across realistic scenarios
 
 <!-- toc:begin -->
 ## In this series

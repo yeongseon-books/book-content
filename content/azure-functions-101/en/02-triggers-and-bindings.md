@@ -25,6 +25,14 @@ This chapter draws that line clearly. We’ll cover the main trigger types, the 
 
 ---
 
+## Questions this chapter answers
+
+- What is fundamentally different about a trigger versus a binding, and why are they split?
+- How much code do input/output bindings remove, and what flexibility do you give up?
+- Can multiple triggers attach to one function, and if not, why?
+- Where should binding connection strings actually live to stay safe?
+- How does trigger-message reprocessing (retry, poison queue) actually flow?
+
 ## A trigger is the “cause” that wakes a function up
 
 Let’s nail the definition first. **A trigger is the external event that causes a function to run.** An incoming HTTP request, a message landing in a queue, a file being uploaded to Blob storage, the top of every hour — those are all triggers.
@@ -170,6 +178,14 @@ The answer is two words: **Host and Worker**. That’s where Functions’ suppor
 The mental model from the opening chapter becomes much more concrete once you see how triggers and bindings shape the surface area you work with every day. From there, the Host/Worker chapter explains what sits underneath that surface.
 
 ---
+
+## Operational checklist
+
+- [ ] Separated triggers and bindings cleanly between code and config
+- [ ] Documented the implicit work bindings do (auto serialize/deserialize)
+- [ ] Injected connection strings via Key Vault or Managed Identity
+- [ ] Pinned the retry policy and the poison-queue path
+- [ ] Added integration tests that catch regressions when bindings change
 
 <!-- toc:begin -->
 ## In this series

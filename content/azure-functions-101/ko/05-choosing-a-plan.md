@@ -194,6 +194,23 @@ Dedicated(App Service Plan)는 이름보다 본질을 보는 편이 쉽습니다
 
 ---
 
+## 플랜 변경 예시
+
+```bash
+az functionapp plan create \
+  --resource-group $RG --name $PLAN \
+  --location koreacentral \
+  --sku EP1 --is-linux
+```
+
+## 운영 체크리스트
+
+- [ ] Consumption, Premium, Dedicated 플랜의 청구 단위를 표로 정리했다
+- [ ] 콜드 스타트 허용 한도가 플랜 결정의 1차 기준임을 합의했다
+- [ ] VNet 통합 등 플랫폼 기능 요구를 플랜 비교에 반영했다
+- [ ] 스케일 한도(인스턴스 수)와 워크로드 피크를 비교했다
+- [ ] 예상 비용을 월 단위 시나리오로 시뮬레이션했다
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

@@ -25,6 +25,14 @@ last_reviewed: '2026-04-29'
 
 ---
 
+## 이 글에서 답할 질문
+
+- trigger와 binding은 본질적으로 무엇이 다르고 왜 분리되어 있는가?
+- input binding과 output binding은 코드를 얼마나 줄여주고, 어떤 자유를 빼앗아가는가?
+- 여러 trigger를 한 함수에 묶을 수 있는가, 묶지 못한다면 왜인가?
+- binding 설정의 connection string은 어디에 두는 것이 안전한가?
+- 트리거 메시지의 재처리(retry, poison queue)는 어떻게 흐르는가?
+
 ## 트리거 = 함수를 깨우는 “원인”
 
 먼저 단어 정의부터 정확히 합니다. **트리거(trigger)는 함수가 실행되도록 만드는 외부 사건**입니다. HTTP 요청이 들어오는 것, 큐에 메시지가 쌓이는 것, Blob에 파일이 올라오는 것, 매시 정각이 되는 것 — 이 모든 것이 트리거입니다.
@@ -170,6 +178,14 @@ DB 연결, 인증, 재시도 같은 운영 코드는 **Functions Host가 대신 
 앞 장에서 잡은 멘탈 모델은 Trigger와 Binding을 통해 실제 입출력 표면으로 구체화됩니다. 이어지는 Host와 Worker 장을 보면 그 표면 아래에서 실행 경계가 어떻게 나뉘는지 자연스럽게 연결됩니다.
 
 ---
+
+## 운영 체크리스트
+
+- [ ] trigger와 binding을 코드와 설정으로 명시적으로 분리했다
+- [ ] binding이 숨기는 동작(자동 직렬화/역직렬화)을 문서화했다
+- [ ] connection string은 Key Vault나 Managed Identity로 주입했다
+- [ ] 재시도 정책과 poison queue 경로를 명시했다
+- [ ] binding 변경의 회귀를 잡는 통합 테스트를 추가했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

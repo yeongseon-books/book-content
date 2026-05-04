@@ -25,6 +25,14 @@ This chapter revisits the hosting-plan decision from an operations angle. When t
 
 ---
 
+## Questions this chapter answers
+
+- What signals does the Functions scale controller use to add instances?
+- Where exactly does cold start happen, and what do you measure to see it?
+- How much cold start does Premium's always-ready instances actually erase?
+- What goes wrong when burst traffic scales instances too quickly?
+- Which patterns put external dependencies (DB connections) on a collision course with scale?
+
 ## Scaling Has Two Axes — Instance Count and In-Instance Concurrency
 
 “Scaling” hides two different controls.
@@ -178,6 +186,14 @@ Scaling and cold starts only become manageable once you can observe them. The mo
 If you want the implementation details behind those behaviors, pair this chapter with [Deep Dive — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md) and [Deep Dive — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md). The 101 series is about operational judgment; the deep-dive series shows how those behaviors are implemented in the host.
 
 ---
+
+## Operational checklist
+
+- [ ] Cataloged scale-controller signals (queue length, HTTP queue) per workload
+- [ ] Surfaced cold-start metrics (p50/p95) on a dashboard
+- [ ] Decided the always-ready vs. cost tradeoff explicitly
+- [ ] Sized DB connection pools alongside the function-instance ceiling
+- [ ] Set max scale-out limits to throttle burst behavior
 
 <!-- toc:begin -->
 ## In this series

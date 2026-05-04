@@ -269,6 +269,14 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 
 ---
 
+## 운영 체크리스트
+
+- [ ] Function App 이름과 Storage 계정의 글로벌 유니크 제약을 확인했다
+- [ ] 배포 방식(zip deploy vs. continuous)을 명시적으로 선택했다
+- [ ] 함수 키와 호스트 키의 관리 주체를 정했다
+- [ ] 초기 배포 후 health probe와 사용량 메트릭을 확인했다
+- [ ] 롤백 시나리오(slot, 이전 zip)를 테스트했다
+
 <!-- toc:begin -->
 ## 시리즈 목차
 

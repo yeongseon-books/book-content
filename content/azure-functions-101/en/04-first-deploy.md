@@ -34,6 +34,14 @@ One framing note before we start: this walkthrough uses **Flex Consumption as th
 
 ---
 
+## Questions this chapter answers
+
+- Which parameters absolutely must be settled before the first Function App is created?
+- Should you start with zip deploy, GitHub Actions, or VS Code direct deploy?
+- How does the Function App bind to its associated Storage account, and why does it need one?
+- What does function-key versus host-key management actually look like?
+- What rollback path do you have if the first deploy is broken?
+
 ## Tooling — three pieces
 
 You need three tools.
@@ -268,6 +276,14 @@ Once the app is deployed, the next real question is **whether this hosting plan 
 The earlier chapters covered triggers and bindings, then the Host and Worker split; this chapter turns that model into a working deployment path. The next two chapters build from here into plan choice, scaling, and cold-start behavior, which is where most production decisions start.
 
 ---
+
+## Operational checklist
+
+- [ ] Verified the global-uniqueness constraints on Function App and Storage names
+- [ ] Picked the deployment method (zip deploy vs. continuous) explicitly
+- [ ] Decided who owns function keys and host keys long-term
+- [ ] Validated health probes and usage metrics after the first deploy
+- [ ] Rehearsed the rollback path (slots, previous zip)
 
 <!-- toc:begin -->
 ## In this series

@@ -25,6 +25,16 @@ The scope is practical: the baseline observability view, a small KQL toolkit for
 
 ---
 
+> 90% of operations is the ability to see 'what is different from baseline' inside 30 seconds.
+
+## Questions this chapter answers
+
+- How do Application Insights and Log Analytics divide responsibilities for Functions ops?
+- Which queries actually surface per-function latency, failure rate, and dependency calls?
+- When does Live Metrics beat stream logs, and vice versa?
+- Which metrics tell you cost is about to spike before the bill does?
+- What absolutely must be in the incident runbook?
+
 ## Application Insights Is the Starting Point
 
 Most of the operational data you need for Azure Functions ends up in Application Insights. Requests, exceptions, dependency calls, logs, and custom metrics converge there, which makes App Insights integration one of the most important choices you make when standing up a Function App.
@@ -194,6 +204,14 @@ This chapter closes the Azure Functions 101 series. Taken together, the series m
 If you want to go deeper into the implementation, continue with [Deep Dive — Scaling internals](../../azure-functions-deep-dive/en/05-scaling-internals.md) and [Deep Dive — Cold starts and Placeholder Mode](../../azure-functions-deep-dive/en/06-cold-start-placeholder.md). The 101 series is about making good engineering decisions quickly; the deep-dive series shows how those behaviors are built inside the host.
 
 ---
+
+## Operational checklist
+
+- [ ] Added per-function latency and failure-rate charts to the default dashboard
+- [ ] Enabled distributed traces on key dependencies (DB, external APIs)
+- [ ] Set cost alarms (execution count, GB-s)
+- [ ] Specified the first-five-minutes actions in the incident runbook
+- [ ] Shared Live Metrics access with the on-call team
 
 <!-- toc:begin -->
 ## In this series

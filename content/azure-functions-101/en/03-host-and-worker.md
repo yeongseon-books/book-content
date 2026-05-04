@@ -31,6 +31,14 @@ Let’s unpack that line with diagrams.
 
 ---
 
+## Questions this chapter answers
+
+- Why are the Functions Host and the language worker separate processes?
+- What message flow runs over the gRPC channel between Host and worker?
+- How many function instances does one worker run concurrently?
+- What signals trigger a Host restart versus a worker restart?
+- What tradeoffs come with the out-of-process worker model versus in-process?
+
 ## The big picture — two processes
 
 A traditional web framework usually does everything inside a single process. Loading code, handling HTTP, calling the database, building the response — all in one chunk.
@@ -124,6 +132,26 @@ That wraps up the "structure of Functions" portion of the series. The practical 
 The earlier chapters established the mental model, triggers, and bindings; this one explains the execution boundary between the Host and the Worker. The deployment and operations chapters build directly on that boundary.
 
 ---
+
+## Key host.json settings
+
+```json
+{
+  "version": "2.0",
+  "functionTimeout": "00:05:00",
+  "extensions": {
+    "http": { "maxConcurrentRequests": 100 }
+  }
+}
+```
+
+## Operational checklist
+
+- [ ] Confirmed whether your language uses in-process or out-of-process workers
+- [ ] Tuned concurrency limits (`maxConcurrentRequests`, etc.) from workload data
+- [ ] Set up the environment so Host and worker logs are separable
+- [ ] Tested automatic recovery when a worker crashes
+- [ ] Managed key host.json settings via infrastructure IaC
 
 <!-- toc:begin -->
 ## In this series

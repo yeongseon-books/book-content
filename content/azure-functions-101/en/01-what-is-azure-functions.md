@@ -25,6 +25,14 @@ This series is an introductory guide for developers who are picking up Azure Fun
 
 ---
 
+## Questions this chapter answers
+
+- What model of serverless compute is Azure Functions, exactly?
+- Does per-execution billing actually save money, and when does it backfire?
+- Where does Functions sit in an event-driven architecture?
+- How do Functions, Logic Apps, and Durable Functions split responsibilities?
+- Which production scenarios are a sign that Functions is the wrong fit?
+
 ## A One-Sentence Definition — "An event arrives, my function runs, and then it's gone"
 
 Here's Azure Functions in a single line:
@@ -145,6 +153,14 @@ This chapter focused on getting the mental model right. One-line summary:
 The next concepts to internalize are **triggers and bindings**: what kinds of events can wake a function, how much code bindings save, and where the abstraction stops being magic and becomes an explicit contract.
 
 ---
+
+## Operational checklist
+
+- [ ] Estimated trigger types and call frequency alongside the billing unit
+- [ ] Wrote the cold-start tolerance into the non-functional requirements
+- [ ] Inventoried the lifecycle (deployment, permissions) of grouped functions
+- [ ] Decided connection-pooling policy for outbound dependencies (storage, DB)
+- [ ] Captured 'do not use Functions for X' cases in an ADR
 
 <!-- toc:begin -->
 ## In this series
