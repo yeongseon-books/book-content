@@ -44,6 +44,14 @@ and why App Service keeps pushing you toward stateless design.
 
 ---
 
+## Questions this chapter answers
+
+- What does a Front-End node actually do, and where does ARR (Application Request Routing) sit inside it?
+- Is the ARR Affinity cookie just a sticky session, or more than that?
+- How do TLS termination and SNI handling flow through the Front End?
+- How do custom domains and hostname bindings change Front-End routing?
+- From the user's perspective, how does a Front-End failure look different from a Worker failure?
+
 ## The routing path in three stages
 
 ![Three-stage path from ingress to worker](../../../assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
@@ -262,6 +270,24 @@ Episode 1 drew the whole map, and this post zoomed into the Front-End and ARR bo
 Client → App Service Front-End → host/slot resolution → ARR worker selection inside the shared App Service Plan → slot-specific app instance
 
 Slot-swap path: apply target-slot settings to the source slot → warm every source-slot instance → switch Front-End routing rules
+
+### Inspect Front-End routing, hostnames, and SSL
+
+```bash
+az webapp config show -n my-app -g my-rg \
+  --query "{httpsOnly:httpsOnly, http20:http20Enabled, alwaysOn:alwaysOn, ftpsState:ftpsState, clientCertEnabled:clientCertEnabled}"
+
+az webapp config hostname list -n my-app -g my-rg -o table
+az webapp config ssl list -g my-rg -o table
+```
+
+## Operational checklist
+
+- [ ] Documented whether ARR Affinity is on and what failure patterns that creates
+- [ ] Verified automated TLS certificate renewal and alerting
+- [ ] Monitor Front-End 5xx and Worker 5xx as separate signals
+- [ ] Catalogued routing priority and redirect rules per custom domain
+- [ ] Separated paths that require client-cert auth from those that do not
 
 <!-- toc:begin -->
 ## In this series

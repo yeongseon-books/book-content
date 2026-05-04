@@ -46,6 +46,14 @@ This post follows that path end to end.
 
 ---
 
+## Questions this chapter answers
+
+- Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?
+- How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?
+- When you swap a Deployment Slot, what gets swapped and what does not?
+- What does the warm-up page actually guarantee during a swap?
+- Which deployment models allow automatic rollback on failure, and which do not?
+
 ## The deployment pipeline in one picture
 
 ![Deployment path from upload to startup](../../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
@@ -241,6 +249,26 @@ The previous posts explained request routing and worker execution boundaries. Th
 ## Call Path Summary
 
 Push (zip, git, publish profile, container image reference) → Kudu SCM endpoint → optional build automation (`SCM_DO_BUILD_DURING_DEPLOYMENT`, Oryx on Linux code apps) → content placement in `wwwroot` or mounted package path → app restart / worker process recycle → worker serves the new artifact
+
+### Slot swap and warm-up flow
+
+```bash
+az webapp deployment slot list -n my-app -g my-rg -o table
+
+az webapp deployment slot swap -n my-app -g my-rg \
+  --slot staging --target-slot production --action swap
+
+az webapp config appsettings list -n my-app -g my-rg --slot staging \
+  --query "[?starts_with(name, 'WEBSITE_SWAP')]" -o table
+```
+
+## Operational checklist
+
+- [ ] Standardised on one deployment method and recorded the rationale in an ADR
+- [ ] Verified warm-up exercises every main path before swap
+- [ ] Automated rollback and measured the resulting RTO
+- [ ] Confirmed no code relies on writing to a read-only filesystem under Run From Package
+- [ ] Separated deployment privileges from slot privileges
 
 <!-- toc:begin -->
 ## In this series

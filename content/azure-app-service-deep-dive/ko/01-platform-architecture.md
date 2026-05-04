@@ -49,6 +49,14 @@ Functions Deep Dive가 프로세스 안쪽을 봤다면,
 
 ---
 
+## 이 글에서 답할 질문
+
+- App Service의 ‘플랫폼’은 정확히 어떤 레이어로 구성되어 있는가?
+- App Service Plan은 단순한 가격표인가, 아니면 격리 단위인가?
+- Front End 풀과 Worker 풀은 누가 소유하고, 우리 코드는 어디에서 도는가?
+- Linux 플랜과 Windows 플랜의 내부 차이는 우리 의사결정에 어떻게 영향을 주는가?
+- App Service Environment(ASE)는 멀티테넌트 모델과 무엇이 본질적으로 다른가?
+
 ## 전체 그림 — App Service 한 인스턴스가 받는 요청
 
 이 그림이 이번 시리즈의 지도입니다.
@@ -294,6 +302,24 @@ Front-End와 ARR이 어떻게 요청을 워커에 보내는지,
 - Windows code app과 Linux code app은 기본적으로 공유된 앱 콘텐츠 경로를 여러 인스턴스가 함께 봅니다.
 - Linux custom container는 `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`일 때 `/home` 공유 영속 스토리지 마운트를 사용하지 않을 수 있습니다.
 - Kudu는 앱 옆의 SCM buddy site로서 배포와 진단 경로를 담당합니다.
+
+### 플랜 구성과 워커 가시성 점검
+
+```bash
+az appservice plan show -n my-plan -g my-rg \
+  --query "{sku:sku.name, tier:sku.tier, workers:numberOfWorkers, perSite:perSiteScaling, kind:kind, reserved:reserved}"
+
+az webapp list --plan my-plan -g my-rg \
+  --query "[].{name:name, state:state, hostNames:defaultHostName}" -o table
+```
+
+## 운영 체크리스트
+
+- [ ] App Service Plan을 ‘격리 단위’로서 의식적으로 분리했다
+- [ ] Linux/Windows 선택 근거를 ADR로 남겼다
+- [ ] ASE 도입의 비용/격리 trade-off를 매트릭스로 정리했다
+- [ ] 동일 플랜 위 앱들의 자원 경쟁(noisy neighbor) 시나리오를 검토했다
+- [ ] 플랫폼 업그레이드(OS, Runtime) 알림과 회귀 테스트 흐름을 정의했다
 
 <!-- toc:begin -->
 ## 시리즈 목차

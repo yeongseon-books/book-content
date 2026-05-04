@@ -50,6 +50,14 @@ All of those symptoms start here.
 
 ---
 
+## Questions this chapter answers
+
+- Inside what sandbox does the Worker process run, and what does that sandbox actually block?
+- How do sandbox restrictions appear in file system, network, and process spawning?
+- When a worker dies, who starts healing on what signal?
+- What does Always On mean beyond a simple 'process keepalive'?
+- What is the first rule for writing sandbox-friendly code?
+
 ## The two worker models that matter
 
 ![Windows and Linux worker execution boundaries](../../../assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
@@ -267,6 +275,26 @@ Episode 2 delivered requests to the worker, and this post explained the executio
 ## Call Path Summary
 
 App Service Front-End (ARR) → worker instance → IIS `w3wp.exe` on Windows or container entrypoint on Linux → App Service sandbox or container boundary → user code
+
+### Diagnose worker and sandbox via Kudu/SCM
+
+```bash
+az webapp log tail -n my-app -g my-rg
+
+az webapp ssh -n my-app -g my-rg
+# inside the sandbox
+ps -ef | head
+ls /home/site/wwwroot
+cat /home/LogFiles/eventlog.xml 2>/dev/null | tail -40
+```
+
+## Operational checklist
+
+- [ ] Added sandbox-forbidden calls (child processes, raw sockets) to the code-review rules
+- [ ] Reflected worker-healing behaviour in the SLO definition
+- [ ] Decided cost vs stability trade-off for Always On
+- [ ] Minimised Kudu/SCM access privileges
+- [ ] Run separate alerts on worker process memory and CPU metrics
 
 <!-- toc:begin -->
 ## In this series

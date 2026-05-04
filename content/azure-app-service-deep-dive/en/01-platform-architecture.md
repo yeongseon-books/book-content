@@ -48,6 +48,14 @@ this series looks at the platform that hosts it.
 
 ---
 
+## Questions this chapter answers
+
+- What layers really make up App Service's 'platform'?
+- Is an App Service Plan just a price tag, or is it an isolation unit?
+- Who owns the Front-End pool and the Worker pool, and where exactly does your code run?
+- How do internal differences between Linux and Windows plans affect your decisions?
+- How is App Service Environment (ASE) fundamentally different from the multi-tenant model?
+
 ## The big picture — one request through App Service
 
 This is the map for the rest of the series.
@@ -293,6 +301,24 @@ Episode 2 covers Front-End and ARR, episode 3 covers workers and the sandbox, ep
 - Windows code apps and Linux code apps normally share the same deployed-content path across scaled-out instances.
 - Linux custom containers can opt out of shared persistent `/home` storage with `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`.
 - Kudu is the SCM buddy site that handles deployment and diagnostics alongside the main app.
+
+### Inspect plan layout and worker visibility
+
+```bash
+az appservice plan show -n my-plan -g my-rg \
+  --query "{sku:sku.name, tier:sku.tier, workers:numberOfWorkers, perSite:perSiteScaling, kind:kind, reserved:reserved}"
+
+az webapp list --plan my-plan -g my-rg \
+  --query "[].{name:name, state:state, hostNames:defaultHostName}" -o table
+```
+
+## Operational checklist
+
+- [ ] Treated the App Service Plan deliberately as an isolation unit
+- [ ] Recorded the rationale for choosing Linux vs Windows in an ADR
+- [ ] Tabulated cost vs isolation trade-offs for adopting ASE
+- [ ] Reviewed noisy-neighbour scenarios across apps on the same plan
+- [ ] Defined notification and regression-test flow for platform upgrades (OS, runtime)
 
 <!-- toc:begin -->
 ## In this series

@@ -42,6 +42,14 @@ or the new process or container has not finished becoming traffic-eligible.
 
 ---
 
+## Questions this chapter answers
+
+- What sequence of steps actually adds up to cold-start on App Service?
+- How much does Always On reduce cold-start, and when does it not help at all?
+- What must a warm-up ping hit to be meaningful, and what would give false confidence?
+- Per runtime (.NET, Node, Python), where does the dominant cold-start cost live?
+- How do you express cold-start latency in an SLO — mean or p99?
+
 ## The cold path and the warm path
 
 ![First request waiting for a ready worker](../../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
@@ -227,6 +235,25 @@ Read back through the series and the whole model lines up: entry, routing, execu
 - Linux App Service exposes startup-readiness controls through `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, and `WEBSITES_CONTAINER_START_TIME_LIMIT`.
 - Windows App Service can use IIS `applicationInitialization` and slot warm-up behavior to prepare instances before production traffic arrives.
 - Slot swap helps by warming the source-slot instances first and only then switching Front-End routing rules.
+
+### Probe warm-up path and response distribution
+
+```bash
+az webapp restart -n my-app -g my-rg
+
+for i in $(seq 1 50); do
+  curl -o /dev/null -s -w "%{http_code} %{time_total}s\n" \
+    https://my-app.azurewebsites.net/healthz
+done | sort -k2 -n | tail -10
+```
+
+## Operational checklist
+
+- [ ] Confirmed warm-up ping wakes core dependencies (DB, cache)
+- [ ] Decided the cost vs latency balance of Always On
+- [ ] Measured cold-start profile per runtime
+- [ ] Pinned p99 cold-start in the SLO document
+- [ ] Load-tested the scenario where scale-out exposes cold-start to users
 
 <!-- toc:begin -->
 ## In this series

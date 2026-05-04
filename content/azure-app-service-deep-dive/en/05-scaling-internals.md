@@ -50,6 +50,14 @@ The goal is to map the **publicly observable scale-decision loop** into a usable
 
 ---
 
+## Questions this chapter answers
+
+- On what metric sources and what cadence does auto-scale evaluate rules?
+- Scale-out and scale-up are not the same decision tree — who decides what, and how?
+- When should you turn per-site scaling on, and when is it dangerous?
+- During scale, how far is cold-start of a new instance shielded from the user?
+- On scale-in, what happens to existing connections and any stateful in-process state?
+
 ## The control path in one diagram
 
 ![Autoscale control path to new workers](../../../assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png)
@@ -289,6 +297,24 @@ This post translates the intro-series scaling guidance into the internal App Ser
 - Azure Monitor autoscale uses a periodic evaluation loop, observation windows, cooldowns, and anti-flapping behavior.
 - Scale-out can trigger when any scale-out rule matches, while scale-in requires all scale-in rules to match.
 - `AutoscaleEvaluationsLog`, `AutoscaleScaleActionsLog`, and the activity log expose the actual decision trail.
+
+### Track auto-scale rules and instance count
+
+```bash
+az monitor autoscale show -g my-rg -n my-app-autoscale
+
+az monitor metrics list \
+  --resource $(az appservice plan show -n my-plan -g my-rg --query id -o tsv) \
+  --metric "CpuPercentage,HttpQueueLength" --interval PT1M -o table
+```
+
+## Operational checklist
+
+- [ ] Measured a steady-state baseline for scale-out metrics and thresholds
+- [ ] Recorded the per-site scaling decision in an ADR
+- [ ] Verified SIGTERM handlers exist for graceful drain on scale-in
+- [ ] Put scale-event alerts and instance-count graphs on the dashboard
+- [ ] Split runbooks for scale-up (SKU change) and scale-out
 
 <!-- toc:begin -->
 ## In this series

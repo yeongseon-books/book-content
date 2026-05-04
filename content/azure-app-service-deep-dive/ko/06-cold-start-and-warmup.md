@@ -43,6 +43,14 @@ worker가 아직 준비되지 않았거나,
 
 ---
 
+## 이 글에서 답할 질문
+
+- App Service에서 cold-start는 정확히 어떤 단계의 합인가?
+- Always On이 cold-start를 ‘얼마나’ 줄여 주는가, 어떤 경우 효과가 없는가?
+- warm-up ping은 무엇을 hit해야 의미 있고, 무엇을 hit하면 거짓 안전감을 주는가?
+- 런타임(예: .NET, Node, Python) 별로 cold-start의 우세한 요소는 어디에 있는가?
+- cold-start latency를 SLO에 어떻게 표현하는가, 평균인가 p99인가?
+
 ## 큰 그림 — cold path와 warm path
 
 ![첫 요청이 ready worker를 기다리는 경로](../../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.ko.png)
@@ -222,6 +230,25 @@ warm-up이 한 시스템으로 이어진 플랫폼으로 볼 수 있습니다.
 - Linux App Service는 `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, `WEBSITES_CONTAINER_START_TIME_LIMIT`으로 startup readiness 계약을 조정합니다.
 - Windows App Service는 IIS `applicationInitialization`과 slot warm-up 흐름을 통해 production 전 준비를 앞당길 수 있습니다.
 - slot swap은 warm-up이 끝난 뒤 Front-End 라우팅 규칙을 바꾸므로, cold start 비용을 production URL 바깥에서 치르게 해 줍니다.
+
+### warm-up 경로와 응답 분포 측정
+
+```bash
+az webapp restart -n my-app -g my-rg
+
+for i in $(seq 1 50); do
+  curl -o /dev/null -s -w "%{http_code} %{time_total}s\n" \
+    https://my-app.azurewebsites.net/healthz
+done | sort -k2 -n | tail -10
+```
+
+## 운영 체크리스트
+
+- [ ] warm-up ping이 main 의존성(DB, cache)까지 깨우는지 확인했다
+- [ ] Always On 사용 여부의 비용/지연 균형을 결정했다
+- [ ] 런타임 별 cold-start 프로파일을 측정해 두었다
+- [ ] cold-start p99를 SLO 문서에 명시했다
+- [ ] scale-out 시 cold-start가 사용자에게 노출되는 시나리오를 부하 테스트했다
 
 <!-- toc:begin -->
 ## 시리즈 목차
