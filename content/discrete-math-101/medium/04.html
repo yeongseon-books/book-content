@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Relations and Equivalence</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Relations and Equivalence</h1>
+<blockquote>
+<p>Discrete Math 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: A database "relation," the <code>==</code> operator, the topological sort of a dependency graph — what is the shared mathematical structure?</p>
+<blockquote>
+<p>A relation is a subset of a Cartesian product expressing "some connection" between two elements. Combinations of properties (reflexive, symmetric, transitive) define equivalence relations and partial orders, which underpin partitions, ordering, and hierarchies. This article covers relations, their properties, equivalence classes, and topological sort.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and representation of binary relations</li>
+<li>Reflexive, symmetric, transitive, and antisymmetric properties</li>
+<li>Equivalence relations, equivalence classes, and the partition theorem</li>
+<li>Partial orders and topological sort</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The relational database model came directly from relation theory. Git's commit graph, npm dependency resolution, and build tool task scheduling are all topological sorts on partial orders. The <code>==</code> and <code>is</code> operators along with caching strategies are applications of equivalence relations.</p>
+<blockquote>
+<p>A relation is the most basic tool for expressing structure between data.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A relation is a set of pairs (a, b). Depending on which properties hold, it is classified as an equivalence relation, a partial order, etc.</p>
+</blockquote>
+<pre><code class="language-text">   Relation R ⊆ A × A
+        │
+   ┌────┴────┬──────────┐
+ Reflexive   Symmetric  Transitive
+   │         │          │
+   └────┬────┘          │
+   Equivalence ↔ Partition
+                         │
+   Refl ∧ Antisym ∧ Trans = Partial order → Topological sort
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Binary relation</strong><br>
+- Meaning: A subset of A × A</p>
+<p><strong>Reflexive</strong><br>
+- Meaning: (a, a) ∈ R for every a</p>
+<p><strong>Symmetric</strong><br>
+- Meaning: (a, b) ∈ R ⇒ (b, a) ∈ R</p>
+<p><strong>Transitive</strong><br>
+- Meaning: (a, b), (b, c) ∈ R ⇒ (a, c) ∈ R</p>
+<p><strong>Equivalence</strong><br>
+- Meaning: Reflexive + Symmetric + Transitive</p>
+<h2>Before / After</h2>
+<p><strong>Before — no relational thinking:</strong></p>
+<pre><code class="language-python"># Ad-hoc comparison: &quot;are these two objects the same?&quot;
+def same_user(a, b):
+    return a.id == b.id and a.email == b.email
+</code></pre>
+<p><strong>After — explicit equivalence relation:</strong></p>
+<pre><code class="language-python"># Group items into equivalence classes — usable as cache keys
+def equivalence_class(item, items, eq):
+    return {x for x in items if eq(item, x)}
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Representing a Relation</strong></p>
+<pre><code class="language-python"># A relation is a set of (a, b) pairs
+people = {&quot;alice&quot;, &quot;bob&quot;, &quot;carol&quot;}
+friends = {(&quot;alice&quot;, &quot;bob&quot;), (&quot;bob&quot;, &quot;alice&quot;), (&quot;bob&quot;, &quot;carol&quot;), (&quot;carol&quot;, &quot;bob&quot;)}
+
+print(f&quot;alice's friends: {[b for (a, b) in friends if a == 'alice']}&quot;)
+
+# Matrix representation
+import numpy as np
+
+names = sorted(people)
+n = len(names)
+M = np.zeros((n, n), dtype=int)
+for a, b in friends:
+    M[names.index(a)][names.index(b)] = 1
+
+print(f&quot;Adjacency matrix:\n{M}&quot;)
+</code></pre>
+<p>A relation can be a set of pairs, an adjacency matrix, or an adjacency list. We meet these forms again with graphs in Chapter 8.</p>
+<p><strong>Step 2: The Core Properties</strong></p>
+<pre><code class="language-python">def is_reflexive(R: set, A: set) -&gt; bool:
+    return all((a, a) in R for a in A)
+
+def is_symmetric(R: set) -&gt; bool:
+    return all((b, a) in R for (a, b) in R)
+
+def is_transitive(R: set) -&gt; bool:
+    return all(
+        (a, c) in R
+        for (a, b) in R
+        for (b2, c) in R
+        if b == b2
+    )
+
+def is_antisymmetric(R: set) -&gt; bool:
+    return all(
+        a == b for (a, b) in R if (b, a) in R
+    )
+
+A = {1, 2, 3}
+R_eq = {(1, 1), (2, 2), (3, 3), (1, 2), (2, 1)}
+print(f&quot;Reflexive: {is_reflexive(R_eq, A)}&quot;)
+print(f&quot;Symmetric: {is_symmetric(R_eq)}&quot;)
+print(f&quot;Transitive: {is_transitive(R_eq)}&quot;)
+</code></pre>
+<p><strong>Step 3: Equivalence Relations and Classes</strong></p>
+<pre><code class="language-python"># Equivalence: reflexive + symmetric + transitive
+# Example: integers modulo 3
+def mod_equivalent(a: int, b: int, n: int = 3) -&gt; bool:
+    return (a - b) % n == 0
+
+numbers = list(range(10))
+
+def equivalence_class(x: int, domain: list, eq) -&gt; set:
+    return {y for y in domain if eq(x, y)}
+
+for i in range(3):
+    cls = equivalence_class(i, numbers, mod_equivalent)
+    print(f&quot;[{i}] = {sorted(cls)}&quot;)
+
+# Equivalence classes partition the domain
+all_classes = {frozenset(equivalence_class(x, numbers, mod_equivalent)) for x in numbers}
+print(f&quot;Partition: {[sorted(c) for c in all_classes]}&quot;)
+</code></pre>
+<p>Equivalence relations always induce partitions and vice versa — the two notions are in bijection. Cache invalidation, deduplication, and clustering all reduce to defining the right equivalence.</p>
+<p><strong>Step 4: Partial Orders and Hasse Diagrams</strong></p>
+<pre><code class="language-python"># Partial order: reflexive + antisymmetric + transitive
+# Example: subset relation ⊆
+A = [{1}, {2}, {1, 2}, {1, 2, 3}]
+
+def is_subset_of(x: set, y: set) -&gt; bool:
+    return x &lt;= y
+
+# Cover relation: x ⊂ y with no element strictly in between
+def covers(x, y, items):
+    if x == y or not is_subset_of(x, y):
+        return False
+    return not any(
+        is_subset_of(x, z) and is_subset_of(z, y) and z != x and z != y
+        for z in items
+    )
+
+for x in A:
+    for y in A:
+        if covers(x, y, A):
+            print(f&quot;{x} ⋖ {y}&quot;)
+</code></pre>
+<p>In a partial order, not every pair must be comparable — that's how it differs from a total order. Directory trees, class inheritance, and Git commit DAGs are all partial orders.</p>
+<p><strong>Step 5: Topological Sort</strong></p>
+<pre><code class="language-python">from collections import defaultdict, deque
+
+def topological_sort(nodes: list, edges: list[tuple]) -&gt; list:
+    &quot;&quot;&quot;Return a linear order respecting the partial order.&quot;&quot;&quot;
+    graph = defaultdict(list)
+    indegree = {n: 0 for n in nodes}
+    for a, b in edges:
+        graph[a].append(b)
+        indegree[b] += 1
+
+    queue = deque([n for n in nodes if indegree[n] == 0])
+    result = []
+    while queue:
+        node = queue.popleft()
+        result.append(node)
+        for nxt in graph[node]:
+            indegree[nxt] -= 1
+            if indegree[nxt] == 0:
+                queue.append(nxt)
+    return result if len(result) == len(nodes) else []
+
+tasks = [&quot;wake_up&quot;, &quot;shower&quot;, &quot;breakfast&quot;, &quot;work&quot;]
+deps = [(&quot;wake_up&quot;, &quot;shower&quot;), (&quot;shower&quot;, &quot;breakfast&quot;), (&quot;breakfast&quot;, &quot;work&quot;)]
+print(f&quot;Execution order: {topological_sort(tasks, deps)}&quot;)
+</code></pre>
+<p>Topological sort produces a linear ordering that satisfies every constraint of a partial order. Build tools (make, gradle), package managers, and task schedulers all use it.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Relations are subsets of Cartesian products — simple definition, rich structure</li>
+<li>Equivalence relation ↔ partition is a one-to-one correspondence</li>
+<li>Partial orders are weaker than total orders but more general</li>
+<li>Topological sort exists only when there are no cycles</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Skip an equivalence property</strong><br>
+- Problem: Reflexivity or transitivity check missed<br>
+- Fix: Verify all three explicitly</p>
+<p><strong>Confuse partial and total order</strong><br>
+- Problem: Cannot handle incomparable pairs<br>
+- Fix: Partial order compares only some pairs</p>
+<p><strong>Topological sort with cycles</strong><br>
+- Problem: Infinite loop or empty result<br>
+- Fix: Check for cycles first</p>
+<p><strong>Treat classes and partitions separately</strong><br>
+- Problem: Reimplement the same idea twice<br>
+- Fix: Define one, derive the other</p>
+<p><strong>Confuse symmetry and antisymmetry</strong><br>
+- Problem: Both can hold on empty relations<br>
+- Fix: Use definitions strictly</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Database normalization rests on functional dependencies (a partial order)</li>
+<li>npm/pip dependency resolution is topological sort</li>
+<li>Git's ancestor relation is a partial order</li>
+<li>Cache key design is the same as defining an equivalence relation</li>
+<li>An ORM's <code>equals()</code> must satisfy the equivalence laws</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>When defining "equality," senior engineers always check the three equivalence properties. Java's <code>equals()</code> contract and Python's <code>__eq__</code> rely on them — break them and collections break too. When designing task scheduling, the first question is "is this dependency a partial order with no cycles?"</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can define the four relation properties</li>
+<li>[ ] I remember the three equivalence laws</li>
+<li>[ ] I see the bijection between equivalence and partition</li>
+<li>[ ] I distinguish partial vs total order</li>
+<li>[ ] I know topological sort requires no cycles</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Decide whether "same sign" is an equivalence relation on the integers and list its equivalence classes.</p>
+</li>
+<li>
+<p>Express your directory layout as a partial order and write one valid topological order.</p>
+</li>
+<li>
+<p>Construct a broken <code>__eq__</code> in Python that violates transitivity and explain what goes wrong.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A relation is a subset of a Cartesian product, and combinations of properties produce equivalences and partial orders. Equivalences yield partitions; partial orders yield topological sorts. These structures are the math behind data modeling and task scheduling.</p>
+<p>Next, we examine how to "rigorously prove" claims like these — direct, contradiction, and induction proofs.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
+<li><strong>Relations and Equivalence (current)</strong></li>
+<li>Proof Techniques (upcoming)</li>
+<li>Sequences and Recurrence (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Graph Theory Basics (upcoming)</li>
+<li>Trees and Graph Traversal (upcoming)</li>
+<li>Discrete Mathematics and Algorithms (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html">Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 9</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Equivalence_relation">Wikipedia — Equivalence Relation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Partially_ordered_set">Wikipedia — Partially Ordered Set</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Topological_sorting">Wikipedia — Topological Sorting</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Discrete Math, Relations, Equivalence Classes, Partial Order, Data Modeling</p>
+</body>
+</html>

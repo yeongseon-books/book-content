@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Discrete Mathematics?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Discrete Mathematics?</h1>
+<blockquote>
+<p>Discrete Math 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How is discrete mathematics different from calculus, and why is it the first math course in every computer science curriculum?</p>
+<blockquote>
+<p>Discrete mathematics studies "countable" objects — integers, propositions, sets, graphs — entities that come in distinct, separated units. Computers are inherently discrete machines, so every theory in computer science is built on discrete math. This article maps the field, contrasts it with continuous math, and previews the topics covered in this series.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How discrete and continuous mathematics differ</li>
+<li>The five pillars of discrete mathematics</li>
+<li>Why discrete math is mandatory for computer scientists</li>
+<li>The roadmap for this entire series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Analyzing algorithms requires recurrences and combinatorics. Understanding databases requires set and relation theory. Designing networks requires graph theory. Discrete math is not just another math class — it is the shared language across all of computer science.</p>
+<blockquote>
+<p>Discrete math = the language a computer scientist uses to organize their thinking.</p>
+</blockquote>
+<p>This series walks through the core concepts one episode at a time, drawing the link to computer science at every step.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Discrete math rests on five pillars: logic, sets, functions, combinatorics, and graphs. They are unified by the property of "discreteness."</p>
+</blockquote>
+<pre><code class="language-text">            Logic (propositions, proofs)
+                |
+        Sets / Functions / Relations
+                |
+        ┌───────┼───────┐
+   Combinatorics  Sequences   Graphs
+       (count)   (recurrence) (structure)
+        └───────┼───────┘
+                |
+        Algorithms / Data structures
+                |
+        Computer science applications
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Discrete</strong><br>
+- Meaning: Countable in distinct, separated units</p>
+<p><strong>Continuous</strong><br>
+- Meaning: Connected without breaks</p>
+<p><strong>Proposition</strong><br>
+- Meaning: A sentence that is true or false</p>
+<p><strong>Set</strong><br>
+- Meaning: A collection of distinct elements</p>
+<p><strong>Graph</strong><br>
+- Meaning: A structure of vertices and edges</p>
+<h2>Before / After</h2>
+<p><strong>Before — without discrete math:</strong></p>
+<pre><code class="language-python"># Hard to answer &quot;why is this O(log n)?&quot;
+def binary_search(data, target):
+    low, high = 0, len(data) - 1
+    while low &lt;= high:
+        mid = (low + high) // 2
+        if data[mid] == target:
+            return mid
+        elif data[mid] &lt; target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+</code></pre>
+<p><strong>After — with discrete math:</strong></p>
+<pre><code class="language-python"># Express it as the recurrence T(n) = T(n/2) + 1
+# and prove O(log n) via the Master Theorem.
+# Also recognize that &quot;sorted array&quot; is a total-order precondition.
+def binary_search(data, target):
+    &quot;&quot;&quot;Precondition: data is sorted under a total order.
+    Complexity: T(n) = T(n/2) + O(1) ⟹ O(log n)
+    &quot;&quot;&quot;
+    low, high = 0, len(data) - 1
+    while low &lt;= high:
+        mid = (low + high) // 2
+        if data[mid] == target:
+            return mid
+        elif data[mid] &lt; target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Discrete vs Continuous</strong></p>
+<pre><code class="language-python"># Continuous: infinitely many values in [0, 1]
+# Discrete: {0, 1, 2, 3} is clearly countable
+import math
+
+continuous_sample = [i * 0.0001 for i in range(10001)]  # an approximation
+discrete_set = list(range(11))                          # exact
+
+print(f&quot;Continuous samples: {len(continuous_sample)}&quot;)
+print(f&quot;Discrete size: {len(discrete_set)}&quot;)
+print(f&quot;Continuous gap: {continuous_sample[1] - continuous_sample[0]}&quot;)
+print(f&quot;Discrete gap: {discrete_set[1] - discrete_set[0]}&quot;)
+</code></pre>
+<p>Memory is segmented into bits, so computers are intrinsically discrete. Floating-point numbers only approximate the reals — they are never truly continuous.</p>
+<p><strong>Step 2: Propositions and Truth Values</strong></p>
+<pre><code class="language-python"># A proposition: a sentence that is unambiguously true or false
+def is_prime(n: int) -&gt; bool:
+    &quot;&quot;&quot;Return True if n is prime.&quot;&quot;&quot;
+    if n &lt; 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+# &quot;7 is prime&quot; is a true proposition
+# &quot;9 is prime&quot; is a false proposition
+print(f&quot;7 is prime: {is_prime(7)}&quot;)  # True
+print(f&quot;9 is prime: {is_prime(9)}&quot;)  # False
+</code></pre>
+<p>Propositional logic underlies every computer reasoning task. <code>if</code>, <code>while</code>, and SQL <code>WHERE</code> clauses all evaluate the truth value of propositions.</p>
+<p><strong>Step 3: Set Operations</strong></p>
+<pre><code class="language-python"># Sets are the most basic discrete structure
+A = {1, 2, 3, 4, 5}
+B = {3, 4, 5, 6, 7}
+
+print(f&quot;Union A ∪ B: {A | B}&quot;)
+print(f&quot;Intersection A ∩ B: {A &amp; B}&quot;)
+print(f&quot;Difference A - B: {A - B}&quot;)
+print(f&quot;Symmetric difference A △ B: {A ^ B}&quot;)
+print(f&quot;Subset A ⊆ {A | B}: {A &lt;= (A | B)}&quot;)
+</code></pre>
+<p>SQL <code>JOIN</code> is a direct application of set operations. <code>UNION</code>, <code>INTERSECT</code>, and <code>EXCEPT</code> correspond one-to-one with the operators above.</p>
+<p><strong>Step 4: Modeling Relationships with Graphs</strong></p>
+<pre><code class="language-python"># A graph is built from vertices and edges
+graph = {
+    &quot;A&quot;: [&quot;B&quot;, &quot;C&quot;],
+    &quot;B&quot;: [&quot;A&quot;, &quot;D&quot;],
+    &quot;C&quot;: [&quot;A&quot;, &quot;D&quot;],
+    &quot;D&quot;: [&quot;B&quot;, &quot;C&quot;, &quot;E&quot;],
+    &quot;E&quot;: [&quot;D&quot;],
+}
+
+def neighbors(g: dict, node: str) -&gt; list:
+    &quot;&quot;&quot;Return neighbors of the given vertex.&quot;&quot;&quot;
+    return g.get(node, [])
+
+for node in graph:
+    print(f&quot;{node} neighbors: {neighbors(graph, node)}&quot;)
+</code></pre>
+<p>Social networks, road maps, dependency trees, internet routing — almost every relationship in computer science is modeled as a graph.</p>
+<p><strong>Step 5: The Series Roadmap</strong></p>
+<pre><code class="language-python">roadmap = [
+    (1, &quot;What Is Discrete Mathematics?&quot;, &quot;the big picture&quot;),
+    (2, &quot;Propositions and Logic&quot;, &quot;truth values, operators, inference&quot;),
+    (3, &quot;Sets and Functions&quot;, &quot;set ops, domain, range&quot;),
+    (4, &quot;Relations and Equivalence&quot;, &quot;properties, classes, partitions&quot;),
+    (5, &quot;Proof Techniques&quot;, &quot;direct, contradiction, induction&quot;),
+    (6, &quot;Sequences and Recurrence&quot;, &quot;recursion, Master Theorem&quot;),
+    (7, &quot;Combinatorics&quot;, &quot;permutations, combinations, pigeonhole&quot;),
+    (8, &quot;Graph Theory Basics&quot;, &quot;vertices, edges, paths, connectivity&quot;),
+    (9, &quot;Trees and Graph Traversal&quot;, &quot;BFS, DFS, spanning trees&quot;),
+    (10, &quot;Discrete Math and Algorithms&quot;, &quot;complexity, NP, applications&quot;),
+]
+
+for num, title, keywords in roadmap:
+    print(f&quot;  {num:02d}. {title} — {keywords}&quot;)
+</code></pre>
+<h2>Notable Points</h2>
+<ul>
+<li>Discrete structures are the only objects a computer can represent exactly</li>
+<li>Propositions, sets, and graphs are different abstractions sharing one property — discreteness</li>
+<li>Algorithm analysis depends on recurrences and combinatorics</li>
+<li>The tools of discrete math show up directly in SQL, routing, and dependency management</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Treat as abstract math</strong><br>
+- Problem: You stall on algorithm analysis<br>
+- Fix: Pair every concept with code</p>
+<p><strong>Memorize proofs</strong><br>
+- Problem: Cannot apply to new problems<br>
+- Fix: Understand structure and motivation</p>
+<p><strong>See graphs only visually</strong><br>
+- Problem: Breaks down on large inputs<br>
+- Fix: Practice adjacency list and matrix forms</p>
+<p><strong>Confuse combinations and permutations</strong><br>
+- Problem: Wrong counting<br>
+- Fix: Distinguish by whether order matters</p>
+<p><strong>Confuse propositions and predicates</strong><br>
+- Problem: Stuck on formal logic<br>
+- Fix: Master quantifiers ∀ and ∃</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Database query optimization uses set theory and relational algebra</li>
+<li>Dependency tools (npm, pip) rely on topological sorting of graphs</li>
+<li>Distributed consensus algorithms use propositional logic and consistency proofs</li>
+<li>Recommendation systems use graph embeddings rooted in graph theory</li>
+<li>Compiler optimization analyzes data-flow graphs</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer can grasp the essence of any new algorithm quickly because they can re-cast the problem in the vocabulary of discrete math. "This is graph traversal." "This is set partitioning." Naming the structure is half the solution.</p>
+<p>Senior engineers are also obsessive about correctness. "Almost right" is not allowed. Discrete math is a world of true and false, and they bring that same standard to system design.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain in my own words how discrete and continuous differ</li>
+<li>[ ] I can list the five pillars (logic, sets, functions, combinatorics, graphs)</li>
+<li>[ ] I understand why computer science needs discrete math</li>
+<li>[ ] I see the link between SQL JOIN and set operations</li>
+<li>[ ] I have reviewed the full series roadmap</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Find five examples of "discrete" and five examples of "continuous" objects from daily life. Which ones can a computer represent exactly?</p>
+</li>
+<li>
+<p>Construct an unsorted array on which <code>binary_search</code> returns the wrong index. Which precondition was violated?</p>
+</li>
+<li>
+<p>Sketch the friend graph of your social network. What are the vertices, and what does an edge mean?</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Discrete math is the study of countable objects, and it is the universal language of computer science. The five pillars — logic, sets, functions, combinatorics, graphs — connect directly to algorithms, databases, networks, and beyond.</p>
+<p>Next, we examine the smallest unit of discrete math — the proposition — together with the logical operators that drive every computer's reasoning.</p>
+<ul>
+<li><strong>What Is Discrete Mathematics? (current)</strong></li>
+<li>Propositions and Logic (upcoming)</li>
+<li>Sets and Functions (upcoming)</li>
+<li>Relations and Equivalence (upcoming)</li>
+<li>Proof Techniques (upcoming)</li>
+<li>Sequences and Recurrence (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Graph Theory Basics (upcoming)</li>
+<li>Trees and Graph Traversal (upcoming)</li>
+<li>Discrete Mathematics and Algorithms (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html">Discrete Mathematics and Its Applications — Kenneth Rosen</a></li>
+<li><a href="https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/">MIT OCW — Mathematics for Computer Science</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Discrete_mathematics">Wikipedia — Discrete Mathematics</a></li>
+<li><a href="https://www.people.vcu.edu/~rhammack/BookOfProof/">Book of Proof — Richard Hammack</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Discrete Math, Foundations, Logic, Sets, Mathematics</p>
+</body>
+</html>

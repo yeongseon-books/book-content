@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Proof Techniques</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Proof Techniques</h1>
+<blockquote>
+<p>Discrete Math 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we guarantee that an algorithm "always" works correctly? Even if 100 tests pass, can't input 100,001 still fail?</p>
+<blockquote>
+<p>A proof is a rigorous argument that a statement holds in every possible case. Direct proof, contrapositive, contradiction, and mathematical induction are the four core techniques in discrete math, and they are the same tools used to prove algorithm correctness and termination. This article walks through each technique and shows how it applies to real code verification.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Direct and contrapositive proofs</li>
+<li>Proof by contradiction</li>
+<li>Mathematical induction (and strong induction)</li>
+<li>Proving algorithm correctness and termination</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Tests can show the presence of bugs but not their absence. Distributed consensus algorithms, cryptographic protocols, and compiler optimizations all rely on formal proofs. Recursive functions are proven correct by induction; algorithm termination is proven via well-founded measures.</p>
+<blockquote>
+<p>A proof = a guarantee for every possible input.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>The proof technique you choose depends on the form of the statement: P → Q for direct/contrapositive, ¬P for contradiction, ∀n: P(n) for induction.</p>
+</blockquote>
+<pre><code class="language-text">   Statement to prove
+        │
+   ┌────┼────────────┬─────────────┐
+   ↓    ↓            ↓             ↓
+  P→Q  P→Q          ¬P            ∀n: P(n)
+  Direct Contrap.   Contradict.   Induction
+                                    │
+                                    ↓
+                             Base + Inductive step
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Direct proof</strong><br>
+- Meaning: Assume P, derive Q</p>
+<p><strong>Contrapositive</strong><br>
+- Meaning: Assume ¬Q, derive ¬P</p>
+<p><strong>Contradiction</strong><br>
+- Meaning: Assume ¬P, derive a contradiction</p>
+<p><strong>Induction</strong><br>
+- Meaning: Base P(0) + (P(k) → P(k+1))</p>
+<p><strong>Tautology</strong><br>
+- Meaning: A statement true in every case</p>
+<h2>Before / After</h2>
+<p><strong>Before — no proof:</strong></p>
+<pre><code class="language-python"># &quot;100 tests passed, so it must work&quot; — no guarantee on all inputs
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+</code></pre>
+<p><strong>After — correctness reasoning attached:</strong></p>
+<pre><code class="language-python">def gcd(a: int, b: int) -&gt; int:
+    &quot;&quot;&quot;Euclidean algorithm.
+
+    Correctness: gcd(a, b) = gcd(b, a mod b) (mathematical theorem)
+    Termination: b strictly decreases each iteration on the naturals → well-founded
+    &quot;&quot;&quot;
+    while b:
+        a, b = b, a % b
+    return a
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Direct Proof</strong></p>
+<pre><code class="language-python"># Claim: the square of an even number is even
+# Proof: assume n = 2k. Then n² = 4k² = 2(2k²), which is even.
+
+def verify_direct(limit: int = 1000) -&gt; bool:
+    &quot;&quot;&quot;Empirical check (the math proof is what really establishes it)&quot;&quot;&quot;
+    for k in range(limit):
+        n = 2 * k
+        assert (n ** 2) % 2 == 0
+    return True
+
+print(f&quot;Verified: {verify_direct()}&quot;)
+</code></pre>
+<p>Verification and proof are different. Verification confirms a finite set of cases; a proof covers them all.</p>
+<p><strong>Step 2: Contrapositive</strong></p>
+<pre><code class="language-python"># Claim: if n² is even, then n is even
+# Direct is awkward, but the contrapositive is easy:
+# Contrapositive: if n is odd, then n² is odd.
+# n = 2k + 1 → n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1 → odd
+
+def contrapositive_check(limit: int = 1000) -&gt; None:
+    for n in range(limit):
+        if n % 2 == 1:           # n odd
+            assert (n ** 2) % 2 == 1   # n² odd
+
+contrapositive_check()
+print(&quot;Contrapositive cases verified&quot;)
+</code></pre>
+<p>The contrapositive proves P → Q by proving ¬Q → ¬P. Both have the same truth value.</p>
+<p><strong>Step 3: Proof by Contradiction</strong></p>
+<pre><code class="language-python"># Claim: √2 is irrational
+# Assume √2 = p/q in lowest terms. Then 2q² = p².
+# → p² is even → p is even → p = 2k
+# → 2q² = 4k² → q² = 2k² → q² is even → q is even
+# → both p and q even ⊥ &quot;lowest terms&quot; assumption
+
+import math
+
+def is_rational_approx(x: float, max_q: int = 10000) -&gt; bool:
+    &quot;&quot;&quot;Empirical: does x have an exact fraction with denominator ≤ max_q?&quot;&quot;&quot;
+    for q in range(1, max_q):
+        p = round(x * q)
+        if abs(x - p / q) &lt; 1e-15:
+            return True
+    return False
+
+print(f&quot;Is √2 expressible as fraction with q ≤ 10000? {is_rational_approx(math.sqrt(2))}&quot;)
+</code></pre>
+<p>Contradiction assumes the negation of the conclusion and derives a contradiction. Distributed-systems impossibility results (FLP, CAP) are proofs by contradiction.</p>
+<p><strong>Step 4: Mathematical Induction</strong></p>
+<pre><code class="language-python"># Claim: 1 + 2 + ... + n = n(n+1)/2
+# Base P(1): 1 = 1·2/2 = 1 ✓
+# Inductive step: assuming P(k), prove P(k+1)
+#   1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1) = (k+1)(k+2)/2 ✓
+
+def gauss_sum(n: int) -&gt; int:
+    return n * (n + 1) // 2
+
+def actual_sum(n: int) -&gt; int:
+    return sum(range(1, n + 1))
+
+for n in [1, 10, 100, 1000]:
+    assert gauss_sum(n) == actual_sum(n)
+    print(f&quot;n={n}: formula={gauss_sum(n)}, actual={actual_sum(n)}&quot;)
+</code></pre>
+<p>Induction has two parts: (1) the base case — the smallest input — and (2) the inductive step — going from k to k+1. Together they cover every natural number.</p>
+<p><strong>Step 5: Proving Algorithm Correctness</strong></p>
+<pre><code class="language-python"># Claim: this returns the correct index of target in a sorted array,
+# or -1 if absent.
+
+def binary_search(arr: list, target: int) -&gt; int:
+    low, high = 0, len(arr) - 1
+    while low &lt;= high:
+        # Invariant: if target is in arr, it lies in arr[low..high]
+        mid = (low + high) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] &lt; target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+
+# Termination: high - low strictly decreases each iteration
+# Correctness: loop invariant + termination condition
+# Both formal proofs use induction.
+
+for arr, target in [([1, 3, 5, 7, 9], 5), ([1, 3, 5, 7, 9], 4)]:
+    print(f&quot;binary_search({arr}, {target}) = {binary_search(arr, target)}&quot;)
+</code></pre>
+<p>Loop invariants are the heart of algorithm correctness proofs. Hoare logic and Floyd–Hoare verification are both built on them.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Verification ≠ proof — verification covers some cases, proof covers all</li>
+<li>Contrapositive and contradiction are useful when direct proof is hard</li>
+<li>Induction is the standard technique for natural numbers and recursion</li>
+<li>Algorithm correctness is established by loop invariants</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Mistake verification for proof</strong><br>
+- Problem: Some passes ≠ all cases proven<br>
+- Fix: Use a formal proof or verifier</p>
+<p><strong>Skip the induction base</strong><br>
+- Problem: Only k → k+1, no starting point<br>
+- Fix: Always state P(0) or P(1)</p>
+<p><strong>Wrong negation in contradiction</strong><br>
+- Problem: Unclear what "not P → Q" means<br>
+- Fix: Use "P ∧ ¬Q"</p>
+<p><strong>Confuse converse with contrapositive</strong><br>
+- Problem: Converse is not equivalent<br>
+- Fix: Only contrapositive (¬Q → ¬P) is</p>
+<p><strong>Skip termination proof</strong><br>
+- Problem: Loop may never end<br>
+- Fix: Show a well-founded measure that decreases</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Distributed consensus (Paxos, Raft) proofs of safety and liveness</li>
+<li>Cryptographic protocol security proofs (BAN logic, Tamarin)</li>
+<li>Semantics-preserving compiler optimization (CompCert)</li>
+<li>TLA+, Coq, and Lean for industrial formal verification</li>
+<li>Code review questions like "does this always hold? what about edge cases?" are informal proofs</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>Senior engineers run informal proofs in their heads while reading code. "What is the loop invariant? What measure decreases? Is the exit condition reachable?" Even without writing formal proofs, this proof-style thinking governs correctness. In domains where tests cannot cover everything (such as distributed systems), they rely on formal models and proofs.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the four proof techniques</li>
+<li>[ ] I remember the two parts of induction</li>
+<li>[ ] I distinguish converse from contrapositive</li>
+<li>[ ] I understand loop invariants</li>
+<li>[ ] I can clearly distinguish verification from proof</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Prove directly: "if n is divisible by 3, so is n²".</p>
+</li>
+<li>
+<p>Use induction to prove 1² + 2² + ... + n² = n(n+1)(2n+1)/6.</p>
+</li>
+<li>
+<p>Pick one of your <code>while</code> loops and write down its loop invariant and termination measure.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A proof guarantees correctness across every possible input. The four techniques — direct, contrapositive, contradiction, induction — cover almost every claim in discrete math, and the same tools prove algorithm correctness. The thinking of a senior engineer closely resembles informal proof.</p>
+<p>Next, we cover sequences and recurrences — induction's natural partner and an essential tool for algorithm analysis.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Relations and Equivalence</a></li>
+<li><strong>Proof Techniques (current)</strong></li>
+<li>Sequences and Recurrence (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Graph Theory Basics (upcoming)</li>
+<li>Trees and Graph Traversal (upcoming)</li>
+<li>Discrete Mathematics and Algorithms (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.people.vcu.edu/~rhammack/BookOfProof/">Book of Proof — Richard Hammack (Free)</a></li>
+<li><a href="https://www.cambridge.org/core/books/how-to-prove-it/6D2965D6905658D704B782B9D67E2989">How to Prove It — Daniel Velleman</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Mathematical_proof">Wikipedia — Mathematical Proof</a></li>
+<li><a href="https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/">MIT OCW — Mathematics for Computer Science, Lectures 2-5</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Discrete Math, Mathematical Proof, Induction, Contradiction, Algorithm Correctness</p>
+</body>
+</html>
