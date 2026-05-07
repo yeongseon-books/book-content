@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Machine Learning?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Machine Learning?</h1>
+<blockquote>
+<p>Machine Learning 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>machine learning</em> just <em>a new name for statistics</em>, or <em>a new programming paradigm</em>?</p>
+<blockquote>
+<p><em>Machine learning </em>learns a function from data<em> and uses it to </em>predict on new inputs<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>machine learning</em></li>
+<li>The intuition of <em>learning, generalization, prediction</em></li>
+<li>The <em>difference</em> from <em>statistics</em> and <em>rule-based code</em></li>
+<li>A 5-step first ML hands-on</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Recommendation, medicine, finance, autonomous driving — <em>every industry</em> is being <em>reshaped</em> by ML. Weak fundamentals make <em>every model collapse</em> later.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;data (X, y)&quot;] --&gt; Train[&quot;train: learn f&quot;]
+    Train --&gt; Model[&quot;model f̂&quot;]
+    Model --&gt; Predict[&quot;predict y_hat for new X&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Learning</strong>: <em>estimating a function</em> from data.</li>
+<li><strong>Generalization</strong>: <em>working well</em> on <em>unseen data</em>.</li>
+<li><strong>Prediction</strong>: applying the learned <em>function</em> to <em>new inputs</em>.</li>
+<li><strong>Feature</strong>: <em>input variable</em>.</li>
+<li><strong>Label</strong>: <em>target to predict</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"Code every rule with if-else"</em> — every new pattern adds code.</p>
+<p><strong>After</strong>: <em>"Give data, the model learns rules"</em> — scale with <em>data, not code</em>.</p>
+<h2>Hands-on: Your First ML in Five Steps</h2>
+<p><strong>Step 1 — Data</strong></p>
+<pre><code class="language-python">from sklearn.datasets import load_iris
+X, y = load_iris(return_X_y=True)
+print(X.shape, y.shape)
+</code></pre>
+<p><strong>Step 2 — Pick a model</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+model = LogisticRegression(max_iter=1000)
+</code></pre>
+<p><strong>Step 3 — Fit</strong></p>
+<pre><code class="language-python">model.fit(X, y)
+</code></pre>
+<p><strong>Step 4 — Predict</strong></p>
+<pre><code class="language-python">print(model.predict(X[:5]))
+</code></pre>
+<p><strong>Step 5 — Score</strong></p>
+<pre><code class="language-python">print(&quot;acc:&quot;, model.score(X, y))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>fit / predict / score</em> is the <em>scikit-learn standard interface</em>.</li>
+<li><em>score</em> here is only <em>training accuracy</em> — not generalization.</li>
+<li><em>Model choice</em> depends on <em>problem type</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Judging <em>success</em> on <em>training data only</em>.</strong></li>
+<li><strong>Ignoring <em>feature scaling</em>.</strong></li>
+<li><strong><em>Target leakage</em> in features.</strong></li>
+<li><strong>No <em>random seed</em> — not reproducible.</strong></li>
+<li><strong>Training without handling <em>missing values or outliers</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Recommendation, fraud detection, demand forecasting, image recognition, NLP chatbots — the <em>data → train → predict</em> pipeline is the <em>backbone of every ML product</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Problem definition</em> matters more than <em>model selection</em>.</li>
+<li><em>Data quality</em> matters more than <em>algorithm</em>.</li>
+<li>Always measure <em>generalization</em> on <em>separate data</em>.</li>
+<li>Build a <em>baseline model</em> first.</li>
+<li>Save <em>complex models</em> for <em>last</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know what <em>X, y</em> mean.</li>
+<li>[ ] I call <em>fit/predict/score</em>.</li>
+<li>[ ] I know <em>training accuracy ≠ generalization</em>.</li>
+<li>[ ] I value <em>baselines</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Run <em>fit/predict</em> on <em>your own dataset</em> (not iris).</li>
+<li>Explain when <em>score</em> would be <em>over-optimistic</em>.</li>
+<li>Show an example where <em>feature scaling</em> changes the result.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>ML is <em>a function learned from data</em>. Next we cover <em>supervised vs unsupervised learning</em>.</p>
+<ul>
+<li><strong>What Is Machine Learning? (current)</strong></li>
+<li>Supervised and Unsupervised Learning (upcoming)</li>
+<li>Train/Test Split (upcoming)</li>
+<li>Linear Regression (upcoming)</li>
+<li>Logistic Regression (upcoming)</li>
+<li>Decision Tree and Random Forest (upcoming)</li>
+<li>Clustering (upcoming)</li>
+<li>Overfitting and Regularization (upcoming)</li>
+<li>Model Evaluation (upcoming)</li>
+<li>The ML Project Workflow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/getting_started.html">scikit-learn — Getting Started</a></li>
+<li><a href="https://www.coursera.org/specializations/machine-learning-introduction">Andrew Ng — Machine Learning Specialization</a></li>
+<li><a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125967/">Hands-On Machine Learning — Aurélien Géron</a></li>
+<li><a href="https://developers.google.com/machine-learning/crash-course">Google — Machine Learning Crash Course</a></li>
+</ul>
+<p class="tags-line">Tags: MachineLearning, AI, DataScience, Foundations, Beginner</p>
+</body>
+</html>

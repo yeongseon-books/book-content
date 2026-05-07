@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The ML Project Workflow</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The ML Project Workflow</h1>
+<blockquote>
+<p>Machine Learning 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If accuracy is everything, why do 90% of ML projects fail to ship?</p>
+<blockquote>
+<p><em>ML success means completing the loop from problem framing to monitoring, not just maximizing a score.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The seven-step ML workflow</li>
+<li>How <code>Pipeline</code> glues preprocessing and model</li>
+<li>Reproducibility and model cards</li>
+<li>Why post-deployment monitoring matters</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A 0.95 score in a notebook is worth zero if the model never reaches users. Owning the full loop is what creates impact.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[&quot;1.problem&quot;] --&gt; D[&quot;2.data&quot;]
+    D --&gt; F[&quot;3.feature&quot;]
+    F --&gt; M[&quot;4.model&quot;]
+    M --&gt; E[&quot;5.evaluate&quot;]
+    E --&gt; Dep[&quot;6.deploy&quot;]
+    Dep --&gt; Mon[&quot;7.monitor&quot;]
+    Mon --&gt; P
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Pipeline</strong>: a single object combining preprocessing and model.</li>
+<li><strong>Reproducibility</strong>: pinned seeds, versions, and data snapshots.</li>
+<li><strong>Model Card</strong>: official documentation of model metadata.</li>
+<li><strong>Drift</strong>: shift in input or target distribution.</li>
+<li><strong>Shadow deploy</strong>: log predictions without acting on them.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "Train the model, print the score, done."</p>
+<p><strong>After</strong>: A loop of problem, data, model, evaluation, deployment, and monitoring.</p>
+<h2>Hands-on: 5-Step Mini Workflow</h2>
+<p><strong>Step 1 — Problem and data</strong></p>
+<pre><code class="language-python">from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+</code></pre>
+<p><strong>Step 2 — Pipeline</strong></p>
+<pre><code class="language-python">from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+pipe = Pipeline([
+    (&quot;scaler&quot;, StandardScaler()),
+    (&quot;clf&quot;, LogisticRegression(max_iter=2000)),
+])
+</code></pre>
+<p><strong>Step 3 — Train and evaluate</strong></p>
+<pre><code class="language-python">pipe.fit(Xtr, ytr)
+print(&quot;test:&quot;, pipe.score(Xte, yte))
+</code></pre>
+<p><strong>Step 4 — Save (reproducibility)</strong></p>
+<pre><code class="language-python">import joblib
+joblib.dump(pipe, &quot;model.joblib&quot;)
+loaded = joblib.load(&quot;model.joblib&quot;)
+print(&quot;loaded:&quot;, loaded.score(Xte, yte))
+</code></pre>
+<p><strong>Step 5 — Simulate monitoring</strong></p>
+<pre><code class="language-python">import numpy as np
+fresh = Xte + np.random.normal(0, 0.1, Xte.shape)
+print(&quot;drifted:&quot;, loaded.score(fresh, yte))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>Pipeline</code> blocks preprocessing leakage at the source.</li>
+<li><code>joblib</code> enables reproducible deployment.</li>
+<li>Even small input noise drops the score, illustrating drift.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Spreading preprocessing across notebook cells.</li>
+<li>Skipping seeds and version pinning, killing reproducibility.</li>
+<li>Deploying without monitoring.</li>
+<li>Sharing models without a model card.</li>
+<li>Evaluating on stale data that no longer reflects reality.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Recommendation, fraud detection, and search teams compete on how well they automate the full ML loop, not on a single notebook.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Problem framing is 60% of the value.</li>
+<li><code>Pipeline</code> decides maintainability.</li>
+<li>Monitoring is the real beginning, not the end.</li>
+<li>Drift always happens.</li>
+<li>Model cards become organizational assets.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Wrap everything inside a <code>Pipeline</code>.</li>
+<li>[ ] Save and load with <code>joblib</code>.</li>
+<li>[ ] Pin seeds and versions.</li>
+<li>[ ] Plan a drift monitoring strategy.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add <code>PCA</code> to the pipeline and compare scores.</li>
+<li>Load the saved model from a separate script and re-evaluate.</li>
+<li>Plot the score curve as input noise increases.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Congratulations — you finished Machine Learning 101. Continue with Model Evaluation 101 and MLOps 101 for deeper material.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Logistic Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Decision Tree and Random Forest</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/07-clustering.md">Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/08-overfitting-and-regularization.md">Overfitting and Regularization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/09-model-evaluation.md">Model Evaluation</a></li>
+<li><strong>The ML Project Workflow (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/compose.html">scikit-learn — Pipelines</a></li>
+<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google — Rules of ML</a></li>
+<li><a href="https://arxiv.org/abs/1810.03993">Model Cards — Mitchell et al. (2019)</a></li>
+<li><a href="https://papers.nips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html">Hidden Technical Debt in ML — Sculley et al.</a></li>
+</ul>
+<p class="tags-line">Tags: MachineLearning, MLWorkflow, Pipeline, MLOps, Beginner</p>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Train/Test Split</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Train/Test Split</h1>
+<blockquote>
+<p>Machine Learning 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: A model with 99% training accuracy can still fail in production. Why?</p>
+<blockquote>
+<p><em>A train/test split is the minimum apparatus for measuring how a model behaves on data it has never seen.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The roles of train, validation, and test sets</li>
+<li>Why <code>random_state</code> matters for reproducibility</li>
+<li>How <code>stratify</code> handles imbalanced classes</li>
+<li>The intuition behind K-fold cross-validation</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    All[&quot;all data&quot;] --&gt; Tr[&quot;train (fit)&quot;]
+    All --&gt; Va[&quot;valid (tune)&quot;]
+    All --&gt; Te[&quot;test (final)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Train</strong>: data used for fitting the model.</li>
+<li><strong>Validation</strong>: data used for tuning hyperparameters.</li>
+<li><strong>Test</strong>: held out, looked at exactly once.</li>
+<li><strong>Stratify</strong>: keep class proportions constant across splits.</li>
+<li><strong>K-fold</strong>: split into K parts and rotate the test fold.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Fit on all data, score on the same data. Performance is overestimated.</p>
+<p><strong>After</strong>: Fit on train, score on held-out test. The number reflects reality.</p>
+<h2>Hands-on: 5 Steps to Split and Evaluate</h2>
+<p><strong>Step 1 — Data</strong></p>
+<pre><code class="language-python">from sklearn.datasets import load_iris
+X, y = load_iris(return_X_y=True)
+</code></pre>
+<p><strong>Step 2 — Split</strong></p>
+<pre><code class="language-python">from sklearn.model_selection import train_test_split
+Xtr, Xte, ytr, yte = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42
+)
+</code></pre>
+<p><strong>Step 3 — Model</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+model = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+</code></pre>
+<p><strong>Step 4 — Evaluate</strong></p>
+<pre><code class="language-python">print(&quot;train:&quot;, model.score(Xtr, ytr))
+print(&quot;test :&quot;, model.score(Xte, yte))
+</code></pre>
+<p><strong>Step 5 — Cross-validate</strong></p>
+<pre><code class="language-python">from sklearn.model_selection import cross_val_score
+print(cross_val_score(model, X, y, cv=5).mean())
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>stratify=y</code> preserves class ratios in both splits.</li>
+<li>A fixed <code>random_state</code> makes results reproducible.</li>
+<li><code>cross_val_score</code> repeats train and evaluate K times.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Tuning on the test set, which leaks performance.</li>
+<li>Fitting a scaler on the entire dataset before splitting.</li>
+<li>Forgetting to set the random seed and chasing noise.</li>
+<li>Ignoring <code>stratify</code> on imbalanced data.</li>
+<li>Splitting time-series data randomly instead of by time.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A/B experiments, model comparison, and MLOps gating all hinge on a sound split strategy. The split governs the decision, not just the metric.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Touch the test set exactly once.</li>
+<li>Keep validation and test separate.</li>
+<li>Split time-series chronologically.</li>
+<li>Always suspect group leakage.</li>
+<li>Preprocess after splitting, not before.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the role of train, valid, and test.</li>
+<li>[ ] I understand what <code>stratify</code> does.</li>
+<li>[ ] I always fix <code>random_state</code>.</li>
+<li>[ ] I can run <code>cross_val_score</code>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Vary <code>test_size</code> between 0.1 and 0.3 and observe the test score.</li>
+<li>Compare class ratios in train and test with <code>stratify=None</code>.</li>
+<li>Compare the variance of 5-fold and 10-fold scores.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A correct split is the prerequisite for every measurement that follows. Next, we cover linear regression as the foundation of supervised learning.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
+<li><strong>Train/Test Split (current)</strong></li>
+<li>Linear Regression (upcoming)</li>
+<li>Logistic Regression (upcoming)</li>
+<li>Decision Tree and Random Forest (upcoming)</li>
+<li>Clustering (upcoming)</li>
+<li>Overfitting and Regularization (upcoming)</li>
+<li>Model Evaluation (upcoming)</li>
+<li>The ML Project Workflow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html">scikit-learn — train_test_split</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn — Cross-validation</a></li>
+<li><a href="https://otexts.com/fpp3/">Forecasting: Principles and Practice — Hyndman</a></li>
+<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google — Rules of ML</a></li>
+</ul>
+<p class="tags-line">Tags: MachineLearning, TrainTestSplit, Generalization, CrossValidation, scikit-learn</p>
+</body>
+</html>
