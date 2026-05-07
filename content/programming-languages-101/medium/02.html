@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Syntax and Semantics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Syntax and Semantics</h1>
+<blockquote>
+<p>Programming Languages 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does the build pass yet the program misbehave, and why does a single missing comma break the whole compilation?</p>
+<blockquote>
+<p>Every programming language stands on two axes. <strong>Syntax</strong> answers which arrangements of characters are legal. <strong>Semantics</strong> answers what those legal arrangements actually mean. They get blurred together in everyday talk, but separating them is the moment compile errors and runtime bugs stop looking like the same animal.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The exact boundary between syntax and semantics</li>
+<li>The pipeline from tokens to grammar to an AST</li>
+<li>Why "syntactically valid but meaningfully wrong" code happens</li>
+<li>The difference between static and dynamic semantics</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Reading errors quickly, picking up new language syntax fast, and understanding why the same code behaves differently across languages all require splitting the two axes. The later episodes — type systems, scope, closures — are all examples of "same syntax, different semantics."</p>
+<blockquote>
+<p>"It builds" only means syntax passed. It does not mean the meaning matches your intent.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Source: total = 3 + 4&quot;] --&gt; B[&quot;Lexer (tokens)&quot;]
+    B --&gt; C[&quot;Parser (grammar)&quot;]
+    C --&gt; D[&quot;AST&quot;]
+    D --&gt; E[&quot;Type check / IR&quot;]
+    E --&gt; F[&quot;Execute&quot;]
+</code></pre>
+<p>The lexer cuts characters into tokens; the parser checks token order against a grammar and builds a tree (AST). All of that is syntax. After it, interpreting meaning — type checking and evaluation — is semantics.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Token</strong>: The smallest meaningful chunk of characters (<code>if</code>, <code>=</code>, <code>42</code>).</li>
+<li><strong>Grammar (BNF/EBNF)</strong>: Rules for which orderings of tokens are legal.</li>
+<li><strong>AST (Abstract Syntax Tree)</strong>: A tree representation of source code.</li>
+<li><strong>Static semantics</strong>: Meaning fixed before execution (type checking, name resolution).</li>
+<li><strong>Dynamic semantics</strong>: Meaning that emerges during execution (evaluation, side effects).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — confusing syntax errors with intent errors</strong></p>
+<pre><code class="language-python"># Both are &quot;errors,&quot; but they live in different layers.
+print(&quot;hello&quot;   # SyntaxError
+divide(10, 0)   # legal syntax, throws ZeroDivisionError at runtime
+</code></pre>
+<p>These two errors are nothing alike. The first is rejected by the parser. The second only happens once execution reaches it.</p>
+<p><strong>After — read errors by which layer they came from</strong></p>
+<pre><code class="language-python">import ast
+
+src_ok  = &quot;total = 3 + 4&quot;
+src_bad = &quot;total = 3 +&quot;
+
+print(ast.parse(src_ok))   # passes syntax → produces an AST
+ast.parse(src_bad)         # SyntaxError: invalid syntax
+</code></pre>
+<p>Whether <code>ast.parse</code> succeeds tells you cleanly whether the syntax stage passed. Whether the meaning matches intent is a later question.</p>
+<h2>Hands-on: Parse a Tiny Expression Yourself</h2>
+<p>Let's tokenize, parse, and evaluate something like <code>3 + 4 * 2</code>.</p>
+<p><strong>Step 1 — Tokenize</strong></p>
+<pre><code class="language-python"># 1_lex.py
+import re
+
+def tokenize(src: str) -&gt; list[tuple[str, str]]:
+    spec = [
+        (&quot;NUM&quot;, r&quot;\d+&quot;),
+        (&quot;OP&quot;,  r&quot;[+*\-/()]&quot;),
+        (&quot;WS&quot;,  r&quot;\s+&quot;),
+    ]
+    regex = &quot;|&quot;.join(f&quot;(?P&lt;{n}&gt;{p})&quot; for n, p in spec)
+    return [
+        (m.lastgroup, m.group())
+        for m in re.finditer(regex, src)
+        if m.lastgroup != &quot;WS&quot;
+    ]
+
+print(tokenize(&quot;3 + 4 * 2&quot;))
+# [('NUM', '3'), ('OP', '+'), ('NUM', '4'), ('OP', '*'), ('NUM', '2')]
+</code></pre>
+<p>This step only cuts text into meaningful chunks. It does not interpret meaning.</p>
+<p><strong>Step 2 — Define a grammar</strong></p>
+<p>In BNF-flavored notation:</p>
+<pre><code>expr    = term  (&quot;+&quot; term  | &quot;-&quot; term)*
+term    = factor (&quot;*&quot; factor | &quot;/&quot; factor)*
+factor  = NUM | &quot;(&quot; expr &quot;)&quot;
+</code></pre>
+<p>The fact that <code>*</code> lives one level deeper (inside <code>term</code>) is what creates precedence.</p>
+<p><strong>Step 3 — Parser produces an AST</strong></p>
+<pre><code class="language-python"># 3_parse.py
+class P:
+    def __init__(self, toks):
+        self.toks, self.i = toks, 0
+    def peek(self): return self.toks[self.i] if self.i &lt; len(self.toks) else (None, None)
+    def eat(self):  t = self.peek(); self.i += 1; return t
+    def expr(self):
+        node = self.term()
+        while self.peek()[1] in (&quot;+&quot;, &quot;-&quot;):
+            op = self.eat()[1]; node = (op, node, self.term())
+        return node
+    def term(self):
+        node = self.factor()
+        while self.peek()[1] in (&quot;*&quot;, &quot;/&quot;):
+            op = self.eat()[1]; node = (op, node, self.factor())
+        return node
+    def factor(self):
+        k, v = self.eat()
+        if k == &quot;NUM&quot;: return int(v)
+        if v == &quot;(&quot;:
+            node = self.expr(); self.eat(); return node
+        raise SyntaxError(f&quot;unexpected {v}&quot;)
+
+from pprint import pprint
+pprint(P(tokenize(&quot;3 + 4 * 2&quot;)).expr())
+# ('+', 3, ('*', 4, 2))
+</code></pre>
+<p>The tree shows the precedence directly. <code>4 * 2</code> lives inside one node, sitting on the right side of <code>+</code>.</p>
+<p><strong>Step 4 — Evaluate (semantics)</strong></p>
+<pre><code class="language-python"># 4_eval.py
+def evaluate(node) -&gt; int:
+    if isinstance(node, int):
+        return node
+    op, a, b = node
+    return {
+        &quot;+&quot;: lambda x, y: x + y,
+        &quot;-&quot;: lambda x, y: x - y,
+        &quot;*&quot;: lambda x, y: x * y,
+        &quot;/&quot;: lambda x, y: x // y,
+    }[op](evaluate(a), evaluate(b))
+
+print(evaluate((&quot;+&quot;, 3, (&quot;*&quot;, 4, 2))))  # 11
+</code></pre>
+<p>This is dynamic semantics. Only when an evaluator decides what each node means do you get a result. A different evaluator on the same AST gives a different result.</p>
+<p><strong>Step 5 — Same syntax, different semantics</strong></p>
+<pre><code class="language-python"># 5_two_semantics.py
+def evaluate_strange(node):
+    if isinstance(node, int): return node
+    op, a, b = node
+    if op == &quot;+&quot;: return evaluate_strange(a) * evaluate_strange(b)  # + as multiply
+    return 0
+
+print(evaluate_strange((&quot;+&quot;, 3, (&quot;*&quot;, 4, 2))))  # 24 — meaning changed
+</code></pre>
+<p>The example is extreme on purpose, but it proves the point: the same syntax can be assigned a different semantics. The two axes really are separable.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Syntax answers "is this legal?", semantics answers "what does it mean?"</li>
+<li>The AST that the parser produces is the final product of syntax and the input of semantics.</li>
+<li>The same AST under a different evaluator changes meaning — exactly what interpreters and compilers do.</li>
+<li>Precedence and associativity are properties of the grammar, not the evaluator.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating all errors the same.</strong> SyntaxError, TypeError, and RuntimeError live in different layers and require different debugging.</li>
+<li><strong>Believing "it builds" implies "it is correct."</strong> Syntax passing does not guarantee semantic correctness.</li>
+<li><strong>Trying to memorize operator precedence.</strong> Don't. Use parentheses to write your intent. Future-you will thank you.</li>
+<li><strong>Assuming the same symbol means the same thing across languages.</strong> <code>+</code> is string concatenation in Python and forces type coercion in JavaScript.</li>
+<li><strong>Never having looked at an AST.</strong> Once you see one even briefly, error messages start reading much more clearly.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Code formatters, linters, refactoring tools, and code transformers all work on ASTs. Python's <code>ast</code> module, Babel for JavaScript, the TypeScript compiler API are common examples. Tasks like "find every call site of this function" or "automatically migrate off a deprecated API" are AST-based, not regex-based.</p>
+<p>It also helps when reading logs. <code>Unexpected token</code> is a syntax-stage message. <code>is not a function</code> is a dynamic-semantics message. Knowing which layer the message came from tells you where to start looking.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Classifies an error first by layer — syntax, static semantics, or dynamic semantics.</li>
+<li>When learning a new language, <strong>prints an AST once</strong> to ground their mental model.</li>
+<li>Writes parentheses instead of memorizing precedence; readability over cleverness.</li>
+<li>Stays alert to the same symbol meaning different things; compares languages by semantics, not keywords.</li>
+<li>Reaches for AST-based tools, not regex, when transforming code.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between syntax and semantics in one sentence?</li>
+<li>[ ] Can you explain what an AST is and why it exists?</li>
+<li>[ ] Can you tell static and dynamic semantics apart in one line?</li>
+<li>[ ] When you read an error message, do you guess which layer it came from?</li>
+<li>[ ] Have you accepted that the same syntax can mean different things in different languages?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <code>**</code> (exponent) operator to the evaluator above. It must bind tighter than <code>*</code>. Both the grammar and the evaluator need changes.</li>
+<li>Run <code>1 + "2"</code> in Python and in JavaScript, write down the results, and explain in one line which axis (syntax or semantics) accounts for the difference.</li>
+<li>Pick a recent bug where the build passed but the result was wrong. Classify the bug as syntax, static semantics, or dynamic semantics.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Syntax is the question of legality. Semantics is the question of meaning. Splitting them clarifies what an error really is and tells you where to look first when meeting a new language. Next we examine the biggest tool in static semantics — the type system.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
+<li><strong>Syntax and Semantics (current)</strong></li>
+<li>Type Systems (upcoming)</li>
+<li>Scope and Binding (upcoming)</li>
+<li>Functions and Closures (upcoming)</li>
+<li>Objects and Prototypes (upcoming)</li>
+<li>Memory Management (upcoming)</li>
+<li>Interpreters and Compilers (upcoming)</li>
+<li>Static vs Dynamic Languages (upcoming)</li>
+<li>What Makes a Good Language Design? (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/ast.html">Python ast module documentation</a></li>
+<li><a href="https://craftinginterpreters.com/">Crafting Interpreters (Bob Nystrom)</a></li>
+<li><a href="https://suif.stanford.edu/dragonbook/">Compilers: Principles, Techniques, and Tools (Dragon Book)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form">Backus–Naur Form (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Programming Languages, Syntax, Semantics, Grammar, Parsing</p>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Objects and Prototypes</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Objects and Prototypes</h1>
+<blockquote>
+<p>Programming Languages 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: We call both Java classes and JavaScript prototypes "OOP," so why do they look so different?</p>
+<blockquote>
+<p>An object bundles <strong>state and the methods that operate on it</strong>. There are two ways to make that bundle — <strong>class-based</strong>, where you stamp out instances from a blueprint, and <strong>prototype-based</strong>, where you make new objects by extending an existing one. The decisive difference is how method lookup happens.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A precise definition of "object" under two models</li>
+<li>The method-lookup difference between class-based and prototype-based</li>
+<li>That Python classes are themselves objects</li>
+<li>The relationship between inheritance and delegation</li>
+<li>That closures and objects are two views of the same idea</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Once you understand the object model precisely, "why is this method being called?" or "why does super behave this way?" becomes a single answer. Knowing both models lets you adapt to any new OOP language fast.</p>
+<blockquote>
+<p>Object = state + behavior. Classes and prototypes are different tools for making the same kind of bundle.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;instance&quot;] --&gt;|not found| B[&quot;class&quot;]
+    B --&gt;|not found| C[&quot;parent class&quot;]
+    C --&gt;|not found| D[&quot;object (root)&quot;]
+    E[&quot;JS instance&quot;] --&gt;|prototype chain| F[&quot;prototype object&quot;]
+    F --&gt; G[&quot;Object.prototype&quot;]
+</code></pre>
+<p>Class-based on top, prototype-based below. Same idea: <strong>delegate one level up when not found</strong>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Instance</strong>: A concrete object holding state at a moment in time.</li>
+<li><strong>Class</strong>: A blueprint defining shape and behavior for instances.</li>
+<li><strong>Prototype</strong>: A base object that other objects can delegate to.</li>
+<li><strong>Method resolution</strong>: The rule for how far up the chain to search.</li>
+<li><strong>Delegation</strong>: When an attribute is missing, hand the lookup to another object.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — data and functions live apart</strong></p>
+<pre><code class="language-python">def make_user(name, age):
+    return {&quot;name&quot;: name, &quot;age&quot;: age}
+
+def greet(user):
+    return f&quot;hi, {user['name']}&quot;
+
+u = make_user(&quot;kim&quot;, 30)
+print(greet(u))
+</code></pre>
+<p>Callers always have to carry both pieces.</p>
+<p><strong>After — bundled as a class</strong></p>
+<pre><code class="language-python">class User:
+    def __init__(self, name: str, age: int) -&gt; None:
+        self.name, self.age = name, age
+    def greet(self) -&gt; str:
+        return f&quot;hi, {self.name}&quot;
+
+print(User(&quot;kim&quot;, 30).greet())
+</code></pre>
+<p>State and behavior travel as one unit, so the caller carries one thing.</p>
+<h2>Hands-on: Trace Both Models</h2>
+<p><strong>Step 1 — Class-based lookup</strong></p>
+<pre><code class="language-python"># 1_class.py
+class A:
+    def hi(self): return &quot;A.hi&quot;
+
+class B(A):
+    pass
+
+print(B().hi())          # 'A.hi' — not on B, delegated upward
+print(B.__mro__)          # the lookup order
+</code></pre>
+<p>The MRO (method resolution order) is exactly the search path.</p>
+<p><strong>Step 2 — A class is also an object</strong></p>
+<pre><code class="language-python"># 2_class_is_object.py
+class A: ...
+print(type(A))         # &lt;class 'type'&gt;  — a class is an instance of type
+A.tag = &quot;v1&quot;            # you can attach attributes to a class object
+print(A.tag)
+</code></pre>
+<p>Classes are first-class objects too, and you can manipulate them dynamically.</p>
+<p><strong>Step 3 — A prototype-style table in Python</strong></p>
+<pre><code class="language-python"># 3_prototype.py
+base = {&quot;hi&quot;: lambda self: &quot;base.hi&quot;}
+
+def lookup(obj, key):
+    if key in obj: return obj[key]
+    if &quot;__proto__&quot; in obj: return lookup(obj[&quot;__proto__&quot;], key)
+    raise KeyError(key)
+
+inst = {&quot;__proto__&quot;: base}
+print(lookup(inst, &quot;hi&quot;)(inst))   # 'base.hi'
+</code></pre>
+<p>Python has no real prototype chain, but "missing → delegate upward" is the same idea.</p>
+<p><strong>Step 4 — Method override and super</strong></p>
+<pre><code class="language-python"># 4_super.py
+class A:
+    def hi(self): return &quot;A&quot;
+class B(A):
+    def hi(self): return &quot;B+&quot; + super().hi()
+
+print(B().hi())  # B+A
+</code></pre>
+<p><code>super</code> delegates to the next entry in the MRO. Even with multiple inheritance, a single line walks every relevant parent.</p>
+<p><strong>Step 5 — Imitate an object with a closure</strong></p>
+<pre><code class="language-python"># 5_object_as_closure.py
+def make_user(name):
+    def greet(): return f&quot;hi, {name}&quot;
+    return {&quot;greet&quot;: greet}
+
+u = make_user(&quot;kim&quot;)
+print(u[&quot;greet&quot;]())  # hi, kim
+</code></pre>
+<p>State (<code>name</code>) and behavior (<code>greet</code>) bundled by closure. Proof that the essence of an object exists without a class keyword.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Both models reduce to "missing → delegate upward."</li>
+<li>A Python class is an object, and that fact is what makes metaprogramming possible.</li>
+<li><code>super</code> is an arrow to the next entry in the MRO.</li>
+<li>Closures can mimic objects, showing the two ideas are duals of each other.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Inheritance trees four levels deep.</strong> Almost always better flattened with delegation or composition.</li>
+<li><strong>Not knowing the MRO.</strong> With multiple inheritance, <code>super</code> becomes opaque without it.</li>
+<li><strong>Classes with methods but no state.</strong> That is a module or namespace, not an object.</li>
+<li><strong>Treating prototypes as just a class lookalike.</strong> The real power is being able to add or replace methods on an individual object.</li>
+<li><strong>Treating closures and objects as unrelated.</strong> Accepting they are dual makes you better at picking either.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most backend code is class-based OOP — domain models as classes, behavior as methods. JavaScript added class syntax, but the engine still uses prototypes underneath, which is why <code>Object.create</code> and <code>Object.getPrototypeOf</code> survive.</p>
+<p>When designing, write down "what state does this object hold?" first. If the answer is empty, you probably do not need a class. Composition is the default; inheritance is reserved for true is-a relationships.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Asks "what state does this class hold?" before writing the body.</li>
+<li>Composes by default, inherits as a last resort.</li>
+<li>Mentally draws the MRO before using multiple inheritance.</li>
+<li>Treats class, object, and prototype as tools — fitness first.</li>
+<li>Weighs closure-based and object-based solutions equally.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between class-based and prototype-based in one line?</li>
+<li>[ ] Have you ever printed a Python <code>__mro__</code>?</li>
+<li>[ ] Can you say what <code>super</code> does in one sentence?</li>
+<li>[ ] Do you favor composition over inheritance by default?</li>
+<li>[ ] Have you ever imitated an object with a closure?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build two multi-inheritance classes, print <code>__mro__</code>, and explain in a paragraph why the order is what it is.</li>
+<li>Add a "state-mutating" operation to the closure-style object in step 5. You will need <code>nonlocal</code>.</li>
+<li>Pick a recent class of yours that uses inheritance and design a composition-based replacement.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Objects bundle state and behavior; the two models are different ways of building that bundle. Either way, the essence is delegation. Next we look at how those objects live and die in memory — memory management.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Functions and Closures</a></li>
+<li><strong>Objects and Prototypes (current)</strong></li>
+<li>Memory Management (upcoming)</li>
+<li>Interpreters and Compilers (upcoming)</li>
+<li>Static vs Dynamic Languages (upcoming)</li>
+<li>What Makes a Good Language Design? (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">Python Data Model — object</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">MDN — Inheritance and the prototype chain</a></li>
+<li><a href="https://bibliography.selflanguage.org/_static/self-power.pdf">Self: The Power of Simplicity (Ungar &amp; Smith)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">Composition over inheritance (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Programming Languages, Objects, Prototype, Class, Inheritance</p>
+</body>
+</html>

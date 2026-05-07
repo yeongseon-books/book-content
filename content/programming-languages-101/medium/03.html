@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type Systems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Type Systems</h1>
+<blockquote>
+<p>Programming Languages 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Dynamic languages run fine without type annotations, so why do we keep going back and adding them?</p>
+<blockquote>
+<p>A type system is not just data tagging. It is a tool that <strong>proves, before the program runs, that it does not do nonsensical things</strong>. Static typing buys safety and tooling at the cost of a small amount of expressive freedom; dynamic typing trades the other way. This episode looks at the deal both sides accept.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The roles a type plays — checking, documentation, tool support</li>
+<li>The tradeoffs between static and dynamic typing</li>
+<li>How strong/weak differs from static/dynamic</li>
+<li>What type inference actually buys you</li>
+<li>The intuition behind generics and union/intersection types</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most modern languages have some kind of type system, and even Python, JavaScript, and Ruby grew gradual type systems (type hints, TypeScript). To use autocompletion, refactoring tools, and build-stage error messages well, you need to understand types. The later episodes — scope and closures — also operate on top of types.</p>
+<blockquote>
+<p>A type narrows down, in advance, which inputs are even legal.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Source code&quot;] --&gt; B[&quot;Type checker&quot;]
+    B --&gt;|pass| C[&quot;Compile / Run&quot;]
+    B --&gt;|fail| D[&quot;Error before run&quot;]
+    E[&quot;Types as docs&quot;] --&gt; F[&quot;IDE: completion, refactor&quot;]
+</code></pre>
+<p>The type checker rules out impossible calls before runtime. Simultaneously, it gives the IDE the basis for autocompletion and safe refactoring.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Static typing</strong>: Types checked at compile / pre-run time.</li>
+<li><strong>Dynamic typing</strong>: Types checked while the program runs.</li>
+<li><strong>Strong typing</strong>: Implicit conversions are rare.</li>
+<li><strong>Weak typing</strong>: Implicit conversions are common (think JavaScript's <code>+</code>).</li>
+<li><strong>Type inference</strong>: The compiler figures out the type without an annotation.</li>
+<li><strong>Generics</strong>: Parameterizing code so it works for many types safely.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — a function with no types</strong></p>
+<pre><code class="language-python">def discount(price, rate):
+    return price - price * rate
+
+# Someone calls it like this
+discount(&quot;1000&quot;, 0.1)  # TypeError at runtime
+</code></pre>
+<p>The signature alone does not tell callers what to pass, and bugs only show at runtime.</p>
+<p><strong>After — annotated</strong></p>
+<pre><code class="language-python">def discount(price: int, rate: float) -&gt; float:
+    return price - price * rate
+
+discount(&quot;1000&quot;, 0.1)  # mypy rejects this at the call site
+</code></pre>
+<p>A static checker like <code>mypy</code> catches it before runtime, and the signature itself becomes a small piece of documentation.</p>
+<h2>Hands-on: Introduce Types Step by Step</h2>
+<p><strong>Step 1 — Add type hints</strong></p>
+<pre><code class="language-python"># 1_hints.py
+def to_kebab(s: str) -&gt; str:
+    return s.strip().lower().replace(&quot; &quot;, &quot;-&quot;)
+
+print(to_kebab(&quot;Hello World&quot;))
+</code></pre>
+<p>The behavior is the same with or without <code>-&gt; str</code>, but callers now have a contract.</p>
+<p><strong>Step 2 — Run mypy</strong></p>
+<pre><code class="language-bash">pip install mypy
+mypy 1_hints.py    # Success: no issues
+</code></pre>
+<p>A new habit: check at build time.</p>
+<p><strong>Step 3 — Generic function</strong></p>
+<pre><code class="language-python"># 3_generic.py
+from typing import TypeVar, Iterable
+
+T = TypeVar(&quot;T&quot;)
+
+def first(xs: Iterable[T]) -&gt; T:
+    for x in xs:
+        return x
+    raise ValueError(&quot;empty&quot;)
+
+reveal_type(first([1, 2, 3]))   # Revealed type is &quot;int&quot;
+reveal_type(first([&quot;a&quot;, &quot;b&quot;]))  # Revealed type is &quot;str&quot;
+</code></pre>
+<p>The same function preserves an exact return type for many input types. Tooling gets stronger.</p>
+<p><strong>Step 4 — Union types and narrowing</strong></p>
+<pre><code class="language-python"># 4_union.py
+def length(x: str | list) -&gt; int:
+    if isinstance(x, str):
+        return len(x)
+    return sum(len(item) for item in x)
+</code></pre>
+<p>After the <code>isinstance</code> check, the type checker narrows the type inside each branch.</p>
+<p><strong>Step 5 — A real bug found by adding types</strong></p>
+<pre><code class="language-python"># 5_real_bug.py
+def total_price(items: list[dict]) -&gt; int:
+    return sum(item[&quot;price&quot;] for item in items)  # mypy points out the dict value type is unclear
+</code></pre>
+<p>Trying to write the type accurately tends to expose ambiguity in the data model itself. That ambiguity is usually where the real bug lives.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A type is checking, documentation, and tool input all at once.</li>
+<li>A static check does not catch every bug, but it catches the cheapest, most common ones cheapest.</li>
+<li>Generics are the safe form of "write once, use for many types."</li>
+<li>Union types plus <code>isinstance</code> narrowing carry your dynamic-language intuition straight into the static checker.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Sprinkling <code>Any</code> everywhere.</strong> The checker stays quiet, but you lost the safety.</li>
+<li><strong>Adding types everywhere at once.</strong> Start at boundaries — public functions, module interfaces — and grow inward.</li>
+<li><strong>Confusing types with runtime validation.</strong> <code>mypy</code> does not check the shape of external inputs at runtime. Validate those separately.</li>
+<li><strong>Chasing overly precise types.</strong> A simple type that catches 90% of cases tends to be more valuable than a baroque one that catches 100%.</li>
+<li><strong>Treating dynamic vs static as a status battle.</strong> It is a tradeoff that depends on team size and domain.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large Python codebases run mypy or pyright in CI and require types on public functions. The JavaScript world has settled on TypeScript as the de facto default. Types at library boundaries are the first documentation users see and the basis of autocompletion.</p>
+<p>Types are a refactoring safety net. When changing the order of a function's arguments lights up every call site at compile time, you can do that change confidently.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Adds types to module boundaries and public APIs first; helpers later.</li>
+<li>When they spot an <code>Any</code>, they look for one step of narrowing.</li>
+<li>Always validates external input separately (types ≠ runtime validation).</li>
+<li>Treats static vs dynamic as a tradeoff driven by team size and change frequency, not faith.</li>
+<li>Sees IDE support (autocomplete, refactoring) as the type system's main payoff, not a side benefit.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you tell static vs dynamic and strong vs weak typing apart in one line?</li>
+<li>[ ] Do you know where to add types first when adopting them gradually?</li>
+<li>[ ] Do you have a strategy for narrowing an <code>Any</code>?</li>
+<li>[ ] Do you know the difference between types and runtime validation?</li>
+<li>[ ] Can you explain why generics are stronger than ad-hoc parameterization?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Take the <code>total_price</code> example and introduce a <code>TypedDict</code> describing the exact shape of <code>item</code>.</li>
+<li>Pick a function in your favorite dynamic language and write down its input and output types in prose. If anything is ambiguous, describe what that ambiguity actually means.</li>
+<li>Recall a real bug that was only caught after types were added. Explain why the dynamic check found it late.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A type system gives you safety, documentation, and tooling at the same time. Not every language needs every level of typing, but for large systems with many boundaries it is almost always a win. Next we look at another universal pillar — scope and binding.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
+<li><strong>Type Systems (current)</strong></li>
+<li>Scope and Binding (upcoming)</li>
+<li>Functions and Closures (upcoming)</li>
+<li>Objects and Prototypes (upcoming)</li>
+<li>Memory Management (upcoming)</li>
+<li>Interpreters and Compilers (upcoming)</li>
+<li>Static vs Dynamic Languages (upcoming)</li>
+<li>What Makes a Good Language Design? (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.cis.upenn.edu/~bcpierce/tapl/">Types and Programming Languages (Pierce)</a></li>
+<li><a href="https://mypy.readthedocs.io/">mypy documentation</a></li>
+<li><a href="https://www.typescriptlang.org/docs/handbook/">TypeScript Handbook</a></li>
+<li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Programming Languages, TypeSystem, Static, Dynamic, Inference</p>
+</body>
+</html>

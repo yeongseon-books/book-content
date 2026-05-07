@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Makes a Good Language Design?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Makes a Good Language Design?</h1>
+<blockquote>
+<p>Programming Languages 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When we say "this language is well designed," what exactly are we scoring?</p>
+<blockquote>
+<p>Language design is the discipline of tradeoffs. More expressiveness costs consistency. Stronger safety adds friction. A good design is not "great at everything" — it is <strong>a design that balances clearly toward what this language is meant to do well</strong>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Five axes for evaluating a language design</li>
+<li>Tradeoffs among consistency, simplicity, expressiveness, safety, and performance</li>
+<li>How Python, Go, and Rust answered the same problems differently</li>
+<li>Why the concepts in this series ended up the way they are</li>
+<li>The five questions to ask first when meeting any new language</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Design sense is not just for evaluating languages — <strong>the same instinct applies every time you design an API, library, or internal DSL</strong>. Even a single function signature meets the same tradeoffs.</p>
+<blockquote>
+<p>Good design is not "good for everyone." It is "an answer that made its choices clear."</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;language design&quot;] --&gt; B[&quot;consistency&quot;]
+    A --&gt; C[&quot;simplicity&quot;]
+    A --&gt; D[&quot;expressiveness&quot;]
+    A --&gt; E[&quot;safety&quot;]
+    A --&gt; F[&quot;performance&quot;]
+    B &lt;--&gt;|trade| D
+    C &lt;--&gt;|trade| D
+    E &lt;--&gt;|trade| C
+    F &lt;--&gt;|trade| E
+</code></pre>
+<p>The five axes are coupled — push one down and another rises.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Consistency</strong>: Problems with the same shape are solved with code of the same shape.</li>
+<li><strong>Simplicity</strong>: Few rules to learn or remember.</li>
+<li><strong>Expressiveness</strong>: Intent can be written shortly and precisely.</li>
+<li><strong>Safety</strong>: Wrong programs are blocked at build or run time.</li>
+<li><strong>Performance</strong>: Same job uses less time and memory.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — evaluating by vibes</strong></p>
+<blockquote>
+<p>"I like this language." → Cannot explain why.</p>
+</blockquote>
+<p><strong>After — decomposing into five axes</strong></p>
+<blockquote>
+<p>"This language traded some safety for expressiveness and simplicity. Great for short scripts; weaker for long-lived services."</p>
+</blockquote>
+<p>Same fact, but the second version names the tradeoff.</p>
+<h2>Hands-on: Score Three Languages on Five Axes</h2>
+<p><strong>Step 1 — Same problem, three answers</strong></p>
+<p>The same task ("sum the lengths of strings in a list") in three languages.</p>
+<pre><code class="language-python"># Python
+def total_len(xs: list[str]) -&gt; int:
+    return sum(len(x) for x in xs)
+</code></pre>
+<pre><code class="language-go">// Go
+func TotalLen(xs []string) int {
+    n := 0
+    for _, x := range xs {
+        n += len(x)
+    }
+    return n
+}
+</code></pre>
+<pre><code class="language-rust">// Rust
+fn total_len(xs: &amp;[String]) -&gt; usize {
+    xs.iter().map(|x| x.len()).sum()
+}
+</code></pre>
+<p>Same job, similar shape — but different in length, explicitness, and safety.</p>
+<p><strong>Step 2 — Score consistency</strong></p>
+<pre><code class="language-python"># 2_consistency.py
+# Python: sum/len/for keep their shape across collections — high consistency
+print(sum([1,2,3]))
+print(sum((1,2,3)))
+print(sum({1,2,3}))
+</code></pre>
+<p>When one interface cuts across all collections, consistency is high. Go pursues a similar philosophy with very few keywords.</p>
+<p><strong>Step 3 — Simplicity vs expressiveness</strong></p>
+<pre><code class="language-python"># 3_expressiveness.py
+xs = [1, 2, 3, 4, 5]
+print([x*x for x in xs if x % 2])     # high expressiveness
+# Go has no list comprehension → simpler, less expressive
+</code></pre>
+<p>Python lets you write intent in one line. Go forces a <code>for</code> loop, reducing what you must learn.</p>
+<p><strong>Step 4 — Safety vs simplicity</strong></p>
+<pre><code class="language-rust">// 4_safety.rs
+fn first(xs: &amp;[i32]) -&gt; Option&lt;&amp;i32&gt; {
+    xs.first()           // forces &quot;no value&quot; handling at compile time
+}
+</code></pre>
+<p>Rust forces "value may be missing" into the type — high safety, more to learn. Python's <code>None</code> does the same job more lightly (and less safely).</p>
+<p><strong>Step 5 — The whole series in one table</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Python</th>
+<th>Go</th>
+<th>Rust</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Memory (ep07)</td>
+<td>GC + refcount</td>
+<td>GC</td>
+<td>compile-time ownership</td>
+</tr>
+<tr>
+<td>Execution (ep08)</td>
+<td>interpreter + bytecode</td>
+<td>AOT</td>
+<td>AOT</td>
+</tr>
+<tr>
+<td>Types (ep09)</td>
+<td>gradual (optional)</td>
+<td>static (simple)</td>
+<td>static, rich</td>
+</tr>
+<tr>
+<td>Objects (ep06)</td>
+<td>classes, dynamic</td>
+<td>structs + interfaces</td>
+<td>structs + traits</td>
+</tr>
+<tr>
+<td>Functions (ep05)</td>
+<td>first-class, closures</td>
+<td>first-class, simple</td>
+<td>first-class, explicit lifetimes</td>
+</tr>
+</tbody>
+</table>
+<p>Each language's answers cluster around what it tries to be best at.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The three answers are not right or wrong — they are <strong>different priority orderings</strong>.</li>
+<li>High consistency feels like "the pattern I just learned still applies here."</li>
+<li>High expressiveness is short but harder for outsiders to read.</li>
+<li>Strong safety means more time arguing with the compiler — and fewer production incidents in return.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Searching for the "best language."</strong> Goodness is only defined relative to a job.</li>
+<li><strong>Treating expressiveness as always virtuous.</strong> Too short can be illegible.</li>
+<li><strong>Always prioritizing safety.</strong> Rust is overkill for a one-week prototype.</li>
+<li><strong>Ignoring consistency.</strong> Solving the same problem differently every time decays a codebase fast.</li>
+<li><strong>Mistaking your favorite language for objective truth.</strong> Drawing the tradeoff table reveals the bias.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Choosing a language for a new project is not a popularity contest — it is weighting these five axes for the job. Short, fast validation favors Python. Operational simplicity in long-lived services favors Go. Safety and memory control where it really matters favors Rust.</p>
+<p>The same principle applies to internal libraries and APIs. "Does this function favor expressiveness or safety?" Writing the answer down explicitly makes reviews much faster.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Always names which axis a decision sacrificed.</li>
+<li>Accepts that no answer wins on every axis.</li>
+<li>Can write a paragraph on the tradeoffs of any language they know well.</li>
+<li>Applies the same five axes to API design.</li>
+<li>When evaluating a new language, asks "is this a fit for the problem I have?" first.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you define the five axes in one line each?</li>
+<li>[ ] Can you write a paragraph on the tradeoffs of your most-used language?</li>
+<li>[ ] Can you say which axis your most recent API favored?</li>
+<li>[ ] Do you avoid claiming "good language" without context?</li>
+<li>[ ] When meeting a new language, do you deliberately walk through the five axes?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Score your two most-used languages along the five axes and write a paragraph on the differences.</li>
+<li>Pick one public API in a library you wrote recently. Sketch a "more expressive" and a "safer" alternative for the same job.</li>
+<li>Pick the episode in this series that struck you most. Write a paragraph on which of the five axes it touches and how.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good language design is the honest declaration of how to weight the five axes. Everything you saw in this series — syntax, types, scope, closures, objects, memory, execution model, static vs dynamic — was an expression of those weights. The next step is to bring this instinct to your own code and API design.</p>
+<p>This series ends here. Suggested next reading paths: <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/compilers-101">compilers-101</a>, <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/api-design-101">api-design-101</a>, <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/software-design-101">software-design-101</a>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Functions and Closures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/06-objects-and-prototypes.md">Objects and Prototypes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/07-memory-management.md">Memory Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/08-interpreter-and-compiler.md">Interpreters and Compilers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/09-static-vs-dynamic.md">Static vs Dynamic Languages</a></li>
+<li><strong>What Makes a Good Language Design? (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Programming_language">Programming language design (Wikipedia)</a></li>
+<li><a href="https://commandcenter.blogspot.com/2012/06/less-is-exponentially-more.html">Rob Pike — Less is exponentially more (Go)</a></li>
+<li><a href="https://www.stroustrup.com/ETAPS-corrected-draft.pdf">Bjarne Stroustrup — Foundations of C++</a></li>
+<li><a href="https://peps.python.org/pep-0020/">PEP 20 — The Zen of Python</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Programming Languages, LanguageDesign, Consistency, Simplicity, Expressiveness</p>
+</body>
+</html>
