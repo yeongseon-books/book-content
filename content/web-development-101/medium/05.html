@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Frontend and Backend</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Frontend and Backend</h1>
+<blockquote>
+<p>Web Development 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Where</em> does the frontend's job end and the backend's begin?</p>
+<blockquote>
+<p>Whoever owns the <em>source of truth</em> is the backend; whoever <em>shows</em> it to the user is the frontend.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How responsibility splits between frontend and backend</li>
+<li>SPA (Single Page App) vs SSR (Server-Side Rendering)</li>
+<li>How the API contract bridges the two worlds</li>
+<li>Tradeoffs when the same logic could live on either side</li>
+<li>The picture a full-stack engineer holds in mind</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Even when one person writes both sides, blurring the <em>boundary of responsibility</em> rots the code fast. The boundary is not a <em>physical line</em> — it is a <em>promise about who owns what</em>.</p>
+<blockquote>
+<p>Good systems have <em>clear boundaries</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt; FE[&quot;Frontend (browser)&quot;]
+    FE --&gt;|&quot;API call&quot;| BE[&quot;Backend (server)&quot;]
+    BE --&gt; DB[&quot;Database&quot;]
+    DB --&gt; BE
+    BE --&gt; FE
+    FE --&gt; User
+</code></pre>
+<p>Data flows <em>DB → BE → FE → User</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Frontend</strong>: the part that <em>shows</em> things to the user (runs in the browser).</li>
+<li><strong>Backend</strong>: the part that <em>processes and stores</em> data (runs on a server).</li>
+<li><strong>SPA</strong>: load once, then JS swaps screens.</li>
+<li><strong>SSR</strong>: server builds HTML for every request.</li>
+<li><strong>Contract</strong>: the agreed shape of the API between the two sides.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (password check on the frontend)</strong></p>
+<pre><code class="language-js">if (password === &quot;admin1234&quot;) { login(); }  // anyone can read this
+</code></pre>
+<p><strong>After (check on the backend)</strong></p>
+<pre><code class="language-python"># only the server can compare
+if check_password(user, password):
+    return token
+</code></pre>
+<p>The truth lives on the <em>server</em>.</p>
+<h2>Hands-on: Connect the Two Sides in 5 Steps</h2>
+<p><strong>Step 1 — A tiny backend</strong></p>
+<pre><code class="language-python"># server.py
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+@app.get(&quot;/api/items&quot;)
+def items():
+    return jsonify([{&quot;id&quot;: 1, &quot;name&quot;: &quot;apple&quot;}, {&quot;id&quot;: 2, &quot;name&quot;: &quot;pear&quot;}])
+
+if __name__ == &quot;__main__&quot;:
+    app.run(port=8000)
+</code></pre>
+<p><strong>Step 2 — Call from the frontend</strong></p>
+<pre><code class="language-html">&lt;!-- index.html --&gt;
+&lt;ul id=&quot;list&quot;&gt;&lt;/ul&gt;
+&lt;script&gt;
+fetch(&quot;http://localhost:8000/api/items&quot;)
+  .then(r =&gt; r.json())
+  .then(items =&gt; {
+    const ul = document.getElementById(&quot;list&quot;);
+    for (const it of items) {
+      const li = document.createElement(&quot;li&quot;);
+      li.textContent = it.name;
+      ul.appendChild(li);
+    }
+  });
+&lt;/script&gt;
+</code></pre>
+<p><strong>Step 3 — Allow CORS</strong></p>
+<pre><code class="language-python"># add to server.py
+from flask_cors import CORS
+CORS(app)
+</code></pre>
+<p>Browsers <em>block</em> cross-origin requests by default.</p>
+<p><strong>Step 4 — Compare with server-side rendering</strong></p>
+<pre><code class="language-python"># ssr.py
+from flask import Flask, render_template_string
+app = Flask(__name__)
+
+@app.get(&quot;/&quot;)
+def home():
+    items = [{&quot;name&quot;: &quot;apple&quot;}, {&quot;name&quot;: &quot;pear&quot;}]
+    return render_template_string(&quot;&lt;ul&gt;{% for i in items %}&lt;li&gt;{{ i.name }}&lt;/li&gt;{% endfor %}&lt;/ul&gt;&quot;, items=items)
+</code></pre>
+<p><strong>Step 5 — Same feature, two styles</strong></p>
+<pre><code class="language-text">SPA: 1 line of HTML + JS that fetches and builds the DOM
+SSR: server returns fully built HTML on every request
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The API contract (shape of <code>/api/items</code>) is <em>agreed by both sides</em>.</li>
+<li>CORS is a <em>browser</em> security policy, not a server one.</li>
+<li>SSR makes the <em>first paint</em> fast; SPA makes <em>later interactions</em> fast.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Doing authorization on the frontend.</strong> Tools bypass it.</li>
+<li><strong>Coding without an API contract.</strong> Both sides assume different shapes.</li>
+<li><strong>Pushing all business logic to the backend.</strong> Even simple display logic hits the server.</li>
+<li><strong>Pushing all logic to the frontend.</strong> Secrets leak.</li>
+<li><strong>Opening CORS to <em>every</em> origin.</strong> A security hole.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Startups often start with SPA + REST API. Content sites prefer SSR (Next.js, Remix). A <em>full-stack</em> engineer who writes both still keeps the <em>contract</em> clean.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Truth</em> on the backend, <em>experience</em> on the frontend.</li>
+<li>Draw the API contract <em>first</em>.</li>
+<li>Keep data flow one-directional.</li>
+<li>Always check security and authorization on the <em>backend</em>.</li>
+<li>Pick SPA or SSR per situation, not by fashion.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can describe each side's job in one sentence.</li>
+<li>[ ] You can sketch an API contract.</li>
+<li>[ ] You can read a CORS error message.</li>
+<li>[ ] You know the SPA vs SSR tradeoffs.</li>
+<li>[ ] You know where authorization must live.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build the same screen as both SPA and SSR; compare <em>first-paint</em> time.</li>
+<li>Trigger a CORS error on purpose and read the message.</li>
+<li>Pick one endpoint and list the differences (auth, etc.) between calling it from FE vs BE.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Boundaries are <em>promises about responsibility</em>. Next, we layer <em>authentication and sessions</em> on top of that boundary.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
+<li><strong>Frontend and Backend (current)</strong></li>
+<li>Authentication and Sessions (upcoming)</li>
+<li>Connecting to a Database (upcoming)</li>
+<li>Deployment (upcoming)</li>
+<li>Performance and Caching (upcoming)</li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Client-Server_overview">Client-side vs server-side (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/SPA">SPA (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/SSR">Server-side rendering (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS (MDN)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, Frontend, Backend, Architecture, FullStack</p>
+</body>
+</html>

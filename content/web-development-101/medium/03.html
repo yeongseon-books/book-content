@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Browser and the DOM</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Browser and the DOM</h1>
+<blockquote>
+<p>Web Development 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does the browser turn HTML text into a <em>living screen</em> you can click?</p>
+<blockquote>
+<p>It builds a <em>tree (the DOM)</em>, computes styles, runs layout and paint, and then handles <em>behavior</em> through the event loop.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What the DOM is and how it gets built</li>
+<li>The stages of the rendering pipeline</li>
+<li>How JavaScript manipulates the DOM</li>
+<li>The basics of events and the event loop</li>
+<li>Patterns that ruin performance</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without a mental model of the DOM, you will never understand <em>why your page is slow</em>. Once the rendering pipeline is in your head, even React and Vue stop feeling like magic.</p>
+<blockquote>
+<p>The browser is <em>a machine for drawing the DOM</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    HTML[&quot;HTML&quot;] --&gt; Parse[&quot;Parse&quot;]
+    Parse --&gt; DOM[&quot;DOM tree&quot;]
+    CSS[&quot;CSS&quot;] --&gt; Style[&quot;Style calc&quot;]
+    DOM --&gt; Layout[&quot;Layout&quot;]
+    Style --&gt; Layout
+    Layout --&gt; Paint[&quot;Paint&quot;]
+    Paint --&gt; Pixels[&quot;Pixels&quot;]
+</code></pre>
+<p>Five stages: Parse, Style, Layout, Paint, Composite.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>DOM (Document Object Model)</strong>: HTML represented as an object tree.</li>
+<li><strong>Render tree</strong>: DOM plus computed styles.</li>
+<li><strong>Layout</strong>: computing the position and size of every element.</li>
+<li><strong>Paint</strong>: drawing pixels.</li>
+<li><strong>Event loop</strong>: queue system that handles asynchronous work.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (string-style HTML)</strong></p>
+<pre><code class="language-js">document.body.innerHTML += &quot;&lt;p&gt;new item&lt;/p&gt;&quot;;
+</code></pre>
+<p><strong>After (DOM API)</strong></p>
+<pre><code class="language-js">const p = document.createElement(&quot;p&quot;);
+p.textContent = &quot;new item&quot;;
+document.body.appendChild(p);
+</code></pre>
+<p>The DOM API is <em>safer and faster</em> — and it blocks XSS by default.</p>
+<h2>Hands-on: Working With the DOM in 5 Steps</h2>
+<p><strong>Step 1 — Look at the tree</strong></p>
+<pre><code class="language-html">&lt;!-- index.html --&gt;
+&lt;ul id=&quot;list&quot;&gt;
+  &lt;li&gt;apple&lt;/li&gt;
+  &lt;li&gt;pear&lt;/li&gt;
+&lt;/ul&gt;
+&lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p><strong>Step 2 — Select elements</strong></p>
+<pre><code class="language-js">// app.js
+const list = document.getElementById(&quot;list&quot;);
+const items = list.querySelectorAll(&quot;li&quot;);
+console.log(items.length);  // 2
+</code></pre>
+<p><strong>Step 3 — Add a new element</strong></p>
+<pre><code class="language-js">const li = document.createElement(&quot;li&quot;);
+li.textContent = &quot;grape&quot;;
+list.appendChild(li);
+</code></pre>
+<p><strong>Step 4 — Register an event</strong></p>
+<pre><code class="language-js">list.addEventListener(&quot;click&quot;, (e) =&gt; {
+  if (e.target.tagName === &quot;LI&quot;) {
+    console.log(&quot;clicked:&quot;, e.target.textContent);
+  }
+});
+</code></pre>
+<p>This is <em>event delegation</em> — one listener on the parent.</p>
+<p><strong>Step 5 — Compare with async</strong></p>
+<pre><code class="language-js">console.log(&quot;1&quot;);
+setTimeout(() =&gt; console.log(&quot;2&quot;), 0);
+console.log(&quot;3&quot;);
+// Output: 1, 3, 2 — the event loop runs the callback later.
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>DOM mutations are <em>expensive</em> (they trigger layout and paint).</li>
+<li>Event delegation saves both memory and time.</li>
+<li>Even <code>setTimeout(fn, 0)</code> does not run <em>immediately</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using <code>innerHTML</code> with user input.</strong> XSS opens up.</li>
+<li><strong>Adding DOM nodes one by one in a loop.</strong> Layout fires every time.</li>
+<li><strong>Attaching one listener per <code>&lt;li&gt;</code>.</strong> No event delegation.</li>
+<li><strong>Not knowing <em>when</em> JS runs.</strong> <code>defer</code> vs <code>async</code> vs inline matters.</li>
+<li><strong>Assuming the DOM is <em>synchronous</em>.</strong> Async callback order surprises you.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>React and Vue use a <em>Virtual DOM</em> to batch real DOM calls into one update. Infinite scroll, chat apps, browser games — all of them ride on the DOM and the event loop. When something is slow, open Chrome DevTools' <em>Performance</em> tab to see layout and paint as flame charts.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Batch</em> DOM calls into one update.</li>
+<li>Delegate events to parents.</li>
+<li>Measure first, then optimize (DevTools Performance).</li>
+<li>Use virtualization for long lists.</li>
+<li>Hunt down code that triggers repaints.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can list the five rendering stages.</li>
+<li>[ ] You can create and attach an element with the DOM API.</li>
+<li>[ ] You use event delegation.</li>
+<li>[ ] You can predict sync vs async order.</li>
+<li>[ ] You know the risks of <code>innerHTML</code>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare adding 100 <code>&lt;li&gt;</code> items one by one vs adding them with a <code>DocumentFragment</code>. Time both.</li>
+<li>Attach a single click listener to a parent <code>&lt;ul&gt;</code> and log the text of the clicked <code>&lt;li&gt;</code>.</li>
+<li>Predict the output of <code>console.log("a"); Promise.resolve().then(() =&gt; console.log("b")); console.log("c");</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The browser is <em>a machine for drawing the DOM</em>. Next, we look at the bridge between client and server: HTTP and APIs.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
+<li><strong>The Browser and the DOM (current)</strong></li>
+<li>HTTP and APIs (upcoming)</li>
+<li>Frontend and Backend (upcoming)</li>
+<li>Authentication and Sessions (upcoming)</li>
+<li>Connecting to a Database (upcoming)</li>
+<li>Deployment (upcoming)</li>
+<li>Performance and Caching (upcoming)</li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">DOM (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path">Critical rendering path (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_delegation">Event delegation (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop">Event loop (MDN)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, Browser, DOM, JavaScript, Frontend</p>
+</body>
+</html>

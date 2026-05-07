@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Performance and Caching</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Performance and Caching</h1>
+<blockquote>
+<p>Web Development 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When a page is slow, <em>where</em> should you start fixing it?</p>
+<blockquote>
+<p>Measure, cache, reduce, defer. Make the same work happen <em>less often</em> and <em>closer</em> to the user.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Basic performance measurement (browser and server)</li>
+<li>HTTP cache headers (Cache-Control, ETag)</li>
+<li>The role of a CDN</li>
+<li>Lazy loading and code splitting</li>
+<li>DB indexes and the N+1 problem</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A fast site is <em>money</em> — conversion, search rank, and user satisfaction all scale with speed. And making it fast is a job of <em>measurement</em>, not guessing.</p>
+<blockquote>
+<p>Performance starts with <em>measuring</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt; CDN[&quot;CDN cache&quot;]
+    CDN --&gt; Server[&quot;App server&quot;]
+    Server --&gt; AppCache[&quot;App cache (Redis)&quot;]
+    AppCache --&gt; DB[(&quot;Database&quot;)]
+</code></pre>
+<p>The closest cache that has the answer is the <em>fastest</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>TTFB</strong>: time to first byte (server response speed).</li>
+<li><strong>HTTP cache</strong>: the rules that let the browser <em>reuse</em> a response.</li>
+<li><strong>CDN</strong>: <em>proxy servers</em> spread around the world.</li>
+<li><strong>Lazy load</strong>: do not fetch until needed.</li>
+<li><strong>Index</strong>: a <em>shortcut</em> the DB uses to find rows fast.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (DB on every request)</strong></p>
+<pre><code class="language-python">@app.get(&quot;/popular&quot;)
+def popular():
+    return db.fetch(&quot;SELECT * FROM posts ORDER BY views DESC LIMIT 10&quot;)
+</code></pre>
+<p><strong>After (cache for 1 minute)</strong></p>
+<pre><code class="language-python">import time
+_cache = {&quot;at&quot;: 0, &quot;data&quot;: None}
+@app.get(&quot;/popular&quot;)
+def popular():
+    if time.time() - _cache[&quot;at&quot;] &gt; 60:
+        _cache[&quot;data&quot;] = db.fetch(&quot;SELECT * FROM posts ORDER BY views DESC LIMIT 10&quot;)
+        _cache[&quot;at&quot;] = time.time()
+    return _cache[&quot;data&quot;]
+</code></pre>
+<p>Same answer, <em>dozens fewer</em> DB calls.</p>
+<h2>Hands-on: Make It Faster in 5 Steps</h2>
+<p><strong>Step 1 — Measure</strong></p>
+<pre><code class="language-text">Browser: F12 → Lighthouse or Performance tab
+Server: time.perf_counter() or APM (Datadog, New Relic)
+</code></pre>
+<p><strong>Step 2 — Cache headers on static files</strong></p>
+<pre><code class="language-python"># Flask
+@app.after_request
+def add_cache(resp):
+    if resp.mimetype.startswith((&quot;image/&quot;, &quot;text/css&quot;)):
+        resp.headers[&quot;Cache-Control&quot;] = &quot;public, max-age=31536000, immutable&quot;
+    return resp
+</code></pre>
+<p><strong>Step 3 — Add a CDN</strong></p>
+<pre><code class="language-text">Put Cloudflare/Fastly/CloudFront in front and
+static assets become close to users on every continent.
+</code></pre>
+<p><strong>Step 4 — Lazy loading</strong></p>
+<pre><code class="language-html">&lt;img src=&quot;big.jpg&quot; loading=&quot;lazy&quot; alt=&quot;...&quot;&gt;
+</code></pre>
+<pre><code class="language-js">// JS code splitting (dynamic import)
+button.onclick = async () =&gt; {
+  const mod = await import(&quot;./editor.js&quot;);
+  mod.open();
+};
+</code></pre>
+<p><strong>Step 5 — DB indexes and the N+1 trap</strong></p>
+<pre><code class="language-sql">CREATE INDEX idx_posts_views ON posts(views DESC);
+</code></pre>
+<pre><code class="language-python"># N+1 (bad)
+for p in posts: print(p.author.name)  # SELECT every loop
+
+# join (good)
+posts = db.fetch(&quot;SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_id&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A cache must come with both <em>lifetime</em> and <em>invalidation</em>.</li>
+<li>CDNs help most for <em>static</em> assets.</li>
+<li>Indexes follow <em>query patterns</em>, not random columns.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Optimizing on a hunch.</strong> The slow part is usually elsewhere.</li>
+<li><strong><code>no-cache</code> on every response.</strong> You waste cacheable wins.</li>
+<li><strong>CDN-caching <em>dynamic</em> responses.</strong> Risk of leaking per-user data.</li>
+<li><strong>Indexing <em>every</em> column.</strong> Writes get slow.</li>
+<li><strong>No monitoring for N+1.</strong> The service quietly degrades.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Browser → CDN → app cache (Redis) → DB — this <em>four-layer cache</em> underpins almost every large site. The habit of designing the <em>cache strategy</em> alongside the feature is one thing that separates seniors from juniors.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Loop <em>measure → hypothesis → experiment</em>.</li>
+<li>Design caches with both <em>TTL</em> and <em>invalidation key</em>.</li>
+<li>Cache <em>closest</em> to the user first.</li>
+<li>Verify indexes with <em>EXPLAIN</em>.</li>
+<li>Watch <em>p95/p99</em> (averages lie).</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You ran Lighthouse at least once.</li>
+<li>[ ] Static assets have <code>Cache-Control</code>.</li>
+<li>[ ] A CDN sits in front of static assets.</li>
+<li>[ ] You know how to find N+1 queries.</li>
+<li>[ ] You have created at least one DB index.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick one endpoint and <em>measure</em> response time before and after caching.</li>
+<li>Compare page load time with and without <code>&lt;img loading="lazy"&gt;</code>.</li>
+<li>Reproduce an N+1 and refactor it into a single SQL join.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Performance starts with <em>measurement</em>. In the final post we tie everything together and build a small web app.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Frontend and Backend</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/06-auth-and-sessions.md">Authentication and Sessions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/07-connecting-to-database.md">Connecting to a Database</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/08-deployment.md">Deployment</a></li>
+<li><strong>Performance and Caching (current)</strong></li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching">HTTP caching (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading">Lazy loading (MDN)</a></li>
+<li><a href="https://developer.chrome.com/docs/lighthouse/overview/">Lighthouse overview</a></li>
+<li><a href="https://use-the-index-luke.com/">Database indexes (Use The Index, Luke!)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, Performance, Caching, CDN, Optimization</p>
+</body>
+</html>

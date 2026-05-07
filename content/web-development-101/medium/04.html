@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HTTP and APIs</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>HTTP and APIs</h1>
+<blockquote>
+<p>Web Development 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What do clients and servers actually <em>send</em> each other?</p>
+<blockquote>
+<p>A request (method, URL, headers, body) and a response (status, headers, body). That is <em>all</em> of HTTP.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The shape of HTTP requests and responses</li>
+<li>Methods (GET/POST/PUT/DELETE) and status codes</li>
+<li>The role of headers</li>
+<li>Calling and parsing JSON APIs</li>
+<li>The difference between an API and a page request</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Half of web work is <em>building and reading HTTP messages</em>. If you cannot picture the message, debugging becomes guesswork. Learn it once and it transfers to every framework.</p>
+<blockquote>
+<p>HTTP is <em>a protocol made of plain text</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;Client&quot;] --&gt;|&quot;GET /users/1&quot;| Server[&quot;Server&quot;]
+    Server --&gt;|&quot;200 OK + JSON&quot;| Client
+</code></pre>
+<p>One line of request, one line of response.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Method</strong>: what to do (GET reads, POST creates, etc.).</li>
+<li><strong>Status code</strong>: outcome (2xx success, 4xx client error, 5xx server error).</li>
+<li><strong>Header</strong>: metadata (Content-Type, Authorization, etc.).</li>
+<li><strong>Body</strong>: actual payload (JSON, HTML, image bytes).</li>
+<li><strong>API</strong>: a <em>programmatic endpoint</em> meant for code, not browsers.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (HTML page request)</strong></p>
+<pre><code class="language-python">import requests
+r = requests.get(&quot;https://example.com&quot;)
+print(r.text[:80])  # &lt;!doctype html&gt;...
+</code></pre>
+<p><strong>After (JSON API call)</strong></p>
+<pre><code class="language-python">import requests
+r = requests.get(&quot;https://api.github.com/repos/python/cpython&quot;)
+data = r.json()
+print(data[&quot;full_name&quot;], data[&quot;stargazers_count&quot;])
+</code></pre>
+<p>Same HTTP, different <em>Content-Type</em>.</p>
+<h2>Hands-on: HTTP Messages in 5 Steps</h2>
+<p><strong>Step 1 — A GET request</strong></p>
+<pre><code class="language-python"># 1_get.py
+import requests
+r = requests.get(&quot;https://httpbin.org/get?lang=en&quot;)
+print(r.status_code)
+print(r.json()[&quot;args&quot;])  # {'lang': 'en'}
+</code></pre>
+<p><strong>Step 2 — POST with a body</strong></p>
+<pre><code class="language-python"># 2_post.py
+import requests
+r = requests.post(&quot;https://httpbin.org/post&quot;, json={&quot;name&quot;: &quot;yeongseon&quot;})
+print(r.json()[&quot;json&quot;])
+</code></pre>
+<p><strong>Step 3 — Inspect headers</strong></p>
+<pre><code class="language-python"># 3_headers.py
+import requests
+r = requests.get(&quot;https://httpbin.org/headers&quot;, headers={&quot;X-Custom&quot;: &quot;hi&quot;})
+print(r.json()[&quot;headers&quot;][&quot;X-Custom&quot;])
+</code></pre>
+<p><strong>Step 4 — Branch on status code</strong></p>
+<pre><code class="language-python"># 4_status.py
+import requests
+for url in [&quot;https://httpbin.org/status/200&quot;, &quot;https://httpbin.org/status/404&quot;]:
+    r = requests.get(url)
+    if r.ok:
+        print(&quot;OK&quot;, r.status_code)
+    else:
+        print(&quot;FAIL&quot;, r.status_code)
+</code></pre>
+<p><strong>Step 5 — See it raw</strong></p>
+<pre><code class="language-bash">curl -v https://httpbin.org/get
+# &gt; GET /get HTTP/1.1
+# &gt; Host: httpbin.org
+# &lt; HTTP/1.1 200 OK
+# &lt; Content-Type: application/json
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Whether <code>Content-Type</code> is <code>text/html</code> or <code>application/json</code> changes <em>everything</em>.</li>
+<li>POST is the promise that <em>server state may change</em>.</li>
+<li>The same URL behaves differently per method.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Creating data with GET.</strong> GET is <em>read-only</em> by contract.</li>
+<li><strong>Returning 200 for every response.</strong> Clients cannot distinguish errors.</li>
+<li><strong>Ignoring <code>Content-Type</code>.</strong> You parse HTML as JSON.</li>
+<li><strong>Free-form error bodies.</strong> Clients cannot extract the message.</li>
+<li><strong>Putting auth in the URL.</strong> It leaks into logs forever.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most mobile and web apps talk to servers as <em>JSON over HTTP</em>. GraphQL and gRPC also ride on HTTP. The first thing you reach for in a new service is the <em>API documentation</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Use methods and status codes for their <em>intended</em> meaning.</li>
+<li>Standardize the shape of error bodies.</li>
+<li>Auth in <em>headers</em>, tokens with <em>short lifetimes</em>.</li>
+<li>Always set a <em>time budget</em> (timeout).</li>
+<li>API and docs grow together.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know the meaning of the four common methods.</li>
+<li>[ ] You know what 2xx, 4xx, and 5xx ranges mean.</li>
+<li>[ ] You can read <code>Content-Type</code> and branch on it.</li>
+<li>[ ] You can set timeout and retry.</li>
+<li>[ ] You can fire a raw curl request.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Send GET, POST, PUT, and DELETE to <code>httpbin.org/anything</code> and compare responses.</li>
+<li>Write code that does <em>not</em> follow a 3xx redirect.</li>
+<li>Pick a public API and call <em>three of its endpoints</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>HTTP is <em>a contract made of plain text</em>. Next, we look at the two sides of that contract — Frontend and Backend.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
+<li><strong>HTTP and APIs (current)</strong></li>
+<li>Frontend and Backend (upcoming)</li>
+<li>Authentication and Sessions (upcoming)</li>
+<li>Connecting to a Database (upcoming)</li>
+<li>Deployment (upcoming)</li>
+<li>Performance and Caching (upcoming)</li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">HTTP overview (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods">HTTP methods (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">HTTP status codes (MDN)</a></li>
+<li><a href="https://httpbin.org/">httpbin (request/response service)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, HTTP, API, REST, Networking</p>
+</body>
+</html>

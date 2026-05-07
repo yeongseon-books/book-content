@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Authentication and Sessions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Authentication and Sessions</h1>
+<blockquote>
+<p>Web Development 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: HTTP is <em>stateless</em> — so how does a server <em>remember</em> who you are?</p>
+<blockquote>
+<p>Cookies, sessions, JWTs, and OAuth — four tools that lay <em>memory</em> on top of <em>no memory</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between authentication and authorization</li>
+<li>How cookies and sessions actually work</li>
+<li>The structure of a JWT (token-based auth)</li>
+<li>The OAuth flow for third-party login</li>
+<li>Common security mistakes and defenses</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Almost every app has login. A weak design lets <em>account takeover</em> happen in one line. Knowing the names and roles of the tools blocks most disasters.</p>
+<blockquote>
+<p>Auth is not a <em>feature</em> — it is <em>foundation</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt;|&quot;id/pw&quot;| Server[&quot;Server&quot;]
+    Server --&gt;|&quot;session id (cookie)&quot;| Browser[&quot;Browser&quot;]
+    Browser --&gt;|&quot;cookie&quot;| Server
+    Server --&gt;|&quot;data&quot;| Browser
+</code></pre>
+<p>The server issues a <em>session id</em>; the browser sends it on every request.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Authentication</strong>: confirms <em>who</em> you are (login).</li>
+<li><strong>Authorization</strong>: decides <em>what</em> you can do (permission).</li>
+<li><strong>Session</strong>: user state held by the server.</li>
+<li><strong>Cookie</strong>: a per-domain key/value the browser stores.</li>
+<li><strong>JWT</strong>: a signed <em>self-describing</em> token (no server-side memory needed).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (password on every call)</strong></p>
+<pre><code class="language-python">requests.get(&quot;/api/me&quot;, auth=(&quot;alice&quot;, &quot;secret&quot;))  # leaks the password
+</code></pre>
+<p><strong>After (session cookie)</strong></p>
+<pre><code class="language-python">s = requests.Session()
+s.post(&quot;/login&quot;, json={&quot;id&quot;: &quot;alice&quot;, &quot;pw&quot;: &quot;secret&quot;})
+s.get(&quot;/api/me&quot;)  # cookie sent automatically
+</code></pre>
+<p>The password flows <em>once</em>.</p>
+<h2>Hands-on: Build a Login in 5 Steps</h2>
+<p><strong>Step 1 — Flask session login</strong></p>
+<pre><code class="language-python"># app.py
+from flask import Flask, session, request, jsonify
+app = Flask(__name__)
+app.secret_key = &quot;dev-only-change-me&quot;
+
+USERS = {&quot;alice&quot;: &quot;secret&quot;}
+
+@app.post(&quot;/login&quot;)
+def login():
+    data = request.get_json()
+    if USERS.get(data[&quot;id&quot;]) == data[&quot;pw&quot;]:
+        session[&quot;user&quot;] = data[&quot;id&quot;]
+        return jsonify(ok=True)
+    return jsonify(ok=False), 401
+
+@app.get(&quot;/me&quot;)
+def me():
+    user = session.get(&quot;user&quot;)
+    if not user: return jsonify(error=&quot;unauth&quot;), 401
+    return jsonify(user=user)
+</code></pre>
+<p><strong>Step 2 — Confirm the cookie</strong></p>
+<pre><code class="language-bash">curl -c c.txt -X POST -H &quot;Content-Type: application/json&quot; -d '{&quot;id&quot;:&quot;alice&quot;,&quot;pw&quot;:&quot;secret&quot;}' http://localhost:5000/login
+curl -b c.txt http://localhost:5000/me  # → {&quot;user&quot;:&quot;alice&quot;}
+</code></pre>
+<p><strong>Step 3 — Logout</strong></p>
+<pre><code class="language-python">@app.post(&quot;/logout&quot;)
+def logout():
+    session.clear()
+    return jsonify(ok=True)
+</code></pre>
+<p><strong>Step 4 — Issue a JWT (alternative)</strong></p>
+<pre><code class="language-python"># jwt_demo.py
+import jwt, time
+SECRET = &quot;dev&quot;
+token = jwt.encode({&quot;sub&quot;: &quot;alice&quot;, &quot;exp&quot;: time.time() + 3600}, SECRET, algorithm=&quot;HS256&quot;)
+print(jwt.decode(token, SECRET, algorithms=[&quot;HS256&quot;]))
+</code></pre>
+<p><strong>Step 5 — Call with Authorization header</strong></p>
+<pre><code class="language-python">import requests
+requests.get(&quot;/api/me&quot;, headers={&quot;Authorization&quot;: f&quot;Bearer {token}&quot;})
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Sessions need <em>server memory or a DB</em>.</li>
+<li>JWT only needs signature checks — fits distributed systems.</li>
+<li>Cookies must set <code>HttpOnly</code>, <code>Secure</code>, and <code>SameSite</code>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Storing passwords in plain text.</strong> Always <em>hash</em> (bcrypt, argon2).</li>
+<li><strong>Putting secrets inside a JWT.</strong> JWT is <em>signed, not encrypted</em>.</li>
+<li><strong>Leaving cookie options blank.</strong> XSS and CSRF risks.</li>
+<li><strong>Tokens with no expiration.</strong> One leak lasts forever.</li>
+<li><strong>Checking permissions only once.</strong> Check on every protected endpoint.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Web apps use <em>session cookies</em> with CSRF tokens. Mobile, SPA, and microservice setups commonly use <em>JWT</em>. Third-party login (Google, GitHub) uses <em>OAuth 2.0</em> — you never see the user's password.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Hash</em> passwords; <em>short-lived</em> tokens.</li>
+<li>Cookies default to <em>HttpOnly + Secure + SameSite=Lax</em>.</li>
+<li>Authorization in <em>middleware</em>, applied uniformly.</li>
+<li>Split lifetimes with <em>refresh tokens</em>.</li>
+<li>Design assuming a breach — make every credential revocable.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know authentication vs authorization.</li>
+<li>[ ] You know session vs JWT tradeoffs.</li>
+<li>[ ] You use at least one password-hash function.</li>
+<li>[ ] You know three cookie security flags.</li>
+<li>[ ] You can describe the OAuth flow in one line.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build login/logout with Flask sessions; observe the cookie in DevTools.</li>
+<li>Issue a JWT and verify it gets rejected after expiration.</li>
+<li>Apply auth middleware to one endpoint; ensure unauthenticated calls get 401.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Auth is <em>foundation</em>. Next, we look at the database connection that makes user data <em>permanent</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Frontend and Backend</a></li>
+<li><strong>Authentication and Sessions (current)</strong></li>
+<li>Connecting to a Database (upcoming)</li>
+<li>Deployment (upcoming)</li>
+<li>Performance and Caching (upcoming)</li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies">HTTP cookies (MDN)</a></li>
+<li><a href="https://flask.palletsprojects.com/en/latest/quickstart/#sessions">Flask sessions</a></li>
+<li><a href="https://jwt.io/introduction">JWT introduction</a></li>
+<li><a href="https://www.oauth.com/">OAuth 2.0 simplified</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, Authentication, Sessions, Security, Backend</p>
+</body>
+</html>

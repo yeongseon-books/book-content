@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How the Web Works</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>How the Web Works</h1>
+<blockquote>
+<p>Web Development 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you type <code>https://example.com</code> and hit Enter, what <em>exactly</em> happens?</p>
+<blockquote>
+<p>DNS lookup, then TCP/TLS connect, then HTTP request, then server response, then browser rendering. Five steps in concert.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The full path from URL to pixels on the screen</li>
+<li>The role of DNS, HTTP, and the browser renderer</li>
+<li>Where the client ends and the server begins</li>
+<li>How to observe a real network request</li>
+<li>A map of this whole series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Web developers must see the <em>whole picture</em>. Knowing one layer well lets you build, but it does not let you debug. Once the five-step flow is in your head, every tool finds its place.</p>
+<blockquote>
+<p>The web runs on <em>agreed protocols</em>, not magic.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt; Browser[&quot;Browser&quot;]
+    Browser --&gt; DNS[&quot;DNS&quot;]
+    DNS --&gt; Browser
+    Browser --&gt;|&quot;HTTP request&quot;| Server[&quot;Web server&quot;]
+    Server --&gt;|&quot;HTML/CSS/JS&quot;| Browser
+    Browser --&gt; Render[&quot;Render to screen&quot;]
+</code></pre>
+<p>Five beats: DNS, connect, request, response, render.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>URL</strong>: address of a resource (scheme + host + path).</li>
+<li><strong>DNS</strong>: phone book that maps a domain to an IP.</li>
+<li><strong>HTTP</strong>: protocol for requests and responses.</li>
+<li><strong>Server</strong>: program that turns requests into responses.</li>
+<li><strong>Browser</strong>: program that turns responses into pixels.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (raw IP)</strong></p>
+<pre><code class="language-python"># Hard to remember
+import socket
+ip = &quot;93.184.216.34&quot;
+</code></pre>
+<p><strong>After (use a domain)</strong></p>
+<pre><code class="language-python">import socket
+ip = socket.gethostbyname(&quot;example.com&quot;)
+print(ip)
+</code></pre>
+<p>DNS is the bridge between <em>human language</em> and <em>machine language</em>.</p>
+<h2>Hands-on: Trace One Request in Five Steps</h2>
+<p><strong>Step 1 — DNS lookup</strong></p>
+<pre><code class="language-python"># 1_dns.py
+import socket
+print(socket.gethostbyname(&quot;example.com&quot;))
+</code></pre>
+<p>A domain becomes an IP.</p>
+<p><strong>Step 2 — HTTP request</strong></p>
+<pre><code class="language-python"># 2_http.py
+import requests
+r = requests.get(&quot;https://example.com&quot;)
+print(r.status_code, len(r.text))
+</code></pre>
+<p>You should see <code>200</code> and a body length.</p>
+<p><strong>Step 3 — Read response headers</strong></p>
+<pre><code class="language-python"># 3_headers.py
+import requests
+r = requests.get(&quot;https://example.com&quot;)
+for k, v in r.headers.items():
+    print(k, &quot;:&quot;, v)
+</code></pre>
+<p><code>Content-Type</code>, <code>Server</code>, <code>Cache-Control</code> — the <em>metadata</em> of the response.</p>
+<p><strong>Step 4 — Parse HTML</strong></p>
+<pre><code class="language-python"># 4_parse.py
+import re, requests
+html = requests.get(&quot;https://example.com&quot;).text
+title = re.search(r&quot;&lt;title&gt;(.*?)&lt;/title&gt;&quot;, html).group(1)
+print(title)
+</code></pre>
+<p>The browser turns HTML into a tree, then paints pixels.</p>
+<p><strong>Step 5 — Watch in DevTools</strong></p>
+<pre><code class="language-text">Open browser, press F12, Network tab, reload example.com
+</code></pre>
+<p>Every request, timing, and transfer size is right there.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>DNS happens <em>once</em>, then is cached.</li>
+<li>HTTPS is HTTP on top of TCP and TLS.</li>
+<li>HTML, CSS, and JS start arriving in <em>parallel</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mixing DNS and HTTP.</strong> They are different stages.</li>
+<li><strong>Thinking HTTPS is a different protocol from HTTP.</strong> It is HTTP plus a TLS layer.</li>
+<li><strong>Believing the <em>server</em> renders the page.</strong> The browser does, by default.</li>
+<li><strong>Blurring the client/server boundary.</strong> No one knows who owns what.</li>
+<li><strong>Debugging without DevTools.</strong> The Network tab is the fastest diagnostic tool.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>When something breaks, the first question is <em>which step</em>: DNS, TLS, server, or render? Knowing the names of the stages turns a 30-minute debug into 3 minutes. Every monitoring tool — New Relic, Datadog, Sentry — measures these same five steps.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Set a <em>time budget</em> per stage (DNS 50ms, TLS 100ms, etc.).</li>
+<li>Cache anything that <em>can</em> be cached.</li>
+<li>Always ask: should this run on the <em>browser</em> or the <em>server</em>?</li>
+<li>Use DevTools Network as a debugger, not a viewer.</li>
+<li>Measure, do not guess.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can describe URL-to-pixels in five steps.</li>
+<li>[ ] You can explain the difference between DNS and HTTP.</li>
+<li>[ ] You can open DevTools Network and analyze a single request.</li>
+<li>[ ] You can read a status code from a response.</li>
+<li>[ ] You know where caching happens.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Open a favorite site and find the <em>largest</em> request in the Network tab.</li>
+<li>Use <code>dig</code> or <code>nslookup</code> to look up three domains.</li>
+<li>Use <code>requests</code> to call the same URL 100 times and print the average time.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The web is a <em>concert of protocols</em>. Next, we look at the three things the browser actually downloads — HTML, CSS, and JavaScript.</p>
+<ul>
+<li><strong>How the Web Works (current)</strong></li>
+<li>HTML, CSS, and JavaScript (upcoming)</li>
+<li>The Browser and the DOM (upcoming)</li>
+<li>HTTP and APIs (upcoming)</li>
+<li>Frontend and Backend (upcoming)</li>
+<li>Authentication and Sessions (upcoming)</li>
+<li>Connecting to a Database (upcoming)</li>
+<li>Deployment (upcoming)</li>
+<li>Performance and Caching (upcoming)</li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works">How the Web works (MDN)</a></li>
+<li><a href="https://www.cloudflare.com/learning/dns/what-is-dns/">What is DNS? (Cloudflare Learning)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">HTTP overview (MDN)</a></li>
+<li><a href="https://developer.chrome.com/docs/devtools/network/">Chrome DevTools Network</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, HTTP, DNS, Browser, Frontend</p>
+</body>
+</html>
