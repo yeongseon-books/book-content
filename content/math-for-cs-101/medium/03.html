@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sets and Functions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Sets and Functions</h1>
+<blockquote>
+<p>Math for CS 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What lies at the <em>foundation</em> of <em>data structures</em>?</p>
+<blockquote>
+<p>A <em>set</em> is a <em>collection of elements</em>; a <em>function</em> is a <em>rule</em> from <em>input</em> to <em>output</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a <em>set</em></li>
+<li><em>Union</em>, <em>intersection</em>, <em>difference</em></li>
+<li>The definition of a <em>function</em></li>
+<li><em>Injective</em>, <em>surjective</em>, <em>bijective</em></li>
+<li><em>Composition</em> of functions</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Python's <em>set</em>, <em>dict</em>, <em>map</em>, and <em>filter</em> are all reinterpretations of <em>sets and functions</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Set[&quot;set&quot;] --&gt; Union[&quot;union&quot;]
+    Set --&gt; Inter[&quot;intersection&quot;]
+    Set --&gt; Diff[&quot;difference&quot;]
+    Func[&quot;function&quot;] --&gt; Inj[&quot;injective&quot;]
+    Func --&gt; Sur[&quot;surjective&quot;]
+    Func --&gt; Bij[&quot;bijective&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>set</strong>: a collection of <em>distinct</em> elements.</li>
+<li><strong>union</strong>: all elements.</li>
+<li><strong>intersection</strong>: <em>shared</em> elements.</li>
+<li><strong>function</strong>: one <em>output</em> per <em>input</em>.</li>
+<li><strong>bijection</strong>: <em>injective</em> and <em>surjective</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: handle everything with <em>lists</em>.</p>
+<p><strong>After</strong>: handle it with <em>sets</em> and <em>functions</em>, more clearly.</p>
+<h2>Hands-on: Five Steps with Sets and Functions</h2>
+<p><strong>Step 1 — Sets</strong></p>
+<pre><code class="language-python">A, B = {1, 2, 3}, {2, 3, 4}
+</code></pre>
+<p><strong>Step 2 — Union, intersection, difference</strong></p>
+<pre><code class="language-python">def ops(A, B):
+    return A | B, A &amp; B, A - B
+</code></pre>
+<p><strong>Step 3 — A function</strong></p>
+<pre><code class="language-python">def square(x):
+    return x * x
+</code></pre>
+<p><strong>Step 4 — Injective check</strong></p>
+<pre><code class="language-python">def is_injective(f, domain):
+    return len({f(x) for x in domain}) == len(list(domain))
+</code></pre>
+<p><strong>Step 5 — Composition</strong></p>
+<pre><code class="language-python">def compose(f, g):
+    return lambda x: f(g(x))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>operations</em> are <em>one operator</em> each.</li>
+<li><em>Injective</em> is a <em>length</em> comparison.</li>
+<li><em>Composition</em> is a <em>lambda</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Confusing <em>list</em> and <em>set</em>.</strong></li>
+<li><strong>Confusing <em>function</em> with <em>relation</em>.</strong></li>
+<li><strong>Mixing up <em>injective</em> and <em>surjective</em>.</strong></li>
+<li><strong>Misordering in <em>composition</em>.</strong></li>
+<li><strong>Missing the <em>empty set</em> case.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Permission checks</em> are <em>set intersections</em>, <em>data mapping</em> is <em>function composition</em>, and <em>deduplication</em> is a <em>set conversion</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Sets</em> are <em>clear</em>.</li>
+<li><em>Functions</em> are <em>deterministic</em>.</li>
+<li><em>Bijections</em> are <em>invertible</em>.</li>
+<li><em>Composition</em> is a <em>pipe</em>.</li>
+<li>The <em>empty set</em> is the <em>base case</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Translate <em>operations</em> to <em>code</em>.</li>
+<li>[ ] Specify <em>domain</em> and <em>codomain</em>.</li>
+<li>[ ] Decide <em>injective/surjective</em>.</li>
+<li>[ ] Check <em>composability</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>injective</em> in one line.</li>
+<li>Define <em>surjective</em> in one line.</li>
+<li>Define <em>composition</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>graphs</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
+<li><strong>Sets and Functions (current)</strong></li>
+<li>Graphs (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Probability (upcoming)</li>
+<li>Linear Algebra (upcoming)</li>
+<li>Calculus (upcoming)</li>
+<li>Information Theory (upcoming)</li>
+<li>Algorithms and Math (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mathworld.wolfram.com/Set.html">Sets - Wolfram MathWorld</a></li>
+<li><a href="https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:functions">Functions - Khan Academy</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Discrete_Mathematics_and_Its_Applications">Discrete Math - Rosen</a></li>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html#sets">Python Set Operations</a></li>
+</ul>
+<p class="tags-line">Tags: Math, Sets, Functions, Foundations, Beginner</p>
+</body>
+</html>

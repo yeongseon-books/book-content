@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Information Theory</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Information Theory</h1>
+<blockquote>
+<p>Math for CS 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we <em>measure</em> the <em>amount</em> of information?</p>
+<blockquote>
+<p><em>Information theory</em> gives us a <em>bit-level</em> unit for uncertainty behind <em>compression</em>, <em>communication</em>, and <em>ML loss</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Bits</em> and <em>information content</em></li>
+<li><em>Entropy</em></li>
+<li><em>Cross entropy</em></li>
+<li><em>KL divergence</em></li>
+<li><em>Compression</em> intuition</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Classifier losses</em>, <em>zip compression</em>, <em>communication codes</em>, and <em>language models</em> are all defined on top of information theory.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Distribution] --&gt; H[Entropy]
+    P --&gt; C[Cross Entropy]
+    C --&gt; K[KL Divergence]
+    H --&gt; Z[Compression]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>bit</strong>: a <em>binary</em> unit.</li>
+<li><strong>entropy</strong>: <em>average information content</em>.</li>
+<li><strong>cross entropy</strong>: cost of coding <em>truth</em> with <em>predictions</em>.</li>
+<li><strong>KL divergence</strong>: a <em>distance</em> between distributions.</li>
+<li><strong>compression</strong>: bounded <em>below</em> by entropy.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every message gets the <em>same length</em>.</p>
+<p><strong>After</strong>: <em>common</em> messages short, <em>rare</em> ones long.</p>
+<h2>Hands-on: Mini Information Kit</h2>
+<p><strong>Step 1 — Information Content</strong></p>
+<pre><code class="language-python">import math
+
+def info(p):
+    return -math.log2(p)
+</code></pre>
+<p><strong>Step 2 — Entropy</strong></p>
+<pre><code class="language-python">def entropy(probs):
+    return sum(-p * math.log2(p) for p in probs if p &gt; 0)
+</code></pre>
+<p><strong>Step 3 — Cross Entropy</strong></p>
+<pre><code class="language-python">def cross_entropy(p, q):
+    return sum(-pi * math.log2(qi) for pi, qi in zip(p, q) if qi &gt; 0)
+</code></pre>
+<p><strong>Step 4 — KL Divergence</strong></p>
+<pre><code class="language-python">def kl(p, q):
+    return cross_entropy(p, q) - entropy(p)
+</code></pre>
+<p><strong>Step 5 — Average Code Length</strong></p>
+<pre><code class="language-python">def avg_len(probs, lengths):
+    return sum(p * L for p, L in zip(probs, lengths))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>log2</em> gives <em>bits</em>.</li>
+<li><em>KL</em> is <em>asymmetric</em>.</li>
+<li><em>Cross entropy</em> is the standard <em>loss</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Forgetting to handle <em>log(0)</em>.</strong></li>
+<li><strong>Assuming <em>KL</em> is <em>symmetric</em>.</strong></li>
+<li><strong>Mixing up <em>entropy</em> and <em>cross entropy</em>.</strong></li>
+<li><strong>Inputs whose <em>probabilities</em> do not sum to <em>1</em>.</strong></li>
+<li><strong>Confusing <em>units</em> (bits vs nats).</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Classifier loss</em>, <em>language model perplexity</em>, <em>zip/gzip</em>, and <em>ML regularization</em> all use information theory.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Information</em> is <em>bits</em>.</li>
+<li><em>Entropy</em> is the <em>compression floor</em>.</li>
+<li><em>KL</em> is <em>distributional distance</em>.</li>
+<li><em>Loss</em> is <em>cross entropy</em>.</li>
+<li><em>Models</em> estimate <em>distributions</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Verify <em>probabilities sum to 1</em>.</li>
+<li>[ ] Guard <em>log(0)</em>.</li>
+<li>[ ] State the <em>units</em>.</li>
+<li>[ ] State the <em>direction</em> of <em>KL</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>entropy</em> in one line.</li>
+<li>Define <em>KL divergence</em> in one line.</li>
+<li>Define <em>cross entropy</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: the <em>Algorithms and Math</em> capstone.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Linear Algebra</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/08-calculus.md">Calculus</a></li>
+<li><strong>Information Theory (current)</strong></li>
+<li>Algorithms and Math (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://plato.stanford.edu/entries/information-theory/">Information Theory - Stanford Encyclopedia</a></li>
+<li><a href="https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf">A Mathematical Theory of Communication - Shannon</a></li>
+<li><a href="https://www.wiley.com/en-us/Elements+of+Information+Theory%2C+2nd+Edition-p-9780471241959">Elements of Information Theory - Cover and Thomas</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html">SciPy Stats Entropy Documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Math, InformationTheory, Entropy, Compression, Beginner</p>
+</body>
+</html>

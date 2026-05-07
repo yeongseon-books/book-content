@@ -1,0 +1,54 @@
+id: math-for-cs-101
+title:
+  ko: Math for CS 101
+  en: Math for CS 101
+description:
+  ko: 논리, 증명, 집합, 함수, 그래프, 조합, 확률, 선형대수, 미분, 정보이론까지 CS와 ML의 수학을 한 번에 정리하는 입문 시리즈.
+  en: An entry series covering the math behind CS and ML — logic, proofs, sets, functions, graphs, combinatorics, probability, linear algebra, calculus, and information theory.
+languages:
+  - ko
+  - en
+status: content-ready
+level: 101
+lifecycle: active
+episodes:
+  - slug: 01-why-math-for-cs
+    title:
+      ko: CS에 수학이 필요한 이유
+      en: Why Math for CS
+  - slug: 02-logic-and-proofs
+    title:
+      ko: 논리와 증명
+      en: Logic and Proofs
+  - slug: 03-sets-and-functions
+    title:
+      ko: 집합과 함수
+      en: Sets and Functions
+  - slug: 04-graphs
+    title:
+      ko: 그래프
+      en: Graphs
+  - slug: 05-combinatorics
+    title:
+      ko: 조합
+      en: Combinatorics
+  - slug: 06-probability
+    title:
+      ko: 확률
+      en: Probability
+  - slug: 07-linear-algebra
+    title:
+      ko: 선형대수
+      en: Linear Algebra
+  - slug: 08-calculus
+    title:
+      ko: 미분
+      en: Calculus
+  - slug: 09-information-theory
+    title:
+      ko: 정보이론
+      en: Information Theory
+  - slug: 10-algorithms-and-math
+    title:
+      ko: 알고리즘과 수학
+      en: Algorithms and Math
