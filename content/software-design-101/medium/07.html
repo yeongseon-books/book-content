@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Flow Design</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Flow Design</h1>
+<blockquote>
+<p>Software Design 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does it mean to design the flow of data?</p>
+<blockquote>
+<p>Decide where data comes from, how it gets transformed, and where it ends — and make all of that move in one direction.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The single-direction principle for data flow</li>
+<li>Building transformation pipelines</li>
+<li>The value of immutable data</li>
+<li>Push versus pull models</li>
+<li>Signals of code with a clear flow</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most bugs appear when data changes in unexpected places. A single direction makes the change easy to trace and limits the blast radius.</p>
+<blockquote>
+<p>Good code keeps a short distance between input and output.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    IN[&quot;Input&quot;] --&gt; P1[&quot;parse&quot;] --&gt; P2[&quot;validate&quot;] --&gt; P3[&quot;enrich&quot;] --&gt; OUT[&quot;Output&quot;]
+</code></pre>
+<p>Each step is small and just hands off to the next.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Pipeline</strong>: A chain of small transformation functions.</li>
+<li><strong>Pure function</strong>: Same input gives same output, with no side effects.</li>
+<li><strong>Immutability</strong>: Once a value is created, it does not change.</li>
+<li><strong>Push model</strong>: Producers push to consumers.</li>
+<li><strong>Pull model</strong>: Consumers pull what they need.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def process(req):
+    if not req.get(&quot;email&quot;): raise ValueError
+    req[&quot;email&quot;] = req[&quot;email&quot;].lower()
+    db.save(req)
+    send_welcome(req[&quot;email&quot;])
+    return req
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">def parse(payload): ...
+def validate(user): ...
+def normalize(user): ...
+def persist(user): ...
+def notify(user): ...
+
+def signup(payload):
+    return notify(persist(normalize(validate(parse(payload)))))
+</code></pre>
+<p>Each step has a clear responsibility.</p>
+<h2>Hands-on: Five Steps to Clean Up the Flow</h2>
+<p><strong>Step 1 — Write down input and output shapes</strong></p>
+<pre><code class="language-python"># 1_io.py
+# In: dict from HTTP
+# Out: User row id
+# Sketch what happens between, one line per step.
+</code></pre>
+<p>Lock down types and shapes before code.</p>
+<p><strong>Step 2 — Split into step functions</strong></p>
+<pre><code class="language-python"># 2_steps.py
+def parse(payload) -&gt; SignupCommand: ...
+def validate(cmd: SignupCommand) -&gt; SignupCommand: ...
+def to_user(cmd: SignupCommand) -&gt; User: ...
+</code></pre>
+<p>Every step states what it takes and what it returns.</p>
+<p><strong>Step 3 — Push side effects to the end</strong></p>
+<pre><code class="language-python"># 3_side_effects.py
+def signup(payload):
+    user = to_user(validate(parse(payload)))   # pure
+    repo.save(user)                            # effect
+    mailer.send(user.email)                    # effect
+</code></pre>
+<p>Validation and transformation stay pure; IO is last.</p>
+<p><strong>Step 4 — Use immutable data</strong></p>
+<pre><code class="language-python"># 4_immutable.py
+from dataclasses import dataclass
+@dataclass(frozen=True)
+class User:
+    id: str
+    email: str
+</code></pre>
+<p>Return new values instead of mutating state.</p>
+<p><strong>Step 5 — One direction only</strong></p>
+<pre><code class="language-python"># 5_one_way.py
+# UI -&gt; command -&gt; domain -&gt; event
+# events flow back to UI.
+# No silent mid-flow data updates.
+</code></pre>
+<p>Breaking cycles makes debugging easier.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Each step has a narrow responsibility.</li>
+<li>Side effects are concentrated on one side.</li>
+<li>Data does not flow backwards.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mixing side effects into transformation functions.</strong> Tests get hard.</li>
+<li><strong>Multiple steps mutate a shared mutable object.</strong> You cannot tell who changed it.</li>
+<li><strong>IO calls in the middle of the flow.</strong> The flow turns to mud.</li>
+<li><strong>Untyped dicts as the only data shape.</strong> Shape varies on every call.</li>
+<li><strong>Two-way binding everywhere.</strong> Cause and effect blur.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>ETL jobs, request processing pipelines, unidirectional UI flows like React — data flow design is everywhere once you start looking.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They check whether the flow is one-directional first.</li>
+<li>They push side effects to the edge.</li>
+<li>They make immutable data the default.</li>
+<li>They cut steps small and compose them.</li>
+<li>When debugging, they pinpoint which step changed the data.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the data flow in a single direction?</li>
+<li>[ ] Are side effects at the edges?</li>
+<li>[ ] Are steps small with clear responsibilities?</li>
+<li>[ ] Is the data immutable?</li>
+<li>[ ] Are shapes guaranteed by types?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick one function in your code and split side effects from pure transformation.</li>
+<li>Convert a dict-based input into a dataclass.</li>
+<li>Find a place where the flow goes backwards and write down what you would do about it.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once the flow is visible, change is no longer scary. Next up we look at the design that limits how far that change can spread — reducing change impact.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Layered Architecture</a></li>
+<li><strong>Data Flow Design (current)</strong></li>
+<li>Reducing Change Impact (upcoming)</li>
+<li>Design Principles (upcoming)</li>
+<li>Small Design Practice (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell">Functional Core, Imperative Shell (Gary Bernhardt)</a></li>
+<li><a href="https://curtclifton.net/papers/MoseleyMarks06a.pdf">Out of the Tar Pit (Moseley &amp; Marks)</a></li>
+<li><a href="https://facebookarchive.github.io/flux/">Flux Architecture — Unidirectional Data Flow</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Batch and Stream</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareDesign, DataFlow, Pipelines, Immutability, FunctionalDesign</p>
+</body>
+</html>

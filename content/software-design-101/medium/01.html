@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Software Design?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Software Design?</h1>
+<blockquote>
+<p>Software Design 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How is good design different from good coding?</p>
+<blockquote>
+<p>Good code makes one line easier to read; good design makes the whole code base easier to change.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A working definition of software design</li>
+<li>Signals that distinguish good design</li>
+<li>The relationship between design and code quality</li>
+<li>Symptoms of design failure</li>
+<li>The time horizon of design</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Design is invisible. But it shows itself every time the next change is more expensive than expected.</p>
+<blockquote>
+<p>Design debt always charges interest.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[&quot;Requirements&quot;] --&gt; D[&quot;Design decisions&quot;]
+    D --&gt; C[&quot;Code&quot;]
+    C --&gt; M[&quot;Change cost&quot;]
+    M --&gt; R2[&quot;New requirements&quot;]
+    R2 --&gt; D
+</code></pre>
+<p>Design determines change cost.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Software design</strong>: A set of decisions about modules, responsibilities, and dependencies.</li>
+<li><strong>Architecture</strong>: Design decisions at the largest unit.</li>
+<li><strong>Coupling</strong>: Degree of interdependence between modules.</li>
+<li><strong>Cohesion</strong>: Degree of relatedness within a module.</li>
+<li><strong>Change cost</strong>: Time and risk required for the next change.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-text">&quot;It just needs to work.&quot;
+→ Quick first release; painful changes six months later.
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-text">&quot;It must remain changeable in six months.&quot;
+→ Slightly slower first release; smaller cumulative cost.
+</code></pre>
+<p>Design is a cumulative cost game.</p>
+<h2>Hands-on: Five Signals of Good Design</h2>
+<p><strong>Step 1 — Change simulation</strong></p>
+<pre><code class="language-python"># 1_change_sim.py
+# &quot;Add a payment method&quot; — how many files would you touch?
+files_touched = [&quot;payment.py&quot;]  # one file is a strong signal
+</code></pre>
+<p>Smaller change footprint, better design.</p>
+<p><strong>Step 2 — Dependency graph</strong></p>
+<pre><code class="language-python"># 2_deps.py
+# A -&gt; B -&gt; C (one direction) is fine.
+# A &lt;-&gt; B (cycle) is a design smell.
+</code></pre>
+<p>Dependency cycles are nearly always a red flag.</p>
+<p><strong>Step 3 — Module responsibility</strong></p>
+<pre><code class="language-python"># 3_responsibility.py
+# If you cannot describe a module in one sentence, its responsibility is fuzzy.
+PAYMENT = &quot;Payment domain — calls external gateway and applies domain rules&quot;
+</code></pre>
+<p>The name and the one-sentence description must match.</p>
+<p><strong>Step 4 — Testability</strong></p>
+<pre><code class="language-python"># 4_testable.py
+# Can the domain module be tested alone, without IO?
+def can_test_alone(module):
+    return module.no_io and module.no_globals
+</code></pre>
+<p>The most honest measure of design quality.</p>
+<p><strong>Step 5 — Onboarding curve</strong></p>
+<pre><code class="language-text"># 5_onboard.txt
+Can a new teammate understand a module in 30 minutes?
+</code></pre>
+<p>Design is, in the end, a human task.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Change footprint, dependencies, responsibility, and testability viewed together.</li>
+<li>The onboarding curve is the strongest signal.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>One huge upfront design.</strong> Decisions made without information are usually wrong.</li>
+<li><strong>Not measuring change cost.</strong> Design debt becomes invisible.</li>
+<li><strong>Tolerating cycles.</strong> They harden over time.</li>
+<li><strong>Module responsibility takes more than one sentence.</strong> Cohesion is low.</li>
+<li><strong>No record of design decisions.</strong> Same debate repeats forever.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Strong teams keep ADRs (Architecture Decision Records). Decisions and their reasoning are preserved together so new teammates do not relitigate.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Design is a cumulative cost game.</li>
+<li>Start small and evolve often.</li>
+<li>Validate design with change simulations.</li>
+<li>Record decisions in writing.</li>
+<li>Treat the onboarding curve as a design signal.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can each module be described in one sentence?</li>
+<li>[ ] Are there no dependency cycles?</li>
+<li>[ ] Are change footprints small?</li>
+<li>[ ] Can domain modules be tested in isolation?</li>
+<li>[ ] Are decisions captured as ADRs?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Draw the module dependency graph of your project.</li>
+<li>Pick the most frequent change and count the files it touches.</li>
+<li>Write your last big decision as a one-page ADR.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Design decides the cost of the next change. Next we start with the most fundamental tool: separation of concerns.</p>
+<ul>
+<li><strong>What Is Software Design? (current)</strong></li>
+<li>Separation of Concerns (upcoming)</li>
+<li>Modules and Boundaries (upcoming)</li>
+<li>Dependency Direction (upcoming)</li>
+<li>Interfaces and Abstraction (upcoming)</li>
+<li>Layered Architecture (upcoming)</li>
+<li>Data Flow Design (upcoming)</li>
+<li>Reducing Change Impact (upcoming)</li>
+<li>Design Principles (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd.php">A Philosophy of Software Design (J. Ousterhout)</a></li>
+<li><a href="https://martinfowler.com/architecture/">Software Architecture Guide (Martin Fowler)</a></li>
+<li><a href="https://adr.github.io/">Architecture Decision Records (ADR)</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareDesign, Architecture, Modularity, DesignPrinciples, Maintainability</p>
+</body>
+</html>

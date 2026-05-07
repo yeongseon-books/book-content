@@ -1,0 +1,71 @@
+id: software-design-101
+title:
+  ko: Software Design 101
+  en: Software Design 101
+description:
+  ko: 관심사 분리, 모듈 경계, 의존성 방향, 인터페이스 설계, 계층 아키텍처를 통해 변경에 강한 코드를 설계하는 법을 다지는 시리즈.
+  en: Separation of concerns, module boundaries, dependency direction, interface design, and layered architecture — designing code that is easy to change.
+status: content-ready
+category: software-engineering
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-software-design
+    title:
+      ko: 소프트웨어 설계란 무엇인가?
+      en: What Is Software Design?
+  - number: 2
+    slug: separation-of-concerns
+    title:
+      ko: 관심사 분리
+      en: Separation of Concerns
+  - number: 3
+    slug: modules-and-boundaries
+    title:
+      ko: 모듈과 경계
+      en: Modules and Boundaries
+  - number: 4
+    slug: dependency-direction
+    title:
+      ko: 의존성 방향
+      en: Dependency Direction
+  - number: 5
+    slug: interfaces-and-abstraction
+    title:
+      ko: 인터페이스와 추상화
+      en: Interfaces and Abstraction
+  - number: 6
+    slug: layered-architecture
+    title:
+      ko: 계층 아키텍처
+      en: Layered Architecture
+  - number: 7
+    slug: data-flow-design
+    title:
+      ko: 데이터 흐름 설계
+      en: Data Flow Design
+  - number: 8
+    slug: reducing-change-impact
+    title:
+      ko: 변경 영향 줄이기
+      en: Reducing Change Impact
+  - number: 9
+    slug: design-principles
+    title:
+      ko: 설계 원칙 모음
+      en: Design Principles
+  - number: 10
+    slug: small-design-practice
+    title:
+      ko: 작은 프로젝트로 설계 연습
+      en: Practicing Design with a Small Project

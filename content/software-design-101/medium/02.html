@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Separation of Concerns</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Separation of Concerns</h1>
+<blockquote>
+<p>Software Design 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How can you tell that a module is doing too much?</p>
+<blockquote>
+<p>When it changes for more than one reason, it already does too much.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A definition of "concern"</li>
+<li>Coupling and cohesion</li>
+<li>A practical procedure for splitting responsibilities</li>
+<li>Cross-cutting concerns</li>
+<li>Balancing separation against integration</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When concerns blend together you must understand everything to change one thing. Separation lowers the cost of the next change.</p>
+<blockquote>
+<p>Separation is not a cost; it is a gift of options.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    M[&quot;Giant module&quot;] --&gt; A[&quot;UI concern&quot;]
+    M --&gt; B[&quot;Domain concern&quot;]
+    M --&gt; C[&quot;Infra concern&quot;]
+    A &amp; B &amp; C --&gt; R[&quot;Freedom to change&quot;]
+</code></pre>
+<p>Three concerns separated, three independent timelines.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Concern</strong>: One thing the system cares about.</li>
+<li><strong>Coupling</strong>: Interdependence between modules. Lower is better.</li>
+<li><strong>Cohesion</strong>: Relatedness inside a module. Higher is better.</li>
+<li><strong>Cross-cutting concern</strong>: A concern (logging, security) that crosses many modules.</li>
+<li><strong>Boundary</strong>: The seam between concerns.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def process_order(req):
+    # parse + validate + price + store + email + respond
+    ...
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">def process_order(req):
+    cmd = parse(req)               # input
+    order = build_order(cmd)       # domain
+    saved = save_order(order)      # infra
+    notify(saved)                  # comms
+    return to_response(saved)      # output
+</code></pre>
+<p>Each line handles a single concern.</p>
+<h2>Hands-on: Five Steps to Separate Concerns</h2>
+<p><strong>Step 1 — List reasons to change</strong></p>
+<pre><code class="language-python"># 1_reasons.py
+# Why does the Order module change?
+# - pricing policy change
+# - DB schema change
+# - notification channel change
+# Three reasons → three responsibilities.
+</code></pre>
+<p>Reasons to change = responsibility candidates.</p>
+<p><strong>Step 2 — Split domain from infra</strong></p>
+<pre><code class="language-python"># 2_domain_infra.py
+# Domain knows nothing about IO.
+def calculate_total(items, member): ...
+# Infra uses the domain.
+def save(order): db.execute(...)
+</code></pre>
+<p>Domain core + infra adapters.</p>
+<p><strong>Step 3 — Split input/process/output</strong></p>
+<pre><code class="language-python"># 3_io.py
+def parse(req): ...    # input
+def handle(cmd): ...   # process
+def render(res): ...   # output
+</code></pre>
+<p>The function reads as a single line.</p>
+<p><strong>Step 4 — Extract cross-cutting concerns</strong></p>
+<pre><code class="language-python"># 4_cross.py
+def with_logging(fn):
+    def w(*a, **k):
+        # logging
+        return fn(*a, **k)
+    return w
+</code></pre>
+<p>Use decorators or middleware to consolidate.</p>
+<p><strong>Step 5 — Inspect integration points</strong></p>
+<pre><code class="language-python"># 5_seam.py
+# Inspect where the separated concerns meet (the seams).
+def app(req):
+    return render(handle(parse(req)))
+</code></pre>
+<p>Seams should be few and explicit.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Each module has one reason to change.</li>
+<li>The domain knows nothing about IO.</li>
+<li>Cross-cutting concerns do not pollute the domain.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Layer names without separation.</strong> Code stays coupled.</li>
+<li><strong>Cross-cutting concerns inside the domain.</strong> Tests break.</li>
+<li><strong>Splitting too finely.</strong> Integration cost grows.</li>
+<li><strong>Unclear interfaces after separation.</strong> Seams blur.</li>
+<li><strong>Premature performance fear.</strong> Usually safe to measure first.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Strong teams add lints that forbid external imports inside domain packages. Boundaries are enforced by code.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Splits responsibilities along reasons to change.</li>
+<li>Keeps the domain ignorant of IO.</li>
+<li>Consolidates cross-cutting concerns.</li>
+<li>Sees separation and integration as a tradeoff.</li>
+<li>Keeps seams few and explicit.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does each module have one reason to change?</li>
+<li>[ ] Is the domain free of IO libraries?</li>
+<li>[ ] Are cross-cutting concerns consolidated?</li>
+<li>[ ] Are seams explicit?</li>
+<li>[ ] Does the separation justify the integration cost?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write down three reasons to change one module of yours.</li>
+<li>Split one function into input/process/output.</li>
+<li>Move every external import out of your domain code into adapters.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Separation of concerns is the starting point of all design. Next: the unit of separation — modules and boundaries.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
+<li><strong>Separation of Concerns (current)</strong></li>
+<li>Modules and Boundaries (upcoming)</li>
+<li>Dependency Direction (upcoming)</li>
+<li>Interfaces and Abstraction (upcoming)</li>
+<li>Layered Architecture (upcoming)</li>
+<li>Data Flow Design (upcoming)</li>
+<li>Reducing Change Impact (upcoming)</li>
+<li>Design Principles (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.cs.utexas.edu/users/EWD/transcriptions/EWD04xx/EWD447.html">Separation of Concerns (Dijkstra)</a></li>
+<li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd.php">A Philosophy of Software Design</a></li>
+<li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Cockburn)</a></li>
+<li><a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">Clean Architecture (Uncle Bob)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareDesign, SeparationOfConcerns, Modularity, Cohesion, Coupling</p>
+</body>
+</html>

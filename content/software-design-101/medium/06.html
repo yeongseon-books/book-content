@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Layered Architecture</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Layered Architecture</h1>
+<blockquote>
+<p>Software Design 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why bother with layers, and what do you split them on?</p>
+<blockquote>
+<p>So that code with different reasons and rates of change does not sit in the same box.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The classic four-layer structure</li>
+<li>The allowed direction of dependencies</li>
+<li>The anti-corruption layer that protects the domain</li>
+<li>The traps when you slice into layers</li>
+<li>Why layering helps even in small systems</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Layers separate units of change. The UI, the domain, and the infrastructure all change at different rates.</p>
+<blockquote>
+<p>Group together what changes for the same reason.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    UI[&quot;Presentation&quot;] --&gt; APP[&quot;Application&quot;]
+    APP --&gt; DOM[&quot;Domain&quot;]
+    APP --&gt; INF[&quot;Infrastructure&quot;]
+    INF --&gt; DOM
+</code></pre>
+<p>The domain is the stable core that nothing points away from.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Presentation</strong>: HTTP, CLI, UI — the outside touch points.</li>
+<li><strong>Application</strong>: Use case orchestration.</li>
+<li><strong>Domain</strong>: Business rules. The most stable layer.</li>
+<li><strong>Infrastructure</strong>: DB, third-party SaaS, files — the most volatile.</li>
+<li><strong>Anti-corruption layer (ACL)</strong>: A translation layer that prevents external models from leaking into the domain.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python"># one function does HTTP, business, and DB
+@app.route(&quot;/charge&quot;)
+def charge():
+    body = request.json
+    if body[&quot;amount&quot;] &lt;= 0: return &quot;bad&quot;, 400
+    db.execute(&quot;UPDATE wallet ...&quot;)
+    return &quot;ok&quot;
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python"># presentation
+@app.route(&quot;/charge&quot;)
+def charge_view():
+    return charge_use_case(request.json)
+
+# application
+def charge_use_case(payload):
+    cmd = ChargeCommand.from_payload(payload)
+    return charge_service.run(cmd)
+</code></pre>
+<p>Each layer carries only its own responsibility.</p>
+<h2>Hands-on: Five Steps to Introduce Layers</h2>
+<p><strong>Step 1 — Extract the domain</strong></p>
+<pre><code class="language-python"># 1_domain.py
+class Wallet:
+    def debit(self, amount: int) -&gt; None:
+        if amount &lt;= 0: raise ValueError
+        self.balance -= amount
+</code></pre>
+<p>Start by isolating the most stable rules.</p>
+<p><strong>Step 2 — Group into use cases</strong></p>
+<pre><code class="language-python"># 2_usecase.py
+def charge(repo, user_id, amount):
+    w = repo.get(user_id); w.debit(amount); repo.save(w)
+</code></pre>
+<p>Flow lives in the application layer.</p>
+<p><strong>Step 3 — Keep presentation thin</strong></p>
+<pre><code class="language-python"># 3_presentation.py
+@app.route(&quot;/charge&quot;)
+def view():
+    return charge(repo, request.json[&quot;user&quot;], request.json[&quot;amount&quot;])
+</code></pre>
+<p>The web framework only deals with input and output.</p>
+<p><strong>Step 4 — Infrastructure adapter</strong></p>
+<pre><code class="language-python"># 4_infra.py
+class SqlWalletRepo:
+    def get(self, uid): ...
+    def save(self, w): ...
+</code></pre>
+<p>It implements the shape the domain defined.</p>
+<p><strong>Step 5 — Anti-corruption layer</strong></p>
+<pre><code class="language-python"># 5_acl.py
+def to_domain_user(external_json):
+    return User(id=external_json[&quot;uid&quot;], name=external_json[&quot;nm&quot;])
+</code></pre>
+<p>The external schema cannot pollute the domain.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Dependencies always point toward the domain.</li>
+<li>A thin presentation layer makes it easy to swap channels.</li>
+<li>External models do not enter the domain unchanged.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>The domain is plastered with ORM decorators.</strong> It now knows infrastructure.</li>
+<li><strong>Use cases scatter inside the presentation layer.</strong> Routers grow huge.</li>
+<li><strong>Slicing layers too thinly.</strong> All ceremony, little value.</li>
+<li><strong>Skipping the ACL.</strong> External changes shake the domain.</li>
+<li><strong>Forcing four layers everywhere.</strong> Too much for a small script.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most backends are essentially layered already. A common split is router → service → repository → model, with an ACL added at any third-party SaaS boundary.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The domain comes first and gets protected first.</li>
+<li>They visualize the dependency direction.</li>
+<li>The presentation layer stays thin.</li>
+<li>They keep external schemas separate from domain models.</li>
+<li>Small systems get small layering.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the domain avoid importing infrastructure?</li>
+<li>[ ] Are use cases gathered in the application layer?</li>
+<li>[ ] Is the presentation layer thin?</li>
+<li>[ ] Is there an ACL at the external boundary?</li>
+<li>[ ] Is the layer count appropriate for the system size?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one of your routers, lift the business logic out into a service.</li>
+<li>Separate the ORM model from the domain model.</li>
+<li>Apply an ACL to a third-party SaaS response.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Layers absorb the shock of change. Next up we look at the data that moves between them — how to design the flow.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
+<li><strong>Layered Architecture (current)</strong></li>
+<li>Data Flow Design (upcoming)</li>
+<li>Reducing Change Impact (upcoming)</li>
+<li>Design Principles (upcoming)</li>
+<li>Small Design Practice (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">Clean Architecture (Uncle Bob)</a></li>
+<li><a href="https://martinfowler.com/bliki/DomainDrivenDesign.html">Domain-Driven Design — Layered Architecture</a></li>
+<li><a href="https://martinfowler.com/eaaCatalog/">Patterns of Enterprise Application Architecture</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer">Anti-Corruption Layer Pattern</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareDesign, LayeredArchitecture, CleanArchitecture, Layers, Architecture</p>
+</body>
+</html>
