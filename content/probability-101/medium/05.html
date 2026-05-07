@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Random Variables</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Random Variables</h1>
+<blockquote>
+<p>Probability 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What changes when we <em>map outcomes to numbers</em>? A random variable is <em>the world seen as numbers</em>.</p>
+<blockquote>
+<p><em>A random variable is a </em>function that maps outcomes to numbers<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a <em>random variable</em></li>
+<li>The difference between <em>discrete</em> and <em>continuous</em></li>
+<li><em>PMF</em>, <em>PDF</em>, <em>CDF</em></li>
+<li>A 5-step random-variable exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Random variables enable <em>numeric statistics</em> — <em>expectation, variance, distributions, regression</em>. <em>Every ML model output</em> is a random variable.</p>
+<blockquote>
+<p><em>Random variables put numbers on outcomes.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Sample[&quot;Sample space&quot;] --&gt; RV[&quot;X: Omega -&gt; R&quot;]
+    RV --&gt; Discrete[&quot;Discrete: PMF&quot;]
+    RV --&gt; Cont[&quot;Continuous: PDF&quot;]
+    Discrete --&gt; CDF[&quot;CDF&quot;]
+    Cont --&gt; CDF
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Random variable X</strong>: a function Ω → ℝ.</li>
+<li><strong>Discrete RV</strong>: countable outcomes (coin, die).</li>
+<li><strong>Continuous RV</strong>: uncountable outcomes (height, time).</li>
+<li><strong>PMF p(x)</strong>: P(X = x) (discrete).</li>
+<li><strong>PDF f(x)</strong>: density. P(a ≤ X ≤ b) = ∫f.</li>
+<li><strong>CDF F(x)</strong>: P(X ≤ x).</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“A die outcome”</em> — just an event.</p>
+<p><strong>After</strong>: <em>X = the face value</em> → enables <em>numeric analysis</em> like <em>expectation 3.5</em> and <em>variance 2.92</em>.</p>
+<h2>Hands-on: 5-step Random Variables</h2>
+<p><strong>Step 1 — Discrete RV</strong></p>
+<pre><code class="language-python">import numpy as np
+x = np.array([1, 2, 3, 4, 5, 6])
+p = np.full(6, 1/6)  # PMF
+print(&quot;sum p:&quot;, p.sum())
+</code></pre>
+<p><strong>Step 2 — CDF</strong></p>
+<pre><code class="language-python">cdf = np.cumsum(p)
+print(&quot;CDF:&quot;, cdf)
+</code></pre>
+<p><strong>Step 3 — Continuous RV (normal)</strong></p>
+<pre><code class="language-python">from scipy import stats
+rv = stats.norm(loc=0, scale=1)
+print(&quot;PDF at 0:&quot;, rv.pdf(0), &quot;CDF at 0:&quot;, rv.cdf(0))
+</code></pre>
+<p><strong>Step 4 — Sampling</strong></p>
+<pre><code class="language-python">import numpy as np
+samples = np.random.default_rng(0).normal(0, 1, 10_000)
+print(&quot;mean:&quot;, samples.mean(), &quot;std:&quot;, samples.std())
+</code></pre>
+<p><strong>Step 5 — Compute probability</strong></p>
+<pre><code class="language-python">from scipy import stats
+rv = stats.norm()
+print(&quot;P(-1 &lt;= X &lt;= 1):&quot;, rv.cdf(1) - rv.cdf(-1))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>PMF</em> value <em>is</em> a probability; a <em>PDF</em> value is a <em>density</em>, not a probability.</li>
+<li>For continuous RVs, <em>P(X = x) = 0</em>.</li>
+<li>The <em>CDF</em> is <em>always</em> defined.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Reading <em>PDF values as probabilities</em>.</strong></li>
+<li><strong>Mixing up <em>discrete</em> and <em>continuous</em>.</strong></li>
+<li><strong>Using a PMF whose <em>sum ≠ 1</em>.</strong></li>
+<li><strong>Confusing <em>CDF</em> with <em>PDF</em>.</strong></li>
+<li><strong>Treating <em>sample statistics</em> as <em>parameters</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Softmax probabilities from ML models, Gaussian noise assumptions, survival-time analysis — <em>random variables</em> are the foundation of <em>all modeling</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Distinguishes <em>PMF / PDF / CDF</em>.</li>
+<li>Knows <em>P(X = x) = 0</em> in continuous cases.</li>
+<li><em>Visualizes</em> every distribution.</li>
+<li>Computes probabilities by <em>integration / summation</em>.</li>
+<li>Separates <em>sample</em> from <em>parameter</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I separate <em>discrete</em> and <em>continuous</em> RVs.</li>
+<li>[ ] I know <em>PMF / PDF / CDF</em>.</li>
+<li>[ ] I use <em>scipy.stats</em> for distributions.</li>
+<li>[ ] I can simulate by <em>sampling</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build the PMF and CDF for the <em>sum of two dice</em>.</li>
+<li>Compute <em>P(|X| &lt; 2)</em> for <em>N(0,1)</em>.</li>
+<li>Answer: <em>can a PDF value be greater than 1</em>?</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Random variables are the bridge from <em>probability to numeric analysis</em>. The next episode covers <em>expectation and variance</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/03-conditional-probability.md">Conditional Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/04-bayes-theorem.md">Bayes' Theorem</a></li>
+<li><strong>Random Variables (current)</strong></li>
+<li>Expectation and Variance (upcoming)</li>
+<li>Discrete Distributions (upcoming)</li>
+<li>Continuous Distributions (upcoming)</li>
+<li>Law of Large Numbers and CLT (upcoming)</li>
+<li>Probability in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.khanacademy.org/math/statistics-probability/random-variables-stats-library">Khan Academy — Random variables</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Random_variable">Wikipedia — Random variable</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html">scipy.stats</a></li>
+<li><a href="https://web.stanford.edu/class/cs109/">Stanford CS109 — Notes</a></li>
+</ul>
+<p class="tags-line">Tags: Probability, RandomVariable, Distribution, PMF, Beginner</p>
+</body>
+</html>

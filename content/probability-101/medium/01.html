@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Probability?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Probability?</h1>
+<blockquote>
+<p>Probability 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>probability</em> a <em>property of the world</em>, or a <em>measure of our uncertainty</em>?</p>
+<blockquote>
+<p><em>Probability can be a </em>long-run frequency<em> or a </em>degree of belief<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of probability</li>
+<li>The <em>frequentist</em> and <em>Bayesian</em> views</li>
+<li>Why probability <em>matters</em> in <em>data and ML</em></li>
+<li>A 5-step intuition exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Probability is the <em>shared language</em> of ML, statistics, and decision-making. <em>Weak probability skills</em> mean you <em>cannot interpret model output</em>.</p>
+<blockquote>
+<p><em>Probability is the foundation of statistical reasoning.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Sample[&quot;Sample space&quot;] --&gt; Event[&quot;Event&quot;]
+    Event --&gt; P[&quot;P(event) in [0,1]&quot;]
+    P --&gt; Freq[&quot;Frequentist: long-run frequency&quot;]
+    P --&gt; Bayes[&quot;Bayesian: degree of belief&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Sample space Ω</strong>: the set of <em>all possible outcomes</em>.</li>
+<li><strong>Event</strong>: a <em>subset</em> of the sample space.</li>
+<li><strong>Probability P(A)</strong>: a number between <em>0 and 1</em>; <em>all outcomes sum to 1</em>.</li>
+<li><strong>Frequentist</strong>: the <em>limit of relative frequency</em> under <em>repeated trials</em>.</li>
+<li><strong>Bayesian</strong>: a <em>degree of belief</em> given the <em>available information</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“A coin lands heads 50% of the time”</em> — <em>why</em> is unclear.</p>
+<p><strong>After</strong>: <em>“Sample space {H,T}, symmetric, so P(H)=0.5 — or, Bayesian, our </em>prior belief<em> about the coin.”</em></p>
+<h2>Hands-on: 5-step Probability Intuition</h2>
+<p><strong>Step 1 — Sample space</strong></p>
+<pre><code class="language-python">sample_space = {&quot;H&quot;, &quot;T&quot;}
+</code></pre>
+<p><strong>Step 2 — Events and probability</strong></p>
+<pre><code class="language-python">P = {&quot;H&quot;: 0.5, &quot;T&quot;: 0.5}
+print(&quot;P(H):&quot;, P[&quot;H&quot;], &quot;sum:&quot;, sum(P.values()))
+</code></pre>
+<p><strong>Step 3 — Frequentist simulation</strong></p>
+<pre><code class="language-python">import random
+flips = [random.choice([&quot;H&quot;,&quot;T&quot;]) for _ in range(10_000)]
+print(&quot;freq H:&quot;, flips.count(&quot;H&quot;) / len(flips))
+</code></pre>
+<p><strong>Step 4 — Bayesian update</strong></p>
+<pre><code class="language-python">prior = 0.5
+likelihood = 0.7  # likelihood of H under &quot;biased coin&quot; hypothesis
+post = (likelihood * prior) / (likelihood * prior + (1 - likelihood) * (1 - prior))
+print(&quot;posterior:&quot;, post)
+</code></pre>
+<p><strong>Step 5 — Compare the two views</strong></p>
+<pre><code class="language-python"># Same data, two interpretations
+print(&quot;frequentist: long-run ratio&quot;)
+print(&quot;bayesian: updated belief&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Probability rests on <em>axioms</em> (Kolmogorov) — values in <em>[0, 1]</em>; <em>total mass = 1</em>.</li>
+<li>The frequentist and Bayesian views <em>complement</em> each other.</li>
+<li><em>Simulation</em> is the fastest way to <em>validate intuition</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Confusing <em>probability</em> with <em>likelihood</em>.</strong></li>
+<li><strong>Failing to <em>state the sample space</em>.</strong></li>
+<li><strong>Drawing <em>probability conclusions</em> from <em>tiny samples</em>.</strong></li>
+<li><strong>Dismissing <em>subjective probability</em> as <em>unscientific</em>.</strong></li>
+<li><strong>Reading <em>probability 0 or 1</em> as <em>deterministic</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Spam filters, recommender systems, fraud detection, medical diagnosis — <em>probability scores</em> drive <em>decisions</em>. <em>Bayesian A/B testing</em> and <em>probabilistic ML</em> depend on it.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Always names the <em>sample space</em>.</li>
+<li>Uses <em>both</em> frequentist and Bayesian thinking.</li>
+<li><em>Simulates</em> to validate.</li>
+<li>Distinguishes <em>probability</em> from <em>likelihood</em>.</li>
+<li>Quantifies <em>uncertainty</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can define <em>sample space, event, probability</em>.</li>
+<li>[ ] I know both <em>interpretations</em>.</li>
+<li>[ ] I can <em>simulate</em>.</li>
+<li>[ ] I know the <em>Kolmogorov axioms</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the sample space for <em>the sum of two dice</em> and find <em>P(sum = 7)</em>.</li>
+<li>Give the <em>frequentist and Bayesian readings</em> of one event in two lines.</li>
+<li>State the <em>practical difference</em> between <em>probability 0.99</em> and <em>probability 1</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Probability is the <em>language of uncertainty</em>. The next episode defines <em>events and the sample space</em> more precisely.</p>
+<ul>
+<li><strong>What Is Probability? (current)</strong></li>
+<li>Events and Sample Space (upcoming)</li>
+<li>Conditional Probability (upcoming)</li>
+<li>Bayes' Theorem (upcoming)</li>
+<li>Random Variables (upcoming)</li>
+<li>Expectation and Variance (upcoming)</li>
+<li>Discrete Distributions (upcoming)</li>
+<li>Continuous Distributions (upcoming)</li>
+<li>Law of Large Numbers and CLT (upcoming)</li>
+<li>Probability in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.khanacademy.org/math/statistics-probability/probability-library">Khan Academy — Probability</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Probability_axioms">Wikipedia — Probability axioms</a></li>
+<li><a href="https://www.3blue1brown.com/lessons/bayes-theorem">3Blue1Brown — Bayes' theorem</a></li>
+<li><a href="https://web.stanford.edu/class/cs109/">Stanford CS109 — Probability for Computer Scientists</a></li>
+</ul>
+<p class="tags-line">Tags: Probability, Foundations, Intuition, DataScience, Beginner</p>
+</body>
+</html>

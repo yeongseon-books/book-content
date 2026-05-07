@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Conditional Probability</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Conditional Probability</h1>
+<blockquote>
+<p>Probability 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does probability <em>change</em> when we <em>learn new information</em>? The single line <em>P(A | B)</em> explains <em>half the world</em>.</p>
+<blockquote>
+<p><em>Conditional probability is the </em>probability of context<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of <em>P(A | B)</em></li>
+<li>The <em>multiplication rule</em> and <em>law of total probability</em></li>
+<li><em>Independence</em> vs <em>dependence</em></li>
+<li>A 5-step conditional exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The real world is <em>conditional</em>. <em>P(traffic | rain)</em>, <em>P(disease | symptom)</em> — <em>every act of inference</em> starts here.</p>
+<blockquote>
+<p><em>Conditioning is the heart of probability.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Joint[&quot;P(A and B)&quot;] --&gt; CondAB[&quot;P(A|B) = P(A and B) / P(B)&quot;]
+    CondAB --&gt; Mult[&quot;P(A and B) = P(A|B) * P(B)&quot;]
+    Mult --&gt; Total[&quot;Total probability rule&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>P(A | B)</strong>: probability of A given B = P(A∩B) / P(B).</li>
+<li><strong>Multiplication rule</strong>: P(A∩B) = P(A | B)·P(B).</li>
+<li><strong>Law of total probability</strong>: P(A) = Σ P(A | Bᵢ)·P(Bᵢ).</li>
+<li><strong>Independent</strong>: P(A | B) = P(A).</li>
+<li><strong>Dependent</strong>: P(A | B) ≠ P(A).</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“If the test is positive, the chance of disease equals the positive rate.”</em> — <em>Wrong</em>.</p>
+<p><strong>After</strong>: <em>P(disease | positive) = P(positive | disease)·P(disease) / P(positive)</em> — the <em>direction of the condition</em> matters.</p>
+<h2>Hands-on: 5-step Conditional Probability</h2>
+<p><strong>Step 1 — Build the data</strong></p>
+<pre><code class="language-python"># 100 people; 5 sick. Sensitivity 0.9, specificity 0.95
+N, sick = 100, 5
+TP = round(sick * 0.9)
+FN = sick - TP
+TN = round((N - sick) * 0.95)
+FP = (N - sick) - TN
+print(TP, FN, TN, FP)
+</code></pre>
+<p><strong>Step 2 — P(positive)</strong></p>
+<pre><code class="language-python">pos = TP + FP
+print(&quot;P(pos):&quot;, pos / N)
+</code></pre>
+<p><strong>Step 3 — P(disease | positive)</strong></p>
+<pre><code class="language-python">print(&quot;P(sick|pos):&quot;, TP / pos)
+</code></pre>
+<p><strong>Step 4 — Verify the multiplication rule</strong></p>
+<pre><code class="language-python">P_sick = sick / N
+P_pos_given_sick = TP / sick
+print(&quot;P(sick and pos):&quot;, P_pos_given_sick * P_sick, &quot;==&quot;, TP / N)
+</code></pre>
+<p><strong>Step 5 — Check independence</strong></p>
+<pre><code class="language-python">P_pos = pos / N
+print(&quot;indep?&quot;, round(TP/N - P_sick * P_pos, 6))  # nonzero implies dependence
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Conditioning is essentially <em>changing the denominator</em>.</li>
+<li><em>Sensitivity P(+|disease)</em> ≠ <em>positive predictive value P(disease|+)</em> — a <em>classic confusion</em>.</li>
+<li>A <em>low base rate</em> yields a <em>low PPV</em> even with a sensitive test.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Equating <em>P(A|B)<em> with </em>P(B|A)</em></strong>.</li>
+<li><strong>Ignoring the <em>base rate</em> (base-rate fallacy).</strong></li>
+<li><strong>Confusing <em>independence</em> with <em>mutual exclusivity</em>.</strong></li>
+<li><strong>Failing to <em>state the condition</em>.</strong></li>
+<li><strong>Dropping <em>conditions</em> from the <em>multiplication rule</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Spam filters, medical screening, fraud detection, autocomplete — <em>conditional probability</em> drives <em>what model output really means</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Always asks <em>what the denominator is</em>.</li>
+<li>States the <em>direction of the condition</em>.</li>
+<li>Reads numbers alongside the <em>base rate</em>.</li>
+<li><em>Verifies</em> independence assumptions.</li>
+<li>Decomposes via <em>total probability</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can define <em>P(A|B)</em>.</li>
+<li>[ ] I can apply the <em>multiplication rule</em>.</li>
+<li>[ ] I can verify <em>independence</em>.</li>
+<li>[ ] I recognize the <em>base-rate fallacy</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>If <em>P(umbrella | rain)</em> is near 1, is <em>P(rain | umbrella)</em> also near 1? Explain.</li>
+<li>Decide whether a test with PPV 50% is <em>useful</em> in practice.</li>
+<li>Give one <em>independent</em> and one <em>dependent</em> pair of events.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Conditional probability is the tool for <em>handling context</em>. The next episode reaches its peak: <em>Bayes' Theorem</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
+<li><strong>Conditional Probability (current)</strong></li>
+<li>Bayes' Theorem (upcoming)</li>
+<li>Random Variables (upcoming)</li>
+<li>Expectation and Variance (upcoming)</li>
+<li>Discrete Distributions (upcoming)</li>
+<li>Continuous Distributions (upcoming)</li>
+<li>Law of Large Numbers and CLT (upcoming)</li>
+<li>Probability in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.khanacademy.org/math/statistics-probability/probability-library/conditional-probability-independence">Khan Academy — Conditional probability</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Conditional_probability">Wikipedia — Conditional probability</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Base_rate_fallacy">Wikipedia — Base rate fallacy</a></li>
+<li><a href="https://web.stanford.edu/class/cs109/">Stanford CS109 — Notes</a></li>
+</ul>
+<p class="tags-line">Tags: Probability, Conditional, Independence, Inference, Beginner</p>
+</body>
+</html>

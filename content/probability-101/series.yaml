@@ -1,0 +1,52 @@
+id: probability-101
+title:
+  ko: Probability 101
+  en: Probability 101
+description:
+  ko: 사건, 조건부확률, 베이즈 정리, 확률변수, 분포, 중심극한정리까지 ML 기초로 이어지는 확률을 다지는 시리즈.
+  en: A Probability series covering events, conditional probability, Bayes' theorem, random variables, distributions, and the Central Limit Theorem as the bridge to ML.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-probability
+    title:
+      ko: 확률이란 무엇인가?
+      en: What Is Probability?
+  - slug: events-and-sample-space
+    title:
+      ko: 사건과 표본공간
+      en: Events and Sample Space
+  - slug: conditional-probability
+    title:
+      ko: 조건부확률
+      en: Conditional Probability
+  - slug: bayes-theorem
+    title:
+      ko: 베이즈 정리
+      en: Bayes' Theorem
+  - slug: random-variables
+    title:
+      ko: 확률변수
+      en: Random Variables
+  - slug: expectation-and-variance
+    title:
+      ko: 기대값과 분산
+      en: Expectation and Variance
+  - slug: discrete-distributions
+    title:
+      ko: 이산분포
+      en: Discrete Distributions
+  - slug: continuous-distributions
+    title:
+      ko: 연속분포
+      en: Continuous Distributions
+  - slug: lln-and-clt
+    title:
+      ko: 대수의 법칙과 중심극한정리
+      en: Law of Large Numbers and CLT
+  - slug: probability-in-ml
+    title:
+      ko: 머신러닝에서의 확률
+      en: Probability in Machine Learning

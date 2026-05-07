@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Continuous Distributions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Continuous Distributions</h1>
+<blockquote>
+<p>Probability 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we model <em>continuous quantities</em> like <em>height, time, error</em>?</p>
+<blockquote>
+<p><em>The normal distribution is the </em>most frequently encountered<em> distribution in the world.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Uniform / Normal / Exponential / Gamma</em></li>
+<li>The <em>PDF, E, Var</em> of each</li>
+<li><em>Why the normal</em> appears so often</li>
+<li>A 5-step continuous-distribution exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>In <em>ML, signal processing, measurement error</em>, <em>continuous distributions</em> are the <em>default assumption</em>. The <em>normal</em> arises <em>naturally</em> via the <em>CLT</em>.</p>
+<blockquote>
+<p><em>Continuous distributions model the analog world.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[&quot;Uniform(a,b)&quot;] --&gt; N[&quot;Normal(mu, sigma)&quot;]
+    N --&gt; Std[&quot;Standardize Z = (X-mu)/sigma&quot;]
+    E[&quot;Exponential(lambda)&quot;] --&gt; G[&quot;Gamma(k, theta)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Uniform(a,b)</strong>: equal density on the interval. E=(a+b)/2.</li>
+<li><strong>Normal(μ,σ)</strong>: bell shape. E=μ, Var=σ².</li>
+<li><strong>Exponential(λ)</strong>: <em>waiting time</em>. E=1/λ.</li>
+<li><strong>Gamma(k,θ)</strong>: <em>generalization of exponential</em>.</li>
+<li><strong>Standardization</strong>: Z = (X-μ)/σ → N(0,1).</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Height data”</em> — hard to analyze.</p>
+<p><strong>After</strong>: assume <em>Normal(170, 7)</em> → <em>top 5%</em> of heights from a <em>formula</em>.</p>
+<h2>Hands-on: 5-step Continuous Distributions</h2>
+<p><strong>Step 1 — Uniform</strong></p>
+<pre><code class="language-python">from scipy import stats
+rv = stats.uniform(loc=0, scale=10)  # [0, 10]
+print(&quot;E:&quot;, rv.mean(), &quot;Var:&quot;, rv.var())
+</code></pre>
+<p><strong>Step 2 — Normal</strong></p>
+<pre><code class="language-python">from scipy import stats
+rv = stats.norm(loc=170, scale=7)
+print(&quot;P(X &gt;= 180):&quot;, 1 - rv.cdf(180))
+</code></pre>
+<p><strong>Step 3 — Exponential</strong></p>
+<pre><code class="language-python">from scipy import stats
+rv = stats.expon(scale=1/0.5)  # rate 0.5
+print(&quot;P(X &lt;= 1):&quot;, rv.cdf(1))
+</code></pre>
+<p><strong>Step 4 — Gamma</strong></p>
+<pre><code class="language-python">from scipy import stats
+rv = stats.gamma(a=2, scale=1)
+print(&quot;E:&quot;, rv.mean(), &quot;Var:&quot;, rv.var())
+</code></pre>
+<p><strong>Step 5 — Standardize</strong></p>
+<pre><code class="language-python">import numpy as np
+from scipy import stats
+x = np.random.default_rng(0).normal(170, 7, 10_000)
+z = (x - 170) / 7
+print(&quot;Z mean ~ 0:&quot;, z.mean(), &quot;std ~ 1:&quot;, z.std())
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>PDF value</em> is <em>not a probability</em> — <em>integrate</em> to get one.</li>
+<li>The <em>exponential</em> is <em>memoryless</em>.</li>
+<li>The <em>normal</em> arises from <em>sums and averages</em> (CLT).</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Reading <em>PDF values as probabilities</em>.</strong></li>
+<li><strong>Assuming <em>normality</em> without checking.</strong></li>
+<li><strong>Forgetting the <em>units</em> of standard deviation.</strong></li>
+<li><strong>Forgetting the <em>memorylessness</em> of the exponential.</strong></li>
+<li><strong>Ignoring <em>skewed</em> shapes like <em>log-normal</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The <em>normal</em> model for measurement error, <em>exponential</em> waiting times, <em>log-normal</em> prices, the <em>foundation</em> distributions for confidence intervals and tests — <em>continuous distributions</em> are the <em>vocabulary of modeling</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Visualizes</em> every distribution assumption.</li>
+<li>Uses <em>Q-Q plots</em> to check <em>normality</em>.</li>
+<li>Tries <em>log transforms</em> on <em>skewed</em> data.</li>
+<li>Exploits <em>standardization</em>.</li>
+<li>Acknowledges the <em>limits</em> of distributions.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know each <em>PDF</em> and its <em>E/Var</em>.</li>
+<li>[ ] I can <em>standardize</em>.</li>
+<li>[ ] I know <em>PDF ≠ probability</em>.</li>
+<li>[ ] I can draw a <em>Q-Q plot</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>For <em>N(0,1)</em>, compute <em>P(|X| &gt; 2)</em>.</li>
+<li>For <em>Exponential(λ=2)</em>, find the <em>median</em>.</li>
+<li>Describe how <em>log-normal</em> differs in <em>shape</em> from <em>normal</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Continuous distributions are the <em>priors of measurement</em>. The next episode shows <em>why the normal appears everywhere</em> via the LLN and CLT.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/03-conditional-probability.md">Conditional Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/04-bayes-theorem.md">Bayes' Theorem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/05-random-variables.md">Random Variables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/06-expectation-and-variance.md">Expectation and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/07-discrete-distributions.md">Discrete Distributions</a></li>
+<li><strong>Continuous Distributions (current)</strong></li>
+<li>Law of Large Numbers and CLT (upcoming)</li>
+<li>Probability in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Normal_distribution">Wikipedia — Normal distribution</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Exponential_distribution">Wikipedia — Exponential distribution</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Gamma_distribution">Wikipedia — Gamma distribution</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions">scipy.stats — Continuous</a></li>
+</ul>
+<p class="tags-line">Tags: Probability, Continuous, Normal, Exponential, Beginner</p>
+</body>
+</html>
