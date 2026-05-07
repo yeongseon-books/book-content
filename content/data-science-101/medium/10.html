@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>End-to-End Data Project Flow</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>End-to-End Data Project Flow</h1>
+<blockquote>
+<p>Data Science 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do the nine steps we have learned look when <em>connected into one project</em>?</p>
+<blockquote>
+<p><em>The final episode is the assembly episode.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>churn prediction</em> project end to end</li>
+<li>How the nine steps form <em>one flow</em></li>
+<li>The <em>deliverable</em> and <em>decision point</em> of each step</li>
+<li>A 5-step mini project exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Looking at parts in isolation gives you <em>fragments</em>; following one project from start to finish gives you the <em>big picture</em>. Once you have done the <em>assembly</em> once, you can apply the same flow in <em>any domain</em>.</p>
+<blockquote>
+<p><em>Whoever has built the whole once builds the next project faster.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Problem[&quot;1. Problem&quot;] --&gt; Data[&quot;2-3. Collect/Clean&quot;]
+    Data --&gt; EDA[&quot;4-5. EDA/Viz&quot;]
+    EDA --&gt; Model[&quot;6-7. Model/Eval&quot;]
+    Model --&gt; Decide[&quot;8-9. Interpret/Decide&quot;]
+    Decide --&gt; Ship[&quot;Ship &amp; Monitor&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Churn Prediction</strong>: predicting which users are <em>about to leave</em>.</li>
+<li><strong>Baseline</strong>: a <em>simple model</em> used as a <em>comparison anchor</em>.</li>
+<li><strong>Feature</strong>: an <em>input signal</em> for the model.</li>
+<li><strong>Threshold</strong>: the <em>cutoff</em> that turns a probability into a <em>decision</em>.</li>
+<li><strong>Decision</strong>: the <em>sentence</em> that closes analysis into <em>action</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Churn is going up.”</em> — Who? How much? Why?</p>
+<p><strong>After</strong>: <em>“Send a re-engagement campaign to the top 10% of 30-day churn risk users (3,200 people) — projected churn reduction 12% (95% CI ±3%).”</em></p>
+<h2>Hands-on: 5-step Mini Project</h2>
+<p><strong>Step 1 — Define the problem</strong></p>
+<pre><code class="language-text">Q: &quot;How can we reduce churn?&quot;
+→ &quot;Predict the top 10% most-likely-to-churn users in 30 days as a campaign target.&quot;
+Decision: a campaign target list
+</code></pre>
+<p><strong>Step 2 — Data and cleaning</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.read_csv(&quot;events.csv&quot;, parse_dates=[&quot;ts&quot;])
+df = df.dropna(subset=[&quot;user_id&quot;]).drop_duplicates([&quot;user_id&quot;, &quot;ts&quot;])
+</code></pre>
+<p><strong>Step 3 — EDA and features</strong></p>
+<pre><code class="language-python">features = (
+    df.groupby(&quot;user_id&quot;)
+      .agg(sessions=(&quot;ts&quot;, &quot;count&quot;),
+           last_seen=(&quot;ts&quot;, &quot;max&quot;),
+           plan=(&quot;plan&quot;, &quot;last&quot;))
+)
+features[&quot;days_since_last&quot;] = (pd.Timestamp(&quot;2026-05-01&quot;) - features[&quot;last_seen&quot;]).dt.days
+</code></pre>
+<p><strong>Step 4 — Model and evaluation</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+
+X, y = features[[&quot;sessions&quot;, &quot;days_since_last&quot;]], features[&quot;churned_30d&quot;]
+model = LogisticRegression().fit(X, y)
+print(&quot;AUC:&quot;, roc_auc_score(y, model.predict_proba(X)[:, 1]))
+</code></pre>
+<p><strong>Step 5 — Interpret and decide</strong></p>
+<pre><code class="language-text">Top 10% risk segment = 3,200 users
+Expected churn reduction = 12% (95% CI ±3%)
+Decision: send the re-engagement campaign this Friday
+Owner: Growth team / Review: in 2 weeks
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The flow <em>closes</em> from <em>problem to decision</em>.</li>
+<li>It starts at the <em>baseline</em> (logistic regression) — fancier models come later.</li>
+<li>A <em>decision sentence</em> turns the result into <em>action</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Choosing the <em>tool</em> first.</strong> Start with the <em>problem</em>.</li>
+<li><strong>Falling in love with a <em>fancy model</em>.</strong> <em>Skipping the baseline</em>.</li>
+<li><strong>Choosing the <em>evaluation metric</em> at the <em>end</em>.</strong> Decide it <em>up front</em> to avoid drift.</li>
+<li><strong>Having <em>no decision owner</em>.</strong> The analysis <em>disappears into a drawer</em>.</li>
+<li><strong>Forgetting <em>monitoring</em>.</strong> Models <em>age</em> with time.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Data teams write a <em>one-page project doc</em> (problem, metric, data, baseline, decision owner) and run it on <em>two-week sprints</em>. Models are wrapped in pipelines (<em>Airflow / dbt / MLflow</em>) for <em>reproducibility</em>, with <em>dashboards and alerts</em> watching for drift.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Build a <em>short loop</em> from <em>problem to decision</em>.</li>
+<li><em>Respect the baseline.</em></li>
+<li><em>Always</em> write down the <em>owner</em>.</li>
+<li>Design <em>monitoring</em> on <em>Day 1</em>.</li>
+<li>Use <em>code</em> to guarantee <em>reproducibility</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write the <em>problem in one line</em>.</li>
+<li>[ ] I can run a <em>baseline</em>.</li>
+<li>[ ] I can write a <em>decision sentence</em>.</li>
+<li>[ ] I can name an <em>owner</em> and a <em>review date</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick a service you use and <em>plan</em> a 5-step mini project around it.</li>
+<li>For the churn example, propose <em>three features</em> that could beat the baseline.</li>
+<li>Define <em>model drift</em> using <em>two metrics</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This series was an assembly journey through the <em>problem → data → model → decision</em> flow. Next, the <em>Statistics 101</em>, <em>Machine Learning 101</em>, and <em>MLOps 101</em> series go <em>deeper into each step</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Visualization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/07-modeling.md">Modeling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/08-evaluation.md">Evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/09-result-interpretation.md">Result Interpretation</a></li>
+<li><strong>End-to-End Data Project Flow (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pair.withgoogle.com/guidebook/">Google — People + AI Research Guidebook</a></li>
+<li><a href="https://scikit-learn.org/stable/common_pitfalls.html">scikit-learn — Common Pitfalls and Recommended Practices</a></li>
+<li><a href="https://madewithml.com/">Made With ML — End-to-End ML Course</a></li>
+<li><a href="https://fullstackdeeplearning.com/">Full Stack Deep Learning</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, EndToEnd, Project, Workflow, Beginner</p>
+</body>
+</html>

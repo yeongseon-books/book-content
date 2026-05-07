@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Result Interpretation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Result Interpretation</h1>
+<blockquote>
+<p>Data Science 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we turn analysis results <em>into a decision</em> — without inflating or underselling what we found?</p>
+<blockquote>
+<p><em>Interpretation overlays numbers and context.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>result → decision</em> 5-step flow</li>
+<li>How to report <em>uncertainty</em> alongside numbers</li>
+<li>Five <em>cognitive biases</em> that distort interpretation</li>
+<li>A 5-step interpretation exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When interpretation is <em>exaggerated</em>, it leads to <em>bad decisions</em>; when it is <em>understated</em>, opportunities are missed. Reporting <em>uncertainty alongside numbers</em> is the first step toward <em>trust</em>.</p>
+<blockquote>
+<p><em>A good interpretation does not overclaim, yet it still enables a decision.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Result[&quot;Numbers&quot;] --&gt; Context[&quot;Context&quot;]
+    Context --&gt; Uncertain[&quot;Uncertainty&quot;]
+    Uncertain --&gt; Story[&quot;Story&quot;]
+    Story --&gt; Decide[&quot;Decision&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Confidence Interval</strong>: an <em>uncertainty range</em> around an estimate.</li>
+<li><strong>Effect Size</strong>: the <em>magnitude of a difference</em> (more important than mere significance).</li>
+<li><strong>Practical Significance</strong>: a difference that is <em>meaningful for the business</em>.</li>
+<li><strong>Cherry-picking</strong>: the trap of <em>reporting only favorable</em> results.</li>
+<li><strong>Survivorship Bias</strong>: looking <em>only at survivors</em> and missing the failures.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Accuracy went up by 5%!”</em> — Where? For whom? How often?</p>
+<p><strong>After</strong>: <em>“On paid users (60K), the 7-day average accuracy moved from 89% to 91% (95% CI ±0.8%, n=14).”</em></p>
+<h2>Hands-on: 5-step Interpretation</h2>
+<p><strong>Step 1 — Write the numbers precisely</strong></p>
+<pre><code class="language-text">A/B test result: conversion 3.2% (control) vs 3.6% (variant)
+n = 50,000 per arm
+</code></pre>
+<p><strong>Step 2 — Report a confidence interval</strong></p>
+<pre><code class="language-text">delta = +0.4pp (95% CI: +0.2pp ~ +0.6pp)
+</code></pre>
+<p><strong>Step 3 — Evaluate effect size</strong></p>
+<pre><code class="language-text">relative lift = +12.5%
+</code></pre>
+<p><strong>Step 4 — Add context</strong></p>
+<pre><code class="language-text">campaign window: 2 weeks; segment: paid users; device: desktop only
+</code></pre>
+<p><strong>Step 5 — Close with a decision</strong></p>
+<pre><code class="language-text">Decision: roll out to 100% paid desktop users; monitor for 2 more weeks.
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Numbers</em> and <em>context</em> always travel as a <em>pair</em>.</li>
+<li>The <em>confidence interval</em> turns <em>decision risk</em> into a <em>number</em>.</li>
+<li>A <em>decision sentence</em> is what <em>closes</em> the report.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Looking at <em>p-values</em> only.</strong> <em>Effect size</em> may still be tiny.</li>
+<li><strong>Generalizing a <em>single segment</em> to <em>everyone</em>.</strong> Variance gets hidden.</li>
+<li><strong>Reporting <em>only positive</em> findings.</strong> That is cherry-picking.</li>
+<li><strong>Hiding <em>uncertainty</em>.</strong> Decisions become overconfident.</li>
+<li><strong>Ending the report <em>without a decision</em>.</strong> No action follows.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Data team weekly reviews follow a <em>number → context → confidence interval → decision</em> template. <em>Pre-registration</em> of hypotheses (writing them down before the analysis) protects against <em>cherry-picking</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Do not be <em>embarrassed</em> by uncertainty.</li>
+<li><em>Always</em> close with a decision.</li>
+<li>Watch <em>effect size</em> more than <em>p-value</em>.</li>
+<li><em>Split by segment</em> to expose variance.</li>
+<li>Make the <em>review template</em> a <em>team asset</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write a <em>confidence interval</em>.</li>
+<li>[ ] I can read <em>effect size</em>.</li>
+<li>[ ] I can <em>split by segment</em>.</li>
+<li>[ ] I can write a <em>decision sentence</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Take <em>one past analysis</em> and <em>re-interpret</em> it through the <em>5-step flow</em>.</li>
+<li>Write how you would report a result with <em>p=0.04 but only a 0.1% effect</em>.</li>
+<li>List <em>three team rules</em> that would prevent <em>cherry-picking</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Interpretation is the <em>final bridge</em> that carries <em>analysis into decisions</em>. The next episode follows a single <em>data project end to end</em>, pulling everything in this series together.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Visualization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/07-modeling.md">Modeling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/08-evaluation.md">Evaluation</a></li>
+<li><strong>Result Interpretation (current)</strong></li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://statmodeling.stat.columbia.edu/">Andrew Gelman — Statistical Modeling Blog</a></li>
+<li><a href="https://us.macmillan.com/books/9780374533557/thinkingfastandslow">Kahneman — Thinking, Fast and Slow</a></li>
+<li><a href="https://multithreaded.stitchfix.com/">Stitch Fix — A/B Testing Lessons</a></li>
+<li><a href="https://exp-platform.com/">Microsoft — Trustworthy Online Experiments</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, Interpretation, Storytelling, Decision, Beginner</p>
+</body>
+</html>

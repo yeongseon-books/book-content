@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Turning a Problem into a Data Problem</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Turning a Problem into a Data Problem</h1>
+<blockquote>
+<p>Data Science 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you turn <em>“why did revenue drop?”</em> into something <em>the data can actually answer</em>?</p>
+<blockquote>
+<p><em>Once a question becomes </em>measurable<em>, the data starts to </em>answer<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A 5-step framing for <em>business question → data question</em></li>
+<li>How to pick a <em>measurable metric</em></li>
+<li>How to write a <em>falsifiable hypothesis</em></li>
+<li>A <em>5-step</em> framing exercise</li>
+<li>Five common traps</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>fuzzy question</em> gives you <em>no way to choose</em> the right data. <em>Framing</em> is <em>half of the analysis</em>.</p>
+<blockquote>
+<p><em>One precise sentence saves </em>three weeks<em> of analysis.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Vague[&quot;Vague Question&quot;] --&gt; Metric[&quot;Pick Metric&quot;]
+    Metric --&gt; Window[&quot;Pick Window&quot;]
+    Window --&gt; Pop[&quot;Pick Population&quot;]
+    Pop --&gt; Hypothesis[&quot;Falsifiable Hypothesis&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Metric</strong>: a <em>number</em> you can measure (DAU, conversion rate, revenue).</li>
+<li><strong>Window</strong>: the <em>time range</em> of analysis (last 30 days).</li>
+<li><strong>Population</strong>: the <em>group</em> you analyze (paid subscribers).</li>
+<li><strong>Hypothesis</strong>: a statement that <em>could be wrong</em>.</li>
+<li><strong>Counterfactual</strong>: the <em>“what if” scenario</em> — what would have happened without the change.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Why did revenue drop?”</em> → no idea where to start.</p>
+<p><strong>After</strong>: <em>“Did paid-subscriber MRR drop more than 5% in the last 30 days vs the previous 30 days?”</em> → one query.</p>
+<h2>Hands-on: 5-step Framing</h2>
+<p><strong>Step 1 — Write the vague question</strong></p>
+<pre><code class="language-text">&quot;Revenue feels like it's dropping&quot;
+</code></pre>
+<p><strong>Step 2 — Pick a metric</strong></p>
+<pre><code class="language-text">metric = monthly_revenue
+</code></pre>
+<p><strong>Step 3 — Pick a window</strong></p>
+<pre><code class="language-text">window = last 30 days vs previous 30 days
+</code></pre>
+<p><strong>Step 4 — Narrow the population</strong></p>
+<pre><code class="language-text">population = paid subscribers (excluding trials)
+</code></pre>
+<p><strong>Step 5 — Rewrite as falsifiable</strong></p>
+<pre><code class="language-text">&quot;Paid-subscriber monthly revenue dropped more than 5% in the last 30 days versus the prior 30 days.&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>metric</em> is the spine of the analysis.</li>
+<li><em>Window</em> and <em>population</em> keep the comparison <em>fair</em>.</li>
+<li>A hypothesis must be <em>falsifiable</em> before the data can answer.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Choosing the <em>metric last</em>.</strong> The analysis loses direction.</li>
+<li><strong>Using <em>different windows</em> across teams.</strong> Comparisons become <em>unfair</em>.</li>
+<li><strong>Letting the <em>population shift</em>.</strong> Trends get <em>contaminated</em>.</li>
+<li><strong>Writing <em>unfalsifiable</em> hypotheses.</strong> <em>“We are growing”</em> can never be proven or disproven.</li>
+<li><strong>Asking <em>several questions at once</em>.</strong> Answers blur together.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>When PMs send a <em>fuzzy request</em>, the data team <em>rewrites</em> it through the 5-step frame and replies with a <em>clear question</em>. Many teams treat this as a <em>question review</em> — same rigor as a code review.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Pick the <em>metric first</em>.</li>
+<li>Document <em>window and population</em> explicitly.</li>
+<li>Always check <em>falsifiability</em>.</li>
+<li>Treat <em>question review</em> as seriously as <em>code review</em>.</li>
+<li><em>If you can't answer it</em>, rewrite the question.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write <em>metric, window, population</em> clearly.</li>
+<li>[ ] I can write a <em>falsifiable hypothesis</em>.</li>
+<li>[ ] I understand <em>counterfactual</em>.</li>
+<li>[ ] I can rewrite a <em>vague request</em> as a clean question.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Frame <em>“churn is up”</em> using the 5-step process.</li>
+<li>Write 3 <em>unfalsifiable</em> hypotheses, then rewrite each to be <em>falsifiable</em>.</li>
+<li>Pick one metric and show how <em>different windows</em> change the conclusion.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Only <em>answerable questions</em> are the start of analysis. Next, we will look at <em>how to collect</em> the data behind those questions.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><strong>Turning a Problem into a Data Problem (current)</strong></li>
+<li>Data Collection (upcoming)</li>
+<li>Data Cleaning (upcoming)</li>
+<li>Exploratory Data Analysis (upcoming)</li>
+<li>Visualization (upcoming)</li>
+<li>Modeling (upcoming)</li>
+<li>Evaluation (upcoming)</li>
+<li>Result Interpretation (upcoming)</li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google — Rules of Machine Learning (Rule #1)</a></li>
+<li><a href="https://kozyrkov.medium.com/">Cassie Kozyrkov — How to Ask Smart Questions</a></li>
+<li><a href="https://multithreaded.stitchfix.com/">Stitch Fix — A/B Testing Lessons</a></li>
+<li><a href="https://statmodeling.stat.columbia.edu/">Andrew Gelman — Statistical Modeling Blog</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, ProblemFraming, Metrics, Workflow, Beginner</p>
+</body>
+</html>

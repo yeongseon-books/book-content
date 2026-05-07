@@ -1,0 +1,52 @@
+id: data-science-101
+title:
+  ko: Data Science 101
+  en: Data Science 101
+description:
+  ko: 문제 정의, 데이터 수집, 정제, EDA, 시각화, 모델링, 평가, 해석까지 데이터 사이언스 전체 흐름을 다지는 시리즈.
+  en: A Data Science series covering problem framing, data collection, cleaning, EDA, visualization, modeling, evaluation, and interpretation end to end.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-data-science
+    title:
+      ko: Data Science란 무엇인가?
+      en: What Is Data Science?
+  - slug: problem-to-data-problem
+    title:
+      ko: 문제를 데이터 문제로 바꾸기
+      en: Turning a Problem into a Data Problem
+  - slug: data-collection
+    title:
+      ko: 데이터 수집
+      en: Data Collection
+  - slug: data-cleaning
+    title:
+      ko: 데이터 정제
+      en: Data Cleaning
+  - slug: exploratory-data-analysis
+    title:
+      ko: 탐색적 데이터 분석
+      en: Exploratory Data Analysis
+  - slug: visualization
+    title:
+      ko: 시각화
+      en: Visualization
+  - slug: modeling
+    title:
+      ko: 모델링
+      en: Modeling
+  - slug: evaluation
+    title:
+      ko: 평가
+      en: Evaluation
+  - slug: result-interpretation
+    title:
+      ko: 결과 해석
+      en: Result Interpretation
+  - slug: data-project-end-to-end
+    title:
+      ko: 데이터 프로젝트 전체 흐름
+      en: End-to-End Data Project Flow
