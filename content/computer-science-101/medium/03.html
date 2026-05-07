@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Representation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Representation</h1>
+<blockquote>
+<p>Computer Science 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: A computer only knows 0 and 1, so how does it store and process letters, numbers, and images?</p>
+<blockquote>
+<p>Inside a computer every piece of data is a sequence of bits (0 or 1). The number 42, the letter 'A', and a single pixel in an image are all bit sequences in the end. The same bits can mean an integer in one context and a character in another. This article covers binary, character encodings, and the representation of integers and floating-point numbers.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How to convert between binary and decimal</li>
+<li>ASCII and UTF-8 character encodings</li>
+<li>How signed integers are represented (two's complement)</li>
+<li>How floating point works and why precision is limited</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Garbled characters, floating-point error, and integer overflow are all problems you cannot fix without understanding data representation. You need to know why <code>0.1 + 0.2 != 0.3</code> before you can design a financial system correctly.</p>
+<blockquote>
+<p>Data representation = the physics of the digital world.</p>
+</blockquote>
+<p>Bit-level understanding is the foundation of debugging and performance work.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.</p>
+</blockquote>
+<pre><code class="language-text">Bits: 01000001
+   │
+   ├── Read as integer  -&gt; 65
+   ├── Read as ASCII    -&gt; 'A'
+   └── Read as a color  -&gt; very dark blue
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Bit</strong><br>
+- Description: The smallest unit, storing 0 or 1</p>
+<p><strong>Byte</strong><br>
+- Description: A group of 8 bits</p>
+<p><strong>ASCII</strong><br>
+- Description: A 7-bit standard for encoding English characters</p>
+<p><strong>UTF-8</strong><br>
+- Description: A variable-length encoding for the world's characters using 1-4 bytes</p>
+<p><strong>Floating point</strong><br>
+- Description: An approximate representation of decimals defined by IEEE 754</p>
+<h2>Before / After</h2>
+<p><strong>Before — without representation knowledge:</strong></p>
+<pre><code class="language-python"># Why isn't 0.1 + 0.2 equal to 0.3?
+result = 0.1 + 0.2
+print(result)          # 0.30000000000000004
+print(result == 0.3)   # False — and you do not know why
+</code></pre>
+<p><strong>After — with representation knowledge:</strong></p>
+<pre><code class="language-python">from decimal import Decimal
+
+# Floating point is a binary approximation; use Decimal for exact arithmetic.
+result = Decimal(&quot;0.1&quot;) + Decimal(&quot;0.2&quot;)
+print(result)              # 0.3
+print(result == Decimal(&quot;0.3&quot;))  # True
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Binary and decimal conversion</strong></p>
+<pre><code class="language-python"># Decimal -&gt; binary
+print(bin(42))      # 0b101010
+print(bin(255))     # 0b11111111
+
+# Binary -&gt; decimal
+print(int(&quot;101010&quot;, 2))   # 42
+print(int(&quot;11111111&quot;, 2)) # 255
+
+# Verify the conversion principle in code
+def to_binary(n: int) -&gt; str:
+    &quot;&quot;&quot;Convert a decimal integer to a binary string.&quot;&quot;&quot;
+    if n == 0:
+        return &quot;0&quot;
+    bits = []
+    while n &gt; 0:
+        bits.append(str(n % 2))
+        n //= 2
+    return &quot;&quot;.join(reversed(bits))
+
+print(to_binary(42))  # 101010
+</code></pre>
+<p><strong>Step 2: ASCII and UTF-8</strong></p>
+<pre><code class="language-python"># ASCII: one byte per English character
+print(ord(&quot;A&quot;))        # 65
+print(chr(65))         # A
+print(ord(&quot;a&quot;))        # 97
+
+# UTF-8: a Korean character takes three bytes
+korean = &quot;가&quot;
+print(ord(korean))                  # 44032
+print(korean.encode(&quot;utf-8&quot;))       # b'\xea\xb0\x80' (3 bytes)
+print(len(korean))                  # 1 (character count)
+print(len(korean.encode(&quot;utf-8&quot;)))  # 3 (byte count)
+
+# Emoji: four bytes
+emoji = &quot;🐍&quot;
+print(len(emoji))                   # 1 (character count)
+print(len(emoji.encode(&quot;utf-8&quot;)))   # 4 (byte count)
+</code></pre>
+<p><strong>Step 3: Integer size and two's complement</strong></p>
+<pre><code class="language-python"># Python integers have no size limit (arbitrary precision)
+big_number = 2 ** 100
+print(big_number)  # 1267650600228229401496703205376
+
+# But C, Java, and others use fixed sizes
+# 8-bit signed: -128 to 127
+# 32-bit signed: -2,147,483,648 to 2,147,483,647
+
+# Two's complement represents negatives
+def twos_complement(n: int, bits: int = 8) -&gt; str:
+    &quot;&quot;&quot;Return the two's-complement representation of n.&quot;&quot;&quot;
+    if n &gt;= 0:
+        return format(n, f&quot;0{bits}b&quot;)
+    return format((1 &lt;&lt; bits) + n, f&quot;0{bits}b&quot;)
+
+print(twos_complement(5))    # 00000101
+print(twos_complement(-5))   # 11111011
+print(twos_complement(-1))   # 11111111
+</code></pre>
+<p><strong>Step 4: The limits of floating point</strong></p>
+<pre><code class="language-python">import struct
+
+# Inspect the actual stored value of 0.1
+print(f&quot;{0.1:.20f}&quot;)  # 0.10000000000000000555
+
+# IEEE 754 double-precision bit pattern
+bits = struct.pack(&quot;d&quot;, 0.1)
+print(&quot; &quot;.join(f&quot;{b:08b}&quot; for b in bits))
+
+# Compare with a tolerance
+import math
+print(math.isclose(0.1 + 0.2, 0.3))  # True
+
+# For money, use Decimal or integer cents
+price_cents = 1099  # $10.99 stored as cents
+tax_cents = int(price_cents * 0.1)
+total_cents = price_cents + tax_cents
+print(f&quot;${total_cents / 100:.2f}&quot;)  # $12.09
+</code></pre>
+<p><strong>Step 5: Build intuition for data sizes</strong></p>
+<pre><code class="language-python">data_sizes = {
+    &quot;1 bit&quot;: 1,
+    &quot;1 byte&quot;: 8,
+    &quot;1 ASCII character&quot;: 8,
+    &quot;1 UTF-8 Korean char&quot;: 24,
+    &quot;32-bit int&quot;: 32,
+    &quot;64-bit double&quot;: 64,
+    &quot;1 KB&quot;: 8 * 1024,
+    &quot;1 MB&quot;: 8 * 1024 ** 2,
+    &quot;1 GB&quot;: 8 * 1024 ** 3,
+}
+
+for name, bits in data_sizes.items():
+    print(f&quot;{name:22s} = {bits:&gt;15,} bits&quot;)
+</code></pre>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>The same bit sequence can mean a number, a character, or a color depending on interpretation.</li>
+<li>UTF-8 uses a different number of bytes per character, so <code>len(string) != len(bytes)</code>.</li>
+<li>Floating point is approximate — never compare directly with <code>==</code>.</li>
+<li>Python integers never overflow, but other languages do.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Confusing string length with byte length</strong><br>
+- Problem: Wrong slicing of Korean text or emoji<br>
+- Fix: <code>len()</code> gives characters; <code>len(s.encode())</code> gives bytes</p>
+<p><strong>Comparing floats with <code>==</code></strong><br>
+- Problem: <code>0.1 + 0.2 != 0.3</code><br>
+- Fix: Use <code>math.isclose()</code></p>
+<p><strong>Using floats for money</strong><br>
+- Problem: Cent-level errors accumulate<br>
+- Fix: Use <code>Decimal</code> or integer cents</p>
+<p><strong>Reading files without specifying encoding</strong><br>
+- Problem: Garbled characters<br>
+- Fix: Pass <code>encoding="utf-8"</code> explicitly</p>
+<p><strong>Assuming Python-style unbounded integers in other languages</strong><br>
+- Problem: Overflow bugs<br>
+- Fix: Check the integer range per language</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Setting <code>charset=utf-8</code> on the <code>Content-Type</code> header in a web API.</li>
+<li>Handling money with <code>Decimal</code> or integer cents in financial systems.</li>
+<li>Choosing INT vs BIGINT when picking database column types.</li>
+<li>Detecting BOM (Byte Order Mark) and encoding when processing files.</li>
+<li>Handling byte order (endianness) in network protocols.</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>Senior engineers pick data types by <em>meaning and constraints</em>, not by storage size. Prices live as integer cents, identifiers as UUIDs, timestamps as ISO 8601 in UTC.</p>
+<p>Encoding bugs come from not setting a standard early. A simple project-wide rule like "every string is UTF-8" prevents an enormous class of bugs.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can convert between binary and decimal</li>
+<li>[ ] I can explain the difference between ASCII and UTF-8</li>
+<li>[ ] I understand the cause of floating-point error</li>
+<li>[ ] I distinguish character length from byte length</li>
+<li>[ ] I know why floats are unsafe for financial data</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Write a function that converts integers 0 to 255 into binary and hexadecimal. Print the result as a table.</p>
+</li>
+<li>
+<p>Write a program that compares the UTF-8 byte counts of various characters (English, Korean, Japanese, emoji).</p>
+</li>
+<li>
+<p>Add <code>0.1</code> together 100 times using both <code>float</code> and <code>Decimal</code>, and observe the difference.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Every piece of data in a computer is a bit sequence. Encoding rules give bits their meaning. Integers use two's complement, characters use UTF-8, and decimals use IEEE 754 floating point. Knowing each representation's limits is the basis of correct design.</p>
+<p>The next article covers algorithms — how to process data efficiently — and complexity, the way we measure their performance.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><strong>Data Representation (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://home.unicode.org/">Unicode official site</a></li>
+<li><a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754 — Floating-point standard</a></li>
+<li><a href="https://floating-point-gui.de/">What Every Programmer Should Know About Floating-Point</a></li>
+<li><a href="https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/">Joel Spolsky — The Absolute Minimum About Unicode</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Binary, Character Encoding, UTF-8, Floating Point, Data Types</p>
+</body>
+</html>

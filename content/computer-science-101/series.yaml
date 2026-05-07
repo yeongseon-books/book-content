@@ -1,0 +1,71 @@
+id: computer-science-101
+title:
+  ko: Computer Science 101
+  en: Computer Science 101
+description:
+  ko: 컴퓨터공학 전공에서 배우는 주요 과목들이 서로 어떻게 연결되는지 보여주는 입문 시리즈.
+  en: An introductory series showing how major computer science subjects connect to each other.
+status: content-ready
+category: cs-core
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-computer-science
+    title:
+      ko: Computer Science란 무엇인가?
+      en: What Is Computer Science?
+  - number: 2
+    slug: computation-and-programs
+    title:
+      ko: 계산과 프로그램
+      en: Computation and Programs
+  - number: 3
+    slug: data-representation
+    title:
+      ko: 데이터 표현
+      en: Data Representation
+  - number: 4
+    slug: algorithms-and-complexity
+    title:
+      ko: 알고리즘과 복잡도
+      en: Algorithms and Complexity
+  - number: 5
+    slug: computer-architecture
+    title:
+      ko: 컴퓨터 구조
+      en: Computer Architecture
+  - number: 6
+    slug: operating-systems
+    title:
+      ko: 운영체제
+      en: Operating Systems
+  - number: 7
+    slug: networks
+    title:
+      ko: 네트워크
+      en: Networks
+  - number: 8
+    slug: databases
+    title:
+      ko: 데이터베이스
+      en: Databases
+  - number: 9
+    slug: software-engineering
+    title:
+      ko: 소프트웨어 엔지니어링
+      en: Software Engineering
+  - number: 10
+    slug: ai-and-data-science
+    title:
+      ko: AI와 데이터사이언스까지의 연결
+      en: From CS to AI and Data Science

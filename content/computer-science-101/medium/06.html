@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Operating Systems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Operating Systems</h1>
+<blockquote>
+<p>Computer Science 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: Why does it look like hundreds of programs run at the same time on a single machine?</p>
+<blockquote>
+<p>The operating system sits between hardware and applications. It hands CPU and memory out to many programs and gives them a uniform way to reach files, networks, and other resources. Every line of code we write eventually relies on the OS. This article covers processes, threads, virtual memory, system calls, and the basics of concurrency.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between processes and threads</li>
+<li>Virtual memory and address spaces</li>
+<li>System calls and the user/kernel mode boundary</li>
+<li>Concurrency vs parallelism, and what the GIL means</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Why a web server stalls, how a memory leak shows up to the OS, why multithreading is not always faster — all of these need OS-level reasoning to answer.</p>
+<blockquote>
+<p>An OS = resource manager + abstraction layer.</p>
+</blockquote>
+<p>Without understanding OS abstractions, debugging starts to feel like magic.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A process is an isolated execution unit. A thread is a flow of execution that shares memory with other threads inside the same process.</p>
+</blockquote>
+<pre><code class="language-text">Process A                       Process B
+┌───────────────────┐           ┌───────────────────┐
+│ Virtual address   │           │ Virtual address   │
+│  ┌─────────────┐  │           │  ┌─────────────┐  │
+│  │ Thread 1    │  │           │  │ Thread 1    │  │
+│  │ Thread 2    │  │           │  │             │  │
+│  └─────────────┘  │           │  └─────────────┘  │
+└─────────┬─────────┘           └─────────┬─────────┘
+          │                               │
+          └───── Operating system ────────┘
+                       │
+                  Hardware (CPU, RAM, disk)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Process</strong><br>
+- Description: An execution unit with its own memory space</p>
+<p><strong>Thread</strong><br>
+- Description: An execution flow sharing memory inside the same process</p>
+<p><strong>Context switch</strong><br>
+- Description: The OS swapping the running process or thread on the CPU</p>
+<p><strong>Virtual memory</strong><br>
+- Description: The abstraction that gives each process its own contiguous address space</p>
+<p><strong>System call</strong><br>
+- Description: The interface a user program uses to request a kernel service</p>
+<p><strong>Scheduler</strong><br>
+- Description: The OS component deciding which process/thread gets the CPU</p>
+<h2>Before / After</h2>
+<p><strong>Before — code that ignores the OS:</strong></p>
+<pre><code class="language-python"># Fetch 100 URLs sequentially — most of the time is spent waiting
+import urllib.request
+
+urls = [f&quot;https://httpbin.org/delay/1?n={i}&quot; for i in range(100)]
+results = [urllib.request.urlopen(u).read() for u in urls]
+# About 100 seconds — the CPU is idle, just waiting on I/O
+</code></pre>
+<p><strong>After — using the OS's async I/O:</strong></p>
+<pre><code class="language-python"># Same work, done concurrently — overlap the I/O wait
+from concurrent.futures import ThreadPoolExecutor
+import urllib.request
+
+def fetch(url: str) -&gt; bytes:
+    return urllib.request.urlopen(url).read()
+
+with ThreadPoolExecutor(max_workers=20) as pool:
+    results = list(pool.map(fetch, urls))
+# About 5-10 seconds — other requests progress while one waits
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Create a process and a thread</strong></p>
+<pre><code class="language-python">import os
+import threading
+import multiprocessing
+
+def show_id(label: str) -&gt; None:
+    print(f&quot;{label}: pid={os.getpid()}, tid={threading.get_ident()}&quot;)
+
+print(&quot;[main]&quot;)
+show_id(&quot;main&quot;)
+
+print(&quot;\n[thread]&quot;)
+t = threading.Thread(target=show_id, args=(&quot;thread&quot;,))
+t.start()
+t.join()
+
+print(&quot;\n[process]&quot;)
+p = multiprocessing.Process(target=show_id, args=(&quot;process&quot;,))
+p.start()
+p.join()
+</code></pre>
+<p><strong>Step 2: The GIL and the limits of multithreading</strong></p>
+<pre><code class="language-python"># CPU-bound work does not get faster with threads (CPython GIL)
+import time
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+
+def cpu_heavy(n: int) -&gt; int:
+    total = 0
+    for i in range(n):
+        total += i * i
+    return total
+
+N = 10_000_000
+work = [N] * 4
+
+start = time.perf_counter()
+[cpu_heavy(n) for n in work]
+print(f&quot;sequential : {time.perf_counter() - start:.2f}s&quot;)
+
+start = time.perf_counter()
+with ThreadPoolExecutor(max_workers=4) as pool:
+    list(pool.map(cpu_heavy, work))
+print(f&quot;threads x4 : {time.perf_counter() - start:.2f}s&quot;)  # roughly the same
+
+start = time.perf_counter()
+with ProcessPoolExecutor(max_workers=4) as pool:
+    list(pool.map(cpu_heavy, work))
+print(f&quot;processes x4: {time.perf_counter() - start:.2f}s&quot;)  # about 4x faster
+</code></pre>
+<p><strong>Step 3: Look inside a system call</strong></p>
+<pre><code class="language-python"># Python's open() ultimately calls the OS open(2) system call
+import os
+
+fd = os.open(&quot;/tmp/oscourse_demo.txt&quot;, os.O_CREAT | os.O_WRONLY, 0o644)
+os.write(fd, b&quot;Hello from a system call\n&quot;)
+os.close(fd)
+
+print(open(&quot;/tmp/oscourse_demo.txt&quot;).read())
+os.remove(&quot;/tmp/oscourse_demo.txt&quot;)
+</code></pre>
+<p><strong>Step 4: Observe virtual memory</strong></p>
+<pre><code class="language-python"># Inspect process memory usage (Linux/macOS)
+import os
+import resource
+
+print(f&quot;PID            : {os.getpid()}&quot;)
+usage = resource.getrusage(resource.RUSAGE_SELF)
+print(f&quot;max RSS (KB)   : {usage.ru_maxrss}&quot;)    # peak resident set size
+print(f&quot;page faults    : {usage.ru_minflt}&quot;)    # page-fault count
+</code></pre>
+<p><strong>Step 5: Concurrency vs parallelism</strong></p>
+<pre><code class="language-python"># Concurrency = multiple tasks in progress (time-sliced)
+# Parallelism = multiple tasks running at the same instant (multi-core)
+
+import asyncio
+import time
+
+async def task(name: str, sec: float) -&gt; None:
+    print(f&quot;{name} starting&quot;)
+    await asyncio.sleep(sec)        # simulate I/O wait
+    print(f&quot;{name} done&quot;)
+
+async def main() -&gt; None:
+    start = time.perf_counter()
+    await asyncio.gather(task(&quot;A&quot;, 1), task(&quot;B&quot;, 1), task(&quot;C&quot;, 1))
+    print(f&quot;total elapsed: {time.perf_counter() - start:.2f}s&quot;)  # about 1s
+
+asyncio.run(main())
+</code></pre>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>Processes do not share memory; threads do.</li>
+<li>CPython's GIL makes processes preferable to threads for CPU-bound work.</li>
+<li>I/O-bound work scales well with threads or async.</li>
+<li>A system call switches from user mode to kernel mode and that switch has a cost.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Using threads for CPU-bound work</strong><br>
+- Problem: Ineffective due to the GIL<br>
+- Fix: Use <code>multiprocessing</code> or <code>ProcessPoolExecutor</code></p>
+<p><strong>Calling system calls one line at a time</strong><br>
+- Problem: Context-switch overhead<br>
+- Fix: Buffer or batch operations</p>
+<p><strong>Ending child processes without <code>join</code></strong><br>
+- Problem: Zombie processes, resource leaks<br>
+- Fix: Use <code>with</code> or explicit <code>join</code>/<code>wait</code></p>
+<p><strong>Sharing variables between threads without protection</strong><br>
+- Problem: Race conditions<br>
+- Fix: <code>threading.Lock</code> or queue-based patterns</p>
+<p><strong>Judging memory only by RSS</strong><br>
+- Problem: You ignore virtual and shared memory<br>
+- Fix: Use tools like <code>pmap</code> or <code>smem</code> to break it down</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Worker processes plus an async event loop in web servers (Gunicorn + Uvicorn).</li>
+<li>Container (cgroup) resource isolation and OOM Killer behavior.</li>
+<li>Choosing multiprocessing vs distributed processing in data pipelines.</li>
+<li>Debugging tools (<code>strace</code>, <code>dtruss</code>, <code>perf</code>) for analyzing system calls and scheduling.</li>
+<li>Memory-leak analysis tracking RSS, swap, and page-fault trends.</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer asks first: "Is the bottleneck CPU or I/O?" If CPU, they think algorithms and parallelism. If I/O, they think async and concurrency. Even with multithreading, they choose with full awareness of the runtime's concurrency model (GIL, async, actor).</p>
+<p>They also know OS abstractions are <em>leaky abstractions</em>. Virtual memory looks unbounded, but real RAM and swap have limits. The file system looks like a tree, but inodes and mount points exist. Bugs grow at the edges of abstractions.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain processes vs threads from a memory perspective</li>
+<li>[ ] I know what the CPython GIL is and what work it affects</li>
+<li>[ ] I understand virtual memory, pages, and swap</li>
+<li>[ ] I am aware that system calls have a cost</li>
+<li>[ ] I can distinguish concurrency from parallelism in my designs</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Run a CPU-bound and an I/O-bound function with four threads each and four processes each, and compare the times.</p>
+</li>
+<li>
+<p>Use <code>os.fork()</code> (or <code>multiprocessing.Process</code>) and confirm that the parent and child see the same variable differently.</p>
+</li>
+<li>
+<p>Increment a counter from 100 threads with and without <code>threading.Lock</code>, and observe the difference in the result.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>The OS abstracts hardware so that many programs can coexist safely. Processes, threads, virtual memory, and system calls are the stage on which all of our code runs. The right concurrency model depends on whether the work is CPU- or I/O-bound.</p>
+<p>The next article moves beyond a single machine to how computers exchange data — networks.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><strong>Operating Systems (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">Operating Systems: Three Easy Pieces (free)</a></li>
+<li><a href="https://docs.python.org/3/library/concurrent.futures.html">Python — concurrent.futures docs</a></li>
+<li><a href="https://man7.org/linux/man-pages/dir_section_2.html">Linux man-pages — system calls</a></li>
+<li><a href="https://www.pearson.com/en-us/subject-catalog/p/modern-operating-systems/P200000003311">Andrew Tanenbaum — Modern Operating Systems</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Processes, Threads, Virtual Memory, Concurrency</p>
+</body>
+</html>

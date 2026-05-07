@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Computer Architecture</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Computer Architecture</h1>
+<blockquote>
+<p>Computer Science 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: Two pieces of code share the same Big-O. Why is one ten times slower than the other in practice?</p>
+<blockquote>
+<p>Even with the same algorithm, performance depends heavily on how the code uses hardware. The CPU does not touch memory directly — it goes through a cache. Cache-friendly code can be tens of times faster than code that misses the cache constantly. This article covers the von Neumann model, the CPU and memory and cache hierarchy, and how all of it shows up in your code.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The core components of the von Neumann architecture</li>
+<li>The stages a CPU goes through to execute an instruction</li>
+<li>The memory hierarchy (registers -&gt; cache -&gt; RAM -&gt; disk)</li>
+<li>Locality and cache-friendly code</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>There is always a performance gap that algorithms alone cannot explain. Why one O(n) implementation is twice as fast, why a 10x gap appears depending on how you walk a matrix — all of it traces back to the memory hierarchy.</p>
+<blockquote>
+<p>The CPU is fast and memory is slow. The cache exists to close that gap.</p>
+</blockquote>
+<p>An algorithm written without hardware awareness is fast only on paper.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Higher in the hierarchy means faster, more expensive, and smaller. Lower means slower, cheaper, and bigger.</p>
+</blockquote>
+<pre><code class="language-text">Tier            Approx. access time   Size
+────────────────────────────────────────────
+Register        &lt; 1 ns                tens of bytes
+L1 cache        ~1 ns                 32-64 KB
+L2 cache        ~4 ns                 hundreds of KB
+L3 cache        ~10 ns                tens of MB
+Main memory     ~100 ns               tens of GB
+SSD             ~100 µs               hundreds of GB - TB
+HDD             ~10 ms                TB
+Network         ~ms - seconds         —
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>CPU</strong><br>
+- Description: The unit that decodes instructions and performs operations</p>
+<p><strong>Register</strong><br>
+- Description: The fastest storage, inside the CPU</p>
+<p><strong>Cache</strong><br>
+- Description: A fast intermediate store between CPU and memory (L1/L2/L3)</p>
+<p><strong>RAM</strong><br>
+- Description: The main memory used while a program runs</p>
+<p><strong>Bus</strong><br>
+- Description: The data path between CPU, memory, and devices</p>
+<p><strong>Clock</strong><br>
+- Description: The CPU operating speed (Hz, cycles per second)</p>
+<h2>Before / After</h2>
+<p><strong>Before — cache-unfriendly code:</strong></p>
+<pre><code class="language-python"># Walk a 2D list column-major — frequent cache misses
+N = 2000
+matrix = [[0] * N for _ in range(N)]
+
+for j in range(N):           # outer loop is the column
+    for i in range(N):       # inner loop is the row
+        matrix[i][j] += 1    # jump to a different row on every access
+</code></pre>
+<p><strong>After — cache-friendly code:</strong></p>
+<pre><code class="language-python"># Walk row-major — sequential access in adjacent memory
+for i in range(N):           # outer loop is the row
+    for j in range(N):       # inner loop is the column
+        matrix[i][j] += 1    # adjacent memory access within the same row
+</code></pre>
+<p>Both are O(n^2), but the second uses cache lines efficiently and runs faster.</p>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Memory access patterns make a real difference</strong></p>
+<pre><code class="language-python">import time
+
+N = 2000
+matrix = [[0] * N for _ in range(N)]
+
+start = time.perf_counter()
+for i in range(N):
+    for j in range(N):
+        matrix[i][j] += 1
+print(f&quot;row-major   : {time.perf_counter() - start:.3f}s&quot;)
+
+start = time.perf_counter()
+for j in range(N):
+    for i in range(N):
+        matrix[i][j] += 1
+print(f&quot;column-major: {time.perf_counter() - start:.3f}s&quot;)
+</code></pre>
+<p><strong>Step 2: Inspect memory layout with NumPy</strong></p>
+<pre><code class="language-python">import numpy as np
+
+a = np.arange(12).reshape(3, 4)        # default is C-order (row-major)
+print(a.flags[&quot;C_CONTIGUOUS&quot;])         # True
+print(a.flags[&quot;F_CONTIGUOUS&quot;])         # False
+
+b = np.asfortranarray(a)               # Fortran-order (column-major)
+print(b.flags[&quot;F_CONTIGUOUS&quot;])         # True
+
+# Same data, different memory layout -&gt; different traversal speed
+</code></pre>
+<p><strong>Step 3: Feel the speed gap of the memory hierarchy</strong></p>
+<pre><code class="language-python"># Sum data of growing size — the cache tiers become visible
+import time
+
+for power in [10, 14, 18, 22, 24]:
+    n = 1 &lt;&lt; power                      # 2^power
+    data = [1] * n
+    start = time.perf_counter()
+    total = 0
+    for x in data:
+        total += x
+    print(f&quot;n=2^{power:&gt;2}  size~{n * 28 // 1024:&gt;10} KB  time={time.perf_counter() - start:.3f}s&quot;)
+</code></pre>
+<p><strong>Step 4: What the CPU does in one cycle</strong></p>
+<pre><code class="language-python"># A 3 GHz clock = 3 billion cycles per second
+# A simple add = ~1 cycle
+# Main memory access = ~300 cycles (about 100x an L1 hit)
+
+# Pseudocode of the instruction stages (Fetch-Decode-Execute)
+def cpu_cycle(instruction: str) -&gt; None:
+    &quot;&quot;&quot;1. Fetch  — read the instruction from memory.
+       2. Decode — interpret the instruction.
+       3. Execute — perform the operation in the ALU.
+       4. Write back — store the result in a register or memory.&quot;&quot;&quot;
+    fetch = f&quot;read: {instruction}&quot;
+    decode = &quot;decoding&quot;
+    execute = &quot;executing&quot;
+    write_back = &quot;storing result&quot;
+    print(fetch, decode, execute, write_back, sep=&quot; -&gt; &quot;)
+
+cpu_cycle(&quot;ADD R1, R2, R3&quot;)
+</code></pre>
+<p><strong>Step 5: Pack data for locality</strong></p>
+<pre><code class="language-python"># A list of objects (scattered memory) vs a per-field array (contiguous memory)
+import array
+import time
+
+N = 1_000_000
+
+class Point:
+    def __init__(self, x: float, y: float) -&gt; None:
+        self.x = x
+        self.y = y
+
+points = [Point(i, i) for i in range(N)]
+xs = array.array(&quot;d&quot;, [float(i) for i in range(N)])
+
+start = time.perf_counter()
+total = sum(p.x for p in points)
+print(f&quot;object list : {time.perf_counter() - start:.3f}s&quot;)
+
+start = time.perf_counter()
+total = sum(xs)
+print(f&quot;flat array  : {time.perf_counter() - start:.3f}s&quot;)
+</code></pre>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>The same algorithm performs differently depending on memory access order.</li>
+<li>Sequential access of adjacent memory exploits cache lines (spatial locality).</li>
+<li>Reusing the same data soon after keeps it in cache (temporal locality).</li>
+<li>A Python list of objects is an array of pointers, so cache friendliness is poor.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Column-major traversal of a 2D array</strong><br>
+- Problem: Cache misses explode<br>
+- Fix: Walk in the same order as the memory layout</p>
+<p><strong>Processing a large object graph as-is</strong><br>
+- Problem: Pointer chasing kills cache use<br>
+- Fix: Use NumPy arrays or <code>__slots__</code> dataclasses</p>
+<p><strong>Doing disk I/O one line at a time</strong><br>
+- Problem: Syscall overhead dominates<br>
+- Fix: Buffer or read in chunks</p>
+<p><strong>Relying on virtual memory under pressure</strong><br>
+- Problem: Swap is 10,000x slower<br>
+- Fix: Check data size against memory limits first</p>
+<p><strong>Assuming Python <code>list</code> is an array</strong><br>
+- Problem: It is an array of pointers; arithmetic is slow<br>
+- Fix: Use <code>array</code> or <code>numpy</code> for numeric work</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Vectorizing data pipelines with NumPy/Pandas to maximize cache use.</li>
+<li>Improving locality in games and graphics with ECS (Entity-Component-System).</li>
+<li>Column-store DB engines (Parquet, ClickHouse) that favor analytics queries.</li>
+<li>Avoiding false sharing (cache-line contention) in concurrent code.</li>
+<li>Respecting CPU/memory limits and NUMA-aware scheduling in containers.</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>Senior engineers first lower the algorithmic order, then suspect the memory access pattern. They know an O(n^2) algorithm can be fast enough if cache-friendly, while an O(n log n) algorithm can drag if its memory accesses are scattered.</p>
+<p>They also know not every line of code needs cache optimization. Identify the hot path with a profiler and tune it precisely; for everything else, prioritize readability. The principle: "Fix what the profiler points at."</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can roughly state the speed gap between CPU, memory, and cache</li>
+<li>[ ] I can explain spatial vs temporal locality</li>
+<li>[ ] I know why 2D arrays should be walked row-major</li>
+<li>[ ] I understand a Python <code>list</code> is not a true array</li>
+<li>[ ] I have intuition for how expensive disk I/O is compared to memory</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Sum a 1000x1000 matrix row-major and column-major, and measure the speed ratio.</p>
+</li>
+<li>
+<p>Store one million integers in <code>list</code>, <code>array.array("i", ...)</code>, and <code>numpy.ndarray</code>, and compare summation time.</p>
+</li>
+<li>
+<p>Compute the sum of squares with (a) a <code>for</code> loop, (b) a list comprehension, and (c) NumPy vectorization, and analyze the gap.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>The CPU is fast and memory is slow. The cache fills the gap, and code that uses it well is tens of times faster on the same algorithm. Good engineers lower the algorithmic order first, then verify the memory access pattern.</p>
+<p>The next article covers how multiple programs coexist and share resources on this hardware — the operating system.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><strong>Computer Architecture (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1">Computer Organization and Design (Patterson &amp; Hennessy)</a></li>
+<li><a href="https://gist.github.com/jboner/2841832">Latency Numbers Every Programmer Should Know</a></li>
+<li><a href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">Ulrich Drepper — What Every Programmer Should Know About Memory</a></li>
+<li><a href="https://www.agner.org/optimize/">Agner Fog — Optimization Manuals</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, CPU, Memory, Cache, Performance</p>
+</body>
+</html>

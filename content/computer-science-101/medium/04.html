@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Algorithms and Complexity</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Algorithms and Complexity</h1>
+<blockquote>
+<p>Computer Science 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: Given two pieces of code that solve the same problem, how do you know which one is faster?</p>
+<blockquote>
+<p>An algorithm is a clear procedure for solving a problem. Complexity is the language we use to measure how that procedure scales with input size. Two sorting algorithms can produce the same output, but on a million items one might take one second and the other one hour. This article covers the definition of an algorithm, Big-O notation, and the criteria for choosing data structures.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of an algorithm and what makes one good</li>
+<li>Time complexity and space complexity</li>
+<li>Comparing performance with Big-O notation</li>
+<li>How data-structure choice changes complexity</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Code that runs fine on 100 items may stall on 1,000,000. If you cannot predict how performance scales with data size, you will hit incidents in production. Big-O lets you reason about performance limits without even running the code.</p>
+<blockquote>
+<p>Algorithm = the procedure to solve a problem. Complexity = the cost of that procedure.</p>
+</blockquote>
+<p>Reading complexity is one of the clearest dividing lines between senior and junior engineers.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Two algorithms that produce the same result can diverge by thousands of times once the input grows.</p>
+</blockquote>
+<pre><code class="language-text">Input size n          n=10    n=1,000     n=1,000,000
+─────────────────────────────────────────────────────
+O(1)    constant       1        1              1
+O(log n) log            3       10             20
+O(n)    linear         10     1,000      1,000,000
+O(n log n) linearithmic 33    10,000     20,000,000
+O(n^2)  quadratic     100  1,000,000   10^12 (impossible)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Algorithm</strong><br>
+- Description: A finite, well-defined procedure that maps input to output</p>
+<p><strong>Time complexity</strong><br>
+- Description: Growth rate of operations as input size grows</p>
+<p><strong>Space complexity</strong><br>
+- Description: Growth rate of memory use as input size grows</p>
+<p><strong>Big-O</strong><br>
+- Description: Upper bound on growth rate as input grows without bound</p>
+<p><strong>Data structure</strong><br>
+- Description: A way of storing and accessing data (list, dict, set, ...)</p>
+<h2>Before / After</h2>
+<p><strong>Before — without complexity awareness:</strong></p>
+<pre><code class="language-python"># Find common elements between two lists — O(n^2)
+def common_slow(a: list[int], b: list[int]) -&gt; list[int]:
+    result = []
+    for x in a:
+        if x in b:        # `in` on a list is O(n)
+            result.append(x)
+    return result
+
+# At n=10,000 that is roughly 100 million comparisons — several seconds
+</code></pre>
+<p><strong>After — with complexity awareness:</strong></p>
+<pre><code class="language-python"># Same problem — O(n)
+def common_fast(a: list[int], b: list[int]) -&gt; list[int]:
+    b_set = set(b)        # one-time O(n)
+    return [x for x in a if x in b_set]   # `in` on a set is O(1)
+
+# At n=10,000 that is roughly 20,000 comparisons — milliseconds
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Linear search and binary search</strong></p>
+<pre><code class="language-python">def linear_search(arr: list[int], target: int) -&gt; int:
+    &quot;&quot;&quot;Search an unsorted list for target — O(n).&quot;&quot;&quot;
+    for i, value in enumerate(arr):
+        if value == target:
+            return i
+    return -1
+
+def binary_search(arr: list[int], target: int) -&gt; int:
+    &quot;&quot;&quot;Search a sorted list for target — O(log n).&quot;&quot;&quot;
+    lo, hi = 0, len(arr) - 1
+    while lo &lt;= hi:
+        mid = (lo + hi) // 2
+        if arr[mid] == target:
+            return mid
+        if arr[mid] &lt; target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+
+data = sorted(range(1_000_000))
+print(linear_search(data, 999_999))   # 999999 — about 1,000,000 comparisons
+print(binary_search(data, 999_999))   # 999999 — about 20 comparisons
+</code></pre>
+<p><strong>Step 2: Compare wall-clock time</strong></p>
+<pre><code class="language-python">import time
+
+big = sorted(range(1_000_000))
+target = 999_999
+
+start = time.perf_counter()
+linear_search(big, target)
+print(f&quot;linear : {time.perf_counter() - start:.4f}s&quot;)
+
+start = time.perf_counter()
+binary_search(big, target)
+print(f&quot;binary : {time.perf_counter() - start:.6f}s&quot;)
+</code></pre>
+<p><strong>Step 3: Data-structure choice changes complexity</strong></p>
+<pre><code class="language-python"># list: `in` is O(n)
+nums_list = list(range(1_000_000))
+
+# set: `in` is O(1) on average
+nums_set = set(nums_list)
+
+start = time.perf_counter()
+print(999_999 in nums_list)
+print(f&quot;list   : {time.perf_counter() - start:.4f}s&quot;)
+
+start = time.perf_counter()
+print(999_999 in nums_set)
+print(f&quot;set    : {time.perf_counter() - start:.6f}s&quot;)
+</code></pre>
+<p><strong>Step 4: Compare sorting algorithms</strong></p>
+<pre><code class="language-python">import random
+
+def bubble_sort(arr: list[int]) -&gt; list[int]:
+    &quot;&quot;&quot;O(n^2) — educational only. Do not use this in real code.&quot;&quot;&quot;
+    arr = arr[:]
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if arr[j] &gt; arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+
+small = [random.randint(0, 100) for _ in range(2000)]
+
+start = time.perf_counter()
+bubble_sort(small)
+print(f&quot;bubble (n=2000)  : {time.perf_counter() - start:.4f}s&quot;)
+
+start = time.perf_counter()
+sorted(small)             # Python's sorted is Timsort — O(n log n)
+print(f&quot;sorted (n=2000)  : {time.perf_counter() - start:.6f}s&quot;)
+</code></pre>
+<p><strong>Step 5: Build complexity intuition</strong></p>
+<pre><code class="language-python">def complexity_table(sizes: list[int]) -&gt; None:
+    print(f&quot;{'n':&gt;10} {'O(log n)':&gt;12} {'O(n)':&gt;12} {'O(n log n)':&gt;14} {'O(n^2)':&gt;16}&quot;)
+    for n in sizes:
+        import math
+        log_n = math.log2(n)
+        print(f&quot;{n:&gt;10} {log_n:&gt;12.1f} {n:&gt;12} {n * log_n:&gt;14.0f} {n * n:&gt;16,}&quot;)
+
+complexity_table([10, 100, 1_000, 10_000, 100_000])
+</code></pre>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>The same problem can have different complexities depending on the data structure you pick.</li>
+<li><code>in</code> on a <code>list</code> is O(n); <code>in</code> on a <code>set</code> or <code>dict</code> is O(1) on average.</li>
+<li>Use the standard library for sorting (<code>sorted</code>, <code>list.sort</code>) — Timsort guarantees O(n log n).</li>
+<li>Binary search only applies when the input is sorted.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Measuring on small data and feeling safe</strong><br>
+- Problem: Performance explodes as n grows<br>
+- Fix: Measure with 10x and 100x larger inputs</p>
+<p><strong>Repeated <code>in</code> checks against a <code>list</code></strong><br>
+- Problem: Cumulative O(n^2)<br>
+- Fix: Convert lookup targets to a <code>set</code> or <code>dict</code></p>
+<p><strong>Obsessing over micro-optimization</strong><br>
+- Problem: You shave constants while the order stays the same<br>
+- Fix: First lower the algorithmic order</p>
+<p><strong>Trying to make every line O(1)</strong><br>
+- Problem: Lower readability and ballooning memory<br>
+- Fix: Optimize only the bottleneck</p>
+<p><strong>Confusing average and worst-case complexity</strong><br>
+- Problem: Assuming dict is always O(1)<br>
+- Fix: Hash collisions push the worst case to O(n)</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Tracking API response time regression as data grows.</li>
+<li>Reading database EXPLAIN output and seeing how indexes change complexity.</li>
+<li>Picking the right cache structure (LRU with <code>OrderedDict</code>, fast membership with <code>set</code>).</li>
+<li>Reducing space complexity in large log processing with streaming algorithms.</li>
+<li>Trading off complexity in search and recommender index structures (B-Tree, Trie, HNSW).</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer computes complexity in their head while reading code. When they see nested loops, the first question is "What happens when n grows?" On small n you cannot tell which is faster, but on large n the algorithm with the lower order always wins.</p>
+<p>They also know that theoretical Big-O and real performance can diverge. Cache friendliness, branch prediction, and allocation costs dominate the constant factor. So they follow the principle: "An optimization you have not measured is a guess."</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can state the order of an algorithm in Big-O</li>
+<li>[ ] I have memorized the complexities of the main <code>list</code>, <code>set</code>, and <code>dict</code> operations</li>
+<li>[ ] I can tell when to use linear vs binary search</li>
+<li>[ ] I can explain why we use the standard library for sorting</li>
+<li>[ ] I do not judge performance only on small inputs</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Write two implementations that detect duplicates in a list of length n — one O(n^2), one O(n) — and compare their wall-clock time.</p>
+</li>
+<li>
+<p>Merge two sorted lists into one sorted list in O(n) time. (Do not use <code>sorted(a + b)</code> since that is O(n log n).)</p>
+</li>
+<li>
+<p>Find the missing integer in 1..n in O(n) time and O(1) space.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>An algorithm is a procedure for solving a problem. Complexity is its cost. Big-O describes the upper bound on growth as input grows. Data-structure choice drives complexity, so you must know the operation costs of <code>list</code>, <code>set</code>, and <code>dict</code>. Senior engineers do not optimize without measuring.</p>
+<p>The next article opens up the machine that actually runs these algorithms — CPU, memory, and the cache hierarchy.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><strong>Algorithms and Complexity (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.bigocheatsheet.com/">Big-O Cheat Sheet</a></li>
+<li><a href="https://wiki.python.org/moin/TimeComplexity">Python TimeComplexity Wiki</a></li>
+<li><a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">Introduction to Algorithms (CLRS)</a></li>
+<li><a href="https://www-cs-faculty.stanford.edu/~knuth/taocp.html">Donald Knuth — The Art of Computer Programming</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Algorithms, Complexity, Big-O, Data Structures, Performance</p>
+</body>
+</html>
