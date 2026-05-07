@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Docker Compose</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Docker Compose</h1>
+<blockquote>
+<p>Docker 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you start many containers <em>reproducibly</em> and <em>all at once</em>?</p>
+<blockquote>
+<p><em>Compose codifies a </em>multi-container environment<em> into </em>one YAML file<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Defining <em>services / networks / volumes</em></li>
+<li><em>depends_on</em> and healthchecks</li>
+<li><em>profiles</em> for <em>selective execution</em></li>
+<li><em>.env</em> files and variable interpolation</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>New-hire setup finishes in <em>under five minutes</em>. The <em>README setup section</em> simply disappears.</p>
+<blockquote>
+<p><em>Compose is the shortest path to </em>environment-as-code<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Compose[&quot;compose.yaml&quot;] --&gt; Web[&quot;web service&quot;]
+    Compose --&gt; Db[&quot;db service&quot;]
+    Compose --&gt; Cache[&quot;cache service&quot;]
+    Web --&gt; Net[&quot;app-net&quot;]
+    Db --&gt; Net
+    Cache --&gt; Net
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Service</strong>: a <em>group of containers</em> from one image.</li>
+<li><strong>Project</strong>: the <em>logical unit</em> Compose manages.</li>
+<li><strong>Profile</strong>: a <em>bundle of services</em> that runs only in a specific scenario.</li>
+<li><strong>Healthcheck</strong>: the criterion for <em>readiness</em>.</li>
+<li><strong>depends_on</strong>: start <em>order</em> and <em>waiting</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: five <code>docker run</code> commands wrapped in a <em>shell script</em>. Options are <em>remembered, not written down</em>.</p>
+<p><strong>After</strong>: <code>docker compose up</code>. Every option is <em>explicit in YAML</em>.</p>
+<h2>Hands-on: Compose in 5 Steps</h2>
+<p><strong>Step 1 — <code>compose.yaml</code></strong></p>
+<pre><code class="language-yaml">services:
+  web:
+    build: .
+    ports: [&quot;8000:8000&quot;]
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: dev
+    volumes: [&quot;pgdata:/var/lib/postgresql/data&quot;]
+    healthcheck:
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U postgres&quot;]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+volumes:
+  pgdata:
+</code></pre>
+<p><strong>Step 2 — Bring it up</strong></p>
+<pre><code class="language-bash">docker compose up -d
+docker compose ps
+docker compose logs -f web
+</code></pre>
+<p><strong>Step 3 — Variables (<code>.env</code>)</strong></p>
+<pre><code class="language-bash"># .env
+DB_PASSWORD=dev
+APP_PORT=8000
+</code></pre>
+<pre><code class="language-yaml">environment:
+  POSTGRES_PASSWORD: ${DB_PASSWORD}
+ports: [&quot;${APP_PORT}:8000&quot;]
+</code></pre>
+<p><strong>Step 4 — Profile</strong></p>
+<pre><code class="language-yaml">services:
+  worker:
+    image: myapp:1.0
+    profiles: [&quot;worker&quot;]
+</code></pre>
+<pre><code class="language-bash">docker compose --profile worker up -d
+</code></pre>
+<p><strong>Step 5 — Tear down</strong></p>
+<pre><code class="language-bash">docker compose down            # remove containers
+docker compose down -v         # also remove volumes
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>healthcheck + condition: service_healthy</em> waits for <em>real readiness</em>.</li>
+<li><code>depends_on</code> alone only ensures <em>start order</em>, not readiness.</li>
+<li><em>profiles</em> is the standard for <em>optional services</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Trusting <code>depends_on</code> and <em>connecting before DB is ready</em>.</strong> Healthcheck is required.</li>
+<li><strong>Always running <code>up</code>, <em>never</em> <code>down -v</code>.</strong> Data sits <em>contaminated</em>.</li>
+<li><strong>Committing <code>.env</code>.</strong> Secrets leak.</li>
+<li><strong>Running <em>all services always</em> without profiles.</strong> Resource waste.</li>
+<li><strong>Multiple projects on the <em>same port</em>.</strong> Conflicts.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most companies' <em>local dev environments</em> run on Compose. CI also uses it for <em>integration test bootstrapping</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Setup must be </em>one command*.</li>
+<li><code>depends_on</code> without a healthcheck is <em>a lie</em>.</li>
+<li>Keep <code>.env</code> and <code>.env.example</code> <em>separate</em>.</li>
+<li><em>Profiles</em> split <em>complexity</em>.</li>
+<li>Use <code>down -v</code> only when you can <em>recover</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] All services live in <em>one compose.yaml</em>.</li>
+<li>[ ] Dependent services have a <em>healthcheck</em>.</li>
+<li>[ ] <em>.env / .env.example</em> are split.</li>
+<li>[ ] Optional services use <em>profiles</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Bring up <em>web + db + redis</em> via Compose.</li>
+<li>Add a <em>healthcheck</em> on db so web starts <em>after readiness</em>.</li>
+<li>Move ports into <em>.env</em> and reference them.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Compose is your team's <em>first piece of infrastructure as code</em>. Next, the patterns of <em>environment variables and configuration</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
+<li><strong>Docker Compose (current)</strong></li>
+<li>Environment Variables and Configuration (upcoming)</li>
+<li>Containerizing a Python App (upcoming)</li>
+<li>Running with a Database (upcoming)</li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/compose/compose-file/">Compose specification</a></li>
+<li><a href="https://docs.docker.com/compose/">Overview of Compose</a></li>
+<li><a href="https://docs.docker.com/compose/profiles/">Compose profiles</a></li>
+<li><a href="https://docs.docker.com/compose/compose-file/05-services/#healthcheck">Healthcheck in Compose</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Compose, YAML, MultiContainer, Dev</p>
+</body>
+</html>

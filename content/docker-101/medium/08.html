@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Running with a Database</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Running with a Database</h1>
+<blockquote>
+<p>Docker 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you run your containerized <em>Python app</em> together with <em>PostgreSQL</em> properly?</p>
+<blockquote>
+<p><em>The heart of a DB container is the </em>three-step rhythm<em> of </em>persistence, readiness, and migrations<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Running <em>PostgreSQL with Compose</em></li>
+<li><em>Healthchecks</em> and <em>startup order</em></li>
+<li>Automating <em>Alembic migrations</em></li>
+<li><em>Seed data</em> patterns</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If the app starts <em>before</em> the DB is ready, you get <em>cold-start incidents</em>. If migrations are <em>not automated</em>, deployments become <em>manual</em>.</p>
+<blockquote>
+<p><em>The app-DB seam is the </em>most common incident site<em> and the </em>biggest automation opportunity<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Compose[&quot;compose.yaml&quot;] --&gt; Db[&quot;postgres + healthcheck&quot;]
+    Db --&gt;|service_healthy| Mig[&quot;alembic upgrade head&quot;]
+    Mig --&gt; Web[&quot;fastapi&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Migration</strong>: schema <em>versioning</em>.</li>
+<li><strong>Seed</strong>: initial <em>baseline data</em>.</li>
+<li><strong>Healthcheck</strong>: DB <em>readiness signal</em>.</li>
+<li><strong>Init container</strong>: a <em>one-shot</em> migration container.</li>
+<li><strong>Volume</strong>: persistent <em>DB data</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>manual SQL</em> in every new environment. Migrations are <em>order-dependent</em>.</p>
+<p><strong>After</strong>: <code>docker compose up</code> brings up <em>DB + migration + app</em> <em>in order</em> with one line.</p>
+<h2>Hands-on: App + DB in 5 Steps</h2>
+<p><strong>Step 1 — <code>compose.yaml</code></strong></p>
+<pre><code class="language-yaml">services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: app
+    volumes: [&quot;pgdata:/var/lib/postgresql/data&quot;]
+    healthcheck:
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U postgres -d app&quot;]
+      interval: 5s
+      retries: 10
+
+  migrate:
+    image: myapi:1.0
+    command: [&quot;alembic&quot;, &quot;upgrade&quot;, &quot;head&quot;]
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:dev@db/app
+    depends_on:
+      db: { condition: service_healthy }
+
+  web:
+    image: myapi:1.0
+    ports: [&quot;8000:8000&quot;]
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:dev@db/app
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+volumes:
+  pgdata:
+</code></pre>
+<p><strong>Step 2 — Initialize Alembic</strong></p>
+<pre><code class="language-bash">docker compose run --rm migrate alembic init alembic
+docker compose run --rm migrate alembic revision --autogenerate -m &quot;init&quot;
+</code></pre>
+<p><strong>Step 3 — Seed</strong></p>
+<pre><code class="language-python"># app/seed.py
+def seed(session) -&gt; None:
+    if session.query(User).count() == 0:
+        session.add(User(email=&quot;admin@example.com&quot;))
+        session.commit()
+</code></pre>
+<pre><code class="language-yaml">seed:
+  image: myapi:1.0
+  command: [&quot;python&quot;, &quot;-m&quot;, &quot;app.seed&quot;]
+  depends_on:
+    migrate: { condition: service_completed_successfully }
+</code></pre>
+<p><strong>Step 4 — Bring it up and verify</strong></p>
+<pre><code class="language-bash">docker compose up -d
+docker compose exec db psql -U postgres -d app -c &quot;\dt&quot;
+curl http://localhost:8000/users
+</code></pre>
+<p><strong>Step 5 — Backup</strong></p>
+<pre><code class="language-bash">docker compose exec db pg_dump -U postgres app &gt; app.sql
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>condition: service_healthy</em> guarantees <em>real</em> readiness.</li>
+<li><code>migrate</code> is a <em>one-shot init container</em>.</li>
+<li><em>Seeds</em> must be <em>idempotent</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Connecting via <code>depends_on</code> alone.</strong> Without a healthcheck, <em>cold-start fails</em>.</li>
+<li><strong>Running migrations from the <em>web entrypoint</em>.</strong> <em>Each worker re-runs</em> them.</li>
+<li><strong>Mounting the DB via <em>bind mount</em>.</strong> Permission and performance issues.</li>
+<li><strong>Keeping the <em>default <code>POSTGRES_PASSWORD</code></em>.</strong> Immediate compromise once exposed.</li>
+<li><strong>No <em>backup procedure</em>.</strong> Game over after an incident.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Real deployments use <em>managed DBs</em> like RDS / Cloud SQL, but local and CI converge on the same Compose to keep <em>environment parity</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Migrations must be </em>automatic, idempotent, single-runner*.</li>
+<li><em>Healthchecks must be honest</em> for startup order to mean anything.</li>
+<li><em>DB data lives in a named volume and gets backed up</em>.</li>
+<li><em>Seeds</em> are about <em>idempotency</em>.</li>
+<li><em>Passwords come from a secret store; never default</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] DB has a <em>healthcheck</em>.</li>
+<li>[ ] <em>Migration</em> is <em>separated as one-shot</em>.</li>
+<li>[ ] Data is on a <em>named volume</em>.</li>
+<li>[ ] A <em>backup command</em> is documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Bring up <em>postgres + migrate + web</em> with Compose and verify <em>ordered startup</em>.</li>
+<li>Make Alembic migrations <em>run automatically</em>.</li>
+<li>Write <em>idempotent seed data</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A clean app-DB seam drops <em>team setup cost</em> toward <em>zero</em>. Next, <em>image optimization</em> makes builds and pulls fast.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker Compose</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Environment Variables and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/07-python-app-containerize.md">Containerizing a Python App</a></li>
+<li><strong>Running with a Database (current)</strong></li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://hub.docker.com/_/postgres">PostgreSQL official image</a></li>
+<li><a href="https://docs.docker.com/compose/compose-file/05-services/#depends_on">Compose - service_completed_successfully</a></li>
+<li><a href="https://alembic.sqlalchemy.org/">Alembic documentation</a></li>
+<li><a href="https://www.postgresql.org/docs/current/app-pg-isready.html">pg_isready</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Postgres, Compose, Migration, Healthcheck</p>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Writing a Dockerfile</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Writing a Dockerfile</h1>
+<blockquote>
+<p>Docker 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: To make images <em>reproducible</em>, <em>which commands</em> go in <em>what order</em>?</p>
+<blockquote>
+<p><em>A Dockerfile is both a </em>build recipe<em> and </em>documentation<em>. The </em>order of instructions<em> drives both </em>cache efficiency<em> and </em>debugging difficulty<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What <em>FROM / RUN / COPY / CMD</em> mean</li>
+<li>An <em>ordering strategy</em> for the <em>layer cache</em></li>
+<li>The importance of <em>.dockerignore</em></li>
+<li>Running as a <em>non-root user</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>One ordering choice</em> turns a build from <em>5 minutes into 30 seconds</em>. A good Dockerfile <em>visibly</em> changes team productivity.</p>
+<blockquote>
+<p><em>Slow builds are a </em>quiet cost<em>. At 50 builds a day, you lose </em>hundreds of hours per year<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Base[&quot;FROM python:3.12-slim&quot;] --&gt; Deps[&quot;COPY requirements + RUN pip install&quot;]
+    Deps --&gt; Code[&quot;COPY .&quot;]
+    Code --&gt; Cmd[&quot;CMD&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>FROM</strong>: pick a <em>base image</em>.</li>
+<li><strong>RUN</strong>: execute a <em>command at build time</em>.</li>
+<li><strong>COPY</strong>: copy files in.</li>
+<li><strong>CMD</strong>: the <em>default command</em> when a container starts.</li>
+<li><strong>ENTRYPOINT</strong>: a <em>fixed entry point</em> always invoked.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>COPY .</code> sits at the top, so <em>one code change</em> triggers a <em>full rebuild</em>.</p>
+<p><strong>After</strong>: <em>low-change steps</em> up top, <em>high-change steps</em> below. <em>Cache hit rate above 90%</em>.</p>
+<h2>Hands-on: Dockerfile in 5 Steps</h2>
+<p><strong>Step 1 — Minimal Dockerfile</strong></p>
+<pre><code class="language-dockerfile">FROM python:3.12-slim
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+CMD [&quot;python&quot;, &quot;app.py&quot;]
+</code></pre>
+<p><strong>Step 2 — Optimize layer order</strong></p>
+<pre><code class="language-dockerfile">FROM python:3.12-slim
+WORKDIR /app
+
+# 1) low change frequency
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 2) high change frequency
+COPY . .
+
+CMD [&quot;python&quot;, &quot;app.py&quot;]
+</code></pre>
+<p><strong>Step 3 — <code>.dockerignore</code></strong></p>
+<pre><code class="language-text">__pycache__/
+.venv/
+.git/
+*.log
+.env
+node_modules/
+</code></pre>
+<p><strong>Step 4 — Non-root user</strong></p>
+<pre><code class="language-dockerfile">RUN useradd -m -u 1000 appuser
+USER appuser
+</code></pre>
+<p><strong>Step 5 — Build and run</strong></p>
+<pre><code class="language-bash">docker build -t myapp:1.0 .
+docker run --rm myapp:1.0
+docker history myapp:1.0
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Requirements copied first</em> -&gt; the <em>deps layer caches</em>.</li>
+<li>Without <code>.dockerignore</code>, <em>.git</em> is copied wholesale.</li>
+<li>Skipping <code>USER</code> means <em>running as root</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><code>COPY .</code> at the <em>top</em>.</strong> Every change triggers a <em>full rebuild</em>.</li>
+<li><strong>Splitting <code>apt update</code> and <code>install</code> across <em>separate RUN</em>s.</strong> Caches give you <em>stale packages</em>.</li>
+<li><strong>Forgetting to <em>clear caches</em> after <code>pip install</code>.</strong> Image <em>doubles in size</em>.</li>
+<li><strong>No <code>.dockerignore</code>.</strong> <code>.git</code> and <code>.env</code> end up <em>inside the image</em>.</li>
+<li><strong>Running as <em>root</em>.</strong> A security incident waiting to happen.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams use <em>multi-stage builds</em> and <em>BuildKit cache mounts</em> to cut build times to <em>one tenth</em> (covered in episode 9).</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Dockerfiles are also documentation</em>.</li>
+<li><em>Low to high change frequency, top to bottom</em>.</li>
+<li><em>.dockerignore is also a security control</em>.</li>
+<li><em>Be deliberate</em> about CMD vs ENTRYPOINT.</li>
+<li><em>Non-root</em> is the <em>default</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Layer order</em> follows <em>change frequency</em>.</li>
+<li>[ ] A <code>.dockerignore</code> exists.</li>
+<li>[ ] Container runs as <em>non-root</em>.</li>
+<li>[ ] <em>Deps and code</em> are in separate steps.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Edit only code (not requirements) and confirm a <em>cache hit</em>.</li>
+<li>Add a <code>.dockerignore</code> to shrink your image.</li>
+<li>Build a Dockerfile that runs as a <em>non-root user</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A good Dockerfile <em>saves your team time every day</em>. Next, <em>volumes and networks</em> for data and communication.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
+<li><strong>Writing a Dockerfile (current)</strong></li>
+<li>Volumes and Networks (upcoming)</li>
+<li>Docker Compose (upcoming)</li>
+<li>Environment Variables and Configuration (upcoming)</li>
+<li>Containerizing a Python App (upcoming)</li>
+<li>Running with a Database (upcoming)</li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/engine/reference/builder/">Dockerfile reference</a></li>
+<li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Best practices for writing Dockerfiles</a></li>
+<li><a href="https://docs.docker.com/engine/reference/builder/#dockerignore-file">Use a .dockerignore file</a></li>
+<li><a href="https://docs.docker.com/build/buildkit/">BuildKit</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Dockerfile, Build, Layer, Cache</p>
+</body>
+</html>

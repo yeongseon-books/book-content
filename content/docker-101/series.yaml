@@ -1,0 +1,52 @@
+id: docker-101
+title:
+  ko: Docker 101
+  en: Docker 101
+description:
+  ko: Image, Container, Dockerfile, Volume, Network, Compose, 환경 설정, Python 앱 컨테이너화, 이미지 최적화, 배포 구성을 다루는 입문 시리즈.
+  en: Images, containers, Dockerfile, volumes, networks, Compose, configuration, Python apps, image optimization, and production-ready deploy.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-docker
+    title:
+      ko: Docker란 무엇인가?
+      en: What Is Docker?
+  - slug: image-and-container
+    title:
+      ko: Image와 Container
+      en: Images and Containers
+  - slug: dockerfile
+    title:
+      ko: Dockerfile 작성하기
+      en: Writing a Dockerfile
+  - slug: volume-and-network
+    title:
+      ko: Volume과 Network
+      en: Volumes and Networks
+  - slug: docker-compose
+    title:
+      ko: Docker Compose
+      en: Docker Compose
+  - slug: env-and-config
+    title:
+      ko: 환경변수와 설정
+      en: Environment Variables and Configuration
+  - slug: python-app-containerize
+    title:
+      ko: Python 앱 컨테이너화
+      en: Containerizing a Python App
+  - slug: database-with-app
+    title:
+      ko: 데이터베이스와 함께 실행하기
+      en: Running with a Database
+  - slug: image-optimization
+    title:
+      ko: Image 최적화
+      en: Image Optimization
+  - slug: production-docker
+    title:
+      ko: 배포용 Docker 구성
+      en: Production-Ready Docker

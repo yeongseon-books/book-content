@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Images and Containers</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Images and Containers</h1>
+<blockquote>
+<p>Docker 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Images are immutable; containers change</em> — what does that <em>actually</em> mean in practice?</p>
+<blockquote>
+<p><em>An image is a </em>class<em>; a container is an </em>instance<em>. Keeping them separate makes debugging tractable.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>lifecycle</em> of <em>images</em> and <em>containers</em></li>
+<li><em>Layers</em> and <em>copy-on-write</em></li>
+<li>The <em>ten commands</em> you actually use</li>
+<li>How to <em>look inside</em> a container</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you do not understand how containers behave, <em>debugging becomes luck</em>. Knowing layers and lifecycle makes <em>80% of issues</em> <em>predictable</em>.</p>
+<blockquote>
+<p><em>Half of "non-reproducible" bugs come from </em>misunderstanding container state<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Image[&quot;Image (immutable)&quot;] --&gt; Run[&quot;docker run&quot;]
+    Run --&gt; Container[&quot;Container (mutable)&quot;]
+    Container --&gt; Stop[&quot;Stopped&quot;]
+    Stop --&gt; Rm[&quot;Removed&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Layer</strong>: a <em>read-only filesystem slice</em> inside an image.</li>
+<li><strong>Writable layer</strong>: the <em>top read-write layer</em> a container owns.</li>
+<li><strong>Lifecycle</strong>: created -&gt; running -&gt; stopped -&gt; removed.</li>
+<li><strong>Tag</strong>: an image version label (<code>nginx:1.27</code>).</li>
+<li><strong>Digest</strong>: the <em>immutable SHA256</em> identifier of an image.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: you <code>apt install</code> inside a container, then panic when it <em>vanishes on restart</em>.</p>
+<p><strong>After</strong>: changes are <em>codified in a Dockerfile</em>; containers can be <em>thrown away anytime</em>.</p>
+<h2>Hands-on: Images and Containers in 5 Steps</h2>
+<p><strong>Step 1 — Inspect an image</strong></p>
+<pre><code class="language-bash">docker pull nginx:1.27
+docker image inspect nginx:1.27 | jq '.[0].RootFS.Layers'
+docker history nginx:1.27
+</code></pre>
+<p><strong>Step 2 — Create and start a container</strong></p>
+<pre><code class="language-bash">docker create --name web nginx:1.27   # create only
+docker start web                       # then start
+docker ps
+</code></pre>
+<p><strong>Step 3 — Step inside</strong></p>
+<pre><code class="language-bash">docker exec -it web bash
+# inside the container
+ls /etc/nginx
+exit
+</code></pre>
+<p><strong>Step 4 — Changes are <em>ephemeral</em></strong></p>
+<pre><code class="language-bash">docker exec web touch /tmp/hello
+docker stop web &amp;&amp; docker rm web
+docker run --name web2 nginx:1.27
+docker exec web2 ls /tmp/hello   # No such file
+</code></pre>
+<p><strong>Step 5 — Clean up images</strong></p>
+<pre><code class="language-bash">docker image prune -f          # remove dangling
+docker image rm nginx:1.27
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>docker history</code> shows the <em>commands behind each layer</em>.</li>
+<li>Container changes are lost <em>unless you commit</em>.</li>
+<li>A <em>digest</em> is <em>much more trustworthy</em> than a tag.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Storing files <em>permanently inside the container</em>.</strong> Lost on restart.</li>
+<li><strong>Building images via <code>docker commit</code>.</strong> <em>Not reproducible</em>.</li>
+<li><strong>Letting stopped containers <em>pile up</em>.</strong> <code>docker ps -a</code> becomes <em>hundreds of lines</em>.</li>
+<li><strong>Using only <code>latest</code>.</strong> Compatibility breaks one morning.</li>
+<li><strong>Images with <em>too many layers</em>.</strong> Build and pull get slow.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>CI systems build with <em>digest pins</em> for reproducibility, and operations correlate <em>image-level change history</em> with Datadog/Grafana to <em>track change-related incidents</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Images are built; containers are run</em>.</li>
+<li><em>Change is code</em>; <code>commit</code> is the <em>last resort</em>.</li>
+<li><em>Digest pins</em> are the <em>production default</em>.</li>
+<li><em>Layer caching</em> drives <em>build speed</em>.</li>
+<li><em>Design containers to be discarded at any time</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain <em>image vs container</em>.</li>
+<li>[ ] You know container changes are <em>ephemeral</em>.</li>
+<li>[ ] You use <em>layers / digests</em>.</li>
+<li>[ ] You <em>clean up</em> stopped containers.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find the <em>number of layers</em> in <code>nginx:1.27</code>.</li>
+<li>Create a file inside a container, restart it, confirm it is gone.</li>
+<li>Run <code>docker image prune</code> to clear <em>unused images</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Separating images and containers is the <em>fundamentals</em> of Docker. Next we <em>build images with Dockerfile</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><strong>Images and Containers (current)</strong></li>
+<li>Writing a Dockerfile (upcoming)</li>
+<li>Volumes and Networks (upcoming)</li>
+<li>Docker Compose (upcoming)</li>
+<li>Environment Variables and Configuration (upcoming)</li>
+<li>Containerizing a Python App (upcoming)</li>
+<li>Running with a Database (upcoming)</li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/engine/reference/commandline/image/">Docker images</a></li>
+<li><a href="https://docs.docker.com/engine/reference/commandline/container/">Docker container lifecycle</a></li>
+<li><a href="https://docs.docker.com/storage/storagedriver/">Storage drivers and layers</a></li>
+<li><a href="https://docs.docker.com/engine/reference/commandline/pull/#pull-an-image-by-digest-immutable-identifier">Image digests</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Image, Container, Layer, Lifecycle</p>
+</body>
+</html>

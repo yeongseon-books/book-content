@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Containerizing a Python App</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Containerizing a Python App</h1>
+<blockquote>
+<p>Docker 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What do you actually have to handle to containerize a <em>FastAPI app</em> at <em>production grade</em>?</p>
+<blockquote>
+<p><em>Python containerization becomes </em>real<em> the moment you handle </em>PID 1, signals, healthcheck, and non-root<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Containerizing <em>FastAPI + uvicorn</em></li>
+<li><em>Signal handling at PID 1</em> (SIGTERM)</li>
+<li>Adding a <em>healthcheck</em></li>
+<li><em>Non-root user</em> and permissions</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Python in a container</em> often <em>fails to receive SIGTERM</em>, breaking <em>graceful shutdown</em>. This is a common cause of <em>deploy incidents</em>.</p>
+<blockquote>
+<p><em>PID 1 in a container needs to be a </em>small init<em> or a process with </em>correct signal handling<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Build[&quot;Dockerfile (slim, deps cache)&quot;] --&gt; Run[&quot;uvicorn app:app&quot;]
+    Run --&gt; HC[&quot;healthcheck&quot;]
+    HC --&gt; Sig[&quot;graceful SIGTERM&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>PID 1</strong>: the <em>first process</em> in a container.</li>
+<li><strong>SIGTERM</strong>: the <em>graceful</em> termination signal.</li>
+<li><strong>Graceful shutdown</strong>: finishing <em>in-flight requests</em> before exit.</li>
+<li><strong>Healthcheck</strong>: container reports its <em>health</em>.</li>
+<li><strong>Tini</strong>: a <em>tiny init</em> process.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>python app.py</code> runs directly. SIGTERM is ignored, then the process is <em>killed</em>.</p>
+<p><strong>After</strong>: <code>uvicorn</code> + <code>tini</code> deliver <em>graceful shutdown</em>. The healthcheck reports <em>readiness</em>.</p>
+<h2>Hands-on: Python Container in 5 Steps</h2>
+<p><strong>Step 1 — App code (<code>app.py</code>)</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get(&quot;/healthz&quot;)
+def healthz() -&gt; dict[str, str]:
+    return {&quot;status&quot;: &quot;ok&quot;}
+
+@app.get(&quot;/&quot;)
+def root() -&gt; dict[str, str]:
+    return {&quot;hello&quot;: &quot;world&quot;}
+</code></pre>
+<p><strong>Step 2 — Dockerfile</strong></p>
+<pre><code class="language-dockerfile">FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# deps layer
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# app layer
+COPY . .
+
+RUN useradd -m -u 1000 appuser
+USER appuser
+
+EXPOSE 8000
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
+  CMD python -c &quot;import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()&quot; || exit 1
+
+# tini at PID 1 forwards SIGTERM
+ENTRYPOINT [&quot;tini&quot;, &quot;--&quot;]
+CMD [&quot;uvicorn&quot;, &quot;app:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]
+</code></pre>
+<p><strong>Step 3 — <code>requirements.txt</code></strong></p>
+<pre><code class="language-text">fastapi==0.115.*
+uvicorn[standard]==0.30.*
+</code></pre>
+<p><strong>Step 4 — Build and run</strong></p>
+<pre><code class="language-bash">docker build -t myapi:1.0 .
+docker run -d --name api -p 8000:8000 myapi:1.0
+curl http://localhost:8000/healthz
+</code></pre>
+<p><strong>Step 5 — Verify graceful shutdown</strong></p>
+<pre><code class="language-bash">docker stop api    # sends SIGTERM, uvicorn drains in-flight requests
+docker logs api | tail
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Deps -&gt; code</em> ordering for <em>cache efficiency</em>.</li>
+<li><em>tini</em> forwards <em>signals correctly</em>.</li>
+<li>The <em>healthcheck</em> cooperates with the orchestrator.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Running <code>python app.py</code> <em>directly</em>.</strong> SIGTERM is <em>ignored</em>.</li>
+<li><strong>Setting <code>workers</code> to <em>4x cores</em>.</strong> <em>Memory blow-up</em>.</li>
+<li><strong><code>pip install</code> running <em>on every code change</em>.</strong> Minutes of build cost.</li>
+<li><strong>Running as <em>root</em>.</strong> Security incident.</li>
+<li><strong>Healthcheck <em>also probes the DB</em>.</strong> <em>False negatives</em> skyrocket.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>In real deployments, <em>Gunicorn + Uvicorn worker</em>, <em>prometheus-fastapi-instrumentator</em> for metrics, and <em>OpenTelemetry</em> for traces are standard.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Be aware of PID 1</em>.</li>
+<li><em>Graceful shutdown</em> is <em>user trust</em>.</li>
+<li><em>Healthcheck must be light</em>; check dependencies on <em>another endpoint</em>.</li>
+<li><em>Non-root</em> is the <em>default</em>.</li>
+<li>Pick <em>worker count</em> after <em>measuring load</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>tini</em> or equivalent init is used.</li>
+<li>[ ] <em>Healthcheck</em> is light and accurate.</li>
+<li>[ ] Container runs as <em>non-root</em>.</li>
+<li>[ ] <em>Graceful shutdown</em> verified.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Containerize a FastAPI app and verify <code>/healthz</code>.</li>
+<li>Confirm <code>docker stop</code> lets <em>in-flight requests</em> complete <em>before exit</em>.</li>
+<li>Add <code>USER</code> to run as <em>non-root</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The real difficulty of Python containers is <em>signals and healthcheck</em>. Next, we run <em>with a database</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker Compose</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Environment Variables and Configuration</a></li>
+<li><strong>Containerizing a Python App (current)</strong></li>
+<li>Running with a Database (upcoming)</li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://fastapi.tiangolo.com/deployment/docker/">FastAPI in containers</a></li>
+<li><a href="https://www.uvicorn.org/deployment/">Uvicorn deployment</a></li>
+<li><a href="https://github.com/krallin/tini">tini - a tiny init for containers</a></li>
+<li><a href="https://docs.docker.com/engine/reference/builder/#healthcheck">Dockerfile HEALTHCHECK</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Python, FastAPI, Uvicorn, PID1</p>
+</body>
+</html>

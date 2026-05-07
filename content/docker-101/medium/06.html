@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Environment Variables and Configuration</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Environment Variables and Configuration</h1>
+<blockquote>
+<p>Docker 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: With <em>one image</em>, how do you inject <em>different settings per environment</em>?</p>
+<blockquote>
+<p><em>Configuration belongs </em>outside the code<em>; secrets belong </em>outside the image<em>. The most important </em>twelve-factor<em> principle.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>ENV</em> and <em>ARG</em></li>
+<li>Splitting <em>env vars / config files / secrets</em></li>
+<li>Wiring <em>Compose</em> to <em>external secret tools</em></li>
+<li>Patterns for <em>defaults and validation</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The <em>same image</em> must flow from <em>dev to staging to prod</em> unchanged for <em>reproducibility</em>. If per-environment config sneaks into code, that trust is gone.</p>
+<blockquote>
+<p><em>Images are build artifacts; environments are </em>runtime context<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Image[&quot;app:1.0 (immutable)&quot;] --&gt; Dev[&quot;dev env vars&quot;]
+    Image --&gt; Stg[&quot;staging env vars&quot;]
+    Image --&gt; Prd[&quot;prod env vars&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>ENV</strong>: a <em>default env var</em> in the Dockerfile.</li>
+<li><strong>ARG</strong>: a <em>build-time</em> variable.</li>
+<li><strong><code>-e</code> / <code>--env-file</code></strong>: runtime injection.</li>
+<li><strong>Config volume</strong>: mount a <em>config file</em> in.</li>
+<li><strong>Secret store</strong>: external secrets via <em>Vault / Doppler</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: separate images for prod and dev, <em>each built independently</em>.</p>
+<p><strong>After</strong>: <em>one image</em>. Behavior changes by <em>flipping env vars</em>.</p>
+<h2>Hands-on: Env Vars in 5 Steps</h2>
+<p><strong>Step 1 — ENV/ARG in the Dockerfile</strong></p>
+<pre><code class="language-dockerfile">ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION} \
+    LOG_LEVEL=INFO
+</code></pre>
+<p><strong>Step 2 — Runtime injection</strong></p>
+<pre><code class="language-bash">docker run --rm \
+  -e LOG_LEVEL=DEBUG \
+  -e DB_URL=postgres://user:pass@db:5432/app \
+  myapp:1.0
+</code></pre>
+<p><strong>Step 3 — <code>--env-file</code></strong></p>
+<pre><code class="language-bash"># .env.staging
+LOG_LEVEL=INFO
+DB_URL=postgres://user:pass@stg-db:5432/app
+
+docker run --rm --env-file .env.staging myapp:1.0
+</code></pre>
+<p><strong>Step 4 — Variables in Compose</strong></p>
+<pre><code class="language-yaml">services:
+  web:
+    image: myapp:1.0
+    env_file: .env.${ENV:-dev}
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+</code></pre>
+<p><strong>Step 5 — Externalize secrets</strong></p>
+<pre><code class="language-bash"># Doppler
+doppler run -- docker compose up -d
+# Vault (envconsul)
+envconsul -secret secret/app -- docker compose up -d
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Defaults</em> (<code>${VAR:-default}</code>) protect against <em>missing values</em>.</li>
+<li>Splitting <em>.env.dev</em> and <em>.env.staging</em> makes the environment <em>explicit</em>.</li>
+<li><em>Secrets</em> never sit <em>inside Compose</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Hardcoding a secret in <em>Dockerfile ENV</em>.</strong> Forever embedded in the image.</li>
+<li><strong>Committing <code>.env</code> to <em>Git</em>.</strong> Leak.</li>
+<li><strong>Building a <em>separate image per environment</em>.</strong> Reproducibility gone.</li>
+<li><strong>Letting missing vars <em>quietly default to empty</em>.</strong> Runtime incident.</li>
+<li><strong>Logging an <em>env var dump</em>.</strong> Secret exposure.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams let <em>Vault / Doppler / 1Password</em> be the <em>runtime secret provider</em> and the codebase keeps <em>only variable names</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Image is environment-agnostic</em>; <em>environment lives in variables</em>.</li>
+<li><em>A secret in an image has already leaked</em>.</li>
+<li><em>Validate variables at startup</em> and <em>fail fast</em>.</li>
+<li><em>Defaults</em> lean to the <em>safe side</em>.</li>
+<li>Always commit a <em>.env.example</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] The image is <em>environment-agnostic</em>.</li>
+<li>[ ] Secrets live in an <em>external store</em>.</li>
+<li>[ ] A <em>.env.example</em> exists.</li>
+<li>[ ] Startup performs <em>variable validation</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Run the <em>same image</em> in <em>dev</em> and <em>staging</em>.</li>
+<li>Split per-environment configuration via <code>--env-file</code>.</li>
+<li>Add code that <em>fails to start</em> when a required variable is missing.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Configuration discipline is half of <em>production stability</em>. Next, we turn a <em>Python app</em> into a <em>complete container</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker Compose</a></li>
+<li><strong>Environment Variables and Configuration (current)</strong></li>
+<li>Containerizing a Python App (upcoming)</li>
+<li>Running with a Database (upcoming)</li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://12factor.net/config">The Twelve-Factor App - Config</a></li>
+<li><a href="https://docs.docker.com/engine/reference/commandline/run/#env">Set environment variables in containers</a></li>
+<li><a href="https://docs.docker.com/compose/environment-variables/">Compose - environment variables</a></li>
+<li><a href="https://docs.docker.com/engine/swarm/secrets/">Manage secrets with Docker</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Config, EnvVar, Secret, 12Factor</p>
+</body>
+</html>
