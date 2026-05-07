@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>code generation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>code generation</h1>
+<blockquote>
+<p>Compilers 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: The IR has unlimited temporaries like <code>t1, t2, t3...</code>. The real CPU only has 16 registers. How do you fit them?</p>
+<blockquote>
+<p>Code generation turns IR into real instructions. The two core jobs are instruction selection (which instructions?) and register allocation (where do values live?).</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The two core problems code generation solves</li>
+<li>The pattern-matching intuition behind instruction selection</li>
+<li>Viewing register allocation as graph coloring</li>
+<li>Spill: deciding to use memory when registers run out</li>
+<li>Why calling conventions and ABIs exist</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Even with everything before this done well, getting the last step wrong means the program does not run. And for the same IR, a poor backend produces code 2-10x slower. Code generation decides the compiler's reputation.</p>
+<blockquote>
+<p>Theory ends at the IR; skill shows in the backend.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;IR&quot;] --&gt; B[&quot;instruction selection&quot;]
+    B --&gt; C[&quot;register allocation&quot;]
+    C --&gt; D[&quot;scheduling&quot;]
+    D --&gt; E[&quot;assembly / machine code&quot;]
+</code></pre>
+<p>These three steps are the skeleton of nearly every backend.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Instruction selection</strong>: choosing which CPU instruction to use for an IR node.</li>
+<li><strong>Register allocation</strong>: mapping virtual registers (temporaries) to physical registers.</li>
+<li><strong>Spill</strong>: storing a temporary to memory when registers run out.</li>
+<li><strong>Calling convention</strong>: the agreement on which registers carry which values across a call.</li>
+<li><strong>ABI (application binary interface)</strong>: the agreement that lets compiled code call into other compiled code.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — IR with unlimited virtual registers</strong></p>
+<pre><code class="language-text">t1 = LOAD a
+t2 = LOAD b
+t3 = t1 + t2
+RET t3
+</code></pre>
+<p><strong>After — real instructions (e.g., x86-64)</strong></p>
+<pre><code class="language-asm">mov rax, [a]
+add rax, [b]
+ret
+</code></pre>
+<p>Virtual registers collapse onto <code>rax</code>, and LOAD/ADD merge into one instruction.</p>
+<h2>Hands-on: a small code generator</h2>
+<p><strong>Step 1 — Straight-line instruction selection</strong></p>
+<pre><code class="language-python"># 1_select.py
+# very simple 1:1 matching
+def select(inst):
+    op, dst, a, b = inst
+    if op == &quot;LOAD&quot;:  return [f&quot;mov {dst}, {a}&quot;]
+    if op == &quot;+&quot;:     return [f&quot;mov {dst}, {a}&quot;, f&quot;add {dst}, {b}&quot;]
+    if op == &quot;*&quot;:     return [f&quot;mov {dst}, {a}&quot;, f&quot;imul {dst}, {b}&quot;]
+    if op == &quot;RET&quot;:   return [f&quot;mov rax, {a}&quot;, &quot;ret&quot;]
+    return [f&quot;; unknown {op}&quot;]
+
+for inst in [(&quot;LOAD&quot;,&quot;t1&quot;,2,None),(&quot;LOAD&quot;,&quot;t2&quot;,3,None),
+             (&quot;+&quot;,&quot;t3&quot;,&quot;t1&quot;,&quot;t2&quot;),(&quot;RET&quot;,None,&quot;t3&quot;,None)]:
+    print(&quot;\n&quot;.join(select(inst)))
+</code></pre>
+<p>Start with very simple 1:1 matching. Better backends do tree-pattern matching.</p>
+<p><strong>Step 2 — Interference graph</strong></p>
+<pre><code class="language-python"># 2_interference.py
+# two temporaries alive at the same time cannot share a register
+# → an edge in the graph
+def interferences(code):
+    live = set(); edges = set()
+    for op, dst, a, b in reversed(code):
+        if op == &quot;RET&quot;:
+            live.add(a); continue
+        if dst in live:
+            live.discard(dst)
+        for x in live:
+            if isinstance(dst, str):
+                edges.add(frozenset({dst, x}))
+        if isinstance(a, str): live.add(a)
+        if isinstance(b, str): live.add(b)
+    return edges
+</code></pre>
+<p>Track liveness from bottom to top, and the edges of "simultaneously live" variables collect.</p>
+<p><strong>Step 3 — Graph coloring intuition</strong></p>
+<pre><code class="language-python"># 3_color.py
+# given K colors (registers), color so adjacent nodes differ
+def greedy_color(nodes, edges, k):
+    color = {}
+    for n in nodes:
+        used = {color[m] for m in nodes if frozenset({n,m}) in edges and m in color}
+        for c in range(k):
+            if c not in used:
+                color[n] = c; break
+        else:
+            color[n] = &quot;SPILL&quot;
+    return color
+</code></pre>
+<p>Nodes that cannot be colored with K colors are spill candidates. Real algorithms are more refined (e.g., chordal graph properties).</p>
+<p><strong>Step 4 — Spill: temporary storage in memory</strong></p>
+<pre><code class="language-python"># 4_spill.py
+# when registers run out, save to stack and reload
+def spill(code, var):
+    new = []
+    for op, dst, a, b in code:
+        if op != &quot;RET&quot; and a == var:
+            new.append((&quot;LOAD&quot;, &quot;tmp&quot;, f&quot;[stack:{var}]&quot;, None)); a = &quot;tmp&quot;
+        if dst == var:
+            new.append((op, &quot;tmp&quot;, a, b))
+            new.append((&quot;STORE&quot;, None, &quot;tmp&quot;, f&quot;[stack:{var}]&quot;)); continue
+        new.append((op, dst, a, b))
+    return new
+</code></pre>
+<p>Slower but correct. A good backend minimizes spills.</p>
+<p><strong>Step 5 — Calling convention</strong></p>
+<pre><code class="language-python"># 5_call.py
+# x86-64 System V: first 6 integer args go in rdi, rsi, rdx, rcx, r8, r9
+# return value in rax
+def emit_call(name, args):
+    regs = [&quot;rdi&quot;,&quot;rsi&quot;,&quot;rdx&quot;,&quot;rcx&quot;,&quot;r8&quot;,&quot;r9&quot;]
+    out = []
+    for r, a in zip(regs, args):
+        out.append(f&quot;mov {r}, {a}&quot;)
+    out.append(f&quot;call {name}&quot;)
+    return out
+
+print(&quot;\n&quot;.join(emit_call(&quot;printf&quot;, [&quot;fmt&quot;, &quot;x&quot;])))
+</code></pre>
+<p>Your function and the library must obey the same agreement for calls to work. That is the ABI.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Instruction selection is a kind of pattern matching.</li>
+<li>The essence of register allocation is graph coloring; production is more refined.</li>
+<li>Spill is not a defeat but a normal tool.</li>
+<li>Violating the calling convention always means a segfault.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Assigning registers without liveness analysis.</strong> You overwrite a register already in use.</li>
+<li><strong>Fearing spill so much that code explodes.</strong> Some spill is necessary.</li>
+<li><strong>Inventing your own calling convention.</strong> You will never interoperate with external libraries.</li>
+<li><strong>Forgetting implicit registers like the flag register (EFLAGS).</strong> Instructions inserted between compare and jump break it.</li>
+<li><strong>Optimizing instruction selection too early.</strong> First make accurate 1:1 selection work.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>LLVM's backend has two paths — SelectionDAG and GlobalISel — with different selection strategies. Register allocators are offered as options like LinearScan (fast) and Greedy (better quality). ABIs differ by OS and architecture, so the same function is called differently on Linux x86-64 and macOS ARM64.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They first check "which ABI does this backend follow?"</li>
+<li>For a new architecture, they check register count and calling convention first.</li>
+<li>They are not afraid of spill — correctness first, performance next.</li>
+<li>They make liveness analysis the starting point of every backend job.</li>
+<li>They always suspect "implicit things" like flags, exceptions, and atomics.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the two core problems code generation solves?</li>
+<li>[ ] Do you understand register allocation as graph coloring?</li>
+<li>[ ] Can you explain what spill is and when it happens?</li>
+<li>[ ] Can you state the difference between calling convention and ABI?</li>
+<li>[ ] Can you say in one sentence why liveness analysis is needed?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add comparison (<code>&lt;</code>) and conditional branch (<code>jl</code>) to the select function above.</li>
+<li>Draw an interference graph and find which node spills when k=2.</li>
+<li>Imagine two function calls fighting for the same register, and reason about whether spill must go between them.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Code generation is the last bridge between the IR and a real CPU. The next post compares when this whole pipeline runs — at compile time or during execution — JIT vs AOT.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">semantic analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/05-symbol-table-and-scope.md">symbol table and scope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/06-intermediate-representation.md">intermediate representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/07-optimization-basics.md">optimization basics</a></li>
+<li><strong>code generation (current)</strong></li>
+<li>JIT vs AOT (upcoming)</li>
+<li>building a tiny interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Code_generation_(compiler)">Code generation (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Register_allocation">Register allocation (Wikipedia)</a></li>
+<li><a href="https://gitlab.com/x86-psABIs/x86-64-ABI">System V AMD64 ABI</a></li>
+<li><a href="https://llvm.org/docs/CodeGenerator.html">LLVM CodeGen overview</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Compilers, CodeGen, RegisterAllocation, Assembly</p>
+</body>
+</html>

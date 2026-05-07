@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>semantic analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>semantic analysis</h1>
+<blockquote>
+<p>Compilers 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <code>x + "hello"</code> is syntactically fine, so why does the compiler reject it?</p>
+<blockquote>
+<p>Semantic analysis is the step that asks "does this make sense?" of an AST that already passed syntax. It catches name resolution, type errors, and use-before-declare style mistakes.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between syntactic correctness and semantic correctness</li>
+<li>Name resolution: where does this name point?</li>
+<li>Type checking: are these two values the same type?</li>
+<li>The pattern of walking the AST once and attaching meaning to it</li>
+<li>The shape of a good error message at the semantic stage</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A parser can only say "are the parentheses balanced?" The case where <code>y</code> in <code>x = y + 1</code> was never declared, or where <code>y</code> is a string but you try to add <code>1</code>, is caught at the semantic stage. If this stage is weak, code that compiled cleanly dies at runtime.</p>
+<blockquote>
+<p>Compilers earn trust through semantics, not through syntax.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;AST&quot;] --&gt; B[&quot;name resolution&quot;]
+    B --&gt; C[&quot;type inference / check&quot;]
+    C --&gt; D[&quot;annotated AST&quot;]
+    D --&gt; E[&quot;next stage&quot;]
+</code></pre>
+<p>The result is the same AST with metadata like "this name points to that declaration; the type of this expression is int" attached.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Name resolution</strong>: deciding which declaration an identifier points to.</li>
+<li><strong>Type checking</strong>: confirming the type of an expression is allowed in its context.</li>
+<li><strong>Type inference</strong>: deducing types that were not written explicitly.</li>
+<li><strong>Annotated AST</strong>: an AST with semantic information attached.</li>
+<li><strong>Coercion</strong>: an implicit conversion between compatible types (<code>int → float</code>).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — AST as the parser left it</strong></p>
+<pre><code class="language-python">ast = Bin(&quot;+&quot;, Var(&quot;x&quot;), Str(&quot;hello&quot;))
+# nobody knows what x is, or whether the two sides match
+</code></pre>
+<p><strong>After — AST with semantics attached</strong></p>
+<pre><code class="language-python"># x: int (declared at line 3)
+# Bin.+ requires int + int, got int + str → TypeError
+</code></pre>
+<p>This is now a form the next stage can trust.</p>
+<h2>Hands-on: a small semantic analyzer</h2>
+<p><strong>Step 1 — A simple typed environment</strong></p>
+<pre><code class="language-python"># 1_env.py
+class Env:
+    def __init__(self, parent=None):
+        self.parent, self.table = parent, {}
+    def declare(self, name, ty):
+        if name in self.table:
+            raise SyntaxError(f&quot;redeclared: {name}&quot;)
+        self.table[name] = ty
+    def lookup(self, name):
+        if name in self.table: return self.table[name]
+        if self.parent: return self.parent.lookup(name)
+        raise NameError(f&quot;undeclared: {name}&quot;)
+</code></pre>
+<p>Name resolution is just a dictionary lookup. A parent pointer expresses nested scope naturally.</p>
+<p><strong>Step 2 — Name resolution</strong></p>
+<pre><code class="language-python"># 2_resolve.py
+from dataclasses import dataclass
+@dataclass
+class Var: name: str
+@dataclass
+class Decl:
+    name: str; ty: str
+
+env = {&quot;int_globals&quot;: &quot;int&quot;}
+def resolve(node):
+    if isinstance(node, Var):
+        if node.name not in env:
+            raise NameError(f&quot;'{node.name}' is not defined&quot;)
+    if isinstance(node, Decl):
+        env[node.name] = node.ty
+</code></pre>
+<p>The key is treating declaration and use through the same data structure. Walk the AST once, updating and querying the environment.</p>
+<p><strong>Step 3 — Simple type checking</strong></p>
+<pre><code class="language-python"># 3_typecheck.py
+def type_of(node, env):
+    kind = node[0]
+    if kind == &quot;NUM&quot;: return &quot;int&quot;
+    if kind == &quot;STR&quot;: return &quot;str&quot;
+    if kind == &quot;VAR&quot;: return env[node[1]]
+    if kind == &quot;BIN&quot;:
+        op, l, r = node[1], type_of(node[2], env), type_of(node[3], env)
+        if l != r:
+            raise TypeError(f&quot;{op}: {l} vs {r}&quot;)
+        return l
+
+env = {&quot;x&quot;: &quot;int&quot;}
+print(type_of((&quot;BIN&quot;,&quot;+&quot;,(&quot;VAR&quot;,&quot;x&quot;),(&quot;NUM&quot;,1)), env))  # int
+</code></pre>
+<p>Types bubble up through the tree. If two children disagree, the error is raised right there.</p>
+<p><strong>Step 4 — Annotated AST</strong></p>
+<pre><code class="language-python"># 4_annotate.py
+def annotate(node, env):
+    kind = node[0]
+    if kind == &quot;NUM&quot;: return (&quot;NUM&quot;, node[1], &quot;int&quot;)
+    if kind == &quot;VAR&quot;: return (&quot;VAR&quot;, node[1], env[node[1]])
+    if kind == &quot;BIN&quot;:
+        l = annotate(node[2], env); r = annotate(node[3], env)
+        if l[-1] != r[-1]:
+            raise TypeError(f&quot;{node[1]}: {l[-1]} vs {r[-1]}&quot;)
+        return (&quot;BIN&quot;, node[1], l, r, l[-1])
+</code></pre>
+<p>Attach the type to the original AST in a trailing slot. The next stage walks the tree once more and emits code that matches the type.</p>
+<p><strong>Step 5 — Good error messages</strong></p>
+<pre><code class="language-python"># 5_error.py
+def report(token, expected, got):
+    print(f&quot;  File \&quot;&lt;src&gt;\&quot;, line {token['line']}&quot;)
+    print(f&quot;    {token['text']}&quot;)
+    print(f&quot;  TypeError: expected {expected}, got {got}&quot;)
+
+report({&quot;line&quot;: 12, &quot;text&quot;: 'x + &quot;hello&quot;'}, &quot;int&quot;, &quot;str&quot;)
+</code></pre>
+<p>A semantic error is enough with three lines: location, what was expected, what arrived.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The environment (Env) expresses nested scope naturally as a chained dictionary.</li>
+<li>Types are extra information on the AST, not a separate data structure.</li>
+<li>Errors are reported as close to the position as possible.</li>
+<li>One pass can do it; you can also split into multiple passes.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating Name and Symbol as the same thing.</strong> A name is text; a symbol is a declaration entry.</li>
+<li><strong>Not collecting type errors and reporting them all at once.</strong> Stopping at the first error gives a bad user experience.</li>
+<li><strong>Judging type compatibility with <code>==</code> only.</strong> Subtypes, generics, and coercion break that.</li>
+<li><strong>Building two data structures for declarations and uses, ending up with two environments.</strong> There must be one source of truth.</li>
+<li><strong>Implementing scope entry/exit without a parent pointer.</strong> Variable shadowing breaks.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The core of a language server (LSP) lives here. "Go to definition" is name resolution; "type hint" is type inference; "rename symbol" is symbol table updating. The semantic stage of the compiler is exactly the core feature set of an IDE.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They know semantic error messages are the most-read sentences a user will ever read.</li>
+<li>They strongly enforce a single environment as source of truth.</li>
+<li>They attach semantic information to the AST instead of carrying it on the side.</li>
+<li>They design error recovery from the start (report many errors per pass).</li>
+<li>They abstract the type system as a lattice for extensibility.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you explain syntactic vs semantic in one sentence?</li>
+<li>[ ] Have you accepted that name resolution is a dictionary lookup?</li>
+<li>[ ] Have you ever written the pattern of attaching types to an AST?</li>
+<li>[ ] Have you defined a standard shape for semantic error messages?</li>
+<li>[ ] Can you say how LSP features map to the semantic stage?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add nested scope (function entry/exit) to the environment above.</li>
+<li>Add coercion that automatically promotes <code>int + float</code> to <code>float</code>.</li>
+<li>Design a structure that collects all semantic errors in a file and prints them at the end.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Semantic analysis answers the "does this make sense?" question that syntax cannot. The next post zooms into its central tools — symbol table and scope.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
+<li><strong>semantic analysis (current)</strong></li>
+<li>symbol table and scope (upcoming)</li>
+<li>intermediate representation (upcoming)</li>
+<li>optimization basics (upcoming)</li>
+<li>code generation (upcoming)</li>
+<li>JIT vs AOT (upcoming)</li>
+<li>building a tiny interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://craftinginterpreters.com/resolving-and-binding.html">Crafting Interpreters — Resolving and Binding</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Type_system">Type system (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Name_resolution_(programming_languages)">Name resolution (Wikipedia)</a></li>
+<li><a href="https://microsoft.github.io/language-server-protocol/">Language Server Protocol</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Compilers, SemanticAnalysis, TypeChecking, NameResolution</p>
+</body>
+</html>
