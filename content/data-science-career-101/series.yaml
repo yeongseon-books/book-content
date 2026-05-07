@@ -1,0 +1,54 @@
+id: data-science-career-101
+title:
+  ko: Data Science Career 101
+  en: Data Science Career 101
+description:
+  ko: 데이터 직무 커리어를 설계하는 법.
+  en: How to design a data science career.
+languages:
+  - ko
+  - en
+status: content-ready
+level: 101
+lifecycle: active
+episodes:
+  - slug: 01-what-is-data-career
+    title:
+      ko: 데이터 직무란 무엇인가
+      en: What Is a Data Career
+  - slug: 02-analyst-scientist-engineer
+    title:
+      ko: 분석가 vs 사이언티스트 vs 엔지니어
+      en: Analyst vs Scientist vs Engineer
+  - slug: 03-learning-path
+    title:
+      ko: 학습 경로 설계
+      en: Designing the Learning Path
+  - slug: 04-data-portfolio
+    title:
+      ko: 데이터 포트폴리오
+      en: The Data Portfolio
+  - slug: 05-sql-and-analytics-interview
+    title:
+      ko: SQL과 분석 인터뷰
+      en: SQL and Analytics Interviews
+  - slug: 06-ml-interview
+    title:
+      ko: ML 인터뷰
+      en: The ML Interview
+  - slug: 07-case-interview
+    title:
+      ko: 케이스 인터뷰
+      en: The Case Interview
+  - slug: 08-first-job
+    title:
+      ko: 첫 직장 적응
+      en: Settling into the First Data Job
+  - slug: 09-domain-expertise
+    title:
+      ko: 도메인 전문성 쌓기
+      en: Building Domain Expertise
+  - slug: 10-path-to-senior
+    title:
+      ko: 시니어 데이터 직무로 가는 길
+      en: The Path to Senior in Data
