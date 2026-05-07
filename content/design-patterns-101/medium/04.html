@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Behavioral Patterns</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Behavioral Patterns</h1>
+<blockquote>
+<p>Design Patterns 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do objects coordinate their <em>behavior</em>?</p>
+<blockquote>
+<p>By swapping algorithms, propagating notifications, or making requests into objects — the named ways are the behavioral patterns.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The problem behavioral patterns solve</li>
+<li>Strategy, Observer, Command</li>
+<li>State and Iterator</li>
+<li>Treating flow as <em>data</em></li>
+<li>How to choose the right pattern</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Cooperation between objects quickly hardens into piles of if/elif. Behavioral patterns give that cooperation a <em>name</em> and a <em>shape</em>.</p>
+<blockquote>
+<p>Turn flow into objects and the flow becomes testable.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    S[&quot;Strategy (swap algo)&quot;] --&gt; Ctx[&quot;Context&quot;]
+    O[&quot;Observer (notify)&quot;] --&gt; Sub[&quot;Subject&quot;]
+    Cmd[&quot;Command (request as object)&quot;] --&gt; Inv[&quot;Invoker&quot;]
+    St[&quot;State (per-state behavior)&quot;] --&gt; Obj[&quot;Object&quot;]
+    It[&quot;Iterator (traversal)&quot;] --&gt; Col[&quot;Collection&quot;]
+</code></pre>
+<p>Five styles of cooperation.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Strategy</strong>: turn an algorithm into an object so it can be swapped.</li>
+<li><strong>Observer</strong>: notify many subscribers when one object changes.</li>
+<li><strong>Command</strong>: turn a request itself into an object — for queueing or undo.</li>
+<li><strong>State</strong>: separate behavior into state objects.</li>
+<li><strong>Iterator</strong>: traverse a collection without exposing its structure.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def discount(kind, price):
+    if kind == &quot;vip&quot;:
+        return price * 0.7
+    elif kind == &quot;member&quot;:
+        return price * 0.9
+    return price
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">class Discount:
+    def apply(self, p): return p
+
+class Vip(Discount):
+    def apply(self, p): return p * 0.7
+
+class Member(Discount):
+    def apply(self, p): return p * 0.9
+</code></pre>
+<p>New tiers appear without touching existing code.</p>
+<h2>Hands-on: Five Steps to Practice Behavioral Patterns</h2>
+<p><strong>Step 1 — Strategy</strong></p>
+<pre><code class="language-python"># 1_strategy.py
+class Sorter:
+    def __init__(self, strategy): self.strategy = strategy
+    def sort(self, data): return self.strategy(data)
+
+asc = Sorter(sorted)
+desc = Sorter(lambda d: sorted(d, reverse=True))
+</code></pre>
+<p>In Python, functions are first-class — Strategy is often just a function.</p>
+<p><strong>Step 2 — Observer</strong></p>
+<pre><code class="language-python"># 2_observer.py
+class Subject:
+    def __init__(self): self._subs = []
+    def subscribe(self, fn): self._subs.append(fn)
+    def notify(self, e):
+        for fn in self._subs: fn(e)
+
+s = Subject()
+s.subscribe(lambda e: print(&quot;LOG:&quot;, e))
+s.notify(&quot;created&quot;)
+</code></pre>
+<p>The Subject can publish without knowing its subscribers.</p>
+<p><strong>Step 3 — Command</strong></p>
+<pre><code class="language-python"># 3_command.py
+class Command:
+    def execute(self): ...
+
+class SendEmail(Command):
+    def __init__(self, to, body): self.to, self.body = to, body
+    def execute(self): mailer.send(self.to, self.body)
+
+queue = [SendEmail(&quot;a@x&quot;, &quot;hi&quot;), SendEmail(&quot;b@x&quot;, &quot;hi&quot;)]
+for c in queue: c.execute()
+</code></pre>
+<p>Once a request is an object, you can queue, retry, or undo it.</p>
+<p><strong>Step 4 — State</strong></p>
+<pre><code class="language-python"># 4_state.py
+class Order:
+    def __init__(self): self.state = Draft()
+    def submit(self): self.state = self.state.submit()
+
+class Draft:
+    def submit(self): return Pending()
+
+class Pending:
+    def submit(self): return self  # idempotent
+</code></pre>
+<p>Replace state branches with state objects.</p>
+<p><strong>Step 5 — Iterator</strong></p>
+<pre><code class="language-python"># 5_iterator.py
+class Bag:
+    def __init__(self, items): self.items = items
+    def __iter__(self):
+        for x in self.items: yield x
+
+for x in Bag([1, 2, 3]):
+    print(x)
+</code></pre>
+<p>Expose the contract for traversal, not the internal structure.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>if/elif branches <em>condense</em> into objects.</li>
+<li>Algorithm and context separate cleanly.</li>
+<li>Flow becomes data, so it can be queued, stored, or replayed.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>A class explosion for Strategy.</strong> A function would have done.</li>
+<li><strong>Observer cycles.</strong> A→B→A loops forever.</li>
+<li><strong>Business logic scattered into Commands.</strong> A Command is just a <em>request</em>.</li>
+<li><strong>State objects know each other too well.</strong> Coupling explodes.</li>
+<li><strong>Exposing index instead of an Iterator.</strong> The client sees internals.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Django signals are Observer. Celery tasks are Command. FSM libraries are State. Every Python collection implements Iterator. Behavioral patterns sit beneath the daily tools.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The first candidate for Strategy is a <em>function</em>.</li>
+<li>Keep Observer notifications one-directional.</li>
+<li>Command is overkill for a simple request.</li>
+<li>Use State only for a real state machine.</li>
+<li>Iterator is a contract that hides internal structure.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is there a real reason a Strategy is a class, not a function?</li>
+<li>[ ] Does the Observer avoid cyclic notification?</li>
+<li>[ ] Does the Command hold only the <em>request</em>?</li>
+<li>[ ] Are state transitions visible in one place?</li>
+<li>[ ] Does the Iterator hide internal structure?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Refactor a current if/elif branch into Strategy.</li>
+<li>Model domain event publishing with Observer.</li>
+<li>Express an external API call queue with Command.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Behavior expressed as objects reduces branching and makes cooperation visible. The next post zooms in on the most practical behavioral pattern — Strategy.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
+<li><strong>Behavioral Patterns (current)</strong></li>
+<li>Strategy Pattern (upcoming)</li>
+<li>Adapter Pattern (upcoming)</li>
+<li>Observer Pattern (upcoming)</li>
+<li>Factory and Dependency Injection (upcoming)</li>
+<li>Avoiding Pattern Overuse (upcoming)</li>
+<li>Pythonic Patterns (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://refactoring.guru/design-patterns/strategy">Strategy Pattern (refactoring.guru)</a></li>
+<li><a href="https://refactoring.guru/design-patterns/observer">Observer Pattern (refactoring.guru)</a></li>
+<li><a href="https://refactoring.guru/design-patterns/command">Command Pattern (refactoring.guru)</a></li>
+<li><a href="https://refactoring.guru/design-patterns/state">State Pattern (refactoring.guru)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, DesignPatterns, Behavioral, Strategy, Observer, Command</p>
+</body>
+</html>

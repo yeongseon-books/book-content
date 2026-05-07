@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Adapter Pattern</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Adapter Pattern</h1>
+<blockquote>
+<p>Design Patterns 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we use an interface we <em>cannot change</em> in the shape we <em>want</em>?</p>
+<blockquote>
+<p>By placing a thin translator object — an Adapter — between us and it.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The problem Adapter solves</li>
+<li>Define a domain interface, then wrap external calls</li>
+<li>Object Adapter vs Class Adapter</li>
+<li>Adapter and test doubles</li>
+<li>Signs an Adapter has gone wrong</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When external library calls scatter through the domain, every library tweak shakes the domain. An Adapter pins that movement to a single <em>boundary line</em>.</p>
+<blockquote>
+<p>An Adapter is a <em>thin coat</em> at the boundary.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Domain[&quot;Domain code&quot;] --&gt; Iface[&quot;Domain interface&quot;]
+    Iface --&gt; Adapter[&quot;Adapter&quot;]
+    Adapter --&gt; Lib[&quot;External library&quot;]
+</code></pre>
+<p>The domain knows only the interface; the Adapter takes the external call.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Target</strong>: the interface the domain wants.</li>
+<li><strong>Adaptee</strong>: the external interface we have.</li>
+<li><strong>Adapter</strong>: implements Target, calls Adaptee.</li>
+<li><strong>Object Adapter</strong>: holds Adaptee by composition.</li>
+<li><strong>Class Adapter</strong>: absorbs Adaptee via multiple inheritance (rare in Python).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">import boto3
+def save_report(data):
+    s3 = boto3.client(&quot;s3&quot;)
+    s3.put_object(Bucket=&quot;reports&quot;, Key=&quot;r.json&quot;, Body=data)
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">class FileStore:
+    def put(self, key, data): ...
+
+class S3FileStore(FileStore):
+    def __init__(self, bucket):
+        self._s3 = boto3.client(&quot;s3&quot;); self.bucket = bucket
+    def put(self, key, data):
+        self._s3.put_object(Bucket=self.bucket, Key=key, Body=data)
+
+def save_report(store: FileStore, data):
+    store.put(&quot;r.json&quot;, data)
+</code></pre>
+<p><code>save_report</code> no longer knows boto3.</p>
+<h2>Hands-on: Five Steps to Practice Adapter</h2>
+<p><strong>Step 1 — Domain interface first</strong></p>
+<pre><code class="language-python"># 1_iface.py
+from typing import Protocol
+
+class FileStore(Protocol):
+    def put(self, key: str, data: bytes) -&gt; None: ...
+    def get(self, key: str) -&gt; bytes: ...
+</code></pre>
+<p>Define the shape the domain <em>wants</em>, before any external library.</p>
+<p><strong>Step 2 — Wrap the external call</strong></p>
+<pre><code class="language-python"># 2_s3_adapter.py
+class S3FileStore:
+    def __init__(self, client, bucket):
+        self.client, self.bucket = client, bucket
+    def put(self, key, data):
+        self.client.put_object(Bucket=self.bucket, Key=key, Body=data)
+    def get(self, key):
+        return self.client.get_object(Bucket=self.bucket, Key=key)[&quot;Body&quot;].read()
+</code></pre>
+<p>The S3 call lives only inside this class.</p>
+<p><strong>Step 3 — Use it from the domain</strong></p>
+<pre><code class="language-python"># 3_domain.py
+def archive(store, key, data):
+    store.put(key, data)
+</code></pre>
+<p>In tests, you can inject a fake store.</p>
+<p><strong>Step 4 — Add another backend</strong></p>
+<pre><code class="language-python"># 4_local_adapter.py
+import pathlib
+class LocalFileStore:
+    def __init__(self, root): self.root = pathlib.Path(root)
+    def put(self, key, data):
+        (self.root / key).write_bytes(data)
+    def get(self, key):
+        return (self.root / key).read_bytes()
+</code></pre>
+<p>A new Adapter slots in without touching the domain.</p>
+<p><strong>Step 5 — Test double</strong></p>
+<pre><code class="language-python"># 5_fake.py
+class InMemoryFileStore:
+    def __init__(self): self._d = {}
+    def put(self, k, v): self._d[k] = v
+    def get(self, k): return self._d[k]
+</code></pre>
+<p>A fake Adapter makes unit tests fast and deterministic.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>External SDK calls live <em>only</em> inside the Adapter.</li>
+<li>The domain depends only on a Protocol.</li>
+<li>Test doubles slot into the same seam naturally.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Business logic inside the Adapter.</strong> Translation and policy mix.</li>
+<li><strong>Leaking external types through the boundary.</strong> The domain learns the SDK.</li>
+<li><strong>Adapter calling another Adapter directly.</strong> Boundary violation.</li>
+<li><strong>Re-raising external exceptions verbatim.</strong> <em>Translate</em> them to domain exceptions.</li>
+<li><strong>Adapter growing fat.</strong> Responsibility crept in beyond the boundary.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>S3/GCS/Local behind one FileStore, payment gateways (Stripe/Toss/PortOne) behind one PaymentGateway, mail senders (SES/SendGrid/SMTP) behind one Mailer — all Adapters. The freedom to swap operational backends comes from here.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Sketch the <em>domain</em> interface first.</li>
+<li>Keep Adapters <em>thin</em> — translation and call only.</li>
+<li>Translate external exceptions into domain ones.</li>
+<li>Build a Fake/InMemory Adapter alongside.</li>
+<li>A fattening Adapter signals misplaced responsibility.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the domain avoid importing external SDKs?</li>
+<li>[ ] Does the Adapter make no business decisions?</li>
+<li>[ ] Do external types stay inside the boundary?</li>
+<li>[ ] Are external exceptions translated to domain exceptions?</li>
+<li>[ ] Does an InMemory Adapter exist?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Split mail-sending behind a <code>Mailer</code> interface plus an SMTP Adapter.</li>
+<li>Express payment-gateway calls behind a <code>PaymentGateway</code> interface with two or more Adapters.</li>
+<li>Add <code>InMemory</code> versions for both interfaces and write unit tests against them.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Adapter is the <em>thin coat</em> at the boundary. The next post moves to inter-object notification — the Observer pattern.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">The Strategy Pattern</a></li>
+<li><strong>The Adapter Pattern (current)</strong></li>
+<li>Observer Pattern (upcoming)</li>
+<li>Factory and Dependency Injection (upcoming)</li>
+<li>Avoiding Pattern Overuse (upcoming)</li>
+<li>Pythonic Patterns (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://refactoring.guru/design-patterns/adapter">Adapter Pattern (refactoring.guru)</a></li>
+<li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)">Ports and Adapters (Wikipedia)</a></li>
+<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, DesignPatterns, Adapter, Structural, Compatibility, Wrapper</p>
+</body>
+</html>

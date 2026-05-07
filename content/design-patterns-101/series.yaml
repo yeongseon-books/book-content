@@ -1,0 +1,71 @@
+id: design-patterns-101
+title:
+  ko: Design Patterns 101
+  en: Design Patterns 101
+description:
+  ko: GoF 디자인 패턴을 Python 예시로 빠르게 훑고, 언제 쓰고 언제 피해야 할지 감을 잡는 시리즈.
+  en: A fast tour of the GoF design patterns in Python, with a clear sense of when to use them and when to avoid them.
+status: content-ready
+category: software-engineering
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-are-design-patterns
+    title:
+      ko: 디자인 패턴이란 무엇인가?
+      en: What Are Design Patterns?
+  - number: 2
+    slug: creational-patterns
+    title:
+      ko: Creational 패턴
+      en: Creational Patterns
+  - number: 3
+    slug: structural-patterns
+    title:
+      ko: Structural 패턴
+      en: Structural Patterns
+  - number: 4
+    slug: behavioral-patterns
+    title:
+      ko: Behavioral 패턴
+      en: Behavioral Patterns
+  - number: 5
+    slug: strategy-pattern
+    title:
+      ko: Strategy 패턴
+      en: Strategy Pattern
+  - number: 6
+    slug: adapter-pattern
+    title:
+      ko: Adapter 패턴
+      en: Adapter Pattern
+  - number: 7
+    slug: observer-pattern
+    title:
+      ko: Observer 패턴
+      en: Observer Pattern
+  - number: 8
+    slug: factory-and-di
+    title:
+      ko: Factory와 의존성 주입
+      en: Factory and Dependency Injection
+  - number: 9
+    slug: avoiding-pattern-overuse
+    title:
+      ko: 패턴을 남용하지 않는 법
+      en: How Not to Overuse Patterns
+  - number: 10
+    slug: pythonic-patterns
+    title:
+      ko: Python에 어울리는 패턴
+      en: Pythonic Patterns

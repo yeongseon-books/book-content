@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pythonic Patterns</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Pythonic Patterns</h1>
+<blockquote>
+<p>Design Patterns 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is it always right to <em>port GoF patterns</em> directly into Python?</p>
+<blockquote>
+<p>No. Python's first-class functions, modules, Protocols, and decorators dissolve many GoF patterns into <em>less code</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Why a module is already a Singleton</li>
+<li>Strategy and Command expressed as functions</li>
+<li>Interfaces expressed as Protocols</li>
+<li><code>@dataclass</code> and value objects</li>
+<li>Decorator (the pattern) expressed as <code>@decorator</code></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Python's basic tools — modules, functions, Protocols — already provide <em>runtime support</em> for many patterns. The same problem can be solved with <em>less code</em>.</p>
+<blockquote>
+<p>Reach for the language's tools first; pull out a pattern only when those fall short.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    GoF[&quot;GoF form&quot;] --&gt; Trans[&quot;Pythonic translation&quot;]
+    Trans --&gt; Mod[&quot;module = Singleton&quot;]
+    Trans --&gt; Fn[&quot;function = Strategy / Command&quot;]
+    Trans --&gt; Proto[&quot;Protocol = interface&quot;]
+    Trans --&gt; Deco[&quot;@decorator = Decorator&quot;]
+    Trans --&gt; DC[&quot;@dataclass = Value Object&quot;]
+</code></pre>
+<p>Same pattern, lighter expression.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Module-as-singleton</strong>: a module is loaded once and acts like a Singleton.</li>
+<li><strong>First-class function</strong>: functions you can pass, return, and store.</li>
+<li><strong>Protocol</strong>: structural typing (statically checked duck typing).</li>
+<li><strong>Decorator (<code>@</code>)</strong>: a wrapper that adds behavior to a function or class.</li>
+<li><strong>dataclass</strong>: a value object with built-in equality, repr, and immutability.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (GoF as-is)</strong></p>
+<pre><code class="language-python">class SingletonConfig:
+    _inst = None
+    def __new__(cls):
+        if cls._inst is None:
+            cls._inst = super().__new__(cls)
+        return cls._inst
+</code></pre>
+<p><strong>After (Pythonic)</strong></p>
+<pre><code class="language-python"># config.py
+DEBUG = True
+DB_URL = &quot;postgres://...&quot;
+# elsewhere: from config import DEBUG, DB_URL
+</code></pre>
+<p>A module is already a Singleton.</p>
+<h2>Hands-on: Five Steps to Pythonic Patterns</h2>
+<p><strong>Step 1 — Module = Singleton</strong></p>
+<pre><code class="language-python"># 1_module_singleton.py
+# settings.py
+import os
+ENV = os.getenv(&quot;ENV&quot;, &quot;dev&quot;)
+SECRET = os.getenv(&quot;SECRET&quot;, &quot;x&quot;)
+</code></pre>
+<p>Import it anywhere — same value everywhere.</p>
+<p><strong>Step 2 — Function = Strategy / Command</strong></p>
+<pre><code class="language-python"># 2_function_strategy.py
+def asc(d): return sorted(d)
+def desc(d): return sorted(d, reverse=True)
+
+def run(strategy, data): return strategy(data)
+print(run(desc, [3, 1, 2]))
+</code></pre>
+<p>Classes were not necessary for clarity.</p>
+<p><strong>Step 3 — Protocol = interface</strong></p>
+<pre><code class="language-python"># 3_protocol.py
+from typing import Protocol
+
+class Mailer(Protocol):
+    def send(self, to: str, body: str) -&gt; None: ...
+
+class SmtpMailer:
+    def send(self, to, body): ...   # satisfies without inheritance
+</code></pre>
+<p>The balance of duck typing and static checking.</p>
+<p><strong>Step 4 — <code>@dataclass</code> = value object</strong></p>
+<pre><code class="language-python"># 4_dataclass.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Money:
+    amount: int
+    currency: str
+</code></pre>
+<p>Equality, repr, and immutability in one line.</p>
+<p><strong>Step 5 — <code>@decorator</code> = the Decorator pattern</strong></p>
+<pre><code class="language-python"># 5_decorator.py
+import time, functools
+
+def timed(fn):
+    @functools.wraps(fn)
+    def wrap(*a, **k):
+        t = time.time()
+        try: return fn(*a, **k)
+        finally: print(fn.__name__, time.time()-t)
+    return wrap
+
+@timed
+def work(): time.sleep(0.1)
+</code></pre>
+<p><code>@</code> adds responsibility <em>naturally</em>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>There is almost no class hierarchy.</li>
+<li>The pattern <em>emerges</em> from standard tools.</li>
+<li>The same intent is expressed in <em>fewer lines</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Porting Java-style GoF directly.</strong> A weight Python does not need.</li>
+<li><strong>Singleton class instead of a module.</strong> A second instance becomes possible — risky.</li>
+<li><strong>Forcing ABC.</strong> A Protocol is often enough.</li>
+<li><strong>Decorator overuse muddying the call flow.</strong> Forgetting <code>functools.wraps</code> is common.</li>
+<li><strong>Hand-rolled class instead of dataclass.</strong> Missing <code>__eq__</code> and <code>__repr__</code>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><code>logging</code> is a module Singleton, <code>sorted(key=...)</code> is a function Strategy, <code>typing.Protocol</code> is an interface, <code>@app.route(...)</code> is a Decorator. The standard library and popular frameworks are <em>living examples</em> of Pythonic patterns.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Reach for the <em>language's</em> tools first.</li>
+<li>Prefer Protocol over ABC, module over Singleton class.</li>
+<li>A function is enough until it isn't.</li>
+<li>Use <code>functools.wraps</code> with every decorator.</li>
+<li>Patterns ultimately serve <em>readability</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Did you avoid Singleton classes where a module would do?</li>
+<li>[ ] Did you avoid Strategy classes where a function would do?</li>
+<li>[ ] Did you avoid forcing ABC where Protocol fits?</li>
+<li>[ ] Did you use a dataclass for value objects?</li>
+<li>[ ] Did you use <code>functools.wraps</code> in your decorators?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Fold a Singleton class into a module.</li>
+<li>Simplify one Strategy class into a function.</li>
+<li>Convert an ABC interface to a Protocol and pass mypy.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>GoF is a <em>vocabulary</em>, not a <em>manual</em>. Look at Python's tools first, and reach for pattern names only where the tools fall short. The Design Patterns 101 series ends here — use these terms as <em>units of thought</em>, not as instruments.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">The Strategy Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/06-adapter-pattern.md">The Adapter Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/07-observer-pattern.md">The Observer Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/08-factory-and-di.md">Factory and Dependency Injection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/09-avoiding-pattern-overuse.md">Avoiding Pattern Overuse</a></li>
+<li><strong>Pythonic Patterns (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">dataclasses (Python docs)</a></li>
+<li><a href="https://docs.python.org/3/library/functools.html#functools.wraps">functools.wraps (Python docs)</a></li>
+<li><a href="https://python-3-patterns-idioms-test.readthedocs.io/">Python 3 Patterns, Recipes and Idioms (Bruce Eckel)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, DesignPatterns, Python, Idioms, Protocols, Decorators</p>
+</body>
+</html>

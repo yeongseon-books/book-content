@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Are Design Patterns?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Are Design Patterns?</h1>
+<blockquote>
+<p>Design Patterns 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why do we even need design patterns?</p>
+<blockquote>
+<p>Because solving the same problem from scratch every time is exhausting. Patterns are name tags for solutions that have already been proven.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A working definition of a design pattern</li>
+<li>The GoF classification of 23 patterns</li>
+<li>The real problems patterns try to solve</li>
+<li>A sane order to learn them in</li>
+<li>The moments where patterns hurt instead of help</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Patterns are vocabulary, not answers. The biggest payoff is that "let's pull this into a Strategy" makes everyone in the room picture the same shape.</p>
+<blockquote>
+<p>Patterns shine in conversation before they shine in code.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[&quot;Problem&quot;] --&gt; N[&quot;Pattern Name&quot;]
+    N --&gt; S[&quot;Solution structure&quot;]
+    S --&gt; T[&quot;Tradeoffs&quot;]
+</code></pre>
+<p>The name calls up the solution.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Design pattern</strong>: A proven solution to a recurring design problem.</li>
+<li><strong>GoF</strong>: Gang of Four — the 23 patterns the four authors codified.</li>
+<li><strong>Creational / Structural / Behavioral</strong>: The three pattern families.</li>
+<li><strong>Antipattern</strong>: A common but harmful "solution".</li>
+<li><strong>Idiom</strong>: A small pattern tied to a specific language.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python"># &quot;if kind&quot; branching scattered everywhere
+if kind == &quot;credit&quot;: process_credit(...)
+elif kind == &quot;paypal&quot;: process_paypal(...)
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python"># Strategy pattern in one line
+processor = PROCESSORS[kind]
+processor.charge(...)
+</code></pre>
+<p>A named solution carries the intent.</p>
+<h2>Hands-on: Five Steps to Learn a Pattern</h2>
+<p><strong>Step 1 — Recognize the problem</strong></p>
+<pre><code class="language-python"># 1_problem.py
+# Same branch, same object construction, same notification flow recurring?
+# That is the stage for a pattern.
+</code></pre>
+<p>Define the problem first.</p>
+<p><strong>Step 2 — Name the pattern</strong></p>
+<pre><code class="language-python"># 2_name.py
+# Branching? Strategy. Construction? Factory. Notifications? Observer.
+</code></pre>
+<p>The name pulls the solution along.</p>
+<p><strong>Step 3 — Sketch the structure</strong></p>
+<pre><code class="language-python"># 3_structure.py
+# Draw the class diagram before writing code.
+</code></pre>
+<p>Structure first, code second.</p>
+<p><strong>Step 4 — Apply small</strong></p>
+<pre><code class="language-python"># 4_small.py
+# Try it in one module before applying it system-wide.
+</code></pre>
+<p>Try small and verify the payoff.</p>
+<p><strong>Step 5 — Write down the tradeoffs</strong></p>
+<pre><code class="language-python"># 5_tradeoff.md
+# - Gained: branching gone, easier to extend
+# - Lost: more classes to read
+</code></pre>
+<p>Patterns are always trades.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A pattern changes the <em>conversation</em> before it changes the code.</li>
+<li>Every pattern carries tradeoffs.</li>
+<li>Application is usually local, not global.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Patterns everywhere.</strong> Simple code becomes complex.</li>
+<li><strong>Memorizing names without the problems.</strong> You miss the moment to apply.</li>
+<li><strong>Ignoring language traits.</strong> Insisting on Singleton in Python where a module is enough.</li>
+<li><strong>Ignoring tradeoffs.</strong> All you get is a class explosion.</li>
+<li><strong>Believing the pattern is the answer.</strong> A simpler solution slips by.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Patterns earn their keep most often as code-review vocabulary — "drop an Adapter here", "pull this into a Strategy". The name is the agreement.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They treat patterns as vocabulary.</li>
+<li>They identify the problem and then attach a name.</li>
+<li>They start small, not system-wide.</li>
+<li>They are conscious of the tradeoffs.</li>
+<li>They ask one last time whether a simpler solution exists.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Have you written down the problem in one line?</li>
+<li>[ ] Does a fitting pattern name come to mind?</li>
+<li>[ ] Have you sketched the structure?</li>
+<li>[ ] Have you written down the tradeoffs?</li>
+<li>[ ] Is there a simpler solution?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find a place in your code where the same branching shape appears at least three times.</li>
+<li>Suggest one pattern name that fits.</li>
+<li>After applying it, write down two tradeoffs.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Patterns are vocabulary. From the next article on we tour the 23 GoF patterns in three groups — Creational, Structural, and Behavioral.</p>
+<ul>
+<li><strong>What Are Design Patterns? (current)</strong></li>
+<li>Creational Patterns (upcoming)</li>
+<li>Structural Patterns (upcoming)</li>
+<li>Behavioral Patterns (upcoming)</li>
+<li>Strategy Pattern (upcoming)</li>
+<li>Adapter Pattern (upcoming)</li>
+<li>Observer Pattern (upcoming)</li>
+<li>Factory and Dependency Injection (upcoming)</li>
+<li>How Not to Overuse Patterns (upcoming)</li>
+<li>Pythonic Patterns (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Design_Patterns">Design Patterns: Elements of Reusable Object-Oriented Software (GoF)</a></li>
+<li><a href="https://refactoring.guru/design-patterns">refactoring.guru — Design Patterns</a></li>
+<li><a href="https://martinfowler.com/eaaCatalog/">Patterns of Enterprise Application Architecture</a></li>
+<li><a href="https://www.oreilly.com/library/view/head-first-design/9781492077992/">Head First Design Patterns</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, DesignPatterns, SoftwareDesign, GoF, Architecture, Foundations</p>
+</body>
+</html>
