@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is a Database System?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is a Database System?</h1>
+<blockquote>
+<p>Database Systems 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: We could just put data in a file. Why do we run a whole separate piece of software called a database?</p>
+<blockquote>
+<p>A database management system (DBMS) is not just storage. It is software that solves four hard problems together — <strong>concurrent access, crash recovery, consistency, and querying</strong>. A flat file works until two users, a power failure, or a non-trivial question shows up. After that, it does not. This first episode draws that boundary.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The decisive difference between a file and a DBMS</li>
+<li>The four properties a DBMS spends most of its effort guaranteeing</li>
+<li>What relational, document, and key-value stores are good at</li>
+<li>When "a JSON file is enough" is actually true</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you treat a database as "the place where data goes," you cannot explain why locks happen, why transactions exist, or why your data survives a power loss. Once you understand what a DBMS is for, the rest of this series — SQL, indexes, transactions, isolation — stops looking like trivia and starts looking like inevitable design.</p>
+<blockquote>
+<p>"We use a database" really means "we don't write concurrency, crash recovery, and consistency by hand."</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Application&quot;] --&gt; B[&quot;DBMS&quot;]
+    B --&gt; C[&quot;Storage (Disk)&quot;]
+    B --&gt; D[&quot;Buffer / Cache&quot;]
+    B --&gt; E[&quot;Log (WAL)&quot;]
+    F[&quot;Other clients&quot;] --&gt; B
+</code></pre>
+<p>A DBMS sits between the application and the disk, accepting requests from many clients while keeping its cache, log, and on-disk state consistent. The application says <strong>what</strong> it wants in SQL; how to lock and how to write to disk is the DBMS's job.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>DBMS</strong>: Database management system — software like PostgreSQL, MySQL, or SQLite.</li>
+<li><strong>Schema</strong>: A specification of the data's structure: tables, columns, types.</li>
+<li><strong>Transaction</strong>: A group of SQL statements that must all commit or all be rolled back.</li>
+<li><strong>Durability</strong>: Once committed, a change survives even an immediate crash.</li>
+<li><strong>Concurrency control</strong>: The mechanism that keeps results sane when many clients touch the same data at once.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — write to a file directly</strong></p>
+<pre><code class="language-python"># accounts.py — touch the file ourselves
+import json
+
+def deposit(user_id: str, amount: int) -&gt; None:
+    with open(&quot;accounts.json&quot;, &quot;r&quot;) as f:
+        data = json.load(f)
+    data[user_id] = data.get(user_id, 0) + amount
+    with open(&quot;accounts.json&quot;, &quot;w&quot;) as f:
+        json.dump(data, f)
+</code></pre>
+<p>Fine for one user. With two processes, one deposit silently disappears. A crash mid-<code>json.dump</code> corrupts the file.</p>
+<p><strong>After — use SQLite</strong></p>
+<pre><code class="language-python"># accounts.py — DBMS owns concurrency and durability
+import sqlite3
+
+def deposit(db: sqlite3.Connection, user_id: str, amount: int) -&gt; None:
+    with db:  # transaction
+        db.execute(
+            &quot;UPDATE accounts SET balance = balance + ? WHERE user_id = ?&quot;,
+            (amount, user_id),
+        )
+</code></pre>
+<p>The DBMS takes a lock to handle concurrency and uses a write-ahead log so the change survives a crash. The application states intent.</p>
+<h2>Hands-on: Try a Tiny DBMS with SQLite</h2>
+<p><strong>Step 1 — Create a database</strong></p>
+<pre><code class="language-bash">python3 -c &quot;import sqlite3; sqlite3.connect('shop.db').close()&quot;
+ls -l shop.db
+</code></pre>
+<p><code>shop.db</code> is the entire database — one file. SQLite runs in-process, no separate server.</p>
+<p><strong>Step 2 — Define a schema</strong></p>
+<pre><code class="language-python"># init.py
+import sqlite3
+
+DDL = &quot;&quot;&quot;
+CREATE TABLE IF NOT EXISTS products (
+    id    INTEGER PRIMARY KEY,
+    name  TEXT NOT NULL,
+    price INTEGER NOT NULL CHECK (price &gt;= 0)
+);
+&quot;&quot;&quot;
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.executescript(DDL)
+</code></pre>
+<p>Types and constraints (<code>NOT NULL</code>, <code>CHECK</code>) push bad data back at the database boundary, before it reaches your code.</p>
+<p><strong>Step 3 — Insert and read</strong></p>
+<pre><code class="language-python"># use.py
+import sqlite3
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;INSERT INTO products (name, price) VALUES (?, ?)&quot;, (&quot;apple&quot;, 1500))
+    db.execute(&quot;INSERT INTO products (name, price) VALUES (?, ?)&quot;, (&quot;milk&quot;, 3200))
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    rows = db.execute(&quot;SELECT name, price FROM products ORDER BY price&quot;).fetchall()
+    for name, price in rows:
+        print(name, price)
+</code></pre>
+<p>The <code>?</code> placeholders matter. Building SQL with string formatting opens the door to SQL injection.</p>
+<p><strong>Step 4 — Feel a transaction</strong></p>
+<pre><code class="language-python"># tx.py
+import sqlite3
+
+db = sqlite3.connect(&quot;shop.db&quot;)
+try:
+    with db:  # auto BEGIN/COMMIT, ROLLBACK on exception
+        db.execute(&quot;UPDATE products SET price = price + 100 WHERE name = ?&quot;, (&quot;apple&quot;,))
+        raise RuntimeError(&quot;something went wrong&quot;)
+except RuntimeError:
+    pass
+
+print(db.execute(&quot;SELECT price FROM products WHERE name='apple'&quot;).fetchone())
+# unchanged — the update was rolled back
+</code></pre>
+<p>This single step is the decisive difference from raw files.</p>
+<p><strong>Step 5 — Two processes at once</strong></p>
+<pre><code class="language-python"># writer.py — run in two terminals at the same time
+import sqlite3, time
+db = sqlite3.connect(&quot;shop.db&quot;, timeout=5.0)
+with db:
+    db.execute(&quot;UPDATE products SET price = price + 1 WHERE name='apple'&quot;)
+    time.sleep(2)
+print(&quot;done&quot;)
+</code></pre>
+<p>While one transaction is open, the other waits. With direct file writes one update would have overwritten the other.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The application states <strong>what</strong> it wants. Locking, logging, and disk syncing are the DBMS's responsibility.</li>
+<li>Schema and constraints are the first line of data quality, faster and more consistent than application checks.</li>
+<li>Transactions group any SQL into a single "all or nothing" unit. The application defines the boundary.</li>
+<li>The reason two processes don't clobber the file is that SQLite takes a lock for you.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating a DBMS as "a fancier file."</strong> A comparison without concurrency and crash recovery is no comparison.</li>
+<li><strong>Starting without a schema.</strong> It feels free at first; it costs double when you have to clean it up six months in.</li>
+<li><strong>Running every statement in autocommit.</strong> Even two-line updates can leave data inconsistent if one half fails.</li>
+<li><strong>Building SQL with string formatting instead of <code>?</code> placeholders.</strong> The classic on-ramp for SQL injection.</li>
+<li><strong>Never testing recovery.</strong> A backup that has not been restored recently is a hope, not a backup.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most backends use a relational DBMS (PostgreSQL, MySQL) as the system of record, with a cache like Redis and sometimes a search index in front. "We outgrew SQL" is rarer than "we never indexed properly." Reach for NoSQL when the data shape really is a tree, document, time series, or graph and a specialized engine is genuinely simpler.</p>
+<p>In operations, what matters is not how it runs on a calm Tuesday but <strong>whether your data survives a bad day</strong>. WAL, backups, replication, point-in-time recovery — those words come up repeatedly later in this series.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They first ask, "what would I have to write by hand if I skipped the DBMS?" Locks, WAL, indexes, an optimizer — none of it is realistic to build.</li>
+<li>They treat schema as code: migrations are first-class citizens with reviews and rollback plans.</li>
+<li>They draw transaction boundaries explicitly. Vague boundaries hide bugs.</li>
+<li>They shape the data model around access patterns. Normalization is a default, not a religion.</li>
+<li>They rehearse recovery. "We have backups" is not the same as "we restored one this quarter."</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state in one sentence why this needs a DBMS, not a file?</li>
+<li>[ ] Are tables and constraints defined?</li>
+<li>[ ] Are all writes inside a transaction?</li>
+<li>[ ] Does user input go through <code>?</code> placeholders?</li>
+<li>[ ] Has recovery been tested in the last 90 days?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare a file-based store and a DBMS in one sentence each across four axes: concurrency, durability, consistency, querying.</li>
+<li>Run the two-process update from Step 5. Note which process commits first. Drop the timeout to zero — what error message do you see?</li>
+<li>Name two cases where "just a JSON file is fine." For each, state the condition that, if broken, forces you to a DBMS.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A DBMS is not a place to put data — it is <strong>software that solves concurrency, durability, consistency, and querying together</strong>. That is what lets your application stay focused on intent. Next we look at the model SQL is built on: the relational model.</p>
+<ul>
+<li><strong>What Is a Database System? (current)</strong></li>
+<li>The Relational Model (upcoming)</li>
+<li>SQL and Query Processing (upcoming)</li>
+<li>Indexes (upcoming)</li>
+<li>Transactions and ACID (upcoming)</li>
+<li>Isolation Levels (upcoming)</li>
+<li>Normalization and Modeling (upcoming)</li>
+<li>Query Optimization (upcoming)</li>
+<li>Replication and Backup (upcoming)</li>
+<li>OLTP and OLAP (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/intro-whatis.html">PostgreSQL Documentation — Concepts</a></li>
+<li><a href="https://www.sqlite.org/whentouse.html">SQLite — When to Use SQLite</a></li>
+<li><a href="https://www.db-book.com/">Database System Concepts (Silberschatz)</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, DBMS, Data Model, Durability, Transactions</p>
+</body>
+</html>

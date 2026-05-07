@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Isolation Levels</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Isolation Levels</h1>
+<blockquote>
+<p>Database Systems 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When two transactions touch the same data at the same time, how far does the database go to make each one feel like it is alone?</p>
+<blockquote>
+<p>Isolation (the I in ACID) is not on/off, it is a dial. Too loose and you get anomalies like dirty reads or phantom reads; too strict and throughput collapses. Isolation levels are the dial that decides where you stop and where you give in.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The four classic concurrency anomalies</li>
+<li>The difference between READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE</li>
+<li>How MVCC delivers consistent reads without locking</li>
+<li>Which isolation level fits which kind of workload</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without isolation knowledge, half of "we cannot reproduce this bug" tickets stay unexplained. A payment is charged twice, a balance goes negative, the same order is created twice — these are isolation problems. And almost none of them show up in unit tests.</p>
+<blockquote>
+<p>Concurrency bugs hide in calm weather and hit you at the worst possible moment.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;READ UNCOMMITTED&quot;] --&gt; B[&quot;READ COMMITTED&quot;]
+    B --&gt; C[&quot;REPEATABLE READ&quot;]
+    C --&gt; D[&quot;SERIALIZABLE&quot;]
+    A -.-&gt;|&quot;fast but risky&quot;| E[&quot;many anomalies&quot;]
+    D -.-&gt;|&quot;slow but safe&quot;| F[&quot;no anomalies&quot;]
+</code></pre>
+<p>Left to right means safer but more expensive. Most DBMS defaults sit at READ COMMITTED or REPEATABLE READ.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Dirty Read</strong>: You see another transaction's uncommitted change.</li>
+<li><strong>Non-repeatable Read</strong>: You read the same row twice and get different values.</li>
+<li><strong>Phantom Read</strong>: You read with the same predicate twice and get a different number of rows.</li>
+<li><strong>Lost Update</strong>: Two transactions update the same row concurrently and one update vanishes.</li>
+<li><strong>MVCC (Multi-Version Concurrency Control)</strong>: Each row holds multiple versions so reads and writes do not block each other.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — wrong isolation: balance debited twice</strong></p>
+<pre><code class="language-sql">-- T1: SELECT balance FROM accounts WHERE id=1; -- 1000
+-- T2: SELECT balance FROM accounts WHERE id=1; -- 1000
+-- T1: UPDATE ... SET balance=900 WHERE id=1;
+-- T2: UPDATE ... SET balance=900 WHERE id=1;  -- overwrites T1 (Lost Update)
+</code></pre>
+<p><strong>After — SERIALIZABLE or SELECT ... FOR UPDATE</strong></p>
+<pre><code class="language-sql">BEGIN;
+SELECT balance FROM accounts WHERE id=1 FOR UPDATE;
+UPDATE accounts SET balance = balance - 100 WHERE id=1;
+COMMIT;
+</code></pre>
+<p>We lock the row at read time so other transactions cannot touch it.</p>
+<h2>Hands-on: Reproduce the Anomalies Yourself</h2>
+<p><strong>Step 1 — Two sessions</strong></p>
+<pre><code class="language-python"># Open two psql shells, or two sqlite3 connections.
+import sqlite3
+c1 = sqlite3.connect(&quot;iso.db&quot;, isolation_level=&quot;DEFERRED&quot;)
+c2 = sqlite3.connect(&quot;iso.db&quot;, isolation_level=&quot;DEFERRED&quot;)
+
+c1.executescript(&quot;&quot;&quot;
+DROP TABLE IF EXISTS counter;
+CREATE TABLE counter (id INTEGER PRIMARY KEY, n INTEGER);
+INSERT INTO counter VALUES (1, 0);
+&quot;&quot;&quot;)
+c1.commit()
+</code></pre>
+<p><strong>Step 2 — Reproduce a Lost Update</strong></p>
+<pre><code class="language-python">c1.execute(&quot;BEGIN&quot;)
+c2.execute(&quot;BEGIN&quot;)
+n1 = c1.execute(&quot;SELECT n FROM counter WHERE id=1&quot;).fetchone()[0]
+n2 = c2.execute(&quot;SELECT n FROM counter WHERE id=1&quot;).fetchone()[0]
+c1.execute(&quot;UPDATE counter SET n=? WHERE id=1&quot;, (n1 + 1,))
+c2.execute(&quot;UPDATE counter SET n=? WHERE id=1&quot;, (n2 + 1,))
+c1.commit()
+c2.commit()
+print(c1.execute(&quot;SELECT n FROM counter&quot;).fetchone())  # 1, not 2
+</code></pre>
+<p>Both sessions read 0 and each wrote 1. One increment vanished.</p>
+<p><strong>Step 3 — Block it with SELECT ... FOR UPDATE</strong></p>
+<pre><code class="language-python"># PostgreSQL
+# T1
+# BEGIN;
+# SELECT n FROM counter WHERE id=1 FOR UPDATE;  -- lock
+# UPDATE counter SET n = n+1 WHERE id=1;
+# COMMIT;
+# T2: blocks on SELECT ... FOR UPDATE until T1 ends
+</code></pre>
+<p>An explicit row lock serializes the two sessions.</p>
+<p><strong>Step 4 — Consistent reads under REPEATABLE READ</strong></p>
+<pre><code class="language-sql">-- T1
+BEGIN ISOLATION LEVEL REPEATABLE READ;
+SELECT count(*) FROM orders WHERE user_id=7;  -- 10
+
+-- T2 (other session): INSERT INTO orders (user_id, ...) VALUES (7, ...); COMMIT;
+
+-- T1
+SELECT count(*) FROM orders WHERE user_id=7;  -- still 10
+COMMIT;
+</code></pre>
+<p>Under REPEATABLE READ you keep seeing the snapshot from when the transaction started. PostgreSQL implements this lock-free with MVCC.</p>
+<p><strong>Step 5 — The cost of SERIALIZABLE</strong></p>
+<pre><code class="language-sql">-- T1, T2 both SERIALIZABLE.
+-- T1: SELECT with a predicate, then INSERT
+-- T2: same predicate concurrently, then INSERT
+-- If the database detects a conflict, one side fails with SQLSTATE 40001.
+-- The application must retry.
+</code></pre>
+<p>SERIALIZABLE is safe but pays the cost of conflict detection plus retries.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Isolation level is chosen by <strong>the developer</strong>, not the optimizer.</li>
+<li>Thanks to MVCC, PostgreSQL's default is "reads do not block writes, writes do not block reads."</li>
+<li><code>FOR UPDATE</code> is the most common tool for explicit row locks.</li>
+<li>Using SERIALIZABLE without a retry loop makes the system fragile to occasional failures.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Updating a counter or stock without thinking about isolation.</strong> A lost update reproduces exactly.</li>
+<li><strong>Using SERIALIZABLE without a retry loop.</strong> Serialization failures bubble straight up to the user.</li>
+<li><strong>Assuming REPEATABLE READ blocks phantom reads.</strong> It depends on the DBMS.</li>
+<li><strong>Sprinkling <code>SELECT ... FOR UPDATE</code> everywhere.</strong> Lock scope grows and concurrency collapses.</li>
+<li><strong>Setting isolation level once in some forgotten place.</strong> It becomes unclear which transactions are actually using it.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most OLTP services use READ COMMITTED by default, plus <code>SELECT ... FOR UPDATE</code> on the critical write paths. Analytics queries on the same database take advantage of REPEATABLE READ snapshots.</p>
+<p>Domains where correctness is absolute — finance, reservations — default to SERIALIZABLE and wrap every business transaction in a retry loop. In that setting, transactions must be short and idempotent.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They constantly ask "what breaks if this transaction runs concurrently with another?"</li>
+<li>They keep lock scope small. Row lock should not escalate to page lock to table lock.</li>
+<li>They distinguish retryable failures from non-retryable ones.</li>
+<li>Any change in isolation level is a top-priority code review topic.</li>
+<li>Concurrency bugs are caught with logs, traces, and reproducible scenarios — not by reasoning in your head.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Do you know the isolation level on the critical write paths?</li>
+<li>[ ] Are lost-update points protected by a lock or by SERIALIZABLE?</li>
+<li>[ ] If SERIALIZABLE, is there a retry loop?</li>
+<li>[ ] Are transactions short and free of external calls?</li>
+<li>[ ] Do you exercise at least one concurrency scenario in integration tests?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Name two anomalies that are still possible under READ COMMITTED.</li>
+<li>In one paragraph, explain how MVCC enables "reads do not block writes, writes do not block reads."</li>
+<li>Give two ways to safely handle a concurrent INCREMENT on a counter column (locks, atomic UPDATE, etc.).</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Isolation level is the dial between concurrency safety and throughput. Knowing the anomalies and what each level promises lets you design failure modes ahead of time. The next post climbs one layer up to the quality of the data model itself — normalization and functional dependencies. A good model removes update anomalies and concurrency hazards before they ever happen.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">The Relational Model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/03-sql-and-query-processing.md">SQL and Query Processing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/04-indexes.md">Indexes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/05-transactions-and-acid.md">Transactions and ACID</a></li>
+<li><strong>Isolation Levels (current)</strong></li>
+<li>Normalization and Modeling (upcoming)</li>
+<li>Query Optimization (upcoming)</li>
+<li>Replication and Backup (upcoming)</li>
+<li>OLTP and OLAP (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/transaction-iso.html">PostgreSQL — Transaction Isolation</a></li>
+<li><a href="https://jepsen.io/consistency">Jepsen — Consistency Models</a></li>
+<li><a href="https://www.microsoft.com/en-us/research/publication/a-critique-of-ansi-sql-isolation-levels/">A Critique of ANSI SQL Isolation Levels (Berenson et al.)</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Chapter 7</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, Isolation, MVCC, Concurrency, Anomalies</p>
+</body>
+</html>
