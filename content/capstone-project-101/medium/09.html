@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building Presentation Materials</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building Presentation Materials</h1>
+<blockquote>
+<p>Capstone Project 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> are <em>feature list</em> presentations <em>boring</em>?</p>
+<blockquote>
+<p>They lack the <em>problem solution result</em> <em>narrative</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>narrative</em> structure</li>
+<li><em>Slide</em> composition</li>
+<li>A <em>demo script</em></li>
+<li><em>Q&amp;A</em> preparation</li>
+<li><em>Time</em> allocation</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Delivery</em> matters as much as <em>results</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Problem] --&gt; S[Solution]
+    S --&gt; D[Demo]
+    D --&gt; R[Result]
+    R --&gt; N[Next]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>narrative</strong>: a <em>story arc</em>.</li>
+<li><strong>slide</strong>: <em>one</em> slide, <em>one</em> message.</li>
+<li><strong>demo</strong>: a <em>scripted</em> walkthrough.</li>
+<li><strong>QnA</strong>: <em>expected</em> questions.</li>
+<li><strong>timing</strong>: <em>time allocation</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A <em>feature list</em> slide deck.</p>
+<p><strong>After</strong>: A <em>problem solution result</em> deck.</p>
+<h2>Hands-on: Slide Table</h2>
+<p><strong>Step 1 — Build the narrative</strong></p>
+<pre><code class="language-python">story = [&quot;problem&quot;, &quot;solution&quot;, &quot;demo&quot;, &quot;result&quot;, &quot;next&quot;]
+</code></pre>
+<p><strong>Step 2 — Slide counts</strong></p>
+<pre><code class="language-python">slides = {&quot;problem&quot;: 2, &quot;solution&quot;: 3, &quot;demo&quot;: 1, &quot;result&quot;: 2, &quot;next&quot;: 1}
+</code></pre>
+<p><strong>Step 3 — Demo script</strong></p>
+<pre><code class="language-python">demo_steps = [&quot;login&quot;, &quot;core_action&quot;, &quot;result_view&quot;]
+</code></pre>
+<p><strong>Step 4 — Q&amp;A prep</strong></p>
+<pre><code class="language-python">qna = [&quot;why_this_stack&quot;, &quot;how_we_tested&quot;, &quot;what_we_cut&quot;]
+</code></pre>
+<p><strong>Step 5 — Time allocation</strong></p>
+<pre><code class="language-python">minutes = {&quot;talk&quot;: 8, &quot;demo&quot;: 5, &quot;qna&quot;: 7}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>One slide</em> equals <em>one message</em>.</li>
+<li>The <em>demo</em> is <em>three steps</em> or fewer.</li>
+<li><em>Q&amp;A</em> answers are <em>prepared</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Too much <em>text</em>.</strong></li>
+<li><strong>A <em>feature list</em>.</strong></li>
+<li><strong>No <em>demo failure</em> fallback.</strong></li>
+<li><strong>No <em>Q&amp;A</em> preparation.</strong></li>
+<li><strong>Going <em>over time</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Investor pitches also use the <em>problem solution result</em> arc.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Narrative</em> outranks <em>features</em>.</li>
+<li><em>Slides</em> are <em>visual</em>.</li>
+<li><em>Demos</em> are <em>rehearsed</em>.</li>
+<li><em>Q&amp;A</em> is <em>scripted</em>.</li>
+<li><em>Time</em> is <em>kept</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Narrative</em> in five steps.</li>
+<li>[ ] <em>Demo</em> script.</li>
+<li>[ ] <em>Q&amp;A</em> answers.</li>
+<li>[ ] <em>Time</em> allocation table.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the <em>narrative</em> structure in one line.</li>
+<li>State <em>demo failure</em> fallback in one line.</li>
+<li>State a <em>Q&amp;A</em> prep method in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Project Retrospective</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Defining the Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Organizing Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/05-splitting-team-roles.md">Splitting Team Roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/06-designing-the-mvp.md">Designing the MVP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/07-choosing-the-tech-stack.md">Choosing the Tech Stack</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/08-schedule-management.md">Schedule Management</a></li>
+<li><strong>Building Presentation Materials (current)</strong></li>
+<li>Project Retrospective (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.presentationzen.com/">Presentation Zen - Garr Reynolds</a></li>
+<li><a href="https://www.edwardtufte.com/tufte/powerpoint">The Cognitive Style of PowerPoint - Edward Tufte</a></li>
+<li><a href="https://www.ted.com/playlists/574/how_to_make_a_great_presentation">TED Talks - Chris Anderson</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Pyramid_principle">Pyramid Principle - Barbara Minto</a></li>
+</ul>
+<p class="tags-line">Tags: Capstone, Presentation, Demo, Storytelling, Beginner</p>
+</body>
+</html>

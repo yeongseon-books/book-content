@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Choosing a Topic</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Choosing a Topic</h1>
+<blockquote>
+<p>Capstone Project 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>What</em> does a <em>good topic</em> look like, and <em>how</em> do you pick one?</p>
+<blockquote>
+<p>A topic that is <em>small</em>, <em>measurable</em>, and <em>within your team's reach</em> is a <em>good topic</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Criteria</em> for a good topic</li>
+<li>Building a <em>candidate list</em></li>
+<li><em>Comparison matrix</em></li>
+<li><em>Scope</em> tuning</li>
+<li><em>Final</em> pick</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If the <em>topic</em> shakes, the <em>remaining semester</em> shakes.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    I[Ideas] --&gt; F[Filter]
+    F --&gt; M[Matrix]
+    M --&gt; S[Score]
+    S --&gt; P[Pick]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>idea</strong>: a <em>candidate</em>.</li>
+<li><strong>filter</strong>: rejection <em>criteria</em>.</li>
+<li><strong>matrix</strong>: comparison <em>table</em>.</li>
+<li><strong>score</strong>: a <em>number</em>.</li>
+<li><strong>pick</strong>: <em>final selection</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You only chase <em>cool topics</em>.</p>
+<p><strong>After</strong>: You pick a <em>topic that fits your team</em>.</p>
+<h2>Hands-on: Topic Comparison Matrix</h2>
+<p><strong>Step 1 — Candidates</strong></p>
+<pre><code class="language-python">ideas = [&quot;schedule_checker&quot;, &quot;mood_diary&quot;, &quot;campus_map&quot;]
+</code></pre>
+<p><strong>Step 2 — Score axes</strong></p>
+<pre><code class="language-python">axes = [&quot;impact&quot;, &quot;feasibility&quot;, &quot;interest&quot;]
+</code></pre>
+<p><strong>Step 3 — Score table</strong></p>
+<pre><code class="language-python">score = {&quot;schedule_checker&quot;: [4, 5, 4], &quot;mood_diary&quot;: [3, 4, 5], &quot;campus_map&quot;: [4, 3, 3]}
+</code></pre>
+<p><strong>Step 4 — Totals</strong></p>
+<pre><code class="language-python">total = {k: sum(v) for k, v in score.items()}
+</code></pre>
+<p><strong>Step 5 — Pick</strong></p>
+<pre><code class="language-python">pick = max(total, key=total.get)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Comparison</em> makes the <em>decision</em> easy.</li>
+<li><em>Axes</em> are the <em>criteria</em>.</li>
+<li>Look at <em>balance</em> too, not only <em>totals</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Chasing <em>trends</em> only.</strong></li>
+<li><strong>Overestimating <em>team capacity</em>.</strong></li>
+<li><strong>Picking by <em>gut</em> with no <em>score table</em>.</strong></li>
+<li><strong><em>Mixing</em> axis definitions.</strong></li>
+<li><strong>Not <em>keeping alternatives</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Product <em>priority meetings</em> use <em>similar matrices</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Stay <em>small</em>.</li>
+<li><em>Compare</em>.</li>
+<li><em>Document</em>.</li>
+<li>Keep <em>alternatives</em>.</li>
+<li>Allow <em>revisits</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Three or more candidates</em>.</li>
+<li>[ ] <em>Three axes</em>.</li>
+<li>[ ] <em>Score table</em>.</li>
+<li>[ ] <em>Reason for pick</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>impact</em> in one line.</li>
+<li>Define <em>feasibility</em> in one line.</li>
+<li>State the meaning of <em>topic selection</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Defining the Problem</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
+<li><strong>Choosing a Topic (current)</strong></li>
+<li>Defining the Problem (upcoming)</li>
+<li>Organizing Requirements (upcoming)</li>
+<li>Splitting Team Roles (upcoming)</li>
+<li>Designing the MVP (upcoming)</li>
+<li>Choosing the Tech Stack (upcoming)</li>
+<li>Schedule Management (upcoming)</li>
+<li>Building Presentation Materials (upcoming)</li>
+<li>Project Retrospective (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="http://momtestbook.com/">The Mom Test</a></li>
+<li><a href="https://strategyn.com/jobs-to-be-done/">Jobs to be Done</a></li>
+<li><a href="http://paulgraham.com/startupideas.html">How to Get Startup Ideas - Paul Graham</a></li>
+<li><a href="https://www.atlassian.com/work-management/project-management/decision-matrix">Atlassian Decision Matrix</a></li>
+</ul>
+<p class="tags-line">Tags: Capstone, Topic, Ideation, Scope, Beginner</p>
+</body>
+</html>

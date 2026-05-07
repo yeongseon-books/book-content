@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project Retrospective</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Project Retrospective</h1>
+<blockquote>
+<p>Capstone Project 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>How</em> do you keep a <em>retrospective</em> from becoming a <em>blame meeting</em>?</p>
+<blockquote>
+<p>Record only <em>facts</em> and <em>actions</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>KPT</em> format</li>
+<li><em>Data-driven</em> retrospectives</li>
+<li><em>Five Whys</em> root cause</li>
+<li><em>Next actions</em></li>
+<li><em>Learning</em> summary</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>retrospective</em> shapes the <em>next project</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    K[Keep] --&gt; P[Problem]
+    P --&gt; T[Try]
+    T --&gt; A[Action]
+    A --&gt; N[Next Project]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>KPT</strong>: <em>Keep / Problem / Try</em>.</li>
+<li><strong>5 Whys</strong>: a <em>root-cause</em> method.</li>
+<li><strong>action</strong>: a <em>next step</em>.</li>
+<li><strong>data</strong>: <em>numerical</em> evidence.</li>
+<li><strong>learning</strong>: <em>captured</em> lesson.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Only <em>feelings</em> are aired.</p>
+<p><strong>After</strong>: <em>Facts and actions</em> are recorded.</p>
+<h2>Hands-on: Retro Table</h2>
+<p><strong>Step 1 — KPT</strong></p>
+<pre><code class="language-python">kpt = {&quot;keep&quot;: [], &quot;problem&quot;: [], &quot;try&quot;: []}
+</code></pre>
+<p><strong>Step 2 — Data</strong></p>
+<pre><code class="language-python">metrics = {&quot;velocity&quot;: 12, &quot;bugs&quot;: 5, &quot;review_time&quot;: 1.5}
+</code></pre>
+<p><strong>Step 3 — Five Whys</strong></p>
+<pre><code class="language-python">whys = [&quot;bug_at_demo&quot;, &quot;missed_test&quot;, &quot;no_ci&quot;, &quot;no_template&quot;, &quot;first_time&quot;]
+</code></pre>
+<p><strong>Step 4 — Next actions</strong></p>
+<pre><code class="language-python">actions = [{&quot;who&quot;: &quot;A&quot;, &quot;what&quot;: &quot;add_ci&quot;, &quot;by&quot;: &quot;next_sprint&quot;}]
+</code></pre>
+<p><strong>Step 5 — Learning summary</strong></p>
+<pre><code class="language-python">lessons = [&quot;scope_first&quot;, &quot;ci_early&quot;, &quot;demo_dryrun&quot;]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>KPT</em> has <em>three</em> columns.</li>
+<li><em>Data</em> is <em>numeric</em>.</li>
+<li><em>Actions</em> have an <em>owner</em> and <em>deadline</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Asking <em>who</em> is at fault.</strong></li>
+<li><strong>Recording only <em>feelings</em>.</strong></li>
+<li><strong>No <em>actions</em>.</strong></li>
+<li><strong>No <em>data</em>.</strong></li>
+<li><strong>Not <em>linking</em> to the <em>next project</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Companies run <em>sprint retrospectives</em> and <em>postmortems</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Start from <em>facts</em>.</li>
+<li><em>Causes</em> are <em>systemic</em>.</li>
+<li><em>Actions</em> are <em>small</em>.</li>
+<li><em>Responsibility</em> is <em>shared</em>.</li>
+<li><em>Learning</em> is <em>documented</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>KPT</em> table.</li>
+<li>[ ] <em>Data</em> gathered.</li>
+<li>[ ] <em>Five Whys</em>.</li>
+<li>[ ] <em>Three</em> next actions.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the meaning of <em>KPT</em> in one line.</li>
+<li>State what <em>Five Whys</em> is in one line.</li>
+<li>State the <em>next-action</em> format in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This concludes the <em>Capstone Project 101</em> series. The next series is <em>Portfolio Project 101</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Defining the Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Organizing Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/05-splitting-team-roles.md">Splitting Team Roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/06-designing-the-mvp.md">Designing the MVP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/07-choosing-the-tech-stack.md">Choosing the Tech Stack</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/08-schedule-management.md">Schedule Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/09-presentation-materials.md">Building Presentation Materials</a></li>
+<li><strong>Project Retrospective (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pragprog.com/titles/dlret/agile-retrospectives/">Agile Retrospectives - Esther Derby</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Five_whys">The Five Whys - Toyota Production System</a></li>
+<li><a href="https://sre.google/sre-book/postmortem-culture/">Postmortem Culture - Google SRE</a></li>
+<li><a href="https://retrospectives.com/">Project Retrospectives - Norman Kerth</a></li>
+</ul>
+<p class="tags-line">Tags: Capstone, Retrospective, Learning, Reflection, Beginner</p>
+</body>
+</html>
