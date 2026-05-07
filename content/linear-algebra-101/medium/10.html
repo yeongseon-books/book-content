@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Linear Algebra in Machine Learning</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Linear Algebra in Machine Learning</h1>
+<blockquote>
+<p>Linear Algebra 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Where does the <em>linear algebra</em> you have learned actually <em>show up in ML</em>?</p>
+<blockquote>
+<p><em>Linear algebra is the common language of </em>data representation<em>, </em>model definition<em>, and </em>training algorithms<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>normal equations</em> of <em>linear regression</em></li>
+<li><em>Matrix multiplications</em> inside <em>neural network layers</em></li>
+<li><em>Inner product / cosine</em> in <em>embedding spaces</em></li>
+<li>A 5-step capstone hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>An <em>ML engineer with weak linear algebra</em> cannot <em>debug or optimize</em>. They lose the <em>eye for what's inside the model</em>.</p>
+<blockquote>
+<p><em>Every ML algorithm has linear algebra inside.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;Data X (matrix)&quot;] --&gt; Model[&quot;Model = matrices&quot;]
+    Model --&gt; Loss[&quot;Loss&quot;]
+    Loss --&gt; Grad[&quot;Gradient = vectors/matrices&quot;]
+    Grad --&gt; Update[&quot;Weight update&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Design matrix X</strong>: rows = samples, columns = features.</li>
+<li><strong>Weights W</strong>: <em>learnable parameters</em> of a <em>linear transformation</em>.</li>
+<li><strong>Embedding</strong>: a <em>high-dimensional object</em> represented as a <em>vector</em>.</li>
+<li><strong>Gradient</strong>: the <em>derivative</em> of the <em>loss</em> w.r.t. vectors/matrices.</li>
+<li><strong>Batched matmul</strong>: process <em>many inputs at once</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"ML is magic."</em> — the inside is a <em>black box</em>.</p>
+<p><strong>After</strong>: <em>"Every layer is </em>linear transformation + nonlinearity<em> — </em>a sequence of matrices and vectors<em>."</em></p>
+<h2>Hands-on: Five Steps in ML × Linear Algebra</h2>
+<p><strong>Step 1 — Linear regression (normal equations)</strong></p>
+<pre><code class="language-python">import numpy as np
+rng = np.random.default_rng(0)
+X = rng.normal(size=(100, 3))
+y = X @ np.array([1.0, -2.0, 0.5]) + rng.normal(scale=0.1, size=100)
+w_hat, *_ = np.linalg.lstsq(X, y, rcond=None)
+print(&quot;w_hat:&quot;, w_hat)
+</code></pre>
+<p><strong>Step 2 — One neural network layer</strong></p>
+<pre><code class="language-python">W1 = rng.normal(size=(3, 4))
+b1 = np.zeros(4)
+h = np.maximum(0, X @ W1 + b1)  # ReLU
+print(&quot;hidden shape:&quot;, h.shape)
+</code></pre>
+<p><strong>Step 3 — Cosine similarity (embeddings)</strong></p>
+<pre><code class="language-python">emb = rng.normal(size=(5, 8))
+norms = np.linalg.norm(emb, axis=1, keepdims=True)
+emb_n = emb / norms
+sim = emb_n @ emb_n.T
+print(&quot;sim matrix shape:&quot;, sim.shape)
+</code></pre>
+<p><strong>Step 4 — One gradient step</strong></p>
+<pre><code class="language-python">def loss_and_grad(w, X, y):
+    pred = X @ w
+    err = pred - y
+    loss = (err ** 2).mean()
+    grad = 2 * X.T @ err / len(y)
+    return loss, grad
+
+w = np.zeros(3)
+for _ in range(50):
+    L, g = loss_and_grad(w, X, y)
+    w -= 0.05 * g
+print(&quot;learned w:&quot;, w)
+</code></pre>
+<p><strong>Step 5 — Compress features with PCA</strong></p>
+<pre><code class="language-python">Xc = X - X.mean(axis=0)
+U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+X_2d = Xc @ Vt[:2].T
+print(&quot;compressed:&quot;, X_2d.shape)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Every layer</em> is <em>matrix product + nonlinearity</em>.</li>
+<li>The <em>gradient</em> is a <em>vector/matrix derivative</em>.</li>
+<li><em>Embedding similarity</em> is <em>cosine</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Avoiding <em>shape-mismatch</em> debugging.</strong></li>
+<li><strong>Skipping <em>normalization / standardization</em>.</strong></li>
+<li><strong>Confusing <em>matrix product</em> with <em>element-wise product</em>.</strong></li>
+<li><strong>Wrong <em>gradient shape</em> — misplaced <em>transpose</em>.</strong></li>
+<li><strong>Ignoring <em>numerical stability</em> — using <code>inv</code> directly.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Linear regression, logistic regression, <em>MLP / CNN / RNN / Transformer</em>, <em>embedding search</em>, <em>recommender systems</em> — all run on <em>linear algebra</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Always print</em> the <em>shape</em>.</li>
+<li>Uses <em>decompositions / normalization</em> for <em>numerical stability</em>.</li>
+<li>Derives <em>gradient shapes</em> by hand.</li>
+<li>Has <em>intuition for embedding spaces</em>.</li>
+<li>Uses <em>PCA / SVD</em> to <em>understand data</em> quickly.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can solve <em>linear regression</em> with lstsq.</li>
+<li>[ ] You can build <em>one MLP layer</em>.</li>
+<li>[ ] You can compute the <em>cosine similarity matrix</em>.</li>
+<li>[ ] You can implement <em>one gradient descent step</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Train <em>logistic regression</em> on <em>iris</em> using gradient descent (no normal equations).</li>
+<li>Implement a <em>2-layer MLP</em> in NumPy with only the <em>forward pass</em>.</li>
+<li>Extract the <em>top-2 cosine similarities</em> among <em>5 embeddings</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Linear algebra is the <em>skeleton of ML</em>. I hope this series gave you the <em>eye to see inside models</em>. The next step is the <em>Calculus for ML</em> series.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Transformations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/06-basis-and-dimension.md">Basis and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/07-eigenvalues-and-eigenvectors.md">Eigenvalues and Eigenvectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/08-matrix-decomposition.md">Matrix Decomposition</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/09-pca.md">PCA</a></li>
+<li><strong>Linear Algebra in Machine Learning (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.deeplearningbook.org/contents/linear_algebra.html">Deep Learning Book — Linear Algebra</a></li>
+<li><a href="https://github.com/fastai/numerical-linear-algebra">fast.ai — Computational Linear Algebra</a></li>
+<li><a href="https://cs229.stanford.edu/section/cs229-linalg.pdf">Stanford CS229 — Linear Algebra Review</a></li>
+<li><a href="https://www.3blue1brown.com/topics/linear-algebra">3Blue1Brown — Essence of Linear Algebra</a></li>
+</ul>
+<p class="tags-line">Tags: LinearAlgebra, MachineLearning, DeepLearning, DataScience, Beginner</p>
+</body>
+</html>

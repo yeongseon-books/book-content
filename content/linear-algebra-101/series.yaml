@@ -1,0 +1,52 @@
+id: linear-algebra-101
+title:
+  ko: Linear Algebra 101
+  en: Linear Algebra 101
+description:
+  ko: 벡터, 행렬, 내적, 선형변환, 기저, 고유값, 행렬분해, PCA까지 ML 입문 직전 단계의 선형대수를 다지는 시리즈.
+  en: A Linear Algebra series covering vectors, matrices, inner products, linear transformations, basis, eigenvalues, decompositions, and PCA as the bridge to ML.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-linear-algebra
+    title:
+      ko: 선형대수란 무엇인가?
+      en: What Is Linear Algebra?
+  - slug: vectors
+    title:
+      ko: 벡터
+      en: Vectors
+  - slug: matrices
+    title:
+      ko: 행렬
+      en: Matrices
+  - slug: inner-product-and-distance
+    title:
+      ko: 내적과 거리
+      en: Inner Product and Distance
+  - slug: linear-transformation
+    title:
+      ko: 선형변환
+      en: Linear Transformations
+  - slug: basis-and-dimension
+    title:
+      ko: 기저와 차원
+      en: Basis and Dimension
+  - slug: eigenvalues-and-eigenvectors
+    title:
+      ko: 고유값과 고유벡터
+      en: Eigenvalues and Eigenvectors
+  - slug: matrix-decomposition
+    title:
+      ko: 행렬 분해
+      en: Matrix Decomposition
+  - slug: pca
+    title:
+      ko: PCA
+      en: PCA
+  - slug: linear-algebra-in-ml
+    title:
+      ko: 머신러닝에서의 선형대수
+      en: Linear Algebra in Machine Learning

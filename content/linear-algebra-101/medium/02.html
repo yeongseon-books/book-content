@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vectors</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Vectors</h1>
+<blockquote>
+<p>Linear Algebra 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is a <em>vector</em> just a <em>bundle of numbers</em>, or an <em>arrow in space</em>?</p>
+<blockquote>
+<p><em>A vector has </em>direction and magnitude<em> — and is also </em>one row<em> of your dataset.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>three views</em> of a vector — arrow, coordinates, data row</li>
+<li><em>Geometric meaning</em> of <em>addition and scalar multiplication</em></li>
+<li><em>Norm and normalization</em></li>
+<li>A 5-step hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>In ML, <em>one row of data</em> is a <em>vector</em>. If you cannot <em>manipulate vectors</em> properly, you are stuck at the input stage.</p>
+<blockquote>
+<p><em>Vectors are how we package data for machines.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Arrow[&quot;Arrow (geometry)&quot;] --&gt; Vec[&quot;Vector&quot;]
+    Coord[&quot;Coordinates (algebra)&quot;] --&gt; Vec
+    Row[&quot;Data row (ML)&quot;] --&gt; Vec
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Vector</strong>: an <em>ordered bundle of numbers</em> — <code>[x1, x2, ..., xn]</code>.</li>
+<li><strong>Dimension</strong>: the <em>number of entries</em> in the vector.</li>
+<li><strong>Norm ||v||</strong>: the <em>magnitude</em> — usually <em>Euclidean length</em>.</li>
+<li><strong>Unit vector</strong>: a vector with norm <em>1</em>.</li>
+<li><strong>Scalar multiplication</strong>: changes the <em>length</em> and possibly <em>flips direction</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"A vector is just a list."</em> — no geometric meaning.</p>
+<p><strong>After</strong>: <em>"A vector is a </em>point/arrow in space<em>, and </em>operations are geometric transformations<em>."</em></p>
+<h2>Hands-on: Five Steps with Vectors</h2>
+<p><strong>Step 1 — Build vectors</strong></p>
+<pre><code class="language-python">import numpy as np
+v = np.array([3.0, 4.0])
+w = np.array([1.0, 2.0])
+print(&quot;v:&quot;, v, &quot;w:&quot;, w)
+</code></pre>
+<p><strong>Step 2 — Addition and subtraction</strong></p>
+<pre><code class="language-python">print(&quot;v+w:&quot;, v + w)
+print(&quot;v-w:&quot;, v - w)
+</code></pre>
+<p><strong>Step 3 — Scalar multiplication</strong></p>
+<pre><code class="language-python">print(&quot;2v:&quot;, 2 * v)
+print(&quot;-v:&quot;, -v)
+</code></pre>
+<p><strong>Step 4 — Norm</strong></p>
+<pre><code class="language-python">norm_v = np.linalg.norm(v)
+print(&quot;||v||:&quot;, norm_v)
+</code></pre>
+<p><strong>Step 5 — Normalize to a unit vector</strong></p>
+<pre><code class="language-python">unit_v = v / np.linalg.norm(v)
+print(&quot;unit v:&quot;, unit_v, &quot;norm:&quot;, np.linalg.norm(unit_v))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>NumPy</em> vector operations are <em>element-wise</em>.</li>
+<li>The <em>default norm</em> is <em>L2 (Euclidean)</em>.</li>
+<li><em>Normalization</em> keeps <em>direction</em> and forces <em>length 1</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Relying on <em>implicit broadcasting</em> despite <em>shape mismatch</em>.</strong></li>
+<li><strong>Normalizing a <em>zero vector</em> — <em>division by zero</em>.</strong></li>
+<li><strong>Sloppy distinction between <em>row vs column vectors</em>.</strong></li>
+<li><strong>Confusing <em>dot product</em> and <em>element-wise product</em>.</strong></li>
+<li><strong>Ignoring <em>floating-point error</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>ML feature inputs, <em>embedding vectors</em>, <em>user/item vectors</em> in recommenders, and <em>word embeddings</em> in NLP — all of these are <em>vector operations</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Always print</em> the <em>shape</em>.</li>
+<li><em>Always check</em> the <em>norm</em>.</li>
+<li>Know <em>when normalization is required</em>.</li>
+<li><em>Visualize</em> the <em>geometric meaning</em>.</li>
+<li>Care about <em>numerical stability</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can do <em>vector addition / scalar multiplication</em>.</li>
+<li>[ ] You can compute <em>norms</em>.</li>
+<li>[ ] You can <em>normalize</em>.</li>
+<li>[ ] You understand the <em>geometric meaning</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compute by hand the <em>Euclidean norm</em> of <code>v = [3, 4]</code>.</li>
+<li>Verify in code that the <em>normalized vector</em> has norm <em>1</em>.</li>
+<li>Explain why <em>normalizing the zero vector</em> is <em>undefined</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A vector is a <em>point/arrow in space</em> and <em>one row of your data</em>. The next post covers <em>matrices</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
+<li><strong>Vectors (current)</strong></li>
+<li>Matrices (upcoming)</li>
+<li>Inner Product and Distance (upcoming)</li>
+<li>Linear Transformations (upcoming)</li>
+<li>Basis and Dimension (upcoming)</li>
+<li>Eigenvalues and Eigenvectors (upcoming)</li>
+<li>Matrix Decomposition (upcoming)</li>
+<li>PCA (upcoming)</li>
+<li>Linear Algebra in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.3blue1brown.com/lessons/vectors">3Blue1Brown — Vectors</a></li>
+<li><a href="https://www.khanacademy.org/math/linear-algebra/vectors-and-spaces">Khan Academy — Vectors</a></li>
+<li><a href="https://numpy.org/doc/stable/user/basics.creation.html">NumPy — Array creation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Euclidean_vector">Wikipedia — Euclidean vector</a></li>
+</ul>
+<p class="tags-line">Tags: LinearAlgebra, Vectors, NumPy, DataScience, Beginner</p>
+</body>
+</html>

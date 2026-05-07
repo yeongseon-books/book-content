@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Eigenvalues and Eigenvectors</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Eigenvalues and Eigenvectors</h1>
+<blockquote>
+<p>Linear Algebra 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you <em>apply a matrix repeatedly</em>, are there <em>axes that do not change direction</em>?</p>
+<blockquote>
+<p><em>Eigenvectors are the </em>invariant axes<em> of a transformation; eigenvalues are the </em>stretching factors<em> along those axes.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>eigenvalues / eigenvectors</em></li>
+<li>Their <em>geometric meaning</em></li>
+<li>How to compute them with <em>NumPy</em></li>
+<li>A 5-step hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>PCA, dynamics, quantum mechanics, PageRank — all rely on <em>eigendecomposition</em>. It lets you view a matrix in a <em>simple coordinate system</em>.</p>
+<blockquote>
+<p><em>Eigenvectors are the natural axes of a transformation.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Matrix A&quot;] --&gt; Eq[&quot;A v = lambda v&quot;]
+    Eq --&gt; Vec[&quot;Eigenvector v&quot;]
+    Eq --&gt; Lam[&quot;Eigenvalue lambda&quot;]
+    Vec --&gt; Use[&quot;PCA, dynamics, PageRank&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Eigenvector v</strong>: a <em>non-zero vector</em> satisfying <code>A v = lambda v</code>.</li>
+<li><strong>Eigenvalue lambda</strong>: the <em>scalar factor</em> along that axis.</li>
+<li><strong>Eigendecomposition</strong>: <code>A = V D V^-1</code> (when diagonalizable).</li>
+<li><strong>Spectrum</strong>: the <em>set of all eigenvalues</em>.</li>
+<li><strong>Symmetric matrix</strong>: has <em>real eigenvalues</em> and <em>orthogonal eigenvectors</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"Eigenvalues are something you solve with a formula."</em> — no idea why they matter.</p>
+<p><strong>After</strong>: <em>"They reveal the </em>axes of a transformation<em> — along which it acts as a </em>simple scalar<em>."</em></p>
+<h2>Hands-on: Five Steps with Eigendecomposition</h2>
+<p><strong>Step 1 — Define a matrix</strong></p>
+<pre><code class="language-python">import numpy as np
+A = np.array([[2.0, 1.0], [0.0, 3.0]])
+</code></pre>
+<p><strong>Step 2 — Eigenvalues / eigenvectors</strong></p>
+<pre><code class="language-python">vals, vecs = np.linalg.eig(A)
+print(&quot;eigenvalues:&quot;, vals)
+print(&quot;eigenvectors:\n&quot;, vecs)
+</code></pre>
+<p><strong>Step 3 — Verify</strong></p>
+<pre><code class="language-python">for i in range(len(vals)):
+    Av = A @ vecs[:, i]
+    lv = vals[i] * vecs[:, i]
+    print(&quot;A v == lambda v:&quot;, np.allclose(Av, lv))
+</code></pre>
+<p><strong>Step 4 — Symmetric matrix</strong></p>
+<pre><code class="language-python">S = np.array([[2.0, 1.0], [1.0, 2.0]])
+sv, svc = np.linalg.eigh(S)  # for symmetric/Hermitian
+print(&quot;sym eigenvalues:&quot;, sv)
+print(&quot;orthogonal? &quot;, np.allclose(svc.T @ svc, np.eye(2)))
+</code></pre>
+<p><strong>Step 5 — Power iteration and stability</strong></p>
+<pre><code class="language-python">M = np.array([[0.9, 0.1], [0.2, 0.8]])
+v = np.array([1.0, 0.0])
+for _ in range(50):
+    v = M @ v
+print(&quot;steady state:&quot;, v / np.linalg.norm(v, 1))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Eigendecomposition</em> simplifies the <em>transformation</em>.</li>
+<li>For <em>symmetric</em> matrices, prefer <em>eigh</em> — it is more <em>stable</em>.</li>
+<li><em>Power iteration</em> converges toward the <em>largest-eigenvalue direction</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Assuming <em>every matrix</em> is <em>diagonalizable</em>.</strong></li>
+<li><strong>Ignoring <em>complex eigenvalues</em>.</strong></li>
+<li><strong>Using <em>eig</em> on symmetric matrices or <em>eigh</em> on non-symmetric ones.</strong></li>
+<li><strong>Forgetting that <em>eigenvector sign / scale</em> is arbitrary.</strong></li>
+<li><strong>Ignoring <em>numerical stability</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>PCA (<em>eigendecomposition of the covariance matrix</em>), PageRank (<em>top eigenvector</em>), dynamical systems (<em>stability analysis</em>), quantum mechanics (<em>energy eigenstates</em>) — all are <em>eigendecompositions</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Use <em>eigh</em> whenever the matrix is <em>symmetric</em>.</li>
+<li>Reads the <em>condition number</em> for stability.</li>
+<li>Interprets <em>complex eigenvalues</em> physically.</li>
+<li>Tracks <em>eigenvector signs</em>.</li>
+<li>Picks <em>power iteration</em> when appropriate.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can compute <em>eigenvalues / eigenvectors</em>.</li>
+<li>[ ] You know how <em>symmetric matrices</em> differ.</li>
+<li>[ ] You can <em>verify</em> with the eigenvector equation.</li>
+<li>[ ] You understand <em>power iteration convergence</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compute by hand the eigenvalues / eigenvectors of <code>diag(2, 3)</code>.</li>
+<li>Verify that the <em>eigenvectors</em> of a <em>symmetric matrix</em> are <em>orthogonal</em>.</li>
+<li>Estimate the <em>top eigenvector</em> using <em>power iteration</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Eigendecomposition reveals a transformation's <em>natural axes</em>. The next post covers <em>matrix decomposition</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Transformations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/06-basis-and-dimension.md">Basis and Dimension</a></li>
+<li><strong>Eigenvalues and Eigenvectors (current)</strong></li>
+<li>Matrix Decomposition (upcoming)</li>
+<li>PCA (upcoming)</li>
+<li>Linear Algebra in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.3blue1brown.com/lessons/eigenvalues">3Blue1Brown — Eigenvectors and eigenvalues</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">Wikipedia — Eigenvalues and eigenvectors</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.eig.html">NumPy — linalg.eig</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.eigh.html">NumPy — linalg.eigh</a></li>
+</ul>
+<p class="tags-line">Tags: LinearAlgebra, Eigenvalues, Eigenvectors, DataScience, Beginner</p>
+</body>
+</html>
