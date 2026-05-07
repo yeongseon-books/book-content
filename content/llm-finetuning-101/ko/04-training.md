@@ -29,6 +29,15 @@ seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 - effective batch size 공식(`per_device × accum × devices`)을 이해합니다.
 - 학습 루프 디버깅 시 먼저 확인해야 할 출력값을 파악합니다.
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+학습 루프와 하이퍼파라미터를 어떻게 설정해야 안정적인 수렴과 일반화를 얻을까요?
+
+이 글은 그 질문에 답하기 위해 학습 루프와 하이퍼파라미터의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 ![이 글에서 답할 질문](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.ko.png)
@@ -208,6 +217,14 @@ args.max_steps = 1
 학습 루프의 핸심은 "얼마나 많이 돌리느냐"가 아니라 "한 번이라도 끝까지 도는지"입니다. 실무에서 파인튜닝 파이프라인을 처음 구축할 때는 3-step smoke test를 PR 게이트로 거는 것을 권합니다. loss가 숫자인지, NaN이 아닌지, global_step이 증가하는지만 확인하면 됩니다.
 
 하이퍼파라미터 조정은 한 번에 하나만 바꾸는 원칙을 지켜야 합니다. learning rate와 batch size를 동시에 바꾸면 어느 변화가 결과에 영향을 줬는지 추적할 수 없기 때문입니다. GPU 메모리가 부족하다면 batch size를 줄이고 gradient accumulation으로 보상하는 것이 맞지, learning rate를 낮추는 것은 다른 문제입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **learning rate가 가장 중요** — 너무 크면 발산, 너무 작으면 정체됩니다.
+- **batch size·gradient accumulation 트레이드오프** — GPU 메모리와 안정성의 균형입니다.
+- **eval loss를 정기적으로** — train loss만 보면 과적합을 놓칩니다.
+- **checkpointing이 운영의 안전장치** — 장시간 학습이 멈춰도 손실을 줄입니다.
+- **재현성을 위한 seed·환경 기록** — 실험 비교의 전제입니다.
 
 ## 체크리스트
 

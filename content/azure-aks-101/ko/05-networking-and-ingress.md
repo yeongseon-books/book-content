@@ -29,6 +29,15 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 왜
 
 ---
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+AKS 네트워킹과 Ingress를 어떻게 설계해야 운영과 보안이 깔끔할까요?
+
+이 글은 그 질문에 답하기 위해 AKS 네트워킹과 Ingress의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 요청 경로부터 먼저 보자
 
 ![Ingress 앞단의 외부 요청 흐름](../../../assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)
@@ -258,6 +267,14 @@ IPAM 방식은 나중에 바꾸기 싫은 축입니다. 클러스터 수, 노드
 이 글은 Azure Kubernetes Service 101 시리즈의 5화입니다. 앞선 글에서 Pod, Deployment, Service가 클러스터 내부의 구조였다면, 이번 화는 그 구조를 외부 요청과 Azure 네트워크에 연결하는 층을 설명했습니다. 다음 6화에서는 이 네트워크 위로 들어오는 부하에 맞춰 Pod 수와 Node 수가 어떻게 늘어나는지 보게 됩니다.
 
 ---
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **CNI 선택은 사후 변경이 어렵다** — kubenet·Azure CNI·Overlay 중 클러스터 생성 시점에 결정합니다.
+- **IP 주소 계획을 사전에 한다** — Pod·Service CIDR 충돌은 디버깅이 매우 어렵습니다.
+- **Ingress controller는 하나로 통일** — 여러 종류가 섞이면 운영 부담이 급격히 늘어납니다.
+- **외부 노출은 NetworkPolicy와 함께** — 기본 open 정책은 사고를 부릅니다.
+- **L7 정책은 ingress, L4는 NetworkPolicy** — 역할을 섞지 않아야 보안 모델이 명확해집니다.
 
 ## 운영 체크리스트
 

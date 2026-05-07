@@ -14,379 +14,170 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-01'
-seo_description: Retriever는 문서를 저장하는 컴포넌트가 아니라 질문을 검색 가능한 컨텍스트로 바꾸는 진입점입니다.
+last_reviewed: '2026-05-06'
+seo_description: 임베딩과 벡터 스토어로 Retriever를 구성해 LLM에 컨텍스트를 주입하는 방법을 정리합니다
 ---
 
 # Retriever — 문서 검색과 컨텍스트 주입
 
-## 이 글에서 답할 질문
+> LangChain 101 시리즈 (3/6)
 
-- Retriever는 VectorStore와 무엇이 다르고 왜 분리되어 있는가
-- `as_retriever()`로 만들면 체인 안에서 어떤 입력과 출력을 주고받는가
-- 검색된 여러 문서를 프롬프트 컨텍스트로 넣을 때 어떤 포맷이 안정적인가
-- RAG의 정확도 문제를 Retriever 단계에서 어디까지 줄일 수 있는가
+<!-- a-grade-intro:begin -->
 
-> Retriever는 문서를 저장하는 컴포넌트가 아니라 질문을 검색 가능한 컨텍스트로 바꾸는 진입점입니다.
+**핵심 질문**: *LLM* 이 *모르* *는* *내용* 은 *어떻게* *답* *하게* *하나요*?
 
-![이 글에서 답할 질문](../../../assets/langchain-101/03/03-01-questions-this-post-answers.ko.png)
+> *문서* 를 *임베딩* 해 *벡터 스토어* 에 *넣고* *Retriever* 로 *불러* *프롬프트* 에 *주입* 합니다.
 
-*이 글에서 답할 질문*
-## 최소 실행 예제
+<!-- a-grade-intro:end -->
 
-```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+## 이 글에서 배울 것
 
-embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-vectorstore = FAISS.from_texts([
-    "FAISS는 고속 벡터 검색 라이브러리입니다.",
-    "Retriever는 질문과 관련된 문서를 찾습니다.",
-], embedding)
-retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
+- *RAG* 의 *기본* *흐름*
+- *임베딩* 과 *벡터 스토어*
+- *FAISS* 로 *로컬* *인덱스* *만들기*
+- *Retriever* 인터페이스
+- *컨텍스트* 를 *프롬프트* 에 *주입*
 
-print(retriever.invoke("Retriever가 무엇을 하나요?")[0].page_content)
+## 왜 중요한가
+
+*LLM* 의 *지식* 은 *학습 시점* 에 *고정* 됩니다. *최신 문서* 나 *사내 자료* 는 *컨텍스트* 로 *직접* *전달* 해야 합니다.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    D[Documents] --> E[Embeddings]
+    E --> V[VectorStore]
+    Q[Question] --> R[Retriever]
+    V --> R
+    R --> P[Prompt]
+    P --> L[LLM]
+    L --> A[Answer]
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+## 핵심 용어 정리
 
-    Retriever는 질문과 관련된 문서를 찾습니다.
+- **Embedding**: *텍스트* 를 *벡터* 로 *변환* *하는* *모델*.
+- **VectorStore**: *벡터* 와 *원문* 을 *함께* *저장* *하는* *인덱스*.
+- **FAISS**: *Meta* 의 *로컬* *벡터 검색* *라이브러리*.
+- **Retriever**: *질문* 으로 *관련 문서* 를 *돌려* *주는* *Runnable*.
+- **Top-k**: *유사도 상위* *k 개* *문서* *반환*.
 
-<!-- injected-output:end -->
+## Before/After
 
-## 이 코드에서 봐야 할 것
+**Before**: "*PDF* 를 *직접* *읽고* *문자열* 로 *프롬프트* 에 *붙입니다*."
 
-- 임베딩 모델은 텍스트를 벡터로 바꾸고, Retriever는 그 벡터 인덱스를 검색 인터페이스로 감춥니다.
-- 체인 입장에서는 `query -> documents`라는 일관된 계약만 알면 됩니다.
-- 검색 결과는 문자열이 아니라 `Document` 객체 목록이므로 후처리 단계가 필요합니다.
-- RAG 품질의 첫 관문은 프롬프트보다 검색 결과 품질입니다.
+**After**: "`retriever | format_docs | prompt | llm` 한 줄이 *같은* *흐름* 을 *대체* 합니다."
 
-## 실무에서 헷갈리는 지점
+## 실습: 로컬 RAG 5단계
 
-- VectorStore를 만들었다고 바로 RAG가 되는 것은 아닙니다. 문서 포맷팅 단계가 꼭 필요합니다.
-- `k`를 크게 늘리면 항상 좋아지는 것이 아니라 노이즈가 늘 수 있습니다.
-- Retriever는 답을 생성하지 않고, 답에 넣을 문맥만 고릅니다.
-
-## 체크리스트
-
-- [ ] VectorStore와 Retriever의 역할 차이를 설명할 수 있다
-- [ ] 검색된 `Document` 리스트를 문자열 컨텍스트로 바꿀 수 있다
-- [ ] 간단한 Retriever를 LCEL 체인에 연결할 수 있다
-
-LangChain 101 시리즈 (3/6)
-
-예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/03-retriever)
-
-## 이 글에서 답할 질문
-
-- Retriever는 VectorStore와 어떤 관계를 가질까
-- `as_retriever()` 뒤에 어떤 검색 파라미터를 조절할 수 있을까
-- 검색 결과를 프롬프트 컨텍스트 문자열로 바꿀 때 무엇을 주의해야 할까
-- RAG 체인에서 retriever는 정확히 어느 위치에 들어갈까
-
-> Retriever는 질문을 받아 관련 문서를 고르고, 그 결과를 프롬프트에 넣을 수 있는 컨텍스트로 바꾸는 LangChain의 검색 경계입니다.
-
-## 핵심 흐름 한눈에 보기
-
-![핵심 흐름 한눈에 보기](../../../assets/langchain-101/03/03-02-the-flow-at-a-glance.ko.png)
-
-*핵심 흐름 한눈에 보기*
-Retriever는 쿼리를 받아 관련 문서 목록을 반환하는 컴포넌트입니다. LangChain의 Retriever 인터페이스는 `get_relevant_documents(query)` 메서드 하나로 정의됩니다. 뒤에 어떤 검색 시스템이 있든 — FAISS, Chroma, Elasticsearch — 체인에서는 같은 방식으로 사용합니다.
-
-이번 글에서는 FAISS 기반 Retriever를 만들고, 그 결과를 프롬프트에 주입하는 RAG 패턴의 기본 형태를 구현합니다.
-
-다룰 내용은 다음과 같습니다.
-
-- FAISS VectorStore와 Retriever 만들기
-- `as_retriever()`와 검색 파라미터
-- Retriever를 체인에 연결하기
-- 검색 결과를 컨텍스트로 주입하는 패턴
-- 여러 문서를 하나의 컨텍스트 문자열로 합치기
-
----
-
-## FAISS VectorStore 만들기
-
-![원문이 벡터 인덱스로 바뀌는 구조](../../../assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.ko.png)
-
-*원문이 벡터 인덱스로 바뀌는 구조*
-LangChain은 `FAISS` 클래스를 통해 벡터 저장소를 추상화합니다. 문서 목록과 임베딩 모델만 넘기면 인덱스를 자동으로 구성합니다.
-
-```bash
-pip install langchain langchain-community faiss-cpu sentence-transformers langchain-groq
-```
+### 1단계 — 문서 준비
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
 
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-documents = [
-    "FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.",
-    "코사인 유사도는 두 벡터의 방향 유사성을 측정합니다.",
-    "임베딩 모델은 텍스트를 고차원 벡터 공간에 투영합니다.",
-    "sentence-transformers는 문장 수준 임베딩에 특화된 라이브러리입니다.",
-    "벡터 검색은 키워드 검색이 놓치는 의미적 유사성을 잡아냅니다.",
-    "RAG는 검색된 문서를 LLM 프롬프트에 결합하는 패턴입니다.",
-    "청크 전략은 긴 문서를 임베딩 가능한 단위로 나누는 방법입니다.",
+docs = [
+    Document(page_content="LCEL은 LangChain 컴포넌트를 파이프 연산자로 잇는 표현식 언어입니다."),
+    Document(page_content="Retriever는 질문을 받아 관련 문서 리스트를 반환하는 Runnable입니다."),
+    Document(page_content="FAISS는 Meta가 만든 로컬 벡터 검색 라이브러리입니다."),
 ]
-
-vectorstore = FAISS.from_texts(
-    texts=documents,
-    embedding=embedding_model,
-)
-
-print(f"인덱스 벡터 수: {vectorstore.index.ntotal}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    인덱스 벡터 수: 7
-
-<!-- injected-output:end -->
-
----
-
-## Retriever 만들기
-
-![similarity mmr threshold 검색 분기 흐름](../../../assets/langchain-101/03/03-02-creating-a-retriever.ko.png)
-
-*similarity mmr threshold 검색 분기 흐름*
-`as_retriever()`는 VectorStore를 Retriever 인터페이스로 감쌉니다. 검색 방식과 결과 수를 파라미터로 지정합니다.
+### 2단계 — 임베딩 모델 로드
 
 ```python
-retriever = vectorstore.as_retriever(
-    search_type="similarity",  # 기본값: 코사인 유사도
-    search_kwargs={"k": 3},    # 반환할 문서 수
+from langchain_huggingface import HuggingFaceEmbeddings
+
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
-
-docs = retriever.invoke("벡터 검색의 원리")
-
-for i, doc in enumerate(docs):
-    print(f"[{i}] {doc.page_content}")
 ```
 
-`search_type` 옵션은 세 가지입니다.
-
-- `"similarity"`: 코사인 유사도 기반, 상위 k개 반환
-- `"mmr"`: 최대 한계 관련성 — 다양성과 관련성을 함께 고려
-- `"similarity_score_threshold"`: 임계값 이상의 유사도를 가진 문서만 반환
+### 3단계 — FAISS 인덱스 생성
 
 ```python
-# MMR 예시 — 다양성 강조
-retriever_mmr = vectorstore.as_retriever(
-    search_type="mmr",
-    search_kwargs={"k": 3, "fetch_k": 10, "lambda_mult": 0.5},
-)
+from langchain_community.vectorstores import FAISS
+
+vectorstore = FAISS.from_documents(docs, embeddings)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 ```
 
----
+### 4단계 — 컨텍스트 포맷터
 
-## Retriever를 체인에 연결하기
+```python
+def format_docs(docs):
+    return "\n\n".join(d.page_content for d in docs)
+```
 
-![검색 문서가 프롬프트 문맥이 되는 흐름](../../../assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.ko.png)
-
-*검색 문서가 프롬프트 문맥이 되는 흐름*
-Retriever의 출력(문서 목록)을 LLM 프롬프트의 컨텍스트로 주입하는 패턴입니다.
+### 5단계 — RAG 체인 연결
 
 ```python
 import os
-
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_groq import ChatGroq
 
-def format_docs(docs: list) -> str:
-    """문서 목록을 하나의 컨텍스트 문자열로 합칩니다."""
-    return "\n\n".join(doc.page_content for doc in docs)
-
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-documents = [
-    "FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.",
-    "코사인 유사도는 두 벡터의 방향 유사성을 측정합니다.",
-    "임베딩 모델은 텍스트를 고차원 벡터 공간에 투영합니다.",
-    "sentence-transformers는 문장 수준 임베딩에 특화된 라이브러리입니다.",
-    "벡터 검색은 키워드 검색이 놓치는 의미적 유사성을 잡아냅니다.",
-    "RAG는 검색된 문서를 LLM 프롬프트에 결합하는 패턴입니다.",
-]
-
-vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+os.environ.setdefault("GROQ_API_KEY", "your-key-here")
+llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
 
 prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "다음 문서를 참고해서 질문에 답하세요. 문서에 없는 내용은 모른다고 하세요.\n\n"
-        "문서:\n{context}",
-    ),
-    ("human", "{question}"),
+    ("system", "주어진 컨텍스트만 사용해 한국어로 답합니다."),
+    ("human", "컨텍스트:\n{context}\n\n질문: {question}"),
 ])
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-# RAG 체인
-rag_chain = (
-    {
-        "context": retriever | format_docs,
-        "question": RunnablePassthrough(),
-    }
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
     | prompt
     | llm
     | StrOutputParser()
 )
 
-questions = [
-    "FAISS는 무엇인가요?",
-    "RAG 패턴은 어떻게 동작하나요?",
-    "임베딩 모델은 무엇을 하나요?",
-]
-
-for question in questions:
-    print(f"\n질문: {question}")
-    answer = rag_chain.invoke(question)
-    print(f"답변: {answer}")
+print(chain.invoke("FAISS는 누가 만들었나요?"))
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+## 이 코드에서 주목할 점
 
-    질문: FAISS는 무엇인가요?
-    답변: FAISS는 Fast Approximate Nearest Neighbors Search의 약자로, 벡터를 효율적으로 검색하고 검색 결과의 정확도와 속도 trade-off를 관리할 수 있는 오픈 소스 라이브러리에요.
+- *Retriever* 자체가 *Runnable* 이라 `|` 로 *바로* *체인* 에 *합쳐* 집니다.
+- *dict 형태* `{"context": ..., "question": ...}` 는 *병렬* 입력을 *조립* 하는 *LCEL 관용구* 입니다.
+- *RunnablePassthrough* 는 *invoke 의 입력* 을 *그대로* `question` 에 *연결* 합니다.
 
-    FAISS는 코사인 유사도나 다른 거리 메트릭을 사용하는 벡터 기반의 임베딩 검색을 위해 설계된 라이브러리입니다. 이 라이브러리는 기존의 벡터 검색 기술을 개선하여, 빠른 속도와 높은 정확도를 제공합니다.
+## 자주 하는 실수 5가지
 
-    FAISS는 다음과 같은 기능을 제공합니다:
+1. ***임베딩 모델 불일치*** — *인덱싱* 과 *검색* 에 *다른* *모델* 을 쓰면 *유사도* 가 *깨집니다*.
+2. ***Top-k 과다*** — `k` 가 *크면* *컨텍스트* 가 *늘어* *비용* 과 *지연* 이 *증가* 합니다.
+3. ***청크 분할 누락*** — *긴 문서* 를 *통째로* 넣으면 *임베딩 품질* 이 *낮아* 집니다.
+4. ***답변 출처 미표시*** — *근거 문서* 를 *함께* *반환* 하지 않으면 *환각* 을 *잡* *기* *어렵습니다*.
+5. ***인덱스 재생성 누락*** — *원문* 이 *바뀌었는데* *인덱스* 를 *그대로* 쓰면 *낡은 답변* 이 *나옵니다*.
 
-    - 빠른 벡터 검색
-    - 효율적인 인덱싱
-    - 다양한 거리 메트릭 지원
-    - GPU 및 CPU를 지원한 고성능
+## 실무에서는 이렇게 쓰입니다
 
-    FAISS는 다양한 분야에서 사용됩니다, 예를 들어 이미지 검색, 자연어 처리, 추천 시스템 등.
+*프로덕션* 에서는 *문서 로더 → 청크 분할 → 임베딩 → 벡터 스토어* 파이프라인을 *별도* *작업* 으로 *돌리고*, *Retriever* 는 *서빙 시점* 에만 *호출* 합니다. *벡터 스토어* 로는 *Pinecone*, *Weaviate*, *PGVector* 가 *자주* *쓰입니다*.
 
-    질문: RAG 패턴은 어떻게 동작하나요?
-    답변: RAG 패턴은 검색된 문서를 LLM(Large Language Model) 프롬프트에 결합하는 패턴입니다. 이 패턴은 다음과 같이 동작합니다.
+## 시니어 엔지니어는 이렇게 생각합니다
 
-    1. 검색된 문서를 추출합니다.
-    2. 추출된 문서를 LLM 프롬프트에 결합합니다.
-    3. LLM 모델은 결합된 프롬프트에 대해 텍스트를 생성합니다.
-    4. 생성된 텍스트는 RAG 패턴을 통해 문서와 관련된 정보를 추출합니다.
-
-    RAG 패턴은 문서를 검색할 때 키워드 검색만을 사용하는 것보다 더 정확한 결과를 얻을 수 있습니다.
-
-    질문: 임베딩 모델은 무엇을 하나요?
-    답변: 임베딩 모델은 벡터 공간으로 자연어 텍스트를 매핑하는 모델입니다. 일반적으로 임베딩 모델은 텍스트를 숫자 벡터로 변환하여 벡터 공간에서 처리할 수 있도록 합니다. 이 숫자 벡터는 임베딩 벡터라고 부릅니다. 임베딩 모델은 자연어 처리에서 다양하게 사용됩니다.
-
-<!-- injected-output:end -->
-
-핵심 부분은 체인 입력 딕셔너리입니다.
-
-```python
-{
-    "context": retriever | format_docs,
-    "question": RunnablePassthrough(),
-}
-```
-
-`retriever | format_docs`는 쿼리를 받아 → 관련 문서를 검색하고 → 문자열로 합칩니다. `RunnablePassthrough()`는 쿼리를 그대로 `"question"` 키로 넘깁니다.
-
----
-
-## VectorStore 저장과 불러오기
-
-![인덱스 저장과 재로딩 재사용 흐름](../../../assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.ko.png)
-
-*인덱스 저장과 재로딩 재사용 흐름*
-VectorStore도 디스크에 저장할 수 있습니다. 인덱스를 한 번만 만들고 재사용할 때 유용합니다.
-
-```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-documents = [
-    "FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.",
-    "RAG는 검색된 문서를 LLM 프롬프트에 결합하는 패턴입니다.",
-]
-
-vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
-
-# 저장
-vectorstore.save_local("faiss_store")
-print("저장 완료")
-
-# 불러오기
-loaded_store = FAISS.load_local(
-    "faiss_store",
-    embeddings=embedding_model,
-    allow_dangerous_deserialization=True,
-)
-print(f"불러오기 완료: {loaded_store.index.ntotal}개 벡터")
-
-# 검색 테스트
-results = loaded_store.similarity_search("벡터 검색", k=1)
-print(f"\n검색 결과: {results[0].page_content}")
-```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    저장 완료
-    불러오기 완료: 2개 벡터
-
-    검색 결과: RAG는 검색된 문서를 LLM 프롬프트에 결합하는 패턴입니다.
-
-<!-- injected-output:end -->
-
----
-
-## 이 코드에서 봐야 할 것
-
-- VectorStore는 문서를 저장하는 계층이고, Retriever는 그 저장소를 질의 가능한 인터페이스로 감싼 계층입니다.
-- `retriever | format_docs` 패턴은 검색 결과를 바로 프롬프트 입력으로 넘기기 위한 가장 흔한 LCEL 연결입니다.
-- `RunnablePassthrough()`는 질문 원문을 별도 키로 유지해 컨텍스트와 질문을 함께 프롬프트에 넣게 합니다.
-- 저장과 재로딩 예제는 Retriever가 일회성 데모가 아니라 재사용 가능한 인덱스 위에서 동작한다는 점을 보여줍니다.
-
-## 실무에서 헷갈리는 지점
-
-- Retriever가 답을 만드는 것으로 오해하기 쉽지만, 실제 답변 생성은 여전히 LLM 단계의 역할입니다.
-- 검색 품질 문제를 프롬프트 문제로 착각하는 경우가 많습니다. 관련 문서가 안 뽑히면 먼저 임베딩·청킹·`k` 값을 봐야 합니다.
-- 문서를 단순 연결할 때 길이 제한을 넘기기 쉽습니다. `format_docs`는 내용뿐 아니라 길이 제어 지점이기도 합니다.
+- *RAG* 는 *환각 방지* 가 아니라 *지식 주입* 도구입니다.
+- *Top-k* 는 *3~5* 에서 *시작* 하고 *측정* 하며 *조정* 합니다.
+- *청크 크기* 는 *모델 컨텍스트 윈도우* 의 *1/10* 안쪽이 *안전* 합니다.
+- *근거 문서* 를 *반드시* *응답* 에 *포함* 합니다.
+- *인덱스 갱신 주기* 를 *문서 변경 주기* 와 *맞춥니다*.
 
 ## 체크리스트
 
-- [ ] VectorStore와 Retriever의 역할 차이를 설명할 수 있다
-- [ ] `as_retriever(search_kwargs={...})`에서 조절할 값을 알고 있다
-- [ ] 검색 결과를 컨텍스트 문자열로 합치는 이유와 주의점을 이해했다
+- [ ] *동일 임베딩 모델* 로 *인덱싱* 과 *검색*.
+- [ ] *Top-k* *합리적 값* (3~5) 으로 *시작*.
+- [ ] *컨텍스트 포맷터* 로 *원문* *분리자* *명확화*.
+- [ ] *근거 문서* *함께* *반환*.
 
-## 마무리
+## 연습 문제
 
-Retriever를 만들고 RAG 체인에 연결하는 방법을 익혔습니다. `context: retriever | format_docs, question: RunnablePassthrough()` 패턴은 LangChain RAG 코드에서 가장 자주 나오는 구조입니다.
+1. *문서* 를 *5 개* 더 *추가* 하고 *Top-k* 를 *1, 3, 5* 로 *바꿔* *답변* 차이를 *비교* 하세요.
+2. `RecursiveCharacterTextSplitter` 로 *긴 문서* 를 *분할* 한 뒤 *동일 질문* 의 *결과* 를 *비교* 하세요.
+3. *체인* 이 *근거 문서 리스트* 도 *함께* *반환* 하도록 *수정* 하세요.
 
-다음 글에서는 Tool Calling을 다룹니다. LLM이 외부 함수를 호출하고 그 결과를 응답에 반영하는 방법입니다.
+## 정리 및 다음 단계
+
+다음 글은 *Tool Calling — 외부 도구 연결하기* 입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -400,12 +191,11 @@ Retriever를 만들고 RAG 체인에 연결하는 방법을 익혔습니다. `co
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangChain Retriever 인터페이스](https://python.langchain.com/docs/modules/data_connection/retrievers/)
-- [FAISS VectorStore](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
-- [RAG 체인 빌드하기](https://python.langchain.com/docs/use_cases/question_answering/)
+- [Retrieval concept](https://python.langchain.com/docs/concepts/retrievers/)
+- [FAISS vector store](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [HuggingFace embeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingface/)
+- [LangChain GitHub](https://github.com/langchain-ai/langchain)
 
 Tags: LangChain, LCEL, Python, LLM

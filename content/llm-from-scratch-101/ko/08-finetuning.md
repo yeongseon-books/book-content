@@ -141,6 +141,14 @@ A: My lord, I serve thee with a faithful heart.
 
 <!-- a-grade-example:begin -->
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **LoRA 우선** — 전체 미세조정 전에 LoRA·QLoRA로 가성비를 확인합니다.
+- **데이터 품질** — 양보다 품질·다양성이 결과를 더 크게 좌우합니다.
+- **Catastrophic forgetting** — 원 지식 유지를 위해 혼합 비율을 조정합니다.
+- **평가 분리** — 학습/검증/회귀 셋을 명확히 분리합니다.
+- **재현성** — 데이터·하이퍼·시드를 모두 기록합니다.
+
 ## 체크리스트
 
 - [ ] instruction / response 형식의 미니 데이터셋을 직접 만들었다.

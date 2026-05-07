@@ -288,6 +288,14 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 
 `functools.partial`은 과소평가된 도구입니다. `lambda x: f(x, fixed_arg)` 대신 `partial(f, fixed_arg)`를 사용하면 더 명확하고, `repr()`로 고정된 인자를 확인할 수 있어 디버깅도 쉬워집니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **캡처 명확화** — 캡처 변수는 명시적으로 documenting합니다.
+- **Late binding 함정** — 루프 안 람다의 late binding을 인지합니다.
+- **functools.partial** — 부분 적용으로 의도를 드러냅니다.
+- **불변 캡처** — 캡처 데이터는 불변으로 두면 디버깅이 쉽습니다.
+- **테스트** — 클로저 단위 테스트로 회귀를 고정합니다.
+
 ## 체크리스트
 
 - [ ] 클로저가 외부 변수를 기억하는 메커니즘을 설명할 수 있다

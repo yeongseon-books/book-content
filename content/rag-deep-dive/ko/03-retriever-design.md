@@ -105,6 +105,14 @@ if __name__ == "__main__":
 - `fetch_k == k` 상태에서는 MMR이 사실상 similarity search와 비슷해질 수 있습니다.
 - retriever threshold와 vector store raw score threshold는 같은 계층이 아닙니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **MMR 활용** — 다양성 확보로 답변 품질이 오릅니다.
+- **Hybrid 검색** — BM25와 임베딩을 항상 함께 비교합니다.
+- **필터링** — 메타 필터는 정확도를 결정적으로 높입니다.
+- **재랭킹** — cross-encoder 재랭킹은 비용 대비 효과가 큽니다.
+- **회귀 셋** — 도메인 골든 셋을 retriever 단위로 만듭니다.
+
 ## 체크리스트
 
 - [ ] similarity와 MMR을 같은 질의로 비교해 봤다.

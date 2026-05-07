@@ -189,7 +189,7 @@ def greet(name: str):
 @main.command()
 @click.argument("path", type=click.Path(exists=True))
 def check(path: str):
-    """Check a file."""
+    """파일을 검사합니다."""
     click.echo(f"Checking: {path}")
 ```
 
@@ -209,7 +209,7 @@ import click
 @click.command()
 @click.argument("path", type=click.Path())
 def main(path: str):
-    """Process a file."""
+    """파일을 처리합니다."""
     try:
         with open(path) as f:
             lines = f.readlines()
@@ -269,6 +269,14 @@ CLI 도구는 성공 시 0, 실패 시 1 이상의 종료 코드를 반환해야
 CLI를 만들 때 가장 중요한 것은 **일관된 인터페이스**입니다. `--verbose`, `--output`, `--format` 같은 공통 옵션의 이름과 동작을 통일하면 사용자가 직관적으로 씁니다.
 
 `argparse`는 외부 의존성이 없어 가볍지만, `click`은 서브커맨드, 프롬프트, 색상 출력, 테스트 러너를 내장하여 실무에서 더 생산적입니다. 라이브러리라면 `argparse`, 독립 CLI 도구라면 `click`이 적합합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **entry points** — console_scripts로 노출합니다.
+- **argparse vs click** — 복잡도에 따라 선택합니다.
+- **UX** — 도움말·에러 메시지에 시간을 투자합니다.
+- **종료 코드** — 성공/실패 종료 코드를 표준화합니다.
+- **테스트** — CLI 자체도 통합 테스트로 회귀를 막습니다.
 
 ## 체크리스트
 

@@ -188,6 +188,14 @@ print(attn.last_attn.shape)
 
 <!-- a-grade-example:begin -->
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Scale 인자** — 1/√d 스케일이 안정성에 결정적입니다.
+- **Mask 정확성** — causal mask 누락이 가장 흔한 버그입니다.
+- **KV 캐시** — 추론 단계에서 KV 캐시가 latency를 좌우합니다.
+- **Heads 수** — head 수는 표현력·계산 비용 트레이드오프입니다.
+- **Numerical stability** — softmax 전에 max-subtract로 안정성을 확보합니다.
+
 ## 체크리스트
 
 - [ ] scale → softmax → V 가중합 흐름을 손으로 따라 그려 봤다.

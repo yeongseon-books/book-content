@@ -27,6 +27,15 @@ seo_description: OpenAI Whisper가 2022년 9월 공개되기 전까지, producti
 
 ---
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Whisper STT는 어떻게 운영하고, 한국어 음성에서 정확도를 어떻게 끌어올리나요?
+
+이 글은 그 질문에 답하기 위해 오디오 처리와 Whisper STT의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 왜 Whisper가 STT의 default가 됐나
 
 OpenAI Whisper가 2022년 9월 공개되기 전까지, production STT는 Google Speech, AWS Transcribe, Azure Speech 같은 cloud API가 사실상 기본값이었습니다. 한국어 정확도가 영어보다 한참 떨어지고, 비용도 분당 0.024 USD 수준이었습니다.
@@ -87,7 +96,7 @@ segments, info = model.transcribe(
     vad_parameters={"min_silence_duration_ms": 500},
 )
 
-print(f"Detected language: {info.language} (prob {info.language_probability:.2f})")
+print(f"감지된 언어: {info.language} (확률 {info.language_probability:.2f})")
 for seg in segments:
     print(f"[{seg.start:.1f}-{seg.end:.1f}] {seg.text}")
 ```
@@ -236,6 +245,14 @@ self-host도 GPU instance 비용이 시간당 1~3 USD입니다. queue length, GP
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **모델 사이즈 선택** — 지연·비용·정확도 삼각형에서 large-v3는 정확도, distil은 속도입니다.
+- **VAD 선처리** — 무음/잡음 제거가 WER을 가장 크게 낮추는 비용 대비 효과 큰 단계입니다.
+- **긴 오디오 처리** — 30초 윈도와 chunking 정책을 명시해 시간축 정합성을 유지합니다.
+- **도메인 어휘** — 초기 prompt와 사후 사전 치환으로 고유명사 인식을 보정합니다.
+- **타임스탬프 신뢰도** — 단어/세그먼트 단위 신뢰도 차이를 인지하고 후처리에 반영합니다.
+
 ## Multimodal AI 101 시리즈
 
 - [Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)

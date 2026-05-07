@@ -45,6 +45,15 @@ seo_description: MetaData는 schema의 카탈로그입니다. application이 알
 - Composite key, named constraint, `Index`를 Python으로 선언하는 방법
 - 기존 데이터베이스의 schema를 가져오는 reflection (`Table(..., autoload_with=engine)`)
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Core의 MetaData·Table·Column을 왜 ORM 이전에 익혀야 할까요?
+
+이 글은 그 질문에 답하기 위해 Core 스키마 모델의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - ORM 없이 Core만 써도 schema 정의가 의미가 있나?
@@ -448,6 +457,14 @@ app/
 또 하나 자주 쓰는 패턴은 ORM과 Core를 동시에 쓰는 코드베이스에서 동일한 `metadata`를 공유하는 것입니다. ORM declarative base의 `metadata` 속성을 Core `Table`과 같은 객체로 두면, `metadata.create_all(engine)` 한 번으로 두 layer의 모든 테이블이 함께 생성됩니다. 이 패턴은 5편 이후의 ORM 시리즈에서 본격적으로 다룹니다.
 
 Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic migration으로 schema를 관리하는 편이 안전합니다. 그러나 test fixture, 로컬 dev DB 초기화, demo 환경 등에서는 `create_all`이 여전히 가장 빠른 부트스트랩 방법입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Core가 모든 ORM의 기반** — MetaData가 schema의 단일 출처입니다.
+- **Table·Column이 1급 시민** — ORM 클래스 없이도 완전한 SQL을 표현합니다.
+- **Type system이 dialect 차이를 흡수** — DateTime·JSON 타입이 백엔드별로 매핑됩니다.
+- **제약·인덱스를 코드로 표현** — DB 스키마가 코드로 추적됩니다.
+- **reflect로 기존 DB와 연결** — 마이그레이션 없는 환경도 지원됩니다.
 
 ## 체크리스트
 

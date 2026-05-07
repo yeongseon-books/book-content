@@ -23,6 +23,15 @@ seo_description: LLM이 학습 데이터에 있던 이메일 주소나 전화번
 > AI Data Preparation 101 시리즈 (4/10)
 
 ---
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+학습 데이터의 PII를 어떻게 탐지하고 익명화해야 법적·윤리적 사고를 막을 수 있을까요?
+
+이 글은 그 질문에 답하기 위해 PII 탐지와 익명화의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## "학습 데이터에 PII가 있으면 안 되는 거죠?"
 
 LLM이 학습 데이터에 있던 이메일 주소나 전화번호를 그대로 출력해 버리는 사고는 이미 여러 사례로 보고됐습니다. Carlini et al.(2021)의 "Extracting Training Data from Large Language Models" 논문은 GPT-2에서 실제 사람의 이름과 연락처가 추출되는 것을 보여줬습니다. 학습 단계의 PII는 inference 단계에서 leak됩니다.
@@ -226,6 +235,14 @@ def anonymize_with_audit(rows: list[dict], audit_path: str,
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **PII 탐지는 다층 방어** — 정규식·NER·LLM 검증을 결합합니다.
+- **익명화 vs 가명화의 차이** — 복구 가능 여부가 법적 의미를 결정합니다.
+- **지역별 규정 차이를 의식** — GDPR·CCPA·국내법이 모두 다릅니다.
+- **재식별 위험을 평가** — 단일 필드 익명화로는 부족합니다.
+- **샘플 audit이 마지막 안전장치** — 자동 탐지만 믿지 않습니다.
+
 ## AI Data Preparation 101 시리즈
 
 - [데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)

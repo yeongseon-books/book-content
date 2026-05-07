@@ -32,6 +32,15 @@ seo_description: autogenerate는 현재 DB(ground truth)와 target_metadata(desi
 - table/column rename을 안전하게 처리하는 패턴
 - 자동 생성 결과를 사람 눈으로 다시 한 번 손봐야 하는 이유
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+autogenerate를 어디까지 믿을 수 있고, 어떤 변경은 사람이 직접 작성해야 할까요?
+
+이 글은 그 질문에 답하기 위해 autogenerate의 한계의 핵심 결정과 실무 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - `alembic revision --autogenerate`는 내부적으로 무엇과 무엇을 비교하여 diff를 만드는가?
@@ -216,6 +225,14 @@ SQLite에서는 batch 모드가 필요합니다(3편 참고).
 - **migration이 큰 변경일 때는 autogenerate 결과를 일단 빈 revision으로 받고 손으로 다시 작성.** 자동 결과는 참고용으로 옆에 둡니다.
 - **schema-only 라이브러리 테이블 격리.** Celery, APScheduler 등 third-party 테이블은 `include_object`로 제외하거나 별도 metadata로 분리합니다.
 - **CI에서 `alembic check` 활용.** model과 migration이 어긋났는지 자동으로 검출합니다(alembic 1.9+).
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **autogenerate는 초안 생성기다** — 최종본이 아니라 초안이므로 모든 diff를 사람이 검토해야 합니다.
+- **이름 변경을 자동 감지하지 않는다** — drop+create로 보이므로 op.alter_column으로 직접 작성합니다.
+- **CHECK·인덱스 식·트리거는 누락된다** — DB 종속 객체는 수동 작성이 안전합니다.
+- **타입 미세 차이도 노이즈가 된다** — SQLAlchemy 타입과 DB 타입의 표현 차이는 비교 함수로 정리합니다.
+- **데이터 마이그레이션은 자동 감지 대상이 아니다** — 스키마와 데이터를 별도 리비전으로 명확히 분리합니다.
 
 ## 체크리스트
 

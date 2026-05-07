@@ -248,6 +248,14 @@ where = ["src"]
 
 빌드 백엔드는 `setuptools`가 가장 널리 쓰이지만, 새 프로젝트라면 `hatchling`이나 `flit-core`도 고려하세요. 어떤 백엔드를 쓰든 `pyproject.toml`의 `[project]` 섹션은 동일합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **src layout** — src layout이 import 사고를 줄입니다.
+- **pyproject 단일화** — setup.py 대신 pyproject.toml을 우선합니다.
+- **의존성 명시** — 선택 의존성은 extras로 분리합니다.
+- **테스트 위치** — tests는 패키지 외부에 둡니다.
+- **CI 표준화** — lint·test·build를 첫 PR부터 강제합니다.
+
 ## 체크리스트
 
 - [ ] flat layout과 src layout의 차이를 설명할 수 있다

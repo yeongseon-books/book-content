@@ -26,6 +26,15 @@ seo_description: train_test_split(data, test_size=0.2)로 끝낸 모델이 produ
 > AI Data Preparation 101 시리즈 (9/10)
 
 ---
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+학습·평가·테스트 분할에서 contamination을 어떻게 통제해야 할까요?
+
+이 글은 그 질문에 답하기 위해 분할과 contamination 통제의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## "그냥 random_split 쓰면 되는 거 아닌가요?"
 
 `train_test_split(data, test_size=0.2)`로 끝낸 모델이 production에서 무너지는 패턴은 매년 반복됩니다. 이유는 두 가지입니다.
@@ -213,6 +222,14 @@ def production_split(df: pd.DataFrame, time_col: str, group_col: str | None = No
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **랜덤 분할이 항상 정답은 아니다** — 시계열·그룹 데이터는 다른 전략이 필요합니다.
+- **contamination 검사를 자동화** — 해시·n-gram overlap을 표준으로 둡니다.
+- **evaluation set은 봉인** — 한 번 본 데이터는 더 이상 평가용이 아닙니다.
+- **public benchmark 누출을 의식** — 사전학습에 포함되었는지 확인합니다.
+- **split 비율은 데이터 크기 함수** — 작은 데이터에서 80/10/10이 늘 옳지 않습니다.
+
 ## AI Data Preparation 101 시리즈
 
 - [데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)

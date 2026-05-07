@@ -684,10 +684,10 @@ class StateMachine:
     def transition(self, next_state: WorkflowState) -> bool:
         """상태 전이"""
         if next_state not in self.TRANSITIONS[self.current_state]:
-            print(f"Invalid transition: {self.current_state} → {next_state}")
+            print(f"잘못된 상태 전이: {self.current_state} → {next_state}")
             return False
         
-        print(f"State transition: {self.current_state.value} → {next_state.value}")
+        print(f"상태 전이: {self.current_state.value} → {next_state.value}")
         self.current_state = next_state
         self.state_history.append(next_state)
         return True
@@ -1298,6 +1298,14 @@ else:
 - 작업 분해와 상태 관리가 Workflow 설계의 핵심입니다.
 
 <!-- a-grade-example:begin -->
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **워크플로 vs 에이전트** — 고정 워크플로로 풀 수 있다면 에이전트로 풀지 않습니다.
+- **계획 분리** — plan과 act를 분리해 단계별 검증을 가능하게 합니다.
+- **Step 한도** — 최대 step·시간·비용 상한을 SLO로 둡니다.
+- **실패 경로** — 실패·중단·재시도 경로를 1급 경로로 설계합니다.
+- **샘플 회귀** — 운영 trace에서 회귀 셋을 만들어 변경을 검증합니다.
 
 ## 체크리스트
 

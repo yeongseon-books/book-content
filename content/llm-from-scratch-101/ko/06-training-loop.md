@@ -205,6 +205,14 @@ torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
 
 <!-- a-grade-example:begin -->
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **기울기 클리핑** — 발산 방지를 위해 grad clip을 기본으로 둡니다.
+- **LR 스케줄** — 워밍업 + 코사인이 사실상 표준입니다.
+- **로깅** — loss·grad norm·throughput을 항상 로깅합니다.
+- **Checkpoint** — 정기 체크포인트와 best-loss 저장을 분리합니다.
+- **재현성** — seed·데이터 셔플 시드를 함께 기록합니다.
+
 ## 체크리스트
 
 - [ ] 5줄 학습 루프를 자기 손으로 작성했다.

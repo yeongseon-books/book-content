@@ -237,6 +237,14 @@ for name, s in user_scores.items():
 
 복잡한 중첩 타입은 타입 별칭을 적극 활용합니다. `dict[str, list[tuple[int, str]]]`보다 `type UserRecord = tuple[int, str]`으로 분리하면 코드와 타입 힌트 모두 읽기 쉬워집니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **내장 제네릭** — list[int] 같은 내장 제네릭을 우선 씁니다.
+- **Sequence vs list** — 함수 입력은 더 추상적인 타입을 받습니다.
+- **불변 vs 가변** — Mapping/Dict 차이를 의식해 시그니처를 정합니다.
+- **Iterable** — 한 번만 순회하는 함수는 Iterable로 받습니다.
+- **타입 별칭** — 복잡 타입은 alias로 의도를 드러냅니다.
+
 ## 체크리스트
 
 - [ ] 기본 스칼라 타입 힌트를 작성할 수 있다

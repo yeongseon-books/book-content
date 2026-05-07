@@ -29,6 +29,15 @@ Prompt 한 줄을 고치면 다른 케이스가 깨질 수 있습니다. 이 글
 ![회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게](../../../assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.ko.png)
 
 *회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게*
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+LLM 회귀 테스트를 어떻게 운영해야 어제 잘 되던 게 오늘 망가지지 않을까요?
+
+이 글은 그 질문에 답하기 위해 회귀 테스트의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 평가는 한 번이 아니라 매번 합니다
 
 ![평가는 한 번이 아니라 매번](../../../assets/ai-evaluation-101/08/08-02-evaluate-every-time-not-just-once.ko.png)
@@ -116,7 +125,7 @@ THRESHOLDS = {
     "task_success": 0.90,   # Ep7 agent
 }
 
-# Fail policy
+# 실패 정책
 FAIL_POLICY = "any"  # "any" | "majority" | "weighted"
 ```
 
@@ -305,6 +314,14 @@ PR이 fail했을 때 다음 절차를 따릅니다.
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **회귀 set은 별도 관리** — eval set과 다른 목적입니다.
+- **CI에 포함이 표준** — 사람 손에 맡기면 빠집니다.
+- **threshold는 의미 있게** — 너무 엄격하면 false alarm이 됩니다.
+- **실패 사례를 회귀 set에 추가** — 한 번 잡힌 사고는 다시 잡힙니다.
+- **프롬프트·모델 버전을 함께 기록** — 원인 추적의 단서입니다.
+
 ## AI Evaluation 101 시리즈
 
 - [Ep1 LLM 앱은 왜 평가해야 하는가](./01-why-evaluate-llm-apps.md)

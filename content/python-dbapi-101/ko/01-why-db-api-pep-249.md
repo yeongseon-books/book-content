@@ -240,6 +240,14 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 
 <!-- a-grade-example:begin -->
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **이식성** — 드라이버를 갈아끼워도 코드가 거의 그대로 동작하게 합니다.
+- **Connection/Cursor** — 두 추상이 트랜잭션·자원 관리의 단위가 됩니다.
+- **Threadsafety 등급** — 드라이버 등급을 보고 멀티스레드 정책을 정합니다.
+- **Paramstyle** — qmark/named 등 스타일이 SQL 작성 방식을 바꿉니다.
+- **표준의 한계** — 성능·고급 기능은 드라이버별로 갈리므로 문서를 항상 확인합니다.
+
 ## 체크리스트
 
 - [ ] sqlite3로 connect → cursor → execute → fetch → close 사이클을 한 번 돌렸다.

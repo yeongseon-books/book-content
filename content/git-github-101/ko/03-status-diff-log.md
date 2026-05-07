@@ -32,6 +32,15 @@ seo_description: status·diff·log 세 명령은 각각 "지금 어디에 있나
 - 두 commit 사이의 변경을 `git diff <a> <b>`로 비교하는 방법
 - `git log`의 자주 쓰는 옵션(`--oneline`, `--graph`, `--stat`, `--patch`)을 한자리에서 익히는 방법
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+status·diff·log를 어떻게 읽어야 변경의 맥락을 정확히 파악할 수 있을까요?
+
+이 글은 그 질문에 답하기 위해 변경 사항 읽기의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - `git status` 출력의 각 줄은 어떤 영역(working/staging/HEAD)을 가리키는가?
@@ -343,6 +352,14 @@ index 6e85ca6..b7f5a1e 100644
 - **버그 추적**: 어느 commit에서 문제가 생겼는지 의심될 때 `git log -p <file>`로 파일 변경사를 따라가거나, 더 본격적으로는 `git bisect`를 사용합니다(시리즈 후반에 다룹니다).
 - **alias로 손에 익히기**: `git config --global alias.lg "log --oneline --graph --decorate"` 같은 alias를 한두 개 등록하면 손가락이 기억합니다.
 - **출력 색**: 대부분의 환경에서 기본으로 색이 켜져 있지만, 꺼져 있다면 `git config --global color.ui auto`로 켭니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **status는 작업의 현재 위치** — staged·unstaged·untracked를 분리해 봅니다.
+- **diff는 의도를 검증하는 도구** — 커밋 전에 반드시 변경의 의미를 확인합니다.
+- **log는 시간을 거꾸로 읽는 능력** — --oneline·--graph로 흐름을 파악합니다.
+- **범위 지정이 강력한 디버깅** — diff·log 모두 두 시점을 비교할 수 있습니다.
+- **blame과 결합해 원인 추적** — 코드의 왜를 묻는 출발점입니다.
 
 ## 체크리스트
 

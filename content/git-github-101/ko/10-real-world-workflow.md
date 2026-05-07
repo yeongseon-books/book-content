@@ -31,6 +31,15 @@ seo_description: 실무 흐름은 "issue로 작업을 정의하고, branch에서
 - 흐름 중간에서 실수했을 때 어떤 명령으로 회복하는지 표로 정리합니다.
 - 팀 단위로 같은 흐름을 안정적으로 돌리려면 어떤 장치(branch protection, PR template, CI)를 둬야 하는지 살펴봅니다.
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+실전 Git 워크플로를 어떻게 설계해야 issue부터 release까지 한 흐름으로 이어질까요?
+
+이 글은 그 질문에 답하기 위해 실전 Git 워크플로의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - issue → branch → commit → PR → review → merge → tag → close 한 사이클은 어떤 명령들로 묶이는가?
@@ -266,6 +275,14 @@ Closed • yeongseon opened about 1 hour ago
 여기에 commit-msg hook과 commitlint(Episode 9)까지 더하면, 흐름의 어느 단계에서도 형식이 무너지지 않습니다.
 
 squash merge를 기본으로 두면 history도 깔끔하게 유지됩니다. feature branch 내부의 작은 commit들은 PR 단위로 묶이므로, `main`에서 `git log --oneline`을 보면 한 줄당 한 PR이 보입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **워크플로의 핵심은 강제가 아닌 합의** — 팀이 동의해야 지속됩니다.
+- **trunk-based vs git-flow의 트레이드오프** — 릴리스 주기와 팀 크기에 따라 다릅니다.
+- **브랜치 보호 규칙으로 사고 예방** — main을 사람의 실수로부터 지킵니다.
+- **자동화된 release가 신뢰의 기반** — tag·changelog·배포가 한 흐름이어야 합니다.
+- **회고가 워크플로를 진화시킨다** — 정기적으로 마찰 지점을 점검합니다.
 
 ## 체크리스트
 

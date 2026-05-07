@@ -14,129 +14,148 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-01'
-seo_description: StateGraph는 노드 함수들을 상태 전이 규칙으로 엮어 실행 가능한 워크플로로 바꾸는 설계도입니다.
+last_reviewed: '2026-05-06'
+seo_description: StateGraph로 노드와 엣지를 정의해 LLM 워크플로를 그래프로 표현하는 방법을 정리합니다
 ---
 
 # LangGraph 소개와 그래프 기초
 
-## 이 글에서 답할 질문
+> LangGraph 101 시리즈 (1/6)
 
-- LangGraph에서 `StateGraph`는 정확히 무엇을 정의할까요?
-- 노드와 엣지를 어떻게 연결해야 흐름이 읽히는 그래프가 될까요?
-- `invoke()`를 호출하면 상태가 어떤 순서로 흘러갈까요?
+<!-- a-grade-intro:begin -->
 
-> StateGraph는 노드 함수들을 상태 전이 규칙으로 엮어 실행 가능한 워크플로로 바꾸는 설계도입니다.
+**핵심 질문**: *왜* *체인* 이 *아니라* *그래프* *인가요*?
 
-예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/01-graph-basics)
+> *분기*, *반복*, *상태 공유* 가 *생기면* *그래프* 가 *체인* 보다 *명료* 합니다.
 
-LangGraph를 처음 볼 때 가장 중요한 감각은 "체인 여러 개"가 아니라 "상태가 흐르는 그래프"라는 점입니다. 이 글에서는 가장 작은 그래프를 직접 만들면서 노드 추가, 엣지 연결, `invoke()` 실행까지 한 번에 정리합니다.
+<!-- a-grade-intro:end -->
 
-![이 글에서 답할 질문](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.ko.png)
+## 이 글에서 배울 것
 
-*이 글에서 답할 질문*
-## 최소 실행 예제
+- *그래프* 가 *필요* 한 *순간*
+- *StateGraph* 의 *기본 구성*
+- *node* 와 *edge*
+- *START*, *END* *상수*
+- *compile* 과 *invoke*
 
-![START에서 END까지 이어지는 기본 그래프 흐름](../../../assets/langgraph-101/01/01-01-minimal-runnable-example.ko.png)
+## 왜 중요한가
 
-*START에서 END까지 이어지는 기본 그래프 흐름*
+*LangChain* 의 *LCEL* 은 *직선 흐름* 에 *강합니다*. *조건 분기* 와 *루프* 가 *섞이면* *코드* 가 *복잡* 해집니다. *LangGraph* 는 *흐름* 을 *데이터* 로 *명시* 합니다.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    S[START] --> N1[node_a]
+    N1 --> N2[node_b]
+    N2 --> E[END]
+```
+
+## 핵심 용어 정리
+
+- **StateGraph**: *상태 타입* 을 *공유* 하는 *그래프* *빌더*.
+- **node**: *상태* 를 *입력* 받아 *부분 상태* 를 *돌려* *주는* *함수*.
+- **edge**: *어느 노드* 다음에 *어느 노드* 가 *오는지* 의 *연결*.
+- **START / END**: *그래프* 의 *시작* 과 *끝* 을 *나타내는* *상수*.
+- **compile**: *그래프 정의* 를 *실행 가능* *객체* 로 *변환*.
+
+## Before/After
+
+**Before**: "`if`, `for` 가 *섞인* *체인 함수* 가 *길어지고* *디버깅* 이 *어려워* *집니다*."
+
+**After**: "*노드* 와 *엣지* 로 *흐름* 이 *그림* 처럼 *드러* *납니다*."
+
+## 실습: 첫 그래프 5단계
+
+### 1단계 — 상태 타입 정의
+
 ```python
 from typing import TypedDict
 
-from langgraph.graph import END, START, StateGraph
-
-class ArticleState(TypedDict):
-    user_request: str
-    topic: str
-    outline: list[str]
-    answer: str
-
-def choose_topic(state: ArticleState) -> ArticleState:
-    request = state["user_request"].lower()
-    if "checkpoint" in request:
-        topic = "checkpoints"
-    elif "tool" in request:
-        topic = "tool calling"
-    else:
-        topic = "graph basics"
-    return {"topic": topic}
-
-def build_outline(state: ArticleState) -> ArticleState:
-    outline = [
-        f"Define {state['topic']}",
-        "Show the nodes in the graph",
-        "Explain how invoke() runs the graph",
-    ]
-    return {"outline": outline}
-
-def write_answer(state: ArticleState) -> ArticleState:
-    bullet_lines = "\n".join(f"- {item}" for item in state["outline"])
-    answer = (
-        f"Request: {state['user_request']}\n"
-        f"Chosen topic: {state['topic']}\n"
-        "Teaching outline:\n"
-        f"{bullet_lines}"
-    )
-    return {"answer": answer}
-
-def build_graph():
-    graph = StateGraph(ArticleState)
-    graph.add_node("choose_topic", choose_topic)
-    graph.add_node("build_outline", build_outline)
-    graph.add_node("write_answer", write_answer)
-
-    graph.add_edge(START, "choose_topic")
-    graph.add_edge("choose_topic", "build_outline")
-    graph.add_edge("build_outline", "write_answer")
-    graph.add_edge("write_answer", END)
-
-    return graph.compile()
-
-if __name__ == "__main__":
-    app = build_graph()
-    result = app.invoke(
-        {
-            "user_request": "Explain how a LangGraph StateGraph works.",
-            "topic": "",
-            "outline": [],
-            "answer": "",
-        }
-    )
-    print(result["answer"])
+class State(TypedDict):
+    counter: int
+    log: list[str]
 ```
 
-실행 파일: `/root/Github/langgraph-101/ko/01-graph-basics/main.py`
+### 2단계 — 노드 두 개 작성
 
-## 이 코드에서 봐야 할 것
+```python
+def increment(state: State) -> dict:
+    return {"counter": state["counter"] + 1, "log": ["incremented"]}
 
-![요청과 상태 필드가 연결되는 구조](../../../assets/langgraph-101/01/01-02-what-to-notice-in-this-code.ko.png)
+def double(state: State) -> dict:
+    return {"counter": state["counter"] * 2, "log": ["doubled"]}
+```
 
-*요청과 상태 필드가 연결되는 구조*
-- `StateGraph(ArticleState)`가 그래프 전체에서 공유할 상태 스키마를 정합니다.
-- 각 노드는 상태 전체를 받아 필요한 필드만 업데이트해서 반환합니다.
-- `START → choose_topic → build_outline → write_answer → END` 순서가 코드에 그대로 드러납니다.
+### 3단계 — 그래프 빌드
 
-## 실무에서 헷갈리는 지점
+```python
+from langgraph.graph import StateGraph, START, END
 
-![정의부터 invoke 반환까지 실행 흐름](../../../assets/langgraph-101/01/01-03-where-engineers-get-confused.ko.png)
+builder = StateGraph(State)
+builder.add_node("inc", increment)
+builder.add_node("dbl", double)
+builder.add_edge(START, "inc")
+builder.add_edge("inc", "dbl")
+builder.add_edge("dbl", END)
+```
 
-*정의부터 invoke 반환까지 실행 흐름*
-- 노드가 상태 전체를 다시 만들어야 하는 것은 아닙니다. 바뀐 필드만 반환해도 됩니다.
-- `StateGraph`는 DAG만 만드는 도구가 아닙니다. 뒤 글에서 보겠지만 루프와 조건 분기도 자연스럽게 표현합니다.
-- `invoke()`의 반환값은 마지막 노드 출력이 아니라 최종 상태 전체입니다.
+### 4단계 — compile
+
+```python
+graph = builder.compile()
+```
+
+### 5단계 — invoke
+
+```python
+result = graph.invoke({"counter": 1, "log": []})
+print(result)
+# {'counter': 4, 'log': ['doubled']}
+```
+
+## 이 코드에서 주목할 점
+
+- *노드* 는 *부분 상태 dict* 만 *반환* 합니다. *나머지 키* 는 *건드리지* *않습니다*.
+- *기본 reducer* 는 *덮어* *쓰기* 입니다. *log 리스트* 가 *마지막* *값* 으로 *바뀌는* *이유* 입니다.
+- *2편* 에서 *Annotated* 와 *add_messages* 로 *누적 동작* 을 *바꿉니다*.
+
+## 자주 하는 실수 5가지
+
+1. ***START / END 누락*** — *컴파일* 시 *진입점/종점* 오류 가 *납니다*.
+2. ***노드 이름 중복*** — *add_node* 가 *조용* 히 *기존 노드* 를 *덮어* *씁니다*.
+3. ***전체 상태 반환*** — *부분 상태* 만 *반환* 해도 *충분* 합니다.
+4. ***reducer 미지정*** — *list / set* 누적이 *깨집니다* (*2편* 참고).
+5. ***compile 누락*** — *builder* 를 *직접* *invoke* 하면 *동작* *안* 합니다.
+
+## 실무에서는 이렇게 쓰입니다
+
+*프로덕션* 에서는 *분기 가 있는 에이전트*, *Human-in-the-loop* 워크플로, *멀티 에이전트* 시스템을 *그래프* 로 *그립니다*. *LangSmith* 가 *각 노드* *입출력* 을 *그대로* *시각화* 합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *흐름* 이 *직선* 이면 *LCEL*, *분기/루프* 가 *생기면* *LangGraph*.
+- *노드* 는 *작고* *결정적* 으로 *유지* 합니다.
+- *상태 타입* 이 *문서* 입니다.
+- *그래프* 는 *그림* 이 *되는지* 부터 *그려* *봅니다*.
+- *컴파일 결과* 는 *Runnable* 이라 *기존 LCEL* 과 *섞* *입니다*.
 
 ## 체크리스트
 
-- [ ] 상태 필드가 다음 노드에 정말 필요한 값만 담고 있는가
-- [ ] 노드 이름만 봐도 흐름이 읽히는가
-- [ ] `START`와 `END` 사이 경로가 불필요하게 우회하지 않는가
+- [ ] *State* TypedDict *정의*.
+- [ ] *모든 노드* 가 *부분 상태 dict* *반환*.
+- [ ] *START → ... → END* *경로* *완성*.
+- [ ] *compile* 후 *invoke*.
 
-## 정리
+## 연습 문제
 
-![상태 스키마와 노드 조립 관계](../../../assets/langgraph-101/01/01-04-summary.ko.png)
+1. *세 번째* *노드* `subtract` 를 *추가* 하고 *순서* 를 *바꿔* *결과* 를 *비교* 하세요.
+2. *log* 키의 *기본* *덮어* *쓰기* *동작* 을 *확인* 하기 위해 *각* *노드* 가 *다른* *문자열* 을 *기록* 하게 *하세요*.
+3. `graph.get_graph().draw_ascii()` 로 *그래프* *구조* 를 *그려* *보세요*.
 
-*상태 스키마와 노드 조립 관계*
-이 단계에서는 "그래프를 만든다"보다 "상태가 어떤 순서로 변하는지 드러낸다"는 감각을 잡는 것이 중요합니다. 다음 글에서는 이 상태를 메모리에 저장하고 같은 `thread_id`로 다시 이어 붙이는 방법을 봅니다.
+## 정리 및 다음 단계
+
+다음 글은 *상태 관리와 체크포인트* 입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -150,12 +169,11 @@ if __name__ == "__main__":
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangGraph 개념 문서](https://langchain-ai.github.io/langgraph/concepts/low_level/)
-- [StateGraph API 레퍼런스](https://langchain-ai.github.io/langgraph/reference/graphs/)
-- [LangGraph 시작 가이드](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
+- [LangGraph quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
+- [StateGraph reference](https://langchain-ai.github.io/langgraph/reference/graphs/)
+- [LangGraph concepts](https://langchain-ai.github.io/langgraph/concepts/low_level/)
+- [LangGraph GitHub](https://github.com/langchain-ai/langgraph)
 
 Tags: LangGraph, Agent, Python, LLM

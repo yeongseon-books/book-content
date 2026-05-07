@@ -294,6 +294,14 @@ print(f"process([1,2,3]) = {result_sum}")     # process([1,2,3]) = 6
 
 `ParamSpec`은 Python 3.10에서 추가된 강력한 도구입니다. 데코레이터를 작성할 때 원본 함수의 시그니처를 그대로 보존하므로, IDE 자동완성과 mypy 검증이 데코레이터를 투과해서 동작합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Callable** — 콜백 타입을 명시해 호출 계약을 분명히 합니다.
+- **Default와 타입** — 기본값과 Optional을 혼동하지 않습니다.
+- **Overload** — 복합 시그니처는 @overload로 표현합니다.
+- **ParamSpec** — 데코레이터 타입 보존에 ParamSpec을 활용합니다.
+- **Return None 명시** — 절차형 함수도 -> None을 명시합니다.
+
 ## 체크리스트
 
 - [ ] `Callable[[ArgTypes], ReturnType]`을 작성할 수 있다

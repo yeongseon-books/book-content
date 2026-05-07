@@ -32,6 +32,15 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 ---
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Worker 프로세스 구조를 이해하면 어떤 언어 런타임 사고를 예방할 수 있을까요?
+
+이 글은 그 질문에 답하기 위해 Worker 프로세스의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - Worker 프로세스는 언어별로 어떻게 다르고, 그 차이는 운영에 어떤 의미를 갖는가?
@@ -174,6 +183,14 @@ OS 프로세스가 떠 있다고 해서 Worker가 “준비 완료”인 건 아
 - `GrpcWorkerChannel.StartWorkerProcessAsync()` → `IWorkerProcess.StartProcessAsync()` → `RpcWorkerProcess.CreateWorkerProcess()` → `_processFactory.CreateWorkerProcess(workerContext)` → `Process.Start()`
 
 ---
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Out-of-proc 워커가 격리의 핵심** — 한 언어 사고가 호스트로 전파되지 않습니다.
+- **워커는 단명일 수 있다는 전제** — 재시작·이동에 내성 있는 코드를 씁니다.
+- **동시성 설정이 워커당 부하를 결정** — max concurrent 값이 메모리·CPU 사고의 원인이 됩니다.
+- **OOM·CPU 한계를 메트릭으로 본다** — 워커 크래시의 가장 흔한 원인입니다.
+- **로컬 캐시 의존을 줄인다** — 워커 재시작 시 일관성 문제로 이어집니다.
 
 ## 운영 체크리스트
 

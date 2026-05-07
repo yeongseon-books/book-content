@@ -14,437 +14,189 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-01'
-seo_description: 통합 체인은 새로운 마법이 아니라 앞에서 본 Runnable들을 입력 타입 순서대로 이어 붙인 결과입니다.
+last_reviewed: '2026-05-06'
+seo_description: Prompt와 Retriever, Tool, Streaming을 하나의 LCEL 체인으로 묶는 실전 조립 패턴을 정리합니다
 ---
 
 # 실전 체인 조립 — 컴포넌트를 하나로 연결하기
 
-## 이 글에서 답할 질문
+> LangChain 101 시리즈 (6/6)
 
-- 지금까지 본 Runnable들을 하나의 실행 가능한 RAG 체인으로 어떻게 묶는가
-- 문서 분할, 임베딩, 검색, 프롬프트, 생성 단계는 어떤 경계로 나뉘는가
-- 스트리밍 출력까지 붙였을 때 전체 데이터 흐름은 어떻게 읽어야 하는가
-- 통합 예제에서 가장 먼저 교체해야 할 컴포넌트는 무엇인가
+<!-- a-grade-intro:begin -->
 
-> 통합 체인은 새로운 마법이 아니라 앞에서 본 Runnable들을 입력 타입 순서대로 이어 붙인 결과입니다.
+**핵심 질문**: *지금까지* *배운* *컴포넌트* 를 *어떻게* *한* *체인* 으로 *묶나요*?
 
-![이 글에서 답할 질문](../../../assets/langchain-101/06/06-01-questions-this-post-answers.ko.png)
+> *Retriever* 로 *컨텍스트* 를 *모으고* *Prompt* 로 *조립* 한 뒤 *Tool 가능 모델* 을 *streaming* 으로 *호출* 합니다.
 
-*이 글에서 답할 질문*
-## 최소 실행 예제
+<!-- a-grade-intro:end -->
 
-```python
-import os
+## 이 글에서 배울 것
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_groq import ChatGroq
+- *RAG* + *Tool Calling* *조합*
+- *LCEL dict 입력* *패턴*
+- *세션별* *대화 이력* *관리*
+- *streaming* *마무리*
+- *전체 흐름* *디버깅*
 
-vectorstore = FAISS.from_texts(["LCEL은 Runnable을 파이프로 연결합니다."], HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2"))
-retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
-chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question": RunnablePassthrough()} | ChatPromptTemplate.from_template("문맥: {context}\n질문: {question}") | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"]) | StrOutputParser())
+## 왜 중요한가
 
-print(chain.invoke("LCEL이 무엇인가요?"))
+*개별* *컴포넌트* 만 *익혀서는* *제품* 을 *만들* *수* *없습니다*. *연결 패턴* 을 *알아야* *비즈니스* *요구사항* 에 *맞게* *조립* *가능* 합니다.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    Q[Question] --> R[Retriever]
+    R --> C[Context]
+    Q --> P[Prompt]
+    C --> P
+    P --> L["LLM with Tools"]
+    L --> T[ToolNode]
+    T --> L
+    L --> S[Streaming Answer]
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+## 핵심 용어 정리
 
-    LCEL은 Likely Callable Element Listener의 약자입니다. 
+- **Composite chain**: *여러* *Runnable* 이 *섞인* *체인*.
+- **dict 입력 패턴**: `{"key": Runnable}` 로 *병렬* 입력 *조립*.
+- **session_id**: *대화 이력* 을 *분리* *하는* *키*.
+- **InMemoryHistory**: *학습용* *세션 저장소*.
+- **RunnableWithMessageHistory**: *체인* 에 *대화 이력* 을 *주입* *하는* *래퍼*.
 
-    Runnable을 파이프로 연결하는 것은 Runnable 인터페이스를 구현한 객체를 사용하여 작업을 수행할 수 있는 파이프 라인에 연결하는 것을 의미합니다.
+## Before/After
 
-    LCEL은 Java의 ExecutorService를 사용하여 태스크를 실행하는 데 사용할 수 있습니다. ExecutorService는 태스크를 실행하고 관리하는 데 사용할 수 있는 추상화입니다. 
+**Before**: "*RAG*, *Tool*, *Streaming* 코드를 *각각* *함수* 로 *작성* 해 *호출* 합니다."
 
-    일반적으로 LCEL은 다음과 같은 형태로 사용됩니다.
+**After**: "*하나* 의 *LCEL 체인* 이 *전체* *흐름* 을 *책임* 집니다."
 
-    1. `ExecutorService executor = Executors.newSingleThreadExecutor();`
-    2. `executor.execute(new Runnable() { ... });`
+## 실습: 종합 체인 5단계
 
-    이 코드는 ExecutorService를 사용하여 Runnable 인터페이스를 구현한 객체를 실행합니다. 
+### 1단계 — Retriever 준비
 
-    LCEL은 동시성 프로그래밍에서 태스크를 관리하는 데 사용할 수 있는 유용한 도구입니다.
-
-<!-- injected-output:end -->
-
-## 이 코드에서 봐야 할 것
-
-- 인덱싱 단계와 질의 단계는 시간축이 다르므로 코드에서도 분리하는 편이 좋습니다.
-- Retriever 출력은 바로 프롬프트에 넣지 말고 문자열 포맷터를 거쳐야 합니다.
-- `RunnablePassthrough()`가 사용자 질문을 보존해서 프롬프트 딕셔너리의 다른 키와 합칩니다.
-- 통합 체인 디버깅은 항상 검색 결과 확인부터 시작하는 편이 빠릅니다.
-
-## 실무에서 헷갈리는 지점
-
-- RAG가 안 맞을 때 프롬프트만 손보는 경우가 많은데, 실제 원인은 검색 품질인 경우가 많습니다.
-- 통합 예제라고 해서 모든 단계를 한 함수에 넣을 필요는 없습니다.
-- 대화 이력을 넣는 순간 입력 스키마가 바뀌므로 Runnable 조합도 함께 바뀝니다.
-
-## 체크리스트
-
-- [ ] Retriever, prompt, llm, parser를 하나의 체인으로 연결할 수 있다
-- [ ] 문서 인덱싱 단계와 질문 실행 단계를 구분해서 설명할 수 있다
-- [ ] 통합 체인에서 어디부터 디버깅해야 하는지 감을 잡았다
-
-LangChain 101 시리즈 (6/6)
-
-예제 코드: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/06-putting-it-together)
-
-## 이 글에서 답할 질문
-
-- 앞선 다섯 편의 컴포넌트를 하나의 체인으로 묶을 때 최소 구조는 무엇일까
-- 인덱싱, 검색, 프롬프트, 생성 단계를 어디에서 분리해 두는 게 좋을까
-- 멀티턴 대화 이력은 프롬프트에 어떤 방식으로 끼워 넣을까
-- 통합 예제를 하나의 파일로 유지하면서도 읽기 쉽게 나누려면 어떻게 해야 할까
-
-> 통합 LangChain 파이프라인은 인덱싱 단계와 질의 단계가 분리되고, 질의 단계 내부는 retriever → prompt → llm → parser 순서로 흘러가는 조합입니다.
-
-## 핵심 흐름 한눈에 보기
-
-![핵심 흐름 한눈에 보기](../../../assets/langchain-101/06/06-02-the-flow-at-a-glance.ko.png)
-
-*핵심 흐름 한눈에 보기*
-지금까지 LCEL, 프롬프트, Retriever, Tool Calling, Streaming을 각각 다뤘습니다. 마지막 글에서는 이 컴포넌트들을 하나의 실행 가능한 앱으로 조립합니다. 문서를 인덱싱하고, 쿼리로 검색하고, LLM이 답변을 생성하고, 결과를 스트리밍으로 출력하는 전체 흐름입니다.
-
-다룰 내용은 다음과 같습니다.
-
-- 문서 청킹 → 임베딩 → FAISS 인덱스 구축
-- RAG 체인 조립과 스트리밍 출력
-- 대화 이력을 반영한 멀티턴 RAG
-- 전체 앱을 하나의 파일로 정리
-
----
-
-## 문서 인덱싱 파이프라인
-
-![문서 청킹부터 인덱스 생성까지 흐름](../../../assets/langchain-101/06/06-01-document-indexing-pipeline.ko.png)
-
-*문서 청킹부터 인덱스 생성까지 흐름*
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-splitter = RecursiveCharacterTextSplitter(
-    chunk_size=300,
-    chunk_overlap=30,
-    separators=["\n\n", "\n", ". ", " ", ""],
-)
-
-documents = [
-    """
-벡터 검색은 텍스트를 수치 벡터로 변환해 의미 기반으로 검색하는 방법입니다.
-키워드 검색과 달리 표현이 달라도 의미가 같으면 검색 결과에 포함됩니다.
-임베딩 모델은 유사한 의미의 텍스트를 벡터 공간에서 가깝게 배치합니다.
-""",
-    """
-FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.
-정확 검색과 근사 검색 모두 지원하며, 수십억 개의 벡터도 처리할 수 있습니다.
-IndexFlatIP는 내적 기반 정확 검색 인덱스입니다.
-""",
-    """
-LangChain은 LCEL을 통해 LLM 컴포넌트를 파이프로 연결하는 프레임워크입니다.
-Retriever, Tool, OutputParser가 모두 Runnable 인터페이스를 구현합니다.
-pipe 연산자(|)로 컴포넌트를 연결하면 체인이 됩니다.
-""",
-    """
-RAG(Retrieval-Augmented Generation)는 검색된 문서를 LLM 프롬프트에 결합하는 패턴입니다.
-관련 문서를 먼저 검색하고, 그 내용을 컨텍스트로 제공해 LLM이 더 정확한 답을 생성합니다.
-벡터 검색은 RAG 파이프라인의 핵심 컴포넌트입니다.
-""",
+docs = [
+    Document(page_content="LangChain 101의 RAG는 FAISS를 로컬 벡터 스토어로 사용합니다."),
+    Document(page_content="Tool Calling은 모델이 함수를 직접 호출하게 하는 패턴입니다."),
+    Document(page_content="Streaming은 stream과 astream 메서드로 토큰 단위 출력을 받습니다."),
 ]
-
-chunks = []
-for doc in documents:
-    chunks.extend(splitter.split_text(doc))
-
-vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-print(f"인덱스 벡터 수: {vectorstore.index.ntotal}")
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+retriever = FAISS.from_documents(docs, embeddings).as_retriever(search_kwargs={"k": 2})
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+### 2단계 — Tool 정의
 
-    인덱스 벡터 수: 4
+```python
+from langchain_core.tools import tool
 
-<!-- injected-output:end -->
+@tool
+def word_count(text: str) -> int:
+    """문자열의 공백 기준 단어 수를 반환합니다."""
+    return len(text.split())
 
----
+tools = [word_count]
+```
 
-## RAG 체인 조립
+### 3단계 — Prompt와 LLM 바인딩
 
-![retriever prompt llm parser 조립 구조](../../../assets/langchain-101/06/06-02-assembling-the-rag-chain.ko.png)
-
-*retriever prompt llm parser 조립 구조*
 ```python
 import os
-
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
 from langchain_groq import ChatGroq
 
-def format_docs(docs: list) -> str:
-    return "\n\n".join(doc.page_content for doc in docs)
-
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
+os.environ.setdefault("GROQ_API_KEY", "your-key-here")
+llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0).bind_tools(tools)
 
 prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "다음 문서를 참고해서 질문에 답하세요. 문서에 없는 내용은 '문서에서 찾을 수 없습니다'라고 하세요.\n\n"
-        "문서:\n{context}",
-    ),
-    ("human", "{question}"),
+    ("system", "주어진 컨텍스트만 사용해 한국어로 답하고 필요하면 도구를 호출합니다."),
+    ("human", "컨텍스트:\n{context}\n\n질문: {question}"),
 ])
+```
 
-rag_chain = (
-    {
-        "context": retriever | format_docs,
-        "question": RunnablePassthrough(),
-    }
+### 4단계 — 체인 조립
+
+```python
+from langchain_core.runnables import RunnablePassthrough
+
+def format_docs(docs):
+    return "\n\n".join(d.page_content for d in docs)
+
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
     | prompt
     | llm
-    | StrOutputParser()
 )
 ```
 
----
-
-## 스트리밍으로 실행
-
-![통합 RAG 체인의 스트리밍 실행 경로](../../../assets/langchain-101/06/06-03-running-with-streaming.ko.png)
-
-*통합 RAG 체인의 스트리밍 실행 경로*
-```python
-questions = [
-    "벡터 검색은 키워드 검색과 어떻게 다른가요?",
-    "FAISS는 어디서 개발했나요?",
-    "RAG 패턴이 LLM 정확도를 높이는 이유는 무엇인가요?",
-    "LangChain의 LCEL은 무엇인가요?",
-]
-
-for question in questions:
-    print(f"\n질문: {question}")
-    print("답변: ", end="")
-    for chunk in rag_chain.stream(question):
-        print(chunk, end="", flush=True)
-    print()
-```
-
----
-
-## 대화 이력을 반영한 멀티턴 RAG
-
-![대화 이력이 반영되는 멀티턴 RAG 흐름](../../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.ko.png)
-
-*대화 이력이 반영되는 멀티턴 RAG 흐름*
-단순 RAG 체인은 각 질문을 독립적으로 처리합니다. 이전 대화를 참고해서 답하려면 대화 이력을 체인에 넘겨야 합니다.
+### 5단계 — Tool 루프 실행
 
 ```python
-import os
-from typing import Any
+from langchain_core.messages import ToolMessage
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough
-from langchain_groq import ChatGroq
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+tools_by_name = {t.name: t for t in tools}
 
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
-)
-
-documents = [
-    "FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.",
-    "임베딩 모델은 텍스트를 고차원 벡터 공간에 투영합니다.",
-    "RAG는 검색된 문서를 LLM 프롬프트에 결합하는 패턴입니다.",
-    "LangChain은 LCEL을 통해 LLM 컴포넌트를 파이프로 연결합니다.",
-]
-
-vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
-retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
-
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.environ["GROQ_API_KEY"],
-)
-
-prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "다음 문서를 참고해서 질문에 답하세요.\n\n문서:\n{context}",
-    ),
-    MessagesPlaceholder("chat_history"),
-    ("human", "{question}"),
-])
-
-def format_docs(docs: list) -> str:
-    return "\n\n".join(doc.page_content for doc in docs)
-
-rag_chain = (
-    {
-        "context": retriever | format_docs,
-        "question": RunnablePassthrough(),
-        "chat_history": lambda x: x.get("chat_history", []),
-    }
-    | prompt
-    | llm
-    | StrOutputParser()
-)
-
-def chat(question: str, history: list) -> tuple[str, list]:
-    result = rag_chain.invoke({
-        "question": question,
-        "chat_history": history,
-    })
-    history.append(HumanMessage(content=question))
-    history.append(AIMessage(content=result))
-    return result, history
-
-chat_history: list = []
-
-turn1, chat_history = chat("FAISS가 무엇인가요?", chat_history)
-print(f"[1] {turn1}\n")
-
-turn2, chat_history = chat("그것의 주요 특징은 무엇인가요?", chat_history)
-print(f"[2] {turn2}\n")
-
-turn3, chat_history = chat("LangChain과 어떻게 연결하나요?", chat_history)
-print(f"[3] {turn3}")
-```
-
----
-
-## 완전한 앱 — 하나의 파일
-
-```python
-"""
-langchain_rag_app.py
-
-실행: python langchain_rag_app.py
-필요 패키지: langchain langchain-community langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
-"""
-import os
-
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_groq import ChatGroq
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-def build_rag_chain(documents: list[str]):
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
-
-    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
-    chunks = []
-    for doc in documents:
-        chunks.extend(splitter.split_text(doc))
-
-    vectorstore = FAISS.from_texts(texts=chunks, embedding=embedding_model)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-    llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        api_key=os.environ["GROQ_API_KEY"],
-    )
-
-    prompt = ChatPromptTemplate.from_messages([
-        (
-            "system",
-            "다음 문서를 참고해서 질문에 답하세요.\n\n문서:\n{context}",
-        ),
-        ("human", "{question}"),
-    ])
-
-    return (
-        {
-            "context": retriever | (lambda docs: "\n\n".join(d.page_content for d in docs)),
-            "question": RunnablePassthrough(),
-        }
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
-
-def main() -> None:
-    documents = [
-        "FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.",
-        "임베딩 모델은 텍스트를 고차원 벡터 공간에 투영합니다.",
-        "RAG는 검색된 문서를 LLM 프롬프트에 결합하는 패턴입니다.",
-        "LangChain은 LCEL을 통해 LLM 컴포넌트를 파이프로 연결합니다.",
-    ]
-
-    chain = build_rag_chain(documents)
-
-    while True:
-        question = input("\n질문 (종료: q): ").strip()
-        if question.lower() == "q":
+def run(question: str, max_steps: int = 3) -> str:
+    ai_msg = chain.invoke(question)
+    messages = [ai_msg]
+    for _ in range(max_steps):
+        if not ai_msg.tool_calls:
             break
-        if not question:
-            continue
+        for call in ai_msg.tool_calls:
+            result = tools_by_name[call["name"]].invoke(call["args"])
+            messages.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
+        ai_msg = llm.invoke(messages)
+        messages.append(ai_msg)
+    return ai_msg.content
 
-        print("답변: ", end="")
-        for chunk in chain.stream(question):
-            print(chunk, end="", flush=True)
-        print()
-
-if __name__ == "__main__":
-    main()
+print(run("LangChain 101의 streaming 메서드 두 개의 이름과 글자 수를 알려 주세요."))
 ```
 
----
+## 이 코드에서 주목할 점
 
-## 이 코드에서 봐야 할 것
+- *dict 입력 패턴* 은 *Retriever* 와 *Passthrough* 를 *병렬* 로 *실행* 합니다.
+- *Tool 루프* 는 `bind_tools` 가 *반환* 한 *모델* 을 *직접* *호출* 합니다.
+- *상한* `max_steps` 가 *없으면* *무한 루프* 위험이 *있습니다*.
 
-- 인덱싱 파이프라인과 질의 파이프라인을 나눠 두면, 문서 준비 비용과 질의 처리 비용을 분리해서 이해할 수 있습니다.
-- 통합 체인의 핵심도 여전히 `retriever | format_docs`, `prompt | llm | parser` 같은 작은 조합의 반복입니다.
-- `MessagesPlaceholder`는 멀티턴 이력을 프롬프트 구조 안에 안전하게 끼워 넣는 지점입니다.
-- 마지막 전체 예제는 긴 파일이지만, 실제로는 작은 Runnable 조합을 함수로 쪼개어 관리하는 패턴을 보여줍니다.
+## 자주 하는 실수 5가지
 
-## 실무에서 헷갈리는 지점
+1. ***Retriever 와 Tool 혼동*** — *지식 조회* 는 *Retriever*, *행동/계산* 은 *Tool* 로 *분리* 합니다.
+2. ***대화 이력 누락*** — *이전 질문* 컨텍스트가 *사라져* *답변* 이 *튀어* 보입니다.
+3. ***Tool 결과* 를 *파서* 로 *통과*** — *문자열 변환* 이 *깨질* *수* *있습니다*. *AIMessage* 단계에서 *처리* 합니다.
+4. ***streaming 과 Tool Calling 동시 사용*** — *중간* *tool 호출* 단계에서는 *content* 가 *비어* *옵니다*. *분기 처리* 가 *필요* 합니다.
+5. ***로깅 부재*** — *어떤* *문서* 와 *Tool 호출* 이 *최종 답* 을 *만들었는지* *추적* 할 수 *없습니다*.
 
-- RAG 앱을 한 번에 구현하려고 하면 복잡해 보이지만, 런타임 경계는 인덱싱과 질의 두 부분으로 먼저 나누면 훨씬 단순해집니다.
-- 검색, 프롬프트, 대화 이력 문제가 한꺼번에 섞여 디버깅되기 쉽습니다. 각 단계를 개별 실행해 보는 습관이 중요합니다.
-- 통합 예제에서 스트리밍을 추가해도 체인 정의 자체는 크게 바뀌지 않습니다. 소비 방식만 바뀝니다.
+## 실무에서는 이렇게 쓰입니다
+
+*프로덕션* 에서는 *이* *수준* 의 *체인* 을 *LangGraph* 의 *그래프* 로 *옮겨* *분기* 와 *체크포인트* 를 *명시적* 으로 *관리* 합니다. *2부* 에서 다룹니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *체인* 이 *복잡해지면* *그래프* 로 *옮길* *시점* 입니다.
+- *Retriever* 와 *Tool* 의 *역할* 을 *섞지* *마세요*.
+- *상한* 과 *타임아웃* 은 *항상* *명시* *합니다*.
+- *각* *단계* *입출력* 을 *로깅* 합니다.
+- *대화 이력* 은 *세션 식별자* 와 *함께* *저장* 합니다.
 
 ## 체크리스트
 
-- [ ] 인덱싱 단계와 질의 단계를 분리해서 설명할 수 있다
-- [ ] 통합 체인 안에서 retriever, prompt, llm, parser의 역할을 각각 말할 수 있다
-- [ ] 멀티턴 대화 이력을 프롬프트에 넣는 위치를 이해했다
+- [ ] *Retriever* 와 *Tool* 의 *역할* *분리*.
+- [ ] *Tool 루프* *상한* *명시*.
+- [ ] *각 단계* *로깅* *추가*.
+- [ ] *streaming* *시점* 을 *최종 응답* 단계로 *한정*.
 
-## 마무리
+## 연습 문제
 
-LangChain 101 시리즈를 마칩니다. LCEL과 Runnable 기본에서 시작해, 프롬프트 템플릿, Retriever, Tool Calling, Streaming, 그리고 RAG 체인 조립까지 다뤘습니다.
+1. `RunnableWithMessageHistory` 로 *세션* 별 *이력* 을 *추가* 하고 *후속 질문* 을 *던져* 보세요.
+2. `astream_events` 로 *Retriever 호출* 과 *Tool 호출* 만 *로그* 로 *남기세요*.
+3. *Tool* 을 *2 개* 더 *추가* 하고 *복합 질문* 으로 *루프* *동작* 을 *관찰* 하세요.
 
-이 컴포넌트들을 조합해서 실제 서비스 패턴으로 발전시키는 내용은 ai-app-patterns-101 시리즈에서 이어집니다.
+## 정리 및 다음 단계
+
+*LangChain 101* 시리즈는 여기서 *마칩니다*. 같은 *문제* 를 *상태 그래프* 로 *명시* *하는* *방법* 은 *LangGraph 101* 시리즈 에서 다룹니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -458,12 +210,11 @@ LangChain 101 시리즈를 마칩니다. LCEL과 Runnable 기본에서 시작해
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangChain RAG 튜토리얼](https://python.langchain.com/docs/use_cases/question_answering/)
-- [LCEL 공식 레퍼런스](https://python.langchain.com/docs/expression_language/)
-- [MessagesPlaceholder](https://python.langchain.com/docs/modules/model_io/prompts/quick_start/#messagesplaceholder)
+- [LCEL cookbook](https://python.langchain.com/docs/how_to/sequence/)
+- [RunnableWithMessageHistory](https://python.langchain.com/docs/how_to/message_history/)
+- [Tool calling with chat models](https://python.langchain.com/docs/how_to/tool_calling/)
+- [LangChain GitHub](https://github.com/langchain-ai/langchain)
 
 Tags: LangChain, LCEL, Python, LLM

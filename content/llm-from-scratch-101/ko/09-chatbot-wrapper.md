@@ -189,6 +189,14 @@ source.onmessage=e=>out.textContent+=e.data;source.onerror=()=>source.close();};
 
 <!-- a-grade-example:begin -->
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **스트리밍 우선** — 체감 응답성은 token streaming이 결정합니다.
+- **타임아웃** — 모든 단계에 명시적 타임아웃을 둡니다.
+- **백프레셔** — 동시 요청 한도와 큐를 둡니다.
+- **관측** — request id로 trace를 묶습니다.
+- **안전 가드** — 입력·출력 검증을 사이드카로 둡니다.
+
 ## 체크리스트
 
 - [ ] FastAPI 앱을 띄우고 /chat 엔드포인트를 호출해 봤다.

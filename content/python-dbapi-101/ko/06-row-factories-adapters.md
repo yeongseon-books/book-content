@@ -28,6 +28,15 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 ![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Row factory와 type adapter는 어떻게 활용해야 하나요?
+
+이 글은 그 질문에 답하기 위해 row factory와 type adapter의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - 기본 tuple 결과를 dict, dataclass, Pydantic 모델로 받으려면 어떻게 하나요?
@@ -394,6 +403,14 @@ GROUP BY u.id;
 - 핫 루프: tuple + 명시적 unpack `for id, name in cur:`도 정당. 단, 함수 1~2개로 한정.
 
 ---
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **dict row 편의** — 딕셔너리 행은 가독성을 크게 높입니다.
+- **커스텀 타입** — 도메인 타입은 adapter로 양방향 변환을 강제합니다.
+- **성능 영향** — 변환 비용은 hot path에서 누적되므로 측정합니다.
+- **None 처리** — NULL과 None 변환 규칙을 명확히 합니다.
+- **테스트** — 변환 로직은 단위 테스트로 회귀를 막습니다.
 
 ## 체크리스트
 

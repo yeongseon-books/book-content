@@ -28,6 +28,15 @@ seo_description: 애플리케이션은 바로 다음 질문을 던집니다. 데
 
 ---
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+App Settings·Connection Strings·Key Vault 참조를 어떻게 정리해야 환경 분리가 깔끔해질까요?
+
+이 글은 그 질문에 답하기 위해 App Service 구성의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - App settings, connection strings, environment variables는 런타임에서 어떻게 노출되는가?
@@ -488,6 +497,14 @@ logger.info("Configuration loaded", extra={
 이번 글은 배포 뒤에 더 오래 남는 문제인 설정, 민감 정보, 슬롯별 값 관리를 다룹니다. `LOG_LEVEL`, Application Insights 연결 문자열, 구조화된 로그 필드처럼 여기서 정한 기준이 이후의 로그·메트릭·추적 품질을 직접 좌우합니다.
 
 ---
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **환경 변수는 슬롯별로 관리한다** — 슬롯 sticky 설정을 정확히 표시해야 스왑 사고를 막습니다.
+- **시크릿은 Key Vault 참조로** — App Settings에 평문 시크릿을 두지 않습니다.
+- **구성 변경도 코드처럼 관리한다** — 포털 직접 변경은 감사 추적이 약합니다.
+- **관리 ID로 권한을 통합한다** — 키·시크릿 회전 부담이 크게 줄어듭니다.
+- **느린 변경은 재시작이 필요함을 의식한다** — 런타임 반영 시점을 잘못 잡으면 사고가 됩니다.
 
 ## 운영 체크리스트
 

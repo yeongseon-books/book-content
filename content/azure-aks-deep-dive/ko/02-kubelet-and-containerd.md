@@ -46,6 +46,15 @@ containerd가 sandbox와 container를 만들고,
 
 ---
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+kubelet과 containerd의 동작을 알면 어떤 노드 사고를 빠르게 진단할 수 있을까요?
+
+이 글은 그 질문에 답하기 위해 kubelet과 containerd의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - kubelet은 정확히 어떤 주기로 무엇을 폴링하고, 그 주기는 어떻게 튜닝되는가?
@@ -190,6 +199,14 @@ journalctl -u kubelet --since '15 min ago' | tail -50
 crictl ps -a | head
 crictl images | grep my-app
 ```
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **kubelet이 노드의 사령관** — Pod 라이프사이클 사고는 대개 kubelet 로그에서 시작합니다.
+- **containerd가 컨테이너의 실체** — 이미지·런타임 문제는 containerd 단에서 봐야 합니다.
+- **이미지 풀 정책이 가용성에 영향** — Always pull은 안정성과 비용을 모두 흔듭니다.
+- **eviction 임계값을 의식한다** — 메모리·디스크 압박이 Pod 강제 종료를 만듭니다.
+- **로그 회전을 설정한다** — 컨테이너 로그가 디스크를 채우는 사고가 흔합니다.
 
 ## 운영 체크리스트
 

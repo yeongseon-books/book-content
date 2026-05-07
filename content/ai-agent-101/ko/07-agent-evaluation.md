@@ -522,7 +522,7 @@ if result == expected:
 # 좋은 예
 results = [agent.run(test_input) for _ in range(10)]
 pass_rate = sum(1 for r in results if r == expected) / 10
-print(f"Pass rate: {pass_rate:.0%}")
+print(f"통과율: {pass_rate:.0%}")
 ```
 
 최소 5-10회 반복 실행 후 평균을 봐야 합니다.
@@ -610,6 +610,14 @@ else:
 - 단일 실행이 아닌 5-10회 반복 후 평균으로 평가해야 신뢰할 수 있습니다
 
 <!-- a-grade-example:begin -->
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **결과 vs 과정** — 최종 결과뿐 아니라 step별 행동도 평가합니다.
+- **골든 trace** — 성공 trace 묶음을 회귀 자산으로 보존합니다.
+- **LLM-judge 한계** — judge 비용·편향을 인지하고 사람 평가와 교차 검증합니다.
+- **회귀 게이트** — 임계 미달 시 배포를 막는 자동 게이트를 둡니다.
+- **Cost·Latency** — 품질과 함께 비용·지연을 동일 보드에서 추적합니다.
 
 ## 체크리스트
 

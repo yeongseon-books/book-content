@@ -25,6 +25,15 @@ seo_description: production LLM fine-tuning에서 가장 흔한 병목은 labele
 > AI Data Preparation 101 시리즈 (7/10)
 
 ---
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Self-Instruct·Distillation 등 합성 데이터를 어떻게 만들어야 모델이 망가지지 않을까요?
+
+이 글은 그 질문에 답하기 위해 합성 데이터 생성의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## "데이터가 모자라면 만들어 쓰면 되지 않나요?"
 
 production LLM fine-tuning에서 가장 흔한 병목은 labeled data 부족입니다. human annotation은 sample당 $1~5에 며칠이 걸립니다. synthetic data generation은 더 강한 LLM(teacher)으로 supervised data를 자동 생성하는 기법입니다.
@@ -206,6 +215,14 @@ unique_ratio가 0.7 미만이면 다양성이 부족한 신호입니다. refusal
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **합성은 부족한 도메인을 채우는 도구** — 전체 corpus 대체는 위험합니다.
+- **seed 다양성이 결과 다양성을 결정** — 같은 seed로는 같은 출력만 나옵니다.
+- **model collapse를 의식** — 합성 비율이 높을수록 분포가 좁아집니다.
+- **품질 검증을 반드시 거친다** — 합성 데이터의 노이즈가 학습을 망칩니다.
+- **라이선스·출처 추적이 필수** — 원본 모델의 ToS가 적용될 수 있습니다.
+
 ## AI Data Preparation 101 시리즈
 
 - [데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)

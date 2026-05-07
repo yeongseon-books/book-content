@@ -29,6 +29,15 @@ seo_description: LoRA 어댑터는 다음 그림으로 요약됩니다.
 - `print_trainable_parameters()`로 어댑터 부착을 검증하는 습관을 들입니다.
 - 저랭크 분해 구조(`y = Wx + (α/r)·B·A·x`)를 직관적으로 이해합니다.
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+LoRA 어댑터 구성을 어떻게 결정해야 효율과 성능을 동시에 잡을까요?
+
+이 글은 그 질문에 답하기 위해 LoRA 어댑터의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 ![이 글에서 답할 질문](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.ko.png)
@@ -198,6 +207,14 @@ for name, param in peft_model.named_parameters():
 LoRA는 파라미터 효율성이 돋보이지만, 실무에서는 "어느 레이어에 붙일 것인가"가 훨씬 더 중요한 결정입니다. attention QKV에만 붙여도 충분한 경우가 대부분이고, MLP까지 포함하면 학습 파라미터가 두세 배로 뛰어 실험 속도가 느려집니다. 또 rank를 키우는 것과 데이터를 늘리는 것 중 어느 쪽이 비용 대비 효과가 더 큰지는 데이터셋 크기에 따라 달라집니다.
 
 팀에서 LoRA를 도입할 때 가장 먼저 할 일은 모델별 `target_modules` 매핑 표를 위키에 박아 두는 것입니다. 이것만으로도 신규 팀원이 `trainable params: 0` 실수를 반복하는 일을 방지할 수 있습니다. 어댑터를 base에 합칠지(`merge_and_unload`) 분리해서 배포할지는 서빙 환경의 latency 요구와 multi-tenancy 필요성에 따라 결정합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **rank가 capacity 결정** — task 복잡도에 맞춰 결정합니다.
+- **target module 선택이 큰 차이** — attention·MLP 어디에 적용할지 ablation합니다.
+- **alpha·dropout이 학습 안정성** — 기본값이 늘 옳지 않습니다.
+- **어댑터 분리·병합 정책을 처음에** — 운영 흐름에 영향을 줍니다.
+- **base model 호환성을 의식** — 어댑터는 base와 함께 버전 관리합니다.
 
 ## 체크리스트
 

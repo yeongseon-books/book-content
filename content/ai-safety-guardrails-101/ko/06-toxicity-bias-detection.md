@@ -23,6 +23,15 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 > AI Safety & Guardrails 101 시리즈 (6/10)
 
 ---
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+독성·편향 탐지를 어떻게 운영해야 모델 공정성과 안전을 동시에 확보할 수 있을까요?
+
+이 글은 그 질문에 답하기 위해 독성·편향 탐지의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## Section 1
 
 ## Toxicity와 Bias는 다른 문제입니다
@@ -203,6 +212,14 @@ Toxicity 차단은 false positive가 즉시 사용자 항의로 돌아옵니다.
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **범용 분류기로 시작** — Perspective API·Azure 등이 출발점입니다.
+- **도메인 적응이 종종 필요** — 범용 모델이 우리 컨텍스트를 못 이해할 수 있습니다.
+- **편향은 측정이 어려운 도전** — 프록시 메트릭의 한계를 인정합니다.
+- **샘플링 audit을 정기적으로** — 자동 메트릭만으로는 신뢰가 부족합니다.
+- **결과를 사용자에게 설명** — 차단 사유의 투명성이 신뢰를 만듭니다.
+
 ## AI Safety & Guardrails 101 시리즈
 
 - [Ep1 AI 안전이 왜 중요한가](./01-why-ai-safety-matters.md)

@@ -31,6 +31,15 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 - multi-head 상태에서의 `upgrade`/`downgrade` 동작
 - 팀에서 branch 사고를 줄이는 운영 규칙
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+여러 브랜치에서 동시에 마이그레이션이 생길 때 충돌을 어떻게 해소해야 할까요?
+
+이 글은 그 질문에 답하기 위해 브랜치와 머지의 핵심 결정과 실무 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - alembic의 revision 그래프는 어떤 상황에서 branch로 갈라지는가?
@@ -235,6 +244,14 @@ branch_labels = ("audit",)
 - **머지 revision의 메시지 컨벤션.** `merge <branchA> and <branchB>`로 통일.
 - **`depends_on`은 정말 필요할 때만.** 보통은 두 revision을 같은 PR에 묶어서 단일 brunch로 만드는 편이 단순합니다.
 - **`alembic history --verbose`로 graph 시각화.** 사고 났을 때 가장 빨리 상황 파악이 됩니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **브랜치는 짧게 유지한다** — 오래 갈수록 베이스 리비전이 멀어져 머지 비용이 폭증합니다.
+- **merge revision은 의식적으로 만든다** — alembic merge로 합류점을 명시해야 head가 하나로 정리됩니다.
+- **CI에서 multiple heads를 차단한다** — main에 head가 둘 이상이면 배포가 깨지므로 검사 단계가 필수입니다.
+- **rebase보다 merge revision을 선호한다** — 이미 적용된 환경이 있다면 히스토리 재작성이 위험합니다.
+- **팀 컨벤션으로 충돌을 예방한다** — 같은 테이블을 동시에 만지는 PR은 사전 조율로 줄입니다.
 
 ## 체크리스트
 

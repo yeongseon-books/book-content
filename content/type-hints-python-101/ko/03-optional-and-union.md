@@ -277,6 +277,14 @@ print(create_user("Charlie", role="admin"))
 
 Python 3.10+를 사용한다면 `Optional[str]` 대신 `str | None`을, `Union[int, str]` 대신 `int | str`을 쓰는 것이 가독성과 현대적 스타일 모두에 좋습니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Optional 의미** — Optional은 "기본값이 None"이 아니라 "None일 수 있음"입니다.
+- **X | Y 문법** — 현대 코드는 union 연산자를 우선합니다.
+- **Narrowing** — isinstance/None 검사로 타입을 좁힙니다.
+- **리턴 다중성** — Union 리턴은 호출자에게 부담이라는 점을 인지합니다.
+- **Result 패턴** — 복잡 분기는 Result/Maybe 패턴이 명료합니다.
+
 ## 체크리스트
 
 - [ ] `Optional[T]`와 `T | None`이 같은 의미임을 설명할 수 있다

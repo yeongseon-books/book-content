@@ -760,8 +760,8 @@ response = client.chat.completions.create(
 )
 
 usage = response.usage
-print(f"Prompt tokens: {usage.prompt_tokens}")
-print(f"Completion tokens: {usage.completion_tokens}")
+print(f"프롬프트 토큰: {usage.prompt_tokens}")
+print(f"완성 토큰: {usage.completion_tokens}")
 print(f"Total tokens: {usage.total_tokens}")
 
 # 비용 계산 (GPT-4 기준: $0.03/1K prompt tokens, $0.06/1K completion tokens)
@@ -1285,6 +1285,14 @@ def save_conversation(user_id, messages):
 - 장기 메모리가 필요한 경우 외부 저장소(벡터 DB, 일반 DB)를 활용합니다.
 
 <!-- a-grade-example:begin -->
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **3-tier 모델** — ephemeral / session / long-term memory를 명확히 분리합니다.
+- **PII 정책** — 장기 메모리에 들어가는 데이터는 분류·마스킹을 강제합니다.
+- **회수 전략** — 검색 기반 회수가 거의 모든 경우 가장 안전합니다.
+- **쓰기 게이트** — 사용자 확인 없는 자동 쓰기는 위험을 키웁니다.
+- **일관성** — 메모리 업데이트는 트랜잭션 경계와 함께 다룹니다.
 
 ## 체크리스트
 

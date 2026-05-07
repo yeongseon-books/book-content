@@ -198,6 +198,14 @@ python -m build    # 깨끗한 상태에서 빌드
 
 대부분의 애플리케이션 개발자는 순수 Python 패키지만 만들기 때문에 `py3-none-any` wheel이면 충분합니다. 중요한 것은 "빌드한 뒤 새 환경에서 설치해보는" 습관입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **표준 빌드** — python -m build를 표준으로 씁니다.
+- **Sdist 포함 파일** — MANIFEST.in 또는 SCM 통합으로 누락을 막습니다.
+- **Wheel 호환성** — pure Python이면 universal wheel을 검토합니다.
+- **Native 의존** — C 확장은 cibuildwheel로 매트릭스 빌드합니다.
+- **재현성** — 같은 커밋이 같은 sha를 만드는지 확인합니다.
+
 ## 체크리스트
 
 - [ ] sdist와 wheel의 차이를 설명할 수 있다

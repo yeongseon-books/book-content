@@ -494,7 +494,7 @@ def code_agent_handler(message: AgentMessage):
 
 def orchestrator_handler(message: AgentMessage):
     """Orchestrator의 메시지 처리 함수"""
-    print(f"[Orchestrator] Received response: {message.content}")
+    print(f"[Orchestrator] 응답 수신: {message.content}")
 
 # Agent 등록
 broker.register_agent("CodeAgent", code_agent_handler)
@@ -590,7 +590,7 @@ class SharedMemoryAgent:
         # 공유 메모리에 저장
         self.shared_memory.set(f"result_{self.name}", result, self.name)
         
-        print(f"[{self.name}] Task done, result saved to shared memory")
+        print(f"[{self.name}] 작업 완료, 결과를 공유 메모리에 저장했습니다")
     
     def read_peer_result(self, peer_name: str):
         """다른 Agent의 결과 읽기"""
@@ -790,7 +790,7 @@ class LoadBasedOrchestrator:
         # 부하 증가
         self.load[worker_name] += 1
         
-        print(f"Delegating to {worker_name} (current load: {self.load[worker_name]})")
+        print(f"{worker_name}에게 위임 (현재 부하: {self.load[worker_name]})")
         
         # 작업 실행
         result = self.workers[worker_name].execute(task)
@@ -816,7 +816,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
     futures = [executor.submit(orchestrator.delegate_with_load_balancing, task) for task in tasks]
     results = [f.result() for f in futures]
 
-print(f"\nFinal load distribution: {dict(orchestrator.load)}")
+print(f"\n최종 부하 분포: {dict(orchestrator.load)}")
 ```
 
 **적용:**
@@ -1020,7 +1020,7 @@ class SafePeerAgent:
     def send_message(self, recipient: str, message: str):
         # 같은 상대와의 교환 횟수 체크
         if self.exchange_count[recipient] >= self.max_exchanges:
-            print(f"[{self.name}] Max exchanges reached with {recipient}")
+            print(f"[{self.name}] {recipient}와의 최대 교환 횟수 도달")
             return
         
         self.exchange_count[recipient] += 1
@@ -1064,7 +1064,7 @@ result = worker.execute(task)  # 예외 발생 시 시스템 멈춤
 try:
     result = worker.execute(task)
 except Exception as e:
-    print(f"Worker failed: {e}")
+    print(f"워커 실패: {e}")
     # Fallback: 다른 Worker에게 재시도
     result = backup_worker.execute(task)
 ```
@@ -1080,6 +1080,14 @@ except Exception as e:
 - Agent 간 명확한 통신 프로토콜과 책임 분담이 성공의 열쇠입니다.
 
 <!-- a-grade-example:begin -->
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **필요성 증명** — 단일 에이전트로 안 되는 이유가 명확할 때만 다중 에이전트로 갑니다.
+- **역할 분리** — 각 에이전트의 책임·인터페이스를 코드처럼 정의합니다.
+- **조정 비용** — 통신 오버헤드가 단일 모델보다 비싸질 수 있음을 인지합니다.
+- **교착 방지** — 라운드 상한·종료 조건을 둡니다.
+- **관측** — 에이전트 간 trace를 단일 timeline으로 묶습니다.
 
 ## 체크리스트
 

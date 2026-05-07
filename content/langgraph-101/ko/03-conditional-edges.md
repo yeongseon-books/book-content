@@ -14,128 +14,182 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-01'
-seo_description: 조건부 엣지는 상태를 계산한 뒤 다음 노드 이름을 반환해 그래프의 흐름을 런타임에 결정합니다.
+last_reviewed: '2026-05-06'
+seo_description: 조건부 엣지로 상태에 따라 다음 노드를 런타임에 선택하는 분기 그래프 패턴을 정리합니다
 ---
 
 # 조건부 엣지와 분기 흐름
 
-## 이 글에서 답할 질문
+> LangGraph 101 시리즈 (3/6)
 
-- `add_conditional_edges()`는 언제 써야 할까요?
-- 상태를 보고 다음 노드를 고르는 함수는 어떤 역할만 맡아야 할까요?
-- 분기 그래프를 만들 때 무한 루프를 어떻게 피할까요?
+<!-- a-grade-intro:begin -->
 
-> 조건부 엣지는 상태를 계산한 뒤 다음 노드 이름을 반환해 그래프의 흐름을 런타임에 결정합니다.
+**핵심 질문**: *모든* *요청* 이 *같은* *경로* 를 *타지* *않을* *때* *어떻게* *분기* *하나요*?
 
-예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/ko/03-conditional-edges)
+> *상태* 를 *읽어* *다음* *노드 이름* 을 *반환* 하는 *조건부 엣지* 로 *런타임* *분기* 를 *표현* 합니다.
 
-LLM 워크플로가 실제 서비스로 가면 모든 요청이 같은 경로를 타지 않습니다. 어떤 질문은 코드 생성으로, 어떤 질문은 개념 설명으로, 어떤 질문은 디버깅 흐름으로 보내야 합니다. LangGraph에서는 이 결정을 조건부 엣지 하나로 드러낼 수 있습니다.
+<!-- a-grade-intro:end -->
 
-![이 글에서 답할 질문](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.ko.png)
+## 이 글에서 배울 것
 
-*이 글에서 답할 질문*
-## 최소 실행 예제
+- *add_conditional_edges* *문법*
+- *분류* 노드 와 *라우팅* 함수 *분리*
+- *path_map* 으로 *라벨* *명시*
+- *Literal* 힌트로 *오타* *예방*
+- *루프* 구성 시 *종료 조건*
 
-![분기 노드가 세 경로로 나뉘는 구조](../../../assets/langgraph-101/03/03-01-minimal-runnable-example.ko.png)
+## 왜 중요한가
 
-*분기 노드가 세 경로로 나뉘는 구조*
+*실서비스* *질문* 은 *균일* 하지 *않습니다*. *디버깅 요청*, *코드 생성*, *개념 설명* 은 *서로* *다른* *경로* 가 *적절* 합니다. *if/else* 를 *노드* *안* 에 *숨기면* *그래프* 가 *그림* 으로 *드러나지* *않습니다*. *조건부* *엣지* 는 *분기* 를 *그래프* *위* 로 *끌어* *올립니다*.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    S[START] --> C[classify]
+    C -- code --> A1[answer_code]
+    C -- concept --> A2[answer_concept]
+    C -- debug --> A3[answer_debug]
+    A1 --> E[END]
+    A2 --> E
+    A3 --> E
+```
+
+## 핵심 용어 정리
+
+- **add_conditional_edges**: *한* *노드* 에서 *여러* *후속 노드* 중 *하나* 를 *런타임* 선택.
+- **router function**: *상태* 를 *입력* 받아 *후속 노드 이름* *문자열* 만 *반환* 하는 *순수* 함수.
+- **path_map**: *반환 라벨 → 실제 노드 이름* 의 *명시적* *매핑* dict.
+- **Literal**: *router* 의 *반환* *타입* 을 *고정* 해 *오타* 방지.
+- **recursion limit**: *루프* 깊이 *기본 25*. *초과* 시 *예외* 발생.
+
+## Before/After
+
+**Before**: "*노드* *내부* *if/else* 가 *길어지면서* *그래프* 가 *직선* 처럼 *보입니다*."
+
+**After**: "*조건부* *엣지* 가 *분기* 를 *명시* 해 *그림* 으로 *읽힙니다*."
+
+## 실습: 라우팅 그래프 5단계
+
+### 1단계 — 상태와 라벨 타입
+
 ```python
 from typing import Literal, TypedDict
-
-from langgraph.graph import END, START, StateGraph
 
 class RouterState(TypedDict):
     question: str
     route: str
     answer: str
 
-def classify_question(state: RouterState) -> RouterState:
-    text = state["question"].lower()
-    if any(word in text for word in ("bug", "error", "traceback")):
-        route = "debug"
-    elif any(word in text for word in ("code", "implement", "write")):
-        route = "code"
-    else:
-        route = "concept"
-    return {"route": route}
-
-def route_question(state: RouterState) -> Literal["code", "concept", "debug"]:
-    return state["route"]
-
-def answer_code(_: RouterState) -> RouterState:
-    return {"answer": "Route: code. Next node should generate or review code."}
-
-def answer_concept(_: RouterState) -> RouterState:
-    return {"answer": "Route: concept. Next node should explain the idea clearly."}
-
-def answer_debug(_: RouterState) -> RouterState:
-    return {"answer": "Route: debug. Next node should inspect failure details first."}
-
-def build_graph():
-    graph = StateGraph(RouterState)
-    graph.add_node("classify", classify_question)
-    graph.add_node("code", answer_code)
-    graph.add_node("concept", answer_concept)
-    graph.add_node("debug", answer_debug)
-
-    graph.add_edge(START, "classify")
-    graph.add_conditional_edges(
-        "classify",
-        route_question,
-        {"code": "code", "concept": "concept", "debug": "debug"},
-    )
-    graph.add_edge("code", END)
-    graph.add_edge("concept", END)
-    graph.add_edge("debug", END)
-
-    return graph.compile()
-
-if __name__ == "__main__":
-    app = build_graph()
-    for question in [
-        "Write Python code for quicksort.",
-        "What is a checkpoint in LangGraph?",
-        "I got a traceback while running my graph.",
-    ]:
-        result = app.invoke({"question": question, "route": "", "answer": ""})
-        print(f"Question: {question}")
-        print(f"Route: {result['route']}")
-        print(f"Answer: {result['answer']}\n")
+Route = Literal["code", "concept", "debug"]
 ```
 
-실행 파일: `/root/Github/langgraph-101/ko/03-conditional-edges/main.py`
+### 2단계 — 분류 노드
 
-## 이 코드에서 봐야 할 것
+```python
+def classify(state: RouterState) -> dict:
+    text = state["question"].lower()
+    if any(w in text for w in ("bug", "error", "traceback")):
+        return {"route": "debug"}
+    if any(w in text for w in ("code", "implement", "write")):
+        return {"route": "code"}
+    return {"route": "concept"}
+```
 
-![질문이 route 필드로 바뀌는 흐름](../../../assets/langgraph-101/03/03-02-what-to-notice-in-this-code.ko.png)
+### 3단계 — 답변 노드 세 개
 
-*질문이 route 필드로 바뀌는 흐름*
-- `classify_question()`은 분기 판단에 필요한 값을 상태에 씁니다.
-- `route_question()`은 부작용 없이 다음 노드 이름만 반환합니다.
-- `path_map` 딕셔너리 덕분에 문자열 라벨과 실제 노드 이름 매핑이 명시적으로 남습니다.
+```python
+def answer_code(_: RouterState) -> dict:
+    return {"answer": "Route: code. Generate or review code next."}
 
-## 실무에서 헷갈리는 지점
+def answer_concept(_: RouterState) -> dict:
+    return {"answer": "Route: concept. Explain the idea clearly."}
 
-![분기와 반복 경로를 닫는 종료 구조](../../../assets/langgraph-101/03/03-03-where-engineers-get-confused.ko.png)
+def answer_debug(_: RouterState) -> dict:
+    return {"answer": "Route: debug. Inspect failure details first."}
+```
 
-*분기와 반복 경로를 닫는 종료 구조*
-- 라우팅 함수 안에서 LLM 호출까지 같이 넣으면 디버깅이 어려워집니다. 분류와 라우팅은 분리하는 편이 낫습니다.
-- 조건부 엣지는 if/else 한 번으로 끝나지 않습니다. 루프를 만들 수도 있으므로 종료 조건을 항상 같이 설계해야 합니다.
-- 라우트 문자열이 오타 나면 런타임에 바로 깨집니다. `Literal[...]` 힌트를 두는 이유가 여기 있습니다.
+### 4단계 — 라우터 함수와 그래프
+
+```python
+from langgraph.graph import StateGraph, START, END
+
+def route_question(state: RouterState) -> Route:
+    return state["route"]  # type: ignore[return-value]
+
+builder = StateGraph(RouterState)
+builder.add_node("classify", classify)
+builder.add_node("code", answer_code)
+builder.add_node("concept", answer_concept)
+builder.add_node("debug", answer_debug)
+
+builder.add_edge(START, "classify")
+builder.add_conditional_edges(
+    "classify",
+    route_question,
+    {"code": "code", "concept": "concept", "debug": "debug"},
+)
+builder.add_edge("code", END)
+builder.add_edge("concept", END)
+builder.add_edge("debug", END)
+
+graph = builder.compile()
+```
+
+### 5단계 — 세 가지 질문 실행
+
+```python
+for q in [
+    "Write Python code for quicksort.",
+    "What is a checkpoint in LangGraph?",
+    "I got a traceback while running my graph.",
+]:
+    result = graph.invoke({"question": q, "route": "", "answer": ""})
+    print(result["route"], "|", result["answer"])
+```
+
+## 이 코드에서 주목할 점
+
+- *classify* 는 *상태* 에 *route* 를 *씁니다*. *분기* *근거* 가 *상태* *위* 에 *남* *습니다*.
+- *route_question* 은 *부작용* 이 *없습니다*. *문자열* 만 *반환* 합니다.
+- *path_map* 덕에 *라벨* 과 *노드 이름* *대응* 이 *한* *눈* 에 *보입니다*.
+
+## 자주 하는 실수 5가지
+
+1. ***라우터에서 LLM 호출*** — *분류* 와 *라우팅* 을 *섞으면* *디버깅* 이 *어려워* *집니다*.
+2. ***path_map 누락*** — *라우터* 가 *노드 이름* 을 *직접* *반환* 해도 *되지만* *변경* 시 *추적* *어렵* *습니다*.
+3. ***루프 종료 조건 부재*** — *조건부* 엣지로 *루프* 만들 때 *recursion limit* 도달 합니다.
+4. ***라벨 오타*** — *Literal* 미사용 시 *런타임* 까지 *발견* *불가*.
+5. ***모든 분기 END 미연결*** — *path_map* 의 *값* 중 *하나* 가 *END* 로 *닫히지* *않으면* *행* 됩니다.
+
+## 실무에서는 이렇게 쓰입니다
+
+*프로덕션* *에이전트* 에서는 *intent* *분류*, *권한* *체크*, *비용* *기반* *모델* *선택* 등을 *조건부* 엣지로 *표현* 합니다. *LangSmith* *trace* 가 *어느* *경로* 를 *탔는지* *시각화* 합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *분기* *근거* 는 *상태 필드* 로 *기록* 합니다.
+- *라우터* 는 *순수* 함수 로 *유지* 합니다.
+- *path_map* 으로 *라벨* 과 *노드* 를 *분리* 합니다.
+- *루프* 가 *생기면* *종료 조건* 을 *먼저* *그립니다*.
+- *조건부* 엣지는 *그래프* 가 *그래프답게* *느껴지는* *첫* *지점* 입니다.
 
 ## 체크리스트
 
-- [ ] 분기 기준이 상태 필드로 분리되어 있는가
-- [ ] 라우팅 함수가 외부 부작용 없이 순수하게 동작하는가
-- [ ] 모든 분기 경로가 `END` 또는 다음 안정된 노드로 닫히는가
+- [ ] *router* 가 *부작용* *없는* *순수* 함수.
+- [ ] *Literal* 로 *반환* *타입* *고정*.
+- [ ] *path_map* *명시*.
+- [ ] *모든* 경로 가 *END* 또는 *다음* *노드* 로 *닫힘*.
 
-## 정리
+## 연습 문제
 
-![질문 유형별 다음 경로 선택 흐름](../../../assets/langgraph-101/03/03-04-summary.ko.png)
+1. *네 번째* *라우트* `summarize` 를 *추가* 하세요.
+2. *router* 가 *Literal* 을 *벗어난* 값을 *반환* 하면 *어떤* *예외* 가 *나는지* *확인* 하세요.
+3. *classify → route → classify* *루프* 를 *만들어* *recursion limit* 동작을 *관찰* 하세요.
 
-*질문 유형별 다음 경로 선택 흐름*
-조건부 엣지는 LangGraph가 "그래프답게" 느껴지는 첫 지점입니다. 다음 글에서는 이 분기 흐름 위에 실제 도구 호출 루프를 얹어 에이전트 형태로 발전시켜 보겠습니다.
+## 정리 및 다음 단계
+
+다음 글은 *도구 호출 에이전트* 입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -149,12 +203,11 @@ if __name__ == "__main__":
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [LangGraph branching 가이드](https://langchain-ai.github.io/langgraph/how-tos/branching/)
-- [LangGraph low-level concepts: edges](https://langchain-ai.github.io/langgraph/concepts/low_level/)
-- [LangGraph recursion limit 가이드](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
+- [Conditional edges how-to](https://langchain-ai.github.io/langgraph/how-tos/branching/)
+- [Low-level concepts: edges](https://langchain-ai.github.io/langgraph/concepts/low_level/#edges)
+- [Recursion limit](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
+- [LangGraph reference](https://langchain-ai.github.io/langgraph/reference/graphs/)
 
 Tags: LangGraph, Agent, Python, LLM

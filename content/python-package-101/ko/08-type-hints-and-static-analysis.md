@@ -174,7 +174,7 @@ from typing import TypeVar, Callable
 T = TypeVar("T")
 
 def retry(func: Callable[..., T], attempts: int = 3) -> T | None:
-    """Retry a function up to N times."""
+    """함수를 최대 N번까지 재시도합니다."""
     for i in range(attempts):
         try:
             return func()
@@ -246,6 +246,14 @@ mypy src/  # import requests의 타입 에러 해소
 타입 힌트는 "미래의 나와 팀원을 위한 문서"입니다. 코드를 읽을 때 `data: dict[str, list[int]]`가 있으면 docstring을 읽지 않아도 구조를 알 수 있습니다.
 
 새 프로젝트에서는 처음부터 `strict = true`로 시작하세요. 기존 프로젝트에서는 새 파일부터 타입을 추가하고 점진적으로 확장합니다. "전부 또는 전무"가 아니라 "점진적 도입"이 현실적인 전략입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **py.typed** — 공개 패키지는 py.typed 마커를 둡니다.
+- **mypy 엄격도** — strict 옵션을 점진적으로 키웁니다.
+- **Public API 우선** — 공개 API에 타입을 가장 먼저 적용합니다.
+- **Stub** — 외부 라이브러리 stub 부재는 wrapper로 대처합니다.
+- **CI 게이트** — 타입 검사를 CI에 강제합니다.
 
 ## 체크리스트
 

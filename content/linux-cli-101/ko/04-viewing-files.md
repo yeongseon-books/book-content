@@ -214,6 +214,14 @@ cat header.csv data1.csv data2.csv > combined.csv
 
 운영 환경에서 가장 많이 쓰는 조합은 `tail -f` + `grep`입니다. `tail -f app.log | grep --line-buffered ERROR`를 띄워두면 에러가 발생하는 즉시 화면에 나타납니다. 장애 대응 시 이 조합을 모르면 "로그 파일을 에디터로 열어서 새로고침"하는 비효율에 빠집니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **less 우선** — 큰 파일은 cat 대신 less로 안전하게 봅니다.
+- **tail -F** — 회전 로그는 -F로 추적합니다.
+- **head/tail 결합** — 샘플링에 head + tail 패턴이 유용합니다.
+- **grep 조합** — 보기 단계에서 grep으로 줄 수를 줄입니다.
+- **바이너리 주의** — less가 binary를 깨뜨릴 수 있어 file로 사전 확인합니다.
+
 ## 체크리스트
 
 - [ ] `cat`, `less`, `head`, `tail`의 용도를 구분할 수 있다

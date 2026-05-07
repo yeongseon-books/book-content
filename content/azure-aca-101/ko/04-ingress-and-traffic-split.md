@@ -34,6 +34,15 @@ seo_description: Ingress는 ACA의 "건물 정문"이고, traffic weight는 "엘
 - Single mode와 Multiple mode가 traffic 분배에 미치는 영향
 - Canary와 Blue-Green을 Revision weight로 구현하고 즉시 rollback하는 패턴
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Ingress와 트래픽 분할을 어떻게 설계해야 점진적 배포가 안전할까요?
+
+이 글은 그 질문에 답하기 위해 Ingress와 트래픽 분할의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - ACA의 관리형 Ingress는 TLS·routing 외에 무엇을 "안 해주는가"?
@@ -230,6 +239,14 @@ production canary 운영 룰:
 - **rollback trigger를 미리 합의** — 5xx > 1%, p95 latency 20% 증가 등
 - **두 Revision 모두 `min-replicas` 같게** — cold start 차이로 인한 측정 왜곡 방지
 - **Revision suffix를 의미 있게** — `v1`, `v2`보다는 `v2-fix-bug-1234` 같은 식
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **외부 노출은 의도적으로 결정한다** — 내부 전용 앱까지 external ingress를 켜지 않습니다.
+- **트래픽 분할은 메트릭과 함께 한다** — 에러율·지연 메트릭 없이 weight만 조절하면 점진 배포의 의미가 없습니다.
+- **세션 친화도는 기본 끔** — stateful 의존을 만들지 말고 stateless 설계를 유지합니다.
+- **커스텀 도메인은 인증서 자동화로** — managed certificate를 활용해 갱신 사고를 예방합니다.
+- **CORS·인증은 ingress 레이어에서 일관되게** — 앱마다 다르면 보안 사고와 디버깅 비용이 큽니다.
 
 ## 체크리스트
 

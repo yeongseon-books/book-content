@@ -145,6 +145,14 @@ Thee no more of men.
 
 <!-- a-grade-example:begin -->
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **샘플링 전략** — temperature·top-p·top-k 조합을 도메인에 맞춰 정합니다.
+- **Repetition penalty** — 반복 억제 파라미터를 회귀 셋으로 검증합니다.
+- **Stop tokens** — 종료 토큰 정책이 응답 품질을 좌우합니다.
+- **KV 캐시** — 긴 응답에서는 KV 캐시 메모리가 병목입니다.
+- **결정성** — 디버깅용 greedy 모드를 항상 갖춰 둡니다.
+
 ## 체크리스트
 
 - [ ] greedy / top-k / top-p / temperature를 바꿔 결과 차이를 관찰했다.

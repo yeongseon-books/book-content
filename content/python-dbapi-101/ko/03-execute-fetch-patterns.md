@@ -214,6 +214,14 @@ def export_notes(db_path, csv_path, chunk=500):
 
 <!-- a-grade-example:begin -->
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **executemany 활용** — 대량 삽입은 executemany로 왕복을 줄입니다.
+- **fetch 전략** — fetchall은 메모리, fetchmany는 균형, fetchone은 스트리밍에 유리합니다.
+- **rowcount 신뢰도** — 드라이버마다 의미가 달라 맹신하지 않습니다.
+- **결과 소진** — Cursor 결과를 끝까지 소진하거나 닫아 자원 누수를 막습니다.
+- **배치 크기** — 메모리·latency 균형으로 배치 크기를 정합니다.
+
 ## 체크리스트
 
 - [ ] executemany로 다중 INSERT를 단일 호출로 처리했다.

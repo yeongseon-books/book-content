@@ -34,6 +34,15 @@ seo_description: Pull Request는 단순한 merge가 아니라 "내 branch의 변
 
 이 글이 끝나면 `feature/release-notes` 같은 branch에서 시작해 GitHub PR을 열고 review와 merge를 마친 뒤 로컬을 정돈하는 한 사이클을 혼자 돌릴 수 있습니다.
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Pull Request를 어떻게 운영해야 review가 의미 있고 main이 안전할까요?
+
+이 글은 그 질문에 답하기 위해 Pull Request 흐름의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - Pull Request는 단순한 `git merge`와 동작·과정 측면에서 어떻게 다른가?
@@ -248,6 +257,14 @@ PR은 merge 도구라기보다 의사결정 기록 도구입니다. 실무에서
 - **draft PR로 진행 상황 공유하기**. 작업이 끝나기 전에라도 draft 상태로 올려 두면, 동료가 일찍 방향을 잡아 줄 수 있습니다.
 - **연관 issue 링크하기**. 본문에 `Closes #42`라고 적으면 merge 시 issue가 자동으로 닫힙니다(다음 글의 주제입니다).
 - **revert가 필요할 때 PR 단위로 되돌리기**. GitHub은 PR 화면에서 "Revert" 버튼을 제공합니다. commit 하나하나를 따로 되돌리는 것보다 안전합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **PR은 변경의 의도를 설명하는 자리** — 코드만이 아니라 맥락을 함께 보냅니다.
+- **작은 PR이 좋은 review를 만든다** — 변경 크기가 review 품질을 결정합니다.
+- **self-review를 먼저 한다** — 올리기 전에 diff를 스스로 한 번 더 봅니다.
+- **CI 통과는 PR의 기본 자격** — review가 자동 검증 위에서 사람의 시간을 씁니다.
+- **merge 정책을 팀에서 합의** — squash·rebase·merge 중 표준을 정합니다.
 
 ## 체크리스트
 
