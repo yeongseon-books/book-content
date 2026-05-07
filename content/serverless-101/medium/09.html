@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cost</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cost</h1>
+<blockquote>
+<p>Serverless 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If each invocation costs <em>$0.0000002</em>, why does the <em>bill</em> still surprise you?</p>
+<blockquote>
+<p><em>Cost</em> is the <em>sum</em> of <em>calls + duration + memory + data transfer + downstream services</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>cost components</em> of serverless</li>
+<li>The effect of <em>memory tuning</em></li>
+<li>The hidden cost of <em>data transfer</em></li>
+<li>The cost of <em>idle</em> provisioning</li>
+<li>A starting point for <em>FinOps</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Serverless</em> is <em>not always cheaper</em>. For some workloads it can cost <em>more</em> than a steady <em>EC2</em> instance.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Calls[&quot;calls&quot;] --&gt; Bill[&quot;bill&quot;]
+    Mem[&quot;memory * duration&quot;] --&gt; Bill
+    Net[&quot;data transfer&quot;] --&gt; Bill
+    Deps[&quot;downstream services&quot;] --&gt; Bill
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>invocation cost</strong>: price <em>per call</em>.</li>
+<li><strong>GB-seconds</strong>: <em>memory × duration</em>.</li>
+<li><strong>egress</strong>: <em>outbound data transfer</em>.</li>
+<li><strong>idle</strong>: the cost of <em>provisioned</em> capacity sitting unused.</li>
+<li><strong>unit economics</strong>: <em>margin per call</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: estimate cost from the <em>per-call price</em> alone.</p>
+<p><strong>After</strong>: compare alternatives using a <em>total cost of ownership</em> model.</p>
+<h2>Hands-on: Modeling Cost</h2>
+<p><strong>Step 1 — Invocation cost</strong></p>
+<pre><code class="language-python">def calls_cost(n, unit_price=0.0000002):
+    return n * unit_price
+</code></pre>
+<p><strong>Step 2 — GB-seconds</strong></p>
+<pre><code class="language-python">def gb_seconds(memory_mb, duration_ms, n):
+    return (memory_mb / 1024) * (duration_ms / 1000) * n
+</code></pre>
+<p><strong>Step 3 — Egress</strong></p>
+<pre><code class="language-python">def egress_cost(gb, price_per_gb=0.09):
+    return gb * price_per_gb
+</code></pre>
+<p><strong>Step 4 — Scenario comparison</strong></p>
+<pre><code class="language-python">def total(n, mem_mb, dur_ms, gb_out):
+    return (
+        calls_cost(n)
+        + gb_seconds(mem_mb, dur_ms, n) * 0.0000166667
+        + egress_cost(gb_out)
+    )
+</code></pre>
+<p><strong>Step 5 — Memory tuning sweep</strong></p>
+<pre><code class="language-python">sizes = [128, 256, 512, 1024]
+for s in sizes:
+    print(s, total(1_000_000, s, 200, 5))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Memory</em> sets both <em>CPU</em> and <em>cost</em>.</li>
+<li><em>Data transfer</em> is a <em>hidden</em> line item.</li>
+<li>Compare alternatives at the <em>scenario</em> level, not the unit level.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Estimating <em>total cost</em> from the <em>per-call price</em> only.</strong></li>
+<li><strong>Pinning <em>memory</em> at the <em>minimum</em> without measuring duration.</strong></li>
+<li><strong>Ignoring <em>egress</em>.</strong></li>
+<li><strong>Forgetting <em>DB</em> and <em>queue</em> charges.</strong></li>
+<li><strong>Using <em>provisioned concurrency</em> without tracking its <em>idle cost</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>FinOps</em> team feeds <em>margin per call</em> back into <em>product decisions</em> — pricing, feature scope, and SLAs.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Cost</em> is part of the <em>feature</em>.</li>
+<li><em>Memory tuning</em> is a <em>time-vs-money</em> trade.</li>
+<li><em>Egress</em> is solved by <em>network design</em>, not code.</li>
+<li><em>Idle</em> is a <em>tax</em> on <em>provisioned</em> capacity.</li>
+<li>Compare <em>alternatives</em> on a <em>fair</em> basis.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Total cost model</em> in place.</li>
+<li>[ ] <em>Memory tuning</em> reviewed.</li>
+<li>[ ] <em>Egress</em> measured.</li>
+<li>[ ] <em>FinOps</em> dashboard live.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>GB-seconds</em> in one line.</li>
+<li>Define <em>egress</em> in one line.</li>
+<li>Define the <em>idle cost</em> of <em>provisioned concurrency</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The final episode is <em>Designing a Serverless App</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Triggers and Events</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Cold Start</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/05-scaling.md">Scaling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/06-state-management.md">State Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/07-queue-and-event-driven.md">Queues and Event-driven Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/08-observability.md">Observability</a></li>
+<li><strong>Cost (current)</strong></li>
+<li>Designing a Serverless App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://aws.amazon.com/lambda/pricing/">Lambda Pricing</a></li>
+<li><a href="https://cloud.google.com/functions/pricing">Cloud Functions Pricing</a></li>
+<li><a href="https://azure.microsoft.com/pricing/details/functions/">Azure Functions Pricing</a></li>
+<li><a href="https://www.finops.org/">FinOps Foundation</a></li>
+</ul>
+<p class="tags-line">Tags: Serverless, Cost, FinOps, Pricing, Cloud</p>
+</body>
+</html>

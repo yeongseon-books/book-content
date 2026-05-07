@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scaling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Scaling</h1>
+<blockquote>
+<p>Serverless 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>how fast</em> and <em>how many</em> can <em>functions</em> scale to?</p>
+<blockquote>
+<p><em>Serverless</em> defaults to <em>horizontal scale</em>, but <em>limits</em> and <em>burst rules</em> still apply.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>the <em>concurrency</em> model</li>
+<li><em>burst</em> vs <em>sustained</em> limits</li>
+<li><em>reserved/limited concurrency</em></li>
+<li><em>downstream protection</em></li>
+<li><em>backpressure</em> patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Scale looks <em>infinite</em> until your <em>DB</em> and <em>external APIs</em> — which are <em>finite</em> — buckle under it. <em>Scaling</em> itself can <em>cause incidents</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Burst[&quot;request burst&quot;] --&gt; Func[&quot;function instances&quot;]
+    Func --&gt; DB[&quot;downstream db&quot;]
+    Func --&gt; API[&quot;external api&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>concurrency</strong>: number of <em>parallel</em> <em>instances</em>.</li>
+<li><strong>burst limit</strong>: cap on <em>short-window</em> growth.</li>
+<li><strong>reserved concurrency</strong>: a <em>fixed</em> allocation per <em>function</em>.</li>
+<li><strong>throttling</strong>: <em>rejecting</em> calls beyond the <em>limit</em>.</li>
+<li><strong>backpressure</strong>: <em>downstream</em> pushing back on <em>demand</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>huge call volume</em> exhausts <em>DB connections</em>.</p>
+<p><strong>After</strong>: <em>reserved concurrency</em> + <em>queue buffering</em> yield <em>flow control</em>.</p>
+<h2>Hands-on: Scaling and Protection</h2>
+<p><strong>Step 1 — Estimate concurrency</strong></p>
+<pre><code class="language-python">def concurrency(rps, duration_s):
+    return rps * duration_s
+</code></pre>
+<p><strong>Step 2 — Burst simulation</strong></p>
+<pre><code class="language-python">import concurrent.futures as cf
+
+def burst(call, n):
+    with cf.ThreadPoolExecutor(max_workers=n) as ex:
+        list(ex.map(lambda i: call(i), range(n)))
+</code></pre>
+<p><strong>Step 3 — Reserved concurrency (pseudo)</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+reserved_concurrency:
+  function: web
+  value: 50
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 4 — Queue buffering</strong></p>
+<pre><code class="language-python">def enqueue(queue, msg):
+    queue.append(msg)
+
+def drain(queue, handler, batch=10):
+    chunk, queue[:] = queue[:batch], queue[batch:]
+    for m in chunk:
+        handler(m, None)
+</code></pre>
+<p><strong>Step 5 — Backpressure</strong></p>
+<pre><code class="language-python">def backoff(attempt):
+    return min(2 ** attempt, 30)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Reserved concurrency</em> protects the <em>DB</em>.</li>
+<li><em>Queues</em> absorb <em>shock</em>.</li>
+<li><em>Backoff</em> prevents <em>retry storms</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Leaving the <em>DB connection pool</em> unprotected.</strong></li>
+<li><strong>Treating <em>burst</em> as <em>sustained</em>.</strong></li>
+<li><strong>Ignoring the <em>rate limit</em> of <em>external APIs</em>.</strong></li>
+<li><strong>Skipping <em>reserved concurrency</em>, starving <em>peer functions</em>.</strong></li>
+<li><strong>Retrying <em>immediately</em> without <em>backoff</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>queue</em> absorbs the <em>spike</em> and <em>functions</em> with <em>reserved concurrency</em> drain it while protecting the <em>DB</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>cost</em> of <em>horizontal scale</em> is paid by <em>downstream</em>.</li>
+<li><em>Backpressure</em> is a <em>base pattern</em>.</li>
+<li><em>Concurrency limits</em> are a <em>budget</em>.</li>
+<li><em>Queues</em> buy <em>time</em>.</li>
+<li>Watch <em>peer-function starvation</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>DB</em> protection strategy.</li>
+<li>[ ] <em>Reserved concurrency</em> reviewed.</li>
+<li>[ ] <em>Backoff</em> in place.</li>
+<li>[ ] <em>External API</em> limits known.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, the <em>purpose</em> of <em>reserved concurrency</em>.</li>
+<li>In one line, the meaning of <em>backpressure</em>.</li>
+<li>In one line, the <em>effect</em> of <em>queue buffering</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>State Management</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Trigger and Event</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Cold Start</a></li>
+<li><strong>Scaling (current)</strong></li>
+<li>State Management (upcoming)</li>
+<li>Queue and Event-driven Architecture (upcoming)</li>
+<li>Observability (upcoming)</li>
+<li>Cost (upcoming)</li>
+<li>Designing a Serverless App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html">Lambda concurrency</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html">Reserved/Provisioned concurrency</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">SQS buffering pattern</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html">Throttling guide</a></li>
+</ul>
+<p class="tags-line">Tags: Serverless, Scaling, Concurrency, Throttling, Cloud</p>
+</body>
+</html>

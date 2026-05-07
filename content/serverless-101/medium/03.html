@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trigger and Event</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Trigger and Event</h1>
+<blockquote>
+<p>Serverless 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>when</em> and <em>who</em> wakes a <em>function</em>?</p>
+<blockquote>
+<p>A <em>trigger</em> delivers an <em>event</em> to a <em>function</em>. The <em>behavior</em> and <em>retry semantics</em> depend on the <em>type</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>categories of <em>triggers</em></li>
+<li>shapes of <em>event</em> payloads</li>
+<li><em>sync</em> vs <em>async</em> differences</li>
+<li><em>retries</em> and <em>DLQ</em></li>
+<li>the importance of <em>idempotency</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without understanding <em>trigger semantics</em>, you ship <em>duplicate processing, lost messages,</em> and <em>retry storms</em> into production.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Source[&quot;event source&quot;] --&gt; Trigger[&quot;trigger&quot;]
+    Trigger --&gt; Func[&quot;function&quot;]
+    Func --&gt; DLQ[&quot;dead letter queue&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>trigger</strong>: connects an <em>event</em> to a <em>function</em>.</li>
+<li><strong>event source</strong>: <em>queues, storage, HTTP, schedules,</em> etc.</li>
+<li><strong>invocation type</strong>: <em>sync / async / stream</em>.</li>
+<li><strong>DLQ</strong>: a <em>dead-letter queue</em> for <em>failed messages</em>.</li>
+<li><strong>idempotency</strong>: <em>same input</em> → <em>same outcome</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>cron</em> + <em>script</em> + <em>manual retry</em>.</p>
+<p><strong>After</strong>: <em>scheduled trigger</em> + <em>DLQ</em> + <em>automatic retry</em>.</p>
+<h2>Hands-on: HTTP / Queue / Schedule</h2>
+<p><strong>Step 1 — HTTP event</strong></p>
+<pre><code class="language-python">def http_handler(event, context):
+    body = event.get(&quot;body&quot;, &quot;&quot;)
+    return {&quot;statusCode&quot;: 200, &quot;body&quot;: f&quot;echo:{body}&quot;}
+</code></pre>
+<p><strong>Step 2 — Queue event</strong></p>
+<pre><code class="language-python">def queue_handler(event, context):
+    for rec in event[&quot;records&quot;]:
+        process(rec[&quot;body&quot;])
+
+def process(msg):
+    print(&quot;got&quot;, msg)
+</code></pre>
+<p><strong>Step 3 — Schedule event</strong></p>
+<pre><code class="language-python">import datetime as dt
+
+def cron_handler(event, context):
+    now = dt.datetime.utcnow().isoformat()
+    return {&quot;ran_at&quot;: now}
+</code></pre>
+<p><strong>Step 4 — Apply an idempotency key</strong></p>
+<pre><code class="language-python">seen = set()
+
+def idempotent(handler):
+    def wrap(event, ctx):
+        key = event.get(&quot;id&quot;)
+        if key in seen:
+            return {&quot;skipped&quot;: True}
+        seen.add(key)
+        return handler(event, ctx)
+    return wrap
+</code></pre>
+<p><strong>Step 5 — Decide what goes to DLQ</strong></p>
+<pre><code class="language-python">def safe(handler, dlq):
+    def wrap(event, ctx):
+        try:
+            return handler(event, ctx)
+        except Exception as e:
+            dlq.append({&quot;event&quot;: event, &quot;error&quot;: str(e)})
+            raise
+    return wrap
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>records</em> may be a <em>batch</em>.</li>
+<li><em>Idempotency keys</em> are a <em>retry safety net</em>.</li>
+<li><em>DLQs</em> are the <em>starting point</em> for <em>debugging</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Assuming <em>retries</em> will not happen.</strong></li>
+<li><strong>Assuming <em>order</em> is <em>guaranteed</em>.</strong></li>
+<li><strong>Doing <em>payment-like</em> work without <em>idempotency</em>.</strong></li>
+<li><strong>Skipping <em>DLQ</em> configuration.</strong></li>
+<li><strong>Setting <em>schedule ticks</em> too <em>short</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Common flows include <em>upload → thumbnail, payment event → email, queue → batch ingest</em> — <em>async pipelines</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Assume <em>every trigger</em> is <em>at-least-once</em>.</li>
+<li><em>Idempotency</em> protects <em>cost</em>.</li>
+<li>Without a <em>DLQ</em>, you do not see <em>problems</em>.</li>
+<li>Use a <em>FIFO queue</em> if <em>order</em> matters.</li>
+<li><em>Schedules</em> must prevent <em>overlap</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Idempotency</em> ensured.</li>
+<li>[ ] <em>DLQ</em> configured.</li>
+<li>[ ] <em>Retry count</em> explicit.</li>
+<li>[ ] <em>Ordering</em> requirement explicit.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, the meaning of <em>at-least-once</em>.</li>
+<li>In one line, the <em>purpose</em> of a <em>DLQ</em>.</li>
+<li>In one line, the <em>risk</em> of missing <em>idempotency keys</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we look at the causes and mitigations of <em>Cold Start</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
+<li><strong>Trigger and Event (current)</strong></li>
+<li>Cold Start (upcoming)</li>
+<li>Scaling (upcoming)</li>
+<li>State Management (upcoming)</li>
+<li>Queue and Event-driven Architecture (upcoming)</li>
+<li>Observability (upcoming)</li>
+<li>Cost (upcoming)</li>
+<li>Designing a Serverless App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html">Lambda event sources</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">SQS DLQ</a></li>
+<li><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html">EventBridge schedules</a></li>
+<li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html">Idempotency pattern</a></li>
+</ul>
+<p class="tags-line">Tags: Serverless, Trigger, Event, EventDriven, Cloud</p>
+</body>
+</html>

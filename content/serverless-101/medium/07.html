@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Queue and Event-driven Architecture</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Queue and Event-driven Architecture</h1>
+<blockquote>
+<p>Serverless 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: how do you connect <em>services</em> without <em>direct calls</em>?</p>
+<blockquote>
+<p><em>Queues</em> and <em>event buses</em> <em>decouple</em> <em>producers</em> and <em>consumers</em> across <em>time and space</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>the meaning of <em>decoupling</em></li>
+<li><em>queue</em> vs <em>Pub/Sub</em></li>
+<li><em>fan-out</em> patterns</li>
+<li><em>FIFO</em> and <em>ordering</em></li>
+<li><em>retries/DLQ</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>synchronous call chain</em> fails <em>whole</em> when <em>one node</em> fails. <em>Async messaging</em> provides <em>resilience</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Producer[&quot;producer&quot;] --&gt; Queue[&quot;queue / topic&quot;]
+    Queue --&gt; C1[&quot;consumer A&quot;]
+    Queue --&gt; C2[&quot;consumer B&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>queue</strong>: <em>1:1</em> or <em>competing consumers</em>.</li>
+<li><strong>topic</strong>: <em>1:N</em> publish/subscribe.</li>
+<li><strong>fan-out</strong>: <em>one event</em> → <em>many subscribers</em>.</li>
+<li><strong>FIFO</strong>: <em>order-preserving</em> queue.</li>
+<li><strong>DLQ</strong>: <em>isolation</em> for <em>failed messages</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>Order API</em> → <em>payment → email → analytics</em> synchronously.</p>
+<p><strong>After</strong>: publish <em>order events</em> to a <em>topic</em>; each <em>function</em> handles its part <em>independently</em>.</p>
+<h2>Hands-on: Tiny Messaging</h2>
+<p><strong>Step 1 — In-memory queue</strong></p>
+<pre><code class="language-python">from collections import deque
+queue = deque()
+def publish(msg): queue.append(msg)
+def consume(): return queue.popleft() if queue else None
+</code></pre>
+<p><strong>Step 2 — Fan-out</strong></p>
+<pre><code class="language-python">subs = []
+def subscribe(fn): subs.append(fn)
+def emit(event):
+    for fn in subs:
+        fn(event)
+</code></pre>
+<p><strong>Step 3 — Consumer functions</strong></p>
+<pre><code class="language-python">def billing(event): print(&quot;bill&quot;, event)
+def mail(event): print(&quot;mail&quot;, event)
+</code></pre>
+<p><strong>Step 4 — Retry and DLQ</strong></p>
+<pre><code class="language-python">def retry(handler, dlq, attempts=3):
+    def wrap(event):
+        for i in range(attempts):
+            try:
+                return handler(event)
+            except Exception:
+                if i == attempts - 1:
+                    dlq.append(event)
+                    raise
+    return wrap
+</code></pre>
+<p><strong>Step 5 — FIFO ordering key</strong></p>
+<pre><code class="language-python">def fifo_key(order):
+    return order[&quot;customer_id&quot;]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Fan-out</em> lowers <em>coupling</em>.</li>
+<li>A <em>FIFO key</em> defines the <em>order unit</em>.</li>
+<li><em>DLQs</em> make <em>problems visible</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Assuming <em>order</em> is needed <em>everywhere</em>.</strong></li>
+<li><strong>Misunderstanding <em>competing-consumer</em> semantics.</strong></li>
+<li><strong>Doing <em>fan-out</em> without <em>idempotency</em>.</strong></li>
+<li><strong>Skipping <em>DLQ</em> setup.</strong></li>
+<li><strong>Ignoring <em>message size</em> limits.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Domain teams (<em>orders, billing, analytics</em>) are <em>loosely coupled</em> through an <em>event bus</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Event schemas</em> are <em>public APIs</em>.</li>
+<li><em>Fan-out</em> helps with <em>org boundaries</em> too.</li>
+<li><em>FIFO</em> is <em>expensive</em>.</li>
+<li>Pair <em>DLQ</em> with <em>alarms</em>.</li>
+<li><em>Evolve</em> without <em>breaking compatibility</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Event schema</em> documented.</li>
+<li>[ ] <em>DLQ</em> + alarm.</li>
+<li>[ ] <em>Idempotency</em> checked.</li>
+<li>[ ] <em>FIFO</em> need decided.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, the difference between <em>queue</em> and <em>topic</em>.</li>
+<li>In one line, the <em>benefit</em> of <em>fan-out</em>.</li>
+<li>In one line, the <em>role</em> of a <em>FIFO key</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>Observability</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Trigger and Event</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Cold Start</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/05-scaling.md">Scaling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/06-state-management.md">State Management</a></li>
+<li><strong>Queue and Event-driven Architecture (current)</strong></li>
+<li>Observability (upcoming)</li>
+<li>Cost (upcoming)</li>
+<li>Designing a Serverless App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">SQS</a></li>
+<li><a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">SNS</a></li>
+<li><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html">EventBridge</a></li>
+<li><a href="https://martinfowler.com/articles/201701-event-driven.html">Event-driven architecture</a></li>
+</ul>
+<p class="tags-line">Tags: Serverless, Queue, EventDriven, PubSub, Cloud</p>
+</body>
+</html>

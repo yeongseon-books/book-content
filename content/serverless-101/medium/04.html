@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cold Start</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cold Start</h1>
+<blockquote>
+<p>Serverless 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: why is the <em>first call</em> of a <em>function</em> slow?</p>
+<blockquote>
+<p><em>Cold start</em> is the <em>time</em> to <em>create</em> the <em>container</em> and <em>load</em> the <em>runtime</em> and <em>code</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>the definition of <em>Cold Start</em></li>
+<li>the <em>causes</em> broken down</li>
+<li>how to <em>measure</em> it</li>
+<li><em>mitigation strategies</em></li>
+<li>when to <em>accept</em> it</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If <em>p99</em> spikes from <em>cold start</em>, <em>SLOs break</em>. You need a balance between <em>mitigation</em> and <em>acceptance</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Req[&quot;request&quot;] --&gt; Init[&quot;init container&quot;]
+    Init --&gt; Load[&quot;load runtime + code&quot;]
+    Load --&gt; Run[&quot;handler&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>cold start</strong>: <em>initialization latency</em> on the <em>first run</em>.</li>
+<li><strong>warm</strong>: a <em>reused</em> container.</li>
+<li><strong>provisioned concurrency</strong>: <em>pre-warmed</em> instances.</li>
+<li><strong>init code</strong>: code <em>outside</em> the <em>handler</em>.</li>
+<li><strong>package size</strong>: scales with <em>load time</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>p99 5s</em> spikes during <em>peaks</em>.</p>
+<p><strong>After</strong>: <em>provisioning</em> + <em>lean package</em> yields a <em>stable p99</em>.</p>
+<h2>Hands-on: Measure and Mitigate</h2>
+<p><strong>Step 1 — Measure init time</strong></p>
+<pre><code class="language-python">import time
+
+t0 = time.perf_counter()
+# heavy import here
+
+INIT_MS = (time.perf_counter() - t0) * 1000
+
+def handler(event, context):
+    return {&quot;init_ms&quot;: INIT_MS}
+</code></pre>
+<p><strong>Step 2 — Trim the package</strong></p>
+<pre><code class="language-python">def lean_requirements(reqs):
+    return [r for r in reqs if r not in {&quot;pandas&quot;, &quot;numpy&quot;} or r in {&quot;required&quot;}]
+</code></pre>
+<p><strong>Step 3 — Global cache</strong></p>
+<pre><code class="language-python">_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        _client = build_client()
+    return _client
+
+def build_client():
+    return {&quot;ready&quot;: True}
+</code></pre>
+<p><strong>Step 4 — Provisioning (pseudo)</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+provisioned_concurrency:
+  function: web
+  min: 5
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 5 — Track p50/p95/p99</strong></p>
+<pre><code class="language-python">def percentile(values, p):
+    s = sorted(values)
+    return s[int(len(s) * p) - 1]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Code <em>outside the handler</em> runs <em>only once</em> on cold.</li>
+<li>Reusing a <em>global client</em> is <em>core to warming</em>.</li>
+<li><em>Provisioning</em> trades <em>cost</em> for <em>latency</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Watching <em>averages</em> and ignoring <em>p99</em>.</strong></li>
+<li><strong>Creating a <em>client</em> inside the <em>handler</em> every time.</strong></li>
+<li><strong>Pulling in <em>heavy dependencies</em> unguarded.</strong></li>
+<li><strong>Treating <em>provisioning</em> as the <em>default</em>.</strong></li>
+<li><strong>Ignoring the <em>cold-start cost</em> of the <em>language</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Use <em>provisioning</em> on <em>latency-sensitive</em> paths like <em>payments, login</em>; <em>accept</em> cold for <em>internal jobs</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Manage</em> cold rather than <em>eliminate</em> it.</li>
+<li><em>p99</em> is the <em>truth</em>.</li>
+<li><em>Lean dependencies</em> are the <em>best weapon</em>.</li>
+<li><em>Provisioning</em> is the <em>last card</em>.</li>
+<li><em>Language choice</em> affects <em>cold</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>p99</em> tracked.</li>
+<li>[ ] <em>Global cache</em> used.</li>
+<li>[ ] <em>Package size</em> monitored.</li>
+<li>[ ] <em>Provisioning</em> cost reviewed.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, the difference between <em>cold</em> and <em>warm</em>.</li>
+<li>In one line, the <em>cost</em> of <em>provisioning</em>.</li>
+<li>In one line, what <em>handler-external code</em> means.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we look at <em>Scaling</em> and the <em>concurrency model</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Trigger and Event</a></li>
+<li><strong>Cold Start (current)</strong></li>
+<li>Scaling (upcoming)</li>
+<li>State Management (upcoming)</li>
+<li>Queue and Event-driven Architecture (upcoming)</li>
+<li>Observability (upcoming)</li>
+<li>Cost (upcoming)</li>
+<li>Designing a Serverless App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">Lambda cold start</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html">Provisioned Concurrency</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html">Package optimization</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html">SnapStart</a></li>
+</ul>
+<p class="tags-line">Tags: Serverless, ColdStart, Performance, Latency, Cloud</p>
+</body>
+</html>

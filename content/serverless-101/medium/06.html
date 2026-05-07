@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>State Management</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>State Management</h1>
+<blockquote>
+<p>Serverless 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: how do <em>stateless</em> functions handle a <em>stateful business</em>?</p>
+<blockquote>
+<p><em>Functions</em> are <em>stateless</em>; <em>state</em> lives in an <em>external store</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>the meaning of <em>stateless</em></li>
+<li>where <em>sessions/caches</em> live</li>
+<li><em>database</em> selection</li>
+<li><em>workflow</em> state</li>
+<li>pairing with <em>idempotency</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>function instance</em> can vanish at any moment. State that is not <em>external</em> is <em>data lost</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Func[&quot;function&quot;] --&gt; Cache[&quot;redis&quot;]
+    Func --&gt; DB[&quot;database&quot;]
+    Func --&gt; Workflow[&quot;state machine&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>stateless</strong>: the <em>function</em> holds no <em>state</em>.</li>
+<li><strong>session store</strong>: <em>Redis/DynamoDB,</em> etc.</li>
+<li><strong>workflow state</strong>: <em>orchestration</em> such as <em>Step Functions</em>.</li>
+<li><strong>idempotency token</strong>: makes <em>retries</em> safe.</li>
+<li><strong>TTL</strong>: <em>expiration time</em> for <em>state</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: cache in <em>global variables</em> → <em>lost</em>.</p>
+<p><strong>After</strong>: <em>Redis</em> + <em>TTL</em> + <em>idempotent keys</em>.</p>
+<h2>Hands-on: External State</h2>
+<p><strong>Step 1 — Key-value cache abstraction</strong></p>
+<pre><code class="language-python">class Cache:
+    def __init__(self):
+        self.store = {}
+    def get(self, k):
+        return self.store.get(k)
+    def set(self, k, v, ttl=60):
+        self.store[k] = (v, ttl)
+</code></pre>
+<p><strong>Step 2 — Session handler</strong></p>
+<pre><code class="language-python">def with_session(handler, cache):
+    def wrap(event, ctx):
+        sid = event.get(&quot;session&quot;)
+        state = cache.get(sid) or {}
+        result = handler(event, ctx, state)
+        cache.set(sid, state)
+        return result
+    return wrap
+</code></pre>
+<p><strong>Step 3 — Idempotency token</strong></p>
+<pre><code class="language-python">def use_token(cache, token):
+    if cache.get(token):
+        return False
+    cache.set(token, &quot;done&quot;, ttl=3600)
+    return True
+</code></pre>
+<p><strong>Step 4 — Workflow state (pseudo)</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+states:
+  Validate -&gt; Charge -&gt; Notify
+on Failure: -&gt; Refund
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 5 — Separate the data model</strong></p>
+<pre><code class="language-python">def model(record):
+    return {&quot;id&quot;: record[&quot;id&quot;], &quot;status&quot;: record.get(&quot;status&quot;, &quot;new&quot;)}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Put <em>sessions</em> in an <em>external store</em>.</li>
+<li><em>Idempotency tokens</em> make <em>retries</em> safe.</li>
+<li>Express <em>workflows</em> as <em>state machines</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Caching in <em>global variables</em>.</strong></li>
+<li><strong>Opening a <em>new DB connection</em> per <em>function</em> invocation.</strong></li>
+<li><strong>Letting state grow <em>unbounded</em> without <em>TTL</em>.</strong></li>
+<li><strong>Missing <em>idempotency tokens</em>.</strong></li>
+<li><strong>Cramming <em>complex flows</em> into <em>one function</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Sessions</em> go to <em>Redis</em>, <em>data</em> to <em>DynamoDB/RDS</em>, <em>complex flows</em> to <em>Step Functions</em> or similar <em>orchestrators</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Stateless</em> is both a <em>constraint</em> and <em>freedom</em>.</li>
+<li><em>State location</em> is your <em>architecture</em>.</li>
+<li><em>TTL</em> protects <em>cost</em>.</li>
+<li>Treat <em>workflows</em> as <em>state machines</em>, not code.</li>
+<li>The <em>data model</em> will <em>evolve</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Sessions</em> externalized.</li>
+<li>[ ] <em>DB connection</em> reused.</li>
+<li>[ ] <em>TTL</em> set.</li>
+<li>[ ] <em>Workflow</em> extracted.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, the meaning of <em>stateless</em>.</li>
+<li>In one line, the <em>role</em> of an <em>idempotency token</em>.</li>
+<li>In one line, the <em>benefit</em> of a <em>workflow state machine</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>Queues</em> and <em>Event-driven Architecture</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Trigger and Event</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Cold Start</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/05-scaling.md">Scaling</a></li>
+<li><strong>State Management (current)</strong></li>
+<li>Queue and Event-driven Architecture (upcoming)</li>
+<li>Observability (upcoming)</li>
+<li>Cost (upcoming)</li>
+<li>Designing a Serverless App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-modeling-nosql-B.html">DynamoDB single-table design</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html">ElastiCache overview</a></li>
+<li><a href="https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html">Step Functions</a></li>
+<li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html">Idempotency pattern</a></li>
+</ul>
+<p class="tags-line">Tags: Serverless, State, Database, Cache, Cloud</p>
+</body>
+</html>
