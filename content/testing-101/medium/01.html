@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Testing?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Testing?</h1>
+<blockquote>
+<p>Testing 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> do we write tests? Is one click in the browser not <em>enough</em>?</p>
+<blockquote>
+<p>A test is code that automatically checks whether <em>your code behaves as intended</em>. A human hand forgets in <em>three days</em>; an automated test still runs <em>three years from now</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> and purpose of a test</li>
+<li>The difference between <em>manual and automated</em> testing</li>
+<li>The <em>main kinds</em> of tests (unit, integration, E2E)</li>
+<li>What happens <em>when tests are missing</em></li>
+<li>Where the <em>unit test</em> of the next post fits</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without tests, <em>every change is a gamble</em>. You fix signup and <em>payments</em> break; you fix payments and <em>login</em> breaks. Tests are the <em>safety net for change</em>.</p>
+<blockquote>
+<p>Tests turn <em>slow hands</em> into <em>fast code</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;Production code&quot;] --&gt; Test[&quot;Test code&quot;]
+    Test --&gt; Run[&quot;Test runner&quot;]
+    Run --&gt; Result[&quot;Pass / Fail + error location&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Test</strong>: a check that expresses <em>expected behavior</em> in <em>code</em>.</li>
+<li><strong>Assertion</strong>: a function that <em>asserts a value matches the expectation</em>.</li>
+<li><strong>Test runner</strong>: a tool that <em>collects and runs</em> tests.</li>
+<li><strong>Fixture</strong>: <em>prepared data/state</em> that a test uses.</li>
+<li><strong>Coverage</strong>: the <em>fraction of production code</em> that tests execute.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (manual testing)</strong></p>
+<pre><code class="language-text">1. Start the server locally
+2. In the browser: signup → login → click pay
+3. Say &quot;it works!&quot; and merge the PR
+4. *Three days later* it breaks from someone else's change
+</code></pre>
+<p><strong>After (automated testing)</strong></p>
+<pre><code class="language-bash">$ pytest
+collected 142 items
+.................................... 142 passed in 3.4s
+</code></pre>
+<h2>Hands-on: Your First Automated Test in Five Steps</h2>
+<p><strong>Step 1 — The function under test</strong></p>
+<pre><code class="language-python"># src/calc.py
+def add(a: int, b: int) -&gt; int:
+    return a + b
+</code></pre>
+<p><strong>Step 2 — The test file</strong></p>
+<pre><code class="language-python"># tests/test_calc.py
+from src.calc import add
+
+def test_add_positive_numbers():
+    assert add(2, 3) == 5
+
+def test_add_with_zero():
+    assert add(0, 7) == 7
+</code></pre>
+<p><strong>Step 3 — Run it</strong></p>
+<pre><code class="language-bash">pip install pytest
+pytest -v
+</code></pre>
+<p><strong>Step 4 — Break it on purpose</strong></p>
+<pre><code class="language-python">def add(a: int, b: int) -&gt; int:
+    return a - b   # bug
+</code></pre>
+<pre><code class="language-bash">pytest -v
+# FAILED tests/test_calc.py::test_add_positive_numbers - assert -1 == 5
+</code></pre>
+<p><strong>Step 5 — Fix it again</strong></p>
+<p>Restore <code>add</code> and run <code>pytest</code> again — <em>all green</em>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A test is <em>small code</em>. It does <em>not need to be complex</em>.</li>
+<li>The flow of <em>broken → green again</em> is what <em>builds trust</em> in tests.</li>
+<li>Tests are also <em>documentation</em>: they show <em>example usage</em> of a function.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Saving tests for <em>later</em>.</strong> "Later" becomes <em>never</em>.</li>
+<li><strong>Cramming <em>several assertions</em> into one test, so you cannot tell <em>what</em> broke.</strong></li>
+<li><strong>Tests too <em>slow</em> to run.</strong> Tests that you do not run are <em>no tests</em>.</li>
+<li><strong>Test code <em>more complex than production</em>.</strong> That itself is a bug.</li>
+<li><strong>Treating green <code>pytest</code> as <em>proof of correctness</em>.</strong> Tests cover <em>only the cases you wrote</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams run tests <em>automatically on every PR</em> (CI). When a test fails, <em>the merge is blocked</em>. That pressure makes teams <em>write smaller PRs</em> and <em>add tests alongside changes</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Treats a PR without tests as <em>temporary</em>.</li>
+<li><em>Fixes a broken test immediately</em> — or deletes it immediately.</li>
+<li>Treats tests as <em>the spec</em> of the code.</li>
+<li>Knows that <em>fast tests build culture</em>.</li>
+<li>Decides <em>what</em> to verify before <em>how</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You installed <code>pytest</code> and ran it once.</li>
+<li>[ ] You broke the code on purpose and read the <em>failure message</em>.</li>
+<li>[ ] You wrote <em>small tests</em> with one or two assertions each.</li>
+<li>[ ] You confirmed tests finish in <em>under three seconds</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write a <code>subtract(a, b)</code> function and <em>three tests</em> for it.</li>
+<li>Intentionally introduce a bug and capture the <em>failure message</em>.</li>
+<li>Explain <em>why we need tests</em> to a peer in one paragraph.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Tests turn <em>fear of change</em> into <em>confidence in change</em>. The next post starts at the smallest unit — the <em>unit test</em>.</p>
+<ul>
+<li><strong>What Is Testing? (current)</strong></li>
+<li>Unit Test (upcoming)</li>
+<li>Integration Test (upcoming)</li>
+<li>E2E Test (upcoming)</li>
+<li>Test Double (upcoming)</li>
+<li>Mock and Stub (upcoming)</li>
+<li>Test Coverage (upcoming)</li>
+<li>Regression Test (upcoming)</li>
+<li>Running Tests in CI (upcoming)</li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/">pytest docs</a></li>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — Testing Strategies</a></li>
+<li><a href="https://testing.googleblog.com/">Google Testing Blog</a></li>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">The Practical Test Pyramid (article)</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Quality, Software, Basics, Engineering</p>
+</body>
+</html>

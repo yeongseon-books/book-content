@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mock and Stub</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Mock and Stub</h1>
+<blockquote>
+<p>Testing 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Stub</em> and <em>Mock</em> look similar. <em>What is the actual difference</em>?</p>
+<blockquote>
+<p>Same kind of <em>fake object</em> — when you verify <em>the result</em> it is a Stub; when you verify <em>the call itself</em> it is a Mock.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The precise definition difference between <em>Stub and Mock</em></li>
+<li>Core APIs of <code>unittest.mock</code></li>
+<li><em>State verification</em> vs <em>interaction verification</em></li>
+<li>Signs that you are <em>overusing</em> Mock</li>
+<li>Five practical patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Confusing Mock and Stub leads to <em>over-mocking</em> and <em>brittle tests</em>. Knowing the difference lets you put <em>the right tool</em> in <em>the right place</em>.</p>
+<blockquote>
+<p>A good test tells you <em>"what broke"</em> in <em>one line</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Stub[&quot;Stub: canned answers&quot;] --&gt; State[&quot;Verify state (result)&quot;]
+    Mock[&quot;Mock: pre-set expectations&quot;] --&gt; Interact[&quot;Verify interaction (calls)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>State verification</strong>: verifying the SUT's <em>final state or return value</em>.</li>
+<li><strong>Interaction verification</strong>: verifying <em>how the SUT called</em> its dependencies.</li>
+<li><strong>MagicMock</strong>: a <em>flexible fake</em> that accepts any attribute or call.</li>
+<li><strong>patch</strong>: a decorator/context that <em>temporarily replaces</em> an existing object.</li>
+<li><strong>Side effect</strong>: a configuration that yields <em>different behavior per call</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (over-mocking)</strong></p>
+<pre><code class="language-python">def test_creates_user(repo_mock):
+    create_user(&quot;a@b.com&quot;, repo=repo_mock)
+    repo_mock.add.assert_called_once()  # only checks *how* it was called
+</code></pre>
+<p><strong>After (verify by result)</strong></p>
+<pre><code class="language-python">def test_creates_user_persists():
+    repo = InMemoryUserRepo()
+    create_user(&quot;a@b.com&quot;, repo=repo)
+    assert repo.find_by_email(&quot;a@b.com&quot;) is not None
+</code></pre>
+<h2>Hands-on: unittest.mock in Five Steps</h2>
+<p><strong>Step 1 — Basic Mock</strong></p>
+<pre><code class="language-python">from unittest.mock import MagicMock
+
+def test_basic_mock():
+    m = MagicMock()
+    m.greet(&quot;hi&quot;)
+    m.greet.assert_called_with(&quot;hi&quot;)
+</code></pre>
+<p><strong>Step 2 — return_value (Stub style)</strong></p>
+<pre><code class="language-python">def test_return_value():
+    m = MagicMock()
+    m.fetch.return_value = {&quot;id&quot;: 1}
+    assert m.fetch()[&quot;id&quot;] == 1
+</code></pre>
+<p><strong>Step 3 — side_effect (exceptions/sequences)</strong></p>
+<pre><code class="language-python">def test_side_effect_raises():
+    m = MagicMock()
+    m.fetch.side_effect = TimeoutError(&quot;slow&quot;)
+    try:
+        m.fetch()
+    except TimeoutError as e:
+        assert str(e) == &quot;slow&quot;
+</code></pre>
+<p><strong>Step 4 — patch to replace external functions</strong></p>
+<pre><code class="language-python">from unittest.mock import patch
+
+def test_patch_function():
+    with patch(&quot;src.weather.requests.get&quot;) as mock_get:
+        mock_get.return_value.json.return_value = {&quot;temp&quot;: 20}
+        from src.weather import current_temp
+        assert current_temp() == 20
+</code></pre>
+<p><strong>Step 5 — assert_called_with vs assert_not_called</strong></p>
+<pre><code class="language-python">def test_not_called_when_disabled():
+    mailer = MagicMock()
+    notify(&quot;a@b.com&quot;, mailer=mailer, enabled=False)
+    mailer.send.assert_not_called()
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>return_value</code> plays the <em>Stub role</em>; <code>assert_called_*</code> plays the <em>Mock role</em>.</li>
+<li><code>patch</code> is <em>a surgical tool</em> — apply it with the <em>narrowest scope</em>.</li>
+<li><code>side_effect</code> lets you cover <em>error paths</em> too.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Setting <em>over-detailed expectations</em> on a Mock.</strong> Refactors become <em>impossible</em>.</li>
+<li><strong>Applying <code>patch</code> <em>too broadly</em>.</strong> Other tests get <em>contaminated</em>.</li>
+<li><strong>Mixing return-value and call verification <em>into one test</em>.</strong></li>
+<li><strong>Hitting <em>real money/email/SMS</em> instead of mocking.</strong></li>
+<li><strong>Mocking <em>every line</em>.</strong> That is <em>not a test anymore</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>In most new tests, <em>Stubs/Fakes come first</em>, and Mocks appear only where <em>the interaction is the essence</em> (email/payment/push notifications, where <em>the side effect itself</em> is what you verify).</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Verifies <em>by result whenever possible</em>.</li>
+<li><em>Minimizes expectations</em> when using Mock.</li>
+<li>Keeps <code>patch</code> scope at the <em>function level</em>.</li>
+<li>Uses Mock when <em>the side effect itself</em> is the system's core.</li>
+<li>Reads "too many mocks" as a <em>design signal</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can describe the <em>purpose difference</em> between Stub and Mock in one line.</li>
+<li>[ ] You used <code>return_value</code>, <code>side_effect</code>, and <code>assert_called_with</code>.</li>
+<li>[ ] You kept <code>patch</code> scope <em>narrow</em>.</li>
+<li>[ ] You preferred <em>result verification</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write a function that calls an external API and test it <em>both</em> with a Stub and a Mock.</li>
+<li>Use <code>side_effect</code> to simulate <em>one failure every three calls</em>.</li>
+<li>Test the same scenario with a <em>Fake</em> and compare <em>which is more readable</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Mock and Stub are <em>tools with different goals</em>. The next post measures <em>how much you tested</em> — <em>test coverage</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Double</a></li>
+<li><strong>Mock and Stub (current)</strong></li>
+<li>Test Coverage (upcoming)</li>
+<li>Regression Test (upcoming)</li>
+<li>Running Tests in CI (upcoming)</li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/unittest.mock.html">unittest.mock docs</a></li>
+<li><a href="https://martinfowler.com/articles/mocksArentStubs.html">Martin Fowler — Mocks Aren't Stubs</a></li>
+<li><a href="https://pytest-mock.readthedocs.io/">pytest-mock</a></li>
+<li><a href="https://www.poodr.com/">Sandi Metz — POODR</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Mock, Stub, unittest.mock, Python</p>
+</body>
+</html>

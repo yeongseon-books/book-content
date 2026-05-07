@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Integration Test</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Integration Test</h1>
+<blockquote>
+<p>Testing 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: All your unit tests pass — <em>why does it still break</em> in the real environment?</p>
+<blockquote>
+<p>An integration test verifies <em>what happens when several parts work together</em>. Each part may be correct, yet <em>fitting them together</em> exposes the real problem.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of an <em>integration test</em> and how it differs from a unit test</li>
+<li>How to handle <em>real dependencies</em> like DB and HTTP</li>
+<li><em>Test containers</em> and fixtures</li>
+<li>Strategies for managing <em>slow tests</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most bugs live at <em>the seams</em> — DB schema, API contracts, authorization checks — <em>between modules</em>, not inside them. Integration tests cover those seams.</p>
+<blockquote>
+<p>Unit tests look at <em>parts</em>; integration tests look at <em>the assembly</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    HTTP[&quot;HTTP route&quot;] --&gt; Service[&quot;Service&quot;]
+    Service --&gt; Repo[&quot;Repository&quot;]
+    Repo --&gt; DB[(&quot;Real DB (test)&quot;)]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Integration test</strong>: a test that exercises <em>two or more components</em> <em>together</em>.</li>
+<li><strong>Test container</strong>: a temporary DB or Redis brought up <em>via container</em>.</li>
+<li><strong>Test database</strong>: a <em>dedicated DB instance</em> or <em>transaction-rollback</em> pattern.</li>
+<li><strong>Seed data</strong>: <em>initial data</em> the test assumes.</li>
+<li><strong>Slow test marker</strong>: a tag that lets you <em>skip slow tests by default</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (unit only)</strong></p>
+<pre><code class="language-text">- 100 unit tests pass
+- Production deploy returns 500 due to *missing DB column*
+</code></pre>
+<p><strong>After (with integration tests)</strong></p>
+<pre><code class="language-text">- 100 unit tests
+- 5 integration tests for POST /users (real DB)
+- The schema gap is *caught in CI* before deploy
+</code></pre>
+<h2>Hands-on: FastAPI + SQLite in Five Steps</h2>
+<p><strong>Step 1 — Code under test</strong></p>
+<pre><code class="language-python"># src/app.py
+from fastapi import FastAPI
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+Base = declarative_base()
+engine = create_engine(&quot;sqlite:///./test.db&quot;, future=True)
+Session = sessionmaker(bind=engine, future=True)
+
+class User(Base):
+    __tablename__ = &quot;users&quot;
+    id = Column(Integer, primary_key=True)
+    email = Column(String, nullable=False, unique=True)
+
+Base.metadata.create_all(engine)
+app = FastAPI()
+
+@app.post(&quot;/users&quot;)
+def create_user(email: str):
+    with Session() as s:
+        u = User(email=email)
+        s.add(u); s.commit(); s.refresh(u)
+        return {&quot;id&quot;: u.id, &quot;email&quot;: u.email}
+</code></pre>
+<p><strong>Step 2 — Test client</strong></p>
+<pre><code class="language-python"># tests/test_users_integration.py
+from fastapi.testclient import TestClient
+from src.app import app, Base, engine
+
+def setup_function():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+client = TestClient(app)
+</code></pre>
+<p><strong>Step 3 — Happy path</strong></p>
+<pre><code class="language-python">def test_create_user_returns_201_and_persists():
+    res = client.post(&quot;/users&quot;, params={&quot;email&quot;: &quot;a@b.com&quot;})
+    assert res.status_code == 200
+    body = res.json()
+    assert body[&quot;email&quot;] == &quot;a@b.com&quot;
+</code></pre>
+<p><strong>Step 4 — Duplicate handling</strong></p>
+<pre><code class="language-python">def test_duplicate_email_fails():
+    client.post(&quot;/users&quot;, params={&quot;email&quot;: &quot;a@b.com&quot;})
+    res = client.post(&quot;/users&quot;, params={&quot;email&quot;: &quot;a@b.com&quot;})
+    assert res.status_code in (400, 409, 500)  # whatever the policy, it must *fail*
+</code></pre>
+<p><strong>Step 5 — Slow test marker</strong></p>
+<pre><code class="language-python">import pytest
+
+@pytest.mark.slow
+def test_large_batch_insert():
+    for i in range(1000):
+        client.post(&quot;/users&quot;, params={&quot;email&quot;: f&quot;u{i}@e.com&quot;})
+</code></pre>
+<pre><code class="language-bash">pytest -m &quot;not slow&quot;   # default
+pytest -m slow         # nightly
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The schema is <em>recreated before each test</em> → <em>state isolation</em>.</li>
+<li>Real <em>HTTP calls</em> are simulated, exercising routing too.</li>
+<li>Slow tests are <em>isolated by marker</em>, keeping the <em>normal cycle fast</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Pointing tests at the <em>production DB</em>.</strong> Dangerous — always use <em>a dedicated DB</em>.</li>
+<li><strong>Sharing <em>data between tests</em>.</strong> A reorder <em>breaks them</em>.</li>
+<li><strong>Running slow tests <em>every time</em> until <em>PR cycle hits 30 minutes</em>.</strong></li>
+<li><strong>Mocking <em>down to the DB</em>.</strong> That is <em>not an integration test</em>.</li>
+<li><strong>Testing <em>only happy paths</em>.</strong> Failure cases prevent more <em>expensive bugs</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most backend teams stand up a <em>real DB</em> with combinations like <em>Postgres + testcontainers</em>. External APIs are usually replaced by <em>VCR or mock servers</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Believes most bugs come from <em>seams</em>.</li>
+<li>Keeps a <em>ratio</em> of unit to integration tests (the pyramid).</li>
+<li>Runs <em>slow tests</em> <em>at night</em>.</li>
+<li>Groups integration tests by <em>scenario</em>.</li>
+<li>Treats <em>state isolation</em> as the most important property.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Integration tests touch a <em>real DB</em> or <em>real HTTP</em> layer.</li>
+<li>[ ] Each test starts from a <em>clean state</em>.</li>
+<li>[ ] Slow tests are <em>isolated by marker</em>.</li>
+<li>[ ] At least one failure path is tested.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <code>GET /users</code> route and write <em>two</em> integration tests.</li>
+<li>Verify a <em>400</em> response on bad input.</li>
+<li>Confirm tests pass when <em>run in different order</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Integration tests show what happens <em>when parts are connected</em>. The next post climbs further up to <em>E2E tests</em> that include the user-facing screen.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><strong>Integration Test (current)</strong></li>
+<li>E2E Test (upcoming)</li>
+<li>Test Double (upcoming)</li>
+<li>Mock and Stub (upcoming)</li>
+<li>Test Coverage (upcoming)</li>
+<li>Regression Test (upcoming)</li>
+<li>Running Tests in CI (upcoming)</li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI — TestClient</a></li>
+<li><a href="https://testcontainers.com/">Testcontainers</a></li>
+<li><a href="https://martinfowler.com/bliki/IntegrationTest.html">Martin Fowler — Integration Test</a></li>
+<li><a href="https://docs.pytest.org/en/stable/example/markers.html">pytest — markers</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Integration, pytest, Database, HTTP</p>
+</body>
+</html>

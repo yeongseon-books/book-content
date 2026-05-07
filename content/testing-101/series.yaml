@@ -1,0 +1,52 @@
+id: testing-101
+title:
+  ko: Testing 101
+  en: Testing 101
+description:
+  ko: Unit, Integration, E2E, Test Double, Mock, Coverage, CI 연동까지 테스트 전략 전반을 다루는 시리즈.
+  en: A complete tour of testing strategy — unit, integration, E2E, test doubles, mocks, coverage, and CI.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-testing
+    title:
+      ko: 테스트란 무엇인가?
+      en: What Is Testing?
+  - slug: unit-test
+    title:
+      ko: 단위 테스트
+      en: Unit Test
+  - slug: integration-test
+    title:
+      ko: 통합 테스트
+      en: Integration Test
+  - slug: e2e-test
+    title:
+      ko: E2E 테스트
+      en: E2E Test
+  - slug: test-double
+    title:
+      ko: 테스트 더블
+      en: Test Double
+  - slug: mock-and-stub
+    title:
+      ko: Mock과 Stub
+      en: Mock and Stub
+  - slug: test-coverage
+    title:
+      ko: 테스트 커버리지
+      en: Test Coverage
+  - slug: regression-test
+    title:
+      ko: 회귀 테스트
+      en: Regression Test
+  - slug: tests-in-ci
+    title:
+      ko: CI에서 테스트 실행하기
+      en: Running Tests in CI
+  - slug: test-strategy
+    title:
+      ko: 테스트 전략 세우기
+      en: Building a Test Strategy

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Running Tests in CI</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Running Tests in CI</h1>
+<blockquote>
+<p>Testing 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If your tests pass <em>only on your laptop</em>, did they really <em>pass</em>?</p>
+<blockquote>
+<p>CI applies <em>the same standard to every commit</em>. It is <em>the safety net for the whole team</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and purpose of <em>CI (Continuous Integration)</em></li>
+<li>The basic structure of a <em>GitHub Actions</em> workflow</li>
+<li>Speeding things up with <em>matrix</em> builds and <em>caching</em></li>
+<li>Test <em>parallelization</em> and <em>result artifacts</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Local environments <em>differ from person to person</em>. <em>CI</em> validates <em>every PR</em> in an <em>identical container</em>. It is the <em>last gate</em> that keeps broken code out of main.</p>
+<blockquote>
+<p>Tests without CI are tests that <em>passed by accident</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Push[&quot;git push&quot;] --&gt; Trigger[&quot;GitHub Actions trigger&quot;]
+    Trigger --&gt; Setup[&quot;Python and cache setup&quot;]
+    Setup --&gt; Run[&quot;Run pytest&quot;]
+    Run --&gt; Report[&quot;Upload results and coverage&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>CI</strong>: <em>Continuous Integration</em>. <em>Auto-validate</em> every commit.</li>
+<li><strong>Workflow</strong>: A GitHub Actions <em>YAML definition</em>.</li>
+<li><strong>Matrix</strong>: A configuration that runs multiple <em>Python versions and OSes</em> <em>in parallel</em>.</li>
+<li><strong>Cache</strong>: <em>Reusing</em> dependency installations to gain speed.</li>
+<li><strong>Artifact</strong>: A <em>file produced</em> by a CI run (logs, reports).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (manual testing)</strong></p>
+<pre><code class="language-text">- Developers run pytest *only on their laptops*
+- One forgotten run later, *failures get merged*
+</code></pre>
+<p><strong>After (CI automation)</strong></p>
+<pre><code class="language-yaml">on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -r requirements.txt
+      - run: pytest -v
+</code></pre>
+<h2>Hands-on: Five Steps to Set Up CI</h2>
+<p><strong>Step 1 - Create the workflow file</strong></p>
+<pre><code class="language-bash">mkdir -p .github/workflows
+touch .github/workflows/test.yml
+</code></pre>
+<p><strong>Step 2 - Test multiple versions with a matrix</strong></p>
+<pre><code class="language-yaml">strategy:
+  matrix:
+    python-version: [&quot;3.11&quot;, &quot;3.12&quot;]
+steps:
+  - uses: actions/setup-python@v5
+    with: { python-version: ${{ matrix.python-version }} }
+</code></pre>
+<p><strong>Step 3 - Cache dependencies</strong></p>
+<pre><code class="language-yaml">- uses: actions/setup-python@v5
+  with:
+    python-version: ${{ matrix.python-version }}
+    cache: 'pip'           # auto-detects requirements.txt
+- run: pip install -r requirements.txt
+</code></pre>
+<p><strong>Step 4 - Speed it up with parallel execution</strong></p>
+<pre><code class="language-bash">pip install pytest-xdist
+pytest -n auto             # parallel across CPU cores
+</code></pre>
+<p><strong>Step 5 - Upload coverage as an artifact</strong></p>
+<pre><code class="language-yaml">- run: pytest --cov=src --cov-report=html
+- uses: actions/upload-artifact@v4
+  with:
+    name: coverage-html
+    path: htmlcov/
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>trigger</em> usually includes <em>both</em> <code>push</code> and <code>pull_request</code>.</li>
+<li>The cache key is <em>managed by the requirements hash</em> automatically.</li>
+<li>Be careful with matrix <em>combinatorial explosion</em>. <em>Two or three versions</em> are usually enough.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Tests that are <em>flaky only on CI</em>.</strong> Usually an <em>order dependency</em> or an <em>external resource</em> problem.</li>
+<li><strong>Running the <em>full E2E suite</em> on every PR.</strong> Split into <em>unit -&gt; integration -&gt; E2E</em> tiers.</li>
+<li><strong>Cache <em>without a key</em> lets <em>stale dependencies</em> pass.</strong> Always use a <em>hash-based key</em>.</li>
+<li><strong>Printing <em>secrets to the log</em>.</strong> Never do <code>echo $SECRET</code>.</li>
+<li><strong>Build time exceeds <em>10 minutes</em> and you ignore it.</strong> Aim for <em>under 5 minutes</em> with parallelism and caching.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large teams <em>split</em> their suites into a <em>unit job</em> (1-2 minutes), an <em>integration job</em> (5 minutes), and an <em>E2E job</em> (15 minutes, nightly). PRs only require <em>unit and integration</em>; <em>E2E</em> runs after merge during the night.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A <em>red PR getting merged</em> is a <em>system failure</em>.</li>
+<li>CI duration is <em>developer velocity</em>. Defend the <em>5-minute rule</em>.</li>
+<li><em>Flaky tests</em> are <em>quarantined immediately</em> and repaired.</li>
+<li><em>Secrets</em> are <em>separated per environment</em>.</li>
+<li>The <em>badge</em> is the <em>first signal in the README</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>.github/workflows/test.yml</code> <em>exists</em>.</li>
+<li>[ ] The <em>matrix</em> runs at least <em>two Python versions</em>.</li>
+<li>[ ] <em>Dependency caching</em> is enabled.</li>
+<li>[ ] <em>Red PRs</em> never get merged.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <em>test.yml</em> workflow to your project and produce its first <em>green build</em>.</li>
+<li>Add <em>Python 3.11 and 3.12</em> to the matrix.</li>
+<li>Adopt <em>pytest-xdist</em> and <em>measure and compare</em> the runtime.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>CI is <em>the safety net for the whole team</em>. In the next post we tie everything together into a <em>test strategy</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What is testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Doubles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Mock and Stub</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/07-test-coverage.md">Test Coverage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/08-regression-test.md">Regression Test</a></li>
+<li><strong>Running Tests in CI (current)</strong></li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/en/actions">GitHub Actions docs</a></li>
+<li><a href="https://pytest-xdist.readthedocs.io/">pytest-xdist</a></li>
+<li><a href="https://martinfowler.com/articles/continuousIntegration.html">Martin Fowler — Continuous Integration</a></li>
+<li><a href="https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html">Google Testing Blog — Flaky Tests</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, CI, GitHub Actions, Automation, Quality</p>
+</body>
+</html>
