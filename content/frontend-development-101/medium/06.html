@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>API Calls and Async</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>API Calls and Async</h1>
+<blockquote>
+<p>Frontend Development 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What do you show the user <em>during the brief moment</em> a server fetch is in flight?</p>
+<blockquote>
+<p>Async code requires you to keep three states in mind at all times: <em>loading, success, failure</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>minimum usage</em> of <code>fetch</code> and <code>async/await</code></li>
+<li>Handling loading/error states <em>explicitly</em></li>
+<li>Cancellation and race conditions</li>
+<li>Caching and stale-while-revalidate</li>
+<li><em>Why React Query / SWR</em> became standard</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Async bugs make up <em>half of frontend defects</em>. They hide on a fast network and explode on a user's <em>slow 3G</em>. Explicit state management is <em>the only cure</em>.</p>
+<blockquote>
+<p>Good async code <em>assumes the worst network</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Idle[&quot;idle&quot;] --&gt; Loading[&quot;loading&quot;]
+    Loading --&gt; Success[&quot;success&quot;]
+    Loading --&gt; Error[&quot;error&quot;]
+    Error --&gt; Loading
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong><code>fetch</code></strong>: the browser-built-in HTTP client.</li>
+<li><strong>Promise</strong>: an object representing <em>a value to arrive in the future</em>.</li>
+<li><strong><code>async/await</code></strong>: syntax to use Promises <em>as if they were synchronous</em>.</li>
+<li><strong>AbortController</strong>: tool to <em>cancel a request mid-flight</em>.</li>
+<li><strong>Stale-while-revalidate</strong>: <em>show cached data first</em>, refresh in the background.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (callback hell)</strong></p>
+<pre><code class="language-javascript">fetch(url, (res) =&gt; {
+  parse(res, (data) =&gt; {
+    render(data, (e) =&gt; { ... });
+  });
+});
+</code></pre>
+<p><strong>After (async/await)</strong></p>
+<pre><code class="language-javascript">const res = await fetch(url);
+const data = await res.json();
+render(data);
+</code></pre>
+<h2>Hands-on: A User List in Five Steps</h2>
+<p><strong>Step 1 — Plain fetch</strong></p>
+<pre><code class="language-javascript">async function loadUsers() {
+  const res = await fetch(&quot;/api/users&quot;);
+  return res.json();
+}
+</code></pre>
+<p><strong>Step 2 — Use it from React</strong></p>
+<pre><code class="language-jsx">function Users() {
+  const [users, setUsers] = useState([]);
+  useEffect(() =&gt; { loadUsers().then(setUsers); }, []);
+  return &lt;ul&gt;{users.map(u =&gt; &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}&lt;/ul&gt;;
+}
+</code></pre>
+<p><strong>Step 3 — Loading and error states</strong></p>
+<pre><code class="language-jsx">function Users() {
+  const [state, setState] = useState({ status: &quot;idle&quot; });
+  useEffect(() =&gt; {
+    setState({ status: &quot;loading&quot; });
+    loadUsers()
+      .then(data =&gt; setState({ status: &quot;success&quot;, data }))
+      .catch(err =&gt; setState({ status: &quot;error&quot;, err }));
+  }, []);
+
+  if (state.status === &quot;loading&quot;) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (state.status === &quot;error&quot;)   return &lt;p&gt;Error: {state.err.message}&lt;/p&gt;;
+  return &lt;ul&gt;{state.data.map(u =&gt; &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}&lt;/ul&gt;;
+}
+</code></pre>
+<p><strong>Step 4 — Cancel on unmount</strong></p>
+<pre><code class="language-jsx">useEffect(() =&gt; {
+  const ctrl = new AbortController();
+  fetch(&quot;/api/users&quot;, { signal: ctrl.signal })
+    .then(r =&gt; r.json()).then(setUsers)
+    .catch(e =&gt; e.name !== &quot;AbortError&quot; &amp;&amp; console.error(e));
+  return () =&gt; ctrl.abort();
+}, []);
+</code></pre>
+<p><strong>Step 5 — Compress all of it with React Query</strong></p>
+<pre><code class="language-jsx">import { useQuery } from &quot;@tanstack/react-query&quot;;
+
+function Users() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: [&quot;users&quot;],
+    queryFn: loadUsers,
+  });
+  if (isLoading) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (error)     return &lt;p&gt;Error&lt;/p&gt;;
+  return &lt;ul&gt;{data.map(u =&gt; &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}&lt;/ul&gt;;
+}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The state is <em>explicit</em>: <code>idle/loading/success/error</code>.</li>
+<li>The request is <em>canceled</em> on unmount.</li>
+<li>React Query handles caching, retry, and race conditions <em>for you</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Skipping the loading state.</strong> Users assume the <em>app is dead</em>.</li>
+<li><strong>Logging errors only to the console.</strong> Users see <em>a white screen</em>.</li>
+<li><strong>Ignoring race conditions.</strong> Fast typing in search shows <em>the wrong result</em>.</li>
+<li><strong>Each component fetches the <em>same</em> data separately.</strong> N copies of one resource.</li>
+<li><strong>No cache invalidation strategy.</strong> Stale screens stay even after fresh data exists.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most React apps standardize on <em>React Query (TanStack Query)</em> or <em>SWR</em>. Vue uses <em>Pinia + composables</em>; Svelte ships with built-in <em>load functions</em>. Hand-rolled fetch state code is <em>fading out</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Async is <em>a state machine</em> — draw all four states.</li>
+<li>Every fetch should be <em>cancellable</em>.</li>
+<li>Caching is <em>the default</em>; live refresh is the exception.</li>
+<li>User-facing errors must be <em>friendly and actionable</em>.</li>
+<li>Test on the DevTools <em>Slow 3G</em> throttle once in a while.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can write fetch with <code>async/await</code>.</li>
+<li>[ ] You render loading, error, and success states distinctly.</li>
+<li>[ ] You have used <code>AbortController</code> once.</li>
+<li>[ ] You have tried React Query or SWR.</li>
+<li>[ ] You have tested under Slow 3G.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Call <code>https://jsonplaceholder.typicode.com/users</code> and render the user list.</li>
+<li>Add explicit loading and error states.</li>
+<li>Add a search box; ensure that fast typing only renders <em>the latest input's result</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Async is <em>state</em>. Next, we look at handling <em>user input</em> via forms and validation.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
+<li><strong>API Calls and Async (current)</strong></li>
+<li>Forms and Validation (upcoming)</li>
+<li>Styling and Design Systems (upcoming)</li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">MDN Fetch API</a></li>
+<li><a href="https://tanstack.com/query/latest">TanStack Query</a></li>
+<li><a href="https://swr.vercel.app/">SWR docs</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController">MDN AbortController</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, API, Async, Fetch, JavaScript</p>
+</body>
+</html>

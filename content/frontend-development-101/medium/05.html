@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Routing and Pages</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Routing and Pages</h1>
+<blockquote>
+<p>Frontend Development 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does a <em>single-page</em> app render <em>multiple screens</em>?</p>
+<blockquote>
+<p>URLs are <em>state</em>. The router reads the URL and decides <em>which component to render</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>principle</em> behind SPA routing</li>
+<li>Mapping paths to components</li>
+<li>Nested routes</li>
+<li>Dynamic parameters and query strings</li>
+<li>Code splitting and lazy loading</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Routing makes <em>refresh-safe screens</em>, <em>shareable links</em>, and <em>back-button behavior</em> work correctly. Broken routing breaks <em>product trust</em>.</p>
+<blockquote>
+<p>Good routing makes the screen <em>guessable from the URL alone</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    URL[&quot;/users/42&quot;] --&gt; Router[&quot;Router&quot;]
+    Router --&gt; Match[&quot;Match path&quot;]
+    Match --&gt; Comp[&quot;UserDetail({id: 42})&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Route</strong>: a <em>mapping</em> from URL pattern to component.</li>
+<li><strong>Nested route</strong>: a route <em>inside another route</em>.</li>
+<li><strong>Dynamic segment</strong>: a pattern with a <em>variable slot</em> like <code>/users/:id</code>.</li>
+<li><strong>Query string</strong>: extra info <em>outside the route</em>, like <code>?q=react&amp;page=2</code>.</li>
+<li><strong>Lazy loading</strong>: <em>splitting code per route</em> so it loads only when needed.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (server routing, full reload)</strong></p>
+<pre><code class="language-html">&lt;a href=&quot;/about&quot;&gt;About&lt;/a&gt;
+</code></pre>
+<p><strong>After (SPA routing, smooth transition)</strong></p>
+<pre><code class="language-jsx">&lt;Link to=&quot;/about&quot;&gt;About&lt;/Link&gt;
+</code></pre>
+<h2>Hands-on: React Router in Five Steps</h2>
+<p><strong>Step 1 — Install</strong></p>
+<pre><code class="language-bash">npm install react-router-dom
+</code></pre>
+<p><strong>Step 2 — Define routes</strong></p>
+<pre><code class="language-jsx">import { createBrowserRouter, RouterProvider } from &quot;react-router-dom&quot;;
+
+const router = createBrowserRouter([
+  { path: &quot;/&quot;, element: &lt;Home /&gt; },
+  { path: &quot;/about&quot;, element: &lt;About /&gt; },
+]);
+
+&lt;RouterProvider router={router} /&gt;
+</code></pre>
+<p><strong>Step 3 — Use Link</strong></p>
+<pre><code class="language-jsx">import { Link } from &quot;react-router-dom&quot;;
+
+&lt;nav&gt;
+  &lt;Link to=&quot;/&quot;&gt;Home&lt;/Link&gt;
+  &lt;Link to=&quot;/about&quot;&gt;About&lt;/Link&gt;
+&lt;/nav&gt;
+</code></pre>
+<p><strong>Step 4 — Dynamic parameters</strong></p>
+<pre><code class="language-jsx">{ path: &quot;/users/:id&quot;, element: &lt;UserDetail /&gt; }
+
+import { useParams } from &quot;react-router-dom&quot;;
+function UserDetail() {
+  const { id } = useParams();
+  return &lt;p&gt;user {id}&lt;/p&gt;;
+}
+</code></pre>
+<p><strong>Step 5 — Lazy loading</strong></p>
+<pre><code class="language-jsx">import { lazy } from &quot;react&quot;;
+const Settings = lazy(() =&gt; import(&quot;./Settings&quot;));
+
+{ path: &quot;/settings&quot;, element: &lt;Suspense&gt;&lt;Settings /&gt;&lt;/Suspense&gt; }
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>&lt;Link&gt;</code> updates router state <em>without a full page reload</em>.</li>
+<li><code>useParams</code> exposes dynamic segments as <em>values</em>.</li>
+<li>Lazy loading shrinks the <em>initial bundle</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mixing <code>&lt;a&gt;</code> and <code>&lt;Link&gt;</code>.</strong> <code>&lt;a&gt;</code> triggers <em>full reload</em>, defeating SPA gains.</li>
+<li><strong>Not protecting auth-gated routes.</strong> Direct URL entry <em>bypasses</em> checks.</li>
+<li><strong>Skipping lazy loading with <em>dozens</em> of routes.</strong> Initial load becomes <em>brutally slow</em>.</li>
+<li><strong>Not syncing query string with state.</strong> Search results <em>vanish on refresh</em>.</li>
+<li><strong>No 404 page.</strong> A bad URL shows <em>a white screen</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams use <em>file-based routing</em> via Next.js, Remix, or Nuxt. <code>pages/users/[id].tsx</code> automatically becomes the <code>/users/:id</code> route. Hand-listing routes is becoming <em>less common</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A URL is <em>shareable state</em>.</li>
+<li>Auth/permission route guards are <em>designed in from day one</em>.</li>
+<li>Lots of routes ⇒ code splitting is <em>mandatory</em>.</li>
+<li>Search/filter belongs in the <em>query string</em> so links stay <em>shareable</em>.</li>
+<li>404 must be <em>friendly</em> and offer a <em>way back</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You distinguish static and dynamic routes.</li>
+<li>[ ] You know the difference between <code>&lt;Link&gt;</code> and <code>&lt;a&gt;</code>.</li>
+<li>[ ] You can read params with <code>useParams</code>.</li>
+<li>[ ] You have set up lazy loading at least once.</li>
+<li>[ ] You have a 404 page.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build four routes: <code>/</code>, <code>/about</code>, <code>/users/:id</code>, <code>/*</code> (404).</li>
+<li>Show the param in <code>/users/:id</code> via <code>useParams</code>.</li>
+<li>Lazy-load <code>/settings</code> and verify a separate chunk in the Network tab.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>URLs decide what users see. Next, we look at how those screens <em>fetch data from a server</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
+<li><strong>Routing and Pages (current)</strong></li>
+<li>API Calls and Async (upcoming)</li>
+<li>Forms and Validation (upcoming)</li>
+<li>Styling and Design Systems (upcoming)</li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://reactrouter.com/">React Router docs</a></li>
+<li><a href="https://nextjs.org/docs/app/building-your-application/routing">Next.js routing</a></li>
+<li><a href="https://url.spec.whatwg.org/">URL Living Standard</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/History_API">MDN History API</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, Routing, SPA, React, Web</p>
+</body>
+</html>

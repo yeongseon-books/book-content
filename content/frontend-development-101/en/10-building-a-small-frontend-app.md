@@ -1,0 +1,260 @@
+---
+series: frontend-development-101
+episode: 10
+title: Building a Small Frontend App
+status: content-ready
+targets:
+  tistory: true
+  medium: true
+  hashnode: true
+  mkdocs: true
+  ebook: true
+language: en
+tags:
+  - Frontend
+  - Project
+  - Capstone
+  - React
+  - Web
+seo_description: Pull the routing, components, API calls, forms, and styles from the previous nine posts into one small notes app and deploy it.
+last_reviewed: '2026-05-04'
+---
+
+# Building a Small Frontend App
+
+> Frontend Development 101 series (10/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: How do we tie all the *pieces* we have learned into *one living app*?
+
+> Building one small app *from scratch to deployment* turns the concepts in a book into *tools in your hand*.
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- How to pick a *folder structure* for a small project
+- How to *connect* the concepts from posts 1\~9
+- The *full flow* of dev → build → deploy
+- The next learning steps (testing, devops)
+
+## Why It Matters
+
+Knowledge becomes *yours* only when it is *bound into a project*. The nine posts gave you *bricks*. The final post builds the *house*.
+
+> Polish does not have to be high. The experience of *shipping all the way to deployment* is *more powerful than any book*.
+
+## Concept at a Glance
+
+```mermaid
+flowchart LR
+    User["User"] --> Page["Pages (routing)"]
+    Page --> Comp["Components + state"]
+    Comp --> API["API calls"]
+    API --> Backend["Backend / external API"]
+    Comp --> Style["Styles + design system"]
+    Build["Build (Vite)"] --> Deploy["Deploy (Netlify/Vercel)"]
+```
+
+## Key Terms
+
+- **Project structure**: a *folder layout split by role*.
+- **Capstone**: the *closing project that ties what you learned*.
+- **Deployment**: the act of putting build output *behind a public URL*.
+- **Roadmap**: a path showing *what to learn next*.
+
+## Before/After
+
+**Before (you only know the concepts)**
+
+```text
+"I know routing, I know forms, I know APIs."
+"But I have never combined them all to *build an app*."
+```
+
+**After (a small app is alive on the internet)**
+
+```text
+https://my-notes.netlify.app
+- A user can *add/edit/delete* notes.
+- The code is *on GitHub*.
+- The next learner studies *on top of this code*.
+```
+
+## Hands-on: A Small Notes App in Five Steps
+
+### Step 1 — Project structure
+
+```text
+my-notes/
+├── src/
+│   ├── components/   # NoteCard, NoteForm, ... (post 4)
+│   ├── pages/        # NotesPage, NotePage (post 5)
+│   ├── api/          # notes API client (post 6)
+│   ├── hooks/        # useNotes, useForm (posts 4, 7)
+│   ├── styles/       # tokens.css, layout.css (post 8)
+│   └── App.tsx
+├── vite.config.ts    # build config (post 9)
+├── .env.production
+└── package.json
+```
+
+### Step 2 — Routing and pages (review of post 5)
+
+```typescript
+// src/App.tsx
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import NotesPage from "./pages/NotesPage";
+import NotePage from "./pages/NotePage";
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<NotesPage />} />
+        <Route path="/notes/:id" element={<NotePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+### Step 3 — API client (review of post 6)
+
+```typescript
+// src/api/notes.ts
+const BASE = import.meta.env.VITE_API_URL;
+
+export async function listNotes() {
+  const res = await fetch(`${BASE}/notes`);
+  if (!res.ok) throw new Error("Failed to list notes");
+  return res.json();
+}
+
+export async function createNote(body: { title: string }) {
+  const res = await fetch(`${BASE}/notes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error("Failed to create note");
+  return res.json();
+}
+```
+
+### Step 4 — Form + component (review of posts 4 and 7)
+
+```tsx
+// src/components/NoteForm.tsx
+import { useState } from "react";
+import { createNote } from "../api/notes";
+
+export function NoteForm({ onCreated }: { onCreated: () => void }) {
+  const [title, setTitle] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (title.trim().length < 2) {
+      setError("Title must be at least 2 characters.");
+      return;
+    }
+    await createNote({ title });
+    setTitle("");
+    setError(null);
+    onCreated();
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={title} onChange={(e) => setTitle(e.target.value)} />
+      {error && <p role="alert">{error}</p>}
+      <button>Add</button>
+    </form>
+  );
+}
+```
+
+### Step 5 — Build and deploy (post 9 + a new step)
+
+```bash
+npm run build
+# Netlify CLI example
+npm install -g netlify-cli
+netlify deploy --dir=dist --prod
+```
+
+When the deploy finishes you have a *public URL*. Share that URL *with the next person*.
+
+## What to Notice in This Code
+
+- The folder layout is split *by role*, so you instantly know *where to edit*.
+- The API client is *separated from components*, which makes *testing easy*.
+- Environment variables split *dev and prod backends*.
+
+## Five Common Mistakes
+
+1. **Putting all code into `App.tsx`.** Past 100 lines it becomes *unreadable*.
+2. **Calling APIs *directly inside components*.** Tests and reuse become *hard*.
+3. **Having *no README*.** Future you *cannot run the project* a month later.
+4. **Looking only at `localhost` and *never deploying*.** Deployment *always surfaces new issues*.
+5. **Waiting *for perfection*.** A small app *deployed today* beats *a perfect undeployed one*.
+
+## How This Shows Up in Production
+
+Production teams use *the same pattern*. Folder structures like `pages/`, `components/`, `api/`, `hooks/`, `styles/` are also the basic skeleton of *codebases shared by dozens of engineers*. The difference is only *scale and abstraction*; *the shape is the same*.
+
+## How a Senior Engineer Thinks
+
+- Builds *small* and ships *often*.
+- Lets folder structure *follow the business domain*.
+- Always keeps a *README and .env.example*.
+- Automates deployment *from day one*.
+- Treats the first user as *themselves*.
+
+## Checklist
+
+- [ ] You can sketch the folder structure.
+- [ ] You moved API clients *outside components*.
+- [ ] `npm run build` succeeds.
+- [ ] Your app is live behind a *public URL*.
+- [ ] Your README explains *how to run it*.
+
+## Practice Problems
+
+1. Build a *notes app* with this structure and deploy it to Netlify or Vercel.
+2. In the README, document *how to run, environment variables, and the deploy URL*.
+3. Measure your build output size and *bring it under 200KB*.
+
+## Wrap-up and Next Steps
+
+If you made it here, *frontend onboarding is done*. Good companion series to read next:
+
+- *Testing 101*: how to *test* components and API calls.
+- *DevOps 101*: how to *automate deployment* and add monitoring.
+- *Secure Coding 101*: how to *block attacks* in forms and APIs.
+
+> Do not try to learn everything at once. *Add one thing at a time* to the app you just built.
+
+<!-- toc:begin -->
+- [What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [HTML and CSS Basics](./02-html-and-css-basics.md)
+- [JavaScript Basics](./03-javascript-basics.md)
+- [Components and State](./04-components-and-state.md)
+- [Routing and Pages](./05-routing-and-pages.md)
+- [API Calls and Async](./06-api-calls-and-async.md)
+- [Forms and Validation](./07-forms-and-validation.md)
+- [Styling and Design Systems](./08-styling-and-design-system.md)
+- [Build Tools and Bundling](./09-build-tools-and-bundling.md)
+- **Building a Small Frontend App (current)**
+<!-- toc:end -->
+
+## References
+
+- [Vite docs](https://vitejs.dev/)
+- [React Router docs](https://reactrouter.com/)
+- [Netlify docs](https://docs.netlify.com/)
+- [Vercel docs](https://vercel.com/docs)
+
+Tags: Frontend, Project, Capstone, React, Web

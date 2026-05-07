@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HTML and CSS Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>HTML and CSS Basics</h1>
+<blockquote>
+<p>Frontend Development 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you keep the <em>skeleton</em> and the <em>clothes</em> of a page cleanly apart?</p>
+<blockquote>
+<p>HTML carries <em>meaning</em>. CSS carries <em>appearance</em>. Future-you will <em>thank you</em> for keeping that line clear.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Building <em>meaningful structure</em> with semantic HTML</li>
+<li>The CSS box model</li>
+<li><em>Where Flexbox shines and where Grid shines</em></li>
+<li>A <em>minimal pattern</em> for responsive design</li>
+<li>The <em>starting point</em> for accessibility</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>HTML and CSS are <em>long-lived skills</em>. Frameworks rotate every five years, but <em>semantic tags and the box model</em> stay. Time spent here is the <em>highest-yield investment</em> in your frontend career.</p>
+<blockquote>
+<p>Semantic HTML is code that <em>search engines and screen readers can read together</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    HTML[&quot;Semantic HTML&quot;] --&gt; Box[&quot;Box model&quot;]
+    Box --&gt; Layout[&quot;Flexbox/Grid&quot;]
+    Layout --&gt; Resp[&quot;Responsive&quot;]
+    Resp --&gt; A11y[&quot;Accessibility&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Semantic HTML</strong>: tags like <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;article&gt;</code> that <em>carry meaning</em>.</li>
+<li><strong>Box model</strong>: every element is <em>content + padding + border + margin</em>.</li>
+<li><strong>Flexbox</strong>: a <em>one-axis</em> layout system.</li>
+<li><strong>Grid</strong>: a <em>two-axis</em> layout system that divides regions.</li>
+<li><strong>Media query</strong>: syntax that applies <em>different styles</em> per screen size.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (a pile of meaningless divs)</strong></p>
+<pre><code class="language-html">&lt;div class=&quot;header&quot;&gt;
+  &lt;div class=&quot;nav&quot;&gt;...&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;...&lt;/div&gt;
+</code></pre>
+<p><strong>After (semantic structure)</strong></p>
+<pre><code class="language-html">&lt;header&gt;&lt;nav&gt;...&lt;/nav&gt;&lt;/header&gt;
+&lt;main&gt;...&lt;/main&gt;
+&lt;footer&gt;...&lt;/footer&gt;
+</code></pre>
+<h2>Hands-on: A Card Layout in Five Steps</h2>
+<p><strong>Step 1 — Semantic structure</strong></p>
+<pre><code class="language-html">&lt;main&gt;
+  &lt;article class=&quot;card&quot;&gt;
+    &lt;h2&gt;Title&lt;/h2&gt;
+    &lt;p&gt;Body&lt;/p&gt;
+  &lt;/article&gt;
+&lt;/main&gt;
+</code></pre>
+<p><strong>Step 2 — Apply the box model</strong></p>
+<pre><code class="language-css">.card {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+</code></pre>
+<p><strong>Step 3 — Flexbox row</strong></p>
+<pre><code class="language-css">main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.card { flex: 1 1 250px; }
+</code></pre>
+<p><strong>Step 4 — Grid regions</strong></p>
+<pre><code class="language-css">main {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+</code></pre>
+<p><strong>Step 5 — Media query</strong></p>
+<pre><code class="language-css">@media (max-width: 600px) {
+  main { grid-template-columns: 1fr; }
+}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Use <em>role-based class names</em> like <code>card</code>, not <code>red</code>.</li>
+<li><code>gap</code> removes <em>margin collision</em> problems.</li>
+<li><code>minmax(250px, 1fr)</code> is the <em>responsive magic</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using only <code>&lt;div&gt;</code>.</strong> Search engines and screen readers <em>cannot read structure</em>.</li>
+<li><strong>Spamming <code>!important</code>.</strong> CSS specificity becomes <em>chaos</em>.</li>
+<li><strong>Using only fixed <code>px</code>.</strong> Mix <code>rem</code>, <code>%</code>, <code>fr</code> to keep responsive flow.</li>
+<li><strong>Carrying information in color alone.</strong> <em>Color-blind</em> users miss it.</li>
+<li><strong>Leaving alt text empty.</strong> Meaningful images <em>need alt</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most companies adopt a <em>design system</em> (Tailwind, Material UI, custom tokens) for reuse. But every design system <em>runs on</em> semantic HTML and Flexbox/Grid underneath. Skipping fundamentals makes design systems <em>un-debuggable</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Semantic tags</em> are the cheapest SEO/accessibility investment.</li>
+<li>Most layout problems reduce to <em>Flexbox vs Grid</em>.</li>
+<li>Design <em>mobile-first</em>, then scale up.</li>
+<li>Color must <em>not be the only</em> signal.</li>
+<li>Always ask: "<em>Why</em> did I make this a div?"</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You use <code>&lt;header&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;footer&gt;</code> correctly.</li>
+<li>[ ] You can sketch the box model.</li>
+<li>[ ] You can describe Flexbox vs Grid in one sentence.</li>
+<li>[ ] You can add a media query for responsiveness.</li>
+<li>[ ] All images have meaningful <code>alt</code>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a business card with semantic HTML and CSS.</li>
+<li>Lay out three cards once with Flexbox, once with Grid. Note the difference.</li>
+<li>Add a media query so the layout collapses to one column under 600 px.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>HTML is <em>the skeleton</em>; CSS is <em>the clothes</em>. With the two clearly separated, behavior — JavaScript — slots in cleanly. We tackle JavaScript fundamentals next.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><strong>HTML and CSS Basics (current)</strong></li>
+<li>JavaScript Basics (upcoming)</li>
+<li>Components and State (upcoming)</li>
+<li>Routing and Pages (upcoming)</li>
+<li>API Calls and Async (upcoming)</li>
+<li>Forms and Validation (upcoming)</li>
+<li>Styling and Design Systems (upcoming)</li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element">MDN HTML elements</a></li>
+<li><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/">CSS Tricks Flexbox guide</a></li>
+<li><a href="https://css-tricks.com/snippets/css/complete-guide-grid/">CSS Tricks Grid guide</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Accessibility/WAI-ARIA_basics">WAI ARIA basics</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, HTML, CSS, Web, Beginner</p>
+</body>
+</html>

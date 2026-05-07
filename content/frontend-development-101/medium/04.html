@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Components and State</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Components and State</h1>
+<blockquote>
+<p>Frontend Development 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you manage a screen once it grows past <em>a thousand lines</em>?</p>
+<blockquote>
+<p>The answer is <em>components</em>. Split the screen into small functions; each function owns <em>only its props and state</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>component mindset</em></li>
+<li>The <em>clear distinction</em> between props and state</li>
+<li>Unidirectional data flow</li>
+<li><em>When to split</em> a component</li>
+<li>A minimal React example</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The component mindset is not exclusive to React. The same pattern works in Vue, Svelte, Angular, and even <em>plain JS</em>. Once you internalize it, <em>every framework reads like a familiar language</em>.</p>
+<blockquote>
+<p>Well-split components exist for <em>readability</em>, not for <em>reuse</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart TD
+    App[&quot;App (state)&quot;] --&gt; Header[&quot;Header&quot;]
+    App --&gt; List[&quot;List (props)&quot;]
+    List --&gt; Item[&quot;Item (props)&quot;]
+    Item --&gt;|event| App
+</code></pre>
+<p>State flows <em>down</em>, events flow <em>up</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Component</strong>: a function that draws <em>one slice</em> of the screen.</li>
+<li><strong>Props</strong>: values <em>passed down</em> from parent. <em>Read-only</em>.</li>
+<li><strong>State</strong>: a mutable value a component <em>holds itself</em>.</li>
+<li><strong>Unidirectional data flow</strong>: data moves <em>only top-down</em>.</li>
+<li><strong>Lifting state up</strong>: when two children share state, <em>move it up to the parent</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (everything in one file)</strong></p>
+<pre><code class="language-html">&lt;script&gt;
+  // 1000 lines of DOM manipulation
+&lt;/script&gt;
+</code></pre>
+<p><strong>After (split into components)</strong></p>
+<pre><code class="language-jsx">function App()    { ... }
+function Header() { ... }
+function List()   { ... }
+function Item()   { ... }
+</code></pre>
+<h2>Hands-on: A React Counter in Five Steps</h2>
+<p><strong>Step 1 — Project</strong></p>
+<pre><code class="language-bash">npm create vite@latest counter -- --template react
+cd counter &amp;&amp; npm install &amp;&amp; npm run dev
+</code></pre>
+<p><strong>Step 2 — Define a component</strong></p>
+<pre><code class="language-jsx">function Counter({ initial = 0 }) {
+  return &lt;button&gt;{initial}&lt;/button&gt;;
+}
+</code></pre>
+<p><strong>Step 3 — Add state</strong></p>
+<pre><code class="language-jsx">import { useState } from &quot;react&quot;;
+
+function Counter({ initial = 0 }) {
+  const [count, setCount] = useState(initial);
+  return &lt;button onClick={() =&gt; setCount(count + 1)}&gt;{count}&lt;/button&gt;;
+}
+</code></pre>
+<p><strong>Step 4 — Use it from the parent</strong></p>
+<pre><code class="language-jsx">function App() {
+  return (
+    &lt;&gt;
+      &lt;Counter initial={0} /&gt;
+      &lt;Counter initial={10} /&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<p><strong>Step 5 — Lift state up</strong></p>
+<pre><code class="language-jsx">function App() {
+  const [total, setTotal] = useState(0);
+  return (
+    &lt;&gt;
+      &lt;p&gt;Total: {total}&lt;/p&gt;
+      &lt;button onClick={() =&gt; setTotal(total + 1)}&gt;+1&lt;/button&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>props</code> are <em>input</em>; <code>state</code> is <em>internal memory</em>.</li>
+<li>A child mutates parent state by receiving a <em>function</em> as a prop.</li>
+<li>The same component can live as <em>multiple instances</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mutating props inside the component.</strong> Props are <em>read-only</em>.</li>
+<li><strong>Putting all state at the top.</strong> Unnecessary <em>globalization</em> hurts performance and readability.</li>
+<li><strong>Letting a component grow past <em>a thousand lines</em>.</strong> Past 200 lines is a <em>split signal</em>.</li>
+<li><strong>Recreating event callbacks every render.</strong> Causes needless child re-renders.</li>
+<li><strong>Storing both state and derived values.</strong> You end up with <em>two sources of truth</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most companies maintain a <em>design system</em> as a component library. New screens are built by <em>composing</em> base components like Button + Input + Card. A senior engineer's job is deciding <em>which components NOT to build</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Components should be <em>small</em> — <em>only when they correspond to meaningful units</em>.</li>
+<li>Place state at the <em>closest common parent</em>.</li>
+<li>Two components that <em>look identical</em> deserve a second thought before merging.</li>
+<li>Cyclic data flow is a sign of <em>bad design</em>.</li>
+<li><em>Readable</em> components beat <em>reusable</em> ones.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can define a component as a function.</li>
+<li>[ ] You distinguish props from state.</li>
+<li>[ ] You can bubble events from child to parent.</li>
+<li>[ ] You can place state in the <em>right</em> location.</li>
+<li>[ ] You can sketch unidirectional data flow.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a todo app split into <code>&lt;TodoItem&gt;</code>, <code>&lt;TodoList&gt;</code>, <code>&lt;App&gt;</code>.</li>
+<li>Apply lifting state up so two counters share <em>the same total</em>.</li>
+<li>Build a <em>pure presentational component</em> that only takes props, and write a unit test for it.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Components and state make screens <em>composable</em>. Next, we connect multiple screens via <em>URLs and routers</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
+<li><strong>Components and State (current)</strong></li>
+<li>Routing and Pages (upcoming)</li>
+<li>API Calls and Async (upcoming)</li>
+<li>Forms and Validation (upcoming)</li>
+<li>Styling and Design Systems (upcoming)</li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://react.dev/">React docs</a></li>
+<li><a href="https://react.dev/learn/thinking-in-react">Thinking in React</a></li>
+<li><a href="https://vuejs.org/guide/essentials/component-basics.html">Vue Components</a></li>
+<li><a href="https://svelte.dev/tutorial">Svelte tutorial</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, React, Components, State, JavaScript</p>
+</body>
+</html>

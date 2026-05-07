@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Frontend Development?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Frontend Development?</h1>
+<blockquote>
+<p>Frontend Development 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Where is <em>everything the user can see</em> actually built?</p>
+<blockquote>
+<p>The frontend is <em>a tiny operating system that runs inside the browser</em>. HTML, CSS, and JavaScript are the <em>languages</em> of that OS.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>clear boundary</em> between frontend and backend</li>
+<li><em>How a browser draws</em> a page</li>
+<li>The <em>distinct roles</em> of HTML, CSS, and JavaScript</li>
+<li>A bird's-eye view of <em>modern frontend tooling</em></li>
+<li>A learning roadmap</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Everything users feel</em> passes through the frontend. A perfect backend with a slow frontend is <em>judged as a slow product</em>. The frontend is the <em>first and last impression</em> of your product.</p>
+<blockquote>
+<p>A great frontend is <em>invisible</em>: users just <em>use it</em> without thinking.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt; Browser[&quot;Browser&quot;]
+    Browser --&gt; HTML[&quot;HTML (structure)&quot;]
+    Browser --&gt; CSS[&quot;CSS (style)&quot;]
+    Browser --&gt; JS[&quot;JavaScript (behavior)&quot;]
+    JS --&gt; API[&quot;Backend API&quot;]
+</code></pre>
+<p>The browser <em>combines</em> the three languages to draw the screen.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>DOM</strong>: the <em>tree structure</em> the browser builds from HTML.</li>
+<li><strong>Rendering</strong>: the process of <em>turning HTML+CSS into pixels</em>.</li>
+<li><strong>Bundle</strong>: the <em>single file</em> produced from many JS files.</li>
+<li><strong>SPA (Single Page Application)</strong>: an app whose screen changes <em>via JS</em>, with no page reload.</li>
+<li><strong>Hydration</strong>: the process of <em>attaching JS behavior</em> to server-rendered HTML.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (static website, 1995)</strong></p>
+<pre><code class="language-html">&lt;!-- Each page is its own .html file --&gt;
+&lt;a href=&quot;/about.html&quot;&gt;About&lt;/a&gt;
+</code></pre>
+<p><strong>After (modern SPA, 2025)</strong></p>
+<pre><code class="language-javascript">// A router swaps the screen inside one page
+&lt;Link to=&quot;/about&quot;&gt;About&lt;/Link&gt;
+</code></pre>
+<h2>Hands-on: Your First Page in Five Steps</h2>
+<p><strong>Step 1 — index.html</strong></p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;title&gt;Hi&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1 id=&quot;t&quot;&gt;Hello&lt;/h1&gt;
+  &lt;button id=&quot;b&quot;&gt;Click me&lt;/button&gt;
+  &lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><strong>Step 2 — style.css</strong></p>
+<pre><code class="language-css">body { font-family: system-ui; padding: 2rem; }
+button { padding: .5rem 1rem; cursor: pointer; }
+</code></pre>
+<p><strong>Step 3 — app.js</strong></p>
+<pre><code class="language-javascript">document.getElementById(&quot;b&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  document.getElementById(&quot;t&quot;).textContent = &quot;Hello, frontend!&quot;;
+});
+</code></pre>
+<p><strong>Step 4 — Local server</strong></p>
+<pre><code class="language-bash">python3 -m http.server 8000
+# Visit http://localhost:8000 in the browser
+</code></pre>
+<p><strong>Step 5 — Open DevTools</strong></p>
+<p>Press <code>F12</code> and inspect the Elements, Console, and Network tabs to see <em>what the browser actually received</em>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>HTML is <em>structure</em>, CSS is <em>appearance</em>, JS is <em>behavior</em>.</li>
+<li>The three are <em>separated</em>, so each can evolve independently.</li>
+<li>DevTools is the <em>single most powerful tool</em> in frontend work.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Inlining styles in HTML.</strong> Maintenance becomes <em>exponentially harder</em>.</li>
+<li><strong>Mixing business logic and DOM manipulation in JS.</strong> Tests become impossible.</li>
+<li><strong>Ignoring DevTools.</strong> You debug <em>with your eyes half-closed</em>.</li>
+<li><strong>Reaching for a framework everywhere.</strong> <em>React for a simple page</em> is overkill.</li>
+<li><strong>Treating mobile as an afterthought.</strong> Mobile users are <em>more than half</em> of traffic.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams use <em>React/Vue/Svelte</em> with <em>TypeScript</em> and <em>Vite/Next.js</em>. Don't try to learn every tool at once: build one page in <em>plain HTML/CSS/JS</em>, then move to a framework. That path is <em>much faster</em> in practice.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Fundamentals</em> outlive frameworks by years.</li>
+<li>User experience is measured in <em>milliseconds</em>.</li>
+<li>If HTML/CSS alone solve it, <em>don't reach for JS</em>.</li>
+<li>Accessibility is <em>cheaper when designed in from day one</em>.</li>
+<li><em>Most answers are inside DevTools</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish the roles of HTML, CSS, and JS.</li>
+<li>[ ] You can serve a static page locally.</li>
+<li>[ ] You can open DevTools and use Elements/Console/Network.</li>
+<li>[ ] You can describe what the DOM is.</li>
+<li>[ ] You can explain an SPA in one sentence.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a self-introduction page using only HTML and CSS — no JavaScript.</li>
+<li>Add a button that updates the text on click.</li>
+<li>In the DevTools Network tab, count <em>how many files</em> are downloaded for one page load.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The frontend is <em>the layer where the product meets the user inside the browser</em>. Next, we dig into the <em>foundation</em> of that layer: HTML and CSS.</p>
+<ul>
+<li><strong>What Is Frontend Development? (current)</strong></li>
+<li>HTML and CSS Basics (upcoming)</li>
+<li>JavaScript Basics (upcoming)</li>
+<li>Components and State (upcoming)</li>
+<li>Routing and Pages (upcoming)</li>
+<li>API Calls and Async (upcoming)</li>
+<li>Forms and Validation (upcoming)</li>
+<li>Styling and Design Systems (upcoming)</li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/">MDN Web Docs</a></li>
+<li><a href="https://web.dev/">web.dev</a></li>
+<li><a href="https://roadmap.sh/frontend">Frontend Roadmap</a></li>
+<li><a href="https://html.spec.whatwg.org/">HTML Living Standard</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, Web, JavaScript, HTML, Beginner</p>
+</body>
+</html>

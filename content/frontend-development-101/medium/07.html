@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Forms and Validation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Forms and Validation</h1>
+<blockquote>
+<p>Frontend Development 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you tell a user <em>kindly</em> that they made a mistake?</p>
+<blockquote>
+<p>A good form <em>helps while typing</em> and never <em>scolds only after submit</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Controlled vs uncontrolled inputs</li>
+<li>Three layers of validation (format, business rule, server)</li>
+<li><em>Where and when</em> to show error messages</li>
+<li>Accessibility and keyboard usability</li>
+<li>The role of form libraries (React Hook Form, Zod)</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Forms drive <em>conversion</em>. Sign-up, payment, search — all forms. <em>Slightly awkward</em> forms cause users to leave. Forms are the <em>UX exam</em> of the frontend.</p>
+<blockquote>
+<p>Great forms <em>ask less</em>, <em>catch typos early</em>, and <em>submit fast</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Input[&quot;Input&quot;] --&gt; Format[&quot;Format check&quot;]
+    Format --&gt; Rule[&quot;Business rule&quot;]
+    Rule --&gt; Submit[&quot;Submit&quot;]
+    Submit --&gt; Server[&quot;Server validation&quot;]
+    Server --&gt;|error| Input
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Controlled input</strong>: value lives in <em>React state</em>.</li>
+<li><strong>Uncontrolled input</strong>: value lives in the <em>DOM</em>.</li>
+<li><strong>Schema validation</strong>: declarative validation with libraries like Zod or Yup.</li>
+<li><strong>Inline error</strong>: an error shown <em>next to the field</em>.</li>
+<li><strong><code>aria-invalid</code></strong>: ARIA attribute telling screen readers <em>the field is invalid</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (validate only on submit)</strong></p>
+<pre><code class="language-javascript">form.onsubmit = () =&gt; {
+  if (email.value === &quot;&quot;) alert(&quot;Please enter an email&quot;);
+};
+</code></pre>
+<p><strong>After (real-time inline check + friendly message)</strong></p>
+<pre><code class="language-jsx">{!isEmail(email) &amp;&amp; &lt;p className=&quot;error&quot;&gt;That doesn't look like an email&lt;/p&gt;}
+</code></pre>
+<h2>Hands-on: A Sign-up Form in Five Steps</h2>
+<p><strong>Step 1 — Controlled input</strong></p>
+<pre><code class="language-jsx">function Signup() {
+  const [email, setEmail] = useState(&quot;&quot;);
+  return &lt;input value={email} onChange={e =&gt; setEmail(e.target.value)} /&gt;;
+}
+</code></pre>
+<p><strong>Step 2 — Format check</strong></p>
+<pre><code class="language-jsx">const isValidEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+</code></pre>
+<p><strong>Step 3 — Inline error</strong></p>
+<pre><code class="language-jsx">&lt;input
+  value={email}
+  onChange={e =&gt; setEmail(e.target.value)}
+  aria-invalid={!isValidEmail}
+/&gt;
+{!isValidEmail &amp;&amp; email &amp;&amp; &lt;p className=&quot;error&quot;&gt;That doesn't look like an email&lt;/p&gt;}
+</code></pre>
+<p><strong>Step 4 — Disable submit while invalid</strong></p>
+<pre><code class="language-jsx">&lt;button disabled={!isValidEmail || submitting}&gt;
+  {submitting ? &quot;Submitting...&quot; : &quot;Sign up&quot;}
+&lt;/button&gt;
+</code></pre>
+<p><strong>Step 5 — Schema with Zod</strong></p>
+<pre><code class="language-jsx">import { z } from &quot;zod&quot;;
+
+const SignupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+const result = SignupSchema.safeParse({ email, password });
+if (!result.success) showErrors(result.error.format());
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Validation happens <em>while the user types</em>.</li>
+<li><code>aria-invalid</code> carries <em>the same information</em> to screen reader users.</li>
+<li>One Zod schema unifies <em>frontend and backend</em> validation.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Asking for the password <em>only once</em>.</strong> A typo causes the entire signup to fail.</li>
+<li><strong>Showing errors <em>only after submit</em>.</strong> Users must re-scan <em>every field</em>.</li>
+<li><strong>Technical error text.</strong> "Schema validation failed" means <em>nothing</em> to the user.</li>
+<li><strong>Missing <code>&lt;label&gt;</code>.</strong> Screen readers don't know <em>which input</em> this is.</li>
+<li><strong>No mobile keyboard hint.</strong> An email field opens the <em>letters keyboard</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most React apps use <em>React Hook Form + Zod</em>. State, validation, submission, and error display are bundled <em>declaratively</em>. Hand-rolled <code>useState</code> forms vanish <em>after the learning phase</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A form is <em>a conversation</em> — give <em>feedback</em> at every step.</li>
+<li>Validate on <em>both</em> frontend (UX) and backend (security).</li>
+<li>Errors must be <em>friendly and actionable</em>.</li>
+<li>The <em>whole form</em> must be reachable by <em>keyboard alone</em>.</li>
+<li>Autocomplete and mobile keyboard <code>type</code> are <em>defaults</em>, not optional.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can use a controlled input.</li>
+<li>[ ] You display inline errors.</li>
+<li>[ ] You attach <code>&lt;label&gt;</code> and <code>for</code> to every input.</li>
+<li>[ ] You know <code>aria-invalid</code> and <code>aria-describedby</code>.</li>
+<li>[ ] You have used a schema validator like Zod or Yup.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a signup form with email, password, and password-confirm fields.</li>
+<li>Add inline validation and friendly error messages to every field.</li>
+<li>Verify the form can be filled and submitted using <em>only the keyboard</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Forms are <em>the longest conversation with the user</em>. Next, we look at how the form — and the rest of the screen — gets <em>its appearance</em> via styling and design systems.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
+<li><strong>Forms and Validation (current)</strong></li>
+<li>Styling and Design Systems (upcoming)</li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://react-hook-form.com/">React Hook Form</a></li>
+<li><a href="https://zod.dev/">Zod docs</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation">MDN Form validation</a></li>
+<li><a href="https://www.w3.org/WAI/tutorials/forms/">W3C Form best practices</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, Forms, Validation, UX, React</p>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Styling and Design Systems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Styling and Design Systems</h1>
+<blockquote>
+<p>Frontend Development 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you keep design <em>consistent</em> as a project grows?</p>
+<blockquote>
+<p>Through <em>design tokens</em> and a <em>component library</em>. Manage every color, spacing, and typography choice <em>in one place</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>comparison</em> of styling approaches (global CSS, CSS Modules, CSS-in-JS, Tailwind)</li>
+<li>The role of <em>design tokens</em> (color, spacing, typography)</li>
+<li>The internal structure of a <em>component library</em></li>
+<li>Dark mode and theming</li>
+<li><em>Automatically enforcing</em> consistency</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Even with consistent code, <em>inconsistent design</em> makes users <em>uneasy</em>. Buttons that differ per page make a product feel <em>unfinished</em>. A design system is <em>consistency at team scale</em>.</p>
+<blockquote>
+<p>A great design system gets <em>designers and engineers speaking the same language</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Tokens[&quot;Design tokens&quot;] --&gt; Comp[&quot;Components&quot;]
+    Comp --&gt; Pages[&quot;Pages&quot;]
+    Tokens --&gt; Theme[&quot;Light/Dark theme&quot;]
+    Theme --&gt; Pages
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Design token</strong>: an <em>atomic unit</em> of color/spacing/typography (e.g., <code>color.primary.500</code>).</li>
+<li><strong>CSS Modules</strong>: makes class names <em>uniquely scoped automatically</em>.</li>
+<li><strong>CSS-in-JS</strong>: write CSS <em>inside the component function</em>.</li>
+<li><strong>Utility-first CSS</strong>: small, composable classes (Tailwind).</li>
+<li><strong>Component library</strong>: a <em>reusable set of components</em> implementing the design system.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (different colors per page)</strong></p>
+<pre><code class="language-css">.btn-a { background: #1d72ff; }   /* page A */
+.btn-b { background: #1d70ff; }   /* page B (typo) */
+</code></pre>
+<p><strong>After (design token)</strong></p>
+<pre><code class="language-css">:root { --color-primary: #1d72ff; }
+.btn  { background: var(--color-primary); }
+</code></pre>
+<h2>Hands-on: A Component With Tailwind in Five Steps</h2>
+<p><strong>Step 1 — Install Tailwind</strong></p>
+<pre><code class="language-bash">npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+</code></pre>
+<p><strong>Step 2 — Define tokens</strong></p>
+<pre><code class="language-javascript">// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: { primary: &quot;#1d72ff&quot;, surface: &quot;#f8fafc&quot; },
+      spacing: { gutter: &quot;1rem&quot; },
+    },
+  },
+};
+</code></pre>
+<p><strong>Step 3 — Button component</strong></p>
+<pre><code class="language-jsx">function Button({ children, variant = &quot;primary&quot; }) {
+  const base = &quot;px-4 py-2 rounded font-medium transition&quot;;
+  const variants = {
+    primary:   &quot;bg-primary text-white hover:opacity-90&quot;,
+    secondary: &quot;bg-surface text-gray-900 border border-gray-200&quot;,
+  };
+  return &lt;button className={`${base} ${variants[variant]}`}&gt;{children}&lt;/button&gt;;
+}
+</code></pre>
+<p><strong>Step 4 — Dark mode</strong></p>
+<pre><code class="language-jsx">// tailwind.config.js: { darkMode: &quot;class&quot; }
+&lt;button className=&quot;bg-primary dark:bg-primary/80 text-white&quot;&gt;
+  Click
+&lt;/button&gt;
+</code></pre>
+<p><strong>Step 5 — Enforce consistency</strong></p>
+<pre><code class="language-bash"># eslint-plugin-tailwindcss
+# Catches arbitrary class names and bad token usage at lint time.
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>All colors appear by <em>name</em> (like <code>primary</code>) — change in <em>one place</em>.</li>
+<li>A component like <code>Button</code> is <em>the single source of truth</em>.</li>
+<li>Dark mode is <em>not extra code</em> — it's <em>extra tokens</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Hardcoding colors per component.</strong> Designer changes color → <em>hell</em>.</li>
+<li><strong>Adding button/input variants <em>without docs</em>.</strong> Components diverge from <em>agreed designs</em>.</li>
+<li><strong>Adding dark mode <em>later</em>.</strong> Scattered colors mean <em>every component</em> needs touching.</li>
+<li><strong>Hardcoding <em>all spacing in px</em>.</strong> Responsive and accessibility break.</li>
+<li><strong>Putting <em>business logic</em> in the component library.</strong> Reuse becomes impossible.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams catalog components in <em>Storybook</em> and unify styling with <em>Tailwind/CSS Modules + design tokens</em>. Big companies publish their <em>design system as an npm package</em> so multiple products share the <em>same components</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Color without a token</em> gets caught in code review.</li>
+<li>Build the design system <em>with designers</em>, not for them.</li>
+<li>New components must answer: <em>why doesn't an existing one work?</em></li>
+<li>Storybook is <em>unit testing for components</em>.</li>
+<li>Dark mode should be solved <em>purely by tokens</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You understand what design tokens mean.</li>
+<li>[ ] You have styled a component with CSS Modules or Tailwind.</li>
+<li>[ ] You have used Storybook once.</li>
+<li>[ ] You have applied dark mode once.</li>
+<li>[ ] You have lint rules to catch arbitrary colors/spacing.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define your own <code>primary</code> color in Tailwind tokens and apply it to a Button.</li>
+<li>Install Storybook and catalog two Button variants.</li>
+<li>Apply dark mode using <code>prefers-color-scheme</code> or a class-based switch.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Even styling needs <em>shared vocabulary</em>. Next, we look at the build tools that turn your code into something <em>the browser can read</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Forms and Validation</a></li>
+<li><strong>Styling and Design Systems (current)</strong></li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://tailwindcss.com/">Tailwind CSS docs</a></li>
+<li><a href="https://storybook.js.org/">Storybook</a></li>
+<li><a href="https://www.w3.org/community/design-tokens/">Design Tokens W3C draft</a></li>
+<li><a href="https://m3.material.io/">Material Design</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, CSS, DesignSystem, Tailwind, UX</p>
+</body>
+</html>
