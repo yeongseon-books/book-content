@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>apply and Vectorization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>apply and Vectorization</h1>
+<blockquote>
+<p>Pandas 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>apply</em> really <em>faster than a for-loop</em>?</p>
+<blockquote>
+<p><em>apply is a </em>thin wrapper around for-loops<em>. Real speed comes from </em>vectorization<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning of <em>vectorization</em></li>
+<li>The difference between <em>apply / map / vectorize</em></li>
+<li><em>Interop</em> with <em>NumPy</em></li>
+<li>A 5-step performance hands-on</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Analysis speed can differ by <em>tens to hundreds of times</em>. <em>Vectorization</em> is the <em>essence of Pandas</em>, and <em>apply abuse</em> is the <em>most common antipattern</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Loop[&quot;for-loop&quot;] --&gt;|slow| Apply[&quot;apply&quot;]
+    Apply --&gt;|faster| Vec[&quot;vectorized (NumPy / Pandas ops)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Vectorization</strong>: array-level computation <em>without explicit loops</em>.</li>
+<li><strong>apply</strong>: apply a function <em>along rows/columns</em> — internally a Python loop.</li>
+<li><strong>map</strong>: apply a function/dict to <em>Series elements</em>.</li>
+<li><strong>np.where</strong>: <em>vectorized conditional</em>.</li>
+<li><strong>eval / numexpr</strong>: <em>acceleration</em> for <em>large expressions</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"for i in range(len(df))"</em> — minutes on 1M rows.</p>
+<p><strong>After</strong>: <em>"df['c'] = df['a'] + df['b']"</em> — milliseconds.</p>
+<h2>Hands-on: Five Performance Steps</h2>
+<p><strong>Step 1 — Baseline data</strong></p>
+<pre><code class="language-python">import numpy as np, pandas as pd
+df = pd.DataFrame({&quot;a&quot;: np.arange(1_000_000), &quot;b&quot;: np.arange(1_000_000)})
+</code></pre>
+<p><strong>Step 2 — Slow path</strong></p>
+<pre><code class="language-python"># %timeit df.apply(lambda r: r[&quot;a&quot;] + r[&quot;b&quot;], axis=1)
+# Very slow — apply(axis=1) is a per-row Python call
+</code></pre>
+<p><strong>Step 3 — Vectorized</strong></p>
+<pre><code class="language-python">df[&quot;c&quot;] = df[&quot;a&quot;] + df[&quot;b&quot;]   # fastest
+</code></pre>
+<p><strong>Step 4 — np.where for conditional</strong></p>
+<pre><code class="language-python">df[&quot;flag&quot;] = np.where(df[&quot;a&quot;] % 2 == 0, &quot;even&quot;, &quot;odd&quot;)
+</code></pre>
+<p><strong>Step 5 — map for code translation</strong></p>
+<pre><code class="language-python">mapping = {0: &quot;zero&quot;, 1: &quot;one&quot;}
+print(pd.Series([0, 1, 2]).map(mapping))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>axis=1 apply</em> is <em>the slowest</em> — Python call <em>per row</em>.</li>
+<li><em>Vector ops</em> run at the <em>C level</em>.</li>
+<li><em>np.where</em> is the <em>vectorized if-else</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Overusing <em>apply(axis=1)</em>.</strong></li>
+<li><strong>Using <em>Python for-loops</em> to compute <em>row-wise sums</em>.</strong></li>
+<li><strong>Building giant expressions without <em>eval/numexpr</em>.</strong></li>
+<li><strong>Ignoring <em>NaNs</em> introduced by <em>map</em>.</strong></li>
+<li><strong>Vectorization fails due to <em>dtype mismatch</em>, then everything becomes <em>object dtype</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>ETL transforms, feature engineering, large reports — <em>vectorization</em> directly cuts <em>cost and time</em>. The <em>easiest lever</em> for <em>cloud cost reduction</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Always check vectorization first</em>.</li>
+<li>Use <em>apply</em> only when <em>vectorization is impossible</em>.</li>
+<li><em>Avoid axis=1</em>.</li>
+<li><em>Match dtypes</em>.</li>
+<li><em>Profile</em> to find the <em>real bottleneck</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I distinguish <em>vectorization</em> from <em>apply</em>.</li>
+<li>[ ] I use <em>np.where</em>.</li>
+<li>[ ] I use <em>map</em> for <em>code translation</em>.</li>
+<li>[ ] I avoid <em>axis=1 apply</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare <em>vectorized addition</em> vs <em>apply(axis=1)</em> with timing.</li>
+<li>Express a <em>3-tier condition</em> with <em>np.where</em>.</li>
+<li>Translate <em>country codes</em> to <em>country names</em> using <em>map</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Vectorization is the <em>essence of Pandas</em>. Next we cover a <em>real-world data analysis</em> example.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">groupby</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Merge and Join</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/08-time-series.md">Time Series</a></li>
+<li><strong>apply and Vectorization (current)</strong></li>
+<li>Real-world Data Analysis (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pandas.pydata.org/docs/user_guide/enhancingperf.html">pandas — Enhancing performance</a></li>
+<li><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.apply.html">pandas — apply</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/ufuncs.html">NumPy — Universal functions</a></li>
+<li><a href="https://realpython.com/fast-flexible-pandas/">Real Python — Fast, Flexible, Easy and Intuitive Pandas</a></li>
+</ul>
+<p class="tags-line">Tags: Pandas, Vectorization, Performance, Apply, Beginner</p>
+</body>
+</html>

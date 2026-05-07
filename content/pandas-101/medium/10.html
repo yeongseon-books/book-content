@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Real-world Data Analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Real-world Data Analysis</h1>
+<blockquote>
+<p>Pandas 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Can we tie everything we learned into <em>a single analysis flow</em>?</p>
+<blockquote>
+<p><em>Analysis is </em>load → clean → transform → aggregate → visualize<em> — </em>five steps<em>. We connect them all in one episode.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The standard <em>EDA workflow</em></li>
+<li>The value of <em>function-level separation</em></li>
+<li>Building <em>reproducible analysis</em></li>
+<li>A 5-step end-to-end run</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Knowing each tool separately is not the same as <em>producing a result</em>. <em>Pro analysts</em> are defined by their <em>connecting ability</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Load[&quot;load (read_csv)&quot;] --&gt; Clean[&quot;clean (dropna / dtype)&quot;]
+    Clean --&gt; Reshape[&quot;reshape (groupby / merge)&quot;]
+    Reshape --&gt; Agg[&quot;aggregate (KPI)&quot;]
+    Agg --&gt; Vis[&quot;visualize / report&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>EDA</strong>: <em>Exploratory Data Analysis</em>.</li>
+<li><strong>Pipeline</strong>: <em>ordered</em> transformation steps.</li>
+<li><strong>Reproducibility</strong>: <em>same input → same output</em>.</li>
+<li><strong>KPI</strong>: <em>key performance indicator</em>.</li>
+<li><strong>Notebook</strong>: an environment that records <em>analysis and outcome together</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"One big script"</em> — cannot rerun.</p>
+<p><strong>After</strong>: <em>"Function-level pipeline"</em> — <em>reproducible, testable, shareable</em>.</p>
+<h2>Hands-on: Going End-to-End in Five Steps</h2>
+<p><strong>Step 1 — Load</strong></p>
+<pre><code class="language-python">import pandas as pd
+
+def load(path):
+    return pd.read_csv(path, parse_dates=[&quot;date&quot;])
+
+df = load(&quot;sales.csv&quot;)
+print(df.shape)
+</code></pre>
+<p><strong>Step 2 — Clean</strong></p>
+<pre><code class="language-python">def clean(df):
+    df = df.dropna(subset=[&quot;sales&quot;])
+    df[&quot;sales&quot;] = df[&quot;sales&quot;].astype(float)
+    return df
+
+df = clean(df)
+</code></pre>
+<p><strong>Step 3 — Transform</strong></p>
+<pre><code class="language-python">def enrich(df):
+    df[&quot;month&quot;] = df[&quot;date&quot;].dt.to_period(&quot;M&quot;)
+    return df
+
+df = enrich(df)
+</code></pre>
+<p><strong>Step 4 — Aggregate (KPI)</strong></p>
+<pre><code class="language-python">def kpi(df):
+    return df.groupby(&quot;month&quot;).agg(
+        total=(&quot;sales&quot;, &quot;sum&quot;),
+        n=(&quot;sales&quot;, &quot;count&quot;),
+        mean=(&quot;sales&quot;, &quot;mean&quot;),
+    )
+
+monthly = kpi(df)
+print(monthly)
+</code></pre>
+<p><strong>Step 5 — Visualize</strong></p>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+monthly[&quot;total&quot;].plot(kind=&quot;bar&quot;, title=&quot;Monthly Sales&quot;)
+plt.tight_layout()
+plt.savefig(&quot;monthly.png&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Function-level separation</em> makes each step <em>independently testable</em>.</li>
+<li><em>parse_dates</em> is the start of <em>time series analysis</em>.</li>
+<li><em>plot</em> draws fast via <em>built-in Pandas plotting</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Putting <em>all steps</em> in <em>a single cell</em>.</strong></li>
+<li><strong>Not <em>saving intermediate results</em>.</strong></li>
+<li><strong>Not <em>documenting column names</em>.</strong></li>
+<li><strong>Concluding from tables only, <em>no visualization</em>.</strong></li>
+<li><strong>Ignoring <em>reproducibility</em> — no <em>seed or version pinning</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>KPI report automation, marketing analytics, ops dashboards — <em>analysis pipelines</em> become <em>reusable libraries</em>. Teams run <em>Jupyter notebooks</em> alongside <em>Python modules</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Split into <em>functions</em>.</li>
+<li>Add <em>docstrings</em> and <em>light tests</em> to each function.</li>
+<li><em>Diagram</em> the <em>raw → result</em> flow.</li>
+<li>Pair <em>visualization</em> with <em>numeric summary</em>.</li>
+<li><em>Record</em> seed, version, and timestamp.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I split <em>load/clean/enrich/kpi/visualize</em> into functions.</li>
+<li>[ ] I produce a <em>visualization</em> output.</li>
+<li>[ ] I document <em>column specs</em>.</li>
+<li>[ ] I confirm <em>reproducibility</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a <em>small project</em> with the four functions <em>load/clean/enrich/kpi</em>.</li>
+<li>Compute <em>monthly</em> and <em>weekly</em> KPIs <em>simultaneously</em>.</li>
+<li>Save the <em>result</em> as both <em>PNG and CSV</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>You have completed <em>Pandas 101</em>. Next stops: <em>Polars, Dask</em>, or <em>visualization (Matplotlib/Plotly)</em>, then <em>ML preprocessing (scikit-learn)</em>. Every road in data work <em>starts at Pandas</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">groupby</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Merge and Join</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/08-time-series.md">Time Series</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/09-apply-and-vectorization.md">apply and Vectorization</a></li>
+<li><strong>Real-world Data Analysis (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pandas.pydata.org/docs/user_guide/cookbook.html">pandas — Cookbook</a></li>
+<li><a href="https://pandas.pydata.org/docs/user_guide/visualization.html">pandas — Visualization</a></li>
+<li><a href="https://wesmckinney.com/book/">Wes McKinney — Python for Data Analysis</a></li>
+<li><a href="https://www.kaggle.com/learn/pandas">Kaggle — Pandas Course</a></li>
+</ul>
+<p class="tags-line">Tags: Pandas, DataAnalysis, EDA, Workflow, Beginner</p>
+</body>
+</html>

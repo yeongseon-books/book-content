@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reading CSV and Excel</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Reading CSV and Excel</h1>
+<blockquote>
+<p>Pandas 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>loading data well</em> really <em>half of the analysis</em>?</p>
+<blockquote>
+<p><em>Bad loading is </em>the start of bad analysis<em>. Get your read_csv options right from the beginning.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>core options</em> of <em>read_csv</em> and <em>read_excel</em></li>
+<li>Handling <em>encoding</em> and <em>separators</em></li>
+<li>The value of explicit <em>dtype</em></li>
+<li>A 5-step loading hands-on</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>80%</em> of analysis is <em>loading and cleaning</em>. <em>Mistakes at load time</em> come back as <em>debugging cost</em> later.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    File[&quot;CSV / Excel&quot;] --&gt; Read[&quot;read_csv / read_excel&quot;]
+    Read --&gt; Check[&quot;dtypes / shape / head&quot;]
+    Check --&gt; Fix[&quot;fix encoding / dtype / header&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>encoding</strong>: file's <em>character encoding</em> (utf-8, cp949, latin-1).</li>
+<li><strong>sep</strong>: <em>separator</em> — comma, tab, semicolon.</li>
+<li><strong>header</strong>: <em>header row position</em> — 0 by default, None for no header.</li>
+<li><strong>dtype</strong>: <em>explicit per-column type</em> — better memory and accuracy.</li>
+<li><strong>parse_dates</strong>: <em>auto-parse date columns</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"Just call read_csv"</em> — broken characters, numbers as strings.</p>
+<p><strong>After</strong>: <em>"Specify encoding, dtype, parse_dates"</em> — <em>data lands as intended</em>.</p>
+<h2>Hands-on: Five Loading Steps</h2>
+<p><strong>Step 1 — Basic read_csv</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.read_csv(&quot;sales.csv&quot;)
+print(df.shape, df.dtypes)
+</code></pre>
+<p><strong>Step 2 — Encoding and separator</strong></p>
+<pre><code class="language-python">df = pd.read_csv(&quot;data.csv&quot;, encoding=&quot;latin-1&quot;, sep=&quot;;&quot;)
+print(df.head())
+</code></pre>
+<p><strong>Step 3 — Explicit dtype</strong></p>
+<pre><code class="language-python">df = pd.read_csv(
+    &quot;sales.csv&quot;,
+    dtype={&quot;product_id&quot;: &quot;string&quot;, &quot;qty&quot;: &quot;int32&quot;},
+    parse_dates=[&quot;date&quot;],
+)
+print(df.dtypes)
+</code></pre>
+<p><strong>Step 4 — Read Excel</strong></p>
+<pre><code class="language-python">xls = pd.read_excel(&quot;report.xlsx&quot;, sheet_name=&quot;Q1&quot;, header=1)
+print(xls.head())
+</code></pre>
+<p><strong>Step 5 — Use chunksize for big files</strong></p>
+<pre><code class="language-python">total = 0
+for chunk in pd.read_csv(&quot;big.csv&quot;, chunksize=100_000):
+    total += len(chunk)
+print(total)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>encoding</em> is the <em>first trap</em> with non-ASCII data.</li>
+<li>Explicit <em>dtype</em> secures <em>memory</em> and <em>type safety</em>.</li>
+<li><em>chunksize</em> is the standard pattern to bypass <em>memory limits</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Skipping <em>encoding</em> and getting garbled text.</strong></li>
+<li><strong>Reading <em>ID columns</em> as numbers and <em>losing leading zeros</em>.</strong></li>
+<li><strong>Leaving <em>dates as strings</em> — never using <em>parse_dates</em>.</strong></li>
+<li><strong>Reading Excel files with <em>non-default header rows</em> unchanged.</strong></li>
+<li><strong>Skipping <em>sheet_name</em> and getting only the <em>first sheet</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>ERP CSV exports, accounting Excel files, CSV from external APIs — to <em>load reliably</em> you fix <em>5-10 options</em> into a <em>standard pattern</em>. Loading code becomes a <em>reusable module</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Put <em>loading code</em> in a <em>separate module</em>.</li>
+<li>Always specify <em>dtype</em> explicitly.</li>
+<li>Always review <em>parse_dates</em>.</li>
+<li>Guard memory with <em>chunksize</em>.</li>
+<li>Keep <em>original files</em> untouched.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I always specify <em>encoding</em>.</li>
+<li>[ ] I specify <em>dtype</em>.</li>
+<li>[ ] I review <em>parse_dates</em>.</li>
+<li>[ ] I specify <em>sheet_name</em> for Excel.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Read a <em>non-UTF-8</em> CSV and print the <em>dtypes</em>.</li>
+<li>Compare <em>dtype</em> with and without <em>parse_dates</em>.</li>
+<li>Write a function that counts rows using <em>chunksize</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good loading is the <em>start of good analysis</em>. Next we cover <em>filtering and selection</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
+<li><strong>Reading CSV and Excel (current)</strong></li>
+<li>Filtering and Selection (upcoming)</li>
+<li>Handling Missing Values (upcoming)</li>
+<li>groupby (upcoming)</li>
+<li>Merge and Join (upcoming)</li>
+<li>Time Series (upcoming)</li>
+<li>apply and Vectorization (upcoming)</li>
+<li>Real-world Data Analysis (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html">pandas — read_csv</a></li>
+<li><a href="https://pandas.pydata.org/docs/reference/api/pandas.read_excel.html">pandas — read_excel</a></li>
+<li><a href="https://pandas.pydata.org/docs/user_guide/io.html">pandas — IO tools</a></li>
+<li><a href="https://realpython.com/python-csv/">Real Python — Reading and Writing CSV Files</a></li>
+</ul>
+<p class="tags-line">Tags: Pandas, CSV, Excel, DataAnalysis, Beginner</p>
+</body>
+</html>
