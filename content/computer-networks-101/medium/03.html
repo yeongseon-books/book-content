@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TCP and UDP</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>TCP and UDP</h1>
+<blockquote>
+<p>Computer Networks 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Are TCP and UDP just a contrast of "reliable vs fast", or are they two designs that show two different ways to split responsibility?</p>
+<blockquote>
+<p>Both are transport-layer protocols on top of IP. TCP handles connection, order, retransmission, and flow and congestion control. UDP pushes all of that onto the application and just throws packets. There is no winner — there is only the right choice for a workload.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The four responsibilities of TCP (connection, order, retransmission, congestion control)</li>
+<li>What UDP intentionally does not do</li>
+<li>The 3-way handshake and 4-way close</li>
+<li>When to pick which one</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The transport-protocol choice directly affects system performance and user experience. Pick TCP for a game or a video call and one lost frame can stall the whole stream. Pick UDP for payment processing and transactions disappear. If you cannot answer "why this protocol?", system design becomes a cargo cult.</p>
+<blockquote>
+<p>Protocol choice is a tradeoff — what to guarantee and what to give up.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>TCP creates a virtual circuit between two hosts and guarantees data flows in order, with no loss, and not too fast. UDP places packets on top of IP one at a time, with no circuit. If reliability is needed, the application has to build it.</p>
+</blockquote>
+<pre><code class="language-text">TCP: handshake → stream → retransmit → flow control → close
+     &quot;if I do not know it arrived, I will resend&quot;
+UDP: just send()
+     &quot;I sent it. You check whether it arrived.&quot;
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>3-way handshake</strong><br>
+- Meaning: TCP connection setup with SYN, SYN-ACK, ACK</p>
+<p><strong>ACK</strong><br>
+- Meaning: Acknowledgement that data arrived</p>
+<p><strong>Retransmission</strong><br>
+- Meaning: Resending when no ACK comes back</p>
+<p><strong>Flow control</strong><br>
+- Meaning: Slow down the sender if the receiver cannot keep up</p>
+<p><strong>Congestion control</strong><br>
+- Meaning: Slow down the sender if the network is congested</p>
+<h2>Before / After</h2>
+<p><strong>Before — "TCP good, UDP risky":</strong></p>
+<pre><code class="language-text">TCP for everything
+</code></pre>
+<p><strong>After — "pick per workload":</strong></p>
+<pre><code class="language-text">Web / API / file transfer  → TCP (HTTP, HTTPS)
+DNS lookup                 → UDP (small and idempotent)
+Video calls / games        → UDP + custom reliability
+QUIC (HTTP/3)              → New reliability layer on top of UDP
+</code></pre>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: TCP echo server</strong></p>
+<pre><code class="language-python"># tcp_server.py
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('127.0.0.1', 5001)); s.listen()
+while True:
+    c, _ = s.accept()
+    data = c.recv(1024)
+    c.sendall(data); c.close()
+</code></pre>
+<pre><code class="language-python"># tcp_client.py
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(('127.0.0.1', 5001))
+s.sendall(b'hello tcp')
+print(s.recv(1024))   # b'hello tcp'
+</code></pre>
+<p><strong>Step 2: UDP echo server</strong></p>
+<pre><code class="language-python"># udp_server.py
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(('127.0.0.1', 5002))
+while True:
+    data, addr = s.recvfrom(1024)
+    s.sendto(data, addr)
+</code></pre>
+<pre><code class="language-python"># udp_client.py
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.sendto(b'hello udp', ('127.0.0.1', 5002))
+print(s.recvfrom(1024))   # (b'hello udp', ('127.0.0.1', 5002))
+</code></pre>
+<p>UDP has no <code>connect</code>, <code>listen</code>, or <code>accept</code>. You just send and receive.</p>
+<p><strong>Step 3: see the handshake with tcpdump</strong></p>
+<pre><code class="language-bash">sudo tcpdump -i lo -nn 'port 5001'
+# SYN → SYN-ACK → ACK → PSH+ACK(data) → ACK → FIN → FIN+ACK → ACK
+</code></pre>
+<p>UDP?</p>
+<pre><code class="language-bash">sudo tcpdump -i lo -nn 'port 5002'
+# UDP, length 9   (one line and done)
+</code></pre>
+<p><strong>Step 4: drop packets on purpose</strong></p>
+<pre><code class="language-python"># UDP packet-loss simulation
+import socket, random
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(('127.0.0.1', 5003))
+while True:
+    data, addr = s.recvfrom(1024)
+    if random.random() &lt; 0.3:
+        continue   # 30% drop
+    s.sendto(data, addr)
+</code></pre>
+<p>A drop in UDP is just a loss. TCP would have retransmitted automatically; UDP makes the application handle it.</p>
+<p><strong>Step 5: a tiny taste of building reliability</strong></p>
+<pre><code class="language-python"># Simple ACK + retransmit on top of UDP
+import socket, time
+
+def send_reliable(sock, data, addr, retries=3, timeout=0.5):
+    for _ in range(retries):
+        sock.sendto(data, addr)
+        sock.settimeout(timeout)
+        try:
+            ack, _ = sock.recvfrom(1024)
+            if ack == b'ACK':
+                return True
+        except socket.timeout:
+            continue
+    return False
+</code></pre>
+<p>QUIC, RTP, and game protocols are all sophisticated versions of this pattern.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>TCP is a stream abstraction (ordered, no boundaries). UDP is a datagram abstraction (boundaries, no order).</li>
+<li>TCP's <code>recv(1024)</code> does not always return exactly 1024 bytes (no message boundaries)</li>
+<li>UDP's <code>recvfrom</code> returns one datagram as a whole</li>
+<li>Reliability is not free — it costs handshakes, ACKs, and retransmissions</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Assuming TCP <code>recv</code> returns one message</strong><br>
+- Problem: Messages get split or merged<br>
+- Fix: Frame with length prefix or delimiter</p>
+<p><strong>Believing UDP always loses packets</strong><br>
+- Problem: Forces TCP onto real-time workloads<br>
+- Fix: Use UDP plus your own reliability</p>
+<p><strong>Generalizing TCP as "slow"</strong><br>
+- Problem: Misses HTTP/2 and HTTP/3 progress<br>
+- Fix: Measure actual RTT and throughput</p>
+<p><strong>Forgetting to close on both ends</strong><br>
+- Problem: TIME_WAIT and resource leaks<br>
+- Fix: Use <code>with</code> or try/finally</p>
+<p><strong>Ignoring congestion control</strong><br>
+- Problem: Low throughput or packet floods<br>
+- Fix: Understand TCP defaults (BBR, CUBIC)</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Web and APIs: HTTP / HTTPS over TCP, gradually moving to HTTP/3 (QUIC over UDP)</li>
+<li>DNS: UDP by default, falls back to TCP for large responses</li>
+<li>Video conferencing (Zoom, Meet): media on UDP (RTP), signaling on TCP</li>
+<li>Games: position and input on UDP, chat and payments on TCP</li>
+<li>Databases: almost always TCP for transactional integrity</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer does not treat "TCP vs UDP" as a holy war. Both are tools, and the right one depends on workload requirements — latency, loss tolerance, message size, security. They keep both protocols' cost models in their head — handshake RTT, retransmission timeouts, MTU and fragmentation — and weigh them at design time, not after an incident.</p>
+<p>QUIC matters to seniors. It came from the insight that TCP lives in the OS kernel and is hard to change, while reliability rebuilt on top of UDP can evolve much faster.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know TCP's four responsibilities</li>
+<li>[ ] I know what UDP intentionally does not do</li>
+<li>[ ] I can draw the 3-way handshake</li>
+<li>[ ] I can pick TCP or UDP per workload</li>
+<li>[ ] I know why HTTP/3 sits on UDP</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Capture a TCP close (4-way) with tcpdump and write down the order of FINs and ACKs.</p>
+</li>
+<li>
+<p>Extend the ACK + retransmit example with sequence numbers and add logic that drops duplicates.</p>
+</li>
+<li>
+<p>Answer in one paragraph: "Is my service TCP or UDP, and why?"</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>TCP and UDP ride on the same IP but show two different ways to split responsibility. TCP puts reliability in the operating system; UDP puts it in the application. The point is to choose by workload.</p>
+<p>Next we look at how the human-readable domain name turns into an IP address — DNS.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and Subnet</a></li>
+<li><strong>TCP and UDP (current)</strong></li>
+<li>DNS (upcoming)</li>
+<li>HTTP and HTTPS (upcoming)</li>
+<li>TLS basics (upcoming)</li>
+<li>Routing and NAT (upcoming)</li>
+<li>Load Balancer (upcoming)</li>
+<li>WebSocket and real-time (upcoming)</li>
+<li>Debugging network problems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc9293">RFC 9293 — Transmission Control Protocol</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc768">RFC 768 — User Datagram Protocol</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc9000">RFC 9000 — QUIC</a></li>
+<li><a href="https://beej.us/guide/bgnet/">Beej's Guide to Network Programming</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networking, TCP, UDP, Transport Layer, Reliability</p>
+</body>
+</html>

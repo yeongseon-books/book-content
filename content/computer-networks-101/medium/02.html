@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IP and Subnet</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>IP and Subnet</h1>
+<blockquote>
+<p>Computer Networks 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is an "IP address" just a number stuck on one computer, or is it a coordinate that also tells you which neighborhood the computer lives in?</p>
+<blockquote>
+<p>An IP address has to be read as two parts — which network, and which host inside that network. The subnet mask defines that split, and CIDR is the short way to write it. Routing, NAT, firewall rules, and container networks all run on top of this split.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between IPv4 and IPv6</li>
+<li>Subnet masks and CIDR notation</li>
+<li>How to calculate the network address, broadcast address, and number of usable hosts</li>
+<li>Private vs public IPs</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you memorize an IP address as "the number for one machine", routing, NAT, and firewalls look like magic. Every network device actually splits the IP into a network part and a host part and decides where to forward based only on the network part. If you cannot read a subnet, cloud VPCs, Kubernetes network policies, and corporate firewall rules all become guessing games.</p>
+<blockquote>
+<p>What a router sees is not the IP address but the network part of the IP address.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>An IP address is a 32-bit number (IPv4) or a 128-bit number (IPv6). The subnet mask is a ruler that says where the network part ends and the host part begins. CIDR (<code>/24</code>, <code>/16</code>, etc.) writes the length of that ruler in bits.</p>
+</blockquote>
+<pre><code class="language-text">IP        : 192.168.10.42
+CIDR      : 192.168.10.0/24
+mask      : 255.255.255.0
+network   : 192.168.10.0
+broadcast : 192.168.10.255
+hosts     : 192.168.10.1 ~ 192.168.10.254 (254 hosts)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>IPv4 / IPv6</strong><br>
+- Meaning: 32-bit / 128-bit address spaces</p>
+<p><strong>Subnet mask</strong><br>
+- Meaning: Bit pattern that separates network and host parts</p>
+<p><strong>CIDR</strong><br>
+- Meaning: Prefix-length notation like <code>192.168.10.0/24</code></p>
+<p><strong>Network address</strong><br>
+- Meaning: Address with all host bits set to 0</p>
+<p><strong>Broadcast address</strong><br>
+- Meaning: Address with all host bits set to 1 (IPv4)</p>
+<p><strong>Private IP</strong><br>
+- Meaning: Ranges that are not routed on the Internet (10/8, 172.16/12, 192.168/16)</p>
+<h2>Before / After</h2>
+<p><strong>Before — "an IP is just a number":</strong></p>
+<pre><code class="language-text">&quot;192.168.0.5 is my laptop's number&quot; — done.
+</code></pre>
+<p><strong>After — "an IP is network + host":</strong></p>
+<pre><code class="language-text">192.168.0.5/24
+└─ host 5 inside network 192.168.0.0/24
+nodes inside the same /24 talk directly without a router
+to reach a different network, packets must cross a router
+</code></pre>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: check your IP</strong></p>
+<pre><code class="language-bash">ip addr show       # Linux
+ifconfig           # macOS
+ipconfig           # Windows
+</code></pre>
+<p>A line like <code>inet 192.168.0.42/24</code> shows both the IP and the prefix.</p>
+<p><strong>Step 2: read the routing table</strong></p>
+<pre><code class="language-bash">ip route
+# default via 192.168.0.1 dev wlan0
+# 192.168.0.0/24 dev wlan0 proto kernel scope link src 192.168.0.42
+</code></pre>
+<p>Destinations in the same <code>/24</code> go directly. Everything else goes to the default gateway (192.168.0.1).</p>
+<p><strong>Step 3: subnet calculation in code</strong></p>
+<pre><code class="language-python">import ipaddress
+
+net = ipaddress.ip_network('192.168.10.0/24')
+print(net.network_address)   # 192.168.10.0
+print(net.broadcast_address) # 192.168.10.255
+print(net.num_addresses)     # 256
+print(list(net.hosts())[:3]) # [192.168.10.1, .2, .3]
+
+ip = ipaddress.ip_interface('192.168.10.42/24')
+print(ip.network)            # 192.168.10.0/24
+</code></pre>
+<p><strong>Step 4: same-subnet check</strong></p>
+<pre><code class="language-python">import ipaddress
+
+a = ipaddress.ip_address('192.168.10.42')
+b = ipaddress.ip_address('192.168.10.99')
+c = ipaddress.ip_address('192.168.20.1')
+net = ipaddress.ip_network('192.168.10.0/24')
+
+print(a in net, b in net, c in net)   # True True False
+</code></pre>
+<p>Same subnet means direct delivery. Otherwise the packet must cross a router.</p>
+<p><strong>Step 5: tell private from public</strong></p>
+<pre><code class="language-python">import ipaddress
+
+for s in ['10.0.0.5', '172.16.3.4', '192.168.1.1', '8.8.8.8']:
+    ip = ipaddress.ip_address(s)
+    print(s, 'private' if ip.is_private else 'public')
+</code></pre>
+<p>Devices in homes and offices mostly use private IPs and reach the Internet through NAT (episode 7).</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>ip_network</code> is per network, <code>ip_interface</code> is per host with "IP + prefix"</li>
+<li>Prefix length is not just a notation shortcut — it is the basic unit of routing</li>
+<li>Private vs public detection is a standard feature of <code>ipaddress</code></li>
+<li>"Same subnet?" is the same question as "no router needed?"</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Always assuming <code>/24</code></strong><br>
+- Problem: Collisions in VPCs and Kubernetes<br>
+- Fix: State the prefix length explicitly</p>
+<p><strong>Using network or broadcast address as a host</strong><br>
+- Problem: Communication fails<br>
+- Fix: Pick from <code>hosts()</code> only</p>
+<p><strong>Thinking private IPs are reachable from the Internet</strong><br>
+- Problem: Security and connectivity bugs<br>
+- Fix: Use NAT or assign a public IP</p>
+<p><strong>IPv4-only code</strong><br>
+- Problem: Fails on dual-stack environments<br>
+- Fix: Abstract through <code>ip_address</code></p>
+<p><strong>Treating subnets as just grouping</strong><br>
+- Problem: Ignores routing and security policy<br>
+- Fix: Subnets are the unit of routing</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>AWS VPC: a <code>/16</code> VPC split into multiple <code>/24</code> subnets per availability zone</li>
+<li>Kubernetes: separate prefixes for pod CIDR and service CIDR</li>
+<li>Firewalls: rules like "allow traffic from 10.0.0.0/8"</li>
+<li>VPNs: prefix planning to avoid collisions with other corporate networks</li>
+<li>Game servers: fast internal traffic between adjacent servers in the same subnet</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>Before designing new infrastructure, a senior engineer draws an "IP plan" first. Which prefix goes where, are there collisions with other corporate networks, and is there enough host capacity for the next N years? Prefix decisions are very hard to undo once they are baked in.</p>
+<p>A senior also looks at both endpoints' IPs, subnets, routing tables, and firewall rules first when someone asks "why doesn't this work?". The network topology has to be in your head before any application-level debugging.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know what <code>/24</code>, <code>/16</code>, and <code>/8</code> mean in CIDR</li>
+<li>[ ] I can compute network and broadcast addresses</li>
+<li>[ ] I can decide if two IPs are in the same subnet</li>
+<li>[ ] I know the private vs public ranges</li>
+<li>[ ] I draw an IP plan before drawing a new system</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Compute the network address, broadcast address, and number of usable hosts for <code>10.20.0.0/22</code>.</p>
+</li>
+<li>
+<p>Decide whether <code>172.16.5.10</code> and <code>172.16.5.130</code> are in the same <code>/25</code> subnet.</p>
+</li>
+<li>
+<p>Assume your company uses a <code>/16</code>. Draw a plan that gives each of five teams its own <code>/20</code>.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>An IP address is not the coordinate of one computer. It is "the Nth host of which network". Subnets and CIDR define that split, and routing, NAT, firewalls, and VPCs all run on top of it.</p>
+<p>Next we compare the two transport protocols that ride on top of IP — TCP and UDP.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
+<li><strong>IP and Subnet (current)</strong></li>
+<li>TCP and UDP (upcoming)</li>
+<li>DNS (upcoming)</li>
+<li>HTTP and HTTPS (upcoming)</li>
+<li>TLS basics (upcoming)</li>
+<li>Routing and NAT (upcoming)</li>
+<li>Load Balancer (upcoming)</li>
+<li>WebSocket and real-time (upcoming)</li>
+<li>Debugging network problems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc791">RFC 791 — Internet Protocol</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc4632">RFC 4632 — CIDR</a></li>
+<li><a href="https://docs.python.org/3/library/ipaddress.html">Python <code>ipaddress</code> module documentation</a></li>
+<li><a href="https://www.cloudflare.com/learning/dns/glossary/what-is-my-ip-address/">Cloudflare Learning — What is an IP address?</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networking, IP, Subnet, CIDR, Routing</p>
+</body>
+</html>

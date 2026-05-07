@@ -1,0 +1,71 @@
+id: computer-networks-101
+title:
+  ko: Computer Networks 101
+  en: Computer Networks 101
+description:
+  ko: IP, TCP, UDP, DNS, HTTP, TLS, 라우팅, 로드밸런서, WebSocket까지 인터넷 동작의 핵심을 정리하는 시리즈.
+  en: A foundational series on how the internet works — IP, TCP, UDP, DNS, HTTP, TLS, routing, load balancers, and WebSocket.
+status: content-ready
+category: cs-core
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-a-network
+    title:
+      ko: 네트워크란 무엇인가?
+      en: What Is a Network?
+  - number: 2
+    slug: ip-and-subnet
+    title:
+      ko: IP와 subnet
+      en: IP and Subnets
+  - number: 3
+    slug: tcp-and-udp
+    title:
+      ko: TCP와 UDP
+      en: TCP and UDP
+  - number: 4
+    slug: dns
+    title:
+      ko: DNS
+      en: DNS
+  - number: 5
+    slug: http-and-https
+    title:
+      ko: HTTP와 HTTPS
+      en: HTTP and HTTPS
+  - number: 6
+    slug: tls-basics
+    title:
+      ko: TLS 기초
+      en: TLS Basics
+  - number: 7
+    slug: routing-and-nat
+    title:
+      ko: 라우팅과 NAT
+      en: Routing and NAT
+  - number: 8
+    slug: load-balancer
+    title:
+      ko: Load Balancer
+      en: Load Balancer
+  - number: 9
+    slug: websocket-and-realtime
+    title:
+      ko: WebSocket과 실시간 통신
+      en: WebSocket and Real-time Communication
+  - number: 10
+    slug: debugging-network-problems
+    title:
+      ko: 네트워크 문제 디버깅
+      en: Debugging Network Problems

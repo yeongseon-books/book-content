@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Load Balancer</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Load Balancer</h1>
+<blockquote>
+<p>Computer Networks 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: With 100 servers behind one domain, how does the client always reach a "live and good enough" server?</p>
+<blockquote>
+<p>A load balancer hides many backends behind one virtual IP, distributes traffic, and removes dead servers. An L4 LB balances based on IP and port. An L7 LB understands HTTP and routes by path or header. Both are the front door of modern services and the first line of reliability.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between an L4 LB and an L7 LB</li>
+<li>Distribution algorithms (round-robin, least connections, hash)</li>
+<li>Health checks and graceful drain</li>
+<li>Sticky sessions and their cost</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A load balancer is more than a distributor — it is the device that decides reliability and deployment strategy. Blue-green deploys, canary releases, region failover, and autoscaling all happen on top of the LB. One wrong line in a health check sends traffic to a dead server or removes a healthy one entirely.</p>
+<blockquote>
+<p>A load balancer is not a tool for picking the "best" server. It is a tool for picking a "good enough, live" server quickly.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-text">client → LB (1 virtual IP) → [backend 1, 2, 3, ...]
+            ├─ health check (HTTP / TCP)
+            ├─ algorithm   (round-robin / least conn / hash)
+            └─ TLS terminate (optional)
+</code></pre>
+<p>An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.</p>
+<h2>Key Terms</h2>
+<p><strong>Virtual IP (VIP)</strong><br>
+- Meaning: The LB address that clients see</p>
+<p><strong>Health check</strong><br>
+- Meaning: Periodic check that the backend is alive</p>
+<p><strong>Round-robin</strong><br>
+- Meaning: Distribute in order</p>
+<p><strong>Least connections</strong><br>
+- Meaning: Send to the backend with the fewest current connections</p>
+<p><strong>Sticky session</strong><br>
+- Meaning: Same client always to the same backend (cookie or IP hash)</p>
+<h2>Before / After</h2>
+<p><strong>Before — "one server until it dies":</strong></p>
+<pre><code class="language-text">client → app1
+app1 dies → service down
+</code></pre>
+<p><strong>After — "many backends + LB":</strong></p>
+<pre><code class="language-text">client → LB → [app1, app2, app3]
+app1 dies → health check removes it, traffic flows to the rest
+</code></pre>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: bring up two backends</strong></p>
+<pre><code class="language-python"># backend.py — Flask
+from flask import Flask
+import os, sys
+name = sys.argv[1] if len(sys.argv) &gt; 1 else 'a'
+app = Flask(__name__)
+@app.get('/')
+def home(): return f'hello from {name}\n'
+@app.get('/health')
+def health(): return 'ok', 200
+if __name__ == '__main__':
+    app.run(port=int(os.environ.get('PORT', 9001)))
+</code></pre>
+<pre><code class="language-bash">PORT=9001 python backend.py app1 &amp;
+PORT=9002 python backend.py app2 &amp;
+</code></pre>
+<p><strong>Step 2: an L7 LB with nginx</strong></p>
+<pre><code class="language-nginx"># nginx.conf (snippet)
+upstream backend {
+    server 127.0.0.1:9001;
+    server 127.0.0.1:9002;
+}
+server {
+    listen 8080;
+    location / {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+    }
+}
+</code></pre>
+<pre><code class="language-bash">nginx -c $(pwd)/nginx.conf
+for i in 1 2 3 4; do curl -s localhost:8080/; done
+# hello from app1
+# hello from app2
+# hello from app1
+# hello from app2
+</code></pre>
+<p>The default is round-robin.</p>
+<p><strong>Step 3: add a health check</strong></p>
+<pre><code class="language-nginx">upstream backend {
+    server 127.0.0.1:9001 max_fails=2 fail_timeout=10s;
+    server 127.0.0.1:9002 max_fails=2 fail_timeout=10s;
+}
+</code></pre>
+<p>If <code>/health</code> keeps failing, nginx pauses traffic to that backend for a while. For richer active health checks, use nginx Plus, envoy, or HAProxy.</p>
+<p><strong>Step 4: change the algorithm</strong></p>
+<pre><code class="language-nginx">upstream backend {
+    least_conn;
+    server 127.0.0.1:9001;
+    server 127.0.0.1:9002;
+}
+</code></pre>
+<p>When request times vary, least connections lowers average latency.</p>
+<p><strong>Step 5: sticky session</strong></p>
+<pre><code class="language-nginx">upstream backend {
+    ip_hash;
+    server 127.0.0.1:9001;
+    server 127.0.0.1:9002;
+}
+</code></pre>
+<p><code>ip_hash</code> sends the same client IP to the same backend. It is a temporary fix when sessions live in memory; the right answer is to make the service stateless.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The value of an LB is in health checks and deployment strategy, not just distribution</li>
+<li>L4 (TCP) is fast but blind to HTTP. L7 enables routing, retries, and header manipulation</li>
+<li>Sticky sessions are an easy patch that block free scaling</li>
+<li>Where TLS terminates (LB or backend) affects security and operations</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Health check too simple (<code>/</code>)</strong><br>
+- Problem: Misses partial failures<br>
+- Fix: <code>/health</code> that exercises real dependencies</p>
+<p><strong>Health-check interval too long</strong><br>
+- Problem: Dead server stays in rotation<br>
+- Fix: 1–5 second intervals + short fail timeout</p>
+<p><strong>Killing without graceful drain</strong><br>
+- Problem: In-flight requests dropped<br>
+- Fix: SIGTERM → fail health check → drain → kill</p>
+<p><strong>Sticky sessions everywhere</strong><br>
+- Problem: Hard to scale and deploy<br>
+- Fix: Move sessions to Redis or JWT</p>
+<p><strong>Trusting only L7</strong><br>
+- Problem: Bad fit for non-HTTP / low-latency workloads<br>
+- Fix: Use L4 or specialized LBs</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Cloud: AWS ALB (L7) / NLB (L4), GCP HTTP(S) LB</li>
+<li>Internal microservices: envoy / Istio sidecars</li>
+<li>Proxy + cache: nginx, HAProxy, Caddy</li>
+<li>Databases: pgbouncer, ProxySQL as specialized LBs</li>
+<li>Global traffic: anycast plus DNS-based GeoLB</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer treats the LB as the first line of service stability, not just a distributor. The first thing they sketch for a new service is the LB's health check and deployment sequence. Patterns like canary, blue-green, and weighted routing become possible or impossible depending on a single LB setting.</p>
+<p>A senior also accepts the LB's limits. To prevent the LB itself from being a single point of failure, they make it redundant (active-active or active-standby) and combine higher-layer mechanisms like DNS round-robin and anycast.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the difference between L4 and L7</li>
+<li>[ ] I can design a health-check policy</li>
+<li>[ ] I know the cost of sticky sessions</li>
+<li>[ ] I know the graceful drain procedure</li>
+<li>[ ] I plan for LB redundancy</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Extend the nginx example, kill one backend, and observe how the health check shifts traffic.</p>
+</li>
+<li>
+<p>Sketch a canary deployment scenario. How must the LB change to send only 5% to a new version?</p>
+</li>
+<li>
+<p>Explain in one paragraph: "Why should sticky sessions be avoided when possible?"</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A load balancer does the simple job of "hide many servers behind one address and pick a live one" in many variations. Health checks, deployment strategy, sticky-session cost, and TLS termination location — these four levers move reliability the most.</p>
+<p>Next we move from request/response to bidirectional streams — WebSocket and real-time communication.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and Subnet</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">TCP and UDP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">DNS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/05-http-and-https.md">HTTP and HTTPS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/06-tls-basics.md">TLS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/07-routing-and-nat.md">Routing and NAT</a></li>
+<li><strong>Load Balancer (current)</strong></li>
+<li>WebSocket and real-time (upcoming)</li>
+<li>Debugging network problems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/">NGINX HTTP Load Balancing</a></li>
+<li><a href="https://docs.haproxy.org/">HAProxy Documentation</a></li>
+<li><a href="https://www.envoyproxy.io/docs">Envoy Proxy Docs</a></li>
+<li><a href="https://docs.aws.amazon.com/elasticloadbalancing/">AWS ELB User Guide</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networking, Load Balancer, L4, L7, Health Check</p>
+</body>
+</html>

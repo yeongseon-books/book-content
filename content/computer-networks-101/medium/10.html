@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Debugging Network Problems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Debugging Network Problems</h1>
+<blockquote>
+<p>Computer Networks 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When the report is "the site is broken," what do you check first, and in what order, to find the cause as quickly as possible?</p>
+<blockquote>
+<p>Network debugging is not guesswork. It is <strong>walking down the layers and killing hypotheses one at a time</strong>. Link → routing → DNS → TCP → TLS → HTTP. Five short commands usually decide which layer owns the problem within a minute. A good tool is one that quickly invalidates a wrong hypothesis, not one that gives you more output to stare at.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A layer-by-layer approach to narrowing a network problem</li>
+<li>What <code>ping</code>, <code>dig</code>, <code>curl</code>, <code>ss</code>, and <code>tcpdump</code> actually tell you</li>
+<li>How to distinguish common failure shapes — timeout vs reset vs DNS failure</li>
+<li>How everything from this series comes together when something breaks</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Under pressure, the first instinct is "what did we just change?" That is necessary but not enough. Without knowing where the path breaks, code changes are guesses. The habit of confirming "this layer is fine" one step at a time is what lets you stay calm at 3 a.m.</p>
+<blockquote>
+<p>Debugging is less about finding what is broken and more about <strong>confirming, one layer at a time, what is fine</strong>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart TB
+    A[&quot;User: the site is down&quot;] --&gt; B[&quot;1. Link/path: ping, traceroute&quot;]
+    B --&gt; C[&quot;2. Name resolution: dig&quot;]
+    C --&gt; D[&quot;3. TCP connect: nc, ss&quot;]
+    D --&gt; E[&quot;4. TLS: openssl s_client&quot;]
+    E --&gt; F[&quot;5. HTTP: curl -v&quot;]
+    F --&gt; G[&quot;6. Packets: tcpdump&quot;]
+</code></pre>
+<p>Each step you confirm as healthy cuts the hypothesis space roughly in half.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>ICMP</strong>: The diagnostic IP protocol used by <code>ping</code> and <code>traceroute</code>.</li>
+<li><strong>RTT (Round Trip Time)</strong>: How long a packet takes to reach the destination and come back.</li>
+<li><strong>Connection refused</strong>: The host is alive but no process is listening on that port.</li>
+<li><strong>RST</strong>: A TCP signal meaning "drop this connection now." Often sent by firewalls.</li>
+<li><strong>Capture filter</strong>: The BPF expression you give <code>tcpdump</code> so it captures only the packets you care about.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — guess-driven debugging</strong></p>
+<pre><code class="language-text">service is down
+→ check recent commits
+→ reinstall the suspicious library
+→ restart the server
+→ still down
+→ one hour gone
+</code></pre>
+<p>Touching things you suspect, with no idea where the break is, only fixes problems by luck.</p>
+<p><strong>After — narrow by layer</strong></p>
+<pre><code class="language-bash"># 1) Is the host alive? (link / path)
+ping -c 3 api.example.com
+
+# 2) Does the name resolve? (DNS)
+dig +short api.example.com
+
+# 3) Is the port open? (TCP)
+nc -vz api.example.com 443
+
+# 4) Does the TLS handshake complete? (TLS)
+openssl s_client -connect api.example.com:443 -servername api.example.com &lt;/dev/null
+
+# 5) What does HTTP return? (HTTP)
+curl -v https://api.example.com/health
+</code></pre>
+<p>Each line kills or supports the next hypothesis. Five lines decide most cases.</p>
+<h2>Hands-on: Trace a Single Request End to End in Five Steps</h2>
+<p><strong>Step 1 — Link and path</strong></p>
+<pre><code class="language-bash">ping -c 3 api.example.com
+traceroute api.example.com   # or mtr api.example.com
+</code></pre>
+<p>100% loss usually means the host is dead or ICMP is blocked. Partial loss hints at congestion somewhere on the path; <code>traceroute</code> shows which hop. Remember that ICMP can be blocked even when the host is healthy, so a <code>ping</code> failure alone is never proof.</p>
+<p><strong>Step 2 — DNS</strong></p>
+<pre><code class="language-bash">dig +short api.example.com
+# 1.2.3.4
+
+dig +trace api.example.com   # walks the delegation chain
+</code></pre>
+<p>If this returns nothing, do not bother going lower. Suspect <code>/etc/resolv.conf</code>, your corporate DNS resolver, or the authoritative records — not your application.</p>
+<p><strong>Step 3 — TCP</strong></p>
+<pre><code class="language-bash">nc -vz api.example.com 443
+# Connection to api.example.com port 443 [tcp/https] succeeded!
+</code></pre>
+<p>Distinguish three outcomes carefully:</p>
+<ul>
+<li><strong>succeeded</strong>: The port is open and the SYN/SYN-ACK exchange completed. Move to the next layer.</li>
+<li><strong>Connection refused</strong>: The host is up but no process is listening. The service is down or you are using the wrong port.</li>
+<li><strong>timeout</strong>: No response to SYN. Almost always a firewall silently dropping packets.</li>
+</ul>
+<p>On the server side, confirm what is actually listening:</p>
+<pre><code class="language-bash">ss -tlnp | grep :443
+# LISTEN 0 511 0.0.0.0:443  users:((&quot;nginx&quot;,pid=1234,fd=6))
+</code></pre>
+<p><strong>Step 4 — TLS handshake</strong></p>
+<pre><code class="language-bash">openssl s_client -connect api.example.com:443 \
+                 -servername api.example.com &lt;/dev/null
+</code></pre>
+<p>The crucial flag is <code>-servername</code> (SNI). Without it, the virtual host can return the wrong certificate and mask the real issue. Look for <code>Verify return code: 0 (ok)</code>. Anything else points to expired, mis-chained, or wrong-name certificates.</p>
+<p><strong>Step 5 — HTTP, with human eyes</strong></p>
+<pre><code class="language-bash">curl -v https://api.example.com/health
+</code></pre>
+<p><code>-v</code> is the point. It shows DNS, TCP connect, TLS negotiation, request headers, and response headers in one go. If you reach a 4xx or 5xx response, the problem is no longer the network — it is the application. If everything looks healthy here, suspicion shifts to the client environment.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Each tool eliminates a different hypothesis: <code>ping</code> for link, <code>dig</code> for name, <code>nc</code> for port, <code>openssl</code> for cert, <code>curl</code> for application behavior.</li>
+<li>The work is to <strong>make tool output confirm "fine here"</strong> instead of trusting your gut.</li>
+<li>Many cloud security groups block ICMP. A failing <code>ping</code> is not proof the host is down — fall back to <code>nc</code> or <code>curl</code>.</li>
+<li>A single <code>curl -v</code> covers most of steps 1 through 5. People forget that.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Skipping DNS.</strong> "Nothing changed in our code but it broke" is very often DNS — TTL expiry, cache, recent record change. Suspect it first.</li>
+<li><strong>Treating timeout and refused as the same.</strong> Refused is strong evidence the host is up; timeout almost always points at a firewall. Your next action is completely different.</li>
+<li><strong>Forgetting <code>-servername</code> with <code>openssl s_client</code>.</strong> Without SNI you can fetch the wrong certificate and chase a fake error.</li>
+<li><strong>Reaching for tcpdump first.</strong> It is a great tool, but a capture without a hypothesis is just a big file. Use the five steps above first; bring out tcpdump when you are stuck.</li>
+<li><strong>Calling a restart a fix.</strong> If a restart hid the symptom, it will return next week. Write down the hypothesis you actually validated.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>In incident response, two engineers usually move in parallel: one runs the five steps from outside as a user; the other looks from inside with <code>ss</code>, logs, and <code>tcpdump</code>. They sync every few minutes and merge what each saw to narrow the hypothesis.</p>
+<p><code>tcpdump</code> is the last weapon. Reach for it when you genuinely need to know "is the packet even arriving?" Always restrict it with a capture filter, or your disk fills up fast.</p>
+<pre><code class="language-bash">sudo tcpdump -i eth0 -n -s 0 'host api.example.com and tcp port 443' -w cap.pcap
+</code></pre>
+<p>Open the resulting <code>cap.pcap</code> in Wireshark. Retransmits suggest path loss; RSTs suggest a firewall or a hard server-side reject; clean FINs suggest a normal close. The TCP states and TLS handshake details from earlier in this series are exactly what you read with.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They write the hypothesis first and use tools to kill it. They do not start with a tool and then invent a story.</li>
+<li>They debug from two viewpoints — client and server — at the same time.</li>
+<li>They distrust "a restart fixed it." They assume they will see the same symptom again next week.</li>
+<li>They memorize the five-step command set so 3 a.m. them does not have to search.</li>
+<li>They leave a short post-mortem after every incident. The next person owes them five minutes back.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Did you confirm the host is alive (<code>ping</code>, or <code>nc</code> if ICMP is blocked)?</li>
+<li>[ ] Did you confirm DNS resolves (<code>dig +short</code>)?</li>
+<li>[ ] Did you confirm TCP can connect (<code>nc -vz</code>)?</li>
+<li>[ ] Did you confirm the TLS handshake (<code>openssl s_client -servername</code>)?</li>
+<li>[ ] Did you look at the HTTP response yourself (<code>curl -v</code>)?</li>
+<li>[ ] Did you defer <code>tcpdump</code> until simpler tools ran out?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Give a one-line next action for each case: <code>nc -vz host port</code> returns "Connection refused"; <code>nc -vz host port</code> returns "timeout."</li>
+<li>A user reports that the site "suddenly stopped working." Write the five commands you will run, in order, and what each output must look like for you to move on.</li>
+<li>Write a <code>tcpdump</code> command that captures only traffic to and from <code>api.example.com</code> on port 443 and writes it to <code>cap.pcap</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Network debugging is, in the end, <strong>walking the layers and killing hypotheses</strong>. Five lines — <code>ping</code>, <code>dig</code>, <code>nc</code>, <code>openssl s_client</code>, <code>curl -v</code> — usually decide where the problem lives within a minute. Only when those run out do you reach for <code>tcpdump</code>.</p>
+<p>That closes Computer Networks 101. From "what is a network" through IP, TCP, DNS, HTTP, TLS, routing, load balancers, WebSocket, and now debugging — you have walked one full loop of what happens when you load a web page. The next time a pager fires at 3 a.m., I hope the first five commands come out without thinking.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What is a network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and subnets</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">TCP and UDP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">DNS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/05-http-and-https.md">HTTP and HTTPS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/06-tls-basics.md">TLS basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/07-routing-and-nat.md">Routing and NAT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/08-load-balancer.md">Load Balancer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/09-websocket-and-realtime.md">WebSocket and Real-Time Communication</a></li>
+<li><strong>Debugging Network Problems (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.tcpdump.org/manpages/tcpdump.1.html">tcpdump Manual</a></li>
+<li><a href="https://www.wireshark.org/docs/wsug_html_chunked/">Wireshark User's Guide</a></li>
+<li><a href="https://man7.org/linux/man-pages/man8/ss.8.html"><code>ss(8)</code> Linux Manual</a></li>
+<li><a href="https://wizardzines.com/zines/networking/">Julia Evans — Networking debugging zines</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networking, Debugging, tcpdump, Troubleshooting, Diagnostics</p>
+</body>
+</html>
