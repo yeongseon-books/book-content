@@ -194,6 +194,1108 @@ series:
   status: draft
   path: content/python-101
 
+- id: computer-science-101
+  category: programming
+  title:
+    ko: Computer Science 101
+    en: Computer Science 101
+  description:
+    ko: 컴퓨터공학 전공에서 배우는 주요 과목들이 서로 어떻게 연결되는지 보여주는 입문 시리즈.
+    en: An introductory series showing how major computer science subjects connect to each other.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/computer-science-101
+
+- id: discrete-math-101
+  category: cs-core
+  title:
+    ko: Discrete Math 101
+    en: Discrete Math 101
+  description:
+    ko: 명제, 집합, 함수, 증명, 조합, 그래프 등 컴퓨터공학에 직접 쓰이는 이산수학을 정리하는 시리즈.
+    en: An introductory series on discrete mathematics for computer science covering propositions, sets, functions, proofs, combinatorics, and graphs.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/discrete-math-101
+
+- id: data-structures-101
+  category: cs-core
+  title:
+    ko: Data Structures 101
+    en: Data Structures 101
+  description:
+    ko: 배열, 리스트, 스택, 큐, 해시, 트리, 힙, 그래프까지 자료구조의 큰 그림과 선택 기준을 다루는 시리즈.
+    en: An introductory series covering arrays, lists, stacks, queues, hash tables, trees, heaps, graphs, and how to choose the right data structure.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/data-structures-101
+
+
+- id: algorithms-101
+  category: cs-core
+  title:
+    ko: Algorithms 101
+    en: Algorithms 101
+  description:
+    ko: 복잡도, 탐색, 정렬, 분할 정복, DP, 그리디, 그래프 알고리즘까지 알고리즘 설계 패턴을 배우는 시리즈.
+    en: An introductory series on algorithm design covering complexity, search, sorting, divide and conquer, dynamic programming, greedy, and graph algorithms.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/algorithms-101
+
+
+- id: computer-architecture-101
+  category: cs-core
+  title:
+    ko: Computer Architecture 101
+    en: Computer Architecture 101
+  description:
+    ko: 데이터 표현, CPU와 명령어, 레지스터, 메모리 계층, 캐시, 파이프라인, 멀티코어까지 컴퓨터가 코드를 실행하는 방식을 처음 배우는 시리즈.
+    en: An introductory series on how computers execute code, covering data representation, CPU and instructions, registers, memory hierarchy, caches, pipelining, and multicore.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/computer-architecture-101
+
+
+- id: operating-systems-101
+  category: cs-core
+  title:
+    ko: Operating Systems 101
+    en: Operating Systems 101
+  description:
+    ko: 프로세스, 스레드, 스케줄링, 동시성, 메모리 관리, 가상 메모리, 파일 시스템, 시스템 콜, 컨테이너까지 운영체제의 기본 개념을 다지는 시리즈.
+    en: A foundational series on operating systems covering processes, threads, scheduling, concurrency, memory management, virtual memory, file systems, system calls, and containers.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/operating-systems-101
+
+
+- id: computer-networks-101
+  category: cs-core
+  title:
+    ko: Computer Networks 101
+    en: Computer Networks 101
+  description:
+    ko: IP, TCP, UDP, DNS, HTTP, TLS, 라우팅, 로드밸런서, WebSocket까지 인터넷 동작의 핵심을 정리하는 시리즈.
+    en: A foundational series on how the internet works — IP, TCP, UDP, DNS, HTTP, TLS, routing, load balancers, and WebSocket.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/computer-networks-101
+
+- id: database-systems-101
+  category: cs-core
+  title:
+    ko: Database Systems 101
+    en: Database Systems 101
+  description:
+    ko: 관계형 모델, SQL, 인덱스, 트랜잭션, isolation, 정규화, 쿼리 최적화, 복제까지 DBMS의 핵심을 다루는 시리즈.
+    en: A foundational series on relational databases — model, SQL, indexes, transactions, isolation, normalization, query optimization, and replication.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/database-systems-101
+
+- id: programming-languages-101
+  category: cs-core
+  title:
+    ko: Programming Languages 101
+    en: Programming Languages 101
+  description:
+    ko: syntax, semantics, type system, scope, closure, memory model, interpreter/compiler 차이까지 PL 기초를 다지는 시리즈.
+    en: A foundational series on programming languages — syntax, semantics, type systems, scope, closures, memory model, and the interpreter vs compiler distinction.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/programming-languages-101
+
+- id: compilers-101
+  category: cs-core
+  title:
+    ko: Compilers 101
+    en: Compilers 101
+  description:
+    ko: lexer, parser, AST, semantic analysis, IR, optimization, code generation까지 컴파일러 파이프라인을 처음 배우는 시리즈.
+    en: A first walk through the compiler pipeline — lexer, parser, AST, semantic analysis, IR, optimization, and code generation.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/compilers-101
+
+- id: distributed-systems-101
+  category: cs-core
+  title:
+    ko: Distributed Systems 101
+    en: Distributed Systems 101
+  description:
+    ko: failure model, consistency, replication, consensus, message queue까지 분산 시스템의 핵심 개념을 처음 배우는 시리즈.
+    en: A first walk through distributed systems — failure models, consistency, replication, consensus, leader election, and messaging.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/distributed-systems-101
+
+- id: incident-response-101
+  category: software-engineering
+  title:
+    ko: Incident Response 101
+    en: Incident Response 101
+  description:
+    ko: Severity 분류, 초기 대응, 커뮤니케이션, 타임라인, RCA, 완화, 포스트모템, 재발 방지, 런북 작성까지 다루는 입문 시리즈.
+    en: An entry series covering severity, initial response, communication, timelines, RCA, mitigation, postmortems, prevention, and runbooks.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/incident-response-101
+
+- id: information-security-101
+  category: cs-core
+  title:
+    ko: Information Security 101
+    en: Information Security 101
+  description:
+    ko: 인증, 인가, 암호화, TLS, 웹 보안, secret 관리, 권한 최소화, 감사 로그까지 개발자 수준의 보안 기본을 다루는 시리즈.
+    en: Developer-level security basics - authentication, authorization, cryptography, TLS, web security, secrets, least privilege, and audit logs.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/information-security-101
+
+- id: math-for-cs-101
+  category: cs-core
+  title:
+    ko: Math for CS 101
+    en: Math for CS 101
+  description:
+    ko: 논리, 증명, 집합, 함수, 그래프, 조합, 확률, 선형대수, 미분, 정보이론까지 CS와 ML의 수학을 한 번에 정리하는 입문 시리즈.
+    en: An entry series covering the math behind CS and ML - logic, proofs, sets, functions, graphs, combinatorics, probability, linear algebra, calculus, and information theory.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/math-for-cs-101
+
+- id: calculus-for-ml-101
+  category: cs-core
+  title:
+    ko: Calculus for ML 101
+    en: Calculus for ML 101
+  description:
+    ko: 함수, 기울기, 편미분, gradient, chain rule, 손실, 경사하강, backprop 직관까지 ML에 필요한 미분을 다지는 입문 시리즈.
+    en: An entry series covering functions, slopes, partial derivatives, gradients, chain rule, loss, gradient descent, and backprop intuition for ML.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/calculus-for-ml-101
+
+- id: computer-science-major-101
+  category: cs-core
+  title:
+    ko: 컴퓨터학과 전공 학습 가이드 101
+    en: Computer Science Major 101
+  description:
+    ko: 컴퓨터학과 전공 과목 구성, 핵심 영역, 학습 순서, 졸업 전 역량까지 정리한 입문 시리즈.
+    en: An introductory series on computer science major curriculum, core areas, study order, and graduation skills.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/computer-science-major-101
+
+- id: capstone-project-101
+  category: software-engineering
+  title:
+    ko: 측스톤 프로젝트 101
+    en: Capstone Project 101
+  description:
+    ko: 주제 선정, 문제 정의, MVP, 팀 역할, 발표, 회고까지 측스톤 전체 흐름을 다룬 입문 시리즈.
+    en: An introductory series covering the full capstone flow — topic, problem, MVP, team roles, demo, and retrospective.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/capstone-project-101
+
+- id: portfolio-project-101
+  category: software-engineering
+  title:
+    ko: 포트폴리오 프로젝트 101
+    en: Portfolio Project 101
+  description:
+    ko: 프로젝트 선정, README, 데모, 배포, 테스트, 의사결정 기록, 블로그, 면접 설명까지 다루는 입문 포트폴리오 시리즈.
+    en: An introductory portfolio series covering project selection, README, demo, deploy, tests, decisions, blog, and interviews.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/portfolio-project-101
+
+- id: open-source-101
+  category: software-engineering
+  title:
+    ko: 오픈소스 101
+    en: Open Source 101
+  description:
+    ko: 라이선스부터 첫 오픈소스 프로젝트까지, 오픈소스 기여의 기본을 다지는 시리즈.
+    en: An entry series covering open source contribution from licenses to your first project.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/open-source-101
+- id: developer-career-101
+  category: software-engineering
+  title:
+    ko: Developer Career 101
+    en: Developer Career 101
+  description:
+    ko: 개발자 커리어를 설계하는 법.
+    en: How to design a developer career.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/developer-career-101
+- id: data-science-career-101
+  category: software-engineering
+  title:
+    ko: Data Science Career 101
+    en: Data Science Career 101
+  description:
+    ko: 데이터 직무 커리어를 설계하는 법.
+    en: How to design a data science career.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/data-science-career-101
+- id: software-engineering-101
+  category: software-engineering
+  title:
+    ko: Software Engineering 101
+    en: Software Engineering 101
+  description:
+    ko: 요구사항, 설계, 코드 리뷰, 테스트, 버전 관리, 문서화, 협업, 유지보수까지 소프트웨어 엔지니어링의 큰 그림을 다지는 시리즈.
+    en: The big picture of software engineering — requirements, design, code review, testing, version control, documentation, collaboration, and maintenance.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/software-engineering-101
+
+- id: clean-code-101
+  category: software-engineering
+  title:
+    ko: Clean Code 101
+    en: Clean Code 101
+  description:
+    ko: 이름 짓기, 함수 분리, 조건문 단순화, 중복 제거, 오류 처리부터 리팩토링 기초까지 읽기 쉬운 코드를 쓰는 법을 다지는 시리즈.
+    en: Naming, small functions, simplifying conditionals, removing duplication, error handling, and refactoring fundamentals — practical Clean Code in ten essays.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/clean-code-101
+
+- id: software-design-101
+  category: software-engineering
+  title:
+    ko: Software Design 101
+    en: Software Design 101
+  description:
+    ko: 관심사 분리, 모듈 경계, 의존성 방향, 인터페이스 설계, 계층 아키텍처를 통해 변경에 강한 코드를 설계하는 법을 다지는 시리즈.
+    en: Separation of concerns, module boundaries, dependency direction, interface design, and layered architecture — designing code that is easy to change.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/software-design-101
+
+- id: design-patterns-101
+  category: software-engineering
+  title:
+    ko: Design Patterns 101
+    en: Design Patterns 101
+  description:
+    ko: GoF 디자인 패턴을 Python 예시로 빠르게 훑고, 언제 쓰고 언제 피해야 할지 감을 잡는 시리즈.
+    en: A fast tour of the GoF design patterns in Python, with a clear sense of when to use them and when to avoid them.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/design-patterns-101
+
+- id: api-design-101
+  category: software-engineering
+  title:
+    ko: API Design 101
+    en: API Design 101
+  description:
+    ko: REST 기본부터 리소스 설계, HTTP method/status, schema, pagination, error, OpenAPI까지 쓰기 좋은 API를 설계하는 시리즈.
+    en: A practical tour of API design — REST basics, resources, HTTP methods/status, schemas, pagination, errors, and OpenAPI.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/api-design-101
+
+
+- id: web-development-101
+  category: software-engineering
+  title:
+    ko: Web Development 101
+    en: Web Development 101
+  description:
+    ko: HTML/CSS/JS, 브라우저, HTTP, 프론트/백엔드, 인증, DB, 배포까지 웹 개발 전체 흐름을 한 번에 보는 시리즈.
+    en: A whole-picture tour of web development — HTML/CSS/JS, the browser, HTTP, frontend and backend, auth, databases, and deployment.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/web-development-101
+
+
+- id: backend-development-101
+  category: software-engineering
+  title:
+    ko: Backend Development 101
+    en: Backend Development 101
+  description:
+    ko: HTTP 서버/라우팅/서비스/DB layer/인증/로깅/테스트/배포까지 백엔드 개발 전체 흐름을 다루는 시리즈.
+    en: An end-to-end tour of backend development — HTTP servers, routing, service and DB layers, auth, logging, testing, and deployment.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/backend-development-101
+
+- id: frontend-development-101
+  category: software-engineering
+  title:
+    ko: Frontend Development 101
+    en: Frontend Development 101
+  description:
+    ko: HTML/CSS, JavaScript, 컴포넌트, 라우팅, API 호출, 빌드까지 현대 프론트엔드 개발 전체 흐름을 다루는 시리즈.
+    en: An end-to-end tour of modern frontend development — HTML/CSS, JavaScript, components, routing, API calls, and bundling.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/frontend-development-101
+
+- id: testing-101
+  category: software-engineering
+  title:
+    ko: Testing 101
+    en: Testing 101
+  description:
+    ko: Unit, Integration, E2E, Test Double, Mock, Coverage, CI 연동까지 테스트 전략 전반을 다루는 시리즈.
+    en: A complete tour of testing strategy — unit, integration, E2E, test doubles, mocks, coverage, and CI.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/testing-101
+
+- id: devops-101
+  category: software-engineering
+  title:
+    ko: DevOps 101
+    en: DevOps 101
+  description:
+    ko: CI/CD, IaC, 환경 관리, 모니터링, 배포 전략, on-call까지 DevOps 입문 전반을 다루는 시리즈.
+    en: A DevOps starter — CI/CD, IaC, environment management, monitoring, deployment strategy, and on-call basics.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/devops-101
+
+- id: github-actions-101
+  category: software-engineering
+  title:
+    ko: GitHub Actions 101
+    en: GitHub Actions 101
+  description:
+    ko: Workflow, Job, Trigger, 테스트 자동화, 빌드 아티팩트, 배포, secret 관리까지 GitHub Actions 전반을 다루는 시리즈.
+    en: Workflows, jobs, triggers, test automation, build artifacts, deployment, and secrets — a complete GitHub Actions starter.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/github-actions-101
+
+- id: docker-101
+  category: software-engineering
+  title:
+    ko: Docker 101
+    en: Docker 101
+  description:
+    ko: Image, Container, Dockerfile, Volume, Network, Compose, 환경 설정, Python 앱 컨테이너화, 이미지 최적화, 배포 구성을 다루는 입문 시리즈.
+    en: Images, containers, Dockerfile, volumes, networks, Compose, configuration, Python apps, image optimization, and production-ready deploy.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/docker-101
+
+- id: observability-101
+  category: software-engineering
+  title:
+    ko: Observability 101
+    en: Observability 101
+  description:
+    ko: Metric, log, trace, dashboard, alert, SLO 기초까지 운영 시스템의 가시성을 만드는 입문 시리즈.
+    en: Metrics, logs, traces, dashboards, alerts, and SLO basics to make production systems observable.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/observability-101
+
+- id: secure-coding-101
+  category: software-engineering
+  title:
+    ko: Secure Coding 101
+    en: Secure Coding 101
+  description:
+    ko: 입력 검증, 인증, 인가, secret 관리, SQL Injection, XSS/CSRF, dependency 취약점, 안전한 로깅까지 시큐어 코딩 입문 시리즈.
+    en: A beginner guide to secure coding covering input validation, auth, authz, secret management, SQL Injection, XSS/CSRF, dependency vulnerabilities, and safe logging.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/secure-coding-101
+
+- id: cloud-computing-101
+  category: software-engineering
+  title:
+    ko: Cloud Computing 101
+    en: Cloud Computing 101
+  description:
+    ko: IaaS/PaaS/SaaS, 리전, 컴퓨트, 스토리지, 네트워크, 아이덴티티, 모니터링, 비용까지 클라우드 입문 시리즈.
+    en: A cloud computing primer covering IaaS/PaaS/SaaS, regions, compute, storage, network, identity, monitoring, and cost.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/cloud-computing-101
+
+- id: containers-101
+  category: software-engineering
+  title:
+    ko: Containers 101
+    en: Containers 101
+  description:
+    ko: Image, runtime, layer, Dockerfile부터 보안까지 컨테이너의 큰 그림을 입문자 관점에서 다룹니다.
+    en: A beginner-friendly tour of containers — images, runtimes, layers, Dockerfile, security, and how containers differ from VMs.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/containers-101
+
+- id: kubernetes-101
+  category: software-engineering
+  title:
+    ko: Kubernetes 101
+    en: Kubernetes 101
+  description:
+    ko: Pod, Deployment, Service, Ingress, ConfigMap/Secret, Volume, HPA, Helm까지 Kubernetes 기본 객체를 다루는 시리즈.
+    en: An entry series covering Kubernetes core objects from Pod, Deployment, Service, Ingress, ConfigMap/Secret, Volume, HPA to Helm.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/kubernetes-101
+
+- id: serverless-101
+  category: software-engineering
+  title:
+    ko: Serverless 101
+    en: Serverless 101
+  description:
+    ko: FaaS, trigger/event, cold start, scaling, state, queue, observability, cost까지 서버리스 입문 시리즈.
+    en: An entry series covering FaaS, triggers/events, cold start, scaling, state, queues, observability, and cost.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/serverless-101
+
+- id: sre-101
+  category: software-engineering
+  title:
+    ko: SRE 101
+    en: SRE 101
+  description:
+    ko: 신뢰성, SLI/SLO/SLA, 에러 버짓, 인시던트와 포스트모템, toil 감소, 용량 계획까지 다루는 SRE 입문 시리즈.
+    en: An entry series covering reliability, SLI/SLO/SLA, error budgets, incidents and postmortems, toil reduction, and capacity planning.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/sre-101
+
+- id: sql-101
+  category: database-data
+  title:
+    ko: SQL 101
+    en: SQL 101
+  description:
+    ko: SELECT, JOIN, GROUP BY, subquery, window function, DML, index 기초까지 분석/개발에 바로 쓰는 SQL 입문 시리즈.
+    en: A practical SQL series covering SELECT, JOIN, GROUP BY, subqueries, window functions, DML, and index basics for analysts and junior developers.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/sql-101
+
+- id: data-warehouse-101
+  category: database-data
+  title:
+    ko: Data Warehouse 101
+    en: Data Warehouse 101
+  description:
+    ko: OLTP/OLAP, Fact와 Dimension, Star Schema, Partition, ETL/ELT, BI 연동까지 분석을 위한 데이터 저장소를 설계하는 시리즈.
+    en: A practical Data Warehouse series covering OLTP/OLAP, fact and dimension tables, star schema, partitioning, ETL/ELT, and BI integration.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/data-warehouse-101
+
+- id: data-science-101
+  category: database-data
+  title:
+    ko: Data Science 101
+    en: Data Science 101
+  description:
+    ko: 문제 정의, 데이터 수집, 정제, EDA, 시각화, 모델링, 평가, 해석까지 데이터 사이언스 전체 흐름을 다지는 시리즈.
+    en: A Data Science series covering problem framing, data collection, cleaning, EDA, visualization, modeling, evaluation, and interpretation end to end.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/data-science-101
+
+- id: statistics-101
+  category: database-data
+  title:
+    ko: Statistics 101
+    en: Statistics 101
+  description:
+    ko: 기술 통계, 분포, 추정, 신뢰구간, 가설검정, 회귀까지 데이터 분석에 필요한 통계의 큰 그림을 다지는 시리즈.
+    en: A Statistics series covering descriptive statistics, distributions, estimation, confidence intervals, hypothesis testing, and regression end to end.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/statistics-101
+
+- id: probability-101
+  category: database-data
+  title:
+    ko: Probability 101
+    en: Probability 101
+  description:
+    ko: 사건, 조건부확률, 베이즈 정리, 확률변수, 분포, 중심극한정리까지 ML 기초로 이어지는 확률을 다지는 시리즈.
+    en: A Probability series covering events, conditional probability, Bayes' theorem, random variables, distributions, and the Central Limit Theorem as the bridge to ML.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/probability-101
+
+- id: linear-algebra-101
+  category: database-data
+  title:
+    ko: Linear Algebra 101
+    en: Linear Algebra 101
+  description:
+    ko: 벡터, 행렬, 내적, 선형변환, 기저, 고유값, 행렬분해, PCA까지 ML 입문 직전 단계의 선형대수를 다지는 시리즈.
+    en: A Linear Algebra series covering vectors, matrices, inner products, linear transformations, basis, eigenvalues, decompositions, and PCA as the bridge to ML.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/linear-algebra-101
+
+- id: mlops-101
+  category: database-data
+  title:
+    ko: MLOps 101
+    en: MLOps 101
+  description:
+    ko: 운영 가능한 ML 시스템 — 실험 관리, 모델 배포, 모니터링, drift, feature store까지.
+    en: Production-grade ML systems — experiment tracking, deployment, monitoring, drift, and feature stores.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/mlops-101
+
+- id: model-evaluation-101
+  category: database-data
+  title:
+    ko: Model Evaluation 101
+    en: Model Evaluation 101
+  description:
+    ko: 모델을 제대로 평가하는 법 — train/val/test, precision/recall, ROC, calibration, error analysis까지.
+    en: Properly evaluating ML models — train/val/test, precision and recall, ROC, calibration, and error analysis.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/model-evaluation-101
+
+- id: machine-learning-101
+  category: database-data
+  title:
+    ko: Machine Learning 101
+    en: Machine Learning 101
+  description:
+    ko: 지도/비지도, train/test, 회귀, 분류, 트리, 군집, regularization, 평가까지 ML 전체 흐름을 다지는 시리즈.
+    en: A complete ML walkthrough — supervised/unsupervised, train/test, regression, classification, trees, clustering, regularization, and evaluation.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/machine-learning-101
+
+- id: pandas-101
+  category: database-data
+  title:
+    ko: Pandas 101
+    en: Pandas 101
+  description:
+    ko: Series, DataFrame, 파일 입출력, filtering, missing value, groupby, merge, time series, vectorization까지 다루는 Pandas 입문 시리즈.
+    en: A Pandas series covering Series, DataFrame, file I/O, filtering, missing values, groupby, merge, time series, and vectorization.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/pandas-101
 
 - id: git-github-101
   category: programming
@@ -2145,6 +3247,27 @@ series:
   level: 101
   lifecycle: active
   path: content/ax-practical-guide
+- id: technical-writing-101
+  category: writing
+  title:
+    ko: 기술 글쓰기 101
+    en: Technical Writing 101
+  description:
+    ko: 독자 정의부터 발행 전 체크리스트까지, 기술 글쓰기의 기본을 다지는 시리즈.
+    en: An entry series covering technical writing from defining the reader to the pre-publish checklist.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/technical-writing-101
 - id: technical-writing
   status: planned
   category: writing
