@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Code Review</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Code Review</h1>
+<blockquote>
+<p>Software Engineering 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is code review about catching defects, or about sharing knowledge?</p>
+<blockquote>
+<p>Both. But run it badly and you do neither.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The real purpose of code review</li>
+<li>How to write a Pull Request that is easy to review</li>
+<li>What reviewers actually look at</li>
+<li>Comment tone and decision signals</li>
+<li>What automation can take off the reviewer's plate</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Code review shapes both code quality and the distribution of knowledge in a team. The moment one person is the only one who understands a module, the organization is one resignation away from a freeze.</p>
+<blockquote>
+<p>A review is a consensus, not a verdict.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Author: PR&quot;] --&gt; B[&quot;Automated checks&quot;]
+    B --&gt; C[&quot;Reviewer comments&quot;]
+    C --&gt; D[&quot;Revise or discuss&quot;]
+    D --&gt; E[&quot;Approve and merge&quot;]
+</code></pre>
+<p>Automation first, humans focus on judgment.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>PR (Pull Request)</strong>: The unit of change and the discussion space.</li>
+<li><strong>Reviewer</strong>: A peer who shares responsibility for the code.</li>
+<li><strong>Nit</strong>: A small suggestion, not a blocker.</li>
+<li><strong>Blocking comment</strong>: Must be resolved before merging.</li>
+<li><strong>Approve with comments</strong>: Trust-based approval.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — one PR, 800 lines, "small fix included"</strong></p>
+<pre><code class="language-text">PR title: Refactor user module + bug fix + log cleanup
+-&gt; impossible to review, intent is mixed
+</code></pre>
+<p><strong>After — split PRs, each under 200 lines</strong></p>
+<pre><code class="language-text">1) fix: null user crash
+2) refactor: extract notification port
+3) chore: prune verbose logs
+</code></pre>
+<p>Small PRs merge fast and cause fewer incidents.</p>
+<h2>Hands-on: Make a PR Reviewable</h2>
+<p><strong>Step 1 — One-line intent</strong></p>
+<pre><code class="language-text"># 1_pr_title.txt
+fix(auth): handle expired refresh token without 500
+</code></pre>
+<p>The title states the essence of the change.</p>
+<p><strong>Step 2 — Body template</strong></p>
+<pre><code class="language-text"># 2_pr_body.md
+## What
+Return 401 for expired refresh tokens.
+
+## Why
+Today this throws 500 and floods our alerting.
+
+## How
+Map ExpiredTokenError to 401 in AuthService.refresh().
+
+## Test
+unit + manual cURL.
+</code></pre>
+<p>Reviewers enter through What/Why/How/Test fast.</p>
+<p><strong>Step 3 — Lift load with automation</strong></p>
+<pre><code class="language-yaml"># 3_ci.yml
+jobs:
+  check:
+    steps:
+      - run: ruff check .
+      - run: mypy app
+      - run: pytest -q
+</code></pre>
+<p>Format, types, and tests are not human work.</p>
+<p><strong>Step 4 — Split into small units</strong></p>
+<pre><code class="language-text"># 4_split.md
+- PR 1: data model change
+- PR 2: service logic
+- PR 3: handlers and routing
+</code></pre>
+<p>The smallest mergeable unit is the right unit.</p>
+<p><strong>Step 5 — Comment tone guide</strong></p>
+<pre><code class="language-text"># 5_tone.md
+[nit] Naming user_id consistently would be nicer.
+[question] Could this branch trigger an N+1 query?
+[blocking] A secret key ends up in the log. Must fix before merge.
+</code></pre>
+<p>Tags accelerate decision making.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Automation clears the human's field of view.</li>
+<li>A PR body template accelerates decisions.</li>
+<li>Comment tags make the merge bar explicit.</li>
+<li>Split PRs become recoverable decisions.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Giant PRs.</strong> Review quality drops to zero.</li>
+<li><strong>Humans pointing out formatting.</strong> Move it to automation.</li>
+<li><strong>Aggressive comment tone.</strong> Talk about the code, not the person.</li>
+<li><strong>Rubber-stamp approvals.</strong> Responsibility is shared.</li>
+<li><strong>Merging without tests.</strong> Review is not a substitute for tests.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>GitHub-based teams rely on CODEOWNERS for auto-assignment, 1~2 required reviews, protected branches, and a green CI gate. Larger changes go through an RFC step first.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A PR is a compression of intent.</li>
+<li>Asking humans to do work a machine can do is disrespectful.</li>
+<li>Comments are about code, not people.</li>
+<li>Every approval is shared responsibility.</li>
+<li>The skill of cutting work small is the mark of seniority.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the PR title state intent in one line?</li>
+<li>[ ] Does the PR body include What/Why/How/Test?</li>
+<li>[ ] Does CI cover format, types, and tests?</li>
+<li>[ ] Is the PR under 200~400 lines of change?</li>
+<li>[ ] Are comments about the code, not the author?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick a recent PR and rewrite it using the template above.</li>
+<li>Find one CI item still being checked by humans and propose how to automate it.</li>
+<li>Draft a one-page comment guide with three tags for your team.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Code review does defect detection and knowledge distribution at the same time. Next, we move defect detection to where it belongs — testing strategy.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
+<li><strong>Code Review (current)</strong></li>
+<li>Testing Strategy (upcoming)</li>
+<li>Version Control and Release (upcoming)</li>
+<li>Documentation (upcoming)</li>
+<li>Collaboration Process (upcoming)</li>
+<li>Maintenance and Tech Debt (upcoming)</li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://google.github.io/eng-practices/review/">Google Engineering Practices — Code Review Developer Guide</a></li>
+<li><a href="https://conventionalcomments.org/">Conventional Comments</a></li>
+<li><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches">GitHub Docs — About protected branches</a></li>
+<li><a href="https://smartbear.com/resources/ebooks/best-kept-secrets-of-peer-code-review/">Best Kept Secrets of Peer Code Review — Smart Bear</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, CodeReview, PullRequest, Collaboration, Quality</p>
+</body>
+</html>

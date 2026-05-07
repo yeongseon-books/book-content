@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Documentation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Documentation</h1>
+<blockquote>
+<p>Software Engineering 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If the code is good, do you really need docs?</p>
+<blockquote>
+<p>Code answers "how". Documentation answers "why" and "when".</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The minimum sections of a useful README</li>
+<li>Recording decisions with ADRs</li>
+<li>Docstrings and type hints</li>
+<li>Runbooks and onboarding documents</li>
+<li>The Diataxis four quadrants (tutorial / how-to / reference / explanation)</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without docs, every question routes through a person. The moment a person becomes the bottleneck, team speed depends on their work hours.</p>
+<blockquote>
+<p>Documentation is the infrastructure of async collaboration.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    T[&quot;Tutorial&quot;] --&gt; H[&quot;How-to&quot;]
+    H --&gt; R[&quot;Reference&quot;]
+    R --&gt; E[&quot;Explanation&quot;]
+</code></pre>
+<p>Diataxis splits docs by reader intent.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>README</strong>: First impression and entry point.</li>
+<li><strong>ADR</strong>: A short record of a decision and its reasoning.</li>
+<li><strong>Docstring</strong>: The usage contract of a function or class.</li>
+<li><strong>Runbook</strong>: Step-by-step procedure for incidents.</li>
+<li><strong>Diataxis</strong>: Four-quadrant documentation model.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — one giant wiki</strong></p>
+<pre><code class="language-text">&quot;It's all on the wiki&quot; -&gt; nobody knows where
+</code></pre>
+<p><strong>After — four quadrants + index</strong></p>
+<pre><code class="language-text">docs/tutorials/  docs/how-to/  docs/reference/  docs/explanation/
+</code></pre>
+<p>Folders split by reader intent.</p>
+<h2>Hands-on: A Small Doc Set</h2>
+<p><strong>Step 1 — README in 5 blocks</strong></p>
+<pre><code class="language-markdown"># 1_readme.md
+## What — one-sentence description
+## Why — why it exists
+## Quick start — working in 60 seconds
+## Configuration — env var table
+## Links — go deeper
+</code></pre>
+<p>The reader sees value within 60 seconds.</p>
+<p><strong>Step 2 — One-page ADR</strong></p>
+<pre><code class="language-markdown"># 2_adr.md
+# ADR 0012: introduce cache
+- Context, Decision, Alternatives, Consequences
+- Date, Owners
+</code></pre>
+<p>A decision outlives the code that implements it.</p>
+<p><strong>Step 3 — Docstring and types</strong></p>
+<pre><code class="language-python"># 3_docstring.py
+def compute_invoice(amount: int, tax_rate: float) -&gt; int:
+    &quot;&quot;&quot;Return cents amount including tax.
+
+    Raises:
+        ValueError: when amount is negative.
+    &quot;&quot;&quot;
+</code></pre>
+<p>The signature is half the documentation.</p>
+<p><strong>Step 4 — Runbook</strong></p>
+<pre><code class="language-markdown"># 4_runbook.md
+## Symptom
+- 5xx error rate &gt; 2% for 5 min
+## Diagnose
+1. Check Grafana dashboard X
+2. Look at the latest deploy log
+## Action
+- Roll back immediately (`kubectl rollout undo ...`)
+</code></pre>
+<p>It must be followable at 3 a.m.</p>
+<p><strong>Step 5 — Onboarding checklist</strong></p>
+<pre><code class="language-markdown"># 5_onboarding.md
+- [ ] Clone repo, run dev environment
+- [ ] Land first PR (typo fix)
+- [ ] Shadow first incident within a week
+</code></pre>
+<p>Designs the new hire's first thirty days.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Splitting by intent makes docs findable.</li>
+<li>ADRs make decisions recoverable.</li>
+<li>Runbooks reduce the cost of 3 a.m. incidents.</li>
+<li>The README is both first impression and recruiting tool.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Everything in one wiki page.</strong> Nobody finds anything.</li>
+<li><strong>Auto-generated docs only.</strong> Intent disappears.</li>
+<li><strong>Mixed tense.</strong> Trust leaks.</li>
+<li><strong>Unrehearsed runbooks.</strong> The first run is the real incident.</li>
+<li><strong>No doc owner.</strong> It rots into a lie.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams use docs-as-code (markdown in the repo, change via PR, build in CI). New features ship as RFC -&gt; code -&gt; doc updates inside one PR.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Documentation is the infrastructure of async collaboration.</li>
+<li>Code is "how"; docs are "why" and "when".</li>
+<li>A repo with a weak README is a future debt.</li>
+<li>Every doc needs an owner and a last_reviewed date.</li>
+<li>Review docs as carefully as code.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Are the 5 README blocks present?</li>
+<li>[ ] Do major decisions have ADRs?</li>
+<li>[ ] Do docstrings express usage contracts?</li>
+<li>[ ] Is there an incident runbook?</li>
+<li>[ ] Does every document have an owner?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Rewrite your repo README into the 5 blocks.</li>
+<li>Convert one recent decision into an ADR.</li>
+<li>Write a one-page runbook for your last real incident.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Documentation frees people. Next, we look at how those people work together — the collaboration process.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Code Review</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/05-testing-strategy.md">Testing Strategy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/06-version-control-and-release.md">Version Control and Release</a></li>
+<li><strong>Documentation (current)</strong></li>
+<li>Collaboration Process (upcoming)</li>
+<li>Maintenance and Tech Debt (upcoming)</li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://diataxis.fr/">Diataxis Framework</a></li>
+<li><a href="https://documentation.divio.com/">The Documentation System — Daniele Procida</a></li>
+<li><a href="https://www.writethedocs.org/guide/">Write the Docs — Documentation Guide</a></li>
+<li><a href="https://google.github.io/styleguide/docguide/best_practices.html">Google — Documentation Best Practices</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, Documentation, README, ADR, Knowledge</p>
+</body>
+</html>

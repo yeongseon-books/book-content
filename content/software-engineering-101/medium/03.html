@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Design vs Implementation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Design vs Implementation</h1>
+<blockquote>
+<p>Software Engineering 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is "well-written code" the same as "well-designed system"?</p>
+<blockquote>
+<p>Design is "what"; implementation is "how". Mixing the two blurs both.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Definitions of design and implementation</li>
+<li>ADR (Architecture Decision Record)</li>
+<li>How to capture trade-offs in writing</li>
+<li>Five signs of good design</li>
+<li>How to avoid over-engineering</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Design decisions outlive code. Bad design cannot be hidden under good code.</p>
+<blockquote>
+<p>Code can be rewritten; the trace of decisions follows you forever.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[&quot;Requirement&quot;] --&gt; D[&quot;Design: what&quot;]
+    D --&gt; I[&quot;Implementation: how&quot;]
+    I --&gt; O[&quot;Observe&quot;]
+    O --&gt; D
+</code></pre>
+<p>Design sets the ceiling for implementation.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Design</strong>: deciding components, responsibilities, boundaries, and interfaces.</li>
+<li><strong>Implementation</strong>: realizing those decisions in code.</li>
+<li><strong>ADR</strong>: a short document of one decision and its reasoning.</li>
+<li><strong>Trade-off</strong>: what you gain and what you give up.</li>
+<li><strong>YAGNI</strong>: do not build what you do not need today.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — Designing inside the code</strong></p>
+<pre><code class="language-text">&quot;Just code it and refactor later&quot; -&gt; decisions hide in the code
+</code></pre>
+<p><strong>After — ADR makes it explicit</strong></p>
+<pre><code class="language-text">Options A/B/C, choice + reason, reversibility -&gt; simpler code
+</code></pre>
+<p>When design is visible, code becomes simpler.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — Interface First</strong></p>
+<pre><code class="language-python"># 1_iface.py
+from typing import Protocol
+
+class Notifier(Protocol):
+    def send(self, user_id: str, body: str) -&gt; None: ...
+</code></pre>
+<p>Interface before implementation.</p>
+<p><strong>Step 2 — Two Implementations</strong></p>
+<pre><code class="language-python"># 2_impls.py
+class EmailNotifier:
+    def send(self, user_id, body): ...
+class SMSNotifier:
+    def send(self, user_id, body): ...
+</code></pre>
+<p>Polymorphism makes implementations swappable.</p>
+<p><strong>Step 3 — Write the ADR</strong></p>
+<pre><code class="language-text"># 3_adr.md
+# ADR 0007: Notification channel abstraction
+- Context: email/SMS/push are added often
+- Decision: abstract via Notifier protocol
+- Alternatives: direct if/elif, external SaaS integration
+- Consequences: easy unit testing, negligible perf cost
+</code></pre>
+<p>The reasoning fits on one page.</p>
+<p><strong>Step 4 — Apply YAGNI (Subtract)</strong></p>
+<pre><code class="language-python"># 4_remove.py
+# class NotifierFactory: ...        # not needed for one channel
+# class NotifierRegistry: ...       # current simplicity beats future freedom
+</code></pre>
+<p>Today's simplicity over tomorrow's optionality.</p>
+<p><strong>Step 5 — Observability (At Implementation Time)</strong></p>
+<pre><code class="language-python"># 5_obs.py
+import logging
+log = logging.getLogger(__name__)
+
+class EmailNotifier:
+    def send(self, user_id, body):
+        log.info(&quot;notify&quot;, extra={&quot;user&quot;: user_id, &quot;channel&quot;: &quot;email&quot;})
+        # ...
+</code></pre>
+<p>Design must intend for observability.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The interface defines responsibility.</li>
+<li>Polymorphism prices the cost of future change.</li>
+<li>ADRs preserve the justification for changes.</li>
+<li>Observability is a design-time decision.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Burying design in code.</strong> Reasons disappear.</li>
+<li><strong>Over-design (future assumptions).</strong> Unused abstraction is debt.</li>
+<li><strong>Sharing implementations without an interface.</strong> Leaks into other callers.</li>
+<li><strong>Missing ADRs.</strong> "Why this way?" repeats forever after an incident.</li>
+<li><strong>Avoiding redesign.</strong> Reinforcing a wrong decision with more code.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large organizations keep ADRs in git and change them via PR. System diagrams (C4 model) live in the README. New features always go "design -&gt; review -&gt; implementation".</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>ADR before code.</li>
+<li>Make responsibility boundaries explicit through interfaces.</li>
+<li>Today's simplicity over tomorrow's optionality.</li>
+<li>Observability is part of the design.</li>
+<li>Decisions are kept reversible.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Do major decisions have ADRs?</li>
+<li>[ ] Are interfaces explicit?</li>
+<li>[ ] Has YAGNI been applied to subtract abstraction?</li>
+<li>[ ] Is observability part of the design?</li>
+<li>[ ] Is the decision reversible?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write an ADR for one big decision in your project.</li>
+<li>Find two unused abstractions and outline how to remove them.</li>
+<li>Pick a module without observability and list the additions you would make.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Design and implementation are different jobs done with different tools. Next we look at the last quality gate before merge — code review.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What Is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
+<li><strong>Design vs Implementation (current)</strong></li>
+<li>Code Review (upcoming)</li>
+<li>Testing Strategy (upcoming)</li>
+<li>Version Control and Release (upcoming)</li>
+<li>Documentation (upcoming)</li>
+<li>Collaboration Process (upcoming)</li>
+<li>Maintenance and Tech Debt (upcoming)</li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions">Michael Nygard — Documenting Architecture Decisions</a></li>
+<li><a href="https://c4model.com/">C4 Model — Simon Brown</a></li>
+<li><a href="https://www.thoughtworks.com/radar/techniques/lightweight-architecture-decision-records">ThoughtWorks — Architecture Decision Records</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Martin Kleppmann</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, Design, Architecture, Implementation, Tradeoff</p>
+</body>
+</html>

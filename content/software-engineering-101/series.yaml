@@ -1,0 +1,71 @@
+id: software-engineering-101
+title:
+  ko: Software Engineering 101
+  en: Software Engineering 101
+description:
+  ko: 요구사항, 설계, 코드 리뷰, 테스트, 버전 관리, 문서화, 협업, 유지보수까지 소프트웨어 엔지니어링의 큰 그림을 다지는 시리즈.
+  en: The big picture of software engineering — requirements, design, code review, testing, version control, documentation, collaboration, and maintenance.
+status: content-ready
+category: software-engineering
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-software-engineering
+    title:
+      ko: 소프트웨어 엔지니어링이란 무엇인가?
+      en: What Is Software Engineering?
+  - number: 2
+    slug: understanding-requirements
+    title:
+      ko: 요구사항 이해하기
+      en: Understanding Requirements
+  - number: 3
+    slug: design-vs-implementation
+    title:
+      ko: 설계와 구현의 차이
+      en: Design vs Implementation
+  - number: 4
+    slug: code-review
+    title:
+      ko: 코드 리뷰
+      en: Code Review
+  - number: 5
+    slug: testing-strategy
+    title:
+      ko: 테스트 전략
+      en: Testing Strategy
+  - number: 6
+    slug: version-control-and-release
+    title:
+      ko: 버전 관리와 릴리스
+      en: Version Control and Release
+  - number: 7
+    slug: documentation
+    title:
+      ko: 문서화
+      en: Documentation
+  - number: 8
+    slug: collaboration-process
+    title:
+      ko: 협업 프로세스
+      en: Collaboration Process
+  - number: 9
+    slug: maintenance-and-tech-debt
+    title:
+      ko: 유지보수와 기술부채
+      en: Maintenance and Tech Debt
+  - number: 10
+    slug: what-makes-good-software
+    title:
+      ko: 좋은 소프트웨어의 기준
+      en: What Makes Good Software
