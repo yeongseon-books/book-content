@@ -1,0 +1,52 @@
+id: data-warehouse-101
+title:
+  ko: Data Warehouse 101
+  en: Data Warehouse 101
+description:
+  ko: OLTP/OLAP, Fact와 Dimension, Star Schema, Partition, ETL/ELT, BI 연동까지 분석을 위한 데이터 저장소를 설계하는 시리즈.
+  en: A practical Data Warehouse series covering OLTP/OLAP, fact and dimension tables, star schema, partitioning, ETL/ELT, and BI integration.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-data-warehouse
+    title:
+      ko: Data Warehouse란 무엇인가?
+      en: What Is a Data Warehouse?
+  - slug: oltp-and-olap
+    title:
+      ko: OLTP와 OLAP
+      en: OLTP and OLAP
+  - slug: fact-and-dimension
+    title:
+      ko: Fact와 Dimension
+      en: Fact and Dimension
+  - slug: star-schema
+    title:
+      ko: Star Schema
+      en: Star Schema
+  - slug: partition-and-clustering
+    title:
+      ko: Partition과 Clustering
+      en: Partition and Clustering
+  - slug: etl-and-elt
+    title:
+      ko: ETL과 ELT
+      en: ETL and ELT
+  - slug: bi-and-dashboard
+    title:
+      ko: BI와 Dashboard
+      en: BI and Dashboard
+  - slug: data-mart
+    title:
+      ko: Data Mart
+      en: Data Mart
+  - slug: performance-optimization
+    title:
+      ko: 성능 최적화
+      en: Performance Optimization
+  - slug: warehouse-design-example
+    title:
+      ko: Warehouse 설계 예제
+      en: Warehouse Design Example

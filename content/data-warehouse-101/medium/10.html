@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Warehouse Design Example</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Warehouse Design Example</h1>
+<blockquote>
+<p>Data Warehouse 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we <em>combine</em> everything we have learned and <em>design one warehouse</em> from scratch?</p>
+<blockquote>
+<p><em>Every good design starts with one line of grain.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>An <em>e-commerce</em> example designed <em>end to end</em></li>
+<li>The order <em>grain → dimension → schema → partition → ETL → mart</em></li>
+<li>How everything <em>connects to a dashboard</em></li>
+<li>A 5-step design exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Knowing the parts is not enough — <em>putting them together</em> is the real skill. A single domain walkthrough makes it clear <em>why each piece sits where it sits</em>. This last episode is the <em>assembly</em> episode.</p>
+<blockquote>
+<p><em>All clean designs begin with one line of grain.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Source[&quot;Source Systems&quot;] --&gt; Lake[&quot;Data Lake&quot;]
+    Lake --&gt; Stage[&quot;Staging&quot;]
+    Stage --&gt; Fact[&quot;fact_orders&quot;]
+    Stage --&gt; Dim[&quot;dim_user, dim_product, dim_date&quot;]
+    Fact --&gt; Mart[&quot;mart_sales&quot;]
+    Dim --&gt; Mart
+    Mart --&gt; BI[&quot;Dashboard&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Grain</strong>: what <em>one row</em> of a fact table represents. The <em>starting point</em> of design.</li>
+<li><strong>Conformed dimension</strong>: a dimension <em>shared</em> across multiple facts.</li>
+<li><strong>Surrogate key</strong>: a <em>replacement key</em> issued by the warehouse, not the source.</li>
+<li><strong>Slowly Changing Dimension (SCD)</strong>: a method to <em>record changes</em> in a dimension over time.</li>
+<li><strong>Mart</strong>: a topic-specific or team-specific <em>final model</em> served to consumers.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: analysts query the source DB <em>directly</em> and rewrite SQL for every report. <em>Slow, expensive, fragile</em>.</p>
+<p><strong>After</strong>: the warehouse holds a <em>star schema</em>, and analysts build dashboards from <em>short SQL</em> against a clean mart.</p>
+<h2>Hands-on: 5-step Design</h2>
+<p><strong>Step 1 — Define the grain</strong></p>
+<blockquote>
+<p><em>fact_orders grain</em>: one row per <em>order</em>.</p>
+</blockquote>
+<p><strong>Step 2 — Identify dimensions</strong></p>
+<pre><code class="language-text">dim_user      : user attributes
+dim_product   : product attributes
+dim_date      : date attributes (year, month, weekday)
+dim_channel   : acquisition channel
+</code></pre>
+<p><strong>Step 3 — Write the star schema</strong></p>
+<pre><code class="language-sql">CREATE TABLE fact_orders (
+    order_id      STRING,
+    order_date    DATE,
+    user_key      INT64,
+    product_key   INT64,
+    channel_key   INT64,
+    quantity      INT64,
+    amount        NUMERIC
+)
+PARTITION BY order_date
+CLUSTER BY user_key, product_key;
+</code></pre>
+<p><strong>Step 4 — ETL/ELT flow</strong></p>
+<pre><code class="language-text">source.orders  --(append)--&gt;  staging.orders
+                              |
+                              v
+              transform: surrogate keys, SCD type 2
+                              |
+                              v
+                       fact_orders / dim_*
+</code></pre>
+<p><strong>Step 5 — Mart and dashboard</strong></p>
+<pre><code class="language-sql">CREATE OR REPLACE VIEW mart_sales AS
+SELECT
+    d.year,
+    d.month,
+    p.category,
+    SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_date d    ON d.date_key   = f.order_date
+JOIN dim_product p ON p.product_key = f.product_key
+GROUP BY d.year, d.month, p.category;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>One line of grain</em> anchors the entire design.</li>
+<li><em>Surrogate keys</em> protect the warehouse when sources change.</li>
+<li>The <em>mart</em> is <em>prepared answers</em> for the dashboard, not raw data.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Defining the grain only <em>verbally</em>.</strong> Write <em>one line</em> in the design doc.</li>
+<li><strong>Pushing every column into the <em>fact</em>.</strong> Move attributes into <em>dimensions</em>.</li>
+<li><strong>Reusing <em>source primary keys</em>.</strong> Source changes will <em>break</em> the warehouse.</li>
+<li><strong>Ignoring <em>SCD</em>.</strong> Historical analysis quietly <em>breaks</em>.</li>
+<li><strong>Pointing dashboards at <em>raw fact tables</em>.</strong> Any <em>change</em> hurts every dashboard.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Data teams write a <em>one-page design doc</em> listing <em>grain, dimensions, partition, owner</em>. The doc is reviewed, then DDL ships through PR, and an <em>ETL DAG</em> is added. Dashboards read <em>only from marts</em>, never from raw fact tables.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Define the <em>grain first</em>.</li>
+<li>Share <em>conformed dimensions</em> across the whole org.</li>
+<li>Keep a <em>clear boundary</em> between <em>fact/dim</em> and <em>mart</em>.</li>
+<li>Never create a table without an <em>owner</em>.</li>
+<li>A design <em>without docs</em> is <em>no design at all</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write the <em>grain</em> in one sentence.</li>
+<li>[ ] I understand <em>conformed dimensions</em>.</li>
+<li>[ ] I can write a <em>star schema</em> DDL.</li>
+<li>[ ] I can explain the difference between a <em>mart</em> and a <em>fact</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the grain and dimensions for a <em>blog comment system</em>.</li>
+<li>Design <em>fact_clicks</em> for an <em>ad click log</em>.</li>
+<li>Write a <em>mart view</em> SQL for a <em>monthly revenue dashboard</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>You can now see a warehouse <em>as one flow</em>, from <em>grain to dashboard</em>. The next series moves into <em>Data Science</em> and <em>MLOps</em> — where this warehouse becomes the <em>training ground</em> for models.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Fact and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/04-star-schema.md">Star Schema</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/05-partition-and-clustering.md">Partition and Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/06-etl-and-elt.md">ETL and ELT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/07-bi-and-dashboard.md">BI and Dashboard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/08-data-mart.md">Data Mart</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/09-performance-optimization.md">Performance Optimization</a></li>
+<li><strong>Warehouse Design Example (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/">Kimball Group — Dimensional Modeling Techniques</a></li>
+<li><a href="https://cloud.google.com/bigquery/docs/best-practices-schema-design">BigQuery — Schema Design Best Practices</a></li>
+<li><a href="https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview">dbt — How We Structure Our Projects</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/table-considerations">Snowflake — Table Design Considerations</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, Design, Example, EndToEnd, Analytics</p>
+</body>
+</html>

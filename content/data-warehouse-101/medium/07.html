@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BI and Dashboard</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>BI and Dashboard</h1>
+<blockquote>
+<p>Data Warehouse 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does it take for a <em>number</em> to become a <em>decision</em>? Why do <em>dashboards</em> get <em>ignored</em> so often?</p>
+<blockquote>
+<p><em>A dashboard answers a question. It is not a place to show off your data.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The role of <em>BI tools</em></li>
+<li>What makes a <em>good dashboard</em></li>
+<li>Visualization principles that turn <em>numbers into decisions</em></li>
+<li>Five-step dashboard design hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>BI is the <em>last centimeter</em> of a warehouse. You can model <em>billions of rows</em> perfectly, but if the <em>dashboard is noisy</em>, <em>no decision is made</em>. A great dashboard turns a <em>one-line question</em> into a <em>one-screen answer</em>.</p>
+<blockquote>
+<p><em>A dashboard's success is measured in </em>decisions made<em>, not in </em>opens<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    DW[&quot;Warehouse / Mart&quot;] --&gt; Semantic[&quot;Semantic Layer&quot;]
+    Semantic --&gt; BI[&quot;BI Tool&quot;]
+    BI --&gt; Dashboard[&quot;Dashboard&quot;]
+    Dashboard --&gt; Decision[&quot;Decision&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>BI Tool</strong>: Tableau, Looker, Power BI — <em>visualization tools</em>.</li>
+<li><strong>Semantic Layer</strong>: A shared layer of <em>metric definitions</em>.</li>
+<li><strong>KPI</strong>: A <em>key performance indicator</em> — measured in one line.</li>
+<li><strong>Drill-down</strong>: Moving from <em>summary</em> to <em>detail</em>.</li>
+<li><strong>Refresh cadence</strong>: How <em>often</em> a dashboard updates.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: The <em>same metric</em> shows <em>different numbers</em> per team. Meetings end in <em>number negotiation</em>.</p>
+<p><strong>After</strong>: One <em>semantic layer</em> defines metrics. Everyone sees <em>the same revenue</em>.</p>
+<h2>Hands-on: Dashboard Design in Five Steps</h2>
+<p><strong>Step 1 — Define the question</strong></p>
+<pre><code class="language-text">&quot;How much did this month's revenue grow *vs last month*?&quot;
+</code></pre>
+<p><strong>Step 2 — Confirm the model</strong></p>
+<pre><code class="language-sql">SELECT date_trunc('month', order_date) AS month,
+       SUM(amount) AS revenue
+FROM marts.fact_orders
+GROUP BY 1;
+</code></pre>
+<p><strong>Step 3 — KPI cards</strong></p>
+<pre><code class="language-text">- This month revenue: $1,200,000
+- vs last month: +12%
+- vs same month last year: +35%
+</code></pre>
+<p><strong>Step 4 — Trend chart</strong></p>
+<pre><code class="language-sql">-- 12-month trend
+SELECT date_trunc('month', order_date) AS month,
+       SUM(amount) AS revenue
+FROM marts.fact_orders
+WHERE order_date &gt;= CURRENT_DATE - INTERVAL '12 months'
+GROUP BY 1
+ORDER BY 1;
+</code></pre>
+<p><strong>Step 5 — Drill-down</strong></p>
+<pre><code class="language-sql">-- Contribution by category
+SELECT p.category, SUM(f.amount) AS revenue
+FROM marts.fact_orders f
+JOIN marts.dim_product p ON p.product_key = f.product_key
+WHERE f.order_date &gt;= date_trunc('month', CURRENT_DATE)
+GROUP BY p.category
+ORDER BY revenue DESC;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>One screen answers <em>one question</em>.</li>
+<li>Three layers — <em>KPI → trend → drill-down</em>.</li>
+<li>All numbers come from <em>one model</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Too many charts.</strong> <em>Three to five</em> per screen is the right balance.</li>
+<li><strong>Metric definitions <em>vary by dashboard</em>.</strong> Unify via <em>semantic layer</em>.</li>
+<li><strong>No <em>comparison baseline</em>.</strong> Numbers without <em>vs prior period</em> are <em>useless</em>.</li>
+<li><strong>Colors lose meaning.</strong> Stick to <em>red = bad</em>, <em>green = good</em>.</li>
+<li><strong>Too many <em>decimal places</em>.</strong> Round for <em>readability</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Quarterly review slides start with a <em>dashboard screenshot</em>. <em>Looker / Tableau</em> dashboards back <em>product decisions</em>. Metric definitions live in <em>code</em> such as dbt metrics.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Dashboards start from a </em>question<em>.</em></li>
+<li><em>The semantic layer is the org's </em>common language<em>.</em></li>
+<li><em>Numbers without comparison are </em>empty<em>.</em></li>
+<li><em>Limit KPIs to </em>three or fewer<em>.</em></li>
+<li><em>Track dashboard </em>usage<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can define <em>semantic layer</em>.</li>
+<li>[ ] You can name <em>three traits</em> of a good dashboard.</li>
+<li>[ ] You distinguish <em>KPI</em>, <em>trend</em>, and <em>drill-down</em>.</li>
+<li>[ ] You see why <em>baselines</em> matter.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick <em>three KPIs</em> for <em>your team's dashboard</em>.</li>
+<li><em>Simplify</em> a dashboard with too many charts.</li>
+<li>Describe a <em>metric-definition conflict</em> you resolved.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>BI is the <em>face of the warehouse</em>. Next we cover <em>data marts</em> — analytics scoped to a domain.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Fact and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/04-star-schema.md">Star Schema</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/05-partition-and-clustering.md">Partition and Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/06-etl-and-elt.md">ETL and ELT</a></li>
+<li><strong>BI and Dashboard (current)</strong></li>
+<li>Data Mart (upcoming)</li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cloud.google.com/looker/docs/intro">Looker — Semantic Layer</a></li>
+<li><a href="https://www.tableau.com/learn/articles/data-visualization-tips">Tableau — Visual Best Practices</a></li>
+<li><a href="https://learn.microsoft.com/en-us/power-bi/guidance/star-schema">Power BI — Star Schema</a></li>
+<li><a href="https://docs.getdbt.com/docs/use-dbt-semantic-layer/dbt-sl">dbt — Semantic Layer</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, BI, Dashboard, Visualization, Analytics</p>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Mart</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Mart</h1>
+<blockquote>
+<p>Data Warehouse 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: With a big <em>warehouse</em>, why also build <em>small marts</em>? Should <em>sales</em> and <em>finance</em> really see the <em>same view</em>?</p>
+<blockquote>
+<p><em>A mart is a small analytical zone, restated in the team's vocabulary.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a <em>data mart</em></li>
+<li>How it differs from a <em>warehouse</em></li>
+<li>Why we keep <em>small zones per domain</em></li>
+<li>Five-step mart design hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A warehouse holds <em>org-wide common data</em>. But <em>sales, finance, and ops</em> speak <em>different vocabularies</em>. A mart re-organizes data <em>in each team's words</em> — a <em>thin layer</em> on top of the warehouse.</p>
+<blockquote>
+<p><em>Common in the warehouse, domain in the mart.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    DW[&quot;Warehouse (Conformed)&quot;] --&gt; SalesMart[&quot;Sales Mart&quot;]
+    DW --&gt; FinanceMart[&quot;Finance Mart&quot;]
+    DW --&gt; OpsMart[&quot;Ops Mart&quot;]
+    SalesMart --&gt; SalesBI[&quot;Sales Dashboard&quot;]
+    FinanceMart --&gt; FinanceBI[&quot;Finance Dashboard&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Data Mart</strong>: A <em>domain-scoped</em> analytical zone — a <em>subset</em> of the warehouse.</li>
+<li><strong>Conformed Dimension</strong>: A dimension <em>shared</em> across marts.</li>
+<li><strong>Domain Modeling</strong>: Modeling data with the <em>team's vocabulary and rules</em>.</li>
+<li><strong>Aggregated Mart</strong>: A <em>pre-aggregated</em> mart for speed.</li>
+<li><strong>Self-service</strong>: An interface analysts <em>use directly</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Sales reads <em>raw facts</em> from the warehouse. Joins are <em>complex</em> and <em>slow</em>.</p>
+<p><strong>After</strong>: A <em>sales mart</em> aggregates in <em>team vocabulary</em>. Dashboards load in <em>3 seconds</em>.</p>
+<h2>Hands-on: Mart Design in Five Steps</h2>
+<p><strong>Step 1 — Define the domain</strong></p>
+<pre><code class="language-text">&quot;The sales mart sees data at the *opportunity* level. It bundles *customer, stage, amount, owner*.&quot;
+</code></pre>
+<p><strong>Step 2 — Use conformed dimensions</strong></p>
+<pre><code class="language-sql">CREATE OR REPLACE TABLE sales_mart.fact_opportunity AS
+SELECT
+    o.opp_id,
+    u.user_key AS owner_key,
+    c.customer_key,
+    o.stage,
+    o.amount,
+    o.created_at
+FROM staging.opportunities o
+JOIN warehouse.dim_user u ON u.user_id = o.owner_id
+JOIN warehouse.dim_customer c ON c.customer_id = o.customer_id;
+</code></pre>
+<p><strong>Step 3 — Pre-aggregate</strong></p>
+<pre><code class="language-sql">CREATE OR REPLACE TABLE sales_mart.agg_pipeline_by_owner AS
+SELECT
+    owner_key,
+    stage,
+    SUM(amount) AS pipeline_amount,
+    COUNT(*) AS opp_count
+FROM sales_mart.fact_opportunity
+GROUP BY 1, 2;
+</code></pre>
+<p><strong>Step 4 — Query the mart</strong></p>
+<pre><code class="language-sql">SELECT u.name, SUM(a.pipeline_amount) AS total_pipeline
+FROM sales_mart.agg_pipeline_by_owner a
+JOIN warehouse.dim_user u ON u.user_key = a.owner_key
+WHERE a.stage IN ('proposal', 'negotiation')
+GROUP BY u.name;
+</code></pre>
+<p><strong>Step 5 — Separate permissions</strong></p>
+<pre><code class="language-sql">GRANT SELECT ON SCHEMA sales_mart TO ROLE sales_readers;
+GRANT SELECT ON SCHEMA finance_mart TO ROLE finance_readers;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Conformed dims</em> come from the <em>warehouse</em>.</li>
+<li>The <em>team vocabulary</em> shows up in <em>column names</em>.</li>
+<li>Permissions split by <em>domain</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Building <em>separate dims per mart</em>.</strong> A common cause of <em>number conflicts</em>.</li>
+<li><strong>Skipping the warehouse and <em>building marts first</em>.</strong> <em>Conforming later</em> is <em>hard</em>.</li>
+<li><strong>Pulling <em>every column</em> into the mart.</strong> <em>Unnecessary cost</em>.</li>
+<li><strong>Skipping <em>permission splits</em>.</strong> Risk of <em>sensitive data exposure</em>.</li>
+<li><strong>Unclear if a mart is a <em>live SQL</em> or <em>materialized copy</em>.</strong> Document <em>refresh policy</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>dbt's <em>marts/</em> folder is split <em>by domain</em>. Sales, finance, product, and marketing each have <em>their own mart</em> and pull <em>common dims</em> from the warehouse.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>A mart is the warehouse </em>rewritten in team vocabulary<em>.</em></li>
+<li><em>Conformed dimensions are the </em>org's constitution<em>.</em></li>
+<li><em>Refresh marts </em>small and often<em>.</em></li>
+<li><em>Permissions follow </em>domain boundaries<em>.</em></li>
+<li><em>Track each mart's </em>lifespan<em> as a metric.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish <em>warehouse</em> from <em>mart</em>.</li>
+<li>[ ] You can define <em>conformed dimension</em>.</li>
+<li>[ ] You see why <em>permission split</em> matters.</li>
+<li>[ ] You know the trade-off of <em>pre-aggregation</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick <em>three fact tables</em> for a <em>finance mart</em>.</li>
+<li>Describe a <em>conflict scenario</em> when marts use separate dims.</li>
+<li>List <em>two risks</em> of a mart without <em>permission split</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A mart is a <em>thin bridge</em> between the team and the data. Next, we cover <em>performance optimization patterns</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Fact and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/04-star-schema.md">Star Schema</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/05-partition-and-clustering.md">Partition and Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/06-etl-and-elt.md">ETL and ELT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/07-bi-and-dashboard.md">BI and Dashboard</a></li>
+<li><strong>Data Mart (current)</strong></li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/">Kimball — Data Mart</a></li>
+<li><a href="https://docs.getdbt.com/best-practices/how-we-structure/4-marts">dbt — Mart Layer</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/intro-key-concepts">Snowflake — Schema Design</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Data_mart">Wikipedia — Data Mart</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, DataMart, Modeling, Domain, Analytics</p>
+</body>
+</html>

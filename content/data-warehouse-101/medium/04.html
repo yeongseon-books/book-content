@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Star Schema</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Star Schema</h1>
+<blockquote>
+<p>Data Warehouse 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does the <em>star shape</em> work for analytics? Wouldn't <em>more normalization</em> make things better?</p>
+<blockquote>
+<p><em>A star schema is the shape of a query that joins once and answers.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The structure of a <em>star schema</em></li>
+<li>Differences from the <em>snowflake schema</em></li>
+<li>Why BI tools <em>love</em> the star shape</li>
+<li>Five-step design hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Analytical queries get faster as joins decrease. A star schema keeps <em>one fact</em> and <em>its dimensions</em> — the <em>minimum joins needed</em>. BI tools also assume the star shape and build <em>drill-down</em> on top of it.</p>
+<blockquote>
+<p><em>Analytics is a read game. The simpler the shape, the faster the answer.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    DimUser[&quot;dim_user&quot;] --&gt; Fact[&quot;fact_orders&quot;]
+    DimProduct[&quot;dim_product&quot;] --&gt; Fact
+    DimDate[&quot;dim_date&quot;] --&gt; Fact
+    DimStore[&quot;dim_store&quot;] --&gt; Fact
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Star Schema</strong>: Central <em>fact</em>, surrounding <em>dimensions</em>. <em>One join hop</em>.</li>
+<li><strong>Snowflake Schema</strong>: Dimensions <em>normalized further</em>. <em>Multiple hops</em>.</li>
+<li><strong>Galaxy Schema</strong>: <em>Multiple facts</em> sharing common dimensions.</li>
+<li><strong>Drill-down</strong>: Moving from <em>summary</em> into <em>detail</em>.</li>
+<li><strong>Slice and dice</strong>: Looking at <em>subsets</em> of a single slice.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: dim_user → dim_country → dim_continent — <em>three-hop joins</em>. BI is <em>slow</em>.</p>
+<p><strong>After</strong>: dim_user holds country and continent inline — <em>one join</em>.</p>
+<h2>Hands-on: Design in Five Steps</h2>
+<p><strong>Step 1 — Fact definition</strong></p>
+<pre><code class="language-sql">CREATE TABLE fact_orders (
+    order_id BIGINT,
+    user_key BIGINT,
+    product_key BIGINT,
+    date_key INT,
+    store_key BIGINT,
+    amount NUMERIC(12, 2),
+    qty INT
+);
+</code></pre>
+<p><strong>Step 2 — Dimension definition</strong></p>
+<pre><code class="language-sql">CREATE TABLE dim_product (
+    product_key BIGINT PRIMARY KEY,
+    product_id BIGINT,
+    name TEXT,
+    category TEXT,
+    brand TEXT
+);
+</code></pre>
+<p><strong>Step 3 — Star-shape join</strong></p>
+<pre><code class="language-sql">SELECT p.category, SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_product p ON p.product_key = f.product_key
+GROUP BY p.category;
+</code></pre>
+<p><strong>Step 4 — Multiple dimensions</strong></p>
+<pre><code class="language-sql">SELECT d.year, p.category, SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_product p ON p.product_key = f.product_key
+JOIN dim_date d ON d.date_key = f.date_key
+GROUP BY d.year, p.category;
+</code></pre>
+<p><strong>Step 5 — Drill-down</strong></p>
+<pre><code class="language-sql">-- Category to brand, one step deeper
+SELECT p.brand, SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_product p ON p.product_key = f.product_key
+WHERE p.category = 'Coffee'
+GROUP BY p.brand;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Every join is <em>fact ↔ dimension</em>, one hop.</li>
+<li>Category and brand live <em>inside the dimension</em>.</li>
+<li>BI drill-down maps <em>directly to SQL</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Over-normalizing into a <em>snowflake</em>.</strong> <em>More joins, slower BI</em>.</li>
+<li><strong>Stuffing every column into the <em>fact</em>.</strong> The star shape <em>collapses</em>.</li>
+<li><strong>Making dimensions <em>narrower over time</em>.</strong> Later you need to <em>widen them again</em>.</li>
+<li><strong>Using <em>natural keys only</em>.</strong> Upstream changes <em>shake the fact</em>.</li>
+<li><strong>Letting facts use <em>separate dim_date</em> tables.</strong> <em>Share</em> what is shareable.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Tableau, Looker, and Power BI <em>assume</em> a star schema. dbt's <em>mart</em> layer is typically modeled as a star.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Each join hop is a </em>cost<em>. Reduce them.</em></li>
+<li><em>Dimensions are </em>wide and short<em>.</em></li>
+<li><em>Use </em>SCD strategies<em> for changing attributes.</em></li>
+<li><em>Honor the </em>BI tool's assumptions<em> in the data model.</em></li>
+<li><em>Use snowflake only when the </em>reason is explicit<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish <em>star</em> from <em>snowflake</em>.</li>
+<li>[ ] You know what <em>galaxy</em> means.</li>
+<li>[ ] You can explain why BI <em>prefers stars</em>.</li>
+<li>[ ] You can write a <em>drill-down</em> query.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>List <em>five dimensions</em> around <em>fact_payments</em>.</li>
+<li>Describe an <em>exception</em> where snowflake is better.</li>
+<li>Write a drill-down going <em>category → brand → product</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Star schema is the <em>simplest analytical shape</em>. Next, we tackle <em>partitioning and clustering</em> for fast reads.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Fact and Dimension</a></li>
+<li><strong>Star Schema (current)</strong></li>
+<li>Partition and Clustering (upcoming)</li>
+<li>ETL and ELT (upcoming)</li>
+<li>BI and Dashboard (upcoming)</li>
+<li>Data Mart (upcoming)</li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/star-schemas/">Kimball — Star Schema</a></li>
+<li><a href="https://learn.microsoft.com/en-us/power-bi/guidance/star-schema">Microsoft — Star Schema and Power BI</a></li>
+<li><a href="https://docs.getdbt.com/best-practices/how-we-structure/4-marts">dbt — Mart Layer</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Star_schema">Wikipedia — Star Schema</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, StarSchema, Modeling, Snowflake, Analytics</p>
+</body>
+</html>
