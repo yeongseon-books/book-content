@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Incident Response</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Incident Response</h1>
+<blockquote>
+<p>Information Security 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When an incident hits, do we know what to do in the first minute?</p>
+<blockquote>
+<p>The quality of response is set in peacetime. Procedures invented during an incident are not procedures.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The NIST IR cycle (Prepare, Detect, Contain, Eradicate, Recover, Lessons)</li>
+<li>Runbook structure and how to write one</li>
+<li>Balancing containment with evidence preservation</li>
+<li>Blameless postmortems</li>
+<li>Severity levels and communication</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Incidents will happen. Good response shrinks loss; bad response amplifies it. A two-hour difference can save a company.</p>
+<blockquote>
+<p>"Prevention" does not aim at zero. "Response" is half of real security.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[&quot;Prepare&quot;] --&gt; D[&quot;Detect&quot;]
+    D --&gt; C[&quot;Contain&quot;]
+    C --&gt; E[&quot;Eradicate&quot;]
+    E --&gt; R[&quot;Recover&quot;]
+    R --&gt; L[&quot;Lessons&quot;]
+    L --&gt; P
+</code></pre>
+<p>The NIST IR cycle is unbroken.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>IR (Incident Response)</strong>: the entire response process.</li>
+<li><strong>Runbook</strong>: step-by-step procedure for a specific incident type.</li>
+<li><strong>Containment</strong>: stop further damage by isolating systems.</li>
+<li><strong>Eradication</strong>: remove the root cause of compromise.</li>
+<li><strong>Postmortem</strong>: review after the fact — blameless by principle.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — Improvised response</strong></p>
+<pre><code class="language-text">Decide who does what on the fly -&gt; lost time, destroyed evidence
+</code></pre>
+<p><strong>After — Runbook + Incident Commander (IC)</strong></p>
+<pre><code class="language-text">Roles assigned -&gt; contained in 30 min -&gt; evidence preserved -&gt; recovery
+</code></pre>
+<p>Only prepared organizations learn from incidents.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — First Actions After Detection</strong></p>
+<pre><code class="language-text"># 1_first_action.txt
+1. Assign an Incident Commander (IC)
+2. Open an incident channel (#inc-YYYY-MM-DD-N)
+3. Start a timeline (record every action with time)
+4. Write a hypothesis of impact scope
+5. Hold external communication until PR/Legal joins
+</code></pre>
+<p>The first five minutes set the severity.</p>
+<p><strong>Step 2 — Containment (Pseudocode)</strong></p>
+<pre><code class="language-python"># 2_contain.py
+def contain_compromised_account(user_id):
+    revoke_all_sessions(user_id)
+    rotate_credentials(user_id)
+    block_ip_list(get_recent_ips(user_id))
+    snapshot_logs(user_id, hours=24)   # preserve evidence first
+</code></pre>
+<p>Always capture evidence before containment when possible.</p>
+<p><strong>Step 3 — Severity Levels</strong></p>
+<pre><code class="language-text"># 3_severity.txt
+SEV1: customer data exposed, full outage
+SEV2: partial impact, potential data risk
+SEV3: single user affected, workaround exists
+</code></pre>
+<p>Severity decides who is paged and what the SLA is.</p>
+<p><strong>Step 4 — Blameless Postmortem Template</strong></p>
+<pre><code class="language-text"># 4_postmortem.md
+- What happened (timeline)
+- Impact
+- Root cause (5 Whys)
+- What went well
+- What to improve
+- Action items (owner, due date)
+</code></pre>
+<p>Blame the system, not the person.</p>
+<p><strong>Step 5 — Game Day (Practice)</strong></p>
+<pre><code class="language-text"># 5_gameday.txt
+Scenario: &quot;S3 bucket made public&quot;
+Goal: detect -&gt; contain -&gt; communicate -&gt; recover within 1 hour
+Measure: MTTD, MTTR, accuracy of external comms
+</code></pre>
+<p>Procedures that are not practiced do not work in the real thing.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The Incident Commander is the decision-maker and single point of contact.</li>
+<li>Evidence preservation comes before containment when feasible.</li>
+<li>External communication flows through one unified channel.</li>
+<li>Every action is timestamped.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Killing systems immediately.</strong> Evidence vanishes.</li>
+<li><strong>Multiple people deciding in parallel.</strong> Confusion and contradictions.</li>
+<li><strong>Blaming people in postmortems.</strong> The next incident hides its information.</li>
+<li><strong>No SEV levels defined.</strong> Small incidents grow; big ones get buried.</li>
+<li><strong>Running the incident in DMs and email.</strong> Timeline cannot be reconstructed.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>PagerDuty/Opsgenie auto-assigns the IC. Slack workflows create the incident channel automatically. AWS wires GuardDuty findings into an IR workflow (EventBridge -&gt; Lambda -&gt; isolate). Postmortems are standardized in Notion or Confluence templates.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Write runbooks in peacetime; validate them with game days.</li>
+<li>Automate the first 30 minutes (isolation, alerts).</li>
+<li>Keep severity levels clear and the call tree current.</li>
+<li>Protect people in postmortems; fix systems.</li>
+<li>Action items have an owner and a due date.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the Incident Commander role defined?</li>
+<li>[ ] Are runbooks written for the major incident types?</li>
+<li>[ ] Are SEV levels and the call tree current?</li>
+<li>[ ] Is there a blameless postmortem template?</li>
+<li>[ ] When was the last game day?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the first-five-minutes runbook for "S3 bucket exposed publicly".</li>
+<li>Give two examples of rephrasing a person's mistake into a system problem.</li>
+<li>Design call trees for SEV1 and SEV2.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Incident response is preparation made visible. This closes the Information Security 101 series — from CIA to incident response, the core arc covered. Next steps to consider: threat modeling, cloud security, and compliance frameworks (SOC2, ISO 27001).</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">TLS and Certificates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/05-web-security-basics.md">Web Security Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/06-sql-injection-and-xss.md">SQL Injection and XSS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/07-secret-management.md">Secret Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/08-least-privilege.md">Least Privilege</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/09-logging-and-audit.md">Logging and Audit</a></li>
+<li><strong>Incident Response (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://csrc.nist.gov/publications/detail/sp/800-61/rev-2/final">NIST SP 800-61 — Computer Security Incident Handling Guide</a></li>
+<li><a href="https://sre.google/sre-book/managing-incidents/">Google SRE Book — Managing Incidents</a></li>
+<li><a href="https://response.pagerduty.com/">PagerDuty — Incident Response Documentation</a></li>
+<li><a href="https://www.etsy.com/codeascraft/blameless-postmortems/">Etsy — Blameless Postmortems</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, IncidentResponse, Runbook, Postmortem, Forensics</p>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SQL Injection and XSS</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SQL Injection and XSS</h1>
+<blockquote>
+<p>Information Security 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Where does input become code, and where does it stay data?</p>
+<blockquote>
+<p>Both bugs share one root: never let input be interpreted as code.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The exact mechanism of SQL injection</li>
+<li>Parameter binding and the limits of ORM safety</li>
+<li>The three types of XSS (Reflected, Stored, DOM-based)</li>
+<li>Output encoding and context awareness</li>
+<li>The priority of input validation vs output encoding</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Both bugs have stayed in the OWASP Top 10 for years. Once you understand the principle, you can defend the same way in any new framework or language.</p>
+<blockquote>
+<p>Treat input as data; encode output for its context.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[&quot;User input&quot;] --&gt;|&quot;String concat&quot;| Q[&quot;SQL/HTML&quot;]
+    Q --&gt;|&quot;interpreted as code&quot;| X[&quot;Vulnerable&quot;]
+    U --&gt;|&quot;parameter binding / escape&quot;| S[&quot;treated as data&quot;]
+    S --&gt; O[&quot;Safe&quot;]
+</code></pre>
+<p>Same input, different handling — opposite outcomes.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SQL Injection</strong>: input parsed as SQL syntax.</li>
+<li><strong>Parameterized query</strong>: input bound separately as data.</li>
+<li><strong>Reflected XSS</strong>: input echoed straight back in the response.</li>
+<li><strong>Stored XSS</strong>: input stored, then served to other users.</li>
+<li><strong>Output encoding</strong>: escaping fitted to the output context (HTML, JS, URL).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — String concatenation</strong></p>
+<pre><code class="language-python">cur.execute(f&quot;SELECT * FROM users WHERE name='{name}'&quot;)
+# name = &quot;' OR 1=1 --&quot;  -&gt; returns every row
+</code></pre>
+<p><strong>After — Parameter binding</strong></p>
+<pre><code class="language-python">cur.execute(&quot;SELECT * FROM users WHERE name=%s&quot;, (name,))
+</code></pre>
+<p>A one-line difference splits incident from safety.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — Safe SQL</strong></p>
+<pre><code class="language-python"># 1_sql_safe.py
+import sqlite3
+con = sqlite3.connect(&quot;:memory:&quot;)
+con.execute(&quot;CREATE TABLE u (id int, name text)&quot;)
+con.execute(&quot;INSERT INTO u VALUES (?, ?)&quot;, (1, &quot;alice&quot;))
+print(con.execute(&quot;SELECT * FROM u WHERE name=?&quot;, (&quot;alice&quot;,)).fetchall())
+</code></pre>
+<p>Never inline input into the <code>?</code> or <code>%s</code> slot.</p>
+<p><strong>Step 2 — ORM Is Not a Cure</strong></p>
+<pre><code class="language-python"># 2_orm_dynamic.py
+# SQLAlchemy raw escape hatches stay risky
+# session.execute(text(f&quot;SELECT * FROM u WHERE name='{name}'&quot;))  # do not do this
+</code></pre>
+<p>The <code>raw</code> / <code>text</code> escape hatches need parameter binding too.</p>
+<p><strong>Step 3 — Reflected XSS Defense</strong></p>
+<pre><code class="language-python"># 3_xss_reflect.py
+from markupsafe import escape
+def search(q):
+    return f&quot;&lt;p&gt;Query: {escape(q)}&lt;/p&gt;&quot;
+</code></pre>
+<p>Always escape before rendering on the server.</p>
+<p><strong>Step 4 — Stored XSS Defense</strong></p>
+<pre><code class="language-python"># 4_xss_stored.py
+def render_comment(html):
+    # store the original; encode at output time
+    return f&quot;&lt;div&gt;{escape(html)}&lt;/div&gt;&quot;
+</code></pre>
+<p>Store raw, encode on output — one consistent rule.</p>
+<p><strong>Step 5 — DOM-based XSS</strong></p>
+<pre><code class="language-javascript">// 5_dom_xss.js
+// document.body.innerHTML = location.hash;   // dangerous
+const text = decodeURIComponent(location.hash.slice(1));
+const node = document.createTextNode(text);   // safe
+document.body.appendChild(node);
+</code></pre>
+<p>Use text-node APIs instead of <code>innerHTML</code>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>All SQL goes through parameter binding.</li>
+<li>Output encoding depends on context (HTML body, attribute, URL, JS).</li>
+<li>Avoid <code>innerHTML</code> in DOM manipulation.</li>
+<li>Input validation is a secondary defense, not the main one.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>f-string SQL.</strong> The most common injection path.</li>
+<li><strong>Storing HTML input then rendering without sanitization.</strong> Stored XSS.</li>
+<li><strong>HTML escape applied to JS context.</strong> Wrong encoder.</li>
+<li><strong><code>innerHTML</code> for user input.</strong> DOM XSS.</li>
+<li><strong>Blacklist-based filters.</strong> Easy to bypass — use allowlists.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Big systems allow only typed queries through the ORM and require code review for raw SQL. Frontends trust framework text interpolation but gate <code>dangerouslySetInnerHTML</code> with explicit approvals. A WAF is an extra layer, not the main defense.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Two-line rule: input as data, output encoded for context.</li>
+<li>Lint rules block raw SQL.</li>
+<li>One well-known HTML sanitizer, used everywhere.</li>
+<li>DOM XSS is caught with code review and static analysis.</li>
+<li>New input paths trigger a threat-model update.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does every SQL statement use parameter binding?</li>
+<li>[ ] Is output encoding applied per context?</li>
+<li>[ ] Have you audited <code>innerHTML</code> usage?</li>
+<li>[ ] Is the HTML sanitizer standardized?</li>
+<li>[ ] Is there code-level defense beyond the WAF?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the one-line fix that blocks <code>name=' OR '1'='1</code>.</li>
+<li>List two operational differences between Reflected and Stored XSS.</li>
+<li>Describe one React pattern that prevents DOM XSS.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Both bugs stem from inconsistent input handling. Next we step away from code into configuration — secret management.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">TLS and Certificates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/05-web-security-basics.md">Web Security Basics</a></li>
+<li><strong>SQL Injection and XSS (current)</strong></li>
+<li>Secret Management (upcoming)</li>
+<li>Least Privilege (upcoming)</li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://owasp.org/www-community/attacks/SQL_Injection">OWASP — SQL Injection</a></li>
+<li><a href="https://owasp.org/www-community/attacks/xss/">OWASP — XSS</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">OWASP Cheat Sheet — XSS Prevention</a></li>
+<li><a href="https://portswigger.net/web-security">PortSwigger Web Security Academy</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, SQLInjection, XSS, InputValidation, OutputEncoding</p>
+</body>
+</html>

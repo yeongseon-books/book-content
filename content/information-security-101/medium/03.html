@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cryptography and Hashing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cryptography and Hashing</h1>
+<blockquote>
+<p>Information Security 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If "encryption equals safety" is not true, what should we use where?</p>
+<blockquote>
+<p>Encryption and hashing do different jobs. A strong algorithm used wrongly is the same as no algorithm — sometimes worse.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Symmetric encryption (AES-GCM) and asymmetric encryption (RSA/ECC)</li>
+<li>Hashes, HMAC, and digital signatures</li>
+<li>The difference between encryption and authentication (why we need AEAD)</li>
+<li>The meaning of randomness and nonce/IV</li>
+<li>A one-line guide to which algorithm fits which situation</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most crypto incidents come from wrong combinations, not weak algorithms. Knowing what guarantees what blocks the major paths to disaster.</p>
+<blockquote>
+<p>Algorithms are tools; safety lives in their composition and operation.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    M[&quot;message&quot;] --&gt;|symmetric key| C[&quot;AES-GCM&quot;]
+    M --&gt; H[&quot;SHA-256&quot;]
+    H --&gt; S[&quot;signature (RSA/ECC)&quot;]
+    P[&quot;public key&quot;] --&gt;|verify| S
+</code></pre>
+<p>Encryption guarantees secrecy, hashes guarantee integrity, signatures guarantee origin. Three different tools.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Symmetric encryption</strong>: Same key for encrypt/decrypt (AES).</li>
+<li><strong>Asymmetric encryption</strong>: Public/private key pair (RSA, ECC).</li>
+<li><strong>Hash</strong>: Arbitrary input -&gt; fixed output, one-way (SHA-256).</li>
+<li><strong>HMAC</strong>: Key + hash to prevent tampering.</li>
+<li><strong>AEAD</strong>: Encryption + authentication in one step (AES-GCM, ChaCha20-Poly1305).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — AES-CBC only (no authentication)</strong></p>
+<pre><code class="language-text">attacker tampers ciphertext -&gt; wrong plaintext on decrypt -&gt; exploited
+</code></pre>
+<p><strong>After — AES-GCM (AEAD)</strong></p>
+<pre><code class="language-text">tampered ciphertext is rejected at decryption -&gt; authenticated secrecy
+</code></pre>
+<p>Encryption alone is not enough — AEAD is the modern standard for this reason.</p>
+<h2>Hands-on: See the Difference in Code</h2>
+<p><strong>Step 1 — AES-GCM (symmetric, AEAD)</strong></p>
+<pre><code class="language-python"># 1_aes_gcm.py
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import os
+key = AESGCM.generate_key(bit_length=256)
+aes = AESGCM(key)
+nonce = os.urandom(12)
+ct = aes.encrypt(nonce, b&quot;hello&quot;, None)
+print(aes.decrypt(nonce, ct, None))   # b'hello'
+</code></pre>
+<p>Never reuse a nonce per key. Reuse breaks GCM's security.</p>
+<p><strong>Step 2 — SHA-256 and HMAC</strong></p>
+<pre><code class="language-python"># 2_hash_hmac.py
+import hashlib, hmac
+print(hashlib.sha256(b&quot;hello&quot;).hexdigest())
+print(hmac.new(b&quot;secret&quot;, b&quot;hello&quot;, hashlib.sha256).hexdigest())
+</code></pre>
+<p>SHA alone does not tell you who created the digest. HMAC ensures only the key holder could have produced it.</p>
+<p><strong>Step 3 — RSA sign/verify</strong></p>
+<pre><code class="language-python"># 3_rsa.py
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes
+priv = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+pub = priv.public_key()
+msg = b&quot;hello&quot;
+sig = priv.sign(msg, padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32), hashes.SHA256())
+pub.verify(sig, msg, padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32), hashes.SHA256())
+</code></pre>
+<p>A signature gives integrity + origin at the same time.</p>
+<p><strong>Step 4 — safe randomness</strong></p>
+<pre><code class="language-python"># 4_random.py
+import secrets
+print(secrets.token_bytes(16))
+print(secrets.token_urlsafe(32))
+</code></pre>
+<p>Generate keys, nonces, and tokens with <code>secrets</code>, not <code>random.random()</code>.</p>
+<p><strong>Step 5 — wrong patterns (counter-examples)</strong></p>
+<pre><code class="language-python"># 5_bad.py
+# import md5      # collisions found -&gt; integrity not assured
+# AES-ECB         # identical plaintext blocks -&gt; identical ciphertext
+# reused nonce    # GCM safety destroyed
+</code></pre>
+<p>Knowing common mistakes is half of the defense.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>AES-GCM is highly fragile to nonce reuse.</li>
+<li>HMAC keys must never leak.</li>
+<li>Signatures answer both origin (who) and integrity (untampered).</li>
+<li>Safe randomness comes from OS entropy.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using MD5/SHA1 for integrity.</strong> Collision attacks exist.</li>
+<li><strong>AES-ECB.</strong> Plaintext patterns leak directly.</li>
+<li><strong>Reused GCM nonce.</strong> Key recovery becomes possible.</li>
+<li><strong>Generating keys/tokens with <code>random.random()</code>.</strong> Predictable.</li>
+<li><strong>Inventing your own algorithm.</strong> Crypto without public review is not safe.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>TLS combines asymmetric (key exchange) + symmetric (data). Mobile secure storage (iOS Keychain, Android Keystore) and cloud KMS (AWS KMS, GCP KMS) handle key management. Database transparent encryption is mostly AES-GCM under the hood.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>For new systems, only AES-GCM or ChaCha20-Poly1305 are considered.</li>
+<li>Keys live in a KMS, not in code.</li>
+<li>Key rotation strategy is decided before algorithm choice.</li>
+<li>Self-implemented crypto is forbidden — use libraries.</li>
+<li>The randomness source is verified explicitly.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you say why AEAD is needed?</li>
+<li>[ ] Can you state the difference between HMAC and a hash in one line?</li>
+<li>[ ] Can you describe how nonces/IVs are managed per key?</li>
+<li>[ ] Do you know the safe source of randomness?</li>
+<li>[ ] Can you clearly distinguish signing from encryption?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain the difference between AES-CBC and AES-GCM in a paragraph.</li>
+<li>Write pseudocode for verifying webhook signatures with HMAC.</li>
+<li>Write a one-page key-rotation policy (cycle, storage, retirement).</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Encryption and hashing do different jobs. Next we look at how these tools combine on the network — TLS and certificates.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What Is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><strong>Cryptography and Hashing (current)</strong></li>
+<li>TLS and certificates (upcoming)</li>
+<li>web security basics (upcoming)</li>
+<li>SQL injection and XSS (upcoming)</li>
+<li>secret management (upcoming)</li>
+<li>least privilege (upcoming)</li>
+<li>logging and audit (upcoming)</li>
+<li>security incident response (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.khanacademy.org/computing/computer-science/cryptography">Cryptography 101 — Khan Academy</a></li>
+<li><a href="https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines">NIST Cryptographic Standards</a></li>
+<li><a href="https://www.latacora.com/blog/2018/04/03/cryptographic-right-answers/">Cryptographic Right Answers — Latacora</a></li>
+<li><a href="https://cryptography.io/">Python cryptography library</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, Cryptography, Hash, SymmetricEncryption, PublicKey</p>
+</body>
+</html>

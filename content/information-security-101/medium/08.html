@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Least Privilege</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Least Privilege</h1>
+<blockquote>
+<p>Information Security 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is "convenient extra access" so dangerous?</p>
+<blockquote>
+<p>Least privilege defines your blast radius when an incident happens.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The exact meaning of the principle of least privilege (PoLP)</li>
+<li>Writing deny and allow IAM policies</li>
+<li>RBAC vs ABAC vs ReBAC</li>
+<li>What zero trust actually means in practice</li>
+<li>Separating human and system privileges</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>You cannot always prevent compromise, but you can always shrink the blast radius. Least privilege determines the cost of any incident.</p>
+<blockquote>
+<p>Privileges are not granted; they are loaned.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[&quot;User&quot;] --&gt;|&quot;assume role&quot;| R[&quot;Role&quot;]
+    R --&gt;|&quot;per policy&quot;| A[&quot;Allowed actions&quot;]
+    A --&gt;|&quot;audit log&quot;| L[&quot;SIEM&quot;]
+</code></pre>
+<p>Every privilege is explicit and traceable.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>PoLP</strong>: just enough privilege to do the job.</li>
+<li><strong>RBAC</strong>: role-based access control.</li>
+<li><strong>ABAC</strong>: attribute-based (tags, time, location).</li>
+<li><strong>Zero Trust</strong>: verify every time, regardless of network location.</li>
+<li><strong>Privilege escalation</strong>: must be blocked everywhere.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — Every service runs as admin</strong></p>
+<pre><code class="language-text">One service compromised -&gt; full cluster control lost
+</code></pre>
+<p><strong>After — Per-service least privilege</strong></p>
+<pre><code class="language-text">One service compromised -&gt; only that service's resources affected
+</code></pre>
+<p>Blast radius decides the severity of the incident.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — AWS IAM (Least Privilege)</strong></p>
+<pre><code class="language-json">{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [{
+    &quot;Effect&quot;: &quot;Allow&quot;,
+    &quot;Action&quot;: [&quot;s3:GetObject&quot;],
+    &quot;Resource&quot;: &quot;arn:aws:s3:::my-bucket/reports/*&quot;
+  }]
+}
+</code></pre>
+<p><code>Action: "*"</code> and <code>Resource: "*"</code> are red flags.</p>
+<p><strong>Step 2 — Kubernetes RBAC</strong></p>
+<pre><code class="language-yaml"># 2_role.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata: { namespace: app, name: pod-reader }
+rules:
+- apiGroups: [&quot;&quot;]
+  resources: [&quot;pods&quot;]
+  verbs: [&quot;get&quot;, &quot;list&quot;]
+</code></pre>
+<p>Scoped to one namespace, one resource, read-only.</p>
+<p><strong>Step 3 — Service Account Separation</strong></p>
+<pre><code class="language-yaml"># 3_sa.yaml
+kind: ServiceAccount
+apiVersion: v1
+metadata: { name: reports-reader, namespace: app }
+</code></pre>
+<p>Each workload gets its own dedicated service account.</p>
+<p><strong>Step 4 — Temporary Privilege (sudo Pattern)</strong></p>
+<pre><code class="language-python"># 4_temp_grant.py
+def assume_emergency_role():
+    # break-glass: 30-minute expiry, alerting, audit log
+    issue_short_lived_credential(role=&quot;incident-responder&quot;, ttl_min=30)
+</code></pre>
+<p>No standing privilege; issue only when needed.</p>
+<p><strong>Step 5 — Policy Validation (Static Analysis)</strong></p>
+<pre><code class="language-bash"># 5_check.sh
+# Detect wildcards in IAM policies
+grep -r '&quot;\*&quot;' iam/ &amp;&amp; echo &quot;WARNING: wildcard in IAM&quot;
+</code></pre>
+<p>Treat policy as code; lint it.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Wildcards trigger lint warnings.</li>
+<li>Privileges may have time limits (TTL).</li>
+<li>Human privileges and system privileges are separated.</li>
+<li>Break-glass always carries alerting and audit.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Admin everywhere.</strong> Maximum blast radius.</li>
+<li><strong>Temporary grants that never expire.</strong> Privilege accretion.</li>
+<li><strong>Overly broad RBAC roles.</strong> Effectively admin.</li>
+<li><strong>No alerting on break-glass.</strong> Emergency access becomes routine.</li>
+<li><strong>No periodic review.</strong> Over time everyone becomes admin.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>AWS layers SCP + IAM + Resource Policy + Permission Boundary. Kubernetes layers Namespace + RBAC + NetworkPolicy + PodSecurityAdmission. Human access flows through an IdP (Okta) with Just-In-Time issuance to remove standing privileges.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Privileges are reviewed on a schedule (quarterly).</li>
+<li>New grants ship with an expiry date.</li>
+<li>Policies live in git and change via PR.</li>
+<li>Every incident review revisits blast radius.</li>
+<li>"Temporary" grants do not exist outside the official process.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does every service account have a dedicated identity?</li>
+<li>[ ] Are wildcards absent from IAM policies?</li>
+<li>[ ] Is there a defined access-review cadence?</li>
+<li>[ ] Does break-glass come with alerting?</li>
+<li>[ ] Is human access JIT-issued?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain the difference between RBAC and ABAC in one paragraph.</li>
+<li>List two alert events that should fire on break-glass usage.</li>
+<li>Describe two architectural choices that shrink blast radius when one service is compromised.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Least privilege defines the cost of an incident. Next we look at what makes incidents detectable in the first place — logging and audit.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">TLS and Certificates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/05-web-security-basics.md">Web Security Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/06-sql-injection-and-xss.md">SQL Injection and XSS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/07-secret-management.md">Secret Management</a></li>
+<li><strong>Least Privilege (current)</strong></li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://csrc.nist.gov/glossary/term/least_privilege">NIST — Principle of Least Privilege</a></li>
+<li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html">AWS — IAM Best Practices</a></li>
+<li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">Kubernetes — RBAC Authorization</a></li>
+<li><a href="https://cloud.google.com/beyondcorp">Google — BeyondCorp Zero Trust</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, LeastPrivilege, IAM, AccessControl, ZeroTrust</p>
+</body>
+</html>
