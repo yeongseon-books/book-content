@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error Budget</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Error Budget</h1>
+<blockquote>
+<p>SRE 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you decide <em>how much failure</em> is <em>acceptable</em>?</p>
+<blockquote>
+<p>An <em>error budget</em> is the <em>allowed distance</em> between <em>goal</em> and <em>reality</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of an <em>error budget</em></li>
+<li>How to <em>calculate</em> it</li>
+<li><em>Burn-rate</em> alerting</li>
+<li>Its relationship to <em>release decisions</em></li>
+<li>The cultural effect on a <em>team</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Speed</em> and <em>stability</em> are not enemies — a <em>budget</em> mediates them.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    SLO[&quot;SLO target&quot;] --&gt; Budget[&quot;error budget&quot;]
+    Actual[&quot;actual errors&quot;] --&gt; Spent[&quot;spent&quot;]
+    Spent --&gt; Decision[&quot;release decision&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>error budget</strong>: the <em>allowed amount of failure</em>.</li>
+<li><strong>burn rate</strong>: the <em>speed</em> of consumption.</li>
+<li><strong>freeze</strong>: a <em>release halt</em>.</li>
+<li><strong>window</strong>: the <em>measurement period</em>.</li>
+<li><strong>policy</strong>: the <em>action</em> taken when budget is spent.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: an outage triggers <em>blame</em>.</p>
+<p><strong>After</strong>: as long as the <em>budget holds</em>, you <em>take risks</em>; when it is <em>spent</em>, you <em>freeze</em>.</p>
+<h2>Hands-on: Operating the Budget</h2>
+<p><strong>Step 1 — Compute the budget</strong></p>
+<pre><code class="language-python">def budget(target, total):
+    return (1 - target) * total
+</code></pre>
+<p><strong>Step 2 — Spend ratio</strong></p>
+<pre><code class="language-python">def spent(errors, allowed):
+    return errors / allowed
+</code></pre>
+<p><strong>Step 3 — Burn rate</strong></p>
+<pre><code class="language-python">def burn_rate(errors_in_h, allowed_per_h):
+    return errors_in_h / allowed_per_h
+</code></pre>
+<p><strong>Step 4 — Policy branch</strong></p>
+<pre><code class="language-python">def policy(spent_ratio):
+    if spent_ratio &gt; 1.0:
+        return &quot;freeze&quot;
+    if spent_ratio &gt; 0.5:
+        return &quot;review&quot;
+    return &quot;ship&quot;
+</code></pre>
+<p><strong>Step 5 — Alert</strong></p>
+<pre><code class="language-python">def alert(burn):
+    return burn &gt; 14.4  # 14.4x: fast burn
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>budget</em> is <em>quantifiable</em>.</li>
+<li><em>Burn rate</em> is the <em>early-warning</em> signal.</li>
+<li>A <em>policy</em> turns the budget into <em>behavior</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Keeping the <em>budget</em> only as a <em>document</em>.</strong></li>
+<li><strong>Ignoring <em>burn rate</em>.</strong></li>
+<li><strong>Having <em>no freeze</em> policy.</strong></li>
+<li><strong>Running <em>SLO</em> and <em>budget</em> in <em>separate</em> tools.</strong></li>
+<li><strong>Using the <em>budget</em> as a <em>punishment</em> tool.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>If the <em>budget</em> has room, you <em>experiment</em>. Once it is <em>spent</em>, you <em>focus on stability</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>budget</em> is the <em>language</em> of the conversation.</li>
+<li><em>Burn rate</em> tells you about <em>now</em>.</li>
+<li>A <em>freeze</em> is a <em>reset</em>, not a <em>punishment</em>.</li>
+<li>The <em>policy</em> is <em>negotiated</em> with the team.</li>
+<li>The <em>budget</em> is part of the <em>product</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Budget</em> computed.</li>
+<li>[ ] <em>Burn-rate</em> alert.</li>
+<li>[ ] <em>Freeze</em> policy.</li>
+<li>[ ] Named <em>owner</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>error budget</em> in one line.</li>
+<li>Define <em>burn rate</em> in one line.</li>
+<li>Define <em>freeze</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover the <em>fundamentals of monitoring</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
+<li><strong>Error Budget (current)</strong></li>
+<li>Monitoring (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+<li>Postmortem (upcoming)</li>
+<li>Reducing Toil (upcoming)</li>
+<li>Capacity Planning (upcoming)</li>
+<li>Building Operable Systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/embracing-risk/">Embracing Risk - Google SRE Book</a></li>
+<li><a href="https://sre.google/workbook/alerting-on-slos/">Alerting on SLOs - Google SRE Workbook</a></li>
+<li><a href="https://www.atlassian.com/incident-management/kpis/error-budget">Error Budgets - Atlassian</a></li>
+<li><a href="https://sre.google/workbook/error-budget-policy/">Error Budget Policy - Google</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, ErrorBudget, Reliability, Release, Risk</p>
+</body>
+</html>

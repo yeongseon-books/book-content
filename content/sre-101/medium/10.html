@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building Operable Systems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building Operable Systems</h1>
+<blockquote>
+<p>SRE 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you build a system that is <em>operable from day one</em>?</p>
+<blockquote>
+<p><em>Operability</em> is <em>designed in</em> like a <em>feature</em>, not bolted on later.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>operability</em></li>
+<li><em>Observability</em>, <em>automation</em>, and <em>safe change</em></li>
+<li><em>Resilience</em> patterns</li>
+<li>The <em>integrated</em> operational picture</li>
+<li>A <em>series synthesis</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>feature</em> without <em>operability</em> returns as <em>debt</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Obs[&quot;observability&quot;] --&gt; Op[&quot;operable&quot;]
+    Auto[&quot;automation&quot;] --&gt; Op
+    Safe[&quot;safe change&quot;] --&gt; Op
+    Resil[&quot;resilience&quot;] --&gt; Op
+    Op --&gt; Trust[&quot;customer trust&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>operability</strong>: how <em>easy</em> it is to <em>operate</em> the system.</li>
+<li><strong>observability</strong>: ability to <em>infer internal state</em> from <em>outside</em>.</li>
+<li><strong>safe change</strong>: <em>canary</em> and <em>rollback</em>-friendly change.</li>
+<li><strong>resilience</strong>: ability to <em>recover</em> from <em>partial failure</em>.</li>
+<li><strong>runbook-as-code</strong>: a <em>procedure</em> expressed as <em>code</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: build the <em>feature</em>; defer <em>operations</em>.</p>
+<p><strong>After</strong>: build the <em>feature</em> and its <em>operability</em> together.</p>
+<h2>Hands-on: An Operability Audit</h2>
+<p><strong>Step 1 — Observability check</strong></p>
+<pre><code class="language-python">def has_obs(metrics, logs, traces):
+    return all([metrics, logs, traces])
+</code></pre>
+<p><strong>Step 2 — Safe deploy</strong></p>
+<pre><code class="language-python">def safe_deploy(canary_pct, rollback_ready):
+    return canary_pct &lt;= 5 and rollback_ready
+</code></pre>
+<p><strong>Step 3 — Resilience patterns</strong></p>
+<pre><code class="language-python">def has_resilience(retry, timeout, breaker):
+    return all([retry, timeout, breaker])
+</code></pre>
+<p><strong>Step 4 — Automation ratio</strong></p>
+<pre><code class="language-python">def auto_ratio(auto_min, total_min):
+    return auto_min / total_min
+</code></pre>
+<p><strong>Step 5 — Operability score</strong></p>
+<pre><code class="language-python">def score(obs, deploy, resil, auto):
+    return sum([obs, deploy, resil, auto &gt;= 0.7]) / 4
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>We check <em>four dimensions</em>.</li>
+<li>We <em>prove</em> it with <em>code</em>.</li>
+<li>A <em>score</em> sets the <em>priority</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating <em>operability</em> as a <em>later</em> concern.</strong></li>
+<li><strong>Missing <em>observability</em>.</strong></li>
+<li><strong>Full rollouts without <em>canaries</em>.</strong></li>
+<li><strong>No <em>resilience</em> patterns.</strong></li>
+<li><strong>Insufficient <em>automation</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>platform team</em> ships a <em>common operability</em> template; <em>product teams</em> focus on the <em>business</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Operability</em> is part of the <em>feature</em>.</li>
+<li><em>Observability</em> is the <em>baseline</em> of debugging.</li>
+<li>Make <em>changes</em> <em>small</em> and <em>reversible</em>.</li>
+<li>Stop <em>partial failure</em> from becoming <em>total failure</em>.</li>
+<li><em>Learning</em> is <em>amplified</em> in <em>operations</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Four-dimension <em>checklist</em>.</li>
+<li>[ ] <em>Canary/rollback</em> standard.</li>
+<li>[ ] <em>Common library</em>.</li>
+<li>[ ] <em>Operability KPI</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>operability</em> in one line.</li>
+<li>Define <em>safe change</em> in one line.</li>
+<li>Define <em>resilience</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Congrats on finishing the series. Next, head into <em>Incident Response 101</em> and dive deeper into the <em>operations floor</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">Incident Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/07-postmortem.md">Postmortem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/08-reducing-toil.md">Reducing Toil</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/09-capacity-planning.md">Capacity Planning</a></li>
+<li><strong>Building Operable Systems (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/books/building-secure-reliable-systems/">Building Secure and Reliable Systems - Google</a></li>
+<li><a href="https://pragprog.com/titles/mnee2/release-it-second-edition/">Release It! - Michael Nygard</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Resilience_engineering">Resilience Engineering - Wikipedia</a></li>
+<li><a href="https://www.oreilly.com/library/view/observability-engineering/9781492076438/">Observability Engineering - O'Reilly</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, Operability, Architecture, Reliability, Engineering</p>
+</body>
+</html>

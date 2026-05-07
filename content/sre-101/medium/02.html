@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reliability</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Reliability</h1>
+<blockquote>
+<p>SRE 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>reliability</em> a <em>feeling</em> or a <em>measurable</em> number?</p>
+<blockquote>
+<p><em>Reliability</em> is the discipline of <em>proving</em> a <em>customer promise</em> with <em>numbers</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>reliability</em></li>
+<li>The <em>four measurable dimensions</em></li>
+<li>The difference between <em>availability</em> and <em>latency</em></li>
+<li><em>Durability</em> and <em>correctness</em></li>
+<li>The core <em>design principles</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without numbers, every <em>conversation</em> and <em>decision</em> becomes <em>subjective</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Avail[&quot;availability&quot;] --&gt; R[&quot;reliability&quot;]
+    Lat[&quot;latency&quot;] --&gt; R
+    Corr[&quot;correctness&quot;] --&gt; R
+    Dur[&quot;durability&quot;] --&gt; R
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>availability</strong>: the <em>fraction of time</em> the system works.</li>
+<li><strong>latency</strong>: the <em>response time</em>.</li>
+<li><strong>correctness</strong>: the <em>accuracy</em> of results.</li>
+<li><strong>durability</strong>: how well data is <em>retained</em>.</li>
+<li><strong>MTTR</strong>: <em>mean time to recover</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: vague phrases like "it <em>works fine</em>".</p>
+<p><strong>After</strong>: numbers like "<em>99.9%</em>, <em>p95 200ms</em>".</p>
+<h2>Hands-on: Measuring Four Dimensions</h2>
+<p><strong>Step 1 — Availability</strong></p>
+<pre><code class="language-python">def availability(uptime_s, total_s):
+    return uptime_s / total_s
+</code></pre>
+<p><strong>Step 2 — Latency p95</strong></p>
+<pre><code class="language-python">def p95(samples):
+    s = sorted(samples)
+    return s[int(0.95 * len(s)) - 1]
+</code></pre>
+<p><strong>Step 3 — Correctness</strong></p>
+<pre><code class="language-python">def correctness(correct, total):
+    return correct / total
+</code></pre>
+<p><strong>Step 4 — Durability</strong></p>
+<pre><code class="language-python">def lost_ratio(lost, stored):
+    return lost / stored
+</code></pre>
+<p><strong>Step 5 — Combined SLOs</strong></p>
+<pre><code class="language-python">slos = {
+    &quot;availability&quot;: 0.999,
+    &quot;p95_ms&quot;: 200,
+    &quot;correctness&quot;: 0.9999,
+    &quot;lost_ratio&quot;: 1e-9,
+}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Each <em>dimension</em> has a different <em>indicator</em>.</li>
+<li><em>Quantiles</em> like <em>p95</em> are more useful than averages.</li>
+<li><em>Correctness</em> and <em>durability</em> matter most in <em>data systems</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Looking only at <em>average latency</em>.</strong></li>
+<li><strong>Assuming <em>availability</em> is the <em>whole</em> story.</strong></li>
+<li><strong>Ignoring <em>correctness</em>.</strong></li>
+<li><strong>Treating <em>durability</em> as just <em>backups</em>.</strong></li>
+<li><strong>Confusing <em>server metrics</em> with <em>customer experience</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>payment service</em> prioritizes <em>correctness</em>. A <em>streaming service</em> prioritizes <em>latency</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Reliability</em> needs <em>numbers</em> and <em>definitions</em>.</li>
+<li><em>p95/p99</em> are closer to the <em>customer</em> than averages.</li>
+<li><em>Trade-offs</em> must be made <em>explicit</em>.</li>
+<li><em>MTTR</em> is a <em>learning</em> outcome.</li>
+<li><em>Correctness</em> is part of the <em>feature</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Four-dimension <em>SLOs</em> defined.</li>
+<li>[ ] <em>p95/p99</em> monitored.</li>
+<li>[ ] <em>Correctness</em> verified automatically.</li>
+<li>[ ] <em>Durability</em> policy documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>availability</em> in one line.</li>
+<li>Define <em>p95 latency</em> in one line.</li>
+<li>Define <em>durability</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover the difference between <em>SLI</em>, <em>SLO</em>, and <em>SLA</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><strong>Reliability (current)</strong></li>
+<li>SLI, SLO, SLA (upcoming)</li>
+<li>Error Budget (upcoming)</li>
+<li>Monitoring (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+<li>Postmortem (upcoming)</li>
+<li>Reducing Toil (upcoming)</li>
+<li>Capacity Planning (upcoming)</li>
+<li>Building Operable Systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/embracing-risk/">Reliability - Google SRE Book</a></li>
+<li><a href="https://research.google/pubs/pub40801/">Tail at Scale</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">The Four Golden Signals</a></li>
+<li><a href="https://aws.amazon.com/s3/storage-classes/">Availability vs Durability - AWS</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, Reliability, Availability, Latency, Quality</p>
+</body>
+</html>

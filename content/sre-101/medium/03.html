@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SLI, SLO, SLA</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SLI, SLO, SLA</h1>
+<blockquote>
+<p>SRE 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do <em>measurement</em>, <em>objective</em>, and <em>agreement</em> differ?</p>
+<blockquote>
+<p><em>SLI</em> is the <em>indicator</em>, <em>SLO</em> is the <em>internal goal</em>, <em>SLA</em> is the <em>external promise</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definitions</em> of <em>SLI</em>, <em>SLO</em>, <em>SLA</em></li>
+<li><em>Internal goals</em> vs <em>external promises</em></li>
+<li>What makes a <em>good SLO</em></li>
+<li>The <em>legal</em> side of <em>SLAs</em></li>
+<li>The <em>agreement</em> process</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you mix the <em>three terms</em>, every <em>decision</em> gets <em>wobbly</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    SLI[&quot;SLI: indicator&quot;] --&gt; SLO[&quot;SLO: objective&quot;]
+    SLO --&gt; SLA[&quot;SLA: agreement&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SLI</strong>: a <em>service-level indicator</em>.</li>
+<li><strong>SLO</strong>: a <em>service-level objective</em>.</li>
+<li><strong>SLA</strong>: a <em>service-level agreement</em>.</li>
+<li><strong>window</strong>: the <em>measurement period</em>.</li>
+<li><strong>threshold</strong>: the <em>allowed limit</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: someone says "<em>99.9%</em> is the <em>target</em>".</p>
+<p><strong>After</strong>: a written spec — <em>which indicator</em>, <em>over what window</em>, <em>with what consequence</em>.</p>
+<h2>Hands-on: Writing the Spec</h2>
+<p><strong>Step 1 — Define the SLI</strong></p>
+<pre><code class="language-python">sli = {
+    &quot;name&quot;: &quot;http_success_ratio&quot;,
+    &quot;formula&quot;: &quot;http_2xx / http_total&quot;,
+    &quot;source&quot;: &quot;ingress logs&quot;,
+}
+</code></pre>
+<p><strong>Step 2 — Define the SLO</strong></p>
+<pre><code class="language-python">slo = {
+    &quot;sli&quot;: sli[&quot;name&quot;],
+    &quot;target&quot;: 0.999,
+    &quot;window_days&quot;: 30,
+    &quot;owner&quot;: &quot;payments-team&quot;,
+}
+</code></pre>
+<p><strong>Step 3 — Define the SLA</strong></p>
+<pre><code class="language-python">sla = {
+    &quot;slo&quot;: slo,
+    &quot;remedy&quot;: &quot;service credit 10%&quot;,
+    &quot;exclusions&quot;: [&quot;scheduled maintenance&quot;],
+}
+</code></pre>
+<p><strong>Step 4 — Detect a violation</strong></p>
+<pre><code class="language-python">def violated(success, total, target):
+    return (success / total) &lt; target
+</code></pre>
+<p><strong>Step 5 — Report</strong></p>
+<pre><code class="language-python">def report(success, total, target):
+    return {
+        &quot;value&quot;: success / total,
+        &quot;violated&quot;: (success / total) &lt; target,
+    }
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>SLI</em> names its <em>data source</em>.</li>
+<li>The <em>SLO</em> names its <em>owner</em>.</li>
+<li>The <em>SLA</em> records <em>exclusions</em> and <em>remedies</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating <em>SLOs</em> like <em>SLAs</em> — over-promising.</strong></li>
+<li><strong>An <em>SLI</em> with an <em>unclear data source</em>.</strong></li>
+<li><strong>Forgetting the <em>measurement window</em>.</strong></li>
+<li><strong>An <em>SLO</em> without an <em>owner</em>.</strong></li>
+<li><strong>Calling something an <em>SLA</em> with <em>no remedy</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>In <em>B2B contracts</em> the <em>SLA</em> becomes a legal <em>document</em>; <em>internally</em>, the <em>SLO</em> is the <em>yardstick</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>indicator</em> lives at the <em>customer's</em> level.</li>
+<li>The <em>objective</em> must be <em>realistic</em> to be <em>useful</em>.</li>
+<li>The <em>agreement</em> is reviewed with <em>legal</em>.</li>
+<li>If you cannot <em>measure</em>, it is not a <em>target</em>.</li>
+<li>An <em>SLO</em> without an <em>owner</em> does not exist.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>SLI</em> spec.</li>
+<li>[ ] Named <em>SLO</em> owner.</li>
+<li>[ ] <em>SLA</em> remedy policy.</li>
+<li>[ ] <em>Exclusions</em> documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>SLI</em> in one line.</li>
+<li>Define <em>SLO</em> in one line.</li>
+<li>Define <em>SLA</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover the <em>error budget</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
+<li><strong>SLI, SLO, SLA (current)</strong></li>
+<li>Error Budget (upcoming)</li>
+<li>Monitoring (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+<li>Postmortem (upcoming)</li>
+<li>Reducing Toil (upcoming)</li>
+<li>Capacity Planning (upcoming)</li>
+<li>Building Operable Systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/service-level-objectives/">Service Level Objectives - Google SRE Book</a></li>
+<li><a href="https://sre.google/workbook/implementing-slos/">Implementing SLOs - Google SRE Workbook</a></li>
+<li><a href="https://www.atlassian.com/incident-management/kpis/sla-vs-slo-vs-sli">SLI vs SLO vs SLA - Atlassian</a></li>
+<li><a href="https://www.digitalocean.com/community/tutorials/what-is-sla-slo-sli">SLA, SLO, SLI - DigitalOcean</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, SLI, SLO, SLA, Reliability</p>
+</body>
+</html>

@@ -1,0 +1,54 @@
+id: sre-101
+title:
+  ko: SRE 101
+  en: SRE 101
+description:
+  ko: 신뢰성, SLI/SLO/SLA, 에러 버짓, 인시던트와 포스트모템, toil 감소, 용량 계획까지 다루는 SRE 입문 시리즈.
+  en: An entry series covering reliability, SLI/SLO/SLA, error budgets, incidents and postmortems, toil reduction, and capacity planning.
+languages:
+  - ko
+  - en
+status: content-ready
+level: 101
+lifecycle: active
+episodes:
+  - slug: 01-what-is-sre
+    title:
+      ko: SRE란 무엇인가?
+      en: What is SRE?
+  - slug: 02-reliability
+    title:
+      ko: Reliability
+      en: Reliability
+  - slug: 03-sli-slo-sla
+    title:
+      ko: SLI, SLO, SLA
+      en: SLI, SLO, SLA
+  - slug: 04-error-budget
+    title:
+      ko: Error Budget
+      en: Error Budget
+  - slug: 05-monitoring
+    title:
+      ko: Monitoring
+      en: Monitoring
+  - slug: 06-incident-response
+    title:
+      ko: Incident Response
+      en: Incident Response
+  - slug: 07-postmortem
+    title:
+      ko: Postmortem
+      en: Postmortem
+  - slug: 08-reducing-toil
+    title:
+      ko: Toil 줄이기
+      en: Reducing Toil
+  - slug: 09-capacity-planning
+    title:
+      ko: Capacity Planning
+      en: Capacity Planning
+  - slug: 10-building-operable-systems
+    title:
+      ko: 운영 가능한 시스템 만들기
+      en: Building Operable Systems

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Postmortem</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Postmortem</h1>
+<blockquote>
+<p>SRE 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: After an outage ends, what should the <em>team leave behind</em>?</p>
+<blockquote>
+<p>A <em>postmortem</em> is a <em>learning system</em>, not a <em>document</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of a <em>postmortem</em></li>
+<li><em>Blameless culture</em></li>
+<li>A writing <em>template</em></li>
+<li><em>Action item</em> tracking</li>
+<li><em>Organizational learning</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Repeated outages</em> are the result of <em>missing learning</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Incident[&quot;incident&quot;] --&gt; Doc[&quot;postmortem&quot;]
+    Doc --&gt; Actions[&quot;actions&quot;]
+    Actions --&gt; Tracker[&quot;tracker&quot;]
+    Tracker --&gt; Review[&quot;review&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>postmortem</strong>: a <em>post-incident analysis</em> document.</li>
+<li><strong>blameless</strong>: a <em>no-blame</em> principle.</li>
+<li><strong>timeline</strong>: the <em>event flow</em>.</li>
+<li><strong>root cause</strong>: the <em>underlying</em> cause.</li>
+<li><strong>action item</strong>: a <em>follow-up action</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: hunt down the <em>responsible person</em>.</p>
+<p><strong>After</strong>: analyze the <em>system weaknesses</em>.</p>
+<h2>Hands-on: Writing a Postmortem</h2>
+<p><strong>Step 1 — Define the template</strong></p>
+<pre><code class="language-python">template = {
+    &quot;title&quot;: &quot;&quot;,
+    &quot;summary&quot;: &quot;&quot;,
+    &quot;impact&quot;: &quot;&quot;,
+    &quot;timeline&quot;: [],
+    &quot;root_cause&quot;: &quot;&quot;,
+    &quot;actions&quot;: [],
+    &quot;lessons&quot;: [],
+}
+</code></pre>
+<p><strong>Step 2 — Summarize impact</strong></p>
+<pre><code class="language-python">def impact_line(users, minutes):
+    return f&quot;{users} users affected for {minutes} min&quot;
+</code></pre>
+<p><strong>Step 3 — Timeline</strong></p>
+<pre><code class="language-python">def event(t, msg):
+    return {&quot;time&quot;: t, &quot;event&quot;: msg}
+</code></pre>
+<p><strong>Step 4 — Action items</strong></p>
+<pre><code class="language-python">def action(desc, owner, due):
+    return {&quot;desc&quot;: desc, &quot;owner&quot;: owner, &quot;due&quot;: due}
+</code></pre>
+<p><strong>Step 5 — Track them</strong></p>
+<pre><code class="language-python">def open_actions(items):
+    return [a for a in items if not a.get(&quot;done&quot;)]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>template</em> substitutes for <em>memory</em>.</li>
+<li><em>Owner</em> and <em>due date</em> are the <em>tracking axes</em>.</li>
+<li><em>Lessons</em> become <em>reusable</em> assets.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Personal <em>blame</em> leading to <em>silence</em>.</strong></li>
+<li><strong><em>No tracking</em> of <em>action items</em>.</strong></li>
+<li><strong>Mistaking <em>symptoms</em> for <em>root cause</em>.</strong></li>
+<li><strong>Failing to <em>share</em> the result.</strong></li>
+<li><strong>Filling in the <em>template</em> without any real <em>learning</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Jira</em> or <em>Linear</em> tickets track each action; a <em>weekly review</em> checks progress.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Blameless</em> invites the <em>truth</em>.</li>
+<li>The <em>cause</em> lives in the <em>system</em>.</li>
+<li>A document <em>without actions</em> is <em>waste</em>.</li>
+<li><em>Recurrence prevention</em> is <em>proven by changes</em>.</li>
+<li><em>Learning</em> spreads through <em>openness</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Template</em> agreed.</li>
+<li>[ ] <em>Blameless</em> principle.</li>
+<li>[ ] <em>Action tracking</em>.</li>
+<li>[ ] <em>Shared</em> channel.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>blameless</em> in one line.</li>
+<li>Define <em>root cause</em> in one line.</li>
+<li>Define <em>action item</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>reducing toil</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">Incident Response</a></li>
+<li><strong>Postmortem (current)</strong></li>
+<li>Reducing Toil (upcoming)</li>
+<li>Capacity Planning (upcoming)</li>
+<li>Building Operable Systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/postmortem-culture/">Postmortem Culture - Google SRE Book</a></li>
+<li><a href="https://extfiles.etsy.com/DebriefingFacilitationGuide.pdf">Etsy Debriefing Guide</a></li>
+<li><a href="https://www.atlassian.com/incident-management/postmortem/blameless">Blameless Postmortems - Atlassian</a></li>
+<li><a href="https://postmortems.pagerduty.com/">PagerDuty Postmortem Guide</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, Postmortem, BlamelessCulture, Learning, Operations</p>
+</body>
+</html>
