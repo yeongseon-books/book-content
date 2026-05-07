@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Concurrency and Race Conditions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Concurrency and Race Conditions</h1>
+<blockquote>
+<p>Operating Systems 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does code that works perfectly with one thread break in strange, hard-to-reproduce ways once you go multi-threaded?</p>
+<blockquote>
+<p>A race condition happens when two or more flows touch the same data at the same time, and the result depends on who got there first. Even a single line like <code>count += 1</code> is read-modify-write, and another thread can sneak in between those steps. This article explains why concurrency bugs hide so well, what kinds exist, and which design principles keep them out.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A precise definition of race conditions and why they are hard to reproduce</li>
+<li>Three axes of concurrency violation — atomicity, visibility, ordering</li>
+<li>How memory models relate to visibility</li>
+<li>Design principles that reduce concurrency bugs</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Concurrency bugs are quiet during development and loud in production, especially under load. A bug that never appeared in tests corrupts data at 2am when traffic peaks. After living through this once, "be careful with concurrent code" stops being a slogan.</p>
+<blockquote>
+<p>A race condition is worse than a wrong answer; it is a state where you cannot say which answer you will get.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>When two threads touch the same variable, the OS scheduler can interrupt either of them at any time. Steps from the two flows interleave, and the final state can differ from what either flow intended.</p>
+</blockquote>
+<pre><code class="language-text">Initial: count = 0   (both threads want to add 1)
+
+Ideal                          Real
+T1 read  0                     T1 read  0
+T1 add   1                     T2 read  0   &lt;- interleaves
+T1 write 1                     T1 add   1
+T2 read  1                     T1 write 1
+T2 add   2                     T2 add   1
+T2 write 2  -&gt; 2               T2 write 1  -&gt; 1 (lost update)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Race condition</strong><br>
+- Description: A bug whose outcome depends on execution order</p>
+<p><strong>Critical section</strong><br>
+- Description: A region of code only one flow may run at a time</p>
+<p><strong>Atomicity</strong><br>
+- Description: A step appears indivisible from the outside</p>
+<p><strong>Visibility</strong><br>
+- Description: When one thread's write becomes visible to another</p>
+<p><strong>Memory model</strong><br>
+- Description: The rules a language or hardware promises about concurrent access</p>
+<h2>Before / After</h2>
+<p><strong>Before — "it is one line, so it is safe":</strong></p>
+<pre><code class="language-python">count = 0
+def add():
+    global count
+    for _ in range(100_000):
+        count += 1   # one line
+</code></pre>
+<p>That one line is really three: read, add, write.</p>
+<p><strong>After — "the steps can interleave":</strong></p>
+<pre><code class="language-text">T1: load count -&gt; 100
+T2: load count -&gt; 100   &lt;- same value
+T1: add  -&gt; 101
+T2: add  -&gt; 101
+T1: store -&gt; 101
+T2: store -&gt; 101         &lt;- one increment vanished
+</code></pre>
+<p>Increments quietly disappearing is the textbook race outcome.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Reproduce the simplest race</strong></p>
+<pre><code class="language-python">import threading
+
+count = 0
+def add():
+    global count
+    for _ in range(100_000):
+        count += 1
+
+ts = [threading.Thread(target=add) for _ in range(8)]
+for t in ts: t.start()
+for t in ts: t.join()
+print(count)   # expected: 800_000, actual: usually less, varies per run
+</code></pre>
+<p>Run it several times. The non-determinism is the strongest clue something is racing.</p>
+<p><strong>Step 2: Show with <code>dis</code> that one line is many steps</strong></p>
+<pre><code class="language-python">import dis
+
+def add_one(d):
+    d['k'] += 1
+
+dis.dis(add_one)
+</code></pre>
+<p>You see <code>LOAD_FAST</code>, <code>LOAD_CONST</code>, <code>INPLACE_ADD</code>, <code>STORE_SUBSCR</code>. Another thread can wedge in between any two of them.</p>
+<p><strong>Step 3: Protect with a lock</strong></p>
+<pre><code class="language-python">import threading
+
+count = 0
+lock = threading.Lock()
+
+def add():
+    global count
+    for _ in range(100_000):
+        with lock:
+            count += 1
+
+ts = [threading.Thread(target=add) for _ in range(8)]
+for t in ts: t.start()
+for t in ts: t.join()
+print(count)   # always 800_000
+</code></pre>
+<p>The lock makes the critical section enter-once at a time. Determinism returns.</p>
+<p><strong>Step 4: Visibility intuition</strong></p>
+<pre><code class="language-python">import threading, time
+
+stop = False
+def worker():
+    while not stop:
+        pass
+
+t = threading.Thread(target=worker)
+t.start()
+time.sleep(0.1)
+stop = True
+t.join()
+</code></pre>
+<p>CPython usually behaves here, but in general (other runtimes, JITs) the change to <code>stop</code> may not become visible to the worker promptly. Visibility issues persist as long as a value lives in a per-CPU register or cache.</p>
+<p><strong>Step 5: Avoid the race by reducing sharing</strong></p>
+<pre><code class="language-python">from queue import Queue
+import threading
+
+q = Queue()
+def safe_add():
+    local = 0
+    for _ in range(100_000):
+        local += 1
+    q.put(local)
+
+ts = [threading.Thread(target=safe_add) for _ in range(8)]
+for t in ts: t.start()
+for t in ts: t.join()
+
+total = 0
+while not q.empty():
+    total += q.get()
+print(total)
+</code></pre>
+<p>Reducing shared state is often safer than locking it.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A single source line says nothing about atomicity</li>
+<li>Same code, different result every run -&gt; suspect a race</li>
+<li>Locks are powerful but kill performance if held too long</li>
+<li>Designs that minimize shared state often beat well-locked designs</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>"Tests passed, must be safe"</strong><br>
+- Problem: Only fails under load<br>
+- Fix: Add load and fuzz tests</p>
+<p><strong>Lock too narrow</strong><br>
+- Problem: Race in the unprotected step<br>
+- Fix: Wrap the full critical section</p>
+<p><strong>Lock too wide</strong><br>
+- Problem: Effectively serialized, performance dies<br>
+- Fix: Narrow it, then measure</p>
+<p><strong>Debug with <code>print</code></strong><br>
+- Problem: The print itself synchronizes, hiding the bug<br>
+- Fix: Use logging or deterministic tests</p>
+<p><strong>Ignoring visibility</strong><br>
+- Problem: One thread's write is invisible elsewhere<br>
+- Fix: Learn the memory model and synchronize</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Backend caches: concurrent updates protected by locks or compare-and-swap</li>
+<li>Counters and metrics: thread-local accumulation then periodic merge</li>
+<li>Databases: isolation levels are essentially race-prevention mechanisms</li>
+<li>Distributed systems: cross-node races handled by distributed locks or atomic ops</li>
+<li>UI frameworks: single-owner main thread blocks concurrent access</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer hearing "we sometimes see a concurrency bug" does not jump to a fix. First they make a small table: which data is shared, who reads, who writes, what the locks are claiming to protect. Only after that table is clean does any code change become meaningful.</p>
+<p>A senior also knows "locking is often not the answer." Removing shared state, communicating by messages, using immutable data — these designs cut down the surface where bugs can live. The safest critical section is the one that does not exist.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can define a race condition in one sentence</li>
+<li>[ ] You can distinguish atomicity, visibility, and ordering</li>
+<li>[ ] You know that "one line" says nothing about atomicity</li>
+<li>[ ] You know strategies beyond locks (immutable, messages, thread-local)</li>
+<li>[ ] You treat non-determinism as a clue when debugging concurrency</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Have 8 threads each increment a shared counter 10,000 times. Run three versions: (a) no lock, (b) narrow lock, (c) wide lock. Compare outcomes and runtimes in a small table.</p>
+</li>
+<li>
+<p>Find shared state in one of your own projects and rewrite that part to "share less." Note in a paragraph what got simpler and what got harder.</p>
+</li>
+<li>
+<p>Switch your concurrency debug code from <code>print</code> to <code>logging</code>. Note how interleaved output changes and explain why.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Race conditions hide behind the appearance of "one line" because steps interleave. The three axes — atomicity, visibility, ordering — give you a vocabulary for them, and tools beyond locks (immutability, messages, thread-local accumulation) reduce the surface from the design stage.</p>
+<p>Next we look at the most common synchronization primitives in detail: locks (mutexes) and their cousin the semaphore.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
+<li><strong>Concurrency and Race Conditions (current)</strong></li>
+<li>Locks, Mutexes, and Semaphores (upcoming)</li>
+<li>Memory Management (upcoming)</li>
+<li>Virtual Memory (upcoming)</li>
+<li>File Systems (upcoming)</li>
+<li>System Calls (upcoming)</li>
+<li>Containers and the Operating System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.pearson.com/store/p/modern-operating-systems/P100000869539">Tanenbaum &amp; Bos — Modern Operating Systems</a></li>
+<li><a href="https://jcip.net/">Java Concurrency in Practice — Brian Goetz</a></li>
+<li><a href="https://www.elsevier.com/books/the-art-of-multiprocessor-programming/herlihy/978-0-12-415950-1">The Art of Multiprocessor Programming — Herlihy &amp; Shavit</a></li>
+<li><a href="https://docs.python.org/3/library/threading.html">Python threading documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Concurrency, Race Conditions, Debugging, Systems</p>
+</body>
+</html>

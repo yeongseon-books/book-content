@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Virtual Memory</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Virtual Memory</h1>
+<blockquote>
+<p>Operating Systems 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Every process appears to own its own enormous memory, yet the machine has only a few GB of RAM — how does the OS construct that illusion?</p>
+<blockquote>
+<p>Virtual memory is the biggest illusion the OS produces. It promises every process its own 4GB while the machine has only 8 or 16. Pages, page tables, the TLB, and page faults hold up that illusion. Once you understand the mechanism, you can see why "the process looks fine but the system freezes" actually happens.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The split between virtual addresses and physical addresses</li>
+<li>The roles of pages, page tables, and the TLB</li>
+<li>The cost that page faults and swap impose</li>
+<li>How memory-mapped files (mmap) and copy-on-write are used in practice</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without virtual memory you cannot diagnose "RSS is small but the system is slow" or "swap fills up and response times collapse." Powerful features like mmap, fork, and copy-on-write all live on top of virtual memory. It is where the OS handles resources most elegantly, and also where the most expensive mistakes happen.</p>
+<blockquote>
+<p>Virtual memory is not free. The illusion bills you precisely through page faults.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Each process has its own virtual address space. Virtual addresses are split into pages (typically 4KB) and translated to physical addresses through a page table. The CPU caches recent translations in a TLB. When a translation is missing or the page is on disk, a page fault triggers and the OS handles it.</p>
+</blockquote>
+<pre><code class="language-text">virtual addr  →  [TLB hit]  →  physical addr  →  RAM
+                   ↓ miss
+              page table walk
+                   ↓ not present
+              page fault → OS handles (read from disk / allocate new page)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Page</strong><br>
+- Description: The unit virtual/physical memory is divided into (typically 4KB)</p>
+<p><strong>Page table</strong><br>
+- Description: Map from virtual page → physical frame</p>
+<p><strong>TLB</strong><br>
+- Description: CPU-internal cache of recent page-table lookups</p>
+<p><strong>Page fault</strong><br>
+- Description: Mapping is missing or the page is not in RAM; the OS must intervene</p>
+<p><strong>Swap</strong><br>
+- Description: Pages evicted to disk and brought back when RAM is tight</p>
+<h2>Before / After</h2>
+<p><strong>Before — "RSS tells the whole story":</strong></p>
+<pre><code class="language-bash">ps -o pid,rss,cmd -p $$
+# Not enough. Two processes with the same RSS can have very different speeds
+</code></pre>
+<p><strong>After — "watch page faults and TLB misses too":</strong></p>
+<pre><code class="language-bash"># major fault = went to disk (slow)
+ps -o pid,min_flt,maj_flt,rss,cmd -p $$
+# Rising major faults suggests swap-in
+</code></pre>
+<p>Same RSS but different fault patterns produce very different perceived speed.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Read page-fault counters</strong></p>
+<pre><code class="language-bash">python3 -c &quot;
+import resource
+r = resource.getrusage(resource.RUSAGE_SELF)
+print('minor faults', r.ru_minflt)
+print('major faults', r.ru_majflt)
+&quot;
+</code></pre>
+<p>A minor fault is the cost of grabbing a fresh page in RAM; a major fault is the cost of pulling it from disk. Climbing major faults suggests swap activity.</p>
+<p><strong>Step 2: mmap a large file</strong></p>
+<pre><code class="language-python">import mmap, os
+
+with open('big.bin', 'wb') as f:
+    f.write(b'A' * (10 * 1024 * 1024))     # 10MB
+
+with open('big.bin', 'rb') as f:
+    with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+        print(mm[0:10])                     # only touched pages get loaded
+</code></pre>
+<p>mmap maps a file directly into the virtual address space. Only the pages you actually touch end up in RAM, so you can treat very large files like memory.</p>
+<p><strong>Step 3: Observe copy-on-write (fork)</strong></p>
+<pre><code class="language-python">import os, time
+
+big = bytearray(100 * 1024 * 1024)          # 100MB
+pid = os.fork()
+if pid == 0:                                 # child
+    # Initially shares pages with the parent (CoW)
+    big[0] = 1                               # write triggers a page copy
+    time.sleep(2)
+    os._exit(0)
+else:
+    os.waitpid(pid, 0)
+</code></pre>
+<p><code>fork</code> does not copy pages immediately; copy happens only on write. This is the core trick that makes spawning a child process cheap.</p>
+<p><strong>Step 4: Look at swap usage</strong></p>
+<pre><code class="language-bash">free -h
+swapon --show
+# or
+cat /proc/swaps
+</code></pre>
+<p>If swap is in use and response times are collapsing, RAM is short or the working set has exceeded RAM.</p>
+<p><strong>Step 5: Access pattern and the TLB</strong></p>
+<pre><code class="language-python">import time
+N = 5000
+m = [[0]*N for _ in range(N)]
+
+t = time.time()
+for i in range(N):
+    for j in range(N):
+        m[i][j] = 1                          # row-major — good page locality
+print('row-major', time.time() - t)
+
+t = time.time()
+for j in range(N):
+    for i in range(N):
+        m[i][j] = 1                          # column-major — TLB/cache misses explode
+print('col-major', time.time() - t)
+</code></pre>
+<p>Same data, same number of writes, different access pattern — the timing differs by several times. Virtual-memory cost is decided by access pattern.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>mmap turns file I/O into memory access — a natural abstraction for large data</li>
+<li>Copy-on-write is the trick that makes fork cheap</li>
+<li>When swap shows up, response time has already collapsed</li>
+<li>Same RSS plus different locality produces very different perceived speed</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Judging memory only by RSS</strong><br>
+- Problem: Misses swap and faults<br>
+- Fix: Monitor major faults and swap usage too</p>
+<p><strong>Reading the entire large file</strong><br>
+- Problem: OOM or swap<br>
+- Fix: Use mmap or chunk streaming</p>
+<p><strong>Mutating big data right after fork</strong><br>
+- Problem: Defeats CoW, memory explodes<br>
+- Fix: Minimize writes between fork and exec</p>
+<p><strong>Ignoring access locality</strong><br>
+- Problem: TLB-miss storm<br>
+- Fix: Co-design data structures and loop order</p>
+<p><strong>"Swap on means safe"</strong><br>
+- Problem: Response collapses anyway<br>
+- Fix: Disable or minimize swap on production systems</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Databases: mmap for index and page cache</li>
+<li>Containers: cgroup memory and swap settings shape OOM behavior</li>
+<li>ML training: memory-mapped numpy arrays relieve RAM pressure</li>
+<li>Backends: fork-based worker models (gunicorn, uwsgi) leverage CoW</li>
+<li>Performance tuning: perf and friends measure TLB miss and page faults</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>When a senior engineer hears "we are out of memory," they do not stop at RSS. They first check page-fault rates, swap usage, and whether the working set has exceeded RAM. Virtual memory is an illusion, but unless you can name the moment the illusion breaks (major fault, swap-in), diagnosis goes nowhere.</p>
+<p>A senior also designs the access pattern alongside the data structure. Memory is not a flat 1D space but a hierarchy with pages and cache lines, and that fact alone makes the same algorithm several times faster or slower.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can describe virtual vs physical addresses</li>
+<li>[ ] I can describe the cost difference between minor and major faults</li>
+<li>[ ] I know when mmap is useful</li>
+<li>[ ] I can explain what copy-on-write means</li>
+<li>[ ] I treat visible swap as a danger signal</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Time row-major vs column-major fills of the same 2D array. Explain in one paragraph why the times differ.</p>
+</li>
+<li>
+<p>Process a 1GB file with read() vs mmap. Compare RSS and time.</p>
+</li>
+<li>
+<p>Run the same memory load with swap on and with swap off. Observe the response-time difference.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Virtual memory is an illusion, but the OS bills you precisely for it through page faults and swap. Techniques like mmap and copy-on-write apply that illusion to handle big data gracefully. Understand virtual memory and you can name the moment the system freezes.</p>
+<p>The next article moves on to a resource the OS handles almost as often as memory — the file system.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Concurrency and Race Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Locks, Mutexes, and Semaphores</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Memory Management</a></li>
+<li><strong>Virtual Memory (current)</strong></li>
+<li>File Systems (upcoming)</li>
+<li>System Calls (upcoming)</li>
+<li>Containers and the Operating System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.pearson.com/store/p/modern-operating-systems/P100000869539">Tanenbaum &amp; Bos — Modern Operating Systems</a></li>
+<li><a href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">What Every Programmer Should Know About Memory — Ulrich Drepper</a></li>
+<li><a href="https://man7.org/linux/man-pages/man2/mmap.2.html">Linux mmap(2) man page</a></li>
+<li><a href="https://docs.python.org/3/library/mmap.html">Python mmap</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Virtual Memory, Paging, TLB, Swap</p>
+</body>
+</html>

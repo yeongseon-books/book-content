@@ -1,0 +1,71 @@
+id: operating-systems-101
+title:
+  ko: Operating Systems 101
+  en: Operating Systems 101
+description:
+  ko: 프로세스, 스레드, 스케줄링, 동시성, 메모리 관리, 가상 메모리, 파일 시스템, 시스템 콜, 컨테이너까지 운영체제의 기본 개념을 다지는 시리즈.
+  en: A foundational series on operating systems covering processes, threads, scheduling, concurrency, memory management, virtual memory, file systems, system calls, and containers.
+status: content-ready
+category: cs-core
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-an-operating-system
+    title:
+      ko: 운영체제란 무엇인가?
+      en: What Is an Operating System?
+  - number: 2
+    slug: processes-and-threads
+    title:
+      ko: 프로세스와 스레드
+      en: Processes and Threads
+  - number: 3
+    slug: scheduling
+    title:
+      ko: 스케줄링
+      en: Scheduling
+  - number: 4
+    slug: concurrency-and-race-conditions
+    title:
+      ko: 동시성과 race condition
+      en: Concurrency and Race Conditions
+  - number: 5
+    slug: locks-mutex-semaphore
+    title:
+      ko: lock, mutex, semaphore
+      en: Locks, Mutexes, and Semaphores
+  - number: 6
+    slug: memory-management
+    title:
+      ko: 메모리 관리
+      en: Memory Management
+  - number: 7
+    slug: virtual-memory
+    title:
+      ko: 가상 메모리
+      en: Virtual Memory
+  - number: 8
+    slug: file-systems
+    title:
+      ko: 파일 시스템
+      en: File Systems
+  - number: 9
+    slug: system-calls
+    title:
+      ko: 시스템 콜
+      en: System Calls
+  - number: 10
+    slug: containers-and-the-os
+    title:
+      ko: 컨테이너와 운영체제
+      en: Containers and the Operating System

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is an Operating System?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is an Operating System?</h1>
+<blockquote>
+<p>Operating Systems 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do all the programs on a single computer coexist without trampling each other's CPU, memory, and files?</p>
+<blockquote>
+<p>An operating system (OS) sits between hardware and applications. It coordinates how CPU, memory, disks, and the network are shared, and it wraps raw hardware in clean abstractions like processes, files, and sockets that application code can use. This series follows both roles end to end and explains the machinery that you depend on every day but rarely see.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A working definition of an operating system and its two main roles</li>
+<li>The difference between user mode and kernel mode</li>
+<li>The core abstractions an OS provides — process, virtual memory, file, socket</li>
+<li>Why every developer benefits from understanding the OS</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The OS is invisible until something breaks. Out-of-memory kills, zombie processes, file-descriptor leaks, slow disks, blocked sockets — almost every production incident is, at its root, a conversation gone wrong with the OS. With a mental model of the OS, error messages stop being vague "system errors" and become traceable signals.</p>
+<blockquote>
+<p>Your application sits on the OS, the OS sits on the hardware. If you do not know the cost of crossing those boundaries, you cannot reason about performance or stability.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>The OS is the software layer between user programs and hardware. Above, it exposes a small, simple interface to applications through system calls. Below, it talks directly to hardware via schedulers, memory managers, file systems, and device drivers.</p>
+</blockquote>
+<pre><code class="language-text">+---------------------------------------------+
+|  Application (Python, Browser, IDE, ...)    |
++---------------------------------------------+
+|  System Call Interface  (read, write, ...)  |
++---------------------------------------------+
+|  Kernel                                     |
+|   - Process scheduler                       |
+|   - Memory manager                          |
+|   - File systems / VFS                      |
+|   - Network stack                           |
+|   - Device drivers                          |
++---------------------------------------------+
+|  Hardware (CPU, RAM, Disk, NIC, ...)        |
++---------------------------------------------+
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Kernel</strong><br>
+- Description: The core of the OS, the only code with direct hardware access</p>
+<p><strong>User mode</strong><br>
+- Description: Restricted privilege level where ordinary applications run</p>
+<p><strong>System call</strong><br>
+- Description: The defined entry point applications use to ask the kernel for work</p>
+<p><strong>Process</strong><br>
+- Description: The OS abstraction for a running program (memory plus CPU time)</p>
+<p><strong>Device driver</strong><br>
+- Description: A module that wraps a specific piece of hardware behind an OS interface</p>
+<h2>Before / After</h2>
+<p><strong>Before — "the OS just turns the computer on":</strong></p>
+<pre><code class="language-python">with open(&quot;data.txt&quot;) as f:
+    print(f.read())
+</code></pre>
+<p>For these three lines to run, something has to find which disk blocks hold <code>data.txt</code>, send commands to the disk controller, copy the data into RAM, and map that memory so our process can read it.</p>
+<p><strong>After — "the OS is working on every line":</strong></p>
+<pre><code class="language-text">open()  -&gt; system call -&gt; kernel walks the file system, finds the inode
+                       -&gt; hands a file descriptor back to user space
+read()  -&gt; system call -&gt; queues an I/O request to the disk driver
+                       -&gt; data flows: kernel buffer -&gt; user buffer
+print() -&gt; system call (write to stdout)
+                       -&gt; handed to the terminal device driver
+</code></pre>
+<p>A three-line Python program is really a sequence of system calls.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Trace the system calls</strong></p>
+<pre><code class="language-bash"># Linux: see exactly which syscalls one Python line triggers
+strace -e trace=openat,read,write,close \
+    python3 -c &quot;open('data.txt').read()&quot;
+</code></pre>
+<p>You will see lines like <code>openat(AT_FDCWD, "data.txt", O_RDONLY) = 3</code>. The <code>3</code> is a file descriptor handed back by the kernel; the actual disk work is done inside it.</p>
+<p><strong>Step 2: Measure user time vs system time</strong></p>
+<pre><code class="language-bash">/usr/bin/time -v python3 -c &quot;
+with open('/etc/hosts') as f:
+    for _ in range(100000):
+        f.seek(0); f.read()
+&quot; 2&gt;&amp;1 | grep -E &quot;User time|System time&quot;
+</code></pre>
+<p><code>User time</code> is what your code spent in user mode; <code>System time</code> is what the kernel spent on your behalf. I/O-heavy programs push more time into the second bucket.</p>
+<p><strong>Step 3: Inspect what the OS gave your process</strong></p>
+<pre><code class="language-python">import os, resource
+
+print(f&quot;PID                  : {os.getpid()}&quot;)
+print(f&quot;Parent PID           : {os.getppid()}&quot;)
+print(f&quot;Open file limit      : {resource.getrlimit(resource.RLIMIT_NOFILE)}&quot;)
+print(f&quot;Virtual memory limit : {resource.getrlimit(resource.RLIMIT_AS)}&quot;)
+</code></pre>
+<p>Your PID is the OS-assigned identity. The fd and memory limits are caps the OS enforces. You live within the budget the OS gives you.</p>
+<p><strong>Step 4: Look at how the kernel sees you via <code>/proc</code></strong></p>
+<pre><code class="language-bash"># Kernel-side view of this process
+cat /proc/self/status | head -20
+# File descriptors currently open
+ls -l /proc/self/fd
+</code></pre>
+<p>On Linux, <code>/proc</code> is a virtual file system that exposes kernel data as files. The kernel knows everything about your process: state, memory usage, open files, threads.</p>
+<p><strong>Step 5: Imagine a world without an OS</strong></p>
+<pre><code class="language-text">[No OS]                              [With OS]
+- Apps poke disk sectors directly    - open()/read() abstract files
+- Apps overwrite each other's RAM    - virtual memory isolates them
+- One app monopolizes the CPU         - scheduler shares CPU time
+- Each app ships device-specific code - drivers expose one interface
+</code></pre>
+<p>The value of the OS is the gap between these two columns. Everything that "just works" in normal operation rests on these abstractions.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>File operations are sequences of system calls, not magic</li>
+<li>Crossing the user/kernel boundary has a real cost</li>
+<li>Each process gets a budget; the OS enforces it</li>
+<li>Virtual file systems like <code>/proc</code> and <code>/sys</code> let you talk to the kernel</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Treating the OS as a boot loader</strong><br>
+- Problem: Cannot debug system issues<br>
+- Fix: Think of the OS as a resource manager</p>
+<p><strong>Ignoring user/kernel transition cost</strong><br>
+- Problem: Many small syscalls slow code down<br>
+- Fix: Buffer and batch work</p>
+<p><strong>Assuming unlimited file descriptors</strong><br>
+- Problem: "Too many open files" errors<br>
+- Fix: Know your rlimits and close handles</p>
+<p><strong>Assuming all OSes behave the same</strong><br>
+- Problem: Linux code that breaks on Windows<br>
+- Fix: Learn the syscall differences</p>
+<p><strong>Treating errors as opaque failures</strong><br>
+- Problem: Lost debugging information<br>
+- Fix: Read errno and the syscall man pages</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Backend operations: <code>top</code>, <code>htop</code>, <code>iostat</code> interpret OS-level resource numbers</li>
+<li>Container debugging: <code>strace</code> from inside a container to follow syscalls</li>
+<li>Security: <code>auditd</code> watches syscall patterns from suspicious processes</li>
+<li>Performance: epoll and io_uring exploit OS-provided async I/O</li>
+<li>Embedded and IoT: small OSes like FreeRTOS and Zephyr are chosen and tuned by hand</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer reads application code and constantly asks "what is this code asking the OS to do?" — which lines are system calls, whether they block or are async, how much resource they hold and for how long. With that overlay you can quickly narrow down memory leaks, disk saturation, and runaway context switches.</p>
+<p>A senior also treats the OS as a collaborator, not as a fixed runtime. Kernel parameters, fd limits, scheduler policy, and page cache behavior are all knobs. Production performance and stability are decided as much by these knobs as by the application code itself.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can describe the OS's two roles (resource manager and abstraction provider)</li>
+<li>[ ] You can explain user mode versus kernel mode</li>
+<li>[ ] You know what a system call is and why it costs something</li>
+<li>[ ] You can talk to the OS using <code>strace</code> or <code>/proc</code></li>
+<li>[ ] You sense that OS resources are bounded but tunable</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Run <code>strace -c python3 your_script.py</code> on something you wrote. Make a small table of the top three syscalls by count and explain in one paragraph what each one does.</p>
+</li>
+<li>
+<p>Check your file-descriptor limit with <code>ulimit -n</code>. Write a small Python script that opens files in a loop until it hits the limit. Note exactly what error appears.</p>
+</li>
+<li>
+<p>Read three fields from <code>/proc/self/status</code> — VmRSS, Threads, State — and write a one-line explanation of each in your own words.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>An operating system is the software layer that manages hardware on behalf of applications and gives them clean abstractions to work with. The split between user mode and kernel mode, the system call as a defined boundary, and the process as the basic abstraction — these three ideas are the entry point to OS thinking.</p>
+<p>The next article zooms into the most fundamental abstraction: the process. We look at what a process actually contains, how a thread differs from a process, and how new processes are born.</p>
+<ul>
+<li><strong>What Is an Operating System? (current)</strong></li>
+<li>Processes and Threads (upcoming)</li>
+<li>Scheduling (upcoming)</li>
+<li>Concurrency and Race Conditions (upcoming)</li>
+<li>Locks, Mutexes, and Semaphores (upcoming)</li>
+<li>Memory Management (upcoming)</li>
+<li>Virtual Memory (upcoming)</li>
+<li>File Systems (upcoming)</li>
+<li>System Calls (upcoming)</li>
+<li>Containers and the Operating System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.pearson.com/store/p/modern-operating-systems/P100000869539">Tanenbaum &amp; Bos — Modern Operating Systems</a></li>
+<li><a href="https://www.os-book.com/">Silberschatz, Galvin, Gagne — Operating System Concepts</a></li>
+<li><a href="https://man7.org/linux/man-pages/">Linux man-pages project</a></li>
+<li><a href="https://man7.org/tlpi/">The Linux Programming Interface — Michael Kerrisk</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Systems, Foundations, Kernel, Abstraction</p>
+</body>
+</html>

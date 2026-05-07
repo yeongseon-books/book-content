@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Memory Management</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Memory Management</h1>
+<blockquote>
+<p>Operating Systems 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Where does the memory a process uses come from, and how does the OS divide a limited amount of RAM among many processes?</p>
+<blockquote>
+<p>Memory is the resource that runs out second most often, right after CPU. Without understanding stack vs heap, what malloc and free really do, and how leaks form, you will never track down "why does this service slowly degrade after a few days." This article walks through the fundamentals in one pass.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The process memory layout — text, data, heap, stack</li>
+<li>The difference between malloc/free and garbage collection</li>
+<li>How memory leaks and fragmentation are constructed</li>
+<li>The two axes of OS memory management — partitioning and reclamation</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The most common cause of "the server gets slow after a while" is a memory leak, GC thrashing right before OOM, or a wrongly sized cache. Without understanding memory behavior, staring at CPU graphs gives no answers. Memory is invisible until it hits the limit, and then it is the loudest resource in the system.</p>
+<blockquote>
+<p>Memory management is harder on the reclamation side than on the allocation side. The hard system-design question is "who is responsible for releasing this?"</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Process memory has four main regions: code (text), globals (data/bss), heap, and stack. Heap holds dynamic allocations; stack grows and shrinks automatically with function calls. The OS gives each process a virtual address space so each process appears to own its own RAM.</p>
+</blockquote>
+<pre><code class="language-text">high addr
++---------+
+|  stack  |  ← function calls / locals, auto-managed
+|    ↓    |
+|         |
+|    ↑    |
+|  heap   |  ← malloc/new, freed explicitly or by GC
++---------+
+| bss/data|  ← globals / statics
+| text    |  ← executable code
+low addr
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Virtual address</strong><br>
+- Description: The address a process sees (different from physical RAM)</p>
+<p><strong>Heap</strong><br>
+- Description: Dynamic allocation region; needs explicit free or GC</p>
+<p><strong>Stack</strong><br>
+- Description: Region auto-managed by function calls</p>
+<p><strong>Fragmentation</strong><br>
+- Description: Free space exists but no contiguous large block</p>
+<p><strong>Memory leak</strong><br>
+- Description: Memory no longer used but never reclaimed</p>
+<h2>Before / After</h2>
+<p><strong>Before — "memory is infinite":</strong></p>
+<pre><code class="language-python">cache = {}
+def handle(req):
+    cache[req.id] = expensive(req)   # grows forever
+    return cache[req.id]
+</code></pre>
+<p>A few days later: OOM. Leaks happen in GC languages too — they have no special protection.</p>
+<p><strong>After — "reclamation policy is explicit":</strong></p>
+<pre><code class="language-python">from functools import lru_cache
+
+@lru_cache(maxsize=10_000)
+def handle(req_id):
+    return expensive(req_id)
+</code></pre>
+<p>When capacity and an eviction policy are both written down, it is no longer a leak.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Look at process memory usage</strong></p>
+<pre><code class="language-bash">python3 -c &quot;
+import os, resource
+print('PID', os.getpid())
+print('peak RSS (KB)', resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+&quot;
+</code></pre>
+<p><code>ru_maxrss</code> is the high-water mark of the resident set size — the actual RAM the process held.</p>
+<p><strong>Step 2: Build a leak</strong></p>
+<pre><code class="language-python">import resource, gc
+
+def show():
+    print('RSS', resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+
+leak = []
+for i in range(5):
+    leak.extend([0] * 1_000_000)
+    gc.collect()
+    show()
+</code></pre>
+<p>Even with a GC, live references prevent reclamation. Reachability decides what gets collected, not the collector.</p>
+<p><strong>Step 3: Observe fragmentation</strong></p>
+<pre><code class="language-python"># Allocate large blocks then free every other one
+xs = []
+for i in range(1000):
+    xs.append(bytearray(1024 * 1024))   # 1MB
+for i in range(0, 1000, 2):
+    xs[i] = None                        # free even indices
+
+# ~500MB free, but a single contiguous 1GB block is hard to get
+</code></pre>
+<p>You have plenty of free bytes but no contiguous chunk large enough — that is fragmentation.</p>
+<p><strong>Step 4: Use weak references to avoid leaks</strong></p>
+<pre><code class="language-python">import weakref
+
+class Conn: pass
+
+pool = weakref.WeakValueDictionary()
+def get(name):
+    c = pool.get(name)
+    if c is None:
+        c = Conn(); pool[name] = c
+    return c
+</code></pre>
+<p><code>WeakValueDictionary</code> drops entries automatically when no outside reference remains.</p>
+<p><strong>Step 5: See container memory limits</strong></p>
+<pre><code class="language-bash"># Memory limit and current use of a Docker container
+cat /sys/fs/cgroup/memory.max 2&gt;/dev/null || echo 'not in container'
+cat /sys/fs/cgroup/memory.current 2&gt;/dev/null || echo 'not in container'
+</code></pre>
+<p>Inside a container, cgroup enforces a limit independent of the host. Growing a cache without knowing the limit ends in OOM-kill.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A garbage collector reclaims only objects without live references</li>
+<li>A leak is "no longer used but still referenced," not "not freed"</li>
+<li>Fragmentation is about contiguous space, not total bytes</li>
+<li>Weak references and reclamation policies (LRU, etc.) are the most common leak fixes</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Unbounded cache</strong><br>
+- Problem: OOM<br>
+- Fix: Always set capacity and an eviction policy</p>
+<p><strong>Append forever to a global list</strong><br>
+- Problem: Leak<br>
+- Fix: Use weak references or expirations</p>
+<p><strong>Capture large objects in closures</strong><br>
+- Problem: Not collected<br>
+- Fix: Capture only the values you need</p>
+<p><strong>Ignore container limits</strong><br>
+- Problem: OOM-kill<br>
+- Fix: Size caches and pools against the cgroup limit</p>
+<p><strong>"GC language, so safe"</strong><br>
+- Problem: Leaks anyway<br>
+- Fix: Design the reference graph deliberately</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Caches: capacity and eviction policy are always defined together</li>
+<li>Backends: per-worker memory limits with an OOM safety margin</li>
+<li>Data processing: streaming in chunks to cap peak RSS</li>
+<li>Games / embedded: pool allocation to avoid fragmentation</li>
+<li>Containers: capacity planning against the cgroup limit</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer treats "who owns the lifetime of this object?" as a default code-review question. Any object with no documented owner is a potential leak. When adding a cache they write capacity and eviction policy together. Missing either one means OOM is just a matter of time.</p>
+<p>A senior also knows that memory shows up late in dashboards. CPU spikes to 100% instantly, but a memory leak takes days or weeks to bite. So they monitor RSS trend lines and alert on slope, not only on absolute thresholds.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can describe the process memory regions (text/data/heap/stack)</li>
+<li>[ ] I can distinguish leaks from fragmentation</li>
+<li>[ ] My caches always declare capacity and eviction together</li>
+<li>[ ] I respect cgroup limits inside containers</li>
+<li>[ ] I monitor RSS trends, not only spot values</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Use <code>resource.getrusage</code> to plot how RSS grows over time for the leak code. Summarize the pattern in one paragraph.</p>
+</li>
+<li>
+<p>Replace an unbounded dict cache with <code>functools.lru_cache(maxsize=...)</code>. Run the same load and measure the RSS difference.</p>
+</li>
+<li>
+<p>In a container limited to 64MB, decide a safe cache cap and write down your reasoning.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Memory management is a reclamation problem more than an allocation problem. Make ownership and release policy explicit in both code and operations and the system can run for a long time without OOM. The single habit of writing capacity and eviction policy together kills 80% of leaks.</p>
+<p>The next article moves on to the trick that lets the OS make limited RAM look unlimited — virtual memory.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Concurrency and Race Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Locks, Mutexes, and Semaphores</a></li>
+<li><strong>Memory Management (current)</strong></li>
+<li>Virtual Memory (upcoming)</li>
+<li>File Systems (upcoming)</li>
+<li>System Calls (upcoming)</li>
+<li>Containers and the Operating System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.pearson.com/store/p/modern-operating-systems/P100000869539">Tanenbaum &amp; Bos — Modern Operating Systems</a></li>
+<li><a href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">What Every Programmer Should Know About Memory — Ulrich Drepper</a></li>
+<li><a href="https://docs.python.org/3/library/resource.html">Python resource module</a></li>
+<li><a href="https://docs.kernel.org/admin-guide/cgroup-v2.html#memory">Linux cgroup v2 memory controller</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Memory, Heap, Stack, Allocator</p>
+</body>
+</html>
