@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Portfolio Improvement Checklist</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Portfolio Improvement Checklist</h1>
+<blockquote>
+<p>Portfolio Project 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What is the <em>last</em> thing to <em>check</em> before you <em>share</em> your <em>portfolio</em>?</p>
+<blockquote>
+<p>The <em>eyes of a first-time visitor</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>pre-launch</em> checklist</li>
+<li><em>README</em> review</li>
+<li><em>Demo</em> review</li>
+<li><em>Code</em> review</li>
+<li><em>Story</em> review</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The <em>first impression</em> is decided in <em>three minutes</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[README] --&gt; D[Demo]
+    D --&gt; C[Code]
+    C --&gt; S[Story]
+    S --&gt; P[Publish]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>smoke test</strong>: A <em>basic functional check</em>.</li>
+<li><strong>fresh eyes</strong>: A <em>first-time visitor</em>.</li>
+<li><strong>dead link</strong>: A <em>broken link</em>.</li>
+<li><strong>stale</strong>: <em>Out of date</em>.</li>
+<li><strong>launch</strong>: A <em>public release</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Only the <em>author</em> understands the <em>README</em>.</p>
+<p><strong>After</strong>: A <em>first-time visitor</em> can <em>run it</em> in <em>five minutes</em>.</p>
+<h2>Hands-on: A Five Step Review</h2>
+<p><strong>Step 1 — README Review</strong></p>
+<pre><code class="language-python">readme = [&quot;What&quot;, &quot;Why&quot;, &quot;How&quot;, &quot;Demo&quot;, &quot;License&quot;]
+</code></pre>
+<p><strong>Step 2 — Demo Review</strong></p>
+<pre><code class="language-python">demo = {&quot;url&quot;: &quot;https://demo.example.com&quot;, &quot;uptime&quot;: 0.99}
+</code></pre>
+<p><strong>Step 3 — Code Review</strong></p>
+<pre><code class="language-python">code = {&quot;tests&quot;: True, &quot;lint&quot;: True, &quot;ci&quot;: True}
+</code></pre>
+<p><strong>Step 4 — Story Review</strong></p>
+<pre><code class="language-python">story = [&quot;Problem&quot;, &quot;Solution&quot;, &quot;Result&quot;, &quot;Lesson&quot;]
+</code></pre>
+<p><strong>Step 5 — Launch</strong></p>
+<pre><code class="language-python">launch = [&quot;GitHub&quot;, &quot;Blog&quot;, &quot;LinkedIn&quot;]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>README</em> is the <em>entrance</em>.</li>
+<li><em>Demo</em> is the <em>evidence</em>.</li>
+<li><em>Story</em> is the <em>memory</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>A <em>stale</em> README.</strong></li>
+<li><strong>A <em>broken</em> demo link.</strong></li>
+<li><strong>A <em>failing</em> test suite.</strong></li>
+<li><strong>A <em>missing</em> license.</strong></li>
+<li><strong>No <em>screenshots</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Open source projects run the same <em>pre-release checklist</em> before every release.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>See it through <em>fresh eyes</em>.</li>
+<li>The <em>value</em> must show in <em>three minutes</em>.</li>
+<li>The <em>demo</em> must be <em>live</em>.</li>
+<li>The <em>story</em> must travel with <em>numbers</em>.</li>
+<li>The <em>checklist</em> becomes a <em>routine</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] All <em>five README</em> parts present.</li>
+<li>[ ] <em>Demo</em> link <em>works</em>.</li>
+<li>[ ] <em>Tests</em> pass.</li>
+<li>[ ] <em>License</em> is declared.</li>
+<li>[ ] At least <em>one screenshot</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the meaning of <em>smoke test</em> in one line.</li>
+<li>Write the definition of <em>fresh eyes</em> in one line.</li>
+<li>Write the last check before <em>launch</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This is the <em>final</em> post in <em>Portfolio Project 101</em>. The next series covers <em>Technical Writing</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What Is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Writing the README</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/04-building-the-demo.md">Building the Demo</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/05-deploying-the-project.md">Deploying the Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/06-tests-and-documentation.md">Tests and Documentation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/07-recording-tech-decisions.md">Recording Tech Decisions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/08-summarizing-as-blog-posts.md">Summarizing as Blog Posts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/09-explaining-in-interviews.md">Explaining in Interviews</a></li>
+<li><strong>Portfolio Improvement Checklist (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer - Hunt &amp; Thomas</a></li>
+<li><a href="https://opensource.guide/">Open Source Guides - GitHub</a></li>
+<li><a href="https://sre.google/sre-book/release-engineering/">Release Engineering - Google SRE Book</a></li>
+<li><a href="https://choosealicense.com/">Choose a License</a></li>
+</ul>
+<p class="tags-line">Tags: Portfolio, Checklist, Quality, Review, Beginner</p>
+</body>
+</html>

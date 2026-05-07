@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tests and Documentation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tests and Documentation</h1>
+<blockquote>
+<p>Portfolio Project 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> is there <em>no trust</em> without <em>tests</em>?</p>
+<blockquote>
+<p>Code without <em>proof</em> is only a <em>claim</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Three <em>minimum tests</em></li>
+<li><em>CI</em> automation</li>
+<li><em>Code coverage</em></li>
+<li><em>API docs</em></li>
+<li>A <em>user guide</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Tests + docs</em> are <em>proof</em> of <em>professionalism</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[Unit] --&gt; I[Integration]
+    I --&gt; E[E2E]
+    E --&gt; D[Docs]
+    D --&gt; C[CI]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>unit test</strong>: a <em>unit</em> check.</li>
+<li><strong>integration</strong>: a <em>boundary</em> check.</li>
+<li><strong>E2E</strong>: a <em>full flow</em>.</li>
+<li><strong>CI</strong>: <em>automatic verification</em>.</li>
+<li><strong>docs</strong>: <em>documentation</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>Manual</em> checks only.</p>
+<p><strong>After</strong>: Automatic checks on <em>push</em>.</p>
+<h2>Hands-on: Test Table</h2>
+<p><strong>Step 1 — Unit test</strong></p>
+<pre><code class="language-python">def test_add():
+    assert 1 + 1 == 2
+</code></pre>
+<p><strong>Step 2 — Integration</strong></p>
+<pre><code class="language-python">def test_api(client):
+    assert client.get(&quot;/health&quot;).status_code == 200
+</code></pre>
+<p><strong>Step 3 — E2E</strong></p>
+<pre><code class="language-python">e2e_steps = [&quot;login&quot;, &quot;create&quot;, &quot;delete&quot;]
+</code></pre>
+<p><strong>Step 4 — CI config</strong></p>
+<pre><code class="language-yaml">on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+</code></pre>
+<p><strong>Step 5 — Docs</strong></p>
+<pre><code class="language-python">docs = [&quot;README&quot;, &quot;API.md&quot;, &quot;CHANGELOG.md&quot;]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Unit</em> tests are <em>fast</em>.</li>
+<li><em>Integration</em> tests cover <em>boundaries</em>.</li>
+<li><em>E2E</em> tests cover <em>flows</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Only <em>unit</em> tests.</strong></li>
+<li><strong>No <em>E2E</em>.</strong></li>
+<li><strong>No <em>CI</em>.</strong></li>
+<li><strong>No <em>API docs</em>.</strong></li>
+<li><strong>No <em>CHANGELOG</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>OSS projects also run <em>CI</em> on every push.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Tests</em> form a <em>pyramid</em>.</li>
+<li><em>CI</em> is <em>standard</em>.</li>
+<li><em>API docs</em> are <em>auto-generated</em>.</li>
+<li><em>CHANGELOG</em> is <em>kept</em>.</li>
+<li><em>Coverage</em> is a <em>metric</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Unit</em> tests.</li>
+<li>[ ] One <em>E2E</em>.</li>
+<li>[ ] <em>CI</em> workflow.</li>
+<li>[ ] <em>API docs</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>unit test</em> in one line.</li>
+<li>State what <em>E2E</em> means in one line.</li>
+<li>State the role of <em>CI</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Recording Tech Decisions</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Writing the README</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/04-building-the-demo.md">Building the Demo</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/05-deploying-the-project.md">Deploying the Project</a></li>
+<li><strong>Tests and Documentation (current)</strong></li>
+<li>Recording Tech Decisions (upcoming)</li>
+<li>Summarizing as Blog Posts (upcoming)</li>
+<li>Explaining in Interviews (upcoming)</li>
+<li>Portfolio Improvement Checklist (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Test Pyramid - Martin Fowler</a></li>
+<li><a href="https://docs.pytest.org/">pytest Docs</a></li>
+<li><a href="https://docs.github.com/actions">GitHub Actions Docs</a></li>
+<li><a href="https://keepachangelog.com/">Keep a Changelog</a></li>
+</ul>
+<p class="tags-line">Tags: Portfolio, Testing, Documentation, Quality, Beginner</p>
+</body>
+</html>

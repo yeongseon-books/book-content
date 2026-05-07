@@ -1,0 +1,60 @@
+id: portfolio-project-101
+title:
+  ko: 포트폴리오 프로젝트 101
+  en: Portfolio Project 101
+description:
+  ko: 프로젝트 선정, README, 데모, 배포, 테스트, 의사결정 기록, 블로그, 면접 설명까지 다루는 입문 포트폴리오 시리즈.
+  en: An introductory portfolio series covering project selection, README, demo, deploy, tests, decisions, blog, and interviews.
+status: content-ready
+level: 101
+lifecycle: active
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+episodes:
+  - slug: 01-what-is-a-portfolio-project
+    title:
+      ko: 포트폴리오 프로젝트란 무엇인가
+      en: What is a Portfolio Project
+  - slug: 02-traits-of-a-good-project
+    title:
+      ko: 좋은 프로젝트의 조건
+      en: Traits of a Good Project
+  - slug: 03-writing-the-readme
+    title:
+      ko: README 작성
+      en: Writing the README
+  - slug: 04-building-the-demo
+    title:
+      ko: 데모 만들기
+      en: Building the Demo
+  - slug: 05-deploying-the-project
+    title:
+      ko: 배포하기
+      en: Deploying the Project
+  - slug: 06-tests-and-documentation
+    title:
+      ko: 테스트와 문서화
+      en: Tests and Documentation
+  - slug: 07-recording-tech-decisions
+    title:
+      ko: 기술적 의사결정 기록
+      en: Recording Tech Decisions
+  - slug: 08-summarizing-as-blog-posts
+    title:
+      ko: 블로그 글로 정리하기
+      en: Summarizing as Blog Posts
+  - slug: 09-explaining-in-interviews
+    title:
+      ko: 면접에서 설명하기
+      en: Explaining in Interviews
+  - slug: 10-portfolio-improvement-checklist
+    title:
+      ko: 포트폴리오 개선 체크리스트
+      en: Portfolio Improvement Checklist

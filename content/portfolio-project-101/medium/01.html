@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What is a Portfolio Project</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What is a Portfolio Project</h1>
+<blockquote>
+<p>Portfolio Project 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>What</em> truly separates a <em>homework</em> from a <em>portfolio project</em>?</p>
+<blockquote>
+<p>Whether the <em>problem</em> and the <em>decision rationale</em> are <em>recorded</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>portfolio project</em> definition</li>
+<li>What recruiters <em>actually</em> look at</li>
+<li>The gap from <em>school assignments</em></li>
+<li><em>Minimum components</em></li>
+<li><em>Evaluation criteria</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>portfolio</em> is the fastest way to <em>prove</em> experience.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Problem] --&gt; S[Solution]
+    S --&gt; C[Code]
+    C --&gt; D[Deploy]
+    D --&gt; R[README]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>portfolio</strong>: <em>public work</em>.</li>
+<li><strong>case study</strong>: <em>problem solution result</em>.</li>
+<li><strong>README</strong>: the <em>entry</em> document.</li>
+<li><strong>demo</strong>: a <em>live</em> run.</li>
+<li><strong>decision log</strong>: a <em>record</em> of choices.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Only <em>code</em> on GitHub.</p>
+<p><strong>After</strong>: <em>Problem + demo + README</em> together.</p>
+<h2>Hands-on: Minimal Portfolio</h2>
+<p><strong>Step 1 — Define the project</strong></p>
+<pre><code class="language-python">project = {&quot;name&quot;: &quot;task-tracker&quot;, &quot;problem&quot;: &quot;lost team schedules&quot;}
+</code></pre>
+<p><strong>Step 2 — Demo URL</strong></p>
+<pre><code class="language-python">demo_url = &quot;https://demo.example.com&quot;
+</code></pre>
+<p><strong>Step 3 — README skeleton</strong></p>
+<pre><code class="language-python">sections = [&quot;problem&quot;, &quot;demo&quot;, &quot;stack&quot;, &quot;run&quot;, &quot;next&quot;]
+</code></pre>
+<p><strong>Step 4 — Decision log</strong></p>
+<pre><code class="language-python">decisions = [{&quot;why&quot;: &quot;FastAPI&quot;, &quot;trade&quot;: &quot;less_admin&quot;}]
+</code></pre>
+<p><strong>Step 5 — One-line pitch</strong></p>
+<pre><code class="language-python">pitch = &quot;A mini SaaS that fixes lost team schedules&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>project</em> starts from a <em>problem</em>.</li>
+<li>The <em>demo</em> is a <em>URL</em>.</li>
+<li>The <em>README</em> has <em>five sections</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Only <em>screenshots</em>.</strong></li>
+<li><strong>A <em>one-line README</em>.</strong></li>
+<li><strong>No <em>decision rationale</em>.</strong></li>
+<li><strong>The <em>demo</em> is <em>down</em>.</strong></li>
+<li><strong>Only <em>feature bragging</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Recruiters look for <em>problem solution result</em> in <em>60 seconds</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Problem</em> matters <em>most</em>.</li>
+<li><em>Decisions</em> show <em>skill</em>.</li>
+<li>The <em>demo</em> must be <em>alive</em>.</li>
+<li>The <em>README</em> is the <em>entry</em>.</li>
+<li><em>Small scope</em>, <em>finished</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>One-line problem</em>.</li>
+<li>[ ] <em>Demo URL</em>.</li>
+<li>[ ] <em>Five-section</em> README.</li>
+<li>[ ] <em>Decision log</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>portfolio project</em> in one line.</li>
+<li>State the role of a <em>demo</em> in one line.</li>
+<li>State the meaning of <em>decision log</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Traits of a Good Project</em>.</p>
+<ul>
+<li><strong>What is a Portfolio Project (current)</strong></li>
+<li>Traits of a Good Project (upcoming)</li>
+<li>Writing the README (upcoming)</li>
+<li>Building the Demo (upcoming)</li>
+<li>Deploying the Project (upcoming)</li>
+<li>Tests and Documentation (upcoming)</li>
+<li>Recording Tech Decisions (upcoming)</li>
+<li>Summarizing as Blog Posts (upcoming)</li>
+<li>Explaining in Interviews (upcoming)</li>
+<li>Portfolio Improvement Checklist (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes">GitHub README Best Practices</a></li>
+<li><a href="https://calnewport.com/">Portfolio for Engineers - Cal Newport</a></li>
+<li><a href="https://austinkleon.com/show-your-work/">Show Your Work - Austin Kleon</a></li>
+<li><a href="https://github.com/poteto/hiring-without-whiteboards">Hiring Without Whiteboards</a></li>
+</ul>
+<p class="tags-line">Tags: Portfolio, Career, Project, Hiring, Beginner</p>
+</body>
+</html>
