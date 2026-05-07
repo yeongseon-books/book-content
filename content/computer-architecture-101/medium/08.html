@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>I/O and Devices</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>I/O and Devices</h1>
+<blockquote>
+<p>Computer Architecture 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: A single disk read takes 100,000 times longer than a memory access. What is the CPU doing during that time?</p>
+<blockquote>
+<p>The CPU is fast and devices are slow. Keyboards live at human speed, disks at milliseconds, networks somewhere beyond. Polling, interrupts, and DMA are the mechanisms that bridge the gap, and memory-mapped I/O is how the CPU sees a device as just another set of addresses. This article looks inside, and ties together the starting point for every system call and every async program.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The speed gap between CPU and devices, and what it implies</li>
+<li>The difference between polling and interrupts</li>
+<li>The role of DMA (Direct Memory Access)</li>
+<li>Memory-mapped I/O versus port-mapped I/O</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Every async program, every event loop, every system call is, ultimately, an abstraction for "handle slow devices efficiently." Without interrupts and DMA, every keystroke would freeze the CPU. Knowing these mechanisms is what makes tools like epoll, async/await, and kqueue stop looking arbitrary.</p>
+<blockquote>
+<p>A fast CPU was designed to never wait for a slow device, and your code should follow the same principle.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>CPU and devices are connected by a bus. Polling — having the CPU keep asking — is simple but wastes cycles. An interrupt lets the device signal the CPU when it is ready. DMA lets a device write directly to RAM without involving the CPU. Memory-mapped I/O makes device registers look like ordinary memory addresses.</p>
+</blockquote>
+<pre><code class="language-text">   +-----+        +-----+
+   | CPU |&lt;------&gt;| RAM |
+   +--+--+        +--+--+
+      |              ^
+      |              |  DMA (device writes RAM directly)
+      |              |
+   +--+----- BUS ----+--+
+      |                |
+   +--+--+         +--+--+
+   | NIC |         | SSD |
+   +-----+         +-----+
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Polling</strong><br>
+- Description: CPU repeatedly checks device state</p>
+<p><strong>Interrupt</strong><br>
+- Description: Device signals the CPU</p>
+<p><strong>ISR</strong><br>
+- Description: Interrupt service routine, the handler</p>
+<p><strong>DMA</strong><br>
+- Description: Device-to-memory transfer without CPU</p>
+<p><strong>MMIO</strong><br>
+- Description: Memory-mapped I/O, devices exposed via addresses</p>
+<p><strong>System call</strong><br>
+- Description: User-mode entry into kernel I/O services</p>
+<h2>Before / After</h2>
+<p><strong>Before — polling for a device:</strong></p>
+<pre><code class="language-python"># Synthetic polling loop
+def wait_for_data(device):
+    while not device.is_ready():
+        pass   # CPU pegged at 100%, no other work
+    return device.read()
+</code></pre>
+<p><strong>After — interrupt + callback:</strong></p>
+<pre><code class="language-python"># Synthetic interrupt model
+def on_data_ready(device):
+    data = device.read()
+    process(data)
+
+device.register_interrupt(on_data_ready)
+do_other_work()   # CPU continues working
+# When the device is ready, on_data_ready is called automatically
+</code></pre>
+<p>Same outcome, completely different CPU utilization. The OS exposes this interrupt mechanism to user code as <code>select</code>, <code>epoll</code>, or <code>async</code>.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Build a device-speed table</strong></p>
+<pre><code class="language-python"># Approximate costs (Latency Numbers Every Programmer Should Know, in ns)
+LATENCY = {
+    &quot;L1 cache&quot;:          1,
+    &quot;Branch misprediction&quot;: 5,
+    &quot;L2 cache&quot;:          7,
+    &quot;Main memory&quot;:       100,
+    &quot;SSD random read&quot;:   100_000,
+    &quot;Round trip in DC&quot;:  500_000,
+    &quot;HDD seek&quot;:          10_000_000,
+    &quot;Internet (KR&lt;-&gt;US)&quot;: 150_000_000,
+}
+
+base = LATENCY[&quot;L1 cache&quot;]
+for name, ns in LATENCY.items():
+    print(f&quot;{name:20s} {ns:&gt;15,d} ns   (x{ns / base:&gt;11,.0f} L1)&quot;)
+</code></pre>
+<p>This gap is why async programming exists. The CPU has to do other work during these waits.</p>
+<p><strong>Step 2: Polling vs interrupt simulation</strong></p>
+<pre><code class="language-python">import time
+
+class Device:
+    def __init__(self, ready_after):
+        self.start = time.time()
+        self.ready_after = ready_after
+
+    def is_ready(self):
+        return time.time() - self.start &gt;= self.ready_after
+
+def busy_poll(dev):
+    iterations = 0
+    while not dev.is_ready():
+        iterations += 1
+    return iterations
+
+dev = Device(ready_after=0.1)
+print(&quot;polling iterations:&quot;, busy_poll(dev))   # hundreds of thousands
+</code></pre>
+<p>Polling is simple, but for 100ms the CPU does nothing else. Embedded systems may use it; general-purpose OSes use interrupts.</p>
+<p><strong>Step 3: Interrupt model simulation</strong></p>
+<pre><code class="language-python">import threading, time, queue
+
+interrupts = queue.Queue()
+
+def device_thread():
+    time.sleep(0.1)              # device gets ready
+    interrupts.put(&quot;DATA_READY&quot;)  # raise an interrupt
+
+threading.Thread(target=device_thread, daemon=True).start()
+
+# CPU does other work and occasionally checks the queue
+work_done = 0
+while interrupts.empty():
+    work_done += 1
+    if work_done % 1_000_000 == 0:
+        pass
+
+print(f&quot;interrupt arrived; finished {work_done:,} units of work in the meantime&quot;)
+</code></pre>
+<p><code>queue.Queue</code> is not exactly an OS interrupt, but it shows the model: device events arrive asynchronously.</p>
+<p><strong>Step 4: Mimic DMA — separating the work</strong></p>
+<pre><code class="language-python">import threading, time
+
+shared_buffer = []
+
+def dma_transfer(source_size):
+    &quot;&quot;&quot;Device writes RAM directly. CPU is not involved.&quot;&quot;&quot;
+    time.sleep(0.05)
+    shared_buffer.extend(range(source_size))
+
+threading.Thread(target=dma_transfer, args=(1_000_000,)).start()
+
+# CPU does its own work meanwhile
+total = sum(i * i for i in range(100_000))
+print(f&quot;CPU result: {total}&quot;)
+print(f&quot;buffer after DMA: {len(shared_buffer)}&quot;)
+</code></pre>
+<p>Real DMA is performed cooperatively by the OS and a device controller, but the essence is the same: data transfer barely costs the CPU any cycles.</p>
+<p><strong>Step 5: Use <code>select</code> for a real interrupt-style pattern</strong></p>
+<pre><code class="language-python">import select, sys
+
+print(&quot;Type something within 2 seconds...&quot;)
+ready, _, _ = select.select([sys.stdin], [], [], 2.0)
+if ready:
+    line = sys.stdin.readline()
+    print(f&quot;input: {line.strip()}&quot;)
+else:
+    print(&quot;timeout: the CPU was free to do other work&quot;)
+</code></pre>
+<p><code>select</code> is the oldest interface that exposes the OS interrupt mechanism to user code. <code>epoll</code>, <code>kqueue</code>, and IOCP are more efficient variants of the same idea.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Devices can be 10,000 to 100,000,000 times slower than the CPU</li>
+<li>Polling is simple but burns the CPU</li>
+<li>Interrupts let the CPU work on something else</li>
+<li>DMA frees the CPU even from data movement</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Synchronous I/O on the hot path</strong><br>
+- Problem: One request blocks all others<br>
+- Fix: async/await, epoll</p>
+<p><strong>Busy-loop waiting</strong><br>
+- Problem: CPU 100%, heat and power<br>
+- Fix: sleep or wait on an event</p>
+<p><strong>Heavy work in an interrupt handler</strong><br>
+- Problem: Other interrupts delayed<br>
+- Fix: Keep handler short, queue the rest</p>
+<p><strong>Skipping cache flush after DMA</strong><br>
+- Problem: Reading stale data<br>
+- Fix: Memory barriers, explicit flush</p>
+<p><strong>Ignoring device register alignment</strong><br>
+- Problem: Hitting wrong bits<br>
+- Fix: Follow the datasheet bitmap</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Web servers: epoll/kqueue event loops (nginx, Node.js) handle tens of thousands of connections</li>
+<li>Databases: async I/O and DMA fully utilize disk bandwidth</li>
+<li>Embedded: GPIO interrupts react to sensors instantly</li>
+<li>GPU computing: PCIe DMA moves memory between host and device</li>
+<li>Operating systems: interrupt controllers enforce device priorities</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer looks at the I/O model first. One blocking call on the hot path caps the throughput of the whole system. When designing a new system, they ask "is this work CPU-bound or I/O-bound?" before they pick a thread model, async model, or queue structure.</p>
+<p>A senior also keeps the rule "always measure I/O cost." Whether one disk access takes 100us or 10ms, whether a network round trip is 1ms or 100ms — the same algorithm means completely different things. Latency Numbers is a starting point; the real numbers in your system are the truth.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know main-memory and SSD costs to the order of magnitude</li>
+<li>[ ] You can explain polling vs interrupts</li>
+<li>[ ] You know what DMA wins back for the CPU</li>
+<li>[ ] You know which OS mechanism <code>select</code>/<code>epoll</code> exposes</li>
+<li>[ ] You can describe sync vs async I/O tradeoffs</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Use the <code>LATENCY</code> table to compute the time for "1000 SSD random reads" vs "1000 memory accesses." Decide whether async I/O is justified.</p>
+</li>
+<li>
+<p>Use <code>select.select</code> on stdin and two pipes simultaneously, printing different messages depending on which fires first.</p>
+</li>
+<li>
+<p>Compare a sync HTTP client (e.g., <code>requests</code>) to an async one (e.g., <code>httpx.AsyncClient</code>) on 100 concurrent requests. Measure time, CPU, and memory.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Polling, interrupts, and DMA bridge the huge speed gap between CPU and devices. They surface in user code as <code>select</code>, <code>epoll</code>, and <code>async/await</code>, and that is where every async program starts. Looking at the I/O model first is the entry point of system design.</p>
+<p>Next we cross beyond a single core, into parallelism and multicore. We will cover models for cooperating CPUs and the synchronization problems that arise inside them.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">CPU and Instructions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Registers and the ALU</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/05-memory-organization.md">Memory Organization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/06-cache-and-locality.md">Cache and Locality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/07-pipelining.md">Pipelining</a></li>
+<li><strong>I/O and Devices (current)</strong></li>
+<li>Parallelism and Multicore (upcoming)</li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Direct_memory_access">Wikipedia — Direct memory access</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Interrupt">Wikipedia — Interrupt</a></li>
+<li><a href="https://gist.github.com/jboner/2841832">Latency Numbers Every Programmer Should Know</a></li>
+<li><a href="http://www.kegel.com/c10k.html">The C10K problem (Dan Kegel)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, IO, Interrupts, DMA, Devices</p>
+</body>
+</html>

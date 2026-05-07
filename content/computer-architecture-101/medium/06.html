@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cache and Locality</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cache and Locality</h1>
+<blockquote>
+<p>Computer Architecture 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Two pieces of code read the same data the same number of times. One takes 1 second, the other takes 30. What makes that difference?</p>
+<blockquote>
+<p>The speed gap between the CPU and main memory is more than 100x. Caches close that gap, but caches only help if your code respects temporal and spatial locality. This article covers how caches work, the two kinds of locality, and the difference between cache-friendly and cache-hostile code.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What a cache is and where it sits in the memory hierarchy</li>
+<li>Temporal and spatial locality</li>
+<li>The cache line and the costs it imposes</li>
+<li>Patterns for writing cache-friendly code</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>On a modern CPU, the biggest single performance variable is not clock speed — it is cache miss rate. One main-memory access burns 100–300 cycles; an L1 hit takes around 4. The same algorithm can run 10x faster or slower depending on memory access patterns. Cache awareness is the highest-ROI optimization technique you can learn.</p>
+<blockquote>
+<p>If the algorithm is fixed, the next question is "is this code cache-friendly?"</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A cache is a small, fast store that keeps recently and frequently used data close to the CPU. The CPU does not fetch a single byte from main memory — it fetches a 64-byte block called a cache line. Other data in the same line becomes nearly free to read on the next access.</p>
+</blockquote>
+<pre><code class="language-text">   CPU
+    |  (one cycle)
+    v
+   L1 cache  (32-64KB, ~4 cycles)
+    |
+    v
+   L2 cache  (256KB-1MB, ~12 cycles)
+    |
+    v
+   L3 cache  (several MB, ~40 cycles)
+    |
+    v
+   Main RAM  (several GB, ~200 cycles)
+    |
+    v
+   SSD/HDD  (several TB, tens of thousands of cycles)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Cache line</strong><br>
+- Description: The smallest unit of cache (typically 64 bytes)</p>
+<p><strong>Temporal locality</strong><br>
+- Description: Recently touched data is touched again soon</p>
+<p><strong>Spatial locality</strong><br>
+- Description: Nearby addresses are touched soon after</p>
+<p><strong>Cache miss</strong><br>
+- Description: The needed data is not in cache</p>
+<p><strong>Working set</strong><br>
+- Description: The set of data currently accessed often</p>
+<h2>Before / After</h2>
+<p><strong>Before — cache-hostile code:</strong></p>
+<pre><code class="language-python"># Column-major traversal of a 2D array
+def col_major(matrix, n):
+    total = 0
+    for j in range(n):
+        for i in range(n):
+            total += matrix[i][j]
+    return total
+</code></pre>
+<p><strong>After — cache-friendly code:</strong></p>
+<pre><code class="language-python">def row_major(matrix, n):
+    total = 0
+    for i in range(n):
+        for j in range(n):
+            total += matrix[i][j]
+    return total
+</code></pre>
+<p>Both compute the same sum, but row-major traversal reads adjacent elements that share a cache line, so it runs much faster.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Time row-major vs column-major traversal</strong></p>
+<pre><code class="language-python">import time, numpy as np
+
+N = 4096
+m = np.random.randint(0, 100, (N, N), dtype=np.int32)
+
+start = time.perf_counter()
+total = 0
+for i in range(N):
+    for j in range(N):
+        total += m[i, j]
+print(f&quot;row-major:   {time.perf_counter() - start:.2f} s&quot;)
+
+start = time.perf_counter()
+total = 0
+for j in range(N):
+    for i in range(N):
+        total += m[i, j]
+print(f&quot;col-major:   {time.perf_counter() - start:.2f} s&quot;)
+</code></pre>
+<p>Same data, same number of accesses, different order. Row-major is typically 5–10x faster. The gap comes from cache miss rate.</p>
+<p><strong>Step 2: See the cache line in action</strong></p>
+<pre><code class="language-python">import time, numpy as np
+
+CACHE_LINE = 64
+INT_SIZE = 8     # numpy int64
+stride_ints = CACHE_LINE // INT_SIZE   # 8
+
+N = 100_000_000
+arr = np.zeros(N, dtype=np.int64)
+
+start = time.perf_counter()
+for i in range(0, N, 1):
+    arr[i] += 1
+print(f&quot;stride 1:  {time.perf_counter() - start:.2f} s&quot;)
+
+start = time.perf_counter()
+for i in range(0, N, stride_ints):
+    arr[i] += 1
+print(f&quot;stride 8:  {time.perf_counter() - start:.2f} s&quot;)
+</code></pre>
+<p>Stride 1 uses all 8 elements within a cache line; stride 8 uses only one element per line. Memory bandwidth is wasted by a single-digit factor.</p>
+<p><strong>Step 3: Use temporal locality through caching</strong></p>
+<pre><code class="language-python">from functools import lru_cache
+
+def fib_no_cache(n):
+    if n &lt; 2: return n
+    return fib_no_cache(n - 1) + fib_no_cache(n - 2)
+
+@lru_cache(maxsize=None)
+def fib_cached(n):
+    if n &lt; 2: return n
+    return fib_cached(n - 1) + fib_cached(n - 2)
+
+import time
+start = time.perf_counter(); fib_no_cache(30)
+print(f&quot;no cache: {time.perf_counter() - start:.3f} s&quot;)
+
+start = time.perf_counter(); fib_cached(30)
+print(f&quot;cached:   {time.perf_counter() - start:.6f} s&quot;)
+</code></pre>
+<p>When the same input is asked again, caching the result is the most direct exploitation of temporal locality.</p>
+<p><strong>Step 4: Layout matters — AoS vs SoA</strong></p>
+<pre><code class="language-python">import numpy as np, time
+
+N = 1_000_000
+
+class Particle:
+    __slots__ = (&quot;x&quot;, &quot;y&quot;, &quot;z&quot;, &quot;vx&quot;, &quot;vy&quot;, &quot;vz&quot;)
+    def __init__(self):
+        self.x = self.y = self.z = 0.0
+        self.vx = self.vy = self.vz = 0.0
+
+aos = [Particle() for _ in range(N // 100)]   # smaller for memory
+soa_x = np.zeros(N); soa_y = np.zeros(N); soa_z = np.zeros(N)
+
+start = time.perf_counter()
+for p in aos:
+    p.x += 1.0
+print(f&quot;AoS x++: {time.perf_counter() - start:.4f} s&quot;)
+
+start = time.perf_counter()
+soa_x += 1.0
+print(f&quot;SoA x++: {time.perf_counter() - start:.4f} s&quot;)
+</code></pre>
+<p>When you only update x, SoA traverses a contiguous array of just x values, putting the cache to far better use. This is why game engines and GPU code prefer SoA.</p>
+<p><strong>Step 5: Matrix multiplication and blocking</strong></p>
+<pre><code class="language-python">import numpy as np, time
+
+N = 512
+a = np.random.rand(N, N); b = np.random.rand(N, N)
+
+start = time.perf_counter()
+c = a @ b   # numpy (BLAS) uses cache blocking internally
+print(f&quot;numpy matmul: {time.perf_counter() - start:.3f} s&quot;)
+
+start = time.perf_counter()
+c2 = np.zeros((N, N))
+for i in range(N):
+    for j in range(N):
+        for k in range(N):
+            c2[i, j] += a[i, k] * b[k, j]
+# only meaningful for smaller N because of speed
+</code></pre>
+<p>Numpy's <code>@</code> calls into BLAS, which splits matrices into cache-sized blocks. The same algorithm with cache awareness runs more than 100x faster.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>For the same algorithm and data, access order determines performance</li>
+<li>A cache line must be used in full for it to be efficient</li>
+<li>Temporal locality is exploited through result caching; spatial through adjacent access</li>
+<li>Data layout (AoS vs SoA) is directly tied to cache behavior</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Column-first traversal</strong><br>
+- Problem: Cache miss explosion<br>
+- Fix: Match traversal to layout</p>
+<p><strong>Many small scattered objects</strong><br>
+- Problem: Pointer-chasing cost<br>
+- Fix: Pack into contiguous arrays</p>
+<p><strong>Large stride access</strong><br>
+- Problem: Wasted cache lines<br>
+- Fix: Prefer adjacent indices</p>
+<p><strong>Recomputing results</strong><br>
+- Problem: Ignored temporal locality<br>
+- Fix: Memoize, lru_cache</p>
+<p><strong>Tiny hot field in a big struct</strong><br>
+- Problem: Cache line pollution<br>
+- Fix: Split hot fields into a separate SoA</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Databases: column-store layouts speed up analytical queries</li>
+<li>Machine learning: keeping GPU tensors contiguous in memory</li>
+<li>Game engines: ECS (Entity Component System) enforces SoA layout</li>
+<li>Compilers: loop tiling and loop interchange auto-block code</li>
+<li>Operating systems: the page cache turns disk I/O into memory access</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer asks of a hot piece of code, "where does this working set fit — L1, L2, or L3?" Past L1 (typically 32KB) costs start to climb; past L3 you hit main memory. Knowing roughly which cache level absorbs the data is the basis for interpreting any measurement.</p>
+<p>A senior also keeps the rule "an unmeasured cache optimization is folklore." Cache behavior is non-linear in CPU and data size, so the model in your head must always be checked with tools like <code>perf stat</code>, <code>valgrind --tool=cachegrind</code>, or simple timing.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know the cache line size is typically 64 bytes</li>
+<li>[ ] You know the order-of-magnitude cost of L1, L2, L3, and RAM</li>
+<li>[ ] You can distinguish temporal and spatial locality</li>
+<li>[ ] You know the AoS vs SoA tradeoff</li>
+<li>[ ] You have measured the row-vs-column traversal difference</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Sum a 1024x1024 numpy array in row-major and column-major order. Measure the ratio and check how it relates to cache line size.</p>
+</li>
+<li>
+<p>Compare a function with <code>lru_cache</code> and without it for temporal locality. Call with the same input 1000 times and compare averages.</p>
+</li>
+<li>
+<p>Update the position of 10,000 particles in AoS (Python class) and SoA (numpy array) styles. Measure both.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The cache is the largest device that closes the speed gap between CPU and memory, and its effect depends on whether your code follows locality. The same algorithm can show 10x differences from access pattern alone, and that difference is something you can both measure and design for.</p>
+<p>Next we look at another device that speeds up the CPU itself — the pipeline. We will cover how a CPU appears to finish one instruction per cycle, and why branch prediction was invented.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">CPU and Instructions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Registers and the ALU</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/05-memory-organization.md">Memory Organization</a></li>
+<li><strong>Cache and Locality (current)</strong></li>
+<li>Pipelining (upcoming)</li>
+<li>I/O and Devices (upcoming)</li>
+<li>Parallelism and Multicore (upcoming)</li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.akkadia.org/drepper/cpumemory.pdf">What Every Programmer Should Know About Memory (Ulrich Drepper)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/CPU_cache">Wikipedia — CPU cache</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Locality_of_reference">Wikipedia — Locality of reference</a></li>
+<li><a href="https://www.youtube.com/watch?v=rX0ItVEVjHc">Mike Acton — Data-Oriented Design and C++ (CppCon 2014)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, Cache, Locality, Performance, Memory Hierarchy</p>
+</body>
+</html>

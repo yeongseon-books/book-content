@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CPU and Instructions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>CPU and Instructions</h1>
+<blockquote>
+<p>Computer Architecture 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does a CPU actually do in one cycle, and how does that single cycle connect to the code we write?</p>
+<blockquote>
+<p>The CPU pulls one instruction at a time from memory, decodes it, and executes it. The contract that defines which instructions exist and how they are encoded is called the ISA. x86-64, ARM, and RISC-V are different versions of that contract. This article walks the cycle end to end and shows what your code actually becomes.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The fetch-decode-execute cycle</li>
+<li>How an instruction is structured (opcode and operands)</li>
+<li>Categories of instructions (arithmetic, memory, branch)</li>
+<li>A first taste of x86-64, ARM, and RISC-V</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Performance work eventually reduces to "how many instructions does this code become, and how fast can the CPU run them?" Without the cycle in your head, profiler output is opaque, and without ever reading assembly, you cannot tell what the compiler did well and what it missed.</p>
+<blockquote>
+<p>All high-level code is a sequence of instructions. Keeping that sequence short and simple is a joint effort with the compiler.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Each cycle the CPU (1) fetches the instruction at the address in PC, (2) decodes its bit pattern, and (3) executes it. PC then moves to the next instruction unless a branch redirects it.</p>
+</blockquote>
+<pre><code class="language-text">            +------ Fetch ------+
+            |                   |
+            |   PC --&gt; Memory   |
+            |        |          |
+            |        v          |
+            |   Instruction     |
+            +---------+---------+
+                      |
+                      v
+            +------ Decode -----+
+            |   opcode + operand|
+            +---------+---------+
+                      |
+                      v
+            +------ Execute ----+
+            | ALU / Mem / Branch|
+            +-------------------+
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>ISA</strong><br>
+- Description: The contract for the instruction format</p>
+<p><strong>opcode</strong><br>
+- Description: What to do (add, load, ...)</p>
+<p><strong>operand</strong><br>
+- Description: What to act on (register, memory address)</p>
+<p><strong>PC</strong><br>
+- Description: Program Counter, address of the next instruction</p>
+<p><strong>Branch</strong><br>
+- Description: Instruction that redirects PC</p>
+<p><strong>Cycle</strong><br>
+- Description: One CPU beat, typically 0.3–1 ns</p>
+<h2>Before / After</h2>
+<p><strong>Before — "the code just runs":</strong></p>
+<pre><code class="language-python">def add(a, b):
+    return a + b
+</code></pre>
+<p><strong>After — "how many instructions is this function?":</strong></p>
+<pre><code class="language-text"># x86-64 assembly (simplified)
+add:
+    mov   rax, rdi      # first argument (a) into rax
+    add   rax, rsi      # add the second argument (b)
+    ret                 # return the result
+
+# ~3 instructions, ~3 cycles (cache hits assumed)
+</code></pre>
+<p>The same function tells a different story when you read it at the assembly layer.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Compare bytecode with and without a check</strong></p>
+<pre><code class="language-python">import dis
+
+def add(a, b):
+    return a + b
+
+def add_with_check(a, b):
+    if a &lt; 0 or b &lt; 0:
+        return 0
+    return a + b
+
+print(&quot;--- add ---&quot;)
+dis.dis(add)
+print(&quot;--- add_with_check ---&quot;)
+dis.dis(add_with_check)
+</code></pre>
+<p>A single <code>if</code> becomes a few comparisons, branches, and jumps. The instruction count grows quickly with checks.</p>
+<p><strong>Step 2: Build a tiny fetch-decode-execute simulator</strong></p>
+<pre><code class="language-python">class TinyCPU:
+    &quot;&quot;&quot;Toy CPU: memory, registers, and PC.&quot;&quot;&quot;
+    def __init__(self, program):
+        self.memory = list(program)
+        self.regs = {&quot;R0&quot;: 0, &quot;R1&quot;: 0, &quot;R2&quot;: 0}
+        self.pc = 0
+
+    def step(self):
+        instr = self.memory[self.pc]   # fetch
+        op, *args = instr              # decode
+        if op == &quot;MOV&quot;:
+            self.regs[args[0]] = args[1]
+        elif op == &quot;ADD&quot;:
+            self.regs[args[0]] = self.regs[args[1]] + self.regs[args[2]]
+        elif op == &quot;PRINT&quot;:
+            print(self.regs[args[0]])
+        self.pc += 1                   # advance PC
+
+cpu = TinyCPU([
+    (&quot;MOV&quot;, &quot;R0&quot;, 3),
+    (&quot;MOV&quot;, &quot;R1&quot;, 5),
+    (&quot;ADD&quot;, &quot;R2&quot;, &quot;R0&quot;, &quot;R1&quot;),
+    (&quot;PRINT&quot;, &quot;R2&quot;),
+])
+for _ in range(4):
+    cpu.step()
+</code></pre>
+<p>Every CPU repeats these three steps. Real CPUs do the same thing about 100 million times faster than this simulator.</p>
+<p><strong>Step 3: Add branch instructions</strong></p>
+<pre><code class="language-python">class TinyCPU2(TinyCPU):
+    def step(self):
+        instr = self.memory[self.pc]
+        op, *args = instr
+        if op == &quot;JMP&quot;:
+            self.pc = args[0]          # move PC directly
+            return
+        if op == &quot;JNZ&quot;:                # jump if non-zero
+            if self.regs[args[0]] != 0:
+                self.pc = args[1]
+                return
+        super().step()
+        return
+</code></pre>
+<p>With branches PC no longer just advances by one. This is the entry point for the next article on pipelining and branch prediction.</p>
+<p><strong>Step 4: Categorize instruction types</strong></p>
+<pre><code class="language-python">INSTRUCTION_CATEGORIES = {
+    &quot;Arithmetic/Logic&quot;: [&quot;ADD&quot;, &quot;SUB&quot;, &quot;MUL&quot;, &quot;DIV&quot;, &quot;AND&quot;, &quot;OR&quot;, &quot;XOR&quot;, &quot;SHL&quot;, &quot;SHR&quot;],
+    &quot;Memory&quot;:           [&quot;LOAD&quot;, &quot;STORE&quot;, &quot;MOV&quot;],
+    &quot;Branch&quot;:           [&quot;JMP&quot;, &quot;JNZ&quot;, &quot;JE&quot;, &quot;CALL&quot;, &quot;RET&quot;],
+    &quot;Special&quot;:          [&quot;NOP&quot;, &quot;HLT&quot;, &quot;SYSCALL&quot;],
+}
+
+for cat, ops in INSTRUCTION_CATEGORIES.items():
+    print(f&quot;{cat}: {', '.join(ops)}&quot;)
+</code></pre>
+<p>Most ISAs offer these four categories. They differ in encoding, count, and per-cycle cost.</p>
+<p><strong>Step 5: Read real compiler output</strong></p>
+<pre><code class="language-text"># C source compiled with gcc -O2 -S (excerpt)
+#
+# int sum_to_n(int n) {
+#     int s = 0;
+#     for (int i = 1; i &lt;= n; i++) s += i;
+#     return s;
+# }
+#
+# The compiler rewrites the loop as n * (n + 1) / 2:
+#
+#   lea     eax, [rdi + 1]
+#   imul    eax, edi
+#   sar     eax, 1
+#   ret
+</code></pre>
+<p>A whole loop can collapse into a single multiply. Compilers are very good at instruction reduction; reading their output makes collaboration easy.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Every CPU loops on fetch-decode-execute</li>
+<li>An instruction is opcode plus operands</li>
+<li>Branch instructions change PC directly</li>
+<li>Compilers often rewrite your loop into a much shorter sequence</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>"One line equals one instruction"</strong><br>
+- Problem: Wrong cost estimates<br>
+- Fix: Check with <code>dis</code> or assembly</p>
+<p><strong>Treating branches as free</strong><br>
+- Problem: Big penalty when mispredicted<br>
+- Fix: Reduce branches in hot loops</p>
+<p><strong>Distrusting the compiler</strong><br>
+- Problem: Hand-tuned code becomes slower<br>
+- Fix: Read -O2 output first</p>
+<p><strong>Confusing ISA with CPU</strong><br>
+- Problem: Same ISA, different chips, different speed<br>
+- Fix: Check microarchitecture too</p>
+<p><strong>Relying on interpreter optimization</strong><br>
+- Problem: Hot paths stay slow<br>
+- Fix: Use compiled languages for hot paths</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Game engines: hand-checked assembly and SIMD in hot loops</li>
+<li>Compiler development: instruction selection and scheduling for an ISA</li>
+<li>Embedded systems: real-time guarantees from instruction-level cycle counts</li>
+<li>Security analysis: disassemblers tracing malicious instruction flow</li>
+<li>Databases: hand-tuned assembly for core operators</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer estimates "how many instructions is this function?" for hot code. They picture the branches, memory loads, and system calls in their head, and when in doubt they reach for <code>dis</code>, <code>objdump</code>, or <code>perf</code>. They do not write assembly daily, but they think about its shape daily.</p>
+<p>A senior also keeps the rule "ISA is the contract, microarchitecture is the implementation" close. The same x86-64 instruction has different cycle costs across Intel, AMD, and CPU generations. They trust measurements over universal claims.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can sketch the three stages of fetch-decode-execute</li>
+<li>[ ] You know an instruction is opcode plus operands</li>
+<li>[ ] You understand that branches change PC</li>
+<li>[ ] You know x86-64, ARM, and RISC-V are different ISAs</li>
+<li>[ ] You have read at least one assembly listing of your own code</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Compare the bytecode of <code>sum(range(n))</code> and <code>n * (n - 1) // 2</code> with <code>dis</code>. Match the instruction counts to the measured times.</p>
+</li>
+<li>
+<p>Extend <code>TinyCPU</code> with <code>SUB</code>, <code>JZ</code> (jump if zero), and <code>HLT</code>. Write a program that sums 1 to 10.</p>
+</li>
+<li>
+<p>On godbolt.org, paste a short function in C or Rust and compare -O0 with -O2 output. Note which optimizations the compiler applied.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The CPU is a simple machine: pull one instruction from memory, decode it, run it, repeat. That simplicity sits beneath every abstraction, and serious performance work eventually drops to assembly. Keep the ISA-vs-microarchitecture distinction in mind.</p>
+<p>Next we look at the place where computation actually happens inside the CPU: registers and the ALU. We will see where data sits during execution and how the ALU performs its operations.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><strong>CPU and Instructions (current)</strong></li>
+<li>Registers and the ALU (upcoming)</li>
+<li>Memory Organization (upcoming)</li>
+<li>Cache and Locality (upcoming)</li>
+<li>Pipelining (upcoming)</li>
+<li>I/O and Devices (upcoming)</li>
+<li>Parallelism and Multicore (upcoming)</li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1">Patterson &amp; Hennessy — Computer Organization and Design</a></li>
+<li><a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html">Intel 64 and IA-32 Architectures Software Developer's Manual</a></li>
+<li><a href="https://developer.arm.com/documentation">ARM Architecture Reference Manual</a></li>
+<li><a href="https://godbolt.org/">Compiler Explorer (godbolt.org)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, CPU, Instructions, ISA, Assembly</p>
+</body>
+</html>
