@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>XSS and CSRF Defense</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>XSS and CSRF Defense</h1>
+<blockquote>
+<p>Secure Coding 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we tell whether the <em>user's browser</em> is <em>on our side</em> or has been turned into the <em>attacker's weapon</em>?</p>
+<blockquote>
+<p><em>XSS runs the </em>attacker's code on our page<em>. CSRF triggers </em>unintended requests with the user's authority<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The three flavors of <em>XSS</em></li>
+<li>The role of <em>output escaping</em> and <em>CSP</em></li>
+<li>How <em>CSRF</em> works</li>
+<li><em>SameSite cookies</em> and <em>CSRF tokens</em></li>
+<li>A five-step defense and five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A single <em>XSS</em> can hijack the session. <em>CSRF</em> triggers transfers and deletes <em>without the user knowing</em>.</p>
+<blockquote>
+<p><em>Default rule — </em>escape on output, verify origin on request<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Input[&quot;User input&quot;] --&gt; Store[&quot;Storage&quot;]
+    Store --&gt; Render[&quot;Render (escape!)&quot;]
+    Form[&quot;Form on another site&quot;] --&gt;|cookies auto-sent| API[&quot;Our API&quot;]
+    API --&gt; Csrf[&quot;CSRF token / SameSite check&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Reflected XSS</strong>: input from the URL <em>echoed straight back</em>.</li>
+<li><strong>Stored XSS</strong>: input <em>saved in the DB</em> and rendered later.</li>
+<li><strong>DOM XSS</strong>: client JS inserts via <em>innerHTML</em> or similar.</li>
+<li><strong>CSP</strong>: the browser executes <em>only code from allowed origins</em>.</li>
+<li><strong>CSRF token</strong>: bind requests to an <em>unguessable token</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>&lt;div&gt;{{ comment }}&lt;/div&gt;</code> rendered as-is. A <code>&lt;script&gt;</code> tag <em>runs</em>.</p>
+<p><strong>After</strong>: Escape on output, apply <em>CSP</em>, set cookies to <em>SameSite=Lax</em>, attach a <em>CSRF token</em> on state-changing requests.</p>
+<h2>Hands-on: Defense in Five Steps</h2>
+<p><strong>Step 1 — Escape on output</strong></p>
+<pre><code class="language-python">import html
+def render_comment(text):
+    return f&quot;&lt;div&gt;{html.escape(text)}&lt;/div&gt;&quot;
+</code></pre>
+<p><strong>Step 2 — Content Security Policy</strong></p>
+<pre><code class="language-python">response.headers[&quot;Content-Security-Policy&quot;] = &quot;default-src 'self'; script-src 'self'&quot;
+</code></pre>
+<p><strong>Step 3 — SameSite cookies</strong></p>
+<pre><code class="language-python">response.set_cookie(
+    &quot;session&quot;, sid,
+    httponly=True, secure=True, samesite=&quot;Lax&quot;,
+)
+</code></pre>
+<p><strong>Step 4 — CSRF token</strong></p>
+<pre><code class="language-python">import secrets
+def issue_csrf():
+    return secrets.token_urlsafe(32)
+
+def verify_csrf(form_token, session_token):
+    return secrets.compare_digest(form_token, session_token)
+</code></pre>
+<p><strong>Step 5 — Avoid dangerous sinks</strong></p>
+<pre><code class="language-javascript">// element.innerHTML = userInput;  // forbidden
+element.textContent = userInput;    // safe
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Output escaping must match the <em>context</em> (HTML, JS, attribute, URL).</li>
+<li>CSP is <em>defense in depth</em> — your <em>last line</em> if escaping leaks.</li>
+<li><em>SameSite</em> and <em>CSRF tokens</em> are used <em>together</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Rendering Markdown as <em>raw HTML</em>.</strong> Lets <code>&lt;script&gt;</code> slip in.</li>
+<li><strong>Putting input into <em><code>innerHTML</code></em>.</strong> A textbook <em>DOM XSS</em>.</li>
+<li><strong>Leaving CSP on <code>unsafe-inline</code>.</strong> That <em>defeats</em> CSP.</li>
+<li><strong>CSRF tokens carried in <em>GET</em>.</strong> They end up <em>cached</em>.</li>
+<li><strong>APIs that ignore <em>Origin/Referer</em>.</strong> CSRF <em>passes through</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams keep <em>template auto-escape</em> on by default. They roll out <em>CSP</em> in <em>report-only</em> mode and harden gradually. Every state-changing API verifies a <em>CSRF token</em> or <em>Origin</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Escape by default; raw is the </em>exception<em>.</em></li>
+<li><em>Strengthen CSP </em>over time<em>.</em></li>
+<li><em>Use </em>SameSite and a CSRF token<em> — both.</em></li>
+<li><em>Never put input into the </em>DOM raw<em>; use textContent.</em></li>
+<li><em>Output escaping is safer than input sanitization.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Template <em>auto-escape</em> is enabled.</li>
+<li>[ ] <em>CSP</em> is in place.</li>
+<li>[ ] Cookies use <em>SameSite</em>.</li>
+<li>[ ] State-changing requests have <em>CSRF verification</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Show one-line examples of <em>Reflected</em> and <em>Stored</em> XSS.</li>
+<li>Explain how a <em>CSP nonce</em> works.</li>
+<li>Name a flow that <em>SameSite=Strict</em> would break.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Browser-side attacks are stopped by <em>fundamentals</em>. Next we tackle the code we <em>did not write</em> — <em>dependency vulnerabilities</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Safe Data Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secret and Key Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/07-sql-injection-and-orm.md">SQL Injection and Safe ORM Usage</a></li>
+<li><strong>XSS and CSRF Defense (current)</strong></li>
+<li>Managing Dependency Vulnerabilities (upcoming)</li>
+<li>Safe Logging and Audit (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">OWASP XSS Prevention Cheat Sheet</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html">OWASP CSRF Prevention Cheat Sheet</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP">MDN — Content Security Policy</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies">MDN — SameSite cookies</a></li>
+</ul>
+<p class="tags-line">Tags: XSS, CSRF, CSP, SecureCoding, WebSecurity</p>
+</body>
+</html>

@@ -1,0 +1,52 @@
+id: secure-coding-101
+title:
+  ko: Secure Coding 101
+  en: Secure Coding 101
+description:
+  ko: 입력 검증, 인증, 인가, secret 관리, SQL Injection, XSS/CSRF, dependency 취약점, 안전한 로깅까지 시큐어 코딩 입문 시리즈.
+  en: A beginner guide to secure coding covering input validation, auth, authz, secret management, SQL Injection, XSS/CSRF, dependency vulnerabilities, and safe logging.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-secure-coding
+    title:
+      ko: Secure Coding이란 무엇인가?
+      en: What Is Secure Coding?
+  - slug: input-validation
+    title:
+      ko: 입력값 검증
+      en: Input Validation
+  - slug: authentication-and-session
+    title:
+      ko: 인증과 세션
+      en: Authentication and Session
+  - slug: authorization-and-permissions
+    title:
+      ko: 인가와 권한
+      en: Authorization and Permissions
+  - slug: safe-data-storage
+    title:
+      ko: 안전한 데이터 저장
+      en: Safe Data Storage
+  - slug: secret-and-key-management
+    title:
+      ko: Secret과 키 관리
+      en: Secret and Key Management
+  - slug: sql-injection-and-orm
+    title:
+      ko: SQL Injection과 ORM 안전 사용
+      en: SQL Injection and Safe ORM Usage
+  - slug: xss-and-csrf
+    title:
+      ko: XSS와 CSRF 방어
+      en: XSS and CSRF Defense
+  - slug: dependency-vulnerabilities
+    title:
+      ko: Dependency 취약점 관리
+      en: Managing Dependency Vulnerabilities
+  - slug: safe-logging-and-audit
+    title:
+      ko: 안전한 로깅과 감사
+      en: Safe Logging and Audit

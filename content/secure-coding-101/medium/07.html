@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SQL Injection and Safe ORM Usage</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SQL Injection and Safe ORM Usage</h1>
+<blockquote>
+<p>Secure Coding 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Twenty-five years on, why is <em>SQL injection still the top issue</em>?</p>
+<blockquote>
+<p><em>The cause is always the same — </em>building SQL by string concatenation<em>. So is the fix — </em>use parameters<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How <em>SQL injection</em> works</li>
+<li>Why <em>parameterized queries</em> matter</li>
+<li>When ORMs <em>still leak</em></li>
+<li>How to use <em>raw SQL</em> safely</li>
+<li>A five-step routine and five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A single SQLi exposes the <em>entire database</em>. Auth bypass, data exfiltration, and tampering — all at once.</p>
+<blockquote>
+<p><em>If SQL is built from string concatenation, it </em>will leak<em> one day.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Input[&quot;User input&quot;] --&gt;|concat| Bad[&quot;SQL string&quot;]
+    Bad --&gt; Vuln[&quot;Vulnerable (SQLi)&quot;]
+    Input --&gt;|parameter| Good[&quot;Prepared statement&quot;]
+    Good --&gt; Safe[&quot;Safe&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SQL Injection</strong>: input that <em>changes the meaning</em> of the SQL.</li>
+<li><strong>Parameterized query</strong>: SQL and data are <em>syntactically separated</em>.</li>
+<li><strong>Prepared statement</strong>: SQL the DB <em>pre-compiles</em>.</li>
+<li><strong>ORM</strong>: a library that builds SQL from an <em>object model</em>.</li>
+<li><strong>Stored procedure</strong>: a function <em>stored inside the DB</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>f"SELECT * FROM users WHERE name='{name}'"</code> — <em>plain SQLi</em>.</p>
+<p><strong>After</strong>: <code>cursor.execute("SELECT * FROM users WHERE name=%s", (name,))</code> — <em>parameter</em>.</p>
+<h2>Hands-on: Defend SQLi in Five Steps</h2>
+<p><strong>Step 1 — Use parameters</strong></p>
+<pre><code class="language-python">cursor.execute(
+    &quot;SELECT id FROM users WHERE name=%s AND status=%s&quot;,
+    (name, &quot;active&quot;),
+)
+</code></pre>
+<p><strong>Step 2 — Use the ORM properly</strong></p>
+<pre><code class="language-python">from sqlalchemy import select
+stmt = select(User).where(User.name == name)
+result = session.scalars(stmt).all()
+</code></pre>
+<p><strong>Step 3 — Allowlist any dynamic column</strong></p>
+<pre><code class="language-python">ALLOWED = {&quot;name&quot;, &quot;created_at&quot;, &quot;id&quot;}
+def order_by(field):
+    if field not in ALLOWED:
+        raise ValueError(&quot;invalid order field&quot;)
+    return field  # safe to splice into SQL
+</code></pre>
+<p><strong>Step 4 — Even raw SQL must use <em>parameters</em></strong></p>
+<pre><code class="language-python">session.execute(text(&quot;SELECT * FROM logs WHERE user_id=:uid&quot;), {&quot;uid&quot;: uid})
+</code></pre>
+<p><strong>Step 5 — Split DB privileges</strong></p>
+<pre><code class="language-sql">-- The app account does DML only; DDL belongs to a separate account.
+GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>String concatenation</em> into SQL is a <em>red flag</em> every time.</li>
+<li>An ORM is no shield if you misuse <code>text()</code> or raw escapes.</li>
+<li><em>Dynamic identifiers</em> require an <em>allowlist</em> — there is no other safe option.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>f-strings inside SQL.</strong> The most common SQLi.</li>
+<li><strong>String composition inside an ORM <code>.filter()</code>.</strong> False sense of safety.</li>
+<li><strong>Order-by columns taken <em>directly from input</em>.</strong> Dynamic-column SQLi.</li>
+<li><strong>Granting <em>DROP</em> to the app account.</strong> Catastrophic blast radius.</li>
+<li><strong>Echoing the <em>raw SQL</em> in error messages.</strong> Fuel for <em>blind SQLi</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams default to the ORM and treat <em>raw SQL</em> as the exception. Every raw SQL line is reviewed for <em>parameter use</em>. The application's DB account is on <em>least privilege</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Treat string-built SQL as </em>not allowed<em>.</em></li>
+<li><em>Dynamic identifiers go through an </em>allowlist<em>.</em></li>
+<li><em>DB accounts also follow </em>least privilege<em>.</em></li>
+<li><em>Never let </em>SQL leak into error messages<em>.</em></li>
+<li><em>ORMs are a </em>safe habit<em>, not a magic shield.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] All SQL uses <em>parameters</em>.</li>
+<li>[ ] Dynamic columns/tables go through an <em>allowlist</em>.</li>
+<li>[ ] DB accounts are <em>role-separated</em>.</li>
+<li>[ ] Error messages stay <em>safe</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain <em>blind SQLi</em> in one paragraph.</li>
+<li>Show two safe patterns for using <em>raw text</em> in an ORM.</li>
+<li>Write the <em>order-by allowlist</em> helper.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A safe DB removes the attacker's <em>biggest prize</em>. Next we cover the two browser-side attacks — <em>XSS and CSRF</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Safe Data Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secret and Key Management</a></li>
+<li><strong>SQL Injection and Safe ORM Usage (current)</strong></li>
+<li>XSS and CSRF Defense (upcoming)</li>
+<li>Managing Dependency Vulnerabilities (upcoming)</li>
+<li>Safe Logging and Audit (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html">OWASP SQL Injection Prevention Cheat Sheet</a></li>
+<li><a href="https://portswigger.net/web-security/sql-injection">PortSwigger — SQL injection</a></li>
+<li><a href="https://docs.sqlalchemy.org/">SQLAlchemy security</a></li>
+<li><a href="https://www.psycopg.org/psycopg3/docs/basic/params.html">psycopg parameter binding</a></li>
+</ul>
+<p class="tags-line">Tags: SQLInjection, ORM, Database, SecureCoding, OWASP</p>
+</body>
+</html>
