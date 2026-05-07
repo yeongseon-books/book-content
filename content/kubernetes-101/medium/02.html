@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pod</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Pod</h1>
+<blockquote>
+<p>Kubernetes 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is the <em>base unit</em> a <em>Pod</em>, and not a <em>container</em>?</p>
+<blockquote>
+<p>A <em>Pod</em> is a <em>bundle of containers</em> that <em>live and die together</em> — the <em>smallest deployable unit</em> in <em>Kubernetes</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a <em>Pod</em></li>
+<li>How it differs from a <em>container</em></li>
+<li>The <em>sidecar</em> pattern</li>
+<li>The <em>lifecycle</em> phases</li>
+<li><em>Why</em> you should not create one directly</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Every workload</em> eventually runs <em>on a Pod</em>. You must understand the <em>Pod model</em> before higher-level objects make sense.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Pod[&quot;pod&quot;] --&gt; C1[&quot;app container&quot;]
+    Pod --&gt; C2[&quot;sidecar&quot;]
+    Pod --&gt; Vol[&quot;shared volume&quot;]
+    Pod --&gt; Net[&quot;shared network ns&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>pod</strong>: a <em>shared bundle</em> of <em>one or more containers</em>.</li>
+<li><strong>sidecar</strong>: a helper container <em>next to</em> the main one.</li>
+<li><strong>init container</strong>: a container that runs <em>once before start</em>.</li>
+<li><strong>lifecycle</strong>: <em>Pending → Running → Succeeded/Failed</em>.</li>
+<li><strong>ephemeral</strong>: a Pod <em>does not come back</em> after it dies.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: lone <em>containers</em> struggle to share resources.</p>
+<p><strong>After</strong>: a <em>Pod</em> shares <em>network and volumes</em> naturally.</p>
+<h2>Hands-on: Work with Pod YAML</h2>
+<p><strong>Step 1 — Pod manifest</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+spec:
+  containers:
+  - name: app
+    image: nginx:1.25
+    ports: [{containerPort: 80}]
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 2 — Apply</strong></p>
+<pre><code class="language-python">import subprocess
+
+def apply(path):
+    subprocess.run([&quot;kubectl&quot;, &quot;apply&quot;, &quot;-f&quot;, path], check=True)
+</code></pre>
+<p><strong>Step 3 — Describe</strong></p>
+<pre><code class="language-python">def describe(name):
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;describe&quot;, &quot;pod&quot;, name],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 4 — Logs</strong></p>
+<pre><code class="language-python">def logs(name):
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;logs&quot;, name],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 5 — Delete</strong></p>
+<pre><code class="language-python">def delete(name):
+    subprocess.run([&quot;kubectl&quot;, &quot;delete&quot;, &quot;pod&quot;, name], check=True)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>Pod name</em> must be <em>unique</em>.</li>
+<li><em>containers</em> is an <em>array</em> — more than one is allowed.</li>
+<li>Creating a <em>bare Pod</em> is <em>for learning only</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Assuming <em>Pod = one container</em>.</strong></li>
+<li><strong>Creating a <em>bare Pod</em> and expecting <em>restarts</em>.</strong></li>
+<li><strong>Assuming the <em>IP is stable</em>.</strong></li>
+<li><strong>Losing <em>shared-volume</em> gains by splitting containers.</strong></li>
+<li><strong>Reading <em>logs</em> only from inside the container.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Sidecars</em> such as <em>log collectors</em>, <em>Envoy proxies</em>, and <em>secret syncers</em> sit <em>next to</em> the main container.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Pods are ephemeral.</em> Do not resurrect them.</li>
+<li><em>Restarts</em> are the job of <em>higher objects</em>.</li>
+<li><em>Sidecars</em> are both a <em>coupling tool</em> and a <em>coupling cost</em>.</li>
+<li><em>Pod IPs</em> are <em>temporary</em>.</li>
+<li>Outside of learning, do not create <em>bare Pods</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Bare-Pod creation only for <em>debugging</em>.</li>
+<li>[ ] <em>Sidecar</em> role clearly defined.</li>
+<li>[ ] <em>Logs</em> go to <em>stdout</em>.</li>
+<li>[ ] <em>Pod lifecycle</em> monitored.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the <em>difference</em> between Pod and container in one line.</li>
+<li>Name a <em>real example</em> of a sidecar.</li>
+<li>Explain in one line <em>why</em> you should not create bare Pods.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>With <em>Pods</em> understood, the next step is the <em>Deployment</em>, which owns <em>restarts and rolling updates</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
+<li><strong>Pod (current)</strong></li>
+<li>Deployment (upcoming)</li>
+<li>Service (upcoming)</li>
+<li>Ingress (upcoming)</li>
+<li>ConfigMap and Secret (upcoming)</li>
+<li>Volume (upcoming)</li>
+<li>HPA (upcoming)</li>
+<li>Helm (upcoming)</li>
+<li>Kubernetes in Operation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/pods/">Pods (Kubernetes)</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/">Pod lifecycle</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/">Init containers</a></li>
+<li><a href="https://kubernetes.io/blog/2023/08/25/native-sidecar-containers/">Sidecar containers</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, Pod, Containers, YAML, DevOps</p>
+</body>
+</html>

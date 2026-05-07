@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Helm</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Helm</h1>
+<blockquote>
+<p>Kubernetes 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: should you <em>copy/paste</em> dozens of <em>manifests</em> across <em>environments</em>?</p>
+<blockquote>
+<p><em>Helm</em> separates <em>templates</em> from <em>values</em> through a unit called a <em>chart</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>the layout of a <em>Chart</em></li>
+<li>how <em>values.yaml</em> works</li>
+<li><em>install / upgrade / rollback</em></li>
+<li><em>repositories</em> and <em>dependencies</em></li>
+<li>the role of <em>helm template</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Per-environment copies</em> create <em>drift</em>. <em>Helm</em> lets you reuse the <em>same template</em> and only swap <em>values</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Values[&quot;values.yaml&quot;] --&gt; Tmpl[&quot;templates/*.yaml&quot;]
+    Tmpl --&gt; Render[&quot;rendered manifests&quot;]
+    Render --&gt; API[&quot;kubernetes api&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Chart</strong>: the <em>package unit</em> of <em>Helm</em>.</li>
+<li><strong>values.yaml</strong>: the <em>default values</em> file.</li>
+<li><strong>release</strong>: an <em>installed instance</em> of a <em>chart</em>.</li>
+<li><strong>repository</strong>: the <em>distribution channel</em> for <em>charts</em>.</li>
+<li><strong>dependency</strong>: a <em>subchart</em> relation.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: three <em>YAML copies</em> for <em>dev/stage/prod</em>.</p>
+<p><strong>After</strong>: one <em>Chart</em> with <em>per-environment values</em>.</p>
+<h2>Hands-on: a Tiny Chart</h2>
+<p><strong>Step 1 — Create the Chart</strong></p>
+<pre><code class="language-python">import subprocess
+
+def create(name):
+    subprocess.run([&quot;helm&quot;, &quot;create&quot;, name], check=True)
+</code></pre>
+<p><strong>Step 2 — values.yaml</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+replicaCount: 2
+image:
+  repository: myorg/app
+  tag: &quot;1.0&quot;
+service:
+  type: ClusterIP
+  port: 80
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 3 — install</strong></p>
+<pre><code class="language-python">def install(release, chart, values):
+    subprocess.run(
+        [&quot;helm&quot;, &quot;install&quot;, release, chart, &quot;-f&quot;, values],
+        check=True,
+    )
+</code></pre>
+<p><strong>Step 4 — upgrade</strong></p>
+<pre><code class="language-python">def upgrade(release, chart, values):
+    subprocess.run(
+        [&quot;helm&quot;, &quot;upgrade&quot;, release, chart, &quot;-f&quot;, values, &quot;--atomic&quot;],
+        check=True,
+    )
+</code></pre>
+<p><strong>Step 5 — rollback</strong></p>
+<pre><code class="language-python">def rollback(release, revision):
+    subprocess.run(
+        [&quot;helm&quot;, &quot;rollback&quot;, release, str(revision)],
+        check=True,
+    )
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>--atomic</em> triggers an <em>automatic rollback</em> on failure.</li>
+<li><em>helm template</em> lets you <em>inspect rendered output</em> before applying.</li>
+<li><em>Values</em> differ per environment; the <em>Chart</em> is shared.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mixing <em>values</em> and <em>Chart</em> into the <em>same file</em>.</strong></li>
+<li><strong>Storing <em>secrets</em> as <em>plain text</em> in <em>values</em>.</strong></li>
+<li><strong>Using <em>latest</em> without a <em>version pin</em>.</strong></li>
+<li><strong>Not knowing the <em>rollback</em> procedure.</strong></li>
+<li><strong>Forgetting to <em>update dependencies</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Combined with <em>GitOps</em>, a <em>values change</em> alone drives <em>PR-based</em> deploys.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Chart</em> is a <em>shared contract</em>.</li>
+<li><em>Values</em> should hold only <em>environment differences</em>.</li>
+<li><em>--atomic</em> is the <em>seatbelt</em> for <em>night deploys</em>.</li>
+<li><em>Rollback</em> needs <em>practice</em>.</li>
+<li>Delegate <em>Secret</em> handling to an <em>external manager</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Chart</em> and <em>values</em> separated.</li>
+<li>[ ] <em>Version pinned</em>.</li>
+<li>[ ] <em>--atomic</em> used.</li>
+<li>[ ] <em>Secrets</em> externalized.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, the <em>purpose</em> of <em>helm template</em>.</li>
+<li>In one line, the <em>responsibility difference</em> between <em>values</em> and <em>Chart</em>.</li>
+<li>In one line, why <em>--atomic</em> is <em>safer</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>With a deploy unit in hand, the final piece is the <em>operations view</em>. Next post is <em>Kubernetes in Operation</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">ConfigMap and Secret</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/07-volume.md">Volume</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/08-hpa.md">HPA</a></li>
+<li><strong>Helm (current)</strong></li>
+<li>Kubernetes in Operation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://helm.sh/docs/">Helm official docs</a></li>
+<li><a href="https://helm.sh/docs/topics/charts/">Chart structure</a></li>
+<li><a href="https://helm.sh/docs/chart_best_practices/">Helm best practices</a></li>
+<li><a href="https://artifacthub.io/">Artifact Hub</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, Helm, Chart, PackageManager, DevOps</p>
+</body>
+</html>

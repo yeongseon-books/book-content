@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kubernetes in Operation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Kubernetes in Operation</h1>
+<blockquote>
+<p>Kubernetes 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: does <em>the cluster is running</em> mean <em>the cluster is operable</em>?</p>
+<blockquote>
+<p><em>Probes, RBAC, policies, observability,</em> and <em>runbooks</em> together make <em>operations</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>liveness/readiness/startup</em> probes</li>
+<li><em>RBAC</em> and <em>NetworkPolicy</em></li>
+<li><em>metrics/logs/traces</em></li>
+<li><em>capacity planning</em> and <em>GitOps</em></li>
+<li>the shape of a <em>runbook</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Functionally working</em> and <em>staying up overnight without issues</em> are different. <em>Operability</em> is <em>service trust</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Probe[&quot;probes&quot;] --&gt; App[&quot;application&quot;]
+    App --&gt; Obs[&quot;metrics/logs/traces&quot;]
+    Obs --&gt; SRE[&quot;sre runbooks&quot;]
+    SRE --&gt; GitOps[&quot;gitops&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>liveness probe</strong>: signals when to <em>restart</em>.</li>
+<li><strong>readiness probe</strong>: signals when to <em>receive traffic</em>.</li>
+<li><strong>RBAC</strong>: <em>role-based access control</em>.</li>
+<li><strong>NetworkPolicy</strong>: limits <em>Pod-to-Pod</em> communication.</li>
+<li><strong>GitOps</strong>: <em>declarative ops</em> with <em>Git</em> as the <em>source of truth</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>manual kubectl</em>, <em>log grepping</em>, <em>guess-driven debugging</em>.</p>
+<p><strong>After</strong>: <em>probes</em> + <em>dashboards</em> + <em>runbooks</em> enable <em>repeatable response</em>.</p>
+<h2>Hands-on: Operations Basics</h2>
+<p><strong>Step 1 — Add probes</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+livenessProbe:
+  httpGet: {path: /healthz, port: 8080}
+readinessProbe:
+  httpGet: {path: /ready, port: 8080}
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 2 — RBAC</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: reader, namespace: web}
+rules:
+- apiGroups: [&quot;&quot;]
+  resources: [&quot;pods&quot;, &quot;pods/log&quot;]
+  verbs: [&quot;get&quot;, &quot;list&quot;]
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 3 — NetworkPolicy</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: web-only, namespace: web}
+spec:
+  podSelector: {matchLabels: {app: web}}
+  ingress:
+  - from:
+    - podSelector: {matchLabels: {role: lb}}
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 4 — Collect observability data</strong></p>
+<pre><code class="language-python">import subprocess
+
+def top_pods(ns):
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;top&quot;, &quot;pods&quot;, &quot;-n&quot;, ns],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 5 — Runbook snippet</strong></p>
+<pre><code class="language-python">def runbook_step(name):
+    return {
+        &quot;name&quot;: name,
+        &quot;preconditions&quot;: [&quot;alert fired&quot;, &quot;owner paged&quot;],
+        &quot;actions&quot;: [&quot;check probe&quot;, &quot;rollout status&quot;, &quot;rollback if needed&quot;],
+    }
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>When <em>readiness</em> is <em>0/1</em>, <em>traffic is blocked</em>.</li>
+<li><em>RBAC</em> should start from <em>least privilege</em>.</li>
+<li><em>NetworkPolicy</em> is safest with a <em>default deny</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Setting <em>liveness</em> but skipping <em>readiness</em>.</strong></li>
+<li><strong>Granting <em>all permissions</em> by <em>default</em>.</strong></li>
+<li><strong>Skipping <em>NetworkPolicy</em>, allowing <em>lateral movement</em>.</strong></li>
+<li><strong>Watching only <em>logs</em>, ignoring <em>metrics</em>.</strong></li>
+<li><strong>Responding to incidents without a <em>runbook</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>GitOps</em> tools like <em>Argo CD</em> converge the <em>cluster</em> to the <em>Git</em> state, while <em>dashboards</em> and <em>runbooks</em> make <em>night-time response</em> feasible.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Probes</em> are <em>contracts</em>.</li>
+<li><em>Permissions</em> start <em>small</em>.</li>
+<li><em>Observability</em> stands on <em>three legs</em> (metrics, logs, traces).</li>
+<li>When <em>Git</em> is the <em>source</em>, <em>drift disappears</em>.</li>
+<li><em>Runbooks</em> improve through <em>training</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] All three <em>probe</em> types reviewed.</li>
+<li>[ ] <em>RBAC</em> at <em>least privilege</em>.</li>
+<li>[ ] <em>NetworkPolicy</em> default <em>deny</em>.</li>
+<li>[ ] <em>Dashboards + alerts</em>.</li>
+<li>[ ] <em>Runbook</em> exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, the <em>difference</em> between <em>liveness</em> and <em>readiness</em>.</li>
+<li>In one line, the <em>core benefit</em> of <em>GitOps</em>.</li>
+<li>In one line, the <em>effect</em> of a <em>default-deny NetworkPolicy</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>That wraps the <em>Kubernetes 101</em> series. Next, the <em>Serverless</em> and <em>SRE</em> series go deeper into <em>operability</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">ConfigMap and Secret</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/07-volume.md">Volume</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/08-hpa.md">HPA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/09-helm.md">Helm</a></li>
+<li><strong>Kubernetes in Operation (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/">Probes</a></li>
+<li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">RBAC</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/">NetworkPolicy</a></li>
+<li><a href="https://argo-cd.readthedocs.io/">Argo CD</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, SRE, Observability, GitOps, DevOps</p>
+</body>
+</html>

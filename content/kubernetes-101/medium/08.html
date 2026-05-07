@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HPA</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>HPA</h1>
+<blockquote>
+<p>Kubernetes 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: should a <em>human</em> resize <em>Pod count</em> every time <em>traffic</em> shifts?</p>
+<blockquote>
+<p><em>HorizontalPodAutoscaler</em> watches <em>metrics</em> and scales <em>Pods</em> in and out <em>automatically</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>where <em>HPA</em> fits</li>
+<li>why <em>metrics-server</em> matters</li>
+<li><em>CPU/memory</em> targets</li>
+<li><em>custom metrics</em></li>
+<li>relationship with <em>VPA / Cluster Autoscaler</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Manual scaling</em> causes <em>lag</em> and <em>over-provisioning</em>. <em>Autoscaling</em> protects both <em>cost</em> and <em>availability</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Metrics[&quot;metrics-server&quot;] --&gt; HPA[&quot;hpa&quot;]
+    HPA --&gt; Dep[&quot;deployment&quot;]
+    Dep --&gt; Pods[&quot;pods&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>HPA</strong>: scales <em>Pod count</em> <em>automatically</em>.</li>
+<li><strong>metrics-server</strong>: collector for <em>built-in metrics</em>.</li>
+<li><strong>target utilization</strong>: target <em>CPU/Mem ratio</em>.</li>
+<li><strong>custom metric</strong>: <em>external signals</em> like <em>queue length</em>.</li>
+<li><strong>VPA</strong>: tunes <em>Pod-level resources</em> instead of count.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>waste</em> at <em>night</em>, <em>503s</em> at <em>peak</em>.</p>
+<p><strong>After</strong>: <em>HPA</em> sizes <em>Pods</em> to current <em>demand</em>.</p>
+<h2>Hands-on: CPU-based HPA</h2>
+<p><strong>Step 1 — Resource requests on the Deployment</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: myorg/app:1.0
+        resources:
+          requests: {cpu: 200m, memory: 256Mi}
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 2 — HPA manifest</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: {name: web}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target: {type: Utilization, averageUtilization: 60}
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 3 — apply</strong></p>
+<pre><code class="language-python">import subprocess
+
+def apply(path):
+    subprocess.run([&quot;kubectl&quot;, &quot;apply&quot;, &quot;-f&quot;, path], check=True)
+</code></pre>
+<p><strong>Step 4 — generate load</strong></p>
+<pre><code class="language-python">def load(target):
+    subprocess.run([
+        &quot;kubectl&quot;, &quot;run&quot;, &quot;load&quot;, &quot;--rm&quot;, &quot;-i&quot;, &quot;--restart=Never&quot;,
+        &quot;--image=busybox&quot;, &quot;--&quot;, &quot;sh&quot;, &quot;-c&quot;,
+        f&quot;while true; do wget -q -O- {target}; done&quot;,
+    ], check=False)
+</code></pre>
+<p><strong>Step 5 — inspect HPA state</strong></p>
+<pre><code class="language-python">def hpa_status(name):
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;get&quot;, &quot;hpa&quot;, name, &quot;-o&quot;, &quot;wide&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>HPA</em> does <em>nothing</em> without <em>resource requests</em>.</li>
+<li><em>minReplicas &gt;= 2</em> is the start of <em>high availability</em>.</li>
+<li><em>averageUtilization</em> is a ratio against <em>requests</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Missing <em>requests</em>, so metrics show <em>0%</em>.</strong></li>
+<li><strong><em>maxReplicas</em> too low to absorb the <em>peak</em>.</strong></li>
+<li><strong>Jumping straight to <em>custom metrics</em>.</strong></li>
+<li><strong>Ignoring <em>node limits</em> so scaling <em>cannot proceed</em>.</strong></li>
+<li><strong>Skipping <em>cooldowns</em> and getting <em>flapping</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The common pairing is <em>HPA + Cluster Autoscaler</em> so that <em>Pod growth</em> drives <em>node growth</em> in two coordinated layers.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Requests</em> are the <em>foundation</em> of all autoscaling.</li>
+<li><em>Metric trust</em> equals <em>autoscaler trust</em>.</li>
+<li><em>Custom metrics</em> come <em>after measurement</em>.</li>
+<li><em>Flapping</em> shows up as <em>cost</em>.</li>
+<li>Always pair with <em>node-level automation</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Requests</em> set.</li>
+<li>[ ] <em>minReplicas &gt;= 2</em>.</li>
+<li>[ ] <em>Cluster Autoscaler</em> considered.</li>
+<li>[ ] <em>Flapping</em> monitored.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In one line, why does <em>HPA</em> fail without <em>requests</em>?</li>
+<li>In one line, the <em>difference</em> between <em>VPA</em> and <em>HPA</em>.</li>
+<li>In one line, the <em>role</em> of <em>Cluster Autoscaler</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>With autoscaling in place, you need a <em>repeatable deploy unit</em>. The next post is <em>Helm</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">ConfigMap and Secret</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/07-volume.md">Volume</a></li>
+<li><strong>HPA (current)</strong></li>
+<li>Helm (upcoming)</li>
+<li>Kubernetes in Operation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/">HorizontalPodAutoscaler</a></li>
+<li><a href="https://github.com/kubernetes-sigs/metrics-server">metrics-server</a></li>
+<li><a href="https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler">Cluster Autoscaler</a></li>
+<li><a href="https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler">VPA</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, HPA, Autoscaling, Metrics, DevOps</p>
+</body>
+</html>

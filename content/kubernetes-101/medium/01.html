@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What is Kubernetes?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What is Kubernetes?</h1>
+<blockquote>
+<p>Kubernetes 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Can a <em>human</em> really manage <em>tens or hundreds</em> of containers by hand?</p>
+<blockquote>
+<p><em>Kubernetes</em> is the <em>orchestrator</em> that keeps your <em>containers</em> in their <em>desired state</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning of <em>orchestration</em></li>
+<li><em>Control plane</em> vs <em>worker nodes</em></li>
+<li>The <em>desired state</em> model</li>
+<li>Where <em>kubectl</em> fits</li>
+<li><em>When</em> to adopt it</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A handful of containers fits on <em>Compose</em>. From <em>dozens</em> upward, an <em>orchestrator</em> is a <em>survival requirement</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;kubectl&quot;] --&gt; API[&quot;api-server&quot;]
+    API --&gt; Etcd[&quot;etcd&quot;]
+    API --&gt; Sched[&quot;scheduler&quot;]
+    Sched --&gt; Node[&quot;worker node&quot;]
+    Node --&gt; Pod[&quot;pod&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>cluster</strong>: a <em>control plane + worker nodes</em> bundle.</li>
+<li><strong>control plane</strong>: <em>api-server, etcd, scheduler, controller-manager</em>.</li>
+<li><strong>node</strong>: a machine where <em>containers actually run</em>.</li>
+<li><strong>desired state</strong>: the <em>target state</em> declared in <em>YAML</em>.</li>
+<li><strong>kubectl</strong>: the <em>CLI</em> that talks to the cluster.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: each server runs <em>manual docker run</em> — <em>not reproducible</em>.</p>
+<p><strong>After</strong>: one <em>YAML</em> yields the same result <em>anywhere</em>.</p>
+<h2>Hands-on: Tour Your First Cluster</h2>
+<p><strong>Step 1 — Show context</strong></p>
+<pre><code class="language-python">import subprocess
+
+def current_context():
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;config&quot;, &quot;current-context&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout.strip()
+</code></pre>
+<p><strong>Step 2 — List nodes</strong></p>
+<pre><code class="language-python">def get_nodes():
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;get&quot;, &quot;nodes&quot;, &quot;-o&quot;, &quot;wide&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 3 — List namespaces</strong></p>
+<pre><code class="language-python">def list_namespaces():
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;get&quot;, &quot;ns&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 4 — System pods</strong></p>
+<pre><code class="language-python">def system_pods():
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;-n&quot;, &quot;kube-system&quot;, &quot;get&quot;, &quot;pods&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 5 — Cluster health</strong></p>
+<pre><code class="language-python">def cluster_info():
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;cluster-info&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>kubectl</em> talks only to the <em>api-server</em>.</li>
+<li>You <em>never touch etcd directly</em>.</li>
+<li><em>Namespaces</em> are the <em>default isolation unit</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating <em>Kubernetes</em> as a synonym for <em>containers</em>.</strong></li>
+<li><strong>Believing more <em>nodes</em> alone <em>solve</em> problems.</strong></li>
+<li><strong>Trying to <em>manage etcd directly</em>.</strong></li>
+<li><strong>Mixing up <em>kubectl</em> contexts and applying to <em>production</em>.</strong></li>
+<li><strong>Adopting Kubernetes for <em>tiny</em> workloads.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>EKS / GKE / AKS</em> — <em>managed Kubernetes</em> — operates the <em>control plane for you</em>, leaving the team to focus on <em>workload YAML</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Desired state</em> is the <em>philosophy</em>.</li>
+<li><em>Control plane</em> is the <em>brain</em>, <em>nodes</em> are the <em>limbs</em>.</li>
+<li><em>Kubernetes</em> is <em>overkill</em> for tiny teams.</li>
+<li><em>Managed</em> is the default choice.</li>
+<li><em>kubectl</em> is a <em>thin client</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Switch <em>contexts explicitly</em>.</li>
+<li>[ ] Split into <em>namespaces</em>.</li>
+<li>[ ] Keep <em>desired state</em> in <em>YAML</em>.</li>
+<li>[ ] Prefer <em>managed</em> first.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Describe the <em>role of the control plane</em> in one line.</li>
+<li>Explain in one line <em>why desired state matters</em>.</li>
+<li>Name <em>one situation</em> where you should delay Kubernetes.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The <em>big picture</em> of orchestration is in place. The next post covers the <em>smallest unit</em>: the <em>Pod</em>.</p>
+<ul>
+<li><strong>What is Kubernetes? (current)</strong></li>
+<li>Pod (upcoming)</li>
+<li>Deployment (upcoming)</li>
+<li>Service (upcoming)</li>
+<li>Ingress (upcoming)</li>
+<li>ConfigMap and Secret (upcoming)</li>
+<li>Volume (upcoming)</li>
+<li>HPA (upcoming)</li>
+<li>Helm (upcoming)</li>
+<li>Kubernetes in Operation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/concepts/overview/">Kubernetes Overview</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/overview/components/">Kubernetes components</a></li>
+<li><a href="https://kubernetes.io/docs/reference/kubectl/">kubectl reference</a></li>
+<li><a href="https://landscape.cncf.io/">CNCF landscape</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, Orchestration, Containers, DevOps, SRE</p>
+</body>
+</html>

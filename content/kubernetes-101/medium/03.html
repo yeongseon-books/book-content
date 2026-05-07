@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Deployment</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Deployment</h1>
+<blockquote>
+<p>Kubernetes 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When a <em>Pod dies</em>, <em>who</em> brings one back?</p>
+<blockquote>
+<p>A <em>Deployment</em> keeps the <em>desired number</em> of <em>Pods</em> alive and owns <em>zero-downtime rollout</em> and <em>rollback</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Deployment</em> and <em>ReplicaSet</em> relationship</li>
+<li>The meaning of <em>replicas</em></li>
+<li>The <em>RollingUpdate</em> strategy</li>
+<li>The <em>rollout</em> command</li>
+<li>The <em>rollback</em> flow</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Zero-downtime deploy</em> and <em>self-healing</em> are the <em>biggest reasons</em> to adopt <em>Kubernetes</em>. The object that owns them is the <em>Deployment</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Dep[&quot;deployment&quot;] --&gt; RS[&quot;replicaset&quot;]
+    RS --&gt; P1[&quot;pod&quot;]
+    RS --&gt; P2[&quot;pod&quot;]
+    RS --&gt; P3[&quot;pod&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>deployment</strong>: declares the <em>desired state</em> of a <em>Pod set</em>.</li>
+<li><strong>replicaset</strong>: a controller that <em>holds the Pod count</em>.</li>
+<li><strong>replicas</strong>: the <em>desired Pod count</em>.</li>
+<li><strong>rollout</strong>: a <em>gradual swap</em> to a new version.</li>
+<li><strong>rollback</strong>: returning to the <em>previous ReplicaSet</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: a dead <em>Pod</em> means <em>service down</em>.</p>
+<p><strong>After</strong>: a <em>Deployment</em> recreates Pods <em>and</em> swaps <em>with no downtime</em>.</p>
+<h2>Hands-on: Automate a Zero-Downtime Rollout</h2>
+<p><strong>Step 1 — Deployment manifest</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: web}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: web}}
+  template:
+    metadata: {labels: {app: web}}
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.25
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 2 — Apply</strong></p>
+<pre><code class="language-python">import subprocess
+
+def apply(path):
+    subprocess.run([&quot;kubectl&quot;, &quot;apply&quot;, &quot;-f&quot;, path], check=True)
+</code></pre>
+<p><strong>Step 3 — Update image</strong></p>
+<pre><code class="language-python">def set_image(dep, container, image):
+    subprocess.run([
+        &quot;kubectl&quot;, &quot;set&quot;, &quot;image&quot;,
+        f&quot;deployment/{dep}&quot;, f&quot;{container}={image}&quot;,
+    ], check=True)
+</code></pre>
+<p><strong>Step 4 — Watch rollout</strong></p>
+<pre><code class="language-python">def rollout_status(dep):
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;rollout&quot;, &quot;status&quot;, f&quot;deployment/{dep}&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 5 — Rollback</strong></p>
+<pre><code class="language-python">def rollback(dep):
+    subprocess.run(
+        [&quot;kubectl&quot;, &quot;rollout&quot;, &quot;undo&quot;, f&quot;deployment/{dep}&quot;],
+        check=True,
+    )
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>selector</em> and <em>labels</em> must <em>match exactly</em>.</li>
+<li>Changing only the <em>image</em> triggers a <em>strategy-driven swap</em>.</li>
+<li><em>undo</em> returns to the <em>previous ReplicaSet</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Creating <em>bare Pods</em> and expecting <em>restarts</em>.</strong></li>
+<li><strong>Setting <em>replicas: 1</em> and expecting <em>high availability</em>.</strong></li>
+<li><strong>Skipping <em>RollingUpdate</em> options and causing a <em>swap stampede</em>.</strong></li>
+<li><strong>Missing <em>liveness/readiness</em>, leaving <em>half-broken rollouts</em>.</strong></li>
+<li><strong>Never trimming <em>rollout history</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Argo CD / Flux</em> treat <em>Deployment YAML</em> in <em>Git</em> as the <em>source of truth</em> and <em>sync</em> the cluster.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Deployment</em> is the <em>workload baseline</em>.</li>
+<li><em>RollingUpdate</em> options are the <em>risk-control core</em>.</li>
+<li><em>Readiness</em> is the real <em>zero-downtime</em> condition.</li>
+<li><em>Rollback</em> must be <em>practiced</em> to actually work.</li>
+<li><em>YAML lives in Git</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>replicas ≥ 2</em>.</li>
+<li>[ ] <em>Readiness probe</em> defined.</li>
+<li>[ ] <em>RollingUpdate</em> options explicit.</li>
+<li>[ ] <em>Rollback</em> procedure <em>documented</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the <em>difference</em> between Deployment and ReplicaSet in one line.</li>
+<li>Explain in one line <em>why</em> readiness is the <em>core</em> of zero downtime.</li>
+<li>Name <em>one situation</em> where rollback is <em>not</em> fast.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Even with <em>Pods</em> up, <em>external access</em> needs an <em>address</em>. The next post covers the <em>Service</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
+<li><strong>Deployment (current)</strong></li>
+<li>Service (upcoming)</li>
+<li>Ingress (upcoming)</li>
+<li>ConfigMap and Secret (upcoming)</li>
+<li>Volume (upcoming)</li>
+<li>HPA (upcoming)</li>
+<li>Helm (upcoming)</li>
+<li>Kubernetes in Operation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/">Deployments</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/">ReplicaSet</a></li>
+<li><a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/update/update-intro/">Rolling update strategy</a></li>
+<li><a href="https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#rollout">kubectl rollout</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, Deployment, ReplicaSet, RollingUpdate, DevOps</p>
+</body>
+</html>

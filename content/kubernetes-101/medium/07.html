@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Volume</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Volume</h1>
+<blockquote>
+<p>Kubernetes 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When a <em>Pod dies</em>, what does it take to <em>keep the data alive</em>?</p>
+<blockquote>
+<p>A <em>PersistentVolumeClaim</em> uses a <em>StorageClass</em> to <em>dynamically</em> attach a <em>durable disk</em> to a <em>Pod</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>emptyDir</em> vs <em>PV/PVC</em></li>
+<li>The role of <em>StorageClass</em></li>
+<li><em>Dynamic provisioning</em></li>
+<li><em>Access modes</em></li>
+<li>The <em>backup</em> angle</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A container's filesystem <em>vanishes</em> with the <em>Pod</em>. Stateful workloads <em>require</em> a <em>Volume</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Pod[&quot;pod&quot;] --&gt; PVC[&quot;pvc&quot;]
+    PVC --&gt; SC[&quot;storageclass&quot;]
+    SC --&gt; PV[&quot;pv (disk)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Volume</strong>: storage <em>shared/persisted</em> inside a Pod.</li>
+<li><strong>PersistentVolume (PV)</strong>: a <em>cluster resource</em> disk.</li>
+<li><strong>PersistentVolumeClaim (PVC)</strong>: a Pod's <em>request</em> for a disk.</li>
+<li><strong>StorageClass</strong>: defines <em>how</em> a disk is created (ssd, gp3).</li>
+<li><strong>AccessMode</strong>: <em>RWO / ROX / RWX</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: storing <em>DB data</em> inside the Pod — <em>gone on restart</em>.</p>
+<p><strong>After</strong>: a <em>PVC + PV</em> keeps it on an <em>external disk</em>.</p>
+<h2>Hands-on: Attach a Disk to a Pod</h2>
+<p><strong>Step 1 — PVC</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: data}
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: {requests: {storage: 5Gi}}
+  storageClassName: gp3
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 2 — Use it in a Pod</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+spec:
+  containers:
+  - name: app
+    image: postgres:16
+    volumeMounts:
+    - name: data
+      mountPath: /var/lib/postgresql/data
+  volumes:
+  - name: data
+    persistentVolumeClaim: {claimName: data}
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 3 — Apply</strong></p>
+<pre><code class="language-python">import subprocess
+
+def apply(path):
+    subprocess.run([&quot;kubectl&quot;, &quot;apply&quot;, &quot;-f&quot;, path], check=True)
+</code></pre>
+<p><strong>Step 4 — Inspect</strong></p>
+<pre><code class="language-python">def get_pvc():
+    res = subprocess.run(
+        [&quot;kubectl&quot;, &quot;get&quot;, &quot;pvc&quot;],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 5 — Cleanup (carefully)</strong></p>
+<pre><code class="language-python">def delete(name):
+    subprocess.run([&quot;kubectl&quot;, &quot;delete&quot;, &quot;pvc&quot;, name], check=True)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>PVC</em> receives a <em>PV dynamically</em>.</li>
+<li><em>RWO</em> allows <em>read/write on one node only</em>.</li>
+<li><em>Deleting a PVC</em> may <em>delete the disk</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Holding <em>state</em> in <em>emptyDir</em>.</strong></li>
+<li><strong>Assuming <em>RWX</em> is <em>generally available</em>.</strong></li>
+<li><strong>Ignoring <em>reclaimPolicy</em> and losing data.</strong></li>
+<li><strong>Trusting <em>PVC alone</em> without a <em>backup system</em>.</strong></li>
+<li><strong>Skipping <em>StorageClass</em> and getting only the <em>default</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>StatefulSet</em> automatically creates <em>one PVC per Pod</em>, and tools like <em>Velero</em> periodically <em>snapshot</em> volumes.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>State</em> is safest <em>outside the cluster</em>.</li>
+<li><em>RWX</em> must justify <em>cost and performance</em>.</li>
+<li><em>Backups</em> are the real <em>recovery capability</em>.</li>
+<li><em>reclaimPolicy</em> is set explicitly.</li>
+<li><em>StatefulSet</em> is the start of <em>stateful patterns</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>State</em> lives on a <em>PVC</em> or <em>managed DB</em>.</li>
+<li>[ ] <em>Backup</em> policy exists.</li>
+<li>[ ] <em>AccessMode</em> explicit.</li>
+<li>[ ] <em>reclaimPolicy</em> explicit.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the <em>difference</em> between emptyDir and PVC in one line.</li>
+<li>Name <em>one constraint</em> of RWO.</li>
+<li>Explain in one line <em>why</em> PVC alone is <em>not enough</em> for backup.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>State is solved. The next post covers <em>matching Pod count to load</em> with <em>HPA</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">ConfigMap and Secret</a></li>
+<li><strong>Volume (current)</strong></li>
+<li>HPA (upcoming)</li>
+<li>Helm (upcoming)</li>
+<li>Kubernetes in Operation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/concepts/storage/volumes/">Volumes</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">Persistent Volumes</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/storage/storage-classes/">Storage Classes</a></li>
+<li><a href="https://velero.io/">Velero</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, Volume, PersistentVolume, StorageClass, DevOps</p>
+</body>
+</html>

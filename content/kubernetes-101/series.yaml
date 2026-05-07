@@ -1,0 +1,51 @@
+id: kubernetes-101
+title:
+  ko: Kubernetes 101
+  en: Kubernetes 101
+description:
+  ko: Pod, Deployment, Service, Ingress, ConfigMap/Secret, Volume, HPA, Helm까지 Kubernetes 기본 객체를 다루는 시리즈
+  en: An entry series covering Kubernetes core objects from Pod, Deployment, Service, Ingress, ConfigMap/Secret, Volume, HPA to Helm
+status: content-ready
+level: beginner
+languages: [ko, en]
+episodes:
+  - slug: 01-what-is-kubernetes
+    title:
+      ko: Kubernetes란 무엇인가?
+      en: What is Kubernetes?
+  - slug: 02-pod
+    title:
+      ko: Pod
+      en: Pod
+  - slug: 03-deployment
+    title:
+      ko: Deployment
+      en: Deployment
+  - slug: 04-service
+    title:
+      ko: Service
+      en: Service
+  - slug: 05-ingress
+    title:
+      ko: Ingress
+      en: Ingress
+  - slug: 06-configmap-and-secret
+    title:
+      ko: ConfigMap과 Secret
+      en: ConfigMap and Secret
+  - slug: 07-volume
+    title:
+      ko: Volume
+      en: Volume
+  - slug: 08-hpa
+    title:
+      ko: HPA
+      en: HPA
+  - slug: 09-helm
+    title:
+      ko: Helm
+      en: Helm
+  - slug: 10-kubernetes-in-operation
+    title:
+      ko: 운영 관점의 Kubernetes
+      en: Kubernetes in Operation
