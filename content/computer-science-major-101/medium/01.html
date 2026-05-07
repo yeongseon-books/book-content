@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Computer Science Majors Learn</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Computer Science Majors Learn</h1>
+<blockquote>
+<p>Computer Science Major 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What will you <em>actually</em> learn across four years of a CS major?</p>
+<blockquote>
+<p>Five axes — <em>math</em>, <em>systems</em>, <em>data</em>, <em>AI</em>, <em>projects</em> — form the <em>big picture</em> of the major.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>big picture</em> of the major</li>
+<li>Weight of <em>math</em> and <em>programming</em></li>
+<li>Balance of <em>systems</em> and <em>theory</em></li>
+<li>Role of <em>projects</em></li>
+<li>Connection to <em>career</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A clear <em>map</em> keeps your <em>four years</em> from drifting.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    M[Math] --&gt; P[Programming]
+    P --&gt; S[Systems]
+    S --&gt; D[Data]
+    D --&gt; A[AI]
+    A --&gt; J[Project]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>major</strong>: your <em>primary</em> field.</li>
+<li><strong>core course</strong>: <em>required</em> class.</li>
+<li><strong>elective</strong>: <em>optional</em> class.</li>
+<li><strong>track</strong>: <em>sub-specialty</em>.</li>
+<li><strong>capstone</strong>: <em>graduation</em> project.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You memorize course names.</p>
+<p><strong>After</strong>: You understand each course's <em>role</em> and <em>links</em>.</p>
+<h2>Hands-on: Draw Your Major Map</h2>
+<p><strong>Step 1 — Define areas</strong></p>
+<pre><code class="language-python">areas = [&quot;math&quot;, &quot;programming&quot;, &quot;systems&quot;, &quot;data&quot;, &quot;ai&quot;, &quot;project&quot;]
+</code></pre>
+<p><strong>Step 2 — Place by year</strong></p>
+<pre><code class="language-python">plan = {1: [&quot;math&quot;, &quot;programming&quot;], 2: [&quot;systems&quot;], 3: [&quot;data&quot;, &quot;ai&quot;], 4: [&quot;project&quot;]}
+</code></pre>
+<p><strong>Step 3 — Distribute credits</strong></p>
+<pre><code class="language-python">credits = {a: 6 for a in areas}
+</code></pre>
+<p><strong>Step 4 — Check balance</strong></p>
+<pre><code class="language-python">total = sum(credits.values())  # 36
+</code></pre>
+<p><strong>Step 5 — Find weak areas</strong></p>
+<pre><code class="language-python">weak = [a for a, c in credits.items() if c &lt; 6]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Courses cluster into <em>areas</em>.</li>
+<li><em>Year order</em> matters.</li>
+<li>Credit <em>sums</em> reveal <em>balance</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Pushing <em>required</em> courses to the <em>last semester</em>.</strong></li>
+<li><strong>Picking <em>only theory or only practice</em>.</strong></li>
+<li><strong>Underweighting <em>math</em> in early years.</strong></li>
+<li><strong>Treating <em>projects</em> as just credits.</strong></li>
+<li><strong>Not linking <em>courses</em> to a <em>career path</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Job listings are essentially a <em>combination</em> of <em>major courses</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Math</em> lasts longest.</li>
+<li><em>Languages</em> change.</li>
+<li><em>Systems</em> are foundation.</li>
+<li><em>Data</em> is universal.</li>
+<li><em>Projects</em> are evidence.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] List your <em>areas</em>.</li>
+<li>[ ] Place by <em>year</em>.</li>
+<li>[ ] Balance <em>credits</em>.</li>
+<li>[ ] Reinforce <em>weak</em> areas.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>required course</em> in one line.</li>
+<li>Define <em>track</em> in one line.</li>
+<li>State the meaning of a <em>capstone</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Understanding First Year Subjects</em>.</p>
+<ul>
+<li><strong>What Computer Science Majors Learn (current)</strong></li>
+<li>Understanding First Year Subjects (upcoming)</li>
+<li>Data Structures and Algorithms (upcoming)</li>
+<li>Understanding Systems Subjects (upcoming)</li>
+<li>Database and Network (upcoming)</li>
+<li>AI and Data Science (upcoming)</li>
+<li>Project Subjects (upcoming)</li>
+<li>How to Study Computer Science (upcoming)</li>
+<li>Build Your Portfolio (upcoming)</li>
+<li>Skills to Have Before Graduation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.acm.org/binaries/content/assets/education/curricula-recommendations/cc2020.pdf">ACM Computing Curricula 2020</a></li>
+<li><a href="https://www.eecs.mit.edu/academics/undergraduate-programs/">MIT EECS Undergraduate Curriculum</a></li>
+<li><a href="https://cs.stanford.edu/degrees/undergrad/">Stanford CS Major Requirements</a></li>
+<li><a href="https://github.com/ossu/computer-science">Open Source Society University</a></li>
+</ul>
+<p class="tags-line">Tags: CS, Major, Curriculum, Career, Beginner</p>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding First Year Subjects</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding First Year Subjects</h1>
+<blockquote>
+<p>Computer Science Major 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why do first year CS subjects <em>focus</em> on <em>math</em> and <em>intro programming</em>?</p>
+<blockquote>
+<p>Because <em>foundation strength</em> must be built in <em>one year</em> before upper courses pile on top.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Meaning of <em>calculus</em></li>
+<li>Role of <em>linear algebra</em></li>
+<li>Use of <em>discrete math</em></li>
+<li><em>Intro programming</em></li>
+<li>Building <em>study habits</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Year-one <em>foundations</em> underlie <em>algorithms</em>, <em>AI</em>, and <em>systems</em> — every later course.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    C[Calculus] --&gt; L[Linear Algebra]
+    L --&gt; D[Discrete Math]
+    D --&gt; P[Programming]
+    P --&gt; N[Next Year]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>calculus</strong>: math of <em>continuous</em> change.</li>
+<li><strong>linear algebra</strong>: <em>vectors</em> and <em>matrices</em>.</li>
+<li><strong>discrete math</strong>: <em>logic</em> and <em>sets</em>.</li>
+<li><strong>intro programming</strong>: <em>language</em> basics.</li>
+<li><strong>lab</strong>: <em>hands-on</em> time.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: First year subjects feel <em>far</em> from your career.</p>
+<p><strong>After</strong>: You see them as the <em>roots</em> of every upper course.</p>
+<h2>Hands-on: First Year Course Matrix</h2>
+<p><strong>Step 1 — List courses</strong></p>
+<pre><code class="language-python">courses = [&quot;calculus&quot;, &quot;linalg&quot;, &quot;discrete&quot;, &quot;intro_prog&quot;]
+</code></pre>
+<p><strong>Step 2 — Map to upper courses</strong></p>
+<pre><code class="language-python">maps = {&quot;calculus&quot;: &quot;ml&quot;, &quot;linalg&quot;: &quot;ml&quot;, &quot;discrete&quot;: &quot;algorithms&quot;, &quot;intro_prog&quot;: &quot;all&quot;}
+</code></pre>
+<p><strong>Step 3 — Weekly study hours</strong></p>
+<pre><code class="language-python">hours = {c: 6 for c in courses}
+</code></pre>
+<p><strong>Step 4 — Lab weight</strong></p>
+<pre><code class="language-python">labs = {&quot;intro_prog&quot;: 4, &quot;discrete&quot;: 1}
+</code></pre>
+<p><strong>Step 5 — Mark weak spots</strong></p>
+<pre><code class="language-python">weak = [c for c, h in hours.items() if h &lt; 5]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Each subject <em>links</em> to upper courses.</li>
+<li><em>Study hours</em> equal <em>foundation strength</em>.</li>
+<li><em>Lab time</em> sits separately.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Just <em>attending</em> without <em>reviewing</em>.</strong></li>
+<li><strong>Treating <em>math</em> as pure <em>memorization</em>.</strong></li>
+<li><strong>Switching <em>languages</em> and delaying basics.</strong></li>
+<li><strong>Starting <em>lab assignments</em> the night before.</strong></li>
+<li><strong>Never <em>asking the professor</em> questions.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>If your <em>algebra</em> and <em>logic</em> shake during code review, <em>upper work</em> also collapses.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Foundations</em> are wealth.</li>
+<li><em>Math</em> takes time.</li>
+<li><em>Code</em> is daily.</li>
+<li><em>Mistakes</em> are notes.</li>
+<li><em>Questions</em> are habit.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Course <em>links</em> mapped.</li>
+<li>[ ] <em>Study hours</em> secured.</li>
+<li>[ ] <em>Lab</em> weight set.</li>
+<li>[ ] <em>Weak spots</em> reinforced.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>linear algebra</em> in one line.</li>
+<li>Define <em>discrete math</em> in one line.</li>
+<li>State the meaning of <em>intro programming</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Data Structures and Algorithms</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
+<li><strong>Understanding First Year Subjects (current)</strong></li>
+<li>Data Structures and Algorithms (upcoming)</li>
+<li>Understanding Systems Subjects (upcoming)</li>
+<li>Database and Network (upcoming)</li>
+<li>AI and Data Science (upcoming)</li>
+<li>Project Subjects (upcoming)</li>
+<li>How to Study Computer Science (upcoming)</li>
+<li>Build Your Portfolio (upcoming)</li>
+<li>Skills to Have Before Graduation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/">MIT 6.0001 Introduction to Computer Science</a></li>
+<li><a href="https://www.3blue1brown.com/topics/linear-algebra">3Blue1Brown - Essence of Linear Algebra</a></li>
+<li><a href="https://www.cs.cmu.edu/~rwh/discrete-math/">Discrete Math - CMU</a></li>
+<li><a href="https://www.khanacademy.org/math/calculus-1">Khan Academy Calculus</a></li>
+</ul>
+<p class="tags-line">Tags: CS, Freshman, Math, Programming, Beginner</p>
+</body>
+</html>

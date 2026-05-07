@@ -1,0 +1,60 @@
+id: computer-science-major-101
+title:
+  ko: 컴퓨터학과 전공 학습 가이드 101
+  en: Computer Science Major 101
+description:
+  ko: 컴퓨터학과 전공 과목 구성, 핵심 영역, 학습 순서, 졸업 전 역량까지 정리한 입문 시리즈.
+  en: An introductory series on computer science major curriculum, core areas, study order, and graduation skills.
+status: content-ready
+level: 101
+lifecycle: active
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+episodes:
+  - slug: 01-what-cs-majors-learn
+    title:
+      ko: 컴퓨터학과에서는 무엇을 배우는가
+      en: What Computer Science Majors Learn
+  - slug: 02-first-year-subjects
+    title:
+      ko: 1학년 과목 이해하기
+      en: Understanding First Year Subjects
+  - slug: 03-data-structures-and-algorithms
+    title:
+      ko: 자료구조와 알고리즘
+      en: Data Structures and Algorithms
+  - slug: 04-systems-subjects
+    title:
+      ko: 시스템 과목 이해하기
+      en: Understanding Systems Subjects
+  - slug: 05-database-and-network
+    title:
+      ko: 데이터베이스와 네트워크
+      en: Database and Network
+  - slug: 06-ai-and-data-science
+    title:
+      ko: AI와 데이터사이언스
+      en: AI and Data Science
+  - slug: 07-project-subjects
+    title:
+      ko: 프로젝트 과목
+      en: Project Subjects
+  - slug: 08-how-to-study-cs
+    title:
+      ko: 전공 공부 방법
+      en: How to Study Computer Science
+  - slug: 09-build-your-portfolio
+    title:
+      ko: 포트폴리오로 연결하기
+      en: Build Your Portfolio
+  - slug: 10-skills-before-graduation
+    title:
+      ko: 졸업 전 갖춰야 할 역량
+      en: Skills to Have Before Graduation

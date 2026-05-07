@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI and Data Science</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI and Data Science</h1>
+<blockquote>
+<p>Computer Science Major 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>How</em> do <em>AI</em> and <em>data science</em> <em>split</em> and <em>connect</em> inside the major?</p>
+<blockquote>
+<p><em>Data</em> is the <em>common input</em>, <em>AI</em> is the <em>model</em>, <em>analysis</em> is the <em>interpretation</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Statistics</em> basics</li>
+<li><em>Machine learning</em> intro</li>
+<li><em>Deep learning</em> basics</li>
+<li><em>Data analysis</em></li>
+<li>The <em>division of labor</em> between the two</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Data sense</em> is the <em>core skill</em> of every <em>modern engineer</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    D[Data] --&gt; S[Statistics]
+    S --&gt; M[ML]
+    M --&gt; N[Neural Net]
+    N --&gt; A[Analysis]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>feature</strong>: <em>input</em> variable.</li>
+<li><strong>label</strong>: <em>target</em> value.</li>
+<li><strong>training</strong>: <em>learning</em>.</li>
+<li><strong>inference</strong>: <em>prediction</em>.</li>
+<li><strong>dataset</strong>: <em>collection</em> of data.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You only look at <em>models</em>.</p>
+<p><strong>After</strong>: You look at <em>data quality</em> and <em>distribution</em>.</p>
+<h2>Hands-on: Mini ML Pipeline</h2>
+<p><strong>Step 1 — Data</strong></p>
+<pre><code class="language-python">xs = [1, 2, 3, 4]
+ys = [2, 4, 6, 8]
+</code></pre>
+<p><strong>Step 2 — Mean</strong></p>
+<pre><code class="language-python">avg = sum(ys) / len(ys)
+</code></pre>
+<p><strong>Step 3 — Regression slope</strong></p>
+<pre><code class="language-python">def slope(xs, ys):
+    mx, my = sum(xs)/len(xs), sum(ys)/len(ys)
+    num = sum((x-mx)*(y-my) for x, y in zip(xs, ys))
+    den = sum((x-mx)**2 for x in xs)
+    return num / den
+</code></pre>
+<p><strong>Step 4 — Prediction</strong></p>
+<pre><code class="language-python">m = slope(xs, ys)
+pred = m * 5
+</code></pre>
+<p><strong>Step 5 — Evaluation</strong></p>
+<pre><code class="language-python">mae = sum(abs(m*x - y) for x, y in zip(xs, ys)) / len(xs)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Statistics</em> underlies the <em>model</em>.</li>
+<li><em>Prediction</em> is <em>function application</em>.</li>
+<li><em>Evaluation</em> validates <em>learning</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Creating <em>data leakage</em>.</strong></li>
+<li><strong>Mixing <em>train and test</em> sets.</strong></li>
+<li><strong>Comparing <em>without scaling</em>.</strong></li>
+<li><strong>Reaching for <em>complex models</em> first.</strong></li>
+<li><strong>Leaving <em>metrics</em> vague.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Detecting <em>distribution shift</em> is the <em>core</em> skill of <em>model operations</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Data</em> matters more than the <em>model</em>.</li>
+<li><em>Baseline</em> first.</li>
+<li><em>Evaluation</em> is <em>evidence</em>.</li>
+<li>Think about <em>interpretability</em>.</li>
+<li>Secure <em>reproducibility</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Train/test</em> split.</li>
+<li>[ ] <em>Baseline</em> model.</li>
+<li>[ ] <em>Metric</em> stated.</li>
+<li>[ ] <em>Seed</em> fixed.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>feature</em> in one line.</li>
+<li>Define <em>label</em> in one line.</li>
+<li>State the meaning of <em>model</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Project Subjects</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/03-data-structures-and-algorithms.md">Data Structures and Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/04-systems-subjects.md">Understanding Systems Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/05-database-and-network.md">Database and Network</a></li>
+<li><strong>AI and Data Science (current)</strong></li>
+<li>Project Subjects (upcoming)</li>
+<li>How to Study Computer Science (upcoming)</li>
+<li>Build Your Portfolio (upcoming)</li>
+<li>Skills to Have Before Graduation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.statlearning.com/">An Introduction to Statistical Learning</a></li>
+<li><a href="https://www.deeplearningbook.org/">Deep Learning Book - Goodfellow</a></li>
+<li><a href="https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf">Pattern Recognition and Machine Learning</a></li>
+<li><a href="https://scikit-learn.org/stable/user_guide.html">scikit-learn User Guide</a></li>
+</ul>
+<p class="tags-line">Tags: CS, AI, DataScience, ML, Beginner</p>
+</body>
+</html>

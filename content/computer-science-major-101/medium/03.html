@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Structures and Algorithms</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Structures and Algorithms</h1>
+<blockquote>
+<p>Computer Science Major 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why are <em>data structures</em> and <em>algorithms</em> the <em>core</em> course for <em>every</em> CS major?</p>
+<blockquote>
+<p>Because they are the <em>common language</em> of <em>problem solving</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Meaning of <em>data structures</em></li>
+<li>Meaning of <em>algorithms</em></li>
+<li><em>Time and space complexity</em></li>
+<li>Study <em>order</em></li>
+<li>Link to coding <em>interviews</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Complexity</em> thinking is the first <em>standard</em> of <em>code quality</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    D[Data Structure] --&gt; A[Algorithm]
+    A --&gt; C[Complexity]
+    C --&gt; P[Problem Solving]
+    P --&gt; I[Interview]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>array</strong>: <em>contiguous</em> memory.</li>
+<li><strong>list</strong>: <em>linked</em> structure.</li>
+<li><strong>tree</strong>: <em>hierarchical</em> structure.</li>
+<li><strong>graph</strong>: <em>relations</em>.</li>
+<li><strong>complexity</strong>: <em>growth rate</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You only write <em>for loops</em>.</p>
+<p><strong>After</strong>: You think in <em>complexity</em>.</p>
+<h2>Hands-on: Mini DSA Kit</h2>
+<p><strong>Step 1 — Array sum</strong></p>
+<pre><code class="language-python">def total(xs):
+    return sum(xs)
+</code></pre>
+<p><strong>Step 2 — Linear search</strong></p>
+<pre><code class="language-python">def find(xs, t):
+    return any(x == t for x in xs)
+</code></pre>
+<p><strong>Step 3 — Binary search</strong></p>
+<pre><code class="language-python">def bsearch(xs, t):
+    lo, hi = 0, len(xs) - 1
+    while lo &lt;= hi:
+        m = (lo + hi) // 2
+        if xs[m] == t:
+            return m
+        if xs[m] &lt; t:
+            lo = m + 1
+        else:
+            hi = m - 1
+    return -1
+</code></pre>
+<p><strong>Step 4 — Stack</strong></p>
+<pre><code class="language-python">stack = []
+stack.append(1)
+stack.pop()
+</code></pre>
+<p><strong>Step 5 — Graph BFS</strong></p>
+<pre><code class="language-python">from collections import deque
+def bfs(g, s):
+    seen, q = {s}, deque([s])
+    while q:
+        u = q.popleft()
+        for v in g[u]:
+            if v not in seen:
+                seen.add(v); q.append(v)
+    return seen
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Linear</em> and <em>log</em> differ.</li>
+<li><em>Stack/queue</em> are <em>simple</em> but <em>fundamental</em>.</li>
+<li><em>BFS</em> shines on <em>shortest path</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Never <em>measuring</em> complexity.</strong></li>
+<li><strong>Forgetting <em>recursion stack</em> limits.</strong></li>
+<li><strong>Using <em>hash</em> everywhere.</strong></li>
+<li><strong>Mixing <em>graph representations</em>.</strong></li>
+<li><strong>Underestimating <em>input size</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most API <em>latency</em> problems start at <em>data structure choice</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Complexity</em> is intuition.</li>
+<li><em>Data shape</em> drives the algorithm.</li>
+<li>Look at <em>worst</em> and <em>best</em>.</li>
+<li>Write <em>invariants</em>.</li>
+<li><em>Tests</em> are evidence.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Complexity</em> labeled.</li>
+<li>[ ] <em>Input limit</em> known.</li>
+<li>[ ] <em>Invariant</em> stated.</li>
+<li>[ ] <em>Tests</em> pass.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>hash table</em> in one line.</li>
+<li>Define <em>graph</em> in one line.</li>
+<li>State the meaning of <em>Big O</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Understanding Systems Subjects</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>
+<li><strong>Data Structures and Algorithms (current)</strong></li>
+<li>Understanding Systems Subjects (upcoming)</li>
+<li>Database and Network (upcoming)</li>
+<li>AI and Data Science (upcoming)</li>
+<li>Project Subjects (upcoming)</li>
+<li>How to Study Computer Science (upcoming)</li>
+<li>Build Your Portfolio (upcoming)</li>
+<li>Skills to Have Before Graduation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">CLRS Introduction to Algorithms</a></li>
+<li><a href="https://opendatastructures.org/">Open Data Structures</a></li>
+<li><a href="https://visualgo.net/en">Visualgo - Algorithm Visualization</a></li>
+<li><a href="https://seanprashad.com/leetcode-patterns/">LeetCode Patterns</a></li>
+</ul>
+<p class="tags-line">Tags: CS, DataStructures, Algorithms, Complexity, Beginner</p>
+</body>
+</html>
