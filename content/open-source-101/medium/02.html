@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding Licenses</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding Licenses</h1>
+<blockquote>
+<p>Open Source 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What <em>risk</em> do you take when you use code without reading its <em>license</em>?</p>
+<blockquote>
+<p>The <em>legal liability</em> lands on <em>you</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Permissive</em> vs <em>copyleft</em></li>
+<li><em>MIT, Apache, GPL</em> compared</li>
+<li>The meaning of <em>public domain</em></li>
+<li><em>Dual</em> licensing</li>
+<li>Checking <em>compatibility</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The <em>license</em> shapes the <em>future</em> of the project.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Permissive] --&gt; M[MIT]
+    P --&gt; A[Apache]
+    C[Copyleft] --&gt; G[GPL]
+    C --&gt; L[LGPL]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>permissive</strong>: A <em>permissive</em> license.</li>
+<li><strong>copyleft</strong>: A <em>copyleft</em> license.</li>
+<li><strong>public domain</strong>: The <em>public domain</em>.</li>
+<li><strong>dual license</strong>: A <em>dual license</em>.</li>
+<li><strong>SPDX</strong>: A <em>license identifier standard</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "<em>MIT</em> and <em>GPL</em> are both just <em>open source</em>."</p>
+<p><strong>After</strong>: "You can <em>sell</em> MIT code; <em>GPL</em> requires <em>source disclosure</em>."</p>
+<h2>Hands-on: Comparing Licenses</h2>
+<p><strong>Step 1 — MIT essentials</strong></p>
+<pre><code class="language-text">Allows: use, modify, distribute, sell
+Requires: keep the copyright notice
+</code></pre>
+<p><strong>Step 2 — Apache 2.0 essentials</strong></p>
+<pre><code class="language-text">Allows: same as MIT
+Adds: explicit patent grant
+</code></pre>
+<p><strong>Step 3 — GPL v3 essentials</strong></p>
+<pre><code class="language-text">Allows: use, modify, distribute
+Requires: derivative works share their source
+</code></pre>
+<p><strong>Step 4 — SPDX identifier</strong></p>
+<pre><code class="language-yaml">license: MIT
+</code></pre>
+<p><strong>Step 5 — License file</strong></p>
+<pre><code class="language-bash">curl -O https://choosealicense.com/licenses/mit/
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Permissive</em> is <em>flexible</em>.</li>
+<li><em>Copyleft</em> is <em>contagious</em>.</li>
+<li><em>SPDX</em> is the <em>standard identifier</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Just <em>copying</em> the license.</strong></li>
+<li><strong>Stripping the <em>copyright notice</em>.</strong></li>
+<li><strong>Mixing <em>GPL</em> code into <em>proprietary</em> products.</strong></li>
+<li><strong>Misreading a <em>dual license</em>.</strong></li>
+<li><strong>No <em>SPDX</em> identifier.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Companies run <em>license scanners</em> (FOSSA, Snyk) to check <em>compatibility</em> automatically.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A <em>license</em> is <em>law</em>.</li>
+<li><em>MIT</em> means <em>minimal friction</em>.</li>
+<li><em>GPL</em> enforces <em>sharing</em>.</li>
+<li><em>Apache</em> is <em>patent-safe</em>.</li>
+<li><em>Dual licensing</em> is a <em>strategy</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>LICENSE</em> file present.</li>
+<li>[ ] <em>SPDX</em> identifier set.</li>
+<li>[ ] <em>Copyright</em> notice kept.</li>
+<li>[ ] <em>Compatibility</em> checked.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the difference between <em>permissive</em> and <em>copyleft</em> in one line.</li>
+<li>Write the meaning of <em>SPDX</em> in one line.</li>
+<li>Write an example of a <em>dual license</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The next post is <em>Reading Issues</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
+<li><strong>Understanding Licenses (current)</strong></li>
+<li>Reading Issues (upcoming)</li>
+<li>Creating Pull Requests (upcoming)</li>
+<li>A Good README (upcoming)</li>
+<li>Release and Versioning (upcoming)</li>
+<li>Community Management (upcoming)</li>
+<li>The Maintainer Role (upcoming)</li>
+<li>An Open Source Portfolio (upcoming)</li>
+<li>My First Open Source Project (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://choosealicense.com/">Choose a License</a></li>
+<li><a href="https://spdx.org/licenses/">SPDX License List</a></li>
+<li><a href="https://opensource.org/licenses">Open Source Initiative Licenses</a></li>
+<li><a href="https://www.tldrlegal.com/">tl;dr Legal</a></li>
+</ul>
+<p class="tags-line">Tags: OpenSource, License, MIT, GPL, Beginner</p>
+</body>
+</html>
