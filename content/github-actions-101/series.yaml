@@ -1,0 +1,52 @@
+id: github-actions-101
+title:
+  ko: GitHub Actions 101
+  en: GitHub Actions 101
+description:
+  ko: Workflow, Job, Trigger, 테스트 자동화, 빌드 아티팩트, 배포, secret 관리까지 GitHub Actions 전반을 다루는 시리즈.
+  en: Workflows, jobs, triggers, test automation, build artifacts, deployment, and secrets — a complete GitHub Actions starter.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-github-actions
+    title:
+      ko: GitHub Actions란 무엇인가?
+      en: What Is GitHub Actions?
+  - slug: workflow-and-job
+    title:
+      ko: Workflow와 Job
+      en: Workflows and Jobs
+  - slug: triggers
+    title:
+      ko: Trigger 이해하기
+      en: Understanding Triggers
+  - slug: python-test-automation
+    title:
+      ko: Python 테스트 자동화
+      en: Python Test Automation
+  - slug: lint-and-typecheck
+    title:
+      ko: Lint와 Type Check
+      en: Lint and Type Check
+  - slug: build-artifact
+    title:
+      ko: 빌드 아티팩트
+      en: Build Artifacts
+  - slug: docker-build
+    title:
+      ko: Docker 빌드
+      en: Docker Build
+  - slug: deploy-automation
+    title:
+      ko: 배포 자동화
+      en: Deployment Automation
+  - slug: secret-management
+    title:
+      ko: Secret 관리
+      en: Secret Management
+  - slug: real-world-cicd-pipeline
+    title:
+      ko: 실전 CI/CD 파이프라인
+      en: A Real-World CI/CD Pipeline

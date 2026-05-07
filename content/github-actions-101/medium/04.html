@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python Test Automation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Python Test Automation</h1>
+<blockquote>
+<p>GitHub Actions 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you make <em>pytest run automatically and reliably</em> on every PR?</p>
+<blockquote>
+<p>A test only becomes a <em>real test</em> once it <em>runs automatically</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Fast setup with <em>setup-python</em> + <em>pip cache</em></li>
+<li>Surfacing <em>pytest results</em> as PR checks</li>
+<li>Measuring <em>coverage</em> and uploading to <em>Codecov</em></li>
+<li>Multiple <em>Python versions</em> via <em>matrix</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Manual tests get <em>forgotten</em>. Only automation guarantees <em>the same trust</em> on every PR.</p>
+<blockquote>
+<p><em>Slow CI</em> becomes <em>skipped CI</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    PR[&quot;PR open&quot;] --&gt; Setup[&quot;setup python&quot;]
+    Setup --&gt; Install[&quot;pip install&quot;]
+    Install --&gt; Test[&quot;pytest&quot;]
+    Test --&gt; Cov[&quot;coverage&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>setup-python</strong>: installs <em>Python on the runner</em>.</li>
+<li><strong>pip cache</strong>: caches <em>dependencies</em> for speed.</li>
+<li><strong>pytest</strong>: the Python <em>test runner</em>.</li>
+<li><strong>coverage</strong>: measures <em>test coverage</em>.</li>
+<li><strong>Codecov</strong>: a coverage <em>reporting service</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>pytest</code> runs <em>only locally</em> and breakage shows up <em>after merge</em>.</p>
+<p><strong>After</strong>: a <em>Tests passed</em> check appears on every PR and <em>3.10/3.11/3.12</em> must all pass before merge.</p>
+<h2>Hands-on: Test Automation in 5 Steps</h2>
+<p><strong>Step 1 — Python + cache</strong></p>
+<pre><code class="language-yaml">- uses: actions/setup-python@v5
+  with:
+    python-version: &quot;3.11&quot;
+    cache: &quot;pip&quot;
+- run: pip install -r requirements.txt
+</code></pre>
+<p><strong>Step 2 — Run pytest and report</strong></p>
+<pre><code class="language-yaml">- run: pytest -q --junitxml=report.xml
+- uses: actions/upload-artifact@v4
+  if: always()
+  with:
+    name: pytest-report
+    path: report.xml
+</code></pre>
+<p><strong>Step 3 — Measure coverage</strong></p>
+<pre><code class="language-yaml">- run: pytest --cov=src --cov-report=xml
+- uses: codecov/codecov-action@v4
+  with:
+    files: coverage.xml
+</code></pre>
+<p><strong>Step 4 — Multi-version matrix</strong></p>
+<pre><code class="language-yaml">strategy:
+  matrix:
+    python: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
+steps:
+  - uses: actions/setup-python@v5
+    with:
+      python-version: ${{ matrix.python }}
+</code></pre>
+<p><strong>Step 5 — Capture on failure</strong></p>
+<pre><code class="language-yaml">- name: dump logs on failure
+  if: failure()
+  run: |
+    cat pytest.log || true
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>One line of <em>cache: "pip"</em> trims <em>tens of seconds</em> of install time.</li>
+<li><em>junit XML</em> integrates with <em>Test Reporter</em> tools.</li>
+<li><em>if: always()</em> uploads artifacts even when steps fail.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><code>pip install</code> reinstalls everything every time.</strong> Cache is missing.</li>
+<li><strong>Using <code>pytest -v</code> in <em>production CI</em>.</strong> Log output explodes.</li>
+<li><strong>Tests depending on the <em>external network</em>.</strong> Source of <em>flakiness</em>.</li>
+<li><strong>No <code>junitxml</code>.</strong> PR can't show <em>detailed</em> results.</li>
+<li><strong>Coverage measured <em>with no goal</em>.</strong> Numbers grow but quality doesn't.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams <em>parallelize with pytest-xdist</em>, manage <em>flaky tests</em> with <em>re-run</em> policy, and gate PRs on a <em>coverage threshold</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Slow tests</em> block <em>new code</em>.</li>
+<li><em>Flaky tests</em> must be <em>quarantined</em>.</li>
+<li><em>Coverage</em> is a <em>signal</em>, not a goal.</li>
+<li><em>Matrix</em> must justify its <em>cost</em>.</li>
+<li><em>Artifacts</em> preserve <em>debugging trails</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>pip cache</em> is enabled.</li>
+<li>[ ] <em>junit XML</em> is uploaded.</li>
+<li>[ ] <em>Coverage</em> is measured.</li>
+<li>[ ] <em>Matrix</em> is sized to need.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <em>pytest workflow</em> to your project.</li>
+<li>Enable a <em>3.11/3.12</em> matrix.</li>
+<li>Fail PRs when <em>coverage drops below 80%</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Test automation is the <em>heart of CI</em>. The next post covers <em>Lint and Type Check</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><strong>Python Test Automation (current)</strong></li>
+<li>Lint and Type Check (upcoming)</li>
+<li>Build Artifacts (upcoming)</li>
+<li>Docker Build (upcoming)</li>
+<li>Deployment Automation (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/actions/setup-python">actions/setup-python</a></li>
+<li><a href="https://docs.pytest.org/">pytest documentation</a></li>
+<li><a href="https://coverage.readthedocs.io/">coverage.py</a></li>
+<li><a href="https://github.com/codecov/codecov-action">Codecov GitHub Action</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Python, Pytest, Testing, CICD</p>
+</body>
+</html>

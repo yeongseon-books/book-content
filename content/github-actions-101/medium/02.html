@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Workflows and Jobs</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Workflows and Jobs</h1>
+<blockquote>
+<p>GitHub Actions 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you say "<em>deploy</em> runs only after <em>test</em> passes"?</p>
+<blockquote>
+<p>The <em>graph of jobs</em> is your <em>pipeline</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The exact relationship between <em>Workflow / Job / Step</em></li>
+<li>Expressing dependencies with <em>jobs.<id>.needs</em></li>
+<li>Running <em>many environments</em> with <em>matrix</em></li>
+<li>Passing values between jobs with <em>outputs</em></li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A fully <em>serial</em> CI is slow; a fully <em>parallel</em> one <em>breaks ordering</em>. Drawing the <em>job graph</em> correctly is what makes a pipeline <em>fast and safe</em>.</p>
+<blockquote>
+<p><em>Parallel for speed, dependencies for safety</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Lint[&quot;lint&quot;] --&gt; Build[&quot;build&quot;]
+    Test[&quot;test&quot;] --&gt; Build
+    Build --&gt; Deploy[&quot;deploy&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Workflow</strong>: one <em>YAML file</em> equals one workflow.</li>
+<li><strong>Job</strong>: a <em>unit of execution</em> in a workflow; jobs run <em>in parallel</em> by default.</li>
+<li><strong>Step</strong>: a <em>command</em> or <em>Action call</em> inside a Job.</li>
+<li><strong>needs</strong>: declares <em>dependencies</em> between Jobs.</li>
+<li><strong>matrix</strong>: <em>replicates</em> a Job across <em>combinations of variables</em>.</li>
+<li><strong>outputs</strong>: values a Job <em>passes</em> to the next Job.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every step crammed into <em>one Job</em> — a <em>six-minute serial</em> pipeline.</p>
+<p><strong>After</strong>: split into <em>three parallel jobs</em> (lint / test / build) with <em>deploy needs build</em> — a <em>two-minute graph</em> pipeline.</p>
+<h2>Hands-on: Job Graph in 5 Steps</h2>
+<p><strong>Step 1 — Split into jobs</strong></p>
+<pre><code class="language-yaml">jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pytest -q
+</code></pre>
+<p><strong>Step 2 — Order with needs</strong></p>
+<pre><code class="language-yaml">  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m build
+</code></pre>
+<p><strong>Step 3 — Multiple environments via matrix</strong></p>
+<pre><code class="language-yaml">  test:
+    strategy:
+      matrix:
+        python: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pytest -q
+</code></pre>
+<p><strong>Step 4 — Pass values via outputs</strong></p>
+<pre><code class="language-yaml">  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - id: v
+        run: echo &quot;version=1.2.3&quot; &gt;&gt; &quot;$GITHUB_OUTPUT&quot;
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo &quot;deploy ${{ needs.build.outputs.version }}&quot;
+</code></pre>
+<p><strong>Step 5 — Failure policy: continue-on-error</strong></p>
+<pre><code class="language-yaml">  flaky:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - run: pytest tests/flaky.py
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>needs</em> is a <em>DAG</em>.</li>
+<li><em>matrix</em> watch for <em>combinatorial explosion</em>.</li>
+<li><em>outputs</em> carries <em>strings only</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>All steps in <em>one Job</em>.</strong> Lost parallelism.</li>
+<li><strong>Missing <code>needs</code>.</strong> Dependencies become <em>implicit</em>.</li>
+<li><strong>A <em>huge matrix</em>.</strong> Build cost explodes.</li>
+<li><strong>Complex <em>objects in outputs</em>.</strong> Serialization breaks.</li>
+<li><strong>No <code>if:</code> conditions.</strong> Unnecessary jobs run <em>every time</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams run <em>fast lint+test only</em> on <em>PRs</em> and a <em>full matrix + build</em> on <em>main push</em> — a <em>two-tier graph</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Job decomposition</em> drives <em>feedback time</em>.</li>
+<li>Add <em>matrix only when needed</em>.</li>
+<li><em>needs</em> expresses <em>business intent</em>.</li>
+<li><em>outputs</em> is for <em>simple values</em> only.</li>
+<li>Use <em>if</em> to remove <em>unnecessary runs</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>lint / test / build</em> are separated.</li>
+<li>[ ] <em>needs</em> makes dependencies explicit.</li>
+<li>[ ] <em>matrix</em> is sized for cost.</li>
+<li>[ ] <em>outputs</em> carry only <em>strings</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a <em>3-job graph</em> (lint, test, build).</li>
+<li>Add a <em>Python 3.11/3.12</em> matrix to test.</li>
+<li>Have <em>deploy</em> consume the <em>version output</em> from build.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The job graph is the <em>spine of your pipeline</em>. The next post covers <em>when it runs (Trigger)</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><strong>Workflows and Jobs (current)</strong></li>
+<li>Understanding Triggers (upcoming)</li>
+<li>Python Test Automation (upcoming)</li>
+<li>Lint and Type Check (upcoming)</li>
+<li>Build Artifacts (upcoming)</li>
+<li>Docker Build (upcoming)</li>
+<li>Deployment Automation (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions">Workflow syntax</a></li>
+<li><a href="https://docs.github.com/actions/using-jobs/using-jobs-in-a-workflow">Using jobs in a workflow</a></li>
+<li><a href="https://docs.github.com/actions/using-jobs/using-a-matrix-for-your-jobs">Using a matrix for jobs</a></li>
+<li><a href="https://docs.github.com/actions/using-jobs/defining-outputs-for-jobs">Defining outputs for jobs</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Workflow, Job, Matrix, CICD</p>
+</body>
+</html>

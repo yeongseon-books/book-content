@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Docker Build</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Docker Build</h1>
+<blockquote>
+<p>GitHub Actions 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you build a <em>Docker image per PR</em> <em>fast and safely</em> and push it to a <em>registry</em>?</p>
+<blockquote>
+<p><em>Docker builds</em> are <em>all about cache design</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Enabling <em>Buildx</em> via <em>docker/setup-buildx-action</em></li>
+<li>Cutting build time with the <em>gha cache</em></li>
+<li>Logging in and pushing to <em>GHCR</em></li>
+<li><em>Multi-platform</em> (linux/amd64+arm64) builds</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The <em>slowest CI step</em> is usually the <em>Docker build</em>. Done right (cache + multi-stage + Buildx), <em>minutes</em> become <em>seconds</em>.</p>
+<blockquote>
+<p><em>Container standards</em> drive <em>deployment standards</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Dockerfile[&quot;Dockerfile&quot;] --&gt; Buildx[&quot;docker/build-push-action&quot;]
+    Buildx --&gt; Cache[&quot;gha cache&quot;]
+    Buildx --&gt; GHCR[&quot;ghcr.io&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Buildx</strong>: Docker's <em>advanced builder</em>.</li>
+<li><strong>gha cache</strong>: GitHub Actions <em>cache backend</em>.</li>
+<li><strong>GHCR</strong>: <em>GitHub Container Registry</em>.</li>
+<li><strong>Multi-platform</strong>: building for <em>multiple CPU architectures</em>.</li>
+<li><strong>OCI image</strong>: the <em>standard container image</em> format.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every run <em>rebuilds all layers</em> — <em>4 minutes per PR</em>.</p>
+<p><strong>After</strong>: <em>gha cache + multi-stage</em> finishes in <em>30 seconds</em>.</p>
+<h2>Hands-on: Docker Build in 5 Steps</h2>
+<p><strong>Step 1 — Set up Buildx</strong></p>
+<pre><code class="language-yaml">- uses: docker/setup-qemu-action@v3
+- uses: docker/setup-buildx-action@v3
+</code></pre>
+<p><strong>Step 2 — Log in to GHCR</strong></p>
+<pre><code class="language-yaml">- uses: docker/login-action@v3
+  with:
+    registry: ghcr.io
+    username: ${{ github.actor }}
+    password: ${{ secrets.GITHUB_TOKEN }}
+</code></pre>
+<p><strong>Step 3 — Build and push with build-push-action</strong></p>
+<pre><code class="language-yaml">- uses: docker/build-push-action@v6
+  with:
+    context: .
+    push: true
+    tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+    cache-from: type=gha
+    cache-to: type=gha,mode=max
+</code></pre>
+<p><strong>Step 4 — Multi-platform</strong></p>
+<pre><code class="language-yaml">- uses: docker/build-push-action@v6
+  with:
+    platforms: linux/amd64,linux/arm64
+    push: true
+    tags: ghcr.io/${{ github.repository }}:latest
+</code></pre>
+<p><strong>Step 5 — Permissions (top-level)</strong></p>
+<pre><code class="language-yaml">permissions:
+  contents: read
+  packages: write
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>cache-to: gha, mode=max</em> maximizes <em>layer cache</em> reuse.</li>
+<li><em>Multi-platform</em> roughly <em>doubles cost</em>.</li>
+<li><em>GITHUB_TOKEN</em> needs <em>packages: write</em> permission.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>No Buildx.</strong> No <em>gha cache</em> available.</li>
+<li><strong>Missing <code>permissions: packages: write</code>.</strong> <em>push 401</em>.</li>
+<li><strong>Pushing only <em>latest</em>.</strong> No rollback.</li>
+<li><strong>Building <em>multi-platform</em> on every PR.</strong> Cost explodes.</li>
+<li><strong>Single-stage Dockerfile.</strong> Image grows to <em>hundreds of MB</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams build <em>amd64 + cache only</em> on <em>PRs</em> and produce <em>signed (cosign) multi-platform</em> images on <em>main push</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Docker build time</em> equals <em>team patience</em>.</li>
+<li><em>Cache strategy</em> drives <em>Dockerfile design</em>.</li>
+<li><em>latest</em> is convenience; <em>pinned tags</em> are truth.</li>
+<li>Grant <em>permissions</em> minimally.</li>
+<li><em>Sign</em> artifacts for <em>supply-chain security</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Buildx + gha cache</em> are enabled.</li>
+<li>[ ] Both <em>pinned (sha)</em> and <em>latest</em> tags are pushed.</li>
+<li>[ ] <em>permissions: packages: write</em> is set.</li>
+<li>[ ] <em>Multi-platform</em> runs only on <em>needed triggers</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build <em>amd64 only</em> on PRs.</li>
+<li>Push <em>multi-platform + latest</em> on <em>main push</em>.</li>
+<li>Refactor your <em>Dockerfile</em> to <em>multi-stage</em> to cut image size in <em>half</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Automating Docker builds is the <em>gateway to deployment automation</em>. Next: <em>Deployment automation</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">Build Artifacts</a></li>
+<li><strong>Docker Build (current)</strong></li>
+<li>Deployment Automation (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/docker/build-push-action">docker/build-push-action</a></li>
+<li><a href="https://github.com/docker/setup-buildx-action">docker/setup-buildx-action</a></li>
+<li><a href="https://docs.github.com/packages/working-with-a-github-packages-registry/working-with-the-container-registry">GHCR documentation</a></li>
+<li><a href="https://docs.docker.com/build/ci/github-actions/cache/">Buildx GitHub Actions cache</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Docker, Buildx, GHCR, CICD</p>
+</body>
+</html>

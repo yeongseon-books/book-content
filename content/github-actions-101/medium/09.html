@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Secret Management</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Secret Management</h1>
+<blockquote>
+<p>GitHub Actions 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you handle <em>passwords, API keys, and certificates</em> — <em>sensitive values</em> — <em>safely</em> inside a workflow?</p>
+<blockquote>
+<p><em>Secrets are not code; they are </em>runtime resources<em>. Design storage, exposure, and rotation as separate concerns.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>repository, environment, and organization</em> secrets</li>
+<li>The <em>least-privilege</em> <code>permissions:</code> discipline for <code>GITHUB_TOKEN</code></li>
+<li><em>OIDC</em> as a way to <em>retire long-lived keys</em></li>
+<li>Masking dynamic values with <em><code>::add-mask::</code></em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>A leaked secret is unrecoverable</em>. Once it lands in a public log, it is on the internet <em>forever</em>.</p>
+<blockquote>
+<p><em>The biggest risk to a secret is not a hacker; it is </em>us<em>. One careless echo and it is over.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Org[&quot;Organization secret&quot;] --&gt; Repo[&quot;Repository secret&quot;]
+    Repo --&gt; Env[&quot;Environment secret&quot;]
+    Env --&gt; Job[&quot;Job runtime&quot;]
+    Job --&gt; Mask[&quot;::add-mask::&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Repository secret</strong>: scoped to <em>one repo</em>.</li>
+<li><strong>Environment secret</strong>: scoped <em>per environment</em> (staging, production).</li>
+<li><strong>Organization secret</strong>: <em>shared</em> across many repos.</li>
+<li><strong>GITHUB_TOKEN</strong>: a short-lived token <em>issued automatically</em> per run.</li>
+<li><strong>OIDC</strong>: <em>keyless trust</em> with the cloud.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>.env</code> files are committed, or an <code>AWS_KEY</code> gets shared over Slack DM. Rotation is <em>manual, once a year</em>.</p>
+<p><strong>After</strong>: secrets live only in the <em>GitHub UI</em>. <em>OIDC</em> means <em>zero long-lived keys</em>. <em>Quarterly rotation</em> is on the calendar.</p>
+<h2>Hands-on: Secret Management in 5 Steps</h2>
+<p><strong>Step 1 — Register a repository secret</strong></p>
+<pre><code class="language-bash"># Use the gh CLI instead of clicking
+gh secret set NPM_TOKEN --body &quot;npm_xxx&quot;
+gh secret set --env production DB_PASSWORD --body &quot;***&quot;
+</code></pre>
+<p><strong>Step 2 — Use it inside a workflow</strong></p>
+<pre><code class="language-yaml">jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+</code></pre>
+<p><strong>Step 3 — <code>GITHUB_TOKEN</code> least privilege</strong></p>
+<pre><code class="language-yaml">permissions:
+  contents: read
+  pull-requests: write
+  # everything else defaults to 'none'
+</code></pre>
+<p><strong>Step 4 — Mask dynamic values</strong></p>
+<pre><code class="language-yaml">- name: Mask runtime token
+  run: |
+    TOKEN=$(curl -s https://auth.example.com/token | jq -r .token)
+    echo &quot;::add-mask::$TOKEN&quot;
+    echo &quot;GENERATED_TOKEN=$TOKEN&quot; &gt;&gt; &quot;$GITHUB_ENV&quot;
+</code></pre>
+<p><strong>Step 5 — Dependabot secrets and rotation</strong></p>
+<pre><code class="language-text">Settings &gt; Secrets &gt; Dependabot
+- dependency update PRs can also access secrets
+- put rotation on the calendar quarterly (gh secret set to refresh)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Secrets enter through <em>environment variables</em>, never <em>command-line args</em>.</li>
+<li>Start <code>permissions:</code> at <em>deny-all</em> and grant only what you need.</li>
+<li><em><code>::add-mask::</code></em> protects values <em>generated at runtime</em>, too.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><code>echo $SECRET</code> for debugging.</strong> It is now <em>permanently in the log</em>.</li>
+<li><strong>Granting secret access to PRs via <code>pull_request_target</code>.</strong> <em>Arbitrary code execution</em> risk.</li>
+<li><strong><code>GITHUB_TOKEN</code> left at <em>write-all</em>.</strong> A bad action affects <em>everything</em>.</li>
+<li><strong>Exposing secrets to <em>fork PRs</em>.</strong> External contributors can exfiltrate them.</li>
+<li><strong>No rotation schedule.</strong> A former employee's key lives on for <em>years</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams keep a <em>single source of truth</em> in <em>HashiCorp Vault</em>, <em>Doppler</em>, or <em>1Password Secrets Automation</em>, and let GitHub Actions <em>borrow short-lived credentials</em> via <em>OIDC</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>If a secret is in the code, it has already leaked</em>.</li>
+<li><em>Least privilege</em> is the default.</li>
+<li><em>Long-lived keys are a liability</em>; <em>OIDC is an asset</em>.</li>
+<li><em>Rotation is automation, not a calendar reminder</em>.</li>
+<li><em>Never</em> hand secrets to a <em>fork PR</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Repository / environment / organization</em> scopes are deliberate.</li>
+<li>[ ] <code>permissions:</code> is set to <em>least privilege</em>.</li>
+<li>[ ] <em>OIDC</em> authenticates to the cloud.</li>
+<li>[ ] A <em>rotation schedule</em> exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <code>DB_PASSWORD</code> secret to the <em>production</em> environment and use it safely in a workflow.</li>
+<li>Change a workflow's <code>permissions:</code> from <em>write-all</em> to a <em>deny-all baseline plus what is needed</em>.</li>
+<li>Add a step that masks a <em>runtime-generated token</em> with <code>::add-mask::</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Secret management prevents <em>most</em> security incidents. Next: a <em>real-world CI/CD pipeline</em> that ties everything together.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">Build Artifacts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/07-docker-build.md">Docker Build</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/08-deploy-automation.md">Deployment Automation</a></li>
+<li><strong>Secret Management (current)</strong></li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/actions/security-guides/using-secrets-in-github-actions">Using secrets in GitHub Actions</a></li>
+<li><a href="https://docs.github.com/actions/security-guides/automatic-token-authentication">Automatic token authentication</a></li>
+<li><a href="https://docs.github.com/actions/security-guides/security-hardening-for-github-actions">Security hardening for GitHub Actions</a></li>
+<li><a href="https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#masking-a-value-in-a-log">Workflow commands - add-mask</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Secret, Security, OIDC, CICD</p>
+</body>
+</html>

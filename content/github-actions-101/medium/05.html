@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lint and Type Check</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Lint and Type Check</h1>
+<blockquote>
+<p>GitHub Actions 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you <em>stop spending review time</em> on style and type nits?</p>
+<blockquote>
+<p><em>Let machines catch</em> what <em>machines should catch</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Combined <em>style + lint</em> with <em>Ruff</em></li>
+<li><em>Static type checks</em> with <em>Mypy</em></li>
+<li><em>Local + CI</em> parity via <em>pre-commit</em></li>
+<li>Linting <em>PR diffs</em> only</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Lint and types</em> are the <em>first things reviewers catch</em>. Automating them frees <em>review</em> to focus on <em>design</em>.</p>
+<blockquote>
+<p><em>Format gating</em> cuts <em>review time</em> in half.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;code&quot;] --&gt; Ruff[&quot;ruff&quot;]
+    Code --&gt; Mypy[&quot;mypy&quot;]
+    Ruff --&gt; CI[&quot;CI gate&quot;]
+    Mypy --&gt; CI
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Linter</strong>: catches <em>style/pattern violations</em> (ruff).</li>
+<li><strong>Formatter</strong>: an <em>auto formatter</em> (ruff format).</li>
+<li><strong>Type checker</strong>: a <em>static type</em> checker (mypy).</li>
+<li><strong>pre-commit</strong>: a <em>commit-time</em> check hook.</li>
+<li><strong>Quality gate</strong>: blocks merge on <em>failed quality</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: reviewers nit <em>semicolons, line length, types</em> line by line.</p>
+<p><strong>After</strong>: PRs show <em>Lint passed</em> and <em>Type-check passed</em> automatically; review focuses on <em>logic</em>.</p>
+<h2>Hands-on: Quality Gate in 5 Steps</h2>
+<p><strong>Step 1 — Ruff workflow</strong></p>
+<pre><code class="language-yaml">- uses: actions/checkout@v4
+- uses: actions/setup-python@v5
+  with:
+    python-version: &quot;3.11&quot;
+- run: pip install ruff
+- run: ruff check .
+- run: ruff format --check .
+</code></pre>
+<p><strong>Step 2 — Add Mypy</strong></p>
+<pre><code class="language-yaml">- run: pip install mypy
+- run: mypy src/
+</code></pre>
+<p><strong>Step 3 — Centralize config (pyproject.toml)</strong></p>
+<pre><code class="language-toml">[tool.ruff]
+line-length = 100
+[tool.ruff.lint]
+select = [&quot;E&quot;, &quot;F&quot;, &quot;I&quot;, &quot;N&quot;, &quot;UP&quot;]
+
+[tool.mypy]
+strict = true
+</code></pre>
+<p><strong>Step 4 — Integrate pre-commit</strong></p>
+<pre><code class="language-yaml"># .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.0
+    hooks: [{id: ruff}, {id: ruff-format}]
+</code></pre>
+<p><strong>Step 5 — Lint diffs only (optional)</strong></p>
+<pre><code class="language-yaml">- run: |
+    git fetch origin ${{ github.base_ref }}
+    ruff check $(git diff --name-only origin/${{ github.base_ref }} | grep '\.py$') || true
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>ruff</em> alone replaces <em>flake8 + isort + black</em>.</li>
+<li>Enable <em>strict</em> mypy <em>from day one</em> — the migration cost only grows.</li>
+<li><em>pre-commit</em> catches issues <em>before CI does</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Only running CI; not installing locally.</strong> Every PR breaks at CI.</li>
+<li><strong>Loosening rules until they're meaningless.</strong></li>
+<li><strong>Applying <code>mypy</code> <em>partially</em>.</strong> <em>any</em> leaks across boundaries.</li>
+<li><strong>Auto-committing <code>ruff format</code> per PR.</strong> Merge conflicts.</li>
+<li><strong>Scattering <code>pyproject.toml</code> config.</strong> No source of truth.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams standardize <em>ruff + mypy + pre-commit</em> via a <em>template repo</em> and run identical checks in <em>pre-commit.ci</em> or <em>GitHub Actions</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Lint reduces debate</em>.</li>
+<li><em>Types are documentation</em>.</li>
+<li><em>Strict</em> by default; document any exception.</li>
+<li><em>Local and CI</em> run <em>the same command</em>.</li>
+<li><em>Auto-fix</em> is <em>feedback</em>, not <em>commits</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>ruff check + format</em> run in CI.</li>
+<li>[ ] <em>mypy strict</em> is on.</li>
+<li>[ ] The team has <em>pre-commit installed</em>.</li>
+<li>[ ] All config lives in <em>pyproject.toml</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <em>ruff + mypy</em> workflow.</li>
+<li>Start <em>pre-commit</em> with <em>three hooks</em>.</li>
+<li>Categorize the errors that appear once you enable <em>strict mypy</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Quality gates <em>lighten the review load</em>. Next: <em>Build artifacts</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
+<li><strong>Lint and Type Check (current)</strong></li>
+<li>Build Artifacts (upcoming)</li>
+<li>Docker Build (upcoming)</li>
+<li>Deployment Automation (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.astral.sh/ruff/">Ruff documentation</a></li>
+<li><a href="https://mypy.readthedocs.io/">Mypy documentation</a></li>
+<li><a href="https://pre-commit.com/">pre-commit</a></li>
+<li><a href="https://github.com/astral-sh/ruff-pre-commit">astral-sh/ruff-pre-commit</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Lint, Ruff, Mypy, QualityGate</p>
+</body>
+</html>
