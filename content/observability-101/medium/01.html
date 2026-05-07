@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Observability?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Observability?</h1>
+<blockquote>
+<p>Observability 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When systems <em>fail quietly</em>, how do we <em>understand the inside from the outside</em>?</p>
+<blockquote>
+<p><em>Observability is the ability to </em>understand a system's internal state from external signals alone<em>. Monitoring </em>watches known problems<em>; observability </em>asks unknown questions<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>monitoring</em> and <em>observability</em></li>
+<li>The three pillars: <em>metrics, logs, traces</em></li>
+<li><em>Known unknowns</em> vs <em>unknown unknowns</em></li>
+<li>Five steps to your first signals</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Production systems break in <em>unpredictable ways</em>. Pre-built dashboards cannot explain <em>failures you have never seen</em>. Observability gives you a system you can <em>ask questions of</em>.</p>
+<blockquote>
+<p><em>Dashboards are </em>answers<em>; observability is </em>questions<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    App[&quot;application&quot;] --&gt; Metric[&quot;metric&quot;]
+    App --&gt; Log[&quot;log&quot;]
+    App --&gt; Trace[&quot;trace&quot;]
+    Metric --&gt; Dashboard[&quot;dashboard / alert&quot;]
+    Log --&gt; Search[&quot;log search&quot;]
+    Trace --&gt; Flow[&quot;request flow&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Metric</strong>: a <em>number</em> that changes over time. Example: requests per second.</li>
+<li><strong>Log</strong>: a <em>text line</em> recording an event.</li>
+<li><strong>Trace</strong>: the <em>path</em> a single request takes across services.</li>
+<li><strong>Cardinality</strong>: the number of <em>unique label combinations</em>.</li>
+<li><strong>SLO</strong>: a <em>numeric promise</em> the service must keep.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: An alert fires and you have <em>no idea where it started</em>. You <em>grep</em> logs and flail.</p>
+<p><strong>After</strong>: You see the <em>symptom</em> on a dashboard, find the <em>responsible service</em> with a trace, and read <em>context</em> from logs.</p>
+<h2>Hands-on: Your First Signals in 5 Steps</h2>
+<p><strong>Step 1 — The simplest metric</strong></p>
+<pre><code class="language-python">import time
+counter = 0
+
+def handle_request():
+    global counter
+    counter += 1
+    return f&quot;requests_total {counter}&quot;
+</code></pre>
+<p><strong>Step 2 — Structured logs</strong></p>
+<pre><code class="language-python">import json, time
+
+def log_event(event, **fields):
+    print(json.dumps({&quot;ts&quot;: time.time(), &quot;event&quot;: event, **fields}))
+
+log_event(&quot;request_received&quot;, path=&quot;/health&quot;, status=200)
+</code></pre>
+<p><strong>Step 3 — A simple trace</strong></p>
+<pre><code class="language-python">import uuid
+
+def handle(req):
+    trace_id = req.get(&quot;trace_id&quot;) or str(uuid.uuid4())
+    log_event(&quot;auth_start&quot;, trace_id=trace_id)
+    log_event(&quot;db_query&quot;, trace_id=trace_id)
+    log_event(&quot;response_sent&quot;, trace_id=trace_id)
+</code></pre>
+<p><strong>Step 4 — Reading the three together</strong></p>
+<pre><code class="language-bash"># metric: requests in the last minute
+# log: search by trace_id
+grep '&quot;trace_id&quot;: &quot;abc-123&quot;' app.log
+</code></pre>
+<p><strong>Step 5 — Answer one question</strong></p>
+<pre><code class="language-text">&quot;Why did checkout get slow?&quot;
+1. metric: latency curve rises
+2. trace: payment span is long
+3. log: db connection timeout
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The three signals <em>complement each other</em>. None of them is <em>enough alone</em>.</li>
+<li><em>trace_id</em> is what <em>links</em> metrics, logs, and traces.</li>
+<li>Structured logs are <em>machine-readable data</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating monitoring and observability as <em>synonyms</em>.</strong> One is <em>answers</em>, the other is <em>the ability to ask</em>.</li>
+<li><strong>Collecting only metrics.</strong> You cannot answer <em>why</em>.</li>
+<li><strong>Writing logs as <em>unstructured text</em>.</strong> Search becomes <em>hell</em>.</li>
+<li><strong>Not propagating <em>trace_id</em> across services.</strong> Traces <em>break</em>.</li>
+<li><strong>Storing every signal <em>forever</em>.</strong> Cost <em>explodes</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most SRE teams treat the <em>three pillars</em> as their <em>minimum signal set</em> and then design alerts on top of <em>SLOs</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Systems should be </em>glass boxes<em>, not </em>black boxes<em>.</em></li>
+<li><em>Dashboards are </em>answers to questions<em>, not decoration.</em></li>
+<li><em>Cardinality is </em>cost<em>.</em></li>
+<li><em>Propagate </em>trace_id<em> through every signal.</em></li>
+<li><em>The real test is whether you can </em>ask about an unknown failure<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain <em>monitoring</em> vs <em>observability</em>.</li>
+<li>[ ] You can name the <em>three pillars</em>.</li>
+<li>[ ] You can write one structured log line.</li>
+<li>[ ] You understand the role of <em>trace_id</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick a recent incident. Decompose it into the <em>three pillars</em>.</li>
+<li>Rewrite one unstructured log line as <em>JSON</em>.</li>
+<li>Give two examples each of <em>known unknown</em> and <em>unknown unknown</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Observability is the discipline of <em>asking inside from outside</em>. Next we look deeper into <em>the three pillars</em>.</p>
+<ul>
+<li><strong>What Is Observability? (current)</strong></li>
+<li>Metrics, Logs, and Traces (upcoming)</li>
+<li>Collecting and Visualizing Metrics (upcoming)</li>
+<li>Structured Logging (upcoming)</li>
+<li>Distributed Tracing Basics (upcoming)</li>
+<li>Dashboard Design (upcoming)</li>
+<li>Alerts and On-Call (upcoming)</li>
+<li>SLI and SLO Basics (upcoming)</li>
+<li>Cost and Cardinality (upcoming)</li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opentelemetry.io/docs/concepts/">OpenTelemetry overview</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE Book — Monitoring</a></li>
+<li><a href="https://www.cncf.io/blog/2022/05/24/observability-cloud-native/">Three Pillars of Observability</a></li>
+<li><a href="https://www.honeycomb.io/blog/observability-101">Observability vs Monitoring</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, Monitoring, SRE, DevOps, Metrics</p>
+</body>
+</html>

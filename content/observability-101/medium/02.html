@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Metrics, Logs, and Traces</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Metrics, Logs, and Traces</h1>
+<blockquote>
+<p>Observability 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do the three signals <em>differ</em>, and <em>when do you reach for which</em>?</p>
+<blockquote>
+<p><em>Metrics answer </em>how much<em>, logs answer </em>what happened<em>, traces answer </em>where and how<em>. None of them </em>replaces<em> the others.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>question domain</em> of each signal</li>
+<li>Each signal's <em>data model</em></li>
+<li><em>Cardinality</em> and <em>cost</em></li>
+<li>A decision rule for <em>when to use what</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Picking the <em>wrong signal</em> makes cost <em>explode</em> and answers <em>vanish</em>. Knowing the <em>boundary</em> between the three buys you <em>more answers for less money</em>.</p>
+<blockquote>
+<p><em>One right signal beats </em>ten wrong dashboards<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Q[&quot;question&quot;] --&gt; M[&quot;how much? → metric&quot;]
+    Q --&gt; L[&quot;what happened? → log&quot;]
+    Q --&gt; T[&quot;where? → trace&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Counter / Gauge / Histogram</strong>: the three <em>shapes</em> of metrics.</li>
+<li><strong>Sampling</strong>: <em>cost reduction</em> by collecting only a portion.</li>
+<li><strong>Span</strong>: a single segment of a trace.</li>
+<li><strong>Label / Tag</strong>: an <em>identifier</em> attached to a signal.</li>
+<li><strong>Retention</strong>: how <em>long</em> a signal is kept.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Everything goes into logs. Search is <em>slow</em> and the bill is <em>huge</em>.</p>
+<p><strong>After</strong>: <em>Trends</em> go into metrics, <em>causal context</em> into logs, <em>flow</em> into traces.</p>
+<h2>Hands-on: Compare the Three in 5 Steps</h2>
+<p><strong>Step 1 — Counter</strong></p>
+<pre><code class="language-python">http_requests_total = 0
+
+def on_request():
+    global http_requests_total
+    http_requests_total += 1
+</code></pre>
+<p><strong>Step 2 — Histogram</strong></p>
+<pre><code class="language-python">import time
+buckets = {0.1: 0, 0.5: 0, 1.0: 0, &quot;inf&quot;: 0}
+
+def observe(d):
+    for b in [0.1, 0.5, 1.0]:
+        if d &lt;= b: buckets[b] += 1; return
+    buckets[&quot;inf&quot;] += 1
+</code></pre>
+<p><strong>Step 3 — Structured log</strong></p>
+<pre><code class="language-python">import json
+def log(event, **f):
+    print(json.dumps({&quot;event&quot;: event, **f}))
+
+log(&quot;payment_failed&quot;, order_id=42, reason=&quot;card_declined&quot;)
+</code></pre>
+<p><strong>Step 4 — Simple trace</strong></p>
+<pre><code class="language-python">import uuid, time
+
+def span(name, trace_id):
+    s = time.time()
+    log(&quot;span_start&quot;, trace_id=trace_id, name=name)
+    yield
+    log(&quot;span_end&quot;, trace_id=trace_id, name=name, dur=time.time()-s)
+</code></pre>
+<p><strong>Step 5 — Decision rule</strong></p>
+<pre><code class="language-text">&quot;overall throughput&quot; → metric
+&quot;why this order failed&quot; → log
+&quot;which service was slow for this request&quot; → trace
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>counter</em> only goes <em>up</em>. A <em>gauge</em> moves <em>up and down</em>.</li>
+<li>A <em>histogram</em> shows <em>distribution</em>: p50/p95/p99.</li>
+<li><em>trace_id</em> is the <em>thread</em> that ties signals together.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Putting everything in logs.</strong> Cost <em>explodes</em>, search becomes <em>hell</em>.</li>
+<li><strong>Confusing counter and gauge.</strong> Your graph stops <em>making sense</em>.</li>
+<li><strong>Watching only the <em>average</em>.</strong> You miss the <em>long tail</em>.</li>
+<li><strong>Putting <em>user_id</em> in a label.</strong> <em>Cardinality</em> explodes.</li>
+<li><strong>Reading only traces, ignoring metrics.</strong> You miss <em>overall trend</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams use a three-step pattern: <em>metrics for alerts</em>, <em>logs for debugging</em>, <em>traces for finding the responsible service</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>The three signals have </em>different question domains<em>. They are not substitutes.</em></li>
+<li><em>Cardinality is </em>tax<em>.</em></li>
+<li><em>p99 dwarfs the average.</em></li>
+<li><em>Without </em>trace_id<em> you cannot untangle a distributed system.</em></li>
+<li><em>Sampling is </em>not shameful<em>; it is cost control.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish <em>counter, gauge, histogram</em>.</li>
+<li>[ ] You know what <em>cardinality</em> means.</li>
+<li>[ ] You understand the role of <em>trace_id</em>.</li>
+<li>[ ] You can <em>decide</em> which signal answers a question.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Give three examples each of <em>counter</em> and <em>gauge</em>.</li>
+<li>Describe a case where the average <em>hides p99</em>.</li>
+<li>Sketch the <em>trace_id</em> flow for one request through <em>three services</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The three signals are tools with <em>different boundaries</em>. Next we look at <em>collecting and visualizing metrics</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><strong>Metrics, Logs, and Traces (current)</strong></li>
+<li>Collecting and Visualizing Metrics (upcoming)</li>
+<li>Structured Logging (upcoming)</li>
+<li>Distributed Tracing Basics (upcoming)</li>
+<li>Dashboard Design (upcoming)</li>
+<li>Alerts and On-Call (upcoming)</li>
+<li>SLI and SLO Basics (upcoming)</li>
+<li>Cost and Cardinality (upcoming)</li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://prometheus.io/docs/concepts/metric_types/">Prometheus metric types</a></li>
+<li><a href="https://www.datadoghq.com/blog/structured-logging/">Structured logging</a></li>
+<li><a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry traces</a></li>
+<li><a href="https://prometheus.io/docs/practices/histograms/">Histograms vs averages</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, Metrics, Logging, Tracing, SRE</p>
+</body>
+</html>

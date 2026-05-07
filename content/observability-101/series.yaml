@@ -1,0 +1,52 @@
+id: observability-101
+title:
+  ko: Observability 101
+  en: Observability 101
+description:
+  ko: Metric, log, trace, dashboard, alert, SLO 기초까지 운영 시스템의 가시성을 만드는 입문 시리즈.
+  en: Metrics, logs, traces, dashboards, alerts, and SLO basics to make production systems observable.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-observability
+    title:
+      ko: Observability란 무엇인가?
+      en: What Is Observability?
+  - slug: metric-log-trace
+    title:
+      ko: Metric, Log, Trace
+      en: Metrics, Logs, and Traces
+  - slug: metric-collection
+    title:
+      ko: Metric 수집과 시각화
+      en: Collecting and Visualizing Metrics
+  - slug: structured-logging
+    title:
+      ko: 구조화된 로깅
+      en: Structured Logging
+  - slug: distributed-tracing
+    title:
+      ko: 분산 트레이싱 기초
+      en: Distributed Tracing Basics
+  - slug: dashboard-design
+    title:
+      ko: Dashboard 설계
+      en: Dashboard Design
+  - slug: alert-and-oncall
+    title:
+      ko: Alert와 On-Call
+      en: Alerts and On-Call
+  - slug: sli-and-slo
+    title:
+      ko: SLI와 SLO 기초
+      en: SLI and SLO Basics
+  - slug: cost-and-cardinality
+    title:
+      ko: Cost와 Cardinality
+      en: Cost and Cardinality
+  - slug: production-observability-stack
+    title:
+      ko: 운영 가능한 Observability 스택
+      en: A Production-Ready Observability Stack

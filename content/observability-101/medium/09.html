@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cost and Cardinality</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cost and Cardinality</h1>
+<blockquote>
+<p>Observability 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does observability cost <em>suddenly</em> go up <em>10x</em>?</p>
+<blockquote>
+<p><em>Cardinality explosion, retention, and missing sampling — these three account for </em>99% of cost bombs<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How <em>cardinality</em> drives cost</li>
+<li>Tiered <em>retention</em> policy</li>
+<li>Two models of <em>sampling</em></li>
+<li>The <em>cost curve</em> of each signal</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>In young companies the <em>#1 line on the AWS bill</em> is often <em>observability</em>. When monitoring costs <em>more than the product</em>, it becomes politics.</p>
+<blockquote>
+<p><em>If you do not know the cost of measurement, </em>measurement becomes the enemy<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Labels[&quot;label combinations&quot;] --&gt; Series[&quot;time series count&quot;]
+    Series --&gt; Storage[&quot;storage cost&quot;]
+    Logs[&quot;log volume&quot;] --&gt; Index[&quot;index cost&quot;]
+    Traces[&quot;trace count&quot;] --&gt; Sample[&quot;sampling&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Cardinality</strong>: number of <em>unique label combinations</em>.</li>
+<li><strong>Retention tier</strong>: hot / warm / cold <em>separation</em>.</li>
+<li><strong>Head sampling</strong>: decided at the <em>start</em>.</li>
+<li><strong>Tail sampling</strong>: decided after the trace finishes (slow / error first).</li>
+<li><strong>Aggregation</strong>: shrink volume by <em>aggregating before retention</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>user_id</code> as a label, <em>50M series</em>, cost <em>explodes</em>.</p>
+<p><strong>After</strong>: <code>user_id</code> in <em>logs only</em>, labels stay <em>finite</em>, cost <em>predictable</em>.</p>
+<h2>Hands-on: Cost Control in 5 Steps</h2>
+<p><strong>Step 1 — Measure cardinality</strong></p>
+<pre><code class="language-promql">count({__name__=~&quot;.+&quot;})              # total series
+topk(20, count by (__name__) (...))  # top metrics
+</code></pre>
+<p><strong>Step 2 — Remove dangerous labels</strong></p>
+<pre><code class="language-python"># Bad: per-user series
+http_requests_total{user_id=&quot;42&quot;, path=&quot;/buy&quot;}
+# Good: dimension reduction
+http_requests_total{path=&quot;/buy&quot;}      # user_id goes to logs
+</code></pre>
+<p><strong>Step 3 — Retention tiers</strong></p>
+<pre><code class="language-yaml">prometheus:  retention: 15d
+thanos:      retention.resolution-raw: 30d
+             retention.resolution-5m: 90d
+             retention.resolution-1h: 1y
+</code></pre>
+<p><strong>Step 4 — Tail sampling</strong></p>
+<pre><code class="language-yaml">processors:
+  tail_sampling:
+    policies:
+      - name: errors
+        type: status_code
+        status_code: { status_codes: [ERROR] }
+      - name: slow
+        type: latency
+        latency: { threshold_ms: 500 }
+      - name: random
+        type: probabilistic
+        probabilistic: { sampling_percentage: 5 }
+</code></pre>
+<p><strong>Step 5 — Per-signal budget</strong></p>
+<pre><code class="language-text">metric:  &lt;= X million series
+log:     &lt;= Y GB per day
+trace:   &lt;= Z traces per minute after sampling
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Cardinality</em> explodes via <em>label multiplication</em>.</li>
+<li><em>Resolution downsampling</em> shrinks volume of <em>older data</em>.</li>
+<li><em>Tail sampling</em> keeps only <em>valuable traces</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><code>user_id</code>, <code>request_id</code> as <em>labels</em>.</strong> Cardinality explosion.</li>
+<li><strong>Keeping every signal <em>forever</em>.</strong> Cost compounds.</li>
+<li><strong>Treating sampling as <em>bad</em>.</strong> Risk of insolvency.</li>
+<li><strong>Embedding <em>binaries</em> in logs.</strong> Volume explosion.</li>
+<li><strong>No <em>team-level</em> cost view.</strong> Accountability dilutes.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most companies combine <em>team cardinality budgets</em>, <em>retention tiers</em>, and <em>tail sampling</em> to make observability cost <em>predictable</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Cardinality is </em>tax<em>.</em></li>
+<li><em>Old data lives at </em>lower resolution<em>.</em></li>
+<li><em>Sampling is </em>not shameful<em>.</em></li>
+<li><em>Cost must have an </em>owner<em>.</em></li>
+<li><em>Measure the cost of measurement.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know the <em>top-cardinality</em> metrics.</li>
+<li>[ ] <em>Retention tiers</em> are layered.</li>
+<li>[ ] Traces have <em>sampling</em>.</li>
+<li>[ ] Each team has a <em>cost budget</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find three labels that risk cardinality explosion.</li>
+<li>Design a 3-tier retention plan.</li>
+<li>Write a tail-sampling policy for <em>errors / slow / random</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Without cost awareness, <em>observability becomes the enemy</em>. Next: <em>a production-ready stack</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Distributed Tracing Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Dashboard Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/07-alert-and-oncall.md">Alerts and On-Call</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/08-sli-and-slo.md">SLI and SLO Basics</a></li>
+<li><strong>Cost and Cardinality (current)</strong></li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.robustperception.io/cardinality-is-key/">Cardinality is the enemy</a></li>
+<li><a href="https://thanos.io/tip/components/compact.md/">Thanos downsampling</a></li>
+<li><a href="https://opentelemetry.io/docs/collector/configuration/#processors">OpenTelemetry tail sampling</a></li>
+<li><a href="https://www.honeycomb.io/blog/observability-cost">Honeycomb on cost</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, Cost, Cardinality, Metrics, Sampling</p>
+</body>
+</html>

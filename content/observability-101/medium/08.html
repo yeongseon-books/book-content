@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SLI and SLO Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SLI and SLO Basics</h1>
+<blockquote>
+<p>Observability 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Can you answer <em>how reliable is reliable enough</em> with a <em>number</em>?</p>
+<blockquote>
+<p><em>SLI is the </em>measured reliability<em>; SLO is the </em>promised reliability<em>; error budget is the </em>amount of failure allowed<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of <em>SLI</em> ("good / total")</li>
+<li>The <em>language</em> an <em>SLO</em> creates</li>
+<li>The meaning of <em>error budget</em></li>
+<li><em>Burn-rate</em> alerts</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>"Stable" is <em>subjective</em>. 99.9% is <em>agreement</em>. With SLOs, the <em>features vs reliability</em> fight is settled <em>with data</em>.</p>
+<blockquote>
+<p><em>An SLO is </em>the shared language between engineers and the business<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Req[&quot;request&quot;] --&gt; SLI[&quot;SLI = good/total&quot;]
+    SLI --&gt; SLO[&quot;SLO target (e.g. 99.9%)&quot;]
+    SLO --&gt; Budget[&quot;error budget = 1 - SLO&quot;]
+    Budget --&gt; Burn[&quot;burn-rate alert&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SLI</strong>: a <em>measurable ratio</em> (e.g., success rate).</li>
+<li><strong>SLO</strong>: a <em>target value</em> (e.g., 99.9%).</li>
+<li><strong>SLA</strong>: a <em>contract</em>, breach has <em>penalty</em>.</li>
+<li><strong>Error budget</strong>: the allowed <em>amount of failure</em>.</li>
+<li><strong>Burn rate</strong>: how <em>fast</em> the budget is consumed.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "It's slow" vs "it's fine" — a <em>word fight</em>.</p>
+<p><strong>After</strong>: "This month availability is <em>99.87%</em>, below the <em>99.9%</em> SLO" — <em>debate over</em>.</p>
+<h2>Hands-on: SLOs in 5 Steps</h2>
+<p><strong>Step 1 — Define an SLI</strong></p>
+<pre><code class="language-promql"># Availability SLI = good / total
+sli_good = sum(rate(http_requests_total{status!~&quot;5..&quot;}[5m]))
+sli_total = sum(rate(http_requests_total[5m]))
+sli = sli_good / sli_total
+</code></pre>
+<p><strong>Step 2 — Pick an SLO target</strong></p>
+<pre><code class="language-text">SLO: 99.9% availability over 30 days
+That allows 30 * 24 * 60 * 0.001 = 43.2 minutes/month
+</code></pre>
+<p><strong>Step 3 — Error budget</strong></p>
+<pre><code class="language-promql">1 - (sli_good / sli_total)         # current failure rate
+# remaining 30-day budget = 0.001 * total - errors
+</code></pre>
+<p><strong>Step 4 — Burn-rate alert (multi-window)</strong></p>
+<pre><code class="language-yaml">- alert: FastBurn
+  expr: error_rate_5m &gt; 14.4 * 0.001
+        and error_rate_1h &gt; 14.4 * 0.001
+  for: 2m
+  labels: { severity: page }
+</code></pre>
+<p><strong>Step 5 — Monthly SLO report</strong></p>
+<pre><code class="language-text">- Availability: 99.92% (target 99.9% PASS)
+- Latency: p95 320ms (target &lt;= 500ms PASS)
+- Budget burned: 38%
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>An <em>SLI</em> is always a <em>ratio</em>.</li>
+<li><em>Burn rate</em> uses a <em>short window AND a long window</em>.</li>
+<li>If the budget <em>remains</em>, ship faster; if low, <em>freeze</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Setting SLO to <em>100%</em>.</strong> <em>Unreachable</em>.</li>
+<li><strong>Using an <em>internal metric</em> as SLI.</strong> Disconnected from user experience.</li>
+<li><strong>Only thresholds, no <em>burn rate</em>.</strong> Slow burns <em>go unnoticed</em>.</li>
+<li><strong>Not using budget for <em>feature decisions</em>.</strong> SLO becomes <em>decoration</em>.</li>
+<li><strong>Multiple SLOs <em>breaking at once</em>.</strong> Priority is <em>unclear</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most companies start with <em>availability + latency</em> SLOs and use them as the <em>criterion</em> for product decisions like deploys and feature additions.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>100% is </em>impossible<em>. 99.9% is a </em>choice<em>.</em></li>
+<li><em>SLI is </em>user-facing<em>.</em></li>
+<li><em>Budget is </em>budget<em>. When spent, you </em>stop<em>.</em></li>
+<li><em>Burn rate is </em>early warning<em>.</em></li>
+<li><em>Without an SLO, there is no </em>priority<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You have <em>defined</em> one SLI.</li>
+<li>[ ] You have <em>agreed</em> on one SLO.</li>
+<li>[ ] You can <em>compute</em> the error budget.</li>
+<li>[ ] One burn-rate alert exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write <em>Availability SLI</em> for one service in PromQL.</li>
+<li>Compute the <em>monthly budget</em> (minutes) for SLO 99.9%.</li>
+<li>Write a fast and slow <em>burn-rate</em> alert pair.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>SLOs are a <em>shared language</em>. Next: <em>cost and cardinality</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Distributed Tracing Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Dashboard Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/07-alert-and-oncall.md">Alerts and On-Call</a></li>
+<li><strong>SLI and SLO Basics (current)</strong></li>
+<li>Cost and Cardinality (upcoming)</li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/service-level-objectives/">Google SRE — SLO chapter</a></li>
+<li><a href="https://sre.google/workbook/implementing-slos/">The SRE Workbook — Implementing SLOs</a></li>
+<li><a href="https://sre.google/workbook/alerting-on-slos/">Multi-window burn rate</a></li>
+<li><a href="https://sloth.dev/">Sloth — SLO generator</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, SLO, SLI, SRE, Reliability</p>
+</body>
+</html>

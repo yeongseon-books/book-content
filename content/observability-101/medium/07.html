@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Alerts and On-Call</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Alerts and On-Call</h1>
+<blockquote>
+<p>Observability 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What separates an alert that is <em>worth waking you at 3am</em> from one that is <em>not</em>?</p>
+<blockquote>
+<p><em>Good alerts are </em>actionable<em> and reflect </em>user impact<em>. Anything else just leaves </em>fatigue<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The three conditions of a <em>good alert</em></li>
+<li>The cost of <em>alert fatigue</em></li>
+<li><em>Symptom</em> vs <em>cause</em> alerts</li>
+<li>The basics of <em>on-call</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Too many alerts <em>bury</em> the real signal. On-call <em>buys sleep</em> and <em>spends willpower</em>. Design is cost.</p>
+<blockquote>
+<p><em>Alerts have a </em>wake-up cost<em>. If you do not know it, you go </em>bankrupt<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    M[&quot;metric&quot;] --&gt; Rule[&quot;alert rule&quot;]
+    Rule --&gt; AM[&quot;alertmanager&quot;]
+    AM --&gt; Page[&quot;pager&quot;]
+    AM --&gt; Slack[&quot;chat&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Alert rule</strong>: a condition plus a <em>duration</em>.</li>
+<li><strong>Severity</strong>: <em>page</em> vs <em>ticket</em>.</li>
+<li><strong>Routing</strong>: who receives it.</li>
+<li><strong>Silence</strong>: temporary <em>suppression</em>.</li>
+<li><strong>Runbook</strong>: an <em>action manual</em> for the alert.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: 50 alerts/day, all ignored. The real outage <em>gets missed</em>.</p>
+<p><strong>After</strong>: 3 alerts/week, <em>all actionable</em>.</p>
+<h2>Hands-on: Alerts in 5 Steps</h2>
+<p><strong>Step 1 — Prometheus alert rule</strong></p>
+<pre><code class="language-yaml">groups:
+  - name: api
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m]))
+              / sum(rate(http_requests_total[5m])) &gt; 0.05
+        for: 10m
+        labels: { severity: page }
+        annotations:
+          summary: &quot;5xx &gt; 5% for 10m&quot;
+          runbook: &quot;https://wiki/runbook/api-error&quot;
+</code></pre>
+<p><strong>Step 2 — <code>for</code> clause to prevent <em>flap</em></strong></p>
+<pre><code class="language-yaml">for: 10m   # too short and noise explodes
+</code></pre>
+<p><strong>Step 3 — Split severity</strong></p>
+<pre><code class="language-yaml">labels:
+  severity: page    # wakes you up
+  # severity: ticket # business hours
+</code></pre>
+<p><strong>Step 4 — Alertmanager routing</strong></p>
+<pre><code class="language-yaml">route:
+  receiver: default
+  routes:
+    - match: { severity: page }
+      receiver: pagerduty
+    - match: { severity: ticket }
+      receiver: slack-ops
+</code></pre>
+<p><strong>Step 5 — Runbook link</strong></p>
+<pre><code class="language-text">Every alert MUST have a runbook URL.
+The runbook covers: meaning, first 3 actions, escalation, related dashboards.
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>for: 10m</code> enforces a <em>duration condition</em>.</li>
+<li>The <code>severity</code> label decides <em>behavior</em>.</li>
+<li>An alert without a <em>runbook</em> is <em>half-built</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Every alert is a <em>page</em>.</strong> Nights become <em>hell</em>.</li>
+<li><strong>Alerting only on <em>cause</em>.</strong> Disconnected from <em>user impact</em>.</li>
+<li><strong>No <code>for</code> clause.</strong> <em>Flapping</em> explodes noise.</li>
+<li><strong>No <em>runbook</em>.</strong> The receiver <em>freezes</em>.</li>
+<li><strong>No owner.</strong> Everyone's alert = <em>no one's alert</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams put <em>symptom-based alerts (SLO breaches)</em> first and <em>cause-based alerts (CPU 95%)</em> as backup. PagerDuty / Opsgenie / Grafana OnCall are common.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Delete alerts that are not </em>actionable<em>.</em></li>
+<li><em>Symptom &gt; cause. SLO is the standard.</em></li>
+<li><em>The cost of a page is </em>sleep<em>.</em></li>
+<li><em>On-call is </em>labor<em> and deserves compensation.</em></li>
+<li><em>Alerts without a runbook are </em>retired immediately<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Each alert has a <em>runbook link</em>.</li>
+<li>[ ] Severity splits into <em>page/ticket</em>.</li>
+<li>[ ] <code>for</code> is set.</li>
+<li>[ ] On-call <em>rotation</em> is in place.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write one alert for an SLO breach.</li>
+<li>Identify one <em>symptom</em> alert and one <em>cause</em> alert.</li>
+<li>Write a one-page runbook.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good alerts <em>protect sleep</em>. Next: <em>SLI and SLO basics</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Distributed Tracing Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Dashboard Design</a></li>
+<li><strong>Alerts and On-Call (current)</strong></li>
+<li>SLI and SLO Basics (upcoming)</li>
+<li>Cost and Cardinality (upcoming)</li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/practical-alerting/">Google SRE — Alerting</a></li>
+<li><a href="https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/">Prometheus alerting rules</a></li>
+<li><a href="https://prometheus.io/docs/alerting/latest/alertmanager/">Alertmanager docs</a></li>
+<li><a href="https://increment.com/on-call/when-the-pager-goes-off/">On-call principles</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, Alerting, SRE, OnCall, Monitoring</p>
+</body>
+</html>
