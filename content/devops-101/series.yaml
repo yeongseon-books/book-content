@@ -1,0 +1,52 @@
+id: devops-101
+title:
+  ko: DevOps 101
+  en: DevOps 101
+description:
+  ko: CI/CD, IaC, 환경 관리, 모니터링, 배포 전략, on-call까지 DevOps 입문 전반을 다루는 시리즈.
+  en: A DevOps starter — CI/CD, IaC, environment management, monitoring, deployment strategy, and on-call basics.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-devops
+    title:
+      ko: DevOps란 무엇인가?
+      en: What Is DevOps?
+  - slug: ci-pipeline
+    title:
+      ko: CI 파이프라인
+      en: CI Pipeline
+  - slug: cd-and-deployment
+    title:
+      ko: CD와 배포 전략
+      en: CD and Deployment Strategies
+  - slug: environments-and-config
+    title:
+      ko: 환경 분리와 설정 관리
+      en: Environments and Configuration
+  - slug: infrastructure-as-code
+    title:
+      ko: Infrastructure as Code
+      en: Infrastructure as Code
+  - slug: containers-and-build
+    title:
+      ko: 컨테이너와 빌드
+      en: Containers and Build
+  - slug: monitoring-and-alerting
+    title:
+      ko: 모니터링과 알림
+      en: Monitoring and Alerting
+  - slug: logging-and-analysis
+    title:
+      ko: 로그 수집과 분석
+      en: Logging and Analysis
+  - slug: incident-and-oncall
+    title:
+      ko: 장애 대응과 on-call
+      en: Incident Response and On-Call
+  - slug: operable-devops-flow
+    title:
+      ko: 운영 가능한 DevOps 흐름
+      en: An Operable DevOps Flow

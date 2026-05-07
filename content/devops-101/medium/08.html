@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logging and Analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Logging and Analysis</h1>
+<blockquote>
+<p>DevOps 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Out of 100 servers, can you find <em>where the error happened</em> in one query?</p>
+<blockquote>
+<p>Logs only have value when they are <em>collected and searchable</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>structured</em> and <em>unstructured</em> logs</li>
+<li>Why <em>central log aggregation</em> matters</li>
+<li><em>Loki</em> vs <em>ELK</em> at a glance</li>
+<li>How to use a <em>correlation ID</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The era of <em>ssh-ing</em> into a single server and running <em>grep</em> is over. In distributed systems, you must view logs from <em>many instances</em> in <em>one place</em>.</p>
+<blockquote>
+<p>You read logs <em>three weeks later</em> far more often than you do <em>right now</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    App[&quot;app stdout&quot;] --&gt; Agent[&quot;log agent (Promtail/Fluent Bit)&quot;]
+    Agent --&gt; Store[&quot;Loki/Elasticsearch&quot;]
+    Store --&gt; UI[&quot;Grafana/Kibana&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Structured log</strong>: a log emitted as <em>key-value</em> pairs, usually JSON.</li>
+<li><strong>Log level</strong>: DEBUG, INFO, WARN, ERROR, CRITICAL.</li>
+<li><strong>Correlation ID</strong>: a <em>unique ID</em> that <em>traces one request</em>.</li>
+<li><strong>Log aggregator</strong>: a system that <em>centralizes</em> distributed logs.</li>
+<li><strong>Retention</strong>: how long logs are <em>kept</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (print-style logs)</strong></p>
+<pre><code class="language-python">print(&quot;user logged in&quot;, user_id)
+# ssh server-01 &amp;&amp; grep &quot;logged in&quot; /var/log/app.log
+</code></pre>
+<p><strong>After (structured + central collection)</strong></p>
+<pre><code class="language-python">import structlog
+log = structlog.get_logger()
+log.info(&quot;user.login&quot;, user_id=user_id, request_id=req_id)
+# In Grafana, search with {service=&quot;api&quot;} |= &quot;user.login&quot;
+</code></pre>
+<h2>Hands-on: Five Logging Steps</h2>
+<p><strong>Step 1 — Switch to JSON logs</strong></p>
+<pre><code class="language-python">import structlog
+structlog.configure(
+    processors=[structlog.processors.JSONRenderer()],
+)
+log = structlog.get_logger()
+</code></pre>
+<p><strong>Step 2 — Inject a correlation ID</strong></p>
+<pre><code class="language-python">import uuid
+@app.middleware(&quot;http&quot;)
+async def add_request_id(request, call_next):
+    rid = request.headers.get(&quot;X-Request-ID&quot;, str(uuid.uuid4()))
+    structlog.contextvars.bind_contextvars(request_id=rid)
+    return await call_next(request)
+</code></pre>
+<p><strong>Step 3 — Write to stdout</strong></p>
+<pre><code class="language-text">The container-era principle is *stdout, not files*.
+The runtime collects them for you.
+</code></pre>
+<p><strong>Step 4 — Ship to Loki via Promtail</strong></p>
+<pre><code class="language-yaml">scrape_configs:
+  - job_name: containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+</code></pre>
+<p><strong>Step 5 — Write meaningful queries</strong></p>
+<pre><code class="language-text">{service=&quot;api&quot;, level=&quot;error&quot;} | json | line_format &quot;{{.user_id}} {{.msg}}&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>request ID</em> lets you trace <em>frontend to API to DB</em> on <em>one line</em>.</li>
+<li>Send to <em>stdout</em> and let the <em>infrastructure</em> do the collection.</li>
+<li><em>PII</em> must be <em>masked</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Leaving DEBUG logs on in production.</strong> Cost explodes and noise floods your dashboards.</li>
+<li><strong>Logging PII (personal data) raw.</strong> This is a <em>compliance violation</em>.</li>
+<li><strong>No log retention policy.</strong> Logs pile up past 30 days and <em>bills</em> explode.</li>
+<li><strong>No correlation ID.</strong> Debugging means <em>jumping around</em> line by line.</li>
+<li><strong>Error logs without stack traces.</strong> You cannot diagnose root cause.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams keep <em>trace_id</em> as a <em>common key</em> across <em>logs, metrics, and traces</em>. With one ID, they cross-correlate <em>all three signals</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Logs are a cost</em>. They are conscious of level and retention.</li>
+<li><em>Structured logs</em> are <em>the foundation of search</em>.</li>
+<li><em>Sensitive data</em> is masked <em>in code</em>, not later.</li>
+<li><em>trace_id</em> ties the <em>three signals</em> together.</li>
+<li>For <em>INFO and below</em>, sampling is on the table.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Logs are emitted as <em>JSON</em>.</li>
+<li>[ ] Every log carries a <em>Request ID</em>.</li>
+<li>[ ] <em>PII masking</em> is applied.</li>
+<li>[ ] A <em>retention policy</em> is set.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Convert your own app to <em>structlog</em>.</li>
+<li>Add a <em>Request ID</em> middleware.</li>
+<li>Set up central collection with <em>Loki</em> or <em>Elasticsearch</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Logs are a <em>time-machine for your system</em>. In the next post we combine every signal to <em>respond to incidents</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">The CI Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">CD and Deployment Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">Environments and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">Infrastructure as Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/06-containers-and-build.md">Containers and Builds</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/07-monitoring-and-alerting.md">Monitoring and Alerting</a></li>
+<li><strong>Logging and Analysis (current)</strong></li>
+<li>Incident Response and On-Call (upcoming)</li>
+<li>An Operable DevOps Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.structlog.org/">structlog</a></li>
+<li><a href="https://grafana.com/docs/loki/latest/">Grafana Loki</a></li>
+<li><a href="https://www.elastic.co/elastic-stack">Elastic Stack</a></li>
+<li><a href="https://opentelemetry.io/docs/specs/otel/logs/">OpenTelemetry Logs</a></li>
+</ul>
+<p class="tags-line">Tags: DevOps, Logging, Observability, ELK, Loki</p>
+</body>
+</html>

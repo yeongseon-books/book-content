@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CI Pipeline</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>CI Pipeline</h1>
+<blockquote>
+<p>DevOps 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Do you have <em>one pipe</em> that applies <em>the same checks</em> to <em>every PR</em>?</p>
+<blockquote>
+<p>A CI pipeline is <em>the team's bar</em>. The <em>passing line is encoded</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and stages of a <em>CI pipeline</em></li>
+<li><em>Separation of responsibility</em> per stage (build/test/lint/scan)</li>
+<li>Designing for <em>fast feedback</em></li>
+<li>Clear signals for <em>failed builds</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Tests alone are not enough. <em>Lint, type checks, and security scans</em> must be bundled into <em>one flow</em> so <em>opinions</em> do not creep in.</p>
+<blockquote>
+<p>A PR without CI is <em>wishful thinking</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Push[&quot;push/PR&quot;] --&gt; Lint[&quot;lint&quot;]
+    Lint --&gt; Build[&quot;build&quot;]
+    Build --&gt; Test[&quot;test&quot;]
+    Test --&gt; Scan[&quot;security scan&quot;]
+    Scan --&gt; Pass[&quot;green check&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Pipeline</strong>: an <em>ordered sequence of stages</em>.</li>
+<li><strong>Stage</strong>: a <em>logical unit</em> inside the pipeline (build, test, etc.).</li>
+<li><strong>Job</strong>: an actual <em>execution unit</em>. May run in parallel.</li>
+<li><strong>Artifact</strong>: a <em>file passed between stages</em>.</li>
+<li><strong>Status check</strong>: the <em>signal that decides</em> whether a PR can be merged.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (manual checks)</strong></p>
+<pre><code class="language-text">- Reviewers *check out and build manually*
+- If anyone forgets, *red code* lands on main
+</code></pre>
+<p><strong>After (CI pipeline)</strong></p>
+<pre><code class="language-yaml">on: [pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ruff check .
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pytest
+</code></pre>
+<h2>Hands-on: Five Pipeline Stages</h2>
+<p><strong>Step 1 - Lint (fastest, runs first)</strong></p>
+<pre><code class="language-yaml">- run: ruff check .
+- run: ruff format --check .
+</code></pre>
+<p><strong>Step 2 - Type check</strong></p>
+<pre><code class="language-yaml">- run: mypy src/
+</code></pre>
+<p><strong>Step 3 - Build</strong></p>
+<pre><code class="language-yaml">- run: python -m build
+- uses: actions/upload-artifact@v4
+  with: { name: dist, path: dist/ }
+</code></pre>
+<p><strong>Step 4 - Test (parallel)</strong></p>
+<pre><code class="language-yaml">strategy:
+  matrix:
+    shard: [1, 2, 3, 4]
+steps:
+  - run: pytest --shard ${{ matrix.shard }}/4
+</code></pre>
+<p><strong>Step 5 - Security scan</strong></p>
+<pre><code class="language-yaml">- uses: aquasecurity/trivy-action@master
+  with: { scan-type: fs, severity: HIGH,CRITICAL }
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Faster stages</em> must come <em>first</em> to enable <em>fast failure</em>.</li>
+<li><em>Artifacts</em> between stages reduce <em>rebuild cost</em>.</li>
+<li>Security scans belong <em>as the final gate</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>All stages running <em>serially</em>.</strong> Parallelization can cut time by <em>50%</em>.</li>
+<li><strong>Putting lint <em>last</em>.</strong> A 30-minute build flagged red because of <em>one blank line</em>.</li>
+<li><strong>An environment that <em>only works in CI</em>.</strong> No local repro means <em>debugging hell</em>.</li>
+<li><strong>No required checks.</strong> Red PRs get <em>merged anyway</em>.</li>
+<li><strong>Logs <em>too verbose</em> to find the cause.</strong> Add a <em>summary step</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large monorepos apply <em>impact analysis</em> to build and test only the <em>changed packages</em>. Bazel, Nx, and Turbo are common choices.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>The 5-minute rule</em> — PR feedback must arrive within five minutes.</li>
+<li>On failure, <em>skip the next stage</em>.</li>
+<li><em>Reproducibility</em> — CI must be <em>deterministic</em>.</li>
+<li><em>Secrets</em> are split <em>per environment</em>.</li>
+<li><em>The pipeline itself</em> is subject to <em>code review</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Lint, type, test, and scan</em> all exist.</li>
+<li>[ ] <em>Required checks</em> are configured.</li>
+<li>[ ] <em>Feedback under 5 minutes</em>.</li>
+<li>[ ] Stages are connected by <em>artifacts</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Split your project's CI into <em>four or more stages</em>.</li>
+<li><em>Measure and compare</em> the runtime after parallelizing.</li>
+<li>Add <em>required checks</em> to your PR merge conditions.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A CI pipeline is <em>the encoded passing line</em>. In the next post we cover how to <em>deploy</em> the <em>passed code</em> <em>safely</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What Is DevOps?</a></li>
+<li><strong>CI Pipeline (current)</strong></li>
+<li>CD and Deployment Strategies (upcoming)</li>
+<li>Environments and Configuration (upcoming)</li>
+<li>Infrastructure as Code (upcoming)</li>
+<li>Containers and Build (upcoming)</li>
+<li>Monitoring and Alerting (upcoming)</li>
+<li>Logging and Analysis (upcoming)</li>
+<li>Incident Response and On-Call (upcoming)</li>
+<li>An Operable DevOps Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/en/actions">GitHub Actions docs</a></li>
+<li><a href="https://martinfowler.com/articles/continuousIntegration.html">Martin Fowler — Continuous Integration</a></li>
+<li><a href="https://trivy.dev/">Trivy</a></li>
+<li><a href="https://bazel.build/">Bazel</a></li>
+</ul>
+<p class="tags-line">Tags: DevOps, CI, GitHub Actions, Automation, Pipeline</p>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Incident Response and On-Call</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Incident Response and On-Call</h1>
+<blockquote>
+<p>DevOps 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When a page fires at 3 AM, <em>who does what, and how</em>?</p>
+<blockquote>
+<p><em>Incidents will happen.</em> The difference is <em>how fast and how calmly</em> you recover.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How to classify <em>severity (SEV)</em></li>
+<li>How to design an <em>on-call rotation</em></li>
+<li>How to write a <em>runbook</em></li>
+<li>How to run a <em>blameless postmortem</em></li>
+<li>The meaning of <em>MTTR/MTTD</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Incidents are an <em>organizational</em> problem more than a <em>technical</em> one. Without <em>roles</em> and <em>procedures</em>, people <em>panic</em> and <em>repeat</em> the same mistakes.</p>
+<blockquote>
+<p><em>Process</em> is a substitute for <em>memory</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Alert[&quot;alert&quot;] --&gt; OnCall[&quot;on-call engineer&quot;]
+    OnCall --&gt; Runbook[&quot;runbook&quot;]
+    Runbook --&gt; Mitigate[&quot;mitigation&quot;]
+    Mitigate --&gt; Postmortem[&quot;blameless postmortem&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SEV1 to SEV4</strong>: severity from <em>1 (company-wide outage)</em> to <em>4 (minor)</em>.</li>
+<li><strong>On-call</strong>: the engineer who <em>receives alerts</em> during a shift.</li>
+<li><strong>Runbook</strong>: a <em>symptom -&gt; diagnosis -&gt; action</em> document.</li>
+<li><strong>Incident commander (IC)</strong>: the person who <em>coordinates</em> during an incident.</li>
+<li><strong>Postmortem</strong>: the <em>after-action</em> document.</li>
+<li><strong>MTTD/MTTR</strong>: mean time to <em>detect/recover</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: an alert fires, somebody yells <em>"who is on this?"</em> in Slack, and <em>everyone fixes things at once</em> and breaks more.</p>
+<p><strong>After</strong>: <em>one on-call</em> applies a <em>runbook</em> to <em>mitigate</em>, then an <em>IC</em> coordinates and the team holds a <em>postmortem</em>.</p>
+<h2>Hands-on: Five Incident Steps</h2>
+<p><strong>Step 1 — Define severity (SEV)</strong></p>
+<pre><code class="language-text">SEV1: company-wide outage     | respond immediately
+SEV2: core feature degraded   | within 30 min
+SEV3: partial degradation     | within business day
+SEV4: low-impact bug          | backlog
+</code></pre>
+<p><strong>Step 2 — On-call rotation</strong></p>
+<pre><code class="language-yaml">rotation:
+  schedule: weekly
+  primary: [alice, bob, carol]
+  secondary: [dave, erin]
+  handoff: &quot;Mondays 10:00, hand off open incidents&quot;
+</code></pre>
+<p><strong>Step 3 — Runbook template</strong></p>
+<pre><code class="language-markdown"># Runbook: API 500 spike
+
+## Symptoms
+- /api/* 5xx ratio above 5%
+
+## Diagnosis
+1. Open the Grafana &quot;API Errors&quot; dashboard
+2. Check recent logs: {service=&quot;api&quot;, level=&quot;error&quot;}
+
+## Mitigation
+- If a recent deploy is suspect: `kubectl rollout undo deploy/api`
+
+## Escalation
+- If unresolved in 30 min, page IC in #incident channel
+</code></pre>
+<p><strong>Step 4 — Incident commander role</strong></p>
+<pre><code class="language-text">IC = decision maker. Does NOT fix things directly.
+- Single source of communication
+- Assigns roles (investigator/comms/scribe)
+- Decides on external announcements
+</code></pre>
+<p><strong>Step 5 — Blameless postmortem</strong></p>
+<pre><code class="language-markdown"># Postmortem: 2026-05-04 API outage
+
+- Impact: 12 minutes at 30% 5xx
+- Timeline: 03:11 alert -&gt; 03:18 rollback -&gt; 03:23 recovery
+- Root cause: typo in feature flag default
+- Prevention: add flag-validation checklist to PR template
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>We <em>fix the system and the process</em>, not the person.</li>
+<li><em>Runbooks live next to the code</em>, where they stay current.</li>
+<li><em>Action items</em> must have an <em>owner</em> and a <em>deadline</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Naming <em>people</em> in postmortems.</strong> Trust collapses.</li>
+<li><strong>Runbooks buried <em>deep in a wiki</em>.</strong> No one finds them at 3 AM.</li>
+<li><strong>Too many alerts.</strong> Alert fatigue makes you <em>miss the real ones</em>.</li>
+<li><strong>A <em>junior alone</em> on-call.</strong> Always pair them.</li>
+<li><strong>No action items after an incident.</strong> The same incident <em>repeats</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams attach a <em>runbook URL</em> to every alert so on-call engineers start the procedure with <em>one click</em>. PagerDuty/Opsgenie expose a <em>runbook URL</em> field for exactly this.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Alert quality</em> determines <em>team sleep</em>.</li>
+<li><em>Every SEV1</em> gets <em>a postmortem</em>.</li>
+<li><em>Blameless</em> is non-negotiable.</li>
+<li><em>Action items</em> are tracked as <em>tickets</em>.</li>
+<li><em>MTTR</em> shrinks only when you <em>measure it</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>SEV definitions</em> are documented.</li>
+<li>[ ] <em>On-call rotation</em> is automated.</li>
+<li>[ ] <em>Runbooks</em> are linked from alerts.</li>
+<li>[ ] A <em>postmortem template</em> exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write a <em>runbook</em> for your most common incident.</li>
+<li>Agree <em>SEV definitions</em> with your team and document them.</li>
+<li>Write a <em>blameless postmortem</em> for one recent incident.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Incident response is a combined <em>technical and organizational</em> skill. The final post wraps the whole DevOps flow into a single picture.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">The CI Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">CD and Deployment Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">Environments and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">Infrastructure as Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/06-containers-and-build.md">Containers and Builds</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/07-monitoring-and-alerting.md">Monitoring and Alerting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/08-logging-and-analysis.md">Logging and Analysis</a></li>
+<li><strong>Incident Response and On-Call (current)</strong></li>
+<li>An Operable DevOps Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/managing-incidents/">Google SRE Book — Managing Incidents</a></li>
+<li><a href="https://response.pagerduty.com/">PagerDuty Incident Response</a></li>
+<li><a href="https://www.atlassian.com/incident-management/postmortem/templates">Atlassian Postmortem Template</a></li>
+<li><a href="https://www.etsy.com/codeascraft/blameless-postmortems/">Blameless Postmortems (Etsy)</a></li>
+</ul>
+<p class="tags-line">Tags: DevOps, Incident, OnCall, SRE, Postmortem</p>
+</body>
+</html>

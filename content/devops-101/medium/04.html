@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Environments and Configuration</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Environments and Configuration</h1>
+<blockquote>
+<p>DevOps 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If your <em>environment variables</em> are <em>hardcoded into the code</em>, do you not have to <em>rebuild for every deploy</em>?</p>
+<blockquote>
+<p>Good config management makes <em>one codebase / N environments</em> possible.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning of <em>dev / stage / prod</em> environments</li>
+<li>The <em>Twelve-Factor</em> <em>Config</em> principle</li>
+<li>The difference between <em>environment variables</em> and <em>secrets</em></li>
+<li>A comparison of <em>.env</em>, <em>Vault</em>, and <em>AWS Secrets Manager</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>DB addresses, keys, and domains</em> differ per environment. They must be <em>decoupled from code</em> so the <em>same build artifact</em> can deploy to <em>every environment</em>.</p>
+<blockquote>
+<p><em>Build once, run anywhere</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;app code (1)&quot;] --&gt; Build[&quot;build artifact (1)&quot;]
+    Build --&gt; Dev[&quot;dev (config A)&quot;]
+    Build --&gt; Stage[&quot;stage (config B)&quot;]
+    Build --&gt; Prod[&quot;prod (config C)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Environment</strong>: an <em>execution context</em> like <em>dev/stage/prod</em>.</li>
+<li><strong>Config</strong>: per-environment <em>values</em> (DB URL, domain, etc.).</li>
+<li><strong>Secret</strong>: <em>sensitive information</em> (API key, password).</li>
+<li><strong>.env</strong>: a <em>local-development</em> config file.</li>
+<li><strong>Secrets manager</strong>: an <em>encrypted store</em> like <em>Vault, AWS Secrets, Doppler</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (config baked into code)</strong></p>
+<pre><code class="language-python">DB_URL = &quot;postgres://prod-db.example.com/app&quot;   # hardcoded
+API_KEY = &quot;sk-1234...&quot;                           # secret in code
+</code></pre>
+<p><strong>After (injected from the environment)</strong></p>
+<pre><code class="language-python">import os
+DB_URL = os.environ[&quot;DB_URL&quot;]
+API_KEY = os.environ[&quot;API_KEY&quot;]
+</code></pre>
+<h2>Hands-on: Five Steps for Config Management</h2>
+<p><strong>Step 1 - Separate locally with .env</strong></p>
+<pre><code class="language-bash"># .env (gitignored)
+DB_URL=postgres://localhost/app
+API_KEY=test-key-1234
+</code></pre>
+<p><strong>Step 2 - Validate with pydantic-settings</strong></p>
+<pre><code class="language-python">from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    db_url: str
+    api_key: str
+
+settings = Settings()   # auto-loads from env
+</code></pre>
+<p><strong>Step 3 - Split per environment</strong></p>
+<pre><code class="language-yaml"># k8s/values-prod.yaml
+db_url: postgres://prod-db.example.com/app
+api_key:
+  valueFrom:
+    secretKeyRef: { name: api-key, key: value }
+</code></pre>
+<p><strong>Step 4 - Keep secrets in a dedicated store</strong></p>
+<pre><code class="language-bash"># AWS Secrets Manager
+aws secretsmanager get-secret-value --secret-id prod/api-key
+</code></pre>
+<p><strong>Step 5 - Auto-inject secrets</strong></p>
+<pre><code class="language-yaml"># Kubernetes External Secrets
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+spec:
+  secretStoreRef: { name: aws-secrets, kind: ClusterSecretStore }
+  data:
+    - secretKey: api-key
+      remoteRef: { key: prod/api-key }
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Secrets</em> never enter the <em>code repository</em>.</li>
+<li>Validate config <em>at startup</em>. Discovering <em>missing values</em> at runtime is too late.</li>
+<li><em>Per-environment YAML</em> increases visibility.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Committing secrets <em>to Git</em>.</strong> They are <em>permanently exposed</em>. Even <em>git filter-repo</em> cannot fully erase them.</li>
+<li><strong>Using <em>.env</em> in <em>production</em>.</strong> Move to a secrets manager.</li>
+<li><strong>The <em>same secret</em> across all environments.</strong> A leak affects <em>every environment</em>.</li>
+<li><strong>Changing config at runtime <em>without restart</em>.</strong> A <em>split-state</em> bug appears.</li>
+<li><strong>Per-environment <em>code branches</em>.</strong> <em>if env == "prod"</em> is an anti-pattern.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large teams keep secrets in <em>Vault</em> or <em>AWS Secrets Manager</em> and use the <em>External Secrets Operator</em> to auto-inject them into <em>Kubernetes</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>One codebase, N environments</em>. Build once.</li>
+<li><em>Secret rotation</em> must be <em>automatic</em>.</li>
+<li><em>Config changes</em> are subject to <em>PR and review</em>.</li>
+<li><em>Environment branching is config, not code</em>.</li>
+<li><em>Secret leaks are a matter of when</em>. Build early-detection.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>.env</em> is in <em>.gitignore</em>.</li>
+<li>[ ] <em>Secrets</em> live in a <em>dedicated store</em>.</li>
+<li>[ ] <em>Per-environment config files</em> are separated.</li>
+<li>[ ] The app <em>validates config at startup</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Search your project's <em>git history</em> for <em>secrets</em>.</li>
+<li>Add config validation with <em>pydantic-settings</em>.</li>
+<li>Split config into <em>per-environment YAMLs</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Config management is the start of <em>environment independence</em>. In the next post we treat <em>infrastructure itself as code</em> with <em>IaC</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What Is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">CI Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">CD and Deployment Strategies</a></li>
+<li><strong>Environments and Configuration (current)</strong></li>
+<li>Infrastructure as Code (upcoming)</li>
+<li>Containers and Build (upcoming)</li>
+<li>Monitoring and Alerting (upcoming)</li>
+<li>Logging and Analysis (upcoming)</li>
+<li>Incident Response and On-Call (upcoming)</li>
+<li>An Operable DevOps Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://12factor.net/config">The Twelve-Factor App — Config</a></li>
+<li><a href="https://developer.hashicorp.com/vault">HashiCorp Vault</a></li>
+<li><a href="https://docs.aws.amazon.com/secretsmanager/">AWS Secrets Manager</a></li>
+<li><a href="https://external-secrets.io/">External Secrets Operator</a></li>
+</ul>
+<p class="tags-line">Tags: DevOps, Configuration, Secrets, Environment, TwelveFactor</p>
+</body>
+</html>
