@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Backend Development?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Backend Development?</h1>
+<blockquote>
+<p>Backend Development 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Users only see the screen. So what is the <em>backend</em> actually doing behind it?</p>
+<blockquote>
+<p>It receives a request, applies rules, touches data, and returns a response. The backend is a <em>set of responsibilities</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The role and the boundaries of a backend</li>
+<li>The five layers that form a backend system</li>
+<li>The path of one request through that system</li>
+<li>A map of this whole series</li>
+<li>Why each next chapter exists</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Building only the frontend lets you ship <em>what the user sees</em>. Building the backend lets you ship <em>systems that survive</em>. Data, authentication, consistency, and operations all live behind the screen, and someone has to design them.</p>
+<blockquote>
+<p>The backend is invisible, but it decides everything.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;Client&quot;] --&gt; HTTP[&quot;HTTP server&quot;]
+    HTTP --&gt; Route[&quot;Router&quot;]
+    Route --&gt; Service[&quot;Service&quot;]
+    Service --&gt; DB[&quot;Database&quot;]
+    Service --&gt; Ext[&quot;External API&quot;]
+    DB --&gt; Service
+    Service --&gt; Route
+    Route --&gt; HTTP
+    HTTP --&gt; Client
+</code></pre>
+<p>Requests flow left to right; responses retrace the same path.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>HTTP server</strong>: the front door for requests.</li>
+<li><strong>Router</strong>: chooses which function will produce the response.</li>
+<li><strong>Service</strong>: the layer that holds business rules.</li>
+<li><strong>Repository</strong>: the conversation with the database.</li>
+<li><strong>Middleware</strong>: behavior that runs on <em>every</em> request.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (the frontend does everything)</strong></p>
+<pre><code class="language-python"># A password check inside the browser
+if password == &quot;admin123&quot;:
+    show_dashboard()
+</code></pre>
+<p><strong>After (the backend owns the rule)</strong></p>
+<pre><code class="language-python"># server.py
+@app.post(&quot;/login&quot;)
+def login(body):
+    if not auth.verify(body[&quot;email&quot;], body[&quot;password&quot;]):
+        return 401, {&quot;error&quot;: &quot;invalid&quot;}
+    return 200, {&quot;token&quot;: auth.token(body[&quot;email&quot;])}
+</code></pre>
+<p>Password verification belongs to the <em>server</em>; the client only consumes the result.</p>
+<h2>Hands-on: Your First Backend in Five Steps</h2>
+<p><strong>Step 1 — The smallest server</strong></p>
+<pre><code class="language-python"># 1_app.py
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get(&quot;/&quot;)
+def hello():
+    return {&quot;message&quot;: &quot;hello&quot;}
+</code></pre>
+<p><strong>Step 2 — Run it</strong></p>
+<pre><code class="language-bash">uvicorn 1_app:app --reload
+</code></pre>
+<p>Open <code>http://127.0.0.1:8000/</code> and you will see JSON.</p>
+<p><strong>Step 3 — Add a route</strong></p>
+<pre><code class="language-python"># 2_routes.py
+from fastapi import FastAPI
+app = FastAPI()
+
+USERS = [{&quot;id&quot;: 1, &quot;name&quot;: &quot;Alice&quot;}]
+
+@app.get(&quot;/users&quot;)
+def list_users():
+    return USERS
+</code></pre>
+<p><strong>Step 4 — Accept input</strong></p>
+<pre><code class="language-python"># 3_input.py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class UserIn(BaseModel):
+    name: str
+
+@app.post(&quot;/users&quot;)
+def create_user(payload: UserIn):
+    return {&quot;id&quot;: 99, &quot;name&quot;: payload.name}
+</code></pre>
+<p><strong>Step 5 — Call it</strong></p>
+<pre><code class="language-bash">curl -X POST -H &quot;Content-Type: application/json&quot; \
+     -d '{&quot;name&quot;:&quot;Bob&quot;}' http://127.0.0.1:8000/users
+</code></pre>
+<p>You get JSON back.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A server is a <em>path-to-function</em> mapping.</li>
+<li>Input is <em>validated</em> before it reaches your function.</li>
+<li>The response is <em>data</em> (JSON), not a screen.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Equating backend with database code.</strong> It also covers routing, auth, validation, and logging.</li>
+<li><strong>Putting all logic inside route handlers.</strong> One file becomes a thousand lines.</li>
+<li><strong>Trusting client-side validation.</strong> The server must always validate again.</li>
+<li><strong>Returning 500 for every error.</strong> Use meaningful codes like 400, 404, and 409.</li>
+<li><strong>Skipping logs.</strong> You will never know what happened in production.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The shape of a backend is similar from a startup to a large company — Router, Service, Repository, and Middleware. Learn the <em>layer split</em> once and you can join almost any team without relearning structure. Skip it and every codebase feels foreign.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Business rules live in services, not routes.</li>
+<li>Every input gets validated, every time.</li>
+<li>Every dependency can be injected for testing.</li>
+<li>Logs and metrics are designed alongside the code.</li>
+<li>The bar is "operable", not "it works on my machine".</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can name the five backend layers.</li>
+<li>[ ] You can run the smallest FastAPI server.</li>
+<li>[ ] You can tell GET from POST.</li>
+<li>[ ] You can explain why input validation matters.</li>
+<li>[ ] You know what the next chapter covers.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <code>/health</code> route that returns <code>{"status": "ok"}</code>.</li>
+<li>Add <code>GET /users/{user_id}</code> and echo the path parameter.</li>
+<li>Make <code>POST /login</code> return <code>401</code> when the password is wrong.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The backend is a <em>set of responsibilities</em>. Next, we open up the lowest layer and build an <em>HTTP server</em> by hand to see how it really works.</p>
+<ul>
+<li><strong>What Is Backend Development? (current)</strong></li>
+<li>Building an HTTP Server (upcoming)</li>
+<li>Routing and Controllers (upcoming)</li>
+<li>The Service Layer (upcoming)</li>
+<li>The Database Layer (upcoming)</li>
+<li>Authentication and Authorization (upcoming)</li>
+<li>Logging and Error Handling (upcoming)</li>
+<li>Testing the Backend (upcoming)</li>
+<li>Deploying the Backend (upcoming)</li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://fastapi.tiangolo.com/tutorial/">FastAPI Tutorial</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">HTTP overview (MDN)</a></li>
+<li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
+<li><a href="https://roadmap.sh/backend">Backend roadmap</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, WebDevelopment, HTTP, Architecture, Python</p>
+</body>
+</html>

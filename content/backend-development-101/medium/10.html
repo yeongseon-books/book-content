@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A Production-Ready Backend Structure</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>A Production-Ready Backend Structure</h1>
+<blockquote>
+<p>Backend Development 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you combine the nine layers you have learned into <em>one coherent project</em>?</p>
+<blockquote>
+<p>Writing code that works and writing a backend that <em>runs in production</em> are different jobs. Production-readiness starts with structure.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>project directory layout</em> that hosts all nine layers</li>
+<li>A strategy for splitting config across dev/staging/prod</li>
+<li>The three pillars of observability on one page</li>
+<li>A baseline for performance and cost</li>
+<li>A roadmap for what to learn next</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A good structure lets <em>a new teammate find anything in 30 minutes</em>. A bad structure makes <em>future-you</em> unable to find your own code three months later. Structure is the biggest gift you give your future self.</p>
+<blockquote>
+<p>Production-grade code is <em>easy to read</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Req[&quot;Request&quot;] --&gt; Mid[&quot;Middleware&quot;]
+    Mid --&gt; Ctl[&quot;Controller&quot;]
+    Ctl --&gt; Svc[&quot;Service&quot;]
+    Svc --&gt; Repo[&quot;Repository&quot;]
+    Repo --&gt; DB[&quot;Database&quot;]
+    Svc --&gt; Log[&quot;Logs/Metrics&quot;]
+    Log --&gt; Obs[&quot;Observability&quot;]
+</code></pre>
+<p>Each arrow should align with a <em>directory boundary</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Project layout</strong>: rules for the physical location of code.</li>
+<li><strong>Config layering</strong>: a way to <em>override</em> settings per environment.</li>
+<li><strong>Secret manager</strong>: a system that holds secrets <em>outside the code</em>.</li>
+<li><strong>SLO</strong>: the performance/availability target you <em>promise to hold</em>.</li>
+<li><strong>Capacity plan</strong>: a plan for surviving N times the current traffic.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (everything in one file)</strong></p>
+<pre><code class="language-text">app.py   # routing, business, DB, auth, logging — all together
+</code></pre>
+<p><strong>After (layers visible as directories)</strong></p>
+<pre><code class="language-text">src/
+├── api/            # routers, middleware
+├── services/       # business rules
+├── repositories/   # DB access
+├── db/             # models, migrations
+├── auth/           # authn/authz
+├── observability/  # logging, metrics, tracing
+├── config/         # per-environment settings
+└── main.py         # wiring only
+tests/
+deploy/
+</code></pre>
+<h2>Hands-on: Five Steps to a Production-Ready Layout</h2>
+<p><strong>Step 1 — Directory layout</strong></p>
+<pre><code class="language-bash">mkdir -p src/{api,services,repositories,db,auth,observability,config}
+mkdir -p tests deploy
+touch src/main.py
+</code></pre>
+<p><strong>Step 2 — Layered configuration</strong></p>
+<pre><code class="language-python"># src/config/settings.py
+import os
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    env: str = &quot;dev&quot;
+    db_url: str
+    jwt_secret: str
+    log_level: str = &quot;INFO&quot;
+
+    class Config:
+        env_file = &quot;.env&quot;
+
+settings = Settings()
+</code></pre>
+<p>In production, a <em>secret manager</em> injects environment variables instead of <code>.env</code>.</p>
+<p><strong>Step 3 — main.py is wiring only</strong></p>
+<pre><code class="language-python"># src/main.py
+from fastapi import FastAPI
+from src.api import users, orders
+from src.observability import setup_logging, setup_metrics
+
+def create_app() -&gt; FastAPI:
+    app = FastAPI()
+    setup_logging()
+    setup_metrics(app)
+    app.include_router(users.router)
+    app.include_router(orders.router)
+    return app
+
+app = create_app()
+</code></pre>
+<p>Not a single line of business logic lives here.</p>
+<p><strong>Step 4 — Observability on one page</strong></p>
+<pre><code class="language-python"># src/observability/__init__.py
+import logging, time
+from prometheus_client import Counter, Histogram
+
+REQUESTS = Counter(&quot;http_requests_total&quot;, &quot;Total requests&quot;, [&quot;route&quot;, &quot;status&quot;])
+LATENCY = Histogram(&quot;http_request_seconds&quot;, &quot;Latency&quot;, [&quot;route&quot;])
+
+def setup_logging():
+    logging.basicConfig(level=&quot;INFO&quot;, format=&quot;%(asctime)s %(levelname)s %(message)s&quot;)
+
+def setup_metrics(app):
+    @app.middleware(&quot;http&quot;)
+    async def observe(request, call_next):
+        start = time.time()
+        response = await call_next(request)
+        LATENCY.labels(request.url.path).observe(time.time() - start)
+        REQUESTS.labels(request.url.path, response.status_code).inc()
+        return response
+</code></pre>
+<p><strong>Step 5 — SLO and capacity baseline</strong></p>
+<pre><code class="language-text">- Availability: 99.9% (43 minutes downtime per month)
+- p95 latency: under 300 ms
+- Error rate: under 0.1%
+- 1 instance = 200 RPS (capacity baseline)
+</code></pre>
+<p>Once written down, alerts and capacity planning <em>follow naturally</em>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The thinner <code>main.py</code> is, the easier testing becomes.</li>
+<li>Configuration lives in <em>the environment</em>, not in code.</li>
+<li>Observability must be present <em>from day one</em> to debug fast later.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Letting layer boundaries slide in code review.</strong> A <em>little</em> SQL in a router today becomes <em>normal</em> tomorrow.</li>
+<li><strong>Hardcoding configuration in code.</strong> Per-environment behavior creates <em>unreproducible</em> bugs.</li>
+<li><strong>Postponing observability.</strong> You only add it after an incident — and during the incident there is no time.</li>
+<li><strong>Not writing SLOs as numbers.</strong> "Make it fast" is <em>not a target</em>.</li>
+<li><strong>Putting business logic in <code>main.py</code>.</strong> Tests now require the <em>entire app to boot</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most companies maintain a <em>standard template</em> with layered directories, configuration layering, and the three observability pillars baked in. New services start by <em>cloning the template</em>. A senior engineer's job often includes <em>maintaining that template</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Pick the structure that is comfortable <em>six months from now</em>, not today.</li>
+<li>Every new layer must have a <em>clear name and responsibility</em>.</li>
+<li>"<em>Where should this code live?</em>" being unclear is a sign the structure is wrong.</li>
+<li>Operating without observability is <em>driving with your eyes closed</em>.</li>
+<li>Good structure is measured by <em>the speed of a new teammate's first PR</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] All nine layers are <em>visible as directories</em>.</li>
+<li>[ ] <code>main.py</code> performs <em>only wiring</em>.</li>
+<li>[ ] Configuration is split per environment.</li>
+<li>[ ] No secret lives in code.</li>
+<li>[ ] Logs and metrics are on from day one.</li>
+<li>[ ] SLOs are written down.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Reorganize one of your toy projects into the directory layout above.</li>
+<li>Build a <code>Settings</code> class so a single <code>.env</code> injects every environment variable.</li>
+<li>Expose a <code>/metrics</code> endpoint and verify Prometheus-formatted output.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A production-ready backend <em>starts from structure</em>. Split the nine layers into directories, bake in config and observability from day one, and the <em>future-you</em> will happily revisit the code six months later.</p>
+<p>Recommended next series:</p>
+<ul>
+<li><em>Testing 101</em> — design test strategy like a factory line.</li>
+<li><em>DevOps 101</em> — turn CI/CD into an automation vault.</li>
+<li><em>Observability 101</em> — connect logs, metrics, and traces into one chart.</li>
+</ul>
+<p>Thank you for staying with this series. The ability to <em>take a small backend and make it production-ready</em> is a <em>core skill</em> that travels with you to any company.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">Database Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/07-logging-and-error-handling.md">Logging and Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/08-testing-the-backend.md">Testing the Backend</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/09-deploying-the-backend.md">Deploying the Backend</a></li>
+<li><strong>A Production-Ready Backend Structure (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://12factor.net/">Twelve-Factor App</a></li>
+<li><a href="https://sre.google/books/">Google SRE Book</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/bigger-applications/">FastAPI Bigger Applications</a></li>
+<li><a href="https://github.com/prometheus/client_python">Prometheus Python client</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, Architecture, BestPractices, Python, Production</p>
+</body>
+</html>

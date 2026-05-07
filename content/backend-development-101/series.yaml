@@ -1,0 +1,52 @@
+id: backend-development-101
+title:
+  ko: Backend Development 101
+  en: Backend Development 101
+description:
+  ko: HTTP 서버/라우팅/서비스/DB layer/인증/로깅/테스트/배포까지 백엔드 개발 전체 흐름을 다루는 시리즈.
+  en: An end-to-end tour of backend development — HTTP servers, routing, service and DB layers, auth, logging, testing, and deployment.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-backend-development
+    title:
+      ko: 백엔드 개발이란 무엇인가?
+      en: What Is Backend Development?
+  - slug: building-an-http-server
+    title:
+      ko: HTTP 서버 만들기
+      en: Building an HTTP Server
+  - slug: routing-and-controllers
+    title:
+      ko: Routing과 Controller
+      en: Routing and Controllers
+  - slug: service-layer
+    title:
+      ko: Service Layer
+      en: The Service Layer
+  - slug: database-layer
+    title:
+      ko: Database Layer
+      en: The Database Layer
+  - slug: auth-and-authorization
+    title:
+      ko: 인증과 권한
+      en: Authentication and Authorization
+  - slug: logging-and-error-handling
+    title:
+      ko: Logging과 Error Handling
+      en: Logging and Error Handling
+  - slug: testing-the-backend
+    title:
+      ko: 백엔드 테스트
+      en: Testing the Backend
+  - slug: deploying-the-backend
+    title:
+      ko: 백엔드 배포
+      en: Deploying the Backend
+  - slug: production-ready-backend
+    title:
+      ko: 운영 가능한 백엔드 구조
+      en: A Production-Ready Backend Structure

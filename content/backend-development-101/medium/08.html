@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Testing the Backend</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Testing the Backend</h1>
+<blockquote>
+<p>Backend Development 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is "no time to write tests" the <em>biggest</em> time waste of all?</p>
+<blockquote>
+<p>Without tests, every change is a <em>bet</em>. A single unit test prevents <em>hours</em> of debugging later.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between unit, integration, and E2E tests</li>
+<li>How to test a service with pytest</li>
+<li>How to call endpoints with FastAPI's <code>TestClient</code></li>
+<li>How to test without spinning up a <em>real</em> database</li>
+<li>When to use fixtures and when to mock</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Code without tests can be <em>read but not changed safely</em>. The mark of a good backend is <em>how easily it can be changed</em>, and automated tests are what create that safety.</p>
+<blockquote>
+<p>Tests are the <em>insurance</em> of code — invisible day to day, decisive in incidents.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Unit[&quot;Unit&quot;] --&gt; Int[&quot;Integration&quot;]
+    Int --&gt; E2E[&quot;E2E&quot;]
+    Unit --&gt;|&quot;fast and many&quot;| Pyramid
+    E2E --&gt;|&quot;slow and few&quot;| Pyramid
+</code></pre>
+<p>The test pyramid — <em>many</em> at the bottom, <em>few</em> at the top.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Unit test</strong>: verifies a <em>single</em> function or class.</li>
+<li><strong>Integration test</strong>: verifies that several modules work <em>together</em>.</li>
+<li><strong>E2E test</strong>: drives the <em>whole system</em> like a real user.</li>
+<li><strong>Fixture</strong>: setup code written once and <em>reused</em>.</li>
+<li><strong>Mock</strong>: a fake stand-in for an external dependency.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (manual checks)</strong></p>
+<pre><code class="language-python"># Click around in the browser every time
+</code></pre>
+<p><strong>After (automatic verification)</strong></p>
+<pre><code class="language-python">def test_create_user(client):
+    r = client.post(&quot;/users&quot;, json={&quot;name&quot;: &quot;Alice&quot;})
+    assert r.status_code == 200
+    assert r.json()[&quot;name&quot;] == &quot;Alice&quot;
+</code></pre>
+<p>Every case is verified before deploy.</p>
+<h2>Hands-on: Five Steps Through Testing</h2>
+<p><strong>Step 1 — First pytest test</strong></p>
+<pre><code class="language-python"># tests/test_basic.py
+def add(a, b): return a + b
+
+def test_add():
+    assert add(2, 3) == 5
+</code></pre>
+<pre><code class="language-bash">pytest -q
+</code></pre>
+<p><strong>Step 2 — Unit test a service with mocks</strong></p>
+<pre><code class="language-python"># tests/test_user_service.py
+from unittest.mock import MagicMock
+from services.user_service import UserService
+
+def test_register():
+    repo = MagicMock()
+    repo.insert.return_value = {&quot;id&quot;: 1, &quot;name&quot;: &quot;A&quot;}
+    svc = UserService(repo)
+    result = svc.register(&quot;A&quot;)
+    repo.insert.assert_called_once()
+    assert result[&quot;id&quot;] == 1
+</code></pre>
+<p><strong>Step 3 — FastAPI TestClient</strong></p>
+<pre><code class="language-python"># tests/test_api.py
+from fastapi.testclient import TestClient
+from main import app
+
+client = TestClient(app)
+
+def test_health():
+    assert client.get(&quot;/health&quot;).status_code == 200
+</code></pre>
+<p><strong>Step 4 — Fixture for in-memory DB</strong></p>
+<pre><code class="language-python"># tests/conftest.py
+import pytest
+from sqlalchemy import create_engine
+from db import Base
+
+@pytest.fixture
+def engine():
+    e = create_engine(&quot;sqlite:///:memory:&quot;)
+    Base.metadata.create_all(e)
+    return e
+</code></pre>
+<p><strong>Step 5 — Dependency override</strong></p>
+<pre><code class="language-python"># tests/test_with_db.py
+def test_create_user(client, engine):
+    app.dependency_overrides[get_engine] = lambda: engine
+    r = client.post(&quot;/users&quot;, json={&quot;name&quot;: &quot;Bob&quot;})
+    assert r.status_code == 200
+</code></pre>
+<p>FastAPI's <code>dependency_overrides</code> lets you test <em>without a real database</em>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Unit tests <em>cut external dependencies</em> with mocks.</li>
+<li>Integration tests <em>bind</em> with a real session.</li>
+<li>Fixtures keep the same setup from being repeated.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Doing only E2E.</strong> They are slow, so <em>no one runs them</em>.</li>
+<li><strong>Using <code>time.sleep</code> to wait inside tests.</strong> They become flaky — poll or mock instead.</li>
+<li><strong>Sharing database state between tests.</strong> Cross-test interference — always isolate.</li>
+<li><strong>Mocking too much.</strong> Real behavior never gets verified.</li>
+<li><strong>Calling without asserting.</strong> That is <em>execution</em>, not <em>verification</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>CI (GitHub Actions and friends) runs <code>pytest</code> on every PR. Units take <em>seconds</em>, integration <em>tens of seconds</em>, E2E <em>minutes</em> — break that distribution and dev speed stalls. Seniors keep an eye on the <em>pyramid shape</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A new feature ships <em>with its tests</em>.</li>
+<li>Reproduce a bug with a <em>test</em> before fixing it.</li>
+<li>Test names read like <em>sentences</em> (<code>test_user_with_zero_age_returns_422</code>).</li>
+<li>Mock at the <em>external boundary</em>, not the internals.</li>
+<li>Risk areas matter more than coverage numbers.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can run a first pytest test.</li>
+<li>[ ] You can unit test a service with mocks.</li>
+<li>[ ] You can call endpoints with TestClient.</li>
+<li>[ ] You can write an in-memory DB fixture.</li>
+<li>[ ] You can use <code>dependency_overrides</code>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Unit test <code>OrderService.create</code> with a mock repository.</li>
+<li>Verify that <code>POST /login</code> with the wrong password returns 401.</li>
+<li>Add an integration test for the same endpoint using the in-memory DB.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Tests are the <em>safety net for change</em>. Next, we deliver the code to real users — <em>deploying the backend</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">The Database Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/07-logging-and-error-handling.md">Logging and Error Handling</a></li>
+<li><strong>Testing the Backend (current)</strong></li>
+<li>Deploying the Backend (upcoming)</li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/">pytest documentation</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI testing</a></li>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Testing pyramid (Martin Fowler)</a></li>
+<li><a href="https://docs.python.org/3/library/unittest.mock.html">unittest.mock</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, Testing, Pytest, Python, QualityAssurance</p>
+</body>
+</html>

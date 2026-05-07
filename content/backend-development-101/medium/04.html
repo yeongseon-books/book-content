@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Service Layer</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Service Layer</h1>
+<blockquote>
+<p>Backend Development 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Where does <em>business logic</em> belong?</p>
+<blockquote>
+<p>Not in the controller. Not in the repository. In the <em>service layer</em>. One business action — register, transfer, refund — becomes one function with a meaningful name.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The role of the service layer</li>
+<li>How to split responsibility across controller, service, and repository</li>
+<li>Where to start a transaction</li>
+<li>How to inject dependencies into a service</li>
+<li>Where domain events fit in</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Putting business logic in controllers spreads the same rule across <em>three places</em> — REST, gRPC, batch jobs. Move it into services and <em>every entry point</em> enforces the same rule. This single principle determines how long your service survives.</p>
+<blockquote>
+<p>Business rules do not change when the door changes.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Ctrl[&quot;Controller&quot;] --&gt; Svc[&quot;Service&quot;]
+    Svc --&gt; Repo[&quot;Repository&quot;]
+    Svc --&gt; Ext[&quot;External API&quot;]
+    Svc --&gt; Bus[&quot;Event bus&quot;]
+</code></pre>
+<p>A service is the <em>orchestrator</em> — it coordinates the repo, external APIs, and the event bus.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Service</strong>: an object responsible for one business <em>use case</em>.</li>
+<li><strong>Use case</strong>: a scenario like "create order" or "issue refund".</li>
+<li><strong>Transaction boundary</strong>: the unit that commits or rolls back together.</li>
+<li><strong>Domain event</strong>: a message that announces a business action happened.</li>
+<li><strong>Dependency injection</strong>: receive collaborators through the constructor or arguments.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (controller does everything)</strong></p>
+<pre><code class="language-python">@app.post(&quot;/orders&quot;)
+def create_order(payload, db, mail):
+    if payload.amount &lt;= 0:
+        raise HTTPException(400)
+    order = db.insert(&quot;orders&quot;, payload.dict())
+    mail.send(payload.email, &quot;ordered&quot;)
+    return order
+</code></pre>
+<p><strong>After (service owns the rule)</strong></p>
+<pre><code class="language-python"># services/order_service.py
+class OrderService:
+    def __init__(self, repo, mailer):
+        self.repo = repo
+        self.mailer = mailer
+
+    def create(self, payload):
+        if payload.amount &lt;= 0:
+            raise ValueError(&quot;amount must be &gt; 0&quot;)
+        order = self.repo.save(payload)
+        self.mailer.send(payload.email, &quot;ordered&quot;)
+        return order
+
+# routers/orders.py
+@router.post(&quot;&quot;)
+def create_order(payload, svc: OrderService = Depends(get_order_service)):
+    return svc.create(payload)
+</code></pre>
+<p>The controller is <em>thin</em> and the same service can be reused from a batch job.</p>
+<h2>Hands-on: Five Steps to Designing a Service</h2>
+<p><strong>Step 1 — The smallest service</strong></p>
+<pre><code class="language-python"># 1_service.py
+class GreetService:
+    def hello(self, name: str) -&gt; str:
+        return f&quot;hello, {name}&quot;
+</code></pre>
+<p><strong>Step 2 — Inject dependencies</strong></p>
+<pre><code class="language-python"># 2_di.py
+class UserService:
+    def __init__(self, repo):
+        self.repo = repo
+
+    def register(self, name: str):
+        return self.repo.insert({&quot;name&quot;: name})
+</code></pre>
+<p><strong>Step 3 — Transaction boundary</strong></p>
+<pre><code class="language-python"># 3_tx.py
+class TransferService:
+    def __init__(self, accounts, tx):
+        self.accounts = accounts
+        self.tx = tx
+
+    def transfer(self, src, dst, amount):
+        with self.tx.begin():
+            self.accounts.debit(src, amount)
+            self.accounts.credit(dst, amount)
+</code></pre>
+<p><strong>Step 4 — Integrate an external call</strong></p>
+<pre><code class="language-python"># 4_external.py
+class CheckoutService:
+    def __init__(self, repo, payment_gw):
+        self.repo = repo
+        self.gw = payment_gw
+
+    def checkout(self, cart):
+        receipt = self.gw.charge(cart.total)
+        return self.repo.save_order(cart, receipt.id)
+</code></pre>
+<p><strong>Step 5 — Publish a domain event</strong></p>
+<pre><code class="language-python"># 5_event.py
+class OrderService:
+    def __init__(self, repo, bus):
+        self.repo = repo
+        self.bus = bus
+
+    def place(self, payload):
+        order = self.repo.save(payload)
+        self.bus.publish(&quot;OrderPlaced&quot;, {&quot;id&quot;: order.id})
+        return order
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A service <em>receives</em> its dependencies — it does not construct them.</li>
+<li>The transaction starts <em>inside the service</em>, not the repository.</li>
+<li>External calls are validated before the next step runs.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Passing the HTTP request directly into the service.</strong> Services accept <em>plain inputs</em>.</li>
+<li><strong>Throwing <code>HTTPException</code> from a service.</strong> Translate domain errors at the controller.</li>
+<li><strong>Opening a transaction in the repository.</strong> A use case becomes two transactions.</li>
+<li><strong>Letting services import each other.</strong> Cycles appear — use the event bus instead.</li>
+<li><strong>Stuffing every method into one service.</strong> One service per domain reads better.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large backends keep one service directory per domain (<code>services/orders/</code>, <code>services/payments/</code>). One use case maps to one service method — that single rule lets a new teammate ramp up in thirty minutes. Even without full DDD, this split helps every backend.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>One use case, one method — long methods are a <em>split signal</em>.</li>
+<li>Treat services as functions of <em>input to result</em>.</li>
+<li>Make transaction boundaries explicit.</li>
+<li>Decide retry policies inside the service, not the call site.</li>
+<li>The service file alone should explain the business rules.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can describe controller / service / repository duties.</li>
+<li>[ ] You can inject dependencies into a service.</li>
+<li>[ ] You can start a transaction inside a service.</li>
+<li>[ ] You can tell HTTP exceptions from domain exceptions.</li>
+<li>[ ] You know what a domain event is.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a <code>RefundService.refund(order_id)</code> and raise <code>RefundError</code> for invalid IDs.</li>
+<li>Add an <em>insufficient funds</em> check to <code>TransferService</code>.</li>
+<li>When a service method gets long, refactor it into a new service.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The service layer is the <em>home of business rules</em>. Next, we go a layer deeper to the <em>Database Layer</em>, where data finally lives.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><strong>The Service Layer (current)</strong></li>
+<li>The Database Layer (upcoming)</li>
+<li>Authentication and Authorization (upcoming)</li>
+<li>Logging and Error Handling (upcoming)</li>
+<li>Testing the Backend (upcoming)</li>
+<li>Deploying the Backend (upcoming)</li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/eaaCatalog/serviceLayer.html">Service Layer pattern (Martin Fowler)</a></li>
+<li><a href="https://www.domainlanguage.com/ddd/reference/">DDD reference (Eric Evans)</a></li>
+<li><a href="https://www.cosmicpython.com/">Architecture Patterns with Python</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/dependencies/">FastAPI dependencies</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, Architecture, DesignPatterns, Python, DDD</p>
+</body>
+</html>

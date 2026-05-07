@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Database Layer</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Database Layer</h1>
+<blockquote>
+<p>Backend Development 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why should services <em>not</em> write SQL directly?</p>
+<blockquote>
+<p>Because the database might change, the same query gets duplicated everywhere, and maintenance turns into hell. The repository sits between them.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The role of the repository pattern</li>
+<li>Why we use an ORM and where its <em>traps</em> live</li>
+<li>The flow of transactions, commits, and rollbacks</li>
+<li>What a migration is and why it matters</li>
+<li>The N+1 query problem and how to fix it</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Databases are <em>what changes most often</em> and <em>what should change least</em>. Splitting the layer early means swapping a database, adding a cache, or running tests on an in-memory engine all happen in <em>one file</em>.</p>
+<blockquote>
+<p>A repository is the <em>translator between the database and the service</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Svc[&quot;Service&quot;] --&gt; Repo[&quot;Repository&quot;]
+    Repo --&gt; ORM[&quot;ORM&quot;]
+    ORM --&gt; DB[(&quot;Database&quot;)]
+    Repo --&gt; Cache[(&quot;Cache&quot;)]
+</code></pre>
+<p>The service does not know SQL — only the repository does.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Repository</strong>: an object that wraps database access in <em>function-like</em> methods.</li>
+<li><strong>ORM</strong>: a tool that maps objects to tables.</li>
+<li><strong>Migration</strong>: schema changes versioned in code.</li>
+<li><strong>Transaction</strong>: a unit that commits or rolls back together.</li>
+<li><strong>N+1</strong>: one query plus N child queries — the most common performance trap.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (SQL inside the service)</strong></p>
+<pre><code class="language-python">def create_user(name):
+    cur = db.execute(&quot;INSERT INTO users(name) VALUES(?)&quot;, (name,))
+    return cur.lastrowid
+</code></pre>
+<p><strong>After (wrapped by a repository)</strong></p>
+<pre><code class="language-python"># repositories/user_repo.py
+class UserRepository:
+    def __init__(self, session):
+        self.session = session
+
+    def save(self, user):
+        self.session.add(user)
+        self.session.flush()
+        return user
+</code></pre>
+<p>A query change now lives in <em>one file</em>.</p>
+<h2>Hands-on: Five Steps Through the Database Layer</h2>
+<p><strong>Step 1 — SQLite + SQLAlchemy setup</strong></p>
+<pre><code class="language-python"># 1_setup.py
+from sqlalchemy import create_engine, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+class Base(DeclarativeBase): pass
+
+class User(Base):
+    __tablename__ = &quot;users&quot;
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50))
+
+engine = create_engine(&quot;sqlite:///app.db&quot;)
+Base.metadata.create_all(engine)
+</code></pre>
+<p><strong>Step 2 — Session and repository</strong></p>
+<pre><code class="language-python"># 2_repo.py
+from sqlalchemy.orm import Session
+
+class UserRepository:
+    def __init__(self, session: Session):
+        self.session = session
+
+    def add(self, name: str) -&gt; User:
+        u = User(name=name)
+        self.session.add(u)
+        self.session.flush()
+        return u
+
+    def get(self, uid: int) -&gt; User | None:
+        return self.session.get(User, uid)
+</code></pre>
+<p><strong>Step 3 — Transactions</strong></p>
+<pre><code class="language-python"># 3_tx.py
+from sqlalchemy.orm import Session
+with Session(engine) as s, s.begin():
+    repo = UserRepository(s)
+    repo.add(&quot;Alice&quot;)
+    repo.add(&quot;Bob&quot;)
+# Exiting cleanly commits; an exception rolls back.
+</code></pre>
+<p><strong>Step 4 — Migrations</strong></p>
+<pre><code class="language-bash">pip install alembic
+alembic init migrations
+alembic revision --autogenerate -m &quot;add users&quot;
+alembic upgrade head
+</code></pre>
+<p>Schema changes become <em>code under version control</em>.</p>
+<p><strong>Step 5 — Killing N+1</strong></p>
+<pre><code class="language-python"># 5_eager.py
+from sqlalchemy.orm import selectinload
+stmt = select(Order).options(selectinload(Order.items))
+orders = session.scalars(stmt).all()
+</code></pre>
+<p>Loading the children in <em>one shot</em> eliminates N+1.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Sessions stay <em>short</em> — one per request is standard.</li>
+<li>Repositories return <em>domain objects</em>, not raw dicts.</li>
+<li>Migrations are always safer than direct <code>ALTER TABLE</code>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Returning ORM objects straight to the client.</strong> Use a Pydantic <em>DTO</em> instead.</li>
+<li><strong>Sharing a session globally.</strong> Concurrency bugs follow.</li>
+<li><strong>Editing the production schema by hand.</strong> Environments drift apart.</li>
+<li><strong>Leaving every relation as lazy.</strong> N+1 builds up <em>quietly</em>.</li>
+<li><strong>Using the real database in tests.</strong> Use in-memory SQLite or mocks for speed.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most backends start with <em>PostgreSQL + ORM + Alembic + Repository</em>. As traffic grows you add read replicas, Redis, or Elasticsearch — and the service is untouched. Only the inside of the repository changes. That boundary is what lets the system <em>evolve</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Every query is checked against an <em>index</em>.</li>
+<li>Every migration writes a <em>down</em> path too.</li>
+<li>Repository methods speak the <em>domain language</em> (<code>find_active_users</code>).</li>
+<li>Transactions stay <em>as short as possible</em>.</li>
+<li>The slow-query log is <em>always</em> on in production.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can put SQL behind a repository.</li>
+<li>[ ] You can write a transaction block.</li>
+<li>[ ] You can create an Alembic migration.</li>
+<li>[ ] You can spot N+1 and fix it with eager loading.</li>
+<li>[ ] You can tell a DTO from an ORM object.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Implement <code>OrderRepository.find_recent(limit=10)</code> and check the index.</li>
+<li>Add an Alembic migration that adds a <code>users.email</code> column.</li>
+<li>Trigger an N+1 query on purpose and measure the difference after <code>selectinload</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A repository is a <em>translator over the database</em>. Next, we look at <em>who can see what</em> — authentication and authorization.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
+<li><strong>The Database Layer (current)</strong></li>
+<li>Authentication and Authorization (upcoming)</li>
+<li>Logging and Error Handling (upcoming)</li>
+<li>Testing the Backend (upcoming)</li>
+<li>Deploying the Backend (upcoming)</li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.sqlalchemy.org/en/20/orm/">SQLAlchemy ORM</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/tutorial.html">Alembic Tutorial</a></li>
+<li><a href="https://martinfowler.com/eaaCatalog/repository.html">Repository pattern (Martin Fowler)</a></li>
+<li><a href="https://www.sqlshack.com/n1-query-problem/">N+1 queries explained</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, Database, SQL, SQLAlchemy, Python</p>
+</body>
+</html>
