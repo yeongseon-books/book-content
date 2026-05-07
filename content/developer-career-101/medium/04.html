@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Resume and Portfolio</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Resume and Portfolio</h1>
+<blockquote>
+<p>Developer Career 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you make a recruiter understand you in <em>thirty seconds</em>?</p>
+<blockquote>
+<p>Express role, results, and impact with numbers.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Resume</em> structure</li>
+<li>Writing <em>bullets</em></li>
+<li>Linking to a <em>portfolio</em></li>
+<li>Keywords and <em>ATS</em></li>
+<li>The <em>application flow</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A resume is the ticket into the interview.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    H[Header] --&gt; S[Summary]
+    S --&gt; E[Experience]
+    E --&gt; P[Projects]
+    P --&gt; Sk[Skills]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>summary</strong>: A three-line elevator pitch.</li>
+<li><strong>bullet</strong>: A result sentence.</li>
+<li><strong>STAR</strong>: Situation, Task, Action, Result.</li>
+<li><strong>ATS</strong>: Applicant Tracking System.</li>
+<li><strong>portfolio</strong>: Collected evidence.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "I list my responsibilities."</p>
+<p><strong>After</strong>: "I write results and impact with numbers."</p>
+<h2>Hands-on: Build the Resume</h2>
+<p><strong>Step 1 — Header</strong></p>
+<pre><code class="language-text">Name | Email | GitHub | LinkedIn
+</code></pre>
+<p><strong>Step 2 — Summary</strong></p>
+<pre><code class="language-text">Backend, 3 yrs. Cut payment p95 from 200ms to 80ms.
+</code></pre>
+<p><strong>Step 3 — Experience Bullets (STAR)</strong></p>
+<pre><code class="language-markdown">- Cut p95 latency from 200ms to 80ms by introducing read replicas, serving 5M req/day.
+</code></pre>
+<p><strong>Step 4 — Projects</strong></p>
+<pre><code class="language-markdown">- tinytool: 1.2k stars, used by 30 orgs
+</code></pre>
+<p><strong>Step 5 — Skills</strong></p>
+<pre><code class="language-text">Python, PostgreSQL, AWS, Kubernetes
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Bullets are results.</li>
+<li>Numbers are evidence.</li>
+<li>STAR provides narrative.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Listing only responsibilities.</strong></li>
+<li><strong>No numbers.</strong></li>
+<li><strong>Mismatch with the portfolio.</strong></li>
+<li><strong>Formats that ATS cannot read.</strong></li>
+<li><strong>Resume longer than three pages.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Big companies require a short internal resume even for internal transfers.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The resume is an ad.</li>
+<li>Numbers are king.</li>
+<li>STAR is the frame.</li>
+<li>ATS is reality.</li>
+<li>Portfolio is evidence.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Three-line summary.</li>
+<li>[ ] Five bullets with numbers.</li>
+<li>[ ] Portfolio link.</li>
+<li>[ ] PDF and text format.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>One line: define STAR.</li>
+<li>One line: define ATS.</li>
+<li>One line: example of a numeric bullet.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post covers <em>Preparing for Coding Interviews</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/01-what-is-developer-career.md">What Is a Developer Career</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/02-understanding-roles.md">Understanding Roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/03-learning-plan.md">Building a Learning Plan</a></li>
+<li><strong>Resume and Portfolio (current)</strong></li>
+<li>Preparing for Coding Interviews (upcoming)</li>
+<li>System Design Interviews (upcoming)</li>
+<li>Settling into the First Job (upcoming)</li>
+<li>Side Projects and Learning (upcoming)</li>
+<li>Mentoring and Networking (upcoming)</li>
+<li>The Path to Senior (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://thetechresume.com/">Tech Resume Inside Out</a></li>
+<li><a href="https://careers.google.com/how-we-hire/">Google Resume Tips</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Situation,_task,_action,_result">STAR method</a></li>
+<li><a href="https://www.jobscan.co/resume-writing-guide">ATS-friendly resume</a></li>
+</ul>
+<p class="tags-line">Tags: Career, Resume, Portfolio, Hiring, Beginner</p>
+</body>
+</html>

@@ -1,0 +1,54 @@
+id: developer-career-101
+title:
+  ko: Developer Career 101
+  en: Developer Career 101
+description:
+  ko: 개발자 커리어를 설계하는 법.
+  en: How to design a developer career.
+languages:
+  - ko
+  - en
+status: content-ready
+level: 101
+lifecycle: active
+episodes:
+  - slug: 01-what-is-developer-career
+    title:
+      ko: 개발자 커리어란 무엇인가
+      en: What Is a Developer Career
+  - slug: 02-understanding-roles
+    title:
+      ko: 직무 이해하기
+      en: Understanding Roles
+  - slug: 03-learning-plan
+    title:
+      ko: 학습 계획 세우기
+      en: Building a Learning Plan
+  - slug: 04-resume-and-portfolio
+    title:
+      ko: 이력서와 포트폴리오
+      en: Resume and Portfolio
+  - slug: 05-coding-interview
+    title:
+      ko: 코딩 인터뷰 준비
+      en: Preparing for Coding Interviews
+  - slug: 06-system-design-interview
+    title:
+      ko: 시스템 디자인 인터뷰
+      en: System Design Interviews
+  - slug: 07-first-job
+    title:
+      ko: 첫 직장 적응
+      en: Settling into the First Job
+  - slug: 08-side-projects
+    title:
+      ko: 사이드 프로젝트와 학습
+      en: Side Projects and Learning
+  - slug: 09-mentoring-networking
+    title:
+      ko: 멘토링과 네트워킹
+      en: Mentoring and Networking
+  - slug: 10-path-to-senior
+    title:
+      ko: 시니어로 가는 길
+      en: The Path to Senior

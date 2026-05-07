@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Preparing for Coding Interviews</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Preparing for Coding Interviews</h1>
+<blockquote>
+<p>Developer Career 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>practice problems</em> alone enough to be ready for the interview?</p>
+<blockquote>
+<p>Patterns, communication, and time management must move together.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Eight problem patterns</em></li>
+<li>The <em>UMPIRE</em> procedure</li>
+<li>A <em>mock interview</em> routine</li>
+<li><em>Time management</em></li>
+<li>Absorbing <em>feedback</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without patterns, you waste time.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Pattern] --&gt; S[Solve]
+    S --&gt; C[Communicate]
+    C --&gt; M[Mock]
+    M --&gt; F[Feedback]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>pattern</strong>: Recurring solution shape.</li>
+<li><strong>UMPIRE</strong>: Understand, Match, Plan, Implement, Review, Evaluate.</li>
+<li><strong>mock</strong>: Mock interview.</li>
+<li><strong>edge case</strong>: Boundary condition.</li>
+<li><strong>complexity</strong>: Time and space cost.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "I solve problems at random."</p>
+<p><strong>After</strong>: "I drill three problems per pattern, deeply."</p>
+<h2>Hands-on: Interview Routine</h2>
+<p><strong>Step 1 — Eight Patterns</strong></p>
+<pre><code class="language-text">two pointers, sliding window,
+binary search, BFS/DFS,
+heap, dp, greedy, backtracking
+</code></pre>
+<p><strong>Step 2 — UMPIRE Procedure</strong></p>
+<pre><code class="language-text">Understand → Match → Plan
+Implement → Review → Evaluate
+</code></pre>
+<p><strong>Step 3 — Sample Solution</strong></p>
+<pre><code class="language-python">def two_sum(nums, target):
+    seen = {}
+    for i, n in enumerate(nums):
+        if target - n in seen:
+            return [seen[target - n], i]
+        seen[n] = i
+</code></pre>
+<p><strong>Step 4 — Mock Interviews</strong></p>
+<pre><code class="language-text">- twice a week, 45 minutes
+- a friend or pramp.com
+</code></pre>
+<p><strong>Step 5 — Retro</strong></p>
+<pre><code class="language-markdown">- stuck pattern: dp
+- next week: 5 dp problems + voice recording
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Patterns are shortcuts.</li>
+<li>Talking is evaluation.</li>
+<li>Mocks are real practice.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Coding silently.</strong></li>
+<li><strong>Missing edge cases.</strong></li>
+<li><strong>Not stating complexity.</strong></li>
+<li><strong>Skipping mock interviews.</strong></li>
+<li><strong>Refusing feedback.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Companies run periodic coding assessments for internal leveling too.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Patterns are strategy.</li>
+<li>Talking is evidence.</li>
+<li>Time is a constraint.</li>
+<li>Mocks build muscle.</li>
+<li>Feedback is an editing tool.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Three problems per eight patterns.</li>
+<li>[ ] UMPIRE applied.</li>
+<li>[ ] Two mocks per week.</li>
+<li>[ ] Complexity stated.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>One line: define two pointers.</li>
+<li>One line: an O(n log n) example.</li>
+<li>One line: an edge case example.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post covers <em>System Design Interviews</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/01-what-is-developer-career.md">What Is a Developer Career</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/02-understanding-roles.md">Understanding Roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/03-learning-plan.md">Building a Learning Plan</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/04-resume-and-portfolio.md">Resume and Portfolio</a></li>
+<li><strong>Preparing for Coding Interviews (current)</strong></li>
+<li>System Design Interviews (upcoming)</li>
+<li>Settling into the First Job (upcoming)</li>
+<li>Side Projects and Learning (upcoming)</li>
+<li>Mentoring and Networking (upcoming)</li>
+<li>The Path to Senior (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="http://www.crackingthecodinginterview.com/">Cracking the Coding Interview</a></li>
+<li><a href="https://seanprashad.com/leetcode-patterns/">LeetCode patterns</a></li>
+<li><a href="https://www.pramp.com/">Pramp</a></li>
+<li><a href="https://interviewing.io/">Interviewing.io</a></li>
+</ul>
+<p class="tags-line">Tags: Career, Interview, Algorithms, Practice, Beginner</p>
+</body>
+</html>
