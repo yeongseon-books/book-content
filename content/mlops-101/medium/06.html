@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model Monitoring</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Model Monitoring</h1>
+<blockquote>
+<p>MLOps 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you detect when a deployed model is <em>quietly degrading</em>?</p>
+<blockquote>
+<p><em>Model monitoring continuously observes operational metrics and prediction distributions to surface problems early.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The three layers of monitoring (system / model / business)</li>
+<li>The roles of Prometheus and Grafana</li>
+<li>Metrics vs logs vs traces</li>
+<li>Designing actionable alert rules</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you only watch <em>accuracy</em>, you find out too late. <em>Latency</em>, <em>error rate</em>, and <em>input distribution</em> shift first.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    API[&quot;model API&quot;] --&gt; Metrics[&quot;/metrics&quot;]
+    Metrics --&gt; Prom[&quot;Prometheus&quot;]
+    Prom --&gt; Graf[&quot;Grafana&quot;]
+    Prom --&gt; Alert[&quot;Alertmanager&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Metric</strong>: a numeric time series.</li>
+<li><strong>Log</strong>: a textual event record.</li>
+<li><strong>Trace</strong>: the path of a single request.</li>
+<li><strong>SLO</strong>: a service level objective, e.g. 99% under 200 ms.</li>
+<li><strong>Alert</strong>: a notification fired when a threshold is crossed.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: incidents are discovered when users complain.</p>
+<p><strong>After</strong>: alerts arrive in the team channel automatically.</p>
+<h2>Hands-on: Add Prometheus Metrics to a FastAPI Model</h2>
+<p><strong>Step 1 — Install</strong></p>
+<pre><code class="language-bash">pip install prometheus-client
+</code></pre>
+<p><strong>Step 2 — Counter and histogram</strong></p>
+<pre><code class="language-python">from prometheus_client import Counter, Histogram
+
+REQS = Counter(&quot;predict_requests_total&quot;, &quot;total predict requests&quot;)
+LAT = Histogram(&quot;predict_latency_seconds&quot;, &quot;predict latency&quot;)
+</code></pre>
+<p><strong>Step 3 — Wire into FastAPI</strong></p>
+<pre><code class="language-python">import time
+from fastapi import FastAPI
+from prometheus_client import make_asgi_app
+
+app = FastAPI()
+app.mount(&quot;/metrics&quot;, make_asgi_app())
+
+@app.post(&quot;/predict&quot;)
+def predict(x: float):
+    start = time.time()
+    REQS.inc()
+    result = {&quot;prediction&quot;: int(x &gt; 0.5)}
+    LAT.observe(time.time() - start)
+    return result
+</code></pre>
+<p><strong>Step 4 — Track prediction distribution</strong></p>
+<pre><code class="language-python">PRED = Counter(&quot;predict_class_total&quot;, &quot;predicted class&quot;, [&quot;cls&quot;])
+
+def record(p: int):
+    PRED.labels(cls=str(p)).inc()
+</code></pre>
+<p><strong>Step 5 — Alert rule</strong></p>
+<pre><code class="language-yaml">groups:
+  - name: model
+    rules:
+      - alert: HighLatency
+        expr: histogram_quantile(0.99, rate(predict_latency_seconds_bucket[5m])) &gt; 0.5
+        for: 5m
+        labels:
+          severity: warning
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <code>/metrics</code> endpoint is scraped by Prometheus on a schedule.</li>
+<li>A histogram lets you compute quantiles later.</li>
+<li>Labels turn one counter into many prediction-class series.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Only watching system metrics like CPU and memory.</strong></li>
+<li><strong>Not recording prediction distribution — drift becomes invisible.</strong></li>
+<li><strong>Too many alerts — humans go numb.</strong></li>
+<li><strong>No SLO defined, so no shared bar to clear.</strong></li>
+<li><strong>No dashboard, so context is lost during incidents.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A payments fraud model emits metrics every minute. When fraud rate crosses an SLO, on-call gets paged with a runbook attached.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Watch all three layers (system, model, business).</li>
+<li>Every alert must be <em>actionable</em>.</li>
+<li>A dashboard should be readable in five seconds.</li>
+<li>An SLO is a business agreement, not a number.</li>
+<li>Runbooks live next to the alert.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] A <code>/metrics</code> endpoint is exposed.</li>
+<li>[ ] Latency and error-rate alerts are configured.</li>
+<li>[ ] Prediction distribution is tracked.</li>
+<li>[ ] Each alert links to a runbook.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write an alert rule that fires when <em>error rate exceeds 1%</em>.</li>
+<li>Add a metric for <em>mean input value</em> per minute.</li>
+<li>Pick four widgets for the first screen of a Grafana dashboard.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Monitoring is the <em>prerequisite</em> for drift detection. The next post tackles <em>Data Drift and Model Drift</em> directly.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">Data Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">Model Training Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/05-model-deployment.md">Model Deployment</a></li>
+<li><strong>Model Monitoring (current)</strong></li>
+<li>Data Drift and Model Drift (upcoming)</li>
+<li>Retraining (upcoming)</li>
+<li>Feature Store (upcoming)</li>
+<li>Building a Production ML System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://prometheus.io/docs/">Prometheus documentation</a></li>
+<li><a href="https://github.com/prometheus/client_python">prometheus-client (Python)</a></li>
+<li><a href="https://grafana.com/docs/">Grafana documentation</a></li>
+<li><a href="https://sre.google/workbook/implementing-slos/">Google SRE workbook — SLOs</a></li>
+</ul>
+<p class="tags-line">Tags: MLOps, Monitoring, Prometheus, Observability, DataScience</p>
+</body>
+</html>

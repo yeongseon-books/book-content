@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Drift and Model Drift</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Drift and Model Drift</h1>
+<blockquote>
+<p>MLOps 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you tell <em>the input distribution changed</em> apart from <em>the model just got worse</em>?</p>
+<blockquote>
+<p><em>Data drift means input distributions shift, model drift means prediction quality drops. Statistical tests catch both.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Data drift vs concept drift</li>
+<li>KS test and PSI</li>
+<li>Choosing a baseline distribution</li>
+<li>Setting alert thresholds</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The world keeps moving. The distribution at training time will not last forever. Without drift detection, <em>silent losses</em> pile up.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Train[&quot;train dist&quot;] --&gt; Base[&quot;baseline&quot;]
+    Live[&quot;live dist&quot;] --&gt; Stat[&quot;KS / PSI&quot;]
+    Base --&gt; Stat
+    Stat --&gt; Alert[&quot;alert&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Data drift</strong>: a change in the distribution of input X.</li>
+<li><strong>Concept drift</strong>: a change in the relationship between X and Y.</li>
+<li><strong>PSI</strong>: Population Stability Index. Below 0.1 is considered safe.</li>
+<li><strong>KS</strong>: Kolmogorov–Smirnov test for distribution distance.</li>
+<li><strong>Baseline</strong>: the reference distribution, usually training data.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: you notice accuracy dropped <em>after</em> the loss is real.</p>
+<p><strong>After</strong>: PSI &gt; 0.2 fires, and someone is investigating.</p>
+<h2>Hands-on: Detect Data Drift with PSI</h2>
+<p><strong>Step 1 — Baseline and live data</strong></p>
+<pre><code class="language-python">import numpy as np
+
+base = np.random.normal(0, 1, 1000)
+live = np.random.normal(0.5, 1, 1000)
+</code></pre>
+<p><strong>Step 2 — Bin edges</strong></p>
+<pre><code class="language-python">def bin_edges(x, n=10):
+    return np.quantile(x, np.linspace(0, 1, n + 1))
+</code></pre>
+<p><strong>Step 3 — PSI calculation</strong></p>
+<pre><code class="language-python">def psi(base, live, n=10):
+    edges = bin_edges(base, n)
+    edges[0], edges[-1] = -np.inf, np.inf
+    b, _ = np.histogram(base, edges)
+    l, _ = np.histogram(live, edges)
+    bp = b / b.sum() + 1e-6
+    lp = l / l.sum() + 1e-6
+    return float(np.sum((lp - bp) * np.log(lp / bp)))
+
+print(round(psi(base, live), 3))
+</code></pre>
+<p><strong>Step 4 — KS test</strong></p>
+<pre><code class="language-python">from scipy.stats import ks_2samp
+stat, p = ks_2samp(base, live)
+print(round(stat, 3), round(p, 4))
+</code></pre>
+<p><strong>Step 5 — Threshold policy</strong></p>
+<pre><code class="language-python">def status(p_value, psi_value):
+    if psi_value &gt; 0.2 or p_value &lt; 0.01:
+        return &quot;drift&quot;
+    if psi_value &gt; 0.1:
+        return &quot;watch&quot;
+    return &quot;ok&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <code>+ 1e-6</code> term prevents division by zero.</li>
+<li>KS reduces a distribution gap to a single number.</li>
+<li>The threshold is a team agreement, not a universal constant.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Setting the baseline to "the last few days" — drift becomes invisible.</strong></li>
+<li><strong>Trying to detect concept drift without labels.</strong></li>
+<li><strong>Looking only at single features and ignoring multivariate shift.</strong></li>
+<li><strong>Applying KS to bounded categorical features as-is.</strong></li>
+<li><strong>Alerting only — no automated retraining trigger.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A risk-scoring model computes PSI nightly. If it crosses 0.2, the model is automatically queued for retraining and a ticket is filed.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Data drift is the early warning.</li>
+<li>Model drift confirms the impact via metrics.</li>
+<li>Pin the baseline, refresh on a known cadence.</li>
+<li>Use PSI for categorical, KS for continuous features.</li>
+<li>Wire drift alerts to retraining workflows.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] A baseline distribution is defined.</li>
+<li>[ ] PSI/KS run on a regular schedule.</li>
+<li>[ ] Thresholds are documented.</li>
+<li>[ ] A retraining trigger is connected to the alert.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write a PSI function for <em>categorical</em> features.</li>
+<li>How would you measure concept drift when labels arrive late?</li>
+<li>PSI is 0.18 — alert or ignore? Justify your rule.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once you see drift, the next question is what to do. The next post covers <em>retraining automation</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">Data Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">Model Training Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/05-model-deployment.md">Model Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/06-model-monitoring.md">Model Monitoring</a></li>
+<li><strong>Data Drift and Model Drift (current)</strong></li>
+<li>Retraining (upcoming)</li>
+<li>Feature Store (upcoming)</li>
+<li>Building a Production ML System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.evidentlyai.com/">Evidently AI — drift detection</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ks_2samp.html">SciPy — <code>ks_2samp</code></a></li>
+<li><a href="https://www.listendata.com/2015/05/population-stability-index.html">Population Stability Index explained</a></li>
+<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google — Rules of ML</a></li>
+</ul>
+<p class="tags-line">Tags: MLOps, Drift, Monitoring, DataScience, Statistics</p>
+</body>
+</html>
