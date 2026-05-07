@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Practical Analysis SQL</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Practical Analysis SQL</h1>
+<blockquote>
+<p>SQL 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you <em>assemble</em> SELECT, JOIN, GROUP BY, and windows into <em>real reports</em> like <em>cohort, funnel, retention</em>?</p>
+<blockquote>
+<p><em>Analysis is </em>not magic<em>. It is the same tools </em>stacked in layers<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The SQL pattern for <em>DAU / WAU / MAU</em></li>
+<li>The basic shape of <em>cohort retention</em></li>
+<li>A <em>funnel</em> analysis</li>
+<li><em>Top-N per group</em></li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most dashboard numbers are variations on a few patterns. Learn them, and you can write a <em>first draft in minutes</em> for any new request. Over time, these queries become <em>team assets</em>.</p>
+<blockquote>
+<p><em>Analytics SQL is the </em>final exam<em> of the series — and </em>the starting point<em> of real work.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Events[&quot;Events&quot;] --&gt; CTE1[&quot;1. clean&quot;]
+    CTE1 --&gt; CTE2[&quot;2. aggregate&quot;]
+    CTE2 --&gt; CTE3[&quot;3. window&quot;]
+    CTE3 --&gt; Report[&quot;report&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>DAU/WAU/MAU</strong>: daily / weekly / monthly <em>active users</em>.</li>
+<li><strong>Cohort</strong>: users who <em>signed up at the same time</em>.</li>
+<li><strong>Retention</strong>: percent of cohort active <em>N days later</em>.</li>
+<li><strong>Funnel</strong>: conversion rate per <em>step</em>.</li>
+<li><strong>Top-N per group</strong>: the <em>top N</em> rows <em>within each group</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Every new request becomes a <em>new query from scratch</em>.</p>
+<p><strong>After</strong>: You assemble templates for <em>cohort, funnel, retention</em>.</p>
+<h2>Hands-on: Five Patterns</h2>
+<p><strong>Step 1 — DAU</strong></p>
+<pre><code class="language-sql">SELECT event_at::date AS day, COUNT(DISTINCT user_id) AS dau
+FROM events
+GROUP BY day
+ORDER BY day;
+</code></pre>
+<p><strong>Step 2 — Cohort retention</strong></p>
+<pre><code class="language-sql">WITH cohort AS (
+    SELECT user_id, MIN(event_at)::date AS cohort_day FROM events GROUP BY user_id
+),
+activity AS (
+    SELECT e.user_id, c.cohort_day,
+        (e.event_at::date - c.cohort_day) AS day_n
+    FROM events e JOIN cohort c USING (user_id)
+)
+SELECT cohort_day, day_n, COUNT(DISTINCT user_id) AS users
+FROM activity
+GROUP BY cohort_day, day_n
+ORDER BY cohort_day, day_n;
+</code></pre>
+<p><strong>Step 3 — Funnel</strong></p>
+<pre><code class="language-sql">SELECT
+    COUNT(DISTINCT user_id) FILTER (WHERE step = 'view')   AS s1_view,
+    COUNT(DISTINCT user_id) FILTER (WHERE step = 'cart')   AS s2_cart,
+    COUNT(DISTINCT user_id) FILTER (WHERE step = 'pay')    AS s3_pay
+FROM events;
+</code></pre>
+<p><strong>Step 4 — Top-N per group</strong></p>
+<pre><code class="language-sql">WITH ranked AS (
+    SELECT product_id, total,
+        ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY total DESC) AS rk
+    FROM orders
+)
+SELECT * FROM ranked WHERE rk &lt;= 3;
+</code></pre>
+<p><strong>Step 5 — Month-over-month growth</strong></p>
+<pre><code class="language-sql">WITH monthly AS (
+    SELECT DATE_TRUNC('month', day) AS month, SUM(revenue) AS rev
+    FROM daily_revenue GROUP BY month
+)
+SELECT month, rev,
+    rev - LAG(rev) OVER (ORDER BY month) AS diff,
+    (rev - LAG(rev) OVER (ORDER BY month)) * 100.0
+        / NULLIF(LAG(rev) OVER (ORDER BY month), 0) AS mom_pct
+FROM monthly;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>DISTINCT user_id</code> is the standard expression for <em>active users</em>.</li>
+<li><code>FILTER (WHERE ...)</code> puts a funnel <em>on a single line</em>.</li>
+<li><code>NULLIF</code> prevents <em>divide-by-zero</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Active definition varies between teams.</strong> Without docs, the <em>numbers diverge</em>.</li>
+<li><strong>Skipping timezone handling.</strong> Mixing UTC and local time <em>shifts dates</em>.</li>
+<li><strong>Vague cohort definition.</strong> <em>Signup</em> vs <em>first payment</em> must be <em>explicit</em>.</li>
+<li><strong>Funnel ignores time order.</strong> Steps must be <em>checked chronologically</em>.</li>
+<li><strong>Forgetting NULLIF.</strong> Division by <em>prior zero</em> errors out.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Analytics teams maintain a <em>pattern library</em> of these queries. With PR review and tools like <em>dbt</em>, they become <em>reusable models</em>. Behind every dashboard line is <em>dozens of lines of validated SQL</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Analytics SQL is a </em>team asset<em> — document it.</em></li>
+<li><em>Agree on definitions (active, cohort) </em>first<em>.</em></li>
+<li><em>Always be explicit about timezones.</em></li>
+<li><em>Build layers with windows and CTEs.</em></li>
+<li><em>MoM/YoY uses NULLIF by default.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write DAU in one line.</li>
+<li>[ ] I can write cohort retention in two steps.</li>
+<li>[ ] I can write a funnel using FILTER.</li>
+<li>[ ] I can write top-N per group with ROW_NUMBER.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write <em>Weekly Active Users (WAU)</em>.</li>
+<li>Add <em>step-to-step conversion rates</em> to a funnel.</li>
+<li>Produce a MoM growth table you can chart.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Closing the series: <em>SQL is the shared language of reads, writes, and analytics</em>. Next stops: <em>deeper query plans</em>, <em>running PostgreSQL</em>, and <em>data warehouses</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">JOIN</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">GROUP BY and Aggregates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">Subquery</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/07-window-function.md">Window Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/08-insert-update-delete.md">INSERT, UPDATE, DELETE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/09-index-and-query-plan.md">Index and Query Plan</a></li>
+<li><strong>Practical Analysis SQL (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mode.com/sql-tutorial/">Mode — Advanced SQL</a></li>
+<li><a href="https://www.postgresql.org/docs/current/tutorial-window.html">PostgreSQL — Window Functions</a></li>
+<li><a href="https://docs.getdbt.com/">dbt — Analytics Engineering</a></li>
+<li><a href="https://cloud.google.com/looker/docs">Looker — Block Library</a></li>
+</ul>
+<p class="tags-line">Tags: SQL, Analytics, Cohort, Funnel, Retention</p>
+</body>
+</html>

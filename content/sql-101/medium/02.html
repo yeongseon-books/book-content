@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SELECT Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SELECT Basics</h1>
+<blockquote>
+<p>SQL 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is <code>SELECT *</code> <em>risky</em>, and what changes when you make <em>naming columns</em> a habit?</p>
+<blockquote>
+<p><em>SELECT looks like a simple read, but writing it well lowers the </em>cost for the whole team<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>logical order</em> of SELECT clauses</li>
+<li>Column projection and <em>aliases</em></li>
+<li><em>ORDER BY</em> and <em>LIMIT</em></li>
+<li>The meaning and cost of <em>DISTINCT</em></li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>An analyst issues SELECT <em>hundreds of times a day</em>. One small habit changes <em>reading speed, cost, and trust</em>. Naming columns and using clear aliases is a gift to the <em>future-you in six months</em>.</p>
+<blockquote>
+<p><em>SELECT is </em>easy to say<em> and </em>easy to misread<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    From[&quot;FROM table&quot;] --&gt; Where[&quot;WHERE filter&quot;]
+    Where --&gt; Group[&quot;GROUP BY&quot;]
+    Group --&gt; Having[&quot;HAVING&quot;]
+    Having --&gt; Select[&quot;SELECT columns&quot;]
+    Select --&gt; Order[&quot;ORDER BY&quot;]
+    Order --&gt; Limit[&quot;LIMIT&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Projection</strong>: the <em>set of columns</em> SELECT picks.</li>
+<li><strong>Alias</strong>: a renamed column or table via <code>AS new_name</code>.</li>
+<li><strong>Sort key</strong>: the column <code>ORDER BY</code> uses.</li>
+<li><strong>Pagination</strong>: <code>LIMIT</code> + <code>OFFSET</code> to read in slices.</li>
+<li><strong>Distinct</strong>: removes duplicates — <em>not free</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>SELECT * FROM orders ORDER BY id;</code> returns <em>hundreds of thousands</em> of rows.</p>
+<p><strong>After</strong>: Pick the <em>three columns you need</em> and add <code>LIMIT 50</code> to fit the screen.</p>
+<h2>Hands-on: Five Patterns You'll Repeat</h2>
+<p><strong>Step 1 — Name the columns</strong></p>
+<pre><code class="language-sql">SELECT id, name, signup_at FROM users;
+</code></pre>
+<p><strong>Step 2 — Aliases for readability</strong></p>
+<pre><code class="language-sql">SELECT name AS user_name, signup_at AS joined_on FROM users;
+</code></pre>
+<p><strong>Step 3 — Sort</strong></p>
+<pre><code class="language-sql">SELECT id, name FROM users ORDER BY signup_at DESC;
+</code></pre>
+<p><strong>Step 4 — Top N</strong></p>
+<pre><code class="language-sql">SELECT id, name FROM users ORDER BY id LIMIT 10;
+</code></pre>
+<p><strong>Step 5 — Drop duplicates</strong></p>
+<pre><code class="language-sql">SELECT DISTINCT country FROM users;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>write order</em> is <code>SELECT ... FROM ... WHERE ...</code>, but the <em>logical evaluation</em> is <em>FROM → WHERE → SELECT</em>.</li>
+<li>Aliases are <em>not visible in WHERE</em>, but <em>are visible in ORDER BY</em>.</li>
+<li><code>DISTINCT</code> needs a <em>sort or hash</em>, so it <em>costs</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><code>SELECT *</code> to fetch every column.</strong> Indexes get <em>underused</em> and network traffic <em>balloons</em>.</li>
+<li><strong><code>ORDER BY 1</code> relying on column position.</strong> Adding a column <em>breaks</em> it.</li>
+<li><strong>No <code>LIMIT</code> on huge tables.</strong> The UI <em>freezes</em>.</li>
+<li><strong><code>DISTINCT</code> to hide duplicates.</strong> You then miss the <em>join cardinality bug</em> causing them.</li>
+<li><strong>Quoting nothing on aliases with spaces.</strong> A <em>syntax error</em> waiting to happen.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Dashboards repeat the <code>SELECT cols + ORDER BY + LIMIT</code> pattern <em>hundreds of times</em>. In analysis notebooks, you take a <em>top 50 sample</em> first to find the shape, then write the real query.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Always name columns.</em></li>
+<li><em>Sort only when order </em>matters<em>.</em></li>
+<li><em>Assume <code>LIMIT</code> should have a sane default.</em></li>
+<li><em>If <code>DISTINCT</code> is hiding things, your </em>join<em> is suspicious.</em></li>
+<li><em>Aliases follow a </em>team convention<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write any query without <code>SELECT *</code>.</li>
+<li>[ ] I know how aliases interact with ORDER BY.</li>
+<li>[ ] I know what <code>LIMIT</code> does.</li>
+<li>[ ] I can explain the cost of <code>DISTINCT</code>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pull the <em>names of the five most recent users</em>.</li>
+<li>Sort by <code>signup_at</code> and show the <em>first ten ascending</em>.</li>
+<li>Count the <em>distinct countries</em> in <code>users</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>SELECT is mostly about <em>sentence shape</em>. The next post is <em>WHERE and conditions</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
+<li><strong>SELECT Basics (current)</strong></li>
+<li>WHERE and Conditions (upcoming)</li>
+<li>JOIN (upcoming)</li>
+<li>GROUP BY and Aggregates (upcoming)</li>
+<li>Subquery (upcoming)</li>
+<li>Window Function (upcoming)</li>
+<li>INSERT, UPDATE, DELETE (upcoming)</li>
+<li>Index and Query Plan (upcoming)</li>
+<li>Practical Analysis SQL (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/sql-select.html">PostgreSQL — SELECT</a></li>
+<li><a href="https://sqlbolt.com/lesson/select_queries_introduction">SQLBolt — SELECT queries</a></li>
+<li><a href="https://mode.com/sql-tutorial/sql-select-statement/">Mode — SELECT statement</a></li>
+<li><a href="https://www.sqlstyle.guide/">SQL Style Guide</a></li>
+</ul>
+<p class="tags-line">Tags: SQL, SELECT, Query, Database, Postgres</p>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JOIN</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>JOIN</h1>
+<blockquote>
+<p>SQL 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does combining two tables come in <em>five flavors</em>, and why do results sometimes <em>grow</em>?</p>
+<blockquote>
+<p><em>JOIN combines </em>rows<em>, not columns.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Differences between <em>INNER, LEFT, RIGHT, FULL, CROSS</em></li>
+<li><em>Join keys</em> and <em>cardinality</em></li>
+<li>How results <em>blow up</em></li>
+<li>A safe approach to <em>multi-table joins</em></li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most production queries include a JOIN. Misreading the <em>cardinality</em> doubles your totals. Joining well is what makes an analyst <em>trustable</em>.</p>
+<blockquote>
+<p><em>JOIN is the </em>math of sets<em>, not string concatenation.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Table A&quot;] --&gt;|key match| Inner[&quot;INNER JOIN: intersection&quot;]
+    A --&gt;|all of A| Left[&quot;LEFT JOIN: A-side full&quot;]
+    A -.X.-&gt; Cross[&quot;CROSS JOIN: all pairs&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Join key</strong>: the columns that <em>connect two tables</em>.</li>
+<li><strong>Cardinality</strong>: how many <em>partners</em> one row has.</li>
+<li><strong>Equi-join</strong>: the most common form, joined on <code>=</code>.</li>
+<li><strong>Self-join</strong>: a table joined to <em>itself</em>.</li>
+<li><strong>Anti-join</strong>: rows with <em>no partner</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>SELECT SUM(o.total) FROM orders o JOIN payments p ON o.id = p.order_id;</code> — split payments <em>double the total</em>.</p>
+<p><strong>After</strong>: Join against an <em>aggregated subquery</em> on payments to keep cardinality <em>1:1</em>.</p>
+<h2>Hands-on: Five JOIN Patterns</h2>
+<p><strong>Step 1 — INNER JOIN</strong></p>
+<pre><code class="language-sql">SELECT u.name, o.id AS order_id
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id;
+</code></pre>
+<p><strong>Step 2 — LEFT JOIN</strong></p>
+<pre><code class="language-sql">SELECT u.name, o.id AS order_id
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id;
+</code></pre>
+<p><strong>Step 3 — Anti-join (users with no orders)</strong></p>
+<pre><code class="language-sql">SELECT u.id, u.name
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.id IS NULL;
+</code></pre>
+<p><strong>Step 4 — Self-join (direct manager)</strong></p>
+<pre><code class="language-sql">SELECT e.name AS emp, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON m.id = e.manager_id;
+</code></pre>
+<p><strong>Step 5 — Multi-join</strong></p>
+<pre><code class="language-sql">SELECT u.name, p.name AS product
+FROM users u
+JOIN orders o ON o.user_id = u.id
+JOIN order_items oi ON oi.order_id = o.id
+JOIN products p ON p.id = oi.product_id;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A NULL after LEFT JOIN is a <em>signal of no match</em>.</li>
+<li>Anti-join is often <em>clearer than NOT EXISTS</em> and <em>easier to tune</em>.</li>
+<li>Multi-joins go fastest when the <em>driving table is smallest</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Summing without checking <em>cardinality</em>.</strong> Totals <em>inflate</em>.</li>
+<li><strong>Turning LEFT JOIN into INNER via WHERE.</strong> <code>WHERE o.x = ...</code> <em>drops the NULL rows</em>.</li>
+<li><strong>Mixing <code>USING</code> and <code>ON</code></strong> in one query — readability <em>suffers</em>.</li>
+<li><strong>Accidental CROSS JOIN.</strong> <em>Cartesian explosion</em>.</li>
+<li><strong>Type mismatch on join keys.</strong> Implicit casts <em>kill the index</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Reports usually join <em>event + user + product</em> — three to five tables. The <em>fact table</em> sits in the middle and <em>dimensions</em> are LEFT-joined around it. We verify cardinality with <em>COUNT comparisons</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Write down the cardinality assumption </em>before<em> joining.</em></li>
+<li><em>Always remember what NULLs in LEFT JOIN mean.</em></li>
+<li><em>Often you should aggregate </em>before<em> joining.</em></li>
+<li><em>Multi-joins read better as </em>CTEs<em>.</em></li>
+<li><em>Join keys must have </em>indexes<em> to be fast.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can sketch INNER, LEFT, RIGHT, FULL.</li>
+<li>[ ] I can define cardinality.</li>
+<li>[ ] I can write anti-join two ways.</li>
+<li>[ ] I know the danger of CROSS JOIN.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find <em>users with no orders</em> using an anti-join.</li>
+<li>Compute <em>revenue per product</em> by <em>aggregating before joining</em>.</li>
+<li>Use a <em>self-join</em> to attach the <em>manager name</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>JOIN is the language of <em>sets</em>. Next up: <em>GROUP BY and aggregates</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
+<li><strong>JOIN (current)</strong></li>
+<li>GROUP BY and Aggregates (upcoming)</li>
+<li>Subquery (upcoming)</li>
+<li>Window Function (upcoming)</li>
+<li>INSERT, UPDATE, DELETE (upcoming)</li>
+<li>Index and Query Plan (upcoming)</li>
+<li>Practical Analysis SQL (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/tutorial-join.html">PostgreSQL — Joins</a></li>
+<li><a href="https://sqlbolt.com/lesson/select_queries_with_joins">SQLBolt — Multi-table queries with JOIN</a></li>
+<li><a href="https://mode.com/sql-tutorial/sql-joins/">Mode — JOIN</a></li>
+<li><a href="https://use-the-index-luke.com/sql/join">Use The Index, Luke — Joins</a></li>
+</ul>
+<p class="tags-line">Tags: SQL, JOIN, Relational, Database, Query</p>
+</body>
+</html>
