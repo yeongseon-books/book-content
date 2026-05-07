@@ -1,0 +1,71 @@
+id: data-structures-101
+title:
+  ko: Data Structures 101
+  en: Data Structures 101
+description:
+  ko: 배열, 리스트, 스택, 큐, 해시, 트리, 힙, 그래프까지 자료구조의 큰 그림과 선택 기준을 다루는 시리즈.
+  en: An introductory series covering arrays, lists, stacks, queues, hash tables, trees, heaps, graphs, and how to choose the right data structure.
+status: content-ready
+category: cs-core
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-are-data-structures
+    title:
+      ko: 자료구조란 무엇인가?
+      en: What Are Data Structures?
+  - number: 2
+    slug: arrays-and-dynamic-arrays
+    title:
+      ko: 배열과 동적 배열
+      en: Arrays and Dynamic Arrays
+  - number: 3
+    slug: linked-lists
+    title:
+      ko: 연결 리스트
+      en: Linked Lists
+  - number: 4
+    slug: stacks-and-queues
+    title:
+      ko: 스택과 큐
+      en: Stacks and Queues
+  - number: 5
+    slug: hash-tables
+    title:
+      ko: 해시 테이블
+      en: Hash Tables
+  - number: 6
+    slug: trees
+    title:
+      ko: 트리
+      en: Trees
+  - number: 7
+    slug: binary-search-trees
+    title:
+      ko: 이진 탐색 트리
+      en: Binary Search Trees
+  - number: 8
+    slug: heaps
+    title:
+      ko: 힙
+      en: Heaps
+  - number: 9
+    slug: graphs
+    title:
+      ko: 그래프
+      en: Graphs
+  - number: 10
+    slug: choosing-data-structures
+    title:
+      ko: 자료구조 선택 기준
+      en: Choosing Data Structures

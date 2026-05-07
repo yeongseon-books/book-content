@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Binary Search Trees</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Binary Search Trees</h1>
+<blockquote>
+<p>Data Structures 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you need fast search over sorted data and fast insert and delete at the same time, which data structure should you reach for?</p>
+<blockquote>
+<p>A binary search tree (BST) is a binary tree with one simple rule: the left child is smaller than its parent and the right child is larger. That single rule gives you average O(log n) search, insert, and delete. But when the tree leans to one side, performance collapses to O(n), which is why production systems use balanced variants such as AVL or red-black trees. This article walks through how a BST works, where it breaks, and why balanced trees exist.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a BST and how search, insert, and delete work</li>
+<li>Why average and worst-case time complexities diverge</li>
+<li>The historical context for balanced trees (AVL, red-black, B-tree)</li>
+<li>When a BST is a better fit than a dict or a sorted array</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>BSTs are the foundation of database indexes, file system metadata, memory allocators, and any system that needs fast lookup over sorted data. Without an intuition for balanced trees, it is hard to understand database indexes deeply.</p>
+<blockquote>
+<p>Sorted plus search plus insert plus delete, all at O(log n), is a property that almost only the BST family delivers.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A BST is a "sorted tree". Every node maintains an invariant: the entire left subtree is smaller than the node, and the entire right subtree is larger. That invariant lets you discard half the data at every step, which is what makes average O(log n) search possible.</p>
+</blockquote>
+<pre><code class="language-text">Balanced BST (height 2)        Skewed BST (height 4)
+        50                          10
+       /  \                          \
+      30   70                        20
+     / \   / \                        \
+    20 40 60 80                       30
+                                       \
+                                       40
+                                        \
+                                        50
+Search O(log n)                Search O(n)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>BST invariant</strong><br>
+- Meaning: left.key &lt; node.key &lt; right.key</p>
+<p><strong>Balanced</strong><br>
+- Meaning: The left and right heights at every node differ by at most a fixed limit</p>
+<p><strong>Rotation</strong><br>
+- Meaning: Restructuring parent-child links to restore balance</p>
+<p><strong>AVL tree</strong><br>
+- Meaning: A BST that keeps left and right heights within 1</p>
+<p><strong>Red-black tree</strong><br>
+- Meaning: A BST that uses node colours to guarantee balance, the most common variant in practice</p>
+<h2>Before / After</h2>
+<p><strong>Before — inserting into a sorted array:</strong></p>
+<pre><code class="language-python">import bisect
+
+arr = []
+for v in data:
+    bisect.insort(arr, v)   # search O(log n) + shift O(n) → insert O(n)
+</code></pre>
+<p><strong>After — inserting into a BST:</strong></p>
+<pre><code class="language-python">root = None
+for v in data:
+    root = insert(root, v)   # average O(log n)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Define the BST node and insert</strong></p>
+<pre><code class="language-python">class BSTNode:
+    __slots__ = (&quot;key&quot;, &quot;left&quot;, &quot;right&quot;)
+    def __init__(self, key):
+        self.key = key
+        self.left = None
+        self.right = None
+
+def insert(root, key):
+    if root is None:
+        return BSTNode(key)
+    if key &lt; root.key:
+        root.left = insert(root.left, key)
+    elif key &gt; root.key:
+        root.right = insert(root.right, key)
+    return root
+
+root = None
+for v in [50, 30, 70, 20, 40, 60, 80]:
+    root = insert(root, v)
+</code></pre>
+<p>The comparison decides whether you walk left or right until you find an empty slot.</p>
+<p><strong>Step 2: BST search</strong></p>
+<pre><code class="language-python">def search(root, key):
+    while root is not None:
+        if key == root.key:
+            return True
+        root = root.left if key &lt; root.key else root.right
+    return False
+
+print(search(root, 40))   # True
+print(search(root, 99))   # False
+</code></pre>
+<p>Each step throws away half of the remaining tree. With a balanced tree, that is O(log n).</p>
+<p><strong>Step 3: In-order traversal yields sorted output</strong></p>
+<pre><code class="language-python">def inorder(node):
+    if node is None:
+        return
+    inorder(node.left)
+    print(node.key, end=&quot; &quot;)
+    inorder(node.right)
+
+inorder(root)   # 20 30 40 50 60 70 80
+</code></pre>
+<p>The in-order traversal of a BST is always sorted. It is the most elegant property of the structure.</p>
+<p><strong>Step 4: Delete (the tricky operation)</strong></p>
+<pre><code class="language-python">def find_min(node):
+    while node.left is not None:
+        node = node.left
+    return node
+
+def delete(root, key):
+    if root is None:
+        return None
+    if key &lt; root.key:
+        root.left = delete(root.left, key)
+    elif key &gt; root.key:
+        root.right = delete(root.right, key)
+    else:
+        # Zero or one child
+        if root.left is None:
+            return root.right
+        if root.right is None:
+            return root.left
+        # Two children: replace with the in-order successor
+        successor = find_min(root.right)
+        root.key = successor.key
+        root.right = delete(root.right, successor.key)
+    return root
+
+root = delete(root, 30)
+inorder(root)   # 20 40 50 60 70 80
+</code></pre>
+<p>Delete splits into three cases based on the number of children, and the two-child case is the hardest one.</p>
+<p><strong>Step 5: The tragedy of an unbalanced BST</strong></p>
+<pre><code class="language-python"># Inserting sorted input produces a tree that leans entirely to one side
+import time
+
+skewed = None
+for v in range(10_000):
+    skewed = insert(skewed, v)
+
+start = time.perf_counter()
+search(skewed, 9999)
+print(f&quot;Skewed BST search: {(time.perf_counter() - start) * 1e6:.0f} us&quot;)
+
+# Shuffling restores natural balance
+import random
+
+values = list(range(10_000))
+random.shuffle(values)
+
+balanced = None
+for v in values:
+    balanced = insert(balanced, v)
+
+start = time.perf_counter()
+search(balanced, 9999)
+print(f&quot;Balanced BST search: {(time.perf_counter() - start) * 1e6:.0f} us&quot;)
+</code></pre>
+<p>If you feed sorted data straight in, the BST degenerates into a linked list. That limitation is exactly why balanced trees (AVL, red-black) were invented.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>The BST invariant is simple but powerful enough to deliver fast search</li>
+<li>Delete is hardest in the two-child case and depends on the in-order successor</li>
+<li>An unbalanced BST is O(n) in the worst case, so production code uses balanced variants</li>
+<li>In-order traversal always yields sorted output</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Assuming BST is always O(log n)</strong><br>
+- Problem: Sorted input gives O(n)<br>
+- Fix: Use a balanced tree</p>
+<p><strong>Forgetting to handle duplicate keys</strong><br>
+- Problem: Infinite loop or lost data<br>
+- Fix: Define a duplicate policy explicitly</p>
+<p><strong>Skipping the successor in delete</strong><br>
+- Problem: Tree breaks<br>
+- Fix: Handle the two-child case correctly</p>
+<p><strong>Reaching for a BST instead of a dict</strong><br>
+- Problem: Slower and more complex<br>
+- Fix: Use dict if you do not need sorted traversal</p>
+<p><strong>Recursing on a deep BST</strong><br>
+- Problem: RecursionError<br>
+- Fix: Convert to iteration or an explicit stack</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>The B-tree and B+tree behind database indexes are disk-friendly generalisations of a BST</li>
+<li>Java's <code>TreeMap</code> and C++'s <code>std::map</code> are red-black trees</li>
+<li>In Python you usually reach for <code>sortedcontainers.SortedDict</code> for BST-like semantics</li>
+<li>Operating system virtual memory managers and process schedulers use balanced trees</li>
+<li>IP routing tables use a trie, a related variant, for longest-prefix matching</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer knows that you almost never need to implement a tree from scratch. You reach for the standard library or for <code>sortedcontainers</code>. But you also know exactly what those libraries do internally, because that is what lets you choose well, predict the limits, and debug when things go wrong.</p>
+<p>A senior also asks first: do I actually need sorted order? If you do not need sorted traversal or range queries, a dict is almost always faster. A BST or balanced tree is the price you pay for sorted order.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the BST invariant precisely</li>
+<li>[ ] Can you explain why average and worst-case complexities diverge</li>
+<li>[ ] Do you know the three cases for BST delete</li>
+<li>[ ] Do you understand why balanced trees are needed</li>
+<li>[ ] Do you have criteria for choosing between a BST and a dict</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Add a method that returns the k-th smallest value in the BST. Apply the in-order traversal idea. Try both an O(n) solution and an O(log n) solution that stores subtree sizes on each node.</p>
+</li>
+<li>
+<p>Write a function that decides whether two BSTs hold the same set of keys. The shapes are allowed to differ.</p>
+</li>
+<li>
+<p>Draw the four AVL rotations (LL, LR, RR, RL) and document which rotation applies in which situation.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A binary search tree turns one simple invariant into average O(log n) search, insert, and delete. But the balance can break depending on the input, and the worst case is O(n), so production systems use self-balancing trees such as AVL or red-black. The most elegant property of a BST is that the in-order traversal is always sorted. It underpins every system that needs to manage sorted data dynamically.</p>
+<p>The next article looks at the heap, a data structure specialised for fast access to the maximum or minimum value. It is the standard implementation of a priority queue. The heap is simpler than a BST but optimised for a narrower workload.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Hash Tables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Trees</a></li>
+<li><strong>Binary Search Trees (current)</strong></li>
+<li>Heaps (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Choosing Data Structures (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opendatastructures.org/ods-python/6_2_BinarySearchTree_Unbala.html">Open Data Structures — Binary Search Trees</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Binary_search_tree">Wikipedia — Binary Search Tree</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Red%E2%80%93black_tree">Wikipedia — Red-Black Tree</a></li>
+<li><a href="https://grantjenks.com/docs/sortedcontainers/">sortedcontainers documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Data Structures, Binary Search Tree, BST, Balanced Tree, Search</p>
+</body>
+</html>

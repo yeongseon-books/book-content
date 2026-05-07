@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Arrays and Dynamic Arrays</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Arrays and Dynamic Arrays</h1>
+<blockquote>
+<p>Data Structures 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does calling <code>append</code> on a Python list a million times stay fast? Surely it must reallocate memory each time?</p>
+<blockquote>
+<p>An array stores elements of the same type contiguously in memory. Indexing is instant, but the size is fixed. A dynamic array breaks that limit by allocating a larger block and copying existing elements when capacity runs out. This article walks through both structures, their time complexity, and how Python's list is actually implemented.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How a fixed-size array is laid out and why indexing is O(1)</li>
+<li>How a dynamic array grows and what its amortized cost is</li>
+<li>How Python's list works internally</li>
+<li>When to choose an array and when to avoid one</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Arrays are among the most basic and the fastest data structures. They mesh perfectly with the CPU cache, indexing is O(1), and they form the foundation of nearly every advanced structure. Hash tables, dynamic arrays, and heaps all use arrays underneath.</p>
+<blockquote>
+<p>Without understanding arrays, you cannot deeply understand any other data structure.</p>
+</blockquote>
+<p>This article goes beyond "a collection of values" and looks at memory layout, reallocation, and cache friendliness.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>An array is a contiguous block of memory. <code>arr[i]</code> is computed as start address + <code>i × element size</code>, so it is O(1). When a dynamic array runs out of capacity, it usually allocates a block twice as large and copies the old elements over.</p>
+</blockquote>
+<pre><code class="language-text">Fixed array (size = 5)
+addr: 100 104 108 112 116
+val:  [10][20][30][40][50]
+       ↑
+  arr[2] = 100 + 2*4 = 108
+
+Dynamic array (size = 3, capacity = 4)
+val:  [10][20][30][ - ]   one slot free
+append(40) → [10][20][30][40]   capacity full
+append(50) → new block (capacity 8) → [10][20][30][40][50][ ][ ][ ]
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Static array</strong><br>
+- Meaning: An array whose size is fixed at creation</p>
+<p><strong>Dynamic array</strong><br>
+- Meaning: An array that can grow on demand</p>
+<p><strong>Capacity</strong><br>
+- Meaning: The largest size currently allocated to a dynamic array</p>
+<p><strong>Reallocation</strong><br>
+- Meaning: Allocating a larger block and copying elements over</p>
+<p><strong>Amortized cost</strong><br>
+- Meaning: The average cost across many operations</p>
+<h2>Before / After</h2>
+<p><strong>Before — building a list with <code>+</code>:</strong></p>
+<pre><code class="language-python">result = []
+for i in range(1_000_000):
+    result = result + [i]   # O(n) copy each time → O(n^2) overall
+</code></pre>
+<p><strong>After — using append:</strong></p>
+<pre><code class="language-python">result = []
+for i in range(1_000_000):
+    result.append(i)        # amortized O(1) → O(n) overall
+</code></pre>
+<p>The two look similar, but the time difference is over 1000x.</p>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Is Indexing Truly O(1)?</strong></p>
+<pre><code class="language-python">import time
+
+data = list(range(10_000_000))
+
+start = time.perf_counter()
+_ = data[0]
+print(f&quot;data[0]:        {(time.perf_counter() - start) * 1e6:.2f} us&quot;)
+
+start = time.perf_counter()
+_ = data[5_000_000]
+print(f&quot;data[5_000_000]: {(time.perf_counter() - start) * 1e6:.2f} us&quot;)
+
+start = time.perf_counter()
+_ = data[9_999_999]
+print(f&quot;data[-1]:        {(time.perf_counter() - start) * 1e6:.2f} us&quot;)
+</code></pre>
+<p>All three accesses take roughly the same time. There is multiplication and addition only — no scanning of the data.</p>
+<p><strong>Step 2: Implement Dynamic Array Growth Yourself</strong></p>
+<pre><code class="language-python">class DynamicArray:
+    def __init__(self):
+        self._capacity = 1
+        self._size = 0
+        self._data = [None] * self._capacity
+
+    def append(self, value):
+        if self._size == self._capacity:
+            self._resize(self._capacity * 2)
+        self._data[self._size] = value
+        self._size += 1
+
+    def _resize(self, new_cap):
+        new_data = [None] * new_cap
+        for i in range(self._size):
+            new_data[i] = self._data[i]
+        self._data = new_data
+        self._capacity = new_cap
+
+    def __getitem__(self, i):
+        if not 0 &lt;= i &lt; self._size:
+            raise IndexError(i)
+        return self._data[i]
+
+    def __len__(self):
+        return self._size
+
+arr = DynamicArray()
+for i in range(10):
+    arr.append(i)
+    print(f&quot;size={len(arr)}, capacity={arr._capacity}&quot;)
+</code></pre>
+<p>You will see the capacity climb 1, 2, 4, 8, 16... — doubling each time. The doubling strategy is the key to amortized O(1).</p>
+<p><strong>Step 3: Understand Amortized Cost</strong></p>
+<pre><code class="language-python"># Count the total copies during n appends
+copies = 0
+size = 0
+capacity = 1
+
+for _ in range(1024):
+    if size == capacity:
+        copies += size       # copy old elements to the new block
+        capacity *= 2
+    size += 1
+
+print(f&quot;total appends: {size}, total copies: {copies}&quot;)
+print(f&quot;average: {copies / size:.2f}&quot;)
+</code></pre>
+<p>The average copy count is below 1. Most appends just write a value into a slot — only the occasional resize is expensive.</p>
+<p><strong>Step 4: Inserting in the Middle Is Costly</strong></p>
+<pre><code class="language-python">import time
+
+data = list(range(100_000))
+
+start = time.perf_counter()
+data.append(-1)              # append at the end: O(1)
+print(f&quot;append: {(time.perf_counter() - start) * 1e6:.2f} us&quot;)
+
+data = list(range(100_000))
+start = time.perf_counter()
+data.insert(0, -1)           # insert at the front: O(n)
+print(f&quot;insert(0): {(time.perf_counter() - start) * 1e6:.2f} us&quot;)
+</code></pre>
+<p>Inserting at the front shifts every element back by one slot. If your workload does this often, consider a linked list or a deque.</p>
+<p><strong>Step 5: Cache Friendliness</strong></p>
+<pre><code class="language-python">import time
+
+# Sum the same one million integers
+list_data = list(range(1_000_000))
+
+start = time.perf_counter()
+total = 0
+for x in list_data:
+    total += x
+print(f&quot;list iteration: {(time.perf_counter() - start) * 1000:.2f} ms&quot;)
+
+# Compare with a dict — slower
+dict_data = {i: i for i in range(1_000_000)}
+
+start = time.perf_counter()
+total = 0
+for v in dict_data.values():
+    total += v
+print(f&quot;dict iteration: {(time.perf_counter() - start) * 1000:.2f} ms&quot;)
+</code></pre>
+<p>Contiguous memory is loaded into a CPU cache line in one shot. That is why a list iterates faster than a dict for the same number of elements.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Indexing is just address arithmetic, so it is O(1) regardless of position</li>
+<li>The doubling strategy keeps append's amortized cost at O(1)</li>
+<li>Insertion in the middle or front is O(n) — an inherent limit of dynamic arrays</li>
+<li>Contiguous memory is cache-friendly and benchmarks well</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Building a list with <code>+</code></strong><br>
+- Problem: O(n^2) copy explosion<br>
+- Fix: Use <code>append</code> or a list comprehension</p>
+<p><strong>Frequent inserts at the front</strong><br>
+- Problem: O(n) shift each time<br>
+- Fix: Use <code>collections.deque</code></p>
+<p><strong>Confusing capacity with size</strong><br>
+- Problem: Wrong memory estimates<br>
+- Fix: size = used, capacity = allocated</p>
+<p><strong>Slicing huge lists repeatedly</strong><br>
+- Problem: Wasted memory and time<br>
+- Fix: Use indices instead of slices when possible</p>
+<p><strong>Linear search on sorted data</strong><br>
+- Problem: O(n) when O(log n) is possible<br>
+- Fix: Use the <code>bisect</code> module</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>NumPy's ndarray treats fixed-size arrays at the C level to accelerate numeric work</li>
+<li>Pandas DataFrame columns are stored internally as contiguous arrays</li>
+<li>File I/O buffers, network packets, and image pixel data are all arrays</li>
+<li>Game engine entity-component systems (ECS) use arrays for cache friendliness</li>
+<li>Database column stores compress sorted columns and scan them array-style for speed</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer distinguishes "list" from "array." Python's list is a kind of dynamic array, but other languages do not all share that convention. Java's <code>ArrayList</code>, C++'s <code>std::vector</code>, and Rust's <code>Vec</code> are all dynamic-array families, while Java's <code>LinkedList</code> is a different beast entirely.</p>
+<p>A senior engineer also pre-allocates capacity. If you know the final size, allocating once with <code>[None] * n</code> removes every reallocation cost. It is a small detail, but on a hot path it makes a noticeable difference.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain why array indexing is O(1) using the memory layout</li>
+<li>[ ] I understand the link between doubling and amortized cost</li>
+<li>[ ] I can distinguish capacity from size</li>
+<li>[ ] I know why inserting at the front is expensive</li>
+<li>[ ] I understand why cache friendliness affects performance</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Add <code>pop()</code> and <code>__delitem__()</code> to the <code>DynamicArray</code> above. Then add a shrink strategy that halves capacity once the size falls below a quarter.</p>
+</li>
+<li>
+<p>Compare filling a list with one million <code>append</code>s versus pre-allocating <code>[None] * 1_000_000</code> and writing by index. How big is the difference?</p>
+</li>
+<li>
+<p>What is the time complexity of <code>bisect.insort</code> on a sorted list? Search is O(log n) — why is insert not?</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>An array places same-sized elements contiguously in memory; indexing is O(1) and the layout is cache-friendly. A dynamic array doubles capacity when it runs out, keeping the amortized cost of end-insertion at O(1). Insertions in the middle or front are still O(n), and if that pattern dominates your workload, the linked list in the next article may serve you better.</p>
+<p>Next we look at linked lists — nodes joined by pointers. We compare how they solve the "expensive middle insert" problem of arrays, and what they give up in exchange.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><strong>Arrays and Dynamic Arrays (current)</strong></li>
+<li>Linked Lists (upcoming)</li>
+<li>Stacks and Queues (upcoming)</li>
+<li>Hash Tables (upcoming)</li>
+<li>Trees (upcoming)</li>
+<li>Binary Search Trees (upcoming)</li>
+<li>Heaps (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Choosing Data Structures (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opendatastructures.org/ods-python/2_Array_Based_Lists.html">Open Data Structures — Chapter 2 Array-Based Lists</a></li>
+<li><a href="https://github.com/python/cpython/blob/main/Objects/listobject.c">CPython listobject.c source</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Dynamic_array">Wikipedia — Dynamic Array</a></li>
+<li><a href="https://docs.python.org/3/library/collections.html#collections.deque">Python collections.deque docs</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Data Structures, Array, Dynamic Array, Memory, Python List</p>
+</body>
+</html>

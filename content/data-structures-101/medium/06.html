@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trees</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Trees</h1>
+<blockquote>
+<p>Data Structures 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What single data structure powers file systems, the HTML DOM, organization charts, and regex parsers?</p>
+<blockquote>
+<p>A tree branches out from a starting node into multiple children, forming a hierarchy. With just two rules — no cycles and exactly one parent per node — you can express almost any hierarchy. This article walks through tree terminology, two representations, and the three classic depth-first traversals (preorder, inorder, postorder) implemented from scratch.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Core tree terminology (root, leaf, depth, height)</li>
+<li>The difference between a general tree and a binary tree</li>
+<li>The three depth-first traversals: preorder, inorder, postorder</li>
+<li>How depth-first compares with breadth-first traversal</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Trees are the basic skeleton of nearly every hierarchical dataset: database indexes, the abstract syntax tree (AST) of a compiler, the file system in an operating system, the parsed result of JSON or XML. Without fluency in trees, you cannot handle graphs, BSTs, or heaps with confidence.</p>
+<blockquote>
+<p>A tree is the structure where recursion feels most natural.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A tree is a connected, acyclic graph of nodes and edges. A binary tree is a tree where each node has at most two children — the form algorithms use most often.</p>
+</blockquote>
+<pre><code class="language-text">            A          ← root, depth 0
+          /   \
+         B     C       ← depth 1
+        / \     \
+       D   E     F     ← depth 2 (leaves)
+
+terms:
+- A's children: B, C
+- B's parent: A
+- B's sibling: C
+- leaves: D, E, F
+- height of the tree: 2
+- node count: 6
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Root</strong><br>
+- Meaning: The unique node with no parent</p>
+<p><strong>Leaf</strong><br>
+- Meaning: A node with no children</p>
+<p><strong>Depth</strong><br>
+- Meaning: Edges from the root to the node</p>
+<p><strong>Height</strong><br>
+- Meaning: Edges from the node to the farthest leaf</p>
+<p><strong>Subtree</strong><br>
+- Meaning: A node and all its descendants</p>
+<h2>Before / After</h2>
+<p><strong>Before — representing hierarchy with a flat list:</strong></p>
+<pre><code class="language-python">items = [
+    (&quot;/&quot;, None),
+    (&quot;home&quot;, &quot;/&quot;),
+    (&quot;docs&quot;, &quot;/home&quot;),
+    (&quot;a.txt&quot;, &quot;/home/docs&quot;),
+]
+# Finding parents, listing children, computing depth — all painful
+</code></pre>
+<p><strong>After — representing hierarchy with tree nodes:</strong></p>
+<pre><code class="language-python">class Node:
+    def __init__(self, name):
+        self.name = name
+        self.children = []
+
+root = Node(&quot;/&quot;)
+home = Node(&quot;home&quot;); root.children.append(home)
+docs = Node(&quot;docs&quot;); home.children.append(docs)
+docs.children.append(Node(&quot;a.txt&quot;))
+# Children and descendants traverse naturally with recursion
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Define a General Tree</strong></p>
+<pre><code class="language-python">class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+
+    def add(self, child):
+        self.children.append(child)
+        return child
+
+root = TreeNode(&quot;CEO&quot;)
+cto = root.add(TreeNode(&quot;CTO&quot;))
+cfo = root.add(TreeNode(&quot;CFO&quot;))
+cto.add(TreeNode(&quot;Backend Lead&quot;))
+cto.add(TreeNode(&quot;Frontend Lead&quot;))
+cfo.add(TreeNode(&quot;Accountant&quot;))
+</code></pre>
+<p>Each node holds a value and a list of children. With no cap on the children count, this is a general tree.</p>
+<p><strong>Step 2: Binary Tree</strong></p>
+<pre><code class="language-python">class BinaryNode:
+    def __init__(self, value, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
+
+# Build the tree
+#         1
+#        / \
+#       2   3
+#      / \
+#     4   5
+root = BinaryNode(1,
+                  BinaryNode(2, BinaryNode(4), BinaryNode(5)),
+                  BinaryNode(3))
+</code></pre>
+<p>With at most two children, the memory layout is simpler and the algorithms become more standardized.</p>
+<p><strong>Step 3: The Three Depth-First Traversals</strong></p>
+<pre><code class="language-python">def preorder(node):
+    &quot;&quot;&quot;root -&gt; left -&gt; right&quot;&quot;&quot;
+    if node is None:
+        return
+    print(node.value, end=&quot; &quot;)
+    preorder(node.left)
+    preorder(node.right)
+
+def inorder(node):
+    &quot;&quot;&quot;left -&gt; root -&gt; right&quot;&quot;&quot;
+    if node is None:
+        return
+    inorder(node.left)
+    print(node.value, end=&quot; &quot;)
+    inorder(node.right)
+
+def postorder(node):
+    &quot;&quot;&quot;left -&gt; right -&gt; root&quot;&quot;&quot;
+    if node is None:
+        return
+    postorder(node.left)
+    postorder(node.right)
+    print(node.value, end=&quot; &quot;)
+
+print(&quot;preorder: &quot;, end=&quot;&quot;); preorder(root); print()
+print(&quot;inorder:  &quot;, end=&quot;&quot;); inorder(root); print()
+print(&quot;postorder:&quot;, end=&quot;&quot;); postorder(root); print()
+# preorder:  1 2 4 5 3
+# inorder:   4 2 5 1 3
+# postorder: 4 5 2 3 1
+</code></pre>
+<p>When you visit the root determines the traversal. Postorder evaluates expressions, preorder copies trees, and inorder prints a BST in sorted order.</p>
+<p><strong>Step 4: Breadth-First Traversal</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def bfs(root):
+    if root is None:
+        return
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        print(node.value, end=&quot; &quot;)
+        if node.left:
+            queue.append(node.left)
+        if node.right:
+            queue.append(node.right)
+
+print(&quot;BFS:&quot;, end=&quot; &quot;); bfs(root); print()   # 1 2 3 4 5
+</code></pre>
+<p>You visit every node at the same depth before moving deeper. Use it for shortest paths or per-level processing.</p>
+<p><strong>Step 5: Compute Height and Size</strong></p>
+<pre><code class="language-python">def height(node):
+    if node is None:
+        return -1
+    return 1 + max(height(node.left), height(node.right))
+
+def count(node):
+    if node is None:
+        return 0
+    return 1 + count(node.left) + count(node.right)
+
+print(f&quot;height: {height(root)}&quot;)    # 2
+print(f&quot;count:  {count(root)}&quot;)     # 5
+</code></pre>
+<p>Recursion fits trees naturally because the definition is itself recursive: "a tree is a root and a list of subtrees."</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Trees are recursive by definition, which pairs well with recursive functions</li>
+<li>The difference between depth-first and breadth-first is the choice of stack vs queue</li>
+<li>Binary trees are simpler than general trees but support a richer set of algorithms</li>
+<li>Very deep trees can blow up the recursion stack</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Mixing children list and left/right</strong><br>
+- Problem: Bugs from blending general and binary code<br>
+- Fix: Keep the two representations distinct</p>
+<p><strong>Missing the empty-node branch</strong><br>
+- Problem: NoneType errors<br>
+- Fix: Check for None at the top of recursive calls</p>
+<p><strong>Confusing depth with height</strong><br>
+- Problem: Wrong analysis<br>
+- Fix: Depth measures from the top; height from the bottom</p>
+<p><strong>Recursion on deep trees</strong><br>
+- Problem: RecursionError<br>
+- Fix: Convert to an explicit stack</p>
+<p><strong>Using a list for BFS</strong><br>
+- Problem: Slow O(n) pop<br>
+- Fix: Use <code>collections.deque</code></p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>File systems are the canonical example of a general tree</li>
+<li>Browsers parse HTML and XML into a DOM tree</li>
+<li>Compilers turn source code into an abstract syntax tree (AST) before generating output</li>
+<li>Databases use B-Tree and B+Tree indexes to accelerate sorted-key search</li>
+<li>Decision trees are the foundation of many machine-learning classifiers and regressors</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer asks first whether a tree is balanced. A balanced tree guarantees O(log n), but a tree degenerated into a single line is effectively a linked list with O(n) operations. AVL, Red-Black, and B-Trees exist precisely to address this limit.</p>
+<p>A senior engineer also fears deep recursion. When the tree depth depends on user input (like JSON parsing), they convert to an explicit stack to keep things safe in production. Elegant code and operationally safe code are not the same thing.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can use root, leaf, depth, and height precisely</li>
+<li>[ ] I can distinguish a general tree from a binary tree</li>
+<li>[ ] I know how preorder, inorder, and postorder differ</li>
+<li>[ ] I see DFS vs BFS as a choice of data structure</li>
+<li>[ ] I understand the time-complexity gap between balanced and unbalanced trees</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Write a function that prints the average value at each level of the binary tree above. Combine BFS with a dict.</p>
+</li>
+<li>
+<p>Define a notion of "balanced" for a tree, then write a function that verifies your definition.</p>
+</li>
+<li>
+<p>For a general tree (children list), write a recursive function that returns the depth of the deepest leaf. Then write the same function with an explicit stack and compare them.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A tree is a hierarchical structure with no cycles and exactly one parent per node — the form that meshes most naturally with recursion. The three depth-first traversals and breadth-first traversal are the basic toolkit, and switching between them is just a choice of data structure (stack vs queue). Binary trees are a special case but support a richer set of algorithms.</p>
+<p>Next we look at the binary search tree (BST), a sorted binary tree. It offers average O(log n) lookups, but degrades to O(n) when balance is lost — a subtle structure worth careful attention.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Hash Tables</a></li>
+<li><strong>Trees (current)</strong></li>
+<li>Binary Search Trees (upcoming)</li>
+<li>Heaps (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Choosing Data Structures (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opendatastructures.org/ods-python/6_Binary_Trees.html">Open Data Structures — Binary Trees</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">Wikipedia — Tree (data structure)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Tree_traversal">Wikipedia — Tree Traversal</a></li>
+<li><a href="https://docs.python.org/3/library/ast.html">Python <code>ast</code> module docs</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Data Structures, Tree, Hierarchy, Recursion, Traversal</p>
+</body>
+</html>

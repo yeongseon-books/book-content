@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Are Data Structures?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Are Data Structures?</h1>
+<blockquote>
+<p>Data Structures 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: The same data, the same task — yet one program finishes in one second and another takes an hour. What makes the difference?</p>
+<blockquote>
+<p>A data structure defines how data is laid out in memory and which operations it can support efficiently. The task "find a user among 10 million" needs five million comparisons on average if you scan an array, but only one if you use a hash table. This article defines data structures, contrasts them with abstract data types (ADTs), and maps out the entire series.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The relationship between a data structure and an abstract data type (ADT)</li>
+<li>How structure choice impacts performance</li>
+<li>A high-level map of the nine data structures covered in this series</li>
+<li>The criteria you use to compare data structures</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Writing good code ultimately means making good decisions about how to represent data. Algorithms run on top of data structures. Pick the wrong structure and even the best algorithm becomes slow.</p>
+<blockquote>
+<p>Algorithms + Data Structures = Programs — Niklaus Wirth</p>
+</blockquote>
+<p>This series walks through nine core data structures: how they work, their time and space complexity, and when to reach for each one.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A data structure has two layers: the logical structure of the data and its physical layout in memory. An ADT defines what you can do; a data structure decides how to do it.</p>
+</blockquote>
+<pre><code class="language-text">            ADT (Abstract Data Type)
+              &quot;what can be done&quot;
+                    |
+        ┌───────────┼───────────┐
+        |           |           |
+      List         Set         Map
+        |           |           |
+   ┌────┴────┐  ┌───┴───┐  ┌───┴───┐
+  array  linked  hash  tree  hash  tree
+        |
+   (concrete data structure: memory layout)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Data structure</strong><br>
+- Meaning: A concrete way to store and manipulate data in memory</p>
+<p><strong>Abstract Data Type (ADT)</strong><br>
+- Meaning: A definition of data and operations at the interface level</p>
+<p><strong>Time complexity</strong><br>
+- Meaning: Growth rate of operation time as input size grows</p>
+<p><strong>Space complexity</strong><br>
+- Meaning: Growth rate of memory usage as input size grows</p>
+<p><strong>Amortized cost</strong><br>
+- Meaning: The average cost of an operation across many invocations</p>
+<h2>Before / After</h2>
+<p><strong>Before — without thinking about data structures:</strong></p>
+<pre><code class="language-python"># Find a specific ID among 10 million users
+users = [{&quot;id&quot;: i, &quot;name&quot;: f&quot;user{i}&quot;} for i in range(10_000_000)]
+
+def find_user(target_id: int):
+    for user in users:
+        if user[&quot;id&quot;] == target_id:
+            return user
+    return None
+
+# 5 million comparisons on average, 10 million in the worst case
+</code></pre>
+<p><strong>After — with a data structure in mind:</strong></p>
+<pre><code class="language-python"># Index the same data with a hash table
+users = {i: {&quot;id&quot;: i, &quot;name&quot;: f&quot;user{i}&quot;} for i in range(10_000_000)}
+
+def find_user(target_id: int):
+    return users.get(target_id)
+
+# One comparison on average
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Same Data, Different Structures</strong></p>
+<pre><code class="language-python">import time
+
+N = 1_000_000
+
+list_data = list(range(N))
+set_data = set(list_data)
+
+def measure(label, fn):
+    start = time.perf_counter()
+    fn()
+    elapsed = (time.perf_counter() - start) * 1000
+    print(f&quot;{label}: {elapsed:.2f} ms&quot;)
+
+measure(&quot;list lookup&quot;, lambda: (N - 1) in list_data)
+measure(&quot;set lookup&quot;, lambda: (N - 1) in set_data)
+</code></pre>
+<p>A list scans from start to end; a set jumps straight to the bucket via a hash. The gap widens as the data grows.</p>
+<p><strong>Step 2: Separate ADT from Implementation</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class Stack(ABC):
+    &quot;&quot;&quot;ADT: pop returns whatever was pushed last.&quot;&quot;&quot;
+
+    @abstractmethod
+    def push(self, value): ...
+
+    @abstractmethod
+    def pop(self): ...
+
+class ListStack(Stack):
+    def __init__(self):
+        self._data = []
+
+    def push(self, value):
+        self._data.append(value)
+
+    def pop(self):
+        return self._data.pop()
+
+class LinkedStack(Stack):
+    def __init__(self):
+        self._head = None
+
+    def push(self, value):
+        self._head = (value, self._head)
+
+    def pop(self):
+        value, self._head = self._head
+        return value
+</code></pre>
+<p>The <code>Stack</code> ADT is identical, but the implementation differs. Callers only care about the interface.</p>
+<p><strong>Step 3: Time Complexity Comparison Table</strong></p>
+<pre><code class="language-python">operations = {
+    &quot;Array&quot;:             {&quot;search&quot;: &quot;O(n)&quot;,     &quot;insert&quot;: &quot;O(n)&quot;,  &quot;delete&quot;: &quot;O(n)&quot;},
+    &quot;Dynamic Array&quot;:     {&quot;search&quot;: &quot;O(n)&quot;,     &quot;insert&quot;: &quot;O(1)*&quot;, &quot;delete&quot;: &quot;O(n)&quot;},
+    &quot;Linked List&quot;:       {&quot;search&quot;: &quot;O(n)&quot;,     &quot;insert&quot;: &quot;O(1)&quot;,  &quot;delete&quot;: &quot;O(1)&quot;},
+    &quot;Hash Table&quot;:        {&quot;search&quot;: &quot;O(1)&quot;,     &quot;insert&quot;: &quot;O(1)&quot;,  &quot;delete&quot;: &quot;O(1)&quot;},
+    &quot;Balanced BST&quot;:      {&quot;search&quot;: &quot;O(log n)&quot;, &quot;insert&quot;: &quot;O(log n)&quot;, &quot;delete&quot;: &quot;O(log n)&quot;},
+    &quot;Heap&quot;:              {&quot;search&quot;: &quot;O(n)&quot;,     &quot;insert&quot;: &quot;O(log n)&quot;, &quot;min&quot;: &quot;O(1)&quot;},
+}
+
+for ds, ops in operations.items():
+    print(f&quot;{ds:&lt;20} {ops}&quot;)
+</code></pre>
+<p><code>*</code> marks an amortized cost. A dynamic array occasionally pays a costly resize, but on average the insert is O(1).</p>
+<p><strong>Step 4: The Cost of Choosing Wrong</strong></p>
+<pre><code class="language-python"># Scenario: process events arriving every second by priority
+import heapq
+
+events = []
+# Wrong choice: sort on every insert
+def add_wrong(priority, event):
+    events.append((priority, event))
+    events.sort()
+
+# Right choice: a heap
+heap = []
+def add_right(priority, event):
+    heapq.heappush(heap, (priority, event))
+
+# add_wrong is O(n log n) per insert
+# add_right is O(log n) per insert
+# At 1 million events per day, that is a 1000x difference
+</code></pre>
+<p><strong>Step 5: The Series Roadmap</strong></p>
+<pre><code class="language-python">roadmap = [
+    (1, &quot;What Are Data Structures?&quot;, &quot;the big picture&quot;),
+    (2, &quot;Arrays and Dynamic Arrays&quot;, &quot;fixed/variable contiguous memory&quot;),
+    (3, &quot;Linked Lists&quot;, &quot;nodes connected by pointers&quot;),
+    (4, &quot;Stacks and Queues&quot;, &quot;LIFO and FIFO&quot;),
+    (5, &quot;Hash Tables&quot;, &quot;instant access by key&quot;),
+    (6, &quot;Trees&quot;, &quot;expressing hierarchy&quot;),
+    (7, &quot;Binary Search Trees&quot;, &quot;fast search in a sorted tree&quot;),
+    (8, &quot;Heaps&quot;, &quot;implementing priority queues&quot;),
+    (9, &quot;Graphs&quot;, &quot;modeling arbitrary relationships&quot;),
+    (10, &quot;Choosing Data Structures&quot;, &quot;when to use which&quot;),
+]
+
+for num, title, keywords in roadmap:
+    print(f&quot;  {num:02d}. {title} — {keywords}&quot;)
+</code></pre>
+<h2>Notable Points</h2>
+<ul>
+<li>The same ADT can have wildly different performance depending on the implementation</li>
+<li>Time complexity describes the growth rate at large input — small inputs may favor constant-time differences</li>
+<li>Amortized analysis is needed for structures like dynamic arrays and hash tables that occasionally do expensive work</li>
+<li>Picking the right data structure is as critical to performance as picking the right algorithm</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Conflating ADT and implementation</strong><br>
+- Problem: "A stack is an array"<br>
+- Fix: Treat the ADT as interface; implementations vary</p>
+<p><strong>Judging by small inputs</strong><br>
+- Problem: "List is faster, see?"<br>
+- Fix: Look at the growth rate as input scales</p>
+<p><strong>Reading only Big-O</strong><br>
+- Problem: Ignoring constants<br>
+- Fix: Account for cache friendliness and benchmarks</p>
+<p><strong>Using one structure for everything</strong><br>
+- Problem: Dict for every problem<br>
+- Fix: Match the structure to the access pattern</p>
+<p><strong>Ignoring space complexity</strong><br>
+- Problem: Out-of-memory crashes<br>
+- Fix: Analyze space alongside time</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Database indexes are implemented as B-Trees (a kind of tree) for fast lookup</li>
+<li>Operating system process schedulers use a priority queue (heap) to decide what runs next</li>
+<li>A web browser's back button is backed by a stack</li>
+<li>Routing tables, dependency graphs, and social networks are all modeled as graphs</li>
+<li>In-memory caches like Redis and Memcached are built on hash tables</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer asks "which operations dominate?" before asking "which data structure?" Is it search-heavy, insert-heavy, or does it require ordered traversal? Once the workload is named, the structure almost picks itself.</p>
+<p>Senior engineers also start with primitives plus dict and list. They do not reach for trees and heaps up front. They measure first and only swap in something fancier when a real bottleneck appears. Premature optimization is just as dangerous in data structures as anywhere else.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between a data structure and an ADT</li>
+<li>[ ] I understand that one ADT can have many implementations</li>
+<li>[ ] I know that time complexity describes growth as input scales</li>
+<li>[ ] I know what amortized cost means and when it applies</li>
+<li>[ ] I have reviewed the roadmap for the rest of the series</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Pick a real-world system (a queue at a store, a bookshelf, a phone book) and analyze which data structure it resembles. Which operations are fast, and which are slow?</p>
+</li>
+<li>
+<p>Run the Step 1 measurement code for N = 100k, 1M, 10M. How does the gap between list and set widen? Plot it if you can.</p>
+</li>
+<li>
+<p>Pick a recent piece of code you wrote. List every data structure it uses. For each, ask whether a different choice would have been clearer or faster.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A data structure decides how data sits in memory and which operations it can run efficiently. The same data with the wrong structure can be tens to thousands of times slower. The ADT names the interface; the data structure names the implementation. Keeping them separate sharpens your design.</p>
+<p>Next we look at the most basic structure — the array. We compare fixed-size and dynamic arrays and trace what Python's <code>list</code> actually does under the hood.</p>
+<ul>
+<li><strong>What Are Data Structures? (current)</strong></li>
+<li>Arrays and Dynamic Arrays (upcoming)</li>
+<li>Linked Lists (upcoming)</li>
+<li>Stacks and Queues (upcoming)</li>
+<li>Hash Tables (upcoming)</li>
+<li>Trees (upcoming)</li>
+<li>Binary Search Trees (upcoming)</li>
+<li>Heaps (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Choosing Data Structures (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">Introduction to Algorithms (CLRS) — Cormen et al.</a></li>
+<li><a href="https://opendatastructures.org/">Open Data Structures — Pat Morin</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Data_structure">Wikipedia — Data Structure</a></li>
+<li><a href="https://wiki.python.org/moin/TimeComplexity">Python Time Complexity Wiki</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Data Structures, Abstract Data Type, Algorithms, Time Complexity, Foundations</p>
+</body>
+</html>
