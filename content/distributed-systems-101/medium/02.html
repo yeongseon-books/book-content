@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Failure Models</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Failure Models</h1>
+<blockquote>
+<p>Distributed Systems 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you say "the server is down," what exactly do you mean? How many flavors does that have?</p>
+<blockquote>
+<p>Distributed systems design starts with one question: which kinds of failure do you assume? Crash, omission, and Byzantine are the standard vocabulary used to write that assumption down.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What a failure model is and why we model failure</li>
+<li>The differences between crash, omission, timing, and Byzantine</li>
+<li>Why network partition deserves its own category</li>
+<li>Why timeouts are only an approximation of failure detection</li>
+<li>Which models real systems pick</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If your algorithm does not state how nodes break, you cannot reason about its correctness or its cost. Raft, Paxos, and BFT algorithms differ because they assume different failure models. Without this vocabulary you cannot read papers or docs.</p>
+<blockquote>
+<p>A failure model is the price tag of an algorithm.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;fail-stop / crash&quot;] --&gt; B[&quot;omission&quot;]
+    B --&gt; C[&quot;timing&quot;]
+    C --&gt; D[&quot;byzantine&quot;]
+    A -.-&gt;|weaker assumption| D
+</code></pre>
+<p>The further right you go, the harsher the world you assume. Harsher worlds force more expensive algorithms and more nodes.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Crash (fail-stop)</strong>: A node, once stopped, stays stopped.</li>
+<li><strong>Omission</strong>: A node may occasionally drop a message.</li>
+<li><strong>Timing</strong>: A node's response may be arbitrarily slow.</li>
+<li><strong>Byzantine</strong>: A node may lie or behave arbitrarily.</li>
+<li><strong>Network partition</strong>: Only the links between nodes break, not the nodes themselves.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — "just assume it died"</strong></p>
+<pre><code class="language-text">treating every failure the same forces algorithms to over-pay
+</code></pre>
+<p><strong>After — explicit failure model</strong></p>
+<pre><code class="language-text">crash only -&gt; Raft / Paxos
+byzantine  -&gt; BFT (an order of magnitude more expensive)
+</code></pre>
+<p>Different assumptions, different costs.</p>
+<h2>Hands-on: Simulate Each Failure</h2>
+<p><strong>Step 1 — Simulate a crash</strong></p>
+<pre><code class="language-python"># 1_crash.py
+import os, sys
+def handler():
+    print(&quot;doing work&quot;)
+    os._exit(1)  # cleanly dies
+handler()
+</code></pre>
+<p>Under this model, other nodes assume "once dead, dead forever." The failure detector is simple.</p>
+<p><strong>Step 2 — Simulate omission</strong></p>
+<pre><code class="language-python"># 2_omission.py
+import random
+def send(msg):
+    if random.random() &lt; 0.1:
+        return  # drop with 10% probability
+    transport.send(msg)
+</code></pre>
+<p>From here on you need retries, sequence numbers, and acknowledgements.</p>
+<p><strong>Step 3 — Simulate timing (slow)</strong></p>
+<pre><code class="language-python"># 3_slow.py
+import time, random
+def handle(req):
+    if random.random() &lt; 0.05:
+        time.sleep(10)  # 5% chance of being very slow
+    return process(req)
+</code></pre>
+<p>A "slow node" and a "dead node" look identical from the outside. That is the limit of timeout-based failure detectors.</p>
+<p><strong>Step 4 — Simulate Byzantine behavior</strong></p>
+<pre><code class="language-python"># 4_byzantine.py
+def vote(question):
+    real_answer = compute(question)
+    return not real_answer if is_malicious() else real_answer
+</code></pre>
+<p>Under this model majority voting is not enough; you need signed messages or 3f+1 nodes.</p>
+<p><strong>Step 5 — Simulate a network partition</strong></p>
+<pre><code class="language-bash"># 5_partition.sh (linux)
+sudo iptables -A INPUT -s 10.0.0.5 -j DROP
+sudo iptables -A OUTPUT -d 10.0.0.5 -j DROP
+# restore
+sudo iptables -F
+</code></pre>
+<p>A partition is the special state where "nodes are alive but cannot see each other." Episode 4 (CAP) lives right here.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same "error" comes in different flavors with different responses.</li>
+<li>Omission and timing can only be distinguished by timeout (and not exactly).</li>
+<li>Byzantine costs an order of magnitude more.</li>
+<li>Partition is a link-level event, not a node-level one.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Assuming every failure is a crash.</strong> Algorithms converge incorrectly when the network breaks partially.</li>
+<li><strong>Setting timeouts too short.</strong> You will mark live nodes dead (false suspicion).</li>
+<li><strong>Reaching for Byzantine everywhere.</strong> Costs explode.</li>
+<li><strong>Ignoring partition.</strong> It is a daily event in cloud environments.</li>
+<li><strong>Assuming the failure detector is perfect.</strong> A perfect detector is impossible in an asynchronous model.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most internet services assume crash + partition (CFT). Finance and blockchain assume Byzantine (BFT, PBFT, Tendermint). The algorithm choices in Kubernetes, Spanner, and Cassandra all explicitly state which failure model they target.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They pick the algorithm that needs the weakest assumption that suffices (no needless BFT).</li>
+<li>They are aware that failure detectors are always approximate.</li>
+<li>They treat partition as a daily occurrence.</li>
+<li>They derive timeout values from network measurements.</li>
+<li>They trust only docs and RFCs that name the failure model explicitly.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between crash and omission in one line?</li>
+<li>[ ] Can you explain why Byzantine is more expensive?</li>
+<li>[ ] Can you say how partition differs from node failure?</li>
+<li>[ ] Do you know why timeout-based detectors are imperfect?</li>
+<li>[ ] Can you say which model your system assumes?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write down which model your service assumes: crash, omission, or Byzantine.</li>
+<li>List two metrics you must measure to choose a timeout (e.g., p99 latency).</li>
+<li>Research one mechanism that prevents split-brain when a partition occurs.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The failure model is the first design decision; it sets the algorithm and the operational cost. Next we look at how nodes exchange messages on top of these models — RPC and message passing.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><strong>Failure Models (current)</strong></li>
+<li>RPC and message passing (upcoming)</li>
+<li>consistency and CAP (upcoming)</li>
+<li>replication (upcoming)</li>
+<li>consensus and Raft (upcoming)</li>
+<li>leader election (upcoming)</li>
+<li>message queues and event sourcing (upcoming)</li>
+<li>distributed transactions (upcoming)</li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Failure_semantics">Failure semantics (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Byzantine_fault">Byzantine fault (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Network_partition">Network partition (Wikipedia)</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — chapter 8</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, Failure Models, Crash, Byzantine, Reliability</p>
+</body>
+</html>

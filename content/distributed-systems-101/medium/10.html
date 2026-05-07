@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Patterns for Operable Distributed Systems</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Patterns for Operable Distributed Systems</h1>
+<blockquote>
+<p>Distributed Systems 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If you cannot make a system that never dies, how do you make one that survives death?</p>
+<blockquote>
+<p>An operable distributed system is not one without failures — it is one where failures stay local and recover quickly.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How to isolate failure with bulkheads</li>
+<li>How to break cascade failures with a circuit breaker</li>
+<li>How to safely refuse load with backpressure</li>
+<li>The right combination of timeout, retry, and jitter</li>
+<li>Why observability (metrics, logs, traces) is part of operations</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The tools we covered so far — replication, consensus, queues, transactions — are the building materials. Operational patterns are the operator's toolbox that keeps those materials standing in a "failures are common" reality.</p>
+<blockquote>
+<p>Good operational patterns turn "expected failures" into ordinary events.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Cl[&quot;client&quot;] --&gt;|timeout| LB[&quot;load balancer&quot;]
+    LB --&gt; S1[&quot;service A&quot;]
+    LB --&gt; S2[&quot;service B (isolated pool)&quot;]
+    S1 --&gt;|circuit breaker| Up[&quot;upstream&quot;]
+    S2 --&gt;|backpressure| Q[&quot;queue&quot;]
+</code></pre>
+<p>At every call boundary, combine timeout, breaker, bulkhead, and backpressure so a single failure does not spread.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Bulkhead</strong>: A wall that splits resources (threads, connection pools) so a blast in one place does not spread.</li>
+<li><strong>Circuit breaker</strong>: A circuit that briefly blocks calls when consecutive failures are detected.</li>
+<li><strong>Backpressure</strong>: A mechanism that signals overload via queue length or rejection.</li>
+<li><strong>Jitter</strong>: Random offset added to retry intervals to avoid thundering herd.</li>
+<li><strong>Observability</strong>: The set of signals (metrics, logs, traces) that lets you reason about a system from outside.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — infinite retry, shared pool</strong></p>
+<pre><code class="language-text">one upstream slows down -&gt; retry storm everywhere -&gt; total stall
+</code></pre>
+<p><strong>After — breaker + bulkhead + backpressure</strong></p>
+<pre><code class="language-text">one upstream slows down -&gt; breaker open -&gt; partial rejection -&gt; other paths healthy
+</code></pre>
+<p>Operational patterns are the promise that "death in one place does not spread to the next."</p>
+<h2>Hands-on: Operational Patterns in Short Code</h2>
+<p><strong>Step 1 — timeout</strong></p>
+<pre><code class="language-python"># 1_timeout.py
+import requests
+def call():
+    return requests.get(&quot;https://api.example.com/x&quot;, timeout=2.0)
+</code></pre>
+<p>A call without a timeout is one of the most common causes of operational incidents.</p>
+<p><strong>Step 2 — exponential backoff + jitter</strong></p>
+<pre><code class="language-python"># 2_backoff.py
+import time, random
+def with_retry(fn, retries=4):
+    for i in range(retries):
+        try: return fn()
+        except Exception:
+            time.sleep(min(2**i, 10) + random.random())
+    raise
+</code></pre>
+<p>Without jitter every client retries at the same instant, killing the upstream a second time.</p>
+<p><strong>Step 3 — circuit breaker (simple)</strong></p>
+<pre><code class="language-python"># 3_breaker.py
+import time
+class Breaker:
+    def __init__(self, threshold=5, cool=10):
+        self.fails = 0; self.until = 0
+        self.threshold, self.cool = threshold, cool
+    def call(self, fn):
+        if time.time() &lt; self.until:
+            raise RuntimeError(&quot;breaker open&quot;)
+        try:
+            r = fn(); self.fails = 0; return r
+        except Exception:
+            self.fails += 1
+            if self.fails &gt;= self.threshold:
+                self.until = time.time() + self.cool
+            raise
+</code></pre>
+<p>Once consecutive failures exceed the threshold, the breaker refuses calls during a cool-down.</p>
+<p><strong>Step 4 — bulkhead (split connection pools)</strong></p>
+<pre><code class="language-python"># 4_bulkhead.py (pseudocode)
+pool_payment = ConnectionPool(size=10)
+pool_search  = ConnectionPool(size=10)
+# payment overload does not affect the search pool
+</code></pre>
+<p>Even inside one process, splitting resource pools creates isolation.</p>
+<p><strong>Step 5 — backpressure</strong></p>
+<pre><code class="language-python"># 5_backpressure.py
+from collections import deque
+q, MAX = deque(), 100
+def enqueue(msg):
+    if len(q) &gt;= MAX:
+        return &quot;rejected&quot;   # rejecting is safer than silence
+    q.append(msg); return &quot;ok&quot;
+</code></pre>
+<p>When the queue is full, refuse. A system that rejects quickly is safer than a system that goes silent.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>timeout &lt; retry budget &lt; user-facing latency — break this inequality and operations break.</li>
+<li>The breaker must also recover automatically (half-open).</li>
+<li>A bulkhead is not code — it is the boundary of a resource.</li>
+<li>Backpressure is "polite refusal" — it signals failure quickly.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>External calls without timeouts.</strong> One slow upstream stalls the whole system.</li>
+<li><strong>Retries without jitter.</strong> A thundering herd kills the upstream twice.</li>
+<li><strong>Endless retries with no breaker.</strong> Only user wait time grows.</li>
+<li><strong>Handling all dependencies through a single shared pool.</strong> One spike spreads to all.</li>
+<li><strong>Adding patterns without observability.</strong> Without measuring effect you cannot prevent the next incident.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The same patterns repeat in Netflix Hystrix (historically), resilience4j, retry and circuit breakers in Envoy/Istio, AWS App Mesh, Kubernetes HPA + PDB, and queue-based backpressure (SQS, Kafka lag). SRE teams tie these patterns to SLOs and turn them into automated alerts.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Every external call has an explicit timeout and retry budget.</li>
+<li>Breaker and bulkhead thresholds come from load-test results.</li>
+<li>They do not add patterns without observability (metrics, logs, traces).</li>
+<li>Chaos tests rehearse failures during normal times.</li>
+<li>User-facing latency is an SLI; SLO violations page automatically.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does every external call have an explicit timeout?</li>
+<li>[ ] Do your retries include jitter?</li>
+<li>[ ] Are breakers attached to your critical dependencies?</li>
+<li>[ ] Are resource pools split per domain?</li>
+<li>[ ] Are metrics, logs, and traces tied together by a single trace ID?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write pseudocode for a single call that combines timeout, retry, and breaker.</li>
+<li>List two criteria you would use to decide whether to introduce backpressure.</li>
+<li>Pick three scenarios you would rehearse routinely with chaos tests.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Every tool in distributed systems eventually converges on operability. One sentence to capture the whole series: "Failures are common, and good systems make them ordinary." Recommended next: secure-by-design, observability, and SRE series.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Replication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/06-consensus-and-raft.md">Consensus and Raft</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/07-leader-election.md">Leader Election</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/08-message-queue-and-event-sourcing.md">Message Queues and Event Sourcing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/09-distributed-transaction.md">Distributed Transactions</a></li>
+<li><strong>Patterns for Operable Distributed Systems (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pragprog.com/titles/mnee2/release-it-second-edition/">Release It! — Michael Nygard</a></li>
+<li><a href="https://martinfowler.com/bliki/CircuitBreaker.html">Circuit Breaker — Martin Fowler</a></li>
+<li><a href="https://sre.google/sre-book/table-of-contents/">Google SRE Book</a></li>
+<li><a href="https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html">AWS Well-Architected — Reliability Pillar</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, Resilience, CircuitBreaker, Backpressure, Observability</p>
+</body>
+</html>

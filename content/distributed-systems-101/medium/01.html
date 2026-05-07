@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is a Distributed System?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is a Distributed System?</h1>
+<blockquote>
+<p>Distributed Systems 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is running the same code on one machine so different from running it on a hundred?</p>
+<blockquote>
+<p>A distributed system is not just "many computers." Three essential differences — latency, failure, and coordination — bend every intuition you carry from single-machine programming.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a distributed system and how it really differs from a single machine</li>
+<li>The meaning of the three axes: latency, failure, and coordination</li>
+<li>Lessons from the eight fallacies of distributed computing</li>
+<li>A typical topology of a distributed system</li>
+<li>The big picture this series will cover</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Almost every service you build today is effectively a distributed system. A single database with a replica is distributed. Two microservices talking are distributed. Code written with single-machine intuition (instant response, always success, one clock) breaks the moment it sees production traffic.</p>
+<blockquote>
+<p>Distributed systems live exactly where the assumptions of a single-machine program break.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;client&quot;] --&gt; B[&quot;service A&quot;]
+    B --&gt; C[&quot;service B&quot;]
+    B --&gt; D[&quot;database&quot;]
+    C --&gt; E[&quot;replica&quot;]
+    D --&gt; E
+    B -.-&gt;|network failure| C
+</code></pre>
+<p>Every arrow can carry latency, partial failure, and an unknown response. That is fundamentally different from a function call.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Distributed system</strong>: A set of independent nodes cooperating through message passing.</li>
+<li><strong>Latency</strong>: The time a message takes to reach the other side.</li>
+<li><strong>Failure</strong>: A node, network, or disk stopping in part or whole.</li>
+<li><strong>Coordination</strong>: The process of multiple nodes agreeing on a decision.</li>
+<li><strong>Partial failure</strong>: Some nodes alive, others dead — the signature condition of distribution.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — single-machine intuition</strong></p>
+<pre><code class="language-text">calls finish instantly / always succeed / there is one clock
+</code></pre>
+<p><strong>After — distributed environment</strong></p>
+<pre><code class="language-text">calls take ms to s / can fail in part / each node has its own clock
+</code></pre>
+<p>That simple shift is what produces every topic of this series: retries, timeouts, consensus.</p>
+<h2>Hands-on: Feel the Difference</h2>
+<p><strong>Step 1 — A local function call</strong></p>
+<pre><code class="language-python"># 1_local.py
+def add(a, b):
+    return a + b
+
+print(add(1, 2))  # 3, instantly
+</code></pre>
+<p>The call lasts microseconds. There is no failure to worry about.</p>
+<p><strong>Step 2 — Same machine, separate process (HTTP)</strong></p>
+<pre><code class="language-python"># 2_local_http.py
+# pip install fastapi uvicorn requests
+from fastapi import FastAPI
+app = FastAPI()
+@app.get(&quot;/add&quot;)
+def add(a: int, b: int): return {&quot;r&quot;: a + b}
+# run: uvicorn 2_local_http:app --port 8001
+</code></pre>
+<pre><code class="language-python"># 2_client.py
+import requests
+print(requests.get(&quot;http://127.0.0.1:8001/add&quot;, params={&quot;a&quot;:1,&quot;b&quot;:2}, timeout=1).json())
+</code></pre>
+<p>Even on the same machine, latency jumps to milliseconds. That is the cost of the first split.</p>
+<p><strong>Step 3 — Kill the server</strong></p>
+<pre><code class="language-bash"># after killing the server with ctrl+c
+python3 2_client.py
+# requests.exceptions.ConnectionError
+</code></pre>
+<p>The caller does not know the server's state. This kind of error never appeared on a single machine.</p>
+<p><strong>Step 4 — What if the response is slow?</strong></p>
+<pre><code class="language-python"># 4_slow.py
+@app.get(&quot;/slow&quot;)
+def slow():
+    import time; time.sleep(5)
+    return {&quot;ok&quot;: True}
+</code></pre>
+<pre><code class="language-python">requests.get(&quot;http://127.0.0.1:8001/slow&quot;, timeout=1)
+# requests.exceptions.ReadTimeout
+</code></pre>
+<p>Without a timeout the call blocks for five seconds. In distributed systems a timeout is mandatory, not optional.</p>
+<p><strong>Step 5 — Clock skew between nodes</strong></p>
+<pre><code class="language-python"># 5_clock.py
+import time
+print(&quot;server time:&quot;, time.time())
+# run the same code on another machine and the two values
+# will not match exactly even with NTP (millisecond-level drift)
+</code></pre>
+<p>Never decide ordering with a wall clock. Episode 6 (consensus) and episode 8 (message ordering) attack this directly.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same call gains a different class of error once a network is involved.</li>
+<li>Timeouts, retries, and idempotency are concepts that did not exist on a single machine.</li>
+<li>Clocks never line up exactly.</li>
+<li>A new state appears alongside success/failure: "unknown."</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Calling without a timeout.</strong> The response may never come.</li>
+<li><strong>Retrying without idempotency.</strong> Double-charging customers is a classic outcome.</li>
+<li><strong>Ordering by wall clock.</strong> Each node sees a different time.</li>
+<li><strong>Ignoring partial failure.</strong> It is the most common production state.</li>
+<li><strong>Sizing capacity from single-machine latency.</strong> Network latency dominates the budget.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Every web backend is effectively a distributed system. An RDBMS with a replica plus failover is one. Redis Cluster, Kafka, and Cassandra obviously are. So are AZ-level redundancy in cloud, multi-region setups, and CDNs.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They explicitly distrust single-machine intuition.</li>
+<li>They design timeouts, retries, and idempotency from line one.</li>
+<li>They include the "unknown" state in the system model.</li>
+<li>They trust monotonic clocks and treat wall clocks as display only.</li>
+<li>They recognize when distribution is not needed (a single machine suffices).</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you define a distributed system in one sentence?</li>
+<li>[ ] Can you explain the three axes of latency, failure, and coordination?</li>
+<li>[ ] Can you describe how partial failure differs from single-machine failure?</li>
+<li>[ ] Can you say why timeouts are mandatory?</li>
+<li>[ ] Do you know the difference between wall clock and monotonic clock?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find a piece of code that calls an external API without a timeout and add one.</li>
+<li>List two examples each of operations that are safe to retry and operations that are not.</li>
+<li>Design an idempotency-key approach so that processing the same message twice produces the same result.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Distributed systems differ from single-machine programs along three axes: latency, failure, and coordination. Next, we model failure itself (crash, omission, Byzantine) so we can reason about it precisely.</p>
+<ul>
+<li><strong>What Is a Distributed System? (current)</strong></li>
+<li>failure models (upcoming)</li>
+<li>RPC and message passing (upcoming)</li>
+<li>consistency and CAP (upcoming)</li>
+<li>replication (upcoming)</li>
+<li>consensus and Raft (upcoming)</li>
+<li>leader election (upcoming)</li>
+<li>message queues and event sourcing (upcoming)</li>
+<li>distributed transactions (upcoming)</li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Distributed_computing">Distributed computing (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing">Fallacies of distributed computing (Wikipedia)</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Martin Kleppmann</a></li>
+<li><a href="http://book.mixu.net/distsys/">Distributed Systems for Fun and Profit</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, Fundamentals, Latency, Failure, Coordination</p>
+</body>
+</html>
