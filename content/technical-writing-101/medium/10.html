@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pre-publish Checklist</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Pre-publish Checklist</h1>
+<blockquote>
+<p>Technical Writing 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What is the <em>last</em> thing to <em>review</em> before you hit <em>publish</em>?</p>
+<blockquote>
+<p>Re-reading with the <em>eyes of a first-time visitor</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Title</em> review</li>
+<li><em>Link</em> validation</li>
+<li><em>Code</em> execution</li>
+<li><em>Image</em> checks</li>
+<li><em>Post-publish</em> review</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>fix after publish</em> is far more expensive than a <em>check before publish</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    T[Title] --&gt; L[Links]
+    L --&gt; C[Code]
+    C --&gt; I[Images]
+    I --&gt; P[Publish]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>link rot</strong>: A <em>broken link</em> over time.</li>
+<li><strong>smoke test</strong>: A <em>basic functional check</em>.</li>
+<li><strong>canary read</strong>: A <em>peer pre-review</em>.</li>
+<li><strong>post-mortem</strong>: A <em>post-publish retrospective</em>.</li>
+<li><strong>errata</strong>: <em>Typo corrections</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A <em>broken link</em> found right after publish.</p>
+<p><strong>After</strong>: The <em>checklist</em> passes before publish.</p>
+<h2>Hands-on: A Five Step Review</h2>
+<p><strong>Step 1 — Title review</strong></p>
+<pre><code class="language-python">title_ok = [&quot;has a verb&quot;, &quot;fits 55 chars&quot;, &quot;uses reader words&quot;]
+</code></pre>
+<p><strong>Step 2 — Link validation</strong></p>
+<pre><code class="language-bash">python3 scripts/check_links.py
+</code></pre>
+<p><strong>Step 3 — Code execution</strong></p>
+<pre><code class="language-bash">python3 -c &quot;from m import add; assert add(2,3) == 5&quot;
+</code></pre>
+<p><strong>Step 4 — Image check</strong></p>
+<pre><code class="language-python">images = {&quot;caption&quot;: True, &quot;alt_text&quot;: True, &quot;resolution&quot;: &quot;2x&quot;}
+</code></pre>
+<p><strong>Step 5 — Post-publish review</strong></p>
+<pre><code class="language-python">post = [&quot;fix typos within 24h&quot;, &quot;reply to reader comments&quot;]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>title</em> fits <em>55 characters</em>.</li>
+<li><em>Links</em> are <em>validated automatically</em>.</li>
+<li>The <em>code</em> really <em>runs</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Letting <em>link rot</em> sit.</strong></li>
+<li><strong><em>Code</em> that does not run.</strong></li>
+<li><strong>An <em>image</em> with no <em>alt text</em>.</strong></li>
+<li><strong>A <em>typo</em> left in place.</strong></li>
+<li><strong>No <em>post-mortem</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Engineering blog teams run <em>peer review</em>, <em>automated checks</em>, and <em>post-mortems</em> together.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>checklist</em> is a <em>routine</em>.</li>
+<li><em>Links</em> are validated <em>automatically</em>.</li>
+<li><em>Code</em> runs <em>on copy paste</em>.</li>
+<li>Typos are fixed <em>within 24 hours</em>.</li>
+<li>The <em>post-mortem</em> feeds the <em>next post</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Title</em> OK.</li>
+<li>[ ] <em>Link</em> validation passes.</li>
+<li>[ ] <em>Code</em> execution passes.</li>
+<li>[ ] <em>Image</em> check passes.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the meaning of <em>link rot</em> in one line.</li>
+<li>Write the definition of <em>canary read</em> in one line.</li>
+<li>Write an example of <em>errata</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This is the <em>final</em> post in <em>Technical Writing 101</em>. The next series covers <em>Open Source Contribution</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/01-what-is-technical-writing.md">What Is Technical Writing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/02-defining-the-reader.md">Defining the Reader</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/03-title-and-structure.md">Title and Structure</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/04-explaining-concepts.md">Explaining Concepts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/05-explaining-example-code.md">Explaining Example Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/06-using-figures-and-tables.md">Using Figures and Tables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/07-writing-the-readme.md">Writing the README</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/08-writing-tutorials.md">Writing Tutorials</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/09-blog-vs-docs.md">Blog vs Documentation</a></li>
+<li><strong>Pre-publish Checklist (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://blog.trello.com/editorial-calendar">Editorial Calendars - Trello Guide</a></li>
+<li><a href="https://hemingwayapp.com/">Hemingway Editor</a></li>
+<li><a href="https://vale.sh/">Vale - Prose Linter</a></li>
+<li><a href="https://www.plainlanguage.gov/guidelines/">Plain Language Guidelines</a></li>
+</ul>
+<p class="tags-line">Tags: TechnicalWriting, Checklist, Publishing, Quality, Beginner</p>
+</body>
+</html>

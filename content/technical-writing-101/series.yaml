@@ -1,0 +1,60 @@
+id: technical-writing-101
+title:
+  ko: 기술 글쓰기 101
+  en: Technical Writing 101
+description:
+  ko: 독자 정의부터 발행 전 체크리스트까지, 기술 글쓰기의 기본을 다지는 시리즈입니다.
+  en: An entry series covering technical writing from defining the reader to the pre-publish checklist.
+status: content-ready
+level: 101
+lifecycle: active
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+episodes:
+  - slug: 01-what-is-technical-writing
+    title:
+      ko: 기술 글쓰기란 무엇인가
+      en: What Is Technical Writing
+  - slug: 02-defining-the-reader
+    title:
+      ko: 독자 정의하기
+      en: Defining the Reader
+  - slug: 03-title-and-structure
+    title:
+      ko: 제목과 구조 잡기
+      en: Title and Structure
+  - slug: 04-explaining-concepts
+    title:
+      ko: 개념 설명하기
+      en: Explaining Concepts
+  - slug: 05-explaining-example-code
+    title:
+      ko: 예제 코드 설명하기
+      en: Explaining Example Code
+  - slug: 06-using-figures-and-tables
+    title:
+      ko: 그림과 표 사용하기
+      en: Using Figures and Tables
+  - slug: 07-writing-the-readme
+    title:
+      ko: README 작성하기
+      en: Writing the README
+  - slug: 08-writing-tutorials
+    title:
+      ko: 튜토리얼 작성하기
+      en: Writing Tutorials
+  - slug: 09-blog-vs-docs
+    title:
+      ko: 블로그와 문서 차이
+      en: Blog vs Documentation
+  - slug: 10-pre-publish-checklist
+    title:
+      ko: 발행 전 체크리스트
+      en: Pre-publish Checklist
