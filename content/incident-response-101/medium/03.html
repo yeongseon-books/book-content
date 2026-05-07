@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Initial Response</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Initial Response</h1>
+<blockquote>
+<p>Incident Response 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: In the <em>first five minutes</em> after an <em>alert</em>, <em>what</em> should you do?</p>
+<blockquote>
+<p><em>Initial response</em> focuses on <em>stabilization</em> and <em>role assignment</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>five-minute rule</em></li>
+<li><em>Stabilization first</em></li>
+<li><em>Impact estimation</em></li>
+<li><em>Role assignment</em></li>
+<li><em>Channel setup</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The actions in the <em>first five minutes</em> determine the <em>whole outcome</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Page[&quot;page&quot;] --&gt; Ack[&quot;ack&quot;]
+    Ack --&gt; Triage[&quot;triage&quot;]
+    Triage --&gt; Channel[&quot;open channel&quot;]
+    Channel --&gt; Roles[&quot;assign roles&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>ack</strong>: <em>acknowledging</em> a page.</li>
+<li><strong>triage</strong>: <em>sorting</em> and <em>prioritizing</em>.</li>
+<li><strong>stabilize</strong>: <em>stop the bleeding</em>.</li>
+<li><strong>channel</strong>: a <em>dedicated collaboration space</em>.</li>
+<li><strong>role</strong>: a <em>defined responsibility</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: start with <em>diagnosis</em>.</p>
+<p><strong>After</strong>: start with <em>stabilization</em>.</p>
+<h2>Hands-on: Five-Minute Checklist</h2>
+<p><strong>Step 1 — Ack</strong></p>
+<pre><code class="language-python">def ack(alert_id, user):
+    return {&quot;alert&quot;: alert_id, &quot;by&quot;: user, &quot;at&quot;: &quot;now&quot;}
+</code></pre>
+<p><strong>Step 2 — Estimate impact</strong></p>
+<pre><code class="language-python">def estimate_impact(metrics):
+    return metrics.get(&quot;err_ratio&quot;, 0) * 100
+</code></pre>
+<p><strong>Step 3 — Open the channel</strong></p>
+<pre><code class="language-python">def open_channel(name):
+    return f&quot;#inc-{name}&quot;
+</code></pre>
+<p><strong>Step 4 — Assign roles</strong></p>
+<pre><code class="language-python">def assign(team):
+    return {&quot;IC&quot;: team[0], &quot;ops&quot;: team[1], &quot;comms&quot;: team[2]}
+</code></pre>
+<p><strong>Step 5 — Stabilize</strong></p>
+<pre><code class="language-python">def stabilize(actions):
+    return [a for a in actions if a in (&quot;rollback&quot;, &quot;scale&quot;, &quot;throttle&quot;)]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Ack</em> marks the start of <em>ownership</em>.</li>
+<li>Express <em>impact</em> with <em>numbers</em>.</li>
+<li>The <em>role</em> set has <em>three axes</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Starting with <em>diagnosis</em>.</strong></li>
+<li><strong>The <em>IC</em> doing the <em>hands-on work</em>.</strong></li>
+<li><strong><em>Scattering</em> across channels.</strong></li>
+<li><strong>Skipping <em>customer comms</em>.</strong></li>
+<li><strong>Acting <em>without records</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>PagerDuty ack</em> → <em>auto-created Slack channel</em> → <em>Statuspage draft</em> — all <em>automated</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Time</em> is the <em>enemy</em>.</li>
+<li><em>Stabilization</em> is the <em>top priority</em>.</li>
+<li><em>Roles</em> are <em>fixed</em>.</li>
+<li><em>Recording</em> happens <em>in parallel</em>.</li>
+<li><em>Action</em> beats <em>perfection</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Ack policy</em>.</li>
+<li>[ ] <em>Channel automation</em>.</li>
+<li>[ ] <em>Role cards</em>.</li>
+<li>[ ] <em>Stabilization action list</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>ack</em> in one line.</li>
+<li>Define <em>triage</em> in one line.</li>
+<li>Define <em>stabilize</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>communication</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
+<li><strong>Initial Response (current)</strong></li>
+<li>Communication (upcoming)</li>
+<li>Writing the Timeline (upcoming)</li>
+<li>Root Cause Analysis (upcoming)</li>
+<li>Mitigation and Resolution (upcoming)</li>
+<li>Postmortem (upcoming)</li>
+<li>Prevention (upcoming)</li>
+<li>Building an Incident Runbook (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://response.pagerduty.com/during/during_an_incident/">Incident Response Process - PagerDuty</a></li>
+<li><a href="https://sre.google/sre-book/managing-incidents/">Managing Incidents - Google SRE Book</a></li>
+<li><a href="https://www.atlassian.com/incident-management/incident-response">Incident Triage - Atlassian</a></li>
+<li><a href="https://increment.com/on-call/">On-Call Best Practices</a></li>
+</ul>
+<p class="tags-line">Tags: Incident, Triage, Response, OnCall, Operations</p>
+</body>
+</html>

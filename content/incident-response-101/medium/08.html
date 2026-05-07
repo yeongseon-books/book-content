@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Postmortem</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Postmortem</h1>
+<blockquote>
+<p>Incident Response 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: After an <em>incident</em> ends, <em>how</em> do you turn the <em>learning</em> into an <em>organizational asset</em>?</p>
+<blockquote>
+<p>A <em>postmortem</em> is a <em>blameless</em> document recording <em>facts</em>, <em>impact</em>, <em>cause</em>, and <em>actions</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>blameless</em> principle</li>
+<li><em>Template</em> structure</li>
+<li><em>Action items</em></li>
+<li><em>Tracking</em> methods</li>
+<li><em>Sharing</em> scope</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When the <em>same incident</em> keeps <em>repeating</em>, learning stops at the <em>document</em> and never reaches <em>behavior</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Incident[&quot;incident&quot;] --&gt; Draft[&quot;draft&quot;]
+    Draft --&gt; Review[&quot;review&quot;]
+    Review --&gt; Publish[&quot;publish&quot;]
+    Publish --&gt; Action[&quot;action items&quot;]
+    Action --&gt; Track[&quot;track&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>blameless</strong>: no <em>personal</em> blame.</li>
+<li><strong>summary</strong>: a <em>three-sentence</em> recap.</li>
+<li><strong>impact</strong>: what the <em>customer</em> experienced.</li>
+<li><strong>action item</strong>: a <em>verifiable</em> follow-up.</li>
+<li><strong>owner</strong>: the <em>action's</em> responsible person.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: an <em>internal</em> document of <em>blame</em>.</p>
+<p><strong>After</strong>: an <em>organization-wide</em>, <em>blameless</em> document.</p>
+<h2>Hands-on: A Mini Postmortem Builder</h2>
+<p><strong>Step 1 — Template</strong></p>
+<pre><code class="language-python">TEMPLATE = (&quot;summary&quot;, &quot;impact&quot;, &quot;timeline&quot;, &quot;rca&quot;, &quot;actions&quot;)
+
+def new_doc():
+    return {k: &quot;&quot; for k in TEMPLATE}
+</code></pre>
+<p><strong>Step 2 — Summary check</strong></p>
+<pre><code class="language-python">def is_short(text):
+    return text.count(&quot;.&quot;) &lt;= 3
+</code></pre>
+<p><strong>Step 3 — Quantify impact</strong></p>
+<pre><code class="language-python">def impact(users, minutes):
+    return {&quot;users&quot;: users, &quot;minutes&quot;: minutes}
+</code></pre>
+<p><strong>Step 4 — Register an action</strong></p>
+<pre><code class="language-python">def action(text, owner, due):
+    return {&quot;text&quot;: text, &quot;owner&quot;: owner, &quot;due&quot;: due}
+</code></pre>
+<p><strong>Step 5 — Track</strong></p>
+<pre><code class="language-python">def overdue(actions, today):
+    return [a for a in actions if a[&quot;due&quot;] &lt; today]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>template</em> is <em>fixed</em> as a <em>tuple</em>.</li>
+<li><em>Impact</em> is <em>numeric</em>.</li>
+<li><em>Tracking</em> is one <em>deadline comparison</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Naming an <em>individual</em> as the <em>cause</em>.</strong></li>
+<li><strong>Actions with <em>no owner</em>.</strong></li>
+<li><strong>Actions with <em>no deadline</em>.</strong></li>
+<li><strong>Sharing only <em>internally</em>.</strong></li>
+<li><strong>Reinventing the <em>template</em> every time.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Teams keep a <em>Notion/Confluence</em> postmortem template and <em>link</em> action items to <em>Jira</em>. A <em>quarterly review</em> tracks them.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Blameless</em> is <em>culture</em>.</li>
+<li>No <em>actions</em>, no <em>document</em>.</li>
+<li><em>Impact</em> is in <em>numbers</em>.</li>
+<li><em>Sharing</em> is <em>company-wide</em>.</li>
+<li>The <em>quarterly review</em> closes the <em>loop</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Template</em>.</li>
+<li>[ ] <em>Action register</em>.</li>
+<li>[ ] <em>Tracking tool</em>.</li>
+<li>[ ] <em>Quarterly review</em> on the calendar.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>blameless</em> in one line.</li>
+<li>Define <em>action item</em> in one line.</li>
+<li>Define <em>owner</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>prevention</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Root Cause Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Mitigation and Resolution</a></li>
+<li><strong>Postmortem (current)</strong></li>
+<li>Prevention (upcoming)</li>
+<li>Building an Incident Runbook (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/postmortem-culture/">Postmortem Culture - Google SRE Book</a></li>
+<li><a href="https://response.pagerduty.com/after/post_mortem_process/">Blameless Postmortems - PagerDuty</a></li>
+<li><a href="https://www.atlassian.com/incident-management/postmortem/templates">Postmortem Templates - Atlassian</a></li>
+<li><a href="https://www.etsy.com/codeascraft/blameless-postmortems/">Etsy Code as Craft Postmortems</a></li>
+</ul>
+<p class="tags-line">Tags: Incident, Postmortem, Blameless, Learning, Operations</p>
+</body>
+</html>

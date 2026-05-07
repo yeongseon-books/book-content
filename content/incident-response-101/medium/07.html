@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mitigation and Resolution</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Mitigation and Resolution</h1>
+<blockquote>
+<p>Incident Response 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>putting the fire out</em> the <em>same thing</em> as <em>removing the cause</em>?</p>
+<blockquote>
+<p><em>Mitigation</em> stops the <em>damage</em>. <em>Resolution</em> removes the <em>cause</em>. Different <em>order</em>, different <em>owners</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Mitigation vs resolution</em></li>
+<li><em>Rollback</em> tactics</li>
+<li><em>Scaling out</em></li>
+<li><em>Throttling</em> and <em>kill switches</em></li>
+<li><em>Recovery verification</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you confuse <em>mitigation</em> with <em>resolution</em>, the <em>same incident</em> erupts again at <em>night</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Incident[&quot;incident&quot;] --&gt; Mit[&quot;mitigation&quot;]
+    Mit --&gt; Stable[&quot;stable&quot;]
+    Stable --&gt; Res[&quot;resolution&quot;]
+    Res --&gt; Closed[&quot;closed&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>mitigation</strong>: <em>stop</em> the <em>damage</em>.</li>
+<li><strong>resolution</strong>: <em>remove</em> the <em>cause</em>.</li>
+<li><strong>rollback</strong>: revert to the <em>previous version</em>.</li>
+<li><strong>kill switch</strong>: turn a <em>feature</em> off <em>immediately</em>.</li>
+<li><strong>throttle</strong>: <em>limit</em> incoming traffic.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: announce only after a <em>full fix</em>.</p>
+<p><strong>After</strong>: announce <em>as soon as</em> damage is <em>contained</em>; announce <em>resolution</em> separately.</p>
+<h2>Hands-on: A Mini Mitigation Kit</h2>
+<p><strong>Step 1 — Rollback</strong></p>
+<pre><code class="language-python">def rollback(version):
+    return {&quot;action&quot;: &quot;rollback&quot;, &quot;to&quot;: version}
+</code></pre>
+<p><strong>Step 2 — Scale out</strong></p>
+<pre><code class="language-python">def scale_out(service, replicas):
+    return {&quot;service&quot;: service, &quot;replicas&quot;: replicas}
+</code></pre>
+<p><strong>Step 3 — Throttle</strong></p>
+<pre><code class="language-python">def throttle(endpoint, rps):
+    return {&quot;endpoint&quot;: endpoint, &quot;rps&quot;: rps}
+</code></pre>
+<p><strong>Step 4 — Kill switch</strong></p>
+<pre><code class="language-python">FLAGS = {}
+
+def kill(feature):
+    FLAGS[feature] = False
+    return FLAGS[feature]
+</code></pre>
+<p><strong>Step 5 — Verify recovery</strong></p>
+<pre><code class="language-python">def verify(metrics):
+    return metrics.get(&quot;err_ratio&quot;, 1) &lt; 0.01
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Mitigation</em> is a <em>small</em> action.</li>
+<li>A <em>kill switch</em> is <em>one flag</em> line.</li>
+<li><em>Verification</em> is <em>quantitative</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Only <em>rolling forward</em>, never <em>back</em>.</strong></li>
+<li><strong>No prepared <em>kill switch</em>.</strong></li>
+<li><strong>Announcing <em>mitigation</em> as <em>resolution</em>.</strong></li>
+<li><strong>Closing without <em>verification</em>.</strong></li>
+<li><strong>Forgetting to <em>unthrottle</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>feature flag</em> system and an <em>autoscaler</em> are wired into a single <em>runbook</em> command, so <em>mitigation</em> takes <em>under two minutes</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Mitigation first</em>.</li>
+<li><em>Resolution</em> during <em>business hours</em>.</li>
+<li>A <em>kill switch</em> on <em>every feature</em>.</li>
+<li><em>Verify</em> with numbers.</li>
+<li><em>Unthrottling</em> is also an <em>event</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Rollback procedure</em>.</li>
+<li>[ ] <em>Kill switch inventory</em>.</li>
+<li>[ ] <em>Throttling policy</em>.</li>
+<li>[ ] <em>Recovery verification metric</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>mitigation</em> in one line.</li>
+<li>Define <em>resolution</em> in one line.</li>
+<li>Define <em>kill switch</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover the <em>postmortem</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Root Cause Analysis</a></li>
+<li><strong>Mitigation and Resolution (current)</strong></li>
+<li>Postmortem (upcoming)</li>
+<li>Prevention (upcoming)</li>
+<li>Building an Incident Runbook (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://response.pagerduty.com/during/mitigation/">Mitigation vs Resolution - PagerDuty</a></li>
+<li><a href="https://sre.google/sre-book/release-engineering/">Rollback Strategies - Google SRE Book</a></li>
+<li><a href="https://martinfowler.com/articles/feature-toggles.html">Feature Flags - Martin Fowler</a></li>
+<li><a href="https://increment.com/reliability/throttling/">Throttling and Backpressure - Increment</a></li>
+</ul>
+<p class="tags-line">Tags: Incident, Mitigation, Resolution, Rollback, Operations</p>
+</body>
+</html>
