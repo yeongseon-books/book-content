@@ -1,0 +1,52 @@
+id: statistics-101
+title:
+  ko: Statistics 101
+  en: Statistics 101
+description:
+  ko: 기술 통계, 분포, 추정, 신뢰구간, 가설검정, 회귀까지 데이터 분석에 필요한 통계의 큰 그림을 다지는 시리즈.
+  en: A Statistics series covering descriptive statistics, distributions, estimation, confidence intervals, hypothesis testing, and regression end to end.
+status: content-ready
+languages:
+  - ko
+  - en
+episodes:
+  - slug: what-is-statistics
+    title:
+      ko: 통계란 무엇인가?
+      en: What Is Statistics?
+  - slug: mean-median-variance
+    title:
+      ko: 평균, 중앙값, 분산
+      en: Mean, Median, and Variance
+  - slug: distributions
+    title:
+      ko: 분포
+      en: Distributions
+  - slug: sample-and-population
+    title:
+      ko: 표본과 모집단
+      en: Sample and Population
+  - slug: estimation
+    title:
+      ko: 추정
+      en: Estimation
+  - slug: confidence-interval
+    title:
+      ko: 신뢰구간
+      en: Confidence Interval
+  - slug: hypothesis-testing
+    title:
+      ko: 가설검정
+      en: Hypothesis Testing
+  - slug: correlation-and-regression
+    title:
+      ko: 상관과 회귀
+      en: Correlation and Regression
+  - slug: understanding-p-value
+    title:
+      ko: p-value 이해하기
+      en: Understanding p-value
+  - slug: statistical-thinking
+    title:
+      ko: 통계적 사고방식
+      en: Statistical Thinking

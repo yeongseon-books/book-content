@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mean, Median, and Variance</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Mean, Median, and Variance</h1>
+<blockquote>
+<p>Statistics 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When summarizing data with <em>one or two numbers</em>, when do we use the <em>mean</em> and when do we use the <em>median</em>? What does <em>variance</em> tell us?</p>
+<blockquote>
+<p><em>A summary statistic changes shape with the question you ask.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Measures of <em>central tendency</em> — <em>mean / median / mode</em></li>
+<li>Measures of <em>spread</em> — <em>variance / standard deviation / IQR</em></li>
+<li>Why the <em>mean is dangerous</em> on <em>skewed distributions</em></li>
+<li>A 5-step summary statistics exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Data has <em>thousands of rows</em>, but humans decide with <em>one or two numbers</em>. <em>Which number you pick</em> determines the <em>quality of the decision</em>.</p>
+<blockquote>
+<p><em>One wrong mean writes one wrong decision.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;Data&quot;] --&gt; Center[&quot;Center: mean/median/mode&quot;]
+    Data --&gt; Spread[&quot;Spread: variance/std/IQR&quot;]
+    Center --&gt; Story[&quot;Summary Story&quot;]
+    Spread --&gt; Story
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Mean</strong>: sum / count. <em>Sensitive to outliers</em>.</li>
+<li><strong>Median</strong>: middle value after sorting. <em>Robust to outliers</em>.</li>
+<li><strong>Mode</strong>: the <em>most frequent</em> value.</li>
+<li><strong>Variance</strong>: average of <em>squared distances</em> from the mean.</li>
+<li><strong>Standard Deviation</strong>: square root of variance. Same units as the data.</li>
+<li><strong>IQR (Interquartile Range)</strong>: <em>Q3 − Q1</em>. The width of the middle 50%.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Our average user spend is $50.”</em> — But what if one user spent $5,000?</p>
+<p><strong>After</strong>: <em>“Median $12, mean $50 (heavily skewed) — spend follows a long-tail distribution.”</em></p>
+<h2>Hands-on: 5-step Summary Statistics</h2>
+<p><strong>Step 1 — Prepare data</strong></p>
+<pre><code class="language-python">import numpy as np
+x = np.array([10, 12, 11, 13, 12, 14, 11, 12, 5_000_000])
+</code></pre>
+<p><strong>Step 2 — Mean and median</strong></p>
+<pre><code class="language-python">print(&quot;mean:&quot;, np.mean(x))
+print(&quot;median:&quot;, np.median(x))
+</code></pre>
+<p><strong>Step 3 — Variance and standard deviation</strong></p>
+<pre><code class="language-python">print(&quot;var:&quot;, np.var(x))
+print(&quot;std:&quot;, np.std(x))
+</code></pre>
+<p><strong>Step 4 — IQR</strong></p>
+<pre><code class="language-python">q1, q3 = np.percentile(x, [25, 75])
+print(&quot;IQR:&quot;, q3 - q1)
+</code></pre>
+<p><strong>Step 5 — Summary sentence</strong></p>
+<pre><code class="language-text">Median 12, IQR 1.5 — most users sit near 12.
+Mean 555,557 (skewed by one outlier).
+Decision: report the median, not the mean.
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>With outliers present, <em>mean ≠ median</em>.</li>
+<li>Variance is in <em>squared units</em>; standard deviation is in <em>original units</em>.</li>
+<li>IQR is a <em>spread</em> measure that is <em>robust to outliers</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Deciding from the <em>mean alone</em>.</strong> Missing the <em>shape</em> of the distribution.</li>
+<li><strong>Confusing <em>standard deviation</em> with <em>variance</em>.</strong> Different units.</li>
+<li><strong>Reporting the <em>mean</em> on a <em>skewed</em> distribution.</strong></li>
+<li><strong>Trusting the <em>variance</em> of <em>N=10</em>.</strong> The sample is too small.</li>
+<li><strong>Reporting <em>unitless numbers</em>.</strong> Always include dollars, %, seconds.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Revenue, response time, ad cost — all of these tend to be <em>long-tail</em>, so <em>median / p95 / p99</em> are reported more often than <em>mean</em>. Dashboards usually show <em>three or four statistics</em> together.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Plot the distribution</em> first.</li>
+<li>Look at <em>median / p95</em> alongside the <em>mean</em>.</li>
+<li><em>Investigate the source</em> of outliers.</li>
+<li><em>Always</em> write the units.</li>
+<li>Pick the <em>summary statistic that matches the question</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the difference between <em>mean</em> and <em>median</em>.</li>
+<li>[ ] I know <em>variance / standard deviation / IQR</em>.</li>
+<li>[ ] I use the <em>median</em> on <em>skewed</em> distributions.</li>
+<li>[ ] I include units in my report.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compute the mean and median of your <em>daily study time over the last 30 days</em>.</li>
+<li>Explain in one sentence why the <em>mean is dangerous</em> on a <em>long-tail</em> distribution.</li>
+<li>Compare <em>IQR</em> and <em>standard deviation</em> — how are they different?</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Summary statistics is a tool for <em>briefly conveying the shape</em> of data. The next episode goes one level deeper into the <em>shape itself</em> — <em>distributions</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
+<li><strong>Mean, Median, and Variance (current)</strong></li>
+<li>Distributions (upcoming)</li>
+<li>Sample and Population (upcoming)</li>
+<li>Estimation (upcoming)</li>
+<li>Confidence Interval (upcoming)</li>
+<li>Hypothesis Testing (upcoming)</li>
+<li>Correlation and Regression (upcoming)</li>
+<li>Understanding p-value (upcoming)</li>
+<li>Statistical Thinking (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.itl.nist.gov/div898/handbook/">NIST/SEMATECH e-Handbook of Statistical Methods</a></li>
+<li><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.describe.html">pandas — describe()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Robust_statistics">Wikipedia — Robust Statistics</a></li>
+<li><a href="https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data">Khan Academy — Summary Statistics</a></li>
+</ul>
+<p class="tags-line">Tags: Statistics, DescriptiveStats, Mean, Variance, Beginner</p>
+</body>
+</html>

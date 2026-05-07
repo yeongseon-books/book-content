@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Correlation and Regression</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Correlation and Regression</h1>
+<blockquote>
+<p>Statistics 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When two variables <em>move together</em>, what does that <em>prove</em>? <em>How strongly</em> and <em>in what way</em> do they move?</p>
+<blockquote>
+<p><em>Correlation is companionship; regression is predictable companionship.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning of the <em>Pearson correlation coefficient</em></li>
+<li><em>Simple linear regression</em></li>
+<li>The meaning of <em>R²</em></li>
+<li>A 5-step regression exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Revenue ~ ad spend</em>, <em>study time ~ score</em> — <em>relationships</em> are the <em>start of all analysis</em>. Correlation and regression are the tools that <em>put a relationship into numbers</em>.</p>
+<blockquote>
+<p><em>Correlation is not causation.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    XY[&quot;X, Y&quot;] --&gt; Corr[&quot;Pearson r&quot;]
+    Corr --&gt; Line[&quot;Regression Line&quot;]
+    Line --&gt; R2[&quot;R^2&quot;]
+    R2 --&gt; Predict[&quot;Predict y from x&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Pearson r</strong>: strength of <em>linear correlation</em> (-1 to +1).</li>
+<li><strong>Spearman ρ</strong>: <em>rank-based</em> correlation — robust to non-linearity.</li>
+<li><strong>Simple Linear Regression</strong>: y = β0 + β1·x + ε.</li>
+<li><strong>R²</strong>: the <em>fraction of variance</em> the model <em>explains</em>.</li>
+<li><strong>Residual</strong>: actual − predicted. <em>Residuals</em> are central to <em>model diagnostics</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Ad spend and revenue have correlation 0.6.”</em> — Type of relationship is <em>unknown</em>.</p>
+<p><strong>After</strong>: <em>“sales = 1,200 + 4.2·ads (R²=0.36) — every $10K of spend predicts +$4.2K of revenue.”</em></p>
+<h2>Hands-on: 5-step Regression</h2>
+<p><strong>Step 1 — Data</strong></p>
+<pre><code class="language-python">import numpy as np, pandas as pd
+ads = np.array([10, 20, 30, 40, 50, 60])
+sales = np.array([1300, 1280, 1320, 1360, 1410, 1450])
+</code></pre>
+<p><strong>Step 2 — Correlation</strong></p>
+<pre><code class="language-python">print(&quot;r:&quot;, np.corrcoef(ads, sales)[0, 1])
+</code></pre>
+<p><strong>Step 3 — Fit a regression</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LinearRegression
+X = ads.reshape(-1, 1)
+model = LinearRegression().fit(X, sales)
+print(&quot;β1:&quot;, model.coef_[0], &quot;β0:&quot;, model.intercept_)
+</code></pre>
+<p><strong>Step 4 — R²</strong></p>
+<pre><code class="language-python">print(&quot;R^2:&quot;, model.score(X, sales))
+</code></pre>
+<p><strong>Step 5 — Residuals</strong></p>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+resid = sales - model.predict(X)
+plt.scatter(model.predict(X), resid); plt.axhline(0); plt.show()
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Correlation gives <em>direction and strength</em>; regression gives a <em>predictable equation</em>.</li>
+<li><em>R²</em> lives in <em>0 to 1</em>; closer to 1 means <em>higher explanatory power</em>.</li>
+<li><em>Patterns in residuals</em> point to <em>non-linearity</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Confusing <em>correlation</em> with <em>causation</em>.</strong></li>
+<li><strong>Letting <em>outliers</em> inflate the <em>correlation</em>.</strong></li>
+<li><strong>Using <em>Pearson</em> on a <em>non-linear</em> relationship.</strong></li>
+<li><strong>Calling a model good from <em>R² alone</em>.</strong></li>
+<li><strong>Skipping <em>residual diagnostics</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Revenue forecasting, price ~ demand, ads ~ conversion, usage ~ churn — used everywhere in <em>business decisions</em>. It scales into <em>multivariate</em>, <em>logistic</em>, and <em>time-series</em> regression.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Knows the <em>correlation → causation</em> trap.</li>
+<li><em>Always</em> visualizes.</li>
+<li><em>Diagnoses residuals</em>.</li>
+<li>Reads <em>R²</em> alongside <em>effect size</em>.</li>
+<li>Separates <em>prediction</em> from <em>interpretation</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know <em>correlation ≠ causation</em>.</li>
+<li>[ ] I know the difference between <em>Pearson and Spearman</em>.</li>
+<li>[ ] I understand <em>R²</em>.</li>
+<li>[ ] I check <em>residuals</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build <em>study time ~ score</em> data and compare <em>r</em> with <em>R²</em>.</li>
+<li>Cite a <em>spurious correlation</em> mistakenly read as causation.</li>
+<li>Explain why <em>Pearson</em> is <em>weak</em> on non-linear relationships.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Correlation and regression are the most basic tools for <em>expressing relationships as numbers</em>. The next episode goes deep into the <em>true meaning of the p-value</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Confidence Interval</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/07-hypothesis-testing.md">Hypothesis Testing</a></li>
+<li><strong>Correlation and Regression (current)</strong></li>
+<li>Understanding p-value (upcoming)</li>
+<li>Statistical Thinking (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/linear_model.html">scikit-learn — Linear Regression</a></li>
+<li><a href="https://www.khanacademy.org/math/statistics-probability/describing-relationships-quantitative-data">Khan Academy — Correlation</a></li>
+<li><a href="https://www.tylervigen.com/spurious-correlations">Spurious Correlations (Vigen)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Anscombe%27s_quartet">Wikipedia — Anscombe's Quartet</a></li>
+</ul>
+<p class="tags-line">Tags: Statistics, Correlation, Regression, Modeling, Beginner</p>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Statistical Thinking</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Statistical Thinking</h1>
+<blockquote>
+<p>Statistics 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is statistics a <em>toolkit</em> or a <em>way of thinking</em>? What appears when we <em>fold the whole series</em> into <em>one continuous flow</em>?</p>
+<blockquote>
+<p><em>Statistics is the language of </em>handling uncertainty<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>statistical flow</em> from <em>question to decision</em></li>
+<li>A <em>capstone walk-through</em> of the entire series</li>
+<li>A <em>mindset</em> for <em>uncertainty</em> and <em>context</em></li>
+<li>A 5-step <em>statistical thinking</em> exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Knowing the tools is meaningless without knowing <em>when and how to use them</em>. <em>Statistical thinking</em> is the <em>bridge from data to decisions</em>.</p>
+<blockquote>
+<p><em>Statistics is the grammar of evidence.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Q[&quot;Question&quot;] --&gt; D[&quot;Data&quot;]
+    D --&gt; Dist[&quot;Distribution&quot;]
+    Dist --&gt; Est[&quot;Estimate + CI&quot;]
+    Est --&gt; Test[&quot;Hypothesis Test&quot;]
+    Test --&gt; Eff[&quot;Effect Size&quot;]
+    Eff --&gt; Dec[&quot;Decision&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Question-first</strong>: <em>Sharpen the question</em> before <em>touching the data</em>.</li>
+<li><strong>Uncertainty</strong>: <em>Every estimate</em> carries an <em>error</em>.</li>
+<li><strong>Context</strong>: The same <em>p</em> can mean <em>different things in different contexts</em>.</li>
+<li><strong>Effect size</strong>: <em>Magnitude</em> often matters more than <em>significance</em>.</li>
+<li><strong>Decision</strong>: The point of statistics is a <em>decision</em>, not a <em>p-value</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Let’s </em>run the data<em> and see </em>what comes out<em>.”</em> — a <em>fishing expedition</em>.</p>
+<p><strong>After</strong>: <em>“What is </em>our question<em>, what </em>data<em> answers it, and </em>how much evidence<em> do we need for the </em>decision<em>?”</em></p>
+<h2>Hands-on: 5-step Statistical Thinking (A/B Test)</h2>
+<p><strong>Step 1 — Question</strong></p>
+<pre><code class="language-python"># Does the new checkout button raise conversion?
+question = &quot;Does new button increase conversion?&quot;
+</code></pre>
+<p><strong>Step 2 — Data and distribution</strong></p>
+<pre><code class="language-python"># A: 5,000 users, 250 conversions ; B: 5,000 users, 290 conversions
+nA, kA = 5000, 250
+nB, kB = 5000, 290
+pA, pB = kA/nA, kB/nB
+print(pA, pB)
+</code></pre>
+<p><strong>Step 3 — Estimate and confidence interval</strong></p>
+<pre><code class="language-python">import math
+diff = pB - pA
+se = math.sqrt(pA*(1-pA)/nA + pB*(1-pB)/nB)
+print(&quot;diff:&quot;, diff, &quot;95% CI:&quot;, (diff - 1.96*se, diff + 1.96*se))
+</code></pre>
+<p><strong>Step 4 — Test and effect size</strong></p>
+<pre><code class="language-python">import math
+z = diff / se
+print(&quot;z:&quot;, z, &quot;lift:&quot;, diff / pA)
+</code></pre>
+<p><strong>Step 5 — Decision</strong></p>
+<pre><code class="language-python"># Small effect with zero rollout cost ships; expensive change needs more data
+decision = &quot;ship&quot; if (diff &gt; 0 and z &gt; 1.96) else &quot;hold&quot;
+print(decision)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>question</em> drives the <em>analysis design</em>.</li>
+<li><em>Estimate + CI + effect size</em> carry <em>more information</em> than <em>p</em> alone.</li>
+<li>A <em>decision</em> is a function of <em>statistics + business cost</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Looking at the <em>data</em> before <em>asking the question</em>.</strong></li>
+<li><strong>Deciding from <em>p alone</em>.</strong></li>
+<li><strong>Failing to <em>put uncertainty into words</em>.</strong></li>
+<li><strong>Comparing analyses <em>without context</em>.</strong></li>
+<li><strong>Separating <em>effect size</em> from <em>cost</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Product experiments, pricing decisions, drug approvals, policy evaluations — <em>statistical thinking</em> underlies <em>every data-driven decision</em>. <em>Data science, ML, and business analytics</em> all share the same flow.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Knows the <em>question → data → decision</em> flow.</li>
+<li><em>Quantifies</em> uncertainty.</li>
+<li>Decides on <em>effect size and cost</em>, not on <em>p</em>.</li>
+<li><em>Documents</em> the context.</li>
+<li>Knows statistics is <em>both a toolkit and a mindset</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I define the <em>question</em> first.</li>
+<li>[ ] I report <em>estimate + CI + effect size</em> together.</li>
+<li>[ ] I make <em>uncertainty explicit</em>.</li>
+<li>[ ] I weigh the <em>cost</em> of the decision.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Re-write a recent <em>data-driven decision</em> as a <em>question → decision</em> flow.</li>
+<li>Replace a <em>p &lt; 0.05</em> report with one based on <em>effect size + CI</em>.</li>
+<li>Cite a case that was <em>statistically significant</em> but <em>practically meaningless</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Statistics is the <em>language of uncertainty</em>, and statistical thinking is the <em>flow from data to decisions</em>. The next steps are <em>Probability 101</em> and <em>Machine Learning 101</em>, where this thinking expands into <em>prediction</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Confidence Interval</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/07-hypothesis-testing.md">Hypothesis Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/08-correlation-and-regression.md">Correlation and Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/09-understanding-p-value.md">Understanding p-value</a></li>
+<li><strong>Statistical Thinking (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/The_Signal_and_the_Noise">Nate Silver — The Signal and the Noise</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Factfulness">Hans Rosling — Factfulness</a></li>
+<li><a href="https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf">ASA Statement on p-Values (2016)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Statistical_thinking">Wikipedia — Statistical Thinking</a></li>
+</ul>
+<p class="tags-line">Tags: Statistics, Thinking, Mindset, Decision, Beginner</p>
+</body>
+</html>
