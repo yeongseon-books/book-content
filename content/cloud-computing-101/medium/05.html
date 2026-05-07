@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Storage</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Storage</h1>
+<blockquote>
+<p>Cloud Computing 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why do S3, EBS, EFS, and Glacier all exist <em>separately</em>?</p>
+<blockquote>
+<p><em>Cloud storage splits into object, block, file, and archive based on access pattern and durability/cost tradeoffs.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The four storage types</li>
+<li>Durability vs availability</li>
+<li>Lifecycle policies</li>
+<li>Encryption basics</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The wrong storage choice is <em>expensive, slow, and fragile</em>. The right one quietly works for years.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Block[&quot;block (EBS)&quot;] --&gt; VM[&quot;vm disk&quot;]
+    Object[&quot;object (S3)&quot;] --&gt; Web[&quot;web/api&quot;]
+    File[&quot;file (EFS)&quot;] --&gt; Share[&quot;multi-host share&quot;]
+    Archive[&quot;archive (Glacier)&quot;] --&gt; Cold[&quot;compliance&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Object</strong>: key-value with metadata (S3).</li>
+<li><strong>Block</strong>: a disk-like surface in fixed blocks (EBS).</li>
+<li><strong>File</strong>: a POSIX directory (EFS).</li>
+<li><strong>Durability</strong>: probability your data survives (e.g., 11 nines).</li>
+<li><strong>Lifecycle</strong>: tier transitions over time.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every file lives on the VM disk, backups become a nightmare.</p>
+<p><strong>After</strong>: objects in S3 with a Glacier transition rule.</p>
+<h2>Hands-on: S3 Object Lifecycle</h2>
+<p><strong>Step 1 — Client</strong></p>
+<pre><code class="language-python">import boto3
+s3 = boto3.client(&quot;s3&quot;)
+</code></pre>
+<p><strong>Step 2 — Put</strong></p>
+<pre><code class="language-python">def put(bucket, key, body):
+    s3.put_object(Bucket=bucket, Key=key, Body=body)
+    return f&quot;s3://{bucket}/{key}&quot;
+</code></pre>
+<p><strong>Step 3 — Get</strong></p>
+<pre><code class="language-python">def get(bucket, key):
+    res = s3.get_object(Bucket=bucket, Key=key)
+    return res[&quot;Body&quot;].read()
+</code></pre>
+<p><strong>Step 4 — Lifecycle policy</strong></p>
+<pre><code class="language-python">policy = {
+    &quot;Rules&quot;: [{
+        &quot;ID&quot;: &quot;to-glacier-after-90d&quot;,
+        &quot;Status&quot;: &quot;Enabled&quot;,
+        &quot;Filter&quot;: {&quot;Prefix&quot;: &quot;logs/&quot;},
+        &quot;Transitions&quot;: [{&quot;Days&quot;: 90, &quot;StorageClass&quot;: &quot;GLACIER&quot;}],
+    }]
+}
+</code></pre>
+<p><strong>Step 5 — Apply</strong></p>
+<pre><code class="language-python">def apply_lifecycle(bucket, policy):
+    s3.put_bucket_lifecycle_configuration(
+        Bucket=bucket, LifecycleConfiguration=policy,
+    )
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Prefixes group objects under a policy.</li>
+<li>Transitions are how you actually save money.</li>
+<li>EBS is typically attached to a single VM at a time.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Public ACLs that expose buckets.</strong></li>
+<li><strong>No lifecycle — costs grow forever.</strong></li>
+<li><strong>No EBS snapshots.</strong></li>
+<li><strong>Assuming EFS gives you high IOPS.</strong></li>
+<li><strong>Forgetting Glacier restore time when you actually need data.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Logs land in S3 and transition to Glacier after 90 days. Database volumes use EBS gp3. Shared directories live on EFS.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The access pattern decides the storage.</li>
+<li>Encryption is the default, not a feature request.</li>
+<li>Define lifecycle on day one.</li>
+<li>Restore cost is part of total cost.</li>
+<li>Backup is not the same as replication.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Default encryption enabled.</li>
+<li>[ ] Lifecycle policies defined.</li>
+<li>[ ] Public access blocked by default.</li>
+<li>[ ] At least one restore drill per year.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Name the three Glacier restore speed tiers.</li>
+<li>Describe a sensible scenario for enabling S3 versioning.</li>
+<li>EBS vs EFS for sharing — explain the difference in one sentence.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once data sits somewhere, you have to <em>connect</em> to it. The next post covers Network.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
+<li><strong>Storage (current)</strong></li>
+<li>Network (upcoming)</li>
+<li>Identity and Security (upcoming)</li>
+<li>Monitoring (upcoming)</li>
+<li>Cost Management (upcoming)</li>
+<li>Cloud Architecture Basics (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html">AWS S3 user guide</a></li>
+<li><a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html">AWS EBS</a></li>
+<li><a href="https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html">AWS EFS</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/restoring-objects-retrieval-options.html">AWS Glacier — restore options</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, Storage, S3, EBS, Architecture</p>
+</body>
+</html>

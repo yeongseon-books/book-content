@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IaaS, PaaS, SaaS</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>IaaS, PaaS, SaaS</h1>
+<blockquote>
+<p>Cloud Computing 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: EC2, Heroku, and Notion are all "cloud" — <em>why do they feel completely different</em>?</p>
+<blockquote>
+<p><em>Cloud service models split work between you and the provider — IaaS, PaaS, SaaS — depending on how much of the OS, runtime, and app you manage yourself.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>IaaS, PaaS, SaaS definitions</li>
+<li>The shared-responsibility diagram</li>
+<li>Five selection criteria</li>
+<li>Where serverless fits</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Pick the wrong model and you waste both <em>cost</em> and <em>speed</em>. Each stage of an organization fits a different abstraction level.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    OS[&quot;OS&quot;] --&gt; Run[&quot;runtime&quot;]
+    Run --&gt; App[&quot;app&quot;]
+    App --&gt; Data[&quot;data&quot;]
+    Data --&gt; User[&quot;user&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>IaaS</strong>: VMs, disks, and networks only.</li>
+<li><strong>PaaS</strong>: also runs your runtime and deploys your code.</li>
+<li><strong>SaaS</strong>: a finished application.</li>
+<li><strong>FaaS</strong>: function-level execution (serverless).</li>
+<li><strong>Managed</strong>: the provider runs it for you.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: do everything yourself — server, OS, app.</p>
+<p><strong>After</strong>: you ship code, the platform handles the rest.</p>
+<h2>Hands-on: A PaaS Example with a Tiny Flask App</h2>
+<p><strong>Step 1 — App code</strong></p>
+<pre><code class="language-python"># app.py
+from flask import Flask
+app = Flask(__name__)
+
+@app.route(&quot;/&quot;)
+def home():
+    return {&quot;hello&quot;: &quot;cloud&quot;}
+</code></pre>
+<p><strong>Step 2 — Dependencies</strong></p>
+<pre><code class="language-text">flask==3.0.0
+gunicorn==21.2.0
+</code></pre>
+<p><strong>Step 3 — Process file</strong></p>
+<pre><code class="language-text"># Procfile
+web: gunicorn app:app
+</code></pre>
+<p><strong>Step 4 — Deploy (PaaS is this short)</strong></p>
+<pre><code class="language-bash">git init
+git add .
+git commit -m &quot;init&quot;
+# example: heroku create &amp;&amp; git push heroku main
+</code></pre>
+<p><strong>Step 5 — IaaS comparison</strong></p>
+<pre><code class="language-python"># On IaaS you would also need to:
+# - provision a VM
+# - install OS packages
+# - configure a reverse proxy
+# - install a log shipper
+print(&quot;PaaS = git push, IaaS = the four steps above by hand&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>PaaS deployment is one Procfile line.</li>
+<li>On IaaS, every step is your responsibility.</li>
+<li>SaaS removes the code itself from your scope.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating a PaaS like a VM.</strong></li>
+<li><strong>Going IaaS without enough operations headcount.</strong></li>
+<li><strong>Ignoring data lock-in when adopting SaaS.</strong></li>
+<li><strong>Underestimating cold starts on FaaS.</strong></li>
+<li><strong>Mixing models without a clear responsibility boundary.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Early-stage startups run on PaaS like Heroku or Render. As they grow they move workloads to IaaS such as AWS with EKS, while keeping office tools on SaaS.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Self-host only what you do <em>better</em> than the provider.</li>
+<li>The PaaS-to-IaaS jump is a cost-vs-control decision.</li>
+<li>SaaS includes vendor risk in the price.</li>
+<li>FaaS is great for event-driven workloads.</li>
+<li>Abstraction = freedom <em>and</em> lock-in.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Each workload mapped to the right model.</li>
+<li>[ ] Vendor lock-in evaluated.</li>
+<li>[ ] Cost simulated, not just listed.</li>
+<li>[ ] Operational headcount lined up.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare hosting a database on IaaS vs PaaS.</li>
+<li>Name one workload that is a <em>bad fit</em> for FaaS.</li>
+<li>Why is data export a non-negotiable SaaS requirement?</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once you pick a model, the next question is <em>where it runs</em>. The next post covers Regions and Availability Zones.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><strong>IaaS, PaaS, SaaS (current)</strong></li>
+<li>Region and Availability Zone (upcoming)</li>
+<li>Compute (upcoming)</li>
+<li>Storage (upcoming)</li>
+<li>Network (upcoming)</li>
+<li>Identity and Security (upcoming)</li>
+<li>Monitoring (upcoming)</li>
+<li>Cost Management (upcoming)</li>
+<li>Cloud Architecture Basics (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://csrc.nist.gov/publications/detail/sp/800-145/final">NIST SP 800-145 — service models</a></li>
+<li><a href="https://aws.amazon.com/types-of-cloud-computing/">AWS — types of cloud computing</a></li>
+<li><a href="https://devcenter.heroku.com/categories/platform">Heroku — platform overview</a></li>
+<li><a href="https://vercel.com/docs/functions">Vercel — serverless functions</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, IaaS, PaaS, SaaS, Architecture</p>
+</body>
+</html>

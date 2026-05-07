@@ -1,0 +1,48 @@
+id: cloud-computing-101
+title:
+  ko: Cloud Computing 101
+  en: Cloud Computing 101
+description:
+  ko: 클라우드의 큰 그림을 IaaS/PaaS/SaaS·리전·컴퓨트·스토리지·네트워크·아이덴티티·모니터링·비용으로 익히는 입문 시리즈
+  en: Big-picture cloud computing — IaaS/PaaS/SaaS, regions, compute, storage, network, identity, monitoring, and cost.
+episodes:
+  - slug: 01-what-is-cloud-computing
+    title:
+      ko: Cloud Computing이란 무엇인가?
+      en: What is Cloud Computing?
+  - slug: 02-iaas-paas-saas
+    title:
+      ko: IaaS, PaaS, SaaS
+      en: IaaS, PaaS, SaaS
+  - slug: 03-region-and-availability-zone
+    title:
+      ko: Region과 Availability Zone
+      en: Region and Availability Zone
+  - slug: 04-compute
+    title:
+      ko: Compute
+      en: Compute
+  - slug: 05-storage
+    title:
+      ko: Storage
+      en: Storage
+  - slug: 06-network
+    title:
+      ko: Network
+      en: Network
+  - slug: 07-identity-and-security
+    title:
+      ko: Identity와 Security
+      en: Identity and Security
+  - slug: 08-monitoring
+    title:
+      ko: Monitoring
+      en: Monitoring
+  - slug: 09-cost-management
+    title:
+      ko: Cost Management
+      en: Cost Management
+  - slug: 10-cloud-architecture-basics
+    title:
+      ko: Cloud Architecture 기초
+      en: Cloud Architecture Basics

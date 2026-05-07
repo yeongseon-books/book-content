@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Architecture Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cloud Architecture Basics</h1>
+<blockquote>
+<p>Cloud Computing 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do all the pieces from this series stitch together into one well-built cloud system?</p>
+<blockquote>
+<p><em>Anchor on the five Well-Architected pillars (operations, security, reliability, performance, cost), then assemble a layered, loosely coupled design.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The five Well-Architected pillars</li>
+<li>A layered web architecture pattern</li>
+<li>Stateless vs stateful separation</li>
+<li>Why IaC is non-negotiable</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The same feature can cost ten times more or ten times less depending on the architecture. This final post pulls the whole series into one picture.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;client&quot;] --&gt; CDN[&quot;cdn&quot;]
+    CDN --&gt; ALB[&quot;load balancer&quot;]
+    ALB --&gt; App[&quot;app (asg)&quot;]
+    App --&gt; Cache[&quot;cache&quot;]
+    App --&gt; DB[&quot;rds (multi-az)&quot;]
+    App --&gt; S3[&quot;s3&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Well-Architected</strong>: AWS framework of design best practices.</li>
+<li><strong>Stateless</strong>: the server holds no client state.</li>
+<li><strong>IaC</strong>: infrastructure expressed as code (Terraform, CloudFormation).</li>
+<li><strong>Loose coupling</strong>: components decoupled through queues.</li>
+<li><strong>Idempotent</strong>: a request can be repeated safely.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: a monolith pinned to one server — changes are scary, outages are catastrophic.</p>
+<p><strong>After</strong>: stateless app tier plus a Multi-AZ database, all defined in IaC. Change is safe.</p>
+<h2>Hands-on: Layered Web Architecture (illustrative)</h2>
+<p><strong>Step 1 — IaC skeleton (pseudo-Terraform)</strong></p>
+<pre><code class="language-python">def vpc(): return {&quot;cidr&quot;: &quot;10.0.0.0/16&quot;, &quot;azs&quot;: 2}
+def subnets(): return [&quot;public-a&quot;, &quot;public-b&quot;, &quot;private-a&quot;, &quot;private-b&quot;]
+</code></pre>
+<p><strong>Step 2 — Compute</strong></p>
+<pre><code class="language-python">def asg(min_, max_): return {&quot;min&quot;: min_, &quot;max&quot;: max_, &quot;policy&quot;: &quot;cpu&gt;60&quot;}
+</code></pre>
+<p><strong>Step 3 — Data</strong></p>
+<pre><code class="language-python">def rds(): return {&quot;engine&quot;: &quot;postgres&quot;, &quot;multi_az&quot;: True, &quot;backup_days&quot;: 7}
+def cache(): return {&quot;engine&quot;: &quot;redis&quot;, &quot;nodes&quot;: 2}
+</code></pre>
+<p><strong>Step 4 — Object and queue</strong></p>
+<pre><code class="language-python">def s3(): return {&quot;versioning&quot;: True, &quot;lifecycle&quot;: &quot;to-glacier-90d&quot;}
+def queue(): return {&quot;visibility_timeout&quot;: 30, &quot;dlq&quot;: True}
+</code></pre>
+<p><strong>Step 5 — Routing</strong></p>
+<pre><code class="language-python">def alb(): return {&quot;listeners&quot;: [{&quot;port&quot;: 443, &quot;tls&quot;: True}], &quot;target&quot;: &quot;asg&quot;}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Multi-AZ is the default, not a feature flag.</li>
+<li>A DLQ is your retry safety net.</li>
+<li>Stateless is the precondition for ASG to actually work.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Trying to horizontally scale a stateful app.</strong></li>
+<li><strong>Running databases in a single AZ.</strong></li>
+<li><strong>Manual changes, no IaC.</strong></li>
+<li><strong>Calling external services without retries.</strong></li>
+<li><strong>Never practicing backup restore.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>CloudFront in front of ALB, an ASG of stateless apps, RDS Multi-AZ, Redis for hot data, S3 for blobs. Terraform reproduces the same shape across environments. On-call leans on dashboards and runbooks.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Well-Architected is a conversation tool, not a checklist.</li>
+<li>Change safety beats every other quality.</li>
+<li>Restore drills matter more than backups.</li>
+<li>Start small, modularize as you grow.</li>
+<li>Docs and runbooks ship with the code.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Multi-AZ enabled.</li>
+<li>[ ] Environment is reproducible from IaC.</li>
+<li>[ ] Restore drill scheduled.</li>
+<li>[ ] Five-pillar review at least once a quarter.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>List all five Well-Architected pillars.</li>
+<li>Give one canonical technique for making an app stateless.</li>
+<li>Explain in one line why IaC is safer than manual changes.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>That closes out <em>Cloud Computing 101</em>. The next series — <em>Containers 101</em>, <em>Kubernetes 101</em>, and <em>Serverless 101</em> — go deep on the compute abstractions.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Network</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/07-identity-and-security.md">Identity and Security</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/08-monitoring.md">Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/09-cost-management.md">Cost Management</a></li>
+<li><strong>Cloud Architecture Basics (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html">AWS Well-Architected Framework</a></li>
+<li><a href="https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html">Multi-AZ design</a></li>
+<li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs">Terraform AWS Provider</a></li>
+<li><a href="https://12factor.net/">Twelve-Factor App</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, Architecture, WellArchitected, AWS, DevOps</p>
+</body>
+</html>
