@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>F1 Score</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>F1 Score</h1>
+<blockquote>
+<p>Model Evaluation 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you collapse precision and recall into a single number, what gets distorted?</p>
+<blockquote>
+<p><em>F1 is the harmonic mean. F-beta generalizes it by weighting one side over the other.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The formula and intuition behind F1</li>
+<li>F-beta for recall-heavy vs precision-heavy use cases</li>
+<li>Macro, micro, and weighted averaging</li>
+<li>What F1 means under class imbalance</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Leaderboards usually report a single F1 number. Without specifying which F1, two models cannot be compared.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[&quot;precision&quot;] --&gt; F1[&quot;F1 = harmonic mean&quot;]
+    R[&quot;recall&quot;] --&gt; F1
+    F1 --&gt; Beta[&quot;F-beta with weight&quot;]
+    F1 --&gt; Avg[&quot;macro / micro / weighted&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>F1</strong>: <code>2*P*R/(P+R)</code>.</li>
+<li><strong>F-beta</strong>: <code>beta&gt;1</code> favors recall, <code>beta&lt;1</code> favors precision.</li>
+<li><strong>Macro</strong>: simple average of per-class F1.</li>
+<li><strong>Micro</strong>: aggregate TP, FP, FN first, then compute.</li>
+<li><strong>Weighted</strong>: weighted by class frequency.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "F1 is 0.78."</p>
+<p><strong>After</strong>: "macro F1 is 0.78, F2 is 0.82, per-class F1 is ..."</p>
+<h2>Hands-on: 5 Steps Comparing F1 Variants</h2>
+<p><strong>Step 1 — Data and model</strong></p>
+<pre><code class="language-python">from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+X, y = make_classification(n_samples=2000, n_classes=3, n_informative=5, weights=[0.6, 0.3, 0.1], random_state=0)
+Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
+m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+pred = m.predict(Xte)
+</code></pre>
+<p><strong>Step 2 — F1 averaging</strong></p>
+<pre><code class="language-python">from sklearn.metrics import f1_score
+print(&quot;micro:&quot;, f1_score(yte, pred, average=&quot;micro&quot;))
+print(&quot;macro:&quot;, f1_score(yte, pred, average=&quot;macro&quot;))
+print(&quot;weighted:&quot;, f1_score(yte, pred, average=&quot;weighted&quot;))
+</code></pre>
+<p><strong>Step 3 — Per-class F1</strong></p>
+<pre><code class="language-python">print(&quot;per class:&quot;, f1_score(yte, pred, average=None))
+</code></pre>
+<p><strong>Step 4 — F-beta</strong></p>
+<pre><code class="language-python">from sklearn.metrics import fbeta_score
+print(&quot;F2 (recall heavy):&quot;, fbeta_score(yte, pred, beta=2, average=&quot;macro&quot;))
+print(&quot;F0.5 (precision heavy):&quot;, fbeta_score(yte, pred, beta=0.5, average=&quot;macro&quot;))
+</code></pre>
+<p><strong>Step 5 — Threshold vs F1 (binary case)</strong></p>
+<pre><code class="language-python">import numpy as np
+from sklearn.datasets import make_classification
+Xb, yb = make_classification(n_samples=1000, weights=[0.8, 0.2], random_state=1)
+mb = LogisticRegression(max_iter=1000).fit(Xb, yb)
+proba = mb.predict_proba(Xb)[:, 1]
+for t in np.arange(0.2, 0.9, 0.1):
+    p = (proba &gt;= t).astype(int)
+    print(round(t, 1), round(f1_score(yb, p), 3))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Macro F1 treats minority classes equally.</li>
+<li>Micro F1 is dominated by the majority class.</li>
+<li>Weighted F1 mirrors the class distribution as is.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Reporting F1 without naming the averaging mode.</li>
+<li>Misreading macro F1 on imbalanced data.</li>
+<li>Ignoring per-class precision and recall behind F1.</li>
+<li>Choosing F-beta beta arbitrarily instead of from cost.</li>
+<li>Skipping the F1 vs threshold curve.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Competitions love a single F1 for ranking. In production, per-class F1 and the threshold curve matter more.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A single F1 is a starting line, not a verdict.</li>
+<li>Beta comes from cost, not taste.</li>
+<li>Macro and micro answer different questions.</li>
+<li>Sweep the threshold to find the F1 peak.</li>
+<li>Read per-class F1 to find weaknesses.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I name the averaging mode.</li>
+<li>[ ] I report per-class F1.</li>
+<li>[ ] I justify the choice of beta.</li>
+<li>[ ] I plot F1 versus threshold.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain how macro, micro, and weighted F1 differ on a 3-class problem.</li>
+<li>Pick an F-beta beta when recall is twice as important as precision.</li>
+<li>Find the threshold that maximizes F1 on the binary example.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>F1 summarizes; it does not diagnose. Next, ROC and AUC give a threshold-free view.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
+<li><strong>F1 Score (current)</strong></li>
+<li>ROC and AUC (upcoming)</li>
+<li>Calibration (upcoming)</li>
+<li>Cross Validation (upcoming)</li>
+<li>Error Analysis (upcoming)</li>
+<li>Building an Evaluation Report (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html">scikit-learn — f1_score</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html">scikit-learn — fbeta_score</a></li>
+<li><a href="https://en.wikipedia.org/wiki/F-score">Wikipedia — F-score</a></li>
+<li><a href="https://developers.google.com/machine-learning/crash-course/classification/precision-and-recall">Google — Classification metrics</a></li>
+</ul>
+<p class="tags-line">Tags: ModelEvaluation, F1Score, Fbeta, ImbalancedData, scikit-learn</p>
+</body>
+</html>

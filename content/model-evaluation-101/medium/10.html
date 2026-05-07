@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building an Evaluation Report</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building an Evaluation Report</h1>
+<blockquote>
+<p>Model Evaluation 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you ship a model, what belongs in a one-page evaluation report?</p>
+<blockquote>
+<p><em>A good report gathers the five elements — data, metrics, threshold, slices, and reproducibility — in a single place.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The five sections of an evaluation report</li>
+<li>How it differs from a Model Card</li>
+<li>Reproducibility metadata</li>
+<li>Patterns for automatic generation</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Reviews, audits, and post-incident analyses all read the same report. A consistent format speeds up the team.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;data section&quot;] --&gt; Report
+    Metric[&quot;metrics + threshold&quot;] --&gt; Report
+    Slice[&quot;slice scores&quot;] --&gt; Report
+    Repro[&quot;reproducibility&quot;] --&gt; Report
+    Risk[&quot;known risks&quot;] --&gt; Report
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Model Card</strong>: a document describing a model's intent and limits.</li>
+<li><strong>Datasheet</strong>: a description of a dataset's origin and bias.</li>
+<li><strong>Operating threshold</strong>: the production decision boundary.</li>
+<li><strong>Reproducibility hash</strong>: identifiers for code and data versions.</li>
+<li><strong>Risk register</strong>: known failure modes.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: a single Slack message — "acc 0.92, ship."</p>
+<p><strong>After</strong>: a five-section structured report, generated automatically.</p>
+<h2>Hands-on: 5 Steps to Build a Report</h2>
+<p><strong>Step 1 — Collect metrics</strong></p>
+<pre><code class="language-python">from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, roc_auc_score, brier_score_loss
+X, y = make_classification(n_samples=3000, weights=[0.7, 0.3], random_state=0)
+Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
+m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+proba = m.predict_proba(Xte)[:, 1]
+pred = (proba &gt;= 0.5).astype(int)
+metrics = {
+    &quot;f1_macro&quot;: f1_score(yte, pred, average=&quot;macro&quot;),
+    &quot;auc_roc&quot;: roc_auc_score(yte, proba),
+    &quot;brier&quot;: brier_score_loss(yte, proba),
+}
+</code></pre>
+<p><strong>Step 2 — Slice scores</strong></p>
+<pre><code class="language-python">slice_mask = Xte[:, 0] &gt; 0
+slices = {
+    &quot;slice_pos&quot;: f1_score(yte[slice_mask], pred[slice_mask]),
+    &quot;slice_neg&quot;: f1_score(yte[~slice_mask], pred[~slice_mask]),
+}
+</code></pre>
+<p><strong>Step 3 — Metadata</strong></p>
+<pre><code class="language-python">import hashlib, sys, sklearn
+meta = {
+    &quot;python&quot;: sys.version.split()[0],
+    &quot;sklearn&quot;: sklearn.__version__,
+    &quot;data_hash&quot;: hashlib.sha1(X.tobytes()).hexdigest()[:10],
+    &quot;threshold&quot;: 0.5,
+}
+</code></pre>
+<p><strong>Step 4 — Serialize the report</strong></p>
+<pre><code class="language-python">import json
+report = {&quot;metrics&quot;: metrics, &quot;slices&quot;: slices, &quot;meta&quot;: meta,
+          &quot;risks&quot;: [&quot;minor calibration drift&quot;, &quot;slice_neg lower F1&quot;]}
+print(json.dumps(report, indent=2))
+</code></pre>
+<p><strong>Step 5 — Render to Markdown</strong></p>
+<pre><code class="language-python">def to_md(rep):
+    lines = [&quot;# Evaluation Report&quot;, &quot;## Metrics&quot;]
+    for k, v in rep[&quot;metrics&quot;].items():
+        lines.append(f&quot;- {k}: {round(v, 3)}&quot;)
+    lines.append(&quot;## Slices&quot;)
+    for k, v in rep[&quot;slices&quot;].items():
+        lines.append(f&quot;- {k}: {round(v, 3)}&quot;)
+    lines.append(&quot;## Meta&quot;)
+    for k, v in rep[&quot;meta&quot;].items():
+        lines.append(f&quot;- {k}: {v}&quot;)
+    return &quot;\n&quot;.join(lines)
+
+print(to_md(report))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Generate JSON first, render Markdown second.</li>
+<li>The data hash is the backbone of reproducibility.</li>
+<li>A documented threshold prevents interpretation drift.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Forgetting to record the threshold.</li>
+<li>Skipping slice scores.</li>
+<li>Omitting version info.</li>
+<li>Leaving the risk section blank.</li>
+<li>Writing the report by hand, killing reproducibility.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>ML release gates and monitoring alerts use the evaluation report as the canonical reference.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A report is a build artifact.</li>
+<li>Model Card and report are separate documents.</li>
+<li>Every number cites its data and threshold.</li>
+<li>The risk section matters most.</li>
+<li>Regenerate periodically to track drift.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Metrics are reported with their threshold.</li>
+<li>[ ] Slice scores are included.</li>
+<li>[ ] Version and hash metadata is recorded.</li>
+<li>[ ] Known risks are listed.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Fill the template with your team's most recent model.</li>
+<li>Produce two reports for the same model at two different thresholds.</li>
+<li>Wire the report generator into your CI pipeline.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Across ten episodes you have a vocabulary for evaluation and the realistic traps. From here, MLOps and deeper error analysis are the natural next series.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">F1 Score</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/06-roc-and-auc.md">ROC and AUC</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/07-calibration.md">Calibration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/08-cross-validation.md">Cross Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/09-error-analysis.md">Error Analysis</a></li>
+<li><strong>Building an Evaluation Report (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://modelcards.withgoogle.com/about">Google — Model Cards</a></li>
+<li><a href="https://arxiv.org/abs/1803.09010">Datasheets for Datasets</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html">scikit-learn — Model evaluation</a></li>
+<li><a href="https://ml-ops.org/">MLOps — Production ML guide</a></li>
+</ul>
+<p class="tags-line">Tags: ModelEvaluation, Reporting, ModelCard, Reproducibility, scikit-learn</p>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error Analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Error Analysis</h1>
+<blockquote>
+<p>Model Evaluation 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Two models with the same overall score — how do you find where they fail differently?</p>
+<blockquote>
+<p><em>Error analysis breaks the aggregate average into subgroups to reveal patterns of weakness.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Decomposing performance by slice</li>
+<li>Classifying error types (FP, FN, class confusion)</li>
+<li>Analyzing accuracy by confidence</li>
+<li>Telling data problems from model problems</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>92% accuracy overall can hide 60% accuracy on a specific user segment, which is a fairness issue.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    All[&quot;all errors&quot;] --&gt; Slice[&quot;slice by feature&quot;]
+    All --&gt; Conf[&quot;slice by confidence&quot;]
+    All --&gt; Conf2[&quot;confusion pairs&quot;]
+    Slice --&gt; Weak[&quot;weakest segment&quot;]
+    Conf --&gt; Calib[&quot;calibration gap&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Slice</strong>: a subset of the data defined by some condition.</li>
+<li><strong>Confusion pair</strong>: classes that are frequently swapped.</li>
+<li><strong>Confidence histogram</strong>: distribution of predicted probabilities.</li>
+<li><strong>Hard example</strong>: a sample that is repeatedly misclassified.</li>
+<li><strong>Label noise</strong>: cases where the ground truth itself is wrong.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "92% accuracy, looks good."</p>
+<p><strong>After</strong>: a per-segment table, the weakest slice identified, and either data or modeling fixes scheduled.</p>
+<h2>Hands-on: 5 Steps of Error Analysis</h2>
+<p><strong>Step 1 — Data and model</strong></p>
+<pre><code class="language-python">import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+X, y = make_classification(n_samples=3000, n_features=8, weights=[0.7, 0.3], random_state=0)
+Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
+m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+proba = m.predict_proba(Xte)[:, 1]
+pred = (proba &gt;= 0.5).astype(int)
+</code></pre>
+<p><strong>Step 2 — Slice scores</strong></p>
+<pre><code class="language-python">from sklearn.metrics import f1_score
+slice_mask = Xte[:, 0] &gt; 0
+print(&quot;slice + :&quot;, f1_score(yte[slice_mask], pred[slice_mask]))
+print(&quot;slice - :&quot;, f1_score(yte[~slice_mask], pred[~slice_mask]))
+</code></pre>
+<p><strong>Step 3 — Error types</strong></p>
+<pre><code class="language-python">fp = (pred == 1) &amp; (yte == 0)
+fn = (pred == 0) &amp; (yte == 1)
+print(&quot;FP:&quot;, fp.sum(), &quot;FN:&quot;, fn.sum())
+</code></pre>
+<p><strong>Step 4 — Error rate per confidence bucket</strong></p>
+<pre><code class="language-python">bins = np.linspace(0, 1, 6)
+for lo, hi in zip(bins[:-1], bins[1:]):
+    m_ = (proba &gt;= lo) &amp; (proba &lt; hi)
+    if m_.sum():
+        err = (pred[m_] != yte[m_]).mean()
+        print(round(lo, 1), round(hi, 1), &quot;err:&quot;, round(err, 3))
+</code></pre>
+<p><strong>Step 5 — Most ambiguous samples</strong></p>
+<pre><code class="language-python">order = np.argsort(np.abs(proba - 0.5))[:10]
+print(&quot;ambiguous indices:&quot;, order.tolist())
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Slice scores are the starting point of fairness work.</li>
+<li>Splitting FP and FN guides threshold tuning.</li>
+<li>Ambiguous samples are prime candidates for label review.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Trusting the overall score and ignoring segments.</li>
+<li>Lumping FP and FN together.</li>
+<li>Blaming the model for label noise.</li>
+<li>Tuning the threshold without confidence-bucket analysis.</li>
+<li>Defining slices after seeing the result (cherry-picking).</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Reliability and fairness audits sometimes require per-segment reports by law.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The weakest slice is more dangerous than the overall number.</li>
+<li>Different error types deserve different fixes.</li>
+<li>Label quality caps model quality.</li>
+<li>Pre-define slices.</li>
+<li>Look at the correlation between confidence and error rate.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I report on at least two slices.</li>
+<li>[ ] I split FP and FN.</li>
+<li>[ ] I review error rate by confidence bucket.</li>
+<li>[ ] I audit labels of ambiguous samples.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Bucket a continuous feature into three ranges and compare slice scores.</li>
+<li>Tabulate how threshold changes shift the FP-to-FN ratio.</li>
+<li>Manually inspect labels for the top 10 ambiguous samples.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Error analysis answers "why does it fail?" Next, the evaluation report ties everything into one document.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">F1 Score</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/06-roc-and-auc.md">ROC and AUC</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/07-calibration.md">Calibration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/08-cross-validation.md">Cross Validation</a></li>
+<li><strong>Error Analysis (current)</strong></li>
+<li>Building an Evaluation Report (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html">scikit-learn — Model evaluation</a></li>
+<li><a href="https://developers.google.com/machine-learning/testing-debugging">Google — Model debugging</a></li>
+<li><a href="https://www.kaggle.com/learn/intermediate-machine-learning">Kaggle — Intermediate ML</a></li>
+<li><a href="https://www.deeplearning.ai/the-batch/issue-115/">Andrew Ng — Error analysis</a></li>
+</ul>
+<p class="tags-line">Tags: ModelEvaluation, ErrorAnalysis, Slicing, Debugging, scikit-learn</p>
+</body>
+</html>
