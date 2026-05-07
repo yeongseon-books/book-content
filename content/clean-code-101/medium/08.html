@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Testable Code</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Testable Code</h1>
+<blockquote>
+<p>Clean Code 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is some code one line to test while other code resists testing entirely?</p>
+<blockquote>
+<p>The way side effects and dependencies are handled decides it. Separate them and tests fall out naturally.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Separating pure logic from side effects</li>
+<li>Creating seams with dependency injection</li>
+<li>Fakes and spies as test doubles</li>
+<li>Handling non-deterministic dependencies (time, randomness)</li>
+<li>Refactorings that improve testability</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Hard-to-test code is a sign of hard-to-change structure. Testability is a measure of design quality.</p>
+<blockquote>
+<p>Testability is not an outcome. It is a result of design.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    L[&quot;Logic&quot;] --&gt; P[&quot;Pure functions&quot;]
+    L --&gt; S[&quot;Side-effect adapters&quot;]
+    P --&gt; T1[&quot;Unit tests&quot;]
+    S --&gt; T2[&quot;Integration tests&quot;]
+</code></pre>
+<p>A pure core surrounded by thin adapters.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Pure function</strong>: Same input → same output, no side effects.</li>
+<li><strong>Dependency Injection</strong>: Pass external dependencies as arguments.</li>
+<li><strong>Seam</strong>: A point where behavior can be swapped.</li>
+<li><strong>Fake</strong>: A simplified working implementation for tests.</li>
+<li><strong>Spy</strong>: A test double that records calls.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">import datetime, requests
+def is_business_hour():
+    now = datetime.datetime.now()
+    return 9 &lt;= now.hour &lt; 18
+
+def fetch_user(uid):
+    return requests.get(f&quot;https://api/users/{uid}&quot;).json()
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">def is_business_hour(now):
+    return 9 &lt;= now.hour &lt; 18
+
+def fetch_user(uid, http):
+    return http.get(f&quot;/users/{uid}&quot;).json()
+</code></pre>
+<p>Time and HTTP arrive from the outside.</p>
+<h2>Hands-on: Five Steps to Testability</h2>
+<p><strong>Step 1 — Extract pure logic</strong></p>
+<pre><code class="language-python"># 1_pure.py
+def total(items):
+    return sum(it.price * it.qty for it in items)
+</code></pre>
+<p>IO-free computation should always be pure.</p>
+<p><strong>Step 2 — Inject time</strong></p>
+<pre><code class="language-python"># 2_clock.py
+from datetime import datetime
+def is_overdue(due, now=None):
+    now = now or datetime.now()
+    return now &gt; due
+</code></pre>
+<p>Tests pin <code>now</code> to a fixed value.</p>
+<p><strong>Step 3 — Fake objects</strong></p>
+<pre><code class="language-python"># 3_fake.py
+class FakeRepo:
+    def __init__(self): self.users = {}
+    def save(self, u): self.users[u.id] = u
+    def get(self, uid): return self.users.get(uid)
+
+def register(repo, user):
+    repo.save(user); return user
+</code></pre>
+<p>Test domain logic without a database.</p>
+<p><strong>Step 4 — Recording calls (Spy)</strong></p>
+<pre><code class="language-python"># 4_spy.py
+class EmailSpy:
+    def __init__(self): self.sent = []
+    def send(self, to, body): self.sent.append((to, body))
+
+def notify(email, user):
+    email.send(user.email, &quot;welcome&quot;)
+</code></pre>
+<p>Verify call count and arguments in tests.</p>
+<p><strong>Step 5 — Isolate external calls</strong></p>
+<pre><code class="language-python"># 5_adapter.py
+class HttpClient:
+    def get(self, path): ...
+
+def fetch_user(uid, http: HttpClient):
+    return http.get(f&quot;/users/{uid}&quot;).json()
+</code></pre>
+<p>Concentrate external calls in a single adapter.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The core logic knows nothing about IO.</li>
+<li>Time and randomness are always injected.</li>
+<li>Tests run fast against fake implementations.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Calling <code>datetime.now()</code> inside the function.</strong> Tests break as time passes.</li>
+<li><strong>Coupling DB and network with domain logic.</strong> Unit tests disappear.</li>
+<li><strong>Relying solely on mock libraries.</strong> Hidden tight coupling remains.</li>
+<li><strong>Public methods only for tests.</strong> Encapsulation breaks.</li>
+<li><strong>Global singletons.</strong> Hard to isolate.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Strong teams use hexagonal / ports-and-adapters to keep the domain core away from IO. Thousands of unit tests still finish in under a second.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Starts with pure functions.</li>
+<li>Receives dependencies as arguments.</li>
+<li>Prefers fakes over mocks.</li>
+<li>Pushes time, randomness, and IO to the edges.</li>
+<li>Treats slow tests as a design smell.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the core logic pure?</li>
+<li>[ ] Are external dependencies injected?</li>
+<li>[ ] Are time and randomness injected?</li>
+<li>[ ] Can tests run without IO using fakes?</li>
+<li>[ ] Do unit tests finish in under one second?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Replace one <code>datetime.now()</code> call in your code with an injected argument.</li>
+<li>Unit-test one DB-bound function using a Fake.</li>
+<li>Extract one external HTTP call into an adapter class.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Testability mirrors design. Next: how to safely change code — refactoring basics.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Removing Duplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/07-comments-and-docs.md">Comments and Documentation</a></li>
+<li><strong>Testable Code (current)</strong></li>
+<li>Refactoring Basics (upcoming)</li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/working-effectively-with/0131177052/">Working Effectively with Legacy Code (M. Feathers)</a></li>
+<li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
+<li><a href="https://martinfowler.com/articles/mocksArentStubs.html">Mocks Aren't Stubs (Martin Fowler)</a></li>
+<li><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html">Pytest — Fixtures</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, Testability, Testing, DependencyInjection, Refactoring</p>
+</body>
+</html>

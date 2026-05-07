@@ -1,0 +1,71 @@
+id: clean-code-101
+title:
+  ko: Clean Code 101
+  en: Clean Code 101
+description:
+  ko: 이름 짓기, 함수 분리, 조건문 단순화, 중복 제거, 오류 처리, 리팩토링 기초까지 Clean Code의 핵심 기법을 다루는 시리즈.
+  en: Naming, small functions, simplifying conditionals, removing duplication, error handling, and refactoring fundamentals — practical Clean Code in ten essays.
+status: content-ready
+category: software-engineering
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-clean-code
+    title:
+      ko: Clean Code란 무엇인가?
+      en: What Is Clean Code?
+  - number: 2
+    slug: naming
+    title:
+      ko: 이름 짓기
+      en: Naming
+  - number: 3
+    slug: small-functions
+    title:
+      ko: 함수 작게 만들기
+      en: Small Functions
+  - number: 4
+    slug: simplifying-conditionals
+    title:
+      ko: 조건문 줄이기
+      en: Simplifying Conditionals
+  - number: 5
+    slug: removing-duplication
+    title:
+      ko: 중복 제거
+      en: Removing Duplication
+  - number: 6
+    slug: error-handling
+    title:
+      ko: 오류 처리
+      en: Error Handling
+  - number: 7
+    slug: comments-and-docs
+    title:
+      ko: 주석과 문서화
+      en: Comments and Documentation
+  - number: 8
+    slug: testable-code
+    title:
+      ko: 테스트 가능한 코드
+      en: Testable Code
+  - number: 9
+    slug: refactoring-basics
+    title:
+      ko: 리팩토링 기초
+      en: Refactoring Basics
+  - number: 10
+    slug: good-code-review
+    title:
+      ko: 좋은 코드 리뷰 기준
+      en: Good Code Review Standards

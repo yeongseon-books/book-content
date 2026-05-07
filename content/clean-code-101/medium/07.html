@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Comments and Documentation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Comments and Documentation</h1>
+<blockquote>
+<p>Clean Code 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does a good comment look like?</p>
+<blockquote>
+<p>One that explains the "why" the code cannot. The "what" should be visible in the code itself.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>When not to write a comment</li>
+<li>Intent comments and warning comments</li>
+<li>Docstring conventions in Python</li>
+<li>Documenting public APIs</li>
+<li>Managing TODO and FIXME</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Comments tend to lie. Code changes; comments rarely follow.</p>
+<blockquote>
+<p>The best comment is the one you no longer need.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Q[&quot;Need explanation?&quot;] --&gt;|&quot;Code can do it&quot;| C[&quot;Improve naming/structure&quot;]
+    Q --&gt;|&quot;Why is missing&quot;| W[&quot;Intent comment&quot;]
+    Q --&gt;|&quot;Hazard&quot;| A[&quot;Warning comment&quot;]
+    Q --&gt;|&quot;Public API&quot;| D[&quot;Docstring&quot;]
+</code></pre>
+<p>If something needs explaining, fix the code first.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Self-documenting code</strong>: Names and structure expose intent.</li>
+<li><strong>Intent comment</strong>: Explains why a piece of code exists.</li>
+<li><strong>Docstring</strong>: Usage information attached to a function or class.</li>
+<li><strong>TODO/FIXME</strong>: Markers for future work; must be traceable.</li>
+<li><strong>API doc</strong>: The contract of a public interface.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python"># increment i by one
+i = i + 1
+
+# user list
+def gu(): ...
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">def get_active_users(): ...
+</code></pre>
+<p>The name replaces the comment.</p>
+<h2>Hands-on: Five Steps to Useful Documentation</h2>
+<p><strong>Step 1 — Intent comment</strong></p>
+<pre><code class="language-python"># 1_intent.py
+# The payment gateway sometimes returns 200 with an error in the body,
+# so we read body.status instead of the HTTP status code.
+def is_paid(resp):
+    return resp.json().get(&quot;status&quot;) == &quot;PAID&quot;
+</code></pre>
+<p>Capture context that the code cannot show.</p>
+<p><strong>Step 2 — Warning comment</strong></p>
+<pre><code class="language-python"># 2_warning.py
+# WARNING: this function performs IO. Do not call inside a transaction.
+def upload_invoice(path): ...
+</code></pre>
+<p>Place warnings where the caller can be hurt.</p>
+<p><strong>Step 3 — Docstring</strong></p>
+<pre><code class="language-python"># 3_doc.py
+def discount(price: int, rate: float) -&gt; int:
+    &quot;&quot;&quot;Return the price after applying a discount.
+
+    Args:
+        price: Integer price in cents.
+        rate: Discount rate in [0, 1].
+
+    Returns:
+        Rounded integer price.
+
+    Raises:
+        ValueError: When rate is out of range.
+    &quot;&quot;&quot;
+    if not 0 &lt;= rate &lt;= 1:
+        raise ValueError(&quot;rate out of range&quot;)
+    return int(price * (1 - rate))
+</code></pre>
+<p>Public functions deserve a docstring.</p>
+<p><strong>Step 4 — README header</strong></p>
+<pre><code class="language-markdown">&lt;!-- 4_readme.md --&gt;
+# checkout-service
+
+Payment domain service that responds within 5 seconds.
+
+- Run: `make run`
+- Test: `make test`
+- Env vars: `GATEWAY_URL`, `SECRET_KEY`
+</code></pre>
+<p>A new contributor should onboard in 30 seconds.</p>
+<p><strong>Step 5 — TODO with an owner</strong></p>
+<pre><code class="language-python"># 5_todo.py
+# TODO(yeongseon, 2026-06-01): replace simple retry with exponential backoff.
+def retry_simple(): ...
+</code></pre>
+<p>Every TODO needs a person and a date.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Code expresses "what"; comments express "why".</li>
+<li>Docstrings make the usage contract explicit.</li>
+<li>TODOs are traceable.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Comments that restate the code.</strong> Pure noise.</li>
+<li><strong>Stale comments.</strong> They become lies.</li>
+<li><strong>Anonymous TODOs.</strong> They live forever.</li>
+<li><strong>Boilerplate docstrings on every function.</strong> Zero information.</li>
+<li><strong>Secrets or local paths in comments.</strong> Bad for security and portability.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Strong teams require docstrings on public APIs and allow only intent comments internally. Every TODO carries an issue link.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Improves names and structure before adding a comment.</li>
+<li>Writes only "why" comments.</li>
+<li>States contracts on public APIs.</li>
+<li>Tags TODOs with an owner and a date.</li>
+<li>Updates stale comments together with the code change.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the code self-explanatory?</li>
+<li>[ ] Does the comment explain "why"?</li>
+<li>[ ] Do public functions have a docstring?</li>
+<li>[ ] Do TODOs have an owner and date?</li>
+<li>[ ] Are old comments still accurate?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Delete three noise comments and improve names instead.</li>
+<li>Add a docstring to one public function.</li>
+<li>Attach an issue link and date to one TODO.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good comments are few and accurate. Next we tackle what truly decides a codebase's fate: testable code.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Removing Duplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Error Handling</a></li>
+<li><strong>Comments and Documentation (current)</strong></li>
+<li>Testable Code (upcoming)</li>
+<li>Refactoring Basics (upcoming)</li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/clean-code-a/9780136083238/">Clean Code (Ch. 4 Comments)</a></li>
+<li><a href="https://peps.python.org/pep-0257/">PEP 257 — Docstring Conventions</a></li>
+<li><a href="https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings">Google Python Style Guide — Comments</a></li>
+<li><a href="https://www.writethedocs.org/guide/">Write the Docs — Documentation Guide</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, Comments, Documentation, Docstring, Readability</p>
+</body>
+</html>

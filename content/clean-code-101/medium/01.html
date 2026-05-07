@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Clean Code?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Clean Code?</h1>
+<blockquote>
+<p>Clean Code 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How is working code different from clean code?</p>
+<blockquote>
+<p>Working is the minimum bar. Clean is consideration for the next person.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of clean code and four signals</li>
+<li>Working vs readable vs cheap-to-change</li>
+<li>How small principles compound</li>
+<li>The objective markers of "clean"</li>
+<li>The map of this whole series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Code is written once and read a hundred times. Readability decides the cost of change.</p>
+<blockquote>
+<p>Clean code is the act of saving the next person's time.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    W[&quot;Works&quot;] --&gt; R[&quot;Readable&quot;]
+    R --&gt; C[&quot;Easy to change&quot;]
+    C --&gt; T[&quot;Trust&quot;]
+</code></pre>
+<p>Working is the start, trust is the end.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Clean code</strong>: Code with clear intent and a low cost of change.</li>
+<li><strong>Readability</strong>: Other developers understand it fast.</li>
+<li><strong>Cognitive load</strong>: Mental effort to understand a unit of code.</li>
+<li><strong>Smell</strong>: A signal of trouble (duplication, giant functions, etc.).</li>
+<li><strong>Refactoring</strong>: Changing structure without changing behavior.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — works, that's all</strong></p>
+<pre><code class="language-python">def f(d, t):
+    return d * (1 + t)
+</code></pre>
+<p><strong>After — intent visible</strong></p>
+<pre><code class="language-python">def total_with_tax(amount: int, tax_rate: float) -&gt; float:
+    return amount * (1 + tax_rate)
+</code></pre>
+<p>Names and types speak the intent.</p>
+<h2>Hands-on: Measure the Mess</h2>
+<p><strong>Step 1 — Function length</strong></p>
+<pre><code class="language-python"># 1_length.py
+def process(order):
+    # 80 lines ...
+    pass
+</code></pre>
+<p>Past 20 lines, write down "why?".</p>
+<p><strong>Step 2 — Argument count</strong></p>
+<pre><code class="language-python"># 2_args.py
+def create_user(name, email, age, address, role, plan, ref):
+    ...
+</code></pre>
+<p>More than three is a candidate for an object.</p>
+<p><strong>Step 3 — Indentation depth</strong></p>
+<pre><code class="language-python"># 3_depth.py
+if a:
+    if b:
+        if c:
+            do()
+</code></pre>
+<p>Past depth 3 is a candidate for extraction.</p>
+<p><strong>Step 4 — Honest names</strong></p>
+<pre><code class="language-python"># 4_name.py
+def calc(x):  # of what?
+    ...
+def calculate_invoice_total(line_items):
+    ...
+</code></pre>
+<p>If the name lies, the code lies.</p>
+<p><strong>Step 5 — Measure cognitive load</strong></p>
+<pre><code class="language-bash"># 5_cc.sh
+radon cc app/ -a -s
+</code></pre>
+<p>Cyclomatic complexity 10+ is a candidate for decomposition.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Names speak intent.</li>
+<li>Length, depth, and arg count are measurable signals.</li>
+<li>Small rules compound into a large effect.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>"It works, ship it".</strong> Six months later, that line is debt.</li>
+<li><strong>Giant functions.</strong> Debugging becomes torture.</li>
+<li><strong>Lying names.</strong> Code and name disagree.</li>
+<li><strong>Deep indentation.</strong> Branches obscure the intent.</li>
+<li><strong>No measurement.</strong> Things do not improve.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Strong teams put thresholds on length, complexity, and naming into a code review guide and gradually enforce them via lint. Large functions get auto-flagged on PRs.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Code is written once and read a hundred times.</li>
+<li>Names are half the documentation.</li>
+<li>What is measured improves.</li>
+<li>Small rules compose into large code quality.</li>
+<li>Clean code is consideration for the next person.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Are functions 20 lines or fewer?</li>
+<li>[ ] Are arguments three or fewer?</li>
+<li>[ ] Is indentation depth three or fewer?</li>
+<li>[ ] Do names speak intent?</li>
+<li>[ ] Do you measure complexity?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick the longest function in your repo and write a decomposition plan.</li>
+<li>Find three lying names and rename them.</li>
+<li>Add three lint rules to your project.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Clean code is the sum of small, measurable principles. Next, we look at the single highest-leverage one — naming.</p>
+<ul>
+<li><strong>What Is Clean Code? (current)</strong></li>
+<li>Naming (upcoming)</li>
+<li>Small Functions (upcoming)</li>
+<li>Simplifying Conditionals (upcoming)</li>
+<li>Removing Duplication (upcoming)</li>
+<li>Error Handling (upcoming)</li>
+<li>Comments and Documentation (upcoming)</li>
+<li>Testable Code (upcoming)</li>
+<li>Refactoring Basics (upcoming)</li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/clean-code-a/9780136083238/">Clean Code — Robert C. Martin</a></li>
+<li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd.php">A Philosophy of Software Design — John Ousterhout</a></li>
+<li><a href="https://martinfowler.com/books/refactoring.html">Refactoring — Martin Fowler</a></li>
+<li><a href="https://testing.googleblog.com/search/label/Code%20Health">Google — Code Health Articles</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, Readability, SoftwareEngineering, CodeQuality, Refactoring</p>
+</body>
+</html>

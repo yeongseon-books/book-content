@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Naming</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Naming</h1>
+<blockquote>
+<p>Clean Code 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How much shorter does a good name make your code?</p>
+<blockquote>
+<p>A good name removes half of the comments. And it makes a single grep accurate.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Six signals of a good name</li>
+<li>The differences between variable, function, and class names</li>
+<li>Bringing domain terms into code</li>
+<li>The most common naming mistakes</li>
+<li>A safe procedure for renaming</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Names are the most-read element of code. Pick a wrong one and you keep saying it forever.</p>
+<blockquote>
+<p>A searchable name is the start of maintainability.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    I[&quot;Intent&quot;] --&gt; N[&quot;Name&quot;]
+    N --&gt; S[&quot;Search&quot;]
+    N --&gt; R[&quot;Read&quot;]
+    N --&gt; D[&quot;Doc&quot;]
+</code></pre>
+<p>The name lifts intent into view.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Intention-revealing</strong>: Says what and why.</li>
+<li><strong>Searchable</strong>: Found by grep in one shot.</li>
+<li><strong>Pronounceable</strong>: A name you can say in a meeting.</li>
+<li><strong>Domain term</strong>: Use the business word as-is.</li>
+<li><strong>Length budget</strong>: Shorter is not better; accuracy first.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">d = 86400  # ?
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">SECONDS_PER_DAY = 86400
+</code></pre>
+<p>The constant carries meaning.</p>
+<h2>Hands-on: Six Naming Principles</h2>
+<p><strong>Step 1 — Reveal intent</strong></p>
+<pre><code class="language-python"># 1_intent.py
+def f(x): return x[0]            # of what?
+def first_completed_order(orders): return orders[0]
+</code></pre>
+<p>The name explains the call site.</p>
+<p><strong>Step 2 — Searchable</strong></p>
+<pre><code class="language-python"># 2_search.py
+TAX = 0.08                       # used where? unclear
+DEFAULT_SALES_TAX_RATE = 0.08
+</code></pre>
+<p>Caught by a single grep.</p>
+<p><strong>Step 3 — Domain terms</strong></p>
+<pre><code class="language-python"># 3_domain.py
+def calc(items): ...             # domain lost
+def calculate_invoice_subtotal(line_items): ...
+</code></pre>
+<p>Code and business speak the same word.</p>
+<p><strong>Step 4 — Avoid negatives</strong></p>
+<pre><code class="language-python"># 4_negative.py
+if not is_not_empty(x): ...      # double negative
+if is_empty(x): ...
+</code></pre>
+<p>Affirmatives use less brain.</p>
+<p><strong>Step 5 — Balance brevity and accuracy</strong></p>
+<pre><code class="language-python"># 5_balance.py
+i, j, k                          # short loops are fine
+customer_balance_cents           # domain names can be long
+</code></pre>
+<p>Narrow scope: short. Wide scope: precise.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The name creates meaning at the call site.</li>
+<li>Searchability enables future analysis.</li>
+<li>Domain terms bridge users and developers.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><code>data</code>, <code>info</code>, <code>obj</code>.</strong> Zero information.</li>
+<li><strong>Heavy abbreviations.</strong> Names like <code>usrCtxMgr</code>.</li>
+<li><strong>Numeric suffixes.</strong> <code>process2</code>, <code>process3</code> carry no meaning.</li>
+<li><strong>Type in the name.</strong> Use <code>user</code>, not <code>user_dict</code>.</li>
+<li><strong>Lying names.</strong> <code>getXxx</code> that mutates.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams keep a domain glossary in the repo and enforce consistency in PRs. Lints forbid one-letter variables outside loops and require an abbreviation allow-list.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Names are half the documentation.</li>
+<li>Accuracy beats brevity.</li>
+<li>Searchability decides future cost.</li>
+<li>Bring domain terms straight into code.</li>
+<li>A lying name is fraud.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the name reveal intent?</li>
+<li>[ ] Is it grep-searchable?</li>
+<li>[ ] Does it use a domain term?</li>
+<li>[ ] Did you avoid negatives?</li>
+<li>[ ] Is length appropriate to scope?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find five <code>data</code>/<code>info</code>/<code>obj</code> and rename them.</li>
+<li>Expand five abbreviations.</li>
+<li>Build a one-page domain glossary.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Naming is the single highest-leverage readability tool. Next we shrink the unit those names point at — small functions.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><strong>Naming (current)</strong></li>
+<li>Small Functions (upcoming)</li>
+<li>Simplifying Conditionals (upcoming)</li>
+<li>Removing Duplication (upcoming)</li>
+<li>Error Handling (upcoming)</li>
+<li>Comments and Documentation (upcoming)</li>
+<li>Testable Code (upcoming)</li>
+<li>Refactoring Basics (upcoming)</li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/clean-code-a/9780136083238/">Clean Code (Ch. 2 Meaningful Names)</a></li>
+<li><a href="https://www.oreilly.com/library/view/domain-driven-design-tackling/0321125215/">Domain-Driven Design — Eric Evans</a></li>
+<li><a href="https://google.github.io/styleguide/pyguide.html#316-naming">Google Style Guide — Naming</a></li>
+<li><a href="https://peps.python.org/pep-0008/#naming-conventions">PEP 8 — Naming Conventions</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, Naming, Readability, Refactoring, SoftwareEngineering</p>
+</body>
+</html>
