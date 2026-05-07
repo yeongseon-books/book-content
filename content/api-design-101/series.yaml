@@ -1,0 +1,71 @@
+id: api-design-101
+title:
+  ko: API Design 101
+  en: API Design 101
+description:
+  ko: REST 기본부터 리소스 설계, HTTP method/status, schema, pagination, error, OpenAPI까지 쓰기 좋은 API를 설계하는 시리즈.
+  en: A practical tour of API design — REST basics, resources, HTTP methods/status, schemas, pagination, errors, and OpenAPI.
+status: content-ready
+category: software-engineering
+languages:
+  - ko
+  - en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+level: 101
+lifecycle: active
+episodes:
+  - number: 1
+    slug: what-is-an-api
+    title:
+      ko: API란 무엇인가?
+      en: What Is an API?
+  - number: 2
+    slug: rest-basics
+    title:
+      ko: REST 기본
+      en: REST Basics
+  - number: 3
+    slug: resource-design
+    title:
+      ko: 리소스 설계
+      en: Resource Design
+  - number: 4
+    slug: http-methods-and-status
+    title:
+      ko: HTTP method와 status code
+      en: HTTP Methods and Status Codes
+  - number: 5
+    slug: request-and-response-schema
+    title:
+      ko: Request와 response schema
+      en: Request and Response Schemas
+  - number: 6
+    slug: pagination-and-filtering
+    title:
+      ko: Pagination과 filtering
+      en: Pagination and Filtering
+  - number: 7
+    slug: error-response-design
+    title:
+      ko: Error response 설계
+      en: Designing Error Responses
+  - number: 8
+    slug: openapi-and-swagger
+    title:
+      ko: OpenAPI와 Swagger
+      en: OpenAPI and Swagger
+  - number: 9
+    slug: api-versioning
+    title:
+      ko: Versioning
+      en: API Versioning
+  - number: 10
+    slug: writing-good-api-docs
+    title:
+      ko: 좋은 API 문서 만들기
+      en: Writing Good API Documentation

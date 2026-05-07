@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pagination and Filtering</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Pagination and Filtering</h1>
+<blockquote>
+<p>API Design 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you must return a large collection in <em>chunks</em>, what is the safe and fast way to do it?</p>
+<blockquote>
+<p>The answer depends on how <em>fast the data changes</em> — offset for static data, cursor for fast-changing data.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The limits of offset / limit pagination</li>
+<li>Cursor-based pagination</li>
+<li>Sorting, filtering, and searching</li>
+<li>Response metadata and link headers</li>
+<li>Performance traps in large result sets</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Bad pagination produces slow queries <em>and</em> duplicates <em>and</em> gaps — at the same time. And once it ships, it is hard to change. Be intentional from day one.</p>
+<blockquote>
+<p>Large collections must travel in <em>chunks</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;?limit=20&quot;] --&gt; P1[&quot;page 1 + next_cursor&quot;]
+    P1 --&gt; A2[&quot;?limit=20&amp;cursor=...&quot;]
+    A2 --&gt; P2[&quot;page 2 + next_cursor&quot;]
+</code></pre>
+<p>A cursor marks the <em>start of the next page</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Offset / Limit</strong>: <code>?offset=40&amp;limit=20</code> — simple, but <em>slow as offsets grow</em>.</li>
+<li><strong>Cursor</strong>: an opaque token encoding the last item's sort key.</li>
+<li><strong>Total count</strong>: total number of rows — <em>expensive</em> on large tables.</li>
+<li><strong>Sort</strong>: <code>?sort=created_at:desc</code>.</li>
+<li><strong>Filter</strong>: <code>?status=active&amp;tier=pro</code>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (sort, filter, page mashed together)</strong></p>
+<pre><code>GET /orders?p=3&amp;s=date&amp;q=paid
+</code></pre>
+<p><strong>After (named, standard, with metadata)</strong></p>
+<pre><code>GET /orders?status=paid&amp;sort=created_at:desc&amp;limit=20&amp;cursor=eyJpZCI6MTIzfQ
+</code></pre>
+<h2>Hands-on: Five Pagination Steps</h2>
+<p><strong>Step 1 — offset / limit</strong></p>
+<pre><code class="language-python"># 1_offset.py
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+ITEMS = list(range(1000))
+
+@app.get(&quot;/items&quot;)
+def items():
+    offset = int(request.args.get(&quot;offset&quot;, 0))
+    limit = min(int(request.args.get(&quot;limit&quot;, 20)), 100)
+    return jsonify(items=ITEMS[offset:offset+limit], total=len(ITEMS))
+</code></pre>
+<p>Always cap <code>limit</code>.</p>
+<p><strong>Step 2 — cursor</strong></p>
+<pre><code class="language-python"># 2_cursor.py
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+ITEMS = list(range(1000))
+
+@app.get(&quot;/items&quot;)
+def items():
+    cursor = int(request.args.get(&quot;cursor&quot;, 0))
+    limit = min(int(request.args.get(&quot;limit&quot;, 20)), 100)
+    page = ITEMS[cursor:cursor+limit]
+    nxt = cursor + len(page)
+    return jsonify(items=page, next_cursor=(nxt if nxt &lt; len(ITEMS) else None))
+</code></pre>
+<p>Cursors are <em>opaque</em> — clients do not parse them.</p>
+<p><strong>Step 3 — sorting</strong></p>
+<pre><code>GET /items?sort=created_at:desc
+GET /items?sort=name:asc,id:desc
+</code></pre>
+<p>Standardize multi-key sort too.</p>
+<p><strong>Step 4 — filtering</strong></p>
+<pre><code>GET /orders?status=paid&amp;tier=pro
+GET /orders?created_at__gte=2026-01-01
+</code></pre>
+<p>Use explicit operator suffixes like <code>__gte</code>, <code>__lt</code>.</p>
+<p><strong>Step 5 — search</strong></p>
+<pre><code>GET /articles?q=python+logging
+</code></pre>
+<p>Search lives in its own parameter <code>q</code> — kept separate from filters.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>limit</code> has a <em>cap</em>.</li>
+<li>The cursor is an <em>opaque token</em>.</li>
+<li>Sort, filter, and search each have their own meaning — never share a parameter.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>No cap on <code>limit</code>.</strong> A client asks for a hundred thousand at once.</li>
+<li><strong>Deep offset.</strong> <code>offset=100000</code> is <em>slow</em> even with an index.</li>
+<li><strong>Always computing total.</strong> A killer on large tables.</li>
+<li><strong>Filter, sort, search jammed into one parameter.</strong> Hard to validate or document.</li>
+<li><strong>Exposing cursor <em>contents</em>.</strong> Clients forge cursors and exfiltrate data.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>GitHub returns next/prev URLs in the <code>Link</code> header. Fast-moving data — Twitter, Slack — defaults to cursors. Stripe exposes a simple cursor with <code>has_more</code> plus <code>data[].id</code>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>New collections start with <em>cursors</em>; only small static ones use offset.</li>
+<li>Document the default and maximum <code>limit</code>.</li>
+<li>Make total count <em>optional</em> — drop it when expensive.</li>
+<li>Document filter values as enums.</li>
+<li>Consider moving search to a <em>separate endpoint</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is <code>limit</code> capped?</li>
+<li>[ ] Is the cursor opaque?</li>
+<li>[ ] Do sort, filter, and search use distinct parameters?</li>
+<li>[ ] Does the response include a <em>next-page</em> link or cursor?</li>
+<li>[ ] Was total count chosen <em>with cost in mind</em>?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Redesign one of your list endpoints to be cursor-based.</li>
+<li>Add a hard cap of 100 to Step 1's <code>limit</code>.</li>
+<li>Decide whether to put search on its own endpoint or under <code>?q=</code>, and write down the trade-offs.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Pagination sits at the intersection of <em>performance and correctness</em>. The next episode tackles a topic every API hits — designing error responses.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
+<li><strong>Pagination and Filtering (current)</strong></li>
+<li>Designing Error Responses (upcoming)</li>
+<li>OpenAPI and Swagger (upcoming)</li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://stripe.com/docs/api/pagination">Stripe API: Pagination</a></li>
+<li><a href="https://docs.github.com/en/rest/guides/using-pagination-in-the-rest-api">GitHub REST API: Using Pagination</a></li>
+<li><a href="https://api.slack.com/docs/pagination">Slack API: Cursor-based Pagination</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc5988">RFC 5988 — Web Linking (Link header)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, Pagination, Filtering, Performance, Backend</p>
+</body>
+</html>

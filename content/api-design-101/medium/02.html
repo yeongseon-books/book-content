@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>REST Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>REST Basics</h1>
+<blockquote>
+<p>API Design 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: REST is not just a <em>URL convention</em> — what is it really?</p>
+<blockquote>
+<p>It is the set of <em>six architectural constraints</em> defined by Roy Fielding. At its center sits the <em>resource</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and history of REST</li>
+<li>The six architectural constraints</li>
+<li>Resource-centric thinking</li>
+<li>The intuition behind HTTP method mapping</li>
+<li>What looks like REST but is not (RPC over HTTP)</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>REST is the most common API style. Follow it well and your API becomes <em>predictable</em>; follow it poorly and it becomes <em>something I have seen before but cannot quite recognize</em>. Internalize the core and every later episode becomes easier.</p>
+<blockquote>
+<p>Understand <em>why</em> the rule exists, not only the rule.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;Client&quot;] --&gt;|&quot;GET /users/42&quot;| Server[&quot;Server&quot;]
+    Server --&gt;|&quot;200 OK + JSON&quot;| Client
+    Server --- DB[(&quot;Resources&quot;)]
+</code></pre>
+<p>Resources are identified by URLs; actions are expressed as HTTP methods.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Resource</strong>: the <em>noun</em> an API exposes (users, orders, posts).</li>
+<li><strong>Representation</strong>: the format a resource is returned in (JSON, XML).</li>
+<li><strong>Stateless</strong>: the server stores no client state between calls.</li>
+<li><strong>Uniform Interface</strong>: the call conventions are consistent.</li>
+<li><strong>HATEOAS</strong>: responses include links to <em>next actions</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (RPC style)</strong></p>
+<pre><code>POST /getUser?id=42
+POST /createUser
+POST /deleteUser?id=42
+</code></pre>
+<p>Verbs leak into the URL.</p>
+<p><strong>After (REST style)</strong></p>
+<pre><code>GET    /users/42
+POST   /users
+DELETE /users/42
+</code></pre>
+<p>Resources live in the URL; actions live in the method.</p>
+<h2>Hands-on: Walking Through the Six Constraints</h2>
+<p><strong>Step 1 — Client and Server Separation</strong></p>
+<pre><code class="language-python"># 1_client_server.py
+# Client owns the UI; server owns the data — either side must be replaceable
+import requests
+print(requests.get(&quot;https://api.github.com&quot;).status_code)
+</code></pre>
+<p>The server can change implementation and the client survives.</p>
+<p><strong>Step 2 — Stateless Calls</strong></p>
+<pre><code class="language-python"># 2_stateless.py
+import requests
+# Every call is *self-contained* — credentials travel each time
+headers = {&quot;Authorization&quot;: &quot;token TEST&quot;}
+requests.get(&quot;https://api.example.com/me&quot;, headers=headers)
+</code></pre>
+<p>The server does not <em>remember</em> sessions — every call must carry what it needs.</p>
+<p><strong>Step 3 — Cacheable Responses</strong></p>
+<pre><code class="language-python"># 3_cache.py
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+@app.get(&quot;/articles/1&quot;)
+def article():
+    resp = jsonify(id=1, title=&quot;REST Basics&quot;)
+    resp.headers[&quot;Cache-Control&quot;] = &quot;public, max-age=60&quot;
+    return resp
+</code></pre>
+<p>Make caching <em>explicit</em> in the response.</p>
+<p><strong>Step 4 — Uniform Interface</strong></p>
+<pre><code class="language-python"># 4_uniform.py
+# Same resource, different methods
+# GET    /users/42  -&gt; read
+# PUT    /users/42  -&gt; replace
+# DELETE /users/42  -&gt; remove
+</code></pre>
+<p>Consistent conventions reduce learning cost.</p>
+<p><strong>Step 5 — Layered + Code on Demand</strong></p>
+<pre><code class="language-python"># 5_layered.py
+# Client -&gt; CDN -&gt; LB -&gt; App -&gt; DB
+# The client only knows the *next layer*
+</code></pre>
+<p>You can insert caches or gateways without changing client code.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Methods</em> express verbs; <em>URLs</em> express nouns.</li>
+<li>Tokens travel each call — sessions do not live on the <em>server</em>.</li>
+<li>Headers like <code>Cache-Control</code> are part of the API contract too.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Verbs in URLs.</strong> <code>/getUser</code> — an RPC tell.</li>
+<li><strong>POST for everything.</strong> Throws away method semantics.</li>
+<li><strong>Server-side sessions.</strong> Blocks horizontal scaling.</li>
+<li><strong>Errors returned as 200.</strong> Clients cannot branch.</li>
+<li><strong>Treating REST as only a URL style.</strong> Forgetting the six constraints.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>GitHub, Stripe, GitLab — most public APIs are <em>mostly REST</em>. Pure HATEOAS is rare, but <em>resource-centric design + uniform interface</em> has become the standard. Internal teams default to REST and add GraphQL or gRPC only where the trade-off pays off.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Define the <em>boundary</em> of each resource first.</li>
+<li>Let methods express <em>state transitions</em> on the resource.</li>
+<li>Treat caching, auth, and errors as part of the formal contract.</li>
+<li>Do not turn REST into a religion — RPC has its place.</li>
+<li>Always ask: is this <em>predictable</em> from the client side?</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] No verbs in URLs?</li>
+<li>[ ] Methods carry the same meaning across resources?</li>
+<li>[ ] Responses include appropriate cache headers?</li>
+<li>[ ] Auth is self-contained on every call?</li>
+<li>[ ] Error status codes are unambiguous?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick a familiar REST API; list five endpoints with method, URL, and meaning.</li>
+<li>Extend the Step 4 Flask example with <code>PUT /articles/1</code>.</li>
+<li>Implement the same feature once as RPC over HTTP and once as REST; compare.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>REST is the <em>sum of six constraints</em>. The next episode dives into the heart of those constraints — resource design.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><strong>REST Basics (current)</strong></li>
+<li>Resource Design (upcoming)</li>
+<li>HTTP Methods and Status Codes (upcoming)</li>
+<li>Request and Response Schemas (upcoming)</li>
+<li>Pagination and Filtering (upcoming)</li>
+<li>Designing Error Responses (upcoming)</li>
+<li>OpenAPI and Swagger (upcoming)</li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm">Roy Fielding — Architectural Styles (Ch. 5)</a></li>
+<li><a href="https://restfulapi.net/">REST API Tutorial (restfulapi.net)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">HTTP overview (MDN)</a></li>
+<li><a href="https://martinfowler.com/articles/richardsonMaturityModel.html">Richardson Maturity Model (Martin Fowler)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, REST, HTTP, Backend, WebDevelopment</p>
+</body>
+</html>

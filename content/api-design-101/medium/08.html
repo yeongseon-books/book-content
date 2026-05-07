@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OpenAPI and Swagger</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>OpenAPI and Swagger</h1>
+<blockquote>
+<p>API Design 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If you could capture <em>every promise</em> of an API in a single file, what would happen?</p>
+<blockquote>
+<p>Documentation, validation, client SDKs, and mock servers all <em>follow automatically</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The structure of the OpenAPI 3 spec</li>
+<li>Swagger UI and Redoc</li>
+<li>Code-first vs schema-first</li>
+<li>Generating client SDKs</li>
+<li>Preventing spec drift</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A single spec file produces <em>docs + validation + client code + mock server</em>. Hand-written docs <em>always</em> drift from code — automation is the answer.</p>
+<blockquote>
+<p>Keep one <em>single source of truth</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Spec[&quot;openapi.yaml&quot;] --&gt; Docs[&quot;Swagger UI / Redoc&quot;]
+    Spec --&gt; Validate[&quot;request validation&quot;]
+    Spec --&gt; Client[&quot;client SDK generation&quot;]
+    Spec --&gt; Mock[&quot;mock server&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>OpenAPI</strong>: the API spec standard (formerly Swagger spec).</li>
+<li><strong>Swagger UI</strong>: renders the spec as <em>clickable docs</em>.</li>
+<li><strong>Redoc</strong>: an alternative, more readable renderer.</li>
+<li><strong>Code-first</strong>: the spec is <em>generated</em> from code decorators.</li>
+<li><strong>Schema-first</strong>: the spec is <em>written first</em>, code is generated.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (hand-written docs)</strong></p>
+<pre><code>README.md &quot;GET /users/{id} returns user. id is integer.&quot;
+</code></pre>
+<p><strong>After (slice of OpenAPI)</strong></p>
+<pre><code class="language-yaml">paths:
+  /users/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: integer}
+      responses:
+        '200':
+          description: User
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/User'}
+</code></pre>
+<h2>Hands-on: Five OpenAPI Steps</h2>
+<p><strong>Step 1 — Minimal spec</strong></p>
+<pre><code class="language-yaml"># openapi.yaml
+openapi: 3.0.0
+info: {title: Demo API, version: '1.0'}
+paths:
+  /health:
+    get:
+      responses:
+        '200': {description: OK}
+</code></pre>
+<p>Open it in Swagger UI and you get a <em>try-it-now</em> button for free.</p>
+<p><strong>Step 2 — components / schemas</strong></p>
+<pre><code class="language-yaml">components:
+  schemas:
+    User:
+      type: object
+      required: [id, name]
+      properties:
+        id: {type: integer}
+        name: {type: string}
+</code></pre>
+<p>Schemas are <em>reusable</em> via <code>$ref</code>.</p>
+<p><strong>Step 3 — Code-first (FastAPI)</strong></p>
+<pre><code class="language-python"># 3_codefirst.py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int; name: str
+
+app = FastAPI()
+@app.get(&quot;/users/{uid}&quot;)
+def user(uid: int) -&gt; User: return User(id=uid, name=&quot;Y&quot;)
+# /docs and /openapi.json are generated automatically
+</code></pre>
+<p><strong>Step 4 — Swagger UI / Redoc</strong></p>
+<pre><code>GET /docs        # Swagger UI (try it)
+GET /redoc       # Redoc (read it)
+GET /openapi.json
+</code></pre>
+<p>Two faces of the same spec.</p>
+<p><strong>Step 5 — Generate clients</strong></p>
+<pre><code class="language-bash"># 5_gen.sh
+openapi-generator-cli generate \
+  -i openapi.json -g python -o ./client
+</code></pre>
+<p>Dozens of SDKs from <em>one command</em>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The spec grows <em>with the code</em>.</li>
+<li>The same schema powers validation, docs, and SDKs.</li>
+<li>Hand-written docs disappear.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Spec and code live <em>separately</em>.</strong> They will <em>certainly</em> drift.</li>
+<li><strong>No examples.</strong> Clients cannot see <em>what to send</em>.</li>
+<li><strong>Missing error responses.</strong> Only 200 is documented; 4xx/5xx is a <em>secret</em>.</li>
+<li><strong>No spec versioning.</strong> No way to track changes.</li>
+<li><strong>Internal info in the public spec.</strong> Internal endpoints and fields leak.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>GitHub publishes its OpenAPI spec at <code>api.github.com/openapi</code>. Internally, having CI check that the spec changes whenever the code changes makes drift disappear. FastAPI and NestJS export the spec by default.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Pick <em>one</em> approach — code-first or schema-first, never both.</li>
+<li>Commit the spec to git and review it via PR diffs.</li>
+<li>Always fill in examples — users <em>copy-paste</em> to start.</li>
+<li>Document 4xx and 5xx in the spec, not just 200.</li>
+<li>Separate <em>public</em> and <em>internal</em> specs.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the spec kept in sync with the code (checked in CI)?</li>
+<li>[ ] Does every endpoint have examples?</li>
+<li>[ ] Are 4xx / 5xx defined in the spec?</li>
+<li>[ ] Are <code>components/schemas</code> reused with <code>$ref</code>?</li>
+<li>[ ] Are public and internal specs separated?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Express your largest endpoint as OpenAPI.</li>
+<li>Add <code>POST /users</code> to the Step 3 FastAPI app.</li>
+<li>Sketch a workflow that makes spec changes part of <em>PR review</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>OpenAPI is the API's <em>protocol, documentation, and code</em> in one. The next episode looks at the discipline of <em>changing</em> a contract — versioning.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">Pagination and Filtering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">Designing Error Responses</a></li>
+<li><strong>OpenAPI and Swagger (current)</strong></li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://spec.openapis.org/oas/latest.html">OpenAPI Specification</a></li>
+<li><a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a></li>
+<li><a href="https://redocly.com/redoc/">Redoc</a></li>
+<li><a href="https://fastapi.tiangolo.com/features/">FastAPI: Automatic docs</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, OpenAPI, Swagger, Documentation, Backend</p>
+</body>
+</html>

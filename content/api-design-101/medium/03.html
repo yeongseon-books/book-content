@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Resource Design</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Resource Design</h1>
+<blockquote>
+<p>API Design 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does it actually mean to <em>design good URLs</em> in a REST API?</p>
+<blockquote>
+<p>It means modeling <em>resource boundaries</em> and <em>relationships</em> well. The URL is just the visible result.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How to draw resource boundaries</li>
+<li>Rules for nouns, plurals, and hierarchy</li>
+<li>Modeling sub-resources</li>
+<li>Choosing and exposing identifiers</li>
+<li>Anti-patterns that keep coming back</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Once a URL is public, it is <em>expensive to change</em>. A bad resource model warps every later decision — methods, status codes, documentation. Resource design is <em>half of API design</em>.</p>
+<blockquote>
+<p>If your resources wobble, everything wobbles.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;/users&quot;] --&gt; B[&quot;/users/42&quot;]
+    B --&gt; C[&quot;/users/42/orders&quot;]
+    C --&gt; D[&quot;/users/42/orders/9&quot;]
+</code></pre>
+<p>Collection → item → sub-collection → sub-item.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Collection</strong>: a set of same-kind resources — <code>/users</code>.</li>
+<li><strong>Item</strong>: one element of a collection — <code>/users/42</code>.</li>
+<li><strong>Sub-resource</strong>: a resource that <em>belongs to</em> another — <code>/users/42/orders</code>.</li>
+<li><strong>Identifier</strong>: the key that names a resource (id or slug).</li>
+<li><strong>Canonical URL</strong>: the <em>official</em> path for a resource.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (verbs, singular, flat)</strong></p>
+<pre><code>GET /getUserOrder?userId=42&amp;orderId=9
+</code></pre>
+<p><strong>After (nouns, plural, hierarchical)</strong></p>
+<pre><code>GET /users/42/orders/9
+</code></pre>
+<p>You can read it and understand it.</p>
+<h2>Hands-on: Five Steps to a Resource Model</h2>
+<p><strong>Step 1 — Start with Nouns</strong></p>
+<pre><code>/users
+/orders
+/articles
+</code></pre>
+<p>Plurals by default — collections hold <em>many</em>.</p>
+<p><strong>Step 2 — Attach Identifiers</strong></p>
+<pre><code>/users/42
+/orders/9
+/articles/python-logging
+</code></pre>
+<p>Numeric ids and meaningful slugs both work.</p>
+<p><strong>Step 3 — Sub-resources</strong></p>
+<pre><code>/users/42/orders          # the orders that belong to user 42
+/users/42/orders/9        # order 9 within that scope
+</code></pre>
+<p>Ownership is visible in the <em>shape of the URL</em>.</p>
+<p><strong>Step 4 — Collection Operations</strong></p>
+<pre><code class="language-python"># 4_collection.py
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+USERS = {42: {&quot;name&quot;: &quot;Yeongseon&quot;}}
+
+@app.get(&quot;/users&quot;)
+def list_users(): return jsonify(list(USERS.values()))
+
+@app.get(&quot;/users/&lt;int:uid&gt;&quot;)
+def get_user(uid): return jsonify(USERS[uid])
+</code></pre>
+<p>A collection and a single item are <em>different endpoints</em>.</p>
+<p><strong>Step 5 — Restraint on Depth</strong></p>
+<pre><code># Good
+/users/42/orders
+
+# Too deep
+/users/42/orders/9/items/3/options/red
+</code></pre>
+<p>Past three levels, query parameters usually serve you better.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Every collection is plural.</li>
+<li>Each resource has <em>one</em> canonical URL.</li>
+<li>Deep nesting breaks <em>writing</em> even before it breaks reading.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Singular collections.</strong> <code>/user</code> — counterintuitive.</li>
+<li><strong>Verbs in URLs.</strong> <code>/users/42/activate</code> — prefer <code>POST /users/42:activate</code> for explicit actions.</li>
+<li><strong>Leaking the database schema.</strong> Internal names like <code>user_tbl</code>.</li>
+<li><strong>Exposing primary keys.</strong> Auto-increment ids hurt security and portability.</li>
+<li><strong>Multiple canonical URLs.</strong> Two paths for one resource break caching and SEO.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>GitHub's <code>/repos/{owner}/{repo}/issues/{number}</code> is the canonical example of nouns + plural + hierarchy. Stripe's <code>/v1/customers/{id}/sources</code> follows the same pattern. Larger companies write internal <em>URL guides</em> because teams keep drifting otherwise.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Look at <em>lifetime</em> — URLs live for years.</li>
+<li>Separate the database model from the resource model.</li>
+<li>Two levels by default, three by exception.</li>
+<li>Express <em>actions</em> as state changes; if unavoidable, mark them with <code>:verb</code>.</li>
+<li>Public ids should be <em>opaque</em> (UUIDs, slugs).</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Are all collections plural?</li>
+<li>[ ] No verbs in URLs?</li>
+<li>[ ] Each resource has <em>one</em> canonical URL?</li>
+<li>[ ] Depth stays at three or fewer levels?</li>
+<li>[ ] Public ids are decoupled from internal primary keys?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Sketch the resource model of an internal system — seven collections, five relationships.</li>
+<li>Extend the Step 4 example with <code>/users/&lt;uid&gt;/orders</code>.</li>
+<li>Rewrite five RPC-style endpoints in REST style.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Resources define the shape of your API. The next episode turns to <em>what actions</em> live on those resources — HTTP methods and status codes.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
+<li><strong>Resource Design (current)</strong></li>
+<li>HTTP Methods and Status Codes (upcoming)</li>
+<li>Request and Response Schemas (upcoming)</li>
+<li>Pagination and Filtering (upcoming)</li>
+<li>Designing Error Responses (upcoming)</li>
+<li>OpenAPI and Swagger (upcoming)</li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://restfulapi.net/resource-naming/">REST Resource Naming Guide (restfulapi.net)</a></li>
+<li><a href="https://cloud.google.com/apis/design/resource_names">Google API Design Guide — Resource Names</a></li>
+<li><a href="https://docs.github.com/en/rest/issues/issues">GitHub REST API: Issues</a></li>
+<li><a href="https://stripe.com/docs/api">Stripe API Reference</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, REST, Resources, URL, Backend</p>
+</body>
+</html>
