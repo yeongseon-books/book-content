@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tool Use Fundamentals</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tool Use Fundamentals</h1>
+<blockquote>
+<p>AI Agent 101 Series (3/10)</p>
+</blockquote>
+<p>Agents differ from simple conversational models because they can use tools. They can call weather APIs, query databases, read and write files. This capability makes agents practical automation tools.</p>
+<p>The core of tool use is function calling. When the model determines "I need to check the weather now," it returns a function call request matching a predefined tool schema. The application interprets this request, calls the actual API, and passes the result back to the model.</p>
+<p>This article covers the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.</p>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What does function calling actually look like from the model's side?</li>
+<li>What failures show up when a tool schema is poorly written?</li>
+<li>How does the model pick a tool when several are available?</li>
+<li>What do you need to watch when feeding tool output back into the model?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
+<h2>Function Calling Basic Flow</h2>
+<p>The core mechanism that enables AI agents to interact with external systems is Function Calling (or Tool Use). Let's explore how this works step-by-step.</p>
+<p><strong>The Four-Step Flow</strong></p>
+<p><strong>Step 1: Provide Tool Definitions to LLM</strong></p>
+<p>When calling the LLM API, you register available tools in JSON Schema format.</p>
+<pre><code class="language-python">import openai
+
+tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_weather&quot;,
+            &quot;description&quot;: &quot;Retrieves current weather for a specific location.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;location&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;description&quot;: &quot;City name (e.g., Seoul, New York)&quot;
+                    }
+                },
+                &quot;required&quot;: [&quot;location&quot;]
+            }
+        }
+    }
+]
+
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
+    tools=tools,
+    tool_choice=&quot;auto&quot;  # LLM decides whether to use tools
+)
+</code></pre>
+<p><strong>Step 2: LLM Decides to Call a Tool</strong></p>
+<p>The LLM analyzes the user query and determines which tool to use.</p>
+<pre><code class="language-python"># Example response from LLM
+{
+    &quot;role&quot;: &quot;assistant&quot;,
+    &quot;content&quot;: null,
+    &quot;tool_calls&quot;: [
+        {
+            &quot;id&quot;: &quot;call_abc123&quot;,
+            &quot;type&quot;: &quot;function&quot;,
+            &quot;function&quot;: {
+                &quot;name&quot;: &quot;get_weather&quot;,
+                &quot;arguments&quot;: '{&quot;location&quot;: &quot;Seoul&quot;}'
+            }
+        }
+    ]
+}
+</code></pre>
+<p><strong>Step 3: Execute the Tool</strong></p>
+<p>Your application executes the tool with the parameters provided by the LLM.</p>
+<pre><code class="language-python">import json
+
+def execute_tool(tool_name: str, arguments: str) -&gt; str:
+    &quot;&quot;&quot;Execute the requested tool and return results.&quot;&quot;&quot;
+    params = json.loads(arguments)
+
+    if tool_name == &quot;get_weather&quot;:
+        # Call actual weather API
+        weather_data = get_weather_api(params[&quot;location&quot;])
+        return json.dumps(weather_data)
+
+    return json.dumps({&quot;error&quot;: &quot;Unknown tool&quot;})
+
+# Execute tool
+tool_call = response.choices[0].message.tool_calls[0]
+result = execute_tool(tool_call.function.name, tool_call.function.arguments)
+</code></pre>
+<p><strong>Step 4: Pass Results Back to LLM</strong></p>
+<p>Send the tool execution result back to the LLM to generate a final response.</p>
+<pre><code class="language-python"># Add tool result to conversation
+messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;},
+    response.choices[0].message,  # Assistant's tool call
+    {
+        &quot;role&quot;: &quot;tool&quot;,
+        &quot;tool_call_id&quot;: tool_call.id,
+        &quot;content&quot;: result  # Tool execution result
+    }
+]
+
+# Get final answer
+final_response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=messages
+)
+
+print(final_response.choices[0].message.content)
+# Output: &quot;The current weather in Seoul is sunny with a temperature of 15°C.&quot;
+</code></pre>
+<p><strong>Complete Agent Loop Example</strong></p>
+<p>Here's a full implementation with multi-iteration support:</p>
+<pre><code class="language-python">from typing import Dict, Any, List
+import openai
+import json
+
+def agent_with_tools(
+    user_query: str,
+    tools: List[Dict[str, Any]],
+    max_iterations: int = 5
+) -&gt; str:
+    &quot;&quot;&quot;Agent loop with tool support.&quot;&quot;&quot;
+
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_query}]
+
+    for iteration in range(max_iterations):
+        # Call LLM
+        response = openai.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=messages,
+            tools=tools,
+            tool_choice=&quot;auto&quot;
+        )
+
+        assistant_message = response.choices[0].message
+
+        # Check if LLM wants to use a tool
+        if not assistant_message.tool_calls:
+            # No tool call = final answer ready
+            return assistant_message.content
+
+        # Add assistant's tool call to conversation
+        messages.append(assistant_message)
+
+        # Execute each tool call
+        for tool_call in assistant_message.tool_calls:
+            tool_name = tool_call.function.name
+            tool_args = tool_call.function.arguments
+
+            # Execute tool
+            result = execute_tool(tool_name, tool_args)
+
+            # Add result to conversation
+            messages.append({
+                &quot;role&quot;: &quot;tool&quot;,
+                &quot;tool_call_id&quot;: tool_call.id,
+                &quot;content&quot;: result
+            })
+
+    return &quot;Max iterations reached without completion.&quot;
+
+# Example usage
+tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_weather&quot;,
+            &quot;description&quot;: &quot;Retrieves current weather information.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;location&quot;: {&quot;type&quot;: &quot;string&quot;}
+                },
+                &quot;required&quot;: [&quot;location&quot;]
+            }
+        }
+    }
+]
+
+answer = agent_with_tools(&quot;What's the weather in Seoul?&quot;, tools)
+print(answer)
+</code></pre>
+<p><strong>Why This Pattern Works</strong></p>
+<ol>
+<li><strong>Separation of Concerns</strong>: LLM decides <em>what</em> to do; your code handles <em>how</em> to do it</li>
+<li><strong>Flexibility</strong>: Add new tools without retraining the model</li>
+<li><strong>Reliability</strong>: Tools use deterministic APIs instead of LLM hallucinations</li>
+<li><strong>Iterative Reasoning</strong>: Agent can use tool results to decide next actions</li>
+</ol>
+<p>This four-step flow is the foundation of all AI agent systems. Master this pattern, and you'll understand how agents interact with the world.</p>
+<p>For agents to use tools correctly, they must understand what each tool does and what inputs it expects. This is where tool schemas come in.</p>
+<p><strong>Essential Schema Elements</strong></p>
+<p><strong>Tool Name</strong>: A clear, descriptive name that indicates the tool's purpose.</p>
+<pre><code class="language-python"># Bad: Ambiguous names
+{
+    &quot;name&quot;: &quot;tool1&quot;,  # What does this do?
+    &quot;name&quot;: &quot;get&quot;,    # Get what?
+}
+
+# Good: Clear names
+{
+    &quot;name&quot;: &quot;get_weather&quot;,              # Weather lookup
+    &quot;name&quot;: &quot;search_customer_history&quot;,  # Customer history search
+}
+</code></pre>
+<p><strong>Description</strong>: The most critical information the LLM uses for tool selection.</p>
+<pre><code class="language-python"># Bad: Insufficient description
+{
+    &quot;name&quot;: &quot;get_weather&quot;,
+    &quot;description&quot;: &quot;Gets weather information&quot;  # When? Where? What format?
+}
+
+# Good: Specific description
+{
+    &quot;name&quot;: &quot;get_weather&quot;,
+    &quot;description&quot;: &quot;Retrieves current weather information for a specific location. Takes a city name and returns temperature, humidity, and weather condition.&quot;
+}
+</code></pre>
+<p><strong>Parameters</strong>: Define input values using JSON Schema format.</p>
+<pre><code class="language-python">{
+    &quot;name&quot;: &quot;get_weather&quot;,
+    &quot;description&quot;: &quot;Retrieves current weather for a specific location.&quot;,
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;location&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;description&quot;: &quot;City name (e.g., Seoul, New York)&quot;
+            },
+            &quot;unit&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;enum&quot;: [&quot;celsius&quot;, &quot;fahrenheit&quot;],
+                &quot;description&quot;: &quot;Temperature unit&quot;
+            }
+        },
+        &quot;required&quot;: [&quot;location&quot;]  # location is required, unit is optional
+    }
+}
+</code></pre>
+<p><strong>Importance of Type Definitions</strong></p>
+<p>Clear type definitions help the LLM generate values in the correct format.</p>
+<pre><code class="language-python"># Bad: Undefined type details
+{
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;date&quot;: {&quot;type&quot;: &quot;string&quot;}  # What format? YYYY-MM-DD? DD/MM/YYYY?
+        }
+    }
+}
+
+# Good: Explicit format specification
+{
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;date&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;description&quot;: &quot;Date in YYYY-MM-DD format (e.g., 2024-03-15)&quot;,
+                &quot;pattern&quot;: &quot;^\\d{4}-\\d{2}-\\d{2}$&quot;
+            }
+        }
+    }
+}
+</code></pre>
+<p><strong>Complex Parameter Structures</strong></p>
+<p>You can express nested objects and arrays.</p>
+<pre><code class="language-python">{
+    &quot;name&quot;: &quot;create_order&quot;,
+    &quot;description&quot;: &quot;Creates a new order.&quot;,
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;customer_id&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;description&quot;: &quot;Customer ID&quot;
+            },
+            &quot;items&quot;: {
+                &quot;type&quot;: &quot;array&quot;,
+                &quot;description&quot;: &quot;List of order items&quot;,
+                &quot;items&quot;: {
+                    &quot;type&quot;: &quot;object&quot;,
+                    &quot;properties&quot;: {
+                        &quot;product_id&quot;: {&quot;type&quot;: &quot;string&quot;},
+                        &quot;quantity&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;minimum&quot;: 1}
+                    },
+                    &quot;required&quot;: [&quot;product_id&quot;, &quot;quantity&quot;]
+                }
+            }
+        },
+        &quot;required&quot;: [&quot;customer_id&quot;, &quot;items&quot;]
+    }
+}
+</code></pre>
+<p><strong>Real-World Tool Registration Example</strong></p>
+<pre><code class="language-python">from typing import Dict, Any
+import openai
+
+# Define tool schemas
+tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_weather&quot;,
+            &quot;description&quot;: &quot;Retrieves current weather for a specific location. Returns temperature, humidity, and weather condition.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;location&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;description&quot;: &quot;City name (e.g., Seoul, Tokyo, New York)&quot;
+                    },
+                    &quot;unit&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;enum&quot;: [&quot;celsius&quot;, &quot;fahrenheit&quot;],
+                        &quot;description&quot;: &quot;Temperature unit (default: celsius)&quot;
+                    }
+                },
+                &quot;required&quot;: [&quot;location&quot;]
+            }
+        }
+    },
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;search_documents&quot;,
+            &quot;description&quot;: &quot;Searches the document database for relevant documents using keywords.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;query&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;description&quot;: &quot;Search keyword or question&quot;
+                    },
+                    &quot;limit&quot;: {
+                        &quot;type&quot;: &quot;integer&quot;,
+                        &quot;description&quot;: &quot;Maximum number of documents to return (default: 5)&quot;,
+                        &quot;minimum&quot;: 1,
+                        &quot;maximum&quot;: 20
+                    }
+                },
+                &quot;required&quot;: [&quot;query&quot;]
+            }
+        }
+    }
+]
+
+# Pass tool information to LLM
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
+    tools=tools,
+    tool_choice=&quot;auto&quot;  # LLM automatically selects tool
+)
+</code></pre>
+<p>The clearer your schema, the higher the probability the LLM will use the tool correctly.</p>
+<p>Tool calls can fail at any time. Network errors, invalid parameters, API rate limits—there are many causes. Robust agents anticipate and handle errors appropriately.</p>
+<p><strong>Basic Error Handling Pattern</strong></p>
+<pre><code class="language-python">from typing import Dict, Any
+
+def execute_tool_with_retry(
+    tool_name: str,
+    params: Dict[str, Any],
+    max_retries: int = 3
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Execute tool with retry logic.&quot;&quot;&quot;
+    for attempt in range(max_retries):
+        try:
+            result = execute_tool(tool_name, params)
+            return {&quot;success&quot;: True, &quot;data&quot;: result}
+
+        except ConnectionError as e:
+            # Network error: retry
+            if attempt &lt; max_retries - 1:
+                time.sleep(2 ** attempt)  # Exponential backoff
+                continue
+            return {&quot;success&quot;: False, &quot;error&quot;: f&quot;Connection failed after {max_retries} attempts&quot;}
+
+        except ValueError as e:
+            # Parameter error: no retry needed
+            return {&quot;success&quot;: False, &quot;error&quot;: f&quot;Invalid parameters: {str(e)}&quot;}
+
+        except Exception as e:
+            # Unexpected error: log and return
+            log_error(tool_name, params, e)
+            return {&quot;success&quot;: False, &quot;error&quot;: f&quot;Unexpected error: {str(e)}&quot;}
+</code></pre>
+<p><strong>Strategy by Error Type</strong></p>
+<p><strong>Transient Errors</strong>: Retryable</p>
+<pre><code class="language-python"># Network timeouts, temporary service outages
+RETRYABLE_ERRORS = [
+    ConnectionError,
+    TimeoutError,
+    requests.exceptions.Timeout,
+]
+
+def is_retryable(error: Exception) -&gt; bool:
+    &quot;&quot;&quot;Determine if error is retryable.&quot;&quot;&quot;
+    return any(isinstance(error, err_type) for err_type in RETRYABLE_ERRORS)
+</code></pre>
+<p><strong>Permanent Errors</strong>: Fail immediately</p>
+<pre><code class="language-python"># Authentication errors, invalid parameters, permission denied
+PERMANENT_ERRORS = [
+    PermissionError,
+    ValueError,
+    KeyError,
+]
+
+def is_permanent(error: Exception) -&gt; bool:
+    &quot;&quot;&quot;Determine if error is not retryable.&quot;&quot;&quot;
+    return any(isinstance(error, err_type) for err_type in PERMANENT_ERRORS)
+</code></pre>
+<p><strong>Communicating Errors to LLM</strong></p>
+<p>When errors occur, provide context so the LLM can try alternative strategies.</p>
+<pre><code class="language-python">def handle_tool_error(
+    tool_name: str,
+    params: Dict[str, Any],
+    error: Exception
+) -&gt; str:
+    &quot;&quot;&quot;Convert error to LLM-understandable message.&quot;&quot;&quot;
+
+    if isinstance(error, ConnectionError):
+        return f&quot;Tool '{tool_name}' failed: Network connection error. Try again later or use an alternative method.&quot;
+
+    elif isinstance(error, ValueError):
+        return f&quot;Tool '{tool_name}' failed: Invalid parameters '{params}'. Please correct the parameters and retry.&quot;
+
+    elif isinstance(error, PermissionError):
+        return f&quot;Tool '{tool_name}' failed: Permission denied. This operation cannot be performed.&quot;
+
+    else:
+        return f&quot;Tool '{tool_name}' failed: {str(error)}. Try a different approach.&quot;
+</code></pre>
+<p><strong>Graceful Degradation</strong></p>
+<p>Ensure the agent continues operating even when tools fail.</p>
+<pre><code class="language-python">def agent_with_fallback(user_query: str) -&gt; str:
+    &quot;&quot;&quot;Use fallback strategy when tools fail.&quot;&quot;&quot;
+
+    # First attempt: real-time tool
+    weather_result = execute_tool_with_retry(&quot;get_weather&quot;, {&quot;location&quot;: &quot;Seoul&quot;})
+
+    if weather_result[&quot;success&quot;]:
+        return f&quot;Current weather in Seoul: {weather_result['data']}&quot;
+
+    # Second attempt: cached data
+    cached_data = get_cached_weather(&quot;Seoul&quot;)
+    if cached_data:
+        return f&quot;Recent weather in Seoul (1 hour ago): {cached_data}&quot;
+
+    # Third attempt: LLM knowledge-based response
+    return &quot;Sorry, real-time weather information is currently unavailable. I can provide general weather information.&quot;
+</code></pre>
+<p><strong>Error Logging and Monitoring</strong></p>
+<p>In production, log and analyze errors.</p>
+<pre><code class="language-python">import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+def execute_tool_with_logging(
+    tool_name: str,
+    params: Dict[str, Any]
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Execute tool with error logging.&quot;&quot;&quot;
+
+    start_time = datetime.now()
+
+    try:
+        result = execute_tool(tool_name, params)
+
+        # Success log
+        duration = (datetime.now() - start_time).total_seconds()
+        logger.info(f&quot;Tool '{tool_name}' succeeded in {duration}s&quot;)
+
+        return {&quot;success&quot;: True, &quot;data&quot;: result}
+
+    except Exception as e:
+        # Failure log with details
+        duration = (datetime.now() - start_time).total_seconds()
+        logger.error(
+            f&quot;Tool '{tool_name}' failed in {duration}s&quot;,
+            extra={
+                &quot;tool&quot;: tool_name,
+                &quot;params&quot;: params,
+                &quot;error_type&quot;: type(e).__name__,
+                &quot;error_message&quot;: str(e)
+            }
+        )
+
+        return {&quot;success&quot;: False, &quot;error&quot;: str(e)}
+</code></pre>
+<p><strong>Timeout Configuration</strong></p>
+<p>Prevent tool execution from waiting indefinitely.</p>
+<pre><code class="language-python">import signal
+from contextlib import contextmanager
+
+@contextmanager
+def timeout(seconds: int):
+    &quot;&quot;&quot;Limit function execution time.&quot;&quot;&quot;
+    def timeout_handler(signum, frame):
+        raise TimeoutError(f&quot;Operation timed out after {seconds} seconds&quot;)
+
+    # Set timeout
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(seconds)
+
+    try:
+        yield
+    finally:
+        # Clear timeout
+        signal.alarm(0)
+
+# Usage example
+try:
+    with timeout(10):
+        result = execute_tool(&quot;slow_api_call&quot;, {&quot;param&quot;: &quot;value&quot;})
+except TimeoutError:
+    result = {&quot;success&quot;: False, &quot;error&quot;: &quot;Tool execution timeout&quot;}
+</code></pre>
+<p>Proper error handling significantly improves agent stability and reliability.</p>
+<p>When agents have multiple tools available, they need a strategy to decide which tool to use.</p>
+<p><strong>LLM-Based Automatic Selection</strong></p>
+<p>With OpenAI Function Calling, the <code>tool_choice</code> parameter controls selection strategy.</p>
+<pre><code class="language-python">import openai
+
+tools = [
+    {&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {...}},  # get_weather
+    {&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {...}},  # search_documents
+]
+
+# Strategy 1: Automatic selection (LLM decides)
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
+    tools=tools,
+    tool_choice=&quot;auto&quot;  # LLM uses tools when needed
+)
+
+# Strategy 2: Force tool use
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
+    tools=tools,
+    tool_choice=&quot;required&quot;  # Must call one tool
+)
+
+# Strategy 3: Specify tool
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
+    tools=tools,
+    tool_choice={&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;get_weather&quot;}}
+)
+
+# Strategy 4: Disable tools
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
+    tools=tools,
+    tool_choice=&quot;none&quot;  # No tool use
+)
+</code></pre>
+<p><strong>Context-Based Selection</strong></p>
+<p>Filter tools based on user query intent.</p>
+<pre><code class="language-python">from typing import List, Dict, Any
+
+def select_relevant_tools(
+    user_query: str,
+    all_tools: List[Dict[str, Any]]
+) -&gt; List[Dict[str, Any]]:
+    &quot;&quot;&quot;Select tools relevant to query.&quot;&quot;&quot;
+
+    # Keyword-based filtering
+    query_lower = user_query.lower()
+
+    relevant_tools = []
+    for tool in all_tools:
+        tool_name = tool[&quot;function&quot;][&quot;name&quot;]
+        tool_desc = tool[&quot;function&quot;][&quot;description&quot;]
+
+        # Weather query → weather tools only
+        if &quot;weather&quot; in query_lower and &quot;weather&quot; in tool_name:
+            relevant_tools.append(tool)
+
+        # Search query → search tools only
+        elif any(kw in query_lower for kw in [&quot;search&quot;, &quot;find&quot;, &quot;lookup&quot;]) and &quot;search&quot; in tool_name:
+            relevant_tools.append(tool)
+
+    # Return all tools if no relevant tools found
+    return relevant_tools if relevant_tools else all_tools
+</code></pre>
+<p><strong>Tool Prioritization</strong></p>
+<p>Try frequently-used or high-confidence tools first.</p>
+<pre><code class="language-python">def execute_with_priority(
+    tools: List[str],
+    params: Dict[str, Any]
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Execute tools in priority order.&quot;&quot;&quot;
+
+    # Priority: 1. Cache lookup 2. Real-time API 3. LLM knowledge
+    priority_order = [&quot;check_cache&quot;, &quot;api_call&quot;, &quot;llm_knowledge&quot;]
+
+    for tool_name in priority_order:
+        if tool_name not in tools:
+            continue
+
+        result = execute_tool(tool_name, params)
+
+        if result[&quot;success&quot;]:
+            return result
+
+    return {&quot;success&quot;: False, &quot;error&quot;: &quot;All tools failed&quot;}
+</code></pre>
+<p><strong>Tool Composition</strong></p>
+<p>Use multiple tools sequentially for complex tasks.</p>
+<pre><code class="language-python">def multi_tool_workflow(user_query: str) -&gt; str:
+    &quot;&quot;&quot;Generate answer by combining multiple tools.&quot;&quot;&quot;
+
+    # Step 1: Search documents
+    search_result = execute_tool(&quot;search_documents&quot;, {&quot;query&quot;: user_query})
+
+    if not search_result[&quot;success&quot;]:
+        return &quot;Search failed&quot;
+
+    documents = search_result[&quot;data&quot;]
+
+    # Step 2: Pass documents to LLM for summarization
+    summary_prompt = f&quot;&quot;&quot;
+    Answer the question based on these documents.
+
+    Question: {user_query}
+
+    Documents:
+    {documents}
+    &quot;&quot;&quot;
+
+    response = openai.chat.completions.create(
+        model=&quot;gpt-4&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: summary_prompt}]
+    )
+
+    return response.choices[0].message.content
+</code></pre>
+<p><strong>Dynamic Tool Registration</strong></p>
+<p>Add or remove tools at runtime based on context.</p>
+<pre><code class="language-python">class DynamicToolRegistry:
+    &quot;&quot;&quot;Dynamic tool registry.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.tools: Dict[str, Dict[str, Any]] = {}
+
+    def register(self, tool_schema: Dict[str, Any]):
+        &quot;&quot;&quot;Register a tool.&quot;&quot;&quot;
+        tool_name = tool_schema[&quot;function&quot;][&quot;name&quot;]
+        self.tools[tool_name] = tool_schema
+
+    def unregister(self, tool_name: str):
+        &quot;&quot;&quot;Remove a tool.&quot;&quot;&quot;
+        if tool_name in self.tools:
+            del self.tools[tool_name]
+
+    def get_tools(self, context: str = None) -&gt; List[Dict[str, Any]]:
+        &quot;&quot;&quot;Return tools matching context.&quot;&quot;&quot;
+
+        if context == &quot;weather&quot;:
+            # Weather-related tools only
+            return [t for name, t in self.tools.items() if &quot;weather&quot; in name]
+
+        elif context == &quot;database&quot;:
+            # Database-related tools only
+            return [t for name, t in self.tools.items() if &quot;db&quot; in name or &quot;sql&quot; in name]
+
+        else:
+            # All tools
+            return list(self.tools.values())
+
+# Usage example
+registry = DynamicToolRegistry()
+
+# Register base tools
+registry.register({
+    &quot;type&quot;: &quot;function&quot;,
+    &quot;function&quot;: {
+        &quot;name&quot;: &quot;get_weather&quot;,
+        &quot;description&quot;: &quot;Weather lookup&quot;,
+        &quot;parameters&quot;: {...}
+    }
+})
+
+# Add database tools when user requests database operations
+if &quot;database&quot; in user_query:
+    registry.register({
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;execute_sql&quot;,
+            &quot;description&quot;: &quot;Execute SQL query&quot;,
+            &quot;parameters&quot;: {...}
+        }
+    })
+
+# Pass context-appropriate tools to LLM
+tools = registry.get_tools(context=&quot;database&quot;)
+</code></pre>
+<p><strong>Cost Considerations</strong></p>
+<p>Select tools considering API call costs or execution time.</p>
+<pre><code class="language-python">def select_tool_by_cost(
+    query: str,
+    available_tools: List[str]
+) -&gt; str:
+    &quot;&quot;&quot;Select cost-efficient tool.&quot;&quot;&quot;
+
+    # Tool costs (relative)
+    tool_costs = {
+        &quot;cache_lookup&quot;: 0,      # Free
+        &quot;simple_api&quot;: 1,        # Low cost
+        &quot;expensive_api&quot;: 10,    # High cost
+        &quot;llm_call&quot;: 5           # Medium cost
+    }
+
+    # Analyze query complexity
+    if len(query.split()) &lt;= 5:
+        # Simple query: prefer low-cost tools
+        preferred = [&quot;cache_lookup&quot;, &quot;simple_api&quot;]
+    else:
+        # Complex query: allow high-cost tools
+        preferred = available_tools
+
+    # Select cheapest available tool
+    available_preferred = [t for t in preferred if t in available_tools]
+    return min(available_preferred, key=lambda t: tool_costs.get(t, 999))
+</code></pre>
+<p>The right tool selection strategy significantly impacts agent efficiency and cost.</p>
+<h2>Tool Selection Strategies</h2>
+<p>Let's examine common mistakes when using tools and how to fix them.</p>
+<p><strong>Mistake 1: Unclear Tool Descriptions</strong></p>
+<p><strong>Bad</strong>: LLM cannot accurately understand the tool's purpose.</p>
+<pre><code class="language-python">{
+    &quot;name&quot;: &quot;get_data&quot;,
+    &quot;description&quot;: &quot;Gets data&quot;,  # What data? From where?
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;id&quot;: {&quot;type&quot;: &quot;string&quot;}  # ID of what?
+        }
+    }
+}
+</code></pre>
+<p><strong>Good</strong>: Specific description helps LLM make correct choices.</p>
+<pre><code class="language-python">{
+    &quot;name&quot;: &quot;get_customer_profile&quot;,
+    &quot;description&quot;: &quot;Retrieves customer profile information (name, email, signup date) by customer ID. Does not include customer history or order records.&quot;,
+    &quot;parameters&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;customer_id&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;description&quot;: &quot;Unique customer identifier (e.g., CUST-12345)&quot;
+            }
+        },
+        &quot;required&quot;: [&quot;customer_id&quot;]
+    }
+}
+</code></pre>
+<p><strong>Lesson</strong>: Tool descriptions should specify "what", "when", and "in what format" they return.</p>
+<p><strong>Mistake 2: Missing Error Handling</strong></p>
+<p><strong>Bad</strong>: Agent stops when tool execution fails.</p>
+<pre><code class="language-python">def execute_tool(tool_name: str, params: dict) -&gt; dict:
+    &quot;&quot;&quot;Execute tool (no error handling)&quot;&quot;&quot;
+    if tool_name == &quot;get_weather&quot;:
+        # Throws Exception if API call fails
+        return requests.get(f&quot;https://api.weather.com/{params['location']}&quot;).json()
+</code></pre>
+<p><strong>Good</strong>: Catch errors and communicate them to the LLM.</p>
+<pre><code class="language-python">def execute_tool(tool_name: str, params: dict) -&gt; dict:
+    &quot;&quot;&quot;Execute tool (with error handling)&quot;&quot;&quot;
+    try:
+        if tool_name == &quot;get_weather&quot;:
+            response = requests.get(
+                f&quot;https://api.weather.com/{params['location']}&quot;,
+                timeout=5
+            )
+            response.raise_for_status()
+            return {&quot;success&quot;: True, &quot;data&quot;: response.json()}
+
+    except requests.exceptions.Timeout:
+        return {
+            &quot;success&quot;: False,
+            &quot;error&quot;: &quot;API timeout. Please try again later.&quot;
+        }
+
+    except requests.exceptions.HTTPError as e:
+        return {
+            &quot;success&quot;: False,
+            &quot;error&quot;: f&quot;HTTP error {e.response.status_code}: {e.response.text}&quot;
+        }
+
+    except Exception as e:
+        return {
+            &quot;success&quot;: False,
+            &quot;error&quot;: f&quot;Unexpected error: {str(e)}&quot;
+        }
+</code></pre>
+<p><strong>Lesson</strong>: Apply try-except to all tool calls and write error messages the LLM can understand.</p>
+<p><strong>Mistake 3: Ignoring Tool Results</strong></p>
+<p><strong>Bad</strong>: Call tools and proceed without checking results.</p>
+<pre><code class="language-python">def agent_loop(user_query: str) -&gt; str:
+    &quot;&quot;&quot;Agent loop (result not checked)&quot;&quot;&quot;
+    decision = llm.decide_next_action(user_query)
+
+    if decision[&quot;action&quot;] == &quot;use_tool&quot;:
+        tool_result = execute_tool(decision[&quot;tool&quot;], decision[&quot;params&quot;])
+        # Return final answer without checking result
+        return &quot;Task completed&quot;
+</code></pre>
+<p><strong>Good</strong>: Check results and respond appropriately.</p>
+<pre><code class="language-python">def agent_loop(user_query: str) -&gt; str:
+    &quot;&quot;&quot;Agent loop (result checked)&quot;&quot;&quot;
+    decision = llm.decide_next_action(user_query)
+
+    if decision[&quot;action&quot;] == &quot;use_tool&quot;:
+        tool_result = execute_tool(decision[&quot;tool&quot;], decision[&quot;params&quot;])
+
+        # Check result
+        if tool_result[&quot;success&quot;]:
+            # Success: pass result to LLM for final answer
+            return llm.generate_answer(user_query, tool_result[&quot;data&quot;])
+        else:
+            # Failure: inform LLM of error and request alternative strategy
+            error_context = f&quot;Tool execution failed: {tool_result['error']}&quot;
+            return llm.decide_next_action(user_query, context=error_context)
+</code></pre>
+<p><strong>Lesson</strong>: Always check the <code>success</code> field in tool results and prepare fallback strategies for failures.</p>
+<p><strong>Mistake 4: Registering Too Many Tools</strong></p>
+<p><strong>Bad</strong>: Register all possible tools at once.</p>
+<pre><code class="language-python"># Pass 50 tools to LLM at once
+tools = [
+    {&quot;name&quot;: &quot;get_weather&quot;, ...},
+    {&quot;name&quot;: &quot;search_docs&quot;, ...},
+    {&quot;name&quot;: &quot;send_email&quot;, ...},
+    {&quot;name&quot;: &quot;query_database&quot;, ...},
+    # ... 46 more tools
+]
+
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
+    tools=tools  # Token waste, reduced selection accuracy
+)
+</code></pre>
+<p><strong>Good</strong>: Select only query-relevant tools.</p>
+<pre><code class="language-python">def get_relevant_tools(user_query: str, all_tools: list) -&gt; list:
+    &quot;&quot;&quot;Filter to query-relevant tools only.&quot;&quot;&quot;
+    query_lower = user_query.lower()
+
+    # Keyword-based filtering
+    if &quot;weather&quot; in query_lower:
+        return [t for t in all_tools if &quot;weather&quot; in t[&quot;function&quot;][&quot;name&quot;]]
+    elif &quot;email&quot; in query_lower:
+        return [t for t in all_tools if &quot;email&quot; in t[&quot;function&quot;][&quot;name&quot;]]
+    else:
+        # Base tools only (max 5)
+        return all_tools[:5]
+
+# Pass only relevant tools to LLM
+relevant_tools = get_relevant_tools(user_query, all_tools)
+
+response = openai.chat.completions.create(
+    model=&quot;gpt-4&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_query}],
+    tools=relevant_tools  # 3-5 tools only
+)
+</code></pre>
+<p><strong>Lesson</strong>: Pass only 3-7 tools to LLM at a time to optimize token cost and selection accuracy.</p>
+<p><strong>Mistake 5: Not Validating Tool Output Format</strong></p>
+<p><strong>Bad</strong>: Use tool-returned data directly without validation.</p>
+<pre><code class="language-python">def get_weather(location: str) -&gt; dict:
+    &quot;&quot;&quot;Weather lookup (no validation)&quot;&quot;&quot;
+    response = requests.get(f&quot;https://api.weather.com/{location}&quot;)
+    return response.json()  # Assume response format
+
+# Usage
+weather = get_weather(&quot;Seoul&quot;)
+temperature = weather[&quot;temp&quot;]  # May raise KeyError
+</code></pre>
+<p><strong>Good</strong>: Validate output and convert to consistent format.</p>
+<pre><code class="language-python">from typing import Optional
+
+def get_weather(location: str) -&gt; dict:
+    &quot;&quot;&quot;Weather lookup (with validation)&quot;&quot;&quot;
+    try:
+        response = requests.get(f&quot;https://api.weather.com/{location}&quot;, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+
+        # Validate and standardize response
+        return {
+            &quot;success&quot;: True,
+            &quot;data&quot;: {
+                &quot;location&quot;: data.get(&quot;location&quot;, location),
+                &quot;temperature&quot;: data.get(&quot;temp&quot;, data.get(&quot;temperature&quot;, None)),
+                &quot;condition&quot;: data.get(&quot;condition&quot;, &quot;unknown&quot;),
+                &quot;humidity&quot;: data.get(&quot;humidity&quot;, None)
+            }
+        }
+
+    except Exception as e:
+        return {
+            &quot;success&quot;: False,
+            &quot;error&quot;: str(e)
+        }
+
+# Usage
+result = get_weather(&quot;Seoul&quot;)
+if result[&quot;success&quot;]:
+    temp = result[&quot;data&quot;][&quot;temperature&quot;]  # Safe access
+    if temp is not None:
+        print(f&quot;Current temperature: {temp}°C&quot;)
+</code></pre>
+<p><strong>Lesson</strong>: Design all tools to return consistent format (<code>{"success": bool, "data": ...}</code> or <code>{"success": bool, "error": ...}</code>).</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Tool use is the core feature that makes agents practical automation tools.</li>
+<li>Tool schemas must be clear and specific for models to call them correctly.</li>
+<li>Error handling and tool selection strategies determine agent reliability.</li>
+</ul>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Defined one tool with the OpenAI function-calling spec and exercised it.</li>
+<li>[ ] Observed how a bad schema confuses the model.</li>
+<li>[ ] Logged which tool the model picks when given 2-3 candidates.</li>
+<li>[ ] Closed the loop: tool output back into the model for the final answer.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><strong>Tool Use Fundamentals (current)</strong></li>
+<li>Agent Workflow Design (upcoming)</li>
+<li>Memory and State (upcoming)</li>
+<li>Multi-Agent Systems (upcoming)</li>
+<li>Agent Evaluation (upcoming)</li>
+<li>Error Handling and Reliability (upcoming)</li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<hr>
+<h2>References</h2>
+<ol>
+<li>
+<p><strong>OpenAI Function Calling Guide</strong> - https://platform.openai.com/docs/guides/function-calling<br>
+   Official OpenAI Function Calling documentation. Covers tool schema design, tool_choice parameter, and practical examples.</p>
+</li>
+<li>
+<p><strong>LangChain Tools Documentation</strong> - https://python.langchain.com/docs/modules/agents/tools/<br>
+   LangChain framework's tool system. Discusses custom tool creation, error handling, and tool composition patterns.</p>
+</li>
+<li>
+<p><strong>Toolformer: Language Models Can Teach Themselves to Use Tools</strong> - https://arxiv.org/abs/2302.04761<br>
+   Meta AI research paper. Presents methods for LLMs to learn tool use autonomously.</p>
+</li>
+<li>
+<p><strong>Anthropic Tool Use Best Practices</strong> - https://docs.anthropic.com/claude/docs/tool-use<br>
+   Claude API tool use guide. Explains error handling, retry strategies, and security considerations.</p>
+</li>
+</ol>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
+</body>
+</html>

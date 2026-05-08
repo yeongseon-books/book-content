@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Linked Lists</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Linked Lists</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Python already has list — why learn linked lists?</p>
+<blockquote>
+<p>Python list is array-based, so mid-list insertion and deletion are O(n). Linked lists connect nodes with pointers, achieving O(1) insertion and deletion. This article implements singly and doubly linked lists in Python and compares them with arrays.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The structure and behavior of linked lists</li>
+<li>Implementing a singly linked list</li>
+<li>Implementing a doubly linked list</li>
+<li>Performance comparison between arrays and linked lists</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Linked lists are the most fundamental building block in data structures. Trees, graphs, and hash table chaining all build on top of linked lists. Implementing a linked list from scratch solidifies your understanding of pointers (references).</p>
+<blockquote>
+<p>A linked list is a data structure where each node holds data and a reference to the next node.</p>
+</blockquote>
+<p>Linked list problems are among the most frequently tested in coding interviews. Reversal, cycle detection, and merge problems come in many variations.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Linked list = a linear data structure where nodes are connected by pointers</p>
+</blockquote>
+<pre><code>[Singly Linked List]
+  head -&gt; [A|-&gt;] -&gt; [B|-&gt;] -&gt; [C|-&gt;] -&gt; None
+
+[Doubly Linked List]
+  None &lt;- [&lt;-|A|-&gt;] &lt;-&gt; [&lt;-|B|-&gt;] &lt;-&gt; [&lt;-|C|-&gt;] -&gt; None
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Node</strong><br>
+- Description: A unit that holds data and a reference to the next node</p>
+<p><strong>head</strong><br>
+- Description: Points to the first node of the linked list</p>
+<p><strong>tail</strong><br>
+- Description: Points to the last node of the linked list</p>
+<p><strong>Singly Linked List</strong><br>
+- Description: Each node references only the next node</p>
+<p><strong>Doubly Linked List</strong><br>
+- Description: Each node references both the previous and the next node</p>
+<h2>Before / After</h2>
+<p>Compare mid-list deletion in an array versus a linked list.</p>
+<pre><code class="language-python"># before: delete from middle of list — O(n), shifts all subsequent elements
+data = [10, 20, 30, 40, 50]
+data.pop(2)  # removes 30 — 40 and 50 shift left
+</code></pre>
+<pre><code class="language-python"># after: delete from middle of linked list — O(1), change pointers only
+# node_b.next = node_b.next.next
+# skip node 30 and connect 20 -&gt; 40
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Define the Node class</strong></p>
+<pre><code class="language-python">class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+    def __repr__(self):
+        return f&quot;Node({self.data})&quot;
+</code></pre>
+<p><strong>Step 2: Implement a singly linked list</strong></p>
+<pre><code class="language-python">class SinglyLinkedList:
+    def __init__(self):
+        self.head = None
+        self._size = 0
+
+    def append(self, data):
+        new_node = Node(data)
+        if self.head is None:
+            self.head = new_node
+        else:
+            current = self.head
+            while current.next:
+                current = current.next
+            current.next = new_node
+        self._size += 1
+
+    def prepend(self, data):
+        new_node = Node(data)
+        new_node.next = self.head
+        self.head = new_node
+        self._size += 1
+
+    def delete(self, data):
+        if self.head is None:
+            return
+        if self.head.data == data:
+            self.head = self.head.next
+            self._size -= 1
+            return
+        current = self.head
+        while current.next:
+            if current.next.data == data:
+                current.next = current.next.next
+                self._size -= 1
+                return
+            current = current.next
+
+    def __len__(self):
+        return self._size
+
+    def __str__(self):
+        parts = []
+        current = self.head
+        while current:
+            parts.append(str(current.data))
+            current = current.next
+        return &quot; -&gt; &quot;.join(parts)
+
+sll = SinglyLinkedList()
+sll.append(&quot;A&quot;)
+sll.append(&quot;B&quot;)
+sll.append(&quot;C&quot;)
+print(sll)          # A -&gt; B -&gt; C
+sll.prepend(&quot;Z&quot;)
+print(sll)          # Z -&gt; A -&gt; B -&gt; C
+sll.delete(&quot;B&quot;)
+print(sll)          # Z -&gt; A -&gt; C
+print(len(sll))     # 3
+</code></pre>
+<p><strong>Step 3: Reverse a linked list</strong></p>
+<pre><code class="language-python">def reverse_linked_list(head: Node) -&gt; Node:
+    prev = None
+    current = head
+    while current:
+        next_node = current.next
+        current.next = prev
+        prev = current
+        current = next_node
+    return prev
+
+sll = SinglyLinkedList()
+for item in [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;]:
+    sll.append(item)
+print(f&quot;original: {sll}&quot;)  # A -&gt; B -&gt; C -&gt; D
+sll.head = reverse_linked_list(sll.head)
+print(f&quot;reversed: {sll}&quot;)  # D -&gt; C -&gt; B -&gt; A
+</code></pre>
+<p><strong>Step 4: Implement a doubly linked list</strong></p>
+<pre><code class="language-python">class DNode:
+    def __init__(self, data):
+        self.data = data
+        self.prev = None
+        self.next = None
+
+class DoublyLinkedList:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+        self._size = 0
+
+    def append(self, data):
+        new_node = DNode(data)
+        if self.tail is None:
+            self.head = self.tail = new_node
+        else:
+            new_node.prev = self.tail
+            self.tail.next = new_node
+            self.tail = new_node
+        self._size += 1
+
+    def prepend(self, data):
+        new_node = DNode(data)
+        if self.head is None:
+            self.head = self.tail = new_node
+        else:
+            new_node.next = self.head
+            self.head.prev = new_node
+            self.head = new_node
+        self._size += 1
+
+    def __str__(self):
+        parts = []
+        current = self.head
+        while current:
+            parts.append(str(current.data))
+            current = current.next
+        return &quot; &lt;-&gt; &quot;.join(parts)
+
+dll = DoublyLinkedList()
+dll.append(&quot;A&quot;)
+dll.append(&quot;B&quot;)
+dll.append(&quot;C&quot;)
+dll.prepend(&quot;Z&quot;)
+print(dll)  # Z &lt;-&gt; A &lt;-&gt; B &lt;-&gt; C
+</code></pre>
+<p><strong>Step 5: Cycle detection (Floyd's algorithm)</strong></p>
+<pre><code class="language-python">def has_cycle(head: Node) -&gt; bool:
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            return True
+    return False
+
+# no cycle
+a, b, c = Node(&quot;A&quot;), Node(&quot;B&quot;), Node(&quot;C&quot;)
+a.next, b.next = b, c
+print(has_cycle(a))  # False
+
+# cycle present
+c.next = a  # C -&gt; A creates a cycle
+print(has_cycle(a))  # True
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Linked list prepend is O(1), but list.insert(0, x) is O(n)</li>
+<li>Linked lists have O(n) index access, making them unsuitable for random access</li>
+<li>Reversal and cycle detection are classic interview problems</li>
+<li>Python's collections.deque is implemented internally as a doubly linked list</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Wrong order of next-pointer updates</strong><br>
+- Why It Is a Problem: Nodes are lost and the list breaks<br>
+- Fix: Save the next node in a temp variable before changing pointers</p>
+<p><strong>Not handling the case when head is None</strong><br>
+- Why It Is a Problem: Causes NoneType errors<br>
+- Fix: Always check head is None first</p>
+<p><strong>Forgetting to update size after deletion</strong><br>
+- Why It Is a Problem: len() returns wrong values<br>
+- Fix: Always decrement _size on successful delete</p>
+<p><strong>Not setting prev in a doubly linked list</strong><br>
+- Why It Is a Problem: Reverse traversal becomes impossible<br>
+- Fix: Update both prev and next on every insert/delete</p>
+<p><strong>Infinite loop from circular references</strong><br>
+- Why It Is a Problem: while current never terminates<br>
+- Fix: Use Floyd's algorithm to detect cycles</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>LRU caches are implemented with a doubly linked list plus a dict</li>
+<li>Text editors manage undo history with linked lists</li>
+<li>Memory allocators track free blocks with linked lists</li>
+<li>Hash table chaining uses linked lists</li>
+<li>Browser history is implemented as a doubly linked list</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In Python, you rarely need to implement a linked list from scratch. list and deque cover most situations. But understanding the linked list concept lets you reason about how deque, LRU caches, and graphs work internally.</p>
+<p>For interview preparation, linked lists are essential. They are the best data structure for practicing pointer manipulation, edge-case handling, and recursive thinking.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can implement append, prepend, and delete on a singly linked list</li>
+<li>[ ] Can write an algorithm to reverse a linked list</li>
+<li>[ ] Can explain the advantages of a doubly linked list</li>
+<li>[ ] Can explain Floyd's cycle detection algorithm</li>
+<li>[ ] Can compare the performance differences between arrays and linked lists</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a function that finds the middle node of a singly linked list in a single pass. (Hint: slow/fast pointers)</li>
+<li>Write a function that merges two sorted linked lists into one sorted linked list.</li>
+<li>Write a function that deletes the Nth node from the end of a linked list.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Linked lists connect nodes with pointers to achieve O(1) insertion and deletion. Unlike arrays, they do not require contiguous memory, but index access is O(n). The next article covers trees and binary trees for representing hierarchical structures.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Hash Tables and dict</a></li>
+<li><strong>Linked Lists (current)</strong></li>
+<li>Trees and Binary Trees (upcoming)</li>
+<li>Heaps and Priority Queues (upcoming)</li>
+<li>Graph Representations (upcoming)</li>
+<li>Sets and Set Operations (upcoming)</li>
+<li>Choosing the Right Data Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://realpython.com/linked-lists-python/">Real Python — Linked Lists in Python</a></li>
+<li><a href="https://www.geeksforgeeks.org/data-structures/linked-list/">GeeksforGeeks — Linked List Data Structure</a></li>
+<li><a href="https://visualgo.net/en/list">Visualgo — Linked List Visualization</a></li>
+<li><a href="https://leetcode.com/tag/linked-list/">LeetCode — Linked List Problems</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, Linked List, Node, Pointers</p>
+</body>
+</html>

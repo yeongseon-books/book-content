@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error Handling and Reliability</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Error Handling and Reliability</h1>
+<blockquote>
+<p>AI Agent 101 Series (8/10)</p>
+</blockquote>
+<p>Agents can fail because they call external tools, go through networks, and depend on uncertain model judgments. Various failure modes exist: API timeouts, incorrect tool parameters, model hallucinations, unexpected response formats, etc.</p>
+<p>To build reliable agents, you must anticipate and respond to these failures. Retry strategies, fallback patterns, timeout handling, and graceful degradation are key.</p>
+<p>This article covers common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.</p>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How do you classify the errors an agent throws?</li>
+<li>When do you reach for Retry vs Fallback vs Circuit Breaker?</li>
+<li>What guards do you need to run tools safely?</li>
+<li>What does good graceful degradation look like to the user?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
+<h2>Error Types in Agents</h2>
+<p>Agents tangle together LLMs, tools, external APIs, and user input, so error sources are diverse.</p>
+<p><strong>LLM Response Errors</strong></p>
+<p>The LLM's own non-determinism, format errors, and hallucinations are the most common error source.</p>
+<pre><code class="language-python">import json
+from typing import Optional
+
+class LLMResponseError(Exception):
+    &quot;&quot;&quot;LLM response error.&quot;&quot;&quot;
+    pass
+
+def parse_llm_json(response_text: str) -&gt; dict:
+    &quot;&quot;&quot;Safely parse JSON returned by an LLM.&quot;&quot;&quot;
+    # 1. Strip markdown code fences
+    cleaned = response_text.strip()
+    if cleaned.startswith(&quot;```&quot;):
+        # Remove ```json ... ``` or ``` ... ```
+        lines = cleaned.split(&quot;\n&quot;)
+        cleaned = &quot;\n&quot;.join(lines[1:-1] if lines[-1].strip() == &quot;```&quot; else lines[1:])
+
+    # 2. Try to parse
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        raise LLMResponseError(f&quot;JSON parse failed: {e}\nraw: {response_text[:200]}&quot;)
+
+# Example usage
+response = '```json\n{&quot;action&quot;: &quot;search&quot;, &quot;query&quot;: &quot;Python&quot;}\n```'
+try:
+    parsed = parse_llm_json(response)
+except LLMResponseError as e:
+    # Branch into retry logic
+    pass
+</code></pre>
+<p>Always validate LLM responses and have a fallback path for parse failures.</p>
+<p><strong>Tool Call Errors</strong></p>
+<p>These cover tool failures, timeouts, and external API outages.</p>
+<pre><code class="language-python">import requests
+from typing import Any
+
+class ToolExecutionError(Exception):
+    &quot;&quot;&quot;Tool execution failed.&quot;&quot;&quot;
+    def __init__(self, tool_name: str, reason: str, recoverable: bool = True):
+        self.tool_name = tool_name
+        self.reason = reason
+        self.recoverable = recoverable
+        super().__init__(f&quot;{tool_name} failed: {reason}&quot;)
+
+def execute_tool_safely(tool_name: str, tool_fn, **kwargs) -&gt; Any:
+    &quot;&quot;&quot;Run a tool safely.&quot;&quot;&quot;
+    try:
+        return tool_fn(**kwargs)
+    except requests.Timeout:
+        raise ToolExecutionError(tool_name, &quot;timeout&quot;, recoverable=True)
+    except requests.ConnectionError:
+        raise ToolExecutionError(tool_name, &quot;network connection failed&quot;, recoverable=True)
+    except ValueError as e:
+        # Bad arguments — same args won't succeed on retry
+        raise ToolExecutionError(tool_name, f&quot;bad argument: {e}&quot;, recoverable=False)
+    except Exception as e:
+        raise ToolExecutionError(tool_name, f&quot;unexpected error: {e}&quot;, recoverable=False)
+</code></pre>
+<p>The <code>recoverable</code> flag tells the upstream caller whether retrying makes sense.</p>
+<p><strong>User Input Errors</strong></p>
+<p>Malicious input, ambiguous requests, and context-window overruns all happen.</p>
+<pre><code class="language-python">class UserInputError(Exception):
+    pass
+
+def validate_user_input(text: str, max_chars: int = 10000) -&gt; str:
+    &quot;&quot;&quot;Validate user input.&quot;&quot;&quot;
+    if not text or not text.strip():
+        raise UserInputError(&quot;empty input&quot;)
+    if len(text) &gt; max_chars:
+        raise UserInputError(f&quot;input too long ({len(text)} chars, max {max_chars})&quot;)
+    return text.strip()
+</code></pre>
+<p>Unvalidated input leads to LLM cost bombs and security incidents.</p>
+<h2>Retry Pattern</h2>
+<p>The most basic reliability mechanism. Exponential backoff is the standard.</p>
+<pre><code class="language-python">import time
+import random
+from typing import Callable, Type, Tuple
+
+def retry_with_backoff(
+    fn: Callable,
+    max_attempts: int = 3,
+    initial_delay: float = 1.0,
+    max_delay: float = 30.0,
+    exponential_base: float = 2.0,
+    jitter: bool = True,
+    retryable_exceptions: Tuple[Type[Exception], ...] = (Exception,)
+):
+    &quot;&quot;&quot;Retry with exponential backoff.&quot;&quot;&quot;
+    last_exception = None
+
+    for attempt in range(max_attempts):
+        try:
+            return fn()
+        except retryable_exceptions as e:
+            last_exception = e
+            if attempt == max_attempts - 1:
+                break
+
+            delay = min(initial_delay * (exponential_base ** attempt), max_delay)
+            if jitter:
+                delay = delay * (0.5 + random.random())
+
+            print(f&quot;attempt {attempt + 1} failed: {e}. retrying in {delay:.1f}s&quot;)
+            time.sleep(delay)
+
+    raise last_exception
+
+# Example usage
+def call_flaky_api():
+    response = requests.get(&quot;https://api.example.com/data&quot;, timeout=5)
+    response.raise_for_status()
+    return response.json()
+
+result = retry_with_backoff(
+    call_flaky_api,
+    max_attempts=5,
+    retryable_exceptions=(requests.Timeout, requests.ConnectionError)
+)
+</code></pre>
+<p>Caution: retrying <code>recoverable=False</code> errors only loads the system without changing the outcome.</p>
+<h2>Fallback and Graceful Degradation</h2>
+<p>Even when the primary path fails, the ability to deliver a partial response shapes user experience.</p>
+<pre><code class="language-python">class FallbackChain:
+    &quot;&quot;&quot;Try fallbacks sequentially.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.handlers = []
+
+    def add(self, handler: Callable, name: str):
+        self.handlers.append((name, handler))
+        return self
+
+    def execute(self, *args, **kwargs):
+        errors = []
+        for name, handler in self.handlers:
+            try:
+                result = handler(*args, **kwargs)
+                return {&quot;result&quot;: result, &quot;source&quot;: name, &quot;fallbacks_tried&quot;: errors}
+            except Exception as e:
+                errors.append({&quot;handler&quot;: name, &quot;error&quot;: str(e)})
+        raise RuntimeError(f&quot;all handlers failed: {errors}&quot;)
+
+# Example usage
+def primary_search(query):
+    return external_search_api(query)
+
+def cached_search(query):
+    return cache.get(f&quot;search:{query}&quot;) or []
+
+def degraded_search(query):
+    return [{&quot;text&quot;: f&quot;Search for '{query}' is temporarily unavailable.&quot;, &quot;fallback&quot;: True}]
+
+chain = (FallbackChain()
+    .add(primary_search, &quot;primary&quot;)
+    .add(cached_search, &quot;cache&quot;)
+    .add(degraded_search, &quot;degraded&quot;))
+
+result = chain.execute(&quot;Python tutorial&quot;)
+# On primary failure → cache; on cache failure → friendly message
+</code></pre>
+<p>Graceful degradation provides "an honest, limited response" instead of "a bad response."</p>
+<h2>Circuit Breaker Pattern</h2>
+<p>When a service keeps failing, temporarily block calls to it to prevent overload of the whole system.</p>
+<pre><code class="language-python">from enum import Enum
+import time
+
+class CircuitState(Enum):
+    CLOSED = &quot;closed&quot;      # normal
+    OPEN = &quot;open&quot;          # blocked
+    HALF_OPEN = &quot;half_open&quot;  # trial calls
+
+class CircuitBreaker:
+    &quot;&quot;&quot;Circuit breaker.&quot;&quot;&quot;
+
+    def __init__(
+        self,
+        failure_threshold: int = 5,
+        recovery_timeout: float = 60.0,
+        success_threshold: int = 2
+    ):
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self.success_threshold = success_threshold
+
+        self.state = CircuitState.CLOSED
+        self.failure_count = 0
+        self.success_count = 0
+        self.last_failure_time = 0.0
+
+    def call(self, fn: Callable, *args, **kwargs):
+        if self.state == CircuitState.OPEN:
+            if time.time() - self.last_failure_time &gt; self.recovery_timeout:
+                self.state = CircuitState.HALF_OPEN
+                self.success_count = 0
+            else:
+                raise RuntimeError(&quot;Circuit breaker OPEN&quot;)
+
+        try:
+            result = fn(*args, **kwargs)
+            self._on_success()
+            return result
+        except Exception:
+            self._on_failure()
+            raise
+
+    def _on_success(self):
+        if self.state == CircuitState.HALF_OPEN:
+            self.success_count += 1
+            if self.success_count &gt;= self.success_threshold:
+                self.state = CircuitState.CLOSED
+                self.failure_count = 0
+        elif self.state == CircuitState.CLOSED:
+            self.failure_count = 0
+
+    def _on_failure(self):
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        if self.failure_count &gt;= self.failure_threshold:
+            self.state = CircuitState.OPEN
+
+# Example usage
+breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=30)
+
+try:
+    result = breaker.call(external_api_call, &quot;param&quot;)
+except RuntimeError as e:
+    # Circuit is open, use the fallback
+    result = cached_value
+</code></pre>
+<p>Circuit breakers are essential for agents with many external API dependencies.</p>
+<h2>Safe Tool Execution</h2>
+<p>Without time and resource limits on tool execution, a single failure can paralyze the whole system.</p>
+<pre><code class="language-python">import signal
+from contextlib import contextmanager
+
+class TimeoutError(Exception):
+    pass
+
+@contextmanager
+def time_limit(seconds: int):
+    &quot;&quot;&quot;Limit function execution time.&quot;&quot;&quot;
+    def signal_handler(signum, frame):
+        raise TimeoutError(f&quot;execution exceeded {seconds}s&quot;)
+
+    signal.signal(signal.SIGALRM, signal_handler)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+
+def run_tool_with_limits(tool_fn, *args, timeout: int = 30, **kwargs):
+    &quot;&quot;&quot;Run a tool with timeout and exception handling.&quot;&quot;&quot;
+    try:
+        with time_limit(timeout):
+            return tool_fn(*args, **kwargs)
+    except TimeoutError as e:
+        raise ToolExecutionError(&quot;tool&quot;, str(e), recoverable=True)
+    except Exception as e:
+        raise ToolExecutionError(&quot;tool&quot;, str(e), recoverable=False)
+</code></pre>
+<p>Set timeouts appropriately per tool.</p>
+<h2>Common Mistakes</h2>
+<p><strong>Mistake 1: Retrying Every Error</strong></p>
+<pre><code class="language-python"># Bad
+for _ in range(5):
+    try:
+        return call_api(invalid_args)  # Bad args won't succeed on retry
+    except Exception:
+        time.sleep(1)
+
+# Good
+try:
+    return call_api(args)
+except (Timeout, ConnectionError):
+    return retry_with_backoff(lambda: call_api(args))
+except ValueError:
+    raise  # Not retryable
+</code></pre>
+<p>Unrecoverable errors should fail fast.</p>
+<p><strong>Mistake 2: Infinite Retries</strong></p>
+<pre><code class="language-python"># Bad
+while True:
+    try:
+        return call_api()
+    except Exception:
+        time.sleep(1)  # forever
+
+# Good
+return retry_with_backoff(call_api, max_attempts=5)
+</code></pre>
+<p>Always cap retry count and total time.</p>
+<p><strong>Mistake 3: Single-Path Dependency Without Fallback</strong></p>
+<pre><code class="language-python"># Bad
+def search(query):
+    return external_api.search(query)  # If the API dies, everything dies
+
+# Good
+def search(query):
+    try:
+        return external_api.search(query)
+    except Exception:
+        return cache.get(query) or []  # At least serve cache
+</code></pre>
+<p>Always provide fallbacks for critical functionality.</p>
+<p><strong>Mistake 4: Silently Swallowing Errors</strong></p>
+<pre><code class="language-python"># Bad
+try:
+    result = risky_operation()
+except Exception:
+    pass  # Hidden — undebuggable
+
+# Good
+try:
+    result = risky_operation()
+except Exception as e:
+    logger.error(f&quot;risky_operation failed: {e}&quot;, exc_info=True)
+    metrics.increment(&quot;risky_operation.failures&quot;)
+    raise
+</code></pre>
+<p>Always record errors to logs and metrics.</p>
+<p><strong>Mistake 5: Exposing Raw Errors to Users</strong></p>
+<pre><code class="language-python"># Bad
+return {&quot;error&quot;: str(exception)}  # Leaks internals and stack traces
+
+# Good
+return {
+    &quot;error&quot;: &quot;Unable to process the request&quot;,
+    &quot;request_id&quot;: req_id,  # for internal tracing
+}
+# Detailed info stays in server logs only
+</code></pre>
+<p>Show users a friendly message; manage internal trace IDs separately.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Agent errors arise across many layers — LLM responses, tool calls, user input</li>
+<li>Retries should combine exponential backoff with jitter and distinguish recoverable vs. not</li>
+<li>Provide partial responses through fallback and graceful degradation</li>
+<li>Circuit breakers protect the system from repeatedly failing external dependencies</li>
+<li>Tool execution always needs timeouts and resource limits</li>
+<li>Don't swallow errors silently — surface them through logs and metrics</li>
+</ul>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Sorted agent errors into transient / permanent / model-level.</li>
+<li>[ ] Implemented exponential-backoff retry to absorb transient failures.</li>
+<li>[ ] Sketched the circuit-breaker open/half-open/closed transitions.</li>
+<li>[ ] Wrapped a tool call with timeout + sandbox.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/04-agent-workflow-design.md">Agent Workflow Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/05-memory-and-state.md">Memory and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/06-multi-agent-systems.md">Multi-Agent Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/07-agent-evaluation.md">Agent Evaluation</a></li>
+<li><strong>Error Handling and Reliability (current)</strong></li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ol>
+<li>
+<p><strong>Release It! Design and Deploy Production-Ready Software</strong> - Michael Nygard - https://pragprog.com/titles/mnee2/release-it-second-edition/<br>
+   The classic on reliability patterns: circuit breaker, bulkhead, timeout. The patterns apply directly to agent systems.</p>
+</li>
+<li>
+<p><strong>AWS Builders' Library: Timeouts, retries, and backoff with jitter</strong> - https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/<br>
+   AWS's best practices for retry and backoff. Explains why jitter matters and shows concrete algorithms.</p>
+</li>
+<li>
+<p><strong>OpenAI: Production Best Practices</strong> - https://platform.openai.com/docs/guides/production-best-practices<br>
+   OpenAI's official operations guide. Covers rate limits, error codes, and retry policies.</p>
+</li>
+<li>
+<p><strong>Hystrix: Latency and Fault Tolerance</strong> - https://github.com/Netflix/Hystrix/wiki<br>
+   Netflix's circuit breaker library docs. Provides core concepts and operational case studies.</p>
+</li>
+</ol>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
+</body>
+</html>

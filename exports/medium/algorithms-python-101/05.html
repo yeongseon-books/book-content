@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recursion and Divide and Conquer</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Recursion and Divide and Conquer</h1>
+<blockquote>
+<p>Algorithms with Python 101 Series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Why does breaking a big problem into smaller pieces make it easier to solve?</p>
+<blockquote>
+<p>Recursion is a technique where a function calls itself. Divide and conquer is a strategy that uses recursion to systematically split problems into smaller sub-problems. This article explains how recursion works and applies the divide-and-conquer pattern to real problems.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How recursive functions work and what the call stack looks like</li>
+<li>Why the base case is critical</li>
+<li>The three stages of divide and conquer: divide, conquer, combine</li>
+<li>How to convert recursion to iteration and why memoization matters</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Recursion is the foundation of tree traversal, graph traversal, sorting, and dynamic programming. Without understanding recursion, the rest of the algorithm curriculum becomes impenetrable.</p>
+<blockquote>
+<p>Divide and conquer splits a problem into smaller parts (Divide), solves each part (Conquer), and combines the results (Combine).</p>
+</blockquote>
+<p>Divide and conquer is the common pattern behind merge sort, quick sort, and binary search. Recognizing this pattern lets you tackle new problems systematically.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Recursion = a function that calls itself to perform repetitive work</p>
+</blockquote>
+<pre><code>factorial(4) call trace:
+factorial(4) → 4 × factorial(3)
+               → 3 × factorial(2)
+                    → 2 × factorial(1)
+                         → 1 (base case)
+                    ← 2 × 1 = 2
+               ← 3 × 2 = 6
+          ← 4 × 6 = 24
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Recursion</strong><br>
+- Description: A programming technique where a function calls itself</p>
+<p><strong>Base case</strong><br>
+- Description: The termination condition that stops recursive calls</p>
+<p><strong>Call stack</strong><br>
+- Description: The stack of execution contexts created by recursive calls</p>
+<p><strong>Divide and conquer</strong><br>
+- Description: A strategy that divides, conquers, and combines</p>
+<p><strong>Tail recursion</strong><br>
+- Description: A form where the recursive call is the last operation</p>
+<h2>Before / After</h2>
+<p>Two ways to sum a list.</p>
+<pre><code class="language-python"># before: iterative
+def sum_list(data):
+    total = 0
+    for x in data:
+        total += x
+    return total
+</code></pre>
+<pre><code class="language-python"># after: recursive
+def sum_list(data):
+    if not data:
+        return 0
+    return data[0] + sum_list(data[1:])
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Basic Recursion — Factorial and Fibonacci</strong></p>
+<pre><code class="language-python">def factorial(n: int) -&gt; int:
+    &quot;&quot;&quot;Factorial — O(n).&quot;&quot;&quot;
+    if n &lt;= 1:  # base case
+        return 1
+    return n * factorial(n - 1)
+
+print(factorial(5))   # 120
+print(factorial(10))  # 3628800
+
+def fibonacci(n: int) -&gt; int:
+    &quot;&quot;&quot;Fibonacci — O(2^n), inefficient.&quot;&quot;&quot;
+    if n &lt;= 1:  # base case
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+print(fibonacci(10))  # 55
+</code></pre>
+<p><strong>Step 2: Visualizing the Call Stack</strong></p>
+<pre><code class="language-python">def factorial_trace(n: int, depth: int = 0) -&gt; int:
+    &quot;&quot;&quot;Factorial with call stack visualization.&quot;&quot;&quot;
+    indent = &quot;  &quot; * depth
+    print(f&quot;{indent}factorial({n}) called&quot;)
+
+    if n &lt;= 1:
+        print(f&quot;{indent}base case: return 1&quot;)
+        return 1
+
+    result = n * factorial_trace(n - 1, depth + 1)
+    print(f&quot;{indent}factorial({n}) = {result}&quot;)
+    return result
+
+factorial_trace(4)
+# factorial(4) called
+#   factorial(3) called
+#     factorial(2) called
+#       factorial(1) called
+#       base case: return 1
+#     factorial(2) = 2
+#   factorial(3) = 6
+# factorial(4) = 24
+</code></pre>
+<p><strong>Step 3: Divide and Conquer — Fast Exponentiation</strong></p>
+<pre><code class="language-python">def power(base: int, exp: int) -&gt; int:
+    &quot;&quot;&quot;Divide-and-conquer exponentiation — O(log n).&quot;&quot;&quot;
+    if exp == 0:
+        return 1
+    if exp % 2 == 0:
+        half = power(base, exp // 2)
+        return half * half
+    return base * power(base, exp - 1)
+
+print(power(2, 10))   # 1024
+print(power(3, 5))    # 243
+
+# Comparison: naive approach is O(n), D&amp;C is O(log n)
+# Computing 2^1000 takes ~1000 vs ~10 multiplications
+</code></pre>
+<p><strong>Step 4: Divide and Conquer — Find Max and Tower of Hanoi</strong></p>
+<pre><code class="language-python">def find_max(data: list[int], left: int, right: int) -&gt; int:
+    &quot;&quot;&quot;Find maximum using divide and conquer.&quot;&quot;&quot;
+    if left == right:
+        return data[left]
+    mid = (left + right) // 2
+    left_max = find_max(data, left, mid)
+    right_max = find_max(data, mid + 1, right)
+    return max(left_max, right_max)
+
+data = [3, 7, 2, 9, 1, 8, 4]
+print(find_max(data, 0, len(data) - 1))  # 9
+
+def hanoi(n: int, source: str, target: str, auxiliary: str):
+    &quot;&quot;&quot;Tower of Hanoi — O(2^n).&quot;&quot;&quot;
+    if n == 1:
+        print(f&quot;Disk 1: {source} -&gt; {target}&quot;)
+        return
+    hanoi(n - 1, source, auxiliary, target)
+    print(f&quot;Disk {n}: {source} -&gt; {target}&quot;)
+    hanoi(n - 1, auxiliary, target, source)
+
+hanoi(3, &quot;A&quot;, &quot;C&quot;, &quot;B&quot;)
+# Disk 1: A -&gt; C
+# Disk 2: A -&gt; B
+# Disk 1: C -&gt; B
+# Disk 3: A -&gt; C
+# Disk 1: B -&gt; A
+# Disk 2: B -&gt; C
+# Disk 1: A -&gt; C
+</code></pre>
+<p><strong>Step 5: Converting Recursion to Iteration</strong></p>
+<pre><code class="language-python"># Recursive factorial → iterative factorial
+def factorial_iter(n: int) -&gt; int:
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+print(factorial_iter(10))  # 3628800
+
+# Recursive fibonacci → memoized fibonacci
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fibonacci_memo(n: int) -&gt; int:
+    &quot;&quot;&quot;Memoized Fibonacci — O(n).&quot;&quot;&quot;
+    if n &lt;= 1:
+        return n
+    return fibonacci_memo(n - 1) + fibonacci_memo(n - 2)
+
+print(fibonacci_memo(50))  # 12586269025
+
+# Python recursion depth limit
+import sys
+print(f&quot;Max recursion depth: {sys.getrecursionlimit()}&quot;)  # default 1000
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A recursive function without a base case causes a RecursionError. Always write the base case first</li>
+<li>Divide-and-conquer exponentiation reduces multiplications from O(n) to O(log n)</li>
+<li>Naive recursive Fibonacci is O(2^n), but adding memoization makes it O(n)</li>
+<li>Python's default recursion limit is 1000. For deep recursion, convert to iteration</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Missing base case</strong><br>
+- Why It's a Problem: Infinite recursion causes RecursionError<br>
+- How to Fix It: Always write the base case first</p>
+<p><strong>Exceeding recursion depth</strong><br>
+- Why It's a Problem: Python's default limit is 1000<br>
+- How to Fix It: Convert to iteration or adjust sys.setrecursionlimit</p>
+<p><strong>Redundant computation</strong><br>
+- Why It's a Problem: Same values computed repeatedly, exponential time<br>
+- How to Fix It: Use memoization or DP</p>
+<p><strong>Creating new lists via slicing</strong><br>
+- Why It's a Problem: Wastes memory and time<br>
+- How to Fix It: Pass indices instead</p>
+<p><strong>Forgetting the combine step</strong><br>
+- Why It's a Problem: Sub-results are not merged into the final answer<br>
+- How to Fix It: Verify all three stages: divide, conquer, combine</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>File system explorers recursively traverse directory trees</li>
+<li>Parsers recursively process nested structures like JSON and XML</li>
+<li>MapReduce uses divide and conquer to process large datasets in parallel</li>
+<li>Compilers recursively evaluate abstract syntax trees (ASTs)</li>
+<li>Fractal graphics are generated from recursive patterns</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Recursion makes code concise, but you must watch for performance and stack depth. For inherently recursive structures like trees, recursion is natural. For simple iteration, a for loop is better.</p>
+<p>The real value is learning to recognize the divide-and-conquer pattern. Habitually asking "Can I split this problem in half?" leads to efficient solutions faster.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Explain the role of the base case in a recursive function</li>
+<li>[ ] Trace a call stack diagram for a simple recursive function</li>
+<li>[ ] Identify the three stages of divide and conquer</li>
+<li>[ ] Compare the pros and cons of recursion vs iteration</li>
+<li>[ ] Eliminate redundant computation with memoization</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a function that reverses a list recursively.</li>
+<li>Write a function that computes the sum of a list using divide and conquer.</li>
+<li>Print the minimum number of moves and the full sequence for the Tower of Hanoi with 4 disks.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Recursion is a technique where a function calls itself; divide and conquer is a strategy that uses recursion to systematically break down problems. In the next article, we tackle the redundant computation problem with dynamic programming.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><strong>Recursion and Divide and Conquer (current)</strong></li>
+<li>Dynamic Programming Basics (upcoming)</li>
+<li>Graph Traversal — BFS and DFS (upcoming)</li>
+<li>Shortest Path Basics (upcoming)</li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Coding Test Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/functools.html#functools.lru_cache">Python Documentation — functools.lru_cache</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm">Wikipedia — Divide-and-Conquer Algorithm</a></li>
+<li><a href="https://realpython.com/python-thinking-recursively/">Real Python — Thinking Recursively in Python</a></li>
+<li><a href="https://www.geeksforgeeks.org/divide-and-conquer/">GeeksforGeeks — Divide and Conquer</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Algorithms, Recursion, Divide and Conquer, Tower of Hanoi</p>
+</body>
+</html>

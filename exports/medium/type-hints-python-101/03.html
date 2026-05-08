@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Optional and Union</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Optional and Union</h1>
+<blockquote>
+<p>Type Hints in Python 101 Series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you tell the type checker that a value might be <code>None</code> or could be one of several different types?</p>
+<blockquote>
+<p>In real-world code, functions often return <code>None</code> to signal "not found," and parameters accept multiple types for flexibility. Without explicit annotations, these patterns become invisible traps — a <code>None</code> return value that crashes three function calls later, or a parameter that silently accepts the wrong type. <code>Optional</code> and <code>Union</code> make these contracts explicit so the type checker can enforce them.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><code>Optional[T]</code> for values that might be <code>None</code></li>
+<li><code>Union[T1, T2]</code> for values that could be one of several types</li>
+<li>Python 3.10+ <code>X | Y</code> pipe syntax</li>
+<li>Type narrowing with <code>isinstance</code> and <code>is None</code> checks</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><code>None</code>-related errors are among the most common runtime bugs in Python. A function returns <code>None</code> when no result is found, but the caller assumes it always returns a valid object and calls a method on it — <code>AttributeError</code>. Optional makes this possibility visible. Union handles the equally common case where a parameter legitimately accepts multiple types.</p>
+<blockquote>
+<p>Optional = "this might be None." Union = "this might be one of several types."</p>
+</blockquote>
+<p>Both force the caller to handle all possibilities.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Optional[T] is shorthand for Union[T, None]. Union[T1, T2] means the value is either T1 or T2. Type narrowing confirms which type it actually is.</p>
+</blockquote>
+<pre><code class="language-text">Optional[str]  =  str | None
+                    │
+            if value is not None:
+                    │
+            value: str  (narrowed)
+
+Union[int, str]  =  int | str
+                      │
+            if isinstance(value, int):
+                      │
+            value: int  (narrowed)
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Optional[T]</strong><br>
+- Description: Equivalent to `T \</p>
+<p><strong>Union[T1, T2]</strong><br>
+- Description: The value is one of the listed types</p>
+<p><strong>Pipe syntax</strong><br>
+- Description: Python 3.10+ shorthand: `int \</p>
+<p><strong>Type narrowing</strong><br>
+- Description: Using checks like <code>isinstance</code> to confirm a specific type within a Union</p>
+<p><strong>Type guard</strong><br>
+- Description: A function that tells the type checker a value is a specific type</p>
+<h2>Before / After</h2>
+<p><strong>Before — Hidden None danger:</strong></p>
+<pre><code class="language-python">def find_user(user_id: int) -&gt; dict:
+    if user_id == 0:
+        return None  # type says dict, but returns None
+    return {&quot;id&quot;: user_id, &quot;name&quot;: &quot;Alice&quot;}
+
+user = find_user(0)
+print(user[&quot;name&quot;])  # Runtime: TypeError
+</code></pre>
+<p><strong>After — Explicit Optional:</strong></p>
+<pre><code class="language-python">def find_user(user_id: int) -&gt; dict[str, str | int] | None:
+    if user_id == 0:
+        return None
+    return {&quot;id&quot;: user_id, &quot;name&quot;: &quot;Alice&quot;}
+
+user = find_user(0)
+if user is not None:
+    print(user[&quot;name&quot;])  # Safe: type checker verified the None check
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Optional for Nullable Returns</strong></p>
+<pre><code class="language-python">from typing import Optional
+
+def find_by_name(name: str) -&gt; Optional[str]:
+    &quot;&quot;&quot;Returns the email if found, None otherwise.&quot;&quot;&quot;
+    users = {&quot;Alice&quot;: &quot;alice@example.com&quot;, &quot;Bob&quot;: &quot;bob@example.com&quot;}
+    return users.get(name)
+
+email = find_by_name(&quot;Alice&quot;)
+# email: Optional[str] — must check before using
+if email is not None:
+    print(email.upper())  # Safe
+</code></pre>
+<p><code>Optional[str]</code> is exactly <code>str | None</code>. The type checker forces you to handle the <code>None</code> case.</p>
+<p><strong>Step 2: Python 3.10+ Pipe Syntax</strong></p>
+<pre><code class="language-python"># Python 3.10+: use | instead of Union/Optional
+def find_by_name(name: str) -&gt; str | None:
+    users = {&quot;Alice&quot;: &quot;alice@example.com&quot;}
+    return users.get(name)
+
+def process(value: int | str) -&gt; str:
+    return str(value)
+</code></pre>
+<p>The pipe syntax is cleaner and does not require imports from <code>typing</code>.</p>
+<p><strong>Step 3: Union for Multi-Type Parameters</strong></p>
+<pre><code class="language-python">def format_id(value: int | str) -&gt; str:
+    &quot;&quot;&quot;Accepts both integer IDs and string UUIDs.&quot;&quot;&quot;
+    if isinstance(value, int):
+        return f&quot;ID-{value:06d}&quot;
+    return f&quot;UUID-{value}&quot;
+
+print(format_id(42))          # ID-000042
+print(format_id(&quot;abc-123&quot;))   # UUID-abc-123
+</code></pre>
+<p>The <code>isinstance</code> check narrows the type. Inside the <code>if</code> block, the type checker knows <code>value</code> is <code>int</code>.</p>
+<p><strong>Step 4: Type Narrowing Patterns</strong></p>
+<pre><code class="language-python">def process(value: str | int | None) -&gt; str:
+    # Pattern 1: None check
+    if value is None:
+        return &quot;default&quot;
+
+    # Pattern 2: isinstance check
+    if isinstance(value, int):
+        return str(value)
+
+    # Pattern 3: After eliminating other types, only str remains
+    return value.upper()
+
+def safe_len(text: str | None) -&gt; int:
+    # Pattern 4: Early return for None
+    if text is None:
+        return 0
+    return len(text)
+</code></pre>
+<p><strong>Step 5: Default Values with Optional</strong></p>
+<pre><code class="language-python">def greet(name: str, title: str | None = None) -&gt; str:
+    &quot;&quot;&quot;Title is optional with a default of None.&quot;&quot;&quot;
+    if title is not None:
+        return f&quot;Hello, {title} {name}!&quot;
+    return f&quot;Hello, {name}!&quot;
+
+print(greet(&quot;Alice&quot;))              # Hello, Alice!
+print(greet(&quot;Alice&quot;, &quot;Dr.&quot;))      # Hello, Dr. Alice!
+</code></pre>
+<p>When a parameter has a default of <code>None</code>, annotate it as <code>T | None</code> (or <code>Optional[T]</code>). This signals that callers can omit it.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>Optional[T]</code> is strictly equivalent to <code>T | None</code> — use whichever your team prefers</li>
+<li>Every <code>Optional</code> return value requires a <code>None</code> check before use</li>
+<li><code>isinstance</code> and <code>is None</code> are the primary type narrowing mechanisms</li>
+<li>The pipe syntax (<code>|</code>) is available from Python 3.10+ and requires no imports</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Not checking Optional before use</strong><br>
+- Problem: <code>AttributeError: NoneType has no attribute</code><br>
+- Fix: Always check <code>is not None</code> before accessing</p>
+<p><strong>Using <code>Optional</code> for required params</strong><br>
+- Problem: Misleading — suggests the param is optional<br>
+- Fix: <code>Optional</code> means nullable, not "param is optional"</p>
+<p><strong>Broad <code>Union[int, str, float, bool, list]</code></strong><br>
+- Problem: Too many types to handle<br>
+- Fix: Simplify the API or use a common base</p>
+<p><strong>Forgetting narrowing in branches</strong><br>
+- Problem: Type checker reports errors inside branches<br>
+- Fix: Add <code>isinstance</code> or <code>is None</code> checks</p>
+<p><strong>Nested <code>Optional[Optional[str]]</code></strong><br>
+- Problem: Redundant — collapses to <code>str \
+- Fix: None</code></p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Database query functions return <code>Optional[Model]</code> — not found means <code>None</code></li>
+<li>Configuration lookups use <code>Optional[str]</code> with fallback defaults</li>
+<li>API clients return <code>Union[SuccessResponse, ErrorResponse]</code> for typed error handling</li>
+<li>Form parsing accepts <code>str | int</code> for fields that might be numeric strings</li>
+<li>Cache lookups return <code>T | None</code> to distinguish "not cached" from "cached as empty"</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Senior engineers prefer <code>Optional</code> over sentinel values. Instead of returning <code>-1</code> or <code>""</code> to mean "not found," they return <code>None</code> with an explicit <code>Optional</code> annotation. This makes the absence of a value impossible to miss — the type checker will not let you use it without checking.</p>
+<p>They also keep Union types narrow. A function that accepts <code>int | str | float | list | dict | None</code> is a design smell — it means the interface is poorly defined. If a function needs to accept many types, it often needs to be split into multiple functions with clear contracts.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Used <code>Optional[T]</code> or <code>T | None</code> for nullable values</li>
+<li>[ ] Checked for <code>None</code> before using Optional values</li>
+<li>[ ] Used <code>isinstance</code> for type narrowing in Union branches</li>
+<li>[ ] Kept Union types to 2-3 types maximum</li>
+<li>[ ] Used Python 3.10+ pipe syntax where available</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p>Write a function <code>safe_divide(a: float, b: float) -&gt; float | None</code> that returns <code>None</code> when dividing by zero. Write a caller that handles both cases.</p>
+</li>
+<li>
+<p>Create a <code>format_value(value: int | float | str) -&gt; str</code> function that formats each type differently (integers with commas, floats with 2 decimals, strings in quotes). Use type narrowing.</p>
+</li>
+<li>
+<p>Refactor a function that uses sentinel values (e.g., returning <code>""</code> for "not found") to use <code>Optional[str]</code> instead. Run mypy on both versions and compare the safety guarantees.</p>
+</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p><code>Optional[T]</code> annotates values that might be <code>None</code>, and <code>Union[T1, T2]</code> annotates values that could be one of several types. Type narrowing with <code>isinstance</code> and <code>is None</code> lets the type checker verify that you handle all cases. The Python 3.10+ pipe syntax (<code>X | Y</code>) provides a cleaner alternative to <code>Union</code> and <code>Optional</code> imports.</p>
+<p>In the next article, we will explore function type hints in depth — including <code>Callable</code>, <code>*args</code>, <code>**kwargs</code>, and overload patterns.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
+<li><strong>Optional and Union (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Optional">Python docs — typing.Optional</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Union">Python docs — typing.Union</a></li>
+<li><a href="https://peps.python.org/pep-0604/">PEP 604 — Allow writing union types as X | Y</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/kinds_of_types.html#optional-types-and-the-none-type">mypy docs — Optional types and None</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, Optional, Union, None Handling, Type Narrowing</p>
+</body>
+</html>

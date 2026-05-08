@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Graph Traversal — BFS and DFS</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Graph Traversal — BFS and DFS</h1>
+<blockquote>
+<p>Algorithms with Python 101 Series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you determine whether two points in a network are connected?</p>
+<blockquote>
+<p>A graph is a data structure made of nodes (vertices) and edges. BFS and DFS are two strategies for systematically visiting every node. This article shows how to represent graphs in Python and implement both traversals.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Graph basics and how to represent them in Python</li>
+<li>BFS (Breadth-First Search): principle and implementation</li>
+<li>DFS (Depth-First Search): principle and implementation</li>
+<li>When to use BFS vs DFS</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Social networks, maps, web page links, and dependency graphs are all modeled as graphs. BFS and DFS are the most fundamental algorithms for exploring these structures.</p>
+<blockquote>
+<p>BFS explores neighbors layer by layer; DFS follows one path as deep as possible before backtracking.</p>
+</blockquote>
+<p>BFS is ideal for shortest-path problems on unweighted graphs. DFS is preferred for checking path existence, detecting cycles, and topological sorting.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>A graph is a collection of nodes (vertices) and edges</p>
+</blockquote>
+<pre><code>Example graph:     BFS order:           DFS order:
+  A—B               A (layer 0)         A → B → D → E → C → F
+  |\ \              B, C (layer 1)
+  | C  D            D, E, F (layer 2)
+  |/ \
+  E   F
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Vertex (node)</strong><br>
+- Description: An individual element in a graph</p>
+<p><strong>Edge</strong><br>
+- Description: A connection between two vertices</p>
+<p><strong>Adjacency list</strong><br>
+- Description: Represents a graph as a mapping from each vertex to its neighbors</p>
+<p><strong>BFS (Breadth-First Search)</strong><br>
+- Description: Uses a queue to visit the nearest nodes first</p>
+<p><strong>DFS (Depth-First Search)</strong><br>
+- Description: Uses a stack (or recursion) to visit as deep as possible first</p>
+<h2>Before / After</h2>
+<p>Two ways to check whether two nodes are connected.</p>
+<pre><code class="language-python"># before: ad-hoc traversal — risk of infinite loop
+def is_connected(graph, start, end):
+    # Not systematic, may loop forever
+    pass
+</code></pre>
+<pre><code class="language-python"># after: BFS — systematic O(V+E) traversal
+from collections import deque
+
+def is_connected(graph, start, end):
+    visited = {start}
+    queue = deque([start])
+    while queue:
+        node = queue.popleft()
+        if node == end:
+            return True
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return False
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Representing Graphs</strong></p>
+<pre><code class="language-python"># Adjacency list using a dictionary
+graph: dict[str, list[str]] = {
+    &quot;A&quot;: [&quot;B&quot;, &quot;C&quot;],
+    &quot;B&quot;: [&quot;A&quot;, &quot;D&quot;],
+    &quot;C&quot;: [&quot;A&quot;, &quot;E&quot;, &quot;F&quot;],
+    &quot;D&quot;: [&quot;B&quot;],
+    &quot;E&quot;: [&quot;C&quot;],
+    &quot;F&quot;: [&quot;C&quot;],
+}
+
+# Directed graph
+directed_graph: dict[str, list[str]] = {
+    &quot;A&quot;: [&quot;B&quot;, &quot;C&quot;],
+    &quot;B&quot;: [&quot;D&quot;],
+    &quot;C&quot;: [&quot;E&quot;],
+    &quot;D&quot;: [],
+    &quot;E&quot;: [],
+}
+
+# Weighted graph
+weighted_graph: dict[str, list[tuple[str, int]]] = {
+    &quot;A&quot;: [(&quot;B&quot;, 4), (&quot;C&quot;, 2)],
+    &quot;B&quot;: [(&quot;A&quot;, 4), (&quot;D&quot;, 3)],
+    &quot;C&quot;: [(&quot;A&quot;, 2), (&quot;E&quot;, 1)],
+    &quot;D&quot;: [(&quot;B&quot;, 3)],
+    &quot;E&quot;: [(&quot;C&quot;, 1)],
+}
+</code></pre>
+<p><strong>Step 2: BFS Implementation</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def bfs(graph: dict[str, list[str]], start: str) -&gt; list[str]:
+    &quot;&quot;&quot;BFS — O(V+E), uses a queue.&quot;&quot;&quot;
+    visited = {start}
+    queue = deque([start])
+    order = []
+
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+    return order
+
+print(bfs(graph, &quot;A&quot;))  # ['A', 'B', 'C', 'D', 'E', 'F']
+</code></pre>
+<p><strong>Step 3: DFS Implementation (Recursive and Iterative)</strong></p>
+<pre><code class="language-python">def dfs_recursive(
+    graph: dict[str, list[str]],
+    node: str,
+    visited: set[str] | None = None,
+) -&gt; list[str]:
+    &quot;&quot;&quot;DFS recursive — O(V+E).&quot;&quot;&quot;
+    if visited is None:
+        visited = set()
+    visited.add(node)
+    order = [node]
+    for neighbor in graph[node]:
+        if neighbor not in visited:
+            order.extend(dfs_recursive(graph, neighbor, visited))
+    return order
+
+print(dfs_recursive(graph, &quot;A&quot;))  # ['A', 'B', 'D', 'C', 'E', 'F']
+
+def dfs_iterative(graph: dict[str, list[str]], start: str) -&gt; list[str]:
+    &quot;&quot;&quot;DFS iterative — O(V+E), uses a stack.&quot;&quot;&quot;
+    visited: set[str] = set()
+    stack = [start]
+    order: list[str] = []
+
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        order.append(node)
+        for neighbor in reversed(graph[node]):
+            if neighbor not in visited:
+                stack.append(neighbor)
+
+    return order
+
+print(dfs_iterative(graph, &quot;A&quot;))  # ['A', 'B', 'D', 'C', 'E', 'F']
+</code></pre>
+<p><strong>Step 4: BFS Shortest Path</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def bfs_shortest_path(
+    graph: dict[str, list[str]], start: str, end: str
+) -&gt; list[str] | None:
+    &quot;&quot;&quot;BFS shortest path — unweighted graph.&quot;&quot;&quot;
+    if start == end:
+        return [start]
+
+    visited = {start}
+    queue: deque[list[str]] = deque([[start]])
+
+    while queue:
+        path = queue.popleft()
+        node = path[-1]
+        for neighbor in graph[node]:
+            if neighbor == end:
+                return path + [neighbor]
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(path + [neighbor])
+
+    return None
+
+print(bfs_shortest_path(graph, &quot;A&quot;, &quot;F&quot;))  # ['A', 'C', 'F']
+print(bfs_shortest_path(graph, &quot;D&quot;, &quot;E&quot;))  # ['D', 'B', 'A', 'C', 'E']
+</code></pre>
+<p><strong>Step 5: Connected Components and Cycle Detection</strong></p>
+<pre><code class="language-python">def find_connected_components(
+    graph: dict[str, list[str]],
+) -&gt; list[list[str]]:
+    &quot;&quot;&quot;Find all connected components.&quot;&quot;&quot;
+    visited: set[str] = set()
+    components: list[list[str]] = []
+
+    for node in graph:
+        if node not in visited:
+            component = bfs(graph, node)
+            visited.update(component)
+            components.append(component)
+
+    return components
+
+split_graph: dict[str, list[str]] = {
+    &quot;A&quot;: [&quot;B&quot;], &quot;B&quot;: [&quot;A&quot;],
+    &quot;C&quot;: [&quot;D&quot;], &quot;D&quot;: [&quot;C&quot;],
+}
+print(find_connected_components(split_graph))
+# [['A', 'B'], ['C', 'D']]
+
+def has_cycle(graph: dict[str, list[str]], start: str) -&gt; bool:
+    &quot;&quot;&quot;Cycle detection in an undirected graph using DFS.&quot;&quot;&quot;
+    visited: set[str] = set()
+
+    def _dfs(node: str, parent: str | None) -&gt; bool:
+        visited.add(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                if _dfs(neighbor, node):
+                    return True
+            elif neighbor != parent:
+                return True
+        return False
+
+    return _dfs(start, None)
+
+print(has_cycle(graph, &quot;A&quot;))  # True
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>BFS uses a queue (deque); DFS uses a stack (or recursion)</li>
+<li>BFS guarantees the shortest path on unweighted graphs; DFS does not</li>
+<li>The visited set prevents infinite loops by tracking already-visited nodes</li>
+<li>Cycle detection tracks the parent node to avoid false positives in undirected graphs</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Forgetting the visited check</strong><br>
+- Why It's a Problem: Infinite loop<br>
+- How to Fix It: Always check visited before processing a node</p>
+<p><strong>Using a list as a queue for BFS</strong><br>
+- Why It's a Problem: list.pop(0) is O(n)<br>
+- How to Fix It: Use collections.deque</p>
+<p><strong>Exceeding recursion depth in DFS</strong><br>
+- Why It's a Problem: RecursionError on large graphs<br>
+- How to Fix It: Use iterative DFS</p>
+<p><strong>Confusing directed and undirected</strong><br>
+- Why It's a Problem: Traversal results differ<br>
+- How to Fix It: Be explicit about the graph type</p>
+<p><strong>Missing disconnected nodes</strong><br>
+- Why It's a Problem: Some nodes are never visited<br>
+- How to Fix It: Start traversal from every unvisited node</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Social networks use BFS for "friend of a friend" recommendations</li>
+<li>Web crawlers use BFS to visit pages layer by layer</li>
+<li>Package managers use DFS-based topological sort for dependency resolution</li>
+<li>Maze solvers and game AI use graph traversal for pathfinding</li>
+<li>Network topology analysis uses graph traversal to map infrastructure</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>BFS and DFS are the building blocks of graph algorithms. Once you understand these two, advanced algorithms like Dijkstra, topological sort, and minimum spanning tree follow naturally.</p>
+<p>In production, you would use libraries like NetworkX, but knowing BFS/DFS internals helps you choose the right algorithm for the job.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Represent a graph using an adjacency list</li>
+<li>[ ] Explain the difference between BFS and DFS</li>
+<li>[ ] Find the shortest path using BFS</li>
+<li>[ ] Detect cycles using DFS</li>
+<li>[ ] Find connected components in an undirected graph</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a BFS function that finds the shortest path in a 2D grid (maze).</li>
+<li>Implement topological sort on a directed graph using DFS.</li>
+<li>Determine whether a given graph is bipartite using BFS.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>BFS explores nodes layer by layer and guarantees shortest paths on unweighted graphs. DFS goes deep first and is well-suited for cycle detection and topological sorting. In the next article, we tackle shortest paths on weighted graphs with Dijkstra's algorithm.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Dynamic Programming Basics</a></li>
+<li><strong>Graph Traversal — BFS and DFS (current)</strong></li>
+<li>Shortest Path Basics (upcoming)</li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Coding Test Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Breadth-first_search">Wikipedia — Breadth-First Search</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Depth-first_search">Wikipedia — Depth-First Search</a></li>
+<li><a href="https://realpython.com/python-graph/">Real Python — Graphs in Python</a></li>
+<li><a href="https://visualgo.net/en/dfsbfs">Visualgo — Graph Traversal</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Algorithms, Graphs, BFS, DFS</p>
+</body>
+</html>

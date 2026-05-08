@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Documentation — README, MkDocs, API Reference</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Documentation — README, MkDocs, API Reference</h1>
+<blockquote>
+<p>Python Package 101 series (9/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What should a good README include?</li>
+<li>What is the difference between MkDocs and Sphinx?</li>
+<li>How do you auto-generate an API Reference from docstrings?</li>
+<li>How do you deploy documentation to GitHub Pages?</li>
+</ul>
+<blockquote>
+<p>A README is the front door of your package and an API Reference is the manual for every function. A package without docs does not get used.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>The structure and essential sections of a good README</li>
+<li>How to build a documentation site with MkDocs</li>
+<li>How to auto-generate API Reference from docstrings</li>
+<li>How to deploy documentation to GitHub Pages</li>
+</ul>
+<h2>Why it matters</h2>
+<p>No matter how good your package is, it will not be used if there are no usage instructions. When a user discovers your package on PyPI, they need to decide within 30 seconds: "does this solve my problem?" The README serves that purpose.</p>
+<blockquote>
+<p>You found a useful package but the README has no installation instructions or examples. You would have to read the source code to figure out how to use it. You end up choosing a different package with similar features.</p>
+</blockquote>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Documentation has three layers. Layer 1 (README) answers "what is it and how do I start?" Layer 2 (Guide) answers "how do I use it?" Layer 3 (API Reference) provides "detailed specs for every function." Users start at layer 1 and go deeper as needed.</p>
+</blockquote>
+<pre><code class="language-text">README.md          →  30-second decision: install, quick start
+docs/guide.md      →  5-minute tutorial: main features
+docs/api.md        →  detailed reference: specs for every function/class
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>README</strong><br>
+- Description: Project introduction, installation, quick start<br>
+- File: <code>README.md</code></p>
+<p><strong>docstring</strong><br>
+- Description: Documentation string attached to functions/classes<br>
+- File: <code>"""..."""</code></p>
+<p><strong>MkDocs</strong><br>
+- Description: Markdown-based documentation site generator<br>
+- File: <code>mkdocs.yml</code></p>
+<p><strong>mkdocstrings</strong><br>
+- Description: Plugin that auto-generates API docs from docstrings<br>
+- File: MkDocs plugin</p>
+<p><strong>GitHub Pages</strong><br>
+- Description: Free static site hosting<br>
+- File: <code>gh-pages</code> branch</p>
+<h2>Before / After</h2>
+<p><strong>Before (no documentation)</strong></p>
+<pre><code class="language-text">README.md:
+# mylib
+A Python library.
+</code></pre>
+<p><strong>After (structured documentation)</strong></p>
+<pre><code class="language-text">README.md:
+# mylib
+One-line description.
+
+## Installation
+pip install mylib
+
+## Quick Start
+from mylib import greet
+print(greet(&quot;World&quot;))
+
+## Documentation
+https://yourname.github.io/mylib/
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Write a README</strong></p>
+<pre><code class="language-markdown"># mylib
+
+A simple greeting library for Python.
+
+## Installation
+
+```bash
+pip install mylib
+</code></pre>
+<h2>Quick Start</h2>
+<pre><code class="language-python">from mylib.core import greet
+
+print(greet(&quot;World&quot;))  # Hello, World!
+</code></pre>
+<h2>Features</h2>
+<ul>
+<li>Simple and lightweight</li>
+<li>Type-annotated</li>
+<li>CLI support via <code>greet</code> command</li>
+</ul>
+<h2>Development</h2>
+<pre><code class="language-bash">git clone https://github.com/yourname/mylib
+cd mylib
+pip install -e &quot;.[dev]&quot;
+pytest tests/
+</code></pre>
+<h2>License</h2>
+<p>MIT</p>
+<pre><code>
+### Step 2. Add docstrings
+
+```python
+# src/mylib/core.py
+def greet(name: str) -&gt; str:
+    &quot;&quot;&quot;Return a greeting message.
+
+    Args:
+        name: The name to greet.
+
+    Returns:
+        A formatted greeting string.
+
+    Examples:
+        &gt;&gt;&gt; greet(&quot;Alice&quot;)
+        'Hello, Alice!'
+    &quot;&quot;&quot;
+    return f&quot;Hello, {name}!&quot;
+</code></pre>
+<p><strong>Step 3. Set up MkDocs</strong></p>
+<pre><code class="language-bash">pip install mkdocs mkdocs-material mkdocstrings[python]
+
+cat &gt; mkdocs.yml &lt;&lt; 'EOF'
+site_name: mylib
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Guide: guide.md
+  - API Reference: api.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+EOF
+
+mkdir docs
+echo &quot;# mylib&quot; &gt; docs/index.md
+echo &quot;# Guide&quot; &gt; docs/guide.md
+</code></pre>
+<p><strong>Step 4. Auto-generate API Reference</strong></p>
+<pre><code class="language-markdown">&lt;!-- docs/api.md --&gt;
+# API Reference
+
+::: mylib.core
+    options:
+      show_root_heading: true
+      show_source: true
+</code></pre>
+<pre><code class="language-bash">mkdocs serve
+# INFO - Serving on http://127.0.0.1:8000/
+</code></pre>
+<p><strong>Step 5. Deploy to GitHub Pages</strong></p>
+<pre><code class="language-bash">mkdocs gh-deploy
+# INFO - Deployed to https://yourname.github.io/mylib/
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>Google style docstrings (<code>Args:</code>, <code>Returns:</code>) are the most widely used format</li>
+<li><code>mkdocstrings</code> uses <code>::: mylib.core</code> to auto-render docstrings from that module</li>
+<li><code>mkdocs serve</code> previews locally; <code>mkdocs gh-deploy</code> publishes</li>
+<li>The <code>Examples:</code> section with <code>&gt;&gt;&gt;</code> can be auto-tested with <code>doctest</code></li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Omitting installation instructions from the README</strong></p>
+<p>The first thing users try is "how do I install this?" Always include <code>pip install mylib</code>.</p>
+<p><strong>Mistake 2. Docstrings that do not match the code</strong></p>
+<p>If you change the code but not the docstring, the documentation lies. Run <code>doctest</code> in CI to verify examples still work.</p>
+<p><strong>Mistake 3. Having a docs site but no README</strong></p>
+<p>The first thing users see on PyPI and GitHub is the README. Link to the docs site from the README, but make the README independently useful.</p>
+<p><strong>Mistake 4. Having only API Reference but no guide</strong></p>
+<p>An API Reference lists every function, but what users want to know is "in what order do I call which functions?" A guide serves that purpose.</p>
+<p><strong>Mistake 5. Not deploying the documentation</strong></p>
+<p>Running <code>mkdocs serve</code> locally but never deploying means users cannot access it. Use <code>mkdocs gh-deploy</code> or automate deployment in CI.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>PyPI README</strong>: Use <code>[project.readme]</code> to render the README on the PyPI page</li>
+<li><strong>CI docs build</strong>: Verify docs build on every PR to catch broken links and rendering errors</li>
+<li><strong>Versioned docs</strong>: Use <code>mike</code> (MkDocs plugin) to host docs for multiple versions</li>
+<li><strong>Jupyter integration</strong>: Users can view docstrings with <code>?</code> or <code>help()</code> in notebooks</li>
+<li><strong>Auto CHANGELOG</strong>: Use <code>towncrier</code> to aggregate per-PR change entries automatically</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>Documentation is part of the code. When a PR changes code, docs changes should be reviewed alongside. "Code changed but docs stayed the same" is technical debt.</p>
+<p>MkDocs + Material theme is the de facto standard in the Python ecosystem today. Sphinx is more powerful but has a higher learning curve. For new projects, start with MkDocs.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Your README includes installation, quick start, and license</li>
+<li>[ ] All public functions have docstrings</li>
+<li>[ ] You can generate a docs site with MkDocs</li>
+<li>[ ] You can auto-generate API Reference with mkdocstrings</li>
+<li>[ ] You can deploy documentation to GitHub Pages</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a README.md for the package from the previous post. Include installation, quick start, features, development setup, and license.</li>
+<li>Add Google style docstrings to all public functions and verify examples work with <code>python -m doctest</code>.</li>
+<li>Set up MkDocs and preview the documentation locally with <code>mkdocs serve</code>.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>A README is the front door: installation, quick start, and feature overview are essential.</li>
+<li>Write docstrings in Google style and verify examples with doctest.</li>
+<li>MkDocs + mkdocstrings auto-generates API Reference from docstrings.</li>
+<li><code>mkdocs gh-deploy</code> hosts documentation on GitHub Pages for free.</li>
+<li>Documentation is part of the code — update docs whenever code changes.</li>
+</ul>
+<p>The next post covers <strong>production package template</strong> — cookiecutter, copier, and GitHub Template.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/03-dependency-management.md">Dependency Management — venv, pip, uv, requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/04-building-packages.md">Building Packages — wheel and sdist</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/05-publishing-to-pypi.md">Publishing to PyPI — from TestPyPI to production</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/06-versioning-and-releases.md">Versioning and Releases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/07-cli-packages.md">CLI Packages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/08-type-hints-and-static-analysis.md">Type Hints and Static Analysis</a></li>
+<li><strong>Documentation — README, MkDocs, API Reference (current)</strong></li>
+<li>Production Package Template (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mkdocs.org/">MkDocs documentation</a></li>
+<li><a href="https://mkdocstrings.github.io/">mkdocstrings</a></li>
+<li><a href="https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings">Google Python Style Guide - Docstrings</a></li>
+<li><a href="https://www.writethedocs.org/guide/">Write the Docs - Documentation Guide</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Documentation, MkDocs, README, API Reference, Sphinx</p>
+</body>
+</html>

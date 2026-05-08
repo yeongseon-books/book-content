@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project Structure — src layout and pyproject.toml</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Project Structure — src layout and pyproject.toml</h1>
+<blockquote>
+<p>Python Package 101 series (2/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What is the difference between flat layout and src layout?</li>
+<li>What is <code>pyproject.toml</code> and why does it replace <code>setup.py</code>?</li>
+<li>What goes in <code>[build-system]</code> and <code>[project]</code>?</li>
+<li>What does a minimal pyproject.toml look like?</li>
+</ul>
+<blockquote>
+<p>src layout separates source code from the project root to enforce install-before-test, and pyproject.toml defines how to build the package.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>The difference between flat layout and src layout, and when to choose each</li>
+<li>The required sections of pyproject.toml</li>
+<li>How to write a minimal pyproject.toml</li>
+<li>Real-world project directory structures</li>
+</ul>
+<h2>Why it matters</h2>
+<p>A broken project structure leads to import errors, build tools that cannot find files, and tests that fail in CI. Starting with a standard structure prevents these problems.</p>
+<blockquote>
+<p>You run <code>pytest</code> at the project root and everything passes. But after <code>pip install .</code>, importing from a different directory fails. The tests were reading local source instead of the installed package.</p>
+</blockquote>
+<p>src layout prevents this structurally.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Flat layout displays products right at the storefront. src layout puts them in a warehouse (src/) so they can only be accessed through the shelf (installation). With the warehouse, the illusion of "it works without installation" is impossible.</p>
+</blockquote>
+<pre><code class="language-text">flat layout              src layout
+────────────            ────────────
+mylib/                  src/
+  __init__.py             mylib/
+  core.py                   __init__.py
+tests/                      core.py
+pyproject.toml          tests/
+                        pyproject.toml
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>flat layout</strong><br>
+- Description: Package sits at the project root<br>
+- Notes: Simple but prone to import illusions</p>
+<p><strong>src layout</strong><br>
+- Description: Package lives under <code>src/</code><br>
+- Notes: Forces install-before-import</p>
+<p><strong>pyproject.toml</strong><br>
+- Description: PEP 518/621 standard project config<br>
+- Notes: Replaces setup.py/setup.cfg</p>
+<p><strong>build-system</strong><br>
+- Description: Section specifying build tools<br>
+- Notes: <code>[build-system]</code></p>
+<p><strong>[project]</strong><br>
+- Description: Package name, version, dependencies metadata<br>
+- Notes: PEP 621</p>
+<h2>Before / After</h2>
+<p><strong>Before (setup.py + flat layout)</strong></p>
+<pre><code class="language-python"># setup.py
+from setuptools import setup, find_packages
+setup(
+    name=&quot;mylib&quot;,
+    version=&quot;0.1.0&quot;,
+    packages=find_packages(),
+    install_requires=[&quot;requests&gt;=2.28&quot;],
+)
+</code></pre>
+<p><strong>After (pyproject.toml + src layout)</strong></p>
+<pre><code class="language-toml">[build-system]
+requires = [&quot;setuptools&gt;=68.0&quot;]
+build-backend = &quot;setuptools.build_meta&quot;
+
+[project]
+name = &quot;mylib&quot;
+version = &quot;0.1.0&quot;
+requires-python = &quot;&gt;=3.9&quot;
+dependencies = [&quot;requests&gt;=2.28&quot;]
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Create a src layout project</strong></p>
+<pre><code class="language-bash">mkdir -p ~/practice/mylib-project/src/mylib
+mkdir -p ~/practice/mylib-project/tests
+cd ~/practice/mylib-project
+
+cat &gt; src/mylib/__init__.py &lt;&lt; 'EOF'
+&quot;&quot;&quot;mylib - A sample Python package.&quot;&quot;&quot;
+__version__ = &quot;0.1.0&quot;
+EOF
+
+cat &gt; src/mylib/core.py &lt;&lt; 'EOF'
+def greet(name: str) -&gt; str:
+    &quot;&quot;&quot;Return a greeting message.&quot;&quot;&quot;
+    return f&quot;Hello, {name}!&quot;
+EOF
+</code></pre>
+<p><strong>Step 2. Write pyproject.toml</strong></p>
+<pre><code class="language-bash">cat &gt; pyproject.toml &lt;&lt; 'EOF'
+[build-system]
+requires = [&quot;setuptools&gt;=68.0&quot;]
+build-backend = &quot;setuptools.build_meta&quot;
+
+[project]
+name = &quot;mylib&quot;
+version = &quot;0.1.0&quot;
+description = &quot;A sample Python package&quot;
+requires-python = &quot;&gt;=3.9&quot;
+license = {text = &quot;MIT&quot;}
+authors = [
+    {name = &quot;Your Name&quot;, email = &quot;you@example.com&quot;},
+]
+dependencies = []
+
+[project.urls]
+Repository = &quot;https://github.com/yourname/mylib&quot;
+EOF
+</code></pre>
+<p><strong>Step 3. Editable install</strong></p>
+<pre><code class="language-bash">python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+python -c &quot;from mylib.core import greet; print(greet('World'))&quot;
+# Hello, World!
+</code></pre>
+<p><strong>Step 4. Add tests</strong></p>
+<pre><code class="language-bash">cat &gt; tests/test_core.py &lt;&lt; 'EOF'
+from mylib.core import greet
+
+def test_greet():
+    assert greet(&quot;Alice&quot;) == &quot;Hello, Alice!&quot;
+
+def test_greet_empty():
+    assert greet(&quot;&quot;) == &quot;Hello, !&quot;
+EOF
+
+pip install pytest
+pytest tests/
+# 2 passed
+</code></pre>
+<p><strong>Step 5. Configure setuptools package discovery</strong></p>
+<pre><code class="language-toml"># Add to pyproject.toml
+[tool.setuptools.packages.find]
+where = [&quot;src&quot;]
+</code></pre>
+<pre><code class="language-bash"># Verify install
+pip install -e .
+python -c &quot;import mylib; print(mylib.__version__)&quot;
+# 0.1.0
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li><code>[build-system]</code> specifies the build tool; besides <code>setuptools</code>, you can use <code>hatchling</code>, <code>flit-core</code>, or <code>pdm-backend</code></li>
+<li><code>pip install -e .</code> is an editable install — source changes are reflected without reinstalling</li>
+<li><code>where = ["src"]</code> in <code>[tool.setuptools.packages.find]</code> is the key setting for src layout</li>
+<li><code>requires-python</code> specifies the supported Python version range</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Forgetting the where setting in src layout</strong></p>
+<pre><code class="language-toml"># Wrong: cannot find packages under src/
+[tool.setuptools.packages.find]
+
+# Correct
+[tool.setuptools.packages.find]
+where = [&quot;src&quot;]
+</code></pre>
+<p><strong>Mistake 2. Having both setup.py and pyproject.toml</strong></p>
+<p>The two files can conflict and confuse build tools. Use pyproject.toml only.</p>
+<p><strong>Mistake 3. Testing local imports without an editable install</strong></p>
+<p>Without <code>pip install -e .</code>, tests in flat layout pass but fail after actual installation.</p>
+<p><strong>Mistake 4. Putting heavy code in <strong>init</strong>.py</strong></p>
+<p>Heavy initialization code in <code>__init__.py</code> slows down <code>import mylib</code>. Expose only the version and minimal public API.</p>
+<p><strong>Mistake 5. Including the tests directory in the package</strong></p>
+<p>If <code>tests/</code> is inside <code>src/</code>, tests ship with the distribution. Keep tests at the project root.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Internal libraries</strong>: Standardize on src layout + pyproject.toml for faster new-project starts</li>
+<li><strong>Open source</strong>: Most modern Python projects (black, ruff, httpx) use src layout</li>
+<li><strong>Monorepos</strong>: src layout prevents path collisions when hosting multiple packages in one repository</li>
+<li><strong>CI/CD</strong>: <code>pip install .</code> as the first gate to confirm the package builds</li>
+<li><strong>Docker</strong>: <code>COPY . . &amp;&amp; pip install .</code> installs the package inside the container</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>Spending five minutes on structure at the start saves hours of "why won't this import?" later. src layout requires a small extra config (<code>where = ["src"]</code>), but structurally prevents the "works locally, fails after install" class of problems.</p>
+<p>For the build backend, <code>setuptools</code> is the most widely used, but <code>hatchling</code> and <code>flit-core</code> are worth considering for new projects. Regardless of backend, the <code>[project]</code> section is identical.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain the difference between flat layout and src layout</li>
+<li>[ ] You can write a minimal pyproject.toml</li>
+<li>[ ] You can do an editable install with <code>pip install -e .</code></li>
+<li>[ ] You understand the roles of <code>[build-system]</code> and <code>[project]</code></li>
+<li>[ ] You can verify that tests run against the installed package</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>myutils</code> package in src layout with a <code>string_utils.py</code> module containing a <code>capitalize_words</code> function, and test it.</li>
+<li>Write a pyproject.toml that includes <code>description</code>, <code>authors</code>, <code>license</code>, and <code>requires-python</code>.</li>
+<li>Create both flat layout and src layout projects, run <code>pip install -e .</code>, and compare whether imports work from a different directory.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>src layout places source under <code>src/</code> to prevent direct imports without installation.</li>
+<li><code>pyproject.toml</code> is the PEP 518/621 standard that replaces <code>setup.py</code>.</li>
+<li><code>[build-system]</code> defines the build tool; <code>[project]</code> defines package metadata.</li>
+<li><code>pip install -e .</code> lets you test imports during development.</li>
+<li>Tests belong outside <code>src/</code> to stay out of the distribution.</li>
+</ul>
+<p>The next post covers <strong>dependency management</strong> — venv, pip, uv, and requirements.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
+<li><strong>Project Structure — src layout and pyproject.toml (current)</strong></li>
+<li>Dependency Management — venv, pip, uv, requirements (upcoming)</li>
+<li>Building Packages — wheel and sdist (upcoming)</li>
+<li>Publishing to PyPI — from TestPyPI to production (upcoming)</li>
+<li>Versioning and Releases (upcoming)</li>
+<li>CLI Packages (upcoming)</li>
+<li>Type Hints and Static Analysis (upcoming)</li>
+<li>Documentation — README, MkDocs, API Reference (upcoming)</li>
+<li>Production Package Template (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://packaging.python.org/en/latest/tutorials/packaging-projects/">Python Packaging User Guide - Project Structure</a></li>
+<li><a href="https://peps.python.org/pep-0621/">PEP 621 - Storing project metadata in pyproject.toml</a></li>
+<li><a href="https://setuptools.pypa.io/en/latest/userguide/package_discovery.html">setuptools - src layout</a></li>
+<li><a href="https://hynek.me/articles/testing-packaging/">Hynek Schlawack - Testing &amp; Packaging</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pyproject.toml, src layout, Project Structure, Packaging, setuptools</p>
+</body>
+</html>

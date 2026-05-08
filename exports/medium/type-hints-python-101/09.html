@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pydantic and Type Hints</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Pydantic and Type Hints</h1>
+<blockquote>
+<p>Type Hints in Python 101 Series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can type hints enforce data correctness at runtime, not just during static analysis?</p>
+<blockquote>
+<p>Python type hints are metadata — the interpreter ignores them. mypy checks them statically, but nothing stops invalid data from entering your system at runtime. Pydantic changes this equation. It reads type hints and generates runtime validators that reject bad data immediately. This is why FastAPI chose Pydantic as its foundation. This article covers BaseModel, Field, validators, and FastAPI integration patterns.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Pydantic BaseModel fundamentals and usage</li>
+<li>Field for fine-grained validation rules</li>
+<li>field_validator and model_validator for custom logic</li>
+<li>FastAPI integration patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>External data is never trustworthy. API requests, config files, database rows — all can contain unexpected values. Manual if-else validation is verbose, fragile, and easy to forget. Pydantic generates validation logic from type hints, turning annotations into executable contracts that reject bad data with detailed error messages.</p>
+<blockquote>
+<p>Pydantic = type hints as runtime validation rules.</p>
+</blockquote>
+<p>It elevates type hints from "documentation" to "enforceable contracts."</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Pydantic reads class type hints and generates a validator. Invalid data raises ValidationError with detailed messages.</p>
+</blockquote>
+<pre><code class="language-text">Input data (dict/JSON)
+       │
+  BaseModel.__init__
+       │
+  type-hint-based validation
+       │
+  ├── pass → model instance
+  └── fail → ValidationError
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>BaseModel</strong><br>
+- Description: Pydantic's base class for validated data models</p>
+<p><strong>Field</strong><br>
+- Description: Defines per-field validation rules and metadata</p>
+<p><strong>field_validator</strong><br>
+- Description: Decorator for custom single-field validation logic</p>
+<p><strong>model_validator</strong><br>
+- Description: Decorator for cross-field validation logic</p>
+<p><strong>BaseSettings</strong><br>
+- Description: Model that reads values from environment variables</p>
+<h2>Before / After</h2>
+<p><strong>Before — Manual validation:</strong></p>
+<pre><code class="language-python">def create_user(data: dict) -&gt; dict:
+    if &quot;name&quot; not in data:
+        raise ValueError(&quot;name is required&quot;)
+    if not isinstance(data[&quot;name&quot;], str):
+        raise ValueError(&quot;name must be a string&quot;)
+    if &quot;age&quot; not in data:
+        raise ValueError(&quot;age is required&quot;)
+    if not isinstance(data[&quot;age&quot;], int) or data[&quot;age&quot;] &lt; 0:
+        raise ValueError(&quot;age must be a non-negative integer&quot;)
+    return data
+</code></pre>
+<p><strong>After — Pydantic model:</strong></p>
+<pre><code class="language-python">from pydantic import BaseModel, Field
+
+class User(BaseModel):
+    name: str
+    age: int = Field(ge=0)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: BaseModel Basics</strong></p>
+<pre><code class="language-python">from pydantic import BaseModel
+
+class User(BaseModel):
+    name: str
+    age: int
+    email: str
+
+# Create from keyword arguments
+user = User(name=&quot;Alice&quot;, age=30, email=&quot;alice@example.com&quot;)
+print(user.name)       # Alice
+print(user.model_dump())  # {'name': 'Alice', 'age': 30, 'email': 'alice@example.com'}
+
+# Automatic type coercion
+user2 = User(name=&quot;Bob&quot;, age=&quot;25&quot;, email=&quot;bob@example.com&quot;)
+print(user2.age)       # 25 (str → int coerced)
+print(type(user2.age)) # &lt;class 'int'&gt;
+</code></pre>
+<p>Pydantic coerces compatible types automatically. <code>"25"</code> becomes <code>int(25)</code>, <code>"true"</code> becomes <code>bool(True)</code>.</p>
+<p><strong>Step 2: Field for Validation Rules</strong></p>
+<pre><code class="language-python">from pydantic import BaseModel, Field
+
+class Product(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    price: int = Field(gt=0, description=&quot;Price in cents&quot;)
+    quantity: int = Field(ge=0, default=0)
+    tags: list[str] = Field(default_factory=list, max_length=10)
+
+product = Product(name=&quot;Python Book&quot;, price=3500)
+print(product.quantity)  # 0 (default)
+
+# Validation failure
+# Product(name=&quot;&quot;, price=-100)
+# ValidationError: name must have at least 1 character,
+#                  price must be greater than 0
+</code></pre>
+<p><strong>Step 3: field_validator for Custom Logic</strong></p>
+<pre><code class="language-python">from pydantic import BaseModel, field_validator
+
+class SignupRequest(BaseModel):
+    username: str
+    password: str
+    email: str
+
+    @field_validator(&quot;username&quot;)
+    @classmethod
+    def username_must_be_alphanumeric(cls, v: str) -&gt; str:
+        if not v.isalnum():
+            raise ValueError(&quot;Only alphanumeric characters allowed&quot;)
+        return v.lower()
+
+    @field_validator(&quot;password&quot;)
+    @classmethod
+    def password_strength(cls, v: str) -&gt; str:
+        if len(v) &lt; 8:
+            raise ValueError(&quot;Password must be at least 8 characters&quot;)
+        if not any(c.isdigit() for c in v):
+            raise ValueError(&quot;Password must contain at least one digit&quot;)
+        return v
+</code></pre>
+<p>Validators can also transform values. The <code>username</code> validator normalizes to lowercase.</p>
+<p><strong>Step 4: model_validator for Cross-Field Logic</strong></p>
+<pre><code class="language-python">from pydantic import BaseModel, model_validator
+
+class DateRange(BaseModel):
+    start_date: str
+    end_date: str
+
+    @model_validator(mode=&quot;after&quot;)
+    def end_after_start(self) -&gt; &quot;DateRange&quot;:
+        if self.end_date &lt;= self.start_date:
+            raise ValueError(&quot;end_date must be after start_date&quot;)
+        return self
+
+# DateRange(start_date=&quot;2026-01-10&quot;, end_date=&quot;2026-01-01&quot;)
+# ValidationError: end_date must be after start_date
+</code></pre>
+<p><code>mode="after"</code> runs after individual field validation completes.</p>
+<p><strong>Step 5: FastAPI Integration</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class CreateUserRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=50)
+    age: int = Field(ge=0, le=150)
+    email: str
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    age: int
+
+@app.post(&quot;/users&quot;, response_model=UserResponse)
+def create_user(request: CreateUserRequest) -&gt; UserResponse:
+    # request is already a validated Pydantic model
+    return UserResponse(id=1, name=request.name, age=request.age)
+</code></pre>
+<p>FastAPI automatically parses request bodies into Pydantic models. Validation failures return 422 responses with detailed error messages.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Inheriting from BaseModel turns type hints into validation rules</li>
+<li>Field adds constraints like ranges, lengths, and defaults</li>
+<li>Validators can both validate and transform values</li>
+<li>FastAPI integration automates request/response validation</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Mutable default values</strong><br>
+- Problem: <code>list[str] = []</code> shares reference across instances<br>
+- Fix: Use <code>Field(default_factory=list)</code></p>
+<p><strong>Missing @classmethod on validators</strong><br>
+- Problem: Pydantic v2 requires it<br>
+- Fix: Add <code>@classmethod</code> below <code>@field_validator</code></p>
+<p><strong>Using <code>.dict()</code> in Pydantic v2</strong><br>
+- Problem: Deprecated method<br>
+- Fix: Use <code>model_dump()</code> and <code>model_dump_json()</code></p>
+<p><strong>Over-relying on type coercion</strong><br>
+- Problem: <code>"abc"</code> cannot coerce to <code>int</code><br>
+- Fix: Use strict mode to disable coercion</p>
+<p><strong>Optional field without default</strong><br>
+- Problem: Field becomes required<br>
+- Fix: Use <code>Optional[str] = None</code></p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>FastAPI endpoints with request/response models defining API contracts</li>
+<li>BaseSettings for environment variable configuration (12-Factor App)</li>
+<li>Data pipelines using models as validation gates for raw data</li>
+<li>ORM-to-API layer conversion with separate Pydantic and SQLAlchemy models</li>
+<li>Auto-generated JSON Schema for API documentation and client code generation</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Senior engineers place Pydantic at system boundaries — API requests, external service responses, config files, anywhere "untrusted data" enters the system. Inside the boundary, validated data flows through internal logic using plain dataclasses or typed dicts without re-validation overhead.</p>
+<p>Not every data class needs to be a BaseModel. Internal domain objects that never touch external data are simpler as dataclasses. The principle is: validate once at the boundary, trust the types internally. This keeps the codebase performant and avoids unnecessary Pydantic overhead on hot paths.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Defined data models with BaseModel</li>
+<li>[ ] Added validation rules with Field</li>
+<li>[ ] Applied field_validator for custom single-field logic</li>
+<li>[ ] Used model_validator for cross-field validation</li>
+<li>[ ] Integrated with FastAPI for automated request validation</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p>Create an <code>OrderItem</code> model with <code>product_name</code> (1+ chars), <code>quantity</code> (1+), <code>unit_price</code> (&gt; 0), and a computed <code>total_price</code> field.</p>
+</li>
+<li>
+<p>Write a signup model where <code>password</code> and <code>password_confirm</code> must match, using <code>model_validator</code>.</p>
+</li>
+<li>
+<p>Use <code>BaseSettings</code> to read <code>DATABASE_URL</code>, <code>SECRET_KEY</code>, and <code>DEBUG</code> (default False) from environment variables.</p>
+</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Pydantic turns type hints into runtime validation rules. BaseModel, Field, and validators combine to create powerful yet concise data validation. FastAPI integration automates API request/response validation. Place Pydantic at system boundaries for maximum impact with minimum overhead.</p>
+<p>In the final article, we will establish best practices for applying type hints effectively across a project.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
+<li><strong>Pydantic and Type Hints (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pydantic.dev/latest/">Pydantic documentation</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/body/">FastAPI docs — Request Body</a></li>
+<li><a href="https://docs.pydantic.dev/latest/migration/">Pydantic v2 Migration Guide</a></li>
+<li><a href="https://realpython.com/python-pydantic/">Real Python — Pydantic</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, Pydantic, BaseModel, Data Validation, FastAPI</p>
+</body>
+</html>

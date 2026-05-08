@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coverage and Test Quality</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Coverage and Test Quality</h1>
+<blockquote>
+<p>pytest 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: What percentage of your code do your tests actually execute?</p>
+<blockquote>
+<p>Code coverage measures the proportion of lines your tests run. With pytest-cov, you can measure coverage, find untested lines, and fill the gaps. This article covers setup, interpretation, and CI enforcement.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Installing pytest-cov and measuring coverage</li>
+<li>The difference between line coverage and branch coverage</li>
+<li>Visually inspecting missing lines with HTML reports</li>
+<li>Enforcing coverage thresholds in CI</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Having tests doesn't mean having enough tests. If core logic isn't covered, you end up with "tests pass but bugs ship." Coverage provides an objective measure of test scope.</p>
+<blockquote>
+<p>100% coverage doesn't mean zero bugs. But 30% coverage is definitely risky. Coverage guarantees "at least this code was exercised."</p>
+</blockquote>
+<p>Setting a team-wide coverage threshold prevents new code from merging without tests.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>coverage = lines executed by tests / total lines of code</p>
+</blockquote>
+<pre><code>def process(x):        ← executed
+    if x &gt; 0:          ← executed
+        return x * 2   ← executed
+    else:               ← not executed
+        return 0        ← not executed
+
+test: process(5) → line coverage 60% (3/5)
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Line coverage</strong><br>
+- Description: Percentage of code lines that were executed</p>
+<p><strong>Branch coverage</strong><br>
+- Description: Percentage of conditional branches that were taken</p>
+<p><strong>pytest-cov</strong><br>
+- Description: Plugin that runs coverage.py within pytest</p>
+<p><strong>.coveragerc</strong><br>
+- Description: Configuration file for exclusions and source paths</p>
+<p><strong>Missing lines</strong><br>
+- Description: Line numbers that tests never executed</p>
+<h2>Before / After</h2>
+<p>Compare running tests without and with coverage measurement.</p>
+<pre><code class="language-bash"># before: no coverage measurement
+pytest
+# result: 4 passed — but no idea which code is untested
+</code></pre>
+<pre><code class="language-bash"># after: coverage included
+pytest --cov=src --cov-report=term-missing
+# result: 4 passed, coverage 78% — missing line numbers shown
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Install pytest-cov</strong></p>
+<pre><code class="language-bash">pip install pytest-cov
+</code></pre>
+<p><strong>Step 2: Prepare the Code Under Test</strong></p>
+<pre><code class="language-python"># src/myapp/validator.py
+def validate_email(email: str) -&gt; bool:
+    if not email:
+        return False
+    if &quot;@&quot; not in email:
+        return False
+    local, domain = email.split(&quot;@&quot;, 1)
+    if not local or not domain:
+        return False
+    if &quot;.&quot; not in domain:
+        return False
+    return True
+
+def validate_age(age: int) -&gt; bool:
+    if not isinstance(age, int):
+        raise TypeError(&quot;Age must be an integer&quot;)
+    if age &lt; 0:
+        return False
+    if age &gt; 150:
+        return False
+    return True
+</code></pre>
+<p><strong>Step 3: Write Partial Tests</strong></p>
+<pre><code class="language-python"># tests/test_validator.py
+from myapp.validator import validate_email, validate_age
+
+def test_valid_email():
+    assert validate_email(&quot;user@example.com&quot;) is True
+
+def test_empty_email():
+    assert validate_email(&quot;&quot;) is False
+
+def test_valid_age():
+    assert validate_age(25) is True
+</code></pre>
+<p><strong>Step 4: Measure Coverage</strong></p>
+<pre><code class="language-bash">pytest --cov=src/myapp --cov-report=term-missing
+
+# Example output:
+# Name                        Stmts   Miss  Cover   Missing
+# ---------------------------------------------------------
+# src/myapp/validator.py         16      6    63%   8-10, 20-22
+# ---------------------------------------------------------
+# TOTAL                          16      6    63%
+</code></pre>
+<p><strong>Step 5: Fill the Gaps</strong></p>
+<pre><code class="language-python"># tests/test_validator.py — additional tests
+import pytest
+from myapp.validator import validate_email, validate_age
+
+def test_valid_email():
+    assert validate_email(&quot;user@example.com&quot;) is True
+
+def test_empty_email():
+    assert validate_email(&quot;&quot;) is False
+
+def test_no_at_sign():
+    assert validate_email(&quot;userexample.com&quot;) is False
+
+def test_no_local_part():
+    assert validate_email(&quot;@example.com&quot;) is False
+
+def test_no_domain_dot():
+    assert validate_email(&quot;user@localhost&quot;) is False
+
+def test_valid_age():
+    assert validate_age(25) is True
+
+def test_negative_age():
+    assert validate_age(-1) is False
+
+def test_too_old():
+    assert validate_age(200) is False
+
+def test_age_type_error():
+    with pytest.raises(TypeError):
+        validate_age(&quot;twenty&quot;)
+</code></pre>
+<pre><code class="language-bash">pytest --cov=src/myapp --cov-report=term-missing
+# result: coverage 100%
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>--cov=src/myapp</code> targets the specific directory for measurement</li>
+<li><code>term-missing</code> shows missing line numbers directly in the terminal</li>
+<li>Missing lines guide you to write tests covering those branches</li>
+<li>Even at 100% coverage, not every edge case is necessarily covered</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Aiming for 100% coverage</strong><br>
+- Why It's a Problem: Adds unnecessary tests and maintenance burden<br>
+- Fix: Target 80%+ on core business logic</p>
+<p><strong>Ignoring branch coverage</strong><br>
+- Why It's a Problem: Line coverage can be 100% while missing else branches<br>
+- Fix: Add <code>--cov-branch</code></p>
+<p><strong>Measuring test code coverage</strong><br>
+- Why It's a Problem: Test code itself shouldn't be a coverage target<br>
+- Fix: Use <code>--cov=src</code> to measure source only</p>
+<p><strong>Not reading the report</strong><br>
+- Why It's a Problem: Looking at the number without checking which lines are missing<br>
+- Fix: Generate HTML reports for visual inspection</p>
+<p><strong>Overusing <code># pragma: no cover</code></strong><br>
+- Why It's a Problem: Excluded code hides potential bugs<br>
+- Fix: Only exclude with documented justification</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Fail CI builds with <code>--cov-fail-under=80</code> when coverage drops</li>
+<li>Integrate coverage bots that comment coverage changes on PRs</li>
+<li>Store HTML reports as CI artifacts for team browsing</li>
+<li>Share coverage settings in <code>pyproject.toml</code> across the team</li>
+<li>Track coverage for new code separately to measure improvement over legacy</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>Coverage is a tool for finding "where tests are missing," not for proving "where tests are sufficient." High coverage with weak assertions is meaningless.</p>
+<p>In practice, keeping new code coverage higher than existing code is an effective strategy. Raising legacy code to 100% at once is unrealistic — start by adding tests to code that changes.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Installed pytest-cov and measured coverage</li>
+<li>[ ] Identified missing lines with <code>term-missing</code></li>
+<li>[ ] Generated an HTML report for visual inspection</li>
+<li>[ ] Set a minimum threshold with <code>--cov-fail-under</code></li>
+<li>[ ] Added coverage settings to <code>pyproject.toml</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Run <code>--cov-branch</code> on <code>validate_email</code> and compare branch coverage with line coverage.</li>
+<li>Add coverage settings to <code>pyproject.toml</code> and set <code>--cov-fail-under=90</code> to see a threshold failure.</li>
+<li>Generate an HTML report and open it in a browser to visually inspect missing lines.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>Coverage objectively measures the scope of your tests. Measure with pytest-cov, fill missing lines, and enforce thresholds in CI to maintain test quality. Next, we'll automate test execution with GitHub Actions.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">Mock and Monkeypatch</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/07-testing-files-env-time.md">Testing Files, Environment Variables, and Time</a></li>
+<li><strong>Coverage and Test Quality (current)</strong></li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pytest-cov.readthedocs.io/">pytest-cov — Documentation</a></li>
+<li><a href="https://coverage.readthedocs.io/">coverage.py — Documentation</a></li>
+<li><a href="https://realpython.com/python-testing/#testing-for-code-coverage">Real Python — Python Code Coverage</a></li>
+<li><a href="https://martinfowler.com/bliki/TestCoverage.html">Martin Fowler — Test Coverage</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, coverage, pytest-cov, Code Coverage</p>
+</body>
+</html>

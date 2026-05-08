@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parametrization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Parametrization</h1>
+<blockquote>
+<p>pytest 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: When testing the same logic with different inputs, do you have to copy the function?</p>
+<blockquote>
+<p><code>@pytest.mark.parametrize</code> lets a single test function verify multiple input-output combinations. This article covers basic syntax, multi-parameter usage, and ID customization.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Basic syntax of <code>@pytest.mark.parametrize</code></li>
+<li>Passing multiple parameters simultaneously</li>
+<li>Customizing test IDs for readability</li>
+<li>Combining parametrize with fixtures</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When you need to test a function with many inputs, duplicating the function for each input causes code to explode. Parametrize lets you list input-output data and pytest runs each as an independent test.</p>
+<blockquote>
+<p>Instead of copy-pasting 5 tests, add 5 lines of data. Same logic, different data.</p>
+</blockquote>
+<p>Boundary values, empty inputs, and special characters need comprehensive coverage — parametrize makes this practical.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>parametrize = one test function + multiple data sets → N independent tests</p>
+</blockquote>
+<pre><code>@pytest.mark.parametrize(&quot;input,expected&quot;, [
+    (&quot;hello&quot;, 5),      ← test 1
+    (&quot;&quot;, 0),            ← test 2
+    (&quot;hi&quot;, 2),          ← test 3
+])
+def test_length(input, expected):
+    assert len(input) == expected
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>parametrize</strong><br>
+- Description: Decorator that injects test parameters</p>
+<p><strong>Test ID</strong><br>
+- Description: Unique identifier assigned to each parameter combination</p>
+<p><strong>pytest.param</strong><br>
+- Description: Assigns IDs or marks to individual test cases</p>
+<p><strong>indirect</strong><br>
+- Description: Passes parametrize values to fixtures</p>
+<p><strong>Cartesian product</strong><br>
+- Description: Stacking multiple parametrize decorators multiplies combinations</p>
+<h2>Before / After</h2>
+<p>Compare copy-paste tests with parametrize.</p>
+<pre><code class="language-python"># before: duplicate function per input
+def test_is_palindrome_radar():
+    assert is_palindrome(&quot;radar&quot;) is True
+
+def test_is_palindrome_hello():
+    assert is_palindrome(&quot;hello&quot;) is False
+
+def test_is_palindrome_empty():
+    assert is_palindrome(&quot;&quot;) is True
+
+def test_is_palindrome_single():
+    assert is_palindrome(&quot;a&quot;) is True
+</code></pre>
+<pre><code class="language-python"># after: just list the data
+import pytest
+
+@pytest.mark.parametrize(&quot;word,expected&quot;, [
+    (&quot;radar&quot;, True),
+    (&quot;hello&quot;, False),
+    (&quot;&quot;, True),
+    (&quot;a&quot;, True),
+])
+def test_is_palindrome(word, expected):
+    assert is_palindrome(word) is expected
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Basic Parametrize</strong></p>
+<pre><code class="language-python"># test_math.py
+import pytest
+
+def add(a, b):
+    return a + b
+
+@pytest.mark.parametrize(&quot;a,b,expected&quot;, [
+    (1, 2, 3),
+    (0, 0, 0),
+    (-1, 1, 0),
+    (100, 200, 300),
+    (-5, -3, -8),
+])
+def test_add(a, b, expected):
+    assert add(a, b) == expected
+</code></pre>
+<p><strong>Step 2: String Parameters</strong></p>
+<pre><code class="language-python"># test_string.py
+import pytest
+
+def slugify(text: str) -&gt; str:
+    return text.lower().strip().replace(&quot; &quot;, &quot;-&quot;)
+
+@pytest.mark.parametrize(&quot;input_text,expected&quot;, [
+    (&quot;Hello World&quot;, &quot;hello-world&quot;),
+    (&quot;  spaces  &quot;, &quot;spaces&quot;),
+    (&quot;UPPER CASE&quot;, &quot;upper-case&quot;),
+    (&quot;already-slug&quot;, &quot;already-slug&quot;),
+    (&quot;multiple   spaces&quot;, &quot;multiple---spaces&quot;),
+])
+def test_slugify(input_text, expected):
+    assert slugify(input_text) == expected
+</code></pre>
+<p><strong>Step 3: Exception Case Parametrize</strong></p>
+<pre><code class="language-python"># test_validation.py
+import pytest
+
+def parse_age(value: str) -&gt; int:
+    age = int(value)
+    if age &lt; 0 or age &gt; 150:
+        raise ValueError(f&quot;Invalid age: {age}&quot;)
+    return age
+
+@pytest.mark.parametrize(&quot;value,expected&quot;, [
+    (&quot;25&quot;, 25),
+    (&quot;0&quot;, 0),
+    (&quot;150&quot;, 150),
+])
+def test_parse_age_valid(value, expected):
+    assert parse_age(value) == expected
+
+@pytest.mark.parametrize(&quot;value&quot;, [&quot;-1&quot;, &quot;151&quot;, &quot;999&quot;])
+def test_parse_age_invalid(value):
+    with pytest.raises(ValueError):
+        parse_age(value)
+</code></pre>
+<p><strong>Step 4: Custom IDs</strong></p>
+<pre><code class="language-python"># test_with_ids.py
+import pytest
+
+@pytest.mark.parametrize(&quot;email,valid&quot;, [
+    pytest.param(&quot;user@example.com&quot;, True, id=&quot;normal-email&quot;),
+    pytest.param(&quot;@example.com&quot;, False, id=&quot;missing-local&quot;),
+    pytest.param(&quot;user@&quot;, False, id=&quot;missing-domain&quot;),
+    pytest.param(&quot;&quot;, False, id=&quot;empty-string&quot;),
+    pytest.param(&quot;user@exam ple.com&quot;, False, id=&quot;space-in-domain&quot;),
+])
+def test_validate_email(email, valid):
+    result = &quot;@&quot; in email and len(email.split(&quot;@&quot;)) == 2
+    has_domain = result and len(email.split(&quot;@&quot;)[1]) &gt; 0
+    has_local = result and len(email.split(&quot;@&quot;)[0]) &gt; 0
+    has_no_space = &quot; &quot; not in email
+    assert (has_domain and has_local and has_no_space) == valid
+</code></pre>
+<p><strong>Step 5: Cartesian Product (Stacked Parametrize)</strong></p>
+<pre><code class="language-python"># test_cartesian.py
+import pytest
+
+@pytest.mark.parametrize(&quot;method&quot;, [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;])
+@pytest.mark.parametrize(&quot;status&quot;, [200, 404, 500])
+def test_http_response(method, status):
+    &quot;&quot;&quot;3 methods x 3 statuses = 9 tests generated.&quot;&quot;&quot;
+    response = {&quot;method&quot;: method, &quot;status&quot;: status}
+    assert response[&quot;method&quot;] in [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;]
+    assert isinstance(response[&quot;status&quot;], int)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Each parameter combination runs as an independent test — one failure doesn't block the rest</li>
+<li><code>pytest.param</code>'s <code>id</code> provides meaningful names in test output</li>
+<li>Stacking parametrize decorators creates a Cartesian product</li>
+<li>Separating valid and exception cases into different parametrize blocks improves readability</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Spaces in parameter names</strong><br>
+- Why It's a Problem: <code>"a, b"</code> with spaces causes parsing errors<br>
+- Fix: Use <code>"a,b"</code> or a list <code>["a", "b"]</code></p>
+<p><strong>Parameter count mismatch</strong><br>
+- Why It's a Problem: Tuple element count doesn't match parameter count<br>
+- Fix: Ensure all tuples have the same length</p>
+<p><strong>Too many cases in one parametrize</strong><br>
+- Why It's a Problem: Beyond 50 cases, readability drops<br>
+- Fix: Split by category into separate parametrize blocks</p>
+<p><strong>Mutable objects as parameters</strong><br>
+- Why It's a Problem: Lists or dicts may be shared across tests<br>
+- Fix: Copy inside the test or use tuples</p>
+<p><strong>Complex parameters without IDs</strong><br>
+- Why It's a Problem: Failures show cryptic <code>test[param0-param1]</code><br>
+- Fix: Use <code>pytest.param(..., id="description")</code></p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Batch-test boundary values (empty strings, max lengths, special characters) in validation functions</li>
+<li>Verify various HTTP status code responses with parametrize</li>
+<li>Cover multiple languages in internationalization (i18n) tests</li>
+<li>Test diverse filter combinations in database queries using Cartesian products</li>
+<li>Load parameter data from JSON/YAML files to separate test data from code</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>Parametrize is the perfect solution for the "same verification logic, different data" pattern. Add 50 test cases without writing a single new line of logic.</p>
+<p>In practice, when a bug report arrives, the failing input gets added to a parametrize block as a regression test. If the same bug reappears, it's caught immediately.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Wrote a test using <code>@pytest.mark.parametrize</code></li>
+<li>[ ] Separated valid and exception cases</li>
+<li>[ ] Customized test IDs with <code>pytest.param</code></li>
+<li>[ ] Created a Cartesian product with stacked parametrize</li>
+<li>[ ] Verified individual test cases with the <code>-v</code> option</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a <code>fizzbuzz(n)</code> function and parametrize test cases for inputs 1 through 15.</li>
+<li>Write a password validation function and parametrize tests for minimum length, uppercase, and digit requirements.</li>
+<li>Create a Cartesian product of HTTP methods and Content-Types, and count how many tests are generated.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>Parametrize is the core tool for data-driven testing. A single test function covers diverse inputs, eliminating code duplication. Next, we'll learn mock and monkeypatch for replacing external dependencies.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
+<li><strong>Parametrization (current)</strong></li>
+<li>Mock and Monkeypatch (upcoming)</li>
+<li>Testing Files, Environment Variables, and Time (upcoming)</li>
+<li>Coverage and Test Quality (upcoming)</li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/how-to/parametrize.html">pytest — Parametrize</a></li>
+<li><a href="https://docs.pytest.org/en/stable/reference/reference.html#pytest-param">pytest — pytest.param</a></li>
+<li><a href="https://realpython.com/pytest-python-testing/#parametrize">Real Python — Parametrize Tests</a></li>
+<li><a href="https://testdriven.io/blog/testing-python/">Effective Python Testing with pytest — Parametrize</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, parametrize, Test Cases, Data-Driven Testing</p>
+</body>
+</html>

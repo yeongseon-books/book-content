@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Polymorphism</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Polymorphism</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you handle objects of different types through a single interface?</p>
+<blockquote>
+<p>Polymorphism means that a method with the same name behaves differently depending on the object's type. Python's duck typing enables polymorphism without inheritance. This article covers inheritance-based polymorphism, duck typing, and Python 3.8+ Protocol.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The concept of polymorphism and three implementation approaches</li>
+<li>Duck typing principles and usage</li>
+<li>Structural subtyping with Python <code>Protocol</code></li>
+<li>Practical polymorphic code patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Imagine a payment system handling credit cards, bank transfers, and e-wallets. Each payment method has different internal logic, but the caller wants a single <code>pay(amount)</code> interface. Polymorphism solves this problem.</p>
+<blockquote>
+<p>Polymorphism = same interface, different implementations</p>
+</blockquote>
+<p>Without polymorphism, <code>if isinstance(payment, CreditCard): ...</code> branches multiply every time a new payment method is added. With polymorphism, adding a new payment method requires no changes to existing code.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Three approaches to polymorphism in Python</p>
+</blockquote>
+<pre><code>1. Inheritance-based polymorphism
+   Animal -&gt; Dog.speak(), Cat.speak()
+
+2. Duck Typing
+   &quot;If it has a quack() method, it's a duck&quot;
+   No inheritance needed — just matching methods
+
+3. Protocol — Python 3.8+
+   Structural subtyping: type hints verify duck typing
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Polymorphism</strong><br>
+- Description: A single interface behaving differently based on the object's type</p>
+<p><strong>Duck typing</strong><br>
+- Description: Judging an object by its methods, not its type</p>
+<p><strong>Protocol</strong><br>
+- Description: A <code>typing</code> module class that supports structural subtyping</p>
+<p><strong>Dispatch</strong><br>
+- Description: The mechanism that selects the actual type's method at call time</p>
+<p><strong>Interface</strong><br>
+- Description: The set of methods an object must provide</p>
+<h2>Before / After</h2>
+<p>Comparing payment processing approaches.</p>
+<pre><code class="language-python"># before: type-based branching — requires modification for each new payment method
+def process_payment(payment, amount):
+    if payment[&quot;type&quot;] == &quot;credit_card&quot;:
+        print(f&quot;Credit card payment: ${amount}&quot;)
+    elif payment[&quot;type&quot;] == &quot;bank_transfer&quot;:
+        print(f&quot;Bank transfer: ${amount}&quot;)
+    # new payment method -&gt; add elif
+</code></pre>
+<pre><code class="language-python"># after: polymorphism — no modification needed for new payment methods
+class CreditCard:
+    def pay(self, amount: int) -&gt; str:
+        return f&quot;Credit card payment: ${amount}&quot;
+
+class BankTransfer:
+    def pay(self, amount: int) -&gt; str:
+        return f&quot;Bank transfer: ${amount}&quot;
+
+def process_payment(payment, amount: int) -&gt; None:
+    print(payment.pay(amount))  # any type with pay() works
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Inheritance-Based Polymorphism</strong></p>
+<pre><code class="language-python">class Shape:
+    def area(self) -&gt; float:
+        raise NotImplementedError
+
+    def describe(self) -&gt; str:
+        return f&quot;{type(self).__name__}: area = {self.area():.2f}&quot;
+
+class Circle(Shape):
+    def __init__(self, radius: float) -&gt; None:
+        self.radius = radius
+
+    def area(self) -&gt; float:
+        import math
+        return math.pi * self.radius ** 2
+
+class Rectangle(Shape):
+    def __init__(self, width: float, height: float) -&gt; None:
+        self.width = width
+        self.height = height
+
+    def area(self) -&gt; float:
+        return self.width * self.height
+
+class Triangle(Shape):
+    def __init__(self, base: float, height: float) -&gt; None:
+        self.base = base
+        self.height = height
+
+    def area(self) -&gt; float:
+        return 0.5 * self.base * self.height
+
+shapes: list[Shape] = [Circle(5), Rectangle(4, 6), Triangle(3, 8)]
+for shape in shapes:
+    print(shape.describe())
+# Circle: area = 78.54
+# Rectangle: area = 24.00
+# Triangle: area = 12.00
+</code></pre>
+<p><strong>Step 2: Duck Typing</strong></p>
+<pre><code class="language-python">class FileWriter:
+    def write(self, data: str) -&gt; None:
+        print(f&quot;Writing to file: {data}&quot;)
+
+class DatabaseWriter:
+    def write(self, data: str) -&gt; None:
+        print(f&quot;Saving to DB: {data}&quot;)
+
+class ApiWriter:
+    def write(self, data: str) -&gt; None:
+        print(f&quot;Sending to API: {data}&quot;)
+
+def save_data(writer, data: str) -&gt; None:
+    &quot;&quot;&quot;The type of writer does not matter — only the write() method&quot;&quot;&quot;
+    writer.write(data)
+
+save_data(FileWriter(), &quot;hello&quot;)       # Writing to file: hello
+save_data(DatabaseWriter(), &quot;hello&quot;)   # Saving to DB: hello
+save_data(ApiWriter(), &quot;hello&quot;)        # Sending to API: hello
+</code></pre>
+<p><strong>Step 3: Structural Subtyping with Protocol</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class Writable(Protocol):
+    def write(self, data: str) -&gt; None: ...
+
+class ConsoleWriter:
+    def write(self, data: str) -&gt; None:
+        print(f&quot;Console output: {data}&quot;)
+
+class NetworkWriter:
+    def write(self, data: str) -&gt; None:
+        print(f&quot;Network send: {data}&quot;)
+
+def save_all(writers: list[Writable], data: str) -&gt; None:
+    for writer in writers:
+        writer.write(data)
+
+writers: list[Writable] = [ConsoleWriter(), NetworkWriter()]
+save_all(writers, &quot;important data&quot;)
+# Console output: important data
+# Network send: important data
+</code></pre>
+<p><strong>Step 4: Built-in Polymorphism via Dunder Methods</strong></p>
+<pre><code class="language-python">class Team:
+    def __init__(self, name: str, members: list[str]) -&gt; None:
+        self.name = name
+        self.members = members
+
+    def __len__(self) -&gt; int:
+        return len(self.members)
+
+    def __contains__(self, member: str) -&gt; bool:
+        return member in self.members
+
+    def __iter__(self):
+        return iter(self.members)
+
+team = Team(&quot;Backend&quot;, [&quot;Kim&quot;, &quot;Lee&quot;, &quot;Park&quot;])
+print(len(team))          # 3
+print(&quot;Kim&quot; in team)      # True
+print(list(team))         # ['Kim', 'Lee', 'Park']
+
+for member in team:
+    print(member)
+</code></pre>
+<p><strong>Step 5: functools.singledispatch</strong></p>
+<pre><code class="language-python">from functools import singledispatch
+
+@singledispatch
+def format_value(value) -&gt; str:
+    return str(value)
+
+@format_value.register(int)
+def _(value: int) -&gt; str:
+    return f&quot;{value:,}&quot;
+
+@format_value.register(float)
+def _(value: float) -&gt; str:
+    return f&quot;{value:.2f}&quot;
+
+@format_value.register(list)
+def _(value: list) -&gt; str:
+    return f&quot;[{len(value)} items]&quot;
+
+print(format_value(1000000))       # 1,000,000
+print(format_value(3.14159))       # 3.14
+print(format_value([1, 2, 3]))     # [3 items]
+print(format_value(&quot;hello&quot;))       # hello
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Python's duck typing enables polymorphism without inheritance</li>
+<li><code>Protocol</code> lets type checkers verify duck typing at analysis time</li>
+<li>Dunder methods like <code>__len__</code>, <code>__contains__</code>, <code>__iter__</code> integrate with Python's built-in syntax</li>
+<li><code>singledispatch</code> provides function-level polymorphism based on argument type</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Excessive <code>isinstance()</code> branching</strong><br>
+- Why It Is a Problem: Defeats the purpose of polymorphism<br>
+- Fix: Unify through a common interface</p>
+<p><strong>Mismatched method names in duck typing</strong><br>
+- Why It Is a Problem: <code>AttributeError</code> at runtime<br>
+- Fix: Add type hints with <code>Protocol</code></p>
+<p><strong>Solving everything with inheritance</strong><br>
+- Why It Is a Problem: Creates unnecessary hierarchies<br>
+- Fix: Consider duck typing or Protocol first</p>
+<p><strong>Missing <code>NotImplementedError</code> in base class</strong><br>
+- Why It Is a Problem: Parent's default implementation runs unexpectedly<br>
+- Fix: Use ABC for abstract methods</p>
+<p><strong>Writing implementation code in Protocol</strong><br>
+- Why It Is a Problem: Protocol is for interface definition only<br>
+- Fix: Method bodies should be <code>...</code> only</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Plugin systems use a common interface to integrate extension modules</li>
+<li>Test mocks implement the same interface to replace real dependencies</li>
+<li>Serialization libraries (JSON, YAML, pickle) share a <code>dump</code>/<code>load</code> interface</li>
+<li>Web framework middleware processes requests/responses through a common interface</li>
+<li>Database drivers unify around DB-API 2.0 for interchangeable backends</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In Python, polymorphism "emerges naturally" rather than being "designed intentionally." Thanks to duck typing, objects with matching methods are interchangeable without inheritance.</p>
+<p>For projects where type safety matters, use <code>Protocol</code> extensively. It has zero runtime impact but lets type checkers (mypy) catch interface violations.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can implement inheritance-based polymorphism</li>
+<li>[ ] I understand duck typing principles and can apply them</li>
+<li>[ ] I can define structural subtyping with <code>Protocol</code></li>
+<li>[ ] I can integrate with Python's built-in syntax via dunder methods</li>
+<li>[ ] I can replace <code>isinstance()</code> branching with polymorphism</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Define an <code>Exportable</code> Protocol and implement <code>CsvExporter</code>, <code>JsonExporter</code>, and <code>XmlExporter</code>.</li>
+<li>Implement a <code>Matrix</code> class with <code>__add__</code> and <code>__mul__</code> dunder methods.</li>
+<li>Use <code>singledispatch</code> to create a function that formats various data types into log output.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Polymorphism increases code flexibility by calling different implementations through a single interface. Python supports polymorphism through duck typing, inheritance, and Protocol. In the next article, we explore abstraction — enforcing common interfaces through abstract base classes.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><strong>Polymorphism (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Protocol">Python Official Docs — typing.Protocol</a></li>
+<li><a href="https://realpython.com/duck-typing-python/">Real Python — Duck Typing in Python</a></li>
+<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols: Structural subtyping</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 13: Interfaces, Protocols, and ABCs</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, Polymorphism, Duck Typing, Protocol</p>
+</body>
+</html>

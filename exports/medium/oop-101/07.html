@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Composition vs Inheritance</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Composition vs Inheritance</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: When extending a class, should you choose inheritance or composition?</p>
+<blockquote>
+<p>"Favor composition over inheritance" is a core principle from the GoF Design Patterns. Inheritance suits is-a relationships; composition suits has-a relationships. This article examines the structural differences and practical selection criteria.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The structural difference between inheritance (is-a) and composition (has-a)</li>
+<li>Why composition is more flexible than inheritance</li>
+<li>The delegation pattern</li>
+<li>Practical criteria for choosing between inheritance and composition</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Inheritance creates tight coupling with the parent class. When the parent's internal implementation changes, child classes can break. Composition "contains" objects, so it does not depend on internal implementations and allows runtime replacement.</p>
+<blockquote>
+<p>Inheritance = compile-time coupling, Composition = runtime flexibility</p>
+</blockquote>
+<p>Misused inheritance is a leading cause of increasing complexity during modifications. Always ask: "Is this relationship really is-a?"</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Inheritance vs Composition</p>
+</blockquote>
+<pre><code>Inheritance (is-a)                Composition (has-a)
+┌─────────────┐               ┌─────────────┐
+│ Parent class │               │ Car         │
+└──────┬──────┘               │  ├─ Engine  │
+       │                      │  ├─ Wheel   │
+┌──────┴──────┐               │  └─ GPS     │
+│ Child class  │               └─────────────┘
+└─────────────┘
+Tight coupling                 Loose coupling
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Composition</strong><br>
+- Description: An object contains other objects as attributes</p>
+<p><strong>Delegation</strong><br>
+- Description: A pattern that forwards requests to an internal object</p>
+<p><strong>is-a relationship</strong><br>
+- Description: "The child is a kind of parent" — suits inheritance</p>
+<p><strong>has-a relationship</strong><br>
+- Description: "This object has that object" — suits composition</p>
+<p><strong>Dependency injection (DI)</strong><br>
+- Description: A composition pattern where dependencies are passed from outside</p>
+<h2>Before / After</h2>
+<p>Comparing approaches to adding logging functionality.</p>
+<pre><code class="language-python"># before: logging via inheritance — multiple inheritance needed
+class Logger:
+    def log(self, msg: str) -&gt; None:
+        print(f&quot;[LOG] {msg}&quot;)
+
+class UserService(Logger):  # UserService is-a Logger? No.
+    def create_user(self, name: str) -&gt; None:
+        self.log(f&quot;Creating user: {name}&quot;)
+</code></pre>
+<pre><code class="language-python"># after: logging via composition — natural has-a relationship
+class Logger:
+    def log(self, msg: str) -&gt; None:
+        print(f&quot;[LOG] {msg}&quot;)
+
+class UserService:
+    def __init__(self, logger: Logger) -&gt; None:
+        self._logger = logger  # has-a relationship
+
+    def create_user(self, name: str) -&gt; None:
+        self._logger.log(f&quot;Creating user: {name}&quot;)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Composition Basics — Assembling a Car</strong></p>
+<pre><code class="language-python">class Engine:
+    def __init__(self, horsepower: int) -&gt; None:
+        self.horsepower = horsepower
+        self.running = False
+
+    def start(self) -&gt; str:
+        self.running = True
+        return f&quot;{self.horsepower}hp engine started&quot;
+
+    def stop(self) -&gt; str:
+        self.running = False
+        return &quot;Engine stopped&quot;
+
+class GPS:
+    def navigate(self, destination: str) -&gt; str:
+        return f&quot;Navigating to {destination}&quot;
+
+class Car:
+    def __init__(self, engine: Engine, gps: GPS) -&gt; None:
+        self._engine = engine
+        self._gps = gps
+
+    def drive(self, destination: str) -&gt; None:
+        print(self._engine.start())
+        print(self._gps.navigate(destination))
+
+    def park(self) -&gt; None:
+        print(self._engine.stop())
+
+car = Car(Engine(200), GPS())
+car.drive(&quot;downtown&quot;)
+# 200hp engine started
+# Navigating to downtown
+car.park()
+# Engine stopped
+</code></pre>
+<p><strong>Step 2: Delegation Pattern</strong></p>
+<pre><code class="language-python">class Printer:
+    def print_document(self, content: str) -&gt; None:
+        print(f&quot;Printing: {content}&quot;)
+
+class Scanner:
+    def scan(self) -&gt; str:
+        return &quot;Scan complete&quot;
+
+class Fax:
+    def send_fax(self, number: str, content: str) -&gt; None:
+        print(f&quot;Faxing to {number}: {content}&quot;)
+
+class MultiFunctionDevice:
+    &quot;&quot;&quot;Composition + delegation: each function delegated to an internal object&quot;&quot;&quot;
+
+    def __init__(self) -&gt; None:
+        self._printer = Printer()
+        self._scanner = Scanner()
+        self._fax = Fax()
+
+    def print_document(self, content: str) -&gt; None:
+        self._printer.print_document(content)
+
+    def scan(self) -&gt; str:
+        return self._scanner.scan()
+
+    def send_fax(self, number: str, content: str) -&gt; None:
+        self._fax.send_fax(number, content)
+
+mfd = MultiFunctionDevice()
+mfd.print_document(&quot;Report&quot;)       # Printing: Report
+print(mfd.scan())                   # Scan complete
+mfd.send_fax(&quot;02-1234&quot;, &quot;Contract&quot;)  # Faxing to 02-1234: Contract
+</code></pre>
+<p><strong>Step 3: Strategy Pattern — Runtime Replacement</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class SortStrategy(Protocol):
+    def sort(self, data: list[int]) -&gt; list[int]: ...
+
+class BubbleSort:
+    def sort(self, data: list[int]) -&gt; list[int]:
+        arr = data[:]
+        for i in range(len(arr)):
+            for j in range(len(arr) - 1 - i):
+                if arr[j] &gt; arr[j + 1]:
+                    arr[j], arr[j + 1] = arr[j + 1], arr[j]
+        return arr
+
+class QuickSort:
+    def sort(self, data: list[int]) -&gt; list[int]:
+        return sorted(data)
+
+class Sorter:
+    def __init__(self, strategy: SortStrategy) -&gt; None:
+        self._strategy = strategy
+
+    def set_strategy(self, strategy: SortStrategy) -&gt; None:
+        self._strategy = strategy
+
+    def execute(self, data: list[int]) -&gt; list[int]:
+        return self._strategy.sort(data)
+
+data = [5, 3, 8, 1, 9]
+sorter = Sorter(BubbleSort())
+print(sorter.execute(data))  # [1, 3, 5, 8, 9]
+
+sorter.set_strategy(QuickSort())  # runtime replacement
+print(sorter.execute(data))  # [1, 3, 5, 8, 9]
+</code></pre>
+<p><strong>Step 4: Dependency Injection</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class Database(Protocol):
+    def save(self, data: dict) -&gt; None: ...
+    def find(self, key: str) -&gt; dict | None: ...
+
+class InMemoryDB:
+    def __init__(self) -&gt; None:
+        self._store: dict[str, dict] = {}
+
+    def save(self, data: dict) -&gt; None:
+        self._store[data[&quot;id&quot;]] = data
+
+    def find(self, key: str) -&gt; dict | None:
+        return self._store.get(key)
+
+class UserRepository:
+    def __init__(self, db: Database) -&gt; None:
+        self._db = db  # injected from outside
+
+    def create(self, user_id: str, name: str) -&gt; None:
+        self._db.save({&quot;id&quot;: user_id, &quot;name&quot;: name})
+
+    def get(self, user_id: str) -&gt; dict | None:
+        return self._db.find(user_id)
+
+db = InMemoryDB()
+repo = UserRepository(db)
+repo.create(&quot;u1&quot;, &quot;Kim&quot;)
+print(repo.get(&quot;u1&quot;))  # {'id': 'u1', 'name': 'Kim'}
+</code></pre>
+<p><strong>Step 5: When Inheritance Is Appropriate</strong></p>
+<pre><code class="language-python">class HttpError(Exception):
+    &quot;&quot;&quot;HTTP error base class — inheritance is appropriate for is-a relationships&quot;&quot;&quot;
+
+    def __init__(self, status_code: int, message: str) -&gt; None:
+        super().__init__(message)
+        self.status_code = status_code
+
+class NotFoundError(HttpError):
+    def __init__(self, resource: str) -&gt; None:
+        super().__init__(404, f&quot;{resource} not found&quot;)
+
+class UnauthorizedError(HttpError):
+    def __init__(self) -&gt; None:
+        super().__init__(401, &quot;Authentication required&quot;)
+
+try:
+    raise NotFoundError(&quot;User&quot;)
+except HttpError as e:
+    print(f&quot;[{e.status_code}] {e}&quot;)
+# [404] User not found
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Composition allows replacing internal objects, providing high runtime flexibility</li>
+<li>Dependency injection makes it easy to substitute mock objects during testing</li>
+<li>The strategy pattern is a classic use of composition for runtime algorithm replacement</li>
+<li>The Exception hierarchy is a good example of inheritance where is-a is clear</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Using inheritance for has-a relationships</strong><br>
+- Why It Is a Problem: "Car is-a Engine" does not hold<br>
+- Fix: Switch to composition</p>
+<p><strong>Inheriting only for code reuse</strong><br>
+- Why It Is a Problem: Creates meaningless hierarchies<br>
+- Fix: Use composition or utility functions</p>
+<p><strong>Exposing composed objects directly</strong><br>
+- Why It Is a Problem: Breaks encapsulation<br>
+- Fix: Wrap with delegation methods</p>
+<p><strong>Creating dependencies internally</strong><br>
+- Why It Is a Problem: Hard to test and replace<br>
+- Fix: Inject via constructor</p>
+<p><strong>Converting all inheritance to composition</strong><br>
+- Why It Is a Problem: Some cases like Exception suit inheritance<br>
+- Fix: Use inheritance when is-a is clear</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>FastAPI's <code>Depends()</code> is a composition pattern based on dependency injection</li>
+<li>Django's CBVs combine functionality through mixin-based composition</li>
+<li>Logging, caching, and auth are separated as cross-cutting concerns via composition</li>
+<li>Tests inject InMemoryDB instead of real databases</li>
+<li>Microservices inject HTTP clients via composition</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>"Favor composition over inheritance" does not mean "never use inheritance." Exception hierarchies, Enum extensions, and ABC implementations are natural places for inheritance where is-a is clear.</p>
+<p>The decision rule is simple: "Can a child object be used wherever a parent type is expected?" (Liskov Substitution Principle). If yes, use inheritance. If no, use composition.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can distinguish is-a relationships from has-a relationships</li>
+<li>[ ] I can implement composition and the delegation pattern</li>
+<li>[ ] I can implement runtime behavior replacement with the strategy pattern</li>
+<li>[ ] I understand the purpose and implementation of dependency injection</li>
+<li>[ ] I can judge when inheritance is appropriate and when composition is better</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Design a <code>NotificationService</code> using composition so that <code>EmailSender</code> and <code>SmsSender</code> are interchangeable.</li>
+<li>Refactor an inheritance-based <code>AdminUser(User)</code> to use composition instead.</li>
+<li>Build a <code>Compressor</code> class using the strategy pattern to swap between gzip, bzip2, and lzma algorithms.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Composition provides loose coupling and runtime flexibility, making it more suitable than inheritance in most situations. Inheritance should be reserved for clear is-a relationships. In the next article, we explore SOLID principles — the fundamental guidelines for object-oriented design.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><strong>Composition vs Inheritance (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/design-patterns-elements/0201633612/">Design Patterns — GoF (Gang of Four)</a></li>
+<li><a href="https://realpython.com/inheritance-composition-python/">Real Python — Inheritance and Composition</a></li>
+<li><a href="https://effectivepython.com/">Effective Python — Item 41: Consider Composing Functionality with Mix-in Classes</a></li>
+<li><a href="https://www.oreilly.com/library/view/clean-architecture/9780134494272/">Clean Architecture — Robert C. Martin</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, Composition, Inheritance, Design Patterns</p>
+</body>
+</html>

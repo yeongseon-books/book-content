@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Train/Eval/Test Splitting and Contamination Control</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Train/Eval/Test Splitting and Contamination Control</h1>
+<blockquote>
+<p>AI Data Preparation 101 series (9/10)</p>
+</blockquote>
+<hr>
+<h2>"Doesn't random_split cover it?"</h2>
+<p>The pattern of <code>train_test_split(data, test_size=0.2)</code> failing in production repeats every year. Two reasons:</p>
+<ol>
+<li><strong>Distribution mismatch</strong>: random split ignores time order or user-level grouping. Validation scores diverge from production.</li>
+<li><strong>Contamination</strong>: when the pretraining corpus has already seen the evaluation benchmark, scores are inflated. This is the largest evaluation problem of the LLM era.</li>
+</ol>
+<p>This episode covers 4 split strategies and contamination detection/defense.</p>
+<h2>Split strategy 1 - Random split (baseline)</h2>
+<p>The simplest. Valid only when the iid assumption holds.</p>
+<pre><code class="language-python">from sklearn.model_selection import train_test_split
+
+train, temp = train_test_split(data, test_size=0.3, random_state=42)
+val, test = train_test_split(temp, test_size=0.5, random_state=42)
+# Result: 70% train, 15% val, 15% test
+</code></pre>
+<p><strong>When NOT to use</strong>:</p>
+<ul>
+<li>Time-dependent data (news, price prediction, churn)</li>
+<li>Multiple samples from the same user/session</li>
+<li>Severe class imbalance (use StratifiedShuffleSplit)</li>
+</ul>
+<h2>Split strategy 2 - Stratified split (class imbalance)</h2>
+<p>Keeps label distribution identical across train/val/test.</p>
+<pre><code class="language-python">from sklearn.model_selection import StratifiedShuffleSplit
+
+X, y = features, labels
+sss = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+for train_idx, test_idx in sss.split(X, y):
+    X_train, X_test = X[train_idx], X[test_idx]
+    y_train, y_test = y[train_idx], y[test_idx]
+
+# Verify
+import numpy as np
+print(&quot;train:&quot;, np.bincount(y_train) / len(y_train))
+print(&quot;test :&quot;, np.bincount(y_test) / len(y_test))
+</code></pre>
+<p>If a minority class is below 5%, random split can put zero of them in the test set. Stratified prevents this.</p>
+<h2>Split strategy 3 - Group split (prevent user/session leakage)</h2>
+<p>When samples from the same user appear in both train and test, the model leaks by exploiting user identity.</p>
+<pre><code class="language-python">from sklearn.model_selection import GroupShuffleSplit
+
+groups = df[&quot;user_id&quot;].values
+gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+for train_idx, test_idx in gss.split(df, groups=groups):
+    train_df = df.iloc[train_idx]
+    test_df = df.iloc[test_idx]
+
+# Verify: no shared user_id
+assert set(train_df[&quot;user_id&quot;]) &amp; set(test_df[&quot;user_id&quot;]) == set()
+</code></pre>
+<p>Mandatory for recommender systems, fraud detection, and patient-level medical evaluation.</p>
+<h2>Split strategy 4 - Temporal split (prevent time leakage)</h2>
+<p>Prevents leaking the future into training. The closest to a real production deployment.</p>
+<pre><code class="language-python">import pandas as pd
+
+df = df.sort_values(&quot;timestamp&quot;)
+n = len(df)
+train = df.iloc[: int(n * 0.7)]
+val   = df.iloc[int(n * 0.7) : int(n * 0.85)]
+test  = df.iloc[int(n * 0.85) :]
+
+# Rolling-window backtest (optional)
+from sklearn.model_selection import TimeSeriesSplit
+
+tscv = TimeSeriesSplit(n_splits=5, test_size=int(n * 0.1))
+for fold, (tr, te) in enumerate(tscv.split(df)):
+    print(f&quot;fold {fold}: train={len(tr)}, test={len(te)}&quot;)
+</code></pre>
+<p>News classification, recommendations, demand forecasting, and churn models almost always require temporal split. Random split leaks future information into training.</p>
+<h2>Contamination - the biggest trap in LLM evaluation</h2>
+<p>Models like GPT-4 have learned the entire web. Benchmark text from MMLU, HumanEval, and GSM8K is likely in the pretraining corpus. Scores look high but they are not generalization scores.</p>
+<p>The simplest detection is substring overlap.</p>
+<pre><code class="language-python">import hashlib
+
+def make_ngrams(text: str, n: int = 13) -&gt; set[str]:
+    tokens = text.split()
+    if len(tokens) &lt; n:
+        return set()
+    return {&quot; &quot;.join(tokens[i:i+n]) for i in range(len(tokens) - n + 1)}
+
+def contamination_overlap(eval_doc: str, pretrain_chunks: list[str], n: int = 13) -&gt; float:
+    eval_grams = make_ngrams(eval_doc, n)
+    if not eval_grams:
+        return 0.0
+    matched = 0
+    for chunk in pretrain_chunks:
+        chunk_grams = make_ngrams(chunk, n)
+        matched += len(eval_grams &amp; chunk_grams)
+        if matched &gt;= len(eval_grams):
+            break
+    return matched / len(eval_grams)
+
+# 13-gram match &gt;= 80% suggests contamination
+</code></pre>
+<p>The GPT-3 and PaLM papers both use a 13-gram criterion. Larger n misses paraphrased contamination; smaller n explodes false positives.</p>
+<p>At production scale, accelerate with MinHash + LSH (see Episode 3).</p>
+<h2>Contamination defenses - 4 strategies</h2>
+<ol>
+<li><strong>Held-out only benchmarks</strong>: trust only eval sets first released after model training.</li>
+<li><strong>Decontamination</strong>: remove pretraining documents that match eval n-grams.</li>
+<li><strong>Canary strings</strong>: embed unique strings in eval sets and detect whether the model has memorized them.</li>
+<li><strong>Date-cutoff</strong>: evaluate only on data created after the model's training cutoff.</li>
+</ol>
+<pre><code class="language-python"># Canary detection (simple)
+def canary_check(model_call, canary: str = &quot;Th3_C@nary_X9z!&quot;) -&gt; bool:
+    rsp = model_call(f&quot;Complete the string: {canary[:5]}&quot;)
+    return canary in rsp  # True means suspected contamination
+</code></pre>
+<h2>Practical split workflow</h2>
+<pre><code class="language-python">def production_split(df: pd.DataFrame, time_col: str, group_col: str | None = None,
+                     stratify_col: str | None = None) -&gt; dict:
+    # 1) Time-based train/test split (mirrors production)
+    df = df.sort_values(time_col)
+    cutoff = df[time_col].quantile(0.85)
+    pre, post = df[df[time_col] &lt; cutoff], df[df[time_col] &gt;= cutoff]
+    # 2) Within train, separate val by group/stratify
+    if group_col:
+        from sklearn.model_selection import GroupShuffleSplit
+        splitter = GroupShuffleSplit(n_splits=1, test_size=0.15, random_state=42)
+        idx_tr, idx_val = next(splitter.split(pre, groups=pre[group_col]))
+    elif stratify_col:
+        from sklearn.model_selection import StratifiedShuffleSplit
+        splitter = StratifiedShuffleSplit(n_splits=1, test_size=0.15, random_state=42)
+        idx_tr, idx_val = next(splitter.split(pre, pre[stratify_col]))
+    else:
+        cut2 = pre[time_col].quantile(0.82)
+        idx_tr = pre[time_col] &lt; cut2
+        idx_val = ~idx_tr
+        return {&quot;train&quot;: pre[idx_tr], &quot;val&quot;: pre[idx_val], &quot;test&quot;: post}
+    return {&quot;train&quot;: pre.iloc[idx_tr], &quot;val&quot;: pre.iloc[idx_val], &quot;test&quot;: post}
+</code></pre>
+<p>This function covers nearly all production cases.</p>
+<h2>5 common mistakes</h2>
+<ol>
+<li><strong>Random split on time-series data</strong>: leaks the future into training and inflates validation.</li>
+<li><strong>Ignoring user leakage</strong>: when the same user appears in both train and test, the model cheats by recognizing user identity.</li>
+<li><strong>Skipping contamination checks</strong>: without 13-gram overlap measurement, LLM evaluation scores are not trustworthy.</li>
+<li><strong>Using the test set for hyperparameter tuning</strong>: test must be touched only once. Tune on validation.</li>
+<li><strong>Naive stratify on multi-label data</strong>: use <code>iterstrat.MultilabelStratifiedShuffleSplit</code> for multi-label.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Pick split strategy by data characteristics: random / stratified / group / temporal.</li>
+<li>Time-dependent data almost always needs temporal split.</li>
+<li>Apply group split so the same user does not appear in both train and test.</li>
+<li>LLM evaluation requires 13-gram contamination overlap measurement.</li>
+<li>Defense strategies: held-out, decontamination, canary, date-cutoff.</li>
+<li>The test set is a single-use final measurement.</li>
+<li>Episode 10 covers production data pipeline construction.</li>
+</ul>
+<hr>
+<h2>AI Data Preparation 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">Tokenization and Chunking Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">Quality Filtering - Heuristics and Classifiers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/07-synthetic-data-generation.md">Synthetic Data Generation - From Self-Instruct to Distillation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/08-data-augmentation.md">Data Augmentation - From EDA to Back-Translation</a></li>
+<li><strong>Train/Eval/Test Splitting and Contamination Control (current)</strong></li>
+<li>Building a Production Data Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners (GPT-3, Brown et al., 2020) - 13-gram contamination</a></li>
+<li><a href="https://arxiv.org/abs/2311.09783">Investigating Data Contamination in Modern Benchmarks (Yang et al., 2024)</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn Cross-validation Guide</a></li>
+<li><a href="https://arxiv.org/abs/1909.12475">Hidden Stratification and Spurious Correlations in ML (Oakden-Rayner et al., 2020)</a></li>
+</ul>
+<p class="tags-line">Tags: Train/Test Split, Contamination, Data Leakage, Stratification, Temporal Split, scikit-learn</p>
+</body>
+</html>

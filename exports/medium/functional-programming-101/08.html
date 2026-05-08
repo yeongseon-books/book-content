@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lazy Evaluation and Generators</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Lazy Evaluation and Generators</h1>
+<blockquote>
+<p>Functional Programming 101 Series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can you process data without loading everything into memory at once?</p>
+<blockquote>
+<p>Lazy evaluation is a strategy that defers computation until the moment a value is actually needed. Python's generators are the primary tool for lazy evaluation, enabling memory-efficient data processing. This article covers how generators work and how to build lazy pipelines with itertools.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between eager evaluation and lazy evaluation</li>
+<li>Generator functions and generator expressions</li>
+<li>Memory-efficient processing with itertools</li>
+<li>Working with infinite sequences</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When analyzing a 10 GB log file, you cannot load it all into memory. Lazy evaluation processes data one line at a time, keeping memory usage constant regardless of input size.</p>
+<blockquote>
+<p>Lazy evaluation = compute only as much as you need</p>
+</blockquote>
+<p>Python's <code>range()</code>, <code>map()</code>, <code>filter()</code>, and file objects all use lazy evaluation under the hood. Understanding generators unlocks the principles behind all of these built-in tools.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Eager vs Lazy Evaluation</p>
+</blockquote>
+<pre><code>Eager Evaluation               Lazy Evaluation
+─────────────────             ─────────────────
+[1, 4, 9, 16, 25]            (waiting to compute...)
+Everything in memory          Produces one value at a time
+list()                        generator / iterator
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Lazy evaluation</strong><br>
+- Description: A strategy that computes values only when they are needed</p>
+<p><strong>Generator</strong><br>
+- Description: A function that produces values one at a time using <code>yield</code></p>
+<p><strong>Iterator</strong><br>
+- Description: An object that returns values sequentially via <code>__next__()</code></p>
+<p><strong>Generator expression</strong><br>
+- Description: A lazy expression in the form <code>(expr for x in iterable)</code></p>
+<p><strong>itertools</strong><br>
+- Description: A standard library providing efficient iterator combinators</p>
+<h2>Before / After</h2>
+<p>Replace a full list construction with a generator.</p>
+<pre><code class="language-python"># before: build the entire list in memory
+def get_squares(n: int) -&gt; list[int]:
+    return [i ** 2 for i in range(n)]
+
+squares = get_squares(1_000_000)  # millions of items stored at once
+</code></pre>
+<pre><code class="language-python"># after: yield one value at a time
+def get_squares(n: int):
+    for i in range(n):
+        yield i ** 2
+
+squares = get_squares(1_000_000)  # almost no memory used
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Generator Function Basics</strong></p>
+<pre><code class="language-python">def countdown(n: int):
+    &quot;&quot;&quot;Counts down from n to 1.&quot;&quot;&quot;
+    while n &gt; 0:
+        yield n
+        n -= 1
+
+# create a generator object
+gen = countdown(5)
+print(type(gen))  # &lt;class 'generator'&gt;
+
+# pull values one at a time with next()
+print(next(gen))  # 5
+print(next(gen))  # 4
+
+# iterate over the rest with a for loop
+for n in gen:
+    print(n, end=&quot; &quot;)
+# 3 2 1
+
+# the generator is now exhausted
+# next(gen)  # StopIteration
+</code></pre>
+<p><strong>Step 2: Generator Expressions</strong></p>
+<pre><code class="language-python"># list comprehension — eager evaluation
+squares_list = [x ** 2 for x in range(10)]
+print(type(squares_list))  # &lt;class 'list'&gt;
+
+# generator expression — lazy evaluation
+squares_gen = (x ** 2 for x in range(10))
+print(type(squares_gen))  # &lt;class 'generator'&gt;
+
+# memory comparison
+import sys
+
+big_list = [x ** 2 for x in range(1_000_000)]
+big_gen = (x ** 2 for x in range(1_000_000))
+
+print(f&quot;List: {sys.getsizeof(big_list):,} bytes&quot;)       # ~8,000,000 bytes
+print(f&quot;Generator: {sys.getsizeof(big_gen):,} bytes&quot;)    # ~200 bytes
+
+# pass a generator expression directly to sum()
+total = sum(x ** 2 for x in range(1_000_000))
+print(f&quot;Total: {total:,}&quot;)
+</code></pre>
+<p><strong>Step 3: Infinite Sequences</strong></p>
+<pre><code class="language-python">from itertools import count, islice
+
+# infinite generator
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+# take only what you need with islice
+fib_10 = list(islice(fibonacci(), 10))
+print(fib_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+# infinite counter
+def natural_numbers():
+    n = 1
+    while True:
+        yield n
+        n += 1
+
+# first 5 perfect squares
+squares = list(islice(
+    (n ** 2 for n in natural_numbers()),
+    5,
+))
+print(squares)  # [1, 4, 9, 16, 25]
+</code></pre>
+<p><strong>Step 4: Working with itertools</strong></p>
+<pre><code class="language-python">from itertools import chain, takewhile, dropwhile, accumulate, groupby
+
+# chain: concatenate multiple iterables
+combined = list(chain([1, 2], [3, 4], [5, 6]))
+print(combined)  # [1, 2, 3, 4, 5, 6]
+
+# takewhile / dropwhile: condition-based selection
+numbers = [2, 4, 6, 1, 3, 5, 8]
+taken = list(takewhile(lambda x: x % 2 == 0, numbers))
+dropped = list(dropwhile(lambda x: x % 2 == 0, numbers))
+print(taken)    # [2, 4, 6]
+print(dropped)  # [1, 3, 5, 8]
+
+# accumulate: running totals
+running_total = list(accumulate([1, 2, 3, 4, 5]))
+print(running_total)  # [1, 3, 6, 10, 15]
+
+# groupby: group consecutive elements by key
+data = sorted([&quot;a&quot;, &quot;b&quot;, &quot;a&quot;, &quot;c&quot;, &quot;b&quot;, &quot;a&quot;])
+for key, group in groupby(data):
+    print(f&quot;  {key}: {list(group)}&quot;)
+# a: ['a', 'a', 'a']
+# b: ['b', 'b']
+# c: ['c']
+</code></pre>
+<p><strong>Step 5: Building a Lazy Pipeline</strong></p>
+<pre><code class="language-python">from typing import Iterator
+
+def read_lines(text: str) -&gt; Iterator[str]:
+    &quot;&quot;&quot;Yields lines from a text block.&quot;&quot;&quot;
+    for line in text.strip().split(&quot;\n&quot;):
+        yield line.strip()
+
+def parse_csv(lines: Iterator[str]) -&gt; Iterator[dict]:
+    &quot;&quot;&quot;Converts CSV lines into dictionaries.&quot;&quot;&quot;
+    headers = next(lines).split(&quot;,&quot;)
+    for line in lines:
+        values = line.split(&quot;,&quot;)
+        yield dict(zip(headers, values))
+
+def filter_by_score(records: Iterator[dict], min_score: int) -&gt; Iterator[dict]:
+    &quot;&quot;&quot;Yields only records above the minimum score.&quot;&quot;&quot;
+    for record in records:
+        if int(record[&quot;score&quot;]) &gt;= min_score:
+            yield record
+
+def format_output(records: Iterator[dict]) -&gt; Iterator[str]:
+    &quot;&quot;&quot;Formats records for display.&quot;&quot;&quot;
+    for r in records:
+        yield f&quot;{r['name']}: {r['score']} points&quot;
+
+# run the pipeline — every stage is lazy
+csv_text = &quot;&quot;&quot;name,score
+Alice,85
+Bob,92
+Charlie,78
+Diana,95
+Eve,60&quot;&quot;&quot;
+
+pipeline = format_output(
+    filter_by_score(
+        parse_csv(read_lines(csv_text)),
+        min_score=80,
+    )
+)
+
+# consume results one at a time
+for line in pipeline:
+    print(line)
+# Alice: 85 points
+# Bob: 92 points
+# Diana: 95 points
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Generators produce values one at a time, saving memory</li>
+<li>Generator expressions can be passed directly to <code>sum()</code>, <code>max()</code>, and <code>min()</code></li>
+<li>Infinite sequences are made finite with <code>islice()</code> or <code>takewhile()</code></li>
+<li>In a lazy pipeline, each stage is a generator so data flows one record at a time</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Iterating a generator twice</strong><br>
+- Why It Is a Problem: Once exhausted, it produces nothing<br>
+- Fix: Convert to <code>list()</code> or recreate the generator</p>
+<p><strong>Calling <code>list()</code> on an infinite generator</strong><br>
+- Why It Is a Problem: Memory runs out<br>
+- Fix: Use <code>islice()</code> to limit</p>
+<p><strong>Calling <code>len()</code> on a generator</strong><br>
+- Why It Is a Problem: Raises TypeError<br>
+- Fix: Convert to a list first if you need length</p>
+<p><strong>Ignoring exceptions inside generators</strong><br>
+- Why It Is a Problem: Data loss occurs silently<br>
+- Fix: Handle or propagate exceptions properly</p>
+<p><strong>Unnecessary <code>list()</code> conversion</strong><br>
+- Why It Is a Problem: Loses the benefits of laziness<br>
+- Fix: Keep generators until final consumption</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Process large log files line by line</li>
+<li>Abstract API pagination results as a generator</li>
+<li>Build ETL pipelines by chaining generators</li>
+<li>Transform streaming data in real time</li>
+<li>Use <code>itertools</code> for efficient combinations, permutations, and grouping</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Python's generators are a practical implementation of functional programming's lazy evaluation. The question "Do I really need all this data in memory?" is the trigger — if the answer is no, use a generator.</p>
+<p>In production, the effective pattern is to compose each pipeline stage as a generator and let the final consumer (a for loop, <code>sum()</code>, a file write) drive the actual computation. This follows the same philosophy as UNIX pipes (<code>|</code>).</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between a generator function and a regular function</li>
+<li>[ ] I can write generator expressions</li>
+<li>[ ] I can use key functions from <code>itertools</code></li>
+<li>[ ] I can safely work with infinite sequences</li>
+<li>[ ] I can build lazy pipelines to process large datasets</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a generator that yields prime numbers infinitely, and use <code>islice</code> to print the first 20.</li>
+<li>Build a lazy pipeline that reads a large CSV file line by line and computes the average of a specific column.</li>
+<li>Use <code>itertools.chain</code> and <code>groupby</code> to group log entries from multiple files by date.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Lazy evaluation defers computation to the moment values are needed, keeping memory usage constant. Python's generators and <code>itertools</code> are the core tools for building lazy pipelines. The next article covers combining small functions into complex transformations: <strong>function composition and pipelines</strong>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
+<li><strong>Lazy Evaluation and Generators (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/howto/functional.html#generators">Python Official Docs — Generators</a></li>
+<li><a href="https://docs.python.org/3/library/itertools.html">Python Official Docs — itertools</a></li>
+<li><a href="https://realpython.com/introduction-to-python-generators/">Real Python — Introduction to Python Generators</a></li>
+<li><a href="http://www.dabeaz.com/generators/">David Beazley — Generator Tricks for Systems Programmers</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Functional Programming, Generators, Lazy Evaluation, itertools</p>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding Fixtures</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding Fixtures</h1>
+<blockquote>
+<p>pytest 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you avoid duplicating setup code across multiple tests?</p>
+<blockquote>
+<p>pytest fixtures define test data and state as functions, injecting them automatically by parameter name. This article covers fixture creation, scope management, and yield-based teardown.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Defining fixtures and injecting them into tests</li>
+<li>The difference between fixture scopes (function, class, module, session)</li>
+<li>Separating setup and teardown with yield fixtures</li>
+<li>Sharing fixtures across files with conftest.py</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When every test repeats the same object creation code, test files become bloated and hard to maintain. Fixtures eliminate that repetition, letting tests focus on <em>what</em> they verify.</p>
+<blockquote>
+<p>Fixtures are the "Given" in Given-When-Then. Pull Given into a fixture, and the test body is just When and Then.</p>
+</blockquote>
+<p>Resources like database connections, API clients, and temporary files need fixtures to be created and cleaned up safely.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>fixture = a reusable component that prepares state before a test and cleans up after</p>
+</blockquote>
+<pre><code>@pytest.fixture
+def user():            ← fixture definition
+    return User(&quot;Alice&quot;)
+
+def test_greet(user):  ← auto-injected by parameter name
+    assert user.name == &quot;Alice&quot;
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Fixture</strong><br>
+- Description: A function that provides test data or state</p>
+<p><strong>Scope</strong><br>
+- Description: Controls the fixture's lifetime (function, class, module, session)</p>
+<p><strong>Yield fixture</strong><br>
+- Description: Code before yield is setup; code after is teardown</p>
+<p><strong>conftest.py</strong><br>
+- Description: Configuration file for sharing fixtures across test files</p>
+<p><strong>autouse</strong><br>
+- Description: Fixture applied automatically without explicit request</p>
+<h2>Before / After</h2>
+<p>Compare unittest-style setUp/tearDown with pytest fixtures.</p>
+<pre><code class="language-python"># before: unittest style — setUp/tearDown methods
+import unittest
+import tempfile
+import os
+
+class TestFileProcessor(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.filepath = os.path.join(self.tmpdir, &quot;test.txt&quot;)
+        with open(self.filepath, &quot;w&quot;) as f:
+            f.write(&quot;hello&quot;)
+
+    def tearDown(self):
+        os.remove(self.filepath)
+        os.rmdir(self.tmpdir)
+
+    def test_read(self):
+        with open(self.filepath) as f:
+            assert f.read() == &quot;hello&quot;
+</code></pre>
+<pre><code class="language-python"># after: pytest fixture — declarative and reusable
+import pytest
+
+@pytest.fixture
+def text_file(tmp_path):
+    filepath = tmp_path / &quot;test.txt&quot;
+    filepath.write_text(&quot;hello&quot;)
+    return filepath
+
+def test_read(text_file):
+    assert text_file.read_text() == &quot;hello&quot;
+# no teardown needed — tmp_path auto-cleans
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Define Basic Fixtures</strong></p>
+<pre><code class="language-python"># conftest.py
+import pytest
+
+@pytest.fixture
+def sample_user():
+    return {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 30, &quot;role&quot;: &quot;developer&quot;}
+
+@pytest.fixture
+def sample_users():
+    return [
+        {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 30},
+        {&quot;name&quot;: &quot;Bob&quot;, &quot;age&quot;: 25},
+        {&quot;name&quot;: &quot;Charlie&quot;, &quot;age&quot;: 35},
+    ]
+</code></pre>
+<p><strong>Step 2: Use Fixtures</strong></p>
+<pre><code class="language-python"># test_user.py
+
+def test_user_name(sample_user):
+    assert sample_user[&quot;name&quot;] == &quot;Alice&quot;
+
+def test_user_count(sample_users):
+    assert len(sample_users) == 3
+
+def test_youngest_user(sample_users):
+    youngest = min(sample_users, key=lambda u: u[&quot;age&quot;])
+    assert youngest[&quot;name&quot;] == &quot;Bob&quot;
+</code></pre>
+<p><strong>Step 3: Yield Fixtures for Resource Management</strong></p>
+<pre><code class="language-python"># conftest.py
+import pytest
+import sqlite3
+
+@pytest.fixture
+def db_connection():
+    conn = sqlite3.connect(&quot;:memory:&quot;)
+    conn.execute(&quot;CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)&quot;)
+    conn.execute(&quot;INSERT INTO users (name) VALUES ('Alice')&quot;)
+    conn.commit()
+    yield conn  # provide conn to the test
+    conn.close()  # cleanup after test
+
+# test_db.py
+def test_query_user(db_connection):
+    cursor = db_connection.execute(&quot;SELECT name FROM users&quot;)
+    row = cursor.fetchone()
+    assert row[0] == &quot;Alice&quot;
+</code></pre>
+<p><strong>Step 4: Fixture Scopes</strong></p>
+<pre><code class="language-python"># conftest.py
+import pytest
+
+@pytest.fixture(scope=&quot;module&quot;)
+def expensive_resource():
+    &quot;&quot;&quot;Shared across all tests in the module.&quot;&quot;&quot;
+    print(&quot;Creating resource (runs once)&quot;)
+    resource = {&quot;data&quot;: list(range(10000))}
+    yield resource
+    print(&quot;Cleaning up resource (runs once at module end)&quot;)
+
+# test_scope.py
+def test_first(expensive_resource):
+    assert len(expensive_resource[&quot;data&quot;]) == 10000
+
+def test_second(expensive_resource):
+    # reuses the same resource
+    assert expensive_resource[&quot;data&quot;][0] == 0
+</code></pre>
+<p><strong>Step 5: Fixture Composition</strong></p>
+<pre><code class="language-python"># conftest.py
+import pytest
+
+@pytest.fixture
+def base_url():
+    return &quot;https://api.example.com&quot;
+
+@pytest.fixture
+def auth_headers():
+    return {&quot;Authorization&quot;: &quot;Bearer test-token&quot;}
+
+@pytest.fixture
+def api_client(base_url, auth_headers):
+    &quot;&quot;&quot;Composes other fixtures.&quot;&quot;&quot;
+    return {
+        &quot;base_url&quot;: base_url,
+        &quot;headers&quot;: auth_headers,
+    }
+
+# test_api.py
+def test_api_client_has_auth(api_client):
+    assert &quot;Authorization&quot; in api_client[&quot;headers&quot;]
+
+def test_api_client_url(api_client):
+    assert api_client[&quot;base_url&quot;].startswith(&quot;https://&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The fixture name <em>is</em> the parameter name — no explicit calls needed</li>
+<li>Code before <code>yield</code> is setup; code after is teardown</li>
+<li><code>scope="module"</code> reduces the number of times expensive resources are created</li>
+<li>Fixtures compose by listing other fixtures as parameters</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Asserting inside fixtures</strong><br>
+- Why It's a Problem: Fixtures provide data, they don't verify<br>
+- Fix: Keep asserts in test functions only</p>
+<p><strong>Using function-scope fixture in module-scope</strong><br>
+- Why It's a Problem: Scope mismatch causes errors<br>
+- Fix: Match dependent fixture scopes</p>
+<p><strong>Opening resources without yield</strong><br>
+- Why It's a Problem: Files or connections never close<br>
+- Fix: Add yield with cleanup code</p>
+<p><strong>Importing conftest.py</strong><br>
+- Why It's a Problem: pytest loads it automatically<br>
+- Fix: Use fixture names without import</p>
+<p><strong>Overusing autouse</strong><br>
+- Why It's a Problem: Unnecessary fixtures applied to all tests<br>
+- Fix: Reserve autouse for cross-cutting concerns like logging</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Manage database connections with session-scope fixtures for faster test suites</li>
+<li>Use the built-in <code>tmp_path</code> fixture for temporary files with automatic cleanup</li>
+<li>Provide authentication tokens via fixtures in API tests</li>
+<li>Place conftest.py files at different directory levels for hierarchical fixture scoping</li>
+<li>Use factory fixtures to generate diverse test data variations</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>Fixtures determine the readability and maintainability of your tests. Well-designed fixtures make test code read like scenario descriptions.</p>
+<p>Scope selection follows the rule: "Is it safe for tests to share this data?" Immutable data gets module or session scope; mutable data stays at function scope.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Defined a fixture with <code>@pytest.fixture</code> and injected it into a test</li>
+<li>[ ] Separated setup/teardown with a yield fixture</li>
+<li>[ ] Understood scope differences and chose appropriately</li>
+<li>[ ] Placed shared fixtures in conftest.py</li>
+<li>[ ] Composed complex test data from multiple fixtures</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a fixture providing an SQLite in-memory database, and write tests that verify INSERT and SELECT operations.</li>
+<li>Use the <code>tmp_path</code> built-in fixture to create and read a temporary JSON file.</li>
+<li>Compare execution counts of <code>scope="session"</code> and <code>scope="function"</code> fixtures using the <code>-s</code> flag.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>Fixtures are pytest's core mechanism for managing test data. Understanding scope and yield lets you manage resources safely and efficiently. Next, we'll learn how parametrization lets a single test function verify multiple inputs.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><strong>Understanding Fixtures (current)</strong></li>
+<li>Parametrization (upcoming)</li>
+<li>Mock and Monkeypatch (upcoming)</li>
+<li>Testing Files, Environment Variables, and Time (upcoming)</li>
+<li>Coverage and Test Quality (upcoming)</li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html">pytest — Fixtures</a></li>
+<li><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html#conftest-py-sharing-fixtures-across-files">pytest — conftest.py</a></li>
+<li><a href="https://docs.pytest.org/en/stable/reference/fixtures.html">pytest — Built-in Fixtures</a></li>
+<li><a href="https://realpython.com/pytest-python-testing/#fixtures-managing-state-and-dependencies">Real Python — pytest Fixtures</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, Fixtures, conftest, Test Data</p>
+</body>
+</html>

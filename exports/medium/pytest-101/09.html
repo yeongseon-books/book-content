@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Test Automation with GitHub Actions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Test Automation with GitHub Actions</h1>
+<blockquote>
+<p>pytest 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Do you have to run tests manually every time you open a PR?</p>
+<blockquote>
+<p>GitHub Actions triggers test runs automatically on push and PR events. This article covers setting up pytest with coverage in GitHub Actions, matrix builds across Python versions, and caching for faster runs.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The structure and syntax of a GitHub Actions workflow file</li>
+<li>Running pytest with coverage in CI</li>
+<li>Matrix builds to test across multiple Python versions</li>
+<li>Caching dependencies to speed up CI runs</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Tests pass locally but may fail in a different environment. CI runs all tests in a consistent environment automatically, catching problems before code is merged.</p>
+<blockquote>
+<p>"Works on my machine" is solved by CI. If it passes in CI, it works for everyone on the team.</p>
+</blockquote>
+<p>No matter how well-written your tests are, they're useless if nobody runs them. CI automates execution so "forgot to run tests" never happens.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>CI = push/PR event → automatic test run → results displayed on PR</p>
+</blockquote>
+<pre><code>Developer pushes → GitHub Actions triggered
+  → Install Python
+  → Install dependencies
+  → Run pytest
+  → Coverage report
+  → Result: Pass / Fail
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>workflow</strong><br>
+- Description: An automation pipeline defined in <code>.github/workflows/</code></p>
+<p><strong>job</strong><br>
+- Description: An execution unit within a workflow</p>
+<p><strong>step</strong><br>
+- Description: An individual command within a job</p>
+<p><strong>matrix</strong><br>
+- Description: Tests multiple environment combinations simultaneously</p>
+<p><strong>artifact</strong><br>
+- Description: Files generated during CI that can be stored and downloaded</p>
+<h2>Before / After</h2>
+<p>Compare manual testing with CI automation.</p>
+<pre><code class="language-bash"># before: manual — developer runs tests themselves
+git push origin feature-branch
+# PR created... forgot to run tests
+# reviewer: &quot;Did you run the tests?&quot; → &quot;Uh... no&quot;
+</code></pre>
+<pre><code class="language-yaml"># after: automatic — runs on every push
+# .github/workflows/test.yml
+name: Test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: &quot;3.12&quot;
+      - run: pip install -e &quot;.[test]&quot;
+      - run: pytest --cov
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Write the Basic Workflow</strong></p>
+<pre><code class="language-yaml"># .github/workflows/test.yml
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: &quot;3.12&quot;
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e &quot;.[test]&quot;
+
+      - name: Run tests
+        run: pytest -v --tb=short
+
+      - name: Run tests with coverage
+        run: pytest --cov=src --cov-report=term-missing --cov-fail-under=80
+</code></pre>
+<p><strong>Step 2: Matrix Build</strong></p>
+<pre><code class="language-yaml"># .github/workflows/test.yml
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e &quot;.[test]&quot;
+
+      - name: Run tests
+        run: pytest -v --cov=src --cov-report=term-missing
+</code></pre>
+<p><strong>Step 3: Dependency Caching</strong></p>
+<pre><code class="language-yaml">      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+</code></pre>
+<p><strong>Step 4: Upload Coverage Artifact</strong></p>
+<pre><code class="language-yaml">      - name: Generate HTML coverage report
+        run: pytest --cov=src --cov-report=html
+        if: matrix.python-version == '3.12'
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
+        if: matrix.python-version == '3.12'
+</code></pre>
+<p><strong>Step 5: Configure Test Dependencies in pyproject.toml</strong></p>
+<pre><code class="language-toml"># pyproject.toml
+[project.optional-dependencies]
+test = [
+    &quot;pytest&gt;=8.0&quot;,
+    &quot;pytest-cov&gt;=5.0&quot;,
+    &quot;freezegun&gt;=1.2&quot;,
+]
+
+[tool.pytest.ini_options]
+testpaths = [&quot;tests&quot;]
+pythonpath = [&quot;src&quot;]
+addopts = &quot;-v --tb=short&quot;
+
+[tool.coverage.run]
+source = [&quot;src&quot;]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+exclude_lines = [
+    &quot;pragma: no cover&quot;,
+    &quot;if TYPE_CHECKING:&quot;,
+    &quot;if __name__ == .__main__.&quot;,
+]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>on: [push, pull_request]</code> triggers on both event types</li>
+<li>Matrix builds test 3 Python versions simultaneously</li>
+<li>Caching saves <code>pip install</code> time on subsequent runs</li>
+<li>Coverage reports stored as artifacts for later download</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Only <code>pip install -r requirements.txt</code></strong><br>
+- Why It's a Problem: Package itself isn't installed, causing import errors<br>
+- Fix: Use <code>pip install -e ".[test]"</code></p>
+<p><strong>Python version without quotes</strong><br>
+- Why It's a Problem: <code>3.10</code> is parsed as <code>3.1</code> in YAML<br>
+- Fix: Quote it: <code>"3.10"</code></p>
+<p><strong>Cache key without lock file</strong><br>
+- Why It's a Problem: Cache isn't invalidated when dependencies change<br>
+- Fix: Use <code>hashFiles('pyproject.toml')</code></p>
+<p><strong>No coverage threshold</strong><br>
+- Why It's a Problem: CI passes even when coverage drops<br>
+- Fix: Add <code>--cov-fail-under=80</code></p>
+<p><strong>Only testing on main branch</strong><br>
+- Why It's a Problem: PR changes aren't tested before merge<br>
+- Fix: Include <code>pull_request</code> event</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Enforce branch protection so PRs can't merge until CI passes</li>
+<li>Test across Python 3.10, 3.11, and 3.12 with matrix builds</li>
+<li>Auto-post coverage reports as PR comments</li>
+<li>Split slow tests into a separate job for faster feedback</li>
+<li>Add a workflow status badge to README</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>CI compensates for the human limitation of "forgetting to run tests." Once configured, every push runs tests automatically — you never have to consciously remember.</p>
+<p>In practice, teams enforce a rule that PRs cannot merge without passing CI. This single rule dramatically improves code quality.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Created <code>.github/workflows/test.yml</code></li>
+<li>[ ] Configured triggers for both push and pull_request events</li>
+<li>[ ] Set up a matrix build for multiple Python versions</li>
+<li>[ ] Added dependency caching</li>
+<li>[ ] Set a coverage threshold and uploaded artifacts</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Add a lint job (flake8 or ruff) to the workflow and run it in parallel with the test job.</li>
+<li>Set <code>fail-fast: false</code> so the remaining Python versions continue even if one fails.</li>
+<li>Add a workflow status badge to your README.md.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>GitHub Actions automates test execution so every code change is verified. Matrix builds, caching, and coverage reports make CI effective. Next, we'll learn design principles for writing testable code.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">Mock and Monkeypatch</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/07-testing-files-env-time.md">Testing Files, Environment Variables, and Time</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/08-coverage.md">Coverage and Test Quality</a></li>
+<li><strong>Test Automation with GitHub Actions (current)</strong></li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/en/actions">GitHub Actions — Documentation</a></li>
+<li><a href="https://github.com/actions/setup-python">actions/setup-python</a></li>
+<li><a href="https://pytest-cov.readthedocs.io/en/latest/config.html">pytest-cov — CI Configuration</a></li>
+<li><a href="https://realpython.com/python-continuous-integration/">Real Python — CI/CD with GitHub Actions</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, GitHub Actions, CI/CD, Test Automation</p>
+</body>
+</html>

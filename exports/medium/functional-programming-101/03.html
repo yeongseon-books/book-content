@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Immutable Data</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Immutable Data</h1>
+<blockquote>
+<p>Functional Programming 101 Series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can you write programs without ever changing existing data?</p>
+<blockquote>
+<p>Immutable data cannot be modified after creation. When you need a new value, you create new data based on the original. This article covers Python's immutable types and patterns for writing safe, predictable code.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The distinction between mutable and immutable types in Python</li>
+<li>Practical use of tuple, frozenset, and NamedTuple</li>
+<li>Building immutable objects with frozen dataclasses</li>
+<li>Why immutability simplifies debugging and parallel processing</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Mutable data makes it hard to track "who changed what and when." If you pass a list to a function and that function modifies the original, hunting down the bug becomes extremely difficult.</p>
+<blockquote>
+<p>Immutable data = elimination of unpredictable changes</p>
+</blockquote>
+<p>Defaulting to immutable data eliminates an entire class of state-related bugs and makes code easier to reason about.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Mutable vs Immutable Types in Python</p>
+</blockquote>
+<pre><code>Immutable                       Mutable
+─────────────────               ─────────────────
+int, float, bool                list
+str                             dict
+tuple                           set
+frozenset                       bytearray
+bytes                           user-defined classes (default)
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Immutable</strong><br>
+- Description: An object whose internal state cannot be changed after creation</p>
+<p><strong>Mutable</strong><br>
+- Description: An object whose internal state can be changed after creation</p>
+<p><strong>Structural sharing</strong><br>
+- Description: Reusing unchanged parts when creating a modified copy of immutable data</p>
+<p><strong>Frozen dataclass</strong><br>
+- Description: A dataclass created with <code>frozen=True</code> that prevents attribute assignment</p>
+<p><strong>Defensive copy</strong><br>
+- Description: Copying data at function boundaries to prevent modification of the original</p>
+<h2>Before / After</h2>
+<p>Convert a mutable list operation to an immutable pattern.</p>
+<pre><code class="language-python"># before: mutating the original list
+def add_tag(tags: list[str], tag: str) -&gt; list[str]:
+    tags.append(tag)
+    return tags
+
+original = [&quot;python&quot;, &quot;fp&quot;]
+result = add_tag(original, &quot;immutable&quot;)
+print(original)  # ['python', 'fp', 'immutable'] — original changed!
+</code></pre>
+<pre><code class="language-python"># after: creating a new list
+def add_tag(tags: list[str], tag: str) -&gt; list[str]:
+    return [*tags, tag]
+
+original = [&quot;python&quot;, &quot;fp&quot;]
+result = add_tag(original, &quot;immutable&quot;)
+print(original)  # ['python', 'fp'] — original preserved
+print(result)    # ['python', 'fp', 'immutable']
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Built-in Immutable Types</strong></p>
+<pre><code class="language-python"># tuple — immutable sequence
+point = (3, 4)
+# point[0] = 5  # TypeError: 'tuple' does not support item assignment
+
+# frozenset — immutable set
+allowed = frozenset({&quot;read&quot;, &quot;write&quot;, &quot;execute&quot;})
+# allowed.add(&quot;delete&quot;)  # AttributeError: 'frozenset' has no attribute 'add'
+
+# str — immutable string
+name = &quot;hello&quot;
+upper_name = name.upper()  # creates a new string
+print(name)        # hello — original preserved
+print(upper_name)  # HELLO
+
+# tuples are hashable and can serve as dict keys
+grid: dict[tuple[int, int], str] = {
+    (0, 0): &quot;start&quot;,
+    (1, 2): &quot;goal&quot;,
+}
+print(grid[(0, 0)])  # start
+</code></pre>
+<p><strong>Step 2: Meaningful Immutable Records with NamedTuple</strong></p>
+<pre><code class="language-python">from typing import NamedTuple
+
+class Point(NamedTuple):
+    x: float
+    y: float
+
+class Color(NamedTuple):
+    r: int
+    g: int
+    b: int
+
+p = Point(3.0, 4.0)
+print(p.x, p.y)  # 3.0 4.0
+# p.x = 5.0  # AttributeError — immutable
+
+# create a modified copy with _replace
+p2 = p._replace(x=5.0)
+print(p)   # Point(x=3.0, y=4.0) — original preserved
+print(p2)  # Point(x=5.0, y=4.0)
+
+red = Color(255, 0, 0)
+print(red)  # Color(r=255, g=0, b=0)
+</code></pre>
+<p><strong>Step 3: Frozen Dataclasses</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass, replace
+
+@dataclass(frozen=True)
+class User:
+    name: str
+    email: str
+    role: str = &quot;viewer&quot;
+
+user = User(name=&quot;Alice&quot;, email=&quot;alice@example.com&quot;)
+# user.name = &quot;Bob&quot;  # FrozenInstanceError — cannot modify
+
+# create a new instance
+admin = replace(user, role=&quot;admin&quot;)
+print(user)   # User(name='Alice', email='alice@example.com', role='viewer')
+print(admin)  # User(name='Alice', email='alice@example.com', role='admin')
+
+# frozen dataclasses are hashable — usable as dict keys and set elements
+users = {user, admin}
+print(len(users))  # 2
+</code></pre>
+<p><strong>Step 4: Immutable Dictionary Patterns</strong></p>
+<pre><code class="language-python">from types import MappingProxyType
+
+# MappingProxyType — read-only dictionary view
+config = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: 8080, &quot;debug&quot;: True}
+readonly_config = MappingProxyType(config)
+
+print(readonly_config[&quot;host&quot;])  # localhost
+# readonly_config[&quot;host&quot;] = &quot;0.0.0.0&quot;  # TypeError — cannot modify
+
+# dictionary update — create a new dictionary
+def update_config(config: dict, **updates) -&gt; dict:
+    return {**config, **updates}
+
+original = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: 8080}
+updated = update_config(original, port=9090, debug=False)
+
+print(original)  # {'host': 'localhost', 'port': 8080} — original preserved
+print(updated)   # {'host': 'localhost', 'port': 9090, 'debug': False}
+</code></pre>
+<p><strong>Step 5: State History with Immutable Data</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass, replace
+
+@dataclass(frozen=True)
+class AppState:
+    count: int
+    message: str
+
+def increment(state: AppState) -&gt; AppState:
+    return replace(state, count=state.count + 1)
+
+def set_message(state: AppState, msg: str) -&gt; AppState:
+    return replace(state, message=msg)
+
+# state history — every change is tracked
+history: list[AppState] = []
+
+state = AppState(count=0, message=&quot;start&quot;)
+history.append(state)
+
+state = increment(state)
+history.append(state)
+
+state = increment(state)
+history.append(state)
+
+state = set_message(state, &quot;done&quot;)
+history.append(state)
+
+for i, s in enumerate(history):
+    print(f&quot;Step {i}: count={s.count}, message='{s.message}'&quot;)
+# Step 0: count=0, message='start'
+# Step 1: count=1, message='start'
+# Step 2: count=2, message='start'
+# Step 3: count=2, message='done'
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Python's tuple, frozenset, and str are built-in immutable types</li>
+<li><code>NamedTuple._replace()</code> and <code>dataclasses.replace()</code> are the core immutable update patterns</li>
+<li>Frozen dataclasses are hashable, so they can be used as dict keys and set elements</li>
+<li>Immutable data makes state history (undo/redo) a natural implementation</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Putting mutable objects inside a tuple</strong><br>
+- Why It Is a Problem: The tuple is immutable but inner lists can still change<br>
+- Fix: Use immutable types for inner elements too</p>
+<p><strong>Mutating a dict received as a function argument</strong><br>
+- Why It Is a Problem: The caller's data changes unexpectedly<br>
+- Fix: Create a new dict with <code>{**d, key: value}</code></p>
+<p><strong>Using mutable default arguments</strong><br>
+- Why It Is a Problem: State is shared across calls<br>
+- Fix: Use <code>None</code> as the default</p>
+<p><strong>Copying everything every time</strong><br>
+- Why It Is a Problem: Performance suffers with large data<br>
+- Fix: Use structural sharing or copy only what changes</p>
+<p><strong>Force-modifying frozen objects</strong><br>
+- Why It Is a Problem: Using <code>object.__setattr__</code> violates the contract<br>
+- Fix: Respect the intent of frozen</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Define configuration objects as frozen dataclasses to prevent runtime changes</li>
+<li>Use immutable state updates in Redux-style state management</li>
+<li>Model API responses with NamedTuple or frozen dataclass</li>
+<li>Use tuples or frozensets as cache keys</li>
+<li>Manage history with immutable event objects in event sourcing</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>"Make everything immutable" is not the goal. The key is to default to immutable and use mutable only where performance or convenience requires it. In Python, <code>frozen=True</code> and <code>NamedTuple</code> make immutability easy to achieve.</p>
+<p>For large-scale data processing, copying everything every time can be inefficient. Use generators or structural sharing to avoid unnecessary copies while preserving the benefits of immutability.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can distinguish mutable and immutable types in Python</li>
+<li>[ ] I can use tuple and frozenset appropriately</li>
+<li>[ ] I can define a frozen dataclass and update it with <code>replace()</code></li>
+<li>[ ] I can apply immutable patterns that avoid mutating function arguments</li>
+<li>[ ] I can explain the trade-offs of immutable data</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Refactor a configuration manager that uses a mutable <code>dict</code> into a frozen dataclass.</li>
+<li>Implement a simple text editor with undo support using immutable patterns.</li>
+<li>Define a 2D vector with <code>NamedTuple</code> and write add, subtract, and scalar multiply functions.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Immutable data eliminates unpredictable changes and increases code stability. Python provides tuple, frozenset, NamedTuple, and frozen dataclass for implementing immutability. The next article covers <strong>higher-order functions</strong> — functions that accept and return other functions.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><strong>Immutable Data (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">Python Official Docs — Data Model (Immutable Types)</a></li>
+<li><a href="https://realpython.com/python-mutable-vs-immutable-types/">Real Python — Immutability in Python</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 8: Object References, Mutability, and Recycling</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">Python Official Docs — dataclasses (frozen)</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Functional Programming, Immutability, tuple, frozenset</p>
+</body>
+</html>

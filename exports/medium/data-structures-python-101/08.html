@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Graph Representations</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Graph Representations</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you represent social networks, maps, and dependency relationships in code?</p>
+<blockquote>
+<p>Graphs represent relationships using nodes (vertices) and edges. In Python, you implement adjacency lists with dict and adjacency matrices with 2D lists. This article covers graph representation methods and BFS/DFS traversals.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Basic graph terminology and types</li>
+<li>Implementing adjacency lists and adjacency matrices</li>
+<li>BFS (breadth-first search) and DFS (depth-first search)</li>
+<li>Representing directed and weighted graphs</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most real-world relationships can be modeled as graphs. Social network friendships, web page links, road networks, and package dependencies are all graphs. The ability to represent and traverse graphs is a core skill for solving complex problems.</p>
+<blockquote>
+<p>A graph is a generalization of a tree. A tree is a special case — a connected graph with no cycles.</p>
+</blockquote>
+<p>Graph problems appear at medium-to-hard difficulty in coding interviews. You need to be able to implement BFS and DFS fluently.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Graph = a set of nodes (vertices) connected by edges</p>
+</blockquote>
+<pre><code>[Undirected Graph]        [Adjacency List]
+  A --- B                  A: [B, C]
+  |   / |                  B: [A, C, D]
+  |  /  |                  C: [A, B]
+  C --- D                  D: [B]
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>vertex</strong><br>
+- Description: A node in the graph</p>
+<p><strong>edge</strong><br>
+- Description: A connection between two vertices</p>
+<p><strong>directed graph</strong><br>
+- Description: A graph where edges have direction</p>
+<p><strong>weighted graph</strong><br>
+- Description: A graph where edges carry a cost (weight)</p>
+<p><strong>adjacency list</strong><br>
+- Description: A representation that stores each vertex's neighbors as a list</p>
+<h2>Before / After</h2>
+<p>Compare managing relationship data in loose variables versus structuring it as a graph.</p>
+<pre><code class="language-python"># before: relationships in individual variables — hard to extend
+alice_friends = [&quot;bob&quot;, &quot;charlie&quot;]
+bob_friends = [&quot;alice&quot;, &quot;charlie&quot;, &quot;diana&quot;]
+# adding a new user requires code changes
+</code></pre>
+<pre><code class="language-python"># after: structured as a graph (adjacency list) — easy to extend
+graph = {
+    &quot;alice&quot;: [&quot;bob&quot;, &quot;charlie&quot;],
+    &quot;bob&quot;: [&quot;alice&quot;, &quot;charlie&quot;, &quot;diana&quot;],
+    &quot;charlie&quot;: [&quot;alice&quot;, &quot;bob&quot;],
+    &quot;diana&quot;: [&quot;bob&quot;],
+}
+# new user: graph[&quot;eve&quot;] = [&quot;alice&quot;]
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Implement a graph with an adjacency list</strong></p>
+<pre><code class="language-python">from collections import defaultdict
+
+class Graph:
+    def __init__(self, directed=False):
+        self.adj = defaultdict(list)
+        self.directed = directed
+
+    def add_edge(self, u, v):
+        self.adj[u].append(v)
+        if not self.directed:
+            self.adj[v].append(u)
+
+    def neighbors(self, node):
+        return self.adj[node]
+
+    def __str__(self):
+        lines = []
+        for node in sorted(self.adj):
+            lines.append(f&quot;{node}: {self.adj[node]}&quot;)
+        return &quot;\n&quot;.join(lines)
+
+g = Graph()
+g.add_edge(&quot;A&quot;, &quot;B&quot;)
+g.add_edge(&quot;A&quot;, &quot;C&quot;)
+g.add_edge(&quot;B&quot;, &quot;C&quot;)
+g.add_edge(&quot;B&quot;, &quot;D&quot;)
+print(g)
+# A: ['B', 'C']
+# B: ['A', 'C', 'D']
+# C: ['A', 'B']
+# D: ['B']
+</code></pre>
+<p><strong>Step 2: Implement a graph with an adjacency matrix</strong></p>
+<pre><code class="language-python">class GraphMatrix:
+    def __init__(self, vertices: list):
+        self.vertices = vertices
+        self.index = {v: i for i, v in enumerate(vertices)}
+        n = len(vertices)
+        self.matrix = [[0] * n for _ in range(n)]
+
+    def add_edge(self, u, v, weight=1):
+        i, j = self.index[u], self.index[v]
+        self.matrix[i][j] = weight
+        self.matrix[j][i] = weight  # undirected
+
+    def has_edge(self, u, v):
+        i, j = self.index[u], self.index[v]
+        return self.matrix[i][j] != 0
+
+    def print_matrix(self):
+        print(&quot;  &quot;, &quot; &quot;.join(self.vertices))
+        for i, v in enumerate(self.vertices):
+            print(f&quot;{v}:&quot;, self.matrix[i])
+
+gm = GraphMatrix([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;])
+gm.add_edge(&quot;A&quot;, &quot;B&quot;)
+gm.add_edge(&quot;A&quot;, &quot;C&quot;)
+gm.add_edge(&quot;B&quot;, &quot;D&quot;)
+gm.print_matrix()
+</code></pre>
+<p><strong>Step 3: Implement BFS</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def bfs(graph, start):
+    visited = []
+    queue = deque([start])
+    seen = {start}
+    while queue:
+        node = queue.popleft()
+        visited.append(node)
+        for neighbor in graph.neighbors(node):
+            if neighbor not in seen:
+                seen.add(neighbor)
+                queue.append(neighbor)
+    return visited
+
+g = Graph()
+for u, v in [(&quot;A&quot;,&quot;B&quot;), (&quot;A&quot;,&quot;C&quot;), (&quot;B&quot;,&quot;D&quot;), (&quot;C&quot;,&quot;D&quot;), (&quot;D&quot;,&quot;E&quot;)]:
+    g.add_edge(u, v)
+
+print(f&quot;BFS from A: {bfs(g, 'A')}&quot;)
+# BFS from A: ['A', 'B', 'C', 'D', 'E']
+</code></pre>
+<p><strong>Step 4: Implement DFS (recursive and iterative)</strong></p>
+<pre><code class="language-python">def dfs_recursive(graph, node, visited=None):
+    if visited is None:
+        visited = []
+    visited.append(node)
+    for neighbor in graph.neighbors(node):
+        if neighbor not in visited:
+            dfs_recursive(graph, neighbor, visited)
+    return visited
+
+def dfs_iterative(graph, start):
+    visited = []
+    stack = [start]
+    seen = set()
+    while stack:
+        node = stack.pop()
+        if node in seen:
+            continue
+        seen.add(node)
+        visited.append(node)
+        for neighbor in reversed(graph.neighbors(node)):
+            if neighbor not in seen:
+                stack.append(neighbor)
+    return visited
+
+print(f&quot;DFS recursive: {dfs_recursive(g, 'A')}&quot;)
+print(f&quot;DFS iterative: {dfs_iterative(g, 'A')}&quot;)
+</code></pre>
+<p><strong>Step 5: Weighted graph and shortest path</strong></p>
+<pre><code class="language-python">import heapq
+from collections import defaultdict
+
+class WeightedGraph:
+    def __init__(self):
+        self.adj = defaultdict(list)
+
+    def add_edge(self, u, v, weight):
+        self.adj[u].append((v, weight))
+        self.adj[v].append((u, weight))
+
+def dijkstra(graph, start):
+    dist = {start: 0}
+    heap = [(0, start)]
+    while heap:
+        d, node = heapq.heappop(heap)
+        if d &gt; dist.get(node, float(&quot;inf&quot;)):
+            continue
+        for neighbor, weight in graph.adj[node]:
+            new_dist = d + weight
+            if new_dist &lt; dist.get(neighbor, float(&quot;inf&quot;)):
+                dist[neighbor] = new_dist
+                heapq.heappush(heap, (new_dist, neighbor))
+    return dist
+
+wg = WeightedGraph()
+wg.add_edge(&quot;A&quot;, &quot;B&quot;, 4)
+wg.add_edge(&quot;A&quot;, &quot;C&quot;, 2)
+wg.add_edge(&quot;B&quot;, &quot;D&quot;, 3)
+wg.add_edge(&quot;C&quot;, &quot;D&quot;, 1)
+wg.add_edge(&quot;D&quot;, &quot;E&quot;, 5)
+
+distances = dijkstra(wg, &quot;A&quot;)
+print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Adjacency lists suit sparse graphs; adjacency matrices suit dense graphs</li>
+<li>BFS uses a queue (deque); DFS uses a stack (list or recursion)</li>
+<li>BFS guarantees shortest paths in unweighted graphs</li>
+<li>Dijkstra finds shortest paths in weighted graphs using a heap</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Traversing without visit checks</strong><br>
+- Why It Is a Problem: Causes infinite loops in cyclic graphs<br>
+- Fix: Use a seen/visited set to track visits</p>
+<p><strong>Adding edges in only one direction for undirected graphs</strong><br>
+- Why It Is a Problem: Some paths are missed during traversal<br>
+- Fix: Add both directions in add_edge</p>
+<p><strong>Using adjacency matrices for sparse graphs</strong><br>
+- Why It Is a Problem: Wastes O(V^2) memory<br>
+- Fix: Use adjacency lists instead</p>
+<p><strong>Using a queue instead of a stack for DFS</strong><br>
+- Why It Is a Problem: Produces BFS instead of DFS<br>
+- Fix: DFS uses pop (stack); BFS uses popleft (queue)</p>
+<p><strong>Using Dijkstra with negative weights</strong><br>
+- Why It Is a Problem: Does not guarantee correct results<br>
+- Fix: Use Bellman-Ford for negative weights</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Social networks implement friend recommendations with BFS (2-hop search)</li>
+<li>Package managers topologically sort dependency graphs</li>
+<li>Navigation apps compute shortest paths with Dijkstra</li>
+<li>Web crawlers visit pages using BFS</li>
+<li>CI/CD pipelines manage task dependencies as DAGs (directed acyclic graphs)</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In practice, you rarely implement graphs from scratch. You use libraries like NetworkX or graph databases like Neo4j. But understanding BFS, DFS, and shortest-path internals helps you use those tools more effectively.</p>
+<p>The ability to model problems as graphs is the key skill. Recognizing "is this a graph problem?" is often harder than solving it.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can explain the difference between adjacency lists and adjacency matrices</li>
+<li>[ ] Can implement BFS and DFS</li>
+<li>[ ] Can distinguish directed and undirected graphs</li>
+<li>[ ] Can apply Dijkstra to a weighted graph</li>
+<li>[ ] Can choose the right graph representation for the situation</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a function that finds the shortest path (by edge count) between two nodes using BFS.</li>
+<li>Write a function that finds all connected components in a graph using DFS.</li>
+<li>Write a function that detects whether a directed graph contains a cycle.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Graphs are general-purpose data structures for representing relationships. You represent them with adjacency lists or adjacency matrices and traverse them with BFS and DFS. The next article covers sets — data structures that perform set operations efficiently.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Hash Tables and dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/06-trees-and-binary-trees.md">Trees and Binary Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/07-heaps-and-priority-queues.md">Heaps and Priority Queues</a></li>
+<li><strong>Graph Representations (current)</strong></li>
+<li>Sets and Set Operations (upcoming)</li>
+<li>Choosing the Right Data Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://realpython.com/python-graph-algorithm/">Real Python — Graphs in Python</a></li>
+<li><a href="https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/">GeeksforGeeks — Graph Data Structure</a></li>
+<li><a href="https://visualgo.net/en/dfsbfs">Visualgo — Graph Traversal</a></li>
+<li><a href="https://networkx.org/documentation/stable/">NetworkX Documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, Graph, BFS, DFS</p>
+</body>
+</html>

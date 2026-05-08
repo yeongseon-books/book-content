@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Production Guardrail System</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Production Guardrail System</h1>
+<blockquote>
+<p>AI Safety &amp; Guardrails 101 Series (10/10)</p>
+</blockquote>
+<hr>
+<h2>Section 1</h2>
+<h2>Wiring Nine Components Into One System</h2>
+<p>Episodes 1 through 9 covered guardrails as independent components. In production you need a single architecture diagram that shows where each one sits, the order they run in, and what happens when they fail. This capstone builds that architecture.</p>
+<p>Goals:</p>
+<ul>
+<li>Decide which guardrail belongs at each boundary: input, model, tool call, output.</li>
+<li>Make fail-open versus fail-closed policies explicit.</li>
+<li>Keep guardrail cost inside a performance budget.</li>
+<li>Track every block and pass on a single observability surface.</li>
+</ul>
+<h2>Four-Layer Architecture</h2>
+<p>Guardrails live in four positions in an LLM system.</p>
+<p><strong>Pre-input</strong><br>
+- When it runs: Right after the user request arrives<br>
+- Guardrails: rate limit, jailbreak detection, prompt injection normalization</p>
+<p><strong>Pre-prompt</strong><br>
+- When it runs: Right before the model call<br>
+- Guardrails: PII masking, context sanitization, system prompt verification</p>
+<p><strong>Post-output</strong><br>
+- When it runs: Right after the model response<br>
+- Guardrails: moderation, hallucination grounding, PII re-check</p>
+<p><strong>Audit</strong><br>
+- When it runs: All stages<br>
+- Guardrails: append-only log, decision rationale, cost tracking</p>
+<p>Each layer must be able to fail independently; one layer's failure cannot block the others.</p>
+<h2>Pipeline Implementation</h2>
+<p>A simplified version of the four-layer pipeline. In production each function is replaced by the modules from Episodes 1 through 9.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+from typing import Callable
+
+@dataclass
+class GuardrailResult:
+    allowed: bool
+    stage: str
+    reason: str | None = None
+    metadata: dict | None = None
+
+class GuardrailPipeline:
+    def __init__(self, audit_sink: Callable):
+        self.audit = audit_sink
+
+    def run(self, request: dict) -&gt; dict:
+        ctx = {&quot;request_id&quot;: request[&quot;request_id&quot;], &quot;user_id&quot;: request[&quot;user_id&quot;]}
+
+        # Pre-input
+        for check in [self.rate_limit, self.detect_jailbreak, self.sanitize_input]:
+            res = check(request)
+            self.audit({**ctx, &quot;stage&quot;: res.stage, &quot;allowed&quot;: res.allowed, &quot;reason&quot;: res.reason})
+            if not res.allowed:
+                return self._block(res)
+
+        # Pre-prompt
+        masked_prompt, pii_meta = self.mask_pii(request[&quot;prompt&quot;])
+        retrieved = self.retrieve(masked_prompt)
+        sanitized_chunks = self.sanitize_context(retrieved)
+
+        # Model call
+        response = self.call_model(masked_prompt, sanitized_chunks)
+
+        # Post-output
+        for check in [self.moderate_output, self.verify_grounding, self.recheck_pii]:
+            res = check(response, sanitized_chunks)
+            self.audit({**ctx, &quot;stage&quot;: res.stage, &quot;allowed&quot;: res.allowed, &quot;reason&quot;: res.reason})
+            if not res.allowed:
+                return self._block(res)
+
+        final = self.unmask_pii(response, pii_meta)
+        self.audit({**ctx, &quot;stage&quot;: &quot;delivered&quot;, &quot;allowed&quot;: True})
+        return {&quot;answer&quot;: final}
+
+    def _block(self, res: GuardrailResult) -&gt; dict:
+        return {&quot;answer&quot;: &quot;We can't process that request.&quot;, &quot;blocked&quot;: True, &quot;stage&quot;: res.stage}
+</code></pre>
+<p>The key is that audit records every stage, allowed or blocked, so you can reconstruct any decision later.</p>
+<h2>Fail-Open vs Fail-Closed</h2>
+<p>What happens when a guardrail itself errors? Decide policy in advance.</p>
+<p><strong>Rate limiter Redis down</strong><br>
+- Recommended policy: fail-open + alert<br>
+- Reason: Brief over-spend risk less than blocking all users</p>
+<p><strong>Moderation API down</strong><br>
+- Recommended policy: fail-closed<br>
+- Reason: Risk of harmful content escaping</p>
+<p><strong>PII masking failure</strong><br>
+- Recommended policy: fail-closed<br>
+- Reason: GDPR violation risk</p>
+<p><strong>Grounding check timeout</strong><br>
+- Recommended policy: partial-deliver with warning<br>
+- Reason: Drop the verification badge but ship the answer</p>
+<p><strong>Audit log failure</strong><br>
+- Recommended policy: fail-closed in production, fail-open in dev<br>
+- Reason: Missed audit means compliance violation</p>
+<p>Mark each guardrail with an explicit <code>on_error</code> policy.</p>
+<pre><code class="language-python">def safe_call(check_fn, request, on_error=&quot;closed&quot;):
+    try:
+        return check_fn(request)
+    except Exception as e:
+        log_guardrail_error(check_fn.__name__, e)
+        if on_error == &quot;open&quot;:
+            return GuardrailResult(allowed=True, stage=check_fn.__name__, reason=&quot;degraded&quot;)
+        return GuardrailResult(allowed=False, stage=check_fn.__name__, reason=&quot;error&quot;)
+</code></pre>
+<h2>Performance Budget</h2>
+<p>Running every guardrail serially adds large latency. Control cost with these patterns.</p>
+<ol>
+<li><strong>Parallelize independent checks</strong>: bundle non-dependent checks (PII masking and jailbreak detection) with <code>asyncio.gather</code>.</li>
+<li><strong>Order serial checks by cost</strong>: regex (&lt;1 ms), embedding (&lt;50 ms), LLM judge (&lt;800 ms). Block early to skip expensive layers.</li>
+<li><strong>Cache by input hash</strong>: PII masking and grounding results commonly use a 5-minute TTL.</li>
+<li><strong>Sample expensive checks</strong>: do not run full grounding on every request; sample a fraction as a regression signal.</li>
+</ol>
+<p>Example target: P95 guardrail overhead under 300 ms, excluding the model call.</p>
+<h2>Observability</h2>
+<p>Always show on the dashboard:</p>
+<p><strong>Traffic</strong><br>
+- Metric: RPS, input and output tokens per minute, dollars per minute</p>
+<p><strong>Blocking</strong><br>
+- Metric: Per-category block rate, false positive rate</p>
+<p><strong>Latency</strong><br>
+- Metric: Per-stage P50 and P95</p>
+<p><strong>Trust</strong><br>
+- Metric: Hallucination flag rate, grounding fail rate</p>
+<p><strong>Cost</strong><br>
+- Metric: Cumulative dollars per model and per user</p>
+<p><strong>Security</strong><br>
+- Metric: Jailbreak detection rate, PII discovery rate</p>
+<p>Split Slack alerts into two streams.</p>
+<ul>
+<li><strong>Page</strong>: SLO violations (P95 &gt; 500 ms for 5 minutes, sudden block-rate spike, audit log failure).</li>
+<li><strong>Daily digest</strong>: suspected false positives, new jailbreak patterns, drift signals.</li>
+</ul>
+<h2>Regression Set in CI</h2>
+<p>Code review alone cannot keep guardrails safe. Run a regression suite per PR.</p>
+<pre><code class="language-python">def run_regression():
+    suites = {
+        &quot;jailbreak_attacks&quot;: load_jailbreak_set(),
+        &quot;benign_prompts&quot;: load_benign_set(),
+        &quot;pii_examples&quot;: load_pii_set(),
+        &quot;moderation_cases&quot;: load_moderation_set(),
+        &quot;rag_grounding&quot;: load_rag_set(),
+    }
+    return {name: evaluate_pipeline(pipeline, cases) for name, cases in suites.items()}
+</code></pre>
+<p>In GitHub Actions, block merges if any of the following regress.</p>
+<ul>
+<li>Jailbreak recall &lt; 0.95</li>
+<li>Benign false positive &gt; 1%</li>
+<li>PII recall &lt; 0.98</li>
+<li>Grounding precision &lt; 0.85</li>
+</ul>
+<h2>Gradual Rollout</h2>
+<p>Never enable a guardrail change for 100 percent of traffic in one step.</p>
+<ol>
+<li><strong>Shadow mode (1 week)</strong>: log results in audit only; do not actually block. Watch metrics.</li>
+<li><strong>5 percent canary (3 days)</strong>: enable on 5 percent of traffic. Watch per-stage block rate and user complaints.</li>
+<li><strong>50 percent rollout (3 days)</strong>: expand if no SLO violations.</li>
+<li><strong>100 percent</strong>: full coverage. Monitor the dashboard intensely for one week.</li>
+</ol>
+<p>If something looks wrong, roll back through the same feature flag immediately.</p>
+<h2>Human Procedures</h2>
+<p>Some risk does not yield to technical guardrails alone.</p>
+<ul>
+<li><strong>On-call</strong>: 24/7 staffing for guardrail alerts.</li>
+<li><strong>Red team review</strong>: quarterly simulation of new jailbreak patterns.</li>
+<li><strong>Compliance review</strong>: quarterly sampling of audit logs.</li>
+<li><strong>Complaint handling</strong>: first reply to a false-positive report within 24 hours.</li>
+</ul>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Running every guardrail serially.</strong> Latency explodes. Parallelize and order by cost.</li>
+<li><strong>No explicit failure policy.</strong> Behavior diverges per incident, escalating outages. Pin <code>on_error</code> policy on every check.</li>
+<li><strong>Treating audit as optional.</strong> Without rationale you cannot answer regulators. Audit is a first-class component.</li>
+<li><strong>Shipping without a regression set.</strong> A one-line threshold change can blow up false positives. Gate merges on the regression suite.</li>
+<li><strong>Flipping to 100 percent at once.</strong> Skip shadow and canary, and a single bug hits every user. Always step through the rollout phases.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Split guardrails across pre-input, pre-prompt, post-output, and audit layers so each boundary owns a clear responsibility.</li>
+<li>Predefine fail-open or fail-closed per check to keep behavior consistent during incidents.</li>
+<li>Hold P95 guardrail overhead under 300 ms with parallelization, cost ordering, caching, and sampling.</li>
+<li>Wire a regression suite into CI and gate merges on jailbreak recall, PII recall, grounding precision, and similar SLOs.</li>
+<li>Combine technical layers with on-call, red team, and compliance reviews, and roll changes out shadow → canary → full.</li>
+</ul>
+<hr>
+<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">Ep6 Toxicity and Bias Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/07-hallucination-guardrails.md">Ep7 Hallucination Guardrails - Grounding Checks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/08-rate-limiting-abuse-prevention.md">Ep8 Rate Limiting and Abuse Prevention</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/09-audit-logging-compliance.md">Ep9 Audit Logging and Compliance</a></li>
+<li><strong>Ep10 Building a Production Guardrail System (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI Risk Management Framework</a></li>
+<li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP Top 10 for LLM Applications</a></li>
+<li><a href="https://ai.google/responsibility/responsible-ai-practices/">Google - Responsible AI practices</a></li>
+<li><a href="https://www.anthropic.com/news/anthropics-responsible-scaling-policy">Anthropic - Responsible Scaling Policy</a></li>
+</ul>
+<p class="tags-line">Tags: AI Safety, Guardrails, Production, Architecture</p>
+</body>
+</html>

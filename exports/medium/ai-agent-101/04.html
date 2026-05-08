@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agent Workflow Design</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Agent Workflow Design</h1>
+<blockquote>
+<p>AI Agent 101 Series (4/10)</p>
+</blockquote>
+<p>To perform complex tasks, agents must break work into steps, execute each step in order, and verify results. This process is called a workflow. It's not just about calling tools—it's about designing "what to do in what order to achieve the goal."</p>
+<p>Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Execute, and Reflexion. Each pattern has pros and cons depending on task characteristics, and agent designers must choose patterns that match the task type.</p>
+<p>This article covers major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.</p>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>When does each of ReAct, Plan-and-Execute, and Reflexion shine?</li>
+<li>How do you decide the right granularity of decomposed steps?</li>
+<li>Where should state live inside a workflow?</li>
+<li>What validation must happen before pushing a workflow to production?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
+<h2>Key Workflow Patterns</h2>
+<p>Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.</p>
+<p><strong>ReAct (Reasoning + Acting)</strong></p>
+<p><strong>ReAct</strong> alternates between Reasoning and Acting. The agent thinks, uses tools, and observes results iteratively.</p>
+<pre><code class="language-python">from typing import Dict, Any, List
+import openai
+
+def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -&gt; str:
+    &quot;&quot;&quot;ReAct pattern: Thought → Action → Observation loop&quot;&quot;&quot;
+
+    messages = [
+        {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;&quot;&quot;You are an agent that solves problems step-by-step.
+
+        At each step:
+        1. Thought: Think about what to do next
+        2. Action: Use tools to gather information
+        3. Observation: Observe results and plan next step
+
+        When you reach the goal, provide an answer starting with &quot;Final Answer:&quot;.&quot;&quot;&quot;},
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_query}
+    ]
+
+    for step in range(max_steps):
+        # Request next action from LLM
+        response = openai.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=messages,
+            tools=tools,
+            tool_choice=&quot;auto&quot;
+        )
+
+        assistant_message = response.choices[0].message
+
+        # If final answer
+        if assistant_message.content and &quot;Final Answer:&quot; in assistant_message.content:
+            return assistant_message.content.replace(&quot;Final Answer:&quot;, &quot;&quot;).strip()
+
+        # If tool call
+        if assistant_message.tool_calls:
+            messages.append(assistant_message)
+
+            # Execute each tool
+            for tool_call in assistant_message.tool_calls:
+                result = execute_tool(tool_call.function.name, tool_call.function.arguments)
+
+                # Add observation
+                messages.append({
+                    &quot;role&quot;: &quot;tool&quot;,
+                    &quot;tool_call_id&quot;: tool_call.id,
+                    &quot;content&quot;: f&quot;Observation: {result}&quot;
+                })
+        else:
+            # Neither tool call nor final answer
+            messages.append(assistant_message)
+
+    return &quot;Max steps reached without solution.&quot;
+</code></pre>
+<p><strong>Advantages</strong>:<br>
+- Explicit reasoning process (easy debugging)<br>
+- Can adjust plan based on intermediate results<br>
+- Step-by-step validation possible</p>
+<p><strong>Disadvantages</strong>:<br>
+- LLM call at every step (slow, costly)<br>
+- Trial-and-error without upfront planning for complex tasks</p>
+<p><strong>Suitable for</strong>:<br>
+- Decision-making after information gathering<br>
+- Tasks where strategy changes based on intermediate results<br>
+- Example: "Analyze competitors then develop marketing strategy"</p>
+<p><strong>Plan-and-Execute</strong></p>
+<p><strong>Plan-and-Execute</strong> creates a full plan first, then executes steps sequentially.</p>
+<pre><code class="language-python">def plan_and_execute_agent(user_query: str, tools: List[Dict]) -&gt; str:
+    &quot;&quot;&quot;Plan-and-Execute pattern: Plan → Execute&quot;&quot;&quot;
+
+    # Step 1: Create plan
+    plan_prompt = f&quot;&quot;&quot;
+    Task: {user_query}
+
+    Create a step-by-step plan to complete this task.
+    Each step should have a clear goal and required tools.
+
+    Format:
+    1. [step description] - Tool: [tool name]
+    2. [step description] - Tool: [tool name]
+    ...
+    &quot;&quot;&quot;
+
+    response = openai.chat.completions.create(
+        model=&quot;gpt-4&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: plan_prompt}]
+    )
+
+    plan = response.choices[0].message.content
+    print(f&quot;Plan:\n{plan}\n&quot;)
+
+    # Step 2: Execute plan
+    steps = parse_plan(plan)  # &quot;1. step - Tool: name&quot; → structured
+
+    results = []
+    for idx, step in enumerate(steps):
+        print(f&quot;[Step {idx + 1}] {step['description']}&quot;)
+
+        # Execute tool
+        tool_result = execute_tool(step[&quot;tool&quot;], step[&quot;params&quot;])
+        results.append({
+            &quot;step&quot;: idx + 1,
+            &quot;description&quot;: step[&quot;description&quot;],
+            &quot;result&quot;: tool_result
+        })
+
+        print(f&quot;Result: {tool_result}\n&quot;)
+
+    # Step 3: Generate final answer
+    summary_prompt = f&quot;&quot;&quot;
+    Task: {user_query}
+
+    Executed steps and results:
+    {format_results(results)}
+
+    Answer the user's question based on the above results.
+    &quot;&quot;&quot;
+
+    final_response = openai.chat.completions.create(
+        model=&quot;gpt-4&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: summary_prompt}]
+    )
+
+    return final_response.choices[0].message.content
+</code></pre>
+<p><strong>Advantages</strong>:<br>
+- Clear overall flow (plan reviewable)<br>
+- Easy to identify parallelizable steps<br>
+- Simple progress tracking</p>
+<p><strong>Disadvantages</strong>:<br>
+- Wrong initial plan causes complete failure<br>
+- Hard to adjust plan based on intermediate results<br>
+- Time spent on planning</p>
+<p><strong>Suitable for</strong>:<br>
+- Tasks with clear requirements<br>
+- Predictable steps<br>
+- Example: "Data collection → Analysis → Report writing"</p>
+<p><strong>Reflexion</strong></p>
+<p><strong>Reflexion</strong> evaluates results after execution, reflects on failures, and revises the plan.</p>
+<pre><code class="language-python">def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) -&gt; str:
+    &quot;&quot;&quot;Reflexion pattern: Execute → Evaluate → Reflect → Retry&quot;&quot;&quot;
+
+    reflections = []
+
+    for attempt in range(max_retries):
+        print(f&quot;\n=== Attempt {attempt + 1} ===&quot;)
+
+        # Include previous reflections in context
+        context = &quot;\n&quot;.join([f&quot;Reflection {i+1}: {r}&quot; for i, r in enumerate(reflections)])
+
+        prompt = f&quot;&quot;&quot;
+        Task: {user_query}
+
+        Lessons from previous attempts:
+        {context if context else &quot;None (first attempt)&quot;}
+
+        Perform the task.
+        &quot;&quot;&quot;
+
+        # Execute task
+        result = execute_task(prompt, tools)
+
+        # Evaluate result
+        evaluation = evaluate_result(result, user_query)
+
+        if evaluation[&quot;success&quot;]:
+            return result
+
+        # Reflect on failure
+        reflection_prompt = f&quot;&quot;&quot;
+        Task: {user_query}
+        Attempted method: {result}
+        Failure reason: {evaluation['reason']}
+
+        Reflect on what went wrong and how to improve in the next attempt.
+        &quot;&quot;&quot;
+
+        reflection_response = openai.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: reflection_prompt}]
+        )
+
+        reflection = reflection_response.choices[0].message.content
+        reflections.append(reflection)
+
+        print(f&quot;Reflection: {reflection}&quot;)
+
+    return &quot;Max retries reached without success.&quot;
+</code></pre>
+<p><strong>Advantages</strong>:<br>
+- Learning from failures to improve<br>
+- Adaptability for complex problems<br>
+- Similar to human problem-solving</p>
+<p><strong>Disadvantages</strong>:<br>
+- Multiple retries (time and cost)<br>
+- Effectiveness drops with unclear evaluation criteria<br>
+- Risk of infinite loops</p>
+<p><strong>Suitable for</strong>:<br>
+- Creative tasks without clear correct answers<br>
+- Tasks requiring trial and error<br>
+- Example: "Code writing and debugging", "Complex problem solving"</p>
+<p><strong>Pattern Comparison</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Execution</th>
+<th>Advantages</th>
+<th>Disadvantages</th>
+<th>Suitable Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ReAct</td>
+<td>Step-by-step reasoning + execution</td>
+<td>Transparency, flexibility</td>
+<td>Slow, costly</td>
+<td>Information gathering + decision-making</td>
+</tr>
+<tr>
+<td>Plan-and-Execute</td>
+<td>Plan then execute</td>
+<td>Clarity, parallelization</td>
+<td>Rigidity</td>
+<td>Predictable tasks</td>
+</tr>
+<tr>
+<td>Reflexion</td>
+<td>Execute → Evaluate → Reflect</td>
+<td>Learning, adaptability</td>
+<td>Retry cost</td>
+<td>Creative, trial-and-error</td>
+</tr>
+</tbody>
+</table>
+<p>In production, these patterns are often combined. For example, use Plan-and-Execute for the overall structure, ReAct for each step, and Reflexion for retry on failure.</p>
+<hr>
+<h2>Task Decomposition Strategy</h2>
+<p>Breaking complex tasks into smaller steps is key to workflow design. Let's explore effective decomposition strategies.</p>
+<p><strong>Top-Down Decomposition</strong></p>
+<p>Break large goals into hierarchical sub-goals.</p>
+<pre><code class="language-python">def decompose_task_topdown(task: str) -&gt; List[Dict[str, Any]]:
+    &quot;&quot;&quot;Top-Down task decomposition&quot;&quot;&quot;
+
+    prompt = f&quot;&quot;&quot;
+    Task: {task}
+
+    List major subtasks required to complete this task.
+    Each subtask should be independently executable.
+
+    Format:
+    1. [Subtask 1]
+       - Goal: [specific goal]
+       - Required tools: [tool list]
+    2. [Subtask 2]
+       ...
+    &quot;&quot;&quot;
+
+    response = openai.chat.completions.create(
+        model=&quot;gpt-4&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}]
+    )
+
+    # Parse response
+    subtasks = parse_subtasks(response.choices[0].message.content)
+
+    # Recursively decompose each complex subtask
+    for subtask in subtasks:
+        if is_complex(subtask):
+            subtask[&quot;children&quot;] = decompose_task_topdown(subtask[&quot;description&quot;])
+
+    return subtasks
+</code></pre>
+<p><strong>Example: "Write competitor analysis report"</strong><br>
+1. Collect competitor list<br>
+   - 1.1 Search industry database<br>
+   - 1.2 Analyze news articles<br>
+2. Gather competitor information<br>
+   - 2.1 Crawl websites<br>
+   - 2.2 Query financial data<br>
+3. Analyze and write report<br>
+   - 3.1 Visualize data<br>
+   - 3.2 Derive insights<br>
+   - 3.3 Generate document</p>
+<p><strong>Bottom-Up Decomposition</strong></p>
+<p>Compose possible steps based on available tools.</p>
+<pre><code class="language-python">def decompose_task_bottomup(task: str, available_tools: List[str]) -&gt; List[str]:
+    &quot;&quot;&quot;Bottom-Up: tool-based task decomposition&quot;&quot;&quot;
+
+    prompt = f&quot;&quot;&quot;
+    Task: {task}
+
+    Available tools:
+    {', '.join(available_tools)}
+
+    Design steps to complete the task by combining the above tools.
+    Each step should use one tool.
+    &quot;&quot;&quot;
+
+    response = openai.chat.completions.create(
+        model=&quot;gpt-4&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}]
+    )
+
+    return parse_steps(response.choices[0].message.content)
+</code></pre>
+<p><strong>Example: "Automated customer inquiry response"</strong><br>
+Available tools: <code>search_kb</code>, <code>check_order_status</code>, <code>send_email</code></p>
+<ol>
+<li><code>search_kb</code> - Search knowledge base for relevant info</li>
+<li>If search sufficient, generate answer; else go to step 3</li>
+<li><code>check_order_status</code> - Check order status</li>
+<li><code>send_email</code> - Send final answer email</li>
+</ol>
+<p><strong>Dependency-Based Decomposition</strong></p>
+<p>Determine order by identifying task dependencies.</p>
+<pre><code class="language-python">from typing import Set, Dict
+import networkx as nx
+
+def decompose_with_dependencies(
+    tasks: List[str],
+    dependencies: Dict[str, List[str]]
+) -&gt; List[str]:
+    &quot;&quot;&quot;Dependency-based task ordering&quot;&quot;&quot;
+
+    # Create DAG (Directed Acyclic Graph)
+    graph = nx.DiGraph()
+    graph.add_nodes_from(tasks)
+
+    for task, deps in dependencies.items():
+        for dep in deps:
+            graph.add_edge(dep, task)  # dep → task
+
+    # Topological sort for execution order
+    execution_order = list(nx.topological_sort(graph))
+
+    return execution_order
+
+# Example
+tasks = [&quot;Collect data&quot;, &quot;Clean data&quot;, &quot;Analyze&quot;, &quot;Visualize&quot;, &quot;Write report&quot;]
+
+dependencies = {
+    &quot;Clean data&quot;: [&quot;Collect data&quot;],
+    &quot;Analyze&quot;: [&quot;Clean data&quot;],
+    &quot;Visualize&quot;: [&quot;Analyze&quot;],
+    &quot;Write report&quot;: [&quot;Visualize&quot;, &quot;Analyze&quot;]
+}
+
+order = decompose_with_dependencies(tasks, dependencies)
+# Result: ['Collect data', 'Clean data', 'Analyze', 'Visualize', 'Write report']
+</code></pre>
+<p><strong>Dynamic Decomposition</strong></p>
+<p>Decide next steps during execution based on intermediate results.</p>
+<pre><code class="language-python">def dynamic_decomposition(task: str, initial_context: Dict) -&gt; str:
+    &quot;&quot;&quot;Dynamic task decomposition: decide next step based on current state&quot;&quot;&quot;
+
+    context = initial_context
+    completed_steps = []
+
+    while not is_task_complete(context):
+        # Decide next step based on current state
+        next_step_prompt = f&quot;&quot;&quot;
+        Final goal: {task}
+
+        Completed steps so far:
+        {format_steps(completed_steps)}
+
+        Current state:
+        {context}
+
+        What should be done next?
+        &quot;&quot;&quot;
+
+        response = openai.chat.completions.create(
+            model=&quot;gpt-4&quot;,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: next_step_prompt}]
+        )
+
+        next_action = response.choices[0].message.content
+
+        # Execute next step
+        result = execute_step(next_action)
+
+        # Update context
+        context.update(result)
+        completed_steps.append(next_action)
+
+        # Check termination condition
+        if should_stop(context, task):
+            break
+
+    return generate_final_answer(context, task)
+</code></pre>
+<p><strong>Example: Debugging task</strong><br>
+1. Check error log → "Found network timeout"<br>
+2. Check network settings → "Proxy configuration error"<br>
+3. Fix proxy → "Confirmed working"<br>
+(Next step changes based on intermediate results)</p>
+<p><strong>Task Decomposition Considerations</strong></p>
+<p><strong>Atomicity</strong>:<br>
+Each step should have one clear goal.</p>
+<pre><code class="language-python"># Bad: step too large
+&quot;Analyze competitors and develop strategy&quot;  # Multiple tasks mixed
+
+# Good: clear steps
+&quot;Collect competitor information&quot;
+&quot;Analyze collected data&quot;
+&quot;Derive strategy from analysis&quot;
+</code></pre>
+<p><strong>Verifiability</strong>:<br>
+Completion of each step should be clearly determinable.</p>
+<pre><code class="language-python">def verify_step(step: str, result: Any) -&gt; bool:
+    &quot;&quot;&quot;Verify step completion&quot;&quot;&quot;
+    if step == &quot;Collect data&quot;:
+        return isinstance(result, list) and len(result) &gt; 0
+    elif step == &quot;Clean data&quot;:
+        return all(&quot;clean&quot; in item for item in result)
+    # ...
+</code></pre>
+<p><strong>Reusability</strong>:<br>
+Generalize for reuse in similar tasks.</p>
+<pre><code class="language-python"># Reusable step library
+REUSABLE_STEPS = {
+    &quot;web_scraping&quot;: {
+        &quot;description&quot;: &quot;Extract data from website&quot;,
+        &quot;inputs&quot;: [&quot;url&quot;, &quot;selector&quot;],
+        &quot;outputs&quot;: [&quot;raw_data&quot;],
+        &quot;tool&quot;: &quot;scrape_website&quot;
+    },
+    &quot;data_cleaning&quot;: {
+        &quot;description&quot;: &quot;Clean and standardize data&quot;,
+        &quot;inputs&quot;: [&quot;raw_data&quot;],
+        &quot;outputs&quot;: [&quot;clean_data&quot;],
+        &quot;tool&quot;: &quot;clean_data&quot;
+    }
+}
+</code></pre>
+<p>Proper task decomposition significantly improves agent success rate and maintainability.</p>
+<hr>
+<h2>State Management</h2>
+<p>During workflow execution, agents must track progress and determine next actions.</p>
+<p><strong>State Definition</strong></p>
+<p>Agent state represents all information about task progress.</p>
+<pre><code class="language-python">from typing import Dict, Any, List
+from dataclasses import dataclass
+from datetime import datetime
+
+@dataclass
+class AgentState:
+    &quot;&quot;&quot;Agent state definition&quot;&quot;&quot;
+    task_id: str                        # Unique task ID
+    goal: str                           # Final goal
+    current_step: int                   # Current step number
+    completed_steps: List[Dict]         # Completed steps
+    pending_steps: List[str]            # Remaining steps
+    context: Dict[str, Any]            # Accumulated information
+    status: str                         # pending/running/completed/failed
+    created_at: datetime
+    updated_at: datetime
+
+    def to_dict(self) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Serialize state to dictionary&quot;&quot;&quot;
+        return {
+            &quot;task_id&quot;: self.task_id,
+            &quot;goal&quot;: self.goal,
+            &quot;current_step&quot;: self.current_step,
+            &quot;completed_steps&quot;: self.completed_steps,
+            &quot;pending_steps&quot;: self.pending_steps,
+            &quot;context&quot;: self.context,
+            &quot;status&quot;: self.status,
+            &quot;created_at&quot;: self.created_at.isoformat(),
+            &quot;updated_at&quot;: self.updated_at.isoformat()
+        }
+</code></pre>
+<p><strong>State Persistence and Recovery</strong></p>
+<p>Save state so execution can resume after interruption.</p>
+<pre><code class="language-python">import json
+import redis
+
+class StateManager:
+    &quot;&quot;&quot;State manager&quot;&quot;&quot;
+
+    def __init__(self, redis_client: redis.Redis):
+        self.redis = redis_client
+
+    def save_state(self, state: AgentState) -&gt; None:
+        &quot;&quot;&quot;Save state&quot;&quot;&quot;
+        key = f&quot;agent_state:{state.task_id}&quot;
+        value = json.dumps(state.to_dict())
+
+        # Save to Redis (1 hour TTL)
+        self.redis.setex(key, 3600, value)
+
+    def load_state(self, task_id: str) -&gt; AgentState:
+        &quot;&quot;&quot;Load state&quot;&quot;&quot;
+        key = f&quot;agent_state:{task_id}&quot;
+        value = self.redis.get(key)
+
+        if not value:
+            raise ValueError(f&quot;State not found for task {task_id}&quot;)
+
+        data = json.loads(value)
+        return AgentState(
+            task_id=data[&quot;task_id&quot;],
+            goal=data[&quot;goal&quot;],
+            current_step=data[&quot;current_step&quot;],
+            completed_steps=data[&quot;completed_steps&quot;],
+            pending_steps=data[&quot;pending_steps&quot;],
+            context=data[&quot;context&quot;],
+            status=data[&quot;status&quot;],
+            created_at=datetime.fromisoformat(data[&quot;created_at&quot;]),
+            updated_at=datetime.fromisoformat(data[&quot;updated_at&quot;])
+        )
+
+    def update_state(self, task_id: str, updates: Dict[str, Any]) -&gt; None:
+        &quot;&quot;&quot;Update state&quot;&quot;&quot;
+        state = self.load_state(task_id)
+
+        for key, value in updates.items():
+            setattr(state, key, value)
+
+        state.updated_at = datetime.now()
+        self.save_state(state)
+</code></pre>
+<p><strong>State-Based Resumption</strong></p>
+<p>Resume interrupted tasks.</p>
+<pre><code class="language-python">def resume_agent_workflow(task_id: str, state_manager: StateManager) -&gt; str:
+    &quot;&quot;&quot;Resume interrupted workflow&quot;&quot;&quot;
+
+    # Load saved state
+    state = state_manager.load_state(task_id)
+
+    print(f&quot;Resuming task: {state.goal}&quot;)
+    print(f&quot;Progress: {state.current_step}/{len(state.completed_steps) + len(state.pending_steps)}&quot;)
+
+    # Execute remaining steps
+    for step in state.pending_steps:
+        print(f&quot;[Step {state.current_step + 1}] {step}&quot;)
+
+        try:
+            result = execute_step(step, state.context)
+
+            # Update state
+            state.completed_steps.append({
+                &quot;step&quot;: state.current_step + 1,
+                &quot;description&quot;: step,
+                &quot;result&quot;: result,
+                &quot;timestamp&quot;: datetime.now().isoformat()
+            })
+            state.current_step += 1
+            state.context.update(result)
+
+            # Save intermediate state
+            state_manager.save_state(state)
+
+        except Exception as e:
+            print(f&quot;Step failed: {e}&quot;)
+            state.status = &quot;failed&quot;
+            state_manager.save_state(state)
+            raise
+
+    state.status = &quot;completed&quot;
+    state_manager.save_state(state)
+
+    return generate_final_answer(state.context, state.goal)
+</code></pre>
+<p><strong>State Transitions</strong></p>
+<p>Define rules for agent transitions between states.</p>
+<pre><code class="language-python">from enum import Enum
+
+class WorkflowState(Enum):
+    &quot;&quot;&quot;Workflow states&quot;&quot;&quot;
+    IDLE = &quot;idle&quot;
+    PLANNING = &quot;planning&quot;
+    EXECUTING = &quot;executing&quot;
+    EVALUATING = &quot;evaluating&quot;
+    COMPLETED = &quot;completed&quot;
+    FAILED = &quot;failed&quot;
+
+class StateMachine:
+    &quot;&quot;&quot;State machine&quot;&quot;&quot;
+
+    TRANSITIONS = {
+        WorkflowState.IDLE: [WorkflowState.PLANNING],
+        WorkflowState.PLANNING: [WorkflowState.EXECUTING, WorkflowState.FAILED],
+        WorkflowState.EXECUTING: [WorkflowState.EVALUATING, WorkflowState.FAILED],
+        WorkflowState.EVALUATING: [WorkflowState.COMPLETED, WorkflowState.PLANNING, WorkflowState.FAILED],
+        WorkflowState.COMPLETED: [],
+        WorkflowState.FAILED: []
+    }
+
+    def __init__(self, initial_state: WorkflowState = WorkflowState.IDLE):
+        self.current_state = initial_state
+        self.state_history = [initial_state]
+
+    def transition(self, next_state: WorkflowState) -&gt; bool:
+        &quot;&quot;&quot;Transition state&quot;&quot;&quot;
+        if next_state not in self.TRANSITIONS[self.current_state]:
+            print(f&quot;Invalid transition: {self.current_state} → {next_state}&quot;)
+            return False
+
+        print(f&quot;State transition: {self.current_state.value} → {next_state.value}&quot;)
+        self.current_state = next_state
+        self.state_history.append(next_state)
+        return True
+
+    def can_transition(self, next_state: WorkflowState) -&gt; bool:
+        &quot;&quot;&quot;Check if transition is possible&quot;&quot;&quot;
+        return next_state in self.TRANSITIONS[self.current_state]
+
+# Usage example
+state_machine = StateMachine()
+
+state_machine.transition(WorkflowState.PLANNING)     # IDLE → PLANNING (OK)
+state_machine.transition(WorkflowState.EXECUTING)    # PLANNING → EXECUTING (OK)
+state_machine.transition(WorkflowState.EVALUATING)   # EXECUTING → EVALUATING (OK)
+state_machine.transition(WorkflowState.PLANNING)     # EVALUATING → PLANNING (replan, OK)
+</code></pre>
+<p><strong>Parallel State Management</strong></p>
+<p>Track state of each subtask when multiple run concurrently.</p>
+<pre><code class="language-python">import asyncio
+from typing import List
+
+class ParallelStateManager:
+    &quot;&quot;&quot;Parallel task state management&quot;&quot;&quot;
+
+    def __init__(self):
+        self.subtask_states: Dict[str, AgentState] = {}
+
+    async def execute_parallel_tasks(
+        self,
+        tasks: List[str],
+        parent_task_id: str
+    ) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Execute parallel tasks and track states&quot;&quot;&quot;
+
+        # Create state for each subtask
+        for idx, task in enumerate(tasks):
+            subtask_id = f&quot;{parent_task_id}_sub_{idx}&quot;
+            self.subtask_states[subtask_id] = AgentState(
+                task_id=subtask_id,
+                goal=task,
+                current_step=0,
+                completed_steps=[],
+                pending_steps=[task],
+                context={},
+                status=&quot;pending&quot;,
+                created_at=datetime.now(),
+                updated_at=datetime.now()
+            )
+
+        # Execute in parallel
+        results = await asyncio.gather(*[
+            self.execute_subtask(subtask_id)
+            for subtask_id in self.subtask_states.keys()
+        ])
+
+        # Aggregate results
+        return {
+            subtask_id: result
+            for subtask_id, result in zip(self.subtask_states.keys(), results)
+        }
+
+    async def execute_subtask(self, subtask_id: str) -&gt; Any:
+        &quot;&quot;&quot;Execute subtask&quot;&quot;&quot;
+        state = self.subtask_states[subtask_id]
+        state.status = &quot;running&quot;
+
+        try:
+            result = await async_execute_step(state.goal)
+            state.status = &quot;completed&quot;
+            return result
+        except Exception as e:
+            state.status = &quot;failed&quot;
+            raise
+</code></pre>
+<p><strong>State Visualization</strong></p>
+<p>Display progress visually.</p>
+<pre><code class="language-python">def visualize_state(state: AgentState) -&gt; str:
+    &quot;&quot;&quot;Visualize state&quot;&quot;&quot;
+    total_steps = len(state.completed_steps) + len(state.pending_steps)
+    progress = (state.current_step / total_steps) * 100 if total_steps &gt; 0 else 0
+
+    # Progress bar
+    bar_length = 40
+    filled = int(bar_length * progress / 100)
+    bar = &quot;=&quot; * filled + &quot;-&quot; * (bar_length - filled)
+
+    output = f&quot;&quot;&quot;
+=== Agent Workflow Status ===
+Task ID: {state.task_id}
+Goal: {state.goal}
+Status: {state.status}
+Progress: [{bar}] {progress:.1f}%
+
+Completed Steps ({len(state.completed_steps)}):
+{format_steps(state.completed_steps)}
+
+Pending Steps ({len(state.pending_steps)}):
+{format_pending(state.pending_steps)}
+    &quot;&quot;&quot;
+
+    return output
+</code></pre>
+<p>Proper state management significantly improves agent stability and debuggability.</p>
+<hr>
+<h2>Workflow Design Considerations</h2>
+<p>Effective workflow design requires considering multiple factors.</p>
+<p><strong>Scalability</strong></p>
+<p>Performance should maintain as task scale grows.</p>
+<pre><code class="language-python"># Bad: sequential processing of all items
+def process_items_sequential(items: List[str]) -&gt; List[Any]:
+    &quot;&quot;&quot;Sequential processing (slow)&quot;&quot;&quot;
+    results = []
+    for item in items:
+        result = process_item(item)  # 1 second each
+        results.append(result)
+    return results
+    # 100 items = 100 seconds
+
+# Good: parallel processing
+import asyncio
+
+async def process_items_parallel(items: List[str]) -&gt; List[Any]:
+    &quot;&quot;&quot;Parallel processing (fast)&quot;&quot;&quot;
+    tasks = [async_process_item(item) for item in items]
+    results = await asyncio.gather(*tasks)
+    return results
+    # 100 items = ~1 second (parallelized network I/O)
+</code></pre>
+<p><strong>Robustness</strong></p>
+<p>Entire workflow shouldn't halt when some steps fail.</p>
+<pre><code class="language-python">def robust_workflow(tasks: List[str]) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Robust workflow: continue despite partial failures&quot;&quot;&quot;
+
+    results = {
+        &quot;successful&quot;: [],
+        &quot;failed&quot;: []
+    }
+
+    for task in tasks:
+        try:
+            result = execute_task(task)
+            results[&quot;successful&quot;].append({
+                &quot;task&quot;: task,
+                &quot;result&quot;: result
+            })
+        except Exception as e:
+            # Continue despite failure
+            results[&quot;failed&quot;].append({
+                &quot;task&quot;: task,
+                &quot;error&quot;: str(e)
+            })
+            log_error(task, e)
+
+    # Partial success is still valuable
+    return results
+</code></pre>
+<p><strong>Cost Efficiency</strong></p>
+<p>Minimize LLM calls to reduce costs.</p>
+<pre><code class="language-python"># Bad: LLM call for each item
+def inefficient_workflow(items: List[str]) -&gt; List[str]:
+    &quot;&quot;&quot;Inefficient: call LLM per item&quot;&quot;&quot;
+    results = []
+    for item in items:
+        result = llm_call(f&quot;Process this: {item}&quot;)  # $0.01 each
+        results.append(result)
+    return results
+    # 100 items = $1.00
+
+# Good: batch processing
+def efficient_workflow(items: List[str]) -&gt; List[str]:
+    &quot;&quot;&quot;Efficient: batch items together&quot;&quot;&quot;
+    batch_prompt = f&quot;&quot;&quot;
+    Process each of the following items:
+    {chr(10).join(f&quot;{i+1}. {item}&quot; for i, item in enumerate(items))}
+    &quot;&quot;&quot;
+
+    response = llm_call(batch_prompt)  # Single call: $0.05
+    results = parse_batch_response(response)
+    return results
+    # 100 items = $0.05 (95% savings)
+</code></pre>
+<p><strong>Observability</strong></p>
+<p>Workflow execution should be traceable and debuggable.</p>
+<pre><code class="language-python">import logging
+from datetime import datetime
+
+class ObservableWorkflow:
+    &quot;&quot;&quot;Observable workflow&quot;&quot;&quot;
+
+    def __init__(self, workflow_id: str):
+        self.workflow_id = workflow_id
+        self.logger = logging.getLogger(f&quot;workflow.{workflow_id}&quot;)
+        self.trace = []
+
+    def execute(self, steps: List[str]) -&gt; Any:
+        &quot;&quot;&quot;Traceable execution&quot;&quot;&quot;
+        self.logger.info(f&quot;Workflow {self.workflow_id} started&quot;)
+        start_time = datetime.now()
+
+        for idx, step in enumerate(steps):
+            step_start = datetime.now()
+
+            try:
+                self.logger.info(f&quot;[Step {idx+1}] Starting: {step}&quot;)
+                result = execute_step(step)
+
+                duration = (datetime.now() - step_start).total_seconds()
+
+                self.trace.append({
+                    &quot;step&quot;: idx + 1,
+                    &quot;description&quot;: step,
+                    &quot;status&quot;: &quot;success&quot;,
+                    &quot;duration&quot;: duration,
+                    &quot;result&quot;: result
+                })
+
+                self.logger.info(f&quot;[Step {idx+1}] Completed in {duration}s&quot;)
+
+            except Exception as e:
+                duration = (datetime.now() - step_start).total_seconds()
+
+                self.trace.append({
+                    &quot;step&quot;: idx + 1,
+                    &quot;description&quot;: step,
+                    &quot;status&quot;: &quot;failed&quot;,
+                    &quot;duration&quot;: duration,
+                    &quot;error&quot;: str(e)
+                })
+
+                self.logger.error(f&quot;[Step {idx+1}] Failed: {e}&quot;)
+                raise
+
+        total_duration = (datetime.now() - start_time).total_seconds()
+        self.logger.info(f&quot;Workflow completed in {total_duration}s&quot;)
+
+        return self.trace
+</code></pre>
+<p><strong>Testability</strong></p>
+<p>Workflows should be unit-testable.</p>
+<pre><code class="language-python">import pytest
+from unittest.mock import Mock, patch
+
+def test_workflow_success():
+    &quot;&quot;&quot;Test success case&quot;&quot;&quot;
+    # Mock tools
+    with patch('execute_tool') as mock_execute:
+        mock_execute.return_value = {&quot;data&quot;: &quot;test result&quot;}
+
+        # Execute workflow
+        result = run_workflow(&quot;test task&quot;)
+
+        # Verify
+        assert result[&quot;status&quot;] == &quot;success&quot;
+        assert mock_execute.call_count == 3  # 3 steps executed
+
+def test_workflow_failure_recovery():
+    &quot;&quot;&quot;Test failure recovery&quot;&quot;&quot;
+    with patch('execute_tool') as mock_execute:
+        # First call fails, second succeeds
+        mock_execute.side_effect = [
+            Exception(&quot;Network error&quot;),
+            {&quot;data&quot;: &quot;recovered&quot;}
+        ]
+
+        result = run_workflow_with_retry(&quot;test task&quot;)
+
+        # Verify success after retry
+        assert result[&quot;status&quot;] == &quot;success&quot;
+        assert mock_execute.call_count == 2
+</code></pre>
+<p><strong>Maintainability</strong></p>
+<p>Document and modularize workflow logic clearly.</p>
+<pre><code class="language-python">from typing import Protocol
+
+class WorkflowStep(Protocol):
+    &quot;&quot;&quot;Workflow step interface&quot;&quot;&quot;
+
+    def execute(self, context: Dict[str, Any]) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Execute step&quot;&quot;&quot;
+        ...
+
+    def validate(self, result: Dict[str, Any]) -&gt; bool:
+        &quot;&quot;&quot;Validate result&quot;&quot;&quot;
+        ...
+
+class DataCollectionStep:
+    &quot;&quot;&quot;Data collection step&quot;&quot;&quot;
+
+    def execute(self, context: Dict[str, Any]) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Collect data from web&quot;&quot;&quot;
+        url = context[&quot;url&quot;]
+        data = scrape_website(url)
+        return {&quot;collected_data&quot;: data}
+
+    def validate(self, result: Dict[str, Any]) -&gt; bool:
+        &quot;&quot;&quot;Check data is not empty&quot;&quot;&quot;
+        return &quot;collected_data&quot; in result and len(result[&quot;collected_data&quot;]) &gt; 0
+
+class DataAnalysisStep:
+    &quot;&quot;&quot;Data analysis step&quot;&quot;&quot;
+
+    def execute(self, context: Dict[str, Any]) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Analyze collected data&quot;&quot;&quot;
+        data = context[&quot;collected_data&quot;]
+        insights = analyze_data(data)
+        return {&quot;insights&quot;: insights}
+
+    def validate(self, result: Dict[str, Any]) -&gt; bool:
+        &quot;&quot;&quot;Check insights were generated&quot;&quot;&quot;
+        return &quot;insights&quot; in result
+
+# Assemble workflow
+workflow_steps = [
+    DataCollectionStep(),
+    DataAnalysisStep()
+]
+
+def run_modular_workflow(context: Dict[str, Any]) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Execute modular workflow&quot;&quot;&quot;
+    for step in workflow_steps:
+        result = step.execute(context)
+
+        if not step.validate(result):
+            raise ValueError(f&quot;Step validation failed: {step.__class__.__name__}&quot;)
+
+        context.update(result)
+
+    return context
+</code></pre>
+<p><strong>Design Checklist</strong></p>
+<p>When designing workflows, answer these questions:</p>
+<p><strong>Functional Requirements</strong>:<br>
+- [ ] Is the task clearly defined?<br>
+- [ ] Are inputs and outputs specified for each step?<br>
+- [ ] Is there a recovery strategy for failures?</p>
+<p><strong>Non-Functional Requirements</strong>:<br>
+- [ ] Are expected execution time and cost estimated?<br>
+- [ ] Are parallelizable steps identified?<br>
+- [ ] Can state be saved and restored?</p>
+<p><strong>Operational Requirements</strong>:<br>
+- [ ] Are logs and metrics collected?<br>
+- [ ] Are test cases written?<br>
+- [ ] Is documentation complete?</p>
+<p>Considering these factors results in workflows that operate reliably in production environments.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p>Let's examine frequent mistakes in workflow design.</p>
+<p><strong>Mistake 1: Overly Granular Steps</strong></p>
+<p><strong>Bad</strong>: Steps too small causing overhead</p>
+<pre><code class="language-python"># Split into 10 tiny steps
+steps = [
+    &quot;Open URL&quot;,
+    &quot;Wait for page load&quot;,
+    &quot;Extract title&quot;,
+    &quot;Validate title&quot;,
+    &quot;Extract body&quot;,
+    &quot;Validate body&quot;,
+    &quot;Extract links&quot;,
+    &quot;Validate links&quot;,
+    &quot;Save data&quot;,
+    &quot;Confirm save&quot;
+]
+# LLM call at each step → 10 calls, slow and expensive
+</code></pre>
+<p><strong>Good</strong>: Group into meaningful sizes</p>
+<pre><code class="language-python">steps = [
+    &quot;Scrape web page (title, body, links)&quot;,
+    &quot;Validate collected data&quot;,
+    &quot;Save data&quot;
+]
+# 3 LLM calls for same work
+</code></pre>
+<p><strong>Lesson</strong>: Each step should provide independent value; excessive granularity only increases complexity.</p>
+<p><strong>Mistake 2: Missing State Management</strong></p>
+<p><strong>Bad</strong>: Not saving intermediate results</p>
+<pre><code class="language-python">def fragile_workflow(task: str) -&gt; str:
+    &quot;&quot;&quot;Workflow without state persistence&quot;&quot;&quot;
+    step1_result = execute_step1(task)
+    step2_result = execute_step2(step1_result)  # Failure restarts from step1
+    step3_result = execute_step3(step2_result)
+    return step3_result
+</code></pre>
+<p><strong>Good</strong>: Save state at each step</p>
+<pre><code class="language-python">def resilient_workflow(task_id: str, task: str) -&gt; str:
+    &quot;&quot;&quot;Workflow with state persistence&quot;&quot;&quot;
+    state = load_or_create_state(task_id, task)
+
+    if state.current_step &lt; 1:
+        step1_result = execute_step1(task)
+        state.context[&quot;step1&quot;] = step1_result
+        state.current_step = 1
+        save_state(state)
+
+    if state.current_step &lt; 2:
+        step2_result = execute_step2(state.context[&quot;step1&quot;])
+        state.context[&quot;step2&quot;] = step2_result
+        state.current_step = 2
+        save_state(state)
+
+    if state.current_step &lt; 3:
+        step3_result = execute_step3(state.context[&quot;step2&quot;])
+        state.context[&quot;step3&quot;] = step3_result
+        state.current_step = 3
+        save_state(state)
+
+    return state.context[&quot;step3&quot;]
+</code></pre>
+<p><strong>Lesson</strong>: Saving intermediate state avoids restarting from scratch on failure.</p>
+<p><strong>Mistake 3: Circular Dependencies</strong></p>
+<p><strong>Bad</strong>: Circular dependencies between steps</p>
+<pre><code class="language-python"># A needs B result, B needs C result, C needs A result
+dependencies = {
+    &quot;Analyze&quot;: [&quot;Collect data&quot;],
+    &quot;Collect data&quot;: [&quot;Write report&quot;],
+    &quot;Write report&quot;: [&quot;Analyze&quot;]  # Circular!
+}
+# Cannot execute
+</code></pre>
+<p><strong>Good</strong>: DAG (Directed Acyclic Graph) structure</p>
+<pre><code class="language-python"># Clear directionality
+dependencies = {
+    &quot;Collect data&quot;: [],
+    &quot;Clean data&quot;: [&quot;Collect data&quot;],
+    &quot;Analyze&quot;: [&quot;Clean data&quot;],
+    &quot;Write report&quot;: [&quot;Analyze&quot;]
+}
+# Execution order determinable via topological sort
+</code></pre>
+<p><strong>Lesson</strong>: Task dependencies must always be unidirectional; circular dependencies require design reconsideration.</p>
+<p><strong>Mistake 4: No Error Propagation Strategy</strong></p>
+<p><strong>Bad</strong>: First failure halts everything</p>
+<pre><code class="language-python">def brittle_workflow(steps: List[str]) -&gt; List[Any]:
+    &quot;&quot;&quot;Halt on first failure&quot;&quot;&quot;
+    results = []
+    for step in steps:
+        result = execute_step(step)  # Raises Exception on failure
+        results.append(result)
+    return results
+</code></pre>
+<p><strong>Good</strong>: Explicit failure handling strategy</p>
+<pre><code class="language-python">from enum import Enum
+
+class FailureStrategy(Enum):
+    ABORT = &quot;abort&quot;          # Halt immediately
+    SKIP = &quot;skip&quot;            # Skip and continue
+    RETRY = &quot;retry&quot;          # Retry
+    FALLBACK = &quot;fallback&quot;    # Use alternative method
+
+def resilient_workflow(
+    steps: List[str],
+    failure_strategy: FailureStrategy = FailureStrategy.SKIP
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Workflow with failure strategy&quot;&quot;&quot;
+    results = {&quot;successful&quot;: [], &quot;failed&quot;: []}
+
+    for step in steps:
+        try:
+            result = execute_step(step)
+            results[&quot;successful&quot;].append(result)
+
+        except Exception as e:
+            if failure_strategy == FailureStrategy.ABORT:
+                raise
+
+            elif failure_strategy == FailureStrategy.SKIP:
+                results[&quot;failed&quot;].append({&quot;step&quot;: step, &quot;error&quot;: str(e)})
+                continue
+
+            elif failure_strategy == FailureStrategy.RETRY:
+                result = retry_with_backoff(execute_step, step)
+                results[&quot;successful&quot;].append(result)
+
+            elif failure_strategy == FailureStrategy.FALLBACK:
+                result = execute_fallback(step)
+                results[&quot;successful&quot;].append(result)
+
+    return results
+</code></pre>
+<p><strong>Lesson</strong>: Define upfront how each step's failure impacts the entire workflow.</p>
+<p><strong>Mistake 5: Production Deploy Without Testing</strong></p>
+<p><strong>Bad</strong>: Test directly with real data</p>
+<pre><code class="language-python"># Execute directly in production
+workflow = create_workflow(production_steps)
+result = workflow.execute(real_customer_data)  # Risky!
+</code></pre>
+<p><strong>Good</strong>: Step-by-step testing and validation</p>
+<pre><code class="language-python">import pytest
+
+# 1. Unit test: test each step independently
+def test_data_collection_step():
+    step = DataCollectionStep()
+    result = step.execute({&quot;url&quot;: &quot;https://test.com&quot;})
+    assert &quot;collected_data&quot; in result
+    assert step.validate(result)
+
+# 2. Integration test: test full workflow
+def test_full_workflow():
+    workflow = create_workflow(test_steps)
+    result = workflow.execute(test_data)
+    assert result[&quot;status&quot;] == &quot;success&quot;
+
+# 3. Simulation: replace LLM calls with mocks
+@pytest.fixture
+def mock_llm():
+    with patch('openai.chat.completions.create') as mock:
+        mock.return_value = Mock(
+            choices=[Mock(message=Mock(content=&quot;test result&quot;))]
+        )
+        yield mock
+
+def test_workflow_with_mock(mock_llm):
+    result = run_workflow(&quot;test task&quot;)
+    assert mock_llm.call_count == 3  # Expected call count
+
+# 4. Canary deployment: test with small user subset
+if is_canary_user(user_id):
+    result = new_workflow.execute(data)
+else:
+    result = old_workflow.execute(data)
+</code></pre>
+<p><strong>Lesson</strong>: Go through unit tests, integration tests, and simulation before production deployment.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Workflows are about designing agents to systematically perform complex tasks.</li>
+<li>Various patterns like ReAct, Plan-and-Execute, and Reflexion exist, and you must choose based on task characteristics.</li>
+<li>Task decomposition and state management are the core of workflow design.</li>
+</ul>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Built a one-page comparison of ReAct vs Plan-and-Execute vs Reflexion.</li>
+<li>[ ] Compared two versions of a task split too small vs too large.</li>
+<li>[ ] Wrote a workflow that keeps state in an external store.</li>
+<li>[ ] Applied at least two of: unit tests, simulation, canary rollout.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><strong>Agent Workflow Design (current)</strong></li>
+<li>Memory and State (upcoming)</li>
+<li>Multi-Agent Systems (upcoming)</li>
+<li>Agent Evaluation (upcoming)</li>
+<li>Error Handling and Reliability (upcoming)</li>
+<li>Production Operations (upcoming)</li>
+<li>Building Your First Agent (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ol>
+<li>
+<p><strong>ReAct: Synergizing Reasoning and Acting in Language Models</strong> - https://arxiv.org/abs/2210.03629<br>
+   Yao et al.'s ReAct pattern paper. Presents theoretical background and experimental results for alternating reasoning and acting.</p>
+</li>
+<li>
+<p><strong>LangGraph Documentation</strong> - https://langchain-ai.github.io/langgraph/<br>
+   LangChain's workflow construction framework. Covers state management and graph-based workflow design methods.</p>
+</li>
+<li>
+<p><strong>Reflexion: Language Agents with Verbal Reinforcement Learning</strong> - https://arxiv.org/abs/2303.11366<br>
+   Agent performance improvement through self-reflection. Explains mechanisms for learning from failures.</p>
+</li>
+<li>
+<p><strong>AutoGPT Architecture</strong> - https://github.com/Significant-Gravitas/AutoGPT<br>
+   Real implementation example of Plan-and-Execute pattern. Shows autonomous agent task decomposition and execution strategies.</p>
+</li>
+</ol>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
+</body>
+</html>

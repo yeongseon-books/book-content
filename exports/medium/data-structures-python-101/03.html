@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stacks and Queues</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Stacks and Queues</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Why is list alone not enough for both stacks and queues?</p>
+<blockquote>
+<p>list implements stacks efficiently, but using list as a queue means popping from the front is O(n). This article covers the concepts of stack (LIFO) and queue (FIFO), Python implementations, and efficient queue implementation with deque.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How stacks (LIFO) and queues (FIFO) work</li>
+<li>Implementing a stack with Python list</li>
+<li>Implementing a queue with collections.deque</li>
+<li>Real-world patterns where stacks and queues are used</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Stacks and queues are the most fundamental abstract data types. Function call stacks, browser back buttons, task queues, and BFS traversal all rely on them. Understanding these two gives you the foundation for more complex algorithms.</p>
+<blockquote>
+<p>A stack is "last in, first out." A queue is "first in, first out."</p>
+</blockquote>
+<p>Web server request handling, message brokers, and undo functionality are all built on stack and queue patterns.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Stack = LIFO (Last In, First Out), Queue = FIFO (First In, First Out)</p>
+</blockquote>
+<pre><code>[Stack — LIFO]            [Queue — FIFO]
+  push -&gt; | C |           enqueue -&gt; | A | B | C | -&gt; dequeue
+          | B |                     ^               ^
+          | A |                   rear            front
+          +---+
+  pop  &lt;- | C | (last)    dequeue &lt;- | A | (first)
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Stack</strong><br>
+- Description: A data structure that operates on the LIFO principle</p>
+<p><strong>Queue</strong><br>
+- Description: A data structure that operates on the FIFO principle</p>
+<p><strong>push / pop</strong><br>
+- Description: Operations to add and remove elements from a stack</p>
+<p><strong>enqueue / dequeue</strong><br>
+- Description: Operations to add and remove elements from a queue</p>
+<p><strong>deque</strong><br>
+- Description: A data structure with O(1) insert/delete at both ends</p>
+<h2>Before / After</h2>
+<p>Compare an inefficient queue using list and an efficient queue using deque.</p>
+<pre><code class="language-python"># before: queue with list — pop(0) is O(n)
+queue = [1, 2, 3]
+queue.append(4)       # enqueue
+first = queue.pop(0)  # dequeue — O(n), shifts all elements
+</code></pre>
+<pre><code class="language-python"># after: queue with deque — popleft() is O(1)
+from collections import deque
+queue = deque([1, 2, 3])
+queue.append(4)           # enqueue — O(1)
+first = queue.popleft()   # dequeue — O(1)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Implement a stack with list</strong></p>
+<pre><code class="language-python">class Stack:
+    def __init__(self):
+        self._data = []
+
+    def push(self, item):
+        self._data.append(item)
+
+    def pop(self):
+        if self.is_empty():
+            raise IndexError(&quot;cannot pop from an empty stack&quot;)
+        return self._data.pop()
+
+    def peek(self):
+        if self.is_empty():
+            raise IndexError(&quot;cannot peek an empty stack&quot;)
+        return self._data[-1]
+
+    def is_empty(self):
+        return len(self._data) == 0
+
+    def __len__(self):
+        return len(self._data)
+
+stack = Stack()
+stack.push(&quot;a&quot;)
+stack.push(&quot;b&quot;)
+stack.push(&quot;c&quot;)
+print(stack.pop())   # &quot;c&quot;
+print(stack.peek())  # &quot;b&quot;
+print(len(stack))    # 2
+</code></pre>
+<p><strong>Step 2: Implement a queue with deque</strong></p>
+<pre><code class="language-python">from collections import deque
+
+class Queue:
+    def __init__(self):
+        self._data = deque()
+
+    def enqueue(self, item):
+        self._data.append(item)
+
+    def dequeue(self):
+        if self.is_empty():
+            raise IndexError(&quot;cannot dequeue from an empty queue&quot;)
+        return self._data.popleft()
+
+    def peek(self):
+        if self.is_empty():
+            raise IndexError(&quot;cannot peek an empty queue&quot;)
+        return self._data[0]
+
+    def is_empty(self):
+        return len(self._data) == 0
+
+    def __len__(self):
+        return len(self._data)
+
+queue = Queue()
+queue.enqueue(&quot;task1&quot;)
+queue.enqueue(&quot;task2&quot;)
+queue.enqueue(&quot;task3&quot;)
+print(queue.dequeue())  # &quot;task1&quot;
+print(queue.peek())     # &quot;task2&quot;
+</code></pre>
+<p><strong>Step 3: Balanced parentheses check — stack in action</strong></p>
+<pre><code class="language-python">def is_balanced(text: str) -&gt; bool:
+    pairs = {&quot;(&quot;: &quot;)&quot;, &quot;[&quot;: &quot;]&quot;, &quot;{&quot;: &quot;}&quot;}
+    stack = []
+    for char in text:
+        if char in pairs:
+            stack.append(char)
+        elif char in pairs.values():
+            if not stack or pairs[stack.pop()] != char:
+                return False
+    return len(stack) == 0
+
+print(is_balanced(&quot;({[]})&quot;))   # True
+print(is_balanced(&quot;({[})&quot;))    # False
+print(is_balanced(&quot;((()&quot;))     # False
+</code></pre>
+<p><strong>Step 4: BFS with a queue</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def bfs(graph: dict, start: str) -&gt; list:
+    visited = []
+    queue = deque([start])
+    seen = {start}
+    while queue:
+        node = queue.popleft()
+        visited.append(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in seen:
+                seen.add(neighbor)
+                queue.append(neighbor)
+    return visited
+
+graph = {
+    &quot;A&quot;: [&quot;B&quot;, &quot;C&quot;],
+    &quot;B&quot;: [&quot;D&quot;],
+    &quot;C&quot;: [&quot;D&quot;, &quot;E&quot;],
+    &quot;D&quot;: [],
+    &quot;E&quot;: [],
+}
+print(bfs(graph, &quot;A&quot;))  # ['A', 'B', 'C', 'D', 'E']
+</code></pre>
+<p><strong>Step 5: Performance comparison — list.pop(0) vs deque.popleft()</strong></p>
+<pre><code class="language-python">import time
+from collections import deque
+
+n = 100_000
+
+# list.pop(0) — O(n) per operation
+data_list = list(range(n))
+start = time.perf_counter()
+while data_list:
+    data_list.pop(0)
+list_time = time.perf_counter() - start
+
+# deque.popleft() — O(1) per operation
+data_deque = deque(range(n))
+start = time.perf_counter()
+while data_deque:
+    data_deque.popleft()
+deque_time = time.perf_counter() - start
+
+print(f&quot;list.pop(0):      {list_time:.4f}s&quot;)
+print(f&quot;deque.popleft():  {deque_time:.4f}s&quot;)
+print(f&quot;deque is {list_time / deque_time:.0f}x faster&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>list's append/pop are O(1), making it a natural fit for stacks</li>
+<li>deque's appendleft/popleft are also O(1), making it ideal for queues</li>
+<li>Popping from an empty stack or queue raises an error, so guard clauses are essential</li>
+<li>BFS uses a queue, DFS uses a stack (or recursion)</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Using list.pop(0) for a queue</strong><br>
+- Why It Is a Problem: O(n) per call, slow on large data<br>
+- Fix: Use deque.popleft()</p>
+<p><strong>Calling pop on an empty stack/queue</strong><br>
+- Why It Is a Problem: Raises IndexError<br>
+- Fix: Check is_empty() before popping</p>
+<p><strong>Confusing stack and queue</strong><br>
+- Why It Is a Problem: Data is processed in the wrong order<br>
+- Fix: Distinguish LIFO from FIFO clearly</p>
+<p><strong>Overusing index access on deque</strong><br>
+- Why It Is a Problem: Middle-index access is O(n)<br>
+- Fix: Use only end operations; use list for random access</p>
+<p><strong>Using an unbounded queue without maxlen</strong><br>
+- Why It Is a Problem: Memory grows indefinitely<br>
+- Fix: Use deque(maxlen=N) to cap the size</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Browser back/forward navigation uses two stacks</li>
+<li>Undo functionality is implemented with a stack</li>
+<li>Task queues process requests in FIFO order</li>
+<li>BFS traversal manages nodes to visit with a queue</li>
+<li>Rate limiters track the last N requests with deque(maxlen=N)</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In practice, developers rarely create Stack or Queue classes. They use list and deque directly, signaling intent through comments or type hints like "this variable is used as a stack."</p>
+<p>At scale, in-memory queues give way to Redis, RabbitMQ, or Kafka. But the fundamental principles are identical. Understanding queue behavior through deque makes message queue systems easy to reason about.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can explain the difference between stack (LIFO) and queue (FIFO)</li>
+<li>[ ] Can implement a stack with list</li>
+<li>[ ] Can implement a queue with deque</li>
+<li>[ ] Can solve a balanced-parentheses problem with a stack</li>
+<li>[ ] Can explain why list.pop(0) is slower than deque.popleft()</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Implement a queue using two stacks. (Include enqueue, dequeue, and peek methods.)</li>
+<li>Write a function that reverses a string using a stack.</li>
+<li>Create a <code>deque(maxlen=5)</code> and add 10 elements. Observe what happens.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Stacks operate on LIFO, queues on FIFO. In Python, stacks use list and queues use deque by convention. The next article explores hash tables and dict, which enable O(1) lookups.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
+<li><strong>Stacks and Queues (current)</strong></li>
+<li>Hash Tables and dict (upcoming)</li>
+<li>Linked Lists (upcoming)</li>
+<li>Trees and Binary Trees (upcoming)</li>
+<li>Heaps and Priority Queues (upcoming)</li>
+<li>Graph Representations (upcoming)</li>
+<li>Sets and Set Operations (upcoming)</li>
+<li>Choosing the Right Data Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/collections.html#collections.deque">Python Official Docs — collections.deque</a></li>
+<li><a href="https://realpython.com/queue-in-python/">Real Python — Stacks and Queues in Python</a></li>
+<li><a href="https://www.geeksforgeeks.org/stack-data-structure/">GeeksforGeeks — Stack Data Structure</a></li>
+<li><a href="https://visualgo.net/en/list">Visualgo — Stack and Queue Visualization</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, Stack, Queue, deque</p>
+</body>
+</html>

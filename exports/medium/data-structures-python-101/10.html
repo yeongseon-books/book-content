@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Choosing the Right Data Structure</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Choosing the Right Data Structure</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Should you use a list, a dict, or a set for this problem?</p>
+<blockquote>
+<p>Choosing a data structure comes down to "what operation do you perform most often?" If lookups are frequent, use dict/set. If order matters, use list. If you need priority, use a heap. This article synthesizes the entire series and provides a decision framework for choosing the right data structure.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Comparing operation time complexities across data structures</li>
+<li>A decision framework for choosing data structures by situation</li>
+<li>Python built-in data structure usage guide</li>
+<li>Real-world data structure selection examples</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Knowing individual data structures is different from choosing the right one for the situation. Picking the wrong data structure makes code complex and slow. The right choice makes code clean and fast.</p>
+<blockquote>
+<p>To answer "which data structure should I use?", first ask "which operation do I perform most often?"</p>
+</blockquote>
+<p>In interviews, "why did you choose this data structure?" matters more than implementation ability. You need to be able to explain your reasoning.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Data structure selection = optimizing based on the frequency of key operations and data characteristics</p>
+</blockquote>
+<pre><code>Frequent lookups?
+  +-- Key-value mapping? -&gt; dict
+  +-- Existence only? -&gt; set
+
+Order matters?
+  +-- Append/remove from end only? -&gt; list (stack)
+  +-- Both ends? -&gt; deque (queue)
+  +-- Mid-list insert/delete? -&gt; consider linked lists
+
+Need priority? -&gt; heapq
+
+Hierarchical structure? -&gt; tree
+Relationship network? -&gt; graph
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>time complexity</strong><br>
+- Description: The rate at which operation time grows with data size</p>
+<p><strong>space complexity</strong><br>
+- Description: The amount of memory a data structure uses</p>
+<p><strong>tradeoff</strong><br>
+- Description: Improving one operation's performance may slow another</p>
+<p><strong>profiling</strong><br>
+- Description: Measuring actual bottlenecks in code to find optimization targets</p>
+<p><strong>benchmarking</strong><br>
+- Description: Comparing the performance of different implementations</p>
+<h2>Before / After</h2>
+<p>Compare choosing data structures blindly versus systematically.</p>
+<pre><code class="language-python"># before: using list everywhere — inefficient
+seen = []
+for item in data:
+    if item not in seen:  # O(n) lookup
+        seen.append(item)
+        process(item)
+</code></pre>
+<pre><code class="language-python"># after: choosing the right data structure — efficient
+seen = set()
+for item in data:
+    if item not in seen:  # O(1) lookup
+        seen.add(item)
+        process(item)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Review the time complexity comparison table</strong></p>
+<pre><code class="language-python"># Time complexity by data structure and operation
+complexity = &quot;&quot;&quot;
+| Operation      | list   | dict   | set    | deque  | heapq     |
+|---------------|--------|--------|--------|--------|-----------|
+| Index access  | O(1)   | -      | -      | O(n)   | -         |
+| Search (in)   | O(n)   | O(1)   | O(1)   | O(n)   | O(n)      |
+| Append end    | O(1)*  | O(1)*  | O(1)*  | O(1)   | O(log n)  |
+| Prepend       | O(n)   | -      | -      | O(1)   | -         |
+| Insert mid    | O(n)   | -      | -      | -      | -         |
+| Delete end    | O(1)   | -      | -      | O(1)   | O(log n)  |
+| Delete any    | O(n)   | O(1)*  | O(1)*  | O(n)   | O(n)      |
+| Min value     | O(n)   | O(n)   | O(n)   | O(n)   | O(1)      |
+| Sort          | O(nlogn)| -     | -      | -      | -         |
+
+* amortized
+&quot;&quot;&quot;
+print(complexity)
+</code></pre>
+<p><strong>Step 2: Implement a decision function</strong></p>
+<pre><code class="language-python">def suggest_data_structure(
+    need_order: bool,
+    need_key_value: bool,
+    frequent_search: bool,
+    need_priority: bool,
+    need_both_ends: bool,
+) -&gt; str:
+    if need_priority:
+        return &quot;heapq (priority queue)&quot;
+    if need_key_value:
+        return &quot;dict (hash table)&quot;
+    if frequent_search and not need_order:
+        return &quot;set (hash set)&quot;
+    if need_both_ends:
+        return &quot;deque (double-ended queue)&quot;
+    if need_order:
+        return &quot;list (dynamic array)&quot;
+    return &quot;list (default choice)&quot;
+
+# Example usage
+print(suggest_data_structure(
+    need_order=False,
+    need_key_value=False,
+    frequent_search=True,
+    need_priority=False,
+    need_both_ends=False,
+))
+# set (hash set)
+</code></pre>
+<p><strong>Step 3: Run a real benchmark</strong></p>
+<pre><code class="language-python">import time
+
+def benchmark(name, setup, operation, n=100_000):
+    data = setup(n)
+    start = time.perf_counter()
+    operation(data, n)
+    elapsed = time.perf_counter() - start
+    print(f&quot;{name:20s}: {elapsed:.4f}s&quot;)
+
+# Search benchmark
+target = 99_999
+benchmark(
+    &quot;list search&quot;,
+    lambda n: list(range(n)),
+    lambda data, n: target in data,
+)
+benchmark(
+    &quot;set search&quot;,
+    lambda n: set(range(n)),
+    lambda data, n: target in data,
+)
+benchmark(
+    &quot;dict search&quot;,
+    lambda n: {i: i for i in range(n)},
+    lambda data, n: target in data,
+)
+</code></pre>
+<p><strong>Step 4: Use composite data structures</strong></p>
+<pre><code class="language-python">from collections import defaultdict, deque
+
+# Pattern 1: dict + list — grouping
+students_by_grade = defaultdict(list)
+students = [(&quot;Alice&quot;, &quot;A&quot;), (&quot;Bob&quot;, &quot;B&quot;), (&quot;Charlie&quot;, &quot;A&quot;), (&quot;Diana&quot;, &quot;B&quot;)]
+for name, grade in students:
+    students_by_grade[grade].append(name)
+print(dict(students_by_grade))
+# {'A': ['Alice', 'Charlie'], 'B': ['Bob', 'Diana']}
+
+# Pattern 2: dict + set — unique grouping
+unique_tags = defaultdict(set)
+articles = [(&quot;post1&quot;, &quot;python&quot;), (&quot;post2&quot;, &quot;python&quot;), (&quot;post1&quot;, &quot;flask&quot;)]
+for title, tag in articles:
+    unique_tags[title].add(tag)
+print(dict(unique_tags))
+# {'post1': {'python', 'flask'}, 'post2': {'python'}}
+
+# Pattern 3: list + set — order preservation + fast search
+class OrderedSet:
+    def __init__(self):
+        self._items = []
+        self._set = set()
+
+    def add(self, item):
+        if item not in self._set:
+            self._items.append(item)
+            self._set.add(item)
+
+    def __contains__(self, item):
+        return item in self._set
+
+    def __iter__(self):
+        return iter(self._items)
+
+os = OrderedSet()
+for x in [3, 1, 4, 1, 5, 9, 2, 6, 5]:
+    os.add(x)
+print(list(os))  # [3, 1, 4, 5, 9, 2, 6]
+</code></pre>
+<p><strong>Step 5: Summarize optimal choices by scenario</strong></p>
+<pre><code class="language-python">scenarios = {
+    &quot;Cache (key-value store, O(1) lookup)&quot;: &quot;dict&quot;,
+    &quot;Deduplication&quot;: &quot;set&quot;,
+    &quot;Task queue (FIFO)&quot;: &quot;deque&quot;,
+    &quot;Undo stack (LIFO)&quot;: &quot;list (stack)&quot;,
+    &quot;Top-K extraction&quot;: &quot;heapq&quot;,
+    &quot;Maintaining sorted data&quot;: &quot;bisect + list or SortedList&quot;,
+    &quot;Graph adjacency list&quot;: &quot;dict[str, list[str]]&quot;,
+    &quot;Frequency counting&quot;: &quot;Counter (dict-based)&quot;,
+    &quot;Config/options management&quot;: &quot;dict or dataclass&quot;,
+    &quot;Immutable coordinates/keys&quot;: &quot;tuple&quot;,
+}
+
+for scenario, choice in scenarios.items():
+    print(f&quot;  {scenario:45s} -&gt; {choice}&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The key to data structure selection is identifying the most frequent operation</li>
+<li>Composite data structures (dict + list, dict + set) can satisfy multiple requirements at once</li>
+<li>Benchmarks with real data back up theoretical analysis</li>
+<li>Python's built-in data structures cover the vast majority of situations</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Using list for everything</strong><br>
+- Why It Is a Problem: Search is O(n) — slow for large data<br>
+- Fix: Use dict/set when lookups are frequent</p>
+<p><strong>Optimizing without profiling</strong><br>
+- Why It Is a Problem: Wastes time optimizing non-bottlenecks<br>
+- Fix: Profile to find actual bottlenecks first</p>
+<p><strong>Ignoring data scale</strong><br>
+- Why It Is a Problem: Small-scale differences are negligible, but they matter at scale<br>
+- Fix: Check expected data volume first</p>
+<p><strong>Using unnecessarily complex structures</strong><br>
+- Why It Is a Problem: Hurts code readability<br>
+- Fix: Start simple and change only when needed</p>
+<p><strong>Ignoring conversion costs</strong><br>
+- Why It Is a Problem: list-to-set conversion is O(n) too<br>
+- Fix: Choose the right structure from the start</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>API response caches use dict to prevent duplicate requests</li>
+<li>Log events use deque(maxlen=N) to keep only the most recent N entries</li>
+<li>Recommendation systems store user interests in sets and compute similarity with intersection</li>
+<li>Queue systems manage priority tasks with heapq</li>
+<li>Config files are parsed into dict and converted to dataclasses for type safety</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>"Premature optimization is the root of all evil" — but choosing the right data structure from the start is not optimization, it is design. Mastering just list, dict, set, and deque covers 90% of Python development.</p>
+<p>In practice, you often combine data structures rather than using just one. Combinations like dict + set, dict + list, and heapq + dict cleanly solve complex requirements.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can compare time complexities of key operations across major data structures</li>
+<li>[ ] Can explain a decision framework for choosing data structures by situation</li>
+<li>[ ] Can use composite data structures (dict + list, dict + set)</li>
+<li>[ ] Can benchmark and compare real-world performance of data structures</li>
+<li>[ ] Can summarize the core characteristics of all 10 data structures from this series</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write code that finds the 10 most frequent strings among 1 million strings. Explain which data structure combination is most efficient.</li>
+<li>Implement an LRU cache using dict + doubly linked list (or OrderedDict).</li>
+<li>Design a class that efficiently computes the max, min, and average price over the last 5 minutes from a real-time stock price stream. Explain which data structures you chose and why.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>This series covered list, dict, set, deque, stacks, queues, linked lists, trees, heaps, and graphs. The key to choosing a data structure is asking "what is my most frequent operation?" The right choice makes code cleaner and faster.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Hash Tables and dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/06-trees-and-binary-trees.md">Trees and Binary Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/07-heaps-and-priority-queues.md">Heaps and Priority Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/08-graph-representations.md">Graph Representations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/09-sets-and-set-operations.md">Sets and Set Operations</a></li>
+<li><strong>Choosing the Right Data Structure (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html">Python Docs — Data Structures</a></li>
+<li><a href="https://www.bigocheatsheet.com/">Big-O Cheat Sheet</a></li>
+<li><a href="https://wiki.python.org/moin/TimeComplexity">Python TimeComplexity — Python Wiki</a></li>
+<li><a href="https://realpython.com/python-data-structures/">Real Python — Common Python Data Structures</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, Time Complexity, Performance Optimization, Data Structure Comparison</p>
+</body>
+</html>

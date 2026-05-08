@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Closures and Partial Application</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Closures and Partial Application</h1>
+<blockquote>
+<p>Functional Programming 101 Series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: If a function remembers variables from the scope where it was defined, what patterns become possible?</p>
+<blockquote>
+<p>A closure is an inner function that remembers variables from its enclosing scope. <code>functools.partial</code> fixes some arguments of an existing function to create a new one. This article covers how closures work and practical patterns with partial application.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and mechanics of closures</li>
+<li>The relationship between free variables and cell objects</li>
+<li>Fixing function arguments with functools.partial</li>
+<li>When to choose closures vs partial</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Closures encapsulate state without using classes — a lightweight pattern. Decorators, factory functions, and callbacks are all built on closures.</p>
+<blockquote>
+<p>Closures = functions that carry data</p>
+</blockquote>
+<p><code>functools.partial</code> pre-fills arguments of an existing function to create a specialized version. Both patterns combine with higher-order functions to produce flexible code.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Structure of a Closure</p>
+</blockquote>
+<pre><code>outer_func(x)
+  |
+  +-- local variable x (becomes a free variable)
+  |
+  +-- inner_func(y)
+       |
+       +-- x + y  &lt;- remembers outer x
+           (closure)
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Closure</strong><br>
+- Description: An inner function that remembers variables from its enclosing scope</p>
+<p><strong>Free variable</strong><br>
+- Description: A variable used inside a function that is not locally defined</p>
+<p><strong>Cell object</strong><br>
+- Description: Python's internal structure for storing free variables</p>
+<p><strong>partial</strong><br>
+- Description: Creates a new function by fixing some arguments of an existing function</p>
+<p><strong>Currying</strong><br>
+- Description: Transforming a multi-argument function into a chain of single-argument functions</p>
+<h2>Before / After</h2>
+<p>Remove repeated arguments with a closure.</p>
+<pre><code class="language-python"># before: passing the same argument every time
+import logging
+
+logger = logging.getLogger(&quot;app&quot;)
+
+logger.info(&quot;[UserService] User created&quot;)
+logger.info(&quot;[UserService] User queried&quot;)
+logger.info(&quot;[UserService] User deleted&quot;)
+</code></pre>
+<pre><code class="language-python"># after: closure fixes the prefix
+import logging
+
+def make_logger(prefix: str):
+    logger = logging.getLogger(&quot;app&quot;)
+    def log(message: str) -&gt; None:
+        logger.info(f&quot;[{prefix}] {message}&quot;)
+    return log
+
+user_log = make_logger(&quot;UserService&quot;)
+user_log(&quot;User created&quot;)
+user_log(&quot;User queried&quot;)
+user_log(&quot;User deleted&quot;)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Closure Basics</strong></p>
+<pre><code class="language-python">def make_counter(start: int = 0):
+    &quot;&quot;&quot;Creates a counter function.&quot;&quot;&quot;
+    count = start
+
+    def counter() -&gt; int:
+        nonlocal count
+        count += 1
+        return count
+
+    return counter
+
+c1 = make_counter()
+print(c1())  # 1
+print(c1())  # 2
+print(c1())  # 3
+
+c2 = make_counter(100)
+print(c2())  # 101
+
+# c1 and c2 maintain independent state
+print(c1())  # 4
+print(c2())  # 102
+</code></pre>
+<p><strong>Step 2: Inspecting Free Variables</strong></p>
+<pre><code class="language-python">def make_greeter(greeting: str):
+    def greet(name: str) -&gt; str:
+        return f&quot;{greeting}, {name}!&quot;
+    return greet
+
+hello = make_greeter(&quot;Hello&quot;)
+bye = make_greeter(&quot;Goodbye&quot;)
+
+print(hello(&quot;Alice&quot;))  # Hello, Alice!
+print(bye(&quot;Bob&quot;))      # Goodbye, Bob!
+
+# inspect free variables
+print(hello.__code__.co_freevars)      # ('greeting',)
+print(hello.__closure__[0].cell_contents)  # Hello
+print(bye.__closure__[0].cell_contents)    # Goodbye
+</code></pre>
+<p><strong>Step 3: functools.partial</strong></p>
+<pre><code class="language-python">from functools import partial
+
+# basic usage: fix arguments
+def power(base: int, exponent: int) -&gt; int:
+    return base ** exponent
+
+square = partial(power, exponent=2)
+cube = partial(power, exponent=3)
+
+print(square(5))  # 25
+print(cube(5))    # 125
+
+# practical example: API client configuration
+def send_request(method: str, url: str, headers: dict) -&gt; str:
+    return f&quot;{method} {url} (headers={headers})&quot;
+
+api_get = partial(send_request, &quot;GET&quot;, headers={&quot;Authorization&quot;: &quot;Bearer token&quot;})
+api_post = partial(send_request, &quot;POST&quot;, headers={&quot;Authorization&quot;: &quot;Bearer token&quot;})
+
+print(api_get(&quot;/users&quot;))
+# GET /users (headers={'Authorization': 'Bearer token'})
+print(api_post(&quot;/orders&quot;))
+# POST /orders (headers={'Authorization': 'Bearer token'})
+</code></pre>
+<p><strong>Step 4: Closures vs partial</strong></p>
+<pre><code class="language-python">from functools import partial
+
+# approach 1: closure
+def make_tax_calculator_closure(rate: float):
+    def calculate(amount: float) -&gt; float:
+        return round(amount * rate, 2)
+    return calculate
+
+# approach 2: partial
+def calculate_tax(amount: float, rate: float) -&gt; float:
+    return round(amount * rate, 2)
+
+make_tax_calculator_partial = lambda rate: partial(calculate_tax, rate=rate)
+
+# usage is identical
+tax_10 = make_tax_calculator_closure(0.1)
+tax_10_p = make_tax_calculator_partial(0.1)
+
+print(tax_10(50000))    # 5000.0
+print(tax_10_p(50000))  # 5000.0
+
+# selection criteria
+# - closure: when state mutation (nonlocal) is needed
+# - partial: when you only need to fix arguments
+</code></pre>
+<p><strong>Step 5: Real-World Usage — Event Handlers</strong></p>
+<pre><code class="language-python">from functools import partial
+from typing import Callable
+
+# event system
+class EventBus:
+    def __init__(self) -&gt; None:
+        self._handlers: dict[str, list[Callable]] = {}
+
+    def on(self, event: str, handler: Callable) -&gt; None:
+        self._handlers.setdefault(event, []).append(handler)
+
+    def emit(self, event: str, **data) -&gt; None:
+        for handler in self._handlers.get(event, []):
+            handler(**data)
+
+# closure to create a handler with context
+def make_logger_handler(prefix: str):
+    def handler(**data) -&gt; None:
+        print(f&quot;[{prefix}] {data}&quot;)
+    return handler
+
+# partial to convert an existing function into a handler
+def log_event(level: str, **data) -&gt; None:
+    print(f&quot;[{level}] {data}&quot;)
+
+bus = EventBus()
+bus.on(&quot;user.created&quot;, make_logger_handler(&quot;UserService&quot;))
+bus.on(&quot;user.created&quot;, partial(log_event, &quot;INFO&quot;))
+
+bus.emit(&quot;user.created&quot;, name=&quot;Alice&quot;, email=&quot;alice@example.com&quot;)
+# [UserService] {'name': 'Alice', 'email': 'alice@example.com'}
+# [INFO] {'name': 'Alice', 'email': 'alice@example.com'}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Closures store outer variables in <code>__closure__</code>, keeping them alive after the outer function returns</li>
+<li><code>nonlocal</code> is needed to modify an outer variable (not needed for read-only access)</li>
+<li><code>partial</code> is a convenient way to fix arguments and create specialized functions</li>
+<li>Use closures when state mutation is needed; use <code>partial</code> when only fixing arguments</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Sharing variables across closures in a loop</strong><br>
+- Why It Is a Problem: All closures reference the same variable<br>
+- Fix: Copy the value via a default argument</p>
+<p><strong>Modifying an outer variable without nonlocal</strong><br>
+- Why It Is a Problem: UnboundLocalError is raised<br>
+- Fix: Add a <code>nonlocal</code> declaration</p>
+<p><strong>Managing too much state with closures</strong><br>
+- Why It Is a Problem: A class would be more appropriate<br>
+- Fix: Use a class when state is complex</p>
+<p><strong>Using lambda instead of partial</strong><br>
+- Why It Is a Problem: <code>partial</code> is clearer and faster<br>
+- Fix: Use partial when the goal is fixing arguments</p>
+<p><strong>Not inspecting closure state during debugging</strong><br>
+- Why It Is a Problem: Free variables may differ from expectations<br>
+- Fix: Check <code>__closure__</code> to verify state</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Decorators use closures to remember configuration values</li>
+<li>Callbacks receive extra arguments via <code>partial</code></li>
+<li>Tests use <code>partial</code> to fix common parameters</li>
+<li>Logging utilities use closures to fix a prefix</li>
+<li>Event handlers bind context with closures</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Closures are "lightweight objects." When state is simple and there is only one method, a closure is more appropriate than a class. Conversely, when state is complex and multiple methods are needed, a class is the right choice.</p>
+<p><code>functools.partial</code> is an underrated tool. Using <code>partial(f, fixed_arg)</code> instead of <code>lambda x: f(x, fixed_arg)</code> is clearer and enables <code>repr()</code> to display the fixed arguments, making debugging easier.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the mechanism by which closures remember outer variables</li>
+<li>[ ] I can distinguish when <code>nonlocal</code> is needed and when it is not</li>
+<li>[ ] I can fix function arguments with <code>functools.partial</code></li>
+<li>[ ] I know the selection criteria between closures and partial</li>
+<li>[ ] I can solve the loop variable sharing problem with closures</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a <code>make_call_counter(func)</code> closure that counts how many times the wrapped function is called.</li>
+<li>Use <code>partial</code> to customize the <code>key</code> argument of <code>sorted</code> in a utility function.</li>
+<li>Reproduce the loop variable sharing problem with closures and fix it.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Closures let functions remember the environment where they were defined, and <code>partial</code> fixes arguments of existing functions. Use closures when state is needed; use partial when only fixing arguments. The next article covers a core functional programming technique: <strong>recursion and tail calls</strong>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
+<li><strong>Closures and Partial Application (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/functools.html#functools.partial">Python Official Docs — functools.partial</a></li>
+<li><a href="https://realpython.com/python-closure/">Real Python — Closures in Python</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 9: Decorators and Closures</a></li>
+<li><a href="https://peps.python.org/pep-3104/">PEP 3104 — Access to Names in Outer Scopes (nonlocal)</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Functional Programming, Closures, partial, functools</p>
+</body>
+</html>

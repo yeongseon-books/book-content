@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Function Composition and Pipelines</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Function Composition and Pipelines</h1>
+<blockquote>
+<p>Functional Programming 101 Series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can you snap small functions together like LEGO bricks to build complex transformations?</p>
+<blockquote>
+<p>Function composition combines multiple functions into a new function. A pipeline is a pattern where data flows through a chain of functions, being transformed at each step. This article covers practical ways to implement composition and pipelines in Python.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The mathematical principle behind function composition and its Python implementation</li>
+<li>The difference between pipe and compose</li>
+<li>Type-safe pipeline construction</li>
+<li>Designing real-world data transformation pipelines</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Writing complex data processing logic as one giant function makes it hard to test and reuse. Composing small single-purpose functions lets you test each step independently and recombine them freely.</p>
+<blockquote>
+<p>Function composition = building large systems from small parts</p>
+</blockquote>
+<p>This follows the UNIX philosophy (<code>cat file | grep error | sort | uniq</code>). Each tool does one thing well, and combinations handle complex tasks.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>compose vs pipe — a matter of direction</p>
+</blockquote>
+<pre><code>compose(f, g, h)(x)  =  f(g(h(x)))     &lt;- right to left
+pipe(h, g, f)(x)     =  f(g(h(x)))     &lt;- left to right
+
+Pipeline visualization:
+  x -&gt; [h] -&gt; [g] -&gt; [f] -&gt; result
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Function composition</strong><br>
+- Description: An operation that combines two functions f, g into f(g(x))</p>
+<p><strong>Pipeline</strong><br>
+- Description: A pattern where data passes through a chain of functions sequentially</p>
+<p><strong>compose</strong><br>
+- Description: Composes functions from right to left</p>
+<p><strong>pipe</strong><br>
+- Description: Composes functions from left to right</p>
+<p><strong>Point-free style</strong><br>
+- Description: Expressing logic through function composition alone, without naming arguments</p>
+<h2>Before / After</h2>
+<p>Replace nested function calls with a pipeline.</p>
+<pre><code class="language-python"># before: nested calls — read from inside out
+result = format_output(
+    sort_by_score(
+        filter_passing(
+            calculate_totals(
+                load_data()
+            )
+        )
+    )
+)
+</code></pre>
+<pre><code class="language-python"># after: pipeline — read top to bottom
+result = pipe(
+    load_data,
+    calculate_totals,
+    filter_passing,
+    sort_by_score,
+    format_output,
+)()
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Basic compose and pipe</strong></p>
+<pre><code class="language-python">from typing import Callable, Any
+from functools import reduce
+
+def compose(*funcs: Callable) -&gt; Callable:
+    &quot;&quot;&quot;Composes functions from right to left.&quot;&quot;&quot;
+    def composed(x: Any) -&gt; Any:
+        result = x
+        for f in reversed(funcs):
+            result = f(result)
+        return result
+    return composed
+
+def pipe(*funcs: Callable) -&gt; Callable:
+    &quot;&quot;&quot;Composes functions from left to right.&quot;&quot;&quot;
+    def piped(x: Any) -&gt; Any:
+        result = x
+        for f in funcs:
+            result = f(result)
+        return result
+    return piped
+
+# compose: f(g(h(x)))
+add_one = lambda x: x + 1
+double = lambda x: x * 2
+to_str = lambda x: f&quot;Result: {x}&quot;
+
+transform_c = compose(to_str, double, add_one)
+print(transform_c(5))  # Result: 12  — (5+1)*2 = 12
+
+# pipe: read order matches execution order
+transform_p = pipe(add_one, double, to_str)
+print(transform_p(5))  # Result: 12
+</code></pre>
+<p><strong>Step 2: String Processing Pipeline</strong></p>
+<pre><code class="language-python">import re
+
+def strip_whitespace(text: str) -&gt; str:
+    return text.strip()
+
+def normalize_spaces(text: str) -&gt; str:
+    return re.sub(r&quot;\s+&quot;, &quot; &quot;, text)
+
+def to_lowercase(text: str) -&gt; str:
+    return text.lower()
+
+def replace_special(text: str) -&gt; str:
+    return re.sub(r&quot;[^a-z0-9\s-]&quot;, &quot;&quot;, text)
+
+def spaces_to_hyphens(text: str) -&gt; str:
+    return text.replace(&quot; &quot;, &quot;-&quot;)
+
+def truncate(max_len: int):
+    def _truncate(text: str) -&gt; str:
+        return text[:max_len]
+    return _truncate
+
+# slug generation pipeline
+slugify = pipe(
+    strip_whitespace,
+    normalize_spaces,
+    to_lowercase,
+    replace_special,
+    spaces_to_hyphens,
+    truncate(50),
+)
+
+print(slugify(&quot;  Hello, World!  This is  a Test  &quot;))
+# hello-world-this-is-a-test
+
+print(slugify(&quot;  Functional Programming — A Composition Guide  &quot;))
+# functional-programming--a-composition-guide
+</code></pre>
+<p><strong>Step 3: Data Processing Pipeline</strong></p>
+<pre><code class="language-python">from typing import Callable
+
+def pipe_data(*funcs: Callable) -&gt; Callable:
+    &quot;&quot;&quot;Data processing pipeline.&quot;&quot;&quot;
+    def process(data):
+        result = data
+        for func in funcs:
+            result = func(result)
+        return result
+    return process
+
+# define each stage as an independent function
+def parse_records(raw: list[str]) -&gt; list[dict]:
+    records = []
+    for line in raw:
+        name, score = line.split(&quot;,&quot;)
+        records.append({&quot;name&quot;: name.strip(), &quot;score&quot;: int(score.strip())})
+    return records
+
+def add_grade(records: list[dict]) -&gt; list[dict]:
+    def grade(score: int) -&gt; str:
+        if score &gt;= 90: return &quot;A&quot;
+        if score &gt;= 80: return &quot;B&quot;
+        if score &gt;= 70: return &quot;C&quot;
+        return &quot;F&quot;
+    return [{**r, &quot;grade&quot;: grade(r[&quot;score&quot;])} for r in records]
+
+def filter_passing(records: list[dict]) -&gt; list[dict]:
+    return [r for r in records if r[&quot;grade&quot;] != &quot;F&quot;]
+
+def sort_by_score(records: list[dict]) -&gt; list[dict]:
+    return sorted(records, key=lambda r: r[&quot;score&quot;], reverse=True)
+
+def format_table(records: list[dict]) -&gt; str:
+    lines = [f&quot;{'Name':&lt;10} {'Score':&gt;5} {'Grade':&gt;5}&quot;]
+    lines.append(&quot;-&quot; * 22)
+    for r in records:
+        lines.append(f&quot;{r['name']:&lt;10} {r['score']:&gt;5} {r['grade']:&gt;5}&quot;)
+    return &quot;\n&quot;.join(lines)
+
+# assemble the pipeline
+process_students = pipe_data(
+    parse_records,
+    add_grade,
+    filter_passing,
+    sort_by_score,
+    format_table,
+)
+
+# execute
+raw_data = [
+    &quot;Alice, 85&quot;,
+    &quot;Bob, 92&quot;,
+    &quot;Charlie, 78&quot;,
+    &quot;Diana, 95&quot;,
+    &quot;Eve, 60&quot;,
+]
+
+print(process_students(raw_data))
+# Name        Score Grade
+# ----------------------
+# Diana          95     A
+# Bob            92     A
+# Alice          85     B
+# Charlie        78     C
+</code></pre>
+<p><strong>Step 4: Generator Pipeline</strong></p>
+<pre><code class="language-python">from typing import Iterator, Callable
+
+def gen_pipe(*funcs: Callable) -&gt; Callable:
+    &quot;&quot;&quot;Generator-based lazy pipeline.&quot;&quot;&quot;
+    def process(data):
+        result = data
+        for func in funcs:
+            result = func(result)
+        return result
+    return process
+
+def lines(text: str) -&gt; Iterator[str]:
+    for line in text.strip().split(&quot;\n&quot;):
+        yield line
+
+def strip_lines(it: Iterator[str]) -&gt; Iterator[str]:
+    for line in it:
+        yield line.strip()
+
+def skip_empty(it: Iterator[str]) -&gt; Iterator[str]:
+    for line in it:
+        if line:
+            yield line
+
+def skip_comments(it: Iterator[str]) -&gt; Iterator[str]:
+    for line in it:
+        if not line.startswith(&quot;#&quot;):
+            yield line
+
+def to_upper(it: Iterator[str]) -&gt; Iterator[str]:
+    for line in it:
+        yield line.upper()
+
+# assemble the lazy pipeline
+clean_text = gen_pipe(
+    strip_lines,
+    skip_empty,
+    skip_comments,
+    to_upper,
+)
+
+text = &quot;&quot;&quot;
+  # config file
+  host = localhost
+
+  port = 8080
+
+  # debug mode
+  debug = true
+&quot;&quot;&quot;
+
+for line in clean_text(lines(text)):
+    print(line)
+# HOST = LOCALHOST
+# PORT = 8080
+# DEBUG = TRUE
+</code></pre>
+<p><strong>Step 5: Conditional Pipeline</strong></p>
+<pre><code class="language-python">from typing import Callable, Any
+
+def conditional(
+    predicate: Callable[[Any], bool],
+    if_true: Callable,
+    if_false: Callable | None = None,
+) -&gt; Callable:
+    &quot;&quot;&quot;Applies different functions based on a condition.&quot;&quot;&quot;
+    def apply(value: Any) -&gt; Any:
+        if predicate(value):
+            return if_true(value)
+        return if_false(value) if if_false else value
+    return apply
+
+def when(predicate: Callable[[Any], bool], func: Callable) -&gt; Callable:
+    &quot;&quot;&quot;Applies a function only when the condition is true.&quot;&quot;&quot;
+    return conditional(predicate, func)
+
+# pipeline with conditional steps
+process = pipe(
+    lambda x: x.strip(),
+    when(lambda x: x.startswith(&quot;http&quot;), lambda x: x.replace(&quot;http://&quot;, &quot;https://&quot;)),
+    lambda x: x.lower(),
+    when(lambda x: len(x) &gt; 30, lambda x: x[:27] + &quot;...&quot;),
+)
+
+print(process(&quot;  http://Example.COM/Very-Long-Path-Name-Here  &quot;))
+# https://example.com/very-l...
+print(process(&quot;  Short URL  &quot;))
+# short url
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>pipe</code> matches code order to execution order, improving readability</li>
+<li>Each stage function is independent and can be tested individually</li>
+<li>Generator pipelines process large data in a memory-efficient way</li>
+<li>Conditional pipelines express branching logic declaratively</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Mismatched function signatures</strong><br>
+- Why It Is a Problem: Output of one function does not match the next function's input<br>
+- Fix: Verify compatibility with type hints</p>
+<p><strong>Pipeline grows too long</strong><br>
+- Why It Is a Problem: Debugging becomes difficult<br>
+- Fix: Add intermediate variables or logging steps</p>
+<p><strong>Side effects in the middle of a pipeline</strong><br>
+- Why It Is a Problem: Makes testing and reuse hard<br>
+- Fix: Place side effects at the end of the pipeline</p>
+<p><strong>Missing error handling</strong><br>
+- Why It Is a Problem: A failure in one stage halts the entire pipeline<br>
+- Fix: Include error handling stages in the pipeline</p>
+<p><strong>Mixing compose and pipe</strong><br>
+- Why It Is a Problem: Execution direction becomes confusing<br>
+- Fix: Standardize on one within the project</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Build ETL pipelines (Extract, Transform, Load) with function composition</li>
+<li>Implement data validation as a pipeline of validator functions</li>
+<li>Compose text preprocessing (normalization, tokenization, filtering) as a pipeline</li>
+<li>Implement API middleware chains through function composition</li>
+<li>Define each stage of a CI/CD pipeline as an independent function</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>The core value of function composition is separation of concerns. When each function handles exactly one transformation, testing is easy and recombination is free. This is the UNIX philosophy — "do one thing well" — applied at the code level.</p>
+<p>Python does not have a built-in composition operator like Haskell's <code>.</code>, but a single <code>pipe()</code> utility is all you need. The point is not the tool — it is the mindset of composing small functions.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between compose and pipe</li>
+<li>[ ] I can combine small functions into a data pipeline</li>
+<li>[ ] I can implement lazy evaluation with generator pipelines</li>
+<li>[ ] I can write conditional pipelines</li>
+<li>[ ] I can test each stage of a pipeline independently</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Implement both <code>compose</code> and <code>pipe</code>, and verify they produce the same result.</li>
+<li>Build a 4-stage pipeline that reads JSON data, filters, transforms, sorts, and formats it.</li>
+<li>Implement a pipeline with error handling using a <code>Result</code> type.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Function composition combines small functions into complex transformations. <code>pipe</code> aligns code order with execution order for better readability. The next article wraps up the series with <strong>balancing OOP and functional programming</strong>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
+<li><strong>Function Composition and Pipelines (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/functools.html">Python Official Docs — functools</a></li>
+<li><a href="https://realpython.com/python-functional-programming/">Real Python — Functional Programming in Python</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Unix_philosophy">UNIX Philosophy — Doug McIlroy</a></li>
+<li><a href="https://medium.com/javascript-scene/composing-software-the-book-f31c77fc3ddc">Composing Software — Eric Elliott</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Functional Programming, Function Composition, Pipelines, Data Transformation</p>
+</body>
+</html>

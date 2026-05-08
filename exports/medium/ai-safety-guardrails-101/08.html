@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rate Limiting and Abuse Prevention</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Rate Limiting and Abuse Prevention</h1>
+<blockquote>
+<p>AI Safety &amp; Guardrails 101 Series (8/10)</p>
+</blockquote>
+<hr>
+<h2>Section 1</h2>
+<h2>Why Rate Limiting Is Different for LLM APIs</h2>
+<p>Traditional API abuse control is mostly about requests per second. LLM APIs add two dimensions.</p>
+<ul>
+<li><strong>Token cost</strong>: a single request can be 100 tokens or 100,000 tokens. RPS alone cannot prevent cost runaway.</li>
+<li><strong>Output token cost</strong>: streaming makes infinite-output attacks possible. Measuring only input misses them.</li>
+</ul>
+<p>So an LLM rate limiter must track four dimensions at once: RPS, input tokens per minute, output tokens per minute, and dollars per minute.</p>
+<h2>Token Bucket vs Sliding Window</h2>
+<p>Compare the two basic algorithms.</p>
+<p><strong>Token bucket</strong><br>
+- Strength: Allows bursts, simple to implement<br>
+- Weakness: Long-term average accurate, but stacked short bursts can overrun cost</p>
+<p><strong>Sliding window</strong><br>
+- Strength: Accurate average, easy to analyze<br>
+- Weakness: Expensive in Redis keys, stingy with bursts</p>
+<p>The common LLM pattern is hybrid: token buckets for quota dimensions and sliding windows for burst detection.</p>
+<pre><code class="language-python">import time
+import redis
+
+r = redis.Redis()
+
+def token_bucket(key: str, capacity: int, refill_per_sec: float, cost: int) -&gt; bool:
+    now = time.time()
+    pipe = r.pipeline()
+    pipe.hgetall(key)
+    state = pipe.execute()[0]
+    tokens = float(state.get(b&quot;tokens&quot;, capacity))
+    last = float(state.get(b&quot;ts&quot;, now))
+    tokens = min(capacity, tokens + (now - last) * refill_per_sec)
+    if tokens &lt; cost:
+        r.hset(key, mapping={&quot;tokens&quot;: tokens, &quot;ts&quot;: now})
+        return False
+    tokens -= cost
+    r.hset(key, mapping={&quot;tokens&quot;: tokens, &quot;ts&quot;: now})
+    r.expire(key, 3600)
+    return True
+</code></pre>
+<p><code>cost</code> is 1 for RPS, or actual input or output token count for token quotas.</p>
+<h2>Per-User, Per-IP, Per-Key Limits</h2>
+<p>Apply all three boundaries.</p>
+<pre><code class="language-python">def allow_request(user_id: str, ip: str, api_key: str, input_tokens: int) -&gt; tuple[bool, str]:
+    if not token_bucket(f&quot;u:{user_id}:rps&quot;, capacity=60, refill_per_sec=1, cost=1):
+        return False, &quot;user rps&quot;
+    if not token_bucket(f&quot;u:{user_id}:tok&quot;, capacity=100_000, refill_per_sec=100_000/60, cost=input_tokens):
+        return False, &quot;user tokens&quot;
+    if not token_bucket(f&quot;ip:{ip}:rps&quot;, capacity=120, refill_per_sec=2, cost=1):
+        return False, &quot;ip rps&quot;
+    if not token_bucket(f&quot;k:{api_key}:tok&quot;, capacity=1_000_000, refill_per_sec=1_000_000/60, cost=input_tokens):
+        return False, &quot;key tokens&quot;
+    return True, &quot;&quot;
+</code></pre>
+<p>User limits are the tightest, IP limits stop one user from cycling addresses, and API key limits cap whole-organization spend.</p>
+<h2>Output Token Cap</h2>
+<p>Charge tokens during streaming, not only on completion. Charging at the end leaves infinite-output attacks open.</p>
+<pre><code class="language-python">def stream_with_budget(prompt: str, user_id: str, max_output: int):
+    bucket_key = f&quot;u:{user_id}:out&quot;
+    spent = 0
+    for chunk in llm.stream(prompt, max_tokens=max_output):
+        token_count = len(chunk.split())  # use a real tokenizer in production
+        if not token_bucket(bucket_key, capacity=200_000, refill_per_sec=200_000/60, cost=token_count):
+            yield &quot;[output quota exceeded]&quot;
+            return
+        spent += token_count
+        yield chunk
+</code></pre>
+<p>Always set <code>max_tokens</code> and add an additional application-side cap; the model can ignore it or a streaming proxy may behave differently.</p>
+<h2>Cost Budget Limiter</h2>
+<p>Cap by dollars, not just tokens. Multiply by per-model pricing and accumulate.</p>
+<pre><code class="language-python">PRICING = {
+    &quot;gpt-4o&quot;: {&quot;in&quot;: 2.50/1_000_000, &quot;out&quot;: 10.00/1_000_000},
+    &quot;gpt-4o-mini&quot;: {&quot;in&quot;: 0.15/1_000_000, &quot;out&quot;: 0.60/1_000_000},
+}
+
+def charge(user_id: str, model: str, in_tok: int, out_tok: int) -&gt; bool:
+    p = PRICING[model]
+    cost_cents = int((in_tok * p[&quot;in&quot;] + out_tok * p[&quot;out&quot;]) * 100_000)  # 0.001 cent units
+    return token_bucket(f&quot;u:{user_id}:cost&quot;, capacity=10_000_000, refill_per_sec=10_000_000/86400, cost=cost_cents)
+</code></pre>
+<p>The example caps a user at roughly $10 per day. Vary capacity and refill by plan tier.</p>
+<h2>Anomaly Detection</h2>
+<p>To catch patterns that simple thresholds miss, track per-user mean and standard deviation.</p>
+<pre><code class="language-python">import math
+from collections import deque
+
+class AnomalyDetector:
+    def __init__(self, window: int = 60):
+        self.window = window
+        self.history: dict[str, deque] = {}
+
+    def observe(self, user_id: str, rate: float) -&gt; bool:
+        h = self.history.setdefault(user_id, deque(maxlen=self.window))
+        h.append(rate)
+        if len(h) &lt; 10:
+            return False
+        mean = sum(h) / len(h)
+        var = sum((x - mean) ** 2 for x in h) / len(h)
+        sd = math.sqrt(var) or 1
+        z = (rate - mean) / sd
+        return z &gt; 3.0
+</code></pre>
+<p>A z-score above 3 represents an event in the lower 0.13 percent of a normal distribution. A user who normally sends 5 requests per minute will trip when they suddenly send 200.</p>
+<h2>CAPTCHA and Tiered Escalation</h2>
+<p>Once you flag an anomaly, prefer tiered escalation over instant blocks; it preserves UX for legitimate bursts.</p>
+<ol>
+<li><strong>Warning header</strong>: <code>X-Rate-Warning: approaching limit</code></li>
+<li><strong>Soft throttle</strong>: insert artificial latency in the response</li>
+<li><strong>CAPTCHA challenge</strong>: required when issuing a new session token</li>
+<li><strong>Suspend the API key</strong>: when automated abuse is confirmed</li>
+<li><strong>Manual review</strong>: open a ticket if the same user trips repeatedly within 24 hours</li>
+</ol>
+<pre><code class="language-python">def handle_anomaly(user_id: str, severity: int):
+    if severity == 1:
+        return {&quot;warning&quot;: True}
+    if severity == 2:
+        time.sleep(2)
+    if severity == 3:
+        return {&quot;require_captcha&quot;: True}
+    if severity &gt;= 4:
+        r.set(f&quot;suspended:{user_id}&quot;, &quot;1&quot;, ex=3600)
+        return {&quot;suspended&quot;: True}
+</code></pre>
+<h2>Distributed Counter Accuracy</h2>
+<p>A single Redis node is a single point of failure. With limiters across multiple regions, choose:</p>
+<ul>
+<li><strong>Strong consistency</strong>: Redis Cluster or etcd. Accurate but adds latency.</li>
+<li><strong>Eventual consistency</strong>: per-region local counters with async sync. Faster but allows brief over-spend bursts.</li>
+</ul>
+<p>LLM APIs care about cost caps, so most teams pick strong consistency for cost dimensions and per-region local for RPS.</p>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Limiting only RPS.</strong> A single request can spend 100K tokens, so cost still runs away. Limit token and dollar dimensions too.</li>
+<li><strong>Not measuring output tokens.</strong> Infinite streaming attacks slip through. Charge during the stream.</li>
+<li><strong>Setting only user limits.</strong> A user can cycle IPs or one organization can exhaust the quota for everyone. Add IP and key boundaries.</li>
+<li><strong>Anomaly detection on the mean alone.</strong> Add standard deviation and z-score to keep false positives down.</li>
+<li><strong>Blocking on the first anomaly.</strong> Legitimate bursts get cut off and complaints flood in. Escalate: warn, slow, CAPTCHA, suspend.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>LLM rate limits track four dimensions: RPS, input tokens, output tokens, and cost.</li>
+<li>Hybrid pattern: token bucket for quotas, sliding window for burst monitoring.</li>
+<li>Apply user, IP, and API key boundaries together so attackers cannot trivially cycle out.</li>
+<li>Charge output tokens during the stream and always set <code>max_tokens</code> plus an application-side cap.</li>
+<li>Combine z-score anomaly detection with tiered escalation to balance abuse prevention against false positives.</li>
+</ul>
+<hr>
+<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">Ep6 Toxicity and Bias Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/07-hallucination-guardrails.md">Ep7 Hallucination Guardrails - Grounding Checks</a></li>
+<li><strong>Ep8 Rate Limiting and Abuse Prevention (current)</strong></li>
+<li>Ep9 Audit Logging and Compliance (upcoming)</li>
+<li>Ep10 Building a Production Guardrail System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://stripe.com/blog/rate-limiters">Stripe Engineering - Scaling your API with rate limiters</a></li>
+<li><a href="https://blog.cloudflare.com/counting-things-a-lot-of-different-things/">Cloudflare - How we built rate limiting capable of scaling to millions of domains</a></li>
+<li><a href="https://platform.openai.com/docs/guides/rate-limits">OpenAI API - Rate limits documentation</a></li>
+<li><a href="https://redis.io/docs/latest/develop/use/patterns/distributed-locks/">Redis - Rate limiting patterns</a></li>
+</ul>
+<p class="tags-line">Tags: AI Safety, Rate Limiting, Abuse Prevention, Anomaly Detection</p>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PII Detection and Anonymization for Training Data</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>PII Detection and Anonymization for Training Data</h1>
+<blockquote>
+<p>AI Data Preparation 101 series (4/10)</p>
+</blockquote>
+<hr>
+<h2>"We Can't Have PII in Training Data, Right?"</h2>
+<p>LLMs leaking email addresses or phone numbers that came from training data is no longer hypothetical. Carlini et al. (2021), "Extracting Training Data from Large Language Models," demonstrated real names and contact info being extracted from GPT-2. Whatever PII you put in at training time can leak at inference time.</p>
+<p>PII anonymization is more than regex matching. It is a four-stage pipeline.</p>
+<ol>
+<li><strong>Detection</strong>: which texts contain PII</li>
+<li><strong>Classification</strong>: which kind of PII (email, phone, SSN, name, etc.)</li>
+<li><strong>Anonymization</strong>: redact or pseudonymize</li>
+<li><strong>Audit</strong>: log results and verify with sampling</li>
+</ol>
+<h2>PII Categories — What to Catch</h2>
+<p>Production data falls into roughly these buckets.</p>
+<p><strong>Direct identifier</strong><br>
+- Examples: email, phone, SSN, credit card<br>
+- Risk: High</p>
+<p><strong>Quasi-identifier</strong><br>
+- Examples: name, address, DOB, employer<br>
+- Risk: Medium</p>
+<p><strong>Sensitive attribute</strong><br>
+- Examples: medical info, religion, politics<br>
+- Risk: High</p>
+<p><strong>Indirect identifier</strong><br>
+- Examples: IP, device ID, browser fingerprint<br>
+- Risk: Medium</p>
+<p>GDPR Article 4 and Korea's PIPA both treat "information that, combined with other data, could identify a person" as PII. Sweeney (2000) famously showed that three or four quasi-identifiers can re-identify an individual.</p>
+<h2>Stage 1: Regex Detection</h2>
+<p>Fast, with the highest false-negative rate. But required as the first layer.</p>
+<pre><code class="language-python">import re
+
+PATTERNS = {
+    &quot;email&quot;: re.compile(r&quot;\b[\w.+-]+@[\w-]+\.[\w.-]+\b&quot;),
+    &quot;phone_kr&quot;: re.compile(r&quot;\b01[016789]-?\d{3,4}-?\d{4}\b&quot;),
+    &quot;phone_intl&quot;: re.compile(r&quot;\+\d{1,3}[\s-]?\(?\d{1,4}\)?[\s-]?\d{1,4}[\s-]?\d{1,9}&quot;),
+    &quot;ssn_us&quot;: re.compile(r&quot;\b\d{3}-\d{2}-\d{4}\b&quot;),
+    &quot;rrn_kr&quot;: re.compile(r&quot;\b\d{6}-?[1-4]\d{6}\b&quot;),  # Korean RRN
+    &quot;credit_card&quot;: re.compile(r&quot;\b(?:\d[ -]?){13,19}\b&quot;),
+    &quot;ipv4&quot;: re.compile(r&quot;\b(?:\d{1,3}\.){3}\d{1,3}\b&quot;),
+}
+
+def detect_regex(text: str) -&gt; dict[str, list[str]]:
+    return {k: p.findall(text) for k, p in PATTERNS.items() if p.search(text)}
+
+# Test
+sample = &quot;Contact: alice@example.com or 010-1234-5678.&quot;
+print(detect_regex(sample))
+</code></pre>
+<p>Regex alone misses natural-language PII like names and addresses. Add a NER stage.</p>
+<h2>Stage 2: NER Detection</h2>
+<p><code>spaCy</code> or Microsoft's <code>Presidio</code> catches names, organizations, locations.</p>
+<pre><code class="language-python"># pip install presidio-analyzer presidio-anonymizer
+from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
+
+analyzer = AnalyzerEngine()  # English default; Korean needs spaCy ko model
+anonymizer = AnonymizerEngine()
+
+def detect_ner(text: str, language: str = &quot;en&quot;) -&gt; list[dict]:
+    results = analyzer.analyze(
+        text=text,
+        entities=[&quot;EMAIL_ADDRESS&quot;, &quot;PHONE_NUMBER&quot;, &quot;PERSON&quot;,
+                  &quot;LOCATION&quot;, &quot;CREDIT_CARD&quot;, &quot;IP_ADDRESS&quot;],
+        language=language,
+    )
+    return [{&quot;type&quot;: r.entity_type, &quot;start&quot;: r.start, &quot;end&quot;: r.end,
+             &quot;score&quot;: r.score, &quot;text&quot;: text[r.start:r.end]} for r in results]
+
+text = &quot;John Smith works at Acme Corp in Seoul. Email: john@acme.com&quot;
+for hit in detect_ner(text):
+    print(hit)
+</code></pre>
+<p>Presidio returns confidence scores. Anything below 0.6 should go to a review queue or be redacted conservatively.</p>
+<h2>Stage 3: Four Anonymization Techniques</h2>
+<p>Once PII is found, you have four options.</p>
+<pre><code class="language-python">import hashlib
+import secrets
+
+def redact(text: str, hits: list[dict]) -&gt; str:
+    &quot;&quot;&quot;Full removal: safest, loses context&quot;&quot;&quot;
+    out = text
+    for h in sorted(hits, key=lambda x: -x[&quot;start&quot;]):
+        out = out[:h[&quot;start&quot;]] + f&quot;[{h['type']}]&quot; + out[h[&quot;end&quot;]:]
+    return out
+
+def mask(text: str, hits: list[dict], keep: int = 4) -&gt; str:
+    &quot;&quot;&quot;Partial mask: keeps trailing chars (e.g., card last4)&quot;&quot;&quot;
+    out = text
+    for h in sorted(hits, key=lambda x: -x[&quot;start&quot;]):
+        original = text[h[&quot;start&quot;]:h[&quot;end&quot;]]
+        masked = &quot;*&quot; * (len(original) - keep) + original[-keep:]
+        out = out[:h[&quot;start&quot;]] + masked + out[h[&quot;end&quot;]:]
+    return out
+
+_PEPPER = secrets.token_hex(16)  # process-local secret
+
+def pseudonymize(text: str, hits: list[dict]) -&gt; str:
+    &quot;&quot;&quot;Same input -&gt; same pseudonym. Analytics-friendly, not reversible.&quot;&quot;&quot;
+    out = text
+    for h in sorted(hits, key=lambda x: -x[&quot;start&quot;]):
+        original = text[h[&quot;start&quot;]:h[&quot;end&quot;]]
+        token = hashlib.sha256(
+            (_PEPPER + original).encode()
+        ).hexdigest()[:12]
+        out = out[:h[&quot;start&quot;]] + f&quot;&lt;{h['type']}_{token}&gt;&quot; + out[h[&quot;end&quot;]:]
+    return out
+
+def synthesize(text: str, hits: list[dict], faker) -&gt; str:
+    &quot;&quot;&quot;Replace with fake data. Preserves training distribution.&quot;&quot;&quot;
+    out = text
+    gen = {&quot;PERSON&quot;: faker.name, &quot;EMAIL_ADDRESS&quot;: faker.email,
+           &quot;PHONE_NUMBER&quot;: faker.phone_number}
+    for h in sorted(hits, key=lambda x: -x[&quot;start&quot;]):
+        replacement = gen.get(h[&quot;type&quot;], lambda: &quot;[REDACTED]&quot;)()
+        out = out[:h[&quot;start&quot;]] + replacement + out[h[&quot;end&quot;]:]
+    return out
+</code></pre>
+<p>When to pick each:</p>
+<ul>
+<li><strong>Redact</strong>: when training-data safety dominates everything else.</li>
+<li><strong>Mask</strong>: when you must preserve part of the identifier (e.g., card last 4).</li>
+<li><strong>Pseudonymize</strong>: when you want to track the same user's behavior pattern but hide identity.</li>
+<li><strong>Synthesize</strong>: when distribution (name length, email format) must be preserved in training.</li>
+</ul>
+<h2>Stage 4: Audit and Sampling</h2>
+<p>Log every PII-handling result and have a human review a slice.</p>
+<pre><code class="language-python">import json
+import random
+from datetime import datetime, timezone
+
+def anonymize_with_audit(rows: list[dict], audit_path: str,
+                         sample_rate: float = 0.01) -&gt; list[dict]:
+    out = []
+    audit = []
+    for row in rows:
+        text = row[&quot;text&quot;]
+        hits = detect_ner(text) + sum(
+            [[{&quot;type&quot;: k, &quot;start&quot;: m.start(), &quot;end&quot;: m.end()}
+              for m in PATTERNS[k].finditer(text)]
+             for k in PATTERNS], []
+        )
+        clean = redact(text, hits)
+        out.append({**row, &quot;text&quot;: clean})
+        audit.append({
+            &quot;row_id&quot;: row.get(&quot;id&quot;),
+            &quot;pii_count&quot;: len(hits),
+            &quot;pii_types&quot;: list({h[&quot;type&quot;] for h in hits}),
+            &quot;char_reduction&quot;: len(text) - len(clean),
+            &quot;ts&quot;: datetime.now(timezone.utc).isoformat(),
+        })
+    sample = random.sample(rows, max(1, int(len(rows) * sample_rate)))
+    with open(audit_path, &quot;w&quot;) as f:
+        json.dump({&quot;audit&quot;: audit, &quot;review_sample&quot;: sample}, f, ensure_ascii=False)
+    return out
+</code></pre>
+<p><strong>The audit log must not store the PII itself.</strong> Record only counts, types, and char reduction. Keep the review sample in a separate access-controlled location.</p>
+<h2>Korean Text — Extra Risks</h2>
+<p>Korean data has traps that English code misses.</p>
+<ul>
+<li><strong>RRN (Korean resident registration number)</strong>: 13-digit pattern (<code>900101-1234567</code>). Regex catches it.</li>
+<li><strong>Business registration number</strong>: 10 digits (<code>123-45-67890</code>). Company info, but for sole proprietors it is PII.</li>
+<li><strong>License plate</strong>: patterns like <code>12가3456</code>.</li>
+<li><strong>Names</strong>: Korean names are mostly two to four characters, often missed by general NER. Use a Korean-specific NER model.</li>
+</ul>
+<h2>Common Mistakes</h2>
+<ol>
+<li><strong>Regex only</strong>: misses natural-language PII (names, addresses). Add an NER stage.</li>
+<li><strong>Pseudonymize without pepper</strong>: plain sha256 enables rainbow-table attacks. Always add a process-local secret.</li>
+<li><strong>PII in audit logs</strong>: the audit becomes the leak. Log counts and types only.</li>
+<li><strong>English NER on Korean data</strong>: Korean names get ignored. Load a Korean NER model explicitly.</li>
+<li><strong>Skipping human review</strong>: full automation hides false negatives forever. Keep at least 1% sample review.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>PII handling is a four-stage pipeline: Detection → Classification → Anonymization → Audit.</li>
+<li>Combine regex (fast first pass) and NER (natural-language PII). One alone is insufficient.</li>
+<li>Pick the right anonymization technique (redact / mask / pseudonymize / synthesize) for the use case.</li>
+<li>Pseudonymization always needs a process-local pepper, and audit logs never store PII.</li>
+<li>Korean data needs separate handling for RRN, business numbers, and Korean names.</li>
+<li>Maintain sampling-based human review to keep false negatives from compounding.</li>
+<li>Episode 5 covers tokenization and chunking strategies.</li>
+</ul>
+<hr>
+<h2>AI Data Preparation 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
+<li><strong>PII Detection and Anonymization for Training Data (current)</strong></li>
+<li>Tokenization and Chunking Strategies (upcoming)</li>
+<li>Quality Filtering for Training Data (upcoming)</li>
+<li>Synthetic Data Generation (upcoming)</li>
+<li>Data Augmentation Techniques (upcoming)</li>
+<li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
+<li>Building a Production Data Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://microsoft.github.io/presidio/">Microsoft Presidio - PII detection and anonymization</a></li>
+<li><a href="https://arxiv.org/abs/2012.07805">Extracting Training Data from Large Language Models (Carlini et al., 2021)</a></li>
+<li><a href="https://dataprivacylab.org/dataprivacy/projects/kanonymity/">k-anonymity: A model for protecting privacy (Sweeney, 2002)</a></li>
+<li><a href="https://gdpr-info.eu/art-4-gdpr/">GDPR Article 4 - Definitions</a></li>
+</ul>
+<p class="tags-line">Tags: Data Preparation, PII, Anonymization, Privacy</p>
+</body>
+</html>

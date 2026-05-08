@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building Your First Agent</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building Your First Agent</h1>
+<blockquote>
+<p>AI Agent 101 Series (10/10)</p>
+</blockquote>
+<p>Now let's synthesize what we've learned and build a real agent. This article implements a simple yet practical agent from start to finish. We'll cover the entire process: context setup, tool definition, workflow composition, error handling, and testing.</p>
+<p>Recommended frameworks are LangGraph and Crew AI. Both simplify agent construction but have different approaches. LangGraph is strong in graph-based workflows, while Crew AI is strong in multi-agent collaboration.</p>
+<p>This article covers end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.</p>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Where do you draw the line on what the Research Assistant agent owns?</li>
+<li>In what order should you build tools, memory, and the loop?</li>
+<li>On what basis do you pick raw code vs LangGraph vs CrewAI?</li>
+<li>How do you wire your first agent into automated eval?</li>
+</ul>
+<!-- a-grade-intro:end -->
+
+<h2>What We Are Building: A Research Assistant</h2>
+<p>In this episode, you build a small research assistant agent end to end. The user asks a question and the agent goes through these steps.</p>
+<ol>
+<li>Analyze the question and identify what information is needed.</li>
+<li>Use a search tool to gather relevant material.</li>
+<li>Call a calculator tool when arithmetic is required.</li>
+<li>Synthesize the gathered information into an answer.</li>
+<li>Maintain conversation history to handle follow-up questions.</li>
+</ol>
+<p>This example is small but it pulls together every concept covered in episodes 1 through 9: context setup, tool definition, workflow design, memory, error handling, evaluation, and operations.</p>
+<hr>
+<h2>Prerequisites</h2>
+<p>Install the required packages.</p>
+<pre><code class="language-bash">pip install openai pydantic python-dotenv
+</code></pre>
+<p>Save your API key in a <code>.env</code> file.</p>
+<pre><code class="language-bash">OPENAI_API_KEY=sk-...
+</code></pre>
+<p>The full code lives in a single file <code>agent.py</code>. For learning purposes we use only the standard library and the OpenAI SDK with no external framework. We discuss frameworks in the last section.</p>
+<hr>
+<h2>Step 1: Define the Tools</h2>
+<p>Tools are external functions the agent can call. Each tool needs a clear input schema and deterministic behavior.</p>
+<pre><code class="language-python">from typing import Any
+from pydantic import BaseModel, Field
+import json
+
+class SearchInput(BaseModel):
+    &quot;&quot;&quot;Input schema for the search tool.&quot;&quot;&quot;
+    query: str = Field(..., description=&quot;Search query&quot;)
+    top_k: int = Field(3, description=&quot;Number of results to return&quot;)
+
+class CalculatorInput(BaseModel):
+    &quot;&quot;&quot;Input schema for the calculator tool.&quot;&quot;&quot;
+    expression: str = Field(..., description=&quot;Python arithmetic expression&quot;)
+
+def tool_search(query: str, top_k: int = 3) -&gt; list[dict[str, str]]:
+    &quot;&quot;&quot;Fake search tool. In production this would call an external API.&quot;&quot;&quot;
+    fake_db = [
+        {&quot;title&quot;: &quot;FastAPI Official Docs&quot;, &quot;snippet&quot;: &quot;FastAPI is a modern, fast Python web framework.&quot;},
+        {&quot;title&quot;: &quot;FastAPI Performance Benchmarks&quot;, &quot;snippet&quot;: &quot;FastAPI delivers performance comparable to Node.js and Go.&quot;},
+        {&quot;title&quot;: &quot;FastAPI vs Flask&quot;, &quot;snippet&quot;: &quot;FastAPI beats Flask in async support and automatic documentation.&quot;},
+    ]
+    return fake_db[:top_k]
+
+def tool_calculator(expression: str) -&gt; float:
+    &quot;&quot;&quot;Safe arithmetic. Plain eval is dangerous, so we use a restricted environment.&quot;&quot;&quot;
+    allowed = set(&quot;0123456789+-*/(). &quot;)
+    if not set(expression) &lt;= allowed:
+        raise ValueError(f&quot;Disallowed characters in expression: {expression}&quot;)
+    return eval(expression, {&quot;__builtins__&quot;: {}}, {})
+</code></pre>
+<p>Build a tool registry. The agent reads this table to decide which tool to call.</p>
+<pre><code class="language-python">TOOLS = {
+    &quot;search&quot;: {
+        &quot;function&quot;: tool_search,
+        &quot;schema&quot;: SearchInput,
+        &quot;description&quot;: &quot;Search for material by keyword.&quot;,
+    },
+    &quot;calculator&quot;: {
+        &quot;function&quot;: tool_calculator,
+        &quot;schema&quot;: CalculatorInput,
+        &quot;description&quot;: &quot;Evaluate an arithmetic expression.&quot;,
+    },
+}
+
+def tools_to_openai_format() -&gt; list[dict[str, Any]]:
+    &quot;&quot;&quot;Convert the registry to OpenAI Function Calling format.&quot;&quot;&quot;
+    result = []
+    for name, info in TOOLS.items():
+        result.append({
+            &quot;type&quot;: &quot;function&quot;,
+            &quot;function&quot;: {
+                &quot;name&quot;: name,
+                &quot;description&quot;: info[&quot;description&quot;],
+                &quot;parameters&quot;: info[&quot;schema&quot;].model_json_schema(),
+            },
+        })
+    return result
+</code></pre>
+<hr>
+<h2>Step 2: Implement Memory</h2>
+<p>A simple memory class for conversation history. It applies the sliding window pattern from episode 5.</p>
+<pre><code class="language-python">class ConversationMemory:
+    &quot;&quot;&quot;Sliding window conversation memory.&quot;&quot;&quot;
+
+    def __init__(self, system_prompt: str, max_messages: int = 20):
+        self.system_prompt = system_prompt
+        self.max_messages = max_messages
+        self.messages: list[dict[str, Any]] = []
+
+    def add(self, role: str, content: str, **extra: Any) -&gt; None:
+        &quot;&quot;&quot;Append a message.&quot;&quot;&quot;
+        msg = {&quot;role&quot;: role, &quot;content&quot;: content, **extra}
+        self.messages.append(msg)
+        if len(self.messages) &gt; self.max_messages:
+            self.messages = self.messages[-self.max_messages:]
+
+    def to_openai(self) -&gt; list[dict[str, Any]]:
+        &quot;&quot;&quot;Return messages in OpenAI Chat Completions format.&quot;&quot;&quot;
+        return [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: self.system_prompt}] + self.messages
+</code></pre>
+<p><code>max_messages</code> caps the context length. For token-based compression, see episode 5.</p>
+<hr>
+<h2>Step 3: The Agent Loop</h2>
+<p>The heart of the agent is the loop between LLM and tools. When the LLM emits a tool call, the result is fed back to the LLM. When there are no more calls, the agent returns the final answer.</p>
+<pre><code class="language-python">from openai import OpenAI
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+client = OpenAI(api_key=os.getenv(&quot;OPENAI_API_KEY&quot;))
+
+SYSTEM_PROMPT = &quot;&quot;&quot;You are a research assistant.
+Use the search and calculator tools to answer user questions.
+Synthesize tool results into accurate, concise answers.
+Say you do not know when you do not.&quot;&quot;&quot;
+
+class ResearchAgent:
+    &quot;&quot;&quot;Research assistant agent.&quot;&quot;&quot;
+
+    def __init__(self, model: str = &quot;gpt-4o-mini&quot;, max_iterations: int = 5):
+        self.model = model
+        self.max_iterations = max_iterations
+        self.memory = ConversationMemory(SYSTEM_PROMPT)
+
+    def run(self, user_input: str) -&gt; str:
+        &quot;&quot;&quot;Process a user question and return an answer.&quot;&quot;&quot;
+        self.memory.add(&quot;user&quot;, user_input)
+
+        for iteration in range(self.max_iterations):
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=self.memory.to_openai(),
+                tools=tools_to_openai_format(),
+                tool_choice=&quot;auto&quot;,
+            )
+            msg = response.choices[0].message
+
+            if not msg.tool_calls:
+                self.memory.add(&quot;assistant&quot;, msg.content or &quot;&quot;)
+                return msg.content or &quot;&quot;
+
+            self.memory.add(
+                &quot;assistant&quot;,
+                msg.content or &quot;&quot;,
+                tool_calls=[tc.model_dump() for tc in msg.tool_calls],
+            )
+
+            for tool_call in msg.tool_calls:
+                result = self._execute_tool(tool_call)
+                self.memory.add(
+                    &quot;tool&quot;,
+                    json.dumps(result, ensure_ascii=False),
+                    tool_call_id=tool_call.id,
+                )
+
+        return &quot;Max iterations reached without producing an answer.&quot;
+
+    def _execute_tool(self, tool_call: Any) -&gt; Any:
+        &quot;&quot;&quot;Execute a tool safely.&quot;&quot;&quot;
+        name = tool_call.function.name
+        try:
+            args = json.loads(tool_call.function.arguments)
+            tool = TOOLS.get(name)
+            if not tool:
+                return {&quot;error&quot;: f&quot;Unknown tool: {name}&quot;}
+            validated = tool[&quot;schema&quot;](**args)
+            result = tool[&quot;function&quot;](**validated.model_dump())
+            return {&quot;result&quot;: result}
+        except Exception as exc:
+            return {&quot;error&quot;: str(exc)}
+</code></pre>
+<p>Key points:</p>
+<ul>
+<li><code>max_iterations</code> prevents infinite loops.</li>
+<li>Tool execution is isolated inside <code>_execute_tool</code> so exceptions are caught.</li>
+<li>Inputs are validated with Pydantic schemas.</li>
+<li>Tool responses are also added to the message history.</li>
+</ul>
+<hr>
+<h2>Step 4: Run and Test</h2>
+<p>A simple CLI to drive the agent.</p>
+<pre><code class="language-python">if __name__ == &quot;__main__&quot;:
+    agent = ResearchAgent()
+    print(&quot;Research Assistant. Type 'quit' to exit.&quot;)
+    while True:
+        user_input = input(&quot;\nQuestion: &quot;).strip()
+        if user_input.lower() in {&quot;quit&quot;, &quot;exit&quot;}:
+            break
+        if not user_input:
+            continue
+        try:
+            answer = agent.run(user_input)
+            print(f&quot;\nAnswer: {answer}&quot;)
+        except Exception as exc:
+            print(f&quot;\n[error] {exc}&quot;)
+</code></pre>
+<p>Sample run:</p>
+<pre><code class="language-text">Question: How does FastAPI perform?
+Answer: FastAPI is a modern Python web framework with performance comparable to Node.js and Go.
+The search results note it beats Flask in async support and automatic documentation.
+
+Question: If I process 1000 requests at 0.5 seconds each, how many seconds total?
+Answer: 1000 * 0.5 = 500 seconds.
+</code></pre>
+<p>Verify that follow-up questions retain context:</p>
+<pre><code class="language-text">Question: What if I process them 100 at a time concurrently?
+Answer: Processing 1000 requests 100 at a time concurrently is 10x faster, so it takes 50 seconds.
+</code></pre>
+<hr>
+<h2>Step 5: Automated Evaluation</h2>
+<p>Apply the evaluation framework from episode 7. Build a small golden dataset and detect regressions.</p>
+<pre><code class="language-python">GOLD_CASES = [
+    {
+        &quot;input&quot;: &quot;What kind of framework is FastAPI?&quot;,
+        &quot;must_contain&quot;: [&quot;Python&quot;, &quot;web&quot;],
+    },
+    {
+        &quot;input&quot;: &quot;What is 100 plus 200?&quot;,
+        &quot;must_contain&quot;: [&quot;300&quot;],
+    },
+]
+
+def run_eval() -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Run evaluation against the golden dataset.&quot;&quot;&quot;
+    passed = 0
+    failures = []
+    for case in GOLD_CASES:
+        agent = ResearchAgent()
+        answer = agent.run(case[&quot;input&quot;])
+        if all(kw in answer for kw in case[&quot;must_contain&quot;]):
+            passed += 1
+        else:
+            failures.append({&quot;input&quot;: case[&quot;input&quot;], &quot;answer&quot;: answer})
+    return {
+        &quot;total&quot;: len(GOLD_CASES),
+        &quot;passed&quot;: passed,
+        &quot;pass_rate&quot;: passed / len(GOLD_CASES),
+        &quot;failures&quot;: failures,
+    }
+
+if __name__ == &quot;__main__&quot; and os.getenv(&quot;RUN_EVAL&quot;):
+    result = run_eval()
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+</code></pre>
+<p>Run with <code>RUN_EVAL=1 python agent.py</code> to see the evaluation output. Keyword matching is simple but sufficient for regression detection. For LLM-as-Judge evaluation, see episode 7.</p>
+<hr>
+<h2>Framework Comparison: From Scratch vs LangGraph vs CrewAI</h2>
+<p>The example above is built from scratch. In production you usually want a battle-tested framework. The two leading options are LangGraph and CrewAI.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>From Scratch</th>
+<th>LangGraph</th>
+<th>CrewAI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Learning curve</td>
+<td>Low</td>
+<td>Medium</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Flexibility</td>
+<td>Very high</td>
+<td>Very high</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Multi-agent</td>
+<td>Hand-written</td>
+<td>Designed by you</td>
+<td>Built-in</td>
+</tr>
+<tr>
+<td>Graph visualization</td>
+<td>None</td>
+<td>Built-in</td>
+<td>Limited</td>
+</tr>
+<tr>
+<td>Streaming</td>
+<td>Hand-written</td>
+<td>Built-in</td>
+<td>Built-in</td>
+</tr>
+<tr>
+<td>Checkpoints</td>
+<td>Hand-written</td>
+<td>Built-in</td>
+<td>Limited</td>
+</tr>
+<tr>
+<td>Best fit</td>
+<td>Learning, simple agents</td>
+<td>Complex workflows</td>
+<td>Role-based collaboration</td>
+</tr>
+</tbody>
+</table>
+<p>LangGraph example:</p>
+<pre><code class="language-python">from langgraph.graph import StateGraph, END
+from typing import TypedDict
+
+class AgentState(TypedDict):
+    messages: list[dict[str, Any]]
+    iterations: int
+
+def call_model(state: AgentState) -&gt; AgentState:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=state[&quot;messages&quot;],
+        tools=tools_to_openai_format(),
+    )
+    msg = response.choices[0].message
+    state[&quot;messages&quot;].append(msg.model_dump())
+    state[&quot;iterations&quot;] += 1
+    return state
+
+def should_continue(state: AgentState) -&gt; str:
+    last = state[&quot;messages&quot;][-1]
+    if not last.get(&quot;tool_calls&quot;) or state[&quot;iterations&quot;] &gt;= 5:
+        return END
+    return &quot;tools&quot;
+
+graph = StateGraph(AgentState)
+graph.add_node(&quot;agent&quot;, call_model)
+graph.add_node(&quot;tools&quot;, execute_tools_node)
+graph.set_entry_point(&quot;agent&quot;)
+graph.add_conditional_edges(&quot;agent&quot;, should_continue)
+graph.add_edge(&quot;tools&quot;, &quot;agent&quot;)
+app = graph.compile()
+</code></pre>
+<p>LangGraph expresses workflows as nodes and edges. Complex branches and loops become explicit and inspectable.</p>
+<p>CrewAI example:</p>
+<pre><code class="language-python">from crewai import Agent, Task, Crew
+
+researcher = Agent(
+    role=&quot;Researcher&quot;,
+    goal=&quot;Gather material on the given topic&quot;,
+    backstory=&quot;You are a meticulous researcher.&quot;,
+    tools=[search_tool],
+)
+
+writer = Agent(
+    role=&quot;Writer&quot;,
+    goal=&quot;Write an answer from the gathered material&quot;,
+    backstory=&quot;You are a writer who values clarity.&quot;,
+)
+
+task1 = Task(description=&quot;Research FastAPI&quot;, agent=researcher)
+task2 = Task(description=&quot;Summarize the research&quot;, agent=writer)
+
+crew = Crew(agents=[researcher, writer], tasks=[task1, task2])
+result = crew.kickoff()
+</code></pre>
+<p>CrewAI is strong at role-based multi-agent collaboration. Each agent gets a role and goal, and tasks are assigned across them.</p>
+<p>Selection guide:</p>
+<ul>
+<li>Learning a single simple agent: build from scratch.</li>
+<li>Complex workflow with branches and checkpoints: LangGraph.</li>
+<li>Multiple agents collaborating with distinct roles: CrewAI.</li>
+</ul>
+<hr>
+<h2>Preparing for Deployment</h2>
+<p>Moving learning code to production requires a few more pieces.</p>
+<p><strong>FastAPI Wrapper</strong></p>
+<p>Expose the agent as an HTTP endpoint instead of a CLI.</p>
+<pre><code class="language-python">from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
+
+SESSIONS: dict[str, ResearchAgent] = {}
+
+@app.post(&quot;/chat&quot;)
+def chat(req: ChatRequest) -&gt; dict[str, str]:
+    agent = SESSIONS.setdefault(req.session_id, ResearchAgent())
+    try:
+        answer = agent.run(req.message)
+        return {&quot;answer&quot;: answer}
+    except Exception as exc:
+        raise HTTPException(500, detail=str(exc))
+</code></pre>
+<p>Each session gets its own agent instance to isolate conversations. In a real service you would externalize memory to Redis or a database.</p>
+<p><strong>Environment Variables and Secrets</strong></p>
+<p>Never hardcode API keys. Add <code>.env</code> to <code>.gitignore</code> and use a secret manager (Vault, AWS Secrets Manager, etc.) in production.</p>
+<p><strong>Container Image</strong></p>
+<pre><code class="language-dockerfile">FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD [&quot;uvicorn&quot;, &quot;main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]
+</code></pre>
+<p>Use multi-stage builds to shrink image size. Also apply the operations checklist from episode 9.</p>
+<hr>
+<h2>Common Mistakes</h2>
+<p><strong>1. Forgetting to prevent infinite loops.</strong><br>
+LLMs sometimes call the same tool repeatedly. Always set <code>max_iterations</code>.</p>
+<p><strong>2. Not catching exceptions in tool execution.</strong><br>
+A single failing tool can crash the entire agent. Wrap every tool call in <code>try/except</code>.</p>
+<p><strong>3. Rebuilding the system prompt on every call.</strong><br>
+Define the system prompt once and manage it through memory. Re-creating it per call breaks consistency.</p>
+<p><strong>4. Changing prompts without evaluation.</strong><br>
+Prompt changes can cause regressions. Build even a tiny golden dataset and automate evaluation.</p>
+<p><strong>5. Reaching for a framework first.</strong><br>
+LangGraph and CrewAI are powerful but carry learning costs. Build from scratch first to internalize the mechanics, then migrate to a framework.</p>
+<hr>
+<h2>Next Steps</h2>
+<p>After finishing this series, the recommended learning path is:</p>
+<ol>
+<li><strong>RAG integration</strong>: Build a RAG agent that searches your internal documents. See the <code>vector-search-101</code> and <code>rag-deep-dive</code> series.</li>
+<li><strong>Advanced function calling</strong>: Add support for additional models like Anthropic and Gemini.</li>
+<li><strong>Long-term memory</strong>: Summarize conversations, store them in a vector database, and retrieve them in later sessions.</li>
+<li><strong>Multi-agent systems</strong>: Extend with the Coordinator-Worker pattern from episode 6.</li>
+<li><strong>Production operations</strong>: Apply the observability and cost tracking from episode 9 to a real deployment.</li>
+</ol>
+<p>This series is the starting point of agent development. Begin with small agents and grow complexity gradually. Every agent ultimately follows the same pattern: define tools, manage context, stabilize the loop, and automate evaluation.</p>
+<hr>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Building an agent from scratch teaches the inner mechanics of the LLM-tool loop, memory, and error handling.</li>
+<li><code>max_iterations</code> and <code>try/except</code> are mandatory safety nets for every agent loop.</li>
+<li>Tools should validate inputs with Pydantic schemas and behave deterministically.</li>
+<li>Evaluation can start with a small golden dataset and still catch real regressions.</li>
+<li>Build from scratch first to internalize the principles, then scale with frameworks like LangGraph or CrewAI.</li>
+</ul>
+<!-- a-grade-example:begin -->
+
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Wrote a one-paragraph spec of inputs, outputs, and scope.</li>
+<li>[ ] Built tool → memory → loop in that order.</li>
+<li>[ ] Made a comparison table: hand-rolled vs LangGraph vs CrewAI.</li>
+<li>[ ] Ran the Step 5 auto-eval loop at least once and inspected results.</li>
+</ul>
+<!-- a-grade-example:end -->
+
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">Context Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/03-tool-use-fundamentals.md">Tool Use Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/04-agent-workflow-design.md">Agent Workflow Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/05-memory-and-state.md">Memory and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/06-multi-agent-systems.md">Multi-Agent Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/07-agent-evaluation.md">Agent Evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/08-error-handling-reliability.md">Error Handling and Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/09-production-operations.md">Production Operations</a></li>
+<li><strong>Building Your First Agent (current)</strong></li>
+</ul>
+<hr>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling Guide</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/">LangGraph Documentation</a></li>
+<li><a href="https://docs.crewai.com/">CrewAI Documentation</a></li>
+<li><a href="https://www.anthropic.com/research/building-effective-agents">Building Effective Agents — Anthropic</a></li>
+</ul>
+<p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
+</body>
+</html>

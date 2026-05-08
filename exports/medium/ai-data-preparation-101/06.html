@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quality Filtering - Heuristics and Classifiers</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Quality Filtering - Heuristics and Classifiers</h1>
+<blockquote>
+<p>AI Data Preparation 101 series (6/10)</p>
+</blockquote>
+<hr>
+<h2>"Collected does not mean trainable."</h2>
+<p>A raw corpus is almost always more than half garbage. Ads, auto-generated spam, broken encodings, and meaningless boilerplate are mixed in. Training on it directly wrecks model perplexity and inflates hallucination rates.</p>
+<p>The goal of quality filtering is to decide whether a sample helps training. Two approaches:</p>
+<ol>
+<li><strong>Heuristic filtering</strong>: fast rule-based (ratios, length, repetition)</li>
+<li><strong>Model-based filtering</strong>: classifiers or perplexity scores</li>
+</ol>
+<p>Production uses both. Heuristics drop the obvious garbage; classifiers handle the borderline cases.</p>
+<h2>Heuristic filter - 7 baseline rules</h2>
+<p>These are the basic rules used by large corpora like CCNet, RefinedWeb, and C4.</p>
+<pre><code class="language-python">import re
+from dataclasses import dataclass
+
+@dataclass
+class QualitySignals:
+    n_chars: int
+    n_words: int
+    avg_word_len: float
+    symbol_ratio: float
+    digit_ratio: float
+    upper_ratio: float
+    repetition_ratio: float
+
+def compute_signals(text: str) -&gt; QualitySignals:
+    n_chars = len(text)
+    words = text.split()
+    n_words = len(words)
+    if n_words == 0:
+        return QualitySignals(n_chars, 0, 0, 1, 1, 1, 1)
+    avg_word_len = sum(len(w) for w in words) / n_words
+    symbol_ratio = sum(1 for c in text if not c.isalnum() and not c.isspace()) / max(n_chars, 1)
+    digit_ratio = sum(1 for c in text if c.isdigit()) / max(n_chars, 1)
+    upper_ratio = sum(1 for c in text if c.isupper()) / max(n_chars, 1)
+    # 5-gram repetition
+    grams = [&quot; &quot;.join(words[i:i+5]) for i in range(len(words)-4)]
+    repetition_ratio = 1 - len(set(grams)) / max(len(grams), 1)
+    return QualitySignals(n_chars, n_words, avg_word_len,
+                          symbol_ratio, digit_ratio, upper_ratio, repetition_ratio)
+
+def passes_heuristic(text: str) -&gt; tuple[bool, str]:
+    s = compute_signals(text)
+    if s.n_words &lt; 50:
+        return False, &quot;too_short&quot;
+    if s.n_words &gt; 100_000:
+        return False, &quot;too_long&quot;
+    if s.avg_word_len &lt; 2 or s.avg_word_len &gt; 15:
+        return False, &quot;bad_avg_word_len&quot;
+    if s.symbol_ratio &gt; 0.3:
+        return False, &quot;symbol_heavy&quot;
+    if s.digit_ratio &gt; 0.5:
+        return False, &quot;digit_heavy&quot;
+    if s.upper_ratio &gt; 0.4:
+        return False, &quot;shouting&quot;
+    if s.repetition_ratio &gt; 0.3:
+        return False, &quot;repetitive&quot;
+    return True, &quot;ok&quot;
+</code></pre>
+<p>Tune each threshold to your domain. For a code corpus, raise the symbol_ratio limit to 0.5; for Korean text, widen the avg_word_len range.</p>
+<h2>Language detection - drop out-of-domain samples</h2>
+<p>When you want to keep only specific languages from a multilingual scrape.</p>
+<pre><code class="language-python"># pip install fasttext-langdetect
+from ftlangdetect import detect
+
+def keep_languages(text: str, allowed: set[str], min_conf: float = 0.7) -&gt; bool:
+    sample = text[:1000]  # the head is enough
+    result = detect(text=sample, low_memory=True)
+    return result[&quot;lang&quot;] in allowed and result[&quot;score&quot;] &gt;= min_conf
+
+# Keep only Korean and English
+ok = keep_languages(doc, allowed={&quot;ko&quot;, &quot;en&quot;})
+</code></pre>
+<p>fastText is fast and accurate. Pure-Python libraries like langdetect are unreliable on short text.</p>
+<h2>Perplexity filter - KenLM-based</h2>
+<p>Natural sentences score low perplexity under a good LM. Abnormally high samples are likely broken text.</p>
+<pre><code class="language-python"># pip install kenlm
+import kenlm
+import math
+
+class PerplexityFilter:
+    def __init__(self, model_path: str, max_perplexity: float = 1000.0):
+        self.model = kenlm.Model(model_path)
+        self.max_perplexity = max_perplexity
+
+    def score(self, text: str) -&gt; float:
+        # KenLM returns log10 probability
+        log_prob = self.model.score(text, bos=True, eos=True)
+        n_tokens = len(text.split()) + 1
+        return 10 ** (-log_prob / n_tokens)
+
+    def passes(self, text: str) -&gt; bool:
+        return self.score(text) &lt;= self.max_perplexity
+
+# Use a KenLM model trained on Wikipedia as the reference
+pf = PerplexityFilter(&quot;wiki-en.binary&quot;, max_perplexity=500.0)
+</code></pre>
+<p>This is the approach in the CCNet paper. Using Wikipedia as reference means you measure "how Wikipedia-like is this".</p>
+<h2>Classifier filter - fastText quality score</h2>
+<p>GPT-3 trained a fastText classifier with reddit upvotes as the positive label. The pattern is easy to reproduce.</p>
+<pre><code class="language-python"># pip install fasttext
+import fasttext
+
+# 1) Prepare training data: wiki/books as positive, common-crawl junk as negative
+# format: __label__pos text...
+# Assume train.txt is prepared
+model = fasttext.train_supervised(
+    input=&quot;train.txt&quot;,
+    epoch=10,
+    lr=0.5,
+    wordNgrams=2,
+    dim=100,
+)
+model.save_model(&quot;quality-clf.bin&quot;)
+
+# 2) Inference
+clf = fasttext.load_model(&quot;quality-clf.bin&quot;)
+
+def quality_score(text: str) -&gt; float:
+    labels, probs = clf.predict(text.replace(&quot;\n&quot;, &quot; &quot;), k=2)
+    # Probability of __label__pos
+    return float(probs[labels.index(&quot;__label__pos&quot;)]) if &quot;__label__pos&quot; in labels else 0.0
+
+threshold = 0.5
+keep = quality_score(doc) &gt;= threshold
+</code></pre>
+<p>fastText handles tens of thousands of samples per second on CPU. It is well suited to large-corpus filtering.</p>
+<h2>Integrated pipeline</h2>
+<pre><code class="language-python">def quality_filter_pipeline(docs: list[str], pf: PerplexityFilter, clf) -&gt; list[str]:
+    survivors = []
+    stats = {&quot;heuristic&quot;: 0, &quot;lang&quot;: 0, &quot;perplexity&quot;: 0, &quot;classifier&quot;: 0, &quot;kept&quot;: 0}
+    for d in docs:
+        ok, reason = passes_heuristic(d)
+        if not ok:
+            stats[&quot;heuristic&quot;] += 1
+            continue
+        if not keep_languages(d, allowed={&quot;ko&quot;, &quot;en&quot;}):
+            stats[&quot;lang&quot;] += 1
+            continue
+        if not pf.passes(d):
+            stats[&quot;perplexity&quot;] += 1
+            continue
+        if quality_score(d) &lt; 0.5:
+            stats[&quot;classifier&quot;] += 1
+            continue
+        survivors.append(d)
+        stats[&quot;kept&quot;] += 1
+    return survivors, stats
+</code></pre>
+<p>Ordering matters. Heuristics run first because they are fastest. Perplexity and classifiers call models, so they run last. Dropping obvious garbage early reduces cost.</p>
+<h2>5 common mistakes</h2>
+<ol>
+<li><strong>Hard-coding thresholds upfront</strong>: distributions shift batch by batch. Plot histograms and use percentile-based cutoffs (e.g., drop the bottom 5%).</li>
+<li><strong>Assuming heuristics alone are enough</strong>: spam and scraped boilerplate pass heuristics. A classifier is required.</li>
+<li><strong>Reference corpus too small or biased</strong>: training KenLM on a 1MB Wikipedia dump produces meaningless perplexity numbers. Use at least several GB.</li>
+<li><strong>Running language detection on full text</strong>: a 1000-character sample is enough. Full runs only burn cost.</li>
+<li><strong>Not measuring distribution shift after filtering</strong>: filters often preserve only one domain. Compare before/after distributions by token count, language, and source.</li>
+</ol>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Quality filtering combines heuristic and model-based stages.</li>
+<li>Heuristics quickly cut on length, symbol/digit/upper ratios, and repetition.</li>
+<li>Language detection works fine with fasttext-langdetect on a 1000-character sample.</li>
+<li>Perplexity filtering needs a reference LM like KenLM and is strong at removing broken text.</li>
+<li>A fastText classifier handles tens of thousands of samples per second on CPU - the GPT-3 approach.</li>
+<li>Order the pipeline cheap -&gt; expensive to minimize cost.</li>
+<li>Episode 7 covers synthetic data generation.</li>
+</ul>
+<hr>
+<h2>AI Data Preparation 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">Tokenization and Chunking Strategies</a></li>
+<li><strong>Quality Filtering - Heuristics and Classifiers (current)</strong></li>
+<li>Synthetic Data Generation (upcoming)</li>
+<li>Data Augmentation Techniques (upcoming)</li>
+<li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
+<li>Building a Production Data Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1911.00359">CCNet: Extracting High Quality Monolingual Datasets from Web Crawl Data (Wenzek et al., 2020)</a></li>
+<li><a href="https://arxiv.org/abs/2306.01116">The RefinedWeb Dataset for Falcon LLM (Penedo et al., 2023)</a></li>
+<li><a href="https://kheafield.com/code/kenlm/">KenLM Language Model Toolkit</a></li>
+<li><a href="https://fasttext.cc/docs/en/supervised-tutorial.html">fastText Quality Classifier (used in GPT-3)</a></li>
+</ul>
+<p class="tags-line">Tags: Quality Filtering, Heuristic Rules, Classifier Filter, perplexity, KenLM, fastText</p>
+</body>
+</html>

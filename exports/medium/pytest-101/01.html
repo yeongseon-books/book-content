@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Why Write Tests?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Why Write Tests?</h1>
+<blockquote>
+<p>pytest 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Does writing tests slow down development?</p>
+<blockquote>
+<p>Tests don't slow you down — they remove the fear of change and ultimately speed you up. This article explains why tests matter, what kinds exist, and why pytest is the go-to tool for Python testing.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The concrete impact of tests on development productivity</li>
+<li>The test pyramid and differences between test types</li>
+<li>Manual testing versus automated testing</li>
+<li>Why pytest is the preferred Python testing tool</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>You've probably felt that anxiety when modifying code: "Will this break something else?" Without tests, every change is a gamble. With tests, you confirm existing behavior works in seconds after any change.</p>
+<blockquote>
+<p>Tests are a safety net for your future self. Ten minutes today saves three hours of debugging tomorrow.</p>
+</blockquote>
+<p>In production environments, deploying without tests means incident root-cause analysis takes 3–5x longer on average. Tests tell you exactly which input fails and where.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Test = code that automatically verifies your code behaves as expected</p>
+</blockquote>
+<pre><code>[Manual Testing]           [Automated Testing]
+  Human runs code            Code runs code
+  Repetition cost ↑          Repetition cost ≈ 0
+  Error-prone                Consistent results
+  Coverage unclear           Coverage measurable
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Unit test</strong><br>
+- Description: Verifies a single function in isolation</p>
+<p><strong>Integration test</strong><br>
+- Description: Verifies interaction between multiple components</p>
+<p><strong>E2E test</strong><br>
+- Description: Verifies the entire flow from a user's perspective</p>
+<p><strong>Test pyramid</strong><br>
+- Description: Strategy of writing more unit tests than integration or E2E tests</p>
+<p><strong>Regression test</strong><br>
+- Description: Confirms existing features still work after changes</p>
+<h2>Before / After</h2>
+<p>Compare manual verification with pytest automation.</p>
+<pre><code class="language-python"># before: manually call functions and visually inspect output
+def add(a, b):
+    return a + b
+
+print(add(1, 2))   # check if 3 appears
+print(add(-1, 1))   # check if 0 appears
+</code></pre>
+<pre><code class="language-python"># after: automated verification with pytest
+def add(a, b):
+    return a + b
+
+def test_add_positive():
+    assert add(1, 2) == 3
+
+def test_add_negative():
+    assert add(-1, 1) == 0
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Check Python Environment</strong></p>
+<pre><code class="language-bash">python3 --version
+# Python 3.10 or higher is fine
+</code></pre>
+<p><strong>Step 2: Install pytest</strong></p>
+<pre><code class="language-bash">pip install pytest
+pytest --version
+</code></pre>
+<p><strong>Step 3: Write the Function Under Test</strong></p>
+<p>Create <code>calculator.py</code>:</p>
+<pre><code class="language-python"># calculator.py
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+def divide(a: int, b: int) -&gt; float:
+    if b == 0:
+        raise ValueError(&quot;Cannot divide by zero&quot;)
+    return a / b
+</code></pre>
+<p><strong>Step 4: Write the Test File</strong></p>
+<p>Create <code>test_calculator.py</code>:</p>
+<pre><code class="language-python"># test_calculator.py
+import pytest
+from calculator import add, divide
+
+def test_add():
+    assert add(2, 3) == 5
+
+def test_add_negative():
+    assert add(-1, 1) == 0
+
+def test_divide():
+    assert divide(10, 2) == 5.0
+
+def test_divide_by_zero():
+    with pytest.raises(ValueError, match=&quot;Cannot divide by zero&quot;):
+        divide(1, 0)
+</code></pre>
+<p><strong>Step 5: Run the Tests</strong></p>
+<pre><code class="language-bash">pytest test_calculator.py -v
+</code></pre>
+<p>Output:</p>
+<pre><code>test_calculator.py::test_add PASSED
+test_calculator.py::test_add_negative PASSED
+test_calculator.py::test_divide PASSED
+test_calculator.py::test_divide_by_zero PASSED
+========================= 4 passed =========================
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Functions starting with <code>test_</code> are automatically discovered by pytest</li>
+<li>A single <code>assert</code> statement verifies the expected value — more concise than unittest's <code>assertEqual</code></li>
+<li><code>pytest.raises</code> verifies that an exception is raised</li>
+<li>The <code>-v</code> flag shows individual test pass/fail status</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Test filename doesn't start with <code>test_</code></strong><br>
+- Why It's a Problem: pytest won't discover the test file<br>
+- Fix: Follow the <code>test_*.py</code> or <code>*_test.py</code> naming convention</p>
+<p><strong>Test function doesn't start with <code>test_</code></strong><br>
+- Why It's a Problem: The function won't be recognized as a test<br>
+- Fix: Prefix function names with <code>test_</code></p>
+<p><strong>Using <code>print()</code> to verify results</strong><br>
+- Why It's a Problem: Can't be automated and won't catch regressions<br>
+- Fix: Use <code>assert</code> to state expected values explicitly</p>
+<p><strong>Too many asserts in one test</strong><br>
+- Why It's a Problem: Remaining assertions are skipped after the first failure<br>
+- Fix: Verify one behavior per test</p>
+<p><strong>Tests depend on execution order</strong><br>
+- Why It's a Problem: Tests fail when run independently<br>
+- Fix: Design each test to be self-contained</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Run <code>pytest</code> in CI/CD pipelines to automatically verify before merge</li>
+<li>Write tests before refactoring to establish a safety net</li>
+<li>When receiving a bug report, write a reproduction test first, then fix</li>
+<li>Use test coverage as a metric during code review</li>
+<li>Run tests during onboarding to quickly understand project behavior</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>Some view test writing as "extra work," but experienced developers see tests as "part of development." Writing code without tests is like deploying without compiling.</p>
+<p>In practice, teams invest 20–30% of total development time in writing tests. This investment pays back through reduced debugging time, safer refactoring, and faster code reviews.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Installed pytest and verified with <code>pytest --version</code></li>
+<li>[ ] Understood the <code>test_</code> prefix convention</li>
+<li>[ ] Wrote a test that verifies expected values with <code>assert</code></li>
+<li>[ ] Wrote an exception test with <code>pytest.raises</code></li>
+<li>[ ] Ran <code>pytest -v</code> and reviewed the results</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a <code>multiply(a, b)</code> function and create three tests for positive, negative, and zero inputs.</li>
+<li>Write an <code>is_even(n)</code> function and test it with even, odd, and negative numbers.</li>
+<li>Write a <code>parse_int(s)</code> function that raises <code>ValueError</code> on invalid string input, and test it.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>Tests are a safety net for code changes. pytest lets you write tests with a single <code>assert</code> statement. In the next article, we'll walk through writing your first pytest test from scratch.</p>
+<ul>
+<li><strong>Why Write Tests? (current)</strong></li>
+<li>Writing Your First pytest Test (upcoming)</li>
+<li>Assert and Exception Testing (upcoming)</li>
+<li>Understanding Fixtures (upcoming)</li>
+<li>Parametrization (upcoming)</li>
+<li>Mock and Monkeypatch (upcoming)</li>
+<li>Testing Files, Environment Variables, and Time (upcoming)</li>
+<li>Coverage and Test Quality (upcoming)</li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/">pytest official documentation</a></li>
+<li><a href="https://pragprog.com/titles/bopytest2/python-testing-with-pytest-second-edition/">Python Testing with pytest (Brian Okken)</a></li>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Test Pyramid — Martin Fowler</a></li>
+<li><a href="https://realpython.com/python-testing/">Real Python — Getting Started With Testing in Python</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, Testing, Software Quality, Test Automation</p>
+</body>
+</html>

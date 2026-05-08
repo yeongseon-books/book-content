@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Basic Types and Collection Types</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Basic Types and Collection Types</h1>
+<blockquote>
+<p>Type Hints in Python 101 Series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you annotate containers like lists and dictionaries so the type checker knows what is inside them?</p>
+<blockquote>
+<p>Annotating a function parameter as <code>list</code> tells the type checker it is a list — but not what the list contains. A <code>list[int]</code> is fundamentally different from a <code>list[str]</code> when it comes to the operations you can perform on its elements. This article covers Python's basic scalar types and how to parameterize collection types for precise type checking.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Basic scalar types: <code>int</code>, <code>str</code>, <code>float</code>, <code>bool</code>, <code>bytes</code>, <code>None</code></li>
+<li>Parameterized collection types: <code>list[T]</code>, <code>dict[K, V]</code>, <code>tuple[T, ...]</code>, <code>set[T]</code></li>
+<li>The difference between homogeneous and heterogeneous tuples</li>
+<li>Nested type annotations for complex data structures</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most real-world Python code works with collections. API responses are dictionaries, database queries return lists of rows, and configuration is nested dicts. Without parameterized type annotations, the type checker treats every element as <code>object</code> and cannot catch errors like calling <code>.upper()</code> on an integer inside a list.</p>
+<blockquote>
+<p>Parameterized types = telling the type checker what is <em>inside</em> the container.</p>
+</blockquote>
+<p>This is where type hints start paying real dividends in large codebases.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Basic types annotate single values. Collection types wrap basic types to describe containers and their contents.</p>
+</blockquote>
+<pre><code class="language-text">Scalar:     int    str    float    bool    None
+               \    |     /         |
+Collection: list[int]  dict[str, float]  tuple[str, int]
+               \           |                /
+Nested:     dict[str, list[int]]
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Scalar type</strong><br>
+- Description: A single value type like <code>int</code>, <code>str</code>, <code>float</code>, <code>bool</code></p>
+<p><strong>Parameterized type</strong><br>
+- Description: A generic type with type arguments like <code>list[int]</code></p>
+<p><strong>Homogeneous tuple</strong><br>
+- Description: A tuple with variable length and uniform type: <code>tuple[int, ...]</code></p>
+<p><strong>Heterogeneous tuple</strong><br>
+- Description: A tuple with fixed length and per-position types: <code>tuple[str, int]</code></p>
+<p><strong>Type alias</strong><br>
+- Description: A name assigned to a complex type for readability</p>
+<h2>Before / After</h2>
+<p><strong>Before — Unparameterized collections:</strong></p>
+<pre><code class="language-python">def get_prices(items: list) -&gt; dict:
+    result = {}
+    for item in items:
+        result[item.name] = item.price  # type checker: Unknown attributes
+    return result
+</code></pre>
+<p><strong>After — Parameterized collections:</strong></p>
+<pre><code class="language-python">def get_prices(items: list[Product]) -&gt; dict[str, int]:
+    result: dict[str, int] = {}
+    for item in items:
+        result[item.name] = item.price  # type checker: OK
+    return result
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Basic Scalar Types</strong></p>
+<pre><code class="language-python">name: str = &quot;Alice&quot;
+age: int = 30
+height: float = 5.7
+is_active: bool = True
+data: bytes = b&quot;hello&quot;
+nothing: None = None
+</code></pre>
+<p>These are the building blocks. Every more complex type is ultimately composed of these scalars.</p>
+<p><strong>Step 2: list and set</strong></p>
+<pre><code class="language-python">names: list[str] = [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Charlie&quot;]
+unique_ids: set[int] = {1, 2, 3}
+
+# Nested list
+matrix: list[list[int]] = [
+    [1, 2, 3],
+    [4, 5, 6],
+]
+
+def get_active_users(users: list[str]) -&gt; set[str]:
+    return set(users)
+</code></pre>
+<p><code>list[str]</code> means every element is a <code>str</code>. The type checker will flag <code>names.append(42)</code> as an error.</p>
+<p><strong>Step 3: dict</strong></p>
+<pre><code class="language-python">scores: dict[str, int] = {&quot;Alice&quot;: 95, &quot;Bob&quot;: 87}
+config: dict[str, str | int | bool] = {
+    &quot;host&quot;: &quot;localhost&quot;,
+    &quot;port&quot;: 8080,
+    &quot;debug&quot;: True,
+}
+
+def get_headers() -&gt; dict[str, str]:
+    return {&quot;Content-Type&quot;: &quot;application/json&quot;}
+</code></pre>
+<p><code>dict[str, int]</code> means string keys and integer values. For mixed-value dicts, use Union types.</p>
+<p><strong>Step 4: tuple — Homogeneous vs. Heterogeneous</strong></p>
+<pre><code class="language-python"># Heterogeneous: fixed length, per-position types
+coordinate: tuple[float, float] = (37.5, 127.0)
+record: tuple[str, int, bool] = (&quot;Alice&quot;, 30, True)
+
+# Homogeneous: variable length, uniform type
+numbers: tuple[int, ...] = (1, 2, 3, 4, 5)
+empty: tuple[()] = ()
+</code></pre>
+<p>The <code>...</code> (Ellipsis) in <code>tuple[int, ...]</code> means "zero or more ints." Without it, each position has its own type.</p>
+<p><strong>Step 5: Type Aliases for Complex Types</strong></p>
+<pre><code class="language-python"># Type alias for readability
+UserScores = dict[str, list[int]]
+Config = dict[str, str | int | bool | list[str]]
+
+def aggregate_scores(data: UserScores) -&gt; dict[str, float]:
+    return {name: sum(scores) / len(scores) for name, scores in data.items()}
+
+scores: UserScores = {
+    &quot;Alice&quot;: [95, 87, 92],
+    &quot;Bob&quot;: [78, 85, 90],
+}
+</code></pre>
+<p>Type aliases reduce repetition and make signatures readable. In Python 3.12+, use the <code>type</code> statement: <code>type UserScores = dict[str, list[int]]</code>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Collection types require type parameters to be useful for static analysis</li>
+<li><code>tuple</code> has two forms: heterogeneous (fixed positions) and homogeneous (variable length with <code>...</code>)</li>
+<li>Nested types like <code>dict[str, list[int]]</code> are fully supported</li>
+<li>Type aliases improve readability for complex nested types</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Using bare <code>list</code> or <code>dict</code></strong><br>
+- Problem: Type checker cannot verify element types<br>
+- Fix: Always parameterize: <code>list[int]</code>, <code>dict[str, str]</code></p>
+<p><strong>Confusing <code>tuple[int, int]</code> with <code>tuple[int, ...]</code></strong><br>
+- Problem: Fixed-length vs. variable-length semantics<br>
+- Fix: Use <code>...</code> only for homogeneous variable-length tuples</p>
+<p><strong>Using <code>typing.List</code> on Python 3.9+</strong><br>
+- Problem: Unnecessary import from typing<br>
+- Fix: Use <code>list[str]</code> directly</p>
+<p><strong>Overly broad <code>dict[str, Any]</code></strong><br>
+- Problem: Loses type safety for values<br>
+- Fix: Use specific value types or TypedDict</p>
+<p><strong>Forgetting <code>frozenset</code> for immutable sets</strong><br>
+- Problem: Mutability mismatch<br>
+- Fix: Use <code>frozenset[int]</code> when immutability is required</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>API response models use <code>dict[str, list[dict[str, str]]]</code> for nested JSON structures</li>
+<li>Database query functions return <code>list[tuple[int, str, float]]</code> for typed row results</li>
+<li>Configuration loaders use <code>dict[str, str | int | bool]</code> for settings</li>
+<li>Data pipelines annotate <code>list[dict[str, float]]</code> for tabular data</li>
+<li>Cache implementations parameterize <code>dict[str, T]</code> with generics for type-safe storage</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Senior engineers parameterize every collection type without exception. The five seconds it takes to write <code>list[int]</code> instead of <code>list</code> saves hours of debugging when someone passes the wrong type three layers deep in a call chain.</p>
+<p>They also prefer narrow types over broad ones. <code>dict[str, Any]</code> is almost never the right answer — if you know the shape of your data, use TypedDict (covered in episode 5). The more precise the type, the more the type checker can help you.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Parameterized all collection types with element types</li>
+<li>[ ] Used heterogeneous tuples for fixed-structure data</li>
+<li>[ ] Created type aliases for complex nested types</li>
+<li>[ ] Avoided bare <code>list</code>, <code>dict</code>, <code>tuple</code> without type parameters</li>
+<li>[ ] Used built-in types instead of <code>typing</code> imports (Python 3.9+)</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p>Write a function <code>flatten(matrix: list[list[int]]) -&gt; list[int]</code> that takes a 2D list and returns a 1D list. Verify with mypy.</p>
+</li>
+<li>
+<p>Create a type alias <code>StudentRecord = tuple[str, int, list[float]]</code> (name, age, grades) and write a function that calculates the average grade from a list of student records.</p>
+</li>
+<li>
+<p>Annotate a nested configuration structure: <code>dict[str, dict[str, str | int | list[str]]]</code>. Write a function that extracts a specific value and verify the types with mypy.</p>
+</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Basic types (<code>int</code>, <code>str</code>, <code>float</code>, <code>bool</code>) and parameterized collections (<code>list[T]</code>, <code>dict[K, V]</code>, <code>tuple[T, ...]</code>, <code>set[T]</code>) form the foundation of Python type annotations. Always parameterize collections to give the type checker visibility into element types. Use type aliases for complex nested structures.</p>
+<p>In the next article, we will explore <code>Optional</code> and <code>Union</code> types for handling values that might be missing or could be one of several types.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
+<li><strong>Basic Types and Collection Types (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html">Python docs — typing module</a></li>
+<li><a href="https://peps.python.org/pep-0585/">PEP 585 — Type Hinting Generics In Standard Collections</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/builtin_types.html">mypy docs — Built-in types</a></li>
+<li><a href="https://realpython.com/python-type-checking/">Real Python — Python Type Checking</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, Basic Types, Collection Types, list, dict</p>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Testing Files, Environment Variables, and Time</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Testing Files, Environment Variables, and Time</h1>
+<blockquote>
+<p>pytest 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you reliably test code that reads files or depends on the current time?</p>
+<blockquote>
+<p>pytest's <code>tmp_path</code> fixture manages temporary files, <code>monkeypatch</code> isolates environment variables, and <code>freezegun</code> freezes the clock. This article covers patterns for testing code that depends on system resources.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Managing temporary files with <code>tmp_path</code> and <code>tmp_path_factory</code></li>
+<li>Isolating environment variables per test with <code>monkeypatch.setenv</code></li>
+<li>Freezing time with <code>freezegun</code> to test time-dependent logic</li>
+<li>Safe patterns for file system tests</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>File I/O, environment variables, and the current time are the trickiest external dependencies in testing. Testing files without temporary directories causes collisions between tests, and time-dependent tests fail at midnight or month-end.</p>
+<blockquote>
+<p>Tests that depend on system resources are the primary source of "passes today, fails tomorrow" flaky tests.</p>
+</blockquote>
+<p>Master these three patterns and you can isolate most system dependencies.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>system resource isolation = controlling files, env vars, and time within the test scope</p>
+</blockquote>
+<pre><code>[Before Isolation]                [After Isolation]
+files → real path collisions      tmp_path → auto-cleanup
+env vars → global pollution       monkeypatch → restored after test
+time → varies per execution       freezegun → fixed time
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>tmp_path</strong><br>
+- Description: Built-in pytest fixture providing a per-test temporary directory</p>
+<p><strong>tmp_path_factory</strong><br>
+- Description: Session-scoped fixture for shared temporary directories</p>
+<p><strong>monkeypatch.setenv</strong><br>
+- Description: Sets an environment variable within the test scope</p>
+<p><strong>freezegun</strong><br>
+- Description: Library that replaces <code>datetime.now()</code> with a fixed time</p>
+<p><strong>flaky test</strong><br>
+- Description: A test that intermittently fails on identical code</p>
+<h2>Before / After</h2>
+<p>Compare a test using real file paths with one isolated by tmp_path.</p>
+<pre><code class="language-python"># before: real paths — risk of collisions between tests
+import os
+
+def test_write_file():
+    with open(&quot;/tmp/test_output.txt&quot;, &quot;w&quot;) as f:
+        f.write(&quot;hello&quot;)
+    with open(&quot;/tmp/test_output.txt&quot;) as f:
+        assert f.read() == &quot;hello&quot;
+    os.remove(&quot;/tmp/test_output.txt&quot;)  # leaked if forgotten
+</code></pre>
+<pre><code class="language-python"># after: tmp_path — automatic isolation and cleanup
+def test_write_file(tmp_path):
+    filepath = tmp_path / &quot;test_output.txt&quot;
+    filepath.write_text(&quot;hello&quot;)
+    assert filepath.read_text() == &quot;hello&quot;
+    # no cleanup needed — pytest handles it
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: File Testing with tmp_path</strong></p>
+<pre><code class="language-python"># file_processor.py
+from pathlib import Path
+import json
+
+def save_config(config: dict, filepath: Path) -&gt; None:
+    filepath.write_text(json.dumps(config, indent=2))
+
+def load_config(filepath: Path) -&gt; dict:
+    if not filepath.exists():
+        raise FileNotFoundError(f&quot;{filepath} does not exist&quot;)
+    return json.loads(filepath.read_text())
+</code></pre>
+<pre><code class="language-python"># test_file_processor.py
+import pytest
+from pathlib import Path
+from file_processor import save_config, load_config
+
+def test_save_and_load(tmp_path):
+    config = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: 8080}
+    filepath = tmp_path / &quot;config.json&quot;
+
+    save_config(config, filepath)
+    loaded = load_config(filepath)
+
+    assert loaded == config
+
+def test_load_missing_file(tmp_path):
+    filepath = tmp_path / &quot;missing.json&quot;
+    with pytest.raises(FileNotFoundError):
+        load_config(filepath)
+
+def test_nested_directory(tmp_path):
+    nested = tmp_path / &quot;a&quot; / &quot;b&quot; / &quot;c&quot;
+    nested.mkdir(parents=True)
+    filepath = nested / &quot;deep.txt&quot;
+    filepath.write_text(&quot;deep content&quot;)
+    assert filepath.read_text() == &quot;deep content&quot;
+</code></pre>
+<p><strong>Step 2: Multi-File Processing Test</strong></p>
+<pre><code class="language-python"># csv_processor.py
+from pathlib import Path
+import csv
+
+def merge_csv_files(input_dir: Path, output_file: Path) -&gt; int:
+    rows = []
+    for csv_file in sorted(input_dir.glob(&quot;*.csv&quot;)):
+        with open(csv_file) as f:
+            reader = csv.DictReader(f)
+            rows.extend(reader)
+
+    if not rows:
+        return 0
+
+    with open(output_file, &quot;w&quot;, newline=&quot;&quot;) as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+    return len(rows)
+</code></pre>
+<pre><code class="language-python"># test_csv_processor.py
+from csv_processor import merge_csv_files
+
+def test_merge_csv(tmp_path):
+    (tmp_path / &quot;a.csv&quot;).write_text(&quot;name,age\nAlice,30\n&quot;)
+    (tmp_path / &quot;b.csv&quot;).write_text(&quot;name,age\nBob,25\n&quot;)
+
+    output = tmp_path / &quot;merged.csv&quot;
+    count = merge_csv_files(tmp_path, output)
+
+    assert count == 2
+    lines = output.read_text().strip().split(&quot;\n&quot;)
+    assert len(lines) == 3  # header + 2 rows
+
+def test_merge_empty_dir(tmp_path):
+    output = tmp_path / &quot;merged.csv&quot;
+    count = merge_csv_files(tmp_path, output)
+    assert count == 0
+</code></pre>
+<p><strong>Step 3: Environment Variable Testing</strong></p>
+<pre><code class="language-python"># app_config.py
+import os
+
+def get_config() -&gt; dict:
+    return {
+        &quot;debug&quot;: os.environ.get(&quot;DEBUG&quot;, &quot;false&quot;).lower() == &quot;true&quot;,
+        &quot;db_url&quot;: os.environ.get(&quot;DATABASE_URL&quot;, &quot;sqlite:///default.db&quot;),
+        &quot;log_level&quot;: os.environ.get(&quot;LOG_LEVEL&quot;, &quot;INFO&quot;),
+    }
+</code></pre>
+<pre><code class="language-python"># test_app_config.py
+from app_config import get_config
+
+def test_default_config(monkeypatch):
+    monkeypatch.delenv(&quot;DEBUG&quot;, raising=False)
+    monkeypatch.delenv(&quot;DATABASE_URL&quot;, raising=False)
+    monkeypatch.delenv(&quot;LOG_LEVEL&quot;, raising=False)
+
+    config = get_config()
+    assert config[&quot;debug&quot;] is False
+    assert config[&quot;db_url&quot;] == &quot;sqlite:///default.db&quot;
+    assert config[&quot;log_level&quot;] == &quot;INFO&quot;
+
+def test_production_config(monkeypatch):
+    monkeypatch.setenv(&quot;DEBUG&quot;, &quot;false&quot;)
+    monkeypatch.setenv(&quot;DATABASE_URL&quot;, &quot;postgresql://prod:5432/app&quot;)
+    monkeypatch.setenv(&quot;LOG_LEVEL&quot;, &quot;WARNING&quot;)
+
+    config = get_config()
+    assert config[&quot;debug&quot;] is False
+    assert &quot;postgresql&quot; in config[&quot;db_url&quot;]
+    assert config[&quot;log_level&quot;] == &quot;WARNING&quot;
+
+def test_debug_mode(monkeypatch):
+    monkeypatch.setenv(&quot;DEBUG&quot;, &quot;True&quot;)
+    config = get_config()
+    assert config[&quot;debug&quot;] is True
+</code></pre>
+<p><strong>Step 4: Freezing Time</strong></p>
+<pre><code class="language-python"># billing.py
+from datetime import datetime
+
+def is_billing_day() -&gt; bool:
+    return datetime.now().day == 1
+
+def days_until_expiry(expiry_date: datetime) -&gt; int:
+    delta = expiry_date - datetime.now()
+    return max(0, delta.days)
+
+def format_timestamp() -&gt; str:
+    return datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+</code></pre>
+<pre><code class="language-python"># test_billing.py
+from datetime import datetime
+from unittest.mock import patch
+from billing import is_billing_day, days_until_expiry, format_timestamp
+
+def test_is_billing_day_true():
+    fixed_time = datetime(2025, 1, 1, 12, 0, 0)
+    with patch(&quot;billing.datetime&quot;) as mock_dt:
+        mock_dt.now.return_value = fixed_time
+        assert is_billing_day() is True
+
+def test_is_billing_day_false():
+    fixed_time = datetime(2025, 1, 15, 12, 0, 0)
+    with patch(&quot;billing.datetime&quot;) as mock_dt:
+        mock_dt.now.return_value = fixed_time
+        assert is_billing_day() is False
+
+def test_days_until_expiry():
+    now = datetime(2025, 1, 1, 12, 0, 0)
+    expiry = datetime(2025, 1, 11, 12, 0, 0)
+    with patch(&quot;billing.datetime&quot;) as mock_dt:
+        mock_dt.now.return_value = now
+        assert days_until_expiry(expiry) == 10
+</code></pre>
+<p><strong>Step 5: Using freezegun</strong></p>
+<pre><code class="language-bash">pip install freezegun
+</code></pre>
+<pre><code class="language-python"># test_billing_freezegun.py
+from freezegun import freeze_time
+from billing import is_billing_day, format_timestamp
+
+@freeze_time(&quot;2025-01-01 12:00:00&quot;)
+def test_billing_day_with_freezegun():
+    assert is_billing_day() is True
+
+@freeze_time(&quot;2025-03-15 14:30:00&quot;)
+def test_format_with_freezegun():
+    assert format_timestamp() == &quot;2025-03-15 14:30:00&quot;
+
+@freeze_time(&quot;2025-01-15&quot;)
+def test_not_billing_day():
+    assert is_billing_day() is False
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>tmp_path</code> returns a <code>pathlib.Path</code> object, so you build paths with the <code>/</code> operator</li>
+<li><code>monkeypatch.delenv</code> explicitly tests the "variable not set" scenario</li>
+<li><code>freeze_time</code> is a single decorator that's more concise than manual mock patching</li>
+<li>Each test runs independently with no environment contamination</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Creating files at absolute paths</strong><br>
+- Why It's a Problem: Fails on different systems, collides between tests<br>
+- Fix: Always use <code>tmp_path</code></p>
+<p><strong>Setting env vars directly on <code>os.environ</code></strong><br>
+- Why It's a Problem: Leaks state to other tests if not restored<br>
+- Fix: Use <code>monkeypatch.setenv</code></p>
+<p><strong>Comparing <code>datetime.now()</code> directly</strong><br>
+- Why It's a Problem: Results vary by execution time<br>
+- Fix: Inject time or use freezegun</p>
+<p><strong>Manually cleaning up tmp_path contents</strong><br>
+- Why It's a Problem: Unnecessary since pytest auto-cleans<br>
+- Fix: Remove cleanup code</p>
+<p><strong>Ignoring timezones</strong><br>
+- Why It's a Problem: UTC vs. local time differences cause failures<br>
+- Fix: Always specify UTC or use timezone-aware datetimes</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Create log files in <code>tmp_path</code> and verify log formats</li>
+<li>Batch-test environment variable combinations with parametrize and monkeypatch</li>
+<li>Test expiration logic at past, present, and future times with freezegun</li>
+<li>Use <code>tmp_path</code> in CI to avoid file permission differences across environments</li>
+<li>Test batch job scheduling logic with frozen time</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>Files, environment variables, and time are "the world outside your code." If you don't control that world in tests, your results are determined by the environment, not the code.</p>
+<p><code>tmp_path</code> is one of pytest's most useful built-in fixtures. Make it your starting point for every file I/O test.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Created temporary files with <code>tmp_path</code> and used them in tests</li>
+<li>[ ] Isolated environment variables with <code>monkeypatch.setenv/delenv</code></li>
+<li>[ ] Froze time with <code>unittest.mock.patch</code> or <code>freezegun</code></li>
+<li>[ ] Tested error handling for missing files</li>
+<li>[ ] Confirmed no state contamination between tests</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a YAML config file in <code>tmp_path</code> and write a test that parses it.</li>
+<li>Test a function that outputs JSON or text logs depending on a <code>LOG_FORMAT</code> environment variable.</li>
+<li>Combine <code>freeze_time</code> with parametrize to test the 1st, 15th, and last day of a month.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>With tmp_path, monkeypatch, and freezegun, you can isolate system resources for stable, reproducible tests. Next, we'll learn how to measure coverage and evaluate test quality.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">Mock and Monkeypatch</a></li>
+<li><strong>Testing Files, Environment Variables, and Time (current)</strong></li>
+<li>Coverage and Test Quality (upcoming)</li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/how-to/tmp_path.html">pytest — tmp_path</a></li>
+<li><a href="https://docs.pytest.org/en/stable/how-to/monkeypatch.html">pytest — monkeypatch</a></li>
+<li><a href="https://github.com/spulec/freezegun">freezegun — GitHub</a></li>
+<li><a href="https://realpython.com/pytest-python-testing/#tmp-path">Real Python — Testing with tmp_path</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, tmp_path, freezegun, System Resource Testing</p>
+</body>
+</html>

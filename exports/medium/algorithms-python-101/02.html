@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Time Complexity and Big-O</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Time Complexity and Big-O</h1>
+<blockquote>
+<p>Algorithms with Python 101 Series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How can you tell whether your code will be fast enough before running it on real data?</p>
+<blockquote>
+<p>Time complexity describes how an algorithm's running time grows as the input size increases. Big-O notation gives us a language to express that growth rate objectively. This article teaches you to analyze and compare algorithms by their time complexity.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What time complexity means and why wall-clock time is insufficient</li>
+<li>How to read and write Big-O notation</li>
+<li>Common complexity classes from O(1) to O(n!)</li>
+<li>How to analyze the time complexity of Python code</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Saying "this code is slow" is vague. Big-O provides a precise, hardware-independent way to measure an algorithm's scalability. An O(n) algorithm handles 10 million items comfortably; an O(n^2) algorithm chokes at 100,000.</p>
+<blockquote>
+<p>Big-O notation expresses an algorithm's worst-case growth rate as input size approaches infinity, ignoring constants and lower-order terms.</p>
+</blockquote>
+<p>Understanding time complexity is the foundation for every algorithm discussion in interviews, code reviews, and system design.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Big-O = upper bound on the growth rate of an algorithm's running time</p>
+</blockquote>
+<pre><code>Input Size vs Operations (approximate):
+n=1,000  | O(1): 1       | O(log n): 10    | O(n): 1,000
+         | O(n log n): 10,000 | O(n^2): 1,000,000 | O(2^n): ∞
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Time complexity</strong><br>
+- Description: A measure of how running time grows with input size</p>
+<p><strong>Big-O notation</strong><br>
+- Description: An upper-bound expression for worst-case growth rate</p>
+<p><strong>O(1) — constant</strong><br>
+- Description: Running time does not depend on input size</p>
+<p><strong>O(n) — linear</strong><br>
+- Description: Running time grows proportionally to input size</p>
+<p><strong>O(n^2) — quadratic</strong><br>
+- Description: Running time grows with the square of input size</p>
+<h2>Before / After</h2>
+<p>Two ways to check for a value in a collection.</p>
+<pre><code class="language-python"># before: linear search in a list — O(n)
+def contains(data: list, target) -&gt; bool:
+    for item in data:
+        if item == target:
+            return True
+    return False
+</code></pre>
+<pre><code class="language-python"># after: lookup in a set — O(1) average
+def contains(data: set, target) -&gt; bool:
+    return target in data
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: O(1) — Constant Time</strong></p>
+<pre><code class="language-python">def get_first(data: list) -&gt; int:
+    &quot;&quot;&quot;Access the first element — O(1).&quot;&quot;&quot;
+    return data[0]
+
+def get_by_key(data: dict, key: str):
+    &quot;&quot;&quot;Dictionary lookup — O(1) average.&quot;&quot;&quot;
+    return data.get(key)
+
+numbers = list(range(1_000_000))
+print(get_first(numbers))  # 0
+
+lookup = {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 30}
+print(get_by_key(lookup, &quot;name&quot;))  # Alice
+</code></pre>
+<p><strong>Step 2: O(n) — Linear Time</strong></p>
+<pre><code class="language-python">def linear_sum(data: list[int]) -&gt; int:
+    &quot;&quot;&quot;Sum all elements — O(n).&quot;&quot;&quot;
+    total = 0
+    for x in data:
+        total += x
+    return total
+
+def find_value(data: list[int], target: int) -&gt; int:
+    &quot;&quot;&quot;Linear search — O(n).&quot;&quot;&quot;
+    for i, val in enumerate(data):
+        if val == target:
+            return i
+    return -1
+
+data = list(range(100))
+print(linear_sum(data))       # 4950
+print(find_value(data, 42))   # 42
+</code></pre>
+<p><strong>Step 3: O(n^2) — Quadratic Time</strong></p>
+<pre><code class="language-python">def bubble_sort(data: list[int]) -&gt; list[int]:
+    &quot;&quot;&quot;Bubble sort — O(n^2).&quot;&quot;&quot;
+    arr = data[:]
+    n = len(arr)
+    for i in range(n):
+        for j in range(n - 1 - i):
+            if arr[j] &gt; arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+
+def all_pairs(data: list) -&gt; int:
+    &quot;&quot;&quot;Count all pairs — O(n^2).&quot;&quot;&quot;
+    count = 0
+    for i in range(len(data)):
+        for j in range(i + 1, len(data)):
+            count += 1
+    return count
+
+print(bubble_sort([5, 3, 8, 1, 2]))  # [1, 2, 3, 5, 8]
+print(all_pairs(list(range(100))))    # 4950
+</code></pre>
+<p><strong>Step 4: O(log n) and O(n log n)</strong></p>
+<pre><code class="language-python">def binary_search(sorted_data: list[int], target: int) -&gt; int:
+    &quot;&quot;&quot;Binary search — O(log n).&quot;&quot;&quot;
+    left, right = 0, len(sorted_data) - 1
+    while left &lt;= right:
+        mid = (left + right) // 2
+        if sorted_data[mid] == target:
+            return mid
+        elif sorted_data[mid] &lt; target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+
+data = list(range(1_000_000))
+print(binary_search(data, 999_999))  # 999999
+
+# Python's built-in sort is O(n log n) — Timsort
+import random
+random_data = [random.randint(0, 1000) for _ in range(1000)]
+sorted_data = sorted(random_data)  # O(n log n)
+print(sorted_data[:5])
+</code></pre>
+<p><strong>Step 5: Empirical Measurement</strong></p>
+<pre><code class="language-python">import time
+
+def measure(func, *args) -&gt; float:
+    start = time.perf_counter()
+    func(*args)
+    return time.perf_counter() - start
+
+sizes = [1_000, 5_000, 10_000]
+for n in sizes:
+    data = list(range(n))
+    t_linear = measure(linear_sum, data)
+    t_quadratic = measure(all_pairs, data)
+    ratio = t_quadratic / t_linear if t_linear &gt; 0 else 0
+    print(f&quot;n={n:&gt;6}: linear={t_linear:.5f}s  quadratic={t_quadratic:.5f}s  ratio={ratio:.0f}x&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>O(1) operations like dictionary lookup stay constant regardless of data size</li>
+<li>O(n) and O(n^2) differ dramatically — at n=10,000, quadratic is roughly 10,000x slower than linear</li>
+<li>Binary search demonstrates O(log n): searching 1 million items takes about 20 comparisons</li>
+<li>Python's built-in <code>sorted()</code> uses Timsort, an O(n log n) hybrid algorithm</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Confusing O(n) with O(1)</strong><br>
+- Why It's a Problem: Lists and sets have different lookup costs<br>
+- How to Fix It: Know which operations are O(1) for each data structure</p>
+<p><strong>Ignoring nested loops</strong><br>
+- Why It's a Problem: An inner loop makes the total O(n^2)<br>
+- How to Fix It: Count the nesting depth</p>
+<p><strong>Forgetting hidden costs</strong><br>
+- Why It's a Problem: <code>in</code> on a list is O(n), not O(1)<br>
+- How to Fix It: Check the data structure's complexity table</p>
+<p><strong>Optimizing prematurely</strong><br>
+- Why It's a Problem: Micro-optimizing O(n) code while ignoring O(n^2) elsewhere<br>
+- How to Fix It: Profile first, optimize the biggest bottleneck</p>
+<p><strong>Confusing best, average, and worst case</strong><br>
+- Why It's a Problem: Big-O is worst case by convention<br>
+- How to Fix It: Be explicit about which case you are analyzing</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Database query planners choose indexes based on time complexity analysis</li>
+<li>Search engines use O(1) hash lookups for inverted indexes</li>
+<li>Video streaming uses O(n log n) sorting for recommendation ranking</li>
+<li>Network routers use O(log n) lookups for packet forwarding tables</li>
+<li>Machine learning training time depends on algorithm complexity</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>You do not need to memorize every complexity class. What matters is building intuition: "If I double the input, does the runtime double (linear), quadruple (quadratic), or barely change (logarithmic)?"</p>
+<p>In code reviews, a senior engineer spots nested loops over large data and immediately asks about the complexity. This single habit prevents most performance problems before they reach production.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Explain what Big-O notation represents</li>
+<li>[ ] Identify the time complexity of simple Python code</li>
+<li>[ ] Rank common complexity classes from fastest to slowest</li>
+<li>[ ] Distinguish O(n) from O(n^2) in nested loops</li>
+<li>[ ] Measure and compare algorithm performance empirically</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Analyze the time complexity of Python's <code>list.index()</code> and <code>dict.__getitem__()</code>.</li>
+<li>Write an O(n) algorithm to find duplicates in a list (hint: use a set).</li>
+<li>Predict how long an O(n^2) algorithm takes for n=100,000 if it takes 1 second for n=10,000.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Time complexity and Big-O notation give you a precise way to compare algorithm performance. The most important classes to remember are O(1), O(log n), O(n), O(n log n), and O(n^2). In the next article, we implement and compare two fundamental search algorithms: linear search and binary search.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
+<li><strong>Time Complexity and Big-O (current)</strong></li>
+<li>Linear Search and Binary Search (upcoming)</li>
+<li>Sorting Algorithms (upcoming)</li>
+<li>Recursion and Divide and Conquer (upcoming)</li>
+<li>Dynamic Programming Basics (upcoming)</li>
+<li>Graph Traversal — BFS and DFS (upcoming)</li>
+<li>Shortest Path Basics (upcoming)</li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Coding Test Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.bigocheatsheet.com/">Big-O Cheat Sheet</a></li>
+<li><a href="https://wiki.python.org/moin/TimeComplexity">Python Time Complexity — Python Wiki</a></li>
+<li><a href="https://realpython.com/python-big-o-notation/">Real Python — Big O Notation and Algorithm Analysis</a></li>
+<li><a href="https://www.khanacademy.org/computing/computer-science/algorithms/asymptotic-notation/a/big-o-notation">Khan Academy — Asymptotic Notation</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Algorithms, Time Complexity, Big-O, Performance</p>
+</body>
+</html>

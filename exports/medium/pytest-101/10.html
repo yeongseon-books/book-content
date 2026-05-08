@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Writing Testable Code</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Writing Testable Code</h1>
+<blockquote>
+<p>pytest 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Why is some code easy to test while other code needs 10 mocks?</p>
+<blockquote>
+<p>Hard-to-test code is almost always a design problem. Applying dependency injection, pure functions, and separation of concerns produces code you can test without mocks. This article covers design principles that improve testability.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Common patterns of hard-to-test code</li>
+<li>Separating external dependencies with dependency injection</li>
+<li>Isolating business logic with pure functions</li>
+<li>Narrowing test scope with separation of concerns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If a test needs more than 5 mocks, the problem isn't the test — it's the code. When a single function queries a database, calls an API, and sends an email, of course it's hard to test.</p>
+<blockquote>
+<p>"Hard to test" is feedback that says "improve the design." Tests drive design.</p>
+</blockquote>
+<p>Code with high testability is flexible to change, easy to reuse, and fast to debug.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>testable code = clear inputs + predictable outputs</p>
+</blockquote>
+<pre><code>[Hard to Test]                   [Easy to Test]
+  DB call inside the function     DB passed as parameter
+  Depends on global variables     Values passed as arguments
+  Side effects hidden inside      Side effects separated out
+  datetime.now() called directly  Time passed as parameter
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Dependency injection</strong><br>
+- Description: Passing dependencies from outside so they can be swapped</p>
+<p><strong>Pure function</strong><br>
+- Description: Always returns the same output for the same input, no side effects</p>
+<p><strong>Separation of concerns</strong><br>
+- Description: Splitting business logic from infrastructure code</p>
+<p><strong>Testability</strong><br>
+- Description: The degree to which code can be tested in isolation</p>
+<p><strong>Ports and adapters</strong><br>
+- Description: Pattern separating business logic (ports) from external systems (adapters)</p>
+<h2>Before / After</h2>
+<p>Compare code with hard-coded dependencies versus injected dependencies.</p>
+<pre><code class="language-python"># before: dependencies hard-coded — untestable without mocks
+import requests
+from datetime import datetime
+
+def create_order(user_id, items):
+    user = db.query(f&quot;SELECT * FROM users WHERE id = {user_id}&quot;)
+    order_date = datetime.now()
+    payment = requests.post(&quot;https://pay.api/charge&quot;, json={...})
+    send_email(user[&quot;email&quot;], &quot;Order confirmed&quot;)
+    return {&quot;order_id&quot;: 1, &quot;status&quot;: &quot;completed&quot;}
+</code></pre>
+<pre><code class="language-python"># after: dependencies injected — testable without mocks
+def create_order(user, items, now, charge_fn, notify_fn):
+    total = sum(item[&quot;price&quot;] * item[&quot;qty&quot;] for item in items)
+    payment = charge_fn(user[&quot;id&quot;], total)
+    if payment[&quot;status&quot;] != &quot;success&quot;:
+        return {&quot;status&quot;: &quot;payment_failed&quot;}
+    notify_fn(user[&quot;email&quot;], &quot;Order confirmed&quot;)
+    return {
+        &quot;order_id&quot;: payment[&quot;order_id&quot;],
+        &quot;total&quot;: total,
+        &quot;date&quot;: now,
+        &quot;status&quot;: &quot;completed&quot;,
+    }
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Isolate Business Logic with Pure Functions</strong></p>
+<pre><code class="language-python"># pricing.py — pure functions: input → output, no side effects
+def calculate_discount(total: float, membership: str) -&gt; float:
+    rates = {&quot;gold&quot;: 0.15, &quot;silver&quot;: 0.10, &quot;bronze&quot;: 0.05}
+    rate = rates.get(membership, 0.0)
+    return round(total * rate, 2)
+
+def calculate_shipping(total: float, country: str) -&gt; float:
+    if country == &quot;KR&quot;:
+        return 0.0 if total &gt;= 50000 else 3000.0
+    return 15000.0
+
+def calculate_total(
+    items: list[dict],
+    membership: str,
+    country: str,
+) -&gt; dict:
+    subtotal = sum(item[&quot;price&quot;] * item[&quot;qty&quot;] for item in items)
+    discount = calculate_discount(subtotal, membership)
+    shipping = calculate_shipping(subtotal - discount, country)
+    return {
+        &quot;subtotal&quot;: subtotal,
+        &quot;discount&quot;: discount,
+        &quot;shipping&quot;: shipping,
+        &quot;total&quot;: subtotal - discount + shipping,
+    }
+</code></pre>
+<pre><code class="language-python"># test_pricing.py — no mocks needed
+from pricing import calculate_discount, calculate_shipping, calculate_total
+
+def test_gold_discount():
+    assert calculate_discount(100000, &quot;gold&quot;) == 15000.0
+
+def test_no_discount():
+    assert calculate_discount(100000, &quot;none&quot;) == 0.0
+
+def test_free_shipping_kr():
+    assert calculate_shipping(60000, &quot;KR&quot;) == 0.0
+
+def test_paid_shipping_kr():
+    assert calculate_shipping(30000, &quot;KR&quot;) == 3000.0
+
+def test_total_calculation():
+    items = [{&quot;price&quot;: 10000, &quot;qty&quot;: 3}, {&quot;price&quot;: 5000, &quot;qty&quot;: 2}]
+    result = calculate_total(items, &quot;silver&quot;, &quot;KR&quot;)
+    assert result[&quot;subtotal&quot;] == 40000
+    assert result[&quot;discount&quot;] == 4000.0
+    assert result[&quot;shipping&quot;] == 3000.0
+    assert result[&quot;total&quot;] == 39000.0
+</code></pre>
+<p><strong>Step 2: Dependency Injection Pattern</strong></p>
+<pre><code class="language-python"># user_service.py
+from typing import Protocol
+
+class UserRepository(Protocol):
+    def find_by_id(self, user_id: int) -&gt; dict | None: ...
+    def save(self, user: dict) -&gt; None: ...
+
+class UserService:
+    def __init__(self, repo: UserRepository):
+        self.repo = repo
+
+    def get_user(self, user_id: int) -&gt; dict:
+        user = self.repo.find_by_id(user_id)
+        if not user:
+            raise ValueError(f&quot;User {user_id} not found&quot;)
+        return user
+
+    def update_name(self, user_id: int, new_name: str) -&gt; dict:
+        user = self.get_user(user_id)
+        user[&quot;name&quot;] = new_name
+        self.repo.save(user)
+        return user
+</code></pre>
+<pre><code class="language-python"># test_user_service.py
+import pytest
+from user_service import UserService
+
+class FakeUserRepo:
+    def __init__(self):
+        self.users = {}
+        self.saved = []
+
+    def find_by_id(self, user_id):
+        return self.users.get(user_id)
+
+    def save(self, user):
+        self.saved.append(user)
+
+def test_get_user():
+    repo = FakeUserRepo()
+    repo.users[1] = {&quot;id&quot;: 1, &quot;name&quot;: &quot;Alice&quot;}
+    service = UserService(repo)
+
+    user = service.get_user(1)
+    assert user[&quot;name&quot;] == &quot;Alice&quot;
+
+def test_get_missing_user():
+    repo = FakeUserRepo()
+    service = UserService(repo)
+
+    with pytest.raises(ValueError, match=&quot;not found&quot;):
+        service.get_user(999)
+
+def test_update_name():
+    repo = FakeUserRepo()
+    repo.users[1] = {&quot;id&quot;: 1, &quot;name&quot;: &quot;Alice&quot;}
+    service = UserService(repo)
+
+    updated = service.update_name(1, &quot;Bob&quot;)
+    assert updated[&quot;name&quot;] == &quot;Bob&quot;
+    assert len(repo.saved) == 1
+</code></pre>
+<p><strong>Step 3: Separation of Concerns</strong></p>
+<pre><code class="language-python"># report.py — separate data processing from output
+def aggregate_sales(transactions: list[dict]) -&gt; dict:
+    &quot;&quot;&quot;Pure function: handles data aggregation only.&quot;&quot;&quot;
+    total = sum(t[&quot;amount&quot;] for t in transactions)
+    count = len(transactions)
+    avg = total / count if count &gt; 0 else 0
+    return {&quot;total&quot;: total, &quot;count&quot;: count, &quot;average&quot;: round(avg, 2)}
+
+def format_report(stats: dict) -&gt; str:
+    &quot;&quot;&quot;Pure function: handles formatting only.&quot;&quot;&quot;
+    return (
+        f&quot;Sales Report\n&quot;
+        f&quot;Total Sales: ${stats['total']:,.0f}\n&quot;
+        f&quot;Transactions: {stats['count']}\n&quot;
+        f&quot;Average: ${stats['average']:,.0f}&quot;
+    )
+
+def save_report(content: str, filepath: str) -&gt; None:
+    &quot;&quot;&quot;Infrastructure function: handles file I/O only.&quot;&quot;&quot;
+    with open(filepath, &quot;w&quot;) as f:
+        f.write(content)
+</code></pre>
+<pre><code class="language-python"># test_report.py — test each concern independently
+from report import aggregate_sales, format_report
+
+def test_aggregate_sales():
+    transactions = [
+        {&quot;amount&quot;: 10000},
+        {&quot;amount&quot;: 20000},
+        {&quot;amount&quot;: 30000},
+    ]
+    result = aggregate_sales(transactions)
+    assert result == {&quot;total&quot;: 60000, &quot;count&quot;: 3, &quot;average&quot;: 20000.0}
+
+def test_aggregate_empty():
+    result = aggregate_sales([])
+    assert result == {&quot;total&quot;: 0, &quot;count&quot;: 0, &quot;average&quot;: 0}
+
+def test_format_report():
+    stats = {&quot;total&quot;: 60000, &quot;count&quot;: 3, &quot;average&quot;: 20000.0}
+    report = format_report(stats)
+    assert &quot;$60,000&quot; in report
+    assert &quot;3&quot; in report
+</code></pre>
+<p><strong>Step 4: Separating Side Effects via Function Parameters</strong></p>
+<pre><code class="language-python"># notification.py
+from typing import Callable
+
+def process_order(
+    order: dict,
+    save_fn: Callable[[dict], None],
+    notify_fn: Callable[[str, str], None],
+) -&gt; dict:
+    &quot;&quot;&quot;Business logic only. Injected functions handle side effects.&quot;&quot;&quot;
+    if order[&quot;total&quot;] &lt;= 0:
+        raise ValueError(&quot;Order total must be greater than 0&quot;)
+
+    order[&quot;status&quot;] = &quot;confirmed&quot;
+    save_fn(order)
+    notify_fn(order[&quot;email&quot;], f&quot;Order {order['id']} confirmed&quot;)
+    return order
+</code></pre>
+<pre><code class="language-python"># test_notification.py
+import pytest
+from notification import process_order
+
+def test_process_order():
+    saved = []
+    notifications = []
+
+    result = process_order(
+        order={&quot;id&quot;: 1, &quot;total&quot;: 10000, &quot;email&quot;: &quot;a@test.com&quot;},
+        save_fn=lambda o: saved.append(o),
+        notify_fn=lambda email, msg: notifications.append((email, msg)),
+    )
+
+    assert result[&quot;status&quot;] == &quot;confirmed&quot;
+    assert len(saved) == 1
+    assert len(notifications) == 1
+    assert notifications[0][0] == &quot;a@test.com&quot;
+
+def test_invalid_order():
+    with pytest.raises(ValueError, match=&quot;greater than 0&quot;):
+        process_order(
+            order={&quot;id&quot;: 1, &quot;total&quot;: 0, &quot;email&quot;: &quot;a@test.com&quot;},
+            save_fn=lambda o: None,
+            notify_fn=lambda e, m: None,
+        )
+</code></pre>
+<p><strong>Step 5: Before and After Refactoring</strong></p>
+<pre><code class="language-python"># before refactoring: needs 5 mocks
+# def test_create_order():
+#     with patch(&quot;module.db&quot;) as mock_db, \
+#          patch(&quot;module.requests&quot;) as mock_req, \
+#          patch(&quot;module.send_email&quot;) as mock_email, \
+#          patch(&quot;module.datetime&quot;) as mock_dt, \
+#          patch(&quot;module.logger&quot;) as mock_log:
+#         ...  # 30 lines of setup
+
+# after refactoring: zero mocks
+def test_calculate_order_total():
+    items = [{&quot;price&quot;: 10000, &quot;qty&quot;: 2}]
+    total = calculate_total(items, &quot;gold&quot;, &quot;KR&quot;)
+    assert total[&quot;total&quot;] == 17000.0  # 20000 - 3000(15%) + 0(shipping)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Pure functions only need input/output verification, keeping tests concise</li>
+<li>Protocol-based dependency injection makes Fake implementations easy to build</li>
+<li>Separation of concerns lets you test data processing, formatting, and I/O independently</li>
+<li>Injecting side effects as function parameters enables testing with simple lambdas</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Mixing business logic and I/O in one function</strong><br>
+- Why It's a Problem: Can't test without mocks<br>
+- Fix: Separate logic from I/O</p>
+<p><strong>Depending directly on global objects</strong><br>
+- Why It's a Problem: State leaks between tests<br>
+- Fix: Inject dependencies as parameters</p>
+<p><strong>Overusing mocks</strong><br>
+- Why It's a Problem: Tests couple to implementation details<br>
+- Fix: Improve design to reduce mock needs</p>
+<p><strong>Refusing to change code for testability</strong><br>
+- Why It's a Problem: Testability is a sign of good design<br>
+- Fix: Let tests drive the design</p>
+<p><strong>Making everything a class</strong><br>
+- Why It's a Problem: Unnecessary state complicates tests<br>
+- Fix: Prefer pure functions when possible</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Write business logic as pure functions for fast domain tests</li>
+<li>Use the Repository pattern to isolate DB access with Fake implementations</li>
+<li>Leverage FastAPI's Depends for injection, overriding in tests</li>
+<li>Separate event handlers so publishing and processing are tested independently</li>
+<li>When refactoring legacy code, aim for "testable structure" as the goal</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>When facing hard-to-test code, experienced developers ask "how do I change the design?" not "how do I mock this?" Mocking is a temporary workaround; good design is the permanent fix.</p>
+<p>The real value of TDD isn't "writing tests first" — it's "forcing testable design."</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Separated business logic into pure functions</li>
+<li>[ ] Made external dependencies swappable with dependency injection</li>
+<li>[ ] Defined interfaces with Protocol and created Fakes</li>
+<li>[ ] Tested each layer independently through separation of concerns</li>
+<li>[ ] Tested core business logic without any mocks</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Refactor a function that directly queries a DB into a Repository pattern and test it with a Fake Repository.</li>
+<li>Change a function that calls <code>datetime.now()</code> to accept a time parameter and test it with a fixed time.</li>
+<li>Split a read-file → process-data → write-file function into 3 pure functions and test each independently.</li>
+</ol>
+<h2>Summary and Series Wrap-Up</h2>
+<p>This series covered pytest from the basics to testable design. Tests aren't just "tools for verifying code works" — they're a "feedback loop that drives good design." Think about testing first, and good code follows naturally.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">Mock and Monkeypatch</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/07-testing-files-env-time.md">Testing Files, Environment Variables, and Time</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/08-coverage.md">Coverage and Test Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/09-ci-with-github-actions.md">Test Automation with GitHub Actions</a></li>
+<li><strong>Writing Testable Code (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">Clean Architecture — Robert C. Martin</a></li>
+<li><a href="https://docs.pytest.org/">pytest — Documentation</a></li>
+<li><a href="https://www.cosmicpython.com/">Cosmic Python — Architecture Patterns with Python</a></li>
+<li><a href="https://martinfowler.com/articles/injection.html">Martin Fowler — Dependency Injection</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, Testable Code, Dependency Injection, Software Design</p>
+</body>
+</html>

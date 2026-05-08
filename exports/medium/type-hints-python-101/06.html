@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Protocol and Structural Typing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Protocol and Structural Typing</h1>
+<blockquote>
+<p>Type Hints in Python 101 Series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Can you define "this object must have these methods" without requiring inheritance?</p>
+<blockquote>
+<p>Python's duck typing says "if it walks like a duck and quacks like a duck, it is a duck." But traditional Abstract Base Classes (ABCs) require explicit inheritance, which breaks when you cannot modify the class — like third-party library classes. <code>Protocol</code> brings duck typing into the static type system. If a class has the right methods, it satisfies the Protocol — no inheritance needed. This article covers Protocol, its relationship to structural typing, and practical patterns.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Protocol definition and structural typing principles</li>
+<li>Difference between ABC (nominal typing) and Protocol (structural typing)</li>
+<li><code>@runtime_checkable</code> for runtime Protocol verification</li>
+<li>Practical Protocol design patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>ABCs force inheritance, which creates tight coupling. If a function requires <code>Iterable</code>, every class must explicitly inherit from <code>Iterable</code> — even if it already has <code>__iter__</code>. Protocol eliminates this requirement. If the methods exist, the type is compatible. This mirrors how Python actually works at runtime and aligns static typing with the language's duck typing philosophy.</p>
+<blockquote>
+<p>Protocol = static duck typing.</p>
+</blockquote>
+<p>Like Go interfaces and TypeScript structural types.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Protocol defines a set of methods/attributes. Any class that has those methods is compatible — no inheritance required. This is structural typing.</p>
+</blockquote>
+<pre><code class="language-text">class Closeable(Protocol):     class FileHandler:
+    def close(self) -&gt; None:       def close(self) -&gt; None:
+        ...                            self.file.close()
+
+        │                                    │
+        └──── structural match ──────────────┘
+              (no inheritance needed)
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Protocol</strong><br>
+- Description: A class that defines required methods/attributes without requiring inheritance</p>
+<p><strong>Structural typing</strong><br>
+- Description: Compatibility based on structure (methods/attributes), not inheritance</p>
+<p><strong>Nominal typing</strong><br>
+- Description: Compatibility based on explicit class hierarchy (inheritance)</p>
+<p><strong>@runtime_checkable</strong><br>
+- Description: Enables <code>isinstance()</code> checks against a Protocol</p>
+<p><strong>ABC</strong><br>
+- Description: Abstract Base Class — nominal typing with required method overrides</p>
+<h2>Before / After</h2>
+<p><strong>Before — ABC requires inheritance:</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class Closeable(ABC):
+    @abstractmethod
+    def close(self) -&gt; None: ...
+
+class FileHandler(Closeable):  # Must inherit
+    def close(self) -&gt; None:
+        print(&quot;closed&quot;)
+
+def cleanup(resource: Closeable) -&gt; None:
+    resource.close()
+</code></pre>
+<p><strong>After — Protocol requires no inheritance:</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class Closeable(Protocol):
+    def close(self) -&gt; None: ...
+
+class FileHandler:  # No inheritance needed
+    def close(self) -&gt; None:
+        print(&quot;closed&quot;)
+
+def cleanup(resource: Closeable) -&gt; None:
+    resource.close()
+
+cleanup(FileHandler())  # OK — structural match
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Define a Basic Protocol</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class Renderable(Protocol):
+    def render(self) -&gt; str: ...
+
+class HtmlWidget:
+    def render(self) -&gt; str:
+        return &quot;&lt;div&gt;Hello&lt;/div&gt;&quot;
+
+class JsonResponse:
+    def render(self) -&gt; str:
+        return '{&quot;message&quot;: &quot;hello&quot;}'
+
+def display(item: Renderable) -&gt; None:
+    print(item.render())
+
+display(HtmlWidget())     # OK
+display(JsonResponse())   # OK — both have render() -&gt; str
+</code></pre>
+<p>Neither <code>HtmlWidget</code> nor <code>JsonResponse</code> inherits from <code>Renderable</code>. They are compatible because they have a matching <code>render</code> method.</p>
+<p><strong>Step 2: Protocol with Attributes</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class Named(Protocol):
+    name: str
+
+class User:
+    def __init__(self, name: str) -&gt; None:
+        self.name = name
+
+class Product:
+    def __init__(self, name: str, price: int) -&gt; None:
+        self.name = name
+        self.price = price
+
+def greet(entity: Named) -&gt; str:
+    return f&quot;Hello, {entity.name}!&quot;
+
+greet(User(&quot;Alice&quot;))             # OK
+greet(Product(&quot;Book&quot;, 25))       # OK — has name: str
+</code></pre>
+<p><strong>Step 3: @runtime_checkable</strong></p>
+<pre><code class="language-python">from typing import Protocol, runtime_checkable
+
+@runtime_checkable
+class Sizeable(Protocol):
+    def __len__(self) -&gt; int: ...
+
+print(isinstance([1, 2, 3], Sizeable))   # True
+print(isinstance(&quot;hello&quot;, Sizeable))     # True
+print(isinstance(42, Sizeable))          # False
+</code></pre>
+<p><code>@runtime_checkable</code> enables <code>isinstance()</code> checks. Note: it only checks method existence, not signatures.</p>
+<p><strong>Step 4: Protocol Inheritance</strong></p>
+<pre><code class="language-python">from typing import Protocol
+
+class Readable(Protocol):
+    def read(self) -&gt; str: ...
+
+class Writable(Protocol):
+    def write(self, data: str) -&gt; None: ...
+
+class ReadWritable(Readable, Writable, Protocol):
+    ...
+
+class FileHandler:
+    def read(self) -&gt; str:
+        return &quot;data&quot;
+
+    def write(self, data: str) -&gt; None:
+        print(f&quot;Writing: {data}&quot;)
+
+def process(stream: ReadWritable) -&gt; None:
+    content = stream.read()
+    stream.write(content.upper())
+
+process(FileHandler())  # OK — has both read and write
+</code></pre>
+<p><strong>Step 5: Protocol vs. ABC Decision</strong></p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+from typing import Protocol
+
+# Use ABC when: you own all implementing classes and want to enforce a contract
+class BasePlugin(ABC):
+    @abstractmethod
+    def execute(self) -&gt; None: ...
+
+    def log(self) -&gt; None:  # Shared implementation
+        print(f&quot;Running {self.__class__.__name__}&quot;)
+
+# Use Protocol when: you want structural compatibility with external classes
+class Executable(Protocol):
+    def execute(self) -&gt; None: ...
+</code></pre>
+<p>Use ABC when you provide shared implementation. Use Protocol when you define an interface for code you do not control.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Protocol classes define method signatures but no implementations</li>
+<li>Any class with matching methods is compatible — no inheritance required</li>
+<li><code>@runtime_checkable</code> enables isinstance checks but only verifies method existence</li>
+<li>Protocol inheritance combines multiple Protocols into one</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Adding implementation to Protocol</strong><br>
+- Problem: Protocol methods should be abstract<br>
+- Fix: Use <code>...</code> (Ellipsis) as the body</p>
+<p><strong>Forgetting <code>Protocol</code> in multi-inheritance</strong><br>
+- Problem: Class becomes a regular class<br>
+- Fix: Include <code>Protocol</code> in the bases</p>
+<p><strong>Relying on runtime_checkable for signatures</strong><br>
+- Problem: Only checks method names, not types<br>
+- Fix: Use static type checking for full verification</p>
+<p><strong>Using Protocol where ABC fits better</strong><br>
+- Problem: No shared implementation possible<br>
+- Fix: Use ABC when you need default methods</p>
+<p><strong>Over-fragmenting Protocols</strong><br>
+- Problem: Too many tiny Protocols<br>
+- Fix: Group related methods into one Protocol</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Plugin systems that accept any object with an <code>execute()</code> method</li>
+<li>Testing with mock objects that structurally match the Protocol</li>
+<li>Adapter patterns where third-party classes satisfy your Protocol without modification</li>
+<li>Framework hooks that accept any callable with the right signature</li>
+<li>Repository patterns where different storage backends match the same Protocol</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Senior engineers default to Protocol over ABC for public interfaces. Protocol is more flexible because it does not require the implementing class to know about the interface. This is especially valuable when working with third-party libraries — you can define a Protocol that their classes already satisfy without any modification.</p>
+<p>They use ABC only when shared default implementations are needed. If the base class provides utility methods that subclasses inherit, ABC is the right tool. Otherwise, Protocol gives you the same static type safety with less coupling.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Used Protocol for interfaces that external classes should satisfy</li>
+<li>[ ] Used ABC only when shared implementation is needed</li>
+<li>[ ] Applied <code>@runtime_checkable</code> only when isinstance checks are necessary</li>
+<li>[ ] Kept Protocol definitions focused on essential methods</li>
+<li>[ ] Verified Protocol compatibility with mypy</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p>Define a <code>Serializable</code> Protocol with <code>to_json() -&gt; str</code> and <code>from_json(data: str) -&gt; Self</code> methods. Create two classes that satisfy it without inheritance.</p>
+</li>
+<li>
+<p>Create a <code>Repository</code> Protocol with <code>get(id: int)</code>, <code>save(entity)</code>, and <code>delete(id: int)</code> methods. Write a service function that accepts any Repository.</p>
+</li>
+<li>
+<p>Compare ABC and Protocol by implementing the same interface both ways. Test with mypy and note the differences in error messages and flexibility.</p>
+</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Protocol enables structural typing in Python's static type system. Classes satisfy a Protocol by having the right methods — no inheritance required. This aligns with Python's duck typing philosophy while providing full static type checking. Use Protocol for flexible interfaces and ABC when shared implementation is needed.</p>
+<p>In the next article, we will explore Generics — parameterizing types with type variables for reusable, type-safe code.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><strong>Protocol and Structural Typing (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Protocol">Python docs — typing.Protocol</a></li>
+<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols: Structural subtyping</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/protocols.html">mypy docs — Protocols and structural subtyping</a></li>
+<li><a href="https://realpython.com/python-protocol/">Real Python — Structural Typing</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, Protocol, Structural Typing, Duck Typing, Interface</p>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shortest Path Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Shortest Path Basics</h1>
+<blockquote>
+<p>Algorithms with Python 101 Series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you find the shortest distance from one node to every other node in a weighted graph?</p>
+<blockquote>
+<p>BFS guarantees shortest paths only on unweighted graphs. When edges have weights, you need Dijkstra's algorithm. This article implements Dijkstra's algorithm using Python's heapq module.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The shortest-path problem on weighted graphs</li>
+<li>How Dijkstra's algorithm works</li>
+<li>Implementation with Python's heapq</li>
+<li>Path reconstruction and negative-weight limitations</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Navigation, network routing, and logistics optimization are all weighted-graph shortest-path problems. Dijkstra's algorithm is the most fundamental tool for solving them efficiently.</p>
+<blockquote>
+<p>Dijkstra's algorithm finds the shortest path from a single source to all other nodes in a graph with non-negative edge weights.</p>
+</blockquote>
+<p>Dijkstra combines a greedy strategy with a priority queue to run in O((V+E) log V). This principle underpins advanced algorithms like A*.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Shortest path = the path from source to destination with the minimum total edge weight</p>
+</blockquote>
+<pre><code>Weighted graph:
+A --4-- B --3-- D
+|       |
+2       1
+|       |
+C --5-- E
+
+A→D shortest path: A→B→D (cost 7)
+A→E shortest path: A→B→E (cost 5)
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Weighted graph</strong><br>
+- Description: A graph where each edge has an associated cost (weight)</p>
+<p><strong>Dijkstra's algorithm</strong><br>
+- Description: Finds single-source shortest paths with non-negative weights</p>
+<p><strong>Priority queue</strong><br>
+- Description: A data structure that always dequeues the smallest element first</p>
+<p><strong>Relaxation</strong><br>
+- Description: Updating a distance estimate when a shorter path is found</p>
+<p><strong>Negative weight</strong><br>
+- Description: Edges with negative costs that Dijkstra cannot handle</p>
+<h2>Before / After</h2>
+<p>Two approaches to finding the shortest path in a weighted graph.</p>
+<pre><code class="language-python"># before: BFS — ignores weights, gives wrong answer
+def shortest(graph, start, end):
+    from collections import deque
+    queue = deque([(start, [start])])
+    visited = {start}
+    while queue:
+        node, path = queue.popleft()
+        if node == end:
+            return path  # minimum hops, NOT minimum cost
+        for neighbor, _ in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, path + [neighbor]))
+    return None
+</code></pre>
+<pre><code class="language-python"># after: Dijkstra — weight-aware shortest path
+import heapq
+
+def shortest(graph, start, end):
+    dist = {start: 0}
+    heap = [(0, start, [start])]
+    while heap:
+        cost, node, path = heapq.heappop(heap)
+        if node == end:
+            return cost, path
+        if cost &gt; dist.get(node, float(&quot;inf&quot;)):
+            continue
+        for neighbor, weight in graph[node]:
+            new_cost = cost + weight
+            if new_cost &lt; dist.get(neighbor, float(&quot;inf&quot;)):
+                dist[neighbor] = new_cost
+                heapq.heappush(heap, (new_cost, neighbor, path + [neighbor]))
+    return None
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Representing a Weighted Graph</strong></p>
+<pre><code class="language-python">graph: dict[str, list[tuple[str, int]]] = {
+    &quot;A&quot;: [(&quot;B&quot;, 4), (&quot;C&quot;, 2)],
+    &quot;B&quot;: [(&quot;A&quot;, 4), (&quot;D&quot;, 3), (&quot;E&quot;, 1)],
+    &quot;C&quot;: [(&quot;A&quot;, 2), (&quot;E&quot;, 5)],
+    &quot;D&quot;: [(&quot;B&quot;, 3)],
+    &quot;E&quot;: [(&quot;B&quot;, 1), (&quot;C&quot;, 5)],
+}
+
+for node, neighbors in graph.items():
+    edges = [f&quot;{n}({w})&quot; for n, w in neighbors]
+    print(f&quot;  {node} -&gt; {', '.join(edges)}&quot;)
+</code></pre>
+<p><strong>Step 2: Dijkstra's Algorithm</strong></p>
+<pre><code class="language-python">import heapq
+
+def dijkstra(
+    graph: dict[str, list[tuple[str, int]]], start: str
+) -&gt; dict[str, int]:
+    &quot;&quot;&quot;Dijkstra's algorithm — O((V+E) log V).&quot;&quot;&quot;
+    dist: dict[str, int] = {start: 0}
+    heap: list[tuple[int, str]] = [(0, start)]
+
+    while heap:
+        cost, node = heapq.heappop(heap)
+        if cost &gt; dist.get(node, float(&quot;inf&quot;)):
+            continue
+
+        for neighbor, weight in graph[node]:
+            new_cost = cost + weight
+            if new_cost &lt; dist.get(neighbor, float(&quot;inf&quot;)):
+                dist[neighbor] = new_cost
+                heapq.heappush(heap, (new_cost, neighbor))
+
+    return dist
+
+distances = dijkstra(graph, &quot;A&quot;)
+for node, d in sorted(distances.items()):
+    print(f&quot;  A -&gt; {node}: {d}&quot;)
+# A -&gt; A: 0
+# A -&gt; B: 4
+# A -&gt; C: 2
+# A -&gt; D: 7
+# A -&gt; E: 5
+</code></pre>
+<p><strong>Step 3: Path Reconstruction</strong></p>
+<pre><code class="language-python">import heapq
+
+def dijkstra_with_path(
+    graph: dict[str, list[tuple[str, int]]], start: str
+) -&gt; tuple[dict[str, int], dict[str, list[str]]]:
+    &quot;&quot;&quot;Dijkstra with path reconstruction.&quot;&quot;&quot;
+    dist: dict[str, int] = {start: 0}
+    prev: dict[str, str | None] = {start: None}
+    heap: list[tuple[int, str]] = [(0, start)]
+
+    while heap:
+        cost, node = heapq.heappop(heap)
+        if cost &gt; dist.get(node, float(&quot;inf&quot;)):
+            continue
+        for neighbor, weight in graph[node]:
+            new_cost = cost + weight
+            if new_cost &lt; dist.get(neighbor, float(&quot;inf&quot;)):
+                dist[neighbor] = new_cost
+                prev[neighbor] = node
+                heapq.heappush(heap, (new_cost, neighbor))
+
+    paths: dict[str, list[str]] = {}
+    for node in dist:
+        path: list[str] = []
+        current: str | None = node
+        while current is not None:
+            path.append(current)
+            current = prev.get(current)
+        paths[node] = list(reversed(path))
+
+    return dist, paths
+
+distances, paths = dijkstra_with_path(graph, &quot;A&quot;)
+for node in sorted(paths):
+    print(f&quot;  A -&gt; {node}: cost={distances[node]}, path={' -&gt; '.join(paths[node])}&quot;)
+</code></pre>
+<p><strong>Step 4: Grid Shortest Path</strong></p>
+<pre><code class="language-python">import heapq
+
+def grid_shortest_path(grid: list[list[int]]) -&gt; int:
+    &quot;&quot;&quot;Minimum-cost path from top-left to bottom-right in a grid.&quot;&quot;&quot;
+    rows, cols = len(grid), len(grid[0])
+    dist = [[float(&quot;inf&quot;)] * cols for _ in range(rows)]
+    dist[0][0] = grid[0][0]
+    heap: list[tuple[int, int, int]] = [(grid[0][0], 0, 0)]
+
+    while heap:
+        cost, r, c = heapq.heappop(heap)
+        if r == rows - 1 and c == cols - 1:
+            return cost
+        if cost &gt; dist[r][c]:
+            continue
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            if 0 &lt;= nr &lt; rows and 0 &lt;= nc &lt; cols:
+                new_cost = cost + grid[nr][nc]
+                if new_cost &lt; dist[nr][nc]:
+                    dist[nr][nc] = new_cost
+                    heapq.heappush(heap, (new_cost, nr, nc))
+
+    return dist[rows - 1][cols - 1]
+
+grid = [
+    [1, 3, 1],
+    [1, 5, 1],
+    [4, 2, 1],
+]
+print(grid_shortest_path(grid))  # 7 (1→1→1→1→2→1)
+</code></pre>
+<p><strong>Step 5: Algorithm Comparison</strong></p>
+<pre><code class="language-python">comparison = [
+    (&quot;Unweighted graph&quot;, &quot;BFS — O(V+E)&quot;),
+    (&quot;Non-negative weights&quot;, &quot;Dijkstra — O((V+E) log V)&quot;),
+    (&quot;Negative weights allowed&quot;, &quot;Bellman-Ford — O(V*E)&quot;),
+    (&quot;All-pairs shortest path&quot;, &quot;Floyd-Warshall — O(V^3)&quot;),
+]
+
+print(&quot;Shortest-path algorithm selection guide:&quot;)
+for condition, algorithm in comparison:
+    print(f&quot;  {condition}: {algorithm}&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>heapq is a min-heap, so the node with the smallest distance is always processed first</li>
+<li>The <code>cost &gt; dist.get(node, float("inf"))</code> check skips already-finalized nodes</li>
+<li>Path reconstruction uses a prev dictionary and backtracks from destination to source</li>
+<li>Grid problems are a common interview application of Dijkstra</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Using Dijkstra with negative weights</strong><br>
+- Why It's a Problem: Produces incorrect results<br>
+- How to Fix It: Use Bellman-Ford instead</p>
+<p><strong>Skipping the finalized-node check</strong><br>
+- Why It's a Problem: Wastes time on redundant processing<br>
+- How to Fix It: Compare heap cost with recorded distance</p>
+<p><strong>Using a list as a priority queue</strong><br>
+- Why It's a Problem: insert/remove is O(n)<br>
+- How to Fix It: Use heapq</p>
+<p><strong>Wrong initial distance</strong><br>
+- Why It's a Problem: Source node distance is incorrect<br>
+- How to Fix It: Initialize source distance to 0</p>
+<p><strong>Not handling unreachable nodes</strong><br>
+- Why It's a Problem: KeyError when accessing distance<br>
+- How to Fix It: Use dist.get(node, float("inf"))</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Navigation apps use Dijkstra (or A*) to compute optimal driving routes</li>
+<li>Network routing protocols like OSPF use Dijkstra internally</li>
+<li>Logistics systems optimize delivery routes across warehouses</li>
+<li>Game engines compute NPC movement paths</li>
+<li>Social networks analyze shortest connection paths between users</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>You rarely implement Dijkstra yourself, but recognizing that a problem is a shortest-path problem is the critical skill. Once you make that connection, you can reach for the right library or algorithm.</p>
+<p>In production, you use NetworkX's shortest_path() or a mapping API. But understanding the internals helps you diagnose performance issues and select the right algorithm.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Explain how Dijkstra's algorithm works</li>
+<li>[ ] Implement Dijkstra with heapq in Python</li>
+<li>[ ] Reconstruct the shortest path from source to destination</li>
+<li>[ ] Explain Dijkstra's limitation with negative weights</li>
+<li>[ ] Choose the appropriate shortest-path algorithm for a given problem</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Find the shortest path and cost between two specific nodes in a weighted directed graph.</li>
+<li>Find the shortest path in a grid with obstacles (impassable cells).</li>
+<li>Write a function that finds the k-th shortest path using Dijkstra.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Dijkstra's algorithm finds shortest paths in non-negative weighted graphs in O((V+E) log V). The key insight is processing the nearest unfinalized node first via a priority queue. In the next article, we explore greedy algorithms — the strategy of always making the locally optimal choice.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Dynamic Programming Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Graph Traversal — BFS and DFS</a></li>
+<li><strong>Shortest Path Basics (current)</strong></li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Coding Test Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Wikipedia — Dijkstra's Algorithm</a></li>
+<li><a href="https://docs.python.org/3/library/heapq.html">Python Documentation — heapq</a></li>
+<li><a href="https://visualgo.net/en/sssp">Visualgo — Single-Source Shortest Path</a></li>
+<li><a href="https://realpython.com/python-heapq-module/">Real Python — Priority Queue in Python</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Algorithms, Shortest Path, Dijkstra, heapq</p>
+</body>
+</html>

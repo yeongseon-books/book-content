@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Writing Your First pytest Test</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Writing Your First pytest Test</h1>
+<blockquote>
+<p>pytest 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How does pytest automatically find test files and functions?</p>
+<blockquote>
+<p>pytest uses the <code>test_</code> prefix convention to auto-discover files and functions. This article covers project layout, writing tests, and using various execution options.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>pytest's test discovery rules</li>
+<li>Separating production and test code directories</li>
+<li>pytest execution options and output interpretation</li>
+<li>The role and placement of conftest.py</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>No matter how well-written your tests are, they won't run if pytest can't find them. Getting the project structure and naming conventions right from the start makes test management effortless.</p>
+<blockquote>
+<p>The location and name of your test code are the rules. Follow them and pytest handles everything automatically with zero configuration.</p>
+</blockquote>
+<p>When test structure is consistent across a team project, new members know where tests live before they even open the code.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>test discovery = the mechanism by which pytest automatically locates test files and functions</p>
+</blockquote>
+<pre><code>project/
+├── src/
+│   └── myapp/
+│       ├── __init__.py
+│       └── calculator.py    ← production code
+└── tests/
+    ├── conftest.py          ← shared fixtures
+    ├── test_calculator.py   ← test code
+    └── test_utils.py        ← test code
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Test discovery</strong><br>
+- Description: Automatically locates tests by file, class, and function naming rules</p>
+<p><strong>conftest.py</strong><br>
+- Description: Configuration file for sharing fixtures across test files</p>
+<p><strong>Test node ID</strong><br>
+- Description: Identifies individual tests in <code>file::class::function</code> format</p>
+<p><strong>Test marker</strong><br>
+- Description: Classifies tests with <code>@pytest.mark</code> for selective execution</p>
+<p><strong>Exit code</strong><br>
+- Description: 0 means all passed, 1 means some failed, 2 means user interrupt</p>
+<h2>Before / After</h2>
+<p>Compare a project with no test structure to one with organized tests.</p>
+<pre><code class="language-python"># before: production code and test logic mixed together
+# main.py
+def greet(name):
+    return f&quot;Hello, {name}&quot;
+
+if __name__ == &quot;__main__&quot;:
+    print(greet(&quot;World&quot;))  # manual verification
+</code></pre>
+<pre><code class="language-python"># after: separated structure
+# src/myapp/greeting.py
+def greet(name: str) -&gt; str:
+    if not name:
+        raise ValueError(&quot;Name cannot be empty&quot;)
+    return f&quot;Hello, {name}&quot;
+
+# tests/test_greeting.py
+import pytest
+from myapp.greeting import greet
+
+def test_greet():
+    assert greet(&quot;World&quot;) == &quot;Hello, World&quot;
+
+def test_greet_empty_name():
+    with pytest.raises(ValueError):
+        greet(&quot;&quot;)
+</code></pre>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Create Project Structure</strong></p>
+<pre><code class="language-bash">mkdir -p src/myapp tests
+touch src/myapp/__init__.py
+</code></pre>
+<p><strong>Step 2: Write Production Code</strong></p>
+<pre><code class="language-python"># src/myapp/string_utils.py
+def reverse_string(s: str) -&gt; str:
+    &quot;&quot;&quot;Reverses a string.&quot;&quot;&quot;
+    if not isinstance(s, str):
+        raise TypeError(&quot;Input must be a string&quot;)
+    return s[::-1]
+
+def count_vowels(s: str) -&gt; int:
+    &quot;&quot;&quot;Counts the number of vowels.&quot;&quot;&quot;
+    return sum(1 for c in s.lower() if c in &quot;aeiou&quot;)
+
+def truncate(s: str, max_length: int = 10) -&gt; str:
+    &quot;&quot;&quot;Truncates a string to the specified maximum length.&quot;&quot;&quot;
+    if len(s) &lt;= max_length:
+        return s
+    return s[:max_length] + &quot;...&quot;
+</code></pre>
+<p><strong>Step 3: Write Tests</strong></p>
+<pre><code class="language-python"># tests/test_string_utils.py
+import pytest
+from myapp.string_utils import reverse_string, count_vowels, truncate
+
+class TestReverseString:
+    def test_basic(self):
+        assert reverse_string(&quot;hello&quot;) == &quot;olleh&quot;
+
+    def test_empty(self):
+        assert reverse_string(&quot;&quot;) == &quot;&quot;
+
+    def test_palindrome(self):
+        assert reverse_string(&quot;radar&quot;) == &quot;radar&quot;
+
+    def test_type_error(self):
+        with pytest.raises(TypeError):
+            reverse_string(123)
+
+class TestCountVowels:
+    def test_basic(self):
+        assert count_vowels(&quot;hello&quot;) == 2
+
+    def test_no_vowels(self):
+        assert count_vowels(&quot;xyz&quot;) == 0
+
+    def test_all_vowels(self):
+        assert count_vowels(&quot;aeiou&quot;) == 5
+
+class TestTruncate:
+    def test_short_string(self):
+        assert truncate(&quot;hi&quot;, 10) == &quot;hi&quot;
+
+    def test_long_string(self):
+        assert truncate(&quot;hello world&quot;, 5) == &quot;hello...&quot;
+
+    def test_exact_length(self):
+        assert truncate(&quot;hello&quot;, 5) == &quot;hello&quot;
+</code></pre>
+<p><strong>Step 4: Configure pyproject.toml</strong></p>
+<pre><code class="language-toml"># pyproject.toml
+[tool.pytest.ini_options]
+testpaths = [&quot;tests&quot;]
+pythonpath = [&quot;src&quot;]
+</code></pre>
+<p><strong>Step 5: Run Tests in Various Ways</strong></p>
+<pre><code class="language-bash"># run all tests
+pytest
+
+# verbose output
+pytest -v
+
+# specific file
+pytest tests/test_string_utils.py
+
+# specific class
+pytest tests/test_string_utils.py::TestReverseString
+
+# specific test
+pytest tests/test_string_utils.py::TestReverseString::test_basic
+
+# filter by keyword
+pytest -k &quot;vowel&quot;
+
+# stop on first failure
+pytest -x
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>class Test*</code> groups related tests for better readability</li>
+<li><code>pyproject.toml</code>'s <code>pythonpath</code> tells pytest where to find the <code>src</code> directory</li>
+<li>The <code>-k</code> option filters tests by partial name match</li>
+<li>Node IDs (<code>file::class::function</code>) target exactly one test</li>
+</ul>
+<h2>Common Mistakes</h2>
+<p><strong>Not adding <code>src/</code> to <code>pythonpath</code></strong><br>
+- Why It's a Problem: Causes <code>ModuleNotFoundError</code><br>
+- Fix: Add <code>pythonpath = ["src"]</code> in <code>pyproject.toml</code></p>
+<p><strong>Missing <code>__init__.py</code></strong><br>
+- Why It's a Problem: Directory not recognized as a package<br>
+- Fix: Create <code>__init__.py</code> in every package directory</p>
+<p><strong>Defining <code>__init__</code> in test classes</strong><br>
+- Why It's a Problem: pytest won't recognize the class as a test class<br>
+- Fix: Never define <code>__init__</code> in test classes</p>
+<p><strong>Trying to import conftest.py</strong><br>
+- Why It's a Problem: conftest.py is loaded automatically by pytest<br>
+- Fix: Don't write <code>import conftest</code></p>
+<p><strong>Using hyphens in test filenames</strong><br>
+- Why It's a Problem: Python can't import modules with hyphens<br>
+- Fix: Use underscores instead of hyphens</p>
+<h2>Practical Applications</h2>
+<ul>
+<li>Separate <code>tests/</code> from <code>src/</code> so tests aren't included in the distribution package</li>
+<li>Define common fixtures like database connections and HTTP clients in <code>conftest.py</code></li>
+<li>Use <code>-x</code> flag in CI to fail fast on first error</li>
+<li>Share identical settings across the team via <code>pytest.ini</code> or <code>pyproject.toml</code></li>
+<li>Use <code>-k</code> to quickly run only tests related to a specific feature</li>
+</ul>
+<h2>How Practitioners Think About This</h2>
+<p>Setting up test structure early pays dividends as the codebase grows. "I'll add tests later" almost always means "I'll never add tests."</p>
+<p>In practice, the <code>src/</code> layout is used to clearly separate production code from tests. This ensures test code isn't included when running <code>pip install .</code>.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Organized the project with <code>src/</code> layout</li>
+<li>[ ] Configured <code>testpaths</code> and <code>pythonpath</code> in <code>pyproject.toml</code></li>
+<li>[ ] Ran all tests with <code>pytest -v</code></li>
+<li>[ ] Executed a specific test using its node ID</li>
+<li>[ ] Used the <code>-k</code> option for keyword filtering</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a <code>capitalize_words(s)</code> function and group tests for empty string, single word, and multiple words into a test class.</li>
+<li>Run <code>pytest</code> without <code>pyproject.toml</code>, observe the error, then fix it by adding the configuration.</li>
+<li>Use <code>-k</code> to run only tests containing "reverse" and verify the results.</li>
+</ol>
+<h2>Summary and Next</h2>
+<p>You've learned pytest's test discovery rules and project structure. The <code>test_</code> prefix and <code>src/</code> layout are the foundation. Next, we'll dive deep into <code>assert</code> patterns and exception testing.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
+<li><strong>Writing Your First pytest Test (current)</strong></li>
+<li>Assert and Exception Testing (upcoming)</li>
+<li>Understanding Fixtures (upcoming)</li>
+<li>Parametrization (upcoming)</li>
+<li>Mock and Monkeypatch (upcoming)</li>
+<li>Testing Files, Environment Variables, and Time (upcoming)</li>
+<li>Coverage and Test Quality (upcoming)</li>
+<li>Test Automation with GitHub Actions (upcoming)</li>
+<li>Writing Testable Code (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/goodpractices.html#test-discovery">pytest — Test Discovery</a></li>
+<li><a href="https://docs.pytest.org/en/stable/reference/customize.html">pytest — Configuration</a></li>
+<li><a href="https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/">src layout vs flat layout — Python Packaging Guide</a></li>
+<li><a href="https://realpython.com/pytest-python-testing/">Real Python — Effective Python Testing With Pytest</a></li>
+</ul>
+<p class="tags-line">Tags: Python, pytest, Test Writing, Test Discovery, Project Structure</p>
+</body>
+</html>

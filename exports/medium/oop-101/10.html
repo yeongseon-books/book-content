@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>When to Avoid OOP</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>When to Avoid OOP</h1>
+<blockquote>
+<p>Object-Oriented Programming 101 Series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: Should every problem be solved with classes? When does object-oriented programming get in the way?</p>
+<blockquote>
+<p>OOP is a powerful tool, but it is not a universal solution. For simple scripts, data transformation pipelines, and stateless utilities, plain functions and modules produce cleaner code. This article explores situations where OOP is a poor fit and what alternatives to use instead.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Warning signs that OOP is overkill for the task at hand</li>
+<li>Patterns where a function-based approach works better</li>
+<li>How to leverage dataclass and NamedTuple effectively</li>
+<li>Mixing OOP and functional programming in the right proportions</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>"When all you have is a hammer, everything looks like a nail." Once you learn OOP, you tend to wrap everything in classes. But Python is a multi-paradigm language, and choosing the right tool for each problem is what makes code truly good.</p>
+<blockquote>
+<p>Good design = choosing the right tool for the problem</p>
+</blockquote>
+<p>Unnecessary classes make code harder to read and more expensive to maintain. Always ask yourself: "Does this really need to be a class?"</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>OOP vs Alternatives — Decision Criteria</p>
+</blockquote>
+<pre><code>When classes make sense            When classes are overkill
+─────────────────────              ─────────────────────
+State + behavior together          Stateless transformation functions
+Multiple instances needed          Single-run scripts
+Swappable strategies required      Data-only containers
+Framework demands classes          Pipeline data processing
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Multi-paradigm</strong><br>
+- Description: A language that supports procedural, OOP, and functional styles together</p>
+<p><strong>Anemic domain model</strong><br>
+- Description: A class that holds data but contains no behavior</p>
+<p><strong>dataclass</strong><br>
+- Description: A Python feature for defining data-centric classes with minimal boilerplate</p>
+<p><strong>Higher-order function</strong><br>
+- Description: A function that accepts or returns another function</p>
+<p><strong>Closure</strong><br>
+- Description: An inner function that remembers variables from its enclosing scope</p>
+<h2>Before / After</h2>
+<p>Remove an unnecessary class.</p>
+<pre><code class="language-python"># before: unnecessary class with a single method
+class Validator:
+    def validate_email(self, email: str) -&gt; bool:
+        return &quot;@&quot; in email and &quot;.&quot; in email
+
+validator = Validator()
+print(validator.validate_email(&quot;test@example.com&quot;))
+</code></pre>
+<pre><code class="language-python"># after: a plain function is enough
+def validate_email(email: str) -&gt; bool:
+    return &quot;@&quot; in email and &quot;.&quot; in email
+
+print(validate_email(&quot;test@example.com&quot;))
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Functions Instead of a Class</strong></p>
+<pre><code class="language-python"># Unnecessary class — stateless, methods only
+class StringUtils:
+    @staticmethod
+    def capitalize_words(text: str) -&gt; str:
+        return &quot; &quot;.join(w.capitalize() for w in text.split())
+
+    @staticmethod
+    def count_words(text: str) -&gt; int:
+        return len(text.split())
+
+    @staticmethod
+    def truncate(text: str, max_len: int) -&gt; str:
+        if len(text) &lt;= max_len:
+            return text
+        return text[:max_len - 3] + &quot;...&quot;
+
+# Better: module-level functions
+def capitalize_words(text: str) -&gt; str:
+    return &quot; &quot;.join(w.capitalize() for w in text.split())
+
+def count_words(text: str) -&gt; int:
+    return len(text.split())
+
+def truncate(text: str, max_len: int) -&gt; str:
+    if len(text) &lt;= max_len:
+        return text
+    return text[:max_len - 3] + &quot;...&quot;
+
+print(capitalize_words(&quot;hello world&quot;))  # Hello World
+print(count_words(&quot;one two three&quot;))     # 3
+print(truncate(&quot;abcdefghij&quot;, 8))        # abcde...
+</code></pre>
+<p><strong>Step 2: dataclass and NamedTuple Instead of Manual Classes</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
+from typing import NamedTuple
+
+# Unnecessary boilerplate — manual __init__, __repr__, __eq__
+class ManualPoint:
+    def __init__(self, x: float, y: float) -&gt; None:
+        self.x = x
+        self.y = y
+    def __repr__(self) -&gt; str:
+        return f&quot;Point({self.x}, {self.y})&quot;
+    def __eq__(self, other: object) -&gt; bool:
+        if not isinstance(other, ManualPoint):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+
+# Better 1: dataclass
+@dataclass
+class Point:
+    x: float
+    y: float
+
+# Better 2: NamedTuple (immutable)
+class ImmutablePoint(NamedTuple):
+    x: float
+    y: float
+
+p1 = Point(1, 2)
+p2 = Point(1, 2)
+print(p1)        # Point(x=1, y=2)
+print(p1 == p2)  # True
+
+ip = ImmutablePoint(3, 4)
+print(ip.x)  # 3
+# ip.x = 10  # AttributeError — immutable
+</code></pre>
+<p><strong>Step 3: Higher-Order Functions Instead of Strategy Classes</strong></p>
+<pre><code class="language-python"># Strategy pattern — class version
+from typing import Protocol
+
+class Formatter(Protocol):
+    def format(self, value: float) -&gt; str: ...
+
+class CurrencyFormatter:
+    def format(self, value: float) -&gt; str:
+        return f&quot;${value:,.2f}&quot;
+
+class PercentFormatter:
+    def format(self, value: float) -&gt; str:
+        return f&quot;{value:.1f}%&quot;
+
+# Better: functions are enough — no classes needed
+from typing import Callable
+
+def currency_format(value: float) -&gt; str:
+    return f&quot;${value:,.2f}&quot;
+
+def percent_format(value: float) -&gt; str:
+    return f&quot;{value:.1f}%&quot;
+
+def display_values(
+    values: list[float],
+    formatter: Callable[[float], str],
+) -&gt; None:
+    for v in values:
+        print(formatter(v))
+
+display_values([1000, 2500, 50000], currency_format)
+# $1,000.00
+# $2,500.00
+# $50,000.00
+
+display_values([0.95, 0.87, 0.12], percent_format)
+# 0.9%
+# 0.9%
+# 0.1%
+</code></pre>
+<p><strong>Step 4: Dictionaries and TypedDict Instead of Config Classes</strong></p>
+<pre><code class="language-python"># Unnecessary class — just holding data
+class Config:
+    def __init__(self, host: str, port: int, debug: bool) -&gt; None:
+        self.host = host
+        self.port = port
+        self.debug = debug
+
+# Better 1: TypedDict (structured dictionary)
+from typing import TypedDict
+
+class Config(TypedDict):
+    host: str
+    port: int
+    debug: bool
+
+config: Config = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: 8080, &quot;debug&quot;: True}
+print(config[&quot;host&quot;])  # localhost
+
+# Better 2: a plain dict is enough for simple config
+config = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: 8080, &quot;debug&quot;: True}
+</code></pre>
+<p><strong>Step 5: Functional Pipelines</strong></p>
+<pre><code class="language-python">from functools import reduce
+
+# Data transformation — function chaining without classes
+def load_data() -&gt; list[dict]:
+    return [
+        {&quot;name&quot;: &quot;  Alice  &quot;, &quot;score&quot;: 85},
+        {&quot;name&quot;: &quot;  Bob  &quot;, &quot;score&quot;: 92},
+        {&quot;name&quot;: &quot;  Charlie  &quot;, &quot;score&quot;: 78},
+        {&quot;name&quot;: &quot;  Diana  &quot;, &quot;score&quot;: 95},
+    ]
+
+def clean_names(data: list[dict]) -&gt; list[dict]:
+    return [{**d, &quot;name&quot;: d[&quot;name&quot;].strip()} for d in data]
+
+def filter_passing(data: list[dict], threshold: int = 80) -&gt; list[dict]:
+    return [d for d in data if d[&quot;score&quot;] &gt;= threshold]
+
+def sort_by_score(data: list[dict]) -&gt; list[dict]:
+    return sorted(data, key=lambda d: d[&quot;score&quot;], reverse=True)
+
+def format_results(data: list[dict]) -&gt; list[str]:
+    return [f&quot;{d['name']}: {d['score']} points&quot; for d in data]
+
+# Run the pipeline
+result = format_results(sort_by_score(filter_passing(clean_names(load_data()))))
+for line in result:
+    print(line)
+# Diana: 95 points
+# Bob: 92 points
+# Alice: 85 points
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Stateless utility functions are cleaner as module-level functions than as static methods in a class</li>
+<li><code>dataclass</code> and <code>NamedTuple</code> eliminate boilerplate for data-centric types</li>
+<li>Simple strategy patterns can be replaced with <code>Callable</code> — no class hierarchy needed</li>
+<li>Data transformation pipelines are a natural fit for function chaining</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Wrapping everything in classes</strong><br>
+- Why It Is a Problem: Adds unnecessary complexity<br>
+- Fix: Check whether a plain function is sufficient first</p>
+<p><strong>Class with only one method</strong><br>
+- Why It Is a Problem: A function is clearer<br>
+- Fix: Convert to a function</p>
+<p><strong>Class with only static methods</strong><br>
+- Why It Is a Problem: Namespace abuse<br>
+- Fix: Use module-level functions instead</p>
+<p><strong>Using a plain class when dataclass fits</strong><br>
+- Why It Is a Problem: Too much boilerplate<br>
+- Fix: Use the <code>@dataclass</code> decorator</p>
+<p><strong>Forcing OOP when functional fits better</strong><br>
+- Why It Is a Problem: Verbose, hard to follow<br>
+- Fix: Embrace Python's multi-paradigm nature</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>CLI scripts are typically written with functions only</li>
+<li>Data analysis pipelines (pandas) use function chaining</li>
+<li>API response models use <code>dataclass</code> or Pydantic <code>BaseModel</code></li>
+<li>Configuration management uses <code>TypedDict</code> or environment-variable dicts</li>
+<li>Test utilities are written as module-level functions</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Python's greatest strength is its multi-paradigm nature. Combining functions, classes, and modules to fit the situation is what makes code Pythonic. The answer to "should I make this a class?" is "do state and behavior change together?"</p>
+<p>In practice, the most pragmatic approach is to start with functions and upgrade to classes only when state management becomes necessary. Knowing when not to create a class is itself a design skill.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can identify situations where a class is unnecessary</li>
+<li>[ ] I know which patterns are better served by functions</li>
+<li>[ ] I can use <code>dataclass</code> and <code>NamedTuple</code> appropriately</li>
+<li>[ ] I can replace simple strategy patterns with higher-order functions</li>
+<li>[ ] I can mix OOP and functional styles in a single codebase</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Refactor a <code>MathHelper</code> class with three methods into module-level functions.</li>
+<li>Convert a <code>Student</code> class to a <code>dataclass</code> and write sorting and filtering functions.</li>
+<li>Build a pipeline that reads a CSV, transforms the data, and outputs JSON using function chaining.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Object-oriented programming is a powerful tool, but it is not the right fit for every problem. Leveraging Python's multi-paradigm nature to choose the right tool for each situation is what makes code truly good. Encapsulation, inheritance, polymorphism, abstraction, composition, and SOLID — the concepts covered throughout this series — are now part of your design toolkit.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
+<li><strong>When to Avoid OOP (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=o9pEzgHorH0">Stop Writing Classes — PyCon Talk by Jack Diederich</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">Python Official Docs — dataclasses</a></li>
+<li><a href="https://realpython.com/python3-object-oriented-programming/">Real Python — When to Use Classes in Python</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 6: Design Patterns with First-Class Functions</a></li>
+</ul>
+<p class="tags-line">Tags: Python, OOP, Functional Programming, dataclass, Design Decisions</p>
+</body>
+</html>

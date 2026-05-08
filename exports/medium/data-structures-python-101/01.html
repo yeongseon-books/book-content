@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Are Data Structures?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Are Data Structures?</h1>
+<blockquote>
+<p>Data Structures with Python 101 Series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: If you can store data in a variable, why bother learning data structures?</p>
+<blockquote>
+<p>When data grows, a single variable is not enough. The structure you choose determines whether a search takes 0.001 seconds or 10 seconds. This article explains what data structures are, why they matter, and which ones Python provides out of the box.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and role of data structures</li>
+<li>How data structure choices affect performance</li>
+<li>Built-in data structures in Python and their characteristics</li>
+<li>A roadmap of data structures covered in this series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A program takes data in, processes it, and produces output. How you store that data determines whether a task finishes in milliseconds or seconds. Data structures are the key to that difference.</p>
+<blockquote>
+<p>A data structure is a way to organize data for efficient access and modification. Choosing the right one makes code simpler and faster.</p>
+</blockquote>
+<p>Data structure questions are a staple of coding interviews for good reason. Understanding data structures broadens how you see problems and helps you design optimal solutions.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>Data Structure = a method for organizing data so it can be accessed and modified efficiently</p>
+</blockquote>
+<pre><code>[single variable]    →  stores 1 value
+[list]               →  stores N values in order
+[dict]               →  stores N key-value pairs (O(1) lookup)
+[tree]               →  represents hierarchies (O(log n) search)
+[graph]              →  represents networks of relationships
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>Data Structure</strong><br>
+- Description: A way of organizing data that determines the efficiency of insert, delete, and search operations</p>
+<p><strong>Time Complexity</strong><br>
+- Description: Describes how long an operation takes relative to the size of the data</p>
+<p><strong>Space Complexity</strong><br>
+- Description: Describes how much memory a data structure uses</p>
+<p><strong>Abstract Data Type (ADT)</strong><br>
+- Description: Defines only the operations, hiding the implementation details</p>
+<p><strong>Built-in Data Structures</strong><br>
+- Description: Structures Python provides by default: list, dict, set, tuple, etc.</p>
+<h2>Before / After</h2>
+<p>Compare the difference between not knowing and knowing data structures.</p>
+<pre><code class="language-python"># before: searching in a list — O(n)
+users = [&quot;alice&quot;, &quot;bob&quot;, &quot;charlie&quot;, &quot;diana&quot;]
+if &quot;charlie&quot; in users:
+    print(&quot;found&quot;)
+</code></pre>
+<pre><code class="language-python"># after: searching in a set — O(1)
+users = {&quot;alice&quot;, &quot;bob&quot;, &quot;charlie&quot;, &quot;diana&quot;}
+if &quot;charlie&quot; in users:
+    print(&quot;found&quot;)
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: Compare search speed between list and set</strong></p>
+<pre><code class="language-python">import time
+
+data_list = list(range(1_000_000))
+data_set = set(range(1_000_000))
+
+target = 999_999
+
+start = time.perf_counter()
+_ = target in data_list
+list_time = time.perf_counter() - start
+
+start = time.perf_counter()
+_ = target in data_set
+set_time = time.perf_counter() - start
+
+print(f&quot;list search: {list_time:.6f}s&quot;)
+print(f&quot;set  search: {set_time:.6f}s&quot;)
+print(f&quot;set is {list_time / set_time:.0f}x faster&quot;)
+</code></pre>
+<p><strong>Step 2: Verify O(1) key-value lookup with dict</strong></p>
+<pre><code class="language-python">scores = {&quot;alice&quot;: 95, &quot;bob&quot;: 82, &quot;charlie&quot;: 90}
+print(scores[&quot;bob&quot;])          # 82 — O(1) access
+print(scores.get(&quot;diana&quot;, 0)) # 0 — default when key is missing
+</code></pre>
+<p><strong>Step 3: Represent immutable data with tuple</strong></p>
+<pre><code class="language-python">point = (3, 4)
+# point[0] = 5  # TypeError — tuples are immutable
+print(f&quot;x={point[0]}, y={point[1]}&quot;)
+</code></pre>
+<p><strong>Step 4: Use a list as a stack</strong></p>
+<pre><code class="language-python">stack = []
+stack.append(&quot;a&quot;)
+stack.append(&quot;b&quot;)
+stack.append(&quot;c&quot;)
+print(stack.pop())  # &quot;c&quot; — last in, first out
+print(stack.pop())  # &quot;b&quot;
+</code></pre>
+<p><strong>Step 5: Explore the collections module</strong></p>
+<pre><code class="language-python">from collections import deque, Counter, defaultdict
+
+# deque: O(1) insert/delete at both ends
+dq = deque([1, 2, 3])
+dq.appendleft(0)
+print(list(dq))  # [0, 1, 2, 3]
+
+# Counter: frequency counting
+counter = Counter(&quot;abracadabra&quot;)
+print(counter.most_common(3))  # [('a', 5), ('b', 2), ('r', 2)]
+
+# defaultdict: dict with default values
+dd = defaultdict(list)
+dd[&quot;fruits&quot;].append(&quot;apple&quot;)
+print(dd)  # defaultdict(&lt;class 'list'&gt;, {'fruits': ['apple']})
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <code>in</code> operator on a list is O(n), but on a set it is O(1)</li>
+<li>dict retrieves values by key in O(1), making it ideal for frequent lookups</li>
+<li>Tuples are immutable and can be used as dict keys or set elements</li>
+<li>The collections module provides specialized data structures for common patterns</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Using list everywhere</strong><br>
+- Why It Is a Problem: Search is O(n), slow on large data<br>
+- Fix: Use set or dict when lookups are frequent</p>
+<p><strong>Using a list as a dict key</strong><br>
+- Why It Is a Problem: Lists are mutable and unhashable<br>
+- Fix: Convert to tuple first</p>
+<p><strong>Ignoring data structure size</strong><br>
+- Why It Is a Problem: Can cause memory exhaustion<br>
+- Fix: Choose a structure that fits the data scale</p>
+<p><strong>Relying on insertion order with set</strong><br>
+- Why It Is a Problem: Sets do not guarantee order<br>
+- Fix: Use list or OrderedDict when order matters</p>
+<p><strong>Ignoring time complexity during implementation</strong><br>
+- Why It Is a Problem: Works on small data but fails at scale<br>
+- Fix: Check operation complexity before choosing a structure</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Cache systems use dict for O(1) lookups</li>
+<li>Deduplication uses set to keep only unique values</li>
+<li>Task queues use deque for FIFO processing</li>
+<li>Configuration values are stored in tuples to prevent accidental modification</li>
+<li>Log analysis uses Counter for frequency aggregation</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>Experienced engineers ask "what structure should hold this data?" before writing code. The data structure choice determines the performance and readability of the entire architecture.</p>
+<p>In practice, Python's built-in data structures handle most problems. The key is understanding the characteristics of list, dict, set, and tuple, and choosing the right one for the situation.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can explain the definition and role of data structures</li>
+<li>[ ] Can describe the differences between list, dict, set, and tuple</li>
+<li>[ ] Can explain why set is faster than list for lookups</li>
+<li>[ ] Can use deque, Counter, and defaultdict from the collections module</li>
+<li>[ ] Understands time complexity and can apply it to data structure selection</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write code that searches for a value in a list of 1 million integers and in a set. Compare the execution times.</li>
+<li>Write a function that removes duplicates from a list of strings while preserving the original order. (Hint: use dict.fromkeys)</li>
+<li>Store student name-score data in a dict and print it sorted by score in descending order.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>Data structures are a fundamental concept for storing and accessing data efficiently. Python provides powerful built-in structures like list, dict, set, and tuple. The next article takes a deep dive into the most basic of these: arrays and lists.</p>
+<ul>
+<li><strong>What Are Data Structures? (current)</strong></li>
+<li>Arrays and Lists (upcoming)</li>
+<li>Stacks and Queues (upcoming)</li>
+<li>Hash Tables and dict (upcoming)</li>
+<li>Linked Lists (upcoming)</li>
+<li>Trees and Binary Trees (upcoming)</li>
+<li>Heaps and Priority Queues (upcoming)</li>
+<li>Graph Representations (upcoming)</li>
+<li>Sets and Set Operations (upcoming)</li>
+<li>Choosing the Right Data Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html">Python Official Docs — Data Structures</a></li>
+<li><a href="https://runestone.academy/ns/books/published/pythonds3/index.html">Problem Solving with Algorithms and Data Structures using Python</a></li>
+<li><a href="https://realpython.com/python-data-structures/">Real Python — Common Python Data Structures</a></li>
+<li><a href="https://www.bigocheatsheet.com/">Big-O Cheat Sheet</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Data Structures, Algorithms, Programming Basics, Time Complexity</p>
+</body>
+</html>

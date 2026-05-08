@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>map, filter, reduce</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>map, filter, reduce</h1>
+<blockquote>
+<p>Functional Programming 101 Series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key Question</strong>: How do you transform, filter, and aggregate collections without writing explicit loops?</p>
+<blockquote>
+<p><code>map</code>, <code>filter</code>, and <code>reduce</code> are the three core operations of functional programming. They hide loop details and enable declarative data processing that focuses on "what" rather than "how." This article covers each function's mechanics, Python usage, and comparison with list comprehensions.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How map, filter, and reduce work</li>
+<li>List comprehensions vs map/filter comparison</li>
+<li>Implementing complex aggregations with reduce</li>
+<li>Combining with itertools for efficient processing</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most data processing falls into three patterns: "transform (map)", "select (filter)", and "aggregate (reduce)." Mastering these three lets you express most iteration logic concisely.</p>
+<blockquote>
+<p>map + filter + reduce = the fundamental data processing toolkit</p>
+</blockquote>
+<p>In Python, list comprehensions often replace map/filter, but understanding the principles helps you choose the right tool for each situation.</p>
+<h2>Concept Overview</h2>
+<blockquote>
+<p>The Role of Each Operation</p>
+</blockquote>
+<pre><code>Input list    [1, 2, 3, 4, 5]
+              |
+map(f)        [f(1), f(2), f(3), f(4), f(5)]    -&gt; transform
+filter(p)     [x for x if p(x)]                  -&gt; select
+reduce(g)     g(g(g(g(x1, x2), x3), x4), x5)    -&gt; aggregate
+</code></pre>
+<h2>Key Concepts</h2>
+<p><strong>map</strong><br>
+- Description: Applies a function to each element, producing a new sequence</p>
+<p><strong>filter</strong><br>
+- Description: Selects only elements that satisfy a condition</p>
+<p><strong>reduce</strong><br>
+- Description: Aggregates a sequence into a single value</p>
+<p><strong>List comprehension</strong><br>
+- Description: Python's declarative list creation syntax</p>
+<p><strong>Lazy evaluation</strong><br>
+- Description: map/filter return iterators that compute values only when needed</p>
+<h2>Before / After</h2>
+<p>Convert imperative iteration to declarative style.</p>
+<pre><code class="language-python"># before: imperative loop
+prices = [1200, 3400, 5600, 7800, 2300]
+discounted = []
+for p in prices:
+    if p &gt;= 3000:
+        discounted.append(int(p * 0.9))
+print(discounted)  # [3060, 5040, 7020]
+</code></pre>
+<pre><code class="language-python"># after: map + filter composition
+prices = [1200, 3400, 5600, 7800, 2300]
+discounted = list(map(
+    lambda p: int(p * 0.9),
+    filter(lambda p: p &gt;= 3000, prices),
+))
+print(discounted)  # [3060, 5040, 7020]
+</code></pre>
+<h2>Hands-On Steps</h2>
+<p><strong>Step 1: map — Transform</strong></p>
+<pre><code class="language-python"># basic usage
+numbers = [1, 2, 3, 4, 5]
+squares = list(map(lambda x: x ** 2, numbers))
+print(squares)  # [1, 4, 9, 16, 25]
+
+# with a named function
+def celsius_to_fahrenheit(c: float) -&gt; float:
+    return c * 9 / 5 + 32
+
+temps_c = [0, 20, 37, 100]
+temps_f = list(map(celsius_to_fahrenheit, temps_c))
+print(temps_f)  # [32.0, 68.0, 98.6, 212.0]
+
+# applying to multiple sequences simultaneously
+a = [1, 2, 3]
+b = [10, 20, 30]
+sums = list(map(lambda x, y: x + y, a, b))
+print(sums)  # [11, 22, 33]
+
+# list comprehension alternative
+squares_comp = [x ** 2 for x in numbers]
+print(squares_comp)  # [1, 4, 9, 16, 25]
+</code></pre>
+<p><strong>Step 2: filter — Select</strong></p>
+<pre><code class="language-python"># basic usage
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+evens = list(filter(lambda x: x % 2 == 0, numbers))
+print(evens)  # [2, 4, 6, 8, 10]
+
+# with a named function
+def is_positive(x: float) -&gt; bool:
+    return x &gt; 0
+
+values = [-3, -1, 0, 2, 5, -4, 8]
+positives = list(filter(is_positive, values))
+print(positives)  # [2, 5, 8]
+
+# None removes falsy values
+mixed = [0, &quot;&quot;, &quot;hello&quot;, None, 42, [], &quot;world&quot;]
+truthy = list(filter(None, mixed))
+print(truthy)  # ['hello', 42, 'world']
+
+# list comprehension alternative
+evens_comp = [x for x in numbers if x % 2 == 0]
+print(evens_comp)  # [2, 4, 6, 8, 10]
+</code></pre>
+<p><strong>Step 3: reduce — Aggregate</strong></p>
+<pre><code class="language-python">from functools import reduce
+
+# sum
+numbers = [1, 2, 3, 4, 5]
+total = reduce(lambda acc, x: acc + x, numbers)
+print(total)  # 15
+
+# with initial value
+total_with_init = reduce(lambda acc, x: acc + x, numbers, 100)
+print(total_with_init)  # 115
+
+# maximum (reduce approach)
+maximum = reduce(lambda a, b: a if a &gt; b else b, numbers)
+print(maximum)  # 5
+
+# flatten nested lists
+nested = [[1, 2], [3, 4], [5, 6]]
+flat = reduce(lambda acc, lst: acc + lst, nested, [])
+print(flat)  # [1, 2, 3, 4, 5, 6]
+
+# word frequency count
+words = [&quot;apple&quot;, &quot;banana&quot;, &quot;apple&quot;, &quot;cherry&quot;, &quot;banana&quot;, &quot;apple&quot;]
+freq = reduce(
+    lambda acc, w: {**acc, w: acc.get(w, 0) + 1},
+    words,
+    {},
+)
+print(freq)  # {'apple': 3, 'banana': 2, 'cherry': 1}
+</code></pre>
+<p><strong>Step 4: Comprehensions vs map/filter</strong></p>
+<pre><code class="language-python"># simple case: comprehensions are more Pythonic
+numbers = [1, 2, 3, 4, 5]
+
+# map + filter
+result1 = list(map(lambda x: x ** 2, filter(lambda x: x % 2 == 0, numbers)))
+
+# comprehension — more readable
+result2 = [x ** 2 for x in numbers if x % 2 == 0]
+
+print(result1)  # [4, 16]
+print(result2)  # [4, 16]
+
+# when map is better: applying an existing function
+names = [&quot;alice&quot;, &quot;bob&quot;, &quot;charlie&quot;]
+
+# map + existing method
+upper1 = list(map(str.upper, names))
+
+# comprehension
+upper2 = [n.upper() for n in names]
+
+print(upper1)  # ['ALICE', 'BOB', 'CHARLIE']
+print(upper2)  # ['ALICE', 'BOB', 'CHARLIE']
+# map is slightly more concise
+</code></pre>
+<p><strong>Step 5: Combined Usage — Real-World Data Processing</strong></p>
+<pre><code class="language-python">from functools import reduce
+
+# order data processing
+orders = [
+    {&quot;product&quot;: &quot;Coffee&quot;, &quot;quantity&quot;: 2, &quot;price&quot;: 4500},
+    {&quot;product&quot;: &quot;Cake&quot;, &quot;quantity&quot;: 1, &quot;price&quot;: 6000},
+    {&quot;product&quot;: &quot;Juice&quot;, &quot;quantity&quot;: 3, &quot;price&quot;: 3000},
+    {&quot;product&quot;: &quot;Cookie&quot;, &quot;quantity&quot;: 5, &quot;price&quot;: 1500},
+    {&quot;product&quot;: &quot;Sandwich&quot;, &quot;quantity&quot;: 1, &quot;price&quot;: 5500},
+]
+
+# 1. calculate totals (map)
+with_total = list(map(
+    lambda o: {**o, &quot;total&quot;: o[&quot;quantity&quot;] * o[&quot;price&quot;]},
+    orders,
+))
+
+# 2. filter orders &gt;= $50 (filter)
+expensive = list(filter(lambda o: o[&quot;total&quot;] &gt;= 5000, with_total))
+
+# 3. calculate grand total (reduce)
+grand_total = reduce(lambda acc, o: acc + o[&quot;total&quot;], expensive, 0)
+
+for o in expensive:
+    print(f&quot;  {o['product']}: ${o['total']:,}&quot;)
+print(f&quot;Grand total: ${grand_total:,}&quot;)
+# Coffee: $9,000
+# Cake: $6,000
+# Juice: $9,000
+# Cookie: $7,500
+# Sandwich: $5,500
+# Grand total: $37,000
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>map</code> and <code>filter</code> return iterators, so they are lazily evaluated</li>
+<li>For simple cases, list comprehensions are more Pythonic than map/filter</li>
+<li>Always provide an initial value to <code>reduce</code> for safety</li>
+<li>Combining the three operations expresses complex data processing declaratively</li>
+</ul>
+<h2>5 Common Mistakes</h2>
+<p><strong>Omitting the initial value in reduce</strong><br>
+- Why It Is a Problem: TypeError on empty sequences<br>
+- Fix: Always provide an initial value</p>
+<p><strong>Iterating over a map result multiple times</strong><br>
+- Why It Is a Problem: An iterator can only be consumed once<br>
+- Fix: Convert to <code>list()</code> or recreate</p>
+<p><strong>Nesting map/filter deeply</strong><br>
+- Why It Is a Problem: Readability drops sharply<br>
+- Fix: Use comprehensions or intermediate variables</p>
+<p><strong>Using reduce for everything</strong><br>
+- Why It Is a Problem: Complex reduce is hard to understand<br>
+- Fix: Use built-in functions like <code>sum()</code>, <code>max()</code></p>
+<p><strong>Lambda with side effects in map/filter</strong><br>
+- Why It Is a Problem: Functions in map/filter should be pure<br>
+- Fix: Handle side effects in a for loop</p>
+<h2>Real-World Applications</h2>
+<ul>
+<li>Transform schemas with map in data pipelines</li>
+<li>Filter out failed validation items with filter</li>
+<li>Generate summary reports with reduce</li>
+<li>pandas <code>apply()</code> and <code>query()</code> follow the same concepts</li>
+<li>Process large data lazily with generator expressions</li>
+</ul>
+<h2>How Senior Engineers Think About This</h2>
+<p>In Python, list comprehensions are more idiomatic than map/filter. But knowing the concepts of map/filter/reduce is crucial because pandas, PySpark, and SQL all follow the same patterns.</p>
+<p><code>reduce</code> was moved to <code>functools</code> precisely because it is easy to overuse. If a built-in function like <code>sum()</code>, <code>max()</code>, <code>min()</code>, <code>any()</code>, or <code>all()</code> exists for the job, using it is clearer.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can demonstrate the difference between map, filter, and reduce with code</li>
+<li>[ ] I know when to choose list comprehensions over map/filter</li>
+<li>[ ] I can use reduce safely with an initial value</li>
+<li>[ ] I can compose the three operations into a data pipeline</li>
+<li>[ ] I understand that map/filter return iterators</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>From a list of student dicts, use map to extract names and filter for scores above 90.</li>
+<li>Use reduce to join a list of strings into a single CSV string.</li>
+<li>Implement the same task both ways — map/filter/reduce and list comprehensions — and compare.</li>
+</ol>
+<h2>Summary and Next Steps</h2>
+<p>map, filter, and reduce are the fundamental tools of functional data processing. In Python, list comprehensions replace many cases, but understanding the principles enables broader tool selection. The next article covers <strong>closures and partial application</strong> — functions that remember external variables.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
+<li><strong>map, filter, reduce (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/functions.html">Python Official Docs — Built-in Functions (map, filter)</a></li>
+<li><a href="https://docs.python.org/3/library/functools.html#functools.reduce">Python Official Docs — functools.reduce</a></li>
+<li><a href="https://realpython.com/python-map-function/">Real Python — map, filter, reduce</a></li>
+<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 7: Functions as First-Class Objects</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Functional Programming, map, filter, reduce</p>
+</body>
+</html>

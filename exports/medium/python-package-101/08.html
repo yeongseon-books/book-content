@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type Hints and Static Analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Type Hints and Static Analysis</h1>
+<blockquote>
+<p>Python Package 101 series (8/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Why are type hints needed and do they affect runtime?</li>
+<li>What kinds of errors does <code>mypy</code> catch?</li>
+<li>Why is the <code>py.typed</code> marker file needed?</li>
+<li>How do you use generic types and Union types?</li>
+</ul>
+<blockquote>
+<p>Type hints declare the input and output types of functions, and mypy catches type errors without running the code.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What you will learn</h2>
+<ul>
+<li>How to add type hints to functions, variables, and return values</li>
+<li>How to run static type checking with <code>mypy</code></li>
+<li>How to make a package type-safe with the <code>py.typed</code> marker</li>
+<li>Advanced types: generics, Union, Optional</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Python is dynamically typed, but as projects grow, it becomes hard to tell "what should I pass to this function?" just by reading code. Type hints let IDEs autocomplete and let mypy catch errors before execution.</p>
+<blockquote>
+<p>A function returns a dict but you do not know which keys it has. The caller writes <code>result["username"]</code> but the actual key is <code>result["user_name"]</code>. A runtime KeyError hits production.</p>
+</blockquote>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Type hints are labels on a shipping box. If a box says "fragile," the courier (mypy) handles it carefully. Without a label, breakage goes unnoticed.</p>
+</blockquote>
+<pre><code class="language-text">def greet(name: str) -&gt; str:
+         ↑ input label    ↑ output label
+
+mypy checks:
+  greet(42)    # Error: expected str, got int
+  x: int = greet(&quot;Alice&quot;)  # Error: str assigned to int
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>type hint</strong><br>
+- Description: Type annotation on variables/arguments/return values<br>
+- Example: <code>name: str</code></p>
+<p><strong>mypy</strong><br>
+- Description: Python static type checker<br>
+- Example: <code>mypy src/</code></p>
+<p><strong>py.typed</strong><br>
+- Description: Marker file indicating a package includes type hints<br>
+- Example: empty file</p>
+<p><strong>Generic</strong><br>
+- Description: Type parameterized by another type<br>
+- Example: <code>list[str]</code>, <code>dict[str, int]</code></p>
+<p><strong>Union</strong><br>
+- Description: One of several types<br>
+- Example: `str \</p>
+<h2>Before / After</h2>
+<p><strong>Before (no type hints)</strong></p>
+<pre><code class="language-python">def process(data):
+    # What is data? dict? list? str?
+    return data[&quot;name&quot;]  # possible KeyError
+
+result = process({&quot;username&quot;: &quot;alice&quot;})  # runtime error
+</code></pre>
+<p><strong>After (type hints + mypy)</strong></p>
+<pre><code class="language-python">from typing import TypedDict
+
+class UserData(TypedDict):
+    name: str
+    age: int
+
+def process(data: UserData) -&gt; str:
+    return data[&quot;name&quot;]
+
+result = process({&quot;username&quot;: &quot;alice&quot;})  # mypy catches this before runtime
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Basic type hints</strong></p>
+<pre><code class="language-python"># src/mylib/core.py
+def greet(name: str) -&gt; str:
+    return f&quot;Hello, {name}!&quot;
+
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+def find_user(user_id: int) -&gt; dict[str, str] | None:
+    users = {1: {&quot;name&quot;: &quot;Alice&quot;}, 2: {&quot;name&quot;: &quot;Bob&quot;}}
+    return users.get(user_id)
+</code></pre>
+<p><strong>Step 2. Install and run mypy</strong></p>
+<pre><code class="language-bash">pip install mypy
+mypy src/
+# Success: no issues found in 2 source files
+</code></pre>
+<pre><code class="language-python"># Add an intentional error
+result: int = greet(&quot;Alice&quot;)  # assigning str to int
+</code></pre>
+<pre><code class="language-bash">mypy src/
+# error: Incompatible types in assignment
+#   (expression has type &quot;str&quot;, variable has type &quot;int&quot;)
+</code></pre>
+<p><strong>Step 3. Configure mypy in pyproject.toml</strong></p>
+<pre><code class="language-toml">[tool.mypy]
+python_version = &quot;3.11&quot;
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+</code></pre>
+<pre><code class="language-bash">mypy src/
+</code></pre>
+<p><strong>Step 4. Add the py.typed marker</strong></p>
+<pre><code class="language-bash">touch src/mylib/py.typed
+</code></pre>
+<pre><code class="language-toml"># Include in pyproject.toml
+[tool.setuptools.package-data]
+mylib = [&quot;py.typed&quot;]
+</code></pre>
+<p><strong>Step 5. Advanced type usage</strong></p>
+<pre><code class="language-python"># src/mylib/utils.py
+from typing import TypeVar, Callable
+
+T = TypeVar(&quot;T&quot;)
+
+def retry(func: Callable[..., T], attempts: int = 3) -&gt; T | None:
+    &quot;&quot;&quot;Retry a function up to N times.&quot;&quot;&quot;
+    for i in range(attempts):
+        try:
+            return func()
+        except Exception:
+            if i == attempts - 1:
+                return None
+    return None
+
+# Usage
+def fetch_data() -&gt; dict[str, str]:
+    return {&quot;key&quot;: &quot;value&quot;}
+
+result = retry(fetch_data)  # mypy: dict[str, str] | None
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>Type hints have no runtime effect. They exist purely for tools like mypy and IDEs</li>
+<li>When <code>py.typed</code> is present, projects that depend on your package also get mypy checking</li>
+<li><code>strict = true</code> enables the strictest checking mode, ideal for new projects</li>
+<li>Python 3.10+ allows <code>X | None</code> as a replacement for <code>Optional[X]</code></li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Overusing Any</strong></p>
+<pre><code class="language-python">from typing import Any
+def process(data: Any) -&gt; Any:  # type hints become meaningless
+    ...
+</code></pre>
+<p>Use specific types. Even <code>dict[str, Any]</code> is better than bare <code>Any</code>.</p>
+<p><strong>Mistake 2. Not including py.typed in the build</strong></p>
+<p>Creating <code>py.typed</code> but not adding it to <code>[tool.setuptools.package-data]</code> means it will not be in the wheel.</p>
+<p><strong>Mistake 3. Applying strict mode to an existing codebase at once</strong></p>
+<p>You will get thousands of errors. For existing code, enable flags like <code>--disallow-untyped-defs</code> incrementally.</p>
+<p><strong>Mistake 4. Assuming type hints enforce types at runtime</strong></p>
+<pre><code class="language-python">def greet(name: str) -&gt; str: ...
+greet(42)  # runs fine at runtime! mypy catches it, not Python
+</code></pre>
+<p>For runtime validation, use <code>isinstance</code> or <code>pydantic</code>.</p>
+<p><strong>Mistake 5. Not installing type stubs for third-party libraries</strong></p>
+<pre><code class="language-bash">pip install types-requests  # type stubs for requests
+mypy src/  # resolves import type errors for requests
+</code></pre>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>CI gate</strong>: Add <code>mypy --strict src/</code> to CI to block PRs with type errors</li>
+<li><strong>IDE support</strong>: VSCode Pylance reads type hints for autocomplete and error highlighting</li>
+<li><strong>API docs</strong>: Auto-generate API documentation from type hints (Sphinx autodoc)</li>
+<li><strong>Refactoring safety net</strong>: Changing a function signature flags all call sites, preventing missed updates</li>
+<li><strong>Pydantic integration</strong>: Define data models with type hints and get runtime validation</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>Type hints are "documentation for your future self and your team." When you see <code>data: dict[str, list[int]]</code>, you understand the structure without reading a docstring.</p>
+<p>For new projects, start with <code>strict = true</code> from day one. For existing projects, add types to new files first and expand incrementally. "All or nothing" is unrealistic — "gradual adoption" is the practical strategy.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can add type hints to function arguments and return values</li>
+<li>[ ] You can check for type errors with <code>mypy</code></li>
+<li>[ ] You understand the role of <code>py.typed</code> and can include it in your package</li>
+<li>[ ] You can use Generic, Union, and Optional types appropriately</li>
+<li>[ ] You can configure mypy settings in pyproject.toml</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Add type hints to all functions in the CLI package from the previous post and pass <code>mypy --strict src/</code>.</li>
+<li>Define a user info structure with <code>TypedDict</code> and verify that mypy catches incorrect key access.</li>
+<li>Add <code>py.typed</code>, build a wheel, and confirm that <code>py.typed</code> is included inside the wheel.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>Type hints declare input and output types so tools can catch errors before execution.</li>
+<li><code>mypy</code> is a static analyzer that checks types without running the code.</li>
+<li>The <code>py.typed</code> marker lets consumers of your package benefit from type checking too.</li>
+<li>Start with <code>strict = true</code> for new projects; adopt incrementally for existing ones.</li>
+<li>Overusing <code>Any</code> defeats the purpose of type hints.</li>
+</ul>
+<p>The next post covers <strong>documentation</strong> — README, MkDocs, and API Reference.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/03-dependency-management.md">Dependency Management — venv, pip, uv, requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/04-building-packages.md">Building Packages — wheel and sdist</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/05-publishing-to-pypi.md">Publishing to PyPI — from TestPyPI to production</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/06-versioning-and-releases.md">Versioning and Releases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/07-cli-packages.md">CLI Packages</a></li>
+<li><strong>Type Hints and Static Analysis (current)</strong></li>
+<li>Documentation — README, MkDocs, API Reference (upcoming)</li>
+<li>Production Package Template (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mypy.readthedocs.io/">mypy documentation</a></li>
+<li><a href="https://peps.python.org/pep-0484/">PEP 484 - Type Hints</a></li>
+<li><a href="https://peps.python.org/pep-0561/">PEP 561 - Distributing and Packaging Type Information</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html">Python typing documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Type Hints, mypy, py.typed, Static Analysis, Typing</p>
+</body>
+</html>
